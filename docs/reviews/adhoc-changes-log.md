@@ -72,8 +72,8 @@ reviews, and conversations.
 
 ### AH-102 · Push notifications for the creator app (Creator App arc)
 
-- **Status:** **In progress — Checkpoint A (Stages 0–2, backend) landed locally; pushes HELD, awaiting
-  clearance.** Stages 3–5 (matrix column, the app's push module and Android, then iOS as **AH-102-ios**) are not
+- **Status:** **In progress — Checkpoint A (Stages 0–2, backend) gated, with the R2 rider and the full Playwright run
+  done; pushed.** Stages 3–5 (matrix column, the app's push module and Android, then iOS as **AH-102-ios**) are not
   started. Plan: [`push-notifications-plan.md`](push-notifications-plan.md); inventory:
   [`push-notifications-inventory.md`](push-notifications-inventory.md); review (draft):
   [`push-notifications-review.md`](push-notifications-review.md).
@@ -96,7 +96,7 @@ reviews, and conversations.
     throttle for message types; one push when a draft approval also completes the assignment (the AH-069 mirror).
   - **Flag** `push_notifications_enabled`, default OFF, gates **sending only**.
   - **`push:test`** operator command (credential smoke test and device-proof trigger; one user, one fixed message).
-- **Commits (local, not pushed):**
+- **Commits (pushed at Checkpoint A clearance; not deployed):**
 
   | Commit | SHA        | What                                                                     |
   | ------ | ---------- | ------------------------------------------------------------------------ |
@@ -123,7 +123,7 @@ reviews, and conversations.
   the **FCM credential read** ("set and decodes to valid JSON"), then `push:test --validate-only`. **No flag armed.**
   See [`deploy-log.md`](../runbooks/deploy-log.md).
 - **Not proven yet:** anything on a device; the live FCM error vocabulary (taxonomy is from Google's docs);
-  Playwright (the dev stack on :8000/:5173 must be stopped).
+  device behaviour is Stage 4.
 
 ### AH-101 · Notification preference matrix, post-verified notice and the third creator-app UI batch (Creator App arc)
 

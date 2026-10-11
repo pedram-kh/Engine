@@ -56,15 +56,15 @@ happened.
 
 ## AH-102 (Checkpoint A, backend) — push notifications: token table, FCM sender, dispatcher — PENDING
 
-> **Stacks on AH-101 and everything under it (AH-099 … AH-101, all PENDING).** Local commits only — **not pushed,
-> not deployed**; deploy timing is Pedram's call. This entry covers **backend only** (Stages 0–2). The matrix
+> **Stacks on AH-101 and everything under it (AH-099 … AH-101, all PENDING).** Pushed at Checkpoint A clearance, **not
+> deployed**; deploy timing is Pedram's call. This entry covers **backend only** (Stages 0–2). The matrix
 > column, the app's push module and the Android build (Stages 3–4), and iOS (**AH-102-ios**) come later and get
 > their own entries.
 
-- **Status:** PENDING (not pushed)
+- **Status:** PENDING (pushed, not deployed)
 - **Range:** base `4d468406` (`origin/main` at plan time, pushed, not deployed) → tip **TBD at push** (the commits are
   `faf96d4d`, `1f7d2de0`, `93b7d767`, `ff0a4112`, `2f3d62eb`, `37d482d9`, `6ff737d9`, `238fa85b`, `cdfa13e6`,
-  `68ffb21c`, `72204f1d`, `a8423726`, plus the docs commits). The deploy range also carries the undeployed
+  `68ffb21c`, `72204f1d`, `a8423726`, `8c7d3318` [R2 rider: a dev-server-only Vite config change in `apps/main`], plus the docs commits). The deploy range also carries the undeployed
   AH-099 … AH-101 chain.
 - **AH entries carried:** AH-102 (backend half)
 - **Migrations run:** **1** — `2026_10_10_100000_create_user_push_tokens_table` (`CREATE TABLE` only; FKs _to_ `users`

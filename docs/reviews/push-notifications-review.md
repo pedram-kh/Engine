@@ -1,14 +1,13 @@
 # AH-102 — push notifications for the creator app — Checkpoint A review (backend, Stages 0–2)
 
-- **Status:** **DRAFT for clearance. Checkpoint A: Stages 0–2 are built, gated and committed locally; nothing is pushed
-  and nothing is deployed.** Stages 3–5 (matrix column, the app's push module and Android, iOS) are **not started**.
-  Two things in Stage 0–2 are **not done** and are named in §9: the R2 rider (C0.3) and the full Playwright run, both
-  of which need your dev stack stopped.
+- **Status:** **Checkpoint A gates complete (§5, §12).** Stages 0–2 are built and gated; the two gates that were open at
+  first review (the R2 rider C0.3 and the full Playwright run) are done and recorded in §12. Stages 3–5 (matrix column,
+  the app's push module and Android, iOS) are **not started**. The push and its CI run URL are recorded in §13.
 - **Date:** 2026-10-10
 - **Plan:** [`push-notifications-plan.md`](push-notifications-plan.md) (cleared at `d4edffb4`, dispositions at
   `faf96d4d`) · **Inventory:** [`push-notifications-inventory.md`](push-notifications-inventory.md)
 - **Local tip:** the docs commit that carries this file sits on top of `a8423726`. `origin/main` is `4d468406`.
-  **Both pushes held.**
+  **Pushed at Checkpoint A clearance — see §13.**
 - **Prod-data risk:** LOW–MEDIUM (one additive `CREATE TABLE`; the `notify()` hot path restructured behind try/catch,
   an after-commit job and a default-OFF flag). See §8.
 
@@ -71,7 +70,7 @@
   Stage 3. Old clients ignore the extra key (the one fixture that listed the keys exactly was updated).
 - **Pre-deploy `count(*) WHERE channel='push'` = 0**, **`queue:restart`** and the **`engine_c_user` GRANT check** are
   named steps in the deploy-log entry. Their results are blank: they are yours to read.
-- **Deploy-log disposition before any push:** the PENDING entry exists and stacks on AH-101. **Both pushes held.**
+- **Deploy-log disposition before any push:** the PENDING entry exists and stacks on AH-101. **Pushed after clearance (§13).**
 
 ## 4. Break-revert record (§5.35)
 
@@ -151,7 +150,7 @@ exists.
 | ESLint, all frontend                     | 0 errors; 2 warnings, both pre-existing (`v-html` in `apps/main`)                                                             |
 | vue-tsc, all frontend                    | pass                                                                                                                          |
 | 24-locale parity                         | backend `LangParityTest` (discovers `push.php` by scanning `lang/`) and the frontend locale specs, both inside the runs above |
-| Playwright                               | **NOT RUN** — see §9                                                                                                          |
+| Playwright                               | **Run — see §12**                                                                                                             |
 
 **Environment notes (local only; CI is unaffected):**
 
@@ -217,7 +216,7 @@ scan), `PushTokenRegistryTest` (21), `PushTokenEndpointsTest` (24), `FcmPushSend
   table that nothing reads.
 - **New operator surface:** `push:test` (one user, one fixed message, read-only against our data, never prints a token).
 
-## 9. What is NOT done, and what I need from you
+## 9. What was NOT done at first review (items 1 and 2 are now DONE — see §12)
 
 1. **C0.3 — the R2 rider (`creator-detail.spec.ts:64`).** Not started. Playwright needs the dev stack down and **your
    `php artisan serve` (:8000) and Vite (:5173) are running**. I have not stopped them. Say the word and I will, run the
@@ -233,11 +232,20 @@ scan), `PushTokenRegistryTest` (21), `PushTokenEndpointsTest` (24), `FcmPushSend
 
 ## 10. Decisions I made that you may want to overrule
 
+> **Cleared at Checkpoint A:** `push:test` bypassing the flag (operator-only and single-recipient is the containment), the
+> throttle slot claimed before the build, and the admin flag wording all stand.
+>
+> **Accepted deviation, on the record:** break-revert evidence is per-mutation failing counts, not verbatim runner output
+> (accepted at 45 mutations; re-run only if a row looks off at review time).
+
 - **`push:test` is not behind `push_notifications_enabled`.** The flag gates product sends; the command is how the
   credential and the device are proven _before_ arming, and it reaches only the one user the operator names.
 - **The throttle slot is claimed before the message is built.** If the factory then returns `null` (no copy for that
   type — not reachable for the 14 eligible types today) the slot is spent for ≤60 s. Accepted; the alternative is a
   second cache round-trip.
+- **A failed message build consumes the slot for ≤60 s.** The slot is claimed before the message is built (the right trade
+  against a double-build race); if the build then yields nothing, the (recipient, thread) pair stays throttled for up to
+  60 s. Not reachable today for the 14 eligible types. **Cleared by Pedram at Checkpoint A.**
 - **A throttle slot claimed in a transaction that rolls back stays claimed for ≤60 s** (plan §5.4: accepted; message
   notifications are not emitted inside the state-machine transaction).
 - **Admin flag description** ("Do not arm until the FCM credential is set and `push:test --validate-only` has passed")
@@ -249,3 +257,68 @@ scan), `PushTokenRegistryTest` (21), `PushTokenEndpointsTest` (24), `FcmPushSend
    (§5.41) before calling it done.
 2. May I stop the dev stack to run **C0.3 and the full Playwright run** first? (My recommendation: yes, before the push.)
 3. Anything in §10 you want changed.
+
+## 12. The two open gates, closed (C0.3 and full Playwright)
+
+**Setup.** Dev stack stopped with Pedram's permission (`php artisan serve` :8000, Vite :5173). The admin dev Vite on :5174
+(running since Friday) also had to stop: the admin Playwright config reuses it and it proxies to :8000, so both admin
+specs failed deterministically against it (3 of 3 attempts each) until it was stopped. Isolated E2E DB `catalyst_e2e`,
+`TEST_HELPERS_TOKEN` set, `--retries=2` (CI's value).
+
+### 12.1 C0.3 — the R2 rider: outcome (a), a fix with break-revert (`8c7d3318`)
+
+- **Reproduction.** `creator-detail.spec.ts:64 --repeat-each=30 --retries=0`: **1 of 30 failed — and it was the first
+  iteration** (cold Vite), 29 of 29 warm passed. Repeated with a wiped `node_modules/.vite`: failed the first iteration
+  again. **3 of 3 cold-cache runs on the original config failed** (the repeat-30 run, the wiped-cache run, and the
+  break-revert run below); 0 of 29 warm.
+- **Cause (not the plan's hydration hypothesis).** The trace shows `TypeError: isObject is not a function` from a
+  `.vite/deps/chunk-…?v=…` file and a second navigation to `/roster`; Vite's own log shows
+  `new dependencies optimized: …` then `optimized dependencies changed. reloading`. Vuetify components that live only in
+  lazy route chunks are discovered mid-run; each discovery re-bundles and reloads the page, which drops the click's
+  navigation. `apps/main/vite.config.ts` already documents exactly this mechanism and pre-declares 30 components; these were
+  the ones it missed.
+- **Fix.** 14 more modules in `optimizeDeps.include`: `VSystemBar`, `VBottomNavigation`, `VBadge`, `VPagination`,
+  `VTooltip`, `VImg`, `VRadio`, `VRadioGroup`, `VSwitch`, `transitions`, `VTabs`, `VWindow`, `VSheet`, `VAutocomplete`.
+  Dev-server only; production builds are unaffected.
+- **Break-revert.** Original config, cold cache: first iteration **fails**, 3 reload groups in the Vite log. Fixed config,
+  cold cache: 3 of 3 pass, **0** reloads. Original again: fails. Fixed restored (`diff -q` clean): 2 of 2 pass, 0 reloads.
+- **Time spent:** about 1 h of the 2 h budget.
+
+### 12.2 Full Playwright, main SPA (34 tests, cold Vite cache, `--retries=2`)
+
+| Run                                         | Result                                             | Flaky (passed on retry)                                                                                                                    |
+| ------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1 — with the first 10 modules only          | 32 passed, 2 flaky, exit 0                         | `2fa-enrollment-and-sign-in.spec.ts:93` (30 s timeout, passed on retry); `creator-wizard-happy-path.spec.ts:91` (URL stayed `/onboarding`) |
+| 2 — with all 14 modules (the committed fix) | 33 passed, **1 flaky**, exit 0, **0 Vite reloads** | `2fa-enrollment-and-sign-in.spec.ts:93` — failed attempts 1 and 2, passed on retry 2                                                       |
+
+- `creator-detail.spec.ts:64` passed first time in both full runs. `creator-wizard-happy-path.spec.ts:91` (a known flake)
+  flaked in run 1 at the exact moment Vite logged `VAutocomplete` as newly optimized, and not in run 2: same cause, same fix.
+- **`2fa-enrollment-and-sign-in.spec.ts:93` is NOT one of the known three, and it is recorded, not waved through.** It is the
+  first test of the run. In isolation it takes ~26 s of a 30 s timeout: 4 of 4 warm passes (26.2, 25.9, 26.0, 25.1 s), 1 of 1
+  cold pass with the original Vite config (26.2 s) and 1 of 1 with the fixed one (27.2 s). So it is marginal on this machine
+  whatever the Vite config, and a loaded cold start tips it over. It never reaches `notify()`, so AH-102 cannot cause it.
+  Parked in `tech-debt.md` (item 7). If CI shows it, it is a timeout bump, not a push finding.
+
+### 12.3 Full Playwright, admin SPA (2 tests, `--retries=2`)
+
+1 passed, **1 flaky**: `admin-sign-in.spec.ts:69` (a known one; failed attempt 1, passed on retry 1). Not diagnosed
+(recorded only, per plan). The admin Vite config has the same lazy-component pattern; noted in `tech-debt.md`.
+
+### 12.4 The known three, accounted for
+
+| Known flake                            | This run                                             |
+| -------------------------------------- | ---------------------------------------------------- |
+| `creator-detail.spec.ts:64`            | passed first time (both full runs); root cause fixed |
+| `creator-wizard-happy-path.spec.ts:91` | flaked once (run 1), 0 times after the fix (run 2)   |
+| `admin-sign-in.spec.ts:69`             | flaked once, passed on retry; not diagnosed          |
+
+Plus one new: `2fa-enrollment-and-sign-in.spec.ts:93` (above).
+
+### 12.5 Incidental evidence
+
+The `user_push_tokens` migration ran under real Postgres (`migrate:fresh` against `catalyst_e2e`, all migrations including
+`2026_10_10_100000_create_user_push_tokens_table`, no errors). Every other migration test so far had been SQLite.
+
+## 13. Push
+
+Recorded in the closing commit's message and the PR/CI line below once the push lands.
