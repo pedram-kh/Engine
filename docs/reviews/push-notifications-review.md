@@ -611,3 +611,43 @@ passes). It stays on the watch-list; this is a second data point that it is load
 `creator-wizard-happy-path.spec.ts:91` and `creator-detail.spec.ts:64` (the R2 rider) passed in the full run.
 
 **Still owed:** CI at the pushed tip is the only run at default timeouts on a fast host; it is cited after the push.
+
+## 24. The Android walk (E1, E2, E3), run 2026-10-11
+
+**Device:** Samsung SM-A515F, debug build, local API, **real FCM v1** against `catalyst-production-c28e9`. Every result, with
+its evidence, is in [`push-notifications-device-walk.md`](push-notifications-device-walk.md) (§2 to §4); the gotchas are its §7.
+
+| Block                                   | Result                                                                                                                                          |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| E1.1 to E1.5 (matrix, icon)             | **Pass**                                                                                                                                        |
+| E2.1 to E2.5 (soft-ask)                 | **Pass**, E2.4 with a wording note (one denial is `prompt-with-rationale`, the button is live; the second denial shows "blocked")               |
+| E3 items 1, 2, 3, 5, 6, 7, 8, 9, 10, 11 | **Pass**                                                                                                                                        |
+| E3 item 4 (tap)                         | Background **pass**. Killed **FAILED**, found and fixed (`72afb8ae`), re-run from a real kill **pass**                                          |
+| E3 item 12 (R-8)                        | **Partly**: no token before consent, explicit `getToken()` works, `pm clear` + re-accept leaves one live row. **Rotation re-POST not verified** |
+
+**What the walk found (none was visible to the tests):**
+
+1. **The cold-start tap was lost** (item 4). The tap that launches a killed app is delivered the moment the listener registers,
+   before the router's first navigation, and an immediate `router.push` is overtaken by the dashboard. Fix: wait for
+   `router.isReady()`, extracted to `pushTapRouting.ts` with a spec (3 tests; break-reverts BR-59 push immediately: 2 failing,
+   BR-60 wrong route: 1, BR-61 no catch: unhandled rejection fails the run). The old inline handler in `main.ts` had no spec.
+2. **My walk doc was wrong in two places:** `push:test` never invalidates a token (by design), so item 10 needs a real emit;
+   and `push:test` is English-only, so the localisation check needs a real emit as well.
+3. **Environment traps, all on the dev machine, none in the product:** a pending migration, a bare `localhost` in
+   `SANCTUM_STATEFUL_DOMAINS` (419 for the Android origin), a stale exported `SANCTUM_STATEFUL_DOMAINS` overriding `.env` for a
+   server I started, and `am force-stop` silently blocking FCM. A line-merge in `.env` (an unsaved edit) once broke CORS for
+   the app. The debug build also logs the stored bearer token to the Android console.
+4. **FCM behaviour observed:** after an uninstall, the first sends are still accepted; `UNREGISTERED` arrives on a later one
+   and the real path invalidates once, with no retry and no failed job.
+5. **First real localised copy:** Spanish `creator.approved` read "Cuenta aprobada / Tu cuenta de creador fue aprobada. Abre la
+   app para empezar", neutral. Still **not** native-reviewed (tech-debt item 5), and only one of the 23 non-English locales
+   was seen on a device.
+
+**Dev data the walk changed** (local database only): user 14's preferred language is `es`; user 14 has stored preference rows
+(`message.received_by_creator` in-app and push off, `campaign.job_posted` push on); about 15 test notifications for user 14
+(the bell shows 20); creator 9 was set to pending and re-approved through the admin SPA (`approved_at` now 2026-10-11 17:37,
+by admin 3); the `user_push_tokens` migration was applied; a bare `localhost` was removed from `SANCTUM_STATEFUL_DOMAINS` in
+`apps/api/.env` (the original line is in the walk notes).
+
+**Not done:** the iOS spike (5.1) and the signed archive; item 12's rotation re-POST; the 22 other locales on a device;
+Playwright at the default timeouts on a fast host (CI at the pushed tip).
