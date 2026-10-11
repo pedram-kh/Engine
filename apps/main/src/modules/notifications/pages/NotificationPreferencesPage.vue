@@ -27,8 +27,17 @@
  * The exposed list derives from the single `LIVE_TYPES` registry in `../templates`
  * (shared with the Ch3a renderer), so it cannot drift. The backend stores SPARSELY (D-1: divergence → row,
  * return-to-default → delete) and ships the channel `defaults` over the wire, so
- * the display state is composed as `row?.is_enabled ?? defaults[channel]` and the
+ * the display state is composed as
+ * `row?.is_enabled ?? type_defaults[type]?.[channel] ?? defaults[channel]` (AH-102
+ * added the per-type exceptions: `campaign.job_posted` push is opt-in) and the
  * contract is never hardcoded here.
+ *
+ * AH-102: a fourth column, PUSH, exists on the native app only (and only where
+ * a push can actually arrive — `pushChannelAvailable()`, not bare
+ * `isNativePlatform()`). It is stripped at the registry (`includeNativeOnly`),
+ * not hidden in the template, so on the web there is no push cell to see AND no
+ * push row in the PATCH body: `allRows`, `columnsFor` and `onSave` all derive from
+ * the same groups.
  */
 
 import type {
@@ -41,6 +50,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { useMobileShell } from '@/composables/useMobileShell'
+import { pushChannelAvailable } from '@/core/platform/push/pushChannelAvailable'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 
 import { notificationsApi } from '../api/notifications.api'
@@ -65,7 +75,9 @@ const { isMobile } = useMobileShell()
  * all, plus `digest` for the messaging types whose daily-digest consumer ships.
  */
 const preferenceGroups = computed(() =>
-  preferenceGroupsForRole(recipientRoleForUserType(user.value?.attributes.user_type ?? 'creator')),
+  preferenceGroupsForRole(recipientRoleForUserType(user.value?.attributes.user_type ?? 'creator'), {
+    includeNativeOnly: pushChannelAvailable(),
+  }),
 )
 
 /**
@@ -127,9 +139,15 @@ const loadError = ref(false)
 const saveError = ref(false)
 const saveSuccess = ref(false)
 
-/** Compose display state from the sparse rows + the defaults block (D-3). */
+/**
+ * Compose display state from the sparse rows + the defaults blocks (D-3):
+ * stored row, else the per-type exception, else the channel default. The
+ * per-type step is what makes an opt-in channel (`job_posted` push) read OFF with
+ * no row, and — together with the backend storing a row only on DIVERGENCE from
+ * that same type-aware default — what makes switching it ON stick.
+ */
 function applyState(envelope: NotificationPreferencesEnvelope): void {
-  const { preferences, defaults } = envelope.data.attributes
+  const { preferences, defaults, type_defaults: typeDefaults } = envelope.data.attributes
 
   const overrides = new Map<string, boolean>()
   for (const row of preferences) {
@@ -138,7 +156,7 @@ function applyState(envelope: NotificationPreferencesEnvelope): void {
 
   for (const { type, channel } of allRows.value) {
     const key = stateKey(type, channel)
-    enabled[key] = overrides.get(key) ?? defaults[channel]
+    enabled[key] = overrides.get(key) ?? typeDefaults[type]?.[channel] ?? defaults[channel]
   }
 }
 

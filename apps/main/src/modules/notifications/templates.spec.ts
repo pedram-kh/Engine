@@ -4,6 +4,7 @@ import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import {
+  NATIVE_ONLY_CHANNELS,
   NOTIFICATION_FALLBACK_KEY,
   hasLiveTemplate,
   liveNotificationTypes,
@@ -355,5 +356,163 @@ describe('AH-101 preference matrix registry', () => {
 
     // An unknown channel sorts after the known ones rather than breaking the grid.
     expect(columns).toEqual(['in_app', 'push'])
+  })
+})
+
+/**
+ * AH-102 (C3.1) — the PUSH column. The registry and the backend's
+ * `PushEligibility` must name the same types: a `push` cell for a type the
+ * dispatcher never pushes is a dead control, and a pushed type with no cell is a
+ * notification the creator cannot silence. Like the enum above, the backend
+ * lists are READ FROM SOURCE, not copied.
+ */
+describe('AH-102 push column registry', () => {
+  const root = resolve(__dirname, '../../../../../apps/api/app/Modules/Notifications')
+
+  /** Backend enum case name → wire value, from source. */
+  function enumValueByCase(): Map<string, string> {
+    const source = readFileSync(resolve(root, 'Enums/NotificationType.php'), 'utf8')
+    return new Map(
+      [...source.matchAll(/case\s+(\w+)\s*=\s*'([a-z_.]+)'/g)].map((m) => [
+        m[1] as string,
+        m[2] as string,
+      ]),
+    )
+  }
+
+  /** One of `PushEligibility`'s `public const array NAME = [ NotificationType::X, … ]` lists. */
+  function eligibilityList(name: 'TOGGLEABLE' | 'ALWAYS_ON'): string[] {
+    const source = readFileSync(resolve(root, 'Push/PushEligibility.php'), 'utf8')
+    const body = new RegExp(`const array ${name} = \\[([\\s\\S]*?)\\];`).exec(source)?.[1] ?? ''
+    const values = enumValueByCase()
+
+    return [...body.matchAll(/NotificationType::(\w+)/g)].map((m) => {
+      const value = values.get(m[1] as string)
+      if (value === undefined) {
+        throw new Error(`PushEligibility names an unknown NotificationType case: ${m[1]}`)
+      }
+      return value
+    })
+  }
+
+  const NATIVE = { includeNativeOnly: true } as const
+
+  /** Types offering a `push` SWITCH, across both roles, native shape. */
+  function pushSwitchTypes(): string[] {
+    return (['creator', 'agency'] as const).flatMap((role) =>
+      preferenceGroupsForRole(role, NATIVE).flatMap((g) =>
+        g.types.filter((v) => v.channels.includes('push')).map((v) => v.type as string),
+      ),
+    )
+  }
+
+  /** Types showing a `push` ALWAYS-ON caption, across both roles, native shape. */
+  function pushAlwaysOnTypes(): string[] {
+    return (['creator', 'agency'] as const).flatMap((role) =>
+      preferenceGroupsForRole(role, NATIVE).flatMap((g) =>
+        g.types.filter((v) => v.alwaysOn.includes('push')).map((v) => v.type as string),
+      ),
+    )
+  }
+
+  it('reads the backend lists (the spec is looking at the ruled sets: 10 toggleable, 4 always-on)', () => {
+    expect(eligibilityList('TOGGLEABLE')).toHaveLength(10)
+    expect(eligibilityList('ALWAYS_ON')).toHaveLength(4)
+  })
+
+  it('offers a push switch for exactly PushEligibility::TOGGLEABLE — no more, no fewer', () => {
+    expect([...pushSwitchTypes()].sort()).toEqual([...eligibilityList('TOGGLEABLE')].sort())
+    expect(pushSwitchTypes()).toHaveLength(10)
+  })
+
+  it('shows push as an always-on caption for the ALWAYS_ON types that HAVE a matrix row, and registers the rest as toggle-less', () => {
+    const alwaysOn = eligibilityList('ALWAYS_ON')
+
+    // creator.approved / creator.rejected have a matrix row, so they carry the caption…
+    expect([...pushAlwaysOnTypes()].sort()).toEqual(['creator.approved', 'creator.rejected'])
+    // …the two relation types are always-on with NO row at all (`preference: null`),
+    // so they appear in neither list — but must still be live, creator-reaching types.
+    const noRow = alwaysOn.filter((type) => !pushAlwaysOnTypes().includes(type))
+    expect([...noRow].sort()).toEqual([
+      'agency_creator_relation.admin_connected',
+      'agency_creator_relation.disconnected',
+    ])
+    for (const type of noRow) {
+      expect(liveNotificationTypes()).toContain(type)
+    }
+    expect(pushAlwaysOnTypes()).toHaveLength(2)
+    expect(alwaysOn).toHaveLength(2 + noRow.length)
+  })
+
+  it('never lists a type as BOTH a push switch and an always-on push caption (disjoint)', () => {
+    const overlap = pushSwitchTypes().filter((type) => pushAlwaysOnTypes().includes(type))
+    expect(overlap).toEqual([])
+  })
+
+  it('gives no push cell to a type the dispatcher will not push (live_verified, application.rejected, every agency type)', () => {
+    const pushed = new Set([...eligibilityList('TOGGLEABLE'), ...eligibilityList('ALWAYS_ON')])
+    const cells = new Set([...pushSwitchTypes(), ...pushAlwaysOnTypes()])
+
+    for (const type of [
+      'assignment.live_verified',
+      'campaign_application.rejected',
+      'assignment.draft_submitted',
+      'assignment.contracted',
+      'message.received_by_agency',
+      'message.relationship_received_by_agency',
+      'campaign_application.submitted',
+    ]) {
+      expect(pushed.has(type)).toBe(false)
+      expect(cells.has(type)).toBe(false)
+    }
+    // …and no agency user sees any push cell at all.
+    expect(
+      preferenceGroupsForRole('agency', NATIVE).flatMap((g) =>
+        g.types.flatMap((v) => [...v.channels, ...v.alwaysOn]),
+      ),
+    ).not.toContain('push')
+  })
+
+  it('WEB default: no push cell, switch or caption, for either role (the pre-AH-102 shape)', () => {
+    for (const role of ['creator', 'agency'] as const) {
+      const cells = preferenceGroupsForRole(role).flatMap((g) =>
+        g.types.flatMap((v) => [...v.channels, ...v.alwaysOn]),
+      )
+      expect(cells).not.toContain('push')
+      // The explicit `false` is the same thing as the default.
+      expect(preferenceGroupsForRole(role, { includeNativeOnly: false })).toEqual(
+        preferenceGroupsForRole(role),
+      )
+    }
+  })
+
+  it('native is purely ADDITIVE: strip push from the native groups and you get the web groups exactly', () => {
+    for (const role of ['creator', 'agency'] as const) {
+      const stripped = preferenceGroupsForRole(role, NATIVE).map((g) => ({
+        ...g,
+        types: g.types.map((v) => ({
+          ...v,
+          channels: v.channels.filter((c) => c !== 'push'),
+          alwaysOn: v.alwaysOn.filter((c) => c !== 'push'),
+        })),
+      }))
+      expect(stripped).toEqual(preferenceGroupsForRole(role))
+    }
+  })
+
+  it('puts push LAST in the column order, and a native group gains the column only where a row fills it', () => {
+    expect(PREFERENCE_CHANNEL_ORDER[PREFERENCE_CHANNEL_ORDER.length - 1]).toBe('push')
+
+    const groups = preferenceGroupsForRole('creator', NATIVE)
+    const columns = (name: string) => preferenceColumns(groups.filter((g) => g.group === name))
+
+    expect(columns('assignment')).toEqual(['in_app', 'email', 'push'])
+    expect(columns('jobs_board')).toEqual(['in_app', 'email', 'push'])
+    expect(columns('creator')).toEqual(['in_app', 'email', 'push'])
+    expect(columns('messaging')).toEqual(['in_app', 'email', 'digest', 'push'])
+  })
+
+  it('pins the native-only set to exactly `push` (a new native-only channel is a deliberate edit)', () => {
+    expect([...NATIVE_ONLY_CHANNELS]).toEqual(['push'])
   })
 })

@@ -107,16 +107,42 @@ const IN_APP_ONLY: NotificationChannel[] = ['in_app']
 const IN_APP_AND_EMAIL: NotificationChannel[] = ['in_app', 'email']
 
 /**
+ * AH-102 — the creator-side types that are also PUSHED (the backend's
+ * `PushEligibility::TOGGLEABLE`, which `templates.spec.ts` reads from source so
+ * the two cannot drift). A `push` cell exists ONLY where the dispatcher both
+ * sends and reads the recipient's `push` preference — never a dead control. The
+ * column is native-only (see {@link NATIVE_ONLY_CHANNELS}).
+ */
+const IN_APP_EMAIL_PUSH: NotificationChannel[] = ['in_app', 'email', 'push']
+
+/**
  * The matrix's column order — the ONE place a channel's position is decided.
  * The preferences page derives its columns from the union of the registry's
- * channels sorted by this list, so adding a channel (AH-102's `push`) is one
- * entry here plus the enum case and the label — no page change.
+ * channels sorted by this list, so a column exists exactly when some row fills
+ * it and its position is decided here.
+ *
+ * ⚠ CORRECTED (AH-102): this comment used to say adding a channel was "one entry
+ * here plus the enum case and the label — no page change". That held for a
+ * channel every build shows. It does NOT hold for a channel only some builds can
+ * use: `push` needs {@link NATIVE_ONLY_CHANNELS}, the `includeNativeOnly` option
+ * on {@link preferenceGroupsForRole}, and the page passing it — otherwise the
+ * web would render, and PATCH, cells for a channel it can never receive.
  */
 export const PREFERENCE_CHANNEL_ORDER: readonly NotificationChannel[] = [
   'in_app',
   'email',
   'digest',
+  'push',
 ]
+
+/**
+ * AH-102 (Q8) — channels that exist only inside the native app. They are
+ * stripped from {@link preferenceGroupsForRole}'s output unless the caller says
+ * push can actually arrive on this build (`pushChannelAvailable()`), so a web
+ * user can neither SEE a push cell nor SEND a push row in a PATCH: `allRows`,
+ * `columnsFor` and `onSave` all derive from the same groups.
+ */
+export const NATIVE_ONLY_CHANNELS: readonly NotificationChannel[] = ['push']
 
 /**
  * The live-set. The dotted enum values can't be `t()`-pathed directly (vue-i18n
@@ -132,7 +158,7 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   'assignment.invited': {
     templateKey: 'notifications.types.assignment_invited',
     recipient: 'creator',
-    preference: { group: 'assignment', channels: IN_APP_AND_EMAIL },
+    preference: { group: 'assignment', channels: IN_APP_EMAIL_PUSH },
   },
   // Agency fan-out rows (admins + managers) — only agency users receive these.
   'assignment.draft_submitted': {
@@ -149,17 +175,17 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   'assignment.revision_requested': {
     templateKey: 'notifications.types.assignment_revision_requested',
     recipient: 'creator',
-    preference: { group: 'assignment', channels: IN_APP_AND_EMAIL },
+    preference: { group: 'assignment', channels: IN_APP_EMAIL_PUSH },
   },
   'assignment.draft_approved': {
     templateKey: 'notifications.types.assignment_draft_approved',
     recipient: 'creator',
-    preference: { group: 'assignment', channels: IN_APP_AND_EMAIL },
+    preference: { group: 'assignment', channels: IN_APP_EMAIL_PUSH },
   },
   'assignment.draft_rejected': {
     templateKey: 'notifications.types.assignment_draft_rejected',
     recipient: 'creator',
-    preference: { group: 'assignment', channels: IN_APP_AND_EMAIL },
+    preference: { group: 'assignment', channels: IN_APP_EMAIL_PUSH },
   },
   // AH-069 (D5) — sits BESIDE the draft-approved row, not instead of it: on a
   // campaign that hands off at approval the creator gets both, and together they
@@ -169,12 +195,12 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   'assignment.completed_on_approval': {
     templateKey: 'notifications.types.assignment_completed_on_approval',
     recipient: 'creator',
-    preference: { group: 'assignment', channels: IN_APP_AND_EMAIL },
+    preference: { group: 'assignment', channels: IN_APP_EMAIL_PUSH },
   },
   'assignment.manually_verified': {
     templateKey: 'notifications.types.assignment_manually_verified',
     recipient: 'creator',
-    preference: { group: 'assignment', channels: IN_APP_AND_EMAIL },
+    preference: { group: 'assignment', channels: IN_APP_EMAIL_PUSH },
   },
   // AH-101 (⑦) — the creator's post passed AUTOMATIC verification: the silent
   // success branch, now a notice. Creator-only. The mail leg is behind
@@ -189,12 +215,12 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   'creator.approved': {
     templateKey: 'notifications.types.creator_approved',
     recipient: 'creator',
-    preference: { group: 'creator', channels: IN_APP_ONLY, alwaysOnChannels: ['email'] },
+    preference: { group: 'creator', channels: IN_APP_ONLY, alwaysOnChannels: ['email', 'push'] },
   },
   'creator.rejected': {
     templateKey: 'notifications.types.creator_rejected',
     recipient: 'creator',
-    preference: { group: 'creator', channels: IN_APP_ONLY, alwaysOnChannels: ['email'] },
+    preference: { group: 'creator', channels: IN_APP_ONLY, alwaysOnChannels: ['email', 'push'] },
   },
   // Messaging (Sprint 11, D-7) — dual-recipient new-message notifications. Each
   // direction targets exactly one role, so each gets its own toggle (no dead
@@ -207,7 +233,7 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   'message.received_by_creator': {
     templateKey: 'notifications.types.message_received_by_creator',
     recipient: 'creator',
-    preference: { group: 'messaging', channels: ['in_app', 'email', 'digest'] },
+    preference: { group: 'messaging', channels: ['in_app', 'email', 'digest', 'push'] },
   },
   'message.received_by_agency': {
     templateKey: 'notifications.types.message_received_by_agency',
@@ -224,7 +250,7 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   'message.relationship_received_by_creator': {
     templateKey: 'notifications.types.message_relationship_received_by_creator',
     recipient: 'creator',
-    preference: { group: 'messaging', channels: IN_APP_AND_EMAIL },
+    preference: { group: 'messaging', channels: IN_APP_EMAIL_PUSH },
   },
   'message.relationship_received_by_agency': {
     templateKey: 'notifications.types.message_relationship_received_by_agency',
@@ -271,7 +297,7 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   'campaign.job_posted': {
     templateKey: 'notifications.types.campaign_job_posted',
     recipient: 'creator',
-    preference: { group: 'jobs_board', channels: IN_APP_AND_EMAIL },
+    preference: { group: 'jobs_board', channels: IN_APP_EMAIL_PUSH },
   },
   'campaign_application.submitted': {
     templateKey: 'notifications.types.campaign_application_submitted',
@@ -281,7 +307,7 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   'campaign_application.accepted': {
     templateKey: 'notifications.types.campaign_application_accepted',
     recipient: 'creator',
-    preference: { group: 'jobs_board', channels: IN_APP_AND_EMAIL },
+    preference: { group: 'jobs_board', channels: IN_APP_EMAIL_PUSH },
   },
   // Two emit sites, one type: the agency's reject and the campaign-terminal
   // auto-reject. The template reads `campaign_name` only — `data.cause`
@@ -338,6 +364,15 @@ function inColumnOrder(channels: readonly NotificationChannel[]): NotificationCh
   return [...channels].sort((a, b) => rank(a) - rank(b))
 }
 
+/** Options for {@link preferenceGroupsForRole}. */
+export interface PreferenceGroupOptions {
+  /**
+   * Include {@link NATIVE_ONLY_CHANNELS}. Default `false` (the web shape). The
+   * page passes `pushChannelAvailable()`.
+   */
+  includeNativeOnly?: boolean
+}
+
 /** A prefs-UI group with the live types (for one recipient role) it contains. */
 export interface NotificationPreferenceGroupView {
   group: NotificationPreferenceGroup
@@ -362,10 +397,18 @@ const PREFERENCE_GROUP_ORDER: readonly NotificationPreferenceGroup[] = [
  * AND expose a preference row, grouped + ordered for the UI. Derived entirely
  * from {@link LIVE_TYPES}, so it can never list a type Ch3a can't render or omit
  * one the user receives and is allowed to silence.
+ *
+ * Native-only channels (`push`) are stripped unless `includeNativeOnly` is set —
+ * the DEFAULT is the web shape, so every pre-AH-102 caller is byte-identical.
  */
 export function preferenceGroupsForRole(
   role: NotificationRecipientRole,
+  options: PreferenceGroupOptions = {},
 ): NotificationPreferenceGroupView[] {
+  const { includeNativeOnly = false } = options
+  const keep = (channel: NotificationChannel): boolean =>
+    includeNativeOnly || !NATIVE_ONLY_CHANNELS.includes(channel)
+
   const byGroup = new Map<NotificationPreferenceGroup, NotificationPreferenceTypeView[]>()
 
   for (const [type, definition] of Object.entries(LIVE_TYPES) as Array<
@@ -382,8 +425,8 @@ export function preferenceGroupsForRole(
     const existing = byGroup.get(preference.group) ?? []
     existing.push({
       type,
-      channels: inColumnOrder(preference.channels),
-      alwaysOn: inColumnOrder(preference.alwaysOnChannels ?? []),
+      channels: inColumnOrder(preference.channels.filter(keep)),
+      alwaysOn: inColumnOrder((preference.alwaysOnChannels ?? []).filter(keep)),
     })
     byGroup.set(preference.group, existing)
   }
