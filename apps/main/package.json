@@ -11,6 +11,7 @@
     "build:native": "vue-tsc --noEmit && vite build --mode native-production",
     "cap": "cap",
     "assets:sources": "node scripts/app-icon-sources.mjs",
+    "assets:push-icon": "node scripts/app-push-icon.mjs",
     "assets:generate": "pnpm assets:sources && capacitor-assets generate --ios --android --assetPath assets --iconBackgroundColor '#0b0b0c' --iconBackgroundColorDark '#0b0b0c' --splashBackgroundColor '#0b0b0c' --splashBackgroundColorDark '#0b0b0c' && capacitor-assets generate --android --assetPath assets/android-splash --splashBackgroundColor '#0b0b0c' --splashBackgroundColorDark '#0b0b0c' && node scripts/app-icon-android-fixup.mjs",
     "preview": "vite preview --port 5173",
     "test": "vitest run",

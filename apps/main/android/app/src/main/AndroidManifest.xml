@@ -24,6 +24,24 @@
 
         </activity>
 
+        <!-- AH-102: FCM. Auto-init is OFF so no token is minted before the creator
+             has said yes to the in-app soft-ask (the plugin mints it on demand once
+             consent is given); Firebase Analytics collection stays off. The default
+             channel id is the one the server sets on every message
+             (PushMessage::DEFAULT_CHANNEL) and the app creates at registration. -->
+        <meta-data
+            android:name="firebase_messaging_auto_init_enabled"
+            android:value="false" />
+        <meta-data
+            android:name="firebase_analytics_collection_enabled"
+            android:value="false" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="catalyst_default" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_catalyst" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
