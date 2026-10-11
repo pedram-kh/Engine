@@ -321,4 +321,13 @@ The `user_push_tokens` migration ran under real Postgres (`migrate:fresh` agains
 
 ## 13. Push
 
-Recorded in the closing commit's message and the PR/CI line below once the push lands.
+Pushed to `origin/main` on 2026-10-11: `4d468406..6e827e40` (fast-forward, 17 commits: inventory, plan, Stages 0–2,
+the docs pair, C0.3, and the gates docs commit).
+
+- **CI at the pushed tip `6e827e40`:** [run 38135748678](https://github.com/pedram-kh/Engine/actions/runs/38135748678) —
+  **success**, all four jobs: Backend (Pint + Larastan + Pest), Frontend (lint + typecheck + unit), E2E main
+  (34 passed, 0 flaky), E2E admin (1 passed, **1 flaky**).
+- **CI flake, recorded not waved through:** `admin-sign-in.spec.ts:69` (admin 2FA inline-TOTP sign-in) failed once and
+  passed on retry — the same spec that flaked locally (§12.3); it is on the known-flake list, undiagnosed, and unrelated
+  to push. The main suite had no flakes in CI, including `2fa-enrollment-and-sign-in.spec.ts:93` (tech-debt item 7).
+- A docs-only provenance commit (this section) follows the tip; it changes no code.
