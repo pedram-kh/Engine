@@ -716,3 +716,13 @@ all four jobs green (Frontend, Backend, E2E admin, E2E main).
 - **E2E admin SPA (Playwright): 1 flaky, then passed on retry** (`admin-sign-in.spec.ts:106`: the URL stayed on `/sign-in`
   on the first attempt). The admin app is untouched by AH-102 (no file under `apps/admin` changed in this range), and the run is
   green on retry. Recorded as seen, not diagnosed; if it recurs it is a separate tech-debt row.
+
+## 27. iPhone spike: `NSAllowsLocalNetworking` in the committed Info.plist (2026-10-11)
+
+A real iPhone cannot reach the Mac's `localhost:8000` (no `adb reverse` equivalent), so the spike reaches the API over Wi-Fi.
+Approved by Pedram and kept in the committed plist: `NSAppTransportSecurity` → `NSAllowsLocalNetworking = true`. It only
+relaxes ATS for local-network traffic (unqualified hosts, `.local`, IP addresses); it is not `NSAllowsArbitraryLoads` and sets
+no `NSExceptionDomains`, and production builds talk to an HTTPS API, so it changes nothing for them.
+Pinned in `pushIosConfig.spec.ts` (16 tests); break-reverts, each 1 failing: BR-66 the broad key instead · BR-67 the broad key
+added alongside · BR-68 the key removed. For the spike only (not committed): `IOS_PUSH_ENABLED = true`, a gitignored
+`.env.native-development.local` with the Mac's LAN URL, and the API bound to `0.0.0.0` (reverted to `127.0.0.1` when the spike ends).

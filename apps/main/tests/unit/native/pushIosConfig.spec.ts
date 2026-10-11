@@ -64,6 +64,17 @@ describe('Info.plist', () => {
   it('needs no background mode (a push is shown by the OS, nothing runs in the background)', () => {
     expect(read(`${IOS_APP}/Info.plist`)).not.toContain('UIBackgroundModes')
   })
+
+  it('relaxes ATS for local-network traffic only (the device spike reaches the Mac over Wi-Fi)', () => {
+    const plist = read(`${IOS_APP}/Info.plist`)
+
+    expect(plist).toMatch(
+      /<key>NSAppTransportSecurity<\/key>\s*<dict>\s*<key>NSAllowsLocalNetworking<\/key>\s*<true\/>\s*<\/dict>/,
+    )
+    // The broad keys would let a release build talk cleartext to the internet.
+    expect(plist).not.toContain('NSAllowsArbitraryLoads')
+    expect(plist).not.toContain('NSExceptionDomains')
+  })
 })
 
 describe('AppDelegate.swift', () => {
