@@ -142,14 +142,15 @@ happened.
   page spec). Locale files gain push strings ×24. No route, API or env change.
 - **The Android build** is handed to Pedram's store process; it is not part of the web deploy. `google-services.json`
   (project "Catalyst Production") is committed (`9119b9c4`).
-- **The iOS project** gains the push wiring (`0d51aed9`: plugin, entitlement, plist, AppDelegate) but push stays **off**
-  on iOS (`IOS_PUSH_ENABLED=false`) until the real-iPhone spike passes. No iOS build ships push before that.
+- **The iOS project** gains the push wiring (`0d51aed9`: plugin, entitlement, plist, AppDelegate). The real-iPhone spike
+  passed (2026-10-11, review §28) and `IOS_PUSH_ENABLED` is now `true` in code (`9ab318dd`, **not yet pushed**); the server flag keeps push off. The production-APNs
+  (TestFlight) run is still to do before the first iOS store build.
 
 **What is gated OFF**
 
 - **`push_notifications_enabled` stays OFF.** The Android device proof is **done** (2026-10-11, E3 11 of 12). Still required
   before arming: the production FCM credential in Secrets Manager, `push:test --validate-only` against it, and Pedram's go,
-  timed **before** the first push-capable store build reaches users. iOS stays off (`IOS_PUSH_ENABLED=false`) until the spike.
+  timed **before** the first push-capable store build reaches users. iOS is on in code after the spike (review §28) and also waits for the server flag and the TestFlight run.
 
 - **Infra:** none for the web deploy (the queue-restart and env steps are Checkpoint A's). **Never run a bare
   `npx cap sync`** (R-7); Android builds need JDK 21.

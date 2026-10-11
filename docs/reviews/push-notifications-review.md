@@ -726,3 +726,26 @@ no `NSExceptionDomains`, and production builds talk to an HTTPS API, so it chang
 Pinned in `pushIosConfig.spec.ts` (16 tests); break-reverts, each 1 failing: BR-66 the broad key instead · BR-67 the broad key
 added alongside · BR-68 the key removed. For the spike only (not committed): `IOS_PUSH_ENABLED = true`, a gitignored
 `.env.native-development.local` with the Mac's LAN URL, and the API bound to `0.0.0.0` (reverted to `127.0.0.1` when the spike ends).
+
+## 28. The iPhone spike and the iOS walk (2026-10-11)
+
+**Go.** S5.1 to S5.5 passed on a real iPhone (iOS 27.0.1, Xcode debug install, sandbox APNs through the one uploaded key): the
+app builds and installs, the permission prompt works, an FCM token (`platform=ios`, 142 characters) registers, and a push
+arrives through FCM. Plan §5.4 (`ApnsPushSender`, fallback B) is **not needed**. Details: `push-notifications-device-walk.md` §6.
+
+**What the spike found**
+
+- **A bug that only a device could find (fixed, `9d28206c`).** `register()` called `createChannel` first; the plugin answers it on iOS with
+  "Not implemented on iOS", and the `catch` ended registration silently before `getToken()`: no token, no POST, no error. Now Android-only,
+  specced with the plugin's real rejection (BR-69, BR-70).
+- **The sign-in survives a delete and reinstall** (iOS Keychain). Tech-debt 17; decide before the first iOS store build.
+- **FCM never reported the deleted app as gone** within 6 test sends and 1 real send: the uninstall item is **not observed on iOS** (the
+  logic is server-side and was proven on Android; the reinstall then reused the same token, as Firebase keeps its install identity in the Keychain).
+- The locked-screen card reads "Catalyst / Notification" (the iPhone's Show Previews default); unlocked, the neutral copy shows.
+
+**Committed (local, not pushed):** `4b4dca71` (the `NSAllowsLocalNetworking` exception, §27), `9d28206c` (the iOS channel fix),
+`9ab318dd` (**`IOS_PUSH_ENABLED = true`**, with its spec: BR-71). Full frontend suite: 234 files, 2358 tests green; `vue-tsc` clean.
+
+**Not covered:** the TestFlight run (production APNs, the sandbox/production token split), iOS items 3, 6, 7, 8 (server-side), the other 22 locales
+on a device. **Spike closed:** API back on `127.0.0.1`, worker stopped, flag off, language `en`, the LAN env override deleted; user 14's three stale
+Android sign-in tokens were revoked.
