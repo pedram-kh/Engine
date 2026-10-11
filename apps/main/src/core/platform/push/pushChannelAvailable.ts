@@ -17,12 +17,13 @@ import { isNativePlatform, type NativePlatform } from '../isNativePlatform'
  */
 
 /**
- * Flip to `true` in the AH-102-ios chunk, together with the Apple capability,
- * the APNs key and the Firebase iOS app. It is a constant, not an env var, on
+ * Flipped to `true` after the real-iPhone spike passed (2026-10-11: token, then a
+ * push delivered through FCM), on top of the Apple capability, the APNs key and
+ * the Firebase iOS app. It is a constant, not an env var, on
  * purpose: shipping iOS push is a code change that gets reviewed and built, never
  * a runtime toggle that could light up a channel with no credentials behind it.
  */
-export const IOS_PUSH_ENABLED = false
+export const IOS_PUSH_ENABLED = true
 
 export interface PushAvailabilityOptions {
   /** The native OS, `null` on the web. Injectable so each polarity is specced. */

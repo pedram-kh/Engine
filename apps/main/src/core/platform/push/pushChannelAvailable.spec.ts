@@ -12,8 +12,7 @@ describe('pushChannelAvailable (AH-102, P-8)', () => {
     expect(pushChannelAvailable({ platform: () => 'android' })).toBe(true)
   })
 
-  it('is false on iOS until AH-102-ios flips the constant — native is not enough', () => {
-    expect(pushChannelAvailable({ platform: () => 'ios' })).toBe(false)
+  it('is false on iOS while the iOS switch is off — native is not enough', () => {
     expect(pushChannelAvailable({ platform: () => 'ios', iosPushEnabled: false })).toBe(false)
   })
 
@@ -21,8 +20,9 @@ describe('pushChannelAvailable (AH-102, P-8)', () => {
     expect(pushChannelAvailable({ platform: () => 'ios', iosPushEnabled: true })).toBe(true)
   })
 
-  it('ships with iOS push OFF (flipped only by the AH-102-ios chunk)', () => {
-    expect(IOS_PUSH_ENABLED).toBe(false)
+  it('ships with iOS push ON (flipped after the real-iPhone spike passed, 2026-10-11)', () => {
+    expect(IOS_PUSH_ENABLED).toBe(true)
+    expect(pushChannelAvailable({ platform: () => 'ios' })).toBe(true)
   })
 
   it('defaults to the real platform probe: false under jsdom (no Capacitor shell)', () => {
