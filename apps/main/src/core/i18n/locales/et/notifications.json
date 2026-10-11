@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "In-app",
         "email": "E-post",
-        "digest": "Daily email digest"
+        "digest": "Daily email digest",
+        "push": "Push"
       },
       "alwaysOn": "Alati sees",
+      "push": {
+        "off": "Push-märguanded on selles seadmes välja lülitatud",
+        "enable": "Lülita sisse",
+        "blocked": "Push-märguanded on seadme seadetes blokeeritud",
+        "openSettings": "Ava seaded"
+      },
       "typeLabels": {
         "assignment_invited": "Kampaania kutse on saadud",
         "assignment_draft_submitted": "A draft is submitted for review",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "Looja kandideerib kampaaniale",
         "campaign_application_accepted": "Kandideerimine võetakse vastu",
         "campaign_application_rejected": "Kandideerimine lükatakse tagasi"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Ära jäta ühtegi uuendust vahele",
+        "body": "Saa märguanne kohe, kui sind kinnitatakse, kutsutakse või sulle kirjutatakse.",
+        "note": "Lukustuskuva märguanded on üldised ega näita kunagi sõnumi teksti.",
+        "accept": "Lülita märguanded sisse",
+        "decline": "Mitte praegu"
+      },
+      "channel": {
+        "name": "Uuendused",
+        "description": "Kutsed, ülevaatused, sõnumid ja konto uuendused."
       }
     }
   }

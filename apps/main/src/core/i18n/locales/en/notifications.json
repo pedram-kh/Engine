@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "In-app",
         "email": "Email",
-        "digest": "Daily email digest"
+        "digest": "Daily email digest",
+        "push": "Push"
       },
       "alwaysOn": "Always on",
+      "push": {
+        "off": "Push notifications are off on this device",
+        "enable": "Turn on",
+        "blocked": "Push notifications are blocked in your device settings",
+        "openSettings": "Open settings"
+      },
       "typeLabels": {
         "assignment_invited": "A campaign invite is received",
         "assignment_draft_submitted": "A draft is submitted for review",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "A creator applies to a campaign",
         "campaign_application_accepted": "An application is accepted",
         "campaign_application_rejected": "An application is declined"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Never miss an update",
+        "body": "Get notified the moment you're approved, invited or messaged.",
+        "note": "Lock-screen alerts stay generic and never show message text.",
+        "accept": "Turn on notifications",
+        "decline": "Not now"
+      },
+      "channel": {
+        "name": "Updates",
+        "description": "Invites, reviews, messages and account updates."
       }
     }
   }

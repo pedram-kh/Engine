@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "In-app",
         "email": "E-mail",
-        "digest": "Daily email digest"
+        "digest": "Daily email digest",
+        "push": "Push"
       },
       "alwaysOn": "Mereu activ",
+      "push": {
+        "off": "Notificările push sunt dezactivate pe acest dispozitiv",
+        "enable": "Activează",
+        "blocked": "Notificările push sunt blocate în setările dispozitivului",
+        "openSettings": "Deschide setările"
+      },
       "typeLabels": {
         "assignment_invited": "Este primită o invitație la campanie",
         "assignment_draft_submitted": "A draft is submitted for review",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "Un creator aplică la o campanie",
         "campaign_application_accepted": "O candidatură este acceptată",
         "campaign_application_rejected": "O candidatură este respinsă"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Nu pierde nicio noutate",
+        "body": "Primește o notificare în clipa în care cineva te aprobă, te invită sau îți scrie.",
+        "note": "Alertele de pe ecranul de blocare rămân generice și nu afișează niciodată textul mesajelor.",
+        "accept": "Activează notificările",
+        "decline": "Nu acum"
+      },
+      "channel": {
+        "name": "Noutăți",
+        "description": "Invitații, evaluări, mesaje și noutăți despre cont."
       }
     }
   }

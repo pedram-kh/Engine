@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "I appen",
         "email": "E-post",
-        "digest": "Daglig e-postdigest"
+        "digest": "Daglig e-postdigest",
+        "push": "Push"
       },
       "alwaysOn": "Alltid på",
+      "push": {
+        "off": "Pushnotiser är avstängda på den här enheten",
+        "enable": "Slå på",
+        "blocked": "Pushnotiser är blockerade i enhetens inställningar",
+        "openSettings": "Öppna inställningar"
+      },
       "typeLabels": {
         "assignment_invited": "En kampanjinbjudan tas emot",
         "assignment_draft_submitted": "Ett utkast skickas in för granskning",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "En creator söker en kampanj",
         "campaign_application_accepted": "En ansökan accepteras",
         "campaign_application_rejected": "En ansökan avslås"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Missa aldrig en uppdatering",
+        "body": "Få en notis i samma stund som du godkänns, bjuds in eller får ett meddelande.",
+        "note": "Notiser på låsskärmen är allmänna och visar aldrig meddelandetext.",
+        "accept": "Slå på notiser",
+        "decline": "Inte nu"
+      },
+      "channel": {
+        "name": "Nyheter",
+        "description": "Inbjudningar, granskningar, meddelanden och kontouppdateringar."
       }
     }
   }

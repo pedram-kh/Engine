@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "In-app",
         "email": "Sähköposti",
-        "digest": "Daily email digest"
+        "digest": "Daily email digest",
+        "push": "Push"
       },
       "alwaysOn": "Aina päällä",
+      "push": {
+        "off": "Push-ilmoitukset ovat pois päältä tällä laitteella",
+        "enable": "Ota käyttöön",
+        "blocked": "Push-ilmoitukset on estetty laitteen asetuksissa",
+        "openSettings": "Avaa asetukset"
+      },
       "typeLabels": {
         "assignment_invited": "Kampanjakutsu vastaanotetaan",
         "assignment_draft_submitted": "A draft is submitted for review",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "Sisällöntuottaja hakee kampanjaan",
         "campaign_application_accepted": "Hakemus hyväksytään",
         "campaign_application_rejected": "Hakemus hylätään"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Älä missaa mitään päivitystä",
+        "body": "Saat ilmoituksen heti, kun sinut hyväksytään, kutsutaan tai sinulle kirjoitetaan.",
+        "note": "Lukitusnäytön ilmoitukset ovat yleisiä, eivätkä ne koskaan näytä viestin tekstiä.",
+        "accept": "Ota ilmoitukset käyttöön",
+        "decline": "Ei nyt"
+      },
+      "channel": {
+        "name": "Päivitykset",
+        "description": "Kutsut, tarkastukset, viestit ja tilipäivitykset."
       }
     }
   }

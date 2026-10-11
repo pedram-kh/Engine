@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "I appen",
         "email": "E-mail",
-        "digest": "Dagligt e-mail-sammendrag"
+        "digest": "Dagligt e-mail-sammendrag",
+        "push": "Push"
       },
       "alwaysOn": "Altid slået til",
+      "push": {
+        "off": "Push-notifikationer er slået fra på denne enhed",
+        "enable": "Slå til",
+        "blocked": "Push-notifikationer er blokeret i enhedens indstillinger",
+        "openSettings": "Åbn indstillinger"
+      },
       "typeLabels": {
         "assignment_invited": "En kampagneinvitation modtages",
         "assignment_draft_submitted": "Et udkast indsendes til gennemgang",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "En creator søger en kampagne",
         "campaign_application_accepted": "En ansøgning accepteres",
         "campaign_application_rejected": "En ansøgning afvises"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Gå aldrig glip af en opdatering",
+        "body": "Få besked i det øjeblik, du bliver godkendt, inviteret eller får en besked.",
+        "note": "Notifikationer på låseskærmen er generelle og viser aldrig beskedtekst.",
+        "accept": "Slå notifikationer til",
+        "decline": "Ikke nu"
+      },
+      "channel": {
+        "name": "Opdateringer",
+        "description": "Invitationer, gennemgange, beskeder og kontoopdateringer."
       }
     }
   }

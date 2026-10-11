@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "V aplikaci",
         "email": "E-pošta",
-        "digest": "Denní e-mailový souhrn"
+        "digest": "Denní e-mailový souhrn",
+        "push": "Push"
       },
       "alwaysOn": "Uvijek uključeno",
+      "push": {
+        "off": "Push obavijesti isključene su na ovom uređaju",
+        "enable": "Uključi",
+        "blocked": "Push obavijesti blokirane su u postavkama uređaja",
+        "openSettings": "Otvori postavke"
+      },
       "typeLabels": {
         "assignment_invited": "Primljena je pozivnica za kampanju",
         "assignment_draft_submitted": "Nacrt je odeslán k pregled",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "Kreator se prijavljuje na kampanju",
         "campaign_application_accepted": "Prijava je prihvaćena",
         "campaign_application_rejected": "Prijava je odbijena"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Ne propusti nijedno ažuriranje",
+        "body": "Primi obavijest čim te odobre, pozovu ili ti netko pošalje poruku.",
+        "note": "Obavijesti na zaključanom zaslonu su opće i nikad ne prikazuju tekst poruka.",
+        "accept": "Uključi obavijesti",
+        "decline": "Ne sada"
+      },
+      "channel": {
+        "name": "Ažuriranja",
+        "description": "Pozivi, pregledi, poruke i novosti o računu."
       }
     }
   }

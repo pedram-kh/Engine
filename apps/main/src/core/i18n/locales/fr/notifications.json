@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "Dans l'application",
         "email": "E-mail",
-        "digest": "Résumé quotidien par e-mail"
+        "digest": "Résumé quotidien par e-mail",
+        "push": "Push"
       },
       "alwaysOn": "Toujours activé",
+      "push": {
+        "off": "Les notifications push sont désactivées sur cet appareil",
+        "enable": "Activer",
+        "blocked": "Les notifications push sont bloquées dans les réglages de l'appareil",
+        "openSettings": "Ouvrir les réglages"
+      },
       "typeLabels": {
         "assignment_invited": "Une invitation à une campagne est reçue",
         "assignment_draft_submitted": "Un brouillon est soumis pour révision",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "Un créateur postule à une campagne",
         "campaign_application_accepted": "Une candidature est acceptée",
         "campaign_application_rejected": "Une candidature est refusée"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Ne manquez aucune mise à jour",
+        "body": "Soyez averti dès que vous êtes approuvé, invité ou contacté par message.",
+        "note": "Les alertes de l'écran de verrouillage restent génériques et n'affichent jamais le texte des messages.",
+        "accept": "Activer les notifications",
+        "decline": "Pas maintenant"
+      },
+      "channel": {
+        "name": "Mises à jour",
+        "description": "Invitations, validations, messages et actualités du compte."
       }
     }
   }

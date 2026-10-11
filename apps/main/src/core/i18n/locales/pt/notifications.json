@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "Na aplicação",
         "email": "E-mail",
-        "digest": "Resumo diário por email"
+        "digest": "Resumo diário por email",
+        "push": "Push"
       },
       "alwaysOn": "Sempre ativo",
+      "push": {
+        "off": "As notificações push estão desativadas neste dispositivo",
+        "enable": "Ativar",
+        "blocked": "As notificações push estão bloqueadas nas definições do dispositivo",
+        "openSettings": "Abrir definições"
+      },
       "typeLabels": {
         "assignment_invited": "Um convite de campanha é recebido",
         "assignment_draft_submitted": "Um rascunho é enviado para revisão",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "Um criador candidata-se a uma campanha",
         "campaign_application_accepted": "Uma candidatura é aceite",
         "campaign_application_rejected": "Uma candidatura é recusada"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Não perca nenhuma novidade",
+        "body": "Receba uma notificação assim que for aprovado, convidado ou receber uma mensagem.",
+        "note": "Os alertas no ecrã de bloqueio são genéricos e nunca mostram o texto das mensagens.",
+        "accept": "Ativar notificações",
+        "decline": "Agora não"
+      },
+      "channel": {
+        "name": "Novidades",
+        "description": "Convites, revisões, mensagens e novidades da conta."
       }
     }
   }

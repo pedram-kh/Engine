@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "In-app",
         "email": "Email",
-        "digest": "Daily email digest"
+        "digest": "Daily email digest",
+        "push": "Push"
       },
       "alwaysOn": "Πάντα ενεργό",
+      "push": {
+        "off": "Οι ειδοποιήσεις push είναι απενεργοποιημένες σε αυτή τη συσκευή",
+        "enable": "Ενεργοποίηση",
+        "blocked": "Οι ειδοποιήσεις push είναι αποκλεισμένες στις ρυθμίσεις της συσκευής",
+        "openSettings": "Άνοιγμα ρυθμίσεων"
+      },
       "typeLabels": {
         "assignment_invited": "Λαμβάνεται μια πρόσκληση καμπάνιας",
         "assignment_draft_submitted": "A draft is submitted for review",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "Ένας δημιουργός υποβάλλει αίτηση για καμπάνια",
         "campaign_application_accepted": "Μια αίτηση γίνεται αποδεκτή",
         "campaign_application_rejected": "Μια αίτηση απορρίπτεται"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Μην χάσετε καμία ενημέρωση",
+        "body": "Λάβετε ειδοποίηση τη στιγμή που εγκρίνεστε, προσκαλείστε ή σας στέλνουν μήνυμα.",
+        "note": "Οι ειδοποιήσεις στην οθόνη κλειδώματος είναι γενικές και δεν εμφανίζουν ποτέ το κείμενο των μηνυμάτων.",
+        "accept": "Ενεργοποίηση ειδοποιήσεων",
+        "decline": "Όχι τώρα"
+      },
+      "channel": {
+        "name": "Ενημερώσεις",
+        "description": "Προσκλήσεις, αξιολογήσεις, μηνύματα και ενημερώσεις λογαριασμού."
       }
     }
   }

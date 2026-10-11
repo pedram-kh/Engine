@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "In-app",
         "email": "E-pasts",
-        "digest": "Daily email digest"
+        "digest": "Daily email digest",
+        "push": "Push"
       },
       "alwaysOn": "Vienmēr ieslēgts",
+      "push": {
+        "off": "Push paziņojumi šajā ierīcē ir izslēgti",
+        "enable": "Ieslēgt",
+        "blocked": "Push paziņojumi ir bloķēti ierīces iestatījumos",
+        "openSettings": "Atvērt iestatījumus"
+      },
       "typeLabels": {
         "assignment_invited": "Tiek saņemts uzaicinājums uz kampaņu",
         "assignment_draft_submitted": "A draft is submitted for review",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "Radītājs piesakās kampaņai",
         "campaign_application_accepted": "Pieteikums tiek pieņemts",
         "campaign_application_rejected": "Pieteikums tiek atteikts"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Nepalaid garām nevienu jaunumu",
+        "body": "Saņem paziņojumu brīdī, kad tevi apstiprina, uzaicina vai kāds tev uzraksta.",
+        "note": "Paziņojumi bloķēšanas ekrānā ir vispārīgi un nekad nerāda ziņojuma tekstu.",
+        "accept": "Ieslēgt paziņojumus",
+        "decline": "Ne tagad"
+      },
+      "channel": {
+        "name": "Jaunumi",
+        "description": "Uzaicinājumi, pārbaudes, ziņojumi un konta jaunumi."
       }
     }
   }

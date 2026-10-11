@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "In-app",
         "email": "El. paštas",
-        "digest": "Daily email digest"
+        "digest": "Daily email digest",
+        "push": "Push"
       },
       "alwaysOn": "Visada įjungta",
+      "push": {
+        "off": "Push pranešimai šiame įrenginyje išjungti",
+        "enable": "Įjungti",
+        "blocked": "Push pranešimai užblokuoti įrenginio nustatymuose",
+        "openSettings": "Atidaryti nustatymus"
+      },
       "typeLabels": {
         "assignment_invited": "Gaunamas kvietimas į kampaniją",
         "assignment_draft_submitted": "A draft is submitted for review",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "Kūrėjas pateikia paraišką dėl kampanijos",
         "campaign_application_accepted": "Paraiška priimama",
         "campaign_application_rejected": "Paraiška atmetama"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Nepraleisk jokių naujienų",
+        "body": "Gauk pranešimą, vos tave patvirtins, pakvies ar kas nors parašys.",
+        "note": "Pranešimai užrakinimo ekrane yra bendro pobūdžio ir niekada nerodo žinutės teksto.",
+        "accept": "Įjungti pranešimus",
+        "decline": "Ne dabar"
+      },
+      "channel": {
+        "name": "Naujienos",
+        "description": "Kvietimai, peržiūros, žinutės ir paskyros naujienos."
       }
     }
   }

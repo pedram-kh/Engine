@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "In de app",
         "email": "E-mail",
-        "digest": "Dagelijkse e-mailsamenvatting"
+        "digest": "Dagelijkse e-mailsamenvatting",
+        "push": "Push"
       },
       "alwaysOn": "Altijd aan",
+      "push": {
+        "off": "Pushmeldingen staan uit op dit apparaat",
+        "enable": "Aanzetten",
+        "blocked": "Pushmeldingen zijn geblokkeerd in de instellingen van je apparaat",
+        "openSettings": "Instellingen openen"
+      },
       "typeLabels": {
         "assignment_invited": "Een campagne-uitnodiging wordt ontvangen",
         "assignment_draft_submitted": "Een concept wordt ingediend ter beoordeling",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "Een creator meldt zich aan voor een campagne",
         "campaign_application_accepted": "Een aanmelding wordt geaccepteerd",
         "campaign_application_rejected": "Een aanmelding wordt afgewezen"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Mis nooit een update",
+        "body": "Krijg direct een melding zodra je wordt goedgekeurd, uitgenodigd of een bericht krijgt.",
+        "note": "Meldingen op het vergrendelscherm blijven algemeen en tonen nooit de berichttekst.",
+        "accept": "Meldingen aanzetten",
+        "decline": "Niet nu"
+      },
+      "channel": {
+        "name": "Nieuws",
+        "description": "Uitnodigingen, beoordelingen, berichten en accountnieuws."
       }
     }
   }

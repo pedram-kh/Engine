@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "Nell'app",
         "email": "E-mail",
-        "digest": "Riepilogo giornaliero via email"
+        "digest": "Riepilogo giornaliero via email",
+        "push": "Push"
       },
       "alwaysOn": "Sempre attivo",
+      "push": {
+        "off": "Le notifiche push sono disattivate su questo dispositivo",
+        "enable": "Attiva",
+        "blocked": "Le notifiche push sono bloccate nelle impostazioni del dispositivo",
+        "openSettings": "Apri impostazioni"
+      },
       "typeLabels": {
         "assignment_invited": "Viene ricevuto un invito a una campagna",
         "assignment_draft_submitted": "Viene inviata una bozza per la revisione",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "Un creator si candida a una campagna",
         "campaign_application_accepted": "Una candidatura viene accettata",
         "campaign_application_rejected": "Una candidatura viene rifiutata"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Non perderti nessun aggiornamento",
+        "body": "Ricevi un avviso appena vieni approvato, invitato o ricevi un messaggio.",
+        "note": "Gli avvisi nella schermata di blocco restano generici e non mostrano mai il testo dei messaggi.",
+        "accept": "Attiva le notifiche",
+        "decline": "Non ora"
+      },
+      "channel": {
+        "name": "Aggiornamenti",
+        "description": "Inviti, revisioni, messaggi e novità dell'account."
       }
     }
   }

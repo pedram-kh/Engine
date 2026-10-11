@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "In der App",
         "email": "E-Mail",
-        "digest": "Tägliche E-Mail-Zusammenfassung"
+        "digest": "Tägliche E-Mail-Zusammenfassung",
+        "push": "Push"
       },
       "alwaysOn": "Immer aktiv",
+      "push": {
+        "off": "Push-Benachrichtigungen sind auf diesem Gerät ausgeschaltet",
+        "enable": "Einschalten",
+        "blocked": "Push-Benachrichtigungen sind in den Geräteeinstellungen blockiert",
+        "openSettings": "Einstellungen öffnen"
+      },
       "typeLabels": {
         "assignment_invited": "Eine Kampagnen-Einladung wird empfangen",
         "assignment_draft_submitted": "Ein Entwurf wird zur Überprüfung eingereicht",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "Ein Creator bewirbt sich auf eine Kampagne",
         "campaign_application_accepted": "Eine Bewerbung wird angenommen",
         "campaign_application_rejected": "Eine Bewerbung wird abgelehnt"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Verpasse kein Update",
+        "body": "Erhalte sofort eine Benachrichtigung, wenn du genehmigt, eingeladen oder angeschrieben wirst.",
+        "note": "Mitteilungen auf dem Sperrbildschirm bleiben allgemein und zeigen nie den Nachrichtentext.",
+        "accept": "Benachrichtigungen aktivieren",
+        "decline": "Nicht jetzt"
+      },
+      "channel": {
+        "name": "Neuigkeiten",
+        "description": "Einladungen, Prüfungen, Nachrichten und Kontoupdates."
       }
     }
   }

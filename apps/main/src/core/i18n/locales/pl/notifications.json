@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "W aplikacji",
         "email": "E-mail",
-        "digest": "Dzienny digest e-mail"
+        "digest": "Dzienny digest e-mail",
+        "push": "Push"
       },
       "alwaysOn": "Zawsze włączone",
+      "push": {
+        "off": "Powiadomienia push są wyłączone na tym urządzeniu",
+        "enable": "Włącz",
+        "blocked": "Powiadomienia push są zablokowane w ustawieniach urządzenia",
+        "openSettings": "Otwórz ustawienia"
+      },
       "typeLabels": {
         "assignment_invited": "Zaproszenie do kampanii zostaje odebrane",
         "assignment_draft_submitted": "Szkic zostaje przesłany do recenzji",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "Twórca zgłasza się do kampanii",
         "campaign_application_accepted": "Zgłoszenie zostaje zaakceptowane",
         "campaign_application_rejected": "Zgłoszenie zostaje odrzucone"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Nie przegap żadnej aktualizacji",
+        "body": "Otrzymaj powiadomienie od razu, gdy ktoś Cię zatwierdzi, zaprosi lub napisze.",
+        "note": "Powiadomienia na ekranie blokady są ogólne i nigdy nie pokazują treści wiadomości.",
+        "accept": "Włącz powiadomienia",
+        "decline": "Nie teraz"
+      },
+      "channel": {
+        "name": "Aktualności",
+        "description": "Zaproszenia, oceny, wiadomości i aktualności konta."
       }
     }
   }

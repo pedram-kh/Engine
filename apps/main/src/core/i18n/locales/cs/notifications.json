@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "V aplikaci",
         "email": "E-mail",
-        "digest": "Denní e-mailový souhrn"
+        "digest": "Denní e-mailový souhrn",
+        "push": "Push"
       },
       "alwaysOn": "Vždy zapnuto",
+      "push": {
+        "off": "Push oznámení jsou na tomto zařízení vypnutá",
+        "enable": "Zapnout",
+        "blocked": "Push oznámení jsou zablokovaná v nastavení zařízení",
+        "openSettings": "Otevřít nastavení"
+      },
       "typeLabels": {
         "assignment_invited": "Je přijata pozvánka do kampaně",
         "assignment_draft_submitted": "Návrh je odeslán k posouzení",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "Tvůrce se přihlásí na kampaň",
         "campaign_application_accepted": "Přihláška je přijata",
         "campaign_application_rejected": "Přihláška je odmítnuta"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Nenechte si nic ujít",
+        "body": "Dostanete upozornění ve chvíli, kdy budete schváleni, pozváni nebo vám někdo napíše.",
+        "note": "Upozornění na zamčené obrazovce jsou obecná a nikdy nezobrazují text zpráv.",
+        "accept": "Zapnout oznámení",
+        "decline": "Teď ne"
+      },
+      "channel": {
+        "name": "Aktualizace",
+        "description": "Pozvánky, hodnocení, zprávy a novinky o účtu."
       }
     }
   }

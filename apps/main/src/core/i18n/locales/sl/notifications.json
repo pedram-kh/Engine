@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "V aplikaci",
         "email": "E-pošta",
-        "digest": "Denní e-mailový souhrn"
+        "digest": "Denní e-mailový souhrn",
+        "push": "Push"
       },
       "alwaysOn": "Vedno vklopljeno",
+      "push": {
+        "off": "Push obvestila so na tej napravi izklopljena",
+        "enable": "Vklopi",
+        "blocked": "Push obvestila so blokirana v nastavitvah naprave",
+        "openSettings": "Odpri nastavitve"
+      },
       "typeLabels": {
         "assignment_invited": "Prejeto je povabilo v kampanjo",
         "assignment_draft_submitted": "Osnutek je odeslán k pregled",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "Ustvarjalec se prijavi na kampanjo",
         "campaign_application_accepted": "Prijava je sprejeta",
         "campaign_application_rejected": "Prijava je zavrnjena"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Ne zamudi nobene novosti",
+        "body": "Prejmi obvestilo takoj, ko te odobrijo, povabijo ali ti pošljejo sporočilo.",
+        "note": "Obvestila na zaklenjenem zaslonu so splošna in nikoli ne prikažejo besedila sporočil.",
+        "accept": "Vklopi obvestila",
+        "decline": "Ne zdaj"
+      },
+      "channel": {
+        "name": "Posodobitve",
+        "description": "Povabila, pregledi, sporočila in novosti računa."
       }
     }
   }

@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "In-app",
         "email": "Email",
-        "digest": "Daily email digest"
+        "digest": "Daily email digest",
+        "push": "Push"
       },
       "alwaysOn": "Dejjem mixgħul",
+      "push": {
+        "off": "In-notifiki push huma mitfijin fuq dan l-apparat",
+        "enable": "Ixgħel",
+        "blocked": "In-notifiki push huma mblukkati fis-settings tal-apparat",
+        "openSettings": "Iftaħ is-settings"
+      },
       "typeLabels": {
         "assignment_invited": "Tasal stedina għal kampanja",
         "assignment_draft_submitted": "A draft is submitted for review",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "Kreatur japplika għal kampanja",
         "campaign_application_accepted": "Applikazzjoni tiġi aċċettata",
         "campaign_application_rejected": "Applikazzjoni tiġi rifjutata"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Titlifx aġġornament",
+        "body": "Irċievi notifika hekk kif japrovawk, jistidnuk jew jibagħtulek messaġġ.",
+        "note": "In-notifiki fuq l-iskrin imsakkar huma ġenerali u qatt ma juru t-test tal-messaġġi.",
+        "accept": "Ixgħel in-notifiki",
+        "decline": "Mhux issa"
+      },
+      "channel": {
+        "name": "Aġġornamenti",
+        "description": "Stediniet, reviżjonijiet, messaġġi u aġġornamenti tal-kont."
       }
     }
   }

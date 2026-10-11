@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "In-app",
         "email": "Имейл",
-        "digest": "Daily email digest"
+        "digest": "Daily email digest",
+        "push": "Push"
       },
       "alwaysOn": "Винаги включено",
+      "push": {
+        "off": "Push известията са изключени на това устройство",
+        "enable": "Включете",
+        "blocked": "Push известията са блокирани в настройките на устройството",
+        "openSettings": "Отворете настройките"
+      },
       "typeLabels": {
         "assignment_invited": "Получена е покана за кампания",
         "assignment_draft_submitted": "A draft is submitted for review",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "Създател кандидатства за кампания",
         "campaign_application_accepted": "Кандидатура е приета",
         "campaign_application_rejected": "Кандидатура е отхвърлена"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Не пропускайте нито една новина",
+        "body": "Получавайте известие в мига, в който бъдете одобрени, поканени или получите съобщение.",
+        "note": "Известията на заключения екран са общи и никога не показват текст на съобщения.",
+        "accept": "Включете известията",
+        "decline": "Не сега"
+      },
+      "channel": {
+        "name": "Актуализации",
+        "description": "Покани, прегледи, съобщения и новини за акаунта."
       }
     }
   }

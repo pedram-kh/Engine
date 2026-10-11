@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "In-app",
         "email": "E-mail",
-        "digest": "Daily email digest"
+        "digest": "Daily email digest",
+        "push": "Push"
       },
       "alwaysOn": "Mindig bekapcsolva",
+      "push": {
+        "off": "A push értesítések ki vannak kapcsolva ezen az eszközön",
+        "enable": "Bekapcsolás",
+        "blocked": "A push értesítések le vannak tiltva az eszköz beállításaiban",
+        "openSettings": "Beállítások megnyitása"
+      },
       "typeLabels": {
         "assignment_invited": "Kampányra szóló meghívás érkezik",
         "assignment_draft_submitted": "A draft is submitted for review",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "Egy alkotó jelentkezik egy kampányra",
         "campaign_application_accepted": "Egy jelentkezést elfogadnak",
         "campaign_application_rejected": "Egy jelentkezést elutasítanak"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Ne maradj le semmiről",
+        "body": "Kapj értesítést abban a pillanatban, amikor jóváhagynak, meghívnak vagy üzenetet küldenek neked.",
+        "note": "A lezárási képernyőn megjelenő értesítések általánosak, és soha nem mutatják az üzenet szövegét.",
+        "accept": "Értesítések bekapcsolása",
+        "decline": "Most nem"
+      },
+      "channel": {
+        "name": "Frissítések",
+        "description": "Meghívók, értékelések, üzenetek és fiókfrissítések."
       }
     }
   }

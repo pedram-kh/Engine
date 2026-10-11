@@ -58,9 +58,16 @@
       "channels": {
         "in_app": "In-app",
         "email": "Ríomhphost",
-        "digest": "Daily email digest"
+        "digest": "Daily email digest",
+        "push": "Push"
       },
       "alwaysOn": "Ar siúl i gcónaí",
+      "push": {
+        "off": "Tá fógraí brú múchta ar an ngléas seo",
+        "enable": "Cuir ar siúl",
+        "blocked": "Tá fógraí brú blocáilte i socruithe an ghléis",
+        "openSettings": "Oscail na socruithe"
+      },
       "typeLabels": {
         "assignment_invited": "Faightear cuireadh feachtais",
         "assignment_draft_submitted": "A draft is submitted for review",
@@ -81,6 +88,19 @@
         "campaign_application_submitted": "Cuireann cruthaitheoir iarratas isteach ar fheachtas",
         "campaign_application_accepted": "Glacadh le hiarratas",
         "campaign_application_rejected": "Diúltaítear iarratas"
+      }
+    },
+    "push": {
+      "softAsk": {
+        "title": "Ná caill nuashonrú ar bith",
+        "body": "Faigh fógra an nóiméad a cheadaítear thú, a thugtar cuireadh duit nó a gheobhaidh tú teachtaireacht.",
+        "note": "Bíonn fógraí ar an scáileán glasála ginearálta agus ní thaispeánann siad téacs teachtaireachta riamh.",
+        "accept": "Cuir fógraí ar siúl",
+        "decline": "Ní anois"
+      },
+      "channel": {
+        "name": "Nuashonruithe",
+        "description": "Cuirí, athbhreithnithe, teachtaireachtaí agus nuashonruithe cuntais."
       }
     }
   }
