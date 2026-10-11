@@ -486,18 +486,18 @@ if it grows again. Say if you would rather have `@capacitor/preferences` instead
 
 ## 19. Checkpoint B gate board (at the test tip `55b4ef21` plus the docs)
 
-| Gate                                        | Result                                                                                                                                                                                                                                                                                                                                                |
-| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Backend Pest, full, serial, 2G              | **0 failed.** 3 239 deprecated-but-passing + 5 passed, 16 390 assertions (identical to Checkpoint A: no backend code changed in B; the PHP 8.5 `PDO::MYSQL_ATTR_SSL_CA` noise is as in §5)                                                                                                                                                            |
-| Pint `--test`                               | pass                                                                                                                                                                                                                                                                                                                                                  |
-| PHPStan / Larastan (`--memory-limit=2G`)    | `[OK] No errors`                                                                                                                                                                                                                                                                                                                                      |
-| Vitest, all workspaces                      | design-tokens 42 (+1 todo) · api-client 221 · ui 47 · apps/admin 488 · apps/main **2 319** (2 318 at the C4.1 full run, +1 for the sheet's persistence test) — **all pass**                                                                                                                                                                           |
-| ESLint, all frontend                        | 0 errors; 2 warnings, both pre-existing (`v-html` in `apps/main`)                                                                                                                                                                                                                                                                                     |
-| vue-tsc / tsc, all frontend                 | pass                                                                                                                                                                                                                                                                                                                                                  |
-| 24-locale parity                            | `i18n-push-strings.spec.ts` (new), `i18n-notifications-parity` and backend `LangParityTest`, inside the runs above                                                                                                                                                                                                                                    |
-| Production build (`apps/main`)              | pass; no Firebase web SDK in `dist` (§16.1)                                                                                                                                                                                                                                                                                                           |
-| Android `assembleDebug` / `assembleRelease` | both **BUILD SUCCESSFUL** (JDK 21); merged manifest read (§16.2)                                                                                                                                                                                                                                                                                      |
-| Playwright (main, admin)                    | **NOT RUN at B.** It needs the dev stack down, and your `php artisan serve` is running on :8000 again. I did not stop it. Checkpoint B changes nothing the E2E suites traverse on web (the push column is invisible there, and the preferences page spec is unedited), but the plan calls for the run before the push, so it is outstanding — see §21 |
+| Gate                                        | Result                                                                                                                                                                                     |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Backend Pest, full, serial, 2G              | **0 failed.** 3 239 deprecated-but-passing + 5 passed, 16 390 assertions (identical to Checkpoint A: no backend code changed in B; the PHP 8.5 `PDO::MYSQL_ATTR_SSL_CA` noise is as in §5) |
+| Pint `--test`                               | pass                                                                                                                                                                                       |
+| PHPStan / Larastan (`--memory-limit=2G`)    | `[OK] No errors`                                                                                                                                                                           |
+| Vitest, all workspaces                      | design-tokens 42 (+1 todo) · api-client 221 · ui 47 · apps/admin 488 · apps/main **2 319** (2 318 at the C4.1 full run, +1 for the sheet's persistence test) — **all pass**                |
+| ESLint, all frontend                        | 0 errors; 2 warnings, both pre-existing (`v-html` in `apps/main`)                                                                                                                          |
+| vue-tsc / tsc, all frontend                 | pass                                                                                                                                                                                       |
+| 24-locale parity                            | `i18n-push-strings.spec.ts` (new), `i18n-notifications-parity` and backend `LangParityTest`, inside the runs above                                                                         |
+| Production build (`apps/main`)              | pass; no Firebase web SDK in `dist` (§16.1)                                                                                                                                                |
+| Android `assembleDebug` / `assembleRelease` | both **BUILD SUCCESSFUL** (JDK 21); merged manifest read (§16.2)                                                                                                                           |
+| Playwright (main, admin)                    | **Run 2026-10-11 at `8521aadc` — all 36 tests pass, but not in one clean run on this host; see §23.** (Not run at the original B tip: the dev stack was up.)                               |
 
 **Two environment notes.**
 
@@ -587,3 +587,27 @@ are the part to reconsider.
 
 **Closing AH-102 with Stage 5:** possible if the spike goes well. What it adds to Checkpoint B: this section, the flip commit,
 and the §4 walk run on iOS twice (debug and TestFlight).
+
+## 23. Playwright at `8521aadc` (run 2026-10-11, on the isolated E2E stack)
+
+Main SPA 34 tests, admin SPA 2 tests, `--retries=0` (the local config), dev stack stopped under the standing approval.
+**All 36 pass, but not in a single clean run, and the failures are this host, not AH-102.**
+
+| Run                                         | Result                                                                                                                                                                                                  |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Main, full, as-is                           | 33 pass, 1 fail: `2fa-enrollment-and-sign-in.spec.ts:93`                                                                                                                                                |
+| Same spec on `origin/main` (`6e827e40`)     | **Fails identically**, twice. So it predates AH-102.                                                                                                                                                    |
+| Cause                                       | `POST /auth/2fa/confirm` took 7.2 s: it bcrypts 10 recovery codes (`TwoFactorService::hashRecoveryCode`, driver pinned to `bcrypt`, default 12 rounds), and the spec waits 5 s for the codes to appear. |
+| Main, full, with `BCRYPT_ROUNDS=4` exported | 31 pass, 3 fail, all pure timeouts: `2fa-enrollment` (33 s vs 30 s), `brands.spec:108` (35 s vs 30 s), spec #20 (90 s cap). Host load average was 55–90 (Docker, Spotlight, others).                    |
+| The three, `--timeout=120000`               | All pass (32 s, 41 s, 1.4 min).                                                                                                                                                                         |
+| Admin, full                                 | `admin-sign-in.spec.ts:69` failed once: the redirect to `/` landed at the very end of its 5 s `toHaveURL`. `--repeat-each=3`: 3/3 pass (9–11 s).                                                        |
+
+**What this says.** Nothing in the AH-102 diff reaches these specs (no auth, 2FA, brands or sign-in code changed on web). The
+hosts differ in speed, not behaviour: CI passes them at the default timeouts. I did **not** edit any timeout, spec or
+`playwright.config.ts`. `BCRYPT_ROUNDS=4` and `--timeout=120000` were shell-level overrides for this local run only.
+
+**For the record:** `admin-sign-in.spec.ts:69` flaked once more, the same shape as the watch-list entry (slow redirect, then
+passes). It stays on the watch-list; this is a second data point that it is load-sensitive, not a diagnosis.
+`creator-wizard-happy-path.spec.ts:91` and `creator-detail.spec.ts:64` (the R2 rider) passed in the full run.
+
+**Still owed:** CI at the pushed tip is the only run at default timeouts on a fast host; it is cited after the push.
