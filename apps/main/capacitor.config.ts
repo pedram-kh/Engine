@@ -14,7 +14,24 @@ const config: CapacitorConfig = {
   appId: 'com.catalystgrowth.platform',
   appName: 'Catalyst',
   webDir: 'dist',
+  // AH-102: the Firebase messaging plugin's package identity collides under SwiftPM
+  // unless it is symlinked (the plugin README; needs Capacitor CLI 8.4.0+).
+  experimental: {
+    ios: {
+      spm: {
+        packageOptions: {
+          '@capacitor-firebase/messaging': { symlink: true },
+        },
+      },
+    },
+  },
   plugins: {
+    // AH-102 (P-5): a push that arrives while the app is open shows no system
+    // banner on iOS either — the in-app bell refresh is the foreground signal,
+    // as on Android. (The plugin default would be alert, badge and sound.)
+    FirebaseMessaging: {
+      presentationOptions: [],
+    },
     SystemBars: {
       insetsHandling: 'css',
       initialViewportFitValueHint: 'cover',

@@ -9,9 +9,8 @@
  *   2. the manifest must keep auto-init OFF (consent-first: no token before the
  *      creator says yes), keep analytics off, and point the default channel at
  *      the id the server sets on every message;
- *   3. the Firebase plugin must be wired into the Android project, and the iOS
- *      project must NOT have picked it up (R-7: a full `cap sync` would add the
- *      Firebase SDK to iOS without a plist).
+ *   3. the Firebase plugin must be wired into the Android project (the iOS half
+ *      is pinned in `pushIosConfig.spec.ts`).
  */
 import { readFileSync } from 'node:fs'
 import { mkdtemp, rm } from 'node:fs/promises'
@@ -148,12 +147,6 @@ describe('Capacitor project wiring', () => {
     expect(read('android/app/capacitor.build.gradle')).toContain(
       "implementation project(':capacitor-firebase-messaging')",
     )
-  })
-
-  it('iOS has NOT picked the plugin up (R-7: no Firebase SDK on iOS before AH-102-ios)', () => {
-    const swiftManifest = read('ios/App/CapApp-SPM/Package.swift')
-
-    expect(swiftManifest.toLowerCase()).not.toContain('firebase')
   })
 })
 
