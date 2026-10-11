@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "908297825153",
+    "project_id": "catalyst-production-c28e9",
+    "storage_bucket": "catalyst-production-c28e9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:908297825153:android:4dd8cd2c7f251dc4e55680",
+        "android_client_info": {
+          "package_name": "com.catalystgrowth.platform"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANv4at4nCdbbaHX_axK63asqx1vtt8V90"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

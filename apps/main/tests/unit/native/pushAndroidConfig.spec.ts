@@ -156,3 +156,34 @@ describe('Capacitor project wiring', () => {
     expect(swiftManifest.toLowerCase()).not.toContain('firebase')
   })
 })
+
+describe('google-services.json (the Android Firebase client config, committed per Q14)', () => {
+  const file = path.join(APP_ROOT, 'android/app/google-services.json')
+  const raw = readFileSync(file, 'utf8')
+  const config = JSON.parse(raw) as {
+    project_info: { project_id: string; project_number: string }
+    client: Array<{ client_info: { android_client_info: { package_name: string } } }>
+  }
+
+  it('is registered for this app’s id, so the Google-services plugin matches it', () => {
+    const appId = /appId:\s*'([^']+)'/.exec(
+      readFileSync(path.join(APP_ROOT, 'capacitor.config.ts'), 'utf8'),
+    )?.[1]
+
+    expect(appId).toBe('com.catalystgrowth.platform')
+    expect(config.client.map((c) => c.client_info.android_client_info.package_name)).toContain(
+      appId,
+    )
+  })
+
+  it('belongs to the one production Firebase project', () => {
+    expect(config.project_info.project_id).toBe('catalyst-production-c28e9')
+  })
+
+  it('is the client config, never a service-account credential', () => {
+    // The service-account key signs FCM sends and must never enter the repo (C0.2).
+    expect(raw).not.toContain('private_key')
+    expect(raw).not.toContain('service_account')
+    expect(raw).not.toContain('client_email')
+  })
+})
