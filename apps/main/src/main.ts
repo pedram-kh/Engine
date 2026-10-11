@@ -8,6 +8,7 @@ import { router } from './core/router'
 import { i18n, setLocale } from './core/i18n'
 import { startAppResumeRefresh } from './core/platform/appResume'
 import { bootNativeShell } from './core/platform/bootNativeShell'
+import { createPushTapHandler } from './core/platform/push/pushTapRouting'
 import { startPush } from './core/platform/push/startPush'
 import { useAuthStore } from './modules/auth/stores/useAuthStore'
 import { requestNotificationsRefresh } from './modules/notifications/composables/notificationsRefresh'
@@ -53,9 +54,9 @@ void Promise.all([
   // and shows no banner. The router and the refresh are injected here because
   // only this wiring layer may touch them.
   const push = startPush({
-    onTap: () => {
-      void router.push({ name: 'creator.notifications' })
-    },
+    // Waits for the router's first navigation: a cold-start tap is delivered
+    // before it, and an immediate push is overtaken (see pushTapRouting.ts).
+    onTap: createPushTapHandler(router),
     onForeground: () => requestNotificationsRefresh(),
   })
   // A session appearing (sign-in on a device that already granted permission)
