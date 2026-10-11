@@ -651,3 +651,52 @@ by admin 3); the `user_push_tokens` migration was applied; a bare `localhost` wa
 
 **Not done:** the iOS spike (5.1) and the signed archive; item 12's rotation re-POST; the 22 other locales on a device;
 Playwright at the default timeouts on a fast host (CI at the pushed tip).
+
+## 25. Is the bearer-token logging structurally debug-only? (checked 2026-10-11, before the push)
+
+**Short answer: yes, by the build type, with one override that is now pinned shut. A release build emits nothing.**
+
+**What logs it.** Not our code (no `console.*` in `src/` touches a token). The Capacitor bridge writes plugin results to the
+WebView console, and the Android `WebChromeClient` forwards the console to logcat as `Capacitor/Console`. That is how
+SecureStorage's `internalGetItem` result, the stored token, reached logcat in the debug build.
+
+**The gate, from the installed `@capacitor/android` source (not a runtime flag of ours):**
+
+- `CapConfig.java`: `loggingBehavior` defaults to `debug`, and `debug` means `loggingEnabled = isDebug`, where
+  `isDebug = (applicationInfo.flags & FLAG_DEBUGGABLE) != 0`.
+- `Bridge.java` passes that same `config.isLoggingEnabled()` into the injected JS (`cap.isLoggingEnabled`), which is what
+  switches the JS-side plugin-result logging (`native-bridge.js`). One value gates both halves.
+- `FLAG_DEBUGGABLE` is the APK's `android:debuggable`, fixed at build time by the build type. The app, the server and the
+  user cannot change it on an installed build. It is a property of the artifact, not a toggle.
+- The one way around it is `loggingBehavior: 'production'` (unconditional) in `capacitor.config.ts`. It is not set.
+
+**Evidence from the artefacts (release built with `pnpm build:native`, `cap sync android`, `assembleRelease`):**
+
+| Check                                                                                    | Debug APK                                    | Release APK                  |
+| ---------------------------------------------------------------------------------------- | -------------------------------------------- | ---------------------------- |
+| `aapt2 dump xmltree` merged manifest, `android:debuggable`                               | `true`                                       | **absent** (so false)        |
+| `networkSecurityConfig` (the cleartext-to-localhost config)                              | present                                      | **absent**                   |
+| `assets/capacitor.config.json`, `loggingBehavior` and `android` keys                     | n/a                                          | **both unset**               |
+| On the phone: `adb shell run-as com.catalystgrowth.platform`                             | works                                        | **"package not debuggable"** |
+| Launch, then logcat for the app's pid, lines tagged `Capacitor/` (plugin calls, console) | present (the walk saw them, incl. the token) | **0**                        |
+| Same logcat, lines containing "token", any case                                          | present (the walk saw it)                    | **0**                        |
+
+The release APK was re-signed with the local debug keystore only to install it for this check (aligned and signed under
+`/tmp`, deleted afterwards), then replaced by the debug build. In the release launch the only Capacitor-related log lines were
+one `Capacitor: Starting BridgeActivity` (emitted before the config loads, no data) and two Android `ConnectivityManager`
+stack-trace lines that mention class names.
+
+**What I could NOT show.** A signed-in release session: the release build has no cleartext path to the local API, so it
+cannot sign in against it, and a production API was not part of this check. The absence of token output in release therefore
+rests on the gate above (plus the empty `Capacitor/` log at launch, where the same plugin calls that logged in debug ran
+silently), not on watching a token being stored and not logged.
+
+**Pinned:** `tests/unit/native/androidLoggingDebugOnly.spec.ts` (3 tests) fails if `capacitor.config.ts` sets
+`loggingBehavior` or `webContentsDebuggingEnabled`, if the main manifest or the release build type can make the app
+debuggable, or if a `@capacitor/android` bump changes the `debug` default or stops deriving it from `FLAG_DEBUGGABLE`.
+Break-reverts, each 1 failing: BR-62 `loggingBehavior: 'production'` · BR-63 `android:debuggable="true"` in the main manifest ·
+BR-64 `debuggable true` in the release build type. The dependency-default test was checked by running its pattern against the
+library source and against an edited copy (matches the original, not the edit), not by editing `node_modules`.
+
+**Still true:** in a debug build the token is in logcat. Debug builds are the developer's own; the rule in the walk doc
+(§7.5) is not to paste logcat. Signing out revokes the token.

@@ -121,12 +121,17 @@ happened.
 
 ## AH-102 (Checkpoint B, app) — push column, push registration module, Android FCM wiring — PENDING
 
-> **Stacks on AH-102 Checkpoint A and everything under it (AH-099 … AH-101, all PENDING).** **Local, not pushed:** held
-> for Pedram's eyes-on (E1/E2/E3). This entry is opened **before** the push, per the plan. SPA + Android project only.
+> **Stacks on AH-102 Checkpoint A and everything under it (AH-099 … AH-101, all PENDING).** **Cleared 2026-10-11:** Pedram's
+> Android walk (E1/E2/E3, real FCM, Samsung SM-A515F) passed 11 of 12 items; item 12 is partial (rotation re-POST not
+> verified, accepted as a known gap: self-healing in production, see `docs/tech-debt.md`). SPA + Android project only.
 
-- **Status:** PENDING (local; push held)
-- **Range:** from Checkpoint A's pushed tip `6e827e40` → tip **TBD at push**: `1b16a6f6` (docs), `f61c0ec1` (C3.1),
-  `20942da6` (C3.2), `a377cf97` (C4.1), `6d07b727` (C4.2), `55b4ef21` (a test), `9119b9c4` (google-services.json), `0d51aed9` (iOS wiring), plus the docs commits.
+- **Status:** PENDING (cleared by the Android walk; pushed, not deployed). **Pushing is not deploying.**
+- **Range:** from Checkpoint A's pushed tip `6e827e40` → tip **recorded in the review §26 after the push** (14 local commits
+  at the time of writing, `1b16a6f6` … `96518a3e`, plus this entry and the spec below): `1b16a6f6` (docs), `f61c0ec1` (C3.1),
+  `20942da6` (C3.2), `a377cf97` (C4.1), `6d07b727` (C4.2), `55b4ef21` (a test), `1eef233c` (docs), `9119b9c4`
+  (google-services.json), `0d51aed9` (iOS wiring), `8521aadc` / `899882d3` / `c803d7db` / `96518a3e` (docs), **`72afb8ae`
+  (fix: a cold-start push tap waits for the router; found by the walk)**, and the spec that pins the Android bridge logging as
+  debug-only.
 - **AH entries carried:** AH-102 (app half)
 - **Migrations run:** **none.** No schema change, no backfill.
 - **Pre-deploy reads:** none beyond Checkpoint A's.
@@ -143,14 +148,16 @@ happened.
 
 **What is gated OFF**
 
-- **`push_notifications_enabled` stays OFF.** Arm only after: the Android device proof (E3, including R-8), the
-  `push:test --validate-only` smoke, and Pedram's go — timed **before** the first push-capable store build reaches users.
+- **`push_notifications_enabled` stays OFF.** The Android device proof is **done** (2026-10-11, E3 11 of 12). Still required
+  before arming: the production FCM credential in Secrets Manager, `push:test --validate-only` against it, and Pedram's go,
+  timed **before** the first push-capable store build reaches users. iOS stays off (`IOS_PUSH_ENABLED=false`) until the spike.
 
 - **Infra:** none for the web deploy (the queue-restart and env steps are Checkpoint A's). **Never run a bare
   `npx cap sync`** (R-7); Android builds need JDK 21.
 - **One-shot commands:** none.
 - **Post-deploy verification:** web: the notification preferences page has no Push column; the creator dashboard shows no
-  soft-ask. Android (E3): [`push-notifications-device-walk.md`](../reviews/push-notifications-device-walk.md).
+  soft-ask. Android (E3): [`push-notifications-device-walk.md`](../reviews/push-notifications-device-walk.md) (run once on
+  2026-10-11 against the local API; the first PRODUCTION run is the first store build, after the flag is armed).
 - **Flags armed:** none — `push_notifications_enabled` stays OFF.
 - **Operator:** —
 - **Anything unexpected:** —
