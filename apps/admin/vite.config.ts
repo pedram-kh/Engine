@@ -27,9 +27,18 @@ const proxyTarget = process.env.CATALYST_ADMIN_API_PROXY_TARGET ?? 'http://127.0
  * introduces a Vuetify component not already covered (sub-components share a
  * module, e.g. VContainer/VSpacer → VGrid, VCardText → VCard,
  * VDataTableServer → VDataTable).
+ *
+ * This list is no longer kept honest by diligence alone: the architecture spec
+ * `tests/unit/architecture/vite-vuetify-prebundle.spec.ts` fails CI when any
+ * `.vue` file in the admin SPA or `@catalyst/ui` uses a Vuetify component
+ * whose module is not listed here. (A missing `VProgressLinear` — pulled in by
+ * `CompletenessBar` through the `@catalyst/ui` barrel the dashboard imports —
+ * made the cold-start dev server reload the page mid-sign-in on every fresh
+ * E2E run: `admin-sign-in.spec.ts:69` / `:106`, AH-102b C0.2.)
  */
 const vuetifyComponents = [
   'VApp',
+  'VAppBar',
   'VMain',
   'VGrid',
   'VCard',
@@ -38,17 +47,26 @@ const vuetifyComponents = [
   'VIcon',
   'VForm',
   'VDialog',
+  'VDivider',
   'VTextField',
   'VTextarea',
   'VCombobox',
   'VSelect',
+  'VAutocomplete',
+  'VAvatar',
+  'VMenu',
+  'VNavigationDrawer',
   'VProgressCircular',
+  'VProgressLinear',
+  'VRadio',
+  'VRadioGroup',
   'VChip',
   'VChipGroup',
   'VAlert',
   'VDataTable',
   'VTable',
   'VSnackbar',
+  'VSystemBar',
   'VTooltip',
   'VList',
   'VSwitch',
