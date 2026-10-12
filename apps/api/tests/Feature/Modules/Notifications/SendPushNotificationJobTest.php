@@ -403,3 +403,39 @@ it('the outcome enum is fully handled: every PushOutcome case has a recorder log
 
     expect($outcomes)->toBe($expected)->and($token->exists)->toBeTrue();
 });
+
+// =============================================================================
+// AH-102b C1.2 — the notification ULID reaches the recorder
+// =============================================================================
+
+it('AH-102b: the in-app notification ULID in the message data reaches the recorder (visible in its log context)', function (): void {
+    $token = pjLiveToken();
+    pjSender([PushSendResult::delivered()]);
+    $logs = pjCaptureLogs();
+    $ulid = '01JABCDEFGHJKMNPQRSTVWXYZ0';
+    $message = new PushMessage(title: 't', body: 'b', data: ['type' => 'assignment.draft_approved', 'v' => 1, 'notification_ulid' => $ulid]);
+    $job = new SendPushNotificationJob($token->id, $message, 'assignment.draft_approved');
+    $job->setJob(new PushAttemptJob(1));
+
+    pjRun($job);
+
+    expect(pjLog($logs->records, 'push.delivery')['context']['notification_ulid'])->toBe($ulid);
+});
+
+it('AH-102b: a message with no notification ULID (or a non-string one) reaches the recorder as null', function (mixed $data): void {
+    $token = pjLiveToken();
+    pjSender([PushSendResult::delivered()]);
+    $logs = pjCaptureLogs();
+    $job = new SendPushNotificationJob($token->id, new PushMessage(title: 't', data: $data), 'assignment.draft_approved');
+    $job->setJob(new PushAttemptJob(1));
+
+    pjRun($job);
+
+    $context = pjLog($logs->records, 'push.delivery')['context'];
+    expect(array_key_exists('notification_ulid', $context))->toBeTrue()
+        ->and($context['notification_ulid'])->toBeNull();
+})->with([
+    'absent' => [['type' => 'assignment.draft_approved', 'v' => 1]],
+    'empty string' => [['notification_ulid' => '']],
+    'non-string' => [['notification_ulid' => 12345]],
+]);

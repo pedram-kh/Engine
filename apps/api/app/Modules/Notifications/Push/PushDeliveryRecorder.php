@@ -39,6 +39,7 @@ final class PushDeliveryRecorder
             'user_id' => $result->userId,
             'platform' => $result->platform->value,
             'notification_type' => $result->notificationType,
+            'notification_ulid' => $result->notificationUlid,
             'outcome' => $result->outcome->value,
             'attempt' => $result->attempt,
             'code' => $result->code,

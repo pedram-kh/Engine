@@ -97,6 +97,7 @@ final class SendPushNotificationJob implements ShouldQueue
             detail: $result->detail,
             httpStatus: $result->httpStatus,
             final: $exhausted,
+            notificationUlid: $this->notificationUlid(),
         ));
 
         if ($result->outcome === PushOutcome::Retryable && ! $exhausted) {
@@ -116,5 +117,13 @@ final class SendPushNotificationJob implements ShouldQueue
             'exception' => $exception === null ? null : $exception::class,
             'message' => $exception?->getMessage(),
         ]);
+    }
+
+    /** The in-app notification this push mirrors, if the message carries one (AH-102b delivery join key). */
+    private function notificationUlid(): ?string
+    {
+        $ulid = $this->message->data['notification_ulid'] ?? null;
+
+        return is_string($ulid) && $ulid !== '' ? $ulid : null;
     }
 }
