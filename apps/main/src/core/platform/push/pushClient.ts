@@ -39,8 +39,14 @@ export interface PushClient {
   onTokenReceived: PushSubscription<string>
   /** A push arrived while the app was in the foreground. */
   onNotificationReceived: PushSubscription<void>
-  /** The user tapped a delivered notification (app was backgrounded or killed). */
-  onNotificationTapped: PushSubscription<void>
+  /**
+   * The user tapped a delivered notification (app was backgrounded or killed).
+   * The event is the notification's `data` object and NOTHING else (AH-103): it is
+   * `unknown` on purpose — the OS adds vendor keys of its own (numbers, a nested
+   * `aps`, a stringified Bundle; inventory §9.3), so the one parser
+   * (`parsePushTapData`) is the only place that decides what in it is trusted.
+   */
+  onNotificationTapped: PushSubscription<unknown>
 }
 
 function toDevicePermission(state: string): DevicePermission {
@@ -98,8 +104,10 @@ export const capacitorPushClient: PushClient = {
   },
   async onNotificationTapped(listener) {
     const { FirebaseMessaging } = await import('@capacitor-firebase/messaging')
-    const handle = await FirebaseMessaging.addListener('notificationActionPerformed', () =>
-      listener(undefined),
+    // `event.notification.data` only: on Android the tap event has no title/body, and
+    // nothing else on it is needed (device spike, inventory §9.2).
+    const handle = await FirebaseMessaging.addListener('notificationActionPerformed', (event) =>
+      listener(event.notification?.data),
     )
     return () => {
       void handle.remove()

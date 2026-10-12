@@ -73,8 +73,11 @@ export interface PushRegistrationDeps {
 export interface PushHandlers {
   /** A push arrived while the app is in the foreground. */
   onForeground: () => void
-  /** The user tapped a delivered notification. */
-  onTap: () => void
+  /**
+   * The user tapped a delivered notification. `data` is the notification's `data`
+   * object, passed through UNCHANGED and untrusted (AH-103) — the tap handler parses it.
+   */
+  onTap: (data: unknown) => void
 }
 
 export interface PushRegistration {
@@ -246,9 +249,9 @@ export function createPushRegistration(deps: PushRegistrationDeps): PushRegistra
       }),
     )
     hold(
-      client.onNotificationTapped(() => {
+      client.onNotificationTapped((data) => {
         if (!stopped) {
-          handlers.onTap()
+          handlers.onTap(data)
         }
       }),
     )

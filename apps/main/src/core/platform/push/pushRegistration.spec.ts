@@ -39,7 +39,7 @@ interface Harness {
   emit: {
     token: (token: string) => void
     foreground: () => void
-    tap: () => void
+    tap: (data?: unknown) => void
   }
   unsubscribes: Array<ReturnType<typeof vi.fn>>
 }
@@ -52,7 +52,7 @@ function harness(overrides: Partial<PushRegistrationDeps> = {}): Harness {
   const listeners: {
     token?: (token: string) => void
     foreground?: () => void
-    tap?: () => void
+    tap?: (data?: unknown) => void
   } = {}
 
   const subscribe =
@@ -81,8 +81,8 @@ function harness(overrides: Partial<PushRegistrationDeps> = {}): Harness {
       }),
     ),
     onNotificationTapped: vi.fn(
-      subscribe<void>((l) => {
-        listeners.tap = () => l(undefined)
+      subscribe<unknown>((l) => {
+        listeners.tap = (data?: unknown) => l(data)
       }),
     ),
   }
@@ -115,7 +115,7 @@ function harness(overrides: Partial<PushRegistrationDeps> = {}): Harness {
     emit: {
       token: (t) => listeners.token?.(t),
       foreground: () => listeners.foreground?.(),
-      tap: () => listeners.tap?.(),
+      tap: (data?: unknown) => listeners.tap?.(data),
     },
   }
 }
@@ -411,6 +411,36 @@ describe('start(): foreground, tap and the stop', () => {
 
     h.emit.tap()
     expect(onTap).toHaveBeenCalledTimes(1)
+  })
+
+  it("AH-103: hands the tap's `notification.data` to onTap UNCHANGED (same object, untouched)", async () => {
+    const h = harness()
+    const onTap = vi.fn()
+    createPushRegistration(h.deps).start({ onForeground: vi.fn(), onTap })
+    await settle()
+
+    const data = { type: 'assignment.invited', v: '1', 'google.ttl': 86400, aps: { alert: {} } }
+    h.emit.tap(data)
+
+    expect(onTap).toHaveBeenCalledTimes(1)
+    expect(onTap.mock.calls[0]![0]).toBe(data)
+    expect(data).toEqual({
+      type: 'assignment.invited',
+      v: '1',
+      'google.ttl': 86400,
+      aps: { alert: {} },
+    })
+  })
+
+  it('AH-103: a tap with no data object reaches onTap as undefined (the parser decides — it falls back)', async () => {
+    const h = harness()
+    const onTap = vi.fn()
+    createPushRegistration(h.deps).start({ onForeground: vi.fn(), onTap })
+    await settle()
+
+    h.emit.tap()
+
+    expect(onTap).toHaveBeenCalledWith(undefined)
   })
 
   it('stop() unsubscribes all three and silences late events', async () => {
