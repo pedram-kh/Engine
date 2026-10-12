@@ -120,6 +120,7 @@ discipline in §7.
 
 - **What it is:** one resolver (`parsePushTapData` → `resolveNotificationDestination`) behind both a push tap and an in-app row click; additive ULID-only **route keys** on the push payload (per-type allowlist in `PushMessageFactory`, shared with the SPA through `packages/api-client/contracts/notification-route-keys.json`; `v` stays `1`); `campaign_ulid` on three in-app bags; `redirect=` through the native session-lapse redirects; `?tab=` and `?focus=messages`; a not-found link back to the list. Anything unplaceable falls back to the notifications list. The AH-102 inventory's "no backend payload migration" statement is reversed (dated correction in `push-notifications-inventory.md`).
 - **Open threads (AH-103):**
+  - **Deploy of AH-099 → AH-103 is drafted, awaiting Pedram's review (2026-10-12; nothing run on production):** one ordered checklist, [`docs/runbooks/deploy-ah099-ah103.md`](../runbooks/deploy-ah099-ah103.md) (two pending migrations, the `APP_KEY` guard, the env changes, the `user_push_tokens` / `push_deliveries` GRANT read-backs, the arming order; every undocumented step marked CONFIRM). It carries the **mock-social-verification decision** (§4; recommendation: confirm harmless, no flag change, gated on three read-only queries). The production read-backs it rests on are recorded in each PENDING `deploy-log.md` entry.
   - **Done:** Checkpoint A cleared, device walk accepted (both devices), finding 2 fixed and re-walked on the Samsung, pushed, CI green, the dev DB's walk rows cleaned (notifications 55–96 and the walk's messages; the audit log keeps its rows).
   - **Pedram owes at deploy:** `php artisan queue:restart` (a named step, `PushMessageFactory` changed); either deploy order is safe; the native app needs a release for the app side. No flag change, no migration.
   - **Not done, named follow-ups:** **AH-103b** universal links / Android App Links (Android is blocked on a release keystore / Play App Signing); **AH-103c** biometric-lock interplay; **AH-105** privacy checklist; the TestFlight production-APNs proof (still AH-102's open item).
@@ -1596,16 +1597,18 @@ registered creators, 200+ concurrent admin users), which are design goals, not c
   unaffected. Resolution sketched in `tech-debt.md` (`QUEUE_CONNECTION` override in the Playwright
   `webServer.env`, plus a one-time flush).
 
-- **🚫 BLOCKER — scheduler existence UNVERIFIED.** Until `supervisorctl status` / `crontab -l` from
-  prod confirms a scheduler, **assume NO scheduled command runs in production.** Consequences, all
-  currently assumed dormant: **AH-048's incomplete-creator nudge enablement is blocked on this**
-  (flipping the flag ON achieves nothing without `schedule:run`), and **`messages:send-digest` +
-  `boards:scan-overdue` are likewise assumed not firing** — they predate the nudge and have always
-  silently assumed a scheduler nobody has confirmed. Production was deployed with a different
-  structure (colleague-managed), and runbook §7's scheduler-under-supervisor docs stay reverted
-  pending this reality-sync pass. **Unblock with two commands** on the prod box:
-  `supervisorctl status` and `crontab -l`; record the output here, then either restore §7 or open a
-  chunk to install the cron/timer.
+- ✅ **Scheduler existence — RESOLVED 2026-10-12 (production read-back, Pedram).** Production runs the
+  scheduler under supervisor as `laravel-schedule` → `php artisan schedule:work`, **RUNNING, uptime 41
+  days**; `cron` is also running, but the scheduler is **not** a crontab `schedule:run` line. (Beside it:
+  `laravel-queue` is `queue:work`, not Horizon; `queue.default` = `database`; `cache.default` = `redis`;
+  postfix, sshd and dnsmasq are STOPPED.) So `messages:send-digest` and `boards:scan-overdue` **have been
+  firing**, and the incomplete-creator nudge **would fire** if its flag were ON (whether that flag was ever
+  flipped on production is **not read**; check before assuming either way). The earlier "assume NO scheduled
+  command runs" assumption is withdrawn. **Doc drift, not fixed here:** `production-queue-worker.md` §7 /
+  §7.1 still documents the cron form, and says to check "the cron entry (§7.1)" when the prune is stale;
+  for this production box that reads `supervisorctl status laravel-schedule` instead. The AH-102b
+  `push:prune-deliveries` entry needs **no scheduler restart** to be picked up, because `schedule:work`
+  starts a fresh `schedule:run` every minute.
 - **Backup/restore posture UNVERIFIED — standing open item, owned by Pedram (blocks completion of
   §5.40).** The production-data-safety standard assumes a working snapshot-and-restore path, and that
   assumption is **not yet confirmed**: RDS automated snapshots (assumed enabled, unconfirmed), PITR
@@ -1639,15 +1642,15 @@ registered creators, 200+ concurrent admin users), which are design goals, not c
   (`campaigns:advance-contractless-accepted`, idempotent, scoped to accepted-only +
   requires=false-only) stays in the codebase as a safety net. **With AH-026 also closed, no
   one-shot post-deploy obligations remain.**
-- **NEW deploy dependency — the scheduler cron (`schedule:run`) — carry forward (incomplete-creator
-  nudge chunk, July 16, 2026).** The app now has a **flag-gated daily command**,
-  `creators:send-incomplete-nudges`, registered `->daily()` in `bootstrap/app.php` alongside the
-  pre-existing `messages:send-digest` + `boards:scan-overdue`. Those earlier two already assumed a
-  scheduler; this chunk makes the gap explicit and **documents it for the first time**: production
-  must run `* * * * * php artisan schedule:run` (cron) or the equivalent systemd timer, or **none of
-  the scheduled commands ever fire**. See the new `docs/runbooks/production-queue-worker.md` **§7**
-  (cron/timer setup + first-enable procedure). This is a **standing infra dependency**, distinct from
-  the two one-shot post-deploy commands above — the scheduler is always-on, the one-shots run once.
+- **Standing infra dependency — the scheduler (`schedule:run`) — carry forward (incomplete-creator nudge
+  chunk, July 16, 2026; production confirmed 2026-10-12).** The app has a **flag-gated daily command**,
+  `creators:send-incomplete-nudges`, registered `->daily()` in `bootstrap/app.php` alongside
+  `messages:send-digest` + `boards:scan-overdue` (and, since AH-102b, `push:prune-deliveries`). Without a
+  scheduler **none of them ever fire**. Production **has** one: supervisor `laravel-schedule` →
+  `schedule:work` (see the resolved item above); the "cron or systemd timer" wording in
+  `docs/runbooks/production-queue-worker.md` **§7** is the generic form, not this box. This is a standing
+  infra dependency, distinct from the one-shot post-deploy commands above: the scheduler is always-on,
+  the one-shots run once.
 - **Incomplete-creator nudge first-enable — flag flip, NOT a migration/one-shot.** The nudge ships
   **flag-OFF** (`incomplete_creator_nudge_enabled`, default OFF). To enable: run
   `php artisan creators:send-incomplete-nudges --dry-run` (mutates nothing, ignores the flag), read

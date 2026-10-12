@@ -65,7 +65,7 @@ happened.
   review §1 and the ad-hoc log).
 - **AH entries carried:** AH-103
 - **Migrations run:** **none.** No schema change.
-- **Pre-deploy reads:** none.
+- **Pre-deploy reads:** none of its own. **Production read-backs, 2026-10-12 (Pedram, `docker compose exec app sh` at `/app`):** `supervisorctl`: `laravel-queue` RUNNING (`queue:work`, not Horizon), `laravel-schedule` RUNNING (`schedule:work`, up 41 days), cron / nginx / php-fpm / syslog RUNNING, postfix / sshd / dnsmasq STOPPED. `queue.default` = `database`; `cache.default` = `redis`; `mail.default` = `smtp` (smtp.postmarkapp.com). `user_notification_preferences` with `channel='push'` = **0**. Preference rows: `digest/true` 19, `in_app/false` 15, `email/false` **none**. `integrations.social.driver` = `mock`; `features.social_verification_enabled` stored `"true"` (created 2026-07-14 07:58:21). `migrate:status`: last run `2026_08_27_140000_create_campaign_attachments_table` (batch 8); nothing from AH-099 onward has run. Relevant here: the queue is `database` (the `queue:restart` step is unchanged). Merged checklist for AH-099 → AH-103: [`deploy-ah099-ah103.md`](deploy-ah099-ah103.md).
 
 **What goes live on deploy**
 
@@ -113,7 +113,7 @@ happened.
 - **Migrations run:** **1** — `2026_10_12_100000_create_push_deliveries_table` (`CREATE TABLE` only, additive; one FK to `users`
   with cascade; three indexes; no data writes, no change to an existing table). `down()` drops the table (a log of attempts,
   retention is 90 days anyway).
-- **Pre-deploy reads:** none beyond the earlier entries'.
+- **Pre-deploy reads:** none beyond the earlier entries'. **Production read-backs, 2026-10-12 (Pedram, `docker compose exec app sh` at `/app`):** `supervisorctl`: `laravel-queue` RUNNING (`queue:work`, not Horizon), `laravel-schedule` RUNNING (`schedule:work`, up 41 days), cron / nginx / php-fpm / syslog RUNNING, postfix / sshd / dnsmasq STOPPED. `queue.default` = `database`; `cache.default` = `redis`; `mail.default` = `smtp` (smtp.postmarkapp.com). `user_notification_preferences` with `channel='push'` = **0**. Preference rows: `digest/true` 19, `in_app/false` 15, `email/false` **none**. `integrations.social.driver` = `mock`; `features.social_verification_enabled` stored `"true"` (created 2026-07-14 07:58:21). `migrate:status`: last run `2026_08_27_140000_create_campaign_attachments_table` (batch 8); nothing from AH-099 onward has run. **Relevant here:** the scheduler is `schedule:work` under supervisor, **not cron**, so step 6's `crontab -l` read does not apply: read `supervisorctl status laravel-schedule` and `php artisan schedule:list` instead. `schedule:work` starts a fresh `schedule:run` every minute, so the new `push:prune-deliveries` entry needs **no scheduler restart**.
 
 **What goes live on deploy**
 
@@ -191,13 +191,14 @@ schedule:list` lists `push:prune-deliveries`. **Result:** —
 
 1. **Pre-deploy reads (Pedram):**
    - Worker + queue connection: `supervisorctl status` shows `queue:work` (not Horizon); effective `QUEUE_CONNECTION`.
-     **Result:** —
+     **Result (2026-10-12, Pedram):** `laravel-queue` RUNNING as `queue:work`, not Horizon; effective `queue.default` = **`database`**.
    - `CACHE_STORE` effective value (the push throttle needs an atomic `Cache::add`; the OAuth token cache needs it too).
-     **Result:** —
-   - `SELECT count(*) FROM user_notification_preferences WHERE channel='push';` → **expected `0`.** **Result:** —
+     **Result (2026-10-12, Pedram):** `cache.default` = **`redis`** (atomic).
+   - `SELECT count(*) FROM user_notification_preferences WHERE channel='push';` → **expected `0`.** **Result (2026-10-12, Pedram):** **0**.
    - **FCM credential:** `FCM_PROJECT_ID` is set, and `FCM_SERVICE_ACCOUNT_JSON_B64` **is set and decodes to valid JSON**
      carrying `client_email`, `private_key` and `project_id` — read back **without printing the value**. (`push:test
---validate-only` performs exactly this decode and then the OAuth exchange.) **Result:** —
+--validate-only` performs exactly this decode and then the OAuth exchange.) **Result:** not yet read; it is a deploy-time env change, and `push:test --validate-only` is the read-back (merged checklist, [`deploy-ah099-ah103.md`](deploy-ah099-ah103.md)).
+   - **Production read-backs, 2026-10-12 (Pedram, `docker compose exec app sh` at `/app`):** `supervisorctl`: `laravel-queue` RUNNING (`queue:work`, not Horizon), `laravel-schedule` RUNNING (`schedule:work`, up 41 days), cron / nginx / php-fpm / syslog RUNNING, postfix / sshd / dnsmasq STOPPED. `queue.default` = `database`; `cache.default` = `redis`; `mail.default` = `smtp` (smtp.postmarkapp.com). `user_notification_preferences` with `channel='push'` = **0**. Preference rows: `digest/true` 19, `in_app/false` 15, `email/false` **none**. `integrations.social.driver` = `mock`; `features.social_verification_enabled` stored `"true"` (created 2026-07-14 07:58:21). `migrate:status`: last run `2026_08_27_140000_create_campaign_attachments_table` (batch 8); nothing from AH-099 onward has run.
 2. **Snapshot** taken and confirmed `available` (migration in this deploy). **Snapshot ID:** —
 3. `php artisan migrate` (one migration), then the code.
 4. **`php artisan queue:restart`** — **a named step**: this deploy adds a job class (`SendPushNotificationJob`), and a
@@ -233,7 +234,7 @@ schedule:list` lists `push:prune-deliveries`. **Result:** —
   the iPhone spike), **`9ab318dd`** (`IOS_PUSH_ENABLED = true`), `e2501352` (docs).
 - **AH entries carried:** AH-102 (app half)
 - **Migrations run:** **none.** No schema change, no backfill.
-- **Pre-deploy reads:** none beyond Checkpoint A's.
+- **Pre-deploy reads:** none beyond Checkpoint A's (results recorded in that entry).
 
 **What goes live on deploy**
 
@@ -302,6 +303,7 @@ schedule:list` lists `push:prune-deliveries`. **Result:** —
 GROUP BY 1, 2;` and `... WHERE channel='email' AND is_enabled=false GROUP BY type;` — the count of people who will
   stop receiving a mail must be a known number. (2) The driver and flag read above — see the review §6. Neither blocks
   the deploy; (2) blocks arming the new flag.
+- **Pre-deploy read results (2026-10-12, Pedram):** (1) `email/false`: **none**, so the email-opt-out blast radius is **0 users** on deploy; `in_app/false` 15 rows; `digest/true` 19. (2) `integrations.social.driver` = **`mock`** and `social_verification_enabled` is stored `"true"` (since 2026-07-14), so posts submitted since then **have been mock-"verified" in production**; **`post_verified_mail_enabled` must stay OFF** (this blocks arming it, as written above). The in-app notice will fire for those mock verifications once deployed; the analysis and the recommendation (confirm harmless, no flag change) are in [`deploy-ah099-ah103.md`](deploy-ah099-ah103.md) §4. **Production read-backs, 2026-10-12 (Pedram, `docker compose exec app sh` at `/app`):** `supervisorctl`: `laravel-queue` RUNNING (`queue:work`, not Horizon), `laravel-schedule` RUNNING (`schedule:work`, up 41 days), cron / nginx / php-fpm / syslog RUNNING, postfix / sshd / dnsmasq STOPPED. `queue.default` = `database`; `cache.default` = `redis`; `mail.default` = `smtp` (smtp.postmarkapp.com). `user_notification_preferences` with `channel='push'` = **0**. Preference rows: `digest/true` 19, `in_app/false` 15, `email/false` **none**. `integrations.social.driver` = `mock`; `features.social_verification_enabled` stored `"true"` (created 2026-07-14 07:58:21). `migrate:status`: last run `2026_08_27_140000_create_campaign_attachments_table` (batch 8); nothing from AH-099 onward has run.
 - **Snapshot ID:** n/a (no schema change)
 - **Infra:** **restart the queue worker** (new mailable class `PostVerifiedMail`). No cron / scheduler / env
   change.
@@ -329,7 +331,7 @@ GROUP BY 1, 2;` and `... WHERE channel='email' AND is_enabled=false GROUP BY typ
   the web changes. Still an `apps/main` SPA rebuild only; no migration, no env, no dependency.
 - **AH entries carried:** AH-100d.
 - **Migrations run:** **none.** Zero `apps/api` diff.
-- **Pre-deploy reads:** none of its own.
+- **Pre-deploy reads:** none of its own. The 2026-10-12 production read-backs are recorded in the AH-099, AH-101 and AH-102 entries; none applies here.
 - **Snapshot ID:** not required. No migration, no data change.
 - **Infra:**
   - **`apps/main` SPA rebuild only** (plus `packages/ui` and `packages/design-tokens`, built into it;
@@ -360,7 +362,7 @@ GROUP BY 1, 2;` and `... WHERE channel='email' AND is_enabled=false GROUP BY typ
 - **Range:** `e5beeddc` → `112e7eb6` (the AH-100c feat commit is `9f4934e9`; the rest is docs-only).
 - **AH entries carried:** AH-100c.
 - **Migrations run:** **none.** Zero `apps/api` diff.
-- **Pre-deploy reads:** none of its own.
+- **Pre-deploy reads:** none of its own. The 2026-10-12 production read-backs are recorded in the AH-099, AH-101 and AH-102 entries; none applies here.
 - **Snapshot ID:** not required. No migration, no data change.
 - **Infra:**
   - **`apps/main` SPA rebuild only.** Every addition is native-gated, so a browser renders what it did
@@ -389,7 +391,7 @@ GROUP BY 1, 2;` and `... WHERE channel='email' AND is_enabled=false GROUP BY typ
 - **Range:** `60de0811` → `6c2b86ec` (the AH-100b feat commit; `bdf279c1` above it is a one-test fix, everything else docs-only).
 - **AH entries carried:** AH-100b.
 - **Migrations run:** **none.** Zero `apps/api` diff.
-- **Pre-deploy reads:** none of its own.
+- **Pre-deploy reads:** none of its own. The 2026-10-12 production read-backs are recorded in the AH-099, AH-101 and AH-102 entries; none applies here.
 - **Snapshot ID:** not required. No migration, no data change.
 - **Infra:**
   - **`apps/main` SPA rebuild only.** Every addition is native-gated, so a browser renders what it did
@@ -416,7 +418,7 @@ GROUP BY 1, 2;` and `... WHERE channel='email' AND is_enabled=false GROUP BY typ
 - **Range:** `d1ab5820` → `75ce384d` (the AH-100 feat commit; everything above it is docs-only).
 - **AH entries carried:** AH-100.
 - **Migrations run:** **none.** Zero `apps/api` diff.
-- **Pre-deploy reads:** none of its own. AH-099's reads still apply if they are deployed together.
+- **Pre-deploy reads:** none of its own. AH-099's reads still apply if they are deployed together. The 2026-10-12 production read-backs are recorded in the AH-099, AH-101 and AH-102 entries; none applies here.
 - **Snapshot ID:** not required — no migration, no data change.
 - **Infra:**
   - **`apps/main` SPA rebuild only.** The web renders byte-identically: the bearer transport and
@@ -451,7 +453,7 @@ GROUP BY 1, 2;` and `... WHERE channel='email' AND is_enabled=false GROUP BY typ
   `2026_05_07_003823_create_personal_access_tokens_table` already shows `Ran` locally.
   **Verify on the box before reload:** `php artisan migrate:status` lists it as `Ran` (and nothing
   `Pending` that this deploy introduced).
-- **Pre-deploy reads:**
+- **Pre-deploy reads:** **production, 2026-10-12 (Pedram):** `migrate:status` last run is `2026_08_27_140000_create_campaign_attachments_table` (batch 8) and nothing from AH-099 onward has run; the stock `…create_personal_access_tokens_table` predates that line, so it should read `Ran`, but reads 1–4 below are **not yet taken**. They are step P4 of the merged checklist [`deploy-ah099-ah103.md`](deploy-ah099-ah103.md). Other read-backs that day: `mail.default` = `smtp` (Postmark); `queue.default` = `database`; `cache.default` = `redis`; `integrations.social.driver` = `mock`.
   1. `php artisan migrate:status | grep personal_access_tokens` → `Ran`.
   2. `SELECT count(*) FROM personal_access_tokens;` → expected `0` (zero callers exist).
   3. **`SANCTUM_STATEFUL_DOMAINS` contains no bare `localhost`.** This is the **Android-only**
