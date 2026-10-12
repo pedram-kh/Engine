@@ -56,14 +56,14 @@ happened.
 
 ## AH-102b — admin observability for the creator app: push delivery log, two admin pages — PENDING
 
-> **Stacks on AH-102 (Checkpoints A and B) and everything under it (AH-099 … AH-102, all PENDING).** Pushed only after
+> **Stacks on AH-102 (Checkpoints A and B) and everything under it (AH-099 … AH-102, all PENDING).** Pushed 2026-10-12 after
 > Checkpoint B clearance and Pedram's go; **not deployed**; deploy timing is Pedram's call. Review:
 > [`admin-observability-review.md`](../reviews/admin-observability-review.md).
 
-- **Status:** PENDING (the push state is recorded in the review §10)
-- **Range:** base `b21b7b2f` (`origin/main` at plan time) → tip **TBD at push**. Commits: `65d2b306`, `e4f7bac7`, `9bf80e41`,
+- **Status:** PENDING (**pushed 2026-10-12** to `origin/main` at `176f46fc`, CI **green on all four jobs**: [run 38199714770](https://github.com/pedram-kh/Engine/actions/runs/38199714770); not deployed)
+- **Range:** base `b21b7b2f` (`origin/main` at plan time) → tip **`176f46fc`** (a docs-only closing commit follows). Commits: `65d2b306`, `e4f7bac7`, `9bf80e41`,
   `30b5894c`, `9197cd0b`, `686d653b`, `c67d9505`, `03411f16`, `b64beee8`, `4f4659fa`, `53e32e7a`, `61627374`, `d95988ea`,
-  `eea2e89e`, plus the docs commit.
+  `eea2e89e`, `ff97a781` (docs), `3f8c97a1` (type-filter select), `176f46fc` (docs).
 - **AH entries carried:** AH-102b
 - **Migrations run:** **1** — `2026_10_12_100000_create_push_deliveries_table` (`CREATE TABLE` only, additive; one FK to `users`
   with cascade; three indexes; no data writes, no change to an existing table). `down()` drops the table (a log of attempts,

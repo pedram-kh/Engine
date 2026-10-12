@@ -1,6 +1,6 @@
 # AH-102b — admin observability for the creator app — Checkpoint B review
 
-**Status:** Ready for review (Checkpoint B). Local, **not pushed**; the one push waits for clearance and Pedram's go.
+**Status:** Checkpoint B cleared; eyes-on complete. **Pushed 2026-10-12** (`origin/main` `b21b7b2f..176f46fc`), CI **green on all four jobs** ([run 38199714770](https://github.com/pedram-kh/Engine/actions/runs/38199714770)). **NOT deployed**, no flag armed.
 **Date:** 2026-10-12. **Plan:** [`admin-observability-plan.md`](admin-observability-plan.md). **Inventory:**
 [`admin-observability-inventory.md`](admin-observability-inventory.md).
 **Prod-data risk:** LOW (one additive `CREATE TABLE`; the push job's call site and recorder change behind full containment;
@@ -340,11 +340,29 @@ production half is a separate finding (§7).
 
 ---
 
-## 10. Push and CI (filled after the push)
+## 10. Push and CI
 
-**Pushed tip:** pending (Checkpoint B clearance + Pedram's go). The post-push docs commit records the tip SHA, the CI run id,
-the per-job results and the admin-Playwright flaky/retry tally for `admin-sign-in.spec.ts:69/:106`, as AH-102 did.
-`catalyst_walk` is dropped once CI is green on the pushed tip.
+**Pushed tip: `176f46fc`** (the type-filter docs update; `origin/main` `b21b7b2f..176f46fc`, 17 commits, pushed once, after the
+reviewer's clearance, Pedram's go and the re-walk). **CI at that tip: [run 38199714770](https://github.com/pedram-kh/Engine/actions/runs/38199714770) — completed, success, all four jobs.**
+
+| Job                                | Result                                      | Time (UTC)          |
+| ---------------------------------- | ------------------------------------------- | ------------------- |
+| Backend (Pint + Larastan + Pest)   | success                                     | 03:25:59 – 03:31:17 |
+| Frontend (lint + typecheck + unit) | success                                     | 03:25:54 – 03:35:54 |
+| E2E — admin SPA (Playwright)       | success: **2 passed, 0 flaky, no retries**  | 03:35:56 – 03:37:35 |
+| E2E — main SPA (Playwright)        | success: **34 passed, 0 flaky, no retries** | 03:35:56 – 03:43:53 |
+
+The only job annotations are the four "Node.js 20 is deprecated" warnings from GitHub Actions; there is no flaky-test annotation.
+
+**The `admin-sign-in.spec.ts:69` / `:106` tally.** At the pushed tip: **first-attempt pass, 0 retries** (in the run above). Before the
+fix it flaked in 17 of the 18 `main` runs since 2026-10-06 in which the job ran (§6), including the base-tip run `38174364033`.
+**One clean run is consistent with the C0.2 fix and does not prove it:** §6's "not settled" caveat stands (a rare load-dependent
+failure of the same kind is not excluded; the 4-of-6 early runs had no trace). The tally keeps accumulating on `main`; if `:69`
+flakes again, re-open the tech-debt row with that run's trace. `admin-mandatory-mfa-enrollment.spec.ts:82` (the bcrypt fix,
+C0.2b) also passed first time, as did every main-SPA spec.
+
+**A closing docs commit follows the pushed tip** (this record), as AH-102 did; CI for it is not cited here. `catalyst_walk` was
+dropped and the walk stack shut down after CI went green, as agreed.
 
 ---
 

@@ -116,10 +116,7 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-10-12 · **Through:** **AH-102b, admin observability for the creator app — LANDED LOCALLY, AT CHECKPOINT B (the one
-push awaits the reviewer's clearance and Pedram's go).** The branch is 17 commits ahead of `origin/main` `b21b7b2f` (code, planning and two docs
-commits, including the type-filter select from eyes-on round 1); **nothing from AH-102b is pushed, deployed, or armed**, and live state is `git status`
-and `origin/main`, not this sentence. Review: [`admin-observability-review.md`](admin-observability-review.md) (BRB record, gate board,
+**Last updated:** 2026-10-12 · **Through:** **AH-102b, admin observability for the creator app — CLOSED AND PUSHED (2026-10-12), NOT deployed.** Pushed once, `origin/main` `b21b7b2f..176f46fc` (17 commits, including the type-filter select from eyes-on round 1), CI **green on all four jobs** ([run 38199714770](https://github.com/pedram-kh/Engine/actions/runs/38199714770); admin Playwright 2 passed / 0 flaky, main 34 passed / 0 flaky); **not deployed, no flag armed**; live state is `git status` and `origin/main`, not this sentence. Review: [`admin-observability-review.md`](admin-observability-review.md) (BRB record, gate board,
 the Stage 4 Postgres walk, the flake accounting, lessons); plan: [`admin-observability-plan.md`](admin-observability-plan.md); ad-hoc entry
 AH-102b; deploy entry `AH-102b … — PENDING` in `deploy-log.md`. **One additive migration** (`push_deliveries`); **PROD-DATA RISK: LOW.**
 
@@ -127,11 +124,8 @@ AH-102b; deploy entry `AH-102b … — PENDING` in `deploy-log.md`. **One additi
   contained so a failed write cannot cause a duplicate push); two read-only admin pages (Operations → Push deliveries, Creators →
   Creator app) over four new `GET` routes; i18n ×24.
 - **Open threads (AH-102b):**
-  - **Checkpoint B:** clearance and Pedram's go for the one push. After it: record the pushed tip, the CI run id and the
-    admin-Playwright flaky tally for `admin-sign-in.spec.ts:69` in a follow-up docs commit (review §10), **then** drop the local
-    scratch database `catalyst_walk` (not before CI is green).
-  - **The flake is fixed on evidence but "not settled":** the CI tally at the pushed tip is the check (review §6; tech-debt re-close at
-    the "Residual Playwright-retry flakiness" row).
+  - **Done:** Checkpoint B cleared, eyes-on complete, pushed, CI green; the local scratch database `catalyst_walk` is dropped and the walk stack stopped.
+  - **The flake is fixed on evidence but "not settled":** the pushed tip's run was a first-attempt pass for `admin-sign-in.spec.ts:69` (one clean run, not proof); keep watching the tally on `main` (review §6, §10; tech-debt re-close at the "Residual Playwright-retry flakiness" row).
   - **Pedram owes at deploy:** snapshot, `migrate`, `queue:restart`, the `engine_c_user` GRANT on `push_deliveries` and
     `push_deliveries_id_seq` with read-backs, the scheduler read-back, the prune dry-run (expected `would delete 0`). No flag is armed.
   - **Tech-debt opened:** the production 2FA confirm latency (~3.7 s, bcrypt cost 12 against a comment saying 10 — a real
@@ -1482,8 +1476,7 @@ registered creators, 200+ concurrent admin users), which are design goals, not c
 
 ### Open threads
 
-- **⏳ AH-102b is at Checkpoint B (2026-10-12):** built, gated, walked on Postgres and documented locally; the one push waits for the
-  reviewer's clearance and Pedram's go. Not deployed, no flag armed. See Part 2 above and
+- **✅ AH-102b is CLOSED and PUSHED (2026-10-12), not deployed.** CI green at `176f46fc`. Open: Pedram's deploy read-backs, the flake tally, and the tech-debt rows. No flag armed. See Part 2 above and
   [`admin-observability-review.md`](admin-observability-review.md).
 - **✅ AH-102 is CLOSED and PUSHED (2026-10-11), not deployed.** Open items: the TestFlight production-APNs proof (pending the
   first upload), the token-rotation re-POST (accepted), item 10's iOS observation (not observed; unverified likely cause). Part 2 above

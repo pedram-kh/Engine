@@ -72,8 +72,7 @@ reviews, and conversations.
 
 ### AH-102b · Admin observability for the creator app (Creator App arc)
 
-- **Status:** **Landed locally (17 commits including the two docs commits); not pushed at the time of writing; NOT deployed, no flag armed.**
-  The push state and the CI run for the pushed tip are recorded in the review §10 and in the post-push docs commit. Plan:
+- **Status:** **Closed 2026-10-12. Pushed (`origin/main` `b21b7b2f..176f46fc`, 17 commits), CI green on all four jobs ([run 38199714770](https://github.com/pedram-kh/Engine/actions/runs/38199714770): backend, frontend, admin SPA Playwright 2 passed / 0 flaky, main SPA Playwright 34 passed / 0 flaky), NOT deployed, no flag armed.** A docs-only closing commit follows the pushed tip. Plan:
   [`admin-observability-plan.md`](admin-observability-plan.md); inventory:
   [`admin-observability-inventory.md`](admin-observability-inventory.md); review:
   [`admin-observability-review.md`](admin-observability-review.md).
