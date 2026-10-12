@@ -75,11 +75,47 @@ interface NotificationPreferenceDefinition {
   alwaysOnChannels?: NotificationChannel[]
 }
 
+/**
+ * AH-103 — the id keys a notification can carry that a destination reads. These
+ * are the ONLY keys the push payload and the in-app `data` bag expose for routing
+ * (the shared contract `packages/api-client/contracts/notification-route-keys.json`
+ * lists them per type; the registry parity spec pins this file to it).
+ */
+export type RouteIdKey = 'assignment_ulid' | 'campaign_ulid' | 'thread_ulid'
+
+/**
+ * Where a tap on a notification lands (AH-103). A REQUIRED field on every live
+ * type, the same one-source-of-truth device `recipient` and `preference` use:
+ * `vue-tsc` fails a new live type that omits it, so a new type can never ship
+ * with a tap that silently goes nowhere.
+ *
+ *  - `route`  — a named route; each route param names the id key that supplies it;
+ *               an optional static `query` (a campaign tab); an optional
+ *               `subjectFallback` for old rows that predate the id key.
+ *  - `thread` — a relationship thread, resolved by LOOKUP in the recipient's inbox
+ *               (the payload carries the thread ULID; the route needs the
+ *               counterparty's), so the SPA never invents an id.
+ *  - `list`   — "no destination, on purpose" (a positive assertion, like
+ *               `preference: null`): the user stays on / is sent to the list.
+ */
+export type NotificationDestination =
+  | {
+      kind: 'route'
+      name: string
+      params?: Record<string, RouteIdKey>
+      query?: Record<string, string>
+      subjectFallback?: { type: string; param: string }
+    }
+  | { kind: 'thread'; side: 'creator' | 'agency' }
+  | { kind: 'list' }
+
 interface LiveNotificationType {
   /** Flat i18n key under `notifications.types.*` (the Ch3a body template). */
   templateKey: string
   /** The recipient principal(s) this type actually reaches. */
   recipient: NotificationReach
+  /** Where a tap lands (AH-103). Required — see {@link NotificationDestination}. */
+  destination: NotificationDestination
   /**
    * The prefs row this type exposes, or `null` when it is deliberately
    * ALWAYS-ON — renderable but not user-mutable.
@@ -145,6 +181,22 @@ export const PREFERENCE_CHANNEL_ORDER: readonly NotificationChannel[] = [
 export const NATIVE_ONLY_CHANNELS: readonly NotificationChannel[] = ['push']
 
 /**
+ * AH-103 — the shared destinations (a destination is plain data; the resolver in
+ * `notificationDestination.ts` turns it into a navigation).
+ */
+const TO_ASSIGNMENT: NotificationDestination = {
+  kind: 'route',
+  name: 'creator.assignment.detail',
+  params: { ulid: 'assignment_ulid' },
+}
+const campaignTab = (tab: string): NotificationDestination => ({
+  kind: 'route',
+  name: 'campaigns.detail',
+  params: { ulid: 'campaign_ulid' },
+  query: { tab },
+})
+
+/**
  * The live-set. The dotted enum values can't be `t()`-pathed directly (vue-i18n
  * would treat the dot as nesting), so the flat-underscore `templateKey` applies.
  */
@@ -158,33 +210,39 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   'assignment.invited': {
     templateKey: 'notifications.types.assignment_invited',
     recipient: 'creator',
+    destination: TO_ASSIGNMENT,
     preference: { group: 'assignment', channels: IN_APP_EMAIL_PUSH },
   },
   // Agency fan-out rows (admins + managers) — only agency users receive these.
   'assignment.draft_submitted': {
     templateKey: 'notifications.types.assignment_draft_submitted',
     recipient: 'agency',
+    destination: campaignTab('drafts'),
     preference: { group: 'assignment', channels: IN_APP_ONLY },
   },
   'assignment.contracted': {
     templateKey: 'notifications.types.assignment_contracted',
     recipient: 'agency',
+    destination: campaignTab('creators'),
     preference: { group: 'assignment', channels: IN_APP_ONLY },
   },
   // Creator review/lifecycle rows — only creators receive these.
   'assignment.revision_requested': {
     templateKey: 'notifications.types.assignment_revision_requested',
     recipient: 'creator',
+    destination: TO_ASSIGNMENT,
     preference: { group: 'assignment', channels: IN_APP_EMAIL_PUSH },
   },
   'assignment.draft_approved': {
     templateKey: 'notifications.types.assignment_draft_approved',
     recipient: 'creator',
+    destination: TO_ASSIGNMENT,
     preference: { group: 'assignment', channels: IN_APP_EMAIL_PUSH },
   },
   'assignment.draft_rejected': {
     templateKey: 'notifications.types.assignment_draft_rejected',
     recipient: 'creator',
+    destination: TO_ASSIGNMENT,
     preference: { group: 'assignment', channels: IN_APP_EMAIL_PUSH },
   },
   // AH-069 (D5) — sits BESIDE the draft-approved row, not instead of it: on a
@@ -195,11 +253,13 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   'assignment.completed_on_approval': {
     templateKey: 'notifications.types.assignment_completed_on_approval',
     recipient: 'creator',
+    destination: TO_ASSIGNMENT,
     preference: { group: 'assignment', channels: IN_APP_EMAIL_PUSH },
   },
   'assignment.manually_verified': {
     templateKey: 'notifications.types.assignment_manually_verified',
     recipient: 'creator',
+    destination: TO_ASSIGNMENT,
     preference: { group: 'assignment', channels: IN_APP_EMAIL_PUSH },
   },
   // AH-101 (⑦) — the creator's post passed AUTOMATIC verification: the silent
@@ -210,16 +270,19 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   'assignment.live_verified': {
     templateKey: 'notifications.types.assignment_live_verified',
     recipient: 'creator',
+    destination: TO_ASSIGNMENT,
     preference: { group: 'assignment', channels: IN_APP_AND_EMAIL },
   },
   'creator.approved': {
     templateKey: 'notifications.types.creator_approved',
     recipient: 'creator',
+    destination: { kind: 'route', name: 'creator.dashboard' },
     preference: { group: 'creator', channels: IN_APP_ONLY, alwaysOnChannels: ['email', 'push'] },
   },
   'creator.rejected': {
     templateKey: 'notifications.types.creator_rejected',
     recipient: 'creator',
+    destination: { kind: 'route', name: 'creator.dashboard' },
     preference: { group: 'creator', channels: IN_APP_ONLY, alwaysOnChannels: ['email', 'push'] },
   },
   // Messaging (Sprint 11, D-7) — dual-recipient new-message notifications. Each
@@ -233,11 +296,13 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   'message.received_by_creator': {
     templateKey: 'notifications.types.message_received_by_creator',
     recipient: 'creator',
+    destination: TO_ASSIGNMENT,
     preference: { group: 'messaging', channels: ['in_app', 'email', 'digest', 'push'] },
   },
   'message.received_by_agency': {
     templateKey: 'notifications.types.message_received_by_agency',
     recipient: 'agency',
+    destination: campaignTab('messages'),
     preference: { group: 'messaging', channels: ['in_app', 'digest'] },
   },
   // Relationship messaging (AH-010, D5) — the 1:1 connected agency↔creator DM,
@@ -250,11 +315,13 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   'message.relationship_received_by_creator': {
     templateKey: 'notifications.types.message_relationship_received_by_creator',
     recipient: 'creator',
+    destination: { kind: 'thread', side: 'creator' },
     preference: { group: 'messaging', channels: IN_APP_EMAIL_PUSH },
   },
   'message.relationship_received_by_agency': {
     templateKey: 'notifications.types.message_relationship_received_by_agency',
     recipient: 'agency',
+    destination: { kind: 'thread', side: 'agency' },
     preference: { group: 'messaging', channels: IN_APP_ONLY },
   },
   // Relation lifecycle (AH-051, D7) — admin-mediated connect + disconnect.
@@ -267,11 +334,13 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   'agency_creator_relation.admin_connected': {
     templateKey: 'notifications.types.agency_creator_relation_admin_connected',
     recipient: 'creator',
+    destination: { kind: 'route', name: 'creator.messages' },
     preference: null,
   },
   'agency_creator_relation.disconnected': {
     templateKey: 'notifications.types.agency_creator_relation_disconnected',
     recipient: 'both',
+    destination: { kind: 'list' },
     preference: null,
   },
   // Jobs board (AH-056 D8 + AH-058 D6) — the four jobs-board types, now their
@@ -297,16 +366,25 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   'campaign.job_posted': {
     templateKey: 'notifications.types.campaign_job_posted',
     recipient: 'creator',
+    destination: {
+      kind: 'route',
+      name: 'creator.job.detail',
+      params: { ulid: 'campaign_ulid' },
+      // Rows written before AH-103 lack `campaign_ulid`; their subject IS the campaign.
+      subjectFallback: { type: 'Campaign', param: 'ulid' },
+    },
     preference: { group: 'jobs_board', channels: IN_APP_EMAIL_PUSH },
   },
   'campaign_application.submitted': {
     templateKey: 'notifications.types.campaign_application_submitted',
     recipient: 'agency',
+    destination: campaignTab('applications'),
     preference: { group: 'jobs_board', channels: IN_APP_AND_EMAIL },
   },
   'campaign_application.accepted': {
     templateKey: 'notifications.types.campaign_application_accepted',
     recipient: 'creator',
+    destination: TO_ASSIGNMENT,
     preference: { group: 'jobs_board', channels: IN_APP_EMAIL_PUSH },
   },
   // Two emit sites, one type: the agency's reject and the campaign-terminal
@@ -318,6 +396,7 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   'campaign_application.rejected': {
     templateKey: 'notifications.types.campaign_application_rejected',
     recipient: 'creator',
+    destination: { kind: 'route', name: 'creator.jobs' },
     preference: { group: 'jobs_board', channels: IN_APP_AND_EMAIL },
   },
 }
@@ -464,4 +543,18 @@ export function preferenceColumns(
  */
 export function liveNotificationTypes(): NotificationType[] {
   return Object.keys(LIVE_TYPES) as NotificationType[]
+}
+
+/**
+ * AH-103 — the destination a live type declares, or `null` for a type this build
+ * does not know (an unknown string is never an error: the caller falls back to
+ * the list, which is exactly what AH-102 did for every tap).
+ */
+export function notificationDestination(type: string): NotificationDestination | null {
+  return LIVE_TYPES[type as NotificationType]?.destination ?? null
+}
+
+/** The recipient reach of a live type — exported for the destination parity spec. */
+export function notificationRecipient(type: string): NotificationReach | null {
+  return LIVE_TYPES[type as NotificationType]?.recipient ?? null
 }
