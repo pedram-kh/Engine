@@ -12,6 +12,7 @@ use App\Modules\Admin\Http\Controllers\AdminDashboardController;
 use App\Modules\Admin\Http\Controllers\AdminFeatureFlagController;
 use App\Modules\Admin\Http\Controllers\AdminHealthController;
 use App\Modules\Admin\Http\Controllers\AdminImpersonationController;
+use App\Modules\Admin\Http\Controllers\AdminPushDeliveryController;
 use App\Modules\Identity\Http\Middleware\EnsureMfaForAdmins;
 use Illuminate\Support\Facades\Route;
 
@@ -86,6 +87,17 @@ Route::prefix('admin')
         // Read-only, cross-agency, cursor-paginated view over the
         // append-only audit_logs table. All filters hit indexed columns.
         Route::get('audit-logs', [AdminAuditLogController::class, 'index'])->name('audit-logs.index');
+
+        // ─── Push delivery log (AH-102b, Half A) ─────────────────────
+        // Read-only, cross-agency view over `push_deliveries` (one row per
+        // FCM send attempt). Cursor-paginated on the monotonic id; an unknown
+        // filter value yields an empty page. `summary` = terminal-only
+        // outcome counts for a 24h/7d/30d window + the table-depth footer.
+        // Allowlisted in docs/security/tenancy.md § 4.
+        Route::prefix('push-deliveries')->name('push-deliveries.')->group(function (): void {
+            Route::get('summary', [AdminPushDeliveryController::class, 'summary'])->name('summary');
+            Route::get('/', [AdminPushDeliveryController::class, 'index'])->name('index');
+        });
 
         // ─── Feature-flag toggles (D-6) ──────────────────────────────
         // The RUNTIME mutation path over DB-backed Pennant flags. Every
