@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Notifications\Jobs\SendPushNotificationJob;
+use App\Modules\Notifications\Models\PushDelivery;
 use App\Modules\Notifications\Models\UserPushToken;
 use App\Modules\Notifications\Push\PushMessage;
 use App\Modules\Notifications\Push\PushOutcome;
@@ -15,6 +16,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Laravel\Sanctum\PersonalAccessToken;
 use Tests\TestCase;
 
@@ -439,3 +441,63 @@ it('AH-102b: a message with no notification ULID (or a non-string one) reaches t
     'empty string' => [['notification_ulid' => '']],
     'non-string' => [['notification_ulid' => 12345]],
 ]);
+
+// =============================================================================
+// AH-102b C1.3 — the recorder's insert can never fail the job (no duplicate push)
+// =============================================================================
+
+it('AH-102b positive control: a real job run writes the delivery row (with the notification ULID)', function (): void {
+    $token = pjLiveToken();
+    pjSender([PushSendResult::delivered()]);
+    $message = new PushMessage(title: 't', data: ['type' => 'assignment.draft_approved', 'v' => 1, 'notification_ulid' => '01JABCDEFGHJKMNPQRSTVWXYZ0']);
+    $job = new SendPushNotificationJob($token->id, $message, 'assignment.draft_approved');
+    $job->setJob(new PushAttemptJob(1));
+
+    pjRun($job);
+
+    $row = PushDelivery::query()->sole();
+    expect($row->user_push_token_id)->toBe($token->id)
+        ->and($row->outcome)->toBe(PushOutcome::Delivered)
+        ->and($row->notification_ulid)->toBe('01JABCDEFGHJKMNPQRSTVWXYZ0');
+});
+
+it('AH-102b CONTAINMENT (a)(c): Delivered + a failing insert completes the job with EXACTLY ONE send() and no release — no duplicate push', function (): void {
+    $token = pjLiveToken();
+    $sender = pjSender([PushSendResult::delivered()]);
+    Schema::drop('push_deliveries');
+    $logs = pjCaptureLogs();
+    $job = pjJob($token);
+
+    pjRun($job);   // must not throw
+
+    expect($sender->sent)->toHaveCount(1)
+        ->and(pjReleased($job))->toBeFalse()
+        ->and(pjLog($logs->records, 'push.delivery_record_failed')['context']['step'])->toBe('insert');
+});
+
+it('AH-102b CONTAINMENT: Retryable + a failing insert is still released with its backoff (control flow untouched)', function (): void {
+    $token = pjLiveToken();
+    $sender = pjSender([PushSendResult::retryable('UNAVAILABLE', 'busy', 503)]);
+    Schema::drop('push_deliveries');
+    $job = pjJob($token, 1);
+
+    pjRun($job);
+
+    expect($sender->sent)->toHaveCount(1)
+        ->and(pjReleased($job))->toBeTrue()
+        ->and(pjReleaseDelay($job))->toBe(30)
+        ->and($token->fresh()?->invalidated_at)->toBeNull();
+});
+
+it('AH-102b CONTAINMENT: TokenInvalid + a failing insert still invalidates the token and sends once', function (): void {
+    $token = pjLiveToken();
+    $sender = pjSender([PushSendResult::tokenInvalid('UNREGISTERED', 'gone', 404)]);
+    Schema::drop('push_deliveries');
+    $job = pjJob($token);
+
+    pjRun($job);
+
+    expect($sender->sent)->toHaveCount(1)
+        ->and(pjReleased($job))->toBeFalse()
+        ->and($token->fresh()?->invalidated_at)->not->toBeNull();
+});
