@@ -104,13 +104,18 @@ final class SendMessageNotifications
             return;
         }
 
+        // AH-103 — the AGENCY leg alone carries the campaign id: an agency has no
+        // assignment-keyed route, so a tap opens the campaign's Messages tab. The
+        // creator leg's bag is deliberately unchanged (a test pins it).
+        $agencyData = $data + ['campaign_ulid' => $assignment->campaign?->ulid];
+
         foreach ($agency->notifiableMembers() as $member) {
             $this->notifications->notify(
                 recipient: $member,
                 type: NotificationType::MessageReceivedByAgency,
                 subject: $assignment,
                 actor: $sender,
-                data: $data,
+                data: $agencyData,
             );
         }
     }

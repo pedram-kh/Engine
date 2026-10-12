@@ -116,6 +116,8 @@ final class CampaignApplicationNotifier
                 data: [
                     'creator_name' => $creatorName,
                     'campaign_name' => $campaign->name,
+                    // AH-103 — the campaign the Applications tab belongs to.
+                    'campaign_ulid' => $campaign->ulid,
                 ],
             );
 

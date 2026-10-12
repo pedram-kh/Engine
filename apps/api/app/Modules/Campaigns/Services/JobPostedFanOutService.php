@@ -258,6 +258,9 @@ final class JobPostedFanOutService
             data: [
                 'campaign_name' => $campaign->name,
                 'agency_name' => $campaign->agency->name,
+                // AH-103 — the id a tap needs to open this listing. An opaque ULID,
+                // never user content; also what the push factory may forward.
+                'campaign_ulid' => $campaign->ulid,
             ],
         );
     }
