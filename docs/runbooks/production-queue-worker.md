@@ -225,24 +225,33 @@ php artisan push:prune-deliveries --days=90          # the default; --days must 
 
 It deletes oldest-first in chunks of 5,000, at most `--limit` rows (default 100,000) per run, so a large backlog drains over
 successive daily runs. **The footer is the instrument:** admin → Operations → Push deliveries shows the stored row count and
-the oldest row's date. An oldest date well past 90 days means the prune is not running; check the cron entry (§7.1) first.
+the oldest row's date. An oldest date well past 90 days means the prune is not running; run `supervisorctl status laravel-schedule` (§7.1) first.
 
-### 7.1 The cron entry (standard)
+### 7.1 The scheduler process (production: supervisor `schedule:work`)
 
-The scheduler is a single cron line that runs **every minute**; Laravel decides
-internally which commands are actually due:
+**Production runs the scheduler as a supervisor program, `laravel-schedule`, which runs `php artisan schedule:work`**
+(read back 2026-10-12: RUNNING, uptime 41 days; `queue:work` runs beside it as `laravel-queue`). `schedule:work` is a
+long-running command that starts a fresh `schedule:run` **every minute** and lets Laravel decide which commands are due, so a
+new `->daily()` entry in `bootstrap/app.php` is picked up by the next minute's run **with no scheduler restart**.
+
+```sh
+supervisorctl status laravel-schedule     # expect RUNNING, with an uptime
+php artisan schedule:list                 # the registered commands and their next due time
+```
+
+Run it with the **same `.env` as the API + worker** (same DB, same `QUEUE_CONNECTION`): the scheduled commands only
+_queue_ Mailables, so the §1 worker must also be running for anything to be delivered. The container's `cron` program
+is running too, but it is **not** the scheduler: a `schedule:run` line in any crontab would run every daily command
+**twice** (see the pre-flight read in `deploy-ah099-ah103.md`, P7).
+
+**Alternative, for a host with no supervisor:** one cron line, every minute (`crontab -e` as `www-data`, or a file in
+`/etc/cron.d/`):
 
 ```cron
 * * * * * cd /var/www/catalyst/apps/api && php artisan schedule:run >> /dev/null 2>&1
 ```
 
-Add it to the deploy user's crontab (`crontab -e` as `www-data`, or a file in
-`/etc/cron.d/`). The command must run with the **same `.env` as the API +
-worker** (same DB, same `QUEUE_CONNECTION`) — the scheduled commands only
-_queue_ Mailables, so the §1 worker must also be running for anything to be
-delivered.
-
-### 7.2 systemd timer (alternative, if you prefer no crontab)
+### 7.2 systemd timer (alternative, for a host with neither supervisor nor cron)
 
 `/etc/systemd/system/catalyst-scheduler.service` + `.timer`:
 
@@ -277,7 +286,7 @@ sudo systemctl enable --now catalyst-scheduler.timer
 sudo systemctl list-timers catalyst-scheduler.timer
 ```
 
-Pick **one** of the cron / timer approaches — never both.
+Pick **one** scheduler (supervisor `schedule:work`, cron, or the timer) — never more than one, or every daily command fires twice.
 
 ### 7.3 First-enable procedure for the incomplete-creator nudge
 
@@ -317,11 +326,11 @@ safely:
 To pause it again, flip the flag OFF from the same page (again with a reason).
 Already-stamped creators are never re-nudged regardless.
 
-> **Deploy-note territory (template Part 2).** Production needs this
-> `schedule:run` cron/timer in place alongside the queue worker. The two
+> **Deploy-note territory (template Part 2).** Production needs a running scheduler
+> (supervisor `laravel-schedule`, §7.1) alongside the queue worker. The two
 > pending one-shot commands (`creators:recompute-completeness` and any future
 > backfill) are _manual_ post-deploy steps and are **not** on the scheduler —
-> don't conflate them with this cron.
+> don't conflate them with the scheduler.
 
 ### 7.4 First-enable ritual for the two jobs-board mail flags (AH-059)
 
@@ -334,7 +343,7 @@ ritual"). This is the operator's short form.
 **Preconditions.** The worker is running **and has been restarted since the deploy** (§4) —
 the arc carries new mailable classes and new `lang/**` copy, and a worker caches
 translations in memory. **No scheduler dependency**: every trigger is a user action or the
-terminal-flip job, so §7's cron is irrelevant here.
+terminal-flip job, so §7's scheduler is irrelevant here.
 
 1. **Preview the one flag that can be previewed** (pure read, ignores the flag):
 
@@ -436,7 +445,7 @@ Run these steps **in order**. Do not skip step 1.
    command in the deploy-log entry** — so if a deploy's stated data change does
    not appear as a command in step 4, something is wrong and this is where to
    stop and find out.
-3. **Infra changes** — cron/scheduler lines (the §7 `schedule:run` entry), env
+3. **Infra changes** — the scheduler (§7: supervisor `schedule:work`), env
    var changes, worker (re)starts (§4 deploy hook). Apply these before running
    any command that depends on them.
 4. **One-shot commands** — each with `--dry-run` first **where supported**: run

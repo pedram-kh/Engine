@@ -120,7 +120,7 @@ discipline in §7.
 
 - **What it is:** one resolver (`parsePushTapData` → `resolveNotificationDestination`) behind both a push tap and an in-app row click; additive ULID-only **route keys** on the push payload (per-type allowlist in `PushMessageFactory`, shared with the SPA through `packages/api-client/contracts/notification-route-keys.json`; `v` stays `1`); `campaign_ulid` on three in-app bags; `redirect=` through the native session-lapse redirects; `?tab=` and `?focus=messages`; a not-found link back to the list. Anything unplaceable falls back to the notifications list. The AH-102 inventory's "no backend payload migration" statement is reversed (dated correction in `push-notifications-inventory.md`).
 - **Open threads (AH-103):**
-  - **Deploy of AH-099 → AH-103 is drafted, awaiting Pedram's review (2026-10-12; nothing run on production):** one ordered checklist, [`docs/runbooks/deploy-ah099-ah103.md`](../runbooks/deploy-ah099-ah103.md) (two pending migrations, the `APP_KEY` guard, the env changes, the `user_push_tokens` / `push_deliveries` GRANT read-backs, the arming order; every undocumented step marked CONFIRM). It carries the **mock-social-verification decision** (§4; recommendation: confirm harmless, no flag change, gated on three read-only queries). The production read-backs it rests on are recorded in each PENDING `deploy-log.md` entry.
+  - **Deploy of AH-099 → AH-103 is drafted, awaiting Pedram's review (2026-10-12; nothing run on production):** one ordered checklist, [`docs/runbooks/deploy-ah099-ah103.md`](../runbooks/deploy-ah099-ah103.md) (a read-only P0 of discovery commands first, then P1–P7 pre-flight reads; two pending migrations, the `APP_KEY` guard, the env changes with the FCM secret shipped from the laptop in one pipe, the `user_push_tokens` / `push_deliveries` GRANT read-backs, the arming order; every undocumented step marked CONFIRM). It carries the **mock-social-verification decision** (§4; recommendation: confirm harmless, no flag change, gated on three read-only queries). The production read-backs it rests on are recorded in each PENDING `deploy-log.md` entry.
   - **Done:** Checkpoint A cleared, device walk accepted (both devices), finding 2 fixed and re-walked on the Samsung, pushed, CI green, the dev DB's walk rows cleaned (notifications 55–96 and the walk's messages; the audit log keeps its rows).
   - **Pedram owes at deploy:** `php artisan queue:restart` (a named step, `PushMessageFactory` changed); either deploy order is safe; the native app needs a release for the app side. No flag change, no migration.
   - **Not done, named follow-ups:** **AH-103b** universal links / Android App Links (Android is blocked on a release keystore / Play App Signing); **AH-103c** biometric-lock interplay; **AH-105** privacy checklist; the TestFlight production-APNs proof (still AH-102's open item).
@@ -169,8 +169,8 @@ try/catch, an after-commit job and the OFF flag). Live state is `git status` and
   as self-healing (a rotated token that never re-POSTs goes `UNREGISTERED` on the next send and is invalidated); tech-debt 11;
   **(3)** **item 10 on iOS**, no `UNREGISTERED` observed in 6 test sends and 1 real send (likely sandbox-APNs feedback timing, a known
   vendor quirk, **unverified**; the server logic is proven on Android); re-observe on the TestFlight run.
-- **Pedram owes:** the first TestFlight upload (and the production-APNs run); the production FCM credential in Secrets Manager, then
-  `push:test --validate-only`, before arming `push_notifications_enabled` (timed before the first push-capable store build reaches
+- **Pedram owes:** the first TestFlight upload (and the production-APNs run); the production FCM credential (the service-account file on his laptop, shipped to the env file in one pipe, see the
+  deploy runbook's step 7; not Secrets Manager), then `push:test --validate-only`, before arming `push_notifications_enabled` (timed before the first push-capable store build reaches
   users); the deploy of the Checkpoint A/B stack on his schedule (**pushed is not deployed**; deploy obligations are in the deploy log:
   snapshot, `migrate`, `queue:restart`, the `engine_c_user` GRANT check on `user_push_tokens`, the pre-deploy read, the credential read).
 - **Decided, to land later:** **tech-debt 17** (the iOS Keychain sign-in survives a delete and reinstall) is accepted as recorded; the
@@ -1604,9 +1604,10 @@ registered creators, 200+ concurrent admin users), which are design goals, not c
   postfix, sshd and dnsmasq are STOPPED.) So `messages:send-digest` and `boards:scan-overdue` **have been
   firing**, and the incomplete-creator nudge **would fire** if its flag were ON (whether that flag was ever
   flipped on production is **not read**; check before assuming either way). The earlier "assume NO scheduled
-  command runs" assumption is withdrawn. **Doc drift, not fixed here:** `production-queue-worker.md` §7 /
-  §7.1 still documents the cron form, and says to check "the cron entry (§7.1)" when the prune is stale;
-  for this production box that reads `supervisorctl status laravel-schedule` instead. The AH-102b
+  command runs" assumption is withdrawn. **Doc drift, fixed 2026-10-12:** `production-queue-worker.md` §7 / §7.1 now describe the supervisor
+  `schedule:work` form (cron kept only as the alternative for a host without supervisor), and the stale-prune check is
+  `supervisorctl status laravel-schedule`. A second scheduler would double-fire every daily command, so the deploy
+  checklist reads for one first (its P7). The AH-102b
   `push:prune-deliveries` entry needs **no scheduler restart** to be picked up, because `schedule:work`
   starts a fresh `schedule:run` every minute.
 - **Backup/restore posture UNVERIFIED — standing open item, owned by Pedram (blocks completion of

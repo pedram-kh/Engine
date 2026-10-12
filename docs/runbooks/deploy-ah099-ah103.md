@@ -9,7 +9,12 @@ production read-backs Pedram supplied the same day. It merges the six `PENDING` 
 `Result:` line. Each step says where it runs: **HOST** (`~/catalyst-engine`) or **APP** (inside `docker compose exec app sh`, at
 `/app`). Anything the repo does not document is marked **CONFIRM**: check it on the box before relying on it. The repo's
 `docker-compose.yml` is the **local-dev** stack (Postgres, Redis, Mailhog, MinIO); there is **no production compose, nginx or
-php-fpm file in the repo**, so the production layout is not written down anywhere I could read.
+php-fpm file in the repo**, so the production layout is not written down anywhere I could read. **P0 reads it off the box.**
+
+> **If P0.2 says `/app` is baked into the image (not a bind mount of `~/catalyst-engine/apps/api`), the deploy steps change.** Code then
+> reaches the container by **rebuilding and recreating it** (`docker compose build` / `up -d`), not by `git pull` on the host; steps 2,
+> 3, 4, 7, 8, 9 and 10, the §7 code rollback, and where the env file lives would all need rewriting, and a recreate restarts FPM and
+> the workers by itself. **Stop after P0 and revise this runbook before deploy day.** Nothing below is written for that shape.
 
 ---
 
@@ -17,7 +22,7 @@ php-fpm file in the repo**, so the production layout is not written down anywher
 
 | Item                                     | Value                                                                                                                                 |
 | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Last deployed tip (from `deploy-log.md`) | `9b7d6deb` (AH-098, 2026-09-04). **CONFIRM** with `git rev-parse HEAD` on the host (step P1)                                          |
+| Last deployed tip (from `deploy-log.md`) | `9b7d6deb` (AH-098, 2026-09-04). read on the box in P0.1                                                                              |
 | Deploy tip                               | `origin/main` when you pull. At the time of writing `f932eda4`, plus the docs-only commit that adds this runbook once you clear it    |
 | Migrations                               | **2**, both `CREATE TABLE` only (§1)                                                                                                  |
 | PHP dependencies                         | **No change** (`apps/api/composer.json` and `composer.lock` are identical to `9b7d6deb`)                                              |
@@ -68,17 +73,19 @@ AH-099's `personal_access_tokens` table is the **stock** migration `2026_05_07_0
 
 ## 2. Environment changes (all four, in one place)
 
-| Variable                           | Change                                                          | Notes                                                                                                                                                                                                                              |
-| ---------------------------------- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `FRONTEND_EXTRA_ORIGINS`           | **Append** `capacitor://localhost,https://localhost`            | iOS and Android origins for CORS (AH-099). Comma-separated; keep any existing value                                                                                                                                                |
-| `SANCTUM_STATEFUL_DOMAINS`         | **No change. Read it and confirm there is NO bare `localhost`** | The Android-only trap: Sanctum strips only `http(s)://`, so a bare `localhost` makes `https://localhost` a stateful origin and every bearer POST 419s. The repo's `.env.example` default contains `localhost`; production must not |
-| `FCM_PROJECT_ID`                   | Set to `catalyst-production-c28e9`                              | Non-secret                                                                                                                                                                                                                         |
-| `FCM_SERVICE_ACCOUNT_JSON_B64`     | Set (base64 of the service-account JSON, **one line**)          | **SECRET.** From Secrets Manager (`catalyst/<env>/api/fcm` is a convention to **CONFIRM**). Never paste it into chat, the terminal log or a ticket                                                                                 |
-| `SANCTUM_TOKEN_EXPIRATION_MINUTES` | Optional. Unset defaults to `129600` (90 days)                  | A fixed ceiling from token creation. Leave unset unless you want a different one                                                                                                                                                   |
-| `AUTH_GUARD`                       | Read: must be unset or `web`                                    | AH-099 pre-deploy read                                                                                                                                                                                                             |
+| Variable                           | Change                                                          | Notes                                                                                                                                                                                                                                                        |
+| ---------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `FRONTEND_EXTRA_ORIGINS`           | **Append** `capacitor://localhost,https://localhost`            | iOS and Android origins for CORS (AH-099). Comma-separated; keep any existing value                                                                                                                                                                          |
+| `SANCTUM_STATEFUL_DOMAINS`         | **No change. Read it and confirm there is NO bare `localhost`** | The Android-only trap: Sanctum strips only `http(s)://`, so a bare `localhost` makes `https://localhost` a stateful origin and every bearer POST 419s. The repo's `.env.example` default contains `localhost`; production must not                           |
+| `FCM_PROJECT_ID`                   | Set to `catalyst-production-c28e9`                              | Non-secret                                                                                                                                                                                                                                                   |
+| `FCM_SERVICE_ACCOUNT_JSON_B64`     | Set (base64 of the service-account JSON, **one line**)          | **SECRET.** The source is the service-account file **on Pedram's laptop**: `~/secrets/catalyst-production-c28e9-firebase-adminsdk-*.json` (not Secrets Manager). Step 7 ships it in one pipe. Never echo it to the terminal, history, logs, chat or a ticket |
+| `SANCTUM_TOKEN_EXPIRATION_MINUTES` | Optional. Unset defaults to `129600` (90 days)                  | A fixed ceiling from token creation. Leave unset unless you want a different one                                                                                                                                                                             |
+| `AUTH_GUARD`                       | Read: must be unset or `web`                                    | AH-099 pre-deploy read                                                                                                                                                                                                                                       |
 
-**CONFIRM where production reads its env from** (`/app/.env`, a compose `env_file`, or injected from Secrets Manager). The repo
-does not say. The commands below assume `/app/.env`; adjust the file path, not the procedure.
+**Where production reads its env from is read in P0.3** (`/app/.env`, a compose `env_file`, or variables injected into the container).
+The commands below write `.env` for `/app/.env`; if P0.3 says otherwise, change the file path, not the procedure. **One trap P0.3 checks:**
+Laravel's env loader never overrides a variable that is already in the process environment, so a name set by compose beats the same
+line in `.env`.
 
 ---
 
@@ -205,11 +212,139 @@ deliberate arming. **When a real adapter is wired, the flag will stay ON** unles
 defeats the "no silent vendor calls" guarantee `docs/feature-flags.md:151` claims. This is also why `post_verified_mail_enabled` must
 stay OFF: its own docs say not to arm it over the mock driver.
 
+**Proved, not just read** (dev database, a rolled-back transaction, the real Pennant stack, 2026-10-12): no row + driver `meta` → `false`; no row +
+driver `mock` → `true` (row inserted); **row stored, driver switched to `meta` → still `true`.** Recorded as its own row in
+[`docs/tech-debt.md`](../tech-debt.md), "`social_verification_enabled` is frozen ON by Pennant's stored default", with the trigger (before any real
+adapter is bound).
+
 ---
 
 ## 5. The checklist
 
-### Before you start (nothing here changes production)
+### Before you start (P0 to P7 are read-only: nothing here changes production)
+
+Do not start step 1 until P0 to P7 are all filled in and healthy.
+
+**P0. Discovery reads: answer every CONFIRM item below.** Each command only reads. Where a command could print a secret it is written to
+print names, counts or paths only; **never run a bare `docker compose config`** (it prints the resolved `environment:` values) and never
+`cat` an env file. What stays CONFIRM for Pedram because only the AWS console answers it: the **RDS snapshot name and DB instance**, and **how
+to get an RDS owner SQL session** (step 1 and step 6).
+
+**P0.1 On-box git tip [HOST]**
+
+```sh
+cd ~/catalyst-engine && git rev-parse HEAD && git branch --show-current && git status --short | head && git remote -v
+git merge-base --is-ancestor 9b7d6deb HEAD && echo "9b7d6deb is an ancestor of HEAD"
+git diff --stat 9b7d6deb HEAD -- apps packages pnpm-lock.yaml | tail -3
+```
+
+Healthy: branch `main`, a clean tree, `9b7d6deb` is an ancestor, and the diff stat is **empty** (the checkout's runtime code is the last deployed
+tip; anything else means the box is not where `deploy-log.md` says, so stop and reconcile).
+Result: `______________`
+
+**P0.2 Is `/app` a bind mount of the host checkout, or baked into the image? [HOST]**
+
+```sh
+docker compose ps                                   # the service names, state and image
+docker compose ls                                   # which compose file(s) this project uses
+CID=$(docker compose ps -q app); echo "$CID"
+docker inspect "$CID" --format '{{.Config.Image}} | created {{.Created}} | image {{.Image}}'
+docker inspect "$CID" --format '{{range .Mounts}}{{.Type}} {{.Source}} -> {{.Destination}} (rw={{.RW}}){{"\n"}}{{end}}'
+docker compose exec app sh -c 'grep " /app" /proc/self/mountinfo; ls -ld /app /app/vendor /app/storage'
+stat -c '%i  %n' ~/catalyst-engine/apps/api/composer.json                  # HOST (GNU stat: CONFIRM the host is Linux)
+docker compose exec app stat -c '%i  %n' /app/composer.json                # APP
+docker history --no-trunc "$(docker inspect "$CID" --format '{{.Image}}')" | grep -E ' (COPY|ADD) ' | cut -c1-180
+```
+
+Healthy for this runbook (**bind mount**): the mounts list shows `bind <host path>/apps/api -> /app`, and the two inode numbers are **equal**.
+**Baked**: no mount whose destination is `/app` (a named volume only for `storage`, say), the inodes differ, and the history shows a
+`COPY … /app` layer. **Mixed** (for example only `storage` or `.env` mounted): write down exactly which paths are mounted. Either of the last two
+means: **stop, revise the runbook** (top note).
+Mount shape: bind / baked / mixed: `______________` Source path: `______________`
+Result: `______________`
+
+**P0.3 Env file location, and what is already in the process environment [HOST, then APP]**
+
+```sh
+docker compose config --format json | jq '.services.app | {image, build, env_file, volumes}'   # HOST. Paths only; no environment values
+docker compose exec app sh -c 'ls -l /app/.env; php artisan tinker --execute="echo app()->environmentFilePath(), PHP_EOL;"'
+docker compose exec app sh -c 'env | cut -d= -f1 | sort | grep -E "^(APP_KEY|FRONTEND_EXTRA_ORIGINS|SANCTUM_|FCM_|AUTH_GUARD|DB_|QUEUE_|CACHE_)"'
+docker compose exec app sh -c 'grep -c "^FCM_" /app/.env; id -un'
+```
+
+(No `jq`? `docker compose config --format json | python3 -c "import json,sys; s=json.load(sys.stdin)['services']['app']; print(json.dumps({k: s.get(k) for k in ('image','build','env_file','volumes')}, indent=1))"`.)
+
+Healthy: `environmentFilePath()` is the file you will edit in step 7 (expected `/app/.env`), it exists, and `grep -c "^FCM_"` prints **0** (the FCM
+variables are not set yet). The `env | cut -d= -f1` line prints **names only**: any of `FRONTEND_EXTRA_ORIGINS`, `SANCTUM_*`, `FCM_*` listed there
+is set by compose, **beats `.env`**, and must be changed where compose sets it (the `env_file:` from the first command), not in `.env`. (PHP-FPM
+may scrub the environment with `clear_env`; the CLI and the queue worker do not, so a name here can make web and worker disagree.)
+Env file for step 7: `______________` Names set by compose: `______________`
+Result: `______________`
+
+**P0.4 The PHP-FPM supervisor program, to derive the reload command [APP]**
+
+```sh
+docker compose exec app sh -c 'supervisorctl status; echo; grep -rhE "^\[program:|^command=" /etc/supervisor* /etc/supervisord* 2>/dev/null'
+docker compose exec app sh -c 'supervisorctl pid <PHP_FPM_PROGRAM>; ps -o pid,ppid,args | grep "[p]hp-fpm"'
+```
+
+Healthy: one program runs `php-fpm` (name it from the first command), and the PID that `supervisorctl pid` prints **is the `php-fpm: master process`
+line's PID** in the `ps` output (its PPID is supervisord). Then the reload (step 9) is `supervisorctl signal USR2 <PHP_FPM_PROGRAM>`; PHP-FPM
+treats `USR2` as a graceful reload of the master. If the program wraps FPM in a shell script, the PID differs: signal the **master** PID from `ps`
+instead. If `ps` is missing in the image, `supervisorctl pid` plus `cat /proc/<pid>/cmdline | tr '\0' ' '` shows the same.
+Program name: `______________` Reload command: `______________`
+Result: `______________`
+
+**P0.5 Where the application logs go [APP, HOST]**
+
+```sh
+docker compose exec app php artisan tinker --execute="echo config('logging.default'), ' | ', json_encode(config('logging.channels.stack.channels')), ' | ', storage_path('logs'), PHP_EOL;"
+docker compose exec app sh -c 'ls -la storage/logs | tail -5'
+docker compose logs --since 1h app | tail -3
+```
+
+Healthy: the default is `stack` (or `single` / `daily`) and `laravel*.log` files exist, so the log path is `/app/storage/logs/laravel*.log` and step 17's
+`grep` works as written. If the default is `stderr` or `errorlog`, there are no files: step 17 reads `docker compose logs --since 24h app | grep -c …`
+instead.
+Log path or channel: `______________`
+Result: `______________`
+
+**P0.6 The `/up` host, and where nginx serves the SPAs from [APP]**
+
+```sh
+docker compose exec app sh -c 'grep -rhnE "^[[:space:]]*(server_name|root|listen)[[:space:]]" /etc/nginx/conf.d /etc/nginx/sites-enabled /etc/nginx/http.d 2>/dev/null'
+docker compose exec app php artisan tinker --execute="echo config('app.url'), PHP_EOL;"
+docker compose exec app sh -c 'curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1/up'    # no curl in the image? use: wget -S -O /dev/null http://127.0.0.1/up
+```
+
+Healthy: `server_name` lines name the production host(s) (the `<APP_HOST>` / `<API_HOST>` of steps 11 and 18); `config('app.url')` agrees; `/up` on
+`127.0.0.1` returns `200`. The `root` lines say **where each SPA's `dist/` is served from** (nginx runs inside this container, so that path is
+either a bind mount from the host or baked in): `ls -ld --time-style=long-iso <root>` for each, and compare with the P0.2 mounts. This is the answer to
+step 4's "where is `dist/` published".
+APP_HOST: `______________` API_HOST: `______________` `root` of main SPA: `______________` of admin SPA: `______________`
+Result: `______________`
+
+**P0.7 How earlier deploys built and published the SPAs [repo, then HOST]**
+
+I read the repo for this one; **the repo does not answer it.** `git ls-files` tracks no `Dockerfile`, nginx, supervisor or deploy-script file (only the
+dev `docker-compose.yml`). `deploy-log.md` says only "`pnpm install` on the build host" (AH-100c) and "SPA (apps/main) rebuilt + API rebuilt"
+(AH-097): no command, no path, no host. Re-run in a checkout to see it yourself, then read the box:
+
+```sh
+git ls-files | grep -iE 'dockerfile|compose|nginx|supervisor|deploy'                           # CHECKOUT: expect only docker-compose.yml (dev), docs and useDeployEnv*.ts (a false match); no Dockerfile
+grep -nE -i 'build host|rebuilt|rebuild|pnpm install|dist/' docs/runbooks/deploy-log.md | head -40   # CHECKOUT
+ls -la ~/catalyst-engine ~/catalyst-engine/apps/api | head -40                                  # HOST
+find ~/catalyst-engine -maxdepth 3 \( -iname 'Dockerfile*' -o -iname 'docker-compose*.y*ml' -o -iname 'deploy*.sh' \) -not -path '*/node_modules/*' -not -path '*/vendor/*' 2>/dev/null
+git -C ~/catalyst-engine status --short --ignored | head -20                                    # untracked or ignored production files (a compose override, a script)
+command -v pnpm node; node -v; pnpm -v                                                           # is the host also the build host?
+stat -c '%y  %n' ~/catalyst-engine/apps/main/dist ~/catalyst-engine/apps/admin/dist 2>&1        # when the bundles were last built
+```
+
+Healthy: you can say, in one line each, **which machine builds**, **where the build output goes**, and **how it reaches the nginx `root` from P0.6**
+(already there as a bind mount, copied in, or baked by an image rebuild). The `dist/` timestamps should be near the last deploy (AH-098, 2026-09-04). Your
+own shell history on the box is the likeliest record of the exact commands: read it yourself, do not paste it anywhere (it may hold a secret typed inline).
+Build host: `______________` Publish path: `______________`
+Result: `______________`
 
 **P1. Where is the box now? [HOST]**
 
@@ -218,9 +353,8 @@ cd ~/catalyst-engine && git status --short | head && git rev-parse HEAD && git f
 ```
 
 Healthy: a clean tree, `HEAD` is `9b7d6deb` or a docs-only descendant, and a large positive commit count behind `origin/main`.
-**CONFIRM** the on-box tip: step 3's diff uses it, so write it down. Is `/app` a bind mount of `~/catalyst-engine/apps/api`, or a
-separate copy built into the image? That decides whether the host `git pull` is also what the container serves. **CONFIRM.**
-Result: ****\*\*****\_\_****\*\*****
+Write the on-box tip down: step 3's diff uses it. Whether `/app` is the same tree as the host checkout is P0.2.
+Result: `______________`
 
 **P2. APP_KEY fingerprint and a recoverable copy [APP]**
 
@@ -231,7 +365,7 @@ grep '^APP_KEY=' .env | sha256sum | cut -c1-12
 Healthy: prints 12 hex characters. Write it down; it is compared at steps 2, 3, 7, 8 and 18. Also confirm, **without printing the
 key**, that a copy of the production `APP_KEY` exists outside the box (`docs/05-SECURITY-COMPLIANCE.md` says it is in AWS Secrets
 Manager): **CONFIRM** it is current. If `.env` is not where the key lives, fingerprint wherever it does.
-Fingerprint: \***\*\_\_\_\_\*\*** Recoverable copy confirmed: yes / no
+Fingerprint: `______________` Recoverable copy confirmed: yes / no
 
 **P3. Preview the migrations [APP]**
 
@@ -240,7 +374,7 @@ php artisan migrate:status | tail -5
 ```
 
 Healthy: the last line is `2026_08_27_140000_create_campaign_attachments_table … Ran` and nothing is `Pending`. (Matches your read: batch 8, nothing from AH-099 onward.)
-Result: ****\*\*****\_\_****\*\*****
+Result: `______________`
 
 **P4. AH-099's pre-deploy reads [APP]** (not yet read)
 
@@ -253,13 +387,23 @@ php artisan tinker --execute="echo json_encode([config('sanctum.stateful'), conf
 Healthy: the stock `…create_personal_access_tokens_table` shows `Ran`; the count is `0`; the stateful list has **no bare `localhost`**
 (only real production hostnames) and the guard is `web`. `config('sanctum.stateful')` reflects cached config if it is cached; if you
 suspect a stale cache, read the `SANCTUM_STATEFUL_DOMAINS` line in `.env` too.
-Result: ****\*\*****\_\_****\*\*****
+Result: `______________`
 
-**P5. FCM credential is present and valid, without printing it [APP]** (not yet read)
+**P5. The FCM credential file on your laptop: present and the right shape, without printing it [LAPTOP]** (not yet read)
 
-The credential is a Step 7 change, so this read happens _after_ step 8. Here, only confirm the secret **exists** in Secrets Manager
-(**CONFIRM** path `catalyst/<env>/api/fcm`) and that you can produce it in step 7.
-Result: ****\*\*****\_\_****\*\*****
+The credential is the service-account JSON on Pedram's laptop, **not** in Secrets Manager. The production variable does not exist yet (step 7
+creates it); here you only prove the source file is the right one.
+
+```sh
+ls -l ~/secrets/catalyst-production-c28e9-firebase-adminsdk-*.json
+jq -e '.type=="service_account" and .project_id=="catalyst-production-c28e9" and (.client_email|length>0) and (.private_key|startswith("-----BEGIN PRIVATE KEY-----"))' ~/secrets/catalyst-production-c28e9-firebase-adminsdk-*.json >/dev/null && echo shape-ok
+```
+
+(No `jq`? `python3 -c "import json,glob,os; d=json.load(open(glob.glob(os.path.expanduser('~/secrets/catalyst-production-c28e9-firebase-adminsdk-*.json'))[0])); print(d.get('type')=='service_account' and d.get('project_id')=='catalyst-production-c28e9' and bool(d.get('client_email')) and str(d.get('private_key','')).startswith('-----BEGIN PRIVATE KEY-----'))"` prints `True`.)
+
+Healthy: **exactly one** file is listed (step 7's command refuses to run on zero or several), and the second command prints `shape-ok`. Neither prints
+the contents.
+Result: `______________`
 
 **P6. The Task 1 reads (read-only) [APP]**
 
@@ -273,7 +417,30 @@ php artisan tinker --execute="echo json_encode(DB::select(\"select type, count(*
 Healthy for the recommendation: **no row with `verification_status = pending` that is old** (a `pending` row that is older than a few
 minutes means the job did not run). `live_verified` rows and audit rows show how long mock verification has really been live and
 for whom. Record the numbers; they decide §4.
-Result: ****\*\*****\_\_****\*\*****
+Result: `______________`
+
+**P7. Pre-flight: no second scheduler (a stop condition) [APP, HOST]**
+
+`laravel-schedule` runs `schedule:work`. A `schedule:run` line in **any** crontab would fire every daily command a second time (digests twice,
+overdue events twice, the prune twice). Read every place one could hide.
+
+```sh
+# APP
+supervisorctl status | grep -E 'cron|laravel-schedule'                       # both RUNNING
+for u in $(cut -d: -f1 /etc/passwd); do crontab -l -u "$u" 2>/dev/null | sed "s/^/[$u] /"; done
+ls -la /etc/crontabs /etc/cron.d /var/spool/cron/crontabs /etc/cron.hourly /etc/cron.daily 2>&1 | head -40
+grep -rnE 'schedule:(run|work)|artisan' /etc/crontab /etc/crontabs /etc/cron.d /etc/cron.hourly /etc/cron.daily /var/spool/cron 2>/dev/null
+ps -o pid,ppid,args | grep -E 'schedule:(run|work)' | grep -v grep
+# HOST (a cron there that runs `docker compose exec … schedule:run` double-fires too)
+crontab -l 2>&1; sudo crontab -l 2>&1; ls /etc/cron.d; sudo grep -rn 'schedule' /etc/cron* /var/spool/cron* 2>/dev/null
+```
+
+Healthy: `supervisorctl` shows a **`cron` program RUNNING alongside `laravel-schedule`**; **no `schedule:run` line anywhere** (the `crontab -l` loop,
+`/etc/crontabs`, `/etc/cron.d` and the `grep` all print nothing about it; other cron jobs may exist, so read each line you do see); and the process
+list shows exactly one `schedule:work` plus, at most, a short-lived `schedule:run` whose PPID is that `schedule:work` (that is what `schedule:work`
+does every minute). **If a `schedule:run` cron line exists, STOP.** Double-firing digests is a production issue to fix **before** this deploy,
+not during it: do not proceed to step 1.
+Result: `______________`
 
 ### Step 1. Snapshot [wait for `available`]
 
@@ -287,14 +454,14 @@ aws rds describe-db-snapshots --db-snapshot-identifier <SNAPSHOT_ID> --query 'DB
 
 Healthy: `available`. **Record the ID in the deploy-log entries before step 5.** Both new tables are `CREATE TABLE`; the snapshot is the
 restore point for both migrations.
-Snapshot ID: ****\*\*****\_\_****\*\***** Status read: ****\*\*****\_\_****\*\*****
+Snapshot ID: `______________` Status read: `______________`
 
 ### Step 2. Pull the code [HOST]
 
 ```sh
 cd ~/catalyst-engine
 OLD=$(git rev-parse HEAD); echo "OLD=$OLD"
-git pull --ff-only origin main        # CONFIRM: the repo documents no pull command; the deploy log says "pulled origin/main"
+git pull --ff-only origin main        # remote and branch from P0.1; the deploy log says only "pulled origin/main", so this is the plain form
 git rev-parse HEAD
 ```
 
@@ -305,7 +472,7 @@ grep '^APP_KEY=' .env | sha256sum | cut -c1-12
 ```
 
 Healthy: **identical to P2.**
-New HEAD: \***\*\_\_\_\_\*\*** Fingerprint after: \***\*\_\_\_\_\*\*** Same as P2: yes / no
+New HEAD: `______________` Fingerprint after: `______________` Same as P2: yes / no
 
 ### Step 3. PHP dependencies: normally none [HOST, then APP]
 
@@ -323,12 +490,12 @@ grep -n 'post-install-cmd' composer.json                   # expected: no output
 grep '^APP_KEY=' .env | sha256sum | cut -c1-12             # expected: identical to P2
 ```
 
-diff empty: yes / no Fingerprint: \***\*\_\_\_\_\*\*** Same as P2: yes / no
+diff empty: yes / no Fingerprint: `______________` Same as P2: yes / no
 
-### Step 4. JS dependencies and the two SPA builds [CONFIRM where this runs]
+### Step 4. JS dependencies and the two SPA builds [where this runs: P0.7]
 
 The deploy log says only "`pnpm install` on the build host" and "SPA rebuilt"; **how the bundles are built and published is not in
-the repo. CONFIRM** which machine builds them, where `dist/` is served from (nginx root) and how it is swapped in.
+the repo**; P0.6 and P0.7 answer which machine builds them, where `dist/` is served from (the nginx `root`) and how it is swapped in. Copy those answers here before you run anything.
 The repo's commands (`package.json`, `apps/*/package.json`):
 
 ```sh
@@ -341,8 +508,8 @@ pnpm --filter @catalyst/admin build            # the admin gains Push deliveries
 device build and needs the uncommitted `.env.native-production`.
 Healthy: both builds exit 0 (the type-check runs first, so a TypeScript error fails the build), and the new `dist/` is the one nginx
 serves. Do this **before** the migration only if publishing is atomic; otherwise build now and **publish after step 9** so
-browsers never see a bundle that calls an API the box is not yet running. **CONFIRM** which.
-Result: ****\*\*****\_\_****\*\*****
+browsers never see a bundle that calls an API the box is not yet running. P0.7's answer on how publishing works decides which.
+Result: `______________`
 
 ### Step 5. Migrate [APP]
 
@@ -360,7 +527,7 @@ php artisan migrate:status | tail -4
 ```
 
 Healthy: both `Ran`, batch 9.
-Output: ****\*\*****\_\_****\*\*****
+Output: `______________`
 
 ### Step 6. GRANT read-backs for the app DB role [APP]
 
@@ -388,22 +555,65 @@ GRANT USAGE, SELECT ON SEQUENCE push_deliveries_id_seq TO engine_c_user;
 ```
 
 Also **CONFIRM** which role runs `migrate`. If it is the same as the app role, this step is moot but the read still proves it.
-Role: \***\*\_\_\_\_\*\*** Output: ****\*\*****\_\_****\*\*****
+Role: `______________` Output: `______________`
 
-### Step 7. Environment [APP; CONFIRM the env file]
+### Step 7. Environment [env file from P0.3; the secret from your LAPTOP]
 
-Edit the production env (see §2). Do not print secrets. After editing, **fingerprint the key** and read back **names, not values**:
+Three lines change (§2). Two are plain, one is a secret. **The secret must never reach the terminal, shell history, logs, the clipboard or chat.**
+If P0.3 found any of these names set by compose, change them there instead and skip the matching edit below.
+
+**7a. The two non-secret lines [APP, edit by hand].** Read the current line first (it holds no secret), then edit it in the box's editor:
+
+```sh
+grep -n '^FRONTEND_EXTRA_ORIGINS=' .env       # then make it: FRONTEND_EXTRA_ORIGINS=<what it had>,capacitor://localhost,https://localhost
+printf 'FCM_PROJECT_ID=catalyst-production-c28e9\n' >> .env
+```
+
+Keep whatever value `FRONTEND_EXTRA_ORIGINS` already had; an empty line becomes the two origins alone (the config drops empty entries). If it is
+quoted, put the new origins **inside** the quotes.
+
+**7b. The FCM service-account secret [LAPTOP → env file, one pipe].** Base64-encode on the laptop with no newlines and stream it straight into the
+env file. The value exists only inside the pipe: not on screen, not in history (the command text contains no value), not in a temp file, not on
+the clipboard. Take `<ENV_FILE>` from P0.3 and `<HOST>` is the box's usual `ssh` login. **Bind mount** (the env file is on the host):
+
+```sh
+set -- ~/secrets/catalyst-production-c28e9-firebase-adminsdk-*.json
+if [ $# -ne 1 ] || [ ! -f "$1" ]; then echo "expected exactly one key file, got: $#"; else
+  base64 < "$1" | tr -d '\n' | ssh <HOST> 'tail -c1 <ENV_FILE> | grep -q . && echo >> <ENV_FILE>; { printf FCM_SERVICE_ACCOUNT_JSON_B64=; cat; echo; } >> <ENV_FILE>'
+fi
+```
+
+**Env file only inside the container** (P0.3 found no bind mount): the same body, wrapped. Use this line in place of the `base64 …` line inside the
+`if` above. It has no quotes and no `$`, so it survives the extra layer; `-T` keeps stdin as the pipe:
+
+```sh
+  base64 < "$1" | tr -d '\n' | ssh <HOST> 'cd ~/catalyst-engine && docker compose exec -T app sh -c "tail -c1 /app/.env | grep -q . && echo >> /app/.env; { printf FCM_SERVICE_ACCOUNT_JSON_B64=; cat; echo; } >> /app/.env"'
+```
+
+What the remote body does: if the file's last byte is not a newline it adds one (otherwise the new variable would be glued onto the last line), then
+appends `FCM_SERVICE_ACCOUNT_JSON_B64=<base64>` and a newline. (Tested locally on a fake key file and fake env files with and without a trailing
+newline, and an empty one: the last line stays intact, exactly one new line, its length equals the base64 length, and it decodes back to the file.
+That test used no real credential.)
+
+**Never:** run `base64 …` without the pipe, `cat` or `echo` the JSON, the encoded value or the env file, `docker compose config`, `env | grep FCM`,
+`docker inspect` without a `--format`, or paste any of it into chat or a ticket. (Step 8's tinker line prints only whether the value is set.)
+
+**7c. Read back names, counts and lengths: never the value [APP].**
 
 ```sh
 grep '^APP_KEY=' .env | sha256sum | cut -c1-12                                   # identical to P2
 grep -c '^FCM_PROJECT_ID=catalyst-production-c28e9$' .env                        # expect 1
-grep -c '^FCM_SERVICE_ACCOUNT_JSON_B64=.\+' .env                                 # expect 1 (non-empty; do not print the line)
+grep -c '^FCM_SERVICE_ACCOUNT_JSON_B64=' .env                                    # expect exactly 1 (no duplicate line)
+grep -c '^FCM_SERVICE_ACCOUNT_JSON_B64=.\+' .env                                 # (i) non-empty: expect 1; prints a count, never the value
+awk -F= '/^FCM_SERVICE_ACCOUNT_JSON_B64=/{print length($0)-length("FCM_SERVICE_ACCOUNT_JSON_B64=")}' .env   # a number, never the value
 grep '^FRONTEND_EXTRA_ORIGINS=' .env                                             # must contain capacitor://localhost and https://localhost
 grep '^SANCTUM_STATEFUL_DOMAINS=' .env                                           # must contain NO bare "localhost"
 ```
 
-Healthy: as annotated. `FRONTEND_EXTRA_ORIGINS` keeps any value it already had. These are **not live until step 8**.
-Fingerprint: \***\*\_\_\_\_\*\*** FRONTEND_EXTRA_ORIGINS read: ****\*\*****\_\_****\*\*****
+Healthy: as annotated. The length is **a few thousand characters** (a service-account file is about 2.3 KB and base64 adds a third); a number under
+about a hundred means a truncated or empty pipe, so remove the line and redo 7b. The credential is **verified only by (i) the non-empty check above
+and (ii) `push:test --validate-only` in step 12**: nothing else may print it. These changes are **not live until step 8**.
+Fingerprint: `______________` FRONTEND_EXTRA_ORIGINS read: `______________` FCM lines: `______________` length: `______________`
 
 ### Step 8. Cache config [APP]
 
@@ -415,19 +625,22 @@ php artisan tinker --execute="echo json_encode(['origins'=>config('cors.allowed_
 
 Healthy: `config:cache` succeeds; the origins list includes `capacitor://localhost` and `https://localhost`; `fcm_project` is
 `catalyst-production-c28e9`; `fcm_secret_set` is `true`. If your CORS config uses a different key, read `config('cors')` whole
-(**CONFIRM** the key; `config/cors.php` reads `FRONTEND_EXTRA_ORIGINS`).
-Result: ****\*\*****\_\_****\*\*****
+(`config/cors.php` reads `FRONTEND_EXTRA_ORIGINS` into `cors.allowed_origins`; checked against the repo and run on the dev database).
+Result: `______________`
 
-### Step 9. PHP-FPM reload [CONFIRM the exact command]
+### Step 9. PHP-FPM reload [command from P0.4]
 
 ```sh
-supervisorctl status | grep -i php                                # find the program name
-supervisorctl signal USR2 <php-fpm-program-name>                  # CONFIRM: USR2 = graceful reload for php-fpm; or use the box's usual command
+supervisorctl status <PHP_FPM_PROGRAM>                          # name from P0.4
+supervisorctl signal USR2 <PHP_FPM_PROGRAM>                     # graceful reload; or `kill -USR2 <master pid from P0.4>` if the program wraps FPM
+supervisorctl status <PHP_FPM_PROGRAM>
 ```
 
-Why: opcache serves stale bytecode otherwise (the AH-097 and 2026-08-11 entries in `deploy-log.md` record the reload as a required step). The repo does not say how the box reloads FPM.
-Healthy: FPM stays RUNNING and `/up` still answers. **Publish the SPA bundles now** if step 4 deferred it.
-Result: ****\*\*****\_\_****\*\*****
+Why: opcache serves stale bytecode otherwise (the AH-097 and 2026-08-11 entries in `deploy-log.md` record the reload as a required step). The repo does
+not say how the box reloads FPM; P0.4 derived the command above from the box's own supervisor config.
+Healthy: FPM stays RUNNING (uptime unchanged for the supervisor program, since USR2 reloads the master in place) and `/up` still answers. **Publish the
+SPA bundles now** if step 4 deferred it.
+Result: `______________`
 
 ### Step 10. Restart the worker [APP]
 
@@ -439,17 +652,17 @@ supervisorctl status laravel-queue
 
 Healthy: `RUNNING` with an uptime of seconds (supervisor restarted it onto the new code). Without this the worker runs the old job and
 mail classes (§4 of the queue runbook). `laravel-schedule` is **not** restarted (§3.2).
-Result: ****\*\*****\_\_****\*\*****
+Result: `______________`
 
 ### Step 11. `/up` and one authenticated request
 
 ```sh
-curl -s -o /dev/null -w '%{http_code}\n' https://<APP_HOST>/up         # CONFIRM host; expect 200
+curl -s -o /dev/null -w '%{http_code}\n' https://<APP_HOST>/up         # <APP_HOST> from P0.6; expect 200
 ```
 
 Then log in on the web app (creator or admin) and load the dashboard. Healthy: `200` and the authenticated page renders. If either
 fails, stop and assess (§8 step 5).
-Result: ****\*\*****\_\_****\*\*****
+Result: `______________`
 
 ### Step 12. FCM credential [APP]
 
@@ -460,7 +673,7 @@ php artisan push:test --validate-only
 Healthy: **`Credential OK: the provider accepted authentication…`**. Anything else is a `config_error`, `retryable` or `rejected`
 line: read the code, **do not arm**. This decodes `FCM_SERVICE_ACCOUNT_JSON_B64`, does the OAuth exchange and validates a request
 for a placeholder token; it is the credential read-back.
-Result: ****\*\*****\_\_****\*\*****
+Result: `______________`
 
 ### Step 13. Prune dry-run [APP]
 
@@ -469,7 +682,7 @@ php artisan push:prune-deliveries --dry-run
 ```
 
 Healthy: **`would delete 0`** (the table is empty). Nothing is deleted.
-Result: ****\*\*****\_\_****\*\*****
+Result: `______________`
 
 ### Step 14. Scheduler [APP]
 
@@ -480,9 +693,9 @@ php artisan schedule:list
 
 Healthy: `laravel-schedule` RUNNING; the list includes `push:prune-deliveries` alongside `messages:send-digest`, `boards:scan-overdue` and
 `creators:send-incomplete-nudges`. This is `schedule:work`, **not** cron, so the AH-102b entry's `crontab -l` read does not apply
-(production's `cron` service is running, but the scheduler is the supervisor program). **CONFIRM** that no _second_ `schedule:run`
-cron line exists (`crontab -l`), or every daily command runs twice.
-Result: ****\*\*****\_\_****\*\*****
+(production's `cron` service is running, but the scheduler is the supervisor program). P7 already proved there is no _second_ `schedule:run`
+line; if anything has changed since, re-run P7 before you go on.
+Result: `______________`
 
 ### Step 15. Apply the Task 1 decision
 
@@ -497,14 +710,24 @@ Healthy: `bool(true)` for social verification (unchanged, as it has been since 2
 
 **If you override and switch it OFF:** admin → Feature flags → `social_verification_enabled` OFF, then re-run the line above and read
 `bool(false)`. Know what that does first (§4 D1.3): new and in-flight posts are stuck `posted` / `pending` with no resolution path.
-Decision taken: recommended / OFF / other: ****\*\*****\_\_****\*\***** Read-back: ****\*\*****\_\_****\*\*****
+Decision taken: recommended / OFF / other: `______________` Read-back: `______________`
 
 ### Step 16. Arm `push_notifications_enabled` [admin Feature-flags page]
 
 Preconditions (`feature-flags.md:60`, `production-queue-worker.md` §7.5): the FCM variables are set and decode (step 12 passed); the
 worker restarted after this deploy (step 10); the Android device proof passed (local walk, 2026-10-11, E3 11 of 12). **Arm before the first
-push-capable store build reaches users**, or their first sessions register tokens that never receive anything. No tokens exist
-yet, so arming now sends nothing.
+push-capable store build reaches users**, or their first sessions register tokens that never receive anything.
+
+**Arming is inert at deploy time.** `user_push_tokens` is a brand-new, empty table (step 5 just created it) and no native build that registers
+tokens is out yet, so the dispatcher finds no token to send to: arming opens the gate for tokens that register later and sends **nothing now**. That
+also means arming proves nothing about delivery (step 17 and §6 say what does). Prove it is inert rather than assume it:
+
+```sh
+php artisan tinker --execute="echo DB::table('user_push_tokens')->count(), PHP_EOL;"       # APP: expect 0 before you arm
+```
+
+If it is **not** `0`, some build is already registering tokens; arming would make those devices reachable, so decide that on purpose before you
+flip it.
 
 1. Admin → **Feature flags** → `push_notifications_enabled` **ON**.
 2. Read it back:
@@ -518,7 +741,7 @@ Healthy: `bool(true)`, and one stored row with `value` `true`, `updated_at` just
 
 `production-queue-worker.md` §7.5 step 2 (one real push to a named test account) needs a **production-pointed** build with a
 registered token; none exists yet. **Do it before you announce the app**, not in this sitting.
-Result: ****\*\*****\_\_****\*\*****
+Result: `______________`
 
 ### Step 17. `push_deliveries` after arming [APP]
 
@@ -533,14 +756,14 @@ empty, the cause is a `GRANT` or a recorder failure; look for `push.delivery_rec
 recorder by design and will never write a row).
 
 ```sh
-grep -c 'push.config_error\|push.delivery_rejected' storage/logs/laravel*.log        # CONFIRM log path; expect 0
+grep -c 'push.config_error\|push.delivery_rejected' storage/logs/laravel*.log        # path/channel from P0.5 (stderr: use `docker compose logs --since 24h app | grep -c …`); expect 0
 ```
 
-Result: ****\*\*****\_\_****\*\*****
+Result: `______________`
 
 ### Step 18. Post-deploy smoke, by entry
 
-First, the key fingerprint, last time: `grep '^APP_KEY=' .env | sha256sum | cut -c1-12` → **identical to P2**. \***\*\_\_\_\_\*\***
+First, the key fingerprint, last time: `grep '^APP_KEY=' .env | sha256sum | cut -c1-12` → **identical to P2**. `______________`
 
 **AH-099 (token door).**
 
@@ -558,33 +781,33 @@ php artisan tinker --execute="echo DB::table('personal_access_tokens')->count(),
 ```
 
 Healthy: `401` with `auth.invalid_credentials`, and the count is still `0`.
-Result: ****\*\*****\_\_****\*\*****
+Result: `______________`
 
 **AH-100 / 100b / 100c / 100d (web render only).** Web creator sign-in, dashboard, availability page and Edit profile look and behave
 as before (square buttons; no polling on the under-review page); a cookie session is in use and **no `Authorization` header** is
 sent; `personal_access_tokens` is still `0` after web traffic. AH-100d also repaired the base `assignments` nav label in ten locales
 (bg el et fi ga hu lt lv mt ro): switch one (for example `ro`) and read the top nav.
-Result: ****\*\*****\_\_****\*\*****
+Result: `______________`
 
 **AH-101.** The creator notification-preferences page shows the grid with an **Email** column; the admin Feature-flags list shows
 `post_verified_mail_enabled` **OFF**. No `email/false` rows exist (your read), so the opt-out guard blocks nothing on deploy. The in-app
 `assignment.live_verified` row is live and ungated (§4 D1.2); there is no kill switch for it.
-Result: ****\*\*****\_\_****\*\*****
+Result: `______________`
 
 **AH-102 (backend + app, web side).** The admin Feature-flags page lists `push_notifications_enabled` (now ON, step 16); the creator
 web preferences page has **no Push column** (it is invisible on web); the creator dashboard shows no push soft-ask; `push:test
 --validate-only` passed (step 12). Optional, needs a creator session: `PATCH /api/v1/me/notification-preferences` with `channel: push`
 is accepted. **CONFIRM** if you want it tested here.
-Result: ****\*\*****\_\_****\*\*****
+Result: `______________`
 
 **AH-102b (admin).** The admin sidebar shows **Operations → Push deliveries** and **Creators → Creator app**; Push deliveries loads
 empty, with the footer "No push attempts stored yet."; Creator app loads. (Admin SPA rebuilt in step 4.)
-Result: ****\*\*****\_\_****\*\*****
+Result: `______________`
 
 **AH-103 (deep links).** Backend: nothing visible without a native build. Web: from the agency bell, a campaign-application row opens the
 campaign on the **Applications** tab (`?tab=applications`) if such a row exists; skip honestly if none does. The route keys on push
 payloads are proved by the first real push (§6).
-Result: ****\*\*****\_\_****\*\*****
+Result: `______________`
 
 ### Step 19. Record it [deploy-log.md]
 
@@ -604,7 +827,7 @@ Done: yes / no
   `push-notifications-review.md` (named open items, rows 1 and 4).
 - **§7.5 step 2:** one real push to a named test account with a registered token, before the app is announced.
 - **The first real push:** after it, `push_deliveries` must be `> 0` (step 17) and the AH-103 route keys can be checked by tapping it.
-- **Tech-debt row (D1.5):** the stored `social_verification_enabled` row must be removed or set OFF before a real social adapter is wired.
+- **Tech-debt row (D1.5), now in `docs/tech-debt.md`:** the stored `social_verification_enabled` row must be removed or set OFF before a real social adapter is wired.
 
 ---
 
@@ -616,7 +839,7 @@ Done: yes / no
 | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **`APP_KEY` fingerprint differs** (any step)                          | **Restart nothing.** The workers still hold the old key in memory (that is what made the 2026-08-11 recovery possible). Restore the value in `.env` from the recoverable copy (P2), `php artisan config:cache`, reload FPM. Do not run `composer install` again                                                                                      |
 | A migration fails midway                                              | Do not re-run blindly. Read the error. Both migrations are single `CREATE TABLE`s, so a failure leaves nothing half-applied except possibly one table: `migrate:status`, then fix forward                                                                                                                                                            |
-| Code problem after migrating (API or SPA)                             | **Roll the code back, leave the tables.** Both tables are additive and the old code never touches them. `git checkout <OLD>` on the host, rebuild/republish the SPAs (**CONFIRM** how), reload FPM, `queue:restart`                                                                                                                                  |
+| Code problem after migrating (API or SPA)                             | **Roll the code back, leave the tables.** Both tables are additive and the old code never touches them. `git checkout <OLD>` on the host, rebuild/republish the SPAs (how: P0.7), reload FPM, `queue:restart`                                                                                                                                        |
 | Roll the schema back                                                  | `php artisan migrate:rollback --step=2 --force` drops both tables. Safe while they are empty (they are at deploy). After tokens exist it loses registered tokens (they re-register on next launch) and the delivery log                                                                                                                              |
 | **Data problem** (not just schema)                                    | **Restore from the step-1 snapshot.** An RDS restore creates a **new instance**; it does not roll the live one back in place. **CONFIRM** how the app is re-pointed to it. **The restore has never been rehearsed** (`production-queue-worker.md` §8.2), and everything written after the snapshot is lost. Prefer fix-forward for anything additive |
 | Pushes misbehave after arming (`push.config_error` burst, wrong copy) | Flip `push_notifications_enabled` **OFF** (admin → Feature flags). The dispatcher returns before any token read; jobs already queued re-check token liveness first; nothing already sent is recalled; tokens still register and in-app rows still write                                                                                              |
@@ -639,5 +862,7 @@ outside the flag), and the AH-103 payload route keys (additive; old and new buil
 _Provenance: drafted by Cursor on 2026-10-12 from `docs/runbooks/deploy-log.md`, `production-queue-worker.md` §4, §7, §7.5, §8,
 `feature-flags.md`, the repo at `f932eda4`, and the production read-backs Pedram supplied. The read-only `artisan tinker` commands in
 P4, P6 and steps 6, 8, 15, 16, 17, the `push:prune-deliveries --dry-run` and the `APP_KEY` fingerprint were run against the **local
-dev database** to check their syntax and output shape; **no command has been run against production**. Every item marked CONFIRM is
-something the repo does not document._
+dev database** to check their syntax and output shape; **no command has been run against production**. Revised 2026-10-12 after review: P0
+(discovery reads), P7 (second-scheduler pre-flight), the FCM source and the Step 7 procedure. **What is still CONFIRM, because only you can answer
+it:** the RDS snapshot name and DB instance (step 1), how to get an RDS owner SQL session and which role runs `migrate` (step 6), a current
+off-box copy of the `APP_KEY` (P2), and how the app is re-pointed after an RDS restore (§7). Everything else the repo does not document is read in P0._

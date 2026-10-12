@@ -3076,7 +3076,40 @@ is_blacklisted)` — sized to the `permitsMessaging()` predicate, and re-check t
   [`notification-prefs-and-ui-batch-review.md`](reviews/notification-prefs-and-ui-batch-review.md) §6.
 - **Resolution:** read the value; if it is `mock`/unset, set the intended driver explicitly (or turn the flag
   OFF), and decide how to treat posts already marked verified. A real social adapter is the durable fix.
-- **Owner:** platform. **Status:** open, standing-board item, awaiting the production read-back.
+- **Read-back, 2026-10-12 (production, Pedram):** `integrations.social.driver` = **`mock`**, and the flag is ON
+  (a stored row, see the next entry). So production **has** been running verification over the mock since
+  2026-07-14. The AH-099 to AH-103 deploy review accepted that as harmless (the mock moves no money while escrow is
+  gated; analysis in [`deploy-ah099-ah103.md`](runbooks/deploy-ah099-ah103.md) §4). Still open: set the intended
+  driver explicitly, and decide how to treat posts already marked verified by the mock.
+- **Owner:** platform. **Status:** open, standing-board item; the read-back is taken, the resolution is not.
+
+## `social_verification_enabled` is frozen ON by Pennant's stored default (AH-099 to AH-103 deploy review)
+
+- **Where:** [`SocialVerificationEnabled::default()`](../apps/api/app/Modules/Creators/Features/SocialVerificationEnabled.php)
+  (ON only while `integrations.social.driver` is `mock`), Pennant's `DatabaseDriver::get`
+  (`apps/api/vendor/laravel/pennant/src/Drivers/DatabaseDriver.php:206-231`), the `features` table, and the claim
+  in [`feature-flags.md`](feature-flags.md) (the "driver-based default" bullet, line 151).
+- **What we found (2026-10-12):** the default closure is consulted **only when no stored row exists**. On the first
+  check Pennant **inserts** the resolved value, and from then on the stored row always wins. Production's row is
+  `"true"`, created 2026-07-14 07:58:21: the mock-driver default, frozen in place, not a deliberate arming. Proved on
+  the dev database (a rolled-back transaction, the real Pennant stack): no row + driver `meta` → `false`; no row +
+  driver `mock` → `true` (row inserted); **row stored, driver switched to `meta` → still `true`.**
+- **The risk:** when a real social adapter is wired, the flag does **not** flip OFF. The docs say "the instant a real
+  adapter is wired, the default flips back to OFF", and the class docblock says the closure runs "on every check";
+  both are wrong for any environment that has already checked the flag once. The first deploy with a real adapter
+  would therefore let `VerifyPostedContentJob` reach the vendor straight away, which is exactly the "no silent
+  vendor calls" guarantee the driver-based default was written to give. It also means the admin Feature-flags page
+  shows ON as an explicit stored value.
+- **Not a deploy blocker:** over the mock the stored `true` is harmless (the AH-099 to AH-103 deploy review, runbook §4).
+  It bites only at the moment a real adapter is bound.
+- **Resolution:** (1) **a named step in whichever chunk wires the first real adapter:** before binding it, delete the
+  `social_verification_enabled` row or set it OFF from the admin Feature-flags page (reason mandatory, audit row),
+  and arm it deliberately once the vendor secrets are in place. (2) Correct the `feature-flags.md` sentence and the
+  docblock so neither claims a re-evaluation that does not happen. (3) Optional, design call not made: stop the stored
+  default from outliving the driver it was resolved under (for example by not persisting a resolved default for this
+  flag), with a Pest test that uses the real Pennant database driver, not a faked resolver.
+- **Owner:** platform / creators. **Status:** open. **Trigger:** before any real social adapter (meta, tiktok,
+  youtube) is bound in an environment that has run with the mock.
 
 ## Creator app fields render at 4px, not Figma's 8px (AH-101)
 

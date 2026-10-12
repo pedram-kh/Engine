@@ -251,7 +251,7 @@ schedule:list` lists `push:prune-deliveries`. **Result:** —
 **What is gated OFF**
 
 - **`push_notifications_enabled` stays OFF.** The Android device proof is **done** (2026-10-11, E3 11 of 12). Still required
-  before arming: the production FCM credential in Secrets Manager, `push:test --validate-only` against it, and Pedram's go,
+  before arming: the production FCM credential (the service-account file on Pedram's laptop, shipped into the env file by the deploy runbook's step 7; **not** Secrets Manager), `push:test --validate-only` against it, and Pedram's go,
   timed **before** the first push-capable store build reaches users. iOS is on in code after the spike (review §28) and also waits for the server flag and the TestFlight run.
 
 - **Infra:** none for the web deploy (the queue-restart and env steps are Checkpoint A's). **Never run a bare

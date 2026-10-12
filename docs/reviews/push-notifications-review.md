@@ -195,8 +195,9 @@ scan), `PushTokenRegistryTest` (21), `PushTokenEndpointsTest` (24), `FcmPushSend
    test exits non-zero and prints the code. That is a safe failure, but it may need a one-line adjustment after the
    first real run.
 3. **FCM auto-init disabled (consent-first)** has not been exercised on a device (plan R-8). It is a Stage 4 item.
-4. **The Secrets Manager path** `catalyst/<env>/api/fcm` is a convention guess; confirm it against how the other secrets
-   are named.
+4. ~~**The Secrets Manager path** `catalyst/<env>/api/fcm` is a convention guess.~~ **Resolved 2026-10-12:** the credential is not in Secrets
+   Manager. It is the service-account file on Pedram's laptop (`~/secrets/catalyst-production-c28e9-firebase-adminsdk-*.json`), shipped to the
+   production env file in one pipe (deploy runbook, step 7).
 5. **`lang/*/push.php` ×24 are machine-quality.** Names go after a colon / dash / parenthesis so no inflection is
    needed, and the register matches the house style (informal by default, formal in a few locales as a sentence-level
    choice). **A native speaker has not read them.**
