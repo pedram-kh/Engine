@@ -9,6 +9,7 @@
  * that carries the creator ULID).
  */
 
+import { ApiError } from '@catalyst/api-client'
 import { flushPromises } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -257,6 +258,18 @@ describe('CreatorAppPage (AH-102b)', () => {
     )
   })
 
+  it('an unknown/transport error code shows the page message, and no false "no creators" claim', async () => {
+    vi.mocked(adminCreatorAppApi.users).mockRejectedValue(
+      new ApiError({ status: 500, code: 'http.unknown_error', message: 'x' }),
+    )
+    const h = await mount()
+
+    const error = h.wrapper.find('[data-testid="admin-creator-app-error"]').text()
+    expect(error).toContain("We couldn't load creator app usage")
+    expect(error).not.toContain('http.unknown_error')
+    expect(h.wrapper.text()).not.toContain('No creators match these filters.')
+  })
+
   describe('sign-ins dialog', () => {
     async function openDialog() {
       const h = await mount()
@@ -316,6 +329,19 @@ describe('CreatorAppPage (AH-102b)', () => {
       expect(
         document.body.querySelector('[data-testid="admin-creator-app-signins-empty"]')?.textContent,
       ).toContain('No sign-ins on record.')
+    })
+
+    it('an unknown/transport error code shows the dialog message, never the raw key', async () => {
+      vi.mocked(adminCreatorAppApi.signIns).mockRejectedValue(
+        new ApiError({ status: 500, code: 'http.unknown_error', message: 'x' }),
+      )
+      await openDialog()
+
+      const text =
+        document.body.querySelector('[data-testid="admin-creator-app-signins-error"]')
+          ?.textContent ?? ''
+      expect(text).toContain("We couldn't load the sign-ins")
+      expect(text).not.toContain('http.unknown_error')
     })
 
     it('shows the error surface when the sign-ins fail to load', async () => {

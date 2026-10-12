@@ -316,6 +316,27 @@ describe('PushDeliveriesPage (AH-102b)', () => {
     )
   })
 
+  it('an unknown/transport error code shows the page message, never the raw key, and no false empty claims', async () => {
+    // `http.unknown_error` is what the api-client emits for a non-envelope 500
+    // or a dropped connection; it has no translation.
+    vi.mocked(adminPushDeliveriesApi.list).mockRejectedValue(
+      new ApiError({ status: 500, code: 'http.unknown_error', message: 'x' }),
+    )
+    vi.mocked(adminPushDeliveriesApi.summary).mockRejectedValue(
+      new ApiError({ status: 500, code: 'http.unknown_error', message: 'x' }),
+    )
+    const h = await mount()
+
+    const error = h.wrapper.find('[data-testid="admin-push-error"]').text()
+    expect(error).toContain("We couldn't load the push deliveries")
+    expect(error).not.toContain('http.unknown_error')
+    // A failed load must not claim "no push attempts match" / "none stored yet".
+    expect(h.wrapper.find('[data-testid="admin-push-empty"]').exists()).toBe(false)
+    expect(h.wrapper.find('[data-testid="admin-push-footer"]').text()).not.toContain(
+      'No push attempts stored yet',
+    )
+  })
+
   it('names the email channel as NOT tracked, and the push and in-app channels as tracked', async () => {
     const h = await mount()
     const strip = h.wrapper.find('[data-testid="admin-push-channels"]')

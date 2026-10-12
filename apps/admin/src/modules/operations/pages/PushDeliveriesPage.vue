@@ -34,7 +34,7 @@ import {
 
 type OutcomeChip = PushOutcomeFilter | 'all'
 
-const { t, locale } = useI18n()
+const { t, te, locale } = useI18n()
 const route = useRoute()
 
 const PER_PAGE = 50
@@ -64,6 +64,15 @@ const nextCursor = ref<string | null>(null)
 // Cursor stack so "previous" walks back through visited pages.
 const cursorHistory = ref<string[]>([])
 let requestSeq = 0
+
+// An unknown / transport error code (`http.unknown_error`, `network.error`)
+// has no translation: fall back to the page's own message instead of
+// rendering the raw key at an admin.
+const errorText = computed(() =>
+  errorKey.value !== null && te(errorKey.value)
+    ? t(errorKey.value)
+    : t('admin.operations.push_deliveries.load_failed'),
+)
 
 const configErrorCount = computed(() => summary.value?.counts.config_error ?? 0)
 const configErrorProminent = computed(() => configErrorCount.value > 0)
@@ -99,9 +108,12 @@ const tiles = computed(() => {
   ]
 })
 
-const footerText = computed(() => {
+// `null` while the summary is unavailable (loading or failed): saying "no push
+// attempts stored yet" then would be a claim we cannot back.
+const footerText = computed<string | null>(() => {
   const table = summary.value?.table
-  if (table === undefined || table.total_rows === 0 || table.oldest_at === null) {
+  if (table === undefined) return null
+  if (table.total_rows === 0 || table.oldest_at === null) {
     return t('admin.operations.push_deliveries.footer.empty')
   }
   return t('admin.operations.push_deliveries.footer.rows', {
@@ -348,7 +360,7 @@ onMounted(() => {
       class="mb-4"
       data-testid="admin-push-error"
     >
-      {{ t(errorKey) }}
+      {{ errorText }}
     </v-alert>
 
     <v-table density="compact" data-testid="admin-push-table">
@@ -365,7 +377,7 @@ onMounted(() => {
         </tr>
       </thead>
       <tbody>
-        <tr v-if="items.length === 0 && !loading">
+        <tr v-if="items.length === 0 && !loading && !errorKey">
           <td colspan="8" class="text-medium-emphasis" data-testid="admin-push-empty">
             {{ t('admin.operations.push_deliveries.empty') }}
           </td>
@@ -437,8 +449,8 @@ onMounted(() => {
     </div>
 
     <p class="text-caption text-medium-emphasis mt-2" data-testid="admin-push-footer">
-      {{ footerText }}
-      · {{ t('admin.operations.push_deliveries.footer.retention') }}
+      <template v-if="footerText !== null">{{ footerText }} · </template
+      >{{ t('admin.operations.push_deliveries.footer.retention') }}
     </p>
 
     <v-alert

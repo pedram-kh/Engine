@@ -26,12 +26,17 @@ const props = defineProps<{
 
 const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>()
 
-const { t, locale } = useI18n()
+const { t, te, locale } = useI18n()
 
 const rows = ref<AdminCreatorAppSignIn[]>([])
 const total = ref(0)
 const loading = ref(false)
 const errorKey = ref<string | null>(null)
+const errorText = computed(() =>
+  errorKey.value !== null && te(errorKey.value)
+    ? t(errorKey.value)
+    : t('admin.creators.app.sign_ins.load_failed'),
+)
 let requestSeq = 0
 
 const open = computed({
@@ -121,7 +126,7 @@ function platformLabel(platform: AdminCreatorAppSignIn['platform']): string {
           class="mb-3"
           data-testid="admin-creator-app-signins-error"
         >
-          {{ t(errorKey) }}
+          {{ errorText }}
         </v-alert>
 
         <v-progress-linear v-if="loading" indeterminate class="mb-3" />

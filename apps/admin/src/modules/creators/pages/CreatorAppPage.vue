@@ -12,7 +12,7 @@
  * opens the sign-ins dialog.
  */
 
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { ApiError, formatDateTime } from '@catalyst/api-client'
@@ -32,7 +32,7 @@ type PushFilter = CreatorAppPushFilter | 'all'
 
 const SEARCH_DEBOUNCE_MS = 300
 
-const { t, locale } = useI18n()
+const { t, te, locale } = useI18n()
 
 const statusFilter = ref<StatusFilter>('all')
 const platformFilter = ref<PlatformFilter>('all')
@@ -44,6 +44,14 @@ const totalItems = ref(0)
 const loading = ref(false)
 const errorKey = ref<string | null>(null)
 const tableOptions = ref({ page: 1, itemsPerPage: 25 })
+
+// Unknown / transport error codes have no translation: fall back to the page's
+// own message instead of rendering the raw key.
+const errorText = computed(() =>
+  errorKey.value !== null && te(errorKey.value)
+    ? t(errorKey.value)
+    : t('admin.creators.app.load_failed'),
+)
 
 const dialogOpen = ref(false)
 const dialogCreator = ref<{ ulid: string; name: string | null } | null>(null)
@@ -213,7 +221,7 @@ function statusColor(status: CreatorAppStatus): string | undefined {
       class="mb-4"
       data-testid="admin-creator-app-error"
     >
-      {{ t(errorKey) }}
+      {{ errorText }}
     </v-alert>
 
     <v-data-table-server
@@ -224,7 +232,7 @@ function statusColor(status: CreatorAppStatus): string | undefined {
       :items-per-page="tableOptions.itemsPerPage"
       :page="tableOptions.page"
       item-value="id"
-      :no-data-text="t('admin.creators.app.empty')"
+      :no-data-text="errorKey ? '' : t('admin.creators.app.empty')"
       data-testid="admin-creator-app-table"
       @update:options="onTableUpdate"
     >
