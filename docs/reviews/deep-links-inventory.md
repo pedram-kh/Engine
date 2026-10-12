@@ -44,7 +44,8 @@ mechanism). The content is as the brief describes it.
 5. **Nothing on a device has ever shown what `notificationActionPerformed` delivers in `notification.data`.** The app's
    listener ignores the event entirely (`core/platform/push/pushClient.ts:99-106`). The walk proved _where the tap
    lands_, never _what the tap carried_. Everything in this inventory that depends on the tap's data is **unverified on
-   hardware** (§3.1, Q8).
+   hardware** (§3.1, Q8). **Resolved by the §9 addendum (2026-10-12): observed on both an iPhone and an Android phone, in
+   foreground, background and killed states.**
 6. **Signed-out and expired-session taps already preserve the target** through `requireAuth`'s `?redirect=` and
    `SignInPage`, both pinned by specs. **Two native lapse paths drop it** (§3.2).
 7. **Universal/app links: nothing exists, and nothing can be device-verified before deploy and a signing key exist.**
@@ -490,12 +491,12 @@ The arc's original fence lists them together: "no push/camera/deep-links/biometr
 the biometric chunk (`core/auth/tokenStore.ts:7-8`, `creator-app-client-shell-review.md:113`). So the brief's narrowing of
 AH-103 to deep links is a **rescope**; the table says where the rest lands.
 
-| Item                         | State                                              | Evidence                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Recommended home                                                                                                                                                                                                                                                                 |
-| ---------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Biometric unlock**         | **Unbuilt**; the seam exists                       | No biometric plugin in `apps/main/package.json` (secure storage is `@aparajita/capacitor-secure-storage` only); no `NSFaceIDUsageDescription` in `Info.plist` (no `NS*UsageDescription` key at all); `TokenStore` is a three-method interface written so a biometric decorator can wrap `read()` (`tokenStore.ts:1-22`), `hasLapsed?` made optional for it                                                                                                                                                                                                                                                                                                                                       | **Its own chunk, after AH-103** (call it AH-103c). Security-relevant (token release, lock-out and fallback policy, App Store review copy), so Mode A on its own plan; not a rider on deep links. Interaction to design there: a cold-start tap behind a biometric prompt (§3.1). |
-| **Camera / gallery uploads** | **Partial**                                        | The system picker works through the WebView's `<input type="file">`: native dropzones say "Tap to choose a photo / files" (`creator.ui.upload.*_prompt_native`, AH-100 fidelity audit) on `AvatarUploadDrop.vue:125-126,180-181`, `PortfolioUploadGrid.vue:173-174`, draft media `CreatorAssignmentDetailPage.vue:749-751` (`accept="image/*,video/*"`), chat attachments (`ChatPanel.vue:400`, `RelationshipThreadView.vue:599`). **No camera plugin** (`@capacitor/camera` absent), no `capture` attribute, **no camera/photo usage descriptions** in `Info.plist`, only `INTERNET` in the app's manifest. I found no device-walk record of a camera capture or of the iOS "Take Photo" option | **Later (own chunk, or never)**, and first a device check of what the existing picker already does on both OSes — if capture works through the picker, the gap may be only the usage strings (an iOS requirement I recall but did not verify here). Not this chunk.              |
-| **Offline-grace**            | **Unbuilt**, with one part free                    | The shell loads offline because the app bundles `dist` (`capacitor.config.ts` `webDir: 'dist'`, no `server.url`); the token is read once and served from memory (`tokenStore.ts`, `creator-app-client-shell-review.md:105-107`). **No** connectivity detection (`@capacitor/network` absent), **no** service worker or manifest (`index.html`: none), **no** cached data, no offline banner; a failed background refresh is swallowed (`appResume.ts`), and an offline cold start with a token lands on `error.auth-bootstrap` with a retry. The only offline copy is a generic "could not reach the server" string (`core/i18n/locales/en/auth.json:182`)                                       | **Later.** Needs a product definition (what "grace" means: read-only cache? queued writes?) before any build; the inventory called the cached-shell half of it a reason to keep the bundled shell (`creator-app-inventory.md:52`). Not 103/103b.                                 |
-| **Deep links (this chunk)**  | Unbuilt: in-app routing none, universal links none | §1, §4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | **AH-103** (resolver) + **AH-103b** (universal/app links)                                                                                                                                                                                                                        |
+| Item                         | State                                              | Evidence                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Recommended home                                                                                                                                                                                                                                                                      |
+| ---------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Biometric unlock**         | **Unbuilt**; the seam exists                       | No biometric plugin in `apps/main/package.json` (secure storage is `@aparajita/capacitor-secure-storage` only); no `NSFaceIDUsageDescription` in `Info.plist` (no `NS*UsageDescription` key at all); `TokenStore` is a three-method interface written so a biometric decorator can wrap `read()` (`tokenStore.ts:1-22`), `hasLapsed?` made optional for it                                                                                                                                                                                                                                                                                                                                       | **Its own chunk, after AH-103** (call it AH-103c). Security-relevant (token release, lock-out and fallback policy, App Store review copy), so Mode A on its own plan; not a rider on deep links. Interaction to design there: a cold-start tap behind a biometric prompt (§3.1).      |
+| **Camera / gallery uploads** | **Partial**                                        | The system picker works through the WebView's `<input type="file">`: native dropzones say "Tap to choose a photo / files" (`creator.ui.upload.*_prompt_native`, AH-100 fidelity audit) on `AvatarUploadDrop.vue:125-126,180-181`, `PortfolioUploadGrid.vue:173-174`, draft media `CreatorAssignmentDetailPage.vue:749-751` (`accept="image/*,video/*"`), chat attachments (`ChatPanel.vue:400`, `RelationshipThreadView.vue:599`). **No camera plugin** (`@capacitor/camera` absent), no `capture` attribute, **no camera/photo usage descriptions** in `Info.plist`, only `INTERNET` in the app's manifest. I found no device-walk record of a camera capture or of the iOS "Take Photo" option | **Later (own chunk, or never).** The device check was run (§9.5): **Android's existing picker offers no camera entry; iOS's picker offers Take Photo, and choosing it sends the app out of the app** (consistent with the missing usage string, cause not diagnosed). Not this chunk. |
+| **Offline-grace**            | **Unbuilt**, with one part free                    | The shell loads offline because the app bundles `dist` (`capacitor.config.ts` `webDir: 'dist'`, no `server.url`); the token is read once and served from memory (`tokenStore.ts`, `creator-app-client-shell-review.md:105-107`). **No** connectivity detection (`@capacitor/network` absent), **no** service worker or manifest (`index.html`: none), **no** cached data, no offline banner; a failed background refresh is swallowed (`appResume.ts`), and an offline cold start with a token lands on `error.auth-bootstrap` with a retry. The only offline copy is a generic "could not reach the server" string (`core/i18n/locales/en/auth.json:182`)                                       | **Later.** Needs a product definition (what "grace" means: read-only cache? queued writes?) before any build; the inventory called the cached-shell half of it a reason to keep the bundled shell (`creator-app-inventory.md:52`). Not 103/103b.                                      |
+| **Deep links (this chunk)**  | Unbuilt: in-app routing none, universal links none | §1, §4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | **AH-103** (resolver) + **AH-103b** (universal/app links)                                                                                                                                                                                                                             |
 
 ---
 
@@ -596,7 +597,7 @@ the AH-102 lesson again: every device-only bug in that chunk (cold-start tap, iO
 
 ## 8. Not verified
 
-- **Nothing was run on a device**, and the tap event's `data` shape (Android background/killed, iOS) is unobserved (§0.5).
+- **The tap event's `data` shape was unobserved when this inventory was written** (§0.5); §9 now records it. What §9 still does not cover is listed in §9.6.
 - **No test was run for this inventory.** Every behavioural claim is from reading source at `cb79abfa`. In particular the
   `subject.ulid === null` signal for a gone subject (§3.3), the cold-start ordering of `isReady()` against a dead-token
   bootstrap (§3.2 row 2), and the offline `attempted` path (§3.1) are **code-read, not exercised**.
@@ -609,6 +610,96 @@ the AH-102 lesson again: every device-only bug in that chunk (cold-start tap, iO
 - **CI claims (§6)** are from the GitHub run logs and annotations read at 2026-10-12 ~04:10 UTC.
 - **Translations:** this chunk adds no copy in the inventory; if the plan adds any (a not-found link, an offline string), the
   24-locale rule applies and the flaky ten need real MT, as in AH-102.
+
+---
+
+## 9. Addendum — device spike results (Q8), 2026-10-12
+
+Run after the inventory was cleared (`8378e4e5`), at the same tree. The spike was a **throwaway, uncommitted** debug read of
+`@capacitor-firebase/messaging`'s `notificationActionPerformed` and `notificationReceived` events: a listener edit in
+`pushClient.ts` plus an on-screen overlay that also persisted to localStorage so a killed-state result survives the process
+dying. Pushes were sent by a throwaway script that bypasses the dispatcher (like `push:test`) with fixed fake ULIDs
+(`01SPIKE…`) — no user content, no real notification rows. **The spike code and script are deleted; `git status` is clean at
+`8378e4e5`.** Evidence is Pedram's screenshots of the overlay (not committed); the shapes below are transcribed from them.
+
+### 9.1 Setup
+
+|                 | iPhone                                                                                                             | Android                                                                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| Device          | iPhone 16 Pro, iOS 27.0.1, Xcode debug install (sandbox APNs), over LAN to the local API                           | Samsung SM-A515F, Android 13, debug build, `adb reverse` to the local API              |
+| User / token    | `user 14` (`pedram+32@defraged.com`), token `#5`                                                                   | same user, token `#6`                                                                  |
+| Sender          | `full` = `type`, `v`, `notification_ulid`, `assignment_ulid`, `campaign_ulid`, `thread_ulid`; `bare` = `type`, `v` | same                                                                                   |
+| Provider answer | `delivered` for every send                                                                                         | `delivered` for every send                                                             |
+| Killed state    | swiped from the app switcher                                                                                       | swiped from Recents; `pidof com.catalystgrowth.platform` was **empty** before the send |
+
+### 9.2 What was observed
+
+| State                   | iOS                                                                                                                                                   | Android                                                                                                               |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **Foreground** (`full`) | `notificationReceived`; event keys `["notification"]`; notification keys `title, id, subtitle, body, data`                                            | same event; notification keys `id, data, title, body`                                                                 |
+| **Background** (`full`) | `notificationActionPerformed`; event keys `["notification","actionId"]`; `actionId: "tap"`; notification keys `body, title, subtitle, data, id`       | event keys `["actionId","notification"]`; `actionId: "tap"`; **notification keys `id, data` only — no title or body** |
+| **Killed** (`full`)     | tap delivered with the **full** `data`; route at the instant of the tap was **`/`** (before the first navigation); `/creator/notifications` 3 s later | tap delivered with the **full** `data`; route at the tap **`/`**; `/creator/notifications` 3 s later                  |
+| **Background** (`bare`) | `data` = `type`, `v` only (plus OS extras); none of the ULID keys                                                                                     | not run (§9.6)                                                                                                        |
+
+Route at the tap, backgrounded: `/creator/dashboard` on both, then `/creator/notifications` 3 s later — the AH-102 handler works
+unchanged and the data is already present when it fires.
+
+### 9.3 The shape of `notification.data`
+
+- **Our keys arrive under the names we sent, in every state, on both OSes, as strings:** `type`, `v`, `notification_ulid`,
+  `assignment_ulid`, `campaign_ulid`, `thread_ulid`. **`v` is the string `"1"`**, not the number `1` (as `FcmPushSender.php:157`
+  predicts). Option B's route keys are therefore deliverable on both platforms without a payload-format change.
+- **The `data` object also carries keys we never sent, and not all are strings.**
+  - iOS adds: `aps` (a **nested object**: `alert`, `sound`), `gcm.message_id`, `google.c.a.e`, `google.c.fid`,
+    `google.c.sender.id`.
+  - Android adds: `from`, `collapse_key`, `gcm.n.analytics_data` (a **stringified Android Bundle**,
+    `"Bundle[mParcelledData.dataSize=100]"`), `google.delivered_priority`, `google.original_priority`,
+    `google.sent_time` (**number**), `google.ttl` (**number**), `google.product_id` (**number**). On a foreground event Android
+    adds none of these.
+  - None of these names collides with ours.
+- **The event differs per platform and per state:** Android's tap event has no `title`/`body`; iOS's does. Neither carries
+  anything the parser should need. `actionId` was `"tap"` on every tap.
+- **A killed-state tap delivers its event before the router's first navigation on both OSes** (route `/` at that instant). This
+  is the `isReady()` race AH-102 already fixed; the data is available early enough that the resolver only has to wait for
+  `isReady()`, not for the data.
+- No tap produced more than one `tap` event in the overlays that were readable (the second entry in each overlay is the
+  spike's own +3 s re-record, not a second event).
+
+### 9.4 What the plan's parser must therefore be
+
+(Stated as the requirement the observations impose; the design is the plan's job.)
+
+1. Read **only** `event.notification.data`; do not read `title`, `body`, `subtitle` or `id`.
+2. Take **only the six known keys**, accept **only `typeof === 'string'` and non-empty**, and ignore every other key — including
+   numbers, nested objects and Bundle strings.
+3. Parse `v` as a string (`"1"`); an unrecognised `v` is not an error for the route keys, but must be decided at plan time.
+4. A missing, wrong-typed or malformed value → the AH-102 fallback (the notifications list). Never a throw.
+5. The resolver runs after `router.isReady()` (unchanged from the current handler).
+6. The route keys must be validated as ULIDs before they are put into a route (the spike values were fixed fake strings, so this
+   was not exercised).
+
+### 9.5 Camera check (observation only, no build)
+
+|                       | iPhone                                                                                                                | Android                                                                                                                                                                   |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Profile avatar upload | Sheet offered **Take Photo**; choosing it **sent the app out of the app** (Pedram's words: "it jumps out of the app") | **Android system photo picker** ("Photos" / "Collections" tabs, "Catalyst will only have access to the photos and videos that you select"). **No camera entry.**          |
+| Messages attach       | Same: Take Photo exits the app                                                                                        | **System Documents UI**, "Recent" with Images / Audio / Videos / Docs and "Browse files in other apps" (Bug reports, Adobe Acrobat, Drive, Gallery). **No camera entry.** |
+| Not tested            | the other upload controls (portfolio, draft media)                                                                    | the other upload controls                                                                                                                                                 |
+
+On iOS the exit is **consistent with** `Info.plist` having no `NS*UsageDescription` key (§5), but **I did not capture a crash
+log and did not confirm the cause**. This answers the §5 row; nothing was changed.
+
+### 9.6 Still not observed
+
+- **Android `bare`** push. Expected by analogy (we send only `type` and `v`), but not run.
+- **TestFlight / production APNs** on iOS. This was a debug install on sandbox APNs; the production token split is untested here
+  (the AH-102 walk already flagged it for the TestFlight pass).
+- **A push whose `notification_ulid` is absent** (muted-in-app, push on) was not sent; only the `bare` variant, which also lacks
+  it, was — on iOS.
+- **Notification-permission-denied and signed-out taps** were not exercised in this spike; §3.2's code-read still stands.
+- **A real emit** (`NotificationService::notify`). These were direct sends with fake ULIDs; the payload the factory will build
+  after Q1 does not exist yet.
+- **Other iOS/Android versions** than the two devices above.
 
 _Provenance: drafted by Cursor at AH-103 inventory time (2026-10-12) from the tree at `cb79abfa`; evidence is file reads, `git blame`,
 `git log` and `gh` run data, all cited above._
