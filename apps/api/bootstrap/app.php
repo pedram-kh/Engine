@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Console\Commands\PrunePushDeliveries;
 use App\Console\Commands\ScanOverdueAssignments;
 use App\Console\Commands\SendIncompleteCreatorNudges;
 use App\Console\Commands\SendMessageDigests;
@@ -46,6 +47,13 @@ return Application::configure(basePath: dirname(__DIR__))
         // default OFF) — this runs every day but is a no-op until an operator
         // enables the flag from the admin Feature-flags page.
         $schedule->command(SendIncompleteCreatorNudges::class)->daily();
+
+        // AH-102b: retention for the push delivery attempt log (90 days by
+        // default, oldest-first, capped per run). Only as alive as the
+        // scheduler — see docs/runbooks/production-queue-worker.md §7; the
+        // admin Push deliveries footer (total rows + oldest row) shows a dead
+        // one. Safe to run by hand: `php artisan push:prune-deliveries --dry-run`.
+        $schedule->command(PrunePushDeliveries::class)->daily();
     })
     ->withMiddleware(function (Middleware $middleware): void {
         // Sanctum SPA cookie auth. EnsureFrontendRequestsAreStateful is
