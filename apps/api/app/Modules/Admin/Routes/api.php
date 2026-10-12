@@ -8,6 +8,7 @@ use App\Modules\Admin\Http\Controllers\AdminAlertsController;
 use App\Modules\Admin\Http\Controllers\AdminAuditLogController;
 use App\Modules\Admin\Http\Controllers\AdminAutomationRuleController;
 use App\Modules\Admin\Http\Controllers\AdminComplianceController;
+use App\Modules\Admin\Http\Controllers\AdminCreatorAppController;
 use App\Modules\Admin\Http\Controllers\AdminDashboardController;
 use App\Modules\Admin\Http\Controllers\AdminFeatureFlagController;
 use App\Modules\Admin\Http\Controllers\AdminHealthController;
@@ -97,6 +98,18 @@ Route::prefix('admin')
         Route::prefix('push-deliveries')->name('push-deliveries.')->group(function (): void {
             Route::get('summary', [AdminPushDeliveryController::class, 'summary'])->name('summary');
             Route::get('/', [AdminPushDeliveryController::class, 'index'])->name('index');
+        });
+
+        // ─── Creator-app usage (AH-102b, Half B) ─────────────────────
+        // DERIVED, no new writes: per creator Active / Signed out / Never
+        // from the creator-app PATs (shared LiveAppSession predicate) + the
+        // audited app logins; plus a per-creator sign-ins drawer (≤ 50 rows,
+        // no row ids — nothing here can reference a token). `{creator}` is a
+        // ULID, resolved after the admin check. Allowlisted in
+        // docs/security/tenancy.md § 4.
+        Route::prefix('creator-app')->name('creator-app.')->group(function (): void {
+            Route::get('users', [AdminCreatorAppController::class, 'index'])->name('users.index');
+            Route::get('users/{creator}/sign-ins', [AdminCreatorAppController::class, 'signIns'])->name('users.sign-ins');
         });
 
         // ─── Feature-flag toggles (D-6) ──────────────────────────────
