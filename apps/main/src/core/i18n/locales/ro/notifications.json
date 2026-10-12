@@ -1,7 +1,7 @@
 {
   "notifications": {
     "center": {
-      "title": "Nutificări",
+      "title": "Notificări",
       "empty": "You're all caught up.",
       "markAll": "Mark all read",
       "viewAll": "Vizualizați all notifications",
@@ -13,7 +13,7 @@
       "round": "Ciorna {n}"
     },
     "page": {
-      "title": "Nutificări",
+      "title": "Notificări",
       "empty": "You have no notifications yet."
     },
     "types": {

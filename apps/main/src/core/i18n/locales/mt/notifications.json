@@ -1,7 +1,7 @@
 {
   "notifications": {
     "center": {
-      "title": "Letifiki",
+      "title": "Notifiki",
       "empty": "You're all caught up.",
       "markAll": "Mark all read",
       "viewAll": "Ara all notifications",
@@ -13,7 +13,7 @@
       "round": "Abbozz {n}"
     },
     "page": {
-      "title": "Letifiki",
+      "title": "Notifiki",
       "empty": "You have no notifications yet."
     },
     "types": {
