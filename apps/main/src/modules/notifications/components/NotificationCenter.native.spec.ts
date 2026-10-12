@@ -12,6 +12,7 @@ import type { NotificationResource, NotificationType } from '@catalyst/api-clien
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createI18n } from 'vue-i18n'
+import { createMemoryHistory, createRouter } from 'vue-router'
 import { createVuetify } from 'vuetify'
 import * as vuetifyComponents from 'vuetify/components'
 import * as vuetifyDirectives from 'vuetify/directives'
@@ -79,7 +80,17 @@ async function mountPage(native: boolean, rows: NotificationResource[], last = 1
   const vuetify = createVuetify({ components: vuetifyComponents, directives: vuetifyDirectives })
   const wrapper = mount(NotificationCenter, {
     props: { variant: 'page' },
-    global: { plugins: [i18n, vuetify] },
+    // AH-103: a row can navigate now, so the component injects the router.
+    global: {
+      plugins: [
+        i18n,
+        vuetify,
+        createRouter({
+          history: createMemoryHistory(),
+          routes: [{ path: '/', component: { template: '<div />' } }],
+        }),
+      ],
+    },
     attachTo: document.createElement('div'),
   })
   await flushPromises()

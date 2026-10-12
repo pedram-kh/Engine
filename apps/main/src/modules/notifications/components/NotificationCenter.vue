@@ -16,8 +16,14 @@
  * page variant no handle is passed; the app-bar badge's own 45 s poll is the
  * authoritative reconciler within one interval.
  *
- * D-7 deferred: row click marks read IN PLACE — no navigation. `subject` is on
- * the wire but intentionally unused this chunk.
+ * Row click (AH-103, closing D-7): marks the row read AND opens the screen it is
+ * about, through the same registry + resolver as a push tap
+ * (`useNotificationNavigation`). Neither waits on the other: the optimistic flip
+ * and the PATCH start immediately, navigation never waits on the PATCH, and a
+ * failed PATCH never blocks it. A READ row navigates too, with no PATCH. A row
+ * with no destination (or one that cannot resolve) marks read and stays on the
+ * list. This is the one component for the agency dropdown, the agency page and
+ * the creator page, so agency users get working rows too.
  */
 
 import type { NotificationResource } from '@catalyst/api-client'
@@ -27,6 +33,7 @@ import { useI18n } from 'vue-i18n'
 import { isNativePlatform } from '@/core/platform/isNativePlatform'
 
 import { notificationsApi } from '../api/notifications.api'
+import { useNotificationNavigation } from '../composables/useNotificationNavigation'
 import type { NotificationPollHandle } from '../composables/useNotificationPoll'
 import { compactAge, notificationVisual } from '../notificationVisual'
 import { notificationTemplateKey } from '../templates'
@@ -45,6 +52,7 @@ const props = withDefaults(
 )
 
 const { t, locale } = useI18n()
+const { open: openNotification } = useNotificationNavigation()
 
 /**
  * AH-100d (Figma frame 09): in the native app each row carries a type-icon disc,
@@ -135,10 +143,7 @@ async function reload(): Promise<void> {
   await load(1)
 }
 
-async function onRowClick(row: NotificationResource): Promise<void> {
-  if (!isUnread(row)) {
-    return
-  }
+async function markReadInPlace(row: NotificationResource): Promise<void> {
   // Optimistic local + badge reconcile; server is idempotent so no guard needed.
   const previous = row.attributes.read_at
   row.attributes.read_at = new Date().toISOString()
@@ -149,6 +154,13 @@ async function onRowClick(row: NotificationResource): Promise<void> {
     // Roll back the optimistic local flip; the steady poll reconciles the badge.
     row.attributes.read_at = previous
   }
+}
+
+async function onRowClick(row: NotificationResource): Promise<void> {
+  // Started together, awaited separately: navigation never waits on the PATCH.
+  const marking = isUnread(row) ? markReadInPlace(row) : Promise.resolve()
+  await openNotification(row)
+  await marking
 }
 
 async function onMarkAll(): Promise<void> {

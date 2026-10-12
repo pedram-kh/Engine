@@ -100,6 +100,18 @@ function mountCenter(props: CenterProps) {
         name: 'creator.notifications',
         component: { template: '<div />' },
       },
+      // AH-103 — the real destination routes (same names and paths as the app's table).
+      {
+        path: '/creator/assignments/:ulid',
+        name: 'creator.assignment.detail',
+        component: { template: '<div />' },
+      },
+      {
+        path: '/creator/jobs/:ulid',
+        name: 'creator.job.detail',
+        component: { template: '<div />' },
+      },
+      { path: '/campaigns/:ulid', name: 'campaigns.detail', component: { template: '<div />' } },
     ],
   })
 
@@ -168,7 +180,7 @@ describe('NotificationCenter — feed render + interactions', () => {
     wrapper.unmount()
   })
 
-  it('clicking an already-read row does nothing (no PATCH)', async () => {
+  it('AH-103: clicking an already-read row sends no PATCH and does not touch the badge', async () => {
     const poll = makePoll()
     vi.mocked(notificationsApi.list).mockResolvedValue(
       feed([
@@ -184,6 +196,133 @@ describe('NotificationCenter — feed render + interactions', () => {
     expect(notificationsApi.markRead).not.toHaveBeenCalled()
     expect(poll.applyMarkRead).not.toHaveBeenCalled()
     wrapper.unmount()
+  })
+
+  describe('AH-103 — a row click opens the screen the notification is about', () => {
+    const ASSIGNMENT = '01J9ZK3Q8M5T7WXYABCDEFGHJK'
+    const CAMPAIGN = '01J9ZK3Q8M5T7WXYCAMPAGNAAA'
+
+    async function clickFirstRow(rows: NotificationResource[], props: Partial<CenterProps> = {}) {
+      vi.mocked(notificationsApi.list).mockResolvedValue(feed(rows) as never)
+      vi.mocked(notificationsApi.markRead).mockResolvedValue({} as never)
+      const wrapper = mountCenter({ variant: 'dropdown', poll: makePoll(), ...props })
+      await flushPromises()
+      const router = wrapper.vm.$router
+
+      await wrapper.find('[data-test~="notification-row"]').trigger('click')
+      await flushPromises()
+
+      return { wrapper, router }
+    }
+
+    it('an UNREAD creator row navigates to its assignment AND is marked read', async () => {
+      const { wrapper, router } = await clickFirstRow([
+        makeRow('assignment.draft_approved', { campaign_name: 'A', assignment_ulid: ASSIGNMENT }),
+      ])
+
+      expect(router.currentRoute.value.fullPath).toBe(`/creator/assignments/${ASSIGNMENT}`)
+      expect(notificationsApi.markRead).toHaveBeenCalledTimes(1)
+      wrapper.unmount()
+    })
+
+    it('a READ row navigates too, with NO PATCH', async () => {
+      const { wrapper, router } = await clickFirstRow([
+        makeRow(
+          'assignment.draft_approved',
+          { assignment_ulid: ASSIGNMENT },
+          '2026-06-01T11:00:00Z',
+        ),
+      ])
+
+      expect(router.currentRoute.value.fullPath).toBe(`/creator/assignments/${ASSIGNMENT}`)
+      expect(notificationsApi.markRead).not.toHaveBeenCalled()
+      wrapper.unmount()
+    })
+
+    it('an AGENCY row (the agency bell) opens the campaign on the right tab', async () => {
+      const { wrapper, router } = await clickFirstRow([
+        makeRow('campaign_application.submitted', { campaign_ulid: CAMPAIGN }),
+      ])
+
+      expect(router.currentRoute.value.fullPath).toBe(`/campaigns/${CAMPAIGN}?tab=applications`)
+      wrapper.unmount()
+    })
+
+    it('navigation does not wait on the PATCH, and a failing PATCH neither blocks it nor strands the row read', async () => {
+      vi.mocked(notificationsApi.list).mockResolvedValue(
+        feed([makeRow('assignment.draft_approved', { assignment_ulid: ASSIGNMENT })]) as never,
+      )
+      // A PATCH that never settles.
+      vi.mocked(notificationsApi.markRead).mockReturnValue(new Promise(() => undefined) as never)
+      const wrapper = mountCenter({ variant: 'dropdown', poll: makePoll() })
+      await flushPromises()
+
+      void wrapper.find('[data-test~="notification-row"]').trigger('click')
+      await flushPromises()
+
+      expect(wrapper.vm.$router.currentRoute.value.fullPath).toBe(
+        `/creator/assignments/${ASSIGNMENT}`,
+      )
+      wrapper.unmount()
+    })
+
+    it('a failing PATCH rolls the row back to unread but the navigation still happened', async () => {
+      vi.mocked(notificationsApi.list).mockResolvedValue(
+        feed([makeRow('assignment.draft_approved', { assignment_ulid: ASSIGNMENT })]) as never,
+      )
+      vi.mocked(notificationsApi.markRead).mockRejectedValue(new Error('offline'))
+      const wrapper = mountCenter({ variant: 'dropdown', poll: makePoll() })
+      await flushPromises()
+
+      await wrapper.find('[data-test~="notification-row"]').trigger('click')
+      await flushPromises()
+
+      expect(wrapper.vm.$router.currentRoute.value.fullPath).toBe(
+        `/creator/assignments/${ASSIGNMENT}`,
+      )
+      expect(wrapper.findAll('[data-test~="notification-row--unread"]')).toHaveLength(1)
+      wrapper.unmount()
+    })
+
+    it('an OLD job_posted row (no campaign_ulid in its bag) resolves through its subject', async () => {
+      const row = makeRow('campaign.job_posted', { campaign_name: 'A', agency_name: 'B' })
+      row.attributes.subject = { type: 'Campaign', ulid: CAMPAIGN }
+
+      const { wrapper, router } = await clickFirstRow([row])
+
+      expect(router.currentRoute.value.fullPath).toBe(`/creator/jobs/${CAMPAIGN}`)
+      wrapper.unmount()
+    })
+
+    it('a row with no resolvable destination marks read and STAYS (never a dead click)', async () => {
+      const { wrapper, router } = await clickFirstRow([
+        // An old agency row: no campaign_ulid, no usable subject.
+        makeRow('campaign_application.submitted', { creator_name: 'N', campaign_name: 'C' }),
+      ])
+
+      expect(router.currentRoute.value.fullPath).toBe('/')
+      expect(notificationsApi.markRead).toHaveBeenCalledTimes(1)
+      wrapper.unmount()
+    })
+
+    it('a free-text value under a key that looks like a route key is not navigated to', async () => {
+      const { wrapper, router } = await clickFirstRow([
+        makeRow('assignment.draft_approved', { assignment_ulid: 'SENTINEL-FEEDBACK-xyz' }),
+      ])
+
+      expect(router.currentRoute.value.fullPath).toBe('/')
+      wrapper.unmount()
+    })
+
+    it('an unknown (deferred / future) type marks read and stays', async () => {
+      const { wrapper, router } = await clickFirstRow([
+        makeRow('assignment.cancelled', { assignment_ulid: ASSIGNMENT }),
+      ])
+
+      expect(router.currentRoute.value.fullPath).toBe('/')
+      expect(notificationsApi.markRead).toHaveBeenCalledTimes(1)
+      wrapper.unmount()
+    })
   })
 
   it('mark-all-read calls readAll + zeroes the badge + flips every row', async () => {
