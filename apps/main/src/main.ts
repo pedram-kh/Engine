@@ -11,7 +11,11 @@ import { bootNativeShell } from './core/platform/bootNativeShell'
 import { createPushTapHandler } from './core/platform/push/pushTapRouting'
 import { startPush } from './core/platform/push/startPush'
 import { useAuthStore } from './modules/auth/stores/useAuthStore'
+import { notificationsApi } from './modules/notifications/api/notifications.api'
 import { requestNotificationsRefresh } from './modules/notifications/composables/notificationsRefresh'
+import { createTapResolver } from './modules/notifications/pushTapResolver'
+import { lookupThreadCounterparty } from './modules/notifications/threadLookup'
+import { useAgencyStore } from './core/stores/useAgencyStore'
 import { vuetify } from './plugins/vuetify'
 
 // Self-hosted Inter typeface (Catalyst Engine v2). Imported before the design
@@ -49,14 +53,27 @@ void Promise.all([
 
   // AH-102: creator app only (a no-op on the web, and on iOS until AH-102-ios) —
   // push token upkeep and the tap / foreground handlers. It never asks for
-  // permission (that is the soft-ask sheet's job). A tap opens the notification
-  // list; per-type destinations are AH-103. A foreground push re-reads the bell
+  // permission (that is the soft-ask sheet's job). A foreground push re-reads the bell
   // and shows no banner. The router and the refresh are injected here because
   // only this wiring layer may touch them.
+  //
+  // AH-103: a tap opens the screen its notification is about — the payload's
+  // route ids are parsed and resolved against the registry (the list when nothing
+  // resolves), and the in-app row is marked read once the user has landed.
   const push = startPush({
     // Waits for the router's first navigation: a cold-start tap is delivered
     // before it, and an immediate push is overtaken (see pushTapRouting.ts).
-    onTap: createPushTapHandler(router),
+    onTap: createPushTapHandler(router, {
+      resolveTap: createTapResolver({
+        hasRoute: (name) => router.hasRoute(name),
+        hasSession: () => useAuthStore().user !== null,
+        lookupThread: (side, threadUlid) =>
+          lookupThreadCounterparty(side, threadUlid, useAgencyStore().currentAgencyId),
+      }),
+      hasSession: () => useAuthStore().user !== null,
+      markRead: (ulid) => notificationsApi.markRead(ulid),
+      onMarkedRead: () => requestNotificationsRefresh(),
+    }),
     onForeground: () => requestNotificationsRefresh(),
   })
   // A session appearing (sign-in on a device that already granted permission)
