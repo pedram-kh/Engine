@@ -13,6 +13,11 @@ production read-backs Pedram supplied the same day. It merges the six `PENDING` 
 `docker-compose.yml` is the **local-dev** stack (Postgres, Redis, Mailhog, MinIO); there is **no production compose, nginx or
 php-fpm file in the repo**, so the production layout is not written down anywhere I could read. **P0 reads it off the box.**
 
+> **Observed 2026-10-13, after the first deploy: the SPAs are not on the box.** `platform.catalyst-growth.com` and `admin.catalyst-growth.com` are Netlify
+> sites; the API is `https://platform-api.catalyst-growth.com`. So P0.6's "nginx `root` serves the SPAs" and step 4's "publish `dist/` to nginx" do not
+> describe production; what replaces them (how a Netlify deploy is triggered, and whether it follows `main` automatically) is **not read** and must be
+> read from the Netlify site settings before the next deploy. Details in the AH-103 entry of [`deploy-log.md`](deploy-log.md).
+
 > **If P0.2 says `/app` is baked into the image (not a bind mount of `~/catalyst-engine/apps/api`), the deploy steps change.** Code then
 > reaches the container by **rebuilding and recreating it** (`docker compose build` / `up -d`), not by `git pull` on the host; steps 2,
 > 3, 4, 7, 8, 9 and 10, the §7 code rollback, and where the env file lives would all need rewriting, and a recreate restarts FPM and
