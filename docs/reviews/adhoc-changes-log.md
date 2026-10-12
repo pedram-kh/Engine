@@ -70,6 +70,43 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-103 · Deep links: a notification opens the screen it is about (Creator App arc)
+
+- **Status:** **Closed 2026-10-12. Pushed (`origin/main` `cb79abfa..47d2efc5`, 20 commits), CI green on all four jobs
+  ([run 38289855211](https://github.com/pedram-kh/Engine/actions/runs/38289855211): backend, frontend, admin SPA Playwright 2 passed,
+  main SPA Playwright 35 passed including the new deep-link spec on its first CI run). Not deployed.** Plan:
+  [`deep-links-plan.md`](deep-links-plan.md); inventory: [`deep-links-inventory.md`](deep-links-inventory.md); review:
+  [`deep-links-review.md`](deep-links-review.md).
+- **Date:** 2026-10-12.
+- **Why:** AH-102 delivered pushes but a tap only ever opened the notifications list, and a row in the in-app centre did not navigate at
+  all. A tap on either should land on the exact screen the notification is about.
+- **What:**
+  - **One resolver for both entry points:** `parsePushTapData` → `resolveNotificationDestination`. A required `destination` on every
+    live notification type, with registry parity and route-table specs. Anything unplaceable falls back to the notifications list.
+  - **Route keys on the push payload (Option B):** additive, ULID-only, per-type allowlist in `PushMessageFactory`, shared with the SPA
+    through `packages/api-client/contracts/notification-route-keys.json` (a Pest parity test and a Vitest parity test read the same
+    file). `v` stays `1`. `campaign_ulid` added to the in-app bag at three emit sites. **This reverses the AH-102 inventory note that
+    AH-103 needs no backend payload change**; a dated correction sits at that note.
+  - **Mark read after a settled landing** with a live session; the row click uses the same path.
+  - **`redirect=` through the native session-lapse redirects** (a revoked-token tap returns to its target after sign-in); `?tab=` on the
+    agency campaign page and the web E2E spec; the not-found assignment links back to the list (24 locales, AH-102 locale process);
+    `?focus=messages` scrolls the chat into view (go/no-go rule met).
+  - **Finding 2 fixed (AH-102 defect surfaced by the walk):** `registerAfterSignIn()` re-registers the push token on every sign-in
+    instead of trusting the local `registeredAt` (`47d2efc5`); one extra idempotent `POST` per cold start.
+- **Commits:** `8378e4e5` inventory, `7d8c9166` spike addendum, `e2fa3c97` plan, `85c9f49e` C1.1, `128d75a2` C1.2, `d4258820` C1.3,
+  `577ee2e3` C2.1, `520b929d` C2.2, `a2ec5e8a` C3.1, `c471a083` C3.2, `2a1c08ac` C3.3, `2a524a41` C4.1, `aed227c9` C4.2, `2c90b98c`
+  C4.3, `4366fc83` C4.4, `0700f7b8` Larastan fixes, `771d2287` + `df2fff9c` ro/mt titles, `30a3e0fb` tech-debt addendum, `47d2efc5`
+  finding 2.
+- **Found by the device walk, not by a test:** finding 2 (a revoked device never re-registered for push after re-login) and finding 1
+  (a stale unread after a signed-out tap, recorded, Q6 stands). Real emits on a Samsung and an iPhone, W1–W11 all passing.
+- **PROD-DATA RISK: LOW.** No migration, no new route, no preference-contract change; additive payload and bag fields only.
+- **Deploy obligations (named steps in the deploy log):** none for the schema. **`php artisan queue:restart`** (a named step:
+  `PushMessageFactory` changed and a worker holding the old class map would keep sending payloads without route keys). Either deploy
+  order degrades gracefully (plan §0.4). No flag change.
+- **Not verified:** universal / app links (AH-103b) and biometric-lock interplay (AH-103c) are out of scope; iOS on production APNs
+  (the TestFlight pass); the iPhone after the finding-2 fix (a planned check on the first TestFlight build after the deploy, listed with
+  the production-APNs proof); the first CI run after the `ubuntu-latest` → 26 migration (2026-10-19).
+
 ### AH-102b · Admin observability for the creator app (Creator App arc)
 
 - **Status:** **Closed 2026-10-12. Pushed (`origin/main` `b21b7b2f..176f46fc`, 17 commits), CI green on all four jobs ([run 38199714770](https://github.com/pedram-kh/Engine/actions/runs/38199714770): backend, frontend, admin SPA Playwright 2 passed / 0 flaky, main SPA Playwright 34 passed / 0 flaky), NOT deployed, no flag armed.** A docs-only closing commit follows the pushed tip. Plan:

@@ -138,6 +138,8 @@ server-side ones (3, 6, 7, 8, and the logic of 9 and 10) are platform-independen
 On **go**: revert the local edit, commit `IOS_PUSH_ENABLED = true` (the pinned spec for that constant is updated in the same
 commit), then run items 1 to 12 of §4 on iOS, once from the Xcode debug install and once from TestFlight (production APNs),
 to catch the sandbox/production token split. Item 12 on iOS is the `FirebaseMessagingAutoInitEnabled=NO` equivalent.
+**Add to the TestFlight run (AH-103 finding 2):** after signing in on that build, confirm a new `user_push_tokens` row exists for the
+iPhone and a push is delivered (the re-registration fix was device-verified on the Samsung only).
 
 ## 7. Gotchas met during the Android walk (2026-10-11)
 

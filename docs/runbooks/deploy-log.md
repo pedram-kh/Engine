@@ -54,6 +54,51 @@ happened.
 
 ---
 
+## AH-103 — deep links: a notification opens the screen it is about — PENDING
+
+> **Stacks on AH-102b and everything under it (AH-099 … AH-102b, all PENDING).** Pushed 2026-10-12; **not deployed**; deploy timing
+> is Pedram's call. Review: [`deep-links-review.md`](../reviews/deep-links-review.md).
+
+- **Status:** PENDING (**pushed 2026-10-12** to `origin/main` at `47d2efc5`, CI **green on all four jobs**:
+  [run 38289855211](https://github.com/pedram-kh/Engine/actions/runs/38289855211); not deployed)
+- **Range:** base `cb79abfa` (`origin/main` before the push) → tip **`47d2efc5`**, 20 commits (`8378e4e5` … `47d2efc5`; the list is in the
+  review §1 and the ad-hoc log).
+- **AH entries carried:** AH-103
+- **Migrations run:** **none.** No schema change.
+- **Pre-deploy reads:** none.
+
+**What goes live on deploy**
+
+- **Backend:** the push payload gains additive, ULID-only **route keys** on a per-type allowlist (`PushMessageFactory`); `campaign_ulid`
+  is added to the `data` bag of **new** in-app rows at three emit sites (`campaign.job_posted`, the agency leg of
+  `message.received_by_agency`, `campaign_application.submitted`). No existing row is rewritten. `v` stays `1`.
+- **Creator app (native build):** a tap on a push or on a notification row opens its destination; a revoked or lapsed session returns to
+  the target after sign-in; a signed-out thread tap lands on the list after sign-in (accepted degradation); the not-found assignment links
+  back to the list; **the push token is re-registered on every sign-in** (the AH-102 defect fix, one extra idempotent `POST` per cold
+  start). A native release is needed to ship the app side; the web build ships with the normal front-end deploy.
+- **Agency web:** the bell opens a campaign on the right tab (`?tab=`).
+- **No new route, no preference-contract change.**
+
+**Named deploy steps**
+
+1. **Either order is safe** (plan §0.4): old backend + new app, pushes carry no route keys and the tap falls back to the list; new
+   backend + old app, the extra keys are ignored. Neither produces a dead tap.
+2. **`php artisan queue:restart`** — a named step: `PushMessageFactory` changed, and a worker holding the old class map would keep
+   building payloads without route keys until it restarts.
+3. PHP-FPM reload (opcache), then `/up` and one authenticated request. **Result:** —
+4. **A real push, if the flag is already armed:** emit one for an id-bearing type, tap it on a device, and read the landing screen.
+   **Result:** —
+
+- **Infra:** `queue:restart` (required); no cron, scheduler or env change.
+- **One-shot commands:** none.
+- **Post-deploy verification:** `/up`; one authenticated request; one real tap if a device and the flag allow. **Then, on the first
+  TestFlight build after this deploy** (next to the production-APNs proof): sign in on the iPhone, confirm a new `user_push_tokens` row
+  exists for it, and confirm a push is delivered (AH-103 finding 2 was device-verified on the Samsung only). **Result:** —
+- **Flags armed:** none by this chunk. The push flag's state is whatever AH-102's entry left it at.
+- **Anything unexpected:** —
+
+---
+
 ## AH-102b — admin observability for the creator app: push delivery log, two admin pages — PENDING
 
 > **Stacks on AH-102 (Checkpoints A and B) and everything under it (AH-099 … AH-102, all PENDING).** Pushed 2026-10-12 after

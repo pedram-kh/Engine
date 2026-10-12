@@ -452,6 +452,13 @@ resolver does not exist: `NotificationCenter.vue:19-20` ("D-7 deferred"), `onRow
 navigate today. The push payload carries `notification_ulid` + `type` so AH-103 needs **no** backend payload
 migration; unknown fields are ignored by old app builds.
 
+> **Correction, 2026-10-12 (AH-103).** The "needs **no** backend payload migration" statement above was true for the four always-on
+> types only and is **reversed**: AH-103 chose Option B (plan Q1) and added additive, ULID-only **route keys** to the push payload on a
+> per-type allowlist in `PushMessageFactory`, plus `campaign_ulid` on the `campaign.job_posted` in-app bag. `v` stays `1`; old builds
+> still ignore unknown fields. The "resolver does not exist" and "rows do not navigate today" statements are also superseded: both now
+> go through `resolveNotificationDestination`. See [`deep-links-review.md`](deep-links-review.md) and
+> [`deep-links-plan.md`](deep-links-plan.md) §3.2. The original text is left unedited above for the record.
+
 ---
 
 ## 5. Prerequisites Pedram must do by hand
