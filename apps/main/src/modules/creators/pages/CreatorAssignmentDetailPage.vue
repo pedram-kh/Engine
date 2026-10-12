@@ -36,7 +36,7 @@ import {
   type DraftLink,
   type DraftMediaInput,
 } from '@catalyst/api-client'
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { VBottomSheet } from 'vuetify/components/VBottomSheet'
@@ -239,6 +239,11 @@ function formatReviewedAt(iso: string | null): string {
   return formatDateTime(iso, locale.value)
 }
 
+// AH-103: `?focus=messages` (a new-message notification) scrolls the thread into view,
+// once, after the first successful load.
+const chatCard = ref<{ $el?: HTMLElement } | null>(null)
+let focusPending = route.query.focus === 'messages'
+
 async function load(): Promise<void> {
   loading.value = true
   loadError.value = null
@@ -258,6 +263,11 @@ async function load(): Promise<void> {
   } finally {
     loading.value = false
     loadedOnce.value = true
+  }
+  if (focusPending && assignment.value !== null) {
+    focusPending = false
+    await nextTick()
+    chatCard.value?.$el?.scrollIntoView?.({ block: 'start' })
   }
 }
 
@@ -614,7 +624,7 @@ onMounted(() => {
       </div>
 
       <!-- Inline chat thread with the agency (Sprint 11, D-11) -->
-      <v-card variant="outlined" data-testid="assignment-chat">
+      <v-card ref="chatCard" variant="outlined" data-testid="assignment-chat">
         <v-card-title class="text-h6">
           {{ t('app.messaging.title') }}
         </v-card-title>

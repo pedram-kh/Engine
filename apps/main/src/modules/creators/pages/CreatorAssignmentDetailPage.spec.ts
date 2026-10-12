@@ -173,9 +173,9 @@ beforeEach(() => {
   vi.clearAllMocks()
 })
 
-async function mountDetail() {
+async function mountDetail(query = '') {
   const harness = await mountAuthPage(CreatorAssignmentDetailPage, {
-    initialRoute: `/creator/assignments/${ULID}`,
+    initialRoute: `/creator/assignments/${ULID}${query}`,
   })
   teardown = harness.unmount
   await flushPromises()
@@ -658,6 +658,71 @@ describe('CreatorAssignmentDetailPage — attachments (AH-092)', () => {
     const { wrapper } = await mountDetail()
 
     expect(wrapper.find('[data-testid="creator-attachments-block"]').exists()).toBe(false)
+  })
+})
+
+describe('CreatorAssignmentDetailPage — ?focus=messages (AH-103)', () => {
+  const scrollIntoView = vi.fn()
+
+  beforeEach(() => {
+    scrollIntoView.mockClear()
+    Element.prototype.scrollIntoView = scrollIntoView
+  })
+
+  it('scrolls the chat card into view once the assignment has loaded', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({ data: makeDetail('producing') })
+    const { wrapper } = await mountDetail('?focus=messages')
+
+    expect(scrollIntoView).toHaveBeenCalledTimes(1)
+    expect(scrollIntoView.mock.contexts[0]).toBe(
+      wrapper.find('[data-testid="assignment-chat"]').element,
+    )
+  })
+
+  it.each([
+    ['no query', ''],
+    ['another value', '?focus=drafts'],
+    ['an empty value', '?focus='],
+  ])('does NOT scroll with %s', async (_label, query) => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({ data: makeDetail('producing') })
+    await mountDetail(query)
+
+    expect(scrollIntoView).not.toHaveBeenCalled()
+  })
+
+  it('does not scroll on a 404 (there is no chat to show)', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockRejectedValue(
+      new ApiError({ status: 404, code: 'assignment.not_found', message: 'No assignment found.' }),
+    )
+    await mountDetail('?focus=messages')
+
+    expect(scrollIntoView).not.toHaveBeenCalled()
+  })
+
+  it('scrolls only on the FIRST successful load (a reload after an action must not yank the page)', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({ data: makeDetail('producing') })
+    const { wrapper } = await mountDetail('?focus=messages')
+    expect(scrollIntoView).toHaveBeenCalledTimes(1)
+
+    await (wrapper.vm as unknown as { load: () => Promise<void> }).load()
+    await flushPromises()
+
+    expect(scrollIntoView).toHaveBeenCalledTimes(1)
+  })
+
+  it('a failed first load does not spend the scroll — the retry that succeeds still lands on the chat', async () => {
+    vi.mocked(creatorAssignmentsApi.show)
+      .mockRejectedValueOnce(
+        new ApiError({ status: 500, code: 'server.error', message: 'Server error.' }),
+      )
+      .mockResolvedValue({ data: makeDetail('producing') })
+    const { wrapper } = await mountDetail('?focus=messages')
+    expect(scrollIntoView).not.toHaveBeenCalled()
+
+    await wrapper.find('[data-testid="assignment-detail-retry"]').trigger('click')
+    await flushPromises()
+
+    expect(scrollIntoView).toHaveBeenCalledTimes(1)
   })
 })
 

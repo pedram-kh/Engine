@@ -231,6 +231,22 @@ describe('resolveNotificationDestination', () => {
     })
   })
 
+  it('message.received_by_creator → the assignment with the chat in view (?focus=messages)', async () => {
+    expect(
+      await resolveNotificationDestination(
+        { type: 'message.received_by_creator', ids: { assignment_ulid: ASSIGNMENT } },
+        deps(),
+      ),
+    ).toEqual({
+      kind: 'route',
+      to: {
+        name: 'creator.assignment.detail',
+        params: { ulid: ASSIGNMENT },
+        query: { focus: 'messages' },
+      },
+    })
+  })
+
   it.each([
     ['assignment.draft_submitted', 'drafts'],
     ['assignment.contracted', 'creators'],

@@ -189,6 +189,14 @@ const TO_ASSIGNMENT: NotificationDestination = {
   name: 'creator.assignment.detail',
   params: { ulid: 'assignment_ulid' },
 }
+// A new message lands on the assignment WITH the chat in view (`?focus=messages`; the
+// page scrolls the thread into view once it has loaded).
+const TO_ASSIGNMENT_CHAT: NotificationDestination = {
+  kind: 'route',
+  name: 'creator.assignment.detail',
+  params: { ulid: 'assignment_ulid' },
+  query: { focus: 'messages' },
+}
 const campaignTab = (tab: string): NotificationDestination => ({
   kind: 'route',
   name: 'campaigns.detail',
@@ -296,7 +304,7 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
   'message.received_by_creator': {
     templateKey: 'notifications.types.message_received_by_creator',
     recipient: 'creator',
-    destination: TO_ASSIGNMENT,
+    destination: TO_ASSIGNMENT_CHAT,
     preference: { group: 'messaging', channels: ['in_app', 'email', 'digest', 'push'] },
   },
   'message.received_by_agency': {
