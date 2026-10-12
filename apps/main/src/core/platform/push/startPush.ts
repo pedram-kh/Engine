@@ -1,3 +1,5 @@
+import { watch } from 'vue'
+
 import { pushChannelAvailable } from './pushChannelAvailable'
 import type { PushHandlers, PushRegistration } from './pushRegistration'
 import { usePushRegistration } from './usePushRegistration'
@@ -12,9 +14,13 @@ import { usePushRegistration } from './usePushRegistration'
  *  - a registration sync whenever the app comes back to the foreground (the
  *    WebView's `visibilitychange`, the same signal the notification poll uses) —
  *    throttled to once a day inside the registration;
- *  - {@link StartedPush.sync}, which `main.ts` calls when a session appears, so a
- *    creator who signs in on a device that already granted permission registers
- *    without restarting the app.
+ *  - a registration whenever a session APPEARS (the user id goes from nothing to
+ *    something: a sign-in, or the bootstrap of a stored login). That registration
+ *    does not trust the stored `registeredAt` — see
+ *    {@link PushRegistration.registerAfterSignIn}: a revoked or lapsed login deletes
+ *    the server's token row without the device ever knowing, so the next sign-in
+ *    must re-register whatever the clock says. (AH-103 walk, W8: it did not, and
+ *    the device then received no push until the next manual sign-out.)
  *
  * It never asks for permission: the OS prompt lives behind the soft-ask sheet.
  * The router and the notification refresh are injected, not imported — only the
@@ -25,11 +31,13 @@ export interface StartPushOptions extends PushHandlers {
   registration?: PushRegistration
   /** The foreground signal. Defaults to the document's `visibilitychange`. */
   document?: Pick<Document, 'addEventListener' | 'removeEventListener' | 'visibilityState'>
+  /** The signed-in user's id, or null. A change from null to a value is a session appearing. */
+  userId?: () => string | number | null
 }
 
 export interface StartedPush {
   stop: () => void
-  /** Re-check permission and register if due (call when a session appears). */
+  /** Re-check permission and register if due (the foreground upkeep; throttled to a day). */
   sync: () => void
 }
 
@@ -55,9 +63,20 @@ export function startPush(options: StartPushOptions): StartedPush {
   const stopRegistration = registration.start({ onForeground, onTap })
   doc.addEventListener('visibilitychange', onVisibility)
 
+  const stopSessionWatch =
+    options.userId === undefined
+      ? () => undefined
+      : watch(options.userId, (id, previous) => {
+          // null -> id is a session appearing. id -> id (a different user) is one too.
+          if (id !== null && id !== previous) {
+            void registration.registerAfterSignIn().catch(() => undefined)
+          }
+        })
+
   return {
     stop: () => {
       stopRegistration()
+      stopSessionWatch()
       doc.removeEventListener('visibilitychange', onVisibility)
     },
     sync,

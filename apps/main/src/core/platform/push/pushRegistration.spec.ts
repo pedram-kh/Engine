@@ -345,6 +345,79 @@ describe('upkeep: at most once a day, only when granted', () => {
   })
 })
 
+describe('registerAfterSignIn: a session boundary never trusts the stored registration time', () => {
+  // AH-103 walk, W8 (both devices): a server-side revoke deleted the device's token row,
+  // the re-login ran syncIfGranted, and the fresh `registeredAt` made it skip. Push stayed
+  // dead until a manual sign-out. The server row is tied to the LOGIN, not to the device,
+  // so `registeredAt` proves nothing across a session boundary.
+  it('POSTs again straight after a recent registration (the W8 case); syncIfGranted would not', async () => {
+    const h = harness()
+    h.state.permission = 'granted'
+    const registration = createPushRegistration(h.deps)
+
+    await registration.syncIfGranted()
+    expect(h.tokens.register).toHaveBeenCalledTimes(1)
+
+    // Nothing on the device learns the server row is gone: same clock, same storage.
+    await registration.syncIfGranted()
+    expect(h.tokens.register).toHaveBeenCalledTimes(1) // the trusting path skips ...
+
+    await registration.registerAfterSignIn()
+    expect(h.tokens.register).toHaveBeenCalledTimes(2) // ... the session-boundary path does not
+    expect(h.tokens.register).toHaveBeenLastCalledWith('fcm-token-1', 'android', '1.4.0')
+  })
+
+  it('registers a granted device that has never registered', async () => {
+    const h = harness()
+    h.state.permission = 'granted'
+    await createPushRegistration(h.deps).registerAfterSignIn()
+
+    expect(h.tokens.register).toHaveBeenCalledTimes(1)
+  })
+
+  it.each(['prompt', 'denied'] as const)('does nothing when permission is %s', async (state) => {
+    const h = harness()
+    h.state.permission = state
+    await createPushRegistration(h.deps).registerAfterSignIn()
+
+    expect(h.client.getToken).not.toHaveBeenCalled()
+    expect(h.tokens.register).not.toHaveBeenCalled()
+  })
+
+  it('still never registers while signed out (the endpoint is bearer-only)', async () => {
+    const h = harness()
+    h.state.permission = 'granted'
+    h.state.signedIn = false
+    await createPushRegistration(h.deps).registerAfterSignIn()
+
+    expect(h.tokens.register).not.toHaveBeenCalled()
+  })
+
+  it('a failed POST is not recorded, so the next upkeep retries', async () => {
+    const h = harness()
+    h.state.permission = 'granted'
+    h.tokens.register.mockRejectedValueOnce(new Error('offline'))
+    const registration = createPushRegistration(h.deps)
+
+    await registration.registerAfterSignIn()
+    expect(h.storage.data.has(STORAGE_KEYS.registeredAt)).toBe(false)
+
+    await registration.syncIfGranted()
+    expect(h.tokens.register).toHaveBeenCalledTimes(2)
+  })
+
+  it('records the registration, so the daily upkeep throttle still applies afterwards', async () => {
+    const h = harness()
+    h.state.permission = 'granted'
+    const registration = createPushRegistration(h.deps)
+
+    await registration.registerAfterSignIn()
+    await registration.syncIfGranted()
+
+    expect(h.tokens.register).toHaveBeenCalledTimes(1)
+  })
+})
+
 describe('token rotation', () => {
   async function started(h: Harness) {
     h.state.permission = 'granted'

@@ -1,4 +1,4 @@
-import { createApp, watch } from 'vue'
+import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
 import App from './App.vue'
@@ -60,7 +60,7 @@ void Promise.all([
   // AH-103: a tap opens the screen its notification is about — the payload's
   // route ids are parsed and resolved against the registry (the list when nothing
   // resolves), and the in-app row is marked read once the user has landed.
-  const push = startPush({
+  startPush({
     // Waits for the router's first navigation: a cold-start tap is delivered
     // before it, and an immediate push is overtaken (see pushTapRouting.ts).
     onTap: createPushTapHandler(router, {
@@ -75,15 +75,9 @@ void Promise.all([
       onMarkedRead: () => requestNotificationsRefresh(),
     }),
     onForeground: () => requestNotificationsRefresh(),
+    // A session appearing (sign-in on a device that already granted permission)
+    // registers without an app restart and without trusting the stored
+    // registration time — startPush owns that watch, so a spec can drive it.
+    userId: () => useAuthStore().user?.id ?? null,
   })
-  // A session appearing (sign-in on a device that already granted permission)
-  // registers without an app restart.
-  watch(
-    () => useAuthStore().user?.id ?? null,
-    (userId) => {
-      if (userId !== null) {
-        push.sync()
-      }
-    },
-  )
 })

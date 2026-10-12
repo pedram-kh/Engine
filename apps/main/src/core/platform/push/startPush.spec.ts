@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+import { nextTick, ref, type Ref } from 'vue'
 
 import type { PushRegistration } from './pushRegistration'
 import { startPush } from './startPush'
@@ -7,11 +8,13 @@ function fakeRegistration() {
   const stop = vi.fn()
   const start = vi.fn(() => stop)
   const syncIfGranted = vi.fn(async () => undefined)
+  const registerAfterSignIn = vi.fn(async () => undefined)
   return {
-    registration: { start, syncIfGranted } as unknown as PushRegistration,
+    registration: { start, syncIfGranted, registerAfterSignIn } as unknown as PushRegistration,
     start,
     stop,
     syncIfGranted,
+    registerAfterSignIn,
   }
 }
 
@@ -134,5 +137,100 @@ describe('startPush()', () => {
 
     expect(f.stop).toHaveBeenCalledTimes(1)
     expect(d.raw.removeEventListener).toHaveBeenCalledWith('visibilitychange', expect.any(Function))
+  })
+})
+
+describe('startPush(): a session appearing registers WITHOUT trusting the stored registration time', () => {
+  function started(userId: Ref<string | number | null>, available = true) {
+    const f = fakeRegistration()
+    const d = fakeDocument()
+    const s = startPush({
+      isAvailable: () => available,
+      registration: f.registration,
+      document: d.doc,
+      onForeground: vi.fn(),
+      onTap: vi.fn(),
+      userId: () => userId.value,
+    })
+    return { f, s }
+  }
+
+  it('a user appearing (sign-in, or a stored login bootstrapping) runs registerAfterSignIn, not the throttled sync', async () => {
+    const userId = ref<string | number | null>(null)
+    const { f } = started(userId)
+
+    userId.value = 14
+    await nextTick()
+
+    expect(f.registerAfterSignIn).toHaveBeenCalledTimes(1)
+    // start() itself syncs once at boot; the sign-in path adds none through the throttled route.
+    expect(f.syncIfGranted).not.toHaveBeenCalled()
+  })
+
+  it('the W8 sequence: session lapses (user -> null), the same user signs in again -> registers again', async () => {
+    const userId = ref<string | number | null>(14)
+    const { f } = started(userId)
+
+    userId.value = null // an authoritative 401 clears the user
+    await nextTick()
+    expect(f.registerAfterSignIn).not.toHaveBeenCalled()
+
+    userId.value = 14 // the sign-in
+    await nextTick()
+    expect(f.registerAfterSignIn).toHaveBeenCalledTimes(1)
+  })
+
+  it('a different user replacing the session registers too', async () => {
+    const userId = ref<string | number | null>(14)
+    const { f } = started(userId)
+
+    userId.value = 15
+    await nextTick()
+
+    expect(f.registerAfterSignIn).toHaveBeenCalledTimes(1)
+  })
+
+  it('signing out, and a user that was already there at start, register nothing', async () => {
+    const userId = ref<string | number | null>(14)
+    const { f } = started(userId)
+    await nextTick()
+    expect(f.registerAfterSignIn).not.toHaveBeenCalled()
+
+    userId.value = null
+    await nextTick()
+    expect(f.registerAfterSignIn).not.toHaveBeenCalled()
+  })
+
+  it('a registration failure never escapes the watcher', async () => {
+    const userId = ref<string | number | null>(null)
+    const { f } = started(userId)
+    f.registerAfterSignIn.mockRejectedValueOnce(new Error('bridge down'))
+
+    userId.value = 14
+    await nextTick()
+    await Promise.resolve()
+
+    expect(f.registerAfterSignIn).toHaveBeenCalledTimes(1)
+  })
+
+  it('stop() silences the watcher', async () => {
+    const userId = ref<string | number | null>(null)
+    const { f, s } = started(userId)
+
+    s.stop()
+    userId.value = 14
+    await nextTick()
+
+    expect(f.registerAfterSignIn).not.toHaveBeenCalled()
+  })
+
+  it('does nothing where push is unavailable (web)', async () => {
+    const userId = ref<string | number | null>(null)
+    const { f } = started(userId, false)
+
+    userId.value = 14
+    await nextTick()
+
+    expect(f.registerAfterSignIn).not.toHaveBeenCalled()
   })
 })

@@ -92,6 +92,14 @@ export interface PushRegistration {
   decline(): void
   /** Register if (and only if) permission is already granted and a day has passed. */
   syncIfGranted(): Promise<void>
+  /**
+   * A session just appeared: register if permission is granted, WITHOUT trusting the
+   * stored `registeredAt`. That value says "this device registered", but a revoked
+   * or lapsed login deletes the server row (it is tied to the login's token) and
+   * nothing on the device learns of it, so across a session boundary it proves
+   * nothing. The server upsert is idempotent, so a repeat POST is harmless.
+   */
+  registerAfterSignIn(): Promise<void>
   /** Subscribe to rotation / foreground / tap. Returns a stop that is always callable. */
   start(handlers: PushHandlers): () => void
   /** Sign-out: forget the token server-side and at FCM. Best-effort; never throws. */
@@ -192,6 +200,13 @@ export function createPushRegistration(deps: PushRegistrationDeps): PushRegistra
     }
     const registeredAt = readNumber(STORAGE_KEYS.registeredAt)
     if (registeredAt !== null && now() - registeredAt < UPKEEP_INTERVAL_MS) {
+      return
+    }
+    await register()
+  }
+
+  async function registerAfterSignIn(): Promise<void> {
+    if ((await refreshPermission()) !== 'granted') {
       return
     }
     await register()
@@ -310,6 +325,7 @@ export function createPushRegistration(deps: PushRegistrationDeps): PushRegistra
     accept,
     decline,
     syncIfGranted,
+    registerAfterSignIn,
     start,
     logoutCleanup,
   }
