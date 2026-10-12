@@ -1,0 +1,34 @@
+{
+  "$comment": [
+    "AH-103 — the notification route-key CONTRACT. One file, read by BOTH test suites (Pest in apps/api, Vitest in apps/main), so the emitter, the push factory and the SPA resolver cannot drift apart without a build failing.",
+    "`bag` = the keys a NEW in-app row's `data` bag must contain, as ULID-shaped strings (what the SPA resolver reads).",
+    "`push` = the route keys the push payload must carry for that type (a subset of `bag`; empty for types that never push).",
+    "This lists NAMES only, never values. It is a contract, not sample data.",
+    "Old rows are covered separately: campaign.job_posted resolves via the row's subject when `campaign_ulid` is absent; message.received_by_agency and campaign_application.submitted fall back to the list.",
+    "Adding a live type means adding a row here; the parity tests fail until you do."
+  ],
+  "version": 1,
+  "types": {
+    "assignment.invited": { "bag": ["assignment_ulid"], "push": ["assignment_ulid"] },
+    "assignment.revision_requested": { "bag": ["assignment_ulid"], "push": ["assignment_ulid"] },
+    "assignment.draft_approved": { "bag": ["assignment_ulid"], "push": ["assignment_ulid"] },
+    "assignment.draft_rejected": { "bag": ["assignment_ulid"], "push": ["assignment_ulid"] },
+    "assignment.completed_on_approval": { "bag": ["assignment_ulid"], "push": ["assignment_ulid"] },
+    "assignment.manually_verified": { "bag": ["assignment_ulid"], "push": ["assignment_ulid"] },
+    "assignment.live_verified": { "bag": ["assignment_ulid"], "push": [] },
+    "message.received_by_creator": { "bag": ["assignment_ulid"], "push": ["assignment_ulid"] },
+    "campaign_application.accepted": { "bag": ["assignment_ulid"], "push": ["assignment_ulid"] },
+    "message.relationship_received_by_creator": { "bag": ["thread_ulid"], "push": ["thread_ulid"] },
+    "campaign.job_posted": { "bag": ["campaign_ulid"], "push": ["campaign_ulid"] },
+    "campaign_application.rejected": { "bag": [], "push": [] },
+    "creator.approved": { "bag": [], "push": [] },
+    "creator.rejected": { "bag": [], "push": [] },
+    "agency_creator_relation.admin_connected": { "bag": [], "push": [] },
+    "agency_creator_relation.disconnected": { "bag": [], "push": [] },
+    "assignment.draft_submitted": { "bag": ["campaign_ulid"], "push": [] },
+    "assignment.contracted": { "bag": ["campaign_ulid"], "push": [] },
+    "message.received_by_agency": { "bag": ["campaign_ulid"], "push": [] },
+    "message.relationship_received_by_agency": { "bag": ["thread_ulid"], "push": [] },
+    "campaign_application.submitted": { "bag": ["campaign_ulid"], "push": [] }
+  }
+}
