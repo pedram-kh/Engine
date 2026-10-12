@@ -12,6 +12,7 @@ import {
 } from './templates'
 
 import { createRouter } from '@/core/router'
+import { CAMPAIGN_DETAIL_TABS } from '@/modules/campaigns/campaignTabs'
 
 /**
  * AH-103 C2.1 — the registry's destinations, pinned to the shared contract
@@ -83,6 +84,32 @@ describe('registry ⇄ contract parity', () => {
   it('an unknown type has no destination', () => {
     expect(notificationDestination('assignment.cancelled')).toBeNull()
     expect(notificationDestination('nonsense')).toBeNull()
+  })
+})
+
+describe('tab parity — a destination only names a tab the campaign page opens', () => {
+  it.each(CONTRACT_TYPES)('%s', (type) => {
+    const destination = notificationDestination(type)!
+    const tab = destination.kind === 'route' ? destination.query?.tab : undefined
+
+    if (tab !== undefined) {
+      expect(destination.kind === 'route' && destination.name).toBe('campaigns.detail')
+      expect(CAMPAIGN_DETAIL_TABS as readonly string[]).toContain(tab)
+    }
+  })
+
+  it('the four agency destinations each name a tab (they are the reason ?tab= exists)', () => {
+    const tabs = [
+      'assignment.draft_submitted',
+      'assignment.contracted',
+      'message.received_by_agency',
+      'campaign_application.submitted',
+    ].map((type) => {
+      const d = notificationDestination(type)!
+      return d.kind === 'route' ? d.query?.tab : undefined
+    })
+
+    expect(tabs).toEqual(['drafts', 'creators', 'messages', 'applications'])
   })
 })
 

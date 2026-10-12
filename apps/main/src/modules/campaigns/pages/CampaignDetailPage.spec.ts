@@ -26,6 +26,7 @@ import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import BoardView from '@/modules/boards/components/BoardView.vue'
 
 import CampaignDetailPage from './CampaignDetailPage.vue'
+import { CAMPAIGN_DETAIL_TABS } from '../campaignTabs'
 
 vi.mock('../api/campaigns.api', () => ({
   campaignsApi: {
@@ -187,8 +188,14 @@ async function mountDetail(
     perCampaignContractEnabled?: boolean
     requiresContract?: boolean
     campaign?: Partial<CampaignResource['attributes']>
+    /** AH-103: the query string the page is opened with, e.g. `?tab=drafts`. */
+    query?: string
   } = {},
-): Promise<{ wrapper: ReturnType<typeof mount>; cleanup: () => void }> {
+): Promise<{
+  wrapper: ReturnType<typeof mount>
+  cleanup: () => void
+  router: ReturnType<typeof createRouter>
+}> {
   const pinia = createPinia()
   setActivePinia(pinia)
 
@@ -220,7 +227,7 @@ async function mountDetail(
       { path: '/campaigns/:ulid', name: 'campaigns.detail', component: { template: '<div />' } },
     ],
   })
-  await router.push(`/campaigns/${CAMPAIGN_ULID}`)
+  await router.push(`/campaigns/${CAMPAIGN_ULID}${opts.query ?? ''}`)
   await router.isReady()
 
   const i18n = createI18n({
@@ -244,6 +251,7 @@ async function mountDetail(
 
   return {
     wrapper,
+    router,
     cleanup: () => {
       wrapper.unmount()
       Object.keys(localStorageStore).forEach((k) => delete localStorageStore[k])
@@ -280,6 +288,68 @@ describe('CampaignDetailPage (Sprint 8 Chunk 1)', () => {
     expect(harness.wrapper.find('[data-test="tab-drafts"]').exists()).toBe(true)
     expect(harness.wrapper.find('[data-test="tab-applications"]').exists()).toBe(true)
     expect(harness.wrapper.find('[data-test="tab-payments"]').exists()).toBe(true)
+  })
+
+  describe('AH-103 — ?tab= opens the named tab', () => {
+    const currentTab = (h: { wrapper: ReturnType<typeof mount> }): string =>
+      (h.wrapper.vm as unknown as { tab: string }).tab
+
+    it.each(CAMPAIGN_DETAIL_TABS)('?tab=%s opens that tab', async (tab) => {
+      const harness = await mountDetail('agency_admin', [], { query: `?tab=${tab}` })
+      cleanup = harness.cleanup
+
+      expect(currentTab(harness)).toBe(tab)
+    })
+
+    it.each([
+      ['no query', ''],
+      ['an unknown value', '?tab=nonsense'],
+      ['settings (never deep-linkable)', '?tab=settings'],
+      ['a prototype-ish key', '?tab=__proto__'],
+      ['an empty value', '?tab='],
+      ['a different case', '?tab=DRAFTS'],
+    ])('%s opens the overview', async (_label, query) => {
+      const harness = await mountDetail('agency_admin', [], { query })
+      cleanup = harness.cleanup
+
+      expect(currentTab(harness)).toBe('overview')
+    })
+
+    it('a repeated ?tab= uses the first value', async () => {
+      const harness = await mountDetail('agency_admin', [], { query: '?tab=drafts&tab=creators' })
+      cleanup = harness.cleanup
+
+      expect(currentTab(harness)).toBe('drafts')
+    })
+
+    it('a second link to the SAME campaign (only the query changes) switches the tab', async () => {
+      const harness = await mountDetail('agency_admin', [], { query: '?tab=drafts' })
+      cleanup = harness.cleanup
+
+      await harness.router.push(`/campaigns/${CAMPAIGN_ULID}?tab=applications`)
+      await flushPromises()
+
+      expect(currentTab(harness)).toBe('applications')
+    })
+
+    it('a second link with a bad tab leaves the current tab alone', async () => {
+      const harness = await mountDetail('agency_admin', [], { query: '?tab=drafts' })
+      cleanup = harness.cleanup
+
+      await harness.router.push(`/campaigns/${CAMPAIGN_ULID}?tab=nonsense`)
+      await flushPromises()
+
+      expect(currentTab(harness)).toBe('drafts')
+    })
+
+    it('opening ON the creators tab loads the roster (a change-only watch would never fire)', async () => {
+      const harness = await mountDetail('agency_admin', [makeAssignment('a1', 'invited')], {
+        query: '?tab=creators',
+      })
+      cleanup = harness.cleanup
+
+      expect(campaignsApi.assignments).toHaveBeenCalled()
+    })
   })
 
   it('renders the campaign description through RichBrief — markdown becomes real HTML (AH-081)', async () => {

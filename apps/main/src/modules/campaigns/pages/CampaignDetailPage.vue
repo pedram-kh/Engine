@@ -35,6 +35,7 @@ import RichBrief from '@/components/RichBrief.vue'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { campaignsApi } from '../api/campaigns.api'
 import CampaignForm from '../components/CampaignForm.vue'
+import { campaignTabFromQuery, DEFAULT_CAMPAIGN_TAB } from '../campaignTabs'
 import { LISTING_FLOOR_FIELDS, missingListingFloorFields } from '../listingFloor'
 import InviteCreatorsDialog from '../components/InviteCreatorsDialog.vue'
 import AttachContractDialog from '../components/AttachContractDialog.vue'
@@ -234,7 +235,19 @@ function onResolved(message: string): void {
 }
 
 const ulid = computed(() => String(route.params.ulid))
-const tab = ref<string>('overview')
+// AH-103: a deep link may name the tab (`?tab=drafts`); anything off the whitelist
+// opens the default. A second link to the SAME campaign changes only the query, so
+// the page watches it instead of assuming a fresh mount.
+const tab = ref<string>(campaignTabFromQuery(route.query.tab) ?? DEFAULT_CAMPAIGN_TAB)
+watch(
+  () => route.query.tab,
+  (value) => {
+    const next = campaignTabFromQuery(value)
+    if (next !== null) {
+      tab.value = next
+    }
+  },
+)
 
 const campaign = ref<CampaignResource | null>(null)
 const loading = ref(false)
@@ -390,11 +403,17 @@ onMounted(() => {
   void loadPendingApplications()
 })
 
-watch(tab, (value) => {
-  if (value === 'creators' && assignments.value.length === 0) {
-    void loadAssignments()
-  }
-})
+// `immediate`: a deep link can open ON this tab, where a change-only watch would
+// never fire and the roster would stay empty.
+watch(
+  tab,
+  (value) => {
+    if (value === 'creators' && assignments.value.length === 0) {
+      void loadAssignments()
+    }
+  },
+  { immediate: true },
+)
 
 async function onSaveSettings(): Promise<void> {
   const agencyId = agencyStore.currentAgencyId
