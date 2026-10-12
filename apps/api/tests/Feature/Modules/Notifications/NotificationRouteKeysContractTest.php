@@ -188,18 +188,18 @@ function rkThreadUlid(): string
 // ── Drivers: each returns the key => value pairs the persisted row must carry ──
 
 /**
- * @return array<string, Closure(): array<string, string>>
+ * @return array<string, Closure(mixed): array<string, string>>
  */
 function rkDrivers(): array
 {
-    $listenerCreator = static fn (AuditAction $action): Closure => static function () use ($action): array {
+    $listenerCreator = static fn (AuditAction $action): Closure => static function (mixed $t) use ($action): array {
         $w = rkListenerWorld();
         rkFire($w['assignment'], $action);
 
         return ['assignment_ulid' => $w['assignment']->ulid];
     };
 
-    $listenerAgency = static fn (AuditAction $action): Closure => static function () use ($action): array {
+    $listenerAgency = static fn (AuditAction $action): Closure => static function (mixed $t) use ($action): array {
         $w = rkListenerWorld();
         rkFire($w['assignment'], $action);
 
@@ -218,17 +218,17 @@ function rkDrivers(): array
         'assignment.contracted' => $listenerAgency(AuditAction::AssignmentContracted),
 
         // The real HTTP routes — the same ones MessageNotificationTest drives.
-        'message.received_by_creator' => function (): array {
+        'message.received_by_creator' => function (mixed $t): array {
             $s = rkMessageWorld();
-            test()->actingAs($s['admin'])
+            $t->actingAs($s['admin'])
                 ->postJson("/api/v1/agencies/{$s['agency']->ulid}/campaigns/{$s['campaign']->ulid}/assignments/{$s['assignment']->ulid}/messages", ['body' => 'welcome aboard'])
                 ->assertCreated();
 
             return ['assignment_ulid' => $s['assignment']->ulid];
         },
-        'message.received_by_agency' => function (): array {
+        'message.received_by_agency' => function (mixed $t): array {
             $s = rkMessageWorld();
-            test()->actingAs($s['creatorUser'])
+            $t->actingAs($s['creatorUser'])
                 ->postJson("/api/v1/creators/me/assignments/{$s['assignment']->ulid}/messages", ['body' => 'hello agency'])
                 ->assertCreated();
 
@@ -236,17 +236,17 @@ function rkDrivers(): array
         },
 
         // The real relationship-message routes — RelationshipMessageApiTest's.
-        'message.relationship_received_by_creator' => function (): array {
+        'message.relationship_received_by_creator' => function (mixed $t): array {
             $s = rkRelationshipWorld();
-            test()->actingAs($s['admin'])
+            $t->actingAs($s['admin'])
                 ->postJson("/api/v1/agencies/{$s['agency']->ulid}/creators/{$s['creatorUlid']}/relationship-messages", ['body' => 'ping'])
                 ->assertCreated();
 
             return ['thread_ulid' => rkThreadUlid()];
         },
-        'message.relationship_received_by_agency' => function (): array {
+        'message.relationship_received_by_agency' => function (mixed $t): array {
             $s = rkRelationshipWorld();
-            test()->actingAs($s['creatorUser'])
+            $t->actingAs($s['creatorUser'])
                 ->postJson("/api/v1/creators/me/relationship-threads/{$s['agency']->ulid}/messages", ['body' => 'ping'])
                 ->assertCreated();
 
@@ -254,19 +254,19 @@ function rkDrivers(): array
         },
 
         // The real apply endpoint.
-        'campaign_application.submitted' => function (): array {
+        'campaign_application.submitted' => function (mixed $t): array {
             Mail::fake();
             Feature::activate(ApplicationNotificationsEnabled::NAME);
             $fixture = CreatorJobFixture::make();
             User::factory()->agencyAdmin($fixture->agency)->createOne();
 
-            test()->actingAs($fixture->user)->postJson($fixture->applyUrl())->assertCreated();
+            $t->actingAs($fixture->user)->postJson($fixture->applyUrl())->assertCreated();
 
             return ['campaign_ulid' => $fixture->campaign->ulid];
         },
 
         // The real accept endpoint: the assignment ULID is the one the accept just created.
-        'campaign_application.accepted' => function (): array {
+        'campaign_application.accepted' => function (mixed $t): array {
             Mail::fake();
             Feature::activate(ApplicationNotificationsEnabled::NAME);
             $fixture = CreatorJobFixture::make();
@@ -277,7 +277,7 @@ function rkDrivers(): array
                 'creator_id' => $fixture->creator->id,
             ]);
 
-            test()->actingAs($admin)
+            $t->actingAs($admin)
                 ->postJson(
                     "/api/v1/agencies/{$fixture->agency->ulid}/campaigns/{$fixture->campaign->ulid}/applications/{$application->ulid}/accept",
                     ['agreed_fee_minor_units' => 500_000, 'agreed_fee_currency' => 'EUR'],
@@ -287,7 +287,7 @@ function rkDrivers(): array
             return ['assignment_ulid' => CampaignAssignment::withoutGlobalScopes()->where('campaign_id', $fixture->campaign->id)->firstOrFail()->ulid];
         },
 
-        'campaign.job_posted' => function (): array {
+        'campaign.job_posted' => function (mixed $t): array {
             Mail::fake();
             Feature::activate(JobPostedNotificationsEnabled::NAME);
             $fixture = CreatorJobFixture::make();
@@ -325,7 +325,7 @@ it('every contract type is either driven here or declared key-less (a new key fo
 });
 
 it('the REAL emitter writes the contract keys, with the exact ULID of the thing to open', function (string $type): void {
-    $expected = rkDrivers()[$type]();
+    $expected = rkDrivers()[$type]($this);
 
     $rows = Notification::query()->where('type', $type)->get();
     expect($rows->count())->toBeGreaterThan(0, "{$type}: the real emit path wrote no row");
@@ -342,7 +342,7 @@ it('the REAL emitter writes the contract keys, with the exact ULID of the thing 
 
 it('the creator leg of a campaign message keeps its bag exactly as before (no campaign_ulid leaks into creator rows)', function (): void {
     $s = rkMessageWorld();
-    test()->actingAs($s['admin'])
+    $this->actingAs($s['admin'])
         ->postJson("/api/v1/agencies/{$s['agency']->ulid}/campaigns/{$s['campaign']->ulid}/assignments/{$s['assignment']->ulid}/messages", ['body' => 'welcome aboard'])
         ->assertCreated();
 

@@ -291,8 +291,11 @@ it('SENTINEL (c): every other bag key still never reaches the payload, alongside
     ];
     $m = pushMake(NotificationType::AssignmentRevisionRequested, pushRecipient(), $bag, '01NOTIF');
 
+    $json = (string) json_encode($m->data);
+
     expect(array_keys($m->data))->toBe(['type', 'v', 'notification_ulid', 'assignment_ulid'])
-        ->and((string) json_encode($m->data))->not->toContain('SENTINEL')->not->toContain('Nora');
+        ->and(str_contains($json, 'SENTINEL'))->toBeFalse()
+        ->and(str_contains($json, 'Nora'))->toBeFalse();
 });
 
 it('the payload version stays 1 (the contract is additive)', function (): void {
