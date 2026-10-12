@@ -13,6 +13,66 @@
           "database": "Database",
           "cache": "Cache"
         }
+      },
+      "push_deliveries": {
+        "title": "Livrări push",
+        "window": {
+          "label": "Interval de timp",
+          "24h": "Ultimele 24 de ore",
+          "7d": "Ultimele 7 zile",
+          "30d": "Ultimele 30 de zile"
+        },
+        "outcomes": {
+          "all": "Toate",
+          "failures": "Eșecuri",
+          "delivered": "Livrat",
+          "token_invalid": "Token invalid",
+          "retryable": "Se reîncearcă",
+          "config_error": "Eroare de configurare",
+          "rejected": "Respins"
+        },
+        "tiles": {
+          "retryable_final": "Abandonat după reîncercări",
+          "config_error_hint": "Datele de autentificare sau configurarea proiectului la furnizor necesită atenție."
+        },
+        "filters": {
+          "type": "Tipul notificării",
+          "creator": "ID creator"
+        },
+        "columns": {
+          "creator": "Creator",
+          "type": "Tip",
+          "platform": "Platformă",
+          "outcome": "Rezultat",
+          "attempt": "Încercare",
+          "detail": "Răspunsul furnizorului",
+          "in_app": "În aplicație"
+        },
+        "attempt_final": "final",
+        "in_app": {
+          "read": "Citit",
+          "unread": "Necitit",
+          "none": "Niciunul"
+        },
+        "empty": "Nicio încercare push nu corespunde acestor filtre.",
+        "load_failed": "Livrările push nu au putut fi încărcate. Reîmprospătează pagina.",
+        "footer": {
+          "rows": "Rânduri stocate: {count} · cel mai vechi: {date}",
+          "empty": "Nu există încă încercări push stocate.",
+          "retention": "Rândurile mai vechi sunt șterse automat."
+        },
+        "counts": {
+          "title": "Ce se numără aici",
+          "body": "Numără încercările push care au ajuns la furnizor (FCM). Nu numără creatorii fără dispozitiv înregistrat, notificările push silențioase sau suprimate, trimiterile limitate, tokenurile care dispăruseră deja când a rulat sarcina, sarcinile abandonate fără încercare sau notificările push de test. „Livrat” înseamnă că furnizorul a acceptat mesajul, nu că un telefon l-a afișat."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "urmărit în acest tabel",
+          "in_app": "În aplicație",
+          "in_app_note": "starea de citire pe fiecare rând",
+          "email": "E-mail",
+          "email_note": "neurmărit"
+        }
       }
     }
   }

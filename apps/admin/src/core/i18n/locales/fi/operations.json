@@ -13,6 +13,66 @@
           "database": "Database",
           "cache": "Cache"
         }
+      },
+      "push_deliveries": {
+        "title": "Push-toimitukset",
+        "window": {
+          "label": "Aikajakso",
+          "24h": "Viimeiset 24 tuntia",
+          "7d": "Viimeiset 7 päivää",
+          "30d": "Viimeiset 30 päivää"
+        },
+        "outcomes": {
+          "all": "Kaikki",
+          "failures": "Epäonnistumiset",
+          "delivered": "Toimitettu",
+          "token_invalid": "Virheellinen tunniste",
+          "retryable": "Yritetään uudelleen",
+          "config_error": "Määritysvirhe",
+          "rejected": "Hylätty"
+        },
+        "tiles": {
+          "retryable_final": "Luovutettu uudelleenyritysten jälkeen",
+          "config_error_hint": "Palveluntarjoajan tunnukset tai projektin asetukset vaativat huomiota."
+        },
+        "filters": {
+          "type": "Ilmoituksen tyyppi",
+          "creator": "Sisällöntuottajan tunnus"
+        },
+        "columns": {
+          "creator": "Sisällöntuottaja",
+          "type": "Tyyppi",
+          "platform": "Alusta",
+          "outcome": "Tulos",
+          "attempt": "Yritys",
+          "detail": "Palveluntarjoajan vastaus",
+          "in_app": "Sovelluksessa"
+        },
+        "attempt_final": "lopullinen",
+        "in_app": {
+          "read": "Luettu",
+          "unread": "Lukematon",
+          "none": "Ei mitään"
+        },
+        "empty": "Mikään push-yritys ei vastaa näitä suodattimia.",
+        "load_failed": "Push-toimituksia ei voitu ladata. Päivitä sivu.",
+        "footer": {
+          "rows": "Tallennetut rivit: {count} · vanhin: {date}",
+          "empty": "Push-yrityksiä ei ole vielä tallennettu.",
+          "retention": "Vanhemmat rivit poistetaan automaattisesti."
+        },
+        "counts": {
+          "title": "Mitä tässä lasketaan",
+          "body": "Laskee push-yritykset, jotka pääsivät palveluntarjoajalle (FCM). Ei laske sisällöntuottajia, joilla ei ole rekisteröityä laitetta, mykistettyjä tai estettyjä push-ilmoituksia, rajoitettuja lähetyksiä, tunnisteita, jotka olivat jo poissa tehtävän ajon aikaan, tehtäviä, jotka luovutettiin ilman yritystä, eikä testi-push-ilmoituksia. ”Toimitettu” tarkoittaa, että palveluntarjoaja hyväksyi viestin, ei sitä, että puhelin näytti sen."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "seurataan tässä taulukossa",
+          "in_app": "Sovelluksessa",
+          "in_app_note": "lukutila riveittäin",
+          "email": "Sähköposti",
+          "email_note": "ei seurata"
+        }
       }
     }
   }

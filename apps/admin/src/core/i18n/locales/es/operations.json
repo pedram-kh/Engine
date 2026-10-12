@@ -13,6 +13,66 @@
           "database": "Base de datos",
           "cache": "Caché"
         }
+      },
+      "push_deliveries": {
+        "title": "Entregas push",
+        "window": {
+          "label": "Periodo",
+          "24h": "Últimas 24 horas",
+          "7d": "Últimos 7 días",
+          "30d": "Últimos 30 días"
+        },
+        "outcomes": {
+          "all": "Todas",
+          "failures": "Fallos",
+          "delivered": "Entregada",
+          "token_invalid": "Token no válido",
+          "retryable": "Reintentando",
+          "config_error": "Error de configuración",
+          "rejected": "Rechazada"
+        },
+        "tiles": {
+          "retryable_final": "Abandonada tras reintentos",
+          "config_error_hint": "Las credenciales o la configuración del proyecto en el proveedor necesitan atención."
+        },
+        "filters": {
+          "type": "Tipo de notificación",
+          "creator": "ID del creador"
+        },
+        "columns": {
+          "creator": "Creador",
+          "type": "Tipo",
+          "platform": "Plataforma",
+          "outcome": "Resultado",
+          "attempt": "Intento",
+          "detail": "Respuesta del proveedor",
+          "in_app": "En la app"
+        },
+        "attempt_final": "final",
+        "in_app": {
+          "read": "Leída",
+          "unread": "No leída",
+          "none": "Ninguna"
+        },
+        "empty": "Ningún intento de push coincide con estos filtros.",
+        "load_failed": "No pudimos cargar las entregas push. Actualiza la página.",
+        "footer": {
+          "rows": "Filas almacenadas: {count} · más antigua: {date}",
+          "empty": "Aún no hay intentos de push almacenados.",
+          "retention": "Las filas más antiguas se eliminan automáticamente."
+        },
+        "counts": {
+          "title": "Qué se cuenta aquí",
+          "body": "Cuenta los intentos de push que llegaron al proveedor (FCM). No cuenta creadores sin dispositivo registrado, push silenciados o suprimidos, envíos limitados, tokens que ya no existían cuando se ejecutó la tarea, tareas que se abandonaron sin intento ni push de prueba. «Entregada» significa que el proveedor aceptó el mensaje, no que un teléfono lo mostrara."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "registrado en esta tabla",
+          "in_app": "En la app",
+          "in_app_note": "estado de lectura por fila",
+          "email": "Correo electrónico",
+          "email_note": "sin seguimiento"
+        }
       }
     }
   }

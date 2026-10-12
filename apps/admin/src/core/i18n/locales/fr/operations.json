@@ -13,6 +13,66 @@
           "database": "Base de données",
           "cache": "Cache"
         }
+      },
+      "push_deliveries": {
+        "title": "Envois de notifications push",
+        "window": {
+          "label": "Période",
+          "24h": "Dernières 24 heures",
+          "7d": "7 derniers jours",
+          "30d": "30 derniers jours"
+        },
+        "outcomes": {
+          "all": "Tous",
+          "failures": "Échecs",
+          "delivered": "Remis",
+          "token_invalid": "Jeton invalide",
+          "retryable": "Nouvelle tentative",
+          "config_error": "Erreur de configuration",
+          "rejected": "Refusé"
+        },
+        "tiles": {
+          "retryable_final": "Abandonné après plusieurs essais",
+          "config_error_hint": "Les identifiants ou la configuration du projet chez le fournisseur demandent une vérification."
+        },
+        "filters": {
+          "type": "Type de notification",
+          "creator": "ID du créateur"
+        },
+        "columns": {
+          "creator": "Créateur",
+          "type": "Type",
+          "platform": "Plateforme",
+          "outcome": "Résultat",
+          "attempt": "Tentative",
+          "detail": "Réponse du fournisseur",
+          "in_app": "Dans l'app"
+        },
+        "attempt_final": "final",
+        "in_app": {
+          "read": "Lu",
+          "unread": "Non lu",
+          "none": "Aucun"
+        },
+        "empty": "Aucune tentative push ne correspond à ces filtres.",
+        "load_failed": "Impossible de charger les envois push. Veuillez actualiser la page.",
+        "footer": {
+          "rows": "Lignes stockées : {count} · plus ancienne : {date}",
+          "empty": "Aucune tentative push enregistrée pour l'instant.",
+          "retention": "Les lignes plus anciennes sont supprimées automatiquement."
+        },
+        "counts": {
+          "title": "Ce qui est compté",
+          "body": "Compte les tentatives d'envoi push qui ont atteint le fournisseur (FCM). Ne compte pas les créateurs sans appareil enregistré, les push mis en sourdine ou supprimés, les envois limités, les jetons déjà disparus à l'exécution de la tâche, les tâches abandonnées sans tentative, ni les push de test. « Remis » signifie que le fournisseur a accepté le message, pas qu'un téléphone l'a affiché."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "suivi dans ce tableau",
+          "in_app": "Dans l'app",
+          "in_app_note": "état de lecture par ligne",
+          "email": "E-mail",
+          "email_note": "non suivi"
+        }
       }
     }
   }

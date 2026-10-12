@@ -32,7 +32,8 @@
       "exportRequests": "Exportverzoeken",
       "erasureQueue": "Verwijderingswachtrij",
       "featureFlags": "Functievlaggen",
-      "automations": "Automations"
+      "automations": "Automations",
+      "pushDeliveries": "Pushleveringen"
     },
     "userMenu": {
       "signOut": "Uitloggen",

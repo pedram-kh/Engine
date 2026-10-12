@@ -32,7 +32,8 @@
       "exportRequests": "Export requests",
       "erasureQueue": "Erasure queue",
       "featureFlags": "Ominaisuusliput",
-      "automations": "Automations"
+      "automations": "Automations",
+      "pushDeliveries": "Push-toimitukset"
     },
     "userMenu": {
       "signOut": "Kirjaudu ulos",

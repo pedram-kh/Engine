@@ -13,6 +13,66 @@
           "database": "Database",
           "cache": "Cache"
         }
+      },
+      "push_deliveries": {
+        "title": "Push-kohaletoimetused",
+        "window": {
+          "label": "Ajavahemik",
+          "24h": "Viimased 24 tundi",
+          "7d": "Viimased 7 päeva",
+          "30d": "Viimased 30 päeva"
+        },
+        "outcomes": {
+          "all": "Kõik",
+          "failures": "Ebaõnnestumised",
+          "delivered": "Kohale toimetatud",
+          "token_invalid": "Kehtetu tunnus",
+          "retryable": "Uuesti proovimine",
+          "config_error": "Konfiguratsiooniviga",
+          "rejected": "Tagasi lükatud"
+        },
+        "tiles": {
+          "retryable_final": "Loobuti pärast korduskatseid",
+          "config_error_hint": "Teenusepakkuja volitused või projekti seadistus vajavad tähelepanu."
+        },
+        "filters": {
+          "type": "Teavituse tüüp",
+          "creator": "Looja ID"
+        },
+        "columns": {
+          "creator": "Looja",
+          "type": "Tüüp",
+          "platform": "Platvorm",
+          "outcome": "Tulemus",
+          "attempt": "Katse",
+          "detail": "Teenusepakkuja vastus",
+          "in_app": "Rakenduses"
+        },
+        "attempt_final": "lõplik",
+        "in_app": {
+          "read": "Loetud",
+          "unread": "Lugemata",
+          "none": "Puudub"
+        },
+        "empty": "Neile filtritele ei vasta ükski push-katse.",
+        "load_failed": "Push-kohaletoimetusi ei õnnestunud laadida. Värskenda lehte.",
+        "footer": {
+          "rows": "Salvestatud ridu: {count} · vanim: {date}",
+          "empty": "Push-katseid pole veel salvestatud.",
+          "retention": "Vanemad read kustutatakse automaatselt."
+        },
+        "counts": {
+          "title": "Mida siin loetakse",
+          "body": "Loeb push-katseid, mis jõudsid teenusepakkujani (FCM). Ei loe loojaid ilma registreeritud seadmeta, vaigistatud või alla surutud push-teavitusi, piiratud saatmisi, tunnuseid, mida polnud ülesande käivitamisel enam olemas, ülesandeid, millest loobuti katseta, ega test-push-teavitusi. „Kohale toimetatud“ tähendab, et teenusepakkuja võttis sõnumi vastu, mitte seda, et telefon selle kuvas."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "jälgitakse selles tabelis",
+          "in_app": "Rakenduses",
+          "in_app_note": "lugemisolek rea kohta",
+          "email": "E-post",
+          "email_note": "ei jälgita"
+        }
       }
     }
   }

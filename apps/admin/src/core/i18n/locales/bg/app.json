@@ -32,7 +32,8 @@
       "exportRequests": "Export requests",
       "erasureQueue": "Erasure queue",
       "featureFlags": "Флагове за функции",
-      "automations": "Automations"
+      "automations": "Automations",
+      "pushDeliveries": "Push доставки"
     },
     "userMenu": {
       "signOut": "Излезте",

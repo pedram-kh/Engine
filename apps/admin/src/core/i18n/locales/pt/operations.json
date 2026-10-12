@@ -13,6 +13,66 @@
           "database": "Base de dados",
           "cache": "Cache"
         }
+      },
+      "push_deliveries": {
+        "title": "Entregas push",
+        "window": {
+          "label": "Período",
+          "24h": "Últimas 24 horas",
+          "7d": "Últimos 7 dias",
+          "30d": "Últimos 30 dias"
+        },
+        "outcomes": {
+          "all": "Todas",
+          "failures": "Falhas",
+          "delivered": "Entregue",
+          "token_invalid": "Token inválido",
+          "retryable": "A tentar novamente",
+          "config_error": "Erro de configuração",
+          "rejected": "Rejeitada"
+        },
+        "tiles": {
+          "retryable_final": "Desistiu após tentativas",
+          "config_error_hint": "As credenciais ou a configuração do projeto no fornecedor precisam de atenção."
+        },
+        "filters": {
+          "type": "Tipo de notificação",
+          "creator": "ID do criador"
+        },
+        "columns": {
+          "creator": "Criador",
+          "type": "Tipo",
+          "platform": "Plataforma",
+          "outcome": "Resultado",
+          "attempt": "Tentativa",
+          "detail": "Resposta do fornecedor",
+          "in_app": "Na app"
+        },
+        "attempt_final": "final",
+        "in_app": {
+          "read": "Lida",
+          "unread": "Não lida",
+          "none": "Nenhuma"
+        },
+        "empty": "Nenhuma tentativa de push corresponde a estes filtros.",
+        "load_failed": "Não foi possível carregar as entregas push. Atualize a página.",
+        "footer": {
+          "rows": "Linhas guardadas: {count} · mais antiga: {date}",
+          "empty": "Ainda não há tentativas de push guardadas.",
+          "retention": "As linhas mais antigas são eliminadas automaticamente."
+        },
+        "counts": {
+          "title": "O que é contabilizado",
+          "body": "Conta as tentativas de push que chegaram ao fornecedor (FCM). Não conta criadores sem dispositivo registado, push silenciados ou suprimidos, envios limitados, tokens que já não existiam quando a tarefa correu, tarefas que desistiram sem tentativa nem push de teste. «Entregue» significa que o fornecedor aceitou a mensagem, não que um telemóvel a tenha mostrado."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "registado nesta tabela",
+          "in_app": "Na app",
+          "in_app_note": "estado de leitura por linha",
+          "email": "E-mail",
+          "email_note": "não registado"
+        }
       }
     }
   }

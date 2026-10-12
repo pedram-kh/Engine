@@ -13,6 +13,66 @@
           "database": "Databáze",
           "cache": "Cache"
         }
+      },
+      "push_deliveries": {
+        "title": "Doručení push",
+        "window": {
+          "label": "Období",
+          "24h": "Posledních 24 hodin",
+          "7d": "Posledních 7 dní",
+          "30d": "Posledních 30 dní"
+        },
+        "outcomes": {
+          "all": "Vše",
+          "failures": "Selhání",
+          "delivered": "Doručeno",
+          "token_invalid": "Neplatný token",
+          "retryable": "Opakování",
+          "config_error": "Chyba konfigurace",
+          "rejected": "Odmítnuto"
+        },
+        "tiles": {
+          "retryable_final": "Vzdáno po opakováních",
+          "config_error_hint": "Přihlašovací údaje nebo nastavení projektu u poskytovatele vyžadují pozornost."
+        },
+        "filters": {
+          "type": "Typ oznámení",
+          "creator": "ID tvůrce"
+        },
+        "columns": {
+          "creator": "Tvůrce",
+          "type": "Typ",
+          "platform": "Platforma",
+          "outcome": "Výsledek",
+          "attempt": "Pokus",
+          "detail": "Odpověď poskytovatele",
+          "in_app": "V aplikaci"
+        },
+        "attempt_final": "poslední",
+        "in_app": {
+          "read": "Přečteno",
+          "unread": "Nepřečteno",
+          "none": "Žádné"
+        },
+        "empty": "Těmto filtrům neodpovídají žádné pokusy o push.",
+        "load_failed": "Doručení push se nepodařilo načíst. Obnovte stránku.",
+        "footer": {
+          "rows": "Uložených řádků: {count} · nejstarší: {date}",
+          "empty": "Zatím nejsou uloženy žádné pokusy o push.",
+          "retention": "Starší řádky se mažou automaticky."
+        },
+        "counts": {
+          "title": "Co se zde počítá",
+          "body": "Počítá pokusy o push, které se dostaly k poskytovateli (FCM). Nepočítá tvůrce bez registrovaného zařízení, ztlumené nebo potlačené push, omezená odeslání, tokeny, které už při spuštění úlohy neexistovaly, úlohy vzdané bez pokusu ani testovací push. „Doručeno“ znamená, že poskytovatel zprávu přijal, nikoli že ji telefon zobrazil."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "sledováno v této tabulce",
+          "in_app": "V aplikaci",
+          "in_app_note": "stav přečtení u každého řádku",
+          "email": "E-mail",
+          "email_note": "nesledováno"
+        }
       }
     }
   }

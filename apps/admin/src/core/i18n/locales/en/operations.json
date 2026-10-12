@@ -13,6 +13,66 @@
           "database": "Database",
           "cache": "Cache"
         }
+      },
+      "push_deliveries": {
+        "title": "Push deliveries",
+        "window": {
+          "label": "Time window",
+          "24h": "Last 24 hours",
+          "7d": "Last 7 days",
+          "30d": "Last 30 days"
+        },
+        "outcomes": {
+          "all": "All",
+          "failures": "Failures",
+          "delivered": "Delivered",
+          "token_invalid": "Token invalid",
+          "retryable": "Retrying",
+          "config_error": "Config error",
+          "rejected": "Rejected"
+        },
+        "tiles": {
+          "retryable_final": "Gave up after retries",
+          "config_error_hint": "Provider credentials or project setup need attention."
+        },
+        "filters": {
+          "type": "Notification type",
+          "creator": "Creator ID"
+        },
+        "columns": {
+          "creator": "Creator",
+          "type": "Type",
+          "platform": "Platform",
+          "outcome": "Outcome",
+          "attempt": "Attempt",
+          "detail": "Provider response",
+          "in_app": "In-app"
+        },
+        "attempt_final": "final",
+        "in_app": {
+          "read": "Read",
+          "unread": "Unread",
+          "none": "None"
+        },
+        "empty": "No push attempts match these filters.",
+        "load_failed": "We couldn't load the push deliveries. Please refresh.",
+        "footer": {
+          "rows": "Stored rows: {count} · oldest: {date}",
+          "empty": "No push attempts stored yet.",
+          "retention": "Older rows are pruned automatically."
+        },
+        "counts": {
+          "title": "What this counts",
+          "body": "Counts push attempts that reached the push provider (FCM). It does not count creators with no registered device, muted or suppressed pushes, throttled sends, tokens that were gone by the time the job ran, jobs that gave up without an attempt, or test pushes. \"Delivered\" means the provider accepted the message, not that a phone displayed it."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "tracked in this table",
+          "in_app": "In-app",
+          "in_app_note": "read state shown per row",
+          "email": "Email",
+          "email_note": "not tracked"
+        }
       }
     }
   }

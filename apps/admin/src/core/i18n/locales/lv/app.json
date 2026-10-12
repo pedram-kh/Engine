@@ -32,7 +32,8 @@
       "exportRequests": "Export requests",
       "erasureQueue": "Erasure queue",
       "featureFlags": "Funkciju karodziņi",
-      "automations": "Automations"
+      "automations": "Automations",
+      "pushDeliveries": "Push piegādes"
     },
     "userMenu": {
       "signOut": "Izrakstīties",

@@ -13,6 +13,66 @@
           "database": "Database",
           "cache": "Cache"
         }
+      },
+      "push_deliveries": {
+        "title": "Push-kézbesítések",
+        "window": {
+          "label": "Időszak",
+          "24h": "Elmúlt 24 óra",
+          "7d": "Elmúlt 7 nap",
+          "30d": "Elmúlt 30 nap"
+        },
+        "outcomes": {
+          "all": "Mind",
+          "failures": "Hibák",
+          "delivered": "Kézbesítve",
+          "token_invalid": "Érvénytelen token",
+          "retryable": "Újrapróbálkozás",
+          "config_error": "Konfigurációs hiba",
+          "rejected": "Elutasítva"
+        },
+        "tiles": {
+          "retryable_final": "Újrapróbálkozások után feladva",
+          "config_error_hint": "A szolgáltatónál lévő hitelesítő adatok vagy a projektbeállítás figyelmet igényel."
+        },
+        "filters": {
+          "type": "Értesítés típusa",
+          "creator": "Alkotó azonosítója"
+        },
+        "columns": {
+          "creator": "Alkotó",
+          "type": "Típus",
+          "platform": "Platform",
+          "outcome": "Eredmény",
+          "attempt": "Próbálkozás",
+          "detail": "A szolgáltató válasza",
+          "in_app": "Az alkalmazásban"
+        },
+        "attempt_final": "végleges",
+        "in_app": {
+          "read": "Elolvasva",
+          "unread": "Olvasatlan",
+          "none": "Nincs"
+        },
+        "empty": "Egyetlen push-próbálkozás sem felel meg ezeknek a szűrőknek.",
+        "load_failed": "A push-kézbesítések betöltése nem sikerült. Frissítsd az oldalt.",
+        "footer": {
+          "rows": "Tárolt sorok: {count} · legrégebbi: {date}",
+          "empty": "Még nincs tárolt push-próbálkozás.",
+          "retention": "A régebbi sorok automatikusan törlődnek."
+        },
+        "counts": {
+          "title": "Mit számol ez az oldal",
+          "body": "Azokat a push-próbálkozásokat számolja, amelyek elérték a szolgáltatót (FCM). Nem számolja a regisztrált eszköz nélküli alkotókat, a némított vagy elnyomott push-értesítéseket, a korlátozott küldéseket, a feladat futásakor már megszűnt tokeneket, a próbálkozás nélkül feladott feladatokat és a teszt push-értesítéseket. A „Kézbesítve” azt jelenti, hogy a szolgáltató elfogadta az üzenetet, nem azt, hogy egy telefon megjelenítette."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "ebben a táblázatban követve",
+          "in_app": "Az alkalmazásban",
+          "in_app_note": "olvasási állapot soronként",
+          "email": "E-mail",
+          "email_note": "nincs követve"
+        }
       }
     }
   }

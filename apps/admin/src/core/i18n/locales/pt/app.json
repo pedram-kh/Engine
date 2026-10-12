@@ -32,7 +32,8 @@
       "exportRequests": "Pedidos de exportação",
       "erasureQueue": "Fila de apagamento",
       "featureFlags": "Feature flags",
-      "automations": "Automações"
+      "automations": "Automações",
+      "pushDeliveries": "Entregas push"
     },
     "userMenu": {
       "signOut": "Terminar sessão",

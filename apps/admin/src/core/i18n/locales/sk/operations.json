@@ -13,6 +13,66 @@
           "database": "Databáze",
           "cache": "Cache"
         }
+      },
+      "push_deliveries": {
+        "title": "Doručenia push",
+        "window": {
+          "label": "Obdobie",
+          "24h": "Posledných 24 hodín",
+          "7d": "Posledných 7 dní",
+          "30d": "Posledných 30 dní"
+        },
+        "outcomes": {
+          "all": "Všetko",
+          "failures": "Zlyhania",
+          "delivered": "Doručené",
+          "token_invalid": "Neplatný token",
+          "retryable": "Opakovanie",
+          "config_error": "Chyba konfigurácie",
+          "rejected": "Odmietnuté"
+        },
+        "tiles": {
+          "retryable_final": "Vzdané po opakovaniach",
+          "config_error_hint": "Prihlasovacie údaje alebo nastavenie projektu u poskytovateľa vyžadujú pozornosť."
+        },
+        "filters": {
+          "type": "Typ oznámenia",
+          "creator": "ID tvorcu"
+        },
+        "columns": {
+          "creator": "Tvorca",
+          "type": "Typ",
+          "platform": "Platforma",
+          "outcome": "Výsledok",
+          "attempt": "Pokus",
+          "detail": "Odpoveď poskytovateľa",
+          "in_app": "V aplikácii"
+        },
+        "attempt_final": "posledný",
+        "in_app": {
+          "read": "Prečítané",
+          "unread": "Neprečítané",
+          "none": "Žiadne"
+        },
+        "empty": "Týmto filtrom nezodpovedajú žiadne pokusy o push.",
+        "load_failed": "Doručenia push sa nepodarilo načítať. Obnovte stránku.",
+        "footer": {
+          "rows": "Uložených riadkov: {count} · najstarší: {date}",
+          "empty": "Zatiaľ nie sú uložené žiadne pokusy o push.",
+          "retention": "Staršie riadky sa mažú automaticky."
+        },
+        "counts": {
+          "title": "Čo sa tu počíta",
+          "body": "Počíta pokusy o push, ktoré sa dostali k poskytovateľovi (FCM). Nepočíta tvorcov bez registrovaného zariadenia, stlmené alebo potlačené push, obmedzené odoslania, tokeny, ktoré už pri spustení úlohy neexistovali, úlohy vzdané bez pokusu ani testovacie push. „Doručené“ znamená, že poskytovateľ správu prijal, nie že ju telefón zobrazil."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "sledované v tejto tabuľke",
+          "in_app": "V aplikácii",
+          "in_app_note": "stav prečítania pri každom riadku",
+          "email": "E-mail",
+          "email_note": "nesledované"
+        }
       }
     }
   }

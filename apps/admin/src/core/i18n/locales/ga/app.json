@@ -32,7 +32,8 @@
       "exportRequests": "Export requests",
       "erasureQueue": "Erasure queue",
       "featureFlags": "Bratacha gnéithe",
-      "automations": "Automations"
+      "automations": "Automations",
+      "pushDeliveries": "Seachadtaí push"
     },
     "userMenu": {
       "signOut": "Sínigh amach",

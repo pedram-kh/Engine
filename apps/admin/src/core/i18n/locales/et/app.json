@@ -32,7 +32,8 @@
       "exportRequests": "Export requests",
       "erasureQueue": "Erasure queue",
       "featureFlags": "Funktsioonilipud",
-      "automations": "Automations"
+      "automations": "Automations",
+      "pushDeliveries": "Push-kohaletoimetused"
     },
     "userMenu": {
       "signOut": "Logi välja",

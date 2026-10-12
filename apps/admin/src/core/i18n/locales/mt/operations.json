@@ -13,6 +13,66 @@
           "database": "Database",
           "cache": "Cache"
         }
+      },
+      "push_deliveries": {
+        "title": "Konsenji push",
+        "window": {
+          "label": "Perjodu ta' żmien",
+          "24h": "L-aħħar 24 siegħa",
+          "7d": "L-aħħar 7 ijiem",
+          "30d": "L-aħħar 30 jum"
+        },
+        "outcomes": {
+          "all": "Kollha",
+          "failures": "Fallimenti",
+          "delivered": "Ikkonsenjat",
+          "token_invalid": "Token invalidu",
+          "retryable": "Qed jerġa' jipprova",
+          "config_error": "Żball ta' konfigurazzjoni",
+          "rejected": "Miċħud"
+        },
+        "tiles": {
+          "retryable_final": "Ċeda wara tentattivi mill-ġdid",
+          "config_error_hint": "Il-kredenzjali jew is-setup tal-proġett għand il-fornitur jeħtieġu attenzjoni."
+        },
+        "filters": {
+          "type": "Tip ta' notifika",
+          "creator": "ID tal-kreatur"
+        },
+        "columns": {
+          "creator": "Kreatur",
+          "type": "Tip",
+          "platform": "Pjattaforma",
+          "outcome": "Eżitu",
+          "attempt": "Tentattiv",
+          "detail": "Tweġiba tal-fornitur",
+          "in_app": "Fl-app"
+        },
+        "attempt_final": "finali",
+        "in_app": {
+          "read": "Moqri",
+          "unread": "Mhux moqri",
+          "none": "Xejn"
+        },
+        "empty": "L-ebda tentattiv push ma jaqbel ma' dawn il-filtri.",
+        "load_failed": "Ma stajniex inraddu l-konsenji push. Jekk jogħġbok aġġorna l-paġna.",
+        "footer": {
+          "rows": "Ringieli maħżuna: {count} · l-eqdem: {date}",
+          "empty": "Għad m'hemm l-ebda tentattiv push maħżun.",
+          "retention": "Ir-ringieli eqdem jitħassru awtomatikament."
+        },
+        "counts": {
+          "title": "X'jingħadd hawn",
+          "body": "Jgħodd it-tentattivi push li waslu għand il-fornitur (FCM). Ma jgħoddx kreaturi mingħajr apparat irreġistrat, push mutat jew issuppressat, ibgħatijiet ristretti, tokens li kienu diġà marru meta ġie eżegwit il-ġob, ġobs li ċedew mingħajr tentattiv, jew push tat-test. “Ikkonsenjat” tfisser li l-fornitur aċċetta l-messaġġ, mhux li telefon wrieh."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "ittraċċat f'din it-tabella",
+          "in_app": "Fl-app",
+          "in_app_note": "stat tal-qari għal kull ringiela",
+          "email": "Email",
+          "email_note": "mhux ittraċċat"
+        }
       }
     }
   }

@@ -13,6 +13,66 @@
           "database": "Database",
           "cache": "Cache"
         }
+      },
+      "push_deliveries": {
+        "title": "Seachadtaí push",
+        "window": {
+          "label": "Tréimhse ama",
+          "24h": "An 24 uair an chloig seo caite",
+          "7d": "Na 7 lá seo caite",
+          "30d": "Na 30 lá seo caite"
+        },
+        "outcomes": {
+          "all": "Gach",
+          "failures": "Teipeanna",
+          "delivered": "Seachadta",
+          "token_invalid": "Comhartha neamhbhailí",
+          "retryable": "Ag triail arís",
+          "config_error": "Earráid chumraíochta",
+          "rejected": "Diúltaithe"
+        },
+        "tiles": {
+          "retryable_final": "Tugadh suas tar éis athiarrachtaí",
+          "config_error_hint": "Tá aird ag teastáil ar dhintiúir nó ar chumrú tionscadail an tsoláthraí."
+        },
+        "filters": {
+          "type": "Cineál fógra",
+          "creator": "ID an chruthaitheora"
+        },
+        "columns": {
+          "creator": "Cruthaitheoir",
+          "type": "Cineál",
+          "platform": "Ardán",
+          "outcome": "Toradh",
+          "attempt": "Iarracht",
+          "detail": "Freagra an tsoláthraí",
+          "in_app": "San aip"
+        },
+        "attempt_final": "deiridh",
+        "in_app": {
+          "read": "Léite",
+          "unread": "Gan léamh",
+          "none": "Ceann ar bith"
+        },
+        "empty": "Ní luíonn aon iarracht push leis na scagairí seo.",
+        "load_failed": "Níorbh fhéidir na seachadtaí push a luchtú. Athnuaigh an leathanach.",
+        "footer": {
+          "rows": "Sraitheanna stóráilte: {count} · is sine: {date}",
+          "empty": "Níl aon iarracht push stóráilte fós.",
+          "retention": "Scriostar sraitheanna níos sine go huathoibríoch."
+        },
+        "counts": {
+          "title": "Cad a chuirtear san áireamh anseo",
+          "body": "Cuireann sé san áireamh iarrachtaí push a shroich an soláthraí (FCM). Ní chuireann sé san áireamh cruthaitheoirí gan feiste cláraithe, pushanna balbhaithe nó cumhdaithe, seoltaí srianta, comharthaí a bhí imithe faoin am a ritheadh an jab, jabanna a tugadh suas gan iarracht, ná pushanna tástála. Ciallaíonn “Seachadta” gur ghlac an soláthraí leis an teachtaireacht, ní gur thaispeáin guthán é."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "á rianú sa tábla seo",
+          "in_app": "San aip",
+          "in_app_note": "stádas léite in aghaidh na sraithe",
+          "email": "Ríomhphost",
+          "email_note": "gan rianú"
+        }
       }
     }
   }

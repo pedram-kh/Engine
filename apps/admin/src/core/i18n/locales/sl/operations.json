@@ -13,6 +13,66 @@
           "database": "Databáze",
           "cache": "Cache"
         }
+      },
+      "push_deliveries": {
+        "title": "Dostave push",
+        "window": {
+          "label": "Obdobje",
+          "24h": "Zadnjih 24 ur",
+          "7d": "Zadnjih 7 dni",
+          "30d": "Zadnjih 30 dni"
+        },
+        "outcomes": {
+          "all": "Vse",
+          "failures": "Neuspehi",
+          "delivered": "Dostavljeno",
+          "token_invalid": "Neveljaven žeton",
+          "retryable": "Ponovni poskus",
+          "config_error": "Napaka konfiguracije",
+          "rejected": "Zavrnjeno"
+        },
+        "tiles": {
+          "retryable_final": "Opuščeno po ponovnih poskusih",
+          "config_error_hint": "Poverilnice ali nastavitev projekta pri ponudniku zahtevajo pozornost."
+        },
+        "filters": {
+          "type": "Vrsta obvestila",
+          "creator": "ID ustvarjalca"
+        },
+        "columns": {
+          "creator": "Ustvarjalec",
+          "type": "Vrsta",
+          "platform": "Platforma",
+          "outcome": "Izid",
+          "attempt": "Poskus",
+          "detail": "Odziv ponudnika",
+          "in_app": "V aplikaciji"
+        },
+        "attempt_final": "zadnji",
+        "in_app": {
+          "read": "Prebrano",
+          "unread": "Neprebrano",
+          "none": "Brez"
+        },
+        "empty": "Nobeni poskusi push ne ustrezajo tem filtrom.",
+        "load_failed": "Dostav push ni bilo mogoče naložiti. Osvežite stran.",
+        "footer": {
+          "rows": "Shranjene vrstice: {count} · najstarejša: {date}",
+          "empty": "Shranjenih še ni nobenih poskusov push.",
+          "retention": "Starejše vrstice se samodejno izbrišejo."
+        },
+        "counts": {
+          "title": "Kaj se tu šteje",
+          "body": "Šteje poskuse push, ki so prišli do ponudnika (FCM). Ne šteje ustvarjalcev brez registrirane naprave, utišanih ali zadržanih push obvestil, omejenih pošiljanj, žetonov, ki jih ob zagonu opravila ni bilo več, opravil, opuščenih brez poskusa, in testnih push obvestil. »Dostavljeno« pomeni, da je ponudnik sporočilo sprejel, ne da ga je telefon prikazal."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "spremljano v tej tabeli",
+          "in_app": "V aplikaciji",
+          "in_app_note": "stanje branja po vrstici",
+          "email": "E-pošta",
+          "email_note": "ni spremljano"
+        }
       }
     }
   }

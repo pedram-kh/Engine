@@ -13,6 +13,66 @@
           "database": "Baza danych",
           "cache": "Cache"
         }
+      },
+      "push_deliveries": {
+        "title": "Dostarczenia push",
+        "window": {
+          "label": "Okres",
+          "24h": "Ostatnie 24 godziny",
+          "7d": "Ostatnie 7 dni",
+          "30d": "Ostatnie 30 dni"
+        },
+        "outcomes": {
+          "all": "Wszystkie",
+          "failures": "Niepowodzenia",
+          "delivered": "Dostarczono",
+          "token_invalid": "Nieprawidłowy token",
+          "retryable": "Ponawianie",
+          "config_error": "Błąd konfiguracji",
+          "rejected": "Odrzucono"
+        },
+        "tiles": {
+          "retryable_final": "Poddano się po ponowieniach",
+          "config_error_hint": "Dane uwierzytelniające lub konfiguracja projektu u dostawcy wymagają uwagi."
+        },
+        "filters": {
+          "type": "Typ powiadomienia",
+          "creator": "ID twórcy"
+        },
+        "columns": {
+          "creator": "Twórca",
+          "type": "Typ",
+          "platform": "Platforma",
+          "outcome": "Wynik",
+          "attempt": "Próba",
+          "detail": "Odpowiedź dostawcy",
+          "in_app": "W aplikacji"
+        },
+        "attempt_final": "ostatnia",
+        "in_app": {
+          "read": "Przeczytane",
+          "unread": "Nieprzeczytane",
+          "none": "Brak"
+        },
+        "empty": "Żadne próby wysyłki push nie pasują do tych filtrów.",
+        "load_failed": "Nie udało się wczytać dostarczeń push. Odśwież stronę.",
+        "footer": {
+          "rows": "Zapisane wiersze: {count} · najstarszy: {date}",
+          "empty": "Nie zapisano jeszcze prób wysyłki push.",
+          "retention": "Starsze wiersze są usuwane automatycznie."
+        },
+        "counts": {
+          "title": "Co jest tu liczone",
+          "body": "Liczy próby wysyłki push, które dotarły do dostawcy (FCM). Nie liczy twórców bez zarejestrowanego urządzenia, wyciszonych lub wstrzymanych powiadomień push, ograniczonych wysyłek, tokenów, które zniknęły przed uruchomieniem zadania, zadań porzuconych bez próby ani testowych powiadomień push. „Dostarczono” oznacza, że dostawca przyjął wiadomość, a nie że telefon ją wyświetlił."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "śledzone w tej tabeli",
+          "in_app": "W aplikacji",
+          "in_app_note": "status odczytu w każdym wierszu",
+          "email": "E-mail",
+          "email_note": "nieśledzone"
+        }
       }
     }
   }

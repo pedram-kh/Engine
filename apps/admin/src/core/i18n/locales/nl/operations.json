@@ -13,6 +13,66 @@
           "database": "Database",
           "cache": "Cache"
         }
+      },
+      "push_deliveries": {
+        "title": "Pushleveringen",
+        "window": {
+          "label": "Periode",
+          "24h": "Laatste 24 uur",
+          "7d": "Laatste 7 dagen",
+          "30d": "Laatste 30 dagen"
+        },
+        "outcomes": {
+          "all": "Alle",
+          "failures": "Mislukt",
+          "delivered": "Afgeleverd",
+          "token_invalid": "Token ongeldig",
+          "retryable": "Opnieuw proberen",
+          "config_error": "Configuratiefout",
+          "rejected": "Geweigerd"
+        },
+        "tiles": {
+          "retryable_final": "Opgegeven na herhaalde pogingen",
+          "config_error_hint": "Inloggegevens of projectinstellingen bij de provider vragen aandacht."
+        },
+        "filters": {
+          "type": "Meldingstype",
+          "creator": "Creator-ID"
+        },
+        "columns": {
+          "creator": "Creator",
+          "type": "Type",
+          "platform": "Platform",
+          "outcome": "Resultaat",
+          "attempt": "Poging",
+          "detail": "Antwoord van de provider",
+          "in_app": "In-app"
+        },
+        "attempt_final": "definitief",
+        "in_app": {
+          "read": "Gelezen",
+          "unread": "Ongelezen",
+          "none": "Geen"
+        },
+        "empty": "Geen pushpogingen komen overeen met deze filters.",
+        "load_failed": "De pushleveringen konden niet worden geladen. Vernieuw de pagina.",
+        "footer": {
+          "rows": "Opgeslagen rijen: {count} · oudste: {date}",
+          "empty": "Nog geen pushpogingen opgeslagen.",
+          "retention": "Oudere rijen worden automatisch verwijderd."
+        },
+        "counts": {
+          "title": "Wat hier wordt geteld",
+          "body": "Telt pushpogingen die de pushprovider (FCM) hebben bereikt. Telt niet: creators zonder geregistreerd apparaat, gedempte of onderdrukte pushberichten, afgeremde verzendingen, tokens die al weg waren toen de taak draaide, taken die zonder poging zijn opgegeven en testpushes. „Afgeleverd” betekent dat de provider het bericht heeft geaccepteerd, niet dat een telefoon het heeft getoond."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "bijgehouden in deze tabel",
+          "in_app": "In-app",
+          "in_app_note": "leesstatus per rij",
+          "email": "E-mail",
+          "email_note": "niet bijgehouden"
+        }
       }
     }
   }

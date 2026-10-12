@@ -13,6 +13,66 @@
           "database": "Database",
           "cache": "Cache"
         }
+      },
+      "push_deliveries": {
+        "title": "Push piegādes",
+        "window": {
+          "label": "Laika periods",
+          "24h": "Pēdējās 24 stundas",
+          "7d": "Pēdējās 7 dienas",
+          "30d": "Pēdējās 30 dienas"
+        },
+        "outcomes": {
+          "all": "Visi",
+          "failures": "Kļūmes",
+          "delivered": "Piegādāts",
+          "token_invalid": "Nederīgs marķieris",
+          "retryable": "Atkārtots mēģinājums",
+          "config_error": "Konfigurācijas kļūda",
+          "rejected": "Noraidīts"
+        },
+        "tiles": {
+          "retryable_final": "Atmests pēc atkārtotiem mēģinājumiem",
+          "config_error_hint": "Pakalpojuma sniedzēja akreditācijas dati vai projekta iestatījumi prasa uzmanību."
+        },
+        "filters": {
+          "type": "Paziņojuma veids",
+          "creator": "Satura veidotāja ID"
+        },
+        "columns": {
+          "creator": "Satura veidotājs",
+          "type": "Veids",
+          "platform": "Platforma",
+          "outcome": "Rezultāts",
+          "attempt": "Mēģinājums",
+          "detail": "Pakalpojuma sniedzēja atbilde",
+          "in_app": "Lietotnē"
+        },
+        "attempt_final": "galīgs",
+        "in_app": {
+          "read": "Izlasīts",
+          "unread": "Neizlasīts",
+          "none": "Nav"
+        },
+        "empty": "Neviens push mēģinājums neatbilst šiem filtriem.",
+        "load_failed": "Neizdevās ielādēt push piegādes. Atjaunojiet lapu.",
+        "footer": {
+          "rows": "Saglabātās rindas: {count} · vecākā: {date}",
+          "empty": "Push mēģinājumi vēl nav saglabāti.",
+          "retention": "Vecākas rindas tiek dzēstas automātiski."
+        },
+        "counts": {
+          "title": "Ko šeit skaita",
+          "body": "Skaita push mēģinājumus, kas sasniedza pakalpojuma sniedzēju (FCM). Neskaita satura veidotājus bez reģistrētas ierīces, izslēgtus vai nomāktus push paziņojumus, ierobežotas nosūtīšanas, marķierus, kuru uzdevuma izpildes brīdī vairs nebija, uzdevumus, no kuriem atteicās bez mēģinājuma, un testa push paziņojumus. „Piegādāts” nozīmē, ka pakalpojuma sniedzējs ziņojumu pieņēma, nevis ka tālrunis to attēloja."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "tiek izsekots šajā tabulā",
+          "in_app": "Lietotnē",
+          "in_app_note": "lasīšanas statuss katrā rindā",
+          "email": "E-pasts",
+          "email_note": "netiek izsekots"
+        }
       }
     }
   }

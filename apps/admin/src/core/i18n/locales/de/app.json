@@ -32,7 +32,8 @@
       "exportRequests": "Exportanfragen",
       "erasureQueue": "Lösch-Warteschlange",
       "featureFlags": "Feature-Flags",
-      "automations": "Automations"
+      "automations": "Automations",
+      "pushDeliveries": "Push-Zustellungen"
     },
     "userMenu": {
       "signOut": "Abmelden",

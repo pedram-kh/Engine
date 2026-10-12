@@ -32,7 +32,8 @@
       "exportRequests": "Export requests",
       "erasureQueue": "Erasure queue",
       "featureFlags": "Feature flags",
-      "automations": "Automations"
+      "automations": "Automations",
+      "pushDeliveries": "Push deliveries"
     },
     "userMenu": {
       "signOut": "Sign out",

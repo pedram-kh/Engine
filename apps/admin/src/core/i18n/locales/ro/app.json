@@ -32,7 +32,8 @@
       "exportRequests": "Export requests",
       "erasureQueue": "Erasure queue",
       "featureFlags": "Indicatori de funcții",
-      "automations": "Automations"
+      "automations": "Automations",
+      "pushDeliveries": "Livrări push"
     },
     "userMenu": {
       "signOut": "Deconectați-vă",

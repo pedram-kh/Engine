@@ -32,7 +32,8 @@
       "exportRequests": "Richieste di esportazione",
       "erasureQueue": "Coda di cancellazione",
       "featureFlags": "Feature flag",
-      "automations": "Automazioni"
+      "automations": "Automazioni",
+      "pushDeliveries": "Consegne push"
     },
     "userMenu": {
       "signOut": "Esci",

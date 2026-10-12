@@ -32,7 +32,8 @@
       "exportRequests": "Export requests",
       "erasureQueue": "Erasure queue",
       "featureFlags": "Bnadar tal-karatteristiċi",
-      "automations": "Automations"
+      "automations": "Automations",
+      "pushDeliveries": "Konsenji push"
     },
     "userMenu": {
       "signOut": "Oħroġ",

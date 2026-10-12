@@ -13,6 +13,66 @@
           "database": "Databas",
           "cache": "Cache"
         }
+      },
+      "push_deliveries": {
+        "title": "Push-leveranser",
+        "window": {
+          "label": "Tidsperiod",
+          "24h": "Senaste 24 timmarna",
+          "7d": "Senaste 7 dagarna",
+          "30d": "Senaste 30 dagarna"
+        },
+        "outcomes": {
+          "all": "Alla",
+          "failures": "Misslyckade",
+          "delivered": "Levererad",
+          "token_invalid": "Ogiltig token",
+          "retryable": "Försöker igen",
+          "config_error": "Konfigurationsfel",
+          "rejected": "Nekad"
+        },
+        "tiles": {
+          "retryable_final": "Gav upp efter upprepade försök",
+          "config_error_hint": "Autentiseringsuppgifter eller projektinställningar hos leverantören behöver ses över."
+        },
+        "filters": {
+          "type": "Aviseringstyp",
+          "creator": "Creator-ID"
+        },
+        "columns": {
+          "creator": "Creator",
+          "type": "Typ",
+          "platform": "Plattform",
+          "outcome": "Utfall",
+          "attempt": "Försök",
+          "detail": "Leverantörens svar",
+          "in_app": "I appen"
+        },
+        "attempt_final": "slutgiltigt",
+        "in_app": {
+          "read": "Läst",
+          "unread": "Oläst",
+          "none": "Ingen"
+        },
+        "empty": "Inga push-försök matchar de här filtren.",
+        "load_failed": "Det gick inte att ladda push-leveranserna. Uppdatera sidan.",
+        "footer": {
+          "rows": "Sparade rader: {count} · äldsta: {date}",
+          "empty": "Inga push-försök sparade ännu.",
+          "retention": "Äldre rader rensas automatiskt."
+        },
+        "counts": {
+          "title": "Vad som räknas",
+          "body": "Räknar push-försök som nådde push-leverantören (FCM). Räknar inte creators utan registrerad enhet, tystade eller undertryckta push, begränsade utskick, tokens som redan var borta när jobbet kördes, jobb som gav upp utan försök eller test-push. ”Levererad” betyder att leverantören tog emot meddelandet, inte att en telefon visade det."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "spåras i den här tabellen",
+          "in_app": "I appen",
+          "in_app_note": "lässtatus per rad",
+          "email": "E-post",
+          "email_note": "spåras inte"
+        }
       }
     }
   }

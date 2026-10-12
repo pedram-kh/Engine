@@ -32,7 +32,8 @@
       "exportRequests": "Export requests",
       "erasureQueue": "Erasure queue",
       "featureFlags": "Funkcijų vėliavėlės",
-      "automations": "Automations"
+      "automations": "Automations",
+      "pushDeliveries": "Push pristatymai"
     },
     "userMenu": {
       "signOut": "Atsijungti",

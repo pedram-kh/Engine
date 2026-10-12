@@ -13,6 +13,66 @@
           "database": "Database",
           "cache": "Cache"
         }
+      },
+      "push_deliveries": {
+        "title": "Push-leverancer",
+        "window": {
+          "label": "Tidsrum",
+          "24h": "Seneste 24 timer",
+          "7d": "Seneste 7 dage",
+          "30d": "Seneste 30 dage"
+        },
+        "outcomes": {
+          "all": "Alle",
+          "failures": "Fejl",
+          "delivered": "Leveret",
+          "token_invalid": "Token ugyldigt",
+          "retryable": "Prøver igen",
+          "config_error": "Konfigurationsfejl",
+          "rejected": "Afvist"
+        },
+        "tiles": {
+          "retryable_final": "Opgivet efter gentagne forsøg",
+          "config_error_hint": "Legitimationsoplysninger eller projektopsætning hos udbyderen skal kigges på."
+        },
+        "filters": {
+          "type": "Notifikationstype",
+          "creator": "Creator-ID"
+        },
+        "columns": {
+          "creator": "Creator",
+          "type": "Type",
+          "platform": "Platform",
+          "outcome": "Resultat",
+          "attempt": "Forsøg",
+          "detail": "Udbyderens svar",
+          "in_app": "I appen"
+        },
+        "attempt_final": "endeligt",
+        "in_app": {
+          "read": "Læst",
+          "unread": "Ulæst",
+          "none": "Ingen"
+        },
+        "empty": "Ingen push-forsøg matcher disse filtre.",
+        "load_failed": "Push-leverancerne kunne ikke indlæses. Opdater siden.",
+        "footer": {
+          "rows": "Gemte rækker: {count} · ældste: {date}",
+          "empty": "Ingen push-forsøg gemt endnu.",
+          "retention": "Ældre rækker slettes automatisk."
+        },
+        "counts": {
+          "title": "Hvad der tælles",
+          "body": "Tæller push-forsøg, der nåede push-udbyderen (FCM). Tæller ikke creators uden registreret enhed, dæmpede eller undertrykte push, begrænsede afsendelser, tokens der allerede var væk, da jobbet kørte, job der blev opgivet uden forsøg, eller test-push. „Leveret“ betyder, at udbyderen accepterede beskeden – ikke at en telefon viste den."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "spores i denne tabel",
+          "in_app": "I appen",
+          "in_app_note": "læsestatus pr. række",
+          "email": "E-mail",
+          "email_note": "spores ikke"
+        }
       }
     }
   }

@@ -112,6 +112,11 @@ export const NAV_ENTRIES: ReadonlyArray<NavEntry> = [
     children: [
       { key: 'systemHealth', icon: 'mdi-heart-pulse', routeName: 'app.operations.health' },
       {
+        key: 'pushDeliveries',
+        icon: 'mdi-bell-ring-outline',
+        routeName: 'app.operations.push-deliveries',
+      },
+      {
         key: 'horizon',
         icon: 'mdi-chart-timeline-variant',
         routeName: 'app.operations.health',

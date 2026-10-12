@@ -13,6 +13,66 @@
           "database": "Databáze",
           "cache": "Cache"
         }
+      },
+      "push_deliveries": {
+        "title": "Isporuke push obavijesti",
+        "window": {
+          "label": "Razdoblje",
+          "24h": "Posljednja 24 sata",
+          "7d": "Posljednjih 7 dana",
+          "30d": "Posljednjih 30 dana"
+        },
+        "outcomes": {
+          "all": "Sve",
+          "failures": "Neuspjesi",
+          "delivered": "Isporučeno",
+          "token_invalid": "Nevažeći token",
+          "retryable": "Ponovni pokušaj",
+          "config_error": "Pogreška konfiguracije",
+          "rejected": "Odbijeno"
+        },
+        "tiles": {
+          "retryable_final": "Odustalo nakon ponovnih pokušaja",
+          "config_error_hint": "Vjerodajnice ili postavke projekta kod pružatelja zahtijevaju pažnju."
+        },
+        "filters": {
+          "type": "Vrsta obavijesti",
+          "creator": "ID kreatora"
+        },
+        "columns": {
+          "creator": "Kreator",
+          "type": "Vrsta",
+          "platform": "Platforma",
+          "outcome": "Ishod",
+          "attempt": "Pokušaj",
+          "detail": "Odgovor pružatelja",
+          "in_app": "U aplikaciji"
+        },
+        "attempt_final": "završni",
+        "in_app": {
+          "read": "Pročitano",
+          "unread": "Nepročitano",
+          "none": "Nema"
+        },
+        "empty": "Nijedan push pokušaj ne odgovara ovim filtrima.",
+        "load_failed": "Nije moguće učitati isporuke push obavijesti. Osvježite stranicu.",
+        "footer": {
+          "rows": "Pohranjenih redaka: {count} · najstariji: {date}",
+          "empty": "Još nema pohranjenih push pokušaja.",
+          "retention": "Stariji se retci automatski brišu."
+        },
+        "counts": {
+          "title": "Što se ovdje broji",
+          "body": "Broji push pokušaje koji su stigli do pružatelja (FCM). Ne broji kreatore bez registriranog uređaja, utišane ili potisnute push obavijesti, ograničena slanja, tokene kojih više nije bilo kad se zadatak izvršio, zadatke koji su odustali bez pokušaja ni probne push obavijesti. »Isporučeno« znači da je pružatelj prihvatio poruku, a ne da ju je telefon prikazao."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "prati se u ovoj tablici",
+          "in_app": "U aplikaciji",
+          "in_app_note": "status čitanja po retku",
+          "email": "E-pošta",
+          "email_note": "ne prati se"
+        }
       }
     }
   }

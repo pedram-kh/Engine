@@ -32,7 +32,8 @@
       "exportRequests": "Export requests",
       "erasureQueue": "Erasure queue",
       "featureFlags": "Σημαίες λειτουργιών",
-      "automations": "Automations"
+      "automations": "Automations",
+      "pushDeliveries": "Παραδόσεις push"
     },
     "userMenu": {
       "signOut": "Αποσύνδεση",

@@ -13,6 +13,66 @@
           "database": "Database",
           "cache": "Cache"
         }
+      },
+      "push_deliveries": {
+        "title": "Push pristatymai",
+        "window": {
+          "label": "Laikotarpis",
+          "24h": "Paskutinės 24 valandos",
+          "7d": "Paskutinės 7 dienos",
+          "30d": "Paskutinės 30 dienų"
+        },
+        "outcomes": {
+          "all": "Visi",
+          "failures": "Nesėkmės",
+          "delivered": "Pristatyta",
+          "token_invalid": "Netinkamas raktas",
+          "retryable": "Kartojama",
+          "config_error": "Konfigūracijos klaida",
+          "rejected": "Atmesta"
+        },
+        "tiles": {
+          "retryable_final": "Atsisakyta po pakartojimų",
+          "config_error_hint": "Teikėjo prisijungimo duomenys arba projekto sąranka reikalauja dėmesio."
+        },
+        "filters": {
+          "type": "Pranešimo tipas",
+          "creator": "Kūrėjo ID"
+        },
+        "columns": {
+          "creator": "Kūrėjas",
+          "type": "Tipas",
+          "platform": "Platforma",
+          "outcome": "Rezultatas",
+          "attempt": "Bandymas",
+          "detail": "Teikėjo atsakymas",
+          "in_app": "Programėlėje"
+        },
+        "attempt_final": "galutinis",
+        "in_app": {
+          "read": "Perskaityta",
+          "unread": "Neperskaityta",
+          "none": "Nėra"
+        },
+        "empty": "Jokie push bandymai neatitinka šių filtrų.",
+        "load_failed": "Nepavyko įkelti push pristatymų. Atnaujinkite puslapį.",
+        "footer": {
+          "rows": "Saugomos eilutės: {count} · seniausia: {date}",
+          "empty": "Dar nėra išsaugotų push bandymų.",
+          "retention": "Senesnės eilutės ištrinamos automatiškai."
+        },
+        "counts": {
+          "title": "Ką čia skaičiuojame",
+          "body": "Skaičiuoja push bandymus, kurie pasiekė teikėją (FCM). Neskaičiuoja kūrėjų be užregistruoto įrenginio, nutildytų ar užblokuotų push pranešimų, apribotų siuntimų, raktų, kurių jau nebebuvo užduočiai įvykdyti, užduočių, nuo kurių atsisakyta nepabandžius, ir bandomųjų push pranešimų. „Pristatyta“ reiškia, kad teikėjas priėmė pranešimą, o ne kad telefonas jį parodė."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "stebima šioje lentelėje",
+          "in_app": "Programėlėje",
+          "in_app_note": "skaitymo būsena kiekvienoje eilutėje",
+          "email": "El. paštas",
+          "email_note": "nestebima"
+        }
       }
     }
   }

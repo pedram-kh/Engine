@@ -13,6 +13,66 @@
           "database": "Database",
           "cache": "Cache"
         }
+      },
+      "push_deliveries": {
+        "title": "Consegne push",
+        "window": {
+          "label": "Periodo",
+          "24h": "Ultime 24 ore",
+          "7d": "Ultimi 7 giorni",
+          "30d": "Ultimi 30 giorni"
+        },
+        "outcomes": {
+          "all": "Tutte",
+          "failures": "Errori",
+          "delivered": "Consegnata",
+          "token_invalid": "Token non valido",
+          "retryable": "Nuovo tentativo",
+          "config_error": "Errore di configurazione",
+          "rejected": "Rifiutata"
+        },
+        "tiles": {
+          "retryable_final": "Abbandonata dopo i tentativi",
+          "config_error_hint": "Le credenziali o la configurazione del progetto presso il provider richiedono attenzione."
+        },
+        "filters": {
+          "type": "Tipo di notifica",
+          "creator": "ID del creator"
+        },
+        "columns": {
+          "creator": "Creator",
+          "type": "Tipo",
+          "platform": "Piattaforma",
+          "outcome": "Esito",
+          "attempt": "Tentativo",
+          "detail": "Risposta del provider",
+          "in_app": "In-app"
+        },
+        "attempt_final": "finale",
+        "in_app": {
+          "read": "Letta",
+          "unread": "Non letta",
+          "none": "Nessuna"
+        },
+        "empty": "Nessun tentativo push corrisponde a questi filtri.",
+        "load_failed": "Impossibile caricare le consegne push. Aggiorna la pagina.",
+        "footer": {
+          "rows": "Righe archiviate: {count} · più vecchia: {date}",
+          "empty": "Nessun tentativo push ancora archiviato.",
+          "retention": "Le righe più vecchie vengono eliminate automaticamente."
+        },
+        "counts": {
+          "title": "Cosa viene conteggiato",
+          "body": "Conta i tentativi push che hanno raggiunto il provider (FCM). Non conta i creator senza dispositivo registrato, i push silenziati o soppressi, gli invii limitati, i token già scomparsi quando il job è stato eseguito, i job abbandonati senza tentativo né i push di prova. «Consegnata» significa che il provider ha accettato il messaggio, non che un telefono lo abbia mostrato."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "tracciato in questa tabella",
+          "in_app": "In-app",
+          "in_app_note": "stato di lettura per riga",
+          "email": "E-mail",
+          "email_note": "non tracciato"
+        }
       }
     }
   }

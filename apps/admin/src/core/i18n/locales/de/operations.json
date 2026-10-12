@@ -13,6 +13,66 @@
           "database": "Datenbank",
           "cache": "Cache"
         }
+      },
+      "push_deliveries": {
+        "title": "Push-Zustellungen",
+        "window": {
+          "label": "Zeitraum",
+          "24h": "Letzte 24 Stunden",
+          "7d": "Letzte 7 Tage",
+          "30d": "Letzte 30 Tage"
+        },
+        "outcomes": {
+          "all": "Alle",
+          "failures": "Fehlschläge",
+          "delivered": "Zugestellt",
+          "token_invalid": "Token ungültig",
+          "retryable": "Neuer Versuch",
+          "config_error": "Konfigurationsfehler",
+          "rejected": "Abgelehnt"
+        },
+        "tiles": {
+          "retryable_final": "Nach Wiederholungen aufgegeben",
+          "config_error_hint": "Zugangsdaten oder Projekteinrichtung beim Anbieter müssen geprüft werden."
+        },
+        "filters": {
+          "type": "Benachrichtigungstyp",
+          "creator": "Creator-ID"
+        },
+        "columns": {
+          "creator": "Creator",
+          "type": "Typ",
+          "platform": "Plattform",
+          "outcome": "Ergebnis",
+          "attempt": "Versuch",
+          "detail": "Antwort des Anbieters",
+          "in_app": "In-App"
+        },
+        "attempt_final": "final",
+        "in_app": {
+          "read": "Gelesen",
+          "unread": "Ungelesen",
+          "none": "Keine"
+        },
+        "empty": "Keine Push-Versuche passen zu diesen Filtern.",
+        "load_failed": "Die Push-Zustellungen konnten nicht geladen werden. Bitte aktualisiere die Seite.",
+        "footer": {
+          "rows": "Gespeicherte Zeilen: {count} · älteste: {date}",
+          "empty": "Noch keine Push-Versuche gespeichert.",
+          "retention": "Ältere Zeilen werden automatisch gelöscht."
+        },
+        "counts": {
+          "title": "Was hier gezählt wird",
+          "body": "Gezählt werden Push-Versuche, die den Push-Anbieter (FCM) erreicht haben. Nicht gezählt werden Creator ohne registriertes Gerät, stummgeschaltete oder unterdrückte Pushs, gedrosselte Sendungen, Tokens, die beim Ausführen des Jobs schon weg waren, Jobs, die ohne Versuch aufgegeben haben, und Test-Pushs. „Zugestellt“ bedeutet, dass der Anbieter die Nachricht angenommen hat – nicht, dass ein Telefon sie angezeigt hat."
+        },
+        "channels": {
+          "push": "Push",
+          "push_note": "in dieser Tabelle erfasst",
+          "in_app": "In-App",
+          "in_app_note": "Lesestatus pro Zeile",
+          "email": "E-Mail",
+          "email_note": "nicht erfasst"
+        }
       }
     }
   }

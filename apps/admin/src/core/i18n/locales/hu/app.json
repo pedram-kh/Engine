@@ -32,7 +32,8 @@
       "exportRequests": "Export requests",
       "erasureQueue": "Erasure queue",
       "featureFlags": "Funkciójelzők",
-      "automations": "Automations"
+      "automations": "Automations",
+      "pushDeliveries": "Push-kézbesítések"
     },
     "userMenu": {
       "signOut": "Kijelentkezés",

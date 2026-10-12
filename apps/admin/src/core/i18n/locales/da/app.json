@@ -32,7 +32,8 @@
       "exportRequests": "Eksportanmodninger",
       "erasureQueue": "Sletningskø",
       "featureFlags": "Funktionsflag",
-      "automations": "Automations"
+      "automations": "Automations",
+      "pushDeliveries": "Push-leverancer"
     },
     "userMenu": {
       "signOut": "Log ud",

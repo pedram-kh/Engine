@@ -32,7 +32,8 @@
       "exportRequests": "Žádosti o export",
       "erasureQueue": "Čakalna vrsta smazání",
       "featureFlags": "Stikaloe funkcí",
-      "automations": "Automations"
+      "automations": "Automations",
+      "pushDeliveries": "Dostave push"
     },
     "userMenu": {
       "signOut": "Odjava",
