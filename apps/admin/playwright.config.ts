@@ -125,6 +125,16 @@ export default defineConfig({
         // Isolation from the developer's real dev database — see the
         // top-of-file docblock const and `global-setup.ts`. NEVER remove.
         DB_DATABASE: E2E_DB_DATABASE,
+        // TEST-PERFORMANCE-ONLY bcrypt cost, same caveat as `phpunit.xml`
+        // (read it before copying this anywhere). `POST /auth/2fa/confirm`
+        // bcrypts ten recovery codes; at the default cost 12 that is
+        // ~3.7 s on a fast laptop and 5.8 s on a CI runner, racing the 5 s
+        // `expect` timeout in `admin-mandatory-mfa-enrollment.spec.ts:82`
+        // (AH-102b C0.2 observation). Scoped to this throwaway E2E API
+        // process only (`reuseExistingServer: false` above, isolated DB);
+        // passwords use Argon2id and are unaffected. NEVER put cost 4 in
+        // `.env.example`, `config/hashing.php` or any deployment manifest.
+        BCRYPT_ROUNDS: '4',
       },
       ignoreHTTPSErrors: true,
     },

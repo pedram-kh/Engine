@@ -164,6 +164,17 @@ export default defineConfig({
         // the driver for this run so the upload → signed URL → render path
         // is exercised for real. See `apps/api/config/filesystems.php`.
         MEDIA_DISK_DRIVER: E2E_MEDIA_DISK_DRIVER,
+        // TEST-PERFORMANCE-ONLY bcrypt cost, same caveat as `phpunit.xml`
+        // (read it before copying this anywhere). `POST /auth/2fa/confirm`
+        // bcrypts ten recovery codes; at the default cost 12 that is
+        // 3.7–7.2 s depending on the host, racing the 5 s `expect` timeout
+        // in `2fa-enrollment-and-sign-in.spec.ts:93` (tech-debt row "waits
+        // 5 s for a request that bcrypts ten recovery codes"; AH-102b C0.2).
+        // Scoped to this throwaway E2E API process only (`reuseExistingServer:
+        // false` above, isolated DB); passwords use Argon2id and are
+        // unaffected. NEVER put cost 4 in `.env.example`,
+        // `config/hashing.php` or any deployment manifest.
+        BCRYPT_ROUNDS: '4',
       },
       ignoreHTTPSErrors: true,
     },
