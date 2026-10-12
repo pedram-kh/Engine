@@ -2204,6 +2204,34 @@ present (AH-070)`, placed in the one window where `.env` genuinely does not exis
   The count above is also the heuristic lint proposed below, run by hand — a byte-identity check
   against `en`, filtered to multi-word values, separates the two populations cleanly and is cheap
   enough to run in CI as a **reporting** step (never a blocking one, since some identity is correct).
+- **AH-103 addendum — the corruption has a greppable signature (2026-10-12):** the device-walk
+  prep turned up `ro` "Nutificări" and `mt` "Letifiki" as the notification-centre titles, plus `ro`
+  "Nutification settings". The two titles and the "Nutification settings" lines were fixed in AH-103
+  (`771d2287`, `df2fff9c`) because the walk shows them on screen. **Nothing else was fixed, on
+  purpose** — this row is the cleanup, not AH-103. Two left in place, both in `ro/app.json`:
+  `"Nutify creators when blacklisted"` (line 1217) and `"Setări saved."` (line 1222).
+  These are not random MT noise. They share a pattern:
+  - **Shape:** an English source string had a glossary or word substitution applied **inside it**,
+    including inside longer words, and the rest of the string was never translated. Examples:
+    `Nutification` (`ro`; reads as "Not" → "nu" inside "Notification"), `Letifiki` (`mt`; reads as
+    "No" → "le" inside "Notifiki"), `Setări saved` (`ro`, "Settings" substituted in an English
+    sentence), and the `bg` `Творецs you invite or engage…` / `Кампанияs` from the AH-053 addendum
+    above (a Cyrillic stem plus an English plural `s`). The "reads as" mechanism is an inference from
+    the strings, **not confirmed** against the AH-001 generation script.
+  - **Signature to grep for:** (a) `Nutif` / `Nutify` and other near-misses of common English words
+    (`otific`-style stems with a wrong first syllable); (b) a foreign-script or accented stem
+    **glued to an English suffix** (`[Ѐ-ӿ]+s\b`, `[α-ω]+s\b`, `Setări saved`); (c) a value that is
+    mostly English with one word in the target language (the AH-053 byte-identity check, filtered to
+    multi-word values, finds the bulk of these).
+  - **How the cleanup should start:** a sweep for that signature across **all 24 locale folders in
+    both `apps/main` and `apps/admin`** and over `app.json`, `notifications.json` and `creator.json`
+    at least, not fixing finds one by one. The sweep also bounds the substitution damage, so the
+    glossary decision (AH-053 addendum) is re-taken once, on the full set. A sweep done in AH-103
+    prep over the `main` locales for `Nutif|Nutify` found one remaining hit (`ro/app.json:1217`);
+    that is **not** the full signature, only its most literal form. The full sweep has not been run.
+  - **Standing coverage:** the ro / mt strings fixed in AH-103 stay under this row as
+    unreviewed MT; the AH-103 `notFoundAction` string is real translation in all 24 locales but is
+    likewise not native-reviewed.
 - **Why the gates don't catch it:** the i18n CI gate is **keyset/placeholder/plural parity** — it
   proves a key _exists_ in every locale with matching interpolation/plural shape, but it can
   **never** prove a value isn't still English. "English text under a foreign label" is structurally
