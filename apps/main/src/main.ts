@@ -3,7 +3,7 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import { resolveBootLocale } from './composables/useLocalePreference'
-import { SESSION_EXPIRED_QUERY_REASON } from './core/api'
+import { sessionExpiredLocation } from './core/api'
 import { router } from './core/router'
 import { i18n, setLocale } from './core/i18n'
 import { startAppResumeRefresh } from './core/platform/appResume'
@@ -47,7 +47,7 @@ void Promise.all([
   // first bootstrap (the router guard) owns the cold start.
   startAppResumeRefresh({
     onSessionLapsed: () => {
-      void router.push({ name: 'auth.sign-in', query: { reason: SESSION_EXPIRED_QUERY_REASON } })
+      void router.push(sessionExpiredLocation(router.currentRoute.value))
     },
   })
 

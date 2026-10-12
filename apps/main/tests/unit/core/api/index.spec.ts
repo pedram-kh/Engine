@@ -18,6 +18,7 @@ import {
   shouldHandleNativeUnauthorized,
   shouldHandleUnauthorized,
   SESSION_EXPIRED_QUERY_REASON,
+  sessionExpiredLocation,
   http,
   authApi,
 } from '@/core/api'
@@ -206,6 +207,93 @@ describe('createNativeUnauthorizedPolicy (AH-100)', () => {
 
     expect(clearUser).toHaveBeenCalledTimes(1)
     expect(push).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('sessionExpiredLocation (AH-103 — redirect= through the native lapse redirects)', () => {
+  it('carries the current screen as redirect=, with the expiry reason', () => {
+    expect(
+      sessionExpiredLocation({
+        fullPath: '/creator/assignments/01J9ZK3Q8M5T7WXYABCDEFGHJK',
+        name: 'creator.assignment.detail',
+      }),
+    ).toEqual({
+      name: 'auth.sign-in',
+      query: {
+        reason: SESSION_EXPIRED_QUERY_REASON,
+        redirect: '/creator/assignments/01J9ZK3Q8M5T7WXYABCDEFGHJK',
+      },
+    })
+  })
+
+  it('keeps the query string of the screen it returns to (a campaign tab)', () => {
+    expect(
+      sessionExpiredLocation({
+        fullPath: '/campaigns/01J9ZK3Q8M5T7WXYCAMPAGNAAA?tab=drafts',
+        name: 'campaigns.detail',
+      }).query.redirect,
+    ).toBe('/campaigns/01J9ZK3Q8M5T7WXYCAMPAGNAAA?tab=drafts')
+  })
+
+  it.each([
+    ['the root', { fullPath: '/', name: 'root' }],
+    ['an empty path', { fullPath: '', name: null }],
+    [
+      'sign-in itself (a loop)',
+      { fullPath: '/sign-in?reason=session_expired', name: 'auth.sign-in' },
+    ],
+    ['another auth screen', { fullPath: '/forgot-password', name: 'auth.forgot-password' }],
+    [
+      'the bootstrap-error screen',
+      { fullPath: '/error/auth-bootstrap', name: 'error.auth-bootstrap' },
+    ],
+  ])('OMITS redirect on %s', (_label, current) => {
+    expect(sessionExpiredLocation(current)).toEqual({
+      name: 'auth.sign-in',
+      query: { reason: SESSION_EXPIRED_QUERY_REASON },
+    })
+  })
+
+  it('with no current route (a router that does not expose one) it is the pre-AH-103 location', () => {
+    expect(sessionExpiredLocation()).toEqual({
+      name: 'auth.sign-in',
+      query: { reason: SESSION_EXPIRED_QUERY_REASON },
+    })
+    expect(sessionExpiredLocation(null).query).toEqual({ reason: SESSION_EXPIRED_QUERY_REASON })
+  })
+
+  it('the NATIVE 401 policy sends the user back to where they were; the web policy is unchanged', async () => {
+    const clearUser = vi.fn()
+    const push = vi.fn(() => Promise.resolve())
+    const currentRoute = {
+      value: { fullPath: '/creator/jobs/01J9ZK3Q8M5T7WXYCAMPAGNAAA', name: 'creator.job.detail' },
+    }
+    const router = { push, currentRoute }
+
+    await createNativeUnauthorizedPolicy({
+      getStore: async () => ({ clearUser }),
+      getRouter: async () => router,
+      clearToken: async () => undefined,
+    })('/creators/me')
+
+    expect(push).toHaveBeenCalledWith({
+      name: 'auth.sign-in',
+      query: {
+        reason: SESSION_EXPIRED_QUERY_REASON,
+        redirect: '/creator/jobs/01J9ZK3Q8M5T7WXYCAMPAGNAAA',
+      },
+    })
+
+    push.mockClear()
+    await createUnauthorizedPolicy({
+      getStore: async () => ({ clearUser }),
+      getRouter: async () => router,
+    })('/creators/me')
+
+    expect(push).toHaveBeenCalledWith({
+      name: 'auth.sign-in',
+      query: { reason: SESSION_EXPIRED_QUERY_REASON },
+    })
   })
 })
 

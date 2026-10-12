@@ -43,6 +43,46 @@ import { isNativePlatform } from '@/core/platform/isNativePlatform'
  */
 export const SESSION_EXPIRED_QUERY_REASON = 'session_expired'
 
+/** The slice of a router's current route {@link sessionExpiredLocation} reads. */
+export interface CurrentRouteSlice {
+  fullPath: string
+  name?: string | symbol | null
+}
+
+/**
+ * AH-103 — where the creator app sends a user whose session lapsed: the sign-in
+ * screen with the expiry banner, carrying `redirect=<where they were>` so a
+ * successful sign-in (`SignInPage.postLoginTarget` already honours `redirect`)
+ * returns them to it — e.g. the screen a notification tap had just opened.
+ *
+ * `redirect` is OMITTED when there is nothing worth returning to: the root, or an
+ * auth / error screen (returning to sign-in from sign-in is a loop, and the
+ * bootstrap-error screen is not a destination). `SignInPage` also ignores `/`.
+ */
+export function sessionExpiredLocation(current?: CurrentRouteSlice | null): {
+  name: 'auth.sign-in'
+  query: Record<string, string>
+} {
+  const query: Record<string, string> = { reason: SESSION_EXPIRED_QUERY_REASON }
+
+  if (current !== undefined && current !== null && isReturnableRoute(current)) {
+    query.redirect = current.fullPath
+  }
+
+  return { name: 'auth.sign-in', query }
+}
+
+function isReturnableRoute(route: CurrentRouteSlice): boolean {
+  if (route.fullPath === '' || route.fullPath === '/') {
+    return false
+  }
+
+  return !(
+    typeof route.name === 'string' &&
+    (route.name.startsWith('auth.') || route.name.startsWith('error.'))
+  )
+}
+
 /**
  * Paths that legitimately return 401 without it meaning "session
  * expired":
@@ -90,6 +130,8 @@ export interface UnauthorizedPolicyDeps {
   getStore: () => Promise<{ clearUser: () => void }>
   getRouter: () => Promise<{
     push: (location: { name: string; query: Record<string, string> }) => unknown
+    /** Optional: only the native policy reads it (AH-103, `redirect=`). */
+    currentRoute?: { value: CurrentRouteSlice }
   }>
 }
 
@@ -202,10 +244,7 @@ export function createNativeUnauthorizedPolicy(deps: NativeUnauthorizedPolicyDep
       deps.clearToken().catch(() => undefined),
     ])
     storeMod.clearUser()
-    void routerMod.push({
-      name: 'auth.sign-in',
-      query: { reason: SESSION_EXPIRED_QUERY_REASON },
-    })
+    void routerMod.push(sessionExpiredLocation(routerMod.currentRoute?.value))
   }
 }
 
