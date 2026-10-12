@@ -408,6 +408,7 @@
           "back": "Tillbaka till inbjudningar",
           "about": "Om kampanjen",
           "notFound": "Det här uppdraget hittades inte.",
+          "notFoundAction": "Tillbaka till aviseringar",
           "loadFailed": "Vi kunde inte ladda det här uppdraget. Försök igen.",
           "retry": "Försök igen",
           "awaitingReview": "Ditt utkast har skickats in och väntar på byråns granskning.",

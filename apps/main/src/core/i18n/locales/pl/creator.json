@@ -408,6 +408,7 @@
           "back": "Wróć do zaproszeń",
           "about": "O tej kampanii",
           "notFound": "Tego zadania nie można znaleźć.",
+          "notFoundAction": "Wróć do powiadomień",
           "loadFailed": "Nie mogliśmy załadować tego zadania. Spróbuj ponownie.",
           "retry": "Spróbuj ponownie",
           "awaitingReview": "Twój szkic został przesłany i oczekuje na recenzję agencji.",

@@ -408,6 +408,7 @@
           "back": "Torna agli inviti",
           "about": "Informazioni sulla campagna",
           "notFound": "Impossibile trovare questo incarico.",
+          "notFoundAction": "Torna alle notifiche",
           "loadFailed": "Impossibile caricare questo incarico. Riprova.",
           "retry": "Riprova",
           "awaitingReview": "La tua bozza è stata inviata ed è in attesa di revisione dell'agenzia.",

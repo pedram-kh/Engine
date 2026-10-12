@@ -408,6 +408,7 @@
           "back": "Terug naar uitnodigingen",
           "about": "Over deze campagne",
           "notFound": "Deze opdracht kon niet worden gevonden.",
+          "notFoundAction": "Terug naar meldingen",
           "loadFailed": "We konden deze opdracht niet laden. Probeer het opnieuw.",
           "retry": "Opnieuw proberen",
           "awaitingReview": "Je concept is ingediend en wacht op beoordeling door het bureau.",

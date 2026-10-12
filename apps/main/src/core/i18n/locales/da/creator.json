@@ -408,6 +408,7 @@
           "back": "Tilbage til invitationer",
           "about": "Om denne kampagne",
           "notFound": "Denne opgave kunne ikke findes.",
+          "notFoundAction": "Tilbage til notifikationer",
           "loadFailed": "Vi kunne ikke indlæse denne opgave. Prøv igen.",
           "retry": "Prøv igen",
           "awaitingReview": "Dit udkast er indsendt og afventer bureauets gennemgang.",

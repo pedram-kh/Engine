@@ -408,6 +408,7 @@
           "back": "Retour aux invitations",
           "about": "À propos de cette campagne",
           "notFound": "Cette mission est introuvable.",
+          "notFoundAction": "Retour aux notifications",
           "loadFailed": "Nous n'avons pas pu charger cette mission. Veuillez réessayer.",
           "retry": "Réessayer",
           "awaitingReview": "Votre brouillon a été soumis et est en attente de l'examen de l'agence.",

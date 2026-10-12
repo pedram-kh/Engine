@@ -408,6 +408,7 @@
           "back": "Voltar aos convites",
           "about": "Sobre esta campanha",
           "notFound": "Não foi possível encontrar esta atribuição.",
+          "notFoundAction": "Voltar às notificações",
           "loadFailed": "Não foi possível carregar esta atribuição. Tente novamente.",
           "retry": "Tentar novamente",
           "awaitingReview": "O seu rascunho foi enviado e aguarda revisão da agência.",

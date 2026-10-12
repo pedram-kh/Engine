@@ -1082,7 +1082,19 @@ onMounted(() => {
       variant="tonal"
       data-testid="assignment-detail-not-found"
     >
-      {{ t('creator.ui.assignments.detail.notFound') }}
+      <div class="d-flex align-center ga-3 flex-wrap">
+        <span>{{ t('creator.ui.assignments.detail.notFound') }}</span>
+        <!-- AH-103: a notification tap can land here (a deleted or foreign assignment),
+             so the way out leads back to where the user came from. -->
+        <v-btn
+          size="small"
+          variant="tonal"
+          :to="{ name: 'creator.notifications' }"
+          data-testid="assignment-detail-not-found-action"
+        >
+          {{ t('creator.ui.assignments.detail.notFoundAction') }}
+        </v-btn>
+      </div>
     </v-alert>
 
     <v-alert v-else type="error" variant="tonal" data-testid="assignment-detail-load-error">

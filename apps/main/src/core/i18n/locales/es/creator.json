@@ -408,6 +408,7 @@
           "back": "Volver a las invitaciones",
           "about": "Sobre esta campaña",
           "notFound": "No se ha podido encontrar esta asignación.",
+          "notFoundAction": "Volver a las notificaciones",
           "loadFailed": "No hemos podido cargar esta asignación. Inténtalo de nuevo.",
           "retry": "Reintentar",
           "awaitingReview": "Tu borrador se ha enviado y está a la espera de la revisión de la agencia.",

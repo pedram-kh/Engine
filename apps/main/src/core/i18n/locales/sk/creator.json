@@ -408,6 +408,7 @@
           "back": "Späť na pozvánky",
           "about": "O tejto kampani",
           "notFound": "Tento úkol nie je možné nalézt.",
+          "notFoundAction": "Späť na oznámenia",
           "loadFailed": "Nepodařilo sa nám načíst tento úkol. Zkuste to znova.",
           "retry": "Skúsiť znova",
           "awaitingReview": "Váš návrh byl odeslán a čaká na posúdenie agentúry.",

@@ -672,6 +672,27 @@ describe('CreatorAssignmentDetailPage — load failures', () => {
     expect(wrapper.find('[data-testid="assignment-detail-load-error"]').exists()).toBe(false)
   })
 
+  it('AH-103: the not-found alert offers a way back to the notifications the tap came from', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockRejectedValue(
+      new ApiError({ status: 404, code: 'assignment.not_found', message: 'No assignment found.' }),
+    )
+    const { wrapper } = await mountDetail()
+
+    const action = wrapper.find('[data-testid="assignment-detail-not-found-action"]')
+    expect(action.exists()).toBe(true)
+    expect(action.attributes('href')).toBe('/creator/notifications')
+    expect(action.text()).toBe('Back to notifications')
+  })
+
+  it('AH-103: the notifications link is NOT on the retry-able load error', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockRejectedValue(
+      new ApiError({ status: 500, code: 'server.error', message: 'Server error.' }),
+    )
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-detail-not-found-action"]').exists()).toBe(false)
+  })
+
   it('shows a retry-able error (not "not found") on a 500, then recovers on retry', async () => {
     vi.mocked(creatorAssignmentsApi.show)
       .mockRejectedValueOnce(

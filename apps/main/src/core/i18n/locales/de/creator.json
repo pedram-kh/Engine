@@ -408,6 +408,7 @@
           "back": "Zurück zu Einladungen",
           "about": "Über diese Kampagne",
           "notFound": "Dieser Auftrag konnte nicht gefunden werden.",
+          "notFoundAction": "Zurück zu den Benachrichtigungen",
           "loadFailed": "Dieser Auftrag konnte nicht geladen werden. Bitte versuche es erneut.",
           "retry": "Erneut versuchen",
           "awaitingReview": "Dein Entwurf wurde eingereicht und wartet auf die Prüfung der Agentur.",
