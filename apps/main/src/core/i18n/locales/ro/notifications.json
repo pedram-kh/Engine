@@ -41,9 +41,9 @@
       "fallback": "You have a new notification."
     },
     "preferences": {
-      "title": "Nutification settings",
+      "title": "Setări notificări",
       "description": "Alege ce notificări vrei să primești și în ce mod.",
-      "menuItem": "Nutification settings",
+      "menuItem": "Setări notificări",
       "save": "Salvați modificările",
       "saving": "Saving…",
       "success": "Your notification settings were saved.",
