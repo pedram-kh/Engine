@@ -667,6 +667,16 @@ $ART tinker --execute="echo DB::table('features')->where('name','social_verifica
 #    `[]` means no stored value: the flag then resolves to its default = ON only while the driver above is `mock`.
 #    Deliberately a SELECT, not Feature::active(): Pennant's database store can persist a resolved default, which is a write.
 
-# 9. Confirms nothing from AH-099…AH-102 is deployed (healthy: user_push_tokens migration NOT listed as Ran)
+# 9. Confirms nothing from AH-099…AH-102b is deployed (healthy: neither the user_push_tokens nor the 2026_10_12_100000_create_push_deliveries_table migration listed as Ran)
 $ART migrate:status | tail -n 8
 ```
+
+### Post-build addendum (2026-10-12, C5.1)
+
+- **Item 9 amended** (above): the healthy read-back now covers both migrations, `user_push_tokens` and `push_deliveries`, since the
+  snapshot and the deploy-log entry cover both.
+- **Item 4's `schedule:list` expectation** is unchanged until the deploy: it will not list `push:prune-deliveries` until AH-102b is
+  deployed; after the deploy it must (deploy-log step 6).
+- **Additional deploy read-back from the build:** the `engine_c_user` GRANT on `push_deliveries` **and** `push_deliveries_id_seq`
+  (`has_table_privilege` and `has_sequence_privilege`); see the deploy-log entry.
+- **Still not read from production (as of Checkpoint B):** every command in this appendix; the results are Pedram's.

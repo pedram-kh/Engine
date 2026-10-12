@@ -70,6 +70,45 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-102b · Admin observability for the creator app (Creator App arc)
+
+- **Status:** **Landed locally (15 commits including the docs commit); not pushed at the time of writing; NOT deployed, no flag armed.**
+  The push state and the CI run for the pushed tip are recorded in the review §10 and in the post-push docs commit. Plan:
+  [`admin-observability-plan.md`](admin-observability-plan.md); inventory:
+  [`admin-observability-inventory.md`](admin-observability-inventory.md); review:
+  [`admin-observability-review.md`](admin-observability-review.md).
+- **Date:** 2026-10-12.
+- **Why:** after AH-102 an admin could not answer "did this creator's push go out, and if not, why?" or "is anyone actually using
+  the app?" without reading the database. Half A records every push send attempt; Half B reads it, and data that already existed,
+  in two admin pages.
+- **What:**
+  - **`push_deliveries`:** one append-only row per send attempt (outcome, retry/final flags, a capped diagnostic string for failures
+    only; never a token, message text, IP or user-agent). 90-day retention via `push:prune-deliveries` (daily; `--days` floor 7,
+    chunks of 5,000, `--limit`, `--dry-run`).
+  - **A contained recorder:** invalidate, insert, log, each in its own `try`/`catch`, never rethrown, so a failed write (the likely
+    cause is a missing `GRANT`) costs a row, not a duplicate push.
+  - **Four read-only admin routes:** `GET /admin/push-deliveries` (+ `/summary`), `GET /admin/creator-app/users` (+
+    `/users/{creator}/sign-ins`).
+  - **Two pages:** Operations → Push deliveries; Creators → Creator app (with a sign-ins dialog). i18n ×24 (23 machine
+    translations, not native-reviewed).
+  - **Riders:** the shared `LiveAppSession` liveness predicate (behaviour-identical, `PushTokenRegistryTest` unedited); the admin
+    Vite pre-bundle fix for `admin-sign-in:106` (cause named from the CI trace; the CI tally at the pushed tip is the check); and
+    `BCRYPT_ROUNDS=4` for the two E2E API servers, fixing the E2E half of the `2fa` enrollment flake rows in both SPAs.
+- **Commits:** `65d2b306` inventory, `e4f7bac7` plan, `9bf80e41` C0.1, `30b5894c` C0.2, `9197cd0b` C0.2b, `686d653b` C1.1,
+  `c67d9505` C1.2, `03411f16` C1.3, `b64beee8` C1.4, `4f4659fa` C2.1, `53e32e7a` C2.2, `61627374` C3.1, `d95988ea` C3.2,
+  `eea2e89e` the error-state fix, then the docs commit.
+- **Found by looking, not by a test:** on a 500 or a dropped connection both pages rendered the raw key `http.unknown_error` and
+  said "nothing stored" while the load had failed. The first error specs used a crafted error, not the one the client emits
+  (review §9). `AuditLogPage` very likely has the same defect (suspected, untouched; tech-debt).
+- **PROD-DATA RISK: LOW.** One additive `CREATE TABLE`; the job's call site gains one argument; read-only routes; no flag.
+  Verified on Postgres 16 with a 20,000-creator / 100,000-delivery synthetic dataset (review §4): the slowest query was 143 ms
+  against the 500 ms rule.
+- **Deploy obligations (named steps in the deploy log):** snapshot, `migrate` (one), **`queue:restart`**, the **`engine_c_user`
+  GRANT on `push_deliveries` and `push_deliveries_id_seq`** with read-backs, the scheduler read-back, the prune dry-run. See
+  [`deploy-log.md`](../runbooks/deploy-log.md).
+- **Not verified:** nothing read from production; the pages have no E2E spec; translations not native-reviewed; the `count(*)`
+  footer at real volume (review §8).
+
 ### AH-102 · Push notifications for the creator app (Creator App arc)
 
 - **Status:** **Closed 2026-10-11. Pushed (`origin/main` `4d468406..e2501352`, CI **green on all four jobs** ([run 38173240196](https://github.com/pedram-kh/Engine/actions/runs/38173240196): main SPA Playwright 34 passed, 0 flaky; admin SPA Playwright 1 flaky, passed on retry, the known `admin-sign-in.spec.ts:69`, tech-debt 16)), NOT deployed, no flag armed.**

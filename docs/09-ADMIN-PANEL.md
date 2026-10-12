@@ -319,6 +319,15 @@ The single most-used support tool.
   - Manual retry of failed jobs (with reason)
   - Manual deletion of failed jobs that should not retry
 
+- **Push deliveries (AH-102b):**
+  - Operations → Push deliveries: one row per push send attempt to the creator app, newest first, with filters (outcome, including a
+    "Failures" preset, platform, creator, date range) and an outcome summary over 24 hours, 7 or 30 days
+  - Footer: stored row count and the oldest row's date (the retention instrument for `push:prune-deliveries`)
+  - Counts attempts that reached the push provider only; "Delivered" means the provider accepted the message, not that a phone
+    displayed it; email delivery is not tracked
+  - Read-only; never shows a device token, message text, IP or user-agent
+  - Companion page Creators → Creator app: per-creator sign-in and push state, with a dialog of recent sign-ins
+
 ### 6.10 Compliance
 
 - **GDPR export queue:**

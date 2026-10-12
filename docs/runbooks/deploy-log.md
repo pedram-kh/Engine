@@ -54,6 +54,60 @@ happened.
 
 ---
 
+## AH-102b — admin observability for the creator app: push delivery log, two admin pages — PENDING
+
+> **Stacks on AH-102 (Checkpoints A and B) and everything under it (AH-099 … AH-102, all PENDING).** Pushed only after
+> Checkpoint B clearance and Pedram's go; **not deployed**; deploy timing is Pedram's call. Review:
+> [`admin-observability-review.md`](../reviews/admin-observability-review.md).
+
+- **Status:** PENDING (the push state is recorded in the review §10)
+- **Range:** base `b21b7b2f` (`origin/main` at plan time) → tip **TBD at push**. Commits: `65d2b306`, `e4f7bac7`, `9bf80e41`,
+  `30b5894c`, `9197cd0b`, `686d653b`, `c67d9505`, `03411f16`, `b64beee8`, `4f4659fa`, `53e32e7a`, `61627374`, `d95988ea`,
+  `eea2e89e`, plus the docs commit.
+- **AH entries carried:** AH-102b
+- **Migrations run:** **1** — `2026_10_12_100000_create_push_deliveries_table` (`CREATE TABLE` only, additive; one FK to `users`
+  with cascade; three indexes; no data writes, no change to an existing table). `down()` drops the table (a log of attempts,
+  retention is 90 days anyway).
+- **Pre-deploy reads:** none beyond the earlier entries'.
+
+**What goes live on deploy**
+
+- A row in `push_deliveries` for every push send attempt, **only once `push_notifications_enabled` is armed** (the job, and so
+  the recorder, is not reached with the flag OFF).
+- `GET /api/v1/admin/push-deliveries`, `/summary`, `GET /admin/creator-app/users`, `/users/{creator}/sign-ins` (platform admins
+  only; read-only); two admin SPA pages, **Operations → Push deliveries** and **Creators → Creator app**.
+- `push:prune-deliveries`, scheduled `->daily()`.
+- **No existing behaviour changes:** the recorder's insert is contained, and `PushTokenRegistry`'s liveness SQL is byte-identical.
+
+**Named deploy steps (in order)**
+
+1. **Snapshot** taken and confirmed `available` (migration in this deploy). **Snapshot ID:** —
+2. `php artisan migrate` (one migration), then the code.
+3. **`php artisan queue:restart`** — **a named step**: `PushDeliveryOutcome` and `PushDeliveryRecorder` changed, and a worker
+   holding the old class map would run the old recorder.
+4. PHP-FPM reload (opcache), then `/up` and one authenticated request.
+5. **`engine_c_user` GRANT**, **in this order**: grant `SELECT, INSERT, UPDATE, DELETE` on `push_deliveries` and `USAGE, SELECT`
+   on `push_deliveries_id_seq`, then read both back: `SELECT has_table_privilege('engine_c_user', 'push_deliveries',
+'SELECT,INSERT,UPDATE,DELETE');` and `SELECT has_sequence_privilege('engine_c_user', 'push_deliveries_id_seq', 'USAGE');`
+   → both must be `true`. The snapshot in step 1 covers both migrations. **Result:** —
+6. **Scheduler read-back** (the prune relies on it): `crontab -l` shows `schedule:run` for the app user; `php artisan
+schedule:list` lists `push:prune-deliveries`. **Result:** —
+7. **Prune dry-run:** `php artisan push:prune-deliveries --dry-run` → **expected `would delete 0`** (the table is empty).
+   **Result:** —
+
+- **Infra:** `queue:restart` (required); one new scheduler entry (needs the cron that `docs/runbooks/production-queue-worker.md`
+  §7 describes); no env change.
+- **One-shot commands:** the prune dry-run above; nothing mutates.
+- **Post-deploy verification:** `/up`; the admin sidebar shows the two new entries; **Push deliveries** loads (empty, footer
+  "No push attempts stored yet."); **Creator app** loads.
+- **Flags armed:** none — `push_notifications_enabled` is still OFF; nothing in this entry arms it.
+- **Arming addendum (when `push_notifications_enabled` is armed later):** `push:test` **bypasses the recorder** (it calls the sender directly, by design), so it will never write a row. After a **real** delivered push, an **empty `push_deliveries`** means a missing
+  GRANT or a recorder failure: look for `push.delivery_record_failed` in the log (it carries the step and the exception class,
+  never the message). The Push deliveries footer (total rows and oldest row) is also the scheduler's instrument: an "oldest"
+  date older than the retention window means the prune is not running.
+- **Operator:** —
+- **Anything unexpected:** —
+
 ## AH-102 (Checkpoint A, backend) — push notifications: token table, FCM sender, dispatcher — PENDING
 
 > **Stacks on AH-101 and everything under it (AH-099 … AH-101, all PENDING).** Pushed at Checkpoint A clearance, **not

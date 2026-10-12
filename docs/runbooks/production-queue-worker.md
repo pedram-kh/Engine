@@ -204,15 +204,28 @@ does **not** trigger time-based commands. Those are registered in
 `apps/api/bootstrap/app.php` via `withSchedule()` and only fire if Laravel's
 scheduler runs once a minute:
 
-| Command                           | Cadence   | What it does when it fires                                                           |
-| --------------------------------- | --------- | ------------------------------------------------------------------------------------ |
-| `messages:send-digest`            | `daily()` | Queues the daily unread-messages digest (Sprint 11, D-9).                            |
-| `boards:scan-overdue`             | `daily()` | Fires overdue board events (Sprint 12 Chunk 3, D-5; class `ScanOverdueAssignments`). |
-| `creators:send-incomplete-nudges` | `daily()` | The incomplete-creator nudge — **a no-op until the flag is enabled** (see below).    |
+| Command                           | Cadence   | What it does when it fires                                                             |
+| --------------------------------- | --------- | -------------------------------------------------------------------------------------- |
+| `messages:send-digest`            | `daily()` | Queues the daily unread-messages digest (Sprint 11, D-9).                              |
+| `boards:scan-overdue`             | `daily()` | Fires overdue board events (Sprint 12 Chunk 3, D-5; class `ScanOverdueAssignments`).   |
+| `creators:send-incomplete-nudges` | `daily()` | The incomplete-creator nudge — **a no-op until the flag is enabled** (see below).      |
+| `push:prune-deliveries`           | `daily()` | Deletes `push_deliveries` rows older than 90 days (AH-102b); see the manual run below. |
 
 **Without `schedule:run`, none of these ever fire** — the incomplete-creator
 nudge will silently never send even after the flag is flipped ON. This is the
 scheduler's equivalent of the §1 "no worker → nothing sends" incident.
+
+**`push:prune-deliveries` (AH-102b) — retention for the push delivery log.** The table only grows while pushes are sent, so a
+dead scheduler is harmless at first and visible later. It can be run by hand at any time, and a dry-run deletes nothing:
+
+```
+php artisan push:prune-deliveries --dry-run          # reports how many rows it would delete
+php artisan push:prune-deliveries --days=90          # the default; --days must be 7 to 3650
+```
+
+It deletes oldest-first in chunks of 5,000, at most `--limit` rows (default 100,000) per run, so a large backlog drains over
+successive daily runs. **The footer is the instrument:** admin → Operations → Push deliveries shows the stored row count and
+the oldest row's date. An oldest date well past 90 days means the prune is not running; check the cron entry (§7.1) first.
 
 ### 7.1 The cron entry (standard)
 

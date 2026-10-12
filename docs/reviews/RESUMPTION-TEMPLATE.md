@@ -116,7 +116,35 @@ discipline in §7.
 
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
-**Last updated:** 2026-10-11 · **Through:** **AH-102, push notifications for the creator app (Android and iOS) — CLOSED.**
+**Last updated:** 2026-10-12 · **Through:** **AH-102b, admin observability for the creator app — LANDED LOCALLY, AT CHECKPOINT B (the one
+push awaits the reviewer's clearance and Pedram's go).** The branch is 15 commits ahead of `origin/main` `b21b7b2f` (14 code and
+planning commits plus the C5.1 docs commit); **nothing from AH-102b is pushed, deployed, or armed**, and live state is `git status`
+and `origin/main`, not this sentence. Review: [`admin-observability-review.md`](admin-observability-review.md) (BRB record, gate board,
+the Stage 4 Postgres walk, the flake accounting, lessons); plan: [`admin-observability-plan.md`](admin-observability-plan.md); ad-hoc entry
+AH-102b; deploy entry `AH-102b … — PENDING` in `deploy-log.md`. **One additive migration** (`push_deliveries`); **PROD-DATA RISK: LOW.**
+
+- **What it is:** every push send attempt is recorded (append-only, 90-day retention, `push:prune-deliveries` daily; the recorder is
+  contained so a failed write cannot cause a duplicate push); two read-only admin pages (Operations → Push deliveries, Creators →
+  Creator app) over four new `GET` routes; i18n ×24.
+- **Open threads (AH-102b):**
+  - **Checkpoint B:** clearance and Pedram's go for the one push. After it: record the pushed tip, the CI run id and the
+    admin-Playwright flaky tally for `admin-sign-in.spec.ts:69` in a follow-up docs commit (review §10), **then** drop the local
+    scratch database `catalyst_walk` (not before CI is green).
+  - **The flake is fixed on evidence but "not settled":** the CI tally at the pushed tip is the check (review §6; tech-debt re-close at
+    the "Residual Playwright-retry flakiness" row).
+  - **Pedram owes at deploy:** snapshot, `migrate`, `queue:restart`, the `engine_c_user` GRANT on `push_deliveries` and
+    `push_deliveries_id_seq` with read-backs, the scheduler read-back, the prune dry-run (expected `would delete 0`). No flag is armed.
+  - **Tech-debt opened:** the production 2FA confirm latency (~3.7 s, bcrypt cost 12 against a comment saying 10 — a real
+    user-facing finding), the suspected raw-error-key defect on `AuditLogPage`, the `count(*)` footer watch item, no E2E spec for the new
+    pages, unreviewed machine translations (Irish and Maltese least certain), the `TalentPoolMembershipTest` single-file trap.
+- **AH-105 privacy note:** `push_deliveries` is a **new stored data category** (per-attempt outcome, platform, a capped diagnostic string;
+  no token, text, IP or user-agent; 90-day retention). The privacy checklist must list it.
+- **Standing traps added by this chunk:** an exported `SANCTUM_STATEFUL_DOMAINS` overrides `.env` and is inherited by `artisan serve`
+  (login 500 "no session bound"); a platform admin is forced through 2FA enrollment (`mfa_exempted_at` does not bypass it); a
+  mutation that does not turn the suite red is a bug in the mutation; **error-state tests must use the error the client actually
+  emits** (review §9); background processes must be started from tool-owned shells; the husky commitlint header/body limits apply.
+
+**Previous close (2026-10-11):** **AH-102, push notifications for the creator app (Android and iOS) — CLOSED.**
 Checkpoint A (backend), Checkpoint B (the matrix column, the push module, Android) and Stage 5 (iOS) are all on `origin/main`:
 Checkpoint A `4d468406..6e827e40`, then B and the iOS stage `6e827e40..e2501352` (CI at that tip: **green on all four jobs** ([run 38173240196](https://github.com/pedram-kh/Engine/actions/runs/38173240196): main SPA Playwright 34 passed, 0 flaky; admin SPA Playwright 1 flaky, passed on retry, the known `admin-sign-in.spec.ts:69`, tech-debt 16)), plus a docs-only closing
 commit. **Pushed, NOT deployed, no flag armed:** `push_notifications_enabled` is OFF everywhere; `IOS_PUSH_ENABLED` is `true` in code only.
@@ -1454,6 +1482,9 @@ registered creators, 200+ concurrent admin users), which are design goals, not c
 
 ### Open threads
 
+- **⏳ AH-102b is at Checkpoint B (2026-10-12):** built, gated, walked on Postgres and documented locally; the one push waits for the
+  reviewer's clearance and Pedram's go. Not deployed, no flag armed. See Part 2 above and
+  [`admin-observability-review.md`](admin-observability-review.md).
 - **✅ AH-102 is CLOSED and PUSHED (2026-10-11), not deployed.** Open items: the TestFlight production-APNs proof (pending the
   first upload), the token-rotation re-POST (accepted), item 10's iOS observation (not observed; unverified likely cause). Part 2 above
   and review §29 carry the detail; deploy state is in `deploy-log.md`.
