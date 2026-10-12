@@ -72,6 +72,22 @@
           "in_app_note": "lasīšanas statuss katrā rindā",
           "email": "E-pasts",
           "email_note": "netiek izsekots"
+        },
+        "types": {
+          "assignment_invited": "Uzaicinājums uz kampaņu",
+          "assignment_revision_requested": "Pieprasīti labojumi",
+          "assignment_draft_approved": "Melnraksts apstiprināts",
+          "assignment_draft_rejected": "Melnraksts noraidīts",
+          "assignment_completed_on_approval": "Uzdevums pabeigts ar apstiprinājumu",
+          "assignment_manually_verified": "Ieraksts pārbaudīts manuāli",
+          "message_received_by_creator": "Jauns ziņojums no aģentūras",
+          "message_relationship_received_by_creator": "Jauns tiešais ziņojums no aģentūras",
+          "campaign_application_accepted": "Pieteikums pieņemts",
+          "campaign_job_posted": "Publicēts jauns darbs",
+          "creator_approved": "Satura veidotājs apstiprināts",
+          "creator_rejected": "Satura veidotājs noraidīts",
+          "agency_creator_relation_admin_connected": "Administratora izveidots savienojums",
+          "agency_creator_relation_disconnected": "Savienojums beidzies"
         }
       }
     }

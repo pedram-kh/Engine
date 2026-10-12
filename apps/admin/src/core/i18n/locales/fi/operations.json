@@ -72,6 +72,22 @@
           "in_app_note": "lukutila riveittäin",
           "email": "Sähköposti",
           "email_note": "ei seurata"
+        },
+        "types": {
+          "assignment_invited": "Kampanjakutsu",
+          "assignment_revision_requested": "Muutoksia pyydetty",
+          "assignment_draft_approved": "Luonnos hyväksytty",
+          "assignment_draft_rejected": "Luonnos hylätty",
+          "assignment_completed_on_approval": "Toimeksianto päättyi hyväksyntään",
+          "assignment_manually_verified": "Julkaisu vahvistettu manuaalisesti",
+          "message_received_by_creator": "Uusi viesti toimistolta",
+          "message_relationship_received_by_creator": "Uusi suoraviesti toimistolta",
+          "campaign_application_accepted": "Hakemus hyväksytty",
+          "campaign_job_posted": "Uusi työ julkaistu",
+          "creator_approved": "Sisällöntuottaja hyväksytty",
+          "creator_rejected": "Sisällöntuottaja hylätty",
+          "agency_creator_relation_admin_connected": "Ylläpitäjän luoma yhteys",
+          "agency_creator_relation_disconnected": "Yhteys päättynyt"
         }
       }
     }

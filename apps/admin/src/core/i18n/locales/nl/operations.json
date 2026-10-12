@@ -72,6 +72,22 @@
           "in_app_note": "leesstatus per rij",
           "email": "E-mail",
           "email_note": "niet bijgehouden"
+        },
+        "types": {
+          "assignment_invited": "Campagne-uitnodiging",
+          "assignment_revision_requested": "Herzieningen gevraagd",
+          "assignment_draft_approved": "Concept goedgekeurd",
+          "assignment_draft_rejected": "Concept afgewezen",
+          "assignment_completed_on_approval": "Opdracht afgerond bij goedkeuring",
+          "assignment_manually_verified": "Post handmatig geverifieerd",
+          "message_received_by_creator": "Nieuw bericht van het bureau",
+          "message_relationship_received_by_creator": "Nieuw direct bericht van het bureau",
+          "campaign_application_accepted": "Aanmelding geaccepteerd",
+          "campaign_job_posted": "Nieuwe job geplaatst",
+          "creator_approved": "Creator goedgekeurd",
+          "creator_rejected": "Creator afgewezen",
+          "agency_creator_relation_admin_connected": "Door een beheerder gekoppeld",
+          "agency_creator_relation_disconnected": "Koppeling beëindigd"
         }
       }
     }

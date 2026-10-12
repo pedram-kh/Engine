@@ -72,6 +72,22 @@
           "in_app_note": "olvasási állapot soronként",
           "email": "E-mail",
           "email_note": "nincs követve"
+        },
+        "types": {
+          "assignment_invited": "Kampánymeghívó",
+          "assignment_revision_requested": "Módosítás kérve",
+          "assignment_draft_approved": "Piszkozat jóváhagyva",
+          "assignment_draft_rejected": "Piszkozat elutasítva",
+          "assignment_completed_on_approval": "Megbízás jóváhagyással lezárva",
+          "assignment_manually_verified": "Bejegyzés kézzel ellenőrizve",
+          "message_received_by_creator": "Új üzenet az ügynökségtől",
+          "message_relationship_received_by_creator": "Új közvetlen üzenet az ügynökségtől",
+          "campaign_application_accepted": "Jelentkezés elfogadva",
+          "campaign_job_posted": "Új munka közzétéve",
+          "creator_approved": "Alkotó jóváhagyva",
+          "creator_rejected": "Alkotó elutasítva",
+          "agency_creator_relation_admin_connected": "Adminisztrátor által összekapcsolva",
+          "agency_creator_relation_disconnected": "Kapcsolat megszűnt"
         }
       }
     }

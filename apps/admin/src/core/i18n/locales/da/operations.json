@@ -72,6 +72,22 @@
           "in_app_note": "læsestatus pr. række",
           "email": "E-mail",
           "email_note": "spores ikke"
+        },
+        "types": {
+          "assignment_invited": "Kampagneinvitation",
+          "assignment_revision_requested": "Rettelser anmodet",
+          "assignment_draft_approved": "Udkast godkendt",
+          "assignment_draft_rejected": "Udkast afvist",
+          "assignment_completed_on_approval": "Opgave afsluttet ved godkendelse",
+          "assignment_manually_verified": "Opslag verificeret manuelt",
+          "message_received_by_creator": "Ny besked fra bureauet",
+          "message_relationship_received_by_creator": "Ny direkte besked fra bureauet",
+          "campaign_application_accepted": "Ansøgning accepteret",
+          "campaign_job_posted": "Nyt job opslået",
+          "creator_approved": "Creator godkendt",
+          "creator_rejected": "Creator afvist",
+          "agency_creator_relation_admin_connected": "Forbundet af en administrator",
+          "agency_creator_relation_disconnected": "Forbindelse afsluttet"
         }
       }
     }

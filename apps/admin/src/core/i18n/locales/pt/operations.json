@@ -72,6 +72,22 @@
           "in_app_note": "estado de leitura por linha",
           "email": "E-mail",
           "email_note": "não registado"
+        },
+        "types": {
+          "assignment_invited": "Convite para campanha",
+          "assignment_revision_requested": "Revisões solicitadas",
+          "assignment_draft_approved": "Rascunho aprovado",
+          "assignment_draft_rejected": "Rascunho rejeitado",
+          "assignment_completed_on_approval": "Atribuição concluída com a aprovação",
+          "assignment_manually_verified": "Publicação verificada manualmente",
+          "message_received_by_creator": "Nova mensagem da agência",
+          "message_relationship_received_by_creator": "Nova mensagem direta da agência",
+          "campaign_application_accepted": "Candidatura aceite",
+          "campaign_job_posted": "Novo trabalho publicado",
+          "creator_approved": "Criador aprovado",
+          "creator_rejected": "Criador rejeitado",
+          "agency_creator_relation_admin_connected": "Ligado por um administrador",
+          "agency_creator_relation_disconnected": "Ligação terminada"
         }
       }
     }

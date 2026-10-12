@@ -72,6 +72,22 @@
           "in_app_note": "stato di lettura per riga",
           "email": "E-mail",
           "email_note": "non tracciato"
+        },
+        "types": {
+          "assignment_invited": "Invito a una campagna",
+          "assignment_revision_requested": "Revisioni richieste",
+          "assignment_draft_approved": "Bozza approvata",
+          "assignment_draft_rejected": "Bozza rifiutata",
+          "assignment_completed_on_approval": "Incarico completato con l'approvazione",
+          "assignment_manually_verified": "Post verificato manualmente",
+          "message_received_by_creator": "Nuovo messaggio dall'agenzia",
+          "message_relationship_received_by_creator": "Nuovo messaggio diretto dall'agenzia",
+          "campaign_application_accepted": "Candidatura accettata",
+          "campaign_job_posted": "Nuovo lavoro pubblicato",
+          "creator_approved": "Creator approvato",
+          "creator_rejected": "Creator rifiutato",
+          "agency_creator_relation_admin_connected": "Collegato da un amministratore",
+          "agency_creator_relation_disconnected": "Collegamento terminato"
         }
       }
     }

@@ -72,6 +72,22 @@
           "in_app_note": "stat tal-qari għal kull ringiela",
           "email": "Email",
           "email_note": "mhux ittraċċat"
+        },
+        "types": {
+          "assignment_invited": "Stedina għal kampanja",
+          "assignment_revision_requested": "Reviżjonijiet mitluba",
+          "assignment_draft_approved": "Abbozz approvat",
+          "assignment_draft_rejected": "Abbozz miċħud",
+          "assignment_completed_on_approval": "Inkarigu mitmum mal-approvazzjoni",
+          "assignment_manually_verified": "Post ivverifikat manwalment",
+          "message_received_by_creator": "Messaġġ ġdid mill-aġenzija",
+          "message_relationship_received_by_creator": "Messaġġ dirett ġdid mill-aġenzija",
+          "campaign_application_accepted": "Applikazzjoni aċċettata",
+          "campaign_job_posted": "Xogħol ġdid ippubblikat",
+          "creator_approved": "Kreatur approvat",
+          "creator_rejected": "Kreatur miċħud",
+          "agency_creator_relation_admin_connected": "Konness minn amministratur",
+          "agency_creator_relation_disconnected": "Konnessjoni intemmet"
         }
       }
     }

@@ -72,6 +72,22 @@
           "in_app_note": "starea de citire pe fiecare rând",
           "email": "E-mail",
           "email_note": "neurmărit"
+        },
+        "types": {
+          "assignment_invited": "Invitație la campanie",
+          "assignment_revision_requested": "Revizuiri solicitate",
+          "assignment_draft_approved": "Ciornă aprobată",
+          "assignment_draft_rejected": "Ciornă respinsă",
+          "assignment_completed_on_approval": "Sarcină finalizată la aprobare",
+          "assignment_manually_verified": "Postare verificată manual",
+          "message_received_by_creator": "Mesaj nou de la agenție",
+          "message_relationship_received_by_creator": "Mesaj direct nou de la agenție",
+          "campaign_application_accepted": "Candidatură acceptată",
+          "campaign_job_posted": "Job nou publicat",
+          "creator_approved": "Creator aprobat",
+          "creator_rejected": "Creator respins",
+          "agency_creator_relation_admin_connected": "Conectat de un administrator",
+          "agency_creator_relation_disconnected": "Conexiune încheiată"
         }
       }
     }

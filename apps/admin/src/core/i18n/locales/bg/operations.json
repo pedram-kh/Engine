@@ -72,6 +72,22 @@
           "in_app_note": "състояние на прочитане за всеки ред",
           "email": "Имейл",
           "email_note": "не се проследява"
+        },
+        "types": {
+          "assignment_invited": "Покана за кампания",
+          "assignment_revision_requested": "Поискани корекции",
+          "assignment_draft_approved": "Чернова одобрена",
+          "assignment_draft_rejected": "Чернова отхвърлена",
+          "assignment_completed_on_approval": "Задание, завършено при одобрение",
+          "assignment_manually_verified": "Публикация, потвърдена ръчно",
+          "message_received_by_creator": "Ново съобщение от агенцията",
+          "message_relationship_received_by_creator": "Ново лично съобщение от агенцията",
+          "campaign_application_accepted": "Кандидатурата е приета",
+          "campaign_job_posted": "Нова обява за работа",
+          "creator_approved": "Създателят е одобрен",
+          "creator_rejected": "Създателят е отхвърлен",
+          "agency_creator_relation_admin_connected": "Свързване от администратор",
+          "agency_creator_relation_disconnected": "Връзката е прекратена"
         }
       }
     }

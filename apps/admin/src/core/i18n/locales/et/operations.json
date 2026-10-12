@@ -72,6 +72,22 @@
           "in_app_note": "lugemisolek rea kohta",
           "email": "E-post",
           "email_note": "ei jälgita"
+        },
+        "types": {
+          "assignment_invited": "Kampaaniakutse",
+          "assignment_revision_requested": "Parandusi taotletud",
+          "assignment_draft_approved": "Mustand kinnitatud",
+          "assignment_draft_rejected": "Mustand tagasi lükatud",
+          "assignment_completed_on_approval": "Ülesanne lõpetatud kinnitamisega",
+          "assignment_manually_verified": "Postitus kontrollitud käsitsi",
+          "message_received_by_creator": "Uus sõnum agentuurilt",
+          "message_relationship_received_by_creator": "Uus otsesõnum agentuurilt",
+          "campaign_application_accepted": "Kandideerimine vastu võetud",
+          "campaign_job_posted": "Uus töö avaldatud",
+          "creator_approved": "Looja kinnitatud",
+          "creator_rejected": "Looja tagasi lükatud",
+          "agency_creator_relation_admin_connected": "Administraatori loodud ühendus",
+          "agency_creator_relation_disconnected": "Ühendus lõpetatud"
         }
       }
     }

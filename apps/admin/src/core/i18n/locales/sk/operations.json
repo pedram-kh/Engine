@@ -72,6 +72,22 @@
           "in_app_note": "stav prečítania pri každom riadku",
           "email": "E-mail",
           "email_note": "nesledované"
+        },
+        "types": {
+          "assignment_invited": "Pozvánka do kampane",
+          "assignment_revision_requested": "Vyžiadané úpravy",
+          "assignment_draft_approved": "Návrh schválený",
+          "assignment_draft_rejected": "Návrh zamietnutý",
+          "assignment_completed_on_approval": "Zákazka dokončená schválením",
+          "assignment_manually_verified": "Príspevok overený ručne",
+          "message_received_by_creator": "Nová správa od agentúry",
+          "message_relationship_received_by_creator": "Nová priama správa od agentúry",
+          "campaign_application_accepted": "Prihláška prijatá",
+          "campaign_job_posted": "Nová ponuka práce",
+          "creator_approved": "Tvorca schválený",
+          "creator_rejected": "Tvorca zamietnutý",
+          "agency_creator_relation_admin_connected": "Prepojené administrátorom",
+          "agency_creator_relation_disconnected": "Prepojenie ukončené"
         }
       }
     }

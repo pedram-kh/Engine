@@ -22,6 +22,37 @@ export type PushWindow = '24h' | '7d' | '30d'
 
 export type PushInAppState = 'read' | 'unread' | 'none'
 
+/**
+ * The notification types that can reach the push log: exactly the push-eligible
+ * set (`PushEligibility::TOGGLEABLE` + `ALWAYS_ON`), values as stored in
+ * `push_deliveries.notification_type`. The filter on the page is a select over
+ * this list, so an admin never types a type from memory. Kept in step with the
+ * backend by `push-notification-types.spec.ts` (reads the PHP source).
+ */
+export const PUSH_NOTIFICATION_TYPES = [
+  'assignment.invited',
+  'assignment.revision_requested',
+  'assignment.draft_approved',
+  'assignment.draft_rejected',
+  'assignment.completed_on_approval',
+  'assignment.manually_verified',
+  'message.received_by_creator',
+  'message.relationship_received_by_creator',
+  'campaign_application.accepted',
+  'campaign.job_posted',
+  'creator.approved',
+  'creator.rejected',
+  'agency_creator_relation.admin_connected',
+  'agency_creator_relation.disconnected',
+] as const
+
+export type PushNotificationType = (typeof PUSH_NOTIFICATION_TYPES)[number]
+
+/** i18n key of a type's readable label (dots are not allowed inside a key segment). */
+export function pushNotificationTypeLabelKey(type: string): string {
+  return `admin.operations.push_deliveries.types.${type.replace(/\./g, '_')}`
+}
+
 export interface AdminPushDelivery {
   id: string
   type: 'push_deliveries'

@@ -25,6 +25,8 @@ import { ApiError, formatDateTime } from '@catalyst/api-client'
 
 import {
   adminPushDeliveriesApi,
+  PUSH_NOTIFICATION_TYPES,
+  pushNotificationTypeLabelKey,
   type AdminPushDeliveriesSummary,
   type AdminPushDelivery,
   type PushOutcome,
@@ -49,11 +51,25 @@ const OUTCOME_CHIPS: OutcomeChip[] = [
   'rejected',
 ]
 
+// The type filter is a select over the known push-eligible types: the label
+// is readable, the payload is the stored type value (never typed by hand).
+const typeItems = computed(() =>
+  PUSH_NOTIFICATION_TYPES.map((value) => ({
+    value,
+    title: t(pushNotificationTypeLabelKey(value)),
+  })),
+)
+
 const windowChoice = ref<PushWindow>('7d')
 const summary = ref<AdminPushDeliveriesSummary | null>(null)
 
 const outcome = ref<OutcomeChip>('all')
-const filters = ref({ notification_type: '', creator: '', date_from: '', date_to: '' })
+const filters = ref<{
+  notification_type: string | null
+  creator: string
+  date_from: string
+  date_to: string
+}>({ notification_type: '', creator: '', date_from: '', date_to: '' })
 // Display-only (deep link). Never sent to the API.
 const creatorName = ref<string | null>(null)
 
@@ -292,8 +308,11 @@ onMounted(() => {
 
     <v-row dense class="mb-2">
       <v-col cols="12" sm="3">
-        <v-text-field
+        <v-select
           v-model="filters.notification_type"
+          :items="typeItems"
+          item-title="title"
+          item-value="value"
           :label="t('admin.operations.push_deliveries.filters.type')"
           density="compact"
           variant="outlined"

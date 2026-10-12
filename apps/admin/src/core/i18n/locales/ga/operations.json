@@ -72,6 +72,22 @@
           "in_app_note": "stádas léite in aghaidh na sraithe",
           "email": "Ríomhphost",
           "email_note": "gan rianú"
+        },
+        "types": {
+          "assignment_invited": "Cuireadh chuig feachtas",
+          "assignment_revision_requested": "Athbhreithnithe iarrtha",
+          "assignment_draft_approved": "Dréacht formheasta",
+          "assignment_draft_rejected": "Dréacht diúltaithe",
+          "assignment_completed_on_approval": "Tasc críochnaithe ar fhormheas",
+          "assignment_manually_verified": "Post fíoraithe de láimh",
+          "message_received_by_creator": "Teachtaireacht nua ón ghníomhaireacht",
+          "message_relationship_received_by_creator": "Díreach-theachtaireacht nua ón ghníomhaireacht",
+          "campaign_application_accepted": "Iarratas glactha",
+          "campaign_job_posted": "Post nua curtha suas",
+          "creator_approved": "Cruthaitheoir formheasta",
+          "creator_rejected": "Cruthaitheoir diúltaithe",
+          "agency_creator_relation_admin_connected": "Ceangailte ag riarthóir",
+          "agency_creator_relation_disconnected": "Ceangal críochnaithe"
         }
       }
     }

@@ -72,6 +72,22 @@
           "in_app_note": "lässtatus per rad",
           "email": "E-post",
           "email_note": "spåras inte"
+        },
+        "types": {
+          "assignment_invited": "Kampanjinbjudan",
+          "assignment_revision_requested": "Ändringar begärda",
+          "assignment_draft_approved": "Utkast godkänt",
+          "assignment_draft_rejected": "Utkast avvisat",
+          "assignment_completed_on_approval": "Uppdrag slutfört vid godkännande",
+          "assignment_manually_verified": "Inlägg verifierat manuellt",
+          "message_received_by_creator": "Nytt meddelande från byrån",
+          "message_relationship_received_by_creator": "Nytt direktmeddelande från byrån",
+          "campaign_application_accepted": "Ansökan godkänd",
+          "campaign_job_posted": "Nytt jobb publicerat",
+          "creator_approved": "Creator godkänd",
+          "creator_rejected": "Creator avvisad",
+          "agency_creator_relation_admin_connected": "Ansluten av en administratör",
+          "agency_creator_relation_disconnected": "Anslutning avslutad"
         }
       }
     }

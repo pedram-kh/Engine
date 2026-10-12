@@ -72,6 +72,22 @@
           "in_app_note": "κατάσταση ανάγνωσης ανά γραμμή",
           "email": "Email",
           "email_note": "δεν καταγράφεται"
+        },
+        "types": {
+          "assignment_invited": "Πρόσκληση σε καμπάνια",
+          "assignment_revision_requested": "Ζητήθηκαν αναθεωρήσεις",
+          "assignment_draft_approved": "Πρόχειρο εγκρίθηκε",
+          "assignment_draft_rejected": "Πρόχειρο απορρίφθηκε",
+          "assignment_completed_on_approval": "Ανάθεση ολοκληρώθηκε με έγκριση",
+          "assignment_manually_verified": "Ανάρτηση επαληθεύτηκε χειροκίνητα",
+          "message_received_by_creator": "Νέο μήνυμα από το πρακτορείο",
+          "message_relationship_received_by_creator": "Νέο άμεσο μήνυμα από το πρακτορείο",
+          "campaign_application_accepted": "Η αίτηση έγινε αποδεκτή",
+          "campaign_job_posted": "Νέα αγγελία εργασίας",
+          "creator_approved": "Ο δημιουργός εγκρίθηκε",
+          "creator_rejected": "Ο δημιουργός απορρίφθηκε",
+          "agency_creator_relation_admin_connected": "Σύνδεση από διαχειριστή",
+          "agency_creator_relation_disconnected": "Η σύνδεση έληξε"
         }
       }
     }

@@ -72,6 +72,22 @@
           "in_app_note": "status čitanja po retku",
           "email": "E-pošta",
           "email_note": "ne prati se"
+        },
+        "types": {
+          "assignment_invited": "Pozivnica u kampanju",
+          "assignment_revision_requested": "Zatražene izmjene",
+          "assignment_draft_approved": "Nacrt odobren",
+          "assignment_draft_rejected": "Nacrt odbijen",
+          "assignment_completed_on_approval": "Zadatak dovršen odobrenjem",
+          "assignment_manually_verified": "Objava ručno provjerena",
+          "message_received_by_creator": "Nova poruka od agencije",
+          "message_relationship_received_by_creator": "Nova izravna poruka od agencije",
+          "campaign_application_accepted": "Prijava prihvaćena",
+          "campaign_job_posted": "Novi posao objavljen",
+          "creator_approved": "Kreator odobren",
+          "creator_rejected": "Kreator odbijen",
+          "agency_creator_relation_admin_connected": "Povezao administrator",
+          "agency_creator_relation_disconnected": "Veza prekinuta"
         }
       }
     }

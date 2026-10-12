@@ -72,6 +72,22 @@
           "in_app_note": "état de lecture par ligne",
           "email": "E-mail",
           "email_note": "non suivi"
+        },
+        "types": {
+          "assignment_invited": "Invitation à une campagne",
+          "assignment_revision_requested": "Révisions demandées",
+          "assignment_draft_approved": "Brouillon approuvé",
+          "assignment_draft_rejected": "Brouillon refusé",
+          "assignment_completed_on_approval": "Mission terminée à l'approbation",
+          "assignment_manually_verified": "Publication vérifiée manuellement",
+          "message_received_by_creator": "Nouveau message de l'agence",
+          "message_relationship_received_by_creator": "Nouveau message direct de l'agence",
+          "campaign_application_accepted": "Candidature acceptée",
+          "campaign_job_posted": "Nouvelle offre publiée",
+          "creator_approved": "Créateur approuvé",
+          "creator_rejected": "Créateur refusé",
+          "agency_creator_relation_admin_connected": "Connecté par un administrateur",
+          "agency_creator_relation_disconnected": "Connexion terminée"
         }
       }
     }

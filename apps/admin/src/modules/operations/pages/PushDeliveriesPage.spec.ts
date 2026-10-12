@@ -11,6 +11,7 @@
 import { ApiError } from '@catalyst/api-client'
 import { flushPromises } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { VSelect } from 'vuetify/components'
 
 vi.mock('@/modules/operations/api/pushDeliveries.api', async () => {
   const actual = await vi.importActual<
@@ -27,6 +28,7 @@ vi.mock('@/modules/operations/api/pushDeliveries.api', async () => {
 
 import {
   adminPushDeliveriesApi,
+  PUSH_NOTIFICATION_TYPES,
   type AdminPushDeliveriesResponse,
   type AdminPushDeliveriesSummary,
 } from '@/modules/operations/api/pushDeliveries.api'
@@ -199,11 +201,6 @@ describe('PushDeliveriesPage (AH-102b)', () => {
   it('each text/date filter sends exactly its own param on Apply', async () => {
     const h = await mount()
     const cases: Array<[string, string, Record<string, string>]> = [
-      [
-        'admin-push-filter-type',
-        'assignment.accepted',
-        { notification_type: 'assignment.accepted' },
-      ],
       ['admin-push-filter-creator', '01HQCREATOR', { creator: '01HQCREATOR' }],
       ['admin-push-filter-date-from', '2026-10-01', { date_from: '2026-10-01' }],
       ['admin-push-filter-date-to', '2026-10-09', { date_to: '2026-10-09' }],
@@ -229,6 +226,80 @@ describe('PushDeliveriesPage (AH-102b)', () => {
       fresh.unmount()
     }
     expect(h.wrapper.exists()).toBe(true)
+  })
+
+  // The type filter is a SELECT over the known push-eligible types (an admin
+  // must not have to type `message.received_by_creator` from memory).
+  describe('notification type select', () => {
+    function typeSelect(wrapper: Awaited<ReturnType<typeof mount>>['wrapper']) {
+      return wrapper.findComponent(VSelect)
+    }
+
+    it('is a select, not a free-text input, offering exactly the known types with readable labels', async () => {
+      const h = await mount()
+      const select = typeSelect(h.wrapper)
+
+      expect(select.exists()).toBe(true)
+      expect(select.attributes('data-testid')).toBe('admin-push-filter-type')
+
+      const items = select.props('items') as Array<{ value: string; title: string }>
+      expect(items.map((i) => i.value)).toEqual([...PUSH_NOTIFICATION_TYPES])
+      for (const item of items) {
+        // A label, never the raw payload value and never an unresolved i18n key.
+        expect(item.title).not.toBe(item.value)
+        expect(item.title).not.toContain('admin.operations')
+        expect(item.title.length).toBeGreaterThan(0)
+      }
+      expect(items.find((i) => i.value === 'message.received_by_creator')?.title).toBe(
+        'New message from the agency',
+      )
+    })
+
+    it('picking a labelled option sends exactly the stored type value (not the label) on Apply', async () => {
+      const h = await mount()
+      vi.mocked(adminPushDeliveriesApi.list).mockClear()
+
+      // Drive the real control: open the menu, click the option by its LABEL.
+      await h.wrapper.find('[data-testid="admin-push-filter-type"] .v-field').trigger('mousedown')
+      await flushPromises()
+      const option = Array.from(document.body.querySelectorAll('.v-list-item')).find((el) =>
+        el.textContent?.includes('New message from the agency'),
+      )
+      expect(option, 'the option labelled "New message from the agency"').toBeDefined()
+      ;(option as HTMLElement).click()
+      await flushPromises()
+
+      await h.wrapper.find('[data-testid="admin-push-apply"]').trigger('click')
+      await flushPromises()
+
+      expect(adminPushDeliveriesApi.list).toHaveBeenCalledTimes(1)
+      expect(adminPushDeliveriesApi.list).toHaveBeenCalledWith({
+        outcome: undefined,
+        notification_type: 'message.received_by_creator',
+        creator: undefined,
+        date_from: undefined,
+        date_to: undefined,
+        per_page: 50,
+        cursor: undefined,
+      })
+    })
+
+    it('clearing the select sends no notification_type', async () => {
+      const h = await mount()
+      typeSelect(h.wrapper).vm.$emit('update:modelValue', 'creator.approved')
+      await flushPromises()
+      vi.mocked(adminPushDeliveriesApi.list).mockClear()
+
+      // VSelect `clearable` emits null.
+      typeSelect(h.wrapper).vm.$emit('update:modelValue', null)
+      await flushPromises()
+      await h.wrapper.find('[data-testid="admin-push-apply"]').trigger('click')
+      await flushPromises()
+
+      expect(adminPushDeliveriesApi.list).toHaveBeenLastCalledWith(
+        expect.objectContaining({ notification_type: undefined }),
+      )
+    })
   })
 
   it('walks forward by next_cursor and back by the cursor stack', async () => {

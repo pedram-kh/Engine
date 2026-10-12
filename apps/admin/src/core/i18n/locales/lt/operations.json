@@ -72,6 +72,22 @@
           "in_app_note": "skaitymo būsena kiekvienoje eilutėje",
           "email": "El. paštas",
           "email_note": "nestebima"
+        },
+        "types": {
+          "assignment_invited": "Kvietimas į kampaniją",
+          "assignment_revision_requested": "Paprašyta pataisymų",
+          "assignment_draft_approved": "Juodraštis patvirtintas",
+          "assignment_draft_rejected": "Juodraštis atmestas",
+          "assignment_completed_on_approval": "Užduotis užbaigta patvirtinimu",
+          "assignment_manually_verified": "Įrašas patikrintas rankiniu būdu",
+          "message_received_by_creator": "Nauja agentūros žinutė",
+          "message_relationship_received_by_creator": "Nauja tiesioginė agentūros žinutė",
+          "campaign_application_accepted": "Paraiška priimta",
+          "campaign_job_posted": "Paskelbtas naujas darbas",
+          "creator_approved": "Kūrėjas patvirtintas",
+          "creator_rejected": "Kūrėjas atmestas",
+          "agency_creator_relation_admin_connected": "Administratoriaus sukurtas ryšys",
+          "agency_creator_relation_disconnected": "Ryšys nutrauktas"
         }
       }
     }

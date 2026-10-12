@@ -72,6 +72,22 @@
           "in_app_note": "read state shown per row",
           "email": "Email",
           "email_note": "not tracked"
+        },
+        "types": {
+          "assignment_invited": "Campaign invite",
+          "assignment_revision_requested": "Revisions requested",
+          "assignment_draft_approved": "Draft approved",
+          "assignment_draft_rejected": "Draft rejected",
+          "assignment_completed_on_approval": "Assignment completed on approval",
+          "assignment_manually_verified": "Post verified manually",
+          "message_received_by_creator": "New message from the agency",
+          "message_relationship_received_by_creator": "New direct message from the agency",
+          "campaign_application_accepted": "Application accepted",
+          "campaign_job_posted": "New job posted",
+          "creator_approved": "Creator approved",
+          "creator_rejected": "Creator declined",
+          "agency_creator_relation_admin_connected": "Connected by an admin",
+          "agency_creator_relation_disconnected": "Connection ended"
         }
       }
     }
