@@ -54,13 +54,14 @@ happened.
 
 ---
 
-## AH-103 — deep links: a notification opens the screen it is about — PENDING
+## AH-103 — deep links: a notification opens the screen it is about — DEPLOYED
+
+> **Deployed 2026-10-12** (reported by Pedram; see the Deploy record below). The note under it is the pre-deploy text, kept as written. **Pending after the deploy:** the first TestFlight build (below).
 
 > **Stacks on AH-102b and everything under it (AH-099 … AH-102b, all PENDING).** Pushed 2026-10-12; **not deployed**; deploy timing
 > is Pedram's call. Review: [`deep-links-review.md`](../reviews/deep-links-review.md).
 
-- **Status:** PENDING (**pushed 2026-10-12** to `origin/main` at `47d2efc5`, CI **green on all four jobs**:
-  [run 38289855211](https://github.com/pedram-kh/Engine/actions/runs/38289855211); not deployed)
+- **Status:** DEPLOYED (2026-10-12, one sitting for AH-099 → AH-103; as reported by Pedram, not read from the server by the assistant; see the Deploy record below). Before the deploy it read: PENDING (**pushed 2026-10-12** to `origin/main` at `47d2efc5`, CI **green on all four jobs**: [run 38289855211](https://github.com/pedram-kh/Engine/actions/runs/38289855211); not deployed)
 - **Range:** base `cb79abfa` (`origin/main` before the push) → tip **`47d2efc5`**, 20 commits (`8378e4e5` … `47d2efc5`; the list is in the
   review §1 and the ad-hoc log).
 - **AH entries carried:** AH-103
@@ -85,27 +86,41 @@ happened.
    backend + old app, the extra keys are ignored. Neither produces a dead tap.
 2. **`php artisan queue:restart`** — a named step: `PushMessageFactory` changed, and a worker holding the old class map would keep
    building payloads without route keys until it restarts.
-3. PHP-FPM reload (opcache), then `/up` and one authenticated request. **Result:** —
+3. PHP-FPM reload (opcache), then `/up` and one authenticated request. **Result:** reload done (reported); the `/up` code not read; web login OK for a creator and an admin (reported).
 4. **A real push, if the flag is already armed:** emit one for an id-bearing type, tap it on a device, and read the landing screen.
-   **Result:** —
+   **Result:** not done: no registered token exists and no native build is out.
 
 - **Infra:** `queue:restart` (required); no cron, scheduler or env change.
 - **One-shot commands:** none.
 - **Post-deploy verification:** `/up`; one authenticated request; one real tap if a device and the flag allow. **Then, on the first
   TestFlight build after this deploy** (next to the production-APNs proof): sign in on the iPhone, confirm a new `user_push_tokens` row
-  exists for it, and confirm a push is delivered (AH-103 finding 2 was device-verified on the Samsung only). **Result:** —
-- **Flags armed:** none by this chunk. The push flag's state is whatever AH-102's entry left it at.
-- **Anything unexpected:** —
+  exists for it, and confirm a push is delivered (AH-103 finding 2 was device-verified on the Samsung only). **Result:** not yet: waits for the first TestFlight build.
+- **Flags armed:** none by this chunk. The push flag was armed ON in the same sitting (AH-102's entry); the read-back is **not read**.
+- **Deploy record, 2026-10-12: shared by AH-099 … AH-103 (one sitting).** _Source: Pedram's report of what his colleague did ("his usual procedure plus this release's extras"). Nothing here was read from the server by the assistant. A read that was not reported is written **not read**, never "passed"._
+  - **Snapshot:** reported taken before the deploy. ID as given: [`snapshot-2026-08-19`](https://717248306247-f5u6bh2m.eu-west-1.console.aws.amazon.com/rds/home?region=eu-west-1#db-snapshot:engine=aurora-postgresql;id=snapshot-2026-08-19) (an Aurora PostgreSQL cluster snapshot, `eu-west-1`). **The ID is dated 2026-08-19, not 2026-10-12.** Its creation time, and whether it was `available` before migrating: **not read.** Until its creation time is read in the console, **do not treat it as a restore point for tonight's migrations** (anything written since it was taken would not be in it). Aurora's continuous backup / point-in-time window: **not read.**
+  - **Code:** `composer install` skipped (as planned: `composer.json` and `composer.lock` unchanged since `9b7d6deb`); `pnpm install` run and both SPAs (main, admin) rebuilt. On-box `git rev-parse HEAD`: **not recorded.** The range is `9b7d6deb` → runtime tip `47d2efc5` (AH-103's last runtime commit); the three commits after it (`f932eda4`, `702e2a06`, `8228b803`) are docs-only, so a pull of `origin/main` at any time after `47d2efc5` runs the same runtime. How the bundles were published to nginx: **not read** (the admin showing the two new pages is evidence that the admin bundle is being served).
+  - **Migrate:** the two expected tables only, `user_push_tokens` and `push_deliveries` (reported). `migrate:status` afterwards (the batch number): **not read.**
+  - **Env:** `FRONTEND_EXTRA_ORIGINS` appended; `FCM_PROJECT_ID` and `FCM_SERVICE_ACCOUNT_JSON_B64` set (reported). The resulting `FRONTEND_EXTRA_ORIGINS` value, a `SANCTUM_STATEFUL_DOMAINS` read, and how the secret was transferred: **not read / not reported.**
+  - **Restarts:** `config:cache`, PHP-FPM reload and `queue:restart` done (reported). The reload method, and the worker's uptime afterwards: **not read.**
+  - **Reported passing:** `push:test --validate-only` → "Credential OK"; `schedule:list` includes `push:prune-deliveries`; `APP_KEY` fingerprint unchanged before and after; web login OK (creator and admin); the admin shows **Push deliveries** and **Creator app**; `post_verified_mail_enabled` OFF.
+  - **Flags:** `push_notifications_enabled` **armed ON** in the admin; `social_verification_enabled` unchanged (the Task 1 recommendation, "confirm harmless, no flag change"); `post_verified_mail_enabled` OFF. The read-back after arming (`Feature::active` and the stored `features` row) and the reason text: **not read.** Arming is inert today: `user_push_tokens` is new and no native build that registers tokens is out (its row count before arming: **not read**).
+  - **Not read (so not "passed"):** the P0 discovery reads; the AH-099 pre-deploy reads (`personal_access_tokens` `Ran` and count, `SANCTUM_STATEFUL_DOMAINS` free of a bare `localhost`, `AUTH_GUARD`); the **P6 Task 1 reads** (posts stuck `pending`, `live_verified` counts; **the condition on which the Task 1 recommendation was accepted is therefore still open**); **P7** (no second `schedule:run` cron on the container or the host) and `supervisorctl status laravel-schedule` after the deploy; the **12 GRANT read-backs** on `user_push_tokens`, `push_deliveries` and their id sequences for `engine_c_user`; `push:prune-deliveries --dry-run`; the `/up` status code; `push_deliveries` after arming; the token-door smoke (unknown email → `401`, count still `0`); platform-admin refusal on the main host; a creator `GET /api/v1/me` on a cookie; the AH-101 preferences page's Email column; AH-100d's `ro` nav label; the agency bell's campaign tab; a log grep for `push.config_error`.
+  - **Worth reading next (read-only):** the snapshot's creation time (console); the 12 GRANT reads (a missing grant fails quietly, so the first real push would be the first sign); P7 (a second scheduler would double every digest); `SANCTUM_STATEFUL_DOMAINS` before the first Android build; the P6 queries.
+- **AH-103 specifics.** Reported: `queue:restart` and the PHP-FPM reload done; creator and admin web login OK. **Not done, by design:** a real push tap (no registered token exists and no native build is out). **Not read:** the agency bell's campaign tab, the `/up` code. The iPhone finding-2 re-verify is still planned for the first TestFlight build (below).
+- **Operator:** Pedram's colleague, with his usual procedure plus this release's extras (reported by Pedram). The record is below.
+- **Anything unexpected:** **Yes, one item to check: the snapshot ID.** The ID reported for a snapshot taken before this deploy is dated 2026-08-19 (see the Deploy record); its creation time was not read, so tonight's migrations may have no restore point. Everything else reported was as planned; the long **not read** list above is the honest state, not a failure.
 
 ---
 
-## AH-102b — admin observability for the creator app: push delivery log, two admin pages — PENDING
+## AH-102b — admin observability for the creator app: push delivery log, two admin pages — DEPLOYED
+
+> **Deployed 2026-10-12** (reported by Pedram; see the Deploy record below). The note under it is the pre-deploy text, kept as written.
 
 > **Stacks on AH-102 (Checkpoints A and B) and everything under it (AH-099 … AH-102, all PENDING).** Pushed 2026-10-12 after
 > Checkpoint B clearance and Pedram's go; **not deployed**; deploy timing is Pedram's call. Review:
 > [`admin-observability-review.md`](../reviews/admin-observability-review.md).
 
-- **Status:** PENDING (**pushed 2026-10-12** to `origin/main` at `176f46fc`, CI **green on all four jobs**: [run 38199714770](https://github.com/pedram-kh/Engine/actions/runs/38199714770); not deployed)
+- **Status:** DEPLOYED (2026-10-12, one sitting for AH-099 → AH-103; as reported by Pedram, not read from the server by the assistant; the shared record is in the **AH-103** entry). Before the deploy it read: PENDING (**pushed 2026-10-12** to `origin/main` at `176f46fc`, CI **green on all four jobs**: [run 38199714770](https://github.com/pedram-kh/Engine/actions/runs/38199714770); not deployed)
 - **Range:** base `b21b7b2f` (`origin/main` at plan time) → tip **`176f46fc`** (a docs-only closing commit follows). Commits: `65d2b306`, `e4f7bac7`, `9bf80e41`,
   `30b5894c`, `9197cd0b`, `686d653b`, `c67d9505`, `03411f16`, `b64beee8`, `4f4659fa`, `53e32e7a`, `61627374`, `d95988ea`,
   `eea2e89e`, `ff97a781` (docs), `3f8c97a1` (type-filter select), `176f46fc` (docs).
@@ -126,7 +141,7 @@ happened.
 
 **Named deploy steps (in order)**
 
-1. **Snapshot** taken and confirmed `available` (migration in this deploy). **Snapshot ID:** —
+1. **Snapshot** taken and confirmed `available` (migration in this deploy). **Snapshot ID:** [`snapshot-2026-08-19`](https://717248306247-f5u6bh2m.eu-west-1.console.aws.amazon.com/rds/home?region=eu-west-1#db-snapshot:engine=aurora-postgresql;id=snapshot-2026-08-19) as reported; dated 2026-08-19, creation time and `available` **not read** (see the AH-103 Deploy record).
 2. `php artisan migrate` (one migration), then the code.
 3. **`php artisan queue:restart`** — **a named step**: `PushDeliveryOutcome` and `PushDeliveryRecorder` changed, and a worker
    holding the old class map would run the old recorder.
@@ -134,33 +149,36 @@ happened.
 5. **`engine_c_user` GRANT**, **in this order**: grant `SELECT, INSERT, UPDATE, DELETE` on `push_deliveries` and `USAGE, SELECT`
    on `push_deliveries_id_seq`, then read both back: `SELECT has_table_privilege('engine_c_user', 'push_deliveries',
 'SELECT,INSERT,UPDATE,DELETE');` and `SELECT has_sequence_privilege('engine_c_user', 'push_deliveries_id_seq', 'USAGE');`
-   → both must be `true`. The snapshot in step 1 covers both migrations. **Result:** —
+   → both must be `true`. The snapshot in step 1 covers both migrations. **Result:** **not read** (the GRANT read-backs were not reported).
 6. **Scheduler read-back** (the prune relies on it): `crontab -l` shows `schedule:run` for the app user; `php artisan
-schedule:list` lists `push:prune-deliveries`. **Result:** —
+schedule:list` lists `push:prune-deliveries`. **Result:** `schedule:list` includes `push:prune-deliveries` (reported). The `crontab -l` read does not apply (the scheduler is supervisor `schedule:work`); `supervisorctl status laravel-schedule` after the deploy: **not read**.
 7. **Prune dry-run:** `php artisan push:prune-deliveries --dry-run` → **expected `would delete 0`** (the table is empty).
-   **Result:** —
+   **Result:** **not read**.
 
 - **Infra:** `queue:restart` (required); one new scheduler entry (needs the cron that `docs/runbooks/production-queue-worker.md`
   §7 describes); no env change.
 - **One-shot commands:** the prune dry-run above; nothing mutates.
 - **Post-deploy verification:** `/up`; the admin sidebar shows the two new entries; **Push deliveries** loads (empty, footer
   "No push attempts stored yet."); **Creator app** loads.
-- **Flags armed:** none — `push_notifications_enabled` is still OFF; nothing in this entry arms it.
+- **Flags armed:** none by this entry. `push_notifications_enabled` was armed ON in the same sitting (AH-102 Checkpoint A's entry); read-back **not read**.
 - **Arming addendum (when `push_notifications_enabled` is armed later):** `push:test` **bypasses the recorder** (it calls the sender directly, by design), so it will never write a row. After a **real** delivered push, an **empty `push_deliveries`** means a missing
   GRANT or a recorder failure: look for `push.delivery_record_failed` in the log (it carries the step and the exception class,
   never the message). The Push deliveries footer (total rows and oldest row) is also the scheduler's instrument: an "oldest"
   date older than the retention window means the prune is not running.
-- **Operator:** —
-- **Anything unexpected:** —
+- **Deploy record (2026-10-12; the shared record is in the AH-103 entry).** Reported: migration `2026_10_12_100000_create_push_deliveries_table` ran (the `push_deliveries` table, no other change); `queue:restart` and the PHP-FPM reload done; `schedule:list` includes `push:prune-deliveries`; the admin shows **Push deliveries** and **Creator app**. **Not read:** the `GRANT` read-backs for `push_deliveries` and `push_deliveries_id_seq` (a missing grant would show only when the first real push is recorded); the prune dry-run; whether the pages load empty with the footer "No push attempts stored yet."; `supervisorctl status laravel-schedule`. After the first real push `push_deliveries` must be `> 0`.
+- **Operator:** Pedram's colleague, with his usual procedure plus this release's extras (reported by Pedram). The shared record is in the **AH-103** entry.
+- **Anything unexpected:** Nothing reported. See the AH-103 Deploy record for what was not read; for this entry the GRANT read-backs matter most.
 
-## AH-102 (Checkpoint A, backend) — push notifications: token table, FCM sender, dispatcher — PENDING
+## AH-102 (Checkpoint A, backend) — push notifications: token table, FCM sender, dispatcher — DEPLOYED
+
+> **Deployed 2026-10-12** (reported by Pedram; see the Deploy record below). The note under it is the pre-deploy text, kept as written.
 
 > **Stacks on AH-101 and everything under it (AH-099 … AH-101, all PENDING).** Pushed at Checkpoint A clearance, **not
 > deployed**; deploy timing is Pedram's call. This entry covers **backend only** (Stages 0–2). The matrix
 > column, the app's push module and the Android build (Stages 3–4), and iOS (**AH-102-ios**) come later and get
 > their own entries.
 
-- **Status:** PENDING (pushed, not deployed)
+- **Status:** DEPLOYED (2026-10-12, one sitting for AH-099 → AH-103; as reported by Pedram, not read from the server by the assistant; the shared record is in the **AH-103** entry). Before the deploy it read: PENDING (pushed, not deployed)
 - **Range:** base `4d468406` (`origin/main` at plan time, pushed, not deployed) → tip **TBD at push** (the commits are
   `faf96d4d`, `1f7d2de0`, `93b7d767`, `ff0a4112`, `2f3d62eb`, `37d482d9`, `6ff737d9`, `238fa85b`, `cdfa13e6`,
   `68ffb21c`, `72204f1d`, `a8423726`, `8c7d3318` [R2 rider: a dev-server-only Vite config change in `apps/main`], plus the docs commits). The deploy range also carries the undeployed
@@ -197,9 +215,9 @@ schedule:list` lists `push:prune-deliveries`. **Result:** —
    - `SELECT count(*) FROM user_notification_preferences WHERE channel='push';` → **expected `0`.** **Result (2026-10-12, Pedram):** **0**.
    - **FCM credential:** `FCM_PROJECT_ID` is set, and `FCM_SERVICE_ACCOUNT_JSON_B64` **is set and decodes to valid JSON**
      carrying `client_email`, `private_key` and `project_id` — read back **without printing the value**. (`push:test
---validate-only` performs exactly this decode and then the OAuth exchange.) **Result:** not yet read; it is a deploy-time env change, and `push:test --validate-only` is the read-back (merged checklist, [`deploy-ah099-ah103.md`](deploy-ah099-ah103.md)).
+--validate-only` performs exactly this decode and then the OAuth exchange.) **Result (2026-10-12):** `FCM_PROJECT_ID` and `FCM_SERVICE_ACCOUNT_JSON_B64` set during the deploy (reported); `push:test --validate-only` → "Credential OK" (reported). The variable itself was never read back.
    - **Production read-backs, 2026-10-12 (Pedram, `docker compose exec app sh` at `/app`):** `supervisorctl`: `laravel-queue` RUNNING (`queue:work`, not Horizon), `laravel-schedule` RUNNING (`schedule:work`, up 41 days), cron / nginx / php-fpm / syslog RUNNING, postfix / sshd / dnsmasq STOPPED. `queue.default` = `database`; `cache.default` = `redis`; `mail.default` = `smtp` (smtp.postmarkapp.com). `user_notification_preferences` with `channel='push'` = **0**. Preference rows: `digest/true` 19, `in_app/false` 15, `email/false` **none**. `integrations.social.driver` = `mock`; `features.social_verification_enabled` stored `"true"` (created 2026-07-14 07:58:21). `migrate:status`: last run `2026_08_27_140000_create_campaign_attachments_table` (batch 8); nothing from AH-099 onward has run.
-2. **Snapshot** taken and confirmed `available` (migration in this deploy). **Snapshot ID:** —
+2. **Snapshot** taken and confirmed `available` (migration in this deploy). **Snapshot ID:** [`snapshot-2026-08-19`](https://717248306247-f5u6bh2m.eu-west-1.console.aws.amazon.com/rds/home?region=eu-west-1#db-snapshot:engine=aurora-postgresql;id=snapshot-2026-08-19) as reported; dated 2026-08-19, creation time and `available` **not read** (see the AH-103 Deploy record).
 3. `php artisan migrate` (one migration), then the code.
 4. **`php artisan queue:restart`** — **a named step**: this deploy adds a job class (`SendPushNotificationJob`), and a
    worker holding the old class map would fail it.
@@ -207,25 +225,28 @@ schedule:list` lists `push:prune-deliveries`. **Result:** —
 6. **`engine_c_user` GRANT check** (post-migrate, pre-arm): `SELECT has_table_privilege('engine_c_user',
 'user_push_tokens', 'SELECT,INSERT,UPDATE,DELETE');` → must be `true`, and `USAGE` on the id sequence. Default
    privileges may not cover new tables (the history is not reconstructable), so this is checked, not assumed.
-   **Result:** —
-7. **Smoke:** `php artisan push:test --validate-only` → "Credential OK". **Result:** —
+   **Result:** **not read** (the GRANT read-backs were not reported).
+7. **Smoke:** `php artisan push:test --validate-only` → "Credential OK". **Result:** "Credential OK" (reported).
 
-- **Infra:** `queue:restart` (required); new env vars `FCM_PROJECT_ID`, `FCM_SERVICE_ACCOUNT_JSON_B64` (from Secrets
-  Manager; the path `catalyst/<env>/api/fcm` is a **convention to confirm**); no cron / scheduler change.
+- **Infra:** `queue:restart` (required); new env vars `FCM_PROJECT_ID`, `FCM_SERVICE_ACCOUNT_JSON_B64` (the service-account file
+  on Pedram's laptop, not Secrets Manager); no cron / scheduler change.
 - **One-shot commands:** none that mutate (`push:test` is read-only against our data).
 - **Post-deploy verification:** `/up`; the admin Feature-flags page lists `push_notifications_enabled` OFF; a creator's
   `PATCH /me/notification-preferences` with `channel: push` is accepted; `push:test --validate-only` passes.
-- **Flags armed:** none — `push_notifications_enabled` ships OFF.
-- **Operator:** —
-- **Anything unexpected:** —
+- **Flags armed:** `push_notifications_enabled` was **armed ON** in the admin during this deploy (reported; it shipped OFF). The read-back (`Feature::active`, the stored row) is **not read**. Inert today: `user_push_tokens` is new and empty.
+- **Deploy record (2026-10-12; the shared record is in the AH-103 entry).** Reported: migration `2026_10_10_100000_create_user_push_tokens_table` ran (the `user_push_tokens` table); `FCM_PROJECT_ID` and `FCM_SERVICE_ACCOUNT_JSON_B64` set; `queue:restart`, `config:cache` and the PHP-FPM reload done; `push:test --validate-only` → "Credential OK"; `push_notifications_enabled` armed ON in the admin (so the Feature-flags page lists it). **Not read:** the `GRANT` read-backs on `user_push_tokens` and its id sequence; the `PATCH /me/notification-preferences` push-channel check; the `user_notification_preferences` `channel='push'` count after the deploy; `user_push_tokens` count before arming.
+- **Operator:** Pedram's colleague, with his usual procedure plus this release's extras (reported by Pedram). The shared record is in the **AH-103** entry.
+- **Anything unexpected:** Nothing reported. Known gap: the GRANT read-backs for `user_push_tokens` were not reported, so the first device registration is the first proof. The flag shipped OFF and was armed in the same sitting, as the runbook allowed (inert while no token exists).
 
-## AH-102 (Checkpoint B, app) — push column, push registration module, Android FCM wiring, iOS enabled — PENDING
+## AH-102 (Checkpoint B, app) — push column, push registration module, Android FCM wiring, iOS enabled — DEPLOYED
+
+> **Deployed 2026-10-12** (reported by Pedram; see the Deploy record below). The note under it is the pre-deploy text, kept as written.
 
 > **Stacks on AH-102 Checkpoint A and everything under it (AH-099 … AH-101, all PENDING).** **Cleared 2026-10-11:** Pedram's
 > Android walk (E1/E2/E3, real FCM, Samsung SM-A515F) passed 11 of 12 items; item 12 is partial (rotation re-POST not
 > verified, accepted as a known gap: self-healing in production, see `docs/tech-debt.md`). SPA + Android project only.
 
-- **Status:** PENDING (**closed 2026-10-11**: pushed to `origin/main` at `e2501352`, CI **green on all four jobs** ([run 38173240196](https://github.com/pedram-kh/Engine/actions/runs/38173240196): main SPA Playwright 34 passed, 0 flaky; admin SPA Playwright 1 flaky, passed on retry, the known `admin-sign-in.spec.ts:69`, tech-debt 16); not deployed). **Pushing is not deploying.**
+- **Status:** DEPLOYED (2026-10-12, one sitting for AH-099 → AH-103; as reported by Pedram, not read from the server by the assistant; the shared record is in the **AH-103** entry). Before the deploy it read: PENDING (**closed 2026-10-11**: pushed to `origin/main` at `e2501352`, CI **green on all four jobs** ([run 38173240196](https://github.com/pedram-kh/Engine/actions/runs/38173240196): main SPA Playwright 34 passed, 0 flaky; admin SPA Playwright 1 flaky, passed on retry, the known `admin-sign-in.spec.ts:69`, tech-debt 16); not deployed). **Pushing is not deploying.**
 - **Range:** from Checkpoint A's pushed tip `6e827e40` → **`e2501352`** (a docs-only closing commit follows it). The commits: `1b16a6f6`
   (docs), `f61c0ec1` (C3.1), `20942da6` (C3.2), `a377cf97` (C4.1), `6d07b727` (C4.2), `55b4ef21` (a test), `1eef233c` (docs),
   `9119b9c4` (google-services.json), `0d51aed9` (iOS wiring), `8521aadc` / `899882d3` / `c803d7db` / `96518a3e` / `d0a5fd18` (docs),
@@ -260,20 +281,24 @@ schedule:list` lists `push:prune-deliveries`. **Result:** —
 - **Post-deploy verification:** web: the notification preferences page has no Push column; the creator dashboard shows no
   soft-ask. Android (E3): [`push-notifications-device-walk.md`](../reviews/push-notifications-device-walk.md) (run once on
   2026-10-11 against the local API; the first PRODUCTION run is the first store build, after the flag is armed).
-- **Flags armed:** none — `push_notifications_enabled` stays OFF.
-- **Operator:** —
-- **Anything unexpected:** — (nothing at deploy: not deployed yet). Named open items, none blocking: the TestFlight production-APNs proof
+- **Flags armed:** none by the app half; `push_notifications_enabled` was armed ON in the same sitting (Checkpoint A's entry).
+- **Deploy record (2026-10-12; the shared record is in the AH-103 entry).** The web side shipped with the SPA rebuild (reported). **Not read:** that the notification preferences page has **no Push column** on web and the creator dashboard shows no soft-ask. **Not part of this deploy:** the Android and iOS builds, and the TestFlight production-APNs proof, which remain open (below).
+- **Operator:** Pedram's colleague, with his usual procedure plus this release's extras (reported by Pedram). The shared record is in the **AH-103** entry.
+- **Anything unexpected:** Nothing reported. The TestFlight production-APNs proof, the token-rotation re-POST and the tech-debt 17 decision are still open (below).
+  _Carried from before the deploy:_ named open items, none blocking: the TestFlight production-APNs proof
   (pending the first upload); the token-rotation re-POST (accepted, self-healing); item 10 on iOS not observed (likely sandbox-APNs
   feedback timing, unverified). Tech-debt 17 (the iOS Keychain sign-in survives a reinstall) is decided before the first iOS store build.
 
-## AH-101 — notification preference matrix, post-verified notice, third creator-app UI batch — PENDING
+## AH-101 — notification preference matrix, post-verified notice, third creator-app UI batch — DEPLOYED
+
+> **Deployed 2026-10-12** (reported by Pedram; see the Deploy record below). The note under it is the pre-deploy text, kept as written.
 
 > **Stacks on AH-100d and everything under it (all PENDING).** Half A is backend + SPA; Half B is SPA /
 > native only. **Closed 2026-10-10:** Pedram's device walk passed (sign-in sheet, iOS splash, bell closes on
 > navigation, composer above the tab bar, paperclip placements, no hamburger in native). **Pushed** at `b7a3342f`,
 > CI green on all four jobs ([run `38024623651`](https://github.com/pedram-kh/Engine/actions/runs/38024623651)). **Pushing is not deploying: deploy timing is Pedram's call.**
 
-- **Status:** PENDING (pushed, not deployed)
+- **Status:** DEPLOYED (2026-10-12, one sitting for AH-099 → AH-103; as reported by Pedram, not read from the server by the assistant; the shared record is in the **AH-103** entry). Before the deploy it read: PENDING (pushed, not deployed)
 - **Range:** base `a1a20ead` (inventory), then four commits: Half A feat `34d90a4f` + docs `6c32df5d`; Half B feat
   `7d4f3e36` + docs `811a0356`. (A docs-only close/provenance commit follows them.)
 - **AH entries carried:** AH-101
@@ -313,16 +338,19 @@ GROUP BY 1, 2;` and `... WHERE channel='email' AND is_enabled=false GROUP BY typ
   `post_verified_mail_enabled` OFF.
 - **App build (Half B):** no deploy; a **clean iOS build** is needed for the new splash (the asset catalog and
   `assets/` changed; iOS caches launch screens, so delete and reinstall to see it). No new plugin, so no `cap sync`.
-- **Flags armed:** none — `post_verified_mail_enabled` ships OFF and stays OFF.
-- **Operator:** —
-- **Anything unexpected:** —
+- **Flags armed:** none — `post_verified_mail_enabled` ships OFF and stays OFF (reported OFF after the deploy).
+- **Deploy record (2026-10-12; the shared record is in the AH-103 entry).** Reported: `queue:restart` done (the new `PostVerifiedMail` class); `post_verified_mail_enabled` **OFF** after the deploy; `social_verification_enabled` unchanged (the Task 1 recommendation: confirm harmless, no flag change). The pre-deploy reads were taken before the deploy (results above): `email/false` none, so the email-opt-out guard blocks nothing. **Not read:** the creator preferences page's grid with an Email column; the **P6 Task 1 reads** (the stated condition of the Task 1 acceptance). The in-app `assignment.live_verified` row is now live and ungated, with no kill switch, so mock verifications since 2026-07-14 will notify creators from here on.
+- **Operator:** Pedram's colleague, with his usual procedure plus this release's extras (reported by Pedram). The shared record is in the **AH-103** entry.
+- **Anything unexpected:** Nothing reported. The P6 reads that the Task 1 acceptance was conditional on were not taken; see the AH-103 Deploy record.
 
-## AH-100d — Creator app Figma fidelity audit and app-resume state refresh — PENDING
+## AH-100d — Creator app Figma fidelity audit and app-resume state refresh — DEPLOYED
+
+> **Deployed 2026-10-12** (reported by Pedram; see the Deploy record below). The note under it is the pre-deploy text, kept as written.
 
 > **Stacks on AH-100c, AH-100b, AH-100 and AH-099, all PENDING.** Deploy in order, or together as one
 > entry. Their obligations apply unchanged. **Pushed** after Pedram's third re-walk; the tip and CI run are in the AH-100d review header.
 
-- **Status:** PENDING
+- **Status:** DEPLOYED (2026-10-12, one sitting for AH-099 → AH-103; as reported by Pedram, not read from the server by the assistant; the shared record is in the **AH-103** entry).
 - **Range:** `b214c31f` → the AH-100d docs commits (feat commits `ceae669a`…`766c2d63`, then the
   second re-walk batch `9ef51fd4`…`2b8294d5`).
 - **Second batch, deploy-relevant:** the web bundle gains five new locale keys
@@ -343,22 +371,25 @@ GROUP BY 1, 2;` and `... WHERE channel='email' AND is_enabled=false GROUP BY typ
   - **The creator app is not deployed by this entry.** A device build needs `npx cap sync` for the new
     plugin.
 - **One-shot commands:** none.
-- **Post-deploy verification (to be filled):**
+- **Post-deploy verification (results in the Deploy record below):**
   1. `/up` → 200.
   2. Web creator dashboard, wizard and Edit profile look and behave as before (square web buttons,
      no polling on the under-review page).
 - **Flags armed:** none.
-- **Operator:** _to be filled._
-- **Anything unexpected:** _to be filled._
+- **Deploy record (2026-10-12; the shared record is in the AH-103 entry).** Reported: `pnpm install` and the `apps/main` rebuild done; creator and admin web login OK. **Not read:** the `/up` code; the web dashboard / Edit profile render checks; the `ro` top-nav label (the AH-100d locale repair). The `@capacitor/app` dependency came in with the `pnpm install` (reported).
+- **Operator:** Pedram's colleague, with his usual procedure plus this release's extras (reported by Pedram). The shared record is in the **AH-103** entry.
+- **Anything unexpected:** Nothing reported. Not read: see the Deploy record above.
 
 ---
 
-## AH-100c — Creator app eyes-on fixes: iOS input zoom, edit-profile form body, frame-07 dashboard pass — PENDING
+## AH-100c — Creator app eyes-on fixes: iOS input zoom, edit-profile form body, frame-07 dashboard pass — DEPLOYED
+
+> **Deployed 2026-10-12** (reported by Pedram; see the Deploy record below). The note under it is the pre-deploy text, kept as written.
 
 > **Stacks on AH-100b, AH-100 and AH-099, all PENDING.** Deploy in order, or together as one entry.
 > Their obligations apply unchanged. Pushed on Pedram's clearance after his re-walk (2026-10-09).
 
-- **Status:** PENDING
+- **Status:** DEPLOYED (2026-10-12, one sitting for AH-099 → AH-103; as reported by Pedram, not read from the server by the assistant; the shared record is in the **AH-103** entry).
 - **Range:** `e5beeddc` → `112e7eb6` (the AH-100c feat commit is `9f4934e9`; the rest is docs-only).
 - **AH entries carried:** AH-100c.
 - **Migrations run:** **none.** Zero `apps/api` diff.
@@ -372,22 +403,25 @@ GROUP BY 1, 2;` and `... WHERE channel='email' AND is_enabled=false GROUP BY typ
   - **The creator app is not deployed by this entry.** The fixes reach a device through a local build
     (review §9).
 - **One-shot commands:** none.
-- **Post-deploy verification (to be filled):**
+- **Post-deploy verification (results in the Deploy record below):**
   1. `/up` → 200.
   2. Web creator dashboard and Edit profile look and behave as before (completeness bar and the
      invitation alert are still the web ones).
 - **Flags armed:** none.
-- **Operator:** _to be filled._
-- **Anything unexpected:** _to be filled._
+- **Deploy record (2026-10-12; the shared record is in the AH-103 entry).** Reported: `pnpm install` and the `apps/main` rebuild done; creator and admin web login OK. **Not read:** the `/up` code; the web dashboard and Edit profile render checks.
+- **Operator:** Pedram's colleague, with his usual procedure plus this release's extras (reported by Pedram). The shared record is in the **AH-103** entry.
+- **Anything unexpected:** Nothing reported. Not read: see the Deploy record above.
 
 ---
 
-## AH-100b — Creator app Figma-faithful page passes, walkthrough findings and the real app icon — PENDING
+## AH-100b — Creator app Figma-faithful page passes, walkthrough findings and the real app icon — DEPLOYED
+
+> **Deployed 2026-10-12** (reported by Pedram; see the Deploy record below). The note under it is the pre-deploy text, kept as written.
 
 > **Stacks on AH-100 and AH-099, both PENDING.** Deploy in order, or together as one entry. Their
 > obligations apply unchanged.
 
-- **Status:** PENDING
+- **Status:** DEPLOYED (2026-10-12, one sitting for AH-099 → AH-103; as reported by Pedram, not read from the server by the assistant; the shared record is in the **AH-103** entry).
 - **Range:** `60de0811` → `6c2b86ec` (the AH-100b feat commit; `bdf279c1` above it is a one-test fix, everything else docs-only).
 - **AH entries carried:** AH-100b.
 - **Migrations run:** **none.** Zero `apps/api` diff.
@@ -400,21 +434,24 @@ GROUP BY 1, 2;` and `... WHERE channel='email' AND is_enabled=false GROUP BY typ
   - **The creator app is not deployed by this entry.** The icon and splash live in the `ios/` and
     `android/` projects and reach a device through a local build (review §9).
 - **One-shot commands:** none.
-- **Post-deploy verification (to be filled):**
+- **Post-deploy verification (results in the Deploy record below):**
   1. `/up` → 200.
   2. Web creator and sign-in pages look and behave as before.
 - **Flags armed:** none.
-- **Operator:** _to be filled._
-- **Anything unexpected:** _to be filled._
+- **Deploy record (2026-10-12; the shared record is in the AH-103 entry).** Reported: `pnpm install` and the `apps/main` rebuild done; creator and admin web login OK. **Not read:** the `/up` code; the web creator and sign-in page render checks.
+- **Operator:** Pedram's colleague, with his usual procedure plus this release's extras (reported by Pedram). The shared record is in the **AH-103** entry.
+- **Anything unexpected:** Nothing reported. Not read: see the Deploy record above.
 
 ---
 
-## AH-100 — Creator app client, Capacitor wrap and native theme — PENDING
+## AH-100 — Creator app client, Capacitor wrap and native theme — DEPLOYED
+
+> **Deployed 2026-10-12** (reported by Pedram; see the Deploy record below). The note under it is the pre-deploy text, kept as written.
 
 > **Stacks on AH-099, which is itself PENDING.** Deploy them in order (AH-099 first), or together as
 > one entry; either way AH-099's obligations apply unchanged.
 
-- **Status:** PENDING
+- **Status:** DEPLOYED (2026-10-12, one sitting for AH-099 → AH-103; as reported by Pedram, not read from the server by the assistant; the shared record is in the **AH-103** entry).
 - **Range:** `d1ab5820` → `75ce384d` (the AH-100 feat commit; everything above it is docs-only).
 - **AH entries carried:** AH-100.
 - **Migrations run:** **none.** Zero `apps/api` diff.
@@ -428,24 +465,27 @@ GROUP BY 1, 2;` and `... WHERE channel='email' AND is_enabled=false GROUP BY typ
     production app build (`build:native` with the uncommitted `.env.native-production`) is
     pointless until AH-099's token door exists on production.
 - **One-shot commands:** none.
-- **Post-deploy verification (to be filled):**
+- **Post-deploy verification (results in the Deploy record below):**
   1. `/up` → 200.
   2. Web creator sign-in, dashboard and availability page look and behave as before. A cookie
      session is in use, and no `Authorization` header is sent.
   3. `personal_access_tokens` `count(*)` is unchanged by web traffic.
 - **Flags armed:** none — the web has no new behaviour to arm.
-- **Operator:** _to be filled._
-- **Anything unexpected:** _to be filled._
+- **Deploy record (2026-10-12; the shared record is in the AH-103 entry).** Reported: `pnpm install` and the `apps/main` rebuild done; creator and admin web login OK. **Not read:** the `/up` code; the dashboard and availability page render checks; that no `Authorization` header is sent on the web; that `personal_access_tokens` stays `0` after web traffic.
+- **Operator:** Pedram's colleague, with his usual procedure plus this release's extras (reported by Pedram). The shared record is in the **AH-103** entry.
+- **Anything unexpected:** Nothing reported. Not read: see the Deploy record above.
 
 ---
 
-## AH-099 — Creator app token auth, backend — PENDING
+## AH-099 — Creator app token auth, backend — DEPLOYED
+
+> **Deployed 2026-10-12** (reported by Pedram; see the Deploy record below). The note under it is the pre-deploy text, kept as written.
 
 > **Standalone entry.** Production was current through AH-098 (`9b7d6deb`) before this. The
 > inventory/docs commits between are docs-only. **Deploys dark: nothing calls the new path until
 > AH-100.**
 
-- **Status:** PENDING
+- **Status:** DEPLOYED (2026-10-12, one sitting for AH-099 → AH-103; as reported by Pedram, not read from the server by the assistant; the shared record is in the **AH-103** entry).
 - **Range:** `9b7d6deb` → `e665e9ce` (from-SHA exclusive: the previous deployed tip; to-SHA is the
   feat commit — everything above it is docs-only)
 - **AH entries carried:** AH-099
@@ -470,7 +510,7 @@ GROUP BY 1, 2;` and `... WHERE channel='email' AND is_enabled=false GROUP BY typ
   `SANCTUM_TOKEN_EXPIRATION_MINUTES` is optional (defaults to `129600` = 90 days). Run
   If config is cached on the box, re-cache it so the new `auth.php` / `sanctum.php` keys are read.
 - **One-shot commands:** none.
-- **Post-deploy verification (to be filled):**
+- **Post-deploy verification (results in the Deploy record below):**
   1. `/up` → 200.
   2. A creator **cookie** session still works on `GET /api/v1/me` (the web path did not move).
   3. A platform-admin session on `GET /api/v1/me` of the **main** SPA host is refused as before.
@@ -479,8 +519,9 @@ GROUP BY 1, 2;` and `... WHERE channel='email' AND is_enabled=false GROUP BY typ
      email: a correct password would mint a live token with no client to hold it, and a wrong
      one would bump that creator's failed-login lockout counter.)
 - **Flags armed:** none — the path has no callers; no flag exists or is needed.
-- **Operator:** _to be filled._
-- **Anything unexpected:** _to be filled._
+- **Deploy record (2026-10-12; the shared record is in the AH-103 entry).** Reported: no migration of its own (the two in this sitting belong to AH-102 and AH-102b); `FRONTEND_EXTRA_ORIGINS` appended; `config:cache` and the PHP-FPM reload done; `APP_KEY` fingerprint unchanged; creator and admin web login OK. **Not read:** pre-deploy reads 1–4 (`personal_access_tokens` `Ran` and count, `SANCTUM_STATEFUL_DOMAINS` free of a bare `localhost`, `AUTH_GUARD`); post-deploy checks 1–4 one by one (`/up` code, a creator cookie `GET /api/v1/me`, the platform-admin refusal on the main host, the unknown-email token-door `401` with the token count staying `0`). A working web login is evidence that the cookie path did not move; it is not a pass of check 2.
+- **Operator:** Pedram's colleague, with his usual procedure plus this release's extras (reported by Pedram). The shared record is in the **AH-103** entry.
+- **Anything unexpected:** Nothing reported. Not read: see the Deploy record above. **Carry:** read `SANCTUM_STATEFUL_DOMAINS` for a bare `localhost` before the first production Android build (it would make every Android bearer POST a 419). The token door has no callers yet, so nothing is exposed in the meantime.
 
 ---
 
