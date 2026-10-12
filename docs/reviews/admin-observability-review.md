@@ -23,7 +23,7 @@ read-only admin endpoints; no flag armed).
 
 ---
 
-## 1. What was built (14 commits before this one, all local)
+## 1. What was built (15 commits before this docs update, all local)
 
 | Commit     | Step  | What                                                                                                            |
 | ---------- | ----- | --------------------------------------------------------------------------------------------------------------- |
@@ -41,6 +41,8 @@ read-only admin endpoints; no flag armed).
 | `61627374` | C3.1  | Push deliveries page, nav entry, `operations` i18n ×24                                                          |
 | `d95988ea` | C3.2  | Creator app page + sign-ins dialog, nav entry, route, `creators` i18n ×24                                       |
 | `eea2e89e` | fix   | Error states: page message instead of a raw code; no false "empty" claims on error (found in Stage 4)           |
+| `ff97a781` | C5.1  | Docs: this review and the record updates (the first docs commit)                                                |
+| `3f8c97a1` | fix   | Push type filter is a select of the known types, readable labels (found in the eyes-on walk, round 1)           |
 
 `git diff origin/main..HEAD` is **empty** for `PushTokenRegistryTest.php` and `AdminCreatorController.php` (asserted, both
 rulings from the plan: Q10, Q11). 109 files changed before this docs commit; 72 of them are locale JSON (3 files × 24).
@@ -68,14 +70,15 @@ nav and layout specs pass unchanged.
 
 ## 2. Gate board
 
-At the code tip `eea2e89e` (this docs commit changes no code):
+At the code tip `3f8c97a1` (the docs commits change no code). The backend, the main SPA and `api-client` are unchanged since
+`eea2e89e`; their rows below were measured there, and `git diff eea2e89e..3f8c97a1` touches only `apps/admin`:
 
 | Gate                                                            | Result                                                                                                                                        |
 | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | Backend, full Pest serial                                       | **3,370 tests, 0 failed** (16,925 assertions; every test shows "deprecated" from the PHP 8.5 `PDO::MYSQL_ATTR_SSL_CA` notice, as on baseline) |
 | Pint `--test` (all)                                             | passed                                                                                                                                        |
 | PHPStan (Larastan)                                              | **No errors**; no ignores or baseline entries added                                                                                           |
-| Admin SPA, full Vitest                                          | **534 passed** (was 492 at Stage 0)                                                                                                           |
+| Admin SPA, full Vitest                                          | **539 passed** at `3f8c97a1` (534 at `eea2e89e`; 492 at Stage 0)                                                                              |
 | Admin `vue-tsc`, ESLint (all), Prettier                         | clean on every changed file (a whole-tree Prettier check also flags 42 build-artefact files, which are not source)                            |
 | `verify-locale.mjs` ×23 non-English locales                     | all PASS; `i18n-locale-parity` and `i18n-used-keys-resolve` green inside the Vitest run                                                       |
 | **Main SPA** Vitest + `vue-tsc` (untouched; re-run to prove it) | **2,358 passed**; typecheck clean                                                                                                             |
@@ -145,6 +148,23 @@ suite stayed green. It was caught only because the run showed no failure at all;
 | 16a | fix  | raw error key rendered (the old behaviour)             | 3                                 |
 | 16b | fix  | false empty claims during an error (the old behaviour) | 2                                 |
 
+### Eyes-on round 1 (the type-filter fix, `3f8c97a1`)
+
+| BRB | Mutation                                                 | Failed                                            |
+| --- | -------------------------------------------------------- | ------------------------------------------------- |
+| 17a | the select turned back into a free-text field            | 2 (the control is a select; the option click)     |
+| 17b | `item-value` changed to the label                        | 1 (picking a labelled option sends the **value**) |
+| 17c | one eligible type removed from `PUSH_NOTIFICATION_TYPES` | the backend-parity spec                           |
+| 17d | one label deleted from one locale (`de`)                 | the every-locale-has-a-label spec                 |
+
+**The first version of the select spec was too weak, and 17b showed it.** It emitted `update:modelValue` with the type
+value straight into the component, which bypasses the select's own item-to-value mapping, so mutation 17b passed all 23
+tests. The replacement drives the real control (open the menu, click the option **by its label**) and 17b then fails. This
+is the same lesson as §9 item 1 in a different place.
+
+The backend-parity spec also earned its keep immediately: my first list had `campaign.application_accepted`; the stored
+value is `campaign_application.accepted`, and the spec failed on that before anything was run in a browser.
+
 ---
 
 ## 4. Stage 4 — the Postgres walk (no commit)
@@ -208,6 +228,31 @@ not by the E2E suite. A new-page E2E spec is a tech-debt row, not shipped here.
 `SANCTUM_STATEFUL_DOMAINS` in the shell is inherited by `artisan serve` and gives a login 500 ("no session bound"); a platform
 admin is forced through 2FA enrollment (`mfa_exempted_at` did not bypass it), and the enrollment confirm step visibly sat on
 "Verifying…" for several seconds at the default bcrypt cost — consistent with, but not a timing of, the finding in §7.
+
+### 4.1 Eyes-on round 1 (2026-10-12)
+
+1. **The type filter was a free-text input (finding, fixed in `3f8c97a1`).** An admin would have had to type
+   `message.received_by_creator` from memory. It is now a select over the 14 push-eligible types (exactly
+   `PushEligibility::TOGGLEABLE` + `ALWAYS_ON`, kept in step by a spec that reads the PHP source), readable label shown, the
+   stored type value sent. Labels exist in all 24 locales; **the 23 non-English ones are my translations, not native-reviewed
+   (Irish and Maltese least certain)**, as for the rest of this chunk. Other free-text inputs on the two new pages: the
+   Push page's **Creator ID** (a ULID, normally filled by the deep link from the Creator app page; not a "type") and the
+   Creator app page's **search** (a name search). The audit-log page's **action** filter is the same kind of free-text
+   type input; it is pre-existing and untouched (tech-debt row). The table's **Type** column still shows the raw dotted
+   value; a labelled chip is a follow-up, not done.
+2. **The first Stage 4 dataset used notification types that do not exist** (`campaign.invited`, `contract.ready`,
+   `message.received`, `payout.paid`). Nothing at the time exercised the type filter against them, so it did not show; with
+   the select it would have returned nothing for every option. The scratch database was re-typed in place to the 14 real
+   values (about 5,300 rows each) before the re-walk. Production data can only hold real types: the column is written from
+   `NotificationType`.
+3. **Reviewer's walk ran against a local stack by mistake, which was a useful accident.** On a local database that did not
+   yet have the `push_deliveries` table, Push deliveries failed to load, and the page rendered the proper message with "—" tiles
+   and no false-empty claim: **the `eea2e89e` fix observed working on a genuinely broken load**, not a crafted one. The local
+   database then received the pending migration (`2026_10_12_100000_create_push_deliveries_table`, the only one pending).
+4. **Walk stack for the re-walk:** the same scratch database (20,000 creators, 74,864 deliveries after the prune), API on
+   `127.0.0.1:8002`, admin dev server on `127.0.0.1:5175` with its own Vite cache, and a different host name and port from
+   the everyday stack (`localhost:5174`) so cookies cannot collide. Walk-environment trap added: the API's
+   `FRONTEND_ADMIN_URL` must equal the admin origin, or the CSRF preflight lands on the main session and login returns 419.
 
 ---
 
@@ -287,9 +332,11 @@ production half is a separate finding (§7).
    failed load showed the raw key, plus "No push attempts stored yet" under a failed load. **Rule: an error-state test uses the
    exact error the transport layer produces**, and asserts what the user reads, including the absence of claims the failed load
    cannot back (empty/none/zero).
-2. **A mutation that does not fail anything is suspect** (the BRB-11a no-op).
-3. **Look at it.** Of everything in this chunk, the one real defect found after the green board was found by looking at a
-   rendered failure, on the production database engine, with realistic data.
+2. **A mutation that does not fail anything is suspect** (the BRB-11 no-op, and again BRB-17b against the first select spec).
+3. **Look at it.** Of everything in this chunk, the defects found after the green board were found by looking: a rendered
+   failure on the production database engine (§1 fix), and a filter nobody could use without memorising its values (§4.1).
+4. **Test-data realism is part of the test.** The first walk dataset used notification types the product never emits, so a
+   whole filter looked fine because nothing exercised it. Seeds should draw from the real enum.
 
 ---
 

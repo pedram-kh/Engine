@@ -117,8 +117,8 @@ discipline in §7.
 ## Part 2 — CURRENT STATE ⟵ refresh this block at each session close
 
 **Last updated:** 2026-10-12 · **Through:** **AH-102b, admin observability for the creator app — LANDED LOCALLY, AT CHECKPOINT B (the one
-push awaits the reviewer's clearance and Pedram's go).** The branch is 15 commits ahead of `origin/main` `b21b7b2f` (14 code and
-planning commits plus the C5.1 docs commit); **nothing from AH-102b is pushed, deployed, or armed**, and live state is `git status`
+push awaits the reviewer's clearance and Pedram's go).** The branch is 17 commits ahead of `origin/main` `b21b7b2f` (code, planning and two docs
+commits, including the type-filter select from eyes-on round 1); **nothing from AH-102b is pushed, deployed, or armed**, and live state is `git status`
 and `origin/main`, not this sentence. Review: [`admin-observability-review.md`](admin-observability-review.md) (BRB record, gate board,
 the Stage 4 Postgres walk, the flake accounting, lessons); plan: [`admin-observability-plan.md`](admin-observability-plan.md); ad-hoc entry
 AH-102b; deploy entry `AH-102b … — PENDING` in `deploy-log.md`. **One additive migration** (`push_deliveries`); **PROD-DATA RISK: LOW.**

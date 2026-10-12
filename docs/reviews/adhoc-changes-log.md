@@ -72,7 +72,7 @@ reviews, and conversations.
 
 ### AH-102b · Admin observability for the creator app (Creator App arc)
 
-- **Status:** **Landed locally (15 commits including the docs commit); not pushed at the time of writing; NOT deployed, no flag armed.**
+- **Status:** **Landed locally (17 commits including the two docs commits); not pushed at the time of writing; NOT deployed, no flag armed.**
   The push state and the CI run for the pushed tip are recorded in the review §10 and in the post-push docs commit. Plan:
   [`admin-observability-plan.md`](admin-observability-plan.md); inventory:
   [`admin-observability-inventory.md`](admin-observability-inventory.md); review:
@@ -96,7 +96,7 @@ reviews, and conversations.
     `BCRYPT_ROUNDS=4` for the two E2E API servers, fixing the E2E half of the `2fa` enrollment flake rows in both SPAs.
 - **Commits:** `65d2b306` inventory, `e4f7bac7` plan, `9bf80e41` C0.1, `30b5894c` C0.2, `9197cd0b` C0.2b, `686d653b` C1.1,
   `c67d9505` C1.2, `03411f16` C1.3, `b64beee8` C1.4, `4f4659fa` C2.1, `53e32e7a` C2.2, `61627374` C3.1, `d95988ea` C3.2,
-  `eea2e89e` the error-state fix, then the docs commit.
+  `eea2e89e` the error-state fix, `ff97a781` the docs commit, `3f8c97a1` the type-filter select (eyes-on round 1).
 - **Found by looking, not by a test:** on a 500 or a dropped connection both pages rendered the raw key `http.unknown_error` and
   said "nothing stored" while the load had failed. The first error specs used a crafted error, not the one the client emits
   (review §9). `AuditLogPage` very likely has the same defect (suspected, untouched; tech-debt).
