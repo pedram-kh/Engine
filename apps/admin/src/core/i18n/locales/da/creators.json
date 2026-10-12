@@ -221,6 +221,59 @@
             "error_not_disconnectable": "Der er ingen aktiv forbindelse med dette bureau at afbryde."
           }
         }
+      },
+      "app": {
+        "title": "Creator-app",
+        "filters": {
+          "status": {
+            "all": "Alle",
+            "active": "Aktiv",
+            "signed_out": "Logget ud",
+            "never": "Aldrig logget ind"
+          },
+          "platform_all": "Alle platforme",
+          "push": {
+            "all": "Enhver push-status",
+            "registered": "Push registreret",
+            "dead": "Push-token ugyldigt",
+            "none": "Ingen push"
+          },
+          "search": "Søg efter navn eller e-mail"
+        },
+        "columns": {
+          "creator": "Creator",
+          "status": "Status",
+          "sign_ins": "Aktive logins",
+          "platforms": "Platforme",
+          "last_seen": "Sidst set",
+          "last_sign_in": "Seneste login",
+          "app_version": "App-version",
+          "push": "Push"
+        },
+        "view_sign_ins": "Se logins",
+        "empty": "Ingen creators matcher disse filtre.",
+        "load_failed": "Brugen af creator-appen kunne ikke indlæses. Opdater siden.",
+        "sign_ins": {
+          "title": "Logins",
+          "note": "Et login er én indlogning i creator-appen. Logins, der med vilje er afsluttet, fjernes og vises ikke her.",
+          "state": {
+            "live": "Aktiv",
+            "expired": "Udløbet"
+          },
+          "columns": {
+            "platform": "Platform",
+            "signed_in": "Logget ind",
+            "last_seen": "Sidst set",
+            "state": "Tilstand",
+            "app_version": "App-version",
+            "push": "Push"
+          },
+          "showing": "Viser de seneste {shown} af {total} logins",
+          "empty": "Ingen logins registreret.",
+          "view_deliveries": "Se push-leverancer",
+          "close": "Luk",
+          "load_failed": "Loginsene kunne ikke indlæses. Prøv igen."
+        }
       }
     }
   },

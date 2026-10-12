@@ -221,6 +221,59 @@
             "error_not_disconnectable": "Nu există nicio conexiune activă cu această agenție de deconectat."
           }
         }
+      },
+      "app": {
+        "title": "Aplicația creatorilor",
+        "filters": {
+          "status": {
+            "all": "Toți",
+            "active": "Activ",
+            "signed_out": "Deconectat",
+            "never": "Niciodată conectat"
+          },
+          "platform_all": "Toate platformele",
+          "push": {
+            "all": "Orice stare push",
+            "registered": "Push înregistrat",
+            "dead": "Token push invalid",
+            "none": "Fără push"
+          },
+          "search": "Caută după nume sau e-mail"
+        },
+        "columns": {
+          "creator": "Creator",
+          "status": "Stare",
+          "sign_ins": "Conectări active",
+          "platforms": "Platforme",
+          "last_seen": "Văzut ultima dată",
+          "last_sign_in": "Ultima conectare",
+          "app_version": "Versiunea aplicației",
+          "push": "Push"
+        },
+        "view_sign_ins": "Vezi conectările",
+        "empty": "Niciun creator nu corespunde acestor filtre.",
+        "load_failed": "Utilizarea aplicației creatorilor nu a putut fi încărcată. Reîmprospătează pagina.",
+        "sign_ins": {
+          "title": "Conectări",
+          "note": "O conectare este o autentificare în aplicația creatorilor. Conectările încheiate intenționat sunt eliminate și nu apar aici.",
+          "state": {
+            "live": "Activă",
+            "expired": "Expirată"
+          },
+          "columns": {
+            "platform": "Platformă",
+            "signed_in": "Conectat",
+            "last_seen": "Văzut ultima dată",
+            "state": "Stare",
+            "app_version": "Versiunea aplicației",
+            "push": "Push"
+          },
+          "showing": "Se afișează ultimele {shown} din {total} conectări",
+          "empty": "Nu există conectări înregistrate.",
+          "view_deliveries": "Vezi livrările push",
+          "close": "Închide",
+          "load_failed": "Conectările nu au putut fi încărcate. Încearcă din nou."
+        }
       }
     }
   },

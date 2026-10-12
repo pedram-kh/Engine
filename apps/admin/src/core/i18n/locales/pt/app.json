@@ -33,6 +33,7 @@
       "erasureQueue": "Fila de apagamento",
       "featureFlags": "Feature flags",
       "automations": "Automações",
+      "creatorApp": "App de criadores",
       "pushDeliveries": "Entregas push"
     },
     "userMenu": {

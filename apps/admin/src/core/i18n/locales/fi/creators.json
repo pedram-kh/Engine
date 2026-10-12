@@ -221,6 +221,59 @@
             "error_not_disconnectable": "Tähän toimistoon ei ole aktiivista yhteyttä, jonka voisi katkaista."
           }
         }
+      },
+      "app": {
+        "title": "Sisällöntuottajien sovellus",
+        "filters": {
+          "status": {
+            "all": "Kaikki",
+            "active": "Aktiivinen",
+            "signed_out": "Kirjautunut ulos",
+            "never": "Ei ole koskaan kirjautunut"
+          },
+          "platform_all": "Kaikki alustat",
+          "push": {
+            "all": "Mikä tahansa push-tila",
+            "registered": "Push rekisteröity",
+            "dead": "Push-tunniste virheellinen",
+            "none": "Ei pushia"
+          },
+          "search": "Hae nimellä tai sähköpostilla"
+        },
+        "columns": {
+          "creator": "Sisällöntuottaja",
+          "status": "Tila",
+          "sign_ins": "Aktiiviset kirjautumiset",
+          "platforms": "Alustat",
+          "last_seen": "Viimeksi nähty",
+          "last_sign_in": "Viimeisin kirjautuminen",
+          "app_version": "Sovelluksen versio",
+          "push": "Push"
+        },
+        "view_sign_ins": "Näytä kirjautumiset",
+        "empty": "Mikään sisällöntuottaja ei vastaa näitä suodattimia.",
+        "load_failed": "Sisällöntuottajien sovelluksen käyttöä ei voitu ladata. Päivitä sivu.",
+        "sign_ins": {
+          "title": "Kirjautumiset",
+          "note": "Kirjautuminen on yksi sisäänkirjautuminen sisällöntuottajien sovellukseen. Tarkoituksella päätetyt kirjautumiset poistetaan, eikä niitä näytetä tässä.",
+          "state": {
+            "live": "Aktiivinen",
+            "expired": "Vanhentunut"
+          },
+          "columns": {
+            "platform": "Alusta",
+            "signed_in": "Kirjautunut",
+            "last_seen": "Viimeksi nähty",
+            "state": "Tila",
+            "app_version": "Sovelluksen versio",
+            "push": "Push"
+          },
+          "showing": "Näytetään viimeisimmät {shown} kirjautumista {total}:sta",
+          "empty": "Ei tallennettuja kirjautumisia.",
+          "view_deliveries": "Näytä push-toimitukset",
+          "close": "Sulje",
+          "load_failed": "Kirjautumisia ei voitu ladata. Yritä uudelleen."
+        }
       }
     }
   },

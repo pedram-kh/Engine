@@ -221,6 +221,59 @@
             "error_not_disconnectable": "S touto agenturou neexistuje žádné aktivní spojení, které by bylo možné ukončit."
           }
         }
+      },
+      "app": {
+        "title": "Aplikace pro tvůrce",
+        "filters": {
+          "status": {
+            "all": "Všichni",
+            "active": "Aktivní",
+            "signed_out": "Odhlášen",
+            "never": "Nikdy nepřihlášen"
+          },
+          "platform_all": "Všechny platformy",
+          "push": {
+            "all": "Libovolný stav push",
+            "registered": "Push zaregistrován",
+            "dead": "Neplatný push token",
+            "none": "Bez push"
+          },
+          "search": "Hledat podle jména nebo e-mailu"
+        },
+        "columns": {
+          "creator": "Tvůrce",
+          "status": "Stav",
+          "sign_ins": "Aktivní přihlášení",
+          "platforms": "Platformy",
+          "last_seen": "Naposledy viděn",
+          "last_sign_in": "Poslední přihlášení",
+          "app_version": "Verze aplikace",
+          "push": "Push"
+        },
+        "view_sign_ins": "Zobrazit přihlášení",
+        "empty": "Těmto filtrům neodpovídají žádní tvůrci.",
+        "load_failed": "Využití aplikace pro tvůrce se nepodařilo načíst. Obnovte stránku.",
+        "sign_ins": {
+          "title": "Přihlášení",
+          "note": "Přihlášení je jedno přihlášení do aplikace pro tvůrce. Přihlášení, která byla ukončena záměrně, se odstraňují a nejsou zde uvedena.",
+          "state": {
+            "live": "Aktivní",
+            "expired": "Vypršelo"
+          },
+          "columns": {
+            "platform": "Platforma",
+            "signed_in": "Přihlášeno",
+            "last_seen": "Naposledy viděn",
+            "state": "Stav",
+            "app_version": "Verze aplikace",
+            "push": "Push"
+          },
+          "showing": "Zobrazeno posledních {shown} z {total} přihlášení",
+          "empty": "Žádná zaznamenaná přihlášení.",
+          "view_deliveries": "Zobrazit doručení push",
+          "close": "Zavřít",
+          "load_failed": "Přihlášení se nepodařilo načíst. Zkuste to znovu."
+        }
       }
     }
   },

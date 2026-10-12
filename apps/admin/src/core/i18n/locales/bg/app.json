@@ -33,6 +33,7 @@
       "erasureQueue": "Erasure queue",
       "featureFlags": "Флагове за функции",
       "automations": "Automations",
+      "creatorApp": "Приложение за създатели",
       "pushDeliveries": "Push доставки"
     },
     "userMenu": {

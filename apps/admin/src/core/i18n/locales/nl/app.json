@@ -33,6 +33,7 @@
       "erasureQueue": "Verwijderingswachtrij",
       "featureFlags": "Functievlaggen",
       "automations": "Automations",
+      "creatorApp": "Creator-app",
       "pushDeliveries": "Pushleveringen"
     },
     "userMenu": {

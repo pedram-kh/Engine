@@ -72,6 +72,7 @@ export const NAV_ENTRIES: ReadonlyArray<NavEntry> = [
         badge: 'kycQueue',
       },
       { key: 'allCreators', icon: 'mdi-account-multiple-outline', routeName: 'app.creators.all' },
+      { key: 'creatorApp', icon: 'mdi-cellphone-check', routeName: 'app.creators.app' },
     ],
   },
   {

@@ -33,6 +33,7 @@
       "erasureQueue": "Erasure queue",
       "featureFlags": "Funktsioonilipud",
       "automations": "Automations",
+      "creatorApp": "Loojate rakendus",
       "pushDeliveries": "Push-kohaletoimetused"
     },
     "userMenu": {

@@ -221,6 +221,59 @@
             "error_not_disconnectable": "No hay ninguna conexión activa con esta agencia que desconectar."
           }
         }
+      },
+      "app": {
+        "title": "App de creadores",
+        "filters": {
+          "status": {
+            "all": "Todos",
+            "active": "Activo",
+            "signed_out": "Sesión cerrada",
+            "never": "Nunca inició sesión"
+          },
+          "platform_all": "Todas las plataformas",
+          "push": {
+            "all": "Cualquier estado de push",
+            "registered": "Push registrado",
+            "dead": "Token de push no válido",
+            "none": "Sin push"
+          },
+          "search": "Buscar por nombre o correo"
+        },
+        "columns": {
+          "creator": "Creador",
+          "status": "Estado",
+          "sign_ins": "Sesiones activas",
+          "platforms": "Plataformas",
+          "last_seen": "Última actividad",
+          "last_sign_in": "Último inicio de sesión",
+          "app_version": "Versión de la app",
+          "push": "Push"
+        },
+        "view_sign_ins": "Ver sesiones",
+        "empty": "Ningún creador coincide con estos filtros.",
+        "load_failed": "No pudimos cargar el uso de la app de creadores. Actualiza la página.",
+        "sign_ins": {
+          "title": "Sesiones",
+          "note": "Una sesión es un inicio de sesión en la app de creadores. Las sesiones cerradas a propósito se eliminan y no aparecen aquí.",
+          "state": {
+            "live": "Activa",
+            "expired": "Caducada"
+          },
+          "columns": {
+            "platform": "Plataforma",
+            "signed_in": "Inicio de sesión",
+            "last_seen": "Última actividad",
+            "state": "Estado",
+            "app_version": "Versión de la app",
+            "push": "Push"
+          },
+          "showing": "Mostrando las últimas {shown} de {total} sesiones",
+          "empty": "No hay sesiones registradas.",
+          "view_deliveries": "Ver entregas push",
+          "close": "Cerrar",
+          "load_failed": "No pudimos cargar las sesiones. Inténtalo de nuevo."
+        }
       }
     }
   },

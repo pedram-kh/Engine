@@ -33,6 +33,7 @@
       "erasureQueue": "File d'effacement",
       "featureFlags": "Indicateurs de fonctionnalités",
       "automations": "Automations",
+      "creatorApp": "App créateur",
       "pushDeliveries": "Envois push"
     },
     "userMenu": {

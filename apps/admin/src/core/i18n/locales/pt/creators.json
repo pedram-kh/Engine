@@ -221,6 +221,59 @@
             "error_not_disconnectable": "Não existe nenhuma ligação ativa com esta agência para desligar."
           }
         }
+      },
+      "app": {
+        "title": "App de criadores",
+        "filters": {
+          "status": {
+            "all": "Todos",
+            "active": "Ativo",
+            "signed_out": "Sessão terminada",
+            "never": "Nunca iniciou sessão"
+          },
+          "platform_all": "Todas as plataformas",
+          "push": {
+            "all": "Qualquer estado de push",
+            "registered": "Push registado",
+            "dead": "Token de push inválido",
+            "none": "Sem push"
+          },
+          "search": "Pesquisar por nome ou e-mail"
+        },
+        "columns": {
+          "creator": "Criador",
+          "status": "Estado",
+          "sign_ins": "Sessões ativas",
+          "platforms": "Plataformas",
+          "last_seen": "Última atividade",
+          "last_sign_in": "Último início de sessão",
+          "app_version": "Versão da app",
+          "push": "Push"
+        },
+        "view_sign_ins": "Ver sessões",
+        "empty": "Nenhum criador corresponde a estes filtros.",
+        "load_failed": "Não foi possível carregar a utilização da app de criadores. Atualize a página.",
+        "sign_ins": {
+          "title": "Sessões",
+          "note": "Uma sessão é um início de sessão na app de criadores. As sessões terminadas de propósito são removidas e não aparecem aqui.",
+          "state": {
+            "live": "Ativa",
+            "expired": "Expirada"
+          },
+          "columns": {
+            "platform": "Plataforma",
+            "signed_in": "Sessão iniciada",
+            "last_seen": "Última atividade",
+            "state": "Estado",
+            "app_version": "Versão da app",
+            "push": "Push"
+          },
+          "showing": "A mostrar as últimas {shown} de {total} sessões",
+          "empty": "Não há sessões registadas.",
+          "view_deliveries": "Ver entregas push",
+          "close": "Fechar",
+          "load_failed": "Não foi possível carregar as sessões. Tente novamente."
+        }
       }
     }
   },

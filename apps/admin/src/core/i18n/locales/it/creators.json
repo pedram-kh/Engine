@@ -221,6 +221,59 @@
             "error_not_disconnectable": "Non c'è alcun collegamento attivo con questa agenzia da disconnettere."
           }
         }
+      },
+      "app": {
+        "title": "App creator",
+        "filters": {
+          "status": {
+            "all": "Tutti",
+            "active": "Attivo",
+            "signed_out": "Disconnesso",
+            "never": "Mai effettuato l'accesso"
+          },
+          "platform_all": "Tutte le piattaforme",
+          "push": {
+            "all": "Qualsiasi stato push",
+            "registered": "Push registrato",
+            "dead": "Token push non valido",
+            "none": "Nessun push"
+          },
+          "search": "Cerca per nome o e-mail"
+        },
+        "columns": {
+          "creator": "Creator",
+          "status": "Stato",
+          "sign_ins": "Accessi attivi",
+          "platforms": "Piattaforme",
+          "last_seen": "Ultima attività",
+          "last_sign_in": "Ultimo accesso",
+          "app_version": "Versione dell'app",
+          "push": "Push"
+        },
+        "view_sign_ins": "Vedi accessi",
+        "empty": "Nessun creator corrisponde a questi filtri.",
+        "load_failed": "Impossibile caricare l'utilizzo dell'app creator. Aggiorna la pagina.",
+        "sign_ins": {
+          "title": "Accessi",
+          "note": "Un accesso è un login nell'app creator. Gli accessi terminati di proposito vengono rimossi e non sono elencati qui.",
+          "state": {
+            "live": "Attivo",
+            "expired": "Scaduto"
+          },
+          "columns": {
+            "platform": "Piattaforma",
+            "signed_in": "Accesso effettuato",
+            "last_seen": "Ultima attività",
+            "state": "Stato",
+            "app_version": "Versione dell'app",
+            "push": "Push"
+          },
+          "showing": "Ultimi {shown} accessi su {total}",
+          "empty": "Nessun accesso registrato.",
+          "view_deliveries": "Vedi consegne push",
+          "close": "Chiudi",
+          "load_failed": "Impossibile caricare gli accessi. Riprova."
+        }
       }
     }
   },

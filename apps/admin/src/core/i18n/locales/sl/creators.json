@@ -221,6 +221,59 @@
             "error_not_disconnectable": "S to agencijo ni aktivne povezave, ki bi jo bilo mogoče prekiniti."
           }
         }
+      },
+      "app": {
+        "title": "Aplikacija za ustvarjalce",
+        "filters": {
+          "status": {
+            "all": "Vsi",
+            "active": "Aktiven",
+            "signed_out": "Odjavljen",
+            "never": "Nikoli prijavljen"
+          },
+          "platform_all": "Vse platforme",
+          "push": {
+            "all": "Poljubno stanje push",
+            "registered": "Push registriran",
+            "dead": "Neveljaven žeton push",
+            "none": "Brez push"
+          },
+          "search": "Išči po imenu ali e-pošti"
+        },
+        "columns": {
+          "creator": "Ustvarjalec",
+          "status": "Stanje",
+          "sign_ins": "Aktivne prijave",
+          "platforms": "Platforme",
+          "last_seen": "Nazadnje viden",
+          "last_sign_in": "Zadnja prijava",
+          "app_version": "Različica aplikacije",
+          "push": "Push"
+        },
+        "view_sign_ins": "Prikaži prijave",
+        "empty": "Nobeni ustvarjalci ne ustrezajo tem filtrom.",
+        "load_failed": "Uporabe aplikacije za ustvarjalce ni bilo mogoče naložiti. Osvežite stran.",
+        "sign_ins": {
+          "title": "Prijave",
+          "note": "Prijava je ena prijava v aplikacijo za ustvarjalce. Prijave, ki so bile končane namerno, se odstranijo in tu niso navedene.",
+          "state": {
+            "live": "Aktivna",
+            "expired": "Potekla"
+          },
+          "columns": {
+            "platform": "Platforma",
+            "signed_in": "Prijavljen",
+            "last_seen": "Nazadnje viden",
+            "state": "Stanje",
+            "app_version": "Različica aplikacije",
+            "push": "Push"
+          },
+          "showing": "Prikazanih zadnjih {shown} od {total} prijav",
+          "empty": "Ni zabeleženih prijav.",
+          "view_deliveries": "Prikaži dostave push",
+          "close": "Zapri",
+          "load_failed": "Prijav ni bilo mogoče naložiti. Poskusite znova."
+        }
       }
     }
   },

@@ -221,6 +221,59 @@
             "error_not_disconnectable": "Il n'y a aucune connexion active avec cette agence à déconnecter."
           }
         }
+      },
+      "app": {
+        "title": "App créateur",
+        "filters": {
+          "status": {
+            "all": "Tous",
+            "active": "Actif",
+            "signed_out": "Déconnecté",
+            "never": "Jamais connecté"
+          },
+          "platform_all": "Toutes les plateformes",
+          "push": {
+            "all": "Tout état push",
+            "registered": "Push enregistré",
+            "dead": "Jeton push invalide",
+            "none": "Pas de push"
+          },
+          "search": "Rechercher un nom ou un e-mail"
+        },
+        "columns": {
+          "creator": "Créateur",
+          "status": "Statut",
+          "sign_ins": "Connexions actives",
+          "platforms": "Plateformes",
+          "last_seen": "Dernière activité",
+          "last_sign_in": "Dernière connexion",
+          "app_version": "Version de l'app",
+          "push": "Push"
+        },
+        "view_sign_ins": "Voir les connexions",
+        "empty": "Aucun créateur ne correspond à ces filtres.",
+        "load_failed": "Impossible de charger l'usage de l'app créateur. Veuillez actualiser la page.",
+        "sign_ins": {
+          "title": "Connexions",
+          "note": "Une connexion correspond à une ouverture de session dans l'app créateur. Les connexions terminées volontairement sont supprimées et n'apparaissent pas ici.",
+          "state": {
+            "live": "Active",
+            "expired": "Expirée"
+          },
+          "columns": {
+            "platform": "Plateforme",
+            "signed_in": "Connecté le",
+            "last_seen": "Dernière activité",
+            "state": "État",
+            "app_version": "Version de l'app",
+            "push": "Push"
+          },
+          "showing": "Affichage des {shown} dernières connexions sur {total}",
+          "empty": "Aucune connexion enregistrée.",
+          "view_deliveries": "Voir les envois push",
+          "close": "Fermer",
+          "load_failed": "Impossible de charger les connexions. Veuillez réessayer."
+        }
       }
     }
   },

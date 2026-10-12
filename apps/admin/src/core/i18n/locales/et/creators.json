@@ -221,6 +221,59 @@
             "error_not_disconnectable": "Selle agentuuriga pole aktiivset ühendust, mida katkestada."
           }
         }
+      },
+      "app": {
+        "title": "Loojate rakendus",
+        "filters": {
+          "status": {
+            "all": "Kõik",
+            "active": "Aktiivne",
+            "signed_out": "Välja logitud",
+            "never": "Pole kunagi sisse loginud"
+          },
+          "platform_all": "Kõik platvormid",
+          "push": {
+            "all": "Mis tahes push-olek",
+            "registered": "Push registreeritud",
+            "dead": "Kehtetu push-tunnus",
+            "none": "Push puudub"
+          },
+          "search": "Otsi nime või e-posti järgi"
+        },
+        "columns": {
+          "creator": "Looja",
+          "status": "Olek",
+          "sign_ins": "Aktiivsed sisselogimised",
+          "platforms": "Platvormid",
+          "last_seen": "Viimati nähtud",
+          "last_sign_in": "Viimane sisselogimine",
+          "app_version": "Rakenduse versioon",
+          "push": "Push"
+        },
+        "view_sign_ins": "Vaata sisselogimisi",
+        "empty": "Neile filtritele ei vasta ükski looja.",
+        "load_failed": "Loojate rakenduse kasutust ei õnnestunud laadida. Värskenda lehte.",
+        "sign_ins": {
+          "title": "Sisselogimised",
+          "note": "Sisselogimine on üks sisenemine loojate rakendusse. Tahtlikult lõpetatud sisselogimised eemaldatakse ja neid siin ei kuvata.",
+          "state": {
+            "live": "Aktiivne",
+            "expired": "Aegunud"
+          },
+          "columns": {
+            "platform": "Platvorm",
+            "signed_in": "Sisse logitud",
+            "last_seen": "Viimati nähtud",
+            "state": "Olek",
+            "app_version": "Rakenduse versioon",
+            "push": "Push"
+          },
+          "showing": "Kuvatakse viimased {shown} sisselogimist {total}-st",
+          "empty": "Sisselogimisi pole salvestatud.",
+          "view_deliveries": "Vaata push-kohaletoimetusi",
+          "close": "Sulge",
+          "load_failed": "Sisselogimisi ei õnnestunud laadida. Proovi uuesti."
+        }
       }
     }
   },

@@ -221,6 +221,59 @@
             "error_not_disconnectable": "Er is geen actieve verbinding met dit bureau om te verbreken."
           }
         }
+      },
+      "app": {
+        "title": "Creator-app",
+        "filters": {
+          "status": {
+            "all": "Alle",
+            "active": "Actief",
+            "signed_out": "Uitgelogd",
+            "never": "Nooit ingelogd"
+          },
+          "platform_all": "Alle platforms",
+          "push": {
+            "all": "Elke pushstatus",
+            "registered": "Push geregistreerd",
+            "dead": "Pushtoken ongeldig",
+            "none": "Geen push"
+          },
+          "search": "Zoek op naam of e-mail"
+        },
+        "columns": {
+          "creator": "Creator",
+          "status": "Status",
+          "sign_ins": "Actieve aanmeldingen",
+          "platforms": "Platforms",
+          "last_seen": "Laatst gezien",
+          "last_sign_in": "Laatste aanmelding",
+          "app_version": "App-versie",
+          "push": "Push"
+        },
+        "view_sign_ins": "Aanmeldingen bekijken",
+        "empty": "Geen creators komen overeen met deze filters.",
+        "load_failed": "Het gebruik van de creator-app kon niet worden geladen. Vernieuw de pagina.",
+        "sign_ins": {
+          "title": "Aanmeldingen",
+          "note": "Een aanmelding is één login in de creator-app. Aanmeldingen die bewust zijn beëindigd, worden verwijderd en staan hier niet.",
+          "state": {
+            "live": "Actief",
+            "expired": "Verlopen"
+          },
+          "columns": {
+            "platform": "Platform",
+            "signed_in": "Aangemeld",
+            "last_seen": "Laatst gezien",
+            "state": "Status",
+            "app_version": "App-versie",
+            "push": "Push"
+          },
+          "showing": "De laatste {shown} van {total} aanmeldingen",
+          "empty": "Geen aanmeldingen vastgelegd.",
+          "view_deliveries": "Pushleveringen bekijken",
+          "close": "Sluiten",
+          "load_failed": "De aanmeldingen konden niet worden geladen. Probeer het opnieuw."
+        }
       }
     }
   },

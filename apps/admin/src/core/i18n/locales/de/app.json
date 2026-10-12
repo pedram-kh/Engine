@@ -33,6 +33,7 @@
       "erasureQueue": "Lösch-Warteschlange",
       "featureFlags": "Feature-Flags",
       "automations": "Automations",
+      "creatorApp": "Creator-App",
       "pushDeliveries": "Push-Zustellungen"
     },
     "userMenu": {

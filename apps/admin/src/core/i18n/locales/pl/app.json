@@ -33,6 +33,7 @@
       "erasureQueue": "Kolejka usunięcia",
       "featureFlags": "Flagi funkcji",
       "automations": "Automations",
+      "creatorApp": "Aplikacja twórców",
       "pushDeliveries": "Dostarczenia push"
     },
     "userMenu": {

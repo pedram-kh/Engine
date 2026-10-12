@@ -33,6 +33,7 @@
       "erasureQueue": "Erasure queue",
       "featureFlags": "Σημαίες λειτουργιών",
       "automations": "Automations",
+      "creatorApp": "Εφαρμογή δημιουργών",
       "pushDeliveries": "Παραδόσεις push"
     },
     "userMenu": {

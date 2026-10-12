@@ -221,6 +221,59 @@
             "error_not_disconnectable": "M'hemm l-ebda konnessjoni attiva ma' din l-aġenzija x'tinqata'."
           }
         }
+      },
+      "app": {
+        "title": "App tal-kreaturi",
+        "filters": {
+          "status": {
+            "all": "Kollha",
+            "active": "Attiv",
+            "signed_out": "Skonnettjat",
+            "never": "Qatt ma daħal"
+          },
+          "platform_all": "Il-pjattaformi kollha",
+          "push": {
+            "all": "Kwalunkwe stat push",
+            "registered": "Push irreġistrat",
+            "dead": "Token push invalidu",
+            "none": "L-ebda push"
+          },
+          "search": "Fittex skont l-isem jew l-email"
+        },
+        "columns": {
+          "creator": "Kreatur",
+          "status": "Status",
+          "sign_ins": "Aċċessi attivi",
+          "platforms": "Pjattaformi",
+          "last_seen": "L-aħħar darba li deher",
+          "last_sign_in": "L-aħħar aċċess",
+          "app_version": "Verżjoni tal-app",
+          "push": "Push"
+        },
+        "view_sign_ins": "Ara l-aċċessi",
+        "empty": "L-ebda kreatur ma jaqbel ma' dawn il-filtri.",
+        "load_failed": "Ma stajniex inraddu l-użu tal-app tal-kreaturi. Jekk jogħġbok aġġorna l-paġna.",
+        "sign_ins": {
+          "title": "Aċċessi",
+          "note": "Aċċess huwa dħul wieħed fl-app tal-kreaturi. L-aċċessi li ntemmu apposta jitneħħew u ma jissemmewx hawn.",
+          "state": {
+            "live": "Attiv",
+            "expired": "Skadut"
+          },
+          "columns": {
+            "platform": "Pjattaforma",
+            "signed_in": "Daħal",
+            "last_seen": "L-aħħar darba li deher",
+            "state": "Stat",
+            "app_version": "Verżjoni tal-app",
+            "push": "Push"
+          },
+          "showing": "Qed jintwerew l-aħħar {shown} minn {total} aċċessi",
+          "empty": "L-ebda aċċess irreġistrat.",
+          "view_deliveries": "Ara l-konsenji push",
+          "close": "Agħlaq",
+          "load_failed": "Ma stajniex inraddu l-aċċessi. Jekk jogħġbok erġa' pprova."
+        }
       }
     }
   },

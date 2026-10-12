@@ -221,6 +221,59 @@
             "error_not_disconnectable": "Ne postoji aktivna veza s ovom agencijom koja bi se mogla prekinuti."
           }
         }
+      },
+      "app": {
+        "title": "Aplikacija za kreatore",
+        "filters": {
+          "status": {
+            "all": "Svi",
+            "active": "Aktivan",
+            "signed_out": "Odjavljen",
+            "never": "Nikad prijavljen"
+          },
+          "platform_all": "Sve platforme",
+          "push": {
+            "all": "Bilo koje push stanje",
+            "registered": "Push registriran",
+            "dead": "Nevažeći push token",
+            "none": "Bez push"
+          },
+          "search": "Traži po imenu ili e-pošti"
+        },
+        "columns": {
+          "creator": "Kreator",
+          "status": "Status",
+          "sign_ins": "Aktivne prijave",
+          "platforms": "Platforme",
+          "last_seen": "Zadnji put viđen",
+          "last_sign_in": "Zadnja prijava",
+          "app_version": "Verzija aplikacije",
+          "push": "Push"
+        },
+        "view_sign_ins": "Prikaži prijave",
+        "empty": "Nijedan kreator ne odgovara ovim filtrima.",
+        "load_failed": "Nije moguće učitati korištenje aplikacije za kreatore. Osvježite stranicu.",
+        "sign_ins": {
+          "title": "Prijave",
+          "note": "Prijava je jedna prijava u aplikaciju za kreatore. Prijave koje su namjerno završene uklanjaju se i ovdje nisu navedene.",
+          "state": {
+            "live": "Aktivna",
+            "expired": "Istekla"
+          },
+          "columns": {
+            "platform": "Platforma",
+            "signed_in": "Prijavljen",
+            "last_seen": "Zadnji put viđen",
+            "state": "Stanje",
+            "app_version": "Verzija aplikacije",
+            "push": "Push"
+          },
+          "showing": "Prikazano posljednjih {shown} od {total} prijava",
+          "empty": "Nema zabilježenih prijava.",
+          "view_deliveries": "Prikaži isporuke push obavijesti",
+          "close": "Zatvori",
+          "load_failed": "Nije moguće učitati prijave. Pokušajte ponovno."
+        }
       }
     }
   },

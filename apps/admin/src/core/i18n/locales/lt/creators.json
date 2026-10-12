@@ -221,6 +221,59 @@
             "error_not_disconnectable": "Su šia agentūra nėra aktyvaus ryšio, kurį būtų galima nutraukti."
           }
         }
+      },
+      "app": {
+        "title": "Kūrėjų programėlė",
+        "filters": {
+          "status": {
+            "all": "Visi",
+            "active": "Aktyvus",
+            "signed_out": "Atsijungęs",
+            "never": "Niekada neprisijungęs"
+          },
+          "platform_all": "Visos platformos",
+          "push": {
+            "all": "Bet kokia push būsena",
+            "registered": "Push užregistruotas",
+            "dead": "Netinkamas push raktas",
+            "none": "Be push"
+          },
+          "search": "Ieškoti pagal vardą ar el. paštą"
+        },
+        "columns": {
+          "creator": "Kūrėjas",
+          "status": "Būsena",
+          "sign_ins": "Aktyvūs prisijungimai",
+          "platforms": "Platformos",
+          "last_seen": "Paskutinį kartą matytas",
+          "last_sign_in": "Paskutinis prisijungimas",
+          "app_version": "Programėlės versija",
+          "push": "Push"
+        },
+        "view_sign_ins": "Peržiūrėti prisijungimus",
+        "empty": "Jokie kūrėjai neatitinka šių filtrų.",
+        "load_failed": "Nepavyko įkelti kūrėjų programėlės naudojimo. Atnaujinkite puslapį.",
+        "sign_ins": {
+          "title": "Prisijungimai",
+          "note": "Prisijungimas yra vienas įėjimas į kūrėjų programėlę. Tyčia užbaigti prisijungimai pašalinami ir čia neišvardijami.",
+          "state": {
+            "live": "Aktyvus",
+            "expired": "Pasibaigęs"
+          },
+          "columns": {
+            "platform": "Platforma",
+            "signed_in": "Prisijungta",
+            "last_seen": "Paskutinį kartą matytas",
+            "state": "Būsena",
+            "app_version": "Programėlės versija",
+            "push": "Push"
+          },
+          "showing": "Rodomi paskutiniai {shown} iš {total} prisijungimų",
+          "empty": "Prisijungimų nėra.",
+          "view_deliveries": "Peržiūrėti push pristatymus",
+          "close": "Uždaryti",
+          "load_failed": "Nepavyko įkelti prisijungimų. Bandykite dar kartą."
+        }
       }
     }
   },

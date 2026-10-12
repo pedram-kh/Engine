@@ -35,6 +35,8 @@ import itAuth from '@/core/i18n/locales/it/auth.json'
 import itCreators from '@/core/i18n/locales/it/creators.json'
 
 import { creatorsRoutes } from '@/modules/creators/routes'
+// AH-102b: the Creator app drawer deep-links into the push delivery log.
+import { operationsRoutes } from '@/modules/operations/routes'
 
 import type { Component } from 'vue'
 
@@ -63,7 +65,11 @@ export async function mountCreatorPage<T = unknown>(
 
   const router = createRouter({
     history: createMemoryHistory(),
-    routes: [...creatorsRoutes, { path: '/', name: 'home', component: { template: '<div/>' } }],
+    routes: [
+      ...creatorsRoutes,
+      ...operationsRoutes,
+      { path: '/', name: 'home', component: { template: '<div/>' } },
+    ],
   })
 
   const vuetify = createVuetify({

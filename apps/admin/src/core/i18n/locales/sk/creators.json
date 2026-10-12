@@ -221,6 +221,59 @@
             "error_not_disconnectable": "S touto agentúrou neexistuje žiadne aktívne spojenie, ktoré by bolo možné ukončiť."
           }
         }
+      },
+      "app": {
+        "title": "Aplikácia pre tvorcov",
+        "filters": {
+          "status": {
+            "all": "Všetci",
+            "active": "Aktívny",
+            "signed_out": "Odhlásený",
+            "never": "Nikdy neprihlásený"
+          },
+          "platform_all": "Všetky platformy",
+          "push": {
+            "all": "Ľubovoľný stav push",
+            "registered": "Push zaregistrovaný",
+            "dead": "Neplatný push token",
+            "none": "Bez push"
+          },
+          "search": "Hľadať podľa mena alebo e-mailu"
+        },
+        "columns": {
+          "creator": "Tvorca",
+          "status": "Stav",
+          "sign_ins": "Aktívne prihlásenia",
+          "platforms": "Platformy",
+          "last_seen": "Naposledy videný",
+          "last_sign_in": "Posledné prihlásenie",
+          "app_version": "Verzia aplikácie",
+          "push": "Push"
+        },
+        "view_sign_ins": "Zobraziť prihlásenia",
+        "empty": "Týmto filtrom nezodpovedajú žiadni tvorcovia.",
+        "load_failed": "Využitie aplikácie pre tvorcov sa nepodarilo načítať. Obnovte stránku.",
+        "sign_ins": {
+          "title": "Prihlásenia",
+          "note": "Prihlásenie je jedno prihlásenie do aplikácie pre tvorcov. Prihlásenia, ktoré boli ukončené zámerne, sa odstraňujú a nie sú tu uvedené.",
+          "state": {
+            "live": "Aktívne",
+            "expired": "Vypršalo"
+          },
+          "columns": {
+            "platform": "Platforma",
+            "signed_in": "Prihlásený",
+            "last_seen": "Naposledy videný",
+            "state": "Stav",
+            "app_version": "Verzia aplikácie",
+            "push": "Push"
+          },
+          "showing": "Zobrazených posledných {shown} z {total} prihlásení",
+          "empty": "Žiadne zaznamenané prihlásenia.",
+          "view_deliveries": "Zobraziť doručenia push",
+          "close": "Zavrieť",
+          "load_failed": "Prihlásenia sa nepodarilo načítať. Skúste to znova."
+        }
       }
     }
   },

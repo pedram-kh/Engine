@@ -221,6 +221,59 @@
             "error_not_disconnectable": "Ar šo aģentūru nav aktīva savienojuma, ko atvienot."
           }
         }
+      },
+      "app": {
+        "title": "Satura veidotāju lietotne",
+        "filters": {
+          "status": {
+            "all": "Visi",
+            "active": "Aktīvs",
+            "signed_out": "Izrakstījies",
+            "never": "Nekad nav pieteicies"
+          },
+          "platform_all": "Visas platformas",
+          "push": {
+            "all": "Jebkurš push stāvoklis",
+            "registered": "Push reģistrēts",
+            "dead": "Nederīgs push marķieris",
+            "none": "Nav push"
+          },
+          "search": "Meklēt pēc vārda vai e-pasta"
+        },
+        "columns": {
+          "creator": "Satura veidotājs",
+          "status": "Statuss",
+          "sign_ins": "Aktīvās pieteikšanās",
+          "platforms": "Platformas",
+          "last_seen": "Pēdējo reizi redzēts",
+          "last_sign_in": "Pēdējā pieteikšanās",
+          "app_version": "Lietotnes versija",
+          "push": "Push"
+        },
+        "view_sign_ins": "Skatīt pieteikšanās",
+        "empty": "Neviens satura veidotājs neatbilst šiem filtriem.",
+        "load_failed": "Neizdevās ielādēt satura veidotāju lietotnes lietojumu. Atjaunojiet lapu.",
+        "sign_ins": {
+          "title": "Pieteikšanās",
+          "note": "Pieteikšanās ir viena ieeja satura veidotāju lietotnē. Ar nolūku beigtās pieteikšanās tiek noņemtas un šeit nav uzskaitītas.",
+          "state": {
+            "live": "Aktīva",
+            "expired": "Beigusies"
+          },
+          "columns": {
+            "platform": "Platforma",
+            "signed_in": "Pieteicies",
+            "last_seen": "Pēdējo reizi redzēts",
+            "state": "Stāvoklis",
+            "app_version": "Lietotnes versija",
+            "push": "Push"
+          },
+          "showing": "Rāda pēdējās {shown} no {total} pieteikšanās reizēm",
+          "empty": "Nav ierakstītu pieteikšanos.",
+          "view_deliveries": "Skatīt push piegādes",
+          "close": "Aizvērt",
+          "load_failed": "Neizdevās ielādēt pieteikšanās. Mēģiniet vēlreiz."
+        }
       }
     }
   },

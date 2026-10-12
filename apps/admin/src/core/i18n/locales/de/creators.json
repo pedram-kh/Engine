@@ -221,6 +221,59 @@
             "error_not_disconnectable": "Es gibt keine aktive Verbindung mit dieser Agentur, die getrennt werden könnte."
           }
         }
+      },
+      "app": {
+        "title": "Creator-App",
+        "filters": {
+          "status": {
+            "all": "Alle",
+            "active": "Aktiv",
+            "signed_out": "Abgemeldet",
+            "never": "Nie angemeldet"
+          },
+          "platform_all": "Alle Plattformen",
+          "push": {
+            "all": "Beliebiger Push-Status",
+            "registered": "Push registriert",
+            "dead": "Push-Token ungültig",
+            "none": "Kein Push"
+          },
+          "search": "Nach Name oder E-Mail suchen"
+        },
+        "columns": {
+          "creator": "Creator",
+          "status": "Status",
+          "sign_ins": "Aktive Anmeldungen",
+          "platforms": "Plattformen",
+          "last_seen": "Zuletzt aktiv",
+          "last_sign_in": "Letzte Anmeldung",
+          "app_version": "App-Version",
+          "push": "Push"
+        },
+        "view_sign_ins": "Anmeldungen anzeigen",
+        "empty": "Keine Creator passen zu diesen Filtern.",
+        "load_failed": "Die Creator-App-Nutzung konnte nicht geladen werden. Bitte aktualisiere die Seite.",
+        "sign_ins": {
+          "title": "Anmeldungen",
+          "note": "Eine Anmeldung ist ein Login in der Creator-App. Absichtlich beendete Anmeldungen werden entfernt und hier nicht aufgeführt.",
+          "state": {
+            "live": "Aktiv",
+            "expired": "Abgelaufen"
+          },
+          "columns": {
+            "platform": "Plattform",
+            "signed_in": "Angemeldet",
+            "last_seen": "Zuletzt aktiv",
+            "state": "Zustand",
+            "app_version": "App-Version",
+            "push": "Push"
+          },
+          "showing": "Angezeigt werden die letzten {shown} von {total} Anmeldungen",
+          "empty": "Keine Anmeldungen vorhanden.",
+          "view_deliveries": "Push-Zustellungen ansehen",
+          "close": "Schließen",
+          "load_failed": "Die Anmeldungen konnten nicht geladen werden. Bitte versuche es erneut."
+        }
       }
     }
   },

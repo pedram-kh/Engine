@@ -221,6 +221,59 @@
             "error_not_disconnectable": "Níl aon nasc gníomhach leis an ngníomhaireacht seo le dínascadh."
           }
         }
+      },
+      "app": {
+        "title": "Aip na gcruthaitheoirí",
+        "filters": {
+          "status": {
+            "all": "Gach",
+            "active": "Gníomhach",
+            "signed_out": "Sínithe amach",
+            "never": "Níor shínigh isteach riamh"
+          },
+          "platform_all": "Gach ardán",
+          "push": {
+            "all": "Aon stádas push",
+            "registered": "Push cláraithe",
+            "dead": "Comhartha push neamhbhailí",
+            "none": "Gan push"
+          },
+          "search": "Cuardaigh de réir ainm nó ríomhphoist"
+        },
+        "columns": {
+          "creator": "Cruthaitheoir",
+          "status": "Stádas",
+          "sign_ins": "Sínithe isteach gníomhacha",
+          "platforms": "Ardáin",
+          "last_seen": "Le feiceáil go deireanach",
+          "last_sign_in": "Síniú isteach deireanach",
+          "app_version": "Leagan na haipe",
+          "push": "Push"
+        },
+        "view_sign_ins": "Féach ar shínithe isteach",
+        "empty": "Ní luíonn aon chruthaitheoir leis na scagairí seo.",
+        "load_failed": "Níorbh fhéidir úsáid aip na gcruthaitheoirí a luchtú. Athnuaigh an leathanach.",
+        "sign_ins": {
+          "title": "Sínithe isteach",
+          "note": "Is éard is síniú isteach ann ná logáil isteach amháin in aip na gcruthaitheoirí. Baintear sínithe isteach a cuireadh deireadh leo d'aon ghnó agus níl siad liostaithe anseo.",
+          "state": {
+            "live": "Gníomhach",
+            "expired": "Imithe in éag"
+          },
+          "columns": {
+            "platform": "Ardán",
+            "signed_in": "Sínithe isteach",
+            "last_seen": "Le feiceáil go deireanach",
+            "state": "Staid",
+            "app_version": "Leagan na haipe",
+            "push": "Push"
+          },
+          "showing": "Ag taispeáint an {shown} síniú isteach is déanaí as {total}",
+          "empty": "Níl aon síniú isteach ar taifead.",
+          "view_deliveries": "Féach ar sheachadtaí push",
+          "close": "Dún",
+          "load_failed": "Níorbh fhéidir na sínithe isteach a luchtú. Bain triail eile as."
+        }
       }
     }
   },

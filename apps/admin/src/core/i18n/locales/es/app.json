@@ -33,6 +33,7 @@
       "erasureQueue": "Cola de borrado",
       "featureFlags": "Indicadores de funciones",
       "automations": "Automations",
+      "creatorApp": "App de creadores",
       "pushDeliveries": "Entregas push"
     },
     "userMenu": {

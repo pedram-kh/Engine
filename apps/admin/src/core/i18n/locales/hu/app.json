@@ -33,6 +33,7 @@
       "erasureQueue": "Erasure queue",
       "featureFlags": "Funkciójelzők",
       "automations": "Automations",
+      "creatorApp": "Alkotói alkalmazás",
       "pushDeliveries": "Push-kézbesítések"
     },
     "userMenu": {

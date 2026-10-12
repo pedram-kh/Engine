@@ -221,6 +221,59 @@
             "error_not_disconnectable": "Nie ma aktywnego połączenia z tą agencją, które można by rozłączyć."
           }
         }
+      },
+      "app": {
+        "title": "Aplikacja twórców",
+        "filters": {
+          "status": {
+            "all": "Wszyscy",
+            "active": "Aktywny",
+            "signed_out": "Wylogowany",
+            "never": "Nigdy nie zalogowany"
+          },
+          "platform_all": "Wszystkie platformy",
+          "push": {
+            "all": "Dowolny stan push",
+            "registered": "Push zarejestrowany",
+            "dead": "Nieprawidłowy token push",
+            "none": "Brak push"
+          },
+          "search": "Szukaj według nazwy lub e-maila"
+        },
+        "columns": {
+          "creator": "Twórca",
+          "status": "Status",
+          "sign_ins": "Aktywne logowania",
+          "platforms": "Platformy",
+          "last_seen": "Ostatnio widziany",
+          "last_sign_in": "Ostatnie logowanie",
+          "app_version": "Wersja aplikacji",
+          "push": "Push"
+        },
+        "view_sign_ins": "Pokaż logowania",
+        "empty": "Żaden twórca nie pasuje do tych filtrów.",
+        "load_failed": "Nie udało się wczytać danych o użyciu aplikacji twórców. Odśwież stronę.",
+        "sign_ins": {
+          "title": "Logowania",
+          "note": "Logowanie to jedno zalogowanie w aplikacji twórców. Logowania zakończone celowo są usuwane i nie są tu wymienione.",
+          "state": {
+            "live": "Aktywne",
+            "expired": "Wygasłe"
+          },
+          "columns": {
+            "platform": "Platforma",
+            "signed_in": "Zalogowano",
+            "last_seen": "Ostatnio widziany",
+            "state": "Stan",
+            "app_version": "Wersja aplikacji",
+            "push": "Push"
+          },
+          "showing": "Wyświetlono ostatnie {shown} z {total} logowań",
+          "empty": "Brak zapisanych logowań.",
+          "view_deliveries": "Pokaż dostarczenia push",
+          "close": "Zamknij",
+          "load_failed": "Nie udało się wczytać logowań. Spróbuj ponownie."
+        }
       }
     }
   },

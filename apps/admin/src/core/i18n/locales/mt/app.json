@@ -33,6 +33,7 @@
       "erasureQueue": "Erasure queue",
       "featureFlags": "Bnadar tal-karatteristiċi",
       "automations": "Automations",
+      "creatorApp": "App tal-kreaturi",
       "pushDeliveries": "Konsenji push"
     },
     "userMenu": {

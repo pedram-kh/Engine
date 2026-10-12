@@ -33,6 +33,7 @@
       "erasureQueue": "Erasure queue",
       "featureFlags": "Funkciju karodziņi",
       "automations": "Automations",
+      "creatorApp": "Satura veidotāju lietotne",
       "pushDeliveries": "Push piegādes"
     },
     "userMenu": {

@@ -221,6 +221,59 @@
             "error_not_disconnectable": "Nincs aktív kapcsolat ezzel az ügynökséggel, amelyet meg lehetne szüntetni."
           }
         }
+      },
+      "app": {
+        "title": "Alkotói alkalmazás",
+        "filters": {
+          "status": {
+            "all": "Mind",
+            "active": "Aktív",
+            "signed_out": "Kijelentkezett",
+            "never": "Soha nem jelentkezett be"
+          },
+          "platform_all": "Minden platform",
+          "push": {
+            "all": "Bármilyen push-állapot",
+            "registered": "Push regisztrálva",
+            "dead": "Érvénytelen push-token",
+            "none": "Nincs push"
+          },
+          "search": "Keresés név vagy e-mail alapján"
+        },
+        "columns": {
+          "creator": "Alkotó",
+          "status": "Állapot",
+          "sign_ins": "Aktív bejelentkezések",
+          "platforms": "Platformok",
+          "last_seen": "Utoljára látva",
+          "last_sign_in": "Utolsó bejelentkezés",
+          "app_version": "Alkalmazásverzió",
+          "push": "Push"
+        },
+        "view_sign_ins": "Bejelentkezések megtekintése",
+        "empty": "Egyetlen alkotó sem felel meg ezeknek a szűrőknek.",
+        "load_failed": "Az alkotói alkalmazás használatának betöltése nem sikerült. Frissítsd az oldalt.",
+        "sign_ins": {
+          "title": "Bejelentkezések",
+          "note": "A bejelentkezés egy belépés az alkotói alkalmazásba. A szándékosan befejezett bejelentkezések törlődnek, és itt nem szerepelnek.",
+          "state": {
+            "live": "Aktív",
+            "expired": "Lejárt"
+          },
+          "columns": {
+            "platform": "Platform",
+            "signed_in": "Bejelentkezve",
+            "last_seen": "Utoljára látva",
+            "state": "Állapot",
+            "app_version": "Alkalmazásverzió",
+            "push": "Push"
+          },
+          "showing": "Az utolsó {shown} bejelentkezés látható a(z) {total} közül",
+          "empty": "Nincs rögzített bejelentkezés.",
+          "view_deliveries": "Push-kézbesítések megtekintése",
+          "close": "Bezárás",
+          "load_failed": "A bejelentkezések betöltése nem sikerült. Próbáld újra."
+        }
       }
     }
   },

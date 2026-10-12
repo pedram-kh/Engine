@@ -33,6 +33,7 @@
       "erasureQueue": "Sletningskø",
       "featureFlags": "Funktionsflag",
       "automations": "Automations",
+      "creatorApp": "Creator-app",
       "pushDeliveries": "Push-leverancer"
     },
     "userMenu": {

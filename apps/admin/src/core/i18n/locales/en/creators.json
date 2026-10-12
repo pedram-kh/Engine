@@ -221,6 +221,59 @@
             "error_not_disconnectable": "There's no active connection with this agency to disconnect."
           }
         }
+      },
+      "app": {
+        "title": "Creator app",
+        "filters": {
+          "status": {
+            "all": "All",
+            "active": "Active",
+            "signed_out": "Signed out",
+            "never": "Never signed in"
+          },
+          "platform_all": "All platforms",
+          "push": {
+            "all": "Any push state",
+            "registered": "Push registered",
+            "dead": "Push token invalid",
+            "none": "No push"
+          },
+          "search": "Search name or email"
+        },
+        "columns": {
+          "creator": "Creator",
+          "status": "Status",
+          "sign_ins": "Active sign-ins",
+          "platforms": "Platforms",
+          "last_seen": "Last seen",
+          "last_sign_in": "Last sign-in",
+          "app_version": "App version",
+          "push": "Push"
+        },
+        "view_sign_ins": "View sign-ins",
+        "empty": "No creators match these filters.",
+        "load_failed": "We couldn't load creator app usage. Please refresh.",
+        "sign_ins": {
+          "title": "Sign-ins",
+          "note": "A sign-in is one login to the creator app. Sign-ins that were ended on purpose are removed and are not listed here.",
+          "state": {
+            "live": "Live",
+            "expired": "Expired"
+          },
+          "columns": {
+            "platform": "Platform",
+            "signed_in": "Signed in",
+            "last_seen": "Last seen",
+            "state": "State",
+            "app_version": "App version",
+            "push": "Push"
+          },
+          "showing": "Showing the latest {shown} of {total} sign-ins",
+          "empty": "No sign-ins on record.",
+          "view_deliveries": "View push deliveries",
+          "close": "Close",
+          "load_failed": "We couldn't load the sign-ins. Please try again."
+        }
       }
     }
   },

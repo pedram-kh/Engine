@@ -40,6 +40,16 @@ export const creatorsRoutes: RouteRecordRaw[] = [
     component: () => import('@/modules/creators/pages/AllCreatorsPage.vue'),
     meta: { layout: 'admin', guards: adminGuards },
   },
+  // AH-102b — creator-app usage. Registered BEFORE `/creators/:ulid`, like
+  // `/creators/all` and `/creators/kyc`: a static segment must not be read as
+  // a creator ULID. (vue-router ranks static above dynamic, so this is
+  // belt-and-braces — a route-order spec keeps it deliberate.)
+  {
+    path: '/creators/app',
+    name: 'app.creators.app',
+    component: () => import('@/modules/creators/pages/CreatorAppPage.vue'),
+    meta: { layout: 'admin', guards: adminGuards },
+  },
   {
     path: '/creators/:ulid',
     name: 'app.creators.detail',

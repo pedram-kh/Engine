@@ -33,6 +33,7 @@
       "erasureQueue": "Coda di cancellazione",
       "featureFlags": "Feature flag",
       "automations": "Automazioni",
+      "creatorApp": "App creator",
       "pushDeliveries": "Consegne push"
     },
     "userMenu": {

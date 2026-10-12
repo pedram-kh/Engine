@@ -33,6 +33,7 @@
       "erasureQueue": "Erasure queue",
       "featureFlags": "Ominaisuusliput",
       "automations": "Automations",
+      "creatorApp": "Sisällöntuottajien sovellus",
       "pushDeliveries": "Push-toimitukset"
     },
     "userMenu": {

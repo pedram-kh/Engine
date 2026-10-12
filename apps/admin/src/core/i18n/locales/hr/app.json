@@ -33,6 +33,7 @@
       "erasureQueue": "Čakalna vrsta smazání",
       "featureFlags": "Stikaloe funkcí",
       "automations": "Automations",
+      "creatorApp": "Aplikacija za kreatore",
       "pushDeliveries": "Isporuke push obavijesti"
     },
     "userMenu": {

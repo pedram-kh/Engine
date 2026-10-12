@@ -33,6 +33,7 @@
       "erasureQueue": "Erasure queue",
       "featureFlags": "Indicatori de funcții",
       "automations": "Automations",
+      "creatorApp": "Aplicația creatorilor",
       "pushDeliveries": "Livrări push"
     },
     "userMenu": {

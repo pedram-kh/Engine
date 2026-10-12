@@ -221,6 +221,59 @@
             "error_not_disconnectable": "Det finns ingen aktiv koppling med den här byrån att koppla bort."
           }
         }
+      },
+      "app": {
+        "title": "Creator-appen",
+        "filters": {
+          "status": {
+            "all": "Alla",
+            "active": "Aktiv",
+            "signed_out": "Utloggad",
+            "never": "Aldrig inloggad"
+          },
+          "platform_all": "Alla plattformar",
+          "push": {
+            "all": "Valfri push-status",
+            "registered": "Push registrerad",
+            "dead": "Push-token ogiltig",
+            "none": "Ingen push"
+          },
+          "search": "Sök på namn eller e-post"
+        },
+        "columns": {
+          "creator": "Creator",
+          "status": "Status",
+          "sign_ins": "Aktiva inloggningar",
+          "platforms": "Plattformar",
+          "last_seen": "Senast sedd",
+          "last_sign_in": "Senaste inloggning",
+          "app_version": "Appversion",
+          "push": "Push"
+        },
+        "view_sign_ins": "Visa inloggningar",
+        "empty": "Inga creators matchar de här filtren.",
+        "load_failed": "Det gick inte att ladda användningen av creator-appen. Uppdatera sidan.",
+        "sign_ins": {
+          "title": "Inloggningar",
+          "note": "En inloggning är en login i creator-appen. Inloggningar som avslutats med avsikt tas bort och visas inte här.",
+          "state": {
+            "live": "Aktiv",
+            "expired": "Utgången"
+          },
+          "columns": {
+            "platform": "Plattform",
+            "signed_in": "Inloggad",
+            "last_seen": "Senast sedd",
+            "state": "Tillstånd",
+            "app_version": "Appversion",
+            "push": "Push"
+          },
+          "showing": "Visar de senaste {shown} av {total} inloggningar",
+          "empty": "Inga inloggningar registrerade.",
+          "view_deliveries": "Visa push-leveranser",
+          "close": "Stäng",
+          "load_failed": "Det gick inte att ladda inloggningarna. Försök igen."
+        }
       }
     }
   },
