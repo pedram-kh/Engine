@@ -8,6 +8,7 @@ use App\Modules\Notifications\Enums\NotificationType;
 use App\Modules\Notifications\Push\PushEligibility;
 use App\Modules\Notifications\Push\PushMessage;
 use App\Modules\Notifications\Push\PushMessageFactory;
+use Tests\Support\NotificationRouteKeys;
 use Tests\TestCase;
 
 uses(TestCase::class);
@@ -38,22 +39,29 @@ uses(TestCase::class);
 function pushRealBags(): array
 {
     return [
-        'assignment.invited' => ['campaign_name' => 'Summer Launch', 'creator_name' => 'Nora Creator', 'assignment_ulid' => '01ASSIGN'],
-        'assignment.revision_requested' => ['campaign_name' => 'Summer Launch', 'creator_name' => 'Nora Creator', 'outcome' => 'revision_requested', 'feedback' => 'SENTINEL-FEEDBACK-xyz', 'assignment_ulid' => '01ASSIGN', 'round' => 2],
-        'assignment.draft_approved' => ['campaign_name' => 'Summer Launch', 'creator_name' => 'Nora Creator', 'outcome' => 'approved', 'feedback' => 'SENTINEL-FEEDBACK-xyz', 'assignment_ulid' => '01ASSIGN', 'round' => 1],
-        'assignment.draft_rejected' => ['campaign_name' => 'Summer Launch', 'creator_name' => 'Nora Creator', 'outcome' => 'rejected', 'feedback' => 'SENTINEL-FEEDBACK-xyz', 'assignment_ulid' => '01ASSIGN', 'round' => 1],
-        'assignment.completed_on_approval' => ['campaign_name' => 'Summer Launch', 'creator_name' => 'Nora Creator', 'assignment_ulid' => '01ASSIGN', 'round' => 1],
-        'assignment.manually_verified' => ['campaign_name' => 'Summer Launch', 'creator_name' => 'Nora Creator', 'assignment_ulid' => '01ASSIGN'],
-        'message.received_by_creator' => ['campaign_name' => 'Summer Launch', 'sender_name' => 'Acme Agent', 'assignment_ulid' => '01ASSIGN', 'body' => 'SENTINEL-MESSAGE-TEXT-xyz'],
-        'message.relationship_received_by_creator' => ['agency_name' => 'Acme Agency', 'creator_name' => 'Nora Creator', 'sender_name' => 'Acme Agent', 'thread_ulid' => '01THREAD', 'body' => 'SENTINEL-MESSAGE-TEXT-xyz'],
-        'campaign_application.accepted' => ['agency_name' => 'Acme Agency', 'campaign_name' => 'Summer Launch', 'assignment_ulid' => '01ASSIGN'],
-        'campaign.job_posted' => ['campaign_name' => 'Summer Launch', 'agency_name' => 'Acme Agency'],
+        'assignment.invited' => ['campaign_name' => 'Summer Launch', 'creator_name' => 'Nora Creator', 'assignment_ulid' => PUSH_ASSIGN_ULID],
+        'assignment.revision_requested' => ['campaign_name' => 'Summer Launch', 'creator_name' => 'Nora Creator', 'outcome' => 'revision_requested', 'feedback' => 'SENTINEL-FEEDBACK-xyz', 'assignment_ulid' => PUSH_ASSIGN_ULID, 'version' => 2],
+        'assignment.draft_approved' => ['campaign_name' => 'Summer Launch', 'creator_name' => 'Nora Creator', 'outcome' => 'approved', 'feedback' => 'SENTINEL-FEEDBACK-xyz', 'assignment_ulid' => PUSH_ASSIGN_ULID, 'version' => 1],
+        'assignment.draft_rejected' => ['campaign_name' => 'Summer Launch', 'creator_name' => 'Nora Creator', 'outcome' => 'rejected', 'feedback' => 'SENTINEL-FEEDBACK-xyz', 'assignment_ulid' => PUSH_ASSIGN_ULID, 'version' => 1],
+        'assignment.completed_on_approval' => ['campaign_name' => 'Summer Launch', 'creator_name' => 'Nora Creator', 'assignment_ulid' => PUSH_ASSIGN_ULID, 'version' => 1],
+        'assignment.manually_verified' => ['campaign_name' => 'Summer Launch', 'creator_name' => 'Nora Creator', 'assignment_ulid' => PUSH_ASSIGN_ULID],
+        'message.received_by_creator' => ['campaign_name' => 'Summer Launch', 'sender_name' => 'Acme Agent', 'assignment_ulid' => PUSH_ASSIGN_ULID, 'body' => 'SENTINEL-MESSAGE-TEXT-xyz'],
+        'message.relationship_received_by_creator' => ['agency_name' => 'Acme Agency', 'creator_name' => 'Nora Creator', 'sender_name' => 'Acme Agent', 'thread_ulid' => PUSH_THREAD_ULID, 'body' => 'SENTINEL-MESSAGE-TEXT-xyz'],
+        'campaign_application.accepted' => ['agency_name' => 'Acme Agency', 'campaign_name' => 'Summer Launch', 'assignment_ulid' => PUSH_ASSIGN_ULID],
+        'campaign.job_posted' => ['campaign_name' => 'Summer Launch', 'agency_name' => 'Acme Agency', 'campaign_ulid' => PUSH_CAMPAIGN_ULID],
         'creator.approved' => ['welcome_message' => 'SENTINEL-WELCOME-xyz'],
         'creator.rejected' => ['rejection_reason' => 'SENTINEL-REJECTION-REASON-xyz'],
         'agency_creator_relation.admin_connected' => ['agency_name' => 'Acme Agency'],
         'agency_creator_relation.disconnected' => ['counterparty_name' => 'Acme Agency'],
     ];
 }
+
+// Real-shaped ULIDs (26 uppercase Crockford chars, as `HasUlid` writes them). The old
+// fixtures used '01ASSIGN' — which the emitters never produce — so a shape filter
+// could not have been tested against them (AH-103; the AH-102b §9 lesson).
+const PUSH_ASSIGN_ULID = '01J9ZK3Q8M5T7WXYABCDEFGHJK';
+const PUSH_THREAD_ULID = '01J9ZK3Q8M5T7WXYTHREADAAAA';
+const PUSH_CAMPAIGN_ULID = '01J9ZK3Q8M5T7WXYCAMPAGNAAA';
 
 const PUSH_SENTINELS = ['SENTINEL-FEEDBACK-xyz', 'SENTINEL-MESSAGE-TEXT-xyz', 'SENTINEL-WELCOME-xyz', 'SENTINEL-REJECTION-REASON-xyz'];
 
@@ -190,18 +198,105 @@ it('PRIVACY: no feedback / rejection reason / message text / welcome text reache
     }
 });
 
-it('PRIVACY: the payload data is exactly {type, v, notification_ulid?} — nothing else can be added by a bag', function (): void {
+it('PRIVACY: the payload data is exactly {type, v, notification_ulid?} ∪ the type\'s route keys — nothing else can be added by a bag', function (): void {
     $bag = pushRealBags()['assignment.draft_rejected'] + ['extra' => 'SENTINEL-FEEDBACK-xyz', 'user_email' => 'a@b.test'];
 
     $m = pushMake(NotificationType::AssignmentDraftRejected, pushRecipient(), $bag, '01NOTIF');
 
-    expect($m->data)->toBe(['type' => 'assignment.draft_rejected', 'v' => 1, 'notification_ulid' => '01NOTIF']);
+    expect($m->data)->toBe(['type' => 'assignment.draft_rejected', 'v' => 1, 'notification_ulid' => '01NOTIF', 'assignment_ulid' => PUSH_ASSIGN_ULID]);
 
     $withoutUlid = pushMake(NotificationType::AssignmentDraftRejected, pushRecipient(), $bag, null);
-    expect($withoutUlid->data)->toBe(['type' => 'assignment.draft_rejected', 'v' => 1]);
+    expect($withoutUlid->data)->toBe(['type' => 'assignment.draft_rejected', 'v' => 1, 'assignment_ulid' => PUSH_ASSIGN_ULID]);
 
     $emptyUlid = pushMake(NotificationType::AssignmentDraftRejected, pushRecipient(), $bag, '');
     expect($emptyUlid->data)->not->toHaveKey('notification_ulid');
+});
+
+// =============================================================================
+// 2b. AH-103 route keys — the second allowlist (sentinels a–d)
+// =============================================================================
+
+it('SENTINEL (d): every eligible type\'s payload key set is exactly {type, v, notification_ulid} ∪ the fixture\'s push keys', function (): void {
+    $bags = pushRealBags();
+
+    foreach (pushEligibleTypes() as $type) {
+        $m = pushMake($type, pushRecipient(), $bags[$type->value], '01NOTIF');
+
+        $expected = ['type', 'v', 'notification_ulid', ...NotificationRouteKeys::pushKeys($type->value)];
+        $actual = array_keys($m->data);
+        sort($expected);
+        sort($actual);
+
+        expect($actual)->toBe($expected, $type->value);
+    }
+});
+
+it('the factory allowlist equals the contract fixture for every eligible type (and lists only eligible types)', function (): void {
+    foreach (pushEligibleTypes() as $type) {
+        expect(PushMessageFactory::ROUTE_KEYS_BY_TYPE[$type->value] ?? null)->toBe(NotificationRouteKeys::pushKeys($type->value), $type->value);
+    }
+
+    $listed = array_keys(PushMessageFactory::ROUTE_KEYS_BY_TYPE);
+    $eligible = array_map(fn (NotificationType $t): string => $t->value, pushEligibleTypes());
+    sort($listed);
+    sort($eligible);
+    expect($listed)->toBe($eligible);
+});
+
+it('SENTINEL (a): a free-text value under a LISTED route key is dropped, the push still sends', function (mixed $bad): void {
+    $m = pushMake(NotificationType::AssignmentDraftRejected, pushRecipient(), ['campaign_name' => 'X', 'assignment_ulid' => $bad], '01NOTIF');
+
+    expect($m->data)->toBe(['type' => 'assignment.draft_rejected', 'v' => 1, 'notification_ulid' => '01NOTIF'])
+        ->and((string) json_encode(pushDump($m)))->not->toContain('SENTINEL');
+})->with([
+    'free text' => ['SENTINEL-FEEDBACK-xyz'],
+    'old fixture shape' => ['01ASSIGN'],
+    '25 chars' => ['01J9ZK3Q8M5T7WXYABCDEFGHJ'],
+    '27 chars' => ['01J9ZK3Q8M5T7WXYABCDEFGHJKM'],
+    'forbidden letter U' => ['01J9ZK3Q8M5T7WXYABCDEFGHJU'],
+    'trailing newline' => ["01J9ZK3Q8M5T7WXYABCDEFGHJK\n"],
+    'embedded text' => ['01J9ZK3Q8M5T7WXY SENTINEL-xyz'],
+    'array' => [['01J9ZK3Q8M5T7WXYABCDEFGHJK']],
+    'int' => [42],
+    'null' => [null],
+]);
+
+it('a lowercase ULID is accepted (case-insensitive shape) and forwarded as given', function (): void {
+    $lower = strtolower(PUSH_ASSIGN_ULID);
+    $m = pushMake(NotificationType::AssignmentInvited, pushRecipient(), ['campaign_name' => 'X', 'assignment_ulid' => $lower]);
+
+    expect($m->data['assignment_ulid'])->toBe($lower);
+});
+
+it('SENTINEL (b): a route key NOT listed for the type never reaches the payload', function (): void {
+    // campaign_ulid on a creator message (the leak the per-type map exists to prevent) and thread_ulid on an assignment type.
+    $m = pushMake(NotificationType::MessageReceivedByCreator, pushRecipient(), pushRealBags()['message.received_by_creator'] + ['campaign_ulid' => PUSH_CAMPAIGN_ULID, 'thread_ulid' => PUSH_THREAD_ULID]);
+    expect($m->data)->toBe(['type' => 'message.received_by_creator', 'v' => 1, 'assignment_ulid' => PUSH_ASSIGN_ULID]);
+
+    $m = pushMake(NotificationType::AssignmentInvited, pushRecipient(), pushRealBags()['assignment.invited'] + ['thread_ulid' => PUSH_THREAD_ULID, 'campaign_ulid' => PUSH_CAMPAIGN_ULID]);
+    expect($m->data)->toBe(['type' => 'assignment.invited', 'v' => 1, 'assignment_ulid' => PUSH_ASSIGN_ULID]);
+
+    // Key-less types forward nothing even if a bag carries valid ULIDs.
+    foreach ([NotificationType::CreatorApproved, NotificationType::CreatorRejected, NotificationType::RelationAdminConnected, NotificationType::RelationDisconnected] as $type) {
+        $m = pushMake($type, pushRecipient(), ['assignment_ulid' => PUSH_ASSIGN_ULID, 'campaign_ulid' => PUSH_CAMPAIGN_ULID, 'thread_ulid' => PUSH_THREAD_ULID]);
+        expect($m->data)->toBe(['type' => $type->value, 'v' => 1], $type->value);
+    }
+});
+
+it('SENTINEL (c): every other bag key still never reaches the payload, alongside valid route keys', function (): void {
+    $bag = pushRealBags()['assignment.revision_requested'] + [
+        'rejection_reason' => 'SENTINEL-REJECTION-REASON-xyz',
+        'body' => 'SENTINEL-MESSAGE-TEXT-xyz',
+        'creator_name' => 'Nora Creator',
+    ];
+    $m = pushMake(NotificationType::AssignmentRevisionRequested, pushRecipient(), $bag, '01NOTIF');
+
+    expect(array_keys($m->data))->toBe(['type', 'v', 'notification_ulid', 'assignment_ulid'])
+        ->and((string) json_encode($m->data))->not->toContain('SENTINEL')->not->toContain('Nora');
+});
+
+it('the payload version stays 1 (the contract is additive)', function (): void {
+    expect(PushMessageFactory::PAYLOAD_VERSION)->toBe(1);
 });
 
 it('PRIVACY: a name key holding free text is bounded — the sentinel in a NON-allowlisted key never renders even when the allowlisted key is absent', function (): void {
@@ -338,8 +433,8 @@ it('returns null for every ineligible type (nothing to send)', function (): void
 it('collapse key: per-assignment / per-thread for the two message types only; null otherwise or when the ulid is absent', function (): void {
     $bags = pushRealBags();
 
-    expect(pushMake(NotificationType::MessageReceivedByCreator, pushRecipient(), $bags['message.received_by_creator'])->collapseKey)->toBe('assignment:01ASSIGN')
-        ->and(pushMake(NotificationType::MessageRelationshipReceivedByCreator, pushRecipient(), $bags['message.relationship_received_by_creator'])->collapseKey)->toBe('thread:01THREAD')
+    expect(pushMake(NotificationType::MessageReceivedByCreator, pushRecipient(), $bags['message.received_by_creator'])->collapseKey)->toBe('assignment:'.PUSH_ASSIGN_ULID.'')
+        ->and(pushMake(NotificationType::MessageRelationshipReceivedByCreator, pushRecipient(), $bags['message.relationship_received_by_creator'])->collapseKey)->toBe('thread:'.PUSH_THREAD_ULID.'')
         ->and(pushMake(NotificationType::MessageReceivedByCreator, pushRecipient(), ['sender_name' => 'A', 'campaign_name' => 'B'])->collapseKey)->toBeNull()
         ->and(pushMake(NotificationType::AssignmentInvited, pushRecipient(), $bags['assignment.invited'])->collapseKey)->toBeNull();
 

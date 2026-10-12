@@ -16,12 +16,15 @@ use App\Modules\Notifications\Enums\NotificationType;
  *   - a fixed, localized `title` per type (`lang/{locale}/push.php`);
  *   - an optional localized `body` whose placeholders are drawn ONLY from
  *     {@see self::NAME_KEYS} — campaign / agency / counterparty / sender NAMES;
- *   - `data` = {type, v, notification_ulid?}.
+ *   - `data` = {type, v, notification_ulid?} plus, per type, the ULID route keys
+ *     listed in {@see self::ROUTE_KEYS_BY_TYPE} (AH-103 — what the tap opens).
  * The notification's `data` bag is NEVER forwarded: it carries `feedback`,
  * `rejection_reason` and the like (rendered in-app, never on a lock screen), and
- * message events carry text-adjacent fields. The factory reads exactly four
- * named keys out of it and ignores everything else — there is no code path that
- * copies the bag.
+ * message events carry text-adjacent fields. The factory reads exactly two sets
+ * of named keys out of it — the four NAME_KEYS (placeholders) and, for the
+ * type, its ROUTE_KEYS_BY_TYPE entry (ids) — and ignores everything else. A route
+ * key is forwarded only when it is listed FOR THAT TYPE and its value is
+ * ULID-shaped; there is no code path that copies the bag.
  *
  * LOCALE. Rendered with an EXPLICIT locale argument (the recipient's
  * `preferred_language`, clamped to a rendered UI locale, else `en`) — never
@@ -37,10 +40,39 @@ final class PushMessageFactory
     /** The ONLY `data`-bag keys this factory will read, each as a placeholder name. */
     public const array NAME_KEYS = ['campaign_name', 'agency_name', 'counterparty_name', 'sender_name'];
 
+    /**
+     * AH-103 — the ONLY id keys a push may carry, PER TYPE (the `push` column of
+     * `packages/api-client/contracts/notification-route-keys.json`; a parity test
+     * keeps the two equal). Per type, not one flat list, so `campaign_ulid` cannot
+     * start riding a creator message if a later change adds it to a shared bag.
+     * Account-lifecycle and relationship events carry none: their screens need no id.
+     *
+     * @var array<string, list<string>>
+     */
+    public const array ROUTE_KEYS_BY_TYPE = [
+        'assignment.invited' => ['assignment_ulid'],
+        'assignment.revision_requested' => ['assignment_ulid'],
+        'assignment.draft_approved' => ['assignment_ulid'],
+        'assignment.draft_rejected' => ['assignment_ulid'],
+        'assignment.completed_on_approval' => ['assignment_ulid'],
+        'assignment.manually_verified' => ['assignment_ulid'],
+        'message.received_by_creator' => ['assignment_ulid'],
+        'message.relationship_received_by_creator' => ['thread_ulid'],
+        'campaign_application.accepted' => ['assignment_ulid'],
+        'campaign.job_posted' => ['campaign_ulid'],
+        'creator.approved' => [],
+        'creator.rejected' => [],
+        'agency_creator_relation.admin_connected' => [],
+        'agency_creator_relation.disconnected' => [],
+    ];
+
     public const int NAME_MAX_CHARS = 60;
 
     /** Payload schema version the app can branch on. */
     public const int PAYLOAD_VERSION = 1;
+
+    /** A ULID: 26 Crockford-base32 characters (`HasUlid` stores uppercase; case-insensitive on purpose). */
+    private const string ULID_PATTERN = '/^[0-9A-HJKMNP-TV-Z]{26}\z/i';
 
     /**
      * @param  array<string, mixed>  $data  the in-app notification's `data` bag (read via allowlist ONLY)
@@ -64,6 +96,10 @@ final class PushMessageFactory
 
         if ($notificationUlid !== null && $notificationUlid !== '') {
             $payload['notification_ulid'] = $notificationUlid;
+        }
+
+        foreach (self::routeKeys($type, $data) as $key => $value) {
+            $payload[$key] = $value;
         }
 
         return new PushMessage(
@@ -102,6 +138,28 @@ final class PushMessageFactory
     public static function copyKey(NotificationType $type): string
     {
         return str_replace('.', '_', $type->value);
+    }
+
+    /**
+     * The route ids this type may forward: listed for the type, a string, ULID-shaped.
+     * Anything else is dropped silently — the push still sends and the tap falls back.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, string>
+     */
+    private static function routeKeys(NotificationType $type, array $data): array
+    {
+        $out = [];
+
+        foreach (self::ROUTE_KEYS_BY_TYPE[$type->value] ?? [] as $key) {
+            $value = $data[$key] ?? null;
+
+            if (is_string($value) && preg_match(self::ULID_PATTERN, $value) === 1) {
+                $out[$key] = $value;
+            }
+        }
+
+        return $out;
     }
 
     /**

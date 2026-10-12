@@ -537,6 +537,10 @@ it('an approval that does NOT complete the assignment pushes the plain draft_app
 
     $types = array_map(static fn (SendPushNotificationJob $j): string => $j->notificationType, pdPushed());
     expect($types)->toBe(['assignment.draft_approved']);
+
+    // AH-103, end to end through the real approve route: the push the device receives
+    // carries the REAL assignment ULID the tap opens — not a test-typed one.
+    expect(pdPushed()[0]->message->data['assignment_ulid'] ?? null)->toBe($assignment->ulid);
 });
 
 // =============================================================================
