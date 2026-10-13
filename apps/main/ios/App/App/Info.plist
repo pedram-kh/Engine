@@ -25,6 +25,10 @@
 	<!-- AH-102: no FCM token is minted until the creator accepts the in-app soft-ask. -->
 	<key>FirebaseMessagingAutoInitEnabled</key>
 	<false/>
+	<!-- TestFlight / App Store: the app uses only the OS's standard encryption (HTTPS, the
+	     Keychain), which is exempt, so App Store Connect must not ask on every build. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>
