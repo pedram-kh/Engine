@@ -73,6 +73,16 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<!-- Photo / video pickers: an <input type="file"> in the web view offers "Take Photo or Video"
+	     (and "Photo Library"). iOS terminates the app the moment the camera or microphone opens
+	     without these strings, so each one must stay while any such input exists
+	     (avatar, portfolio, assignment media, relationship and campaign chat). -->
+	<key>NSCameraUsageDescription</key>
+	<string>Catalyst uses your camera so you can take a photo or video for your profile, portfolio, campaign content and messages.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Catalyst uses your microphone to record sound when you capture a video for your portfolio, campaign content or messages.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Catalyst uses your photo library so you can choose photos and videos for your profile, portfolio, campaign content and messages.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsLocalNetworking</key>
