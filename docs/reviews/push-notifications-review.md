@@ -3,8 +3,9 @@
 - **Status:** **CLOSED 2026-10-11 (pushed, CI green at the tip, not deployed, no flag armed).** Checkpoint A (backend) and
   Checkpoint B (the matrix column, the push module, Android, and iOS) are on `origin/main`; Pedram's Android walk (11 of 12
   items) and the real-iPhone spike and walk passed; **`IOS_PUSH_ENABLED` is `true` in code, `push_notifications_enabled` is OFF
-  everywhere.** Named open items, none blocking the close: **(1)** the TestFlight production-APNs proof (pending the first
-  upload); **(2)** the token-rotation re-POST (R-8, never forced on a device; accepted, self-healing); **(3)** item 10 on iOS (no
+  everywhere.** Named open items, none blocking the close: **(1)** ~~the TestFlight production-APNs proof~~ **CLOSED
+  2026-10-13** (TestFlight 1.0.0 (1), production APNs, a push delivered, shown and tapped to the right thread; §29 row 1);
+  **(2)** the token-rotation re-POST (R-8, never forced on a device; accepted, self-healing); **(3)** item 10 on iOS (no
   `UNREGISTERED` observed). Close-out: §29. Sections 1-13 are the Checkpoint A review as it stood; later sections are
   additive.
 - **Date:** 2026-10-10 (Checkpoint A) · 2026-10-11 (Checkpoint B)
@@ -764,12 +765,28 @@ deploy log (Checkpoint A's entry carries the migration, the `queue:restart`, the
 
 **Named open items (carried, not blocking the close)**
 
-| #   | Item                                                                                             | State                                                                                                                                                                                                                                                           | Where it lands                                                |
-| --- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| 1   | **TestFlight production-APNs proof** (the sandbox/production token split on a real signed build) | **Pending the first TestFlight upload.** The iPhone spike used the Xcode debug install (sandbox APNs) only.                                                                                                                                                     | Before the first iOS store build; with the server flag arming |
-| 2   | **Token-rotation re-POST** (R-8: that a rotation fires `tokenReceived` and re-POSTs once)        | Never forced on a device, on Android or iOS. **Accepted by Pedram 2026-10-11** as self-healing: a rotated token that never re-POSTs goes `UNREGISTERED` on the next send and is invalidated; the daily upkeep registers the new one. Tech-debt item 11.         | Tech-debt                                                     |
-| 3   | **Item 10 on iOS** (uninstall, then `UNREGISTERED`, then invalidated)                            | **Not observed on iOS** (6 test sends and 1 real send all `delivered`). Likely cause **unverified**: sandbox-APNs feedback timing, a known vendor quirk. The server logic is platform-independent and proven on Android. **Accepted by Pedram.**                | Re-observe on the TestFlight run                              |
-| 4   | **AH-103 finding-2 re-verify on the iPhone** (sign-in re-registers the push token)               | **Planned, first TestFlight build after the AH-103 deploy.** Sign in, then confirm a **new `user_push_tokens` row exists** for that device and a **push is delivered**. Verified on the Samsung only (AH-103 review §4.1, §5); the iPhone shares the code path. | Run with item 1, on the same TestFlight build                 |
+| #   | Item                                                                                             | State                                                                                                                                                                                                                                                   | Where it lands                   |
+| --- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| 1   | **TestFlight production-APNs proof** (the sandbox/production token split on a real signed build) | **CLOSED 2026-10-13** (see the closure record below the table). The iPhone spike had used the Xcode debug install (sandbox APNs) only.                                                                                                                  | Done on TestFlight 1.0.0 (1)     |
+| 2   | **Token-rotation re-POST** (R-8: that a rotation fires `tokenReceived` and re-POSTs once)        | Never forced on a device, on Android or iOS. **Accepted by Pedram 2026-10-11** as self-healing: a rotated token that never re-POSTs goes `UNREGISTERED` on the next send and is invalidated; the daily upkeep registers the new one. Tech-debt item 11. | Tech-debt                        |
+| 3   | **Item 10 on iOS** (uninstall, then `UNREGISTERED`, then invalidated)                            | **Not observed on iOS** (6 test sends and 1 real send all `delivered`). Likely cause **unverified**: sandbox-APNs feedback timing, a known vendor quirk. The server logic is platform-independent and proven on Android. **Accepted by Pedram.**        | Re-observe on the TestFlight run |
+| 4   | **AH-103 finding-2 re-verify on the iPhone** (sign-in re-registers the push token)               | **CLOSED 2026-10-13** (see the closure record below the table). Sign-in on the TestFlight build registered the device (admin Creator app page: iOS, app 1.0.0, Push registered) and a push was delivered.                                               | Done on TestFlight 1.0.0 (1)     |
+
+**Closure record for rows 1 and 4 (2026-10-13, ~03:03; source: Pedram's report from the device and the admin, not read
+by the assistant).** Build: TestFlight **1.0.0 (1)**, production API `https://platform-api.catalyst-growth.com/api/v1`,
+`catalyst-production-c28e9` Firebase config.
+
+- Admin **Creator app** page: iOS sign-in live, app 1.0.0, **Push registered** (row 4: the sign-in registered the device).
+- `push_deliveries`: **1 row**, `message.relationship_received_by_creator`, iOS, **Delivered**, attempt 1, provider `200`;
+  in-app notification **Read** (row 1: a production-APNs delivery on a signed build).
+- On the phone: the banner was shown, and the tap opened the right thread (AH-103 deep link, on production).
+- **What this proves in passing:** the `INSERT` grants for `engine_c_user` work on **both** `user_push_tokens` and
+  `push_deliveries` (rows were written), and the FCM credential and the APNs key work end to end in production.
+- **What it does not prove (still not read, deferred until the colleague who runs the box is back):** the formal 12-line
+  `GRANT` read (SELECT/UPDATE/DELETE and the id sequences are unexercised), a fresh RDS snapshot, the
+  `SANCTUM_STATEFUL_DOMAINS` read, and the cron / second-scheduler read (P7).
+- **Not covered by this run, so row 3 stays open:** item 10 on iOS (uninstall, then `UNREGISTERED`, then invalidated) was
+  not reported. Row 2 (token-rotation re-POST) is unchanged.
 
 Also carried, not new: the other 22 locales unseen on a device, `lang/*/push.php` machine-quality, tech-debt 17 (the iOS Keychain
 sign-in survives a reinstall; **accepted as recorded**, decided before the first iOS store build, likely with AH-104's deletion work).
