@@ -461,6 +461,12 @@ export interface CreatorAssignmentResource {
     campaign: {
       id: string
       name: string
+      /**
+       * The campaign's lifecycle state, raw (AH-107). Display only: nothing is
+       * gated on it server-side (Q2). Optional because an older backend omits it;
+       * the client treats absent as "show nothing".
+       */
+      status?: CampaignStatus
       posting_window_starts_at: string | null
       posting_window_ends_at: string | null
       brand_name: string | null
@@ -594,6 +600,12 @@ export interface CreatorAssignmentDetailResource {
     campaign: {
       id: string
       name: string
+      /**
+       * The campaign's lifecycle state, raw (AH-107). Display only: nothing is
+       * gated on it server-side (Q2). Optional because an older backend omits it;
+       * the client treats absent as "show nothing".
+       */
+      status?: CampaignStatus
       /** The campaign's own description — closes the AH-032 gap (AH-097). */
       description: string | null
       posting_window_starts_at: string | null
@@ -993,6 +1005,12 @@ export interface CreatorJobCardResource {
   type: 'creator_job'
   attributes: {
     name: string
+    /**
+     * The campaign's lifecycle state, raw (AH-107): draft | active | paused on
+     * the board (completed/cancelled 404). The UI shows Paused only. Optional
+     * because an older backend omits it; absent means "show nothing".
+     */
+    campaign_status?: CampaignStatus
     /** Display-only fee copy, e.g. "€300 per video". Never a binding offer. */
     listing_fee: string | null
     /** Free text, e.g. "4 weeks". */
