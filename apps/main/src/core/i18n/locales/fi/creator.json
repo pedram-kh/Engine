@@ -499,6 +499,18 @@
           "submit": "Lähetä counter"
         }
       },
+      "campaignStatus": {
+        "upcoming": "Tulossa",
+        "active": "Aktiivinen",
+        "paused": "Tauolla",
+        "completed": "Päättynyt",
+        "cancelled": "Peruttu"
+      },
+      "campaignStatusBanner": {
+        "paused": "Tämä kampanja on tauolla. Toimisto ei välttämättä vastaa, ennen kuin se jatkuu.",
+        "completed": "Tämä kampanja on päättynyt.",
+        "cancelled": "Tämä kampanja peruttiin."
+      },
       "jobs": {
         "title": "Työpaikat",
         "subtitle": "Töitä toimistoilta, joiden kanssa työskentelet. Hae niihin, jotka sopivat sinulle.",

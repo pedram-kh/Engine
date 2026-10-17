@@ -499,6 +499,18 @@
           "submit": "Pošlji protinabídku"
         }
       },
+      "campaignStatus": {
+        "upcoming": "Prihajajoča",
+        "active": "Aktivna",
+        "paused": "Zaustavljena",
+        "completed": "Zaključena",
+        "cancelled": "Preklicana"
+      },
+      "campaignStatusBanner": {
+        "paused": "Ta kampanija je začasno zaustavljena. Agencija morda ne bo odgovorila, dokler se ne nadaljuje.",
+        "completed": "Ta kampanija se je končala.",
+        "cancelled": "Ta kampanija je bila preklicana."
+      },
       "jobs": {
         "title": "Oglasi za delo",
         "subtitle": "Dela agencij, s katerimi sodeluješ. Prijavi se na tista, ki ti ustrezajo.",

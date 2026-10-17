@@ -499,6 +499,18 @@
           "submit": "Odoslať protinabídku"
         }
       },
+      "campaignStatus": {
+        "upcoming": "Pripravovaná",
+        "active": "Aktívna",
+        "paused": "Pozastavená",
+        "completed": "Dokončená",
+        "cancelled": "Zrušená"
+      },
+      "campaignStatusBanner": {
+        "paused": "Táto kampaň je pozastavená. Agentúra nemusí odpovedať, kým sa neobnoví.",
+        "completed": "Táto kampaň sa skončila.",
+        "cancelled": "Táto kampaň bola zrušená."
+      },
       "jobs": {
         "title": "Pracovné ponuky",
         "subtitle": "Ponuky od agentúr, s ktorými spolupracuješ. Prihlás sa na tie, ktoré ti sedia.",

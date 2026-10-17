@@ -499,6 +499,18 @@
           "submit": "Nēsūtīt counter"
         }
       },
+      "campaignStatus": {
+        "upcoming": "Gaidāma",
+        "active": "Aktīva",
+        "paused": "Apturēta",
+        "completed": "Pabeigta",
+        "cancelled": "Atcelta"
+      },
+      "campaignStatusBanner": {
+        "paused": "Šī kampaņa ir apturēta. Aģentūra var neatbildēt, kamēr tā netiks atsākta.",
+        "completed": "Šī kampaņa ir beigusies.",
+        "cancelled": "Šī kampaņa tika atcelta."
+      },
       "jobs": {
         "title": "Darba sludinājumi",
         "subtitle": "Darbi no aģentūrām, ar kurām sadarbojies. Piesakies tiem, kas tev der.",

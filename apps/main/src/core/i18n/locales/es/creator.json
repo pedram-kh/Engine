@@ -499,6 +499,18 @@
           "submit": "Enviar contraoferta"
         }
       },
+      "campaignStatus": {
+        "upcoming": "Próxima",
+        "active": "Activa",
+        "paused": "En pausa",
+        "completed": "Finalizada",
+        "cancelled": "Cancelada"
+      },
+      "campaignStatusBanner": {
+        "paused": "Esta campaña está en pausa. Es posible que la agencia no responda hasta que se reanude.",
+        "completed": "Esta campaña ha finalizado.",
+        "cancelled": "Esta campaña fue cancelada."
+      },
       "jobs": {
         "title": "Ofertas de trabajo",
         "subtitle": "Trabajos de las agencias con las que colaboras. Aplica a los que encajen contigo.",

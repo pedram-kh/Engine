@@ -499,6 +499,18 @@
           "submit": "Küldés counter"
         }
       },
+      "campaignStatus": {
+        "upcoming": "Közelgő",
+        "active": "Aktív",
+        "paused": "Szüneteltetve",
+        "completed": "Befejezett",
+        "cancelled": "Lemondva"
+      },
+      "campaignStatusBanner": {
+        "paused": "Ez a kampány szünetel. Az ügynökség lehet, hogy nem válaszol, amíg újra nem indul.",
+        "completed": "Ez a kampány befejeződött.",
+        "cancelled": "Ezt a kampányt lemondták."
+      },
       "jobs": {
         "title": "Álláshirdetések",
         "subtitle": "Munkák azoktól az ügynökségektől, amelyekkel dolgozol. Jelentkezz azokra, amelyek illenek hozzád.",

@@ -499,6 +499,18 @@
           "submit": "Envoyer la contre-proposition"
         }
       },
+      "campaignStatus": {
+        "upcoming": "À venir",
+        "active": "Active",
+        "paused": "En pause",
+        "completed": "Terminée",
+        "cancelled": "Annulée"
+      },
+      "campaignStatusBanner": {
+        "paused": "Cette campagne est en pause. L'agence ne répondra peut-être pas avant sa reprise.",
+        "completed": "Cette campagne est terminée.",
+        "cancelled": "Cette campagne a été annulée."
+      },
       "jobs": {
         "title": "Offres de mission",
         "subtitle": "Les missions des agences avec lesquelles vous travaillez. Postulez à celles qui vous conviennent.",

@@ -499,6 +499,18 @@
           "submit": "Seol counter"
         }
       },
+      "campaignStatus": {
+        "upcoming": "Le teacht",
+        "active": "Gníomhach",
+        "paused": "Curtha ar sos",
+        "completed": "Críochnaithe",
+        "cancelled": "Cealaithe"
+      },
+      "campaignStatusBanner": {
+        "paused": "Tá an feachtas seo curtha ar sos. B'fhéidir nach bhfreagróidh an ghníomhaireacht go dtí go n-atosófar é.",
+        "completed": "Tá an feachtas seo críochnaithe.",
+        "cancelled": "Cealaíodh an feachtas seo."
+      },
       "jobs": {
         "title": "Poist",
         "subtitle": "Poist ó na gníomhaireachtaí a n-oibríonn tú leo. Cuir isteach ar na cinn a oireann duit.",

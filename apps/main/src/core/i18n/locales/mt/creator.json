@@ -499,6 +499,18 @@
           "submit": "Ibgħat counter"
         }
       },
+      "campaignStatus": {
+        "upcoming": "Li ġejja",
+        "active": "Attiva",
+        "paused": "Sospiża",
+        "completed": "Mitmuma",
+        "cancelled": "Ikkanċellata"
+      },
+      "campaignStatusBanner": {
+        "paused": "Din il-kampanja hija sospiża. L-aġenzija jista' ma twieġibx sakemm terġa' tibda.",
+        "completed": "Din il-kampanja spiccat.",
+        "cancelled": "Din il-kampanja ġiet ikkanċellata."
+      },
       "jobs": {
         "title": "Postijiet tax-xogħol",
         "subtitle": "Xogħlijiet mill-aġenziji li taħdem magħhom. Applika għal dawk li jaqblu miegħek.",

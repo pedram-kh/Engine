@@ -499,6 +499,18 @@
           "submit": "Tegenbod sturen"
         }
       },
+      "campaignStatus": {
+        "upcoming": "Binnenkort",
+        "active": "Actief",
+        "paused": "Gepauzeerd",
+        "completed": "Afgerond",
+        "cancelled": "Geannuleerd"
+      },
+      "campaignStatusBanner": {
+        "paused": "Deze campagne is gepauzeerd. Het bureau reageert mogelijk pas wanneer ze wordt hervat.",
+        "completed": "Deze campagne is afgelopen.",
+        "cancelled": "Deze campagne is geannuleerd."
+      },
       "jobs": {
         "title": "Vacatures",
         "subtitle": "Opdrachten van de bureaus waarmee je werkt. Solliciteer op wat bij je past.",

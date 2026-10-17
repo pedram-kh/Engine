@@ -499,6 +499,18 @@
           "submit": "Wyślij kontrpropozycję"
         }
       },
+      "campaignStatus": {
+        "upcoming": "Nadchodząca",
+        "active": "Aktywna",
+        "paused": "Wstrzymana",
+        "completed": "Zakończona",
+        "cancelled": "Anulowana"
+      },
+      "campaignStatusBanner": {
+        "paused": "Ta kampania jest wstrzymana. Agencja może nie odpowiedzieć, dopóki nie zostanie wznowiona.",
+        "completed": "Ta kampania została zakończona.",
+        "cancelled": "Ta kampania została anulowana."
+      },
       "jobs": {
         "title": "Ogłoszenia o pracę",
         "subtitle": "Zlecenia od agencji, z którymi współpracujesz. Aplikuj na te, które do ciebie pasują.",

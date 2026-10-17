@@ -499,6 +499,18 @@
           "submit": "Siųsti counter"
         }
       },
+      "campaignStatus": {
+        "upcoming": "Būsima",
+        "active": "Aktyvi",
+        "paused": "Pristabdyta",
+        "completed": "Baigta",
+        "cancelled": "Atšaukta"
+      },
+      "campaignStatusBanner": {
+        "paused": "Ši kampanija pristabdyta. Agentūra gali neatsakyti, kol ji nebus atnaujinta.",
+        "completed": "Ši kampanija baigėsi.",
+        "cancelled": "Ši kampanija buvo atšaukta."
+      },
       "jobs": {
         "title": "Darbo skelbimai",
         "subtitle": "Darbai iš agentūrų, su kuriomis dirbi. Kandidatuok į tuos, kurie tau tinka.",

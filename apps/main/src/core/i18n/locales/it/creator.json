@@ -499,6 +499,18 @@
           "submit": "Invia controproposta"
         }
       },
+      "campaignStatus": {
+        "upcoming": "In arrivo",
+        "active": "Attiva",
+        "paused": "In pausa",
+        "completed": "Conclusa",
+        "cancelled": "Annullata"
+      },
+      "campaignStatusBanner": {
+        "paused": "Questa campagna è in pausa. L'agenzia potrebbe non rispondere finché non riprende.",
+        "completed": "Questa campagna è conclusa.",
+        "cancelled": "Questa campagna è stata annullata."
+      },
       "jobs": {
         "title": "Offerte di lavoro",
         "subtitle": "Lavori dalle agenzie con cui collabori. Candidati a quelli che fanno per te.",

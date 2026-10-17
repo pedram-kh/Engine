@@ -499,6 +499,18 @@
           "submit": "Skicka motbud"
         }
       },
+      "campaignStatus": {
+        "upcoming": "Kommande",
+        "active": "Aktiv",
+        "paused": "Pausad",
+        "completed": "Avslutad",
+        "cancelled": "Avbruten"
+      },
+      "campaignStatusBanner": {
+        "paused": "Den här kampanjen är pausad. Byrån svarar kanske inte förrän den återupptas.",
+        "completed": "Den här kampanjen har avslutats.",
+        "cancelled": "Den här kampanjen har avbrutits."
+      },
       "jobs": {
         "title": "Jobbannonser",
         "subtitle": "Jobb från byråerna du samarbetar med. Sök de som passar dig.",

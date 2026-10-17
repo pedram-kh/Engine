@@ -499,6 +499,18 @@
           "submit": "Pošalji protinabídku"
         }
       },
+      "campaignStatus": {
+        "upcoming": "Nadolazeća",
+        "active": "Aktivna",
+        "paused": "Pauzirana",
+        "completed": "Završena",
+        "cancelled": "Otkazana"
+      },
+      "campaignStatusBanner": {
+        "paused": "Ova je kampanja pauzirana. Agencija možda neće odgovoriti dok se ne nastavi.",
+        "completed": "Ova je kampanja završena.",
+        "cancelled": "Ova je kampanja otkazana."
+      },
       "jobs": {
         "title": "Oglasi za posao",
         "subtitle": "Poslovi agencija s kojima surađuješ. Prijavi se na one koji ti odgovaraju.",

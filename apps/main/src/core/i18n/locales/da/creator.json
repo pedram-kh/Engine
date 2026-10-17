@@ -499,6 +499,18 @@
           "submit": "Send modbud"
         }
       },
+      "campaignStatus": {
+        "upcoming": "Kommende",
+        "active": "Aktiv",
+        "paused": "Sat på pause",
+        "completed": "Afsluttet",
+        "cancelled": "Annulleret"
+      },
+      "campaignStatusBanner": {
+        "paused": "Denne kampagne er sat på pause. Bureauet svarer muligvis ikke, før den genoptages.",
+        "completed": "Denne kampagne er afsluttet.",
+        "cancelled": "Denne kampagne blev annulleret."
+      },
       "jobs": {
         "title": "Jobopslag",
         "subtitle": "Job fra de bureauer, du samarbejder med. Søg dem, der passer.",

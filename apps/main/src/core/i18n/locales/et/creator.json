@@ -499,6 +499,18 @@
           "submit": "Saada counter"
         }
       },
+      "campaignStatus": {
+        "upcoming": "Tulemas",
+        "active": "Aktiivne",
+        "paused": "Peatatud",
+        "completed": "Lõppenud",
+        "cancelled": "Tühistatud"
+      },
+      "campaignStatusBanner": {
+        "paused": "See kampaania on peatatud. Agentuur ei pruugi vastata enne selle jätkamist.",
+        "completed": "See kampaania on lõppenud.",
+        "cancelled": "See kampaania tühistati."
+      },
       "jobs": {
         "title": "Tööpakkumised",
         "subtitle": "Tööd agentuuridelt, kellega koostööd teed. Kandideeri neile, mis sobivad.",

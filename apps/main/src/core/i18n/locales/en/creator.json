@@ -499,6 +499,18 @@
           "submit": "Send counter"
         }
       },
+      "campaignStatus": {
+        "upcoming": "Upcoming",
+        "active": "Active",
+        "paused": "Paused",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      },
+      "campaignStatusBanner": {
+        "paused": "This campaign is paused. The agency may not respond until it resumes.",
+        "completed": "This campaign has ended.",
+        "cancelled": "This campaign was cancelled."
+      },
       "jobs": {
         "title": "Job posts",
         "subtitle": "Jobs from the agencies you work with. Apply to the ones that fit.",

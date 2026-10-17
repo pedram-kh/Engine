@@ -499,6 +499,18 @@
           "submit": "Gegenangebot senden"
         }
       },
+      "campaignStatus": {
+        "upcoming": "Demnächst",
+        "active": "Aktiv",
+        "paused": "Pausiert",
+        "completed": "Abgeschlossen",
+        "cancelled": "Abgebrochen"
+      },
+      "campaignStatusBanner": {
+        "paused": "Diese Kampagne ist pausiert. Die Agentur antwortet möglicherweise erst, wenn sie fortgesetzt wird.",
+        "completed": "Diese Kampagne ist beendet.",
+        "cancelled": "Diese Kampagne wurde abgebrochen."
+      },
       "jobs": {
         "title": "Jobangebote",
         "subtitle": "Jobs der Agenturen, mit denen du arbeitest. Bewirb dich auf die passenden.",
