@@ -300,3 +300,45 @@ describe('CreatorJobsPage', () => {
     expect(mockApi.list).toHaveBeenCalledWith({ page: 1 })
   })
 })
+
+// ── AH-107 (Q3) — a job card shows the campaign's state when it is PAUSED ───
+
+describe('CreatorJobsPage — the campaign status chip (AH-107)', () => {
+  it('shows "Paused" on a card whose campaign is paused', async () => {
+    mockApi.list.mockResolvedValue(envelope([card({ campaign_status: 'paused' })]) as never)
+    const wrapper = await mountPage()
+
+    const chip = wrapper.find('[data-testid="creator-job-campaign-status-01JOB1"]')
+    expect(chip.text()).toBe('Paused')
+    expect(chip.classes()).toContain('campaign-status-chip')
+  })
+
+  it.each(['draft', 'active'])(
+    'shows NOTHING for a %s campaign (Paused only, Q3)',
+    async (status) => {
+      mockApi.list.mockResolvedValue(envelope([card({ campaign_status: status })]) as never)
+      const wrapper = await mountPage()
+
+      expect(wrapper.find('[data-testid="creator-job-campaign-status-01JOB1"]').exists()).toBe(
+        false,
+      )
+    },
+  )
+
+  it('shows nothing when the backend sends no status (older backend)', async () => {
+    mockApi.list.mockResolvedValue(envelope([card()]) as never)
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-campaign-status-01JOB1"]').exists()).toBe(false)
+  })
+
+  it('does not displace the Applied chip: both can show on one card', async () => {
+    mockApi.list.mockResolvedValue(
+      envelope([card({ campaign_status: 'paused', application_status: 'pending' })]) as never,
+    )
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-applied-01JOB1"]').text()).toBe('Applied')
+    expect(wrapper.find('[data-testid="creator-job-campaign-status-01JOB1"]').text()).toBe('Paused')
+  })
+})

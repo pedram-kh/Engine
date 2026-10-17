@@ -22,6 +22,7 @@ import { CEmptyState } from '@catalyst/ui'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import CampaignStatusChip from '../components/CampaignStatusChip.vue'
 import { creatorJobsApi } from '../jobs.api'
 
 const { t } = useI18n()
@@ -165,6 +166,14 @@ onMounted(() => {
               {{ t(`creator.ui.jobs.status.${job.attributes.application_status}`) }}
             </v-chip>
           </div>
+
+          <!-- AH-107 (Q3): a Paused campaign says so on the card. Paused ONLY: the chip
+               component is told this is a job surface and renders nothing for the rest. -->
+          <CampaignStatusChip
+            :status="job.attributes.campaign_status"
+            surface="job"
+            :data-testid="`creator-job-campaign-status-${job.id}`"
+          />
 
           <div class="job__meta">
             <span v-if="job.attributes.listing_fee" :data-testid="`creator-job-fee-${job.id}`">

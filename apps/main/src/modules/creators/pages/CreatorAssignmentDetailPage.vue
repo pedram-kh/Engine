@@ -44,6 +44,8 @@ import { VDialog } from 'vuetify/components/VDialog'
 
 import { isNativePlatform } from '@/core/platform/isNativePlatform'
 
+import CampaignStatusBanner from '../components/CampaignStatusBanner.vue'
+import CampaignStatusChip from '../components/CampaignStatusChip.vue'
 import { creatorAssignmentsApi } from '../assignments.api'
 import CreatorAttachmentsBlock from '../components/CreatorAttachmentsBlock.vue'
 import RichBrief from '@/components/RichBrief.vue'
@@ -536,6 +538,13 @@ onMounted(() => {
         >
           {{ t(`app.campaigns.assignmentStatus.${assignment.attributes.status}`) }}
         </v-chip>
+        <!-- AH-107: the CAMPAIGN's state (all five, Q3). The header is flex-wrap, and the chip is
+             `flex: 0 0 auto`, so it wraps to a new line rather than squeezing. -->
+        <CampaignStatusChip
+          :status="assignment.attributes.campaign?.status"
+          surface="assignment"
+          data-testid="assignment-detail-campaign-status"
+        />
       </header>
       <p class="text-body-2 text-medium-emphasis">
         <span v-if="assignment.attributes.campaign?.brand_name">
@@ -551,6 +560,10 @@ onMounted(() => {
           / {{ assignment.attributes.fee_per }}</span
         >
       </p>
+
+      <!-- AH-107 (Q2): paused / completed / cancelled. DISPLAY ONLY: every action
+           below still renders; the campaign status gates nothing (tech-debt row). -->
+      <CampaignStatusBanner :status="assignment.attributes.campaign?.status" />
 
       <!-- The campaign's own description (AH-097 — closes the AH-032 gap: an
            invited/assigned creator could previously read only the agency's

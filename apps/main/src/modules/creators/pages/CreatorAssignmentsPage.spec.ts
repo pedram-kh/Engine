@@ -185,3 +185,110 @@ describe('CreatorAssignmentsPage', () => {
     expect(wrapper.find('[data-test="creator-assignments-empty"]').exists()).toBe(true)
   })
 })
+
+// ── AH-107 — the campaign's state on the assignment card (web path) ─────────
+//
+// Q3: every status shows on an assignment card, Active included; draft reads
+// "Upcoming" (Q1). Display only (Q2): the actions below the chip do not change.
+
+function withCampaignStatus(
+  id: string,
+  assignmentStatus: CreatorAssignmentResource['attributes']['status'],
+  campaignStatus: string | undefined,
+): CreatorAssignmentResource {
+  const base = makeAssignment(id, assignmentStatus)
+  const campaign = base.attributes.campaign!
+  return {
+    ...base,
+    attributes: {
+      ...base.attributes,
+      campaign: {
+        ...campaign,
+        ...(campaignStatus === undefined ? {} : { status: campaignStatus }),
+      } as never,
+    },
+  }
+}
+
+describe('CreatorAssignmentsPage — the campaign status chip (AH-107, web)', () => {
+  it.each([
+    ['draft', 'Upcoming'],
+    ['active', 'Active'],
+    ['paused', 'Paused'],
+    ['completed', 'Completed'],
+    ['cancelled', 'Cancelled'],
+  ])('shows the %s campaign as "%s"', async (campaignStatus, label) => {
+    vi.mocked(creatorAssignmentsApi.list).mockResolvedValue({
+      data: [withCampaignStatus('A', 'accepted', campaignStatus)],
+    })
+
+    const { wrapper, unmount } = await mountAuthPage(CreatorAssignmentsPage)
+    teardown = unmount
+    await flushPromises()
+
+    const chip = wrapper.find('[data-testid="creator-assignment-campaign-status-A"]')
+    expect(chip.text()).toBe(label)
+    expect(chip.classes()).toContain('campaign-status-chip')
+  })
+
+  it('shows no campaign chip when the backend sends no status (older backend)', async () => {
+    vi.mocked(creatorAssignmentsApi.list).mockResolvedValue({
+      data: [withCampaignStatus('A', 'accepted', undefined)],
+    })
+
+    const { wrapper, unmount } = await mountAuthPage(CreatorAssignmentsPage)
+    teardown = unmount
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="creator-assignment-campaign-status-A"]').exists()).toBe(
+      false,
+    )
+  })
+
+  it('is a separate chip from the assignment status, which is still there', async () => {
+    vi.mocked(creatorAssignmentsApi.list).mockResolvedValue({
+      data: [withCampaignStatus('A', 'invited', 'paused')],
+    })
+
+    const { wrapper, unmount } = await mountAuthPage(CreatorAssignmentsPage)
+    teardown = unmount
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="creator-assignment-status-A"]').text()).toBe('Invited')
+    expect(wrapper.find('[data-testid="creator-assignment-campaign-status-A"]').text()).toBe(
+      'Paused',
+    )
+  })
+
+  it('DISPLAY ONLY (Q2): a paused / cancelled campaign still offers accept and decline', async () => {
+    vi.mocked(creatorAssignmentsApi.list).mockResolvedValue({
+      data: [
+        withCampaignStatus('A', 'invited', 'paused'),
+        withCampaignStatus('B', 'invited', 'cancelled'),
+      ],
+    })
+
+    const { wrapper, unmount } = await mountAuthPage(CreatorAssignmentsPage)
+    teardown = unmount
+    await flushPromises()
+
+    for (const id of ['A', 'B']) {
+      expect(wrapper.find(`[data-testid="creator-assignment-accept-${id}"]`).exists()).toBe(true)
+      expect(wrapper.find(`[data-testid="creator-assignment-decline-${id}"]`).exists()).toBe(true)
+    }
+  })
+
+  it('keeps the campaign chip OUT of the title row that holds the assignment status (AH-106 lesson)', async () => {
+    vi.mocked(creatorAssignmentsApi.list).mockResolvedValue({
+      data: [withCampaignStatus('A', 'invited', 'paused')],
+    })
+
+    const { wrapper, unmount } = await mountAuthPage(CreatorAssignmentsPage)
+    teardown = unmount
+    await flushPromises()
+
+    const title = wrapper.find('.assignment__title')
+    expect(title.find('[data-testid="creator-assignment-status-A"]').exists()).toBe(true)
+    expect(title.find('[data-testid="creator-assignment-campaign-status-A"]').exists()).toBe(false)
+  })
+})

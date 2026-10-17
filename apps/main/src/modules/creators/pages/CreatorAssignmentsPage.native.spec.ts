@@ -231,3 +231,60 @@ describe('invitations — web is unchanged', () => {
     expect(card.find('[data-testid="creator-assignment-view-A"]').text()).toBe('View')
   })
 })
+
+// ── AH-107 — the campaign's state on the native invitation card ─────────────
+
+function withCampaignStatus(
+  id: string,
+  campaignStatus: string | undefined,
+): CreatorAssignmentResource {
+  const base = makeAssignment(id, 'invited')
+  const campaign = base.attributes.campaign!
+  return {
+    ...base,
+    attributes: {
+      ...base.attributes,
+      campaign: {
+        ...campaign,
+        ...(campaignStatus === undefined ? {} : { status: campaignStatus }),
+      } as never,
+    },
+  }
+}
+
+describe('invitations — the campaign status chip (AH-107, native)', () => {
+  it.each([
+    ['draft', 'Upcoming'],
+    ['active', 'Active'],
+    ['paused', 'Paused'],
+    ['completed', 'Completed'],
+    ['cancelled', 'Cancelled'],
+  ])('shows the %s campaign as "%s" under the brand', async (campaignStatus, label) => {
+    const wrapper = await mountIt(true, [withCampaignStatus('A', campaignStatus)])
+
+    const chip = wrapper.find('[data-testid="creator-assignment-campaign-status-A"]')
+    expect(chip.text()).toBe(label)
+    // In the head column (under the brand), NOT in the card's top row beside the
+    // assignment-status pill: that row is where AH-106's squeeze lived.
+    expect(chip.element.closest('.assignment-card__head')).not.toBeNull()
+    expect(chip.classes()).toContain('campaign-status-chip')
+  })
+
+  it('does not take the assignment-status pill styling hook', async () => {
+    const wrapper = await mountIt(true, [withCampaignStatus('A', 'paused')])
+
+    // creatorNative.css styles `[data-testid^='creator-assignment-status-']` as the
+    // pill (flex: none, a fixed 22px height). The campaign chip must not match it.
+    const chip = wrapper.find('[data-testid="creator-assignment-campaign-status-A"]')
+    expect(chip.attributes('data-testid')?.startsWith('creator-assignment-status-')).toBe(false)
+    expect(wrapper.find('[data-testid="creator-assignment-status-A"]').text()).toBe('Invited')
+  })
+
+  it('shows nothing when the backend sends no status', async () => {
+    const wrapper = await mountIt(true, [withCampaignStatus('A', undefined)])
+
+    expect(wrapper.find('[data-testid="creator-assignment-campaign-status-A"]').exists()).toBe(
+      false,
+    )
+  })
+})

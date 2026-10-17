@@ -51,6 +51,7 @@ import { VDialog } from 'vuetify/components/VDialog'
 
 import { isNativePlatform } from '@/core/platform/isNativePlatform'
 
+import CampaignStatusChip from '../components/CampaignStatusChip.vue'
 import { creatorJobsApi } from '../jobs.api'
 import CreatorAttachmentsBlock from '../components/CreatorAttachmentsBlock.vue'
 import RichBrief from '@/components/RichBrief.vue'
@@ -226,6 +227,12 @@ onMounted(() => {
               {{ job.attributes.brand?.name ?? '—' }}
             </p>
             <h1 class="text-h4" data-testid="creator-job-detail-name">{{ job.attributes.name }}</h1>
+            <!-- AH-107 (Q3): Paused only on a job surface. -->
+            <CampaignStatusChip
+              :status="job.attributes.campaign_status"
+              surface="job"
+              data-testid="creator-job-detail-campaign-status"
+            />
           </div>
         </header>
 

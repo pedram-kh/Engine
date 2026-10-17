@@ -611,3 +611,40 @@ describe('CreatorJobDetailPage — apply container (AH-100b)', () => {
     expect(wrapper.find('[data-testid="creator-job-apply-submit"]').exists()).toBe(true)
   })
 })
+
+// ── AH-107 (Q3) — the job detail shows the campaign's state when PAUSED ─────
+
+describe('CreatorJobDetailPage — the campaign status chip (AH-107)', () => {
+  it('shows "Paused" when the campaign is paused', async () => {
+    mockApi.show.mockResolvedValue(detail({ campaign_status: 'paused' }) as never)
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-detail-campaign-status"]').text()).toBe('Paused')
+  })
+
+  it.each(['draft', 'active'])(
+    'shows NOTHING for a %s campaign (Paused only, Q3)',
+    async (status) => {
+      mockApi.show.mockResolvedValue(detail({ campaign_status: status }) as never)
+      const wrapper = await mountPage()
+
+      expect(wrapper.find('[data-testid="creator-job-detail-campaign-status"]').exists()).toBe(
+        false,
+      )
+    },
+  )
+
+  it('shows nothing when the backend sends no status (older backend)', async () => {
+    mockApi.show.mockResolvedValue(detail() as never)
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-detail-campaign-status"]').exists()).toBe(false)
+  })
+
+  it('does not take Apply away: a paused job can still be applied to (display only, Q2)', async () => {
+    mockApi.show.mockResolvedValue(detail({ campaign_status: 'paused' }) as never)
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-apply"]').exists()).toBe(true)
+  })
+})

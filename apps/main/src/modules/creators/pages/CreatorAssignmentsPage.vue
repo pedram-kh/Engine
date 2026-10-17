@@ -26,6 +26,7 @@ import { useI18n } from 'vue-i18n'
 import RichBrief from '@/components/RichBrief.vue'
 import { isNativePlatform } from '@/core/platform/isNativePlatform'
 
+import CampaignStatusChip from '../components/CampaignStatusChip.vue'
 import { creatorAssignmentsApi } from '../assignments.api'
 
 const { t, locale } = useI18n()
@@ -165,6 +166,13 @@ onMounted(() => {
                 <span v-if="item.attributes.campaign?.brand_name" class="assignment-card__brand">
                   {{ item.attributes.campaign.brand_name }}
                 </span>
+                <!-- AH-107: the CAMPAIGN's state, in the head column under the brand, never
+                     in the row that holds the assignment-status pill (AH-106's squeeze). -->
+                <CampaignStatusChip
+                  :status="item.attributes.campaign?.status"
+                  surface="assignment"
+                  :data-testid="`creator-assignment-campaign-status-${item.id}`"
+                />
               </div>
               <v-chip
                 size="x-small"
@@ -270,6 +278,14 @@ onMounted(() => {
                   {{ t(`app.campaigns.assignmentStatus.${item.attributes.status}`) }}
                 </v-chip>
               </div>
+              <!-- AH-107: the CAMPAIGN's state on its own line under the title, so it never
+                   competes with the assignment-status chip for the title row's width. -->
+              <CampaignStatusChip
+                class="mt-1"
+                :status="item.attributes.campaign?.status"
+                surface="assignment"
+                :data-testid="`creator-assignment-campaign-status-${item.id}`"
+              />
               <p class="assignment__meta">
                 <span v-if="item.attributes.campaign?.brand_name">
                   {{ item.attributes.campaign.brand_name }} ·

@@ -1126,3 +1126,121 @@ describe('CreatorAssignmentDetailPage — status pill (AH-100d)', () => {
     ).not.toHaveProperty('data-status')
   })
 })
+
+// ── AH-107 — the campaign's state on the assignment detail ──────────────────
+//
+// Q3: the header chip shows all five statuses. Q2: a banner for paused /
+// completed / cancelled, DISPLAY ONLY: every action the assignment would
+// otherwise offer must still render under it.
+
+function detailWithCampaign(
+  status: CreatorAssignmentDetailResource['attributes']['status'],
+  campaignStatus: string | undefined,
+): CreatorAssignmentDetailResource {
+  const base = makeDetail(status)
+  const campaign = base.attributes.campaign!
+  return {
+    ...base,
+    attributes: {
+      ...base.attributes,
+      campaign: {
+        ...campaign,
+        ...(campaignStatus === undefined ? {} : { status: campaignStatus }),
+      } as never,
+    },
+  }
+}
+
+const BANNER = '[data-testid="creator-campaign-status-banner"]'
+
+describe('CreatorAssignmentDetailPage — campaign status (AH-107)', () => {
+  it.each([
+    ['draft', 'Upcoming'],
+    ['active', 'Active'],
+    ['paused', 'Paused'],
+    ['completed', 'Completed'],
+    ['cancelled', 'Cancelled'],
+  ])('shows the %s campaign as a header chip: "%s"', async (campaignStatus, label) => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: detailWithCampaign('accepted', campaignStatus),
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-detail-campaign-status"]').text()).toBe(label)
+    // The assignment's own status chip is untouched and separate.
+    expect(wrapper.find('[data-testid="assignment-detail-status"]').exists()).toBe(true)
+  })
+
+  it.each([
+    ['paused', 'This campaign is paused.'],
+    ['completed', 'This campaign has ended.'],
+    ['cancelled', 'This campaign was cancelled.'],
+  ])('shows a banner for a %s campaign', async (campaignStatus, copy) => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: detailWithCampaign('accepted', campaignStatus),
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find(BANNER).text()).toContain(copy)
+  })
+
+  it.each(['draft', 'active', undefined])('shows NO banner for %s', async (campaignStatus) => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: detailWithCampaign('accepted', campaignStatus),
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find(BANNER).exists()).toBe(false)
+  })
+
+  it('shows no campaign chip when the backend sends no status (older backend)', async () => {
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: detailWithCampaign('accepted', undefined),
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.find('[data-testid="assignment-detail-campaign-status"]').exists()).toBe(false)
+  })
+
+  describe('DISPLAY ONLY (Q2): every action still renders under each banner', () => {
+    it.each(['paused', 'completed', 'cancelled'])(
+      'keeps the draft submit form on a producing assignment of a %s campaign',
+      async (campaignStatus) => {
+        vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+          data: detailWithCampaign('producing', campaignStatus),
+        })
+        const { wrapper } = await mountDetail()
+
+        expect(wrapper.find(BANNER).exists()).toBe(true)
+        expect(wrapper.find('[data-testid="assignment-draft-form"]').exists()).toBe(true)
+      },
+    )
+
+    it.each(['paused', 'completed', 'cancelled'])(
+      'keeps accept and decline on an invited assignment of a %s campaign',
+      async (campaignStatus) => {
+        vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+          data: detailWithCampaign('invited', campaignStatus),
+        })
+        const { wrapper } = await mountDetail()
+
+        expect(wrapper.find(BANNER).exists()).toBe(true)
+        expect(wrapper.find('[data-testid="assignment-detail-accept"]').exists()).toBe(true)
+        expect(wrapper.find('[data-testid="assignment-detail-decline"]').exists()).toBe(true)
+      },
+    )
+
+    it.each(['paused', 'completed', 'cancelled'])(
+      'keeps the post form on an approved assignment of a %s campaign',
+      async (campaignStatus) => {
+        vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+          data: detailWithCampaign('approved', campaignStatus),
+        })
+        const { wrapper } = await mountDetail()
+
+        expect(wrapper.find(BANNER).exists()).toBe(true)
+        expect(wrapper.find('[data-testid="assignment-posted-form"]').exists()).toBe(true)
+      },
+    )
+  })
+})
