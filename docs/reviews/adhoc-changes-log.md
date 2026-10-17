@@ -70,6 +70,46 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-106 · Pre-tester UI batch, items 1 and 2: shell back arrow and the clipped Applied chip (Creator App arc)
+
+- **Status:** Landed
+- **Date:** 2026-10-17.
+- **Why:** TestFlight 1.0.0 (2) feedback. (1) The notifications page, opened from the bell, had no way back in the native app: the shell
+  top bar carried only the brand and the bell, and the page has no back control of its own. (2) After applying, the "Applied" chip on a
+  job card was partly cut off.
+- **What:**
+  - **Shell back arrow (Q4):** `CreatorDashboardLayout` shows a back arrow on every creator page that is not a bottom-bar tab and has no
+    back control of its own. `useShellBack` decides which pages (route-name lists, no route-table change) and where it goes: browser
+    history when the previous entry is a creator-layout page, else the dashboard. A previous entry that is sign-in or another layout is
+    never unwound into. Web and native. Today it appears on `creator.availability`, `creator.notifications`,
+    `creator.notifications.preferences` and `creator.profile`.
+  - **Applied chip:** the chip is a flex item of the card's top row and Vuetify's `.v-chip` is `min-width:0; overflow:hidden`, so a long
+    title, a logo, or a longer locale label ("Candidature envoyée") shrank it and clipped the label. `.job__chip { flex: 0 0 auto }` on
+    both chips (applied and lifecycle). Web is affected the same way; it just needs a narrower card or a longer title to show.
+- **Touched:** `apps/main/src/composables/useShellBack.ts` (+ spec), `modules/creators/layouts/CreatorDashboardLayout.vue` (+ spec),
+  `modules/creators/pages/CreatorJobsPage.vue` (+ spec), `playwright/specs/creator-jobs-board.spec.ts`. No backend, no migration, no new
+  i18n key (the arrow reuses `creator.ui.wizard.actions.back`), no route-table change.
+- **Decisions:**
+  - **§5.32 reinterpretation, logged:** Q4 says "every non-tab creator page". The three detail pages (`creator.job.detail`,
+    `creator.assignment.detail`, `creator.messages.thread`) already carry their own back control, so the shell arrow is withheld there;
+    two arrows on one screen would be a regression, not the ruling's intent. Both lists are pinned against the real route table, so a new
+    creator route fails a spec until it is classified.
+  - Q4's "else dashboard" fallback also covers a cold start (a push tap opening the notifications page with no history).
+  - The chip fix is CSS only; no layout restructure (a restructure belongs with AH-107, which adds a chip to the assignment cards).
+- **Verification:**
+  - Break-reverted: the arrow's visibility rule, the history-vs-dashboard branch, the sign-in guard, and the chip rule each made the
+    right spec fail when mutated, and restored clean.
+  - **Chip diagnosis and fix reproduced in real Chromium** (`apps/main/playwright-report/ah106-chip-repro.mjs`, gitignored scratch,
+    built from Vuetify's own `VChip.css` / `VAvatar.css`): before, 23-44 px of label cut at 360 and 390 px widths with a long title or a
+    French label, 0 with a short title; after, 0 in all six cases.
+- **PROD-DATA RISK: NONE.** Front-end only; no data is read or written differently.
+- **Deploy obligations:** web build with the normal front-end deploy; native needs a build (rides TestFlight build 3 with AH-107 and
+  AH-108 per the Q9 ruling). No `queue:restart`, no migration, no flag.
+- **Not verified:** the Playwright geometry leg for the chip (`creator-jobs-board.spec.ts`, "AH-106") was **written and typechecked but
+  not run**: the Docker daemon is not running locally, and CI is the first real run. The arrow has no E2E leg (jsdom unit coverage
+  only). **No device walk yet** for either item. The chip repro is a harness built from Vuetify's CSS, not the live page.
+- **Ref:** `1c3c7aaf` (shell back arrow), `e390581e` (chip). Numbering: AH-104, AH-104b and AH-105 are reserved, hence AH-106.
+
 ### AH-103 · Deep links: a notification opens the screen it is about (Creator App arc)
 
 - **Status:** **Closed 2026-10-12. Pushed (`origin/main` `cb79abfa..47d2efc5`, 20 commits), CI green on all four jobs

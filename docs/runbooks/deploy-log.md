@@ -54,6 +54,27 @@ happened.
 
 ---
 
+## AH-106 — pre-tester UI batch, items 1 and 2 (shell back arrow, clipped Applied chip) — PENDING
+
+> **Not pushed, not deployed.** Opens a new entry because everything below it is DEPLOYED. AH-107 (campaign status) and AH-108 (unread
+> indicators) are planned to stack on this entry for **one** production deploy and **one** TestFlight build 3 (Q9 ruling); they add
+> their own obligations here when they land.
+
+- **Status:** PENDING (local commits `1c3c7aaf`, `e390581e` on top of `8aa11376`; push held for review)
+- **Range:** `47d2efc5` (AH-103's last runtime commit, the deployed runtime tip; the commits between it and `8aa11376` are docs, `.env.example` and the iOS camera strings / build 2) → AH-106 tip `e390581e`.
+- **AH entries carried:** AH-106
+- **Migrations run:** none.
+- **Pre-deploy reads:** none.
+- **Snapshot ID:** not required by this entry (no schema, no data write). The open snapshot question under AH-103 is unchanged.
+- **Infra:** none for AH-106 (no `queue:restart`, no env, no cron). The merged AH-107/AH-108 entry will add `queue:restart` (`PushMessageFactory` changes).
+- **One-shot commands:** none.
+- **Post-deploy verification:** web: open the notifications page from the bell and confirm the back arrow returns; apply to a job with a long title at phone width and confirm the Applied chip shows its full label. Native: the same two checks on build 3.
+- **Flags armed:** none.
+- **Operator:** not yet.
+- **Anything unexpected:** nothing yet. Known gap carried into the deploy: the chip's Playwright leg has not been run (Docker down locally); the first CI run is its first execution.
+
+---
+
 ## AH-103 — deep links: a notification opens the screen it is about — DEPLOYED
 
 > **Deployed 2026-10-12** (reported by Pedram; see the Deploy record below). The note under it is the pre-deploy text, kept as written. **Pending after the deploy:** the first TestFlight build (below).
