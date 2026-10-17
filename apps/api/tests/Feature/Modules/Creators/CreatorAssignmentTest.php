@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
+use App\Modules\Campaigns\Enums\CampaignStatus;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Creators\Database\Factories\CreatorFactory;
@@ -85,6 +86,58 @@ it('lists the creator\'s OWN assignments across all agencies (scope bypass)', fu
         ->getJson('/api/v1/creators/me/assignments')
         ->assertOk()
         ->assertJsonCount(2, 'data');
+});
+
+it('emits EXACTLY the campaign sub-keyset on the list row, including the status (AH-107)', function (): void {
+    [$user, $creator] = creatorUser();
+    invitedAssignmentFor($creator);
+
+    $campaign = $this->actingAs($user)
+        ->getJson('/api/v1/creators/me/assignments')
+        ->assertOk()
+        ->json('data.0.attributes.campaign');
+
+    expect(array_keys($campaign))->toBe([
+        'id',
+        'name',
+        // AH-107 — the campaign's lifecycle state, raw (display only; no gate).
+        'status',
+        'posting_window_starts_at',
+        'posting_window_ends_at',
+        'brand_name',
+    ]);
+});
+
+it('emits the campaign status, raw, on the list row for every status (AH-107)', function (CampaignStatus $status): void {
+    [$user, $creator] = creatorUser();
+    $campaign = Campaign::factory()->create(['budget_currency' => 'EUR', 'status' => $status]);
+    invitedAssignmentFor($creator, ['campaign_id' => $campaign->id]);
+
+    $this->actingAs($user)
+        ->getJson('/api/v1/creators/me/assignments')
+        ->assertOk()
+        ->assertJsonPath('data.0.attributes.campaign.status', $status->value);
+})->with(CampaignStatus::cases());
+
+// AH-107 / Q2 — DISPLAY ONLY. Campaign status does not gate creator actions, and
+// this is the executable form of that tech-debt row: if someone adds a gate
+// later without a ruling, these fail loudly instead of silently changing what a
+// creator can do. (Tracked in tech-debt.md, "campaign status does not gate
+// creator actions".)
+it('does NOT gate accept / decline / counter on the campaign status (Q2)', function (CampaignStatus $status, string $verb, array $body): void {
+    [$user, $creator] = creatorUser();
+    $campaign = Campaign::factory()->create(['budget_currency' => 'EUR', 'status' => $status]);
+    $assignment = invitedAssignmentFor($creator, ['campaign_id' => $campaign->id]);
+
+    $this->actingAs($user)
+        ->postJson(assignmentUrl($assignment, $verb), $body)
+        ->assertOk();
+})->with(function () {
+    foreach ([CampaignStatus::Paused, CampaignStatus::Completed, CampaignStatus::Cancelled] as $status) {
+        yield "accept on {$status->value}" => [$status, 'accept', []];
+        yield "decline on {$status->value}" => [$status, 'decline', []];
+        yield "counter on {$status->value}" => [$status, 'counter', ['countered_fee_minor_units' => 600_000, 'countered_fee_currency' => 'EUR']];
+    }
 });
 
 it('emits the invite-offer context (fee_per, offer_description, offer_attachment) on the list row', function (): void {

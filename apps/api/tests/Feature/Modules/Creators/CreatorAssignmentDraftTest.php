@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
+use App\Modules\Campaigns\Enums\CampaignStatus;
 use App\Modules\Campaigns\Enums\PostedContentVerificationStatus;
 use App\Modules\Campaigns\Events\AssignmentTransitioned;
 use App\Modules\Campaigns\Jobs\VerifyPostedContentJob;
@@ -145,12 +146,28 @@ it('emits EXACTLY the campaign sub-keyset on show, including the new description
     expect(array_keys($campaign))->toBe([
         'id',
         'name',
+        // AH-107 — the campaign's lifecycle state, raw (display only; no gate).
+        'status',
         'description',
         'posting_window_starts_at',
         'posting_window_ends_at',
         'brand_name',
     ]);
 });
+
+it('emits the campaign status, raw, on show for every status (AH-107)', function (CampaignStatus $status): void {
+    [$user, $creator] = draftCreatorUser();
+    $campaign = Campaign::factory()->create(['budget_currency' => 'EUR', 'status' => $status]);
+    $assignment = CampaignAssignment::factory()->status(AssignmentStatus::Producing)->create([
+        'campaign_id' => $campaign->id,
+        'creator_id' => $creator->id,
+    ]);
+
+    $this->actingAs($user)
+        ->getJson("/api/v1/creators/me/assignments/{$assignment->ulid}")
+        ->assertOk()
+        ->assertJsonPath('data.attributes.campaign.status', $status->value);
+})->with(CampaignStatus::cases());
 
 it('renders the campaign description on show (AH-097)', function (): void {
     [$user, $creator] = draftCreatorUser();

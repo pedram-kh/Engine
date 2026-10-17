@@ -45,6 +45,10 @@ uses(TestCase::class, RefreshDatabase::class);
 /** The complete, ordered key list the CARD may emit. */
 const CARD_KEYS = [
     'name',
+    // AH-107 — the campaign's lifecycle state (draft|active|paused: the only
+    // three the board can serve, completed/cancelled 404). The creator UI shows
+    // Paused only (Q3); the field is the raw enum value on BOTH shapes.
+    'campaign_status',
     'listing_fee',
     'listing_duration',
     'applicant_count',
@@ -73,6 +77,18 @@ const DETAIL_KEYS = [
     // conditional key, for the same accretion-guard reason as above.
     'attachments',
 ];
+
+// ── AH-107 — the campaign's status, raw, on both shapes ─────────────────────
+
+it('emits campaign_status as the raw enum value on the card AND the detail', function (CampaignStatus $status): void {
+    $f = CreatorJobFixture::make(['status' => $status]);
+
+    $this->actingAs($f->user)->getJson(CreatorJobFixture::URL)->assertOk()
+        ->assertJsonPath('data.0.attributes.campaign_status', $status->value);
+
+    $this->actingAs($f->user)->getJson($f->jobUrl())->assertOk()
+        ->assertJsonPath('data.attributes.campaign_status', $status->value);
+})->with([CampaignStatus::Draft, CampaignStatus::Active, CampaignStatus::Paused]);
 
 // ── The happy path ──────────────────────────────────────────────────────────
 

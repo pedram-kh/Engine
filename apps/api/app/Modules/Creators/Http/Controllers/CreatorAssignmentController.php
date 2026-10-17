@@ -47,7 +47,7 @@ final class CreatorAssignmentController
         $assignments = CampaignAssignment::query()
             ->withoutGlobalScope(BelongsToAgencyScope::class)
             ->where('creator_id', $creator->id)
-            ->with(['campaign:id,ulid,name,posting_window_starts_at,posting_window_ends_at,starts_at,ends_at,brand_id', 'campaign.brand:id,ulid,name'])
+            ->with(['campaign:id,ulid,name,status,posting_window_starts_at,posting_window_ends_at,starts_at,ends_at,brand_id', 'campaign.brand:id,ulid,name'])
             ->orderByDesc('invited_at')
             ->orderByDesc('id')
             ->get();
@@ -200,6 +200,8 @@ final class CreatorAssignmentController
                 'campaign' => $campaign !== null ? [
                     'id' => $campaign->ulid,
                     'name' => $campaign->name,
+                    // AH-107 — raw lifecycle state; display only, no gate (Q2).
+                    'status' => $campaign->status->value,
                     'posting_window_starts_at' => ($campaign->posting_window_starts_at ?? $campaign->starts_at)?->toIso8601String(),
                     'posting_window_ends_at' => ($campaign->posting_window_ends_at ?? $campaign->ends_at)?->toIso8601String(),
                     'brand_name' => $brand?->name,

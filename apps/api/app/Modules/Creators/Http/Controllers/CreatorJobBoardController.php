@@ -69,6 +69,9 @@ final class CreatorJobBoardController
         'campaigns.ulid',
         'campaigns.name',
         'campaigns.brand_id',
+        // AH-107 — read by the card resource's `campaign_status`. Without it the
+        // attribute is null (Eloquent returns null for an unselected column).
+        'campaigns.status',
         'campaigns.listing_fee',
         'campaigns.listing_duration',
         'campaigns.listed_at',

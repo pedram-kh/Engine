@@ -146,6 +146,8 @@ final class CreatorAssignmentDraftController
                     'campaign' => $campaign !== null ? [
                         'id' => $campaign->ulid,
                         'name' => $campaign->name,
+                        // AH-107 — raw lifecycle state; display only, no gate (Q2).
+                        'status' => $campaign->status->value,
                         // AH-097 — closes the AH-032 tech-debt gap: the assignee
                         // could read only offer_description, never the
                         // campaign's own description. Already served to every
@@ -562,7 +564,7 @@ final class CreatorAssignmentDraftController
             ->withoutGlobalScope(BelongsToAgencyScope::class)
             ->where('creator_id', $creator->id)
             ->where('ulid', $assignmentUlid)
-            ->with(['campaign:id,ulid,name,description,posting_window_starts_at,posting_window_ends_at,starts_at,ends_at,brand_id,requires_per_campaign_contract,creator_posts_content', 'campaign.brand:id,ulid,name'])
+            ->with(['campaign:id,ulid,name,status,description,posting_window_starts_at,posting_window_ends_at,starts_at,ends_at,brand_id,requires_per_campaign_contract,creator_posts_content', 'campaign.brand:id,ulid,name'])
             ->first();
 
         if ($assignment === null) {

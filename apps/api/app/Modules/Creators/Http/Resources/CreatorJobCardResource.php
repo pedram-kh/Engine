@@ -89,6 +89,12 @@ class CreatorJobCardResource extends JsonResource
     {
         return [
             'name' => $campaign->name,
+            // AH-107 — the campaign's lifecycle state, RAW (draft|active|paused: the
+            // board's read-time filter, Campaign::LISTABLE_STATUSES, means a
+            // completed/cancelled campaign never reaches this resource). The creator
+            // UI shows Paused only (Q3); the client owns every label. Display only:
+            // nothing server-side is gated on it (Q2).
+            'campaign_status' => $campaign->status->value,
             'listing_fee' => $campaign->listing_fee,
             'listing_duration' => $campaign->listing_duration,
             // Annotated by the controller via withCount — never lazy-loaded,
