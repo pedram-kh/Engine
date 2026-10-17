@@ -148,6 +148,7 @@ onMounted(() => {
               v-if="lifecycleState(job) !== null"
               size="small"
               variant="tonal"
+              class="job__chip"
               :color="LIFECYCLE_COLOR[lifecycleState(job)!]"
               :data-testid="`creator-job-lifecycle-${job.id}`"
             >
@@ -157,6 +158,7 @@ onMounted(() => {
               v-else-if="job.attributes.application_status !== null"
               size="small"
               variant="tonal"
+              class="job__chip"
               :color="job.attributes.application_status === 'rejected' ? 'error' : 'primary'"
               :data-testid="`creator-job-applied-${job.id}`"
             >
@@ -238,6 +240,17 @@ onMounted(() => {
   flex-direction: column;
   min-width: 0;
   flex: 1 1 auto;
+}
+
+/* AH-106 — the status chip never gives up width. A Vuetify chip is
+   `min-width: 0; overflow: hidden; white-space: nowrap`, so as a plain flex item
+   it SHRINKS when the row overflows and clips its own label ("Appl…"). The row
+   overflows whenever the title's single-line width (a flex-basis of
+   `max-content`, wrapping or not) plus the logo and the chip is wider than the
+   card — a long title, a long locale ("Candidature envoyée"), a narrow phone.
+   Pinning the chip hands the squeeze to the title, which can ellipsize or wrap. */
+.job__chip {
+  flex: 0 0 auto;
 }
 
 .job__brand {

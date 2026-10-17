@@ -9,6 +9,9 @@
  * rather than an error.
  */
 
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+
 import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createI18n } from 'vue-i18n'
@@ -242,6 +245,30 @@ describe('CreatorJobsPage', () => {
       // creator's own decline, and their own choice must not read as a reprimand.
       expect(chip.attributes('color') ?? color).toBe(color)
     }
+  })
+
+  // AH-106 (item 2). jsdom has no layout engine, so the clip itself is measured
+  // in the Playwright leg (`creator-jobs-board.spec.ts`, at phone width). What
+  // CAN be pinned here is the two halves of the fix: both chip branches carry
+  // the class, and the class pins the chip's width.
+  describe('the status chip is never squeezed (AH-106)', () => {
+    it.each([
+      ['the application chip', { application_status: 'pending' }, 'creator-job-applied-01JOB1'],
+      ['the lifecycle chip', { assignment_state: 'in_progress' }, 'creator-job-lifecycle-01JOB1'],
+    ])('%s carries the width-pinning class', async (_name, overrides, testid) => {
+      mockApi.list.mockResolvedValue(envelope([card(overrides)]) as never)
+      const wrapper = await mountPage()
+
+      expect(wrapper.find(`[data-testid="${testid}"]`).classes()).toContain('job__chip')
+    })
+
+    it('the class stops the chip from shrinking', () => {
+      const source = readFileSync(resolve(__dirname, 'CreatorJobsPage.vue'), 'utf8')
+      const rule = /\.job__chip\s*\{([^}]*)\}/.exec(source)
+
+      expect(rule, 'no .job__chip rule in the page style').not.toBeNull()
+      expect(rule?.[1]).toMatch(/flex:\s*0\s+0\s+auto/)
+    })
   })
 
   it('shows the empty state — an empty board is a state, not an error', async () => {

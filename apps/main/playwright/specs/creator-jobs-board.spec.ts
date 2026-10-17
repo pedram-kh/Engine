@@ -211,4 +211,62 @@ test.describe('AH-056 — creator jobs board', () => {
     // from the exact-keyset the server sends (review priority #1).
     await expect(block).not.toContainText('internal-notes.pdf')
   })
+
+  // AH-106 (item 2) — the "Applied" chip was cut off on a real phone. Every
+  // assertion above reads `toHaveText('Applied')`, which matches the DOM text
+  // and cannot see a chip that is rendered 40px wide with its label clipped, so
+  // this leg measures instead. The title is long on purpose: the chip is only
+  // squeezed when the row overflows (a short title never triggered it).
+  //
+  // Reproduced, and the fix verified, in real Chromium against Vuetify's own chip
+  // CSS by `playwright-report/ah106-chip-repro.mjs` (before: 23-44px of label cut
+  // off; after: 0). This leg is the same fact against the real page.
+  test('AH-106 — the Applied chip is not clipped on a long-titled card at phone width', async ({
+    page,
+  }) => {
+    const request = page.context().request
+    const email = uniqueEmail()
+
+    await signUpUser(request, email, PASSWORD, 'Jobs Board Chip E2E')
+    await verifyEmailViaApi(request, email)
+
+    const job = await seedListedJob(request, email, {
+      campaignName: 'Autumn UGC push for the whole family kitchen collection 2026',
+      brandName: 'Northwind Coffee',
+      listingFee: '€300 per video',
+      listingDuration: '4 weeks',
+      description: 'Long title, so the card row overflows at phone width.',
+    })
+
+    await page.setViewportSize({ width: 360, height: 740 })
+
+    await page.goto('/sign-in')
+    await page.locator(dt(testIds.signInEmail)).locator('input').fill(email)
+    await page.locator(dt(testIds.signInPassword)).locator('input').fill(PASSWORD)
+    await page.locator(dt(testIds.signInSubmit)).click()
+    await expect(page).not.toHaveURL(/\/sign-in/, { timeout: 10_000 })
+
+    await page.goto(`/creator/jobs/${job.campaignUlid}`)
+    await page.locator('[data-testid="creator-job-apply"]').click()
+    await page.locator('[data-testid="creator-job-apply-submit"]').click()
+    await expect(page.locator('[data-testid="creator-job-applied-notice"]')).toBeVisible({
+      timeout: 10_000,
+    })
+
+    await page.goto('/creator/jobs')
+    const chip = page.locator(`[data-testid="creator-job-applied-${job.campaignUlid}"]`)
+    await expect(chip).toHaveText('Applied', { timeout: 10_000 })
+
+    const cutOff = await chip.evaluate((el) => el.scrollWidth - el.clientWidth)
+    expect(cutOff, 'the Applied chip clips its own label').toBeLessThanOrEqual(1)
+
+    // And the chip sits inside its card rather than hanging off it.
+    const card = await page.locator(`[data-testid="creator-job-${job.campaignUlid}"]`).boundingBox()
+    const box = await chip.boundingBox()
+    expect(card).not.toBeNull()
+    expect(box).not.toBeNull()
+    expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(
+      (card?.x ?? 0) + (card?.width ?? 0) + 1,
+    )
+  })
 })
