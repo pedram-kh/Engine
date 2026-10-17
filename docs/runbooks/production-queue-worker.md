@@ -424,6 +424,23 @@ liveness first). In-app notifications and token registration are unaffected. Not
 > safety). **We are live** — treat every deploy carrying a migration, backfill,
 > or one-shot command as capable of destroying irreplaceable data.
 
+### 8.0 Where a deploy comes from — GitHub `main` is NOT the deploy source
+
+> **Recorded 2026-10-17 (reported by Pedram; not read from the Bitbucket or Netlify settings by the assistant).**
+
+- **GitHub is the development remote only.** Pushing to `origin/main` on GitHub **never deploys anything**, for the API or for either SPA.
+- **The deploy source is a Bitbucket mirror.** Pedram's colleague mirrors GitHub → Bitbucket and **deploys from Bitbucket**: the API
+  and both SPAs (main, admin). So a deploy has two human steps after a push: the mirror, then the colleague's deploy.
+- **What this means for the log.** A push is not a deploy (as before), and now a **mirrored** commit is not a deploy either. The
+  `Range` in a deploy-log entry must name the SHA that was actually deployed from Bitbucket (SHAs are identical across a git mirror),
+  and the colleague, not the pusher, decides when that is.
+- **What this closes.** The 2026-10-13 note "how the Netlify deploy is triggered, and whether it follows `main` automatically, is not read" is
+  **closed**: the SPAs are Netlify-hosted sites, but their deploy follows the Bitbucket deploy path above, not a push to GitHub. Whether
+  a Netlify site builds from Bitbucket directly or the colleague publishes the build is the colleague's mechanism and is **not read**; it
+  does not change any step below, so it is no longer an open prerequisite.
+- **Before asking for a deploy, tell the colleague** the target SHA, the named steps (`queue:restart`, any one-shot command, any
+  migration), and whether a native build is needed.
+
 Run these steps **in order**. Do not skip step 1.
 
 1. **Manual DB snapshot — and verify it completed before proceeding.** Take an

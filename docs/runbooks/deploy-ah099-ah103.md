@@ -17,6 +17,7 @@ php-fpm file in the repo**, so the production layout is not written down anywher
 > sites; the API is `https://platform-api.catalyst-growth.com`. So P0.6's "nginx `root` serves the SPAs" and step 4's "publish `dist/` to nginx" do not
 > describe production; what replaces them (how a Netlify deploy is triggered, and whether it follows `main` automatically) is **not read** and must be
 > read from the Netlify site settings before the next deploy. Details in the AH-103 entry of [`deploy-log.md`](deploy-log.md).
+> **Closed 2026-10-17:** the deploy source is a **Bitbucket mirror** of GitHub, deployed by the colleague for the API and both SPAs; a push to GitHub never deploys. See [`production-queue-worker.md` §8.0](production-queue-worker.md). The Netlify-settings read is no longer a prerequisite.
 
 > **If P0.2 says `/app` is baked into the image (not a bind mount of `~/catalyst-engine/apps/api`), the deploy steps change.** Code then
 > reaches the container by **rebuilding and recreating it** (`docker compose build` / `up -d`), not by `git pull` on the host; steps 2,
