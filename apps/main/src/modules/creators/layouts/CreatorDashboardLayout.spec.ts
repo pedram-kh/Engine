@@ -21,10 +21,12 @@ import * as vuetifyDirectives from 'vuetify/directives'
 import { lightTheme, darkTheme } from '@catalyst/design-tokens/vuetify'
 import enApp from '@/core/i18n/locales/en/app.json'
 import enAvailability from '@/core/i18n/locales/en/availability.json'
+import enCreator from '@/core/i18n/locales/en/creator.json'
 import enNotifications from '@/core/i18n/locales/en/notifications.json'
 import frAvailability from '@/core/i18n/locales/fr/availability.json'
 import itAvailability from '@/core/i18n/locales/it/availability.json'
 import ptAvailability from '@/core/i18n/locales/pt/availability.json'
+import { SHELL_TAB_ROUTE_NAMES } from '@/composables/useShellBack'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 
 // The app-bar NotificationBell (S11.0 Ch3a) mounts a live unread-count poll.
@@ -177,7 +179,7 @@ async function mountLayout(
     fallbackLocale: 'en',
     availableLocales: ['en', 'pt', 'it', 'fr'],
     messages: {
-      en: { ...enApp, ...enAvailability, ...enNotifications },
+      en: { ...enApp, ...enAvailability, ...enCreator, ...enNotifications },
       pt: { ...enApp, ...ptAvailability, ...enNotifications },
       it: { ...enApp, ...itAvailability, ...enNotifications },
       fr: { ...enApp, ...frAvailability, ...enNotifications },
@@ -547,5 +549,80 @@ describe('CreatorDashboardLayout — tab bar labels (AH-100d)', () => {
       'Messages',
       'Plus',
     ])
+  })
+})
+
+/**
+ * AH-106 (item 1) — the shell's back arrow. The rule itself (which pages, where
+ * it goes) is `useShellBack.spec.ts`; this pins that the LAYOUT renders it, on
+ * both shells, with a name a screen reader can use.
+ */
+describe('CreatorDashboardLayout — shell back arrow (AH-106)', () => {
+  let cleanup: (() => void) | null = null
+
+  beforeEach(() => vi.clearAllMocks())
+  afterEach(() => {
+    if (cleanup !== null) {
+      cleanup()
+      cleanup = null
+    }
+    platform.native = false
+    setViewportWidth(1280)
+  })
+
+  const BACK = '[data-test="creator-shell-back"]'
+
+  it.each([
+    ['web', { route: '/creator/notifications' }],
+    ['web, preferences', { route: '/creator/notifications/preferences' }],
+    ['native', { route: '/creator/notifications', native: true }],
+    ['native, preferences', { route: '/creator/notifications/preferences', native: true }],
+    ['native, a More-sheet page', { route: '/creator/availability', native: true }],
+  ])('shows on a non-tab page (%s), named "Back"', async (_label, options) => {
+    const m = await mountLayout({ applicationStatus: 'approved', ...options })
+    cleanup = m.cleanup
+
+    const arrow = m.wrapper.find(BACK)
+    expect(arrow.exists()).toBe(true)
+    expect(arrow.attributes('aria-label')).toBe('Back')
+  })
+
+  it.each(SHELL_TAB_ROUTE_NAMES.map((name) => [name]))('is absent on the tab %s', async (name) => {
+    const path = {
+      'creator.dashboard': '/creator/dashboard',
+      'creator.jobs': '/creator/jobs',
+      'creator.assignments': '/creator/assignments',
+      'creator.messages': '/creator/messages',
+    }[name as string]
+    const m = await mountLayout({ applicationStatus: 'approved', native: true, route: path })
+    cleanup = m.cleanup
+
+    expect(m.wrapper.find(BACK).exists()).toBe(false)
+  })
+
+  it('the tab list it skips is exactly the four primary slots of the bottom bar', async () => {
+    const m = await mountLayout({ mobile: true, applicationStatus: 'approved' })
+    cleanup = m.cleanup
+
+    const router = m.wrapper.vm.$router
+    const primaryRouteNames = ['dashboard', 'jobs', 'assignments', 'messages'].map(
+      (key) =>
+        router.resolve(
+          m.wrapper.find(`[data-test="creator-bottom-nav-${key}"]`).attributes('href') ?? '',
+        ).name,
+    )
+
+    expect([...primaryRouteNames].sort()).toEqual([...SHELL_TAB_ROUTE_NAMES].sort())
+  })
+
+  it('goes to the dashboard when there is nothing to go back to', async () => {
+    const m = await mountLayout({ route: '/creator/notifications' })
+    cleanup = m.cleanup
+    const router = m.wrapper.vm.$router
+
+    await m.wrapper.find(BACK).trigger('click')
+    await flushPromises()
+
+    expect(router.currentRoute.value.name).toBe('creator.dashboard')
   })
 })

@@ -35,6 +35,7 @@ import { useOnboardingStore } from '@/modules/onboarding/stores/useOnboardingSto
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
 import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
 import { useMobileShell } from '@/composables/useMobileShell'
+import { useShellBack } from '@/composables/useShellBack'
 import { useTheme } from '@/composables/useTheme'
 import catalystLogo from '@/modules/auth/assets/catalyst-logo.svg'
 
@@ -45,6 +46,7 @@ const route = useRoute()
 const authStore = useAuthStore()
 const onboardingStore = useOnboardingStore()
 const { isNative, isMobile } = useMobileShell()
+const { visible: showBack, goBack } = useShellBack()
 const { currentTheme } = useTheme()
 const { user, isLoggingOut } = storeToRefs(authStore)
 const { applicationStatus } = storeToRefs(onboardingStore)
@@ -189,7 +191,24 @@ onMounted(() => {
       :class="{ 'creator-topbar--native': isNative }"
       data-test="creator-topbar"
     >
-      <div class="d-flex align-center px-4" data-test="creator-brand">
+      <!-- AH-106 — the shell's back arrow, on every page that is not a tab and
+           does not draw its own back control (see `useShellBack`). -->
+      <v-btn
+        v-if="showBack"
+        icon="mdi-arrow-left"
+        variant="text"
+        density="comfortable"
+        class="ml-2"
+        :aria-label="t('creator.ui.wizard.actions.back')"
+        data-test="creator-shell-back"
+        @click="goBack"
+      />
+
+      <div
+        class="d-flex align-center"
+        :class="showBack ? 'pl-2 pr-4' : 'px-4'"
+        data-test="creator-brand"
+      >
         <img
           :src="catalystLogo"
           alt="Catalyst"
