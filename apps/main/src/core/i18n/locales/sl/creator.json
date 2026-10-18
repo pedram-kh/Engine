@@ -511,6 +511,7 @@
         "completed": "Ta kampanija se je končala.",
         "cancelled": "Ta kampanija je bila preklicana."
       },
+      "messagesUnreadAria": "Sporočila, neprebrana: {count}",
       "jobs": {
         "title": "Oglasi za delo",
         "subtitle": "Dela agencij, s katerimi sodeluješ. Prijavi se na tista, ki ti ustrezajo.",

@@ -511,6 +511,7 @@
         "completed": "Diese Kampagne ist beendet.",
         "cancelled": "Diese Kampagne wurde abgebrochen."
       },
+      "messagesUnreadAria": "Nachrichten, ungelesen: {count}",
       "jobs": {
         "title": "Jobangebote",
         "subtitle": "Jobs der Agenturen, mit denen du arbeitest. Bewirb dich auf die passenden.",

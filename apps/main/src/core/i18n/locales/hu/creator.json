@@ -511,6 +511,7 @@
         "completed": "Ez a kampány befejeződött.",
         "cancelled": "Ezt a kampányt lemondták."
       },
+      "messagesUnreadAria": "Üzenetek, olvasatlan: {count}",
       "jobs": {
         "title": "Álláshirdetések",
         "subtitle": "Munkák azoktól az ügynökségektől, amelyekkel dolgozol. Jelentkezz azokra, amelyek illenek hozzád.",

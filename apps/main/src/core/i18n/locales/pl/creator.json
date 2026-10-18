@@ -511,6 +511,7 @@
         "completed": "Ta kampania została zakończona.",
         "cancelled": "Ta kampania została anulowana."
       },
+      "messagesUnreadAria": "Wiadomości, nieprzeczytane: {count}",
       "jobs": {
         "title": "Ogłoszenia o pracę",
         "subtitle": "Zlecenia od agencji, z którymi współpracujesz. Aplikuj na te, które do ciebie pasują.",

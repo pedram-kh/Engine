@@ -511,6 +511,7 @@
         "completed": "Cette campagne est terminée.",
         "cancelled": "Cette campagne a été annulée."
       },
+      "messagesUnreadAria": "Messages, non lus : {count}",
       "jobs": {
         "title": "Offres de mission",
         "subtitle": "Les missions des agences avec lesquelles vous travaillez. Postulez à celles qui vous conviennent.",

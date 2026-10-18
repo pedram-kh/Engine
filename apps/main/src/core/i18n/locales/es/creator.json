@@ -511,6 +511,7 @@
         "completed": "Esta campaña ha finalizado.",
         "cancelled": "Esta campaña fue cancelada."
       },
+      "messagesUnreadAria": "Mensajes, sin leer: {count}",
       "jobs": {
         "title": "Ofertas de trabajo",
         "subtitle": "Trabajos de las agencias con las que colaboras. Aplica a los que encajen contigo.",

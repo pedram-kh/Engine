@@ -511,6 +511,7 @@
         "completed": "This campaign has ended.",
         "cancelled": "This campaign was cancelled."
       },
+      "messagesUnreadAria": "Messages, unread: {count}",
       "jobs": {
         "title": "Job posts",
         "subtitle": "Jobs from the agencies you work with. Apply to the ones that fit.",

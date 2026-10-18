@@ -511,6 +511,7 @@
         "completed": "Această campanie s-a încheiat.",
         "cancelled": "Această campanie a fost anulată."
       },
+      "messagesUnreadAria": "Mesaje, necitite: {count}",
       "jobs": {
         "title": "Anunțuri de job",
         "subtitle": "Joburi de la agențiile cu care colaborezi. Aplică la cele care ți se potrivesc.",

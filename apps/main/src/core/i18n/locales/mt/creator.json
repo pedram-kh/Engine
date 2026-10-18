@@ -511,6 +511,7 @@
         "completed": "Din il-kampanja spiccat.",
         "cancelled": "Din il-kampanja ġiet ikkanċellata."
       },
+      "messagesUnreadAria": "Messaġġi, mhux moqrija: {count}",
       "jobs": {
         "title": "Postijiet tax-xogħol",
         "subtitle": "Xogħlijiet mill-aġenziji li taħdem magħhom. Applika għal dawk li jaqblu miegħek.",

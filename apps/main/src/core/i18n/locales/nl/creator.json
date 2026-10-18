@@ -511,6 +511,7 @@
         "completed": "Deze campagne is afgelopen.",
         "cancelled": "Deze campagne is geannuleerd."
       },
+      "messagesUnreadAria": "Berichten, ongelezen: {count}",
       "jobs": {
         "title": "Vacatures",
         "subtitle": "Opdrachten van de bureaus waarmee je werkt. Solliciteer op wat bij je past.",

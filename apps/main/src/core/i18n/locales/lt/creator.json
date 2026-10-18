@@ -511,6 +511,7 @@
         "completed": "Ši kampanija baigėsi.",
         "cancelled": "Ši kampanija buvo atšaukta."
       },
+      "messagesUnreadAria": "Žinutės, neperskaitytos: {count}",
       "jobs": {
         "title": "Darbo skelbimai",
         "subtitle": "Darbai iš agentūrų, su kuriomis dirbi. Kandidatuok į tuos, kurie tau tinka.",

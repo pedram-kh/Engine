@@ -511,6 +511,7 @@
         "completed": "Tá an feachtas seo críochnaithe.",
         "cancelled": "Cealaíodh an feachtas seo."
       },
+      "messagesUnreadAria": "Teachtaireachtaí, gan léamh: {count}",
       "jobs": {
         "title": "Poist",
         "subtitle": "Poist ó na gníomhaireachtaí a n-oibríonn tú leo. Cuir isteach ar na cinn a oireann duit.",

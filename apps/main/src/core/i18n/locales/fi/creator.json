@@ -511,6 +511,7 @@
         "completed": "Tämä kampanja on päättynyt.",
         "cancelled": "Tämä kampanja peruttiin."
       },
+      "messagesUnreadAria": "Viestit, lukemattomia: {count}",
       "jobs": {
         "title": "Työpaikat",
         "subtitle": "Töitä toimistoilta, joiden kanssa työskentelet. Hae niihin, jotka sopivat sinulle.",

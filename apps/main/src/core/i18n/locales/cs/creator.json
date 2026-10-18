@@ -511,6 +511,7 @@
         "completed": "Tato kampaň skončila.",
         "cancelled": "Tato kampaň byla zrušena."
       },
+      "messagesUnreadAria": "Zprávy, nepřečtené: {count}",
       "jobs": {
         "title": "Nabídky práce",
         "subtitle": "Nabídky od agentur, se kterými spolupracuješ. Přihlas se na ty, které ti sedí.",

@@ -511,6 +511,7 @@
         "completed": "Šī kampaņa ir beigusies.",
         "cancelled": "Šī kampaņa tika atcelta."
       },
+      "messagesUnreadAria": "Ziņojumi, nelasīti: {count}",
       "jobs": {
         "title": "Darba sludinājumi",
         "subtitle": "Darbi no aģentūrām, ar kurām sadarbojies. Piesakies tiem, kas tev der.",

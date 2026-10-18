@@ -511,6 +511,7 @@
         "completed": "Ova je kampanja završena.",
         "cancelled": "Ova je kampanja otkazana."
       },
+      "messagesUnreadAria": "Poruke, nepročitane: {count}",
       "jobs": {
         "title": "Oglasi za posao",
         "subtitle": "Poslovi agencija s kojima surađuješ. Prijavi se na one koji ti odgovaraju.",

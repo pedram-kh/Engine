@@ -511,6 +511,7 @@
         "completed": "See kampaania on lõppenud.",
         "cancelled": "See kampaania tühistati."
       },
+      "messagesUnreadAria": "Sõnumid, lugemata: {count}",
       "jobs": {
         "title": "Tööpakkumised",
         "subtitle": "Tööd agentuuridelt, kellega koostööd teed. Kandideeri neile, mis sobivad.",

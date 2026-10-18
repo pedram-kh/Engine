@@ -511,6 +511,7 @@
         "completed": "Den här kampanjen har avslutats.",
         "cancelled": "Den här kampanjen har avbrutits."
       },
+      "messagesUnreadAria": "Meddelanden, olästa: {count}",
       "jobs": {
         "title": "Jobbannonser",
         "subtitle": "Jobb från byråerna du samarbetar med. Sök de som passar dig.",

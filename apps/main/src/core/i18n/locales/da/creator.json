@@ -511,6 +511,7 @@
         "completed": "Denne kampagne er afsluttet.",
         "cancelled": "Denne kampagne blev annulleret."
       },
+      "messagesUnreadAria": "Beskeder, ulæste: {count}",
       "jobs": {
         "title": "Jobopslag",
         "subtitle": "Job fra de bureauer, du samarbejder med. Søg dem, der passer.",
