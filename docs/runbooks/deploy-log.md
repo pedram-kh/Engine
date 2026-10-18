@@ -54,25 +54,26 @@ happened.
 
 ---
 
-## AH-106 — pre-tester UI batch, items 1 and 2 (shell back arrow, clipped Applied chip) — PENDING
+## AH-106 + AH-107 — pre-tester UI batch (shell back arrow, clipped Applied chip, campaign status on the creator side) — PENDING
 
-> **Not pushed, not deployed.** Opens a new entry because everything below it is DEPLOYED. AH-107 (campaign status) and AH-108 (unread
-> indicators) are planned to stack on this entry for **one** production deploy and **one** TestFlight build 3 (Q9 ruling); they add
-> their own obligations here when they land.
+> **AH-106 is pushed (GitHub only), AH-107 is local; nothing here is deployed.** Opens a new entry because everything below it is DEPLOYED.
+> AH-107 (campaign status) is stacked on this entry as of 2026-10-18; AH-108 (unread indicators) is planned to stack here too, for **one**
+> production deploy and **one** TestFlight build 3 (Q9 ruling), and adds its own obligations (a `queue:restart` and a one-shot backlog
+> command) when it lands.
 
-- **Status:** PENDING (local commits `1c3c7aaf`, `e390581e` on top of `8aa11376`; push held for review)
-- **Range:** `47d2efc5` (AH-103's last runtime commit, the deployed runtime tip; the commits between it and `8aa11376` are docs, `.env.example` and the iOS camera strings / build 2) → AH-106 tip `e390581e`.
-- **AH entries carried:** AH-106
+- **Status:** PENDING. AH-106 (`1c3c7aaf`, `e390581e`) is pushed to GitHub `origin/main` (CI green). AH-107 (`0801577e`, `b115639e`, `b1fd5e8b`, `77600807`, `480cfcd8`) is local only; push is held until Claude clears it and Pedram triggers it, after the full local Playwright suite.
+- **Range:** `47d2efc5` (AH-103's last runtime commit, the deployed runtime tip; the commits between it and `8aa11376` are docs, `.env.example` and the iOS camera strings / build 2) → AH-106 tip `e390581e`; AH-107 tip `480cfcd8` (local, not on GitHub; the range extends to whatever tip is pushed).
+- **AH entries carried:** AH-106, AH-107
 - **Migrations run:** none.
 - **Pre-deploy reads:** none.
 - **Snapshot ID:** not required by this entry (no schema, no data write). The open snapshot question under AH-103 is unchanged.
-- **Infra:** none for AH-106 (no `queue:restart`, no env, no cron). The merged AH-107/AH-108 entry will add `queue:restart` (`PushMessageFactory` changes).
+- **Infra:** none for AH-106 or AH-107 (no `queue:restart`, no env, no cron). **API deploy needed for AH-107:** four creator endpoints gain a read-only `campaign_status` / `campaign.status` field (job board card and detail, assignment list, assignment draft show); no migration. Either deploy order is safe (an older backend sends no status; the SPA then renders no chip and no banner). The AH-108 entry will add `queue:restart` (`PushMessageFactory` changes).
 - **One-shot commands:** none.
-- **Post-deploy verification:** web: open the notifications page from the bell and confirm the back arrow returns; apply to a job with a long title at phone width and confirm the Applied chip shows its full label. Native: the same two checks on build 3.
+- **Post-deploy verification:** web: open the notifications page from the bell and confirm the back arrow returns; apply to a job with a long title at phone width and confirm the Applied chip shows its full label. **AH-107:** on the invitations list at phone width, confirm every card shows a campaign chip (Upcoming / Active / Paused / Completed / Cancelled) and that a long-title card's "Contracted" chip is not cut; pause a test campaign from its Settings tab and confirm the creator's assignment detail shows "Paused" and the banner with the draft form still usable; confirm a paused job shows the Paused chip on the job board. Native: the same checks on build 3.
 - **Flags armed:** none.
-- **Source:** pushed to GitHub `origin/main` 2026-10-17 (tip then `54075f02`; CI result recorded below). **A push is not a deploy:** the colleague mirrors GitHub → Bitbucket and deploys from there (API and both SPAs); the mirror and deploy have not happened.
+- **Source:** pushed to GitHub `origin/main` 2026-10-17 (tip then `54075f02`; CI green on all four jobs, [run 39046559682](https://github.com/pedram-kh/Engine/actions/runs/39046559682)). **A push is not a deploy:** the colleague mirrors GitHub → Bitbucket and deploys from there (API and both SPAs); the mirror and deploy have not happened.
 - **Operator:** not yet.
-- **Anything unexpected:** nothing yet. Known gap carried into the deploy: the chip's Playwright leg has not been run (Docker down locally); the first CI run is its first execution.
+- **Anything unexpected:** nothing yet. **Retired 2026-10-18:** the earlier known gap (the AH-106 chip's Playwright leg had not been run) is closed: CI on the pushed AH-106 tip was green on all four jobs, including that leg ([run 39046559682](https://github.com/pedram-kh/Engine/actions/runs/39046559682)). Known gaps carried: no device walk for AH-106 or AH-107; AH-107's `mt`/`ro` creator-visible status strings are unreviewed MT (see tech debt).
 
 ---
 

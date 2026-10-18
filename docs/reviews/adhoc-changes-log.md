@@ -70,6 +70,71 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-107 · Pre-tester UI batch, item 3: campaign status on the creator side (Creator App arc)
+
+- **Status:** Landed locally. **Not pushed, not deployed** (rides one production deploy and TestFlight build 3 with AH-106 and AH-108,
+  per the Q9 ruling). Plan: [`campaign-status-plan.md`](campaign-status-plan.md).
+- **Date:** 2026-10-17 to 2026-10-18.
+- **Why:** TestFlight 1.0.0 (2) feedback: a creator could not see whether the campaign behind an assignment or a job post was upcoming,
+  live, paused, finished or cancelled.
+- **What:**
+  - **Backend, read-only and additive:** the campaign's raw status enum value (D1) is on the creator job card and detail
+    (`campaign_status`, added to `CARD_COLUMNS` because without it the resource would read null), on the assignment list's `campaign`
+    block, and on the assignment draft `show`'s `campaign` block. No write, no migration, no new route.
+  - **Chip (Q3):** assignment list cards and the assignment detail header show every status, Active included; job cards and the job
+    detail show **Paused only** (terminal campaigns are already hidden from the board; a creator browsing the board needs warning about
+    the one state they could still apply into). Client mapping (D2): `campaignStatus.ts`, a closed table; an absent or unknown status
+    renders nothing, never a raw key.
+  - **Banner (Q2):** assignment detail shows an info banner for paused, completed and cancelled. Display only.
+  - **Creator labels (Q1):** draft reads "Upcoming". English: Upcoming / Active / Paused / Completed / Cancelled; banners "This campaign is
+    paused. The agency may not respond until it resumes." / "This campaign has ended." / "This campaign was cancelled." (**EN copy
+    approved by Pedram 2026-10-18, as is.**) `creator.ui.campaignStatus.*` and `creator.ui.campaignStatusBanner.*`, 24 locales with fresh
+    translations (see Decisions for why the agency-side strings were not reused).
+  - **Found in the copy-review screenshots and fixed in this chunk:** on the web assignment card a long campaign title squeezed the
+    existing assignment-status chip ("Contracted", French "Sous contrat") to "Contrac…", the AH-106 defect on the one chip AH-106 did not
+    cover. `.assignment__status-chip { flex: 0 0 auto }` on both layouts. The native pill was already pinned by `flex: none` in
+    `creatorNative.css`; the class backs that up.
+- **Touched:** `apps/api` `CreatorJobBoardController`, `CreatorJobCardResource`, `CreatorAssignmentController`,
+  `CreatorAssignmentDraftController` (+ Pest); `packages/api-client` `types/campaign.ts`; `apps/main` `modules/creators/campaignStatus.ts`,
+  `components/CampaignStatusChip.vue`, `components/CampaignStatusBanner.vue`, the four creator pages (`CreatorAssignmentsPage`,
+  `CreatorAssignmentDetailPage`, `CreatorJobsPage`, `CreatorJobDetailPage`), 24 `locales/*/creator.json`, specs, and
+  `playwright/specs/creator-campaign-status.spec.ts`.
+- **Decisions:**
+  - **D1 raw enum on the wire, D2 client mapping:** the server sends the value, the SPA owns the words and colours, so a new status is
+    one table row plus 24 strings, never a backend release.
+  - **Q1 (invitation count):** left as it was. **Q2 (display only, no server gates):** a banner informs and locks nothing; the actions
+    (draft form, accept, decline, counter) still work under every banner. Tracked as tech debt. **Q3 asymmetry:** job cards show Paused
+    only, assignment cards show all.
+  - **Fresh translations, not the agency-side strings:** the existing agency `app.campaigns.status.*` values for `mt` and `ro` are
+    visibly broken MT (`mt` "Ikkanċellaled", `ro` "Anulațiled", English leftovers like "Paused"); reusing them would have shipped that to
+    the creator. Folded into the existing unreviewed-MT tech-debt row with its greppable signature (not a new row).
+  - **Chip placement:** the campaign chip is never in the row that holds the assignment-status chip (web: its own line under the title;
+    native: the head column under the brand), after AH-106's squeeze finding. The chip-fix above is the second line of defence.
+- **Verification:**
+  - **Break-reverted:** 6 backend and 14 SPA mutations each failed the intended spec and restored clean; the chip fix added 4 more (the
+    rule removed, the rule made shrinkable, the class dropped from the web chip, the class dropped from the native pill), all caught.
+  - **Real Chromium:** a before/after harness (`apps/main/playwright-report/ah107-campaign-chip.mjs`, gitignored scratch, built from
+    Vuetify's own `VChip.css`). For the clip: with a long title the unpinned assignment-status chip is cut by **18 to 24 px** of label at
+    360 and 390 px in EN and FR; pinned, **0** in all six cases (two chips on the card, short and long titles).
+  - **E2E on the real stack:** `creator-campaign-status.spec.ts` ran locally against Postgres and Redis: the agency pauses a campaign
+    through the real Settings select; the creator sees "Paused" on the card and the detail, the banner, the draft form still present,
+    and at 360 px neither chip clipped. The assignment-chip assertion was break-reverted (rule removed: fails with "the assignment-status
+    chip clips its own label"; restored: passes).
+  - **Gates:** Pint, PHPStan, ESLint (0 errors), vue-tsc, Prettier, full `apps/main` Vitest and the api-client tests green.
+  - **Copy review:** screenshots at 390 px, light and dark, EN and FR, from the real stack (seed data only), reviewed by Pedram.
+  - **Local backend suite:** 84 failures (Login, 2FA, impersonation, TalentPools), the identical set on a clean HEAD, so environmental
+    (probably the documented local `SANCTUM_STATEFUL_DOMAINS` trap; not diagnosed in this chunk). CI is the authority.
+- **PROD-DATA RISK: NONE.** Read-only additive response fields; no write, no schema change.
+- **Deploy obligations:** API deploy for the new fields and a web build; native rides TestFlight build 3. Either order is safe: an older
+  backend sends no status and the SPA renders no chip and no banner. No `queue:restart` for this entry, no migration, no flag.
+- **Not verified:** **no device walk yet** (the screenshots are the web shell; the creator iOS app is dark-only in v1 and uses the native
+  head-column layout, which is covered by the native spec and the geometry harness, not by a native screenshot). The **full local
+  Playwright suite has not been run** (required before any push). `mt` and `ro` creator-visible assignment chips still read badly until
+  the unreviewed-MT cleanup (see tech debt); the new campaign-status strings are fresh MT, **not native-reviewed**.
+- **Tech-debt rows opened:** "campaign status does not gate creator actions"; French (and other long-label) bottom-tab crowding at 390 px;
+  the `mt`/`ro` agency-side status strings, folded into the AH-001 unreviewed-MT row.
+- **Ref:** `0801577e` (backend), `b115639e` (api-client types), `b1fd5e8b` (locales), `77600807` (SPA), `480cfcd8` (assignment-chip fix).
+
 ### AH-106 · Pre-tester UI batch, items 1 and 2: shell back arrow and the clipped Applied chip (Creator App arc)
 
 - **Status:** Landed
@@ -105,9 +170,12 @@ reviews, and conversations.
 - **PROD-DATA RISK: NONE.** Front-end only; no data is read or written differently.
 - **Deploy obligations:** web build with the normal front-end deploy; native needs a build (rides TestFlight build 3 with AH-107 and
   AH-108 per the Q9 ruling). No `queue:restart`, no migration, no flag.
-- **Not verified:** the Playwright geometry leg for the chip (`creator-jobs-board.spec.ts`, "AH-106") was **written and typechecked but
-  not run**: the Docker daemon is not running locally, and CI is the first real run. The arrow has no E2E leg (jsdom unit coverage
-  only). **No device walk yet** for either item. The chip repro is a harness built from Vuetify's CSS, not the live page.
+- **Not verified:** the arrow has no E2E leg (jsdom unit coverage only). **No device walk yet** for either item. The chip repro is a
+  harness built from Vuetify's CSS, not the live page.
+  - **Retired 2026-10-18:** this entry used to say the chip's Playwright geometry leg (`creator-jobs-board.spec.ts`, "AH-106") was
+    written but **not run** (Docker was down locally). It has since run: AH-106 was pushed to GitHub `origin/main` on 2026-10-17 and CI
+    was **green on all four jobs** ([run 39046559682](https://github.com/pedram-kh/Engine/actions/runs/39046559682)), including that
+    leg. The caveat no longer applies.
 - **Ref:** `1c3c7aaf` (shell back arrow), `e390581e` (chip). Numbering: AH-104, AH-104b and AH-105 are reserved, hence AH-106.
 
 ### AH-103 · Deep links: a notification opens the screen it is about (Creator App arc)

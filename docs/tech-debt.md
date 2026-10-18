@@ -2232,6 +2232,21 @@ present (AH-070)`, placed in the one window where `.env` genuinely does not exis
   - **Standing coverage:** the ro / mt strings fixed in AH-103 stay under this row as
     unreviewed MT; the AH-103 `notFoundAction` string is real translation in all 24 locales but is
     likewise not native-reviewed.
+- **AH-107 addendum — the agency-side campaign / assignment status strings in `mt` and `ro` (2026-10-18):**
+  `app.campaigns.status.*` and `app.campaigns.assignmentStatus.*` in `locales/mt/app.json` and `locales/ro/app.json` carry the same
+  corruption, and the second group is **creator-visible**: the assignment-status chip on the creator's invitation cards and
+  assignment detail renders it. Examples (en → value): `mt` cancelled → `Ikkanċellaled`, accepted → `Aċċettaed`, rejected →
+  `Irrifjutaed`, declined → `Irrifjutad`, invited → `Stedinad`, approved → `Approvad`, contracted → `Kuntratted`; `ro` cancelled →
+  `Anulațiled`, accepted → `Acceptațied`, rejected → `Respingețied`, declined → `Refuzațid`, invited → `Invitațid`, approved →
+  `Aprobațid`; and English left in place in both (`Paused`, `Countered`, `Producing`, `Posted`, `Live verified`, `Revision
+requested`, `Manually verified`, and for `ro` also `Contracted`). **Signature:** a target-language stem with an English past-tense
+  suffix glued on (`-ed`, `-led`, `-ied`, `-aed`, and the `ro` `-țid` / `-țied` / `-țiled` forms), the `Ikkanċellaled` / `Anulațiled`
+  shape; start the sweep with
+  `rg -n '(Ikkanċellaled|Aċċettaed|Irrifjutaed|Irrifjutad|Stedinad|Approvad|Kuntratted|Anulațiled|Acceptațied|Respingețied|Refuzațid|Invitațid|Aprobațid)' apps/main/src/core/i18n/locales/{mt,ro}/app.json`
+  and then the byte-identity check on the same two groups, in all 24 locales. **Not fixed, on purpose** (this row is the cleanup, not
+  AH-107). AH-107 did **not** reuse these strings for its own chip: `creator.ui.campaignStatus.*` and
+  `creator.ui.campaignStatusBanner.*` are fresh translations in all 24 locales, but they are MT too and **not native-reviewed**.
+  Consequence to carry: a Maltese or Romanian tester sees the broken assignment-status chip beside the clean campaign-status chip.
 - **Why the gates don't catch it:** the i18n CI gate is **keyset/placeholder/plural parity** — it
   proves a key _exists_ in every locale with matching interpolation/plural shape, but it can
   **never** prove a value isn't still English. "English text under a foreign label" is structurally
@@ -3161,3 +3176,26 @@ It is allowlisted in `tests/unit/architecture/use-theme-is-sot.spec.ts` (the tes
   9. **Not built, by ruling:** universal links and Android App Links (**AH-103b**; Android is blocked on a release keystore / Play App Signing that does not exist yet) and the biometric-lock interplay (**AH-103c**).
 - **Owner:** notifications (1, 3); push / platform (2); agency SPA (4); mobile (5, 6); i18n (7); creator app (8).
 - **Status:** open (by design), except items 2 and 6 which are fixed. Surfaced at AH-103 Checkpoint A, 2026-10-12 ([ad-hoc log](reviews/adhoc-changes-log.md)).
+
+## AH-107 (campaign status on the creator side) — standing items opened by the build
+
+- **Where:** [`docs/reviews/campaign-status-plan.md`](reviews/campaign-status-plan.md); ad-hoc entry AH-107 in
+  [`reviews/adhoc-changes-log.md`](reviews/adhoc-changes-log.md).
+- **What we accepted (2026-10-18):**
+  1. **Campaign status does not gate creator actions (Q2, display only).** A banner on the assignment detail says the campaign is
+     paused / completed / cancelled, and nothing is locked: a creator can still upload a draft on a cancelled campaign, and accept,
+     decline or counter an invitation on a paused, completed or cancelled one. The server has no check. **Pinned, so a future gate is a
+     conscious change and not an accident:** the Pest no-gate negatives (accept, decline and counter on paused, completed and cancelled
+     campaigns) in `CreatorAssignmentTest.php`, the SPA specs "actions still render under each banner", and the E2E assertion that the
+     draft form is still present under the Paused banner. **Resolution:** decide per status which actions should stop, then add the
+     server check first (the SPA banner is only a hint); the pinning specs above are the ones to flip.
+  2. **French (and other long-label) bottom-tab labels crowd at 390 px.** In the AH-107 copy-review screenshots the French tab labels
+     "Tableau de bord" and "Offres de mission" truncate or overlap their neighbours in the bottom bar. Pre-existing; not caused by
+     AH-107; seen in the web shell at 390 px, where the creator nav model is the one the native bottom bar also uses, so it very likely
+     reaches the native app (**not checked on a device**). Other long-label locales (German, Finnish, Greek, Hungarian) are likely worse
+     and were not looked at. **Resolution:** shorter tab-label keys (a `short` variant per tab) or wrapping with a fixed two-line label,
+     then a screenshot sweep at 390 px across the 24 locales. **Owner:** creator app / i18n.
+  3. **The `mt` / `ro` agency-side status strings:** folded into the existing AH-001 unreviewed-MT row above (see its "AH-107
+     addendum"), deliberately **not** a new row.
+- **Owner:** creator app (1, 2); i18n (3).
+- **Status:** open (by design). Surfaced at AH-107 Checkpoint A, 2026-10-18.
