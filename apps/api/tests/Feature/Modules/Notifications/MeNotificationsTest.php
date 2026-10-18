@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use App\Modules\Identity\Models\User;
+use App\Modules\Notifications\Enums\NotificationType;
 use App\Modules\Notifications\Models\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
@@ -146,4 +148,54 @@ it('user A cannot mark user B\'s notification read (404, no enumeration)', funct
 
 it('requires authentication', function (): void {
     $this->getJson('/api/v1/me/notifications')->assertUnauthorized();
+});
+
+// ── AH-108: message_unread_count ─────────────────────────────────────────────
+
+it('unread-count adds message_unread_count: unread message-type rows only, caller only', function (): void {
+    $user = User::factory()->createOne();
+    $other = User::factory()->createOne();
+
+    // Counted: one unread row of each of the four message types.
+    foreach (NotificationType::messageTypes() as $type) {
+        Notification::factory()->ofType($type)->createOne(['recipient_user_id' => $user->id]);
+    }
+    // Not message-count rows, but part of the total: a non-message unread row.
+    Notification::factory()->ofType(NotificationType::AssignmentAccepted)->createOne(['recipient_user_id' => $user->id]);
+    // Excluded: a READ message row, and another user's unread message row.
+    Notification::factory()->ofType(NotificationType::MessageReceivedByCreator)->read()->createOne(['recipient_user_id' => $user->id]);
+    Notification::factory()->ofType(NotificationType::MessageReceivedByCreator)->createOne(['recipient_user_id' => $other->id]);
+
+    $this->actingAs($user)
+        ->getJson('/api/v1/me/notifications/unread-count')
+        ->assertOk()
+        ->assertJsonPath('data.attributes.unread_count', 5)
+        ->assertJsonPath('data.attributes.message_unread_count', 4);
+});
+
+it('message_unread_count is a real 0 (not null, not absent) when there are none', function (): void {
+    $user = User::factory()->createOne();
+    Notification::factory()->ofType(NotificationType::AssignmentAccepted)->createOne(['recipient_user_id' => $user->id]);
+
+    $response = $this->actingAs($user)->getJson('/api/v1/me/notifications/unread-count')->assertOk();
+
+    expect($response->json('data.attributes.message_unread_count'))->toBe(0)
+        ->and($response->json('data.attributes.unread_count'))->toBe(1);
+});
+
+it('unread-count reads the notifications table ONCE (one aggregate, not two counts)', function (): void {
+    $user = User::factory()->createOne();
+    Notification::factory()->ofType(NotificationType::MessageReceivedByCreator)->createOne(['recipient_user_id' => $user->id]);
+    Notification::factory()->ofType(NotificationType::AssignmentAccepted)->createOne(['recipient_user_id' => $user->id]);
+
+    $this->actingAs($user);
+    DB::flushQueryLog();
+    DB::enableQueryLog();
+    $this->getJson('/api/v1/me/notifications/unread-count')->assertOk();
+    $queries = collect(DB::getQueryLog())
+        ->filter(static fn (array $q): bool => str_contains($q['query'], 'from "notifications"'))
+        ->count();
+    DB::disableQueryLog();
+
+    expect($queries)->toBe(1);
 });

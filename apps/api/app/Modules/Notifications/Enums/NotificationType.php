@@ -189,6 +189,27 @@ enum NotificationType: string
     }
 
     /**
+     * The new-message notification types: the four "someone wrote to you" rows,
+     * campaign chat and relationship chat, each in both directions (AH-108).
+     *
+     * One source for the two things that must agree: which rows opening a thread
+     * clears (`Notification::markMessageNotificationsRead()`) and which rows the
+     * creator Messages tab badge counts (`message_unread_count`). A message type
+     * added later and missed here would badge but never clear, or the reverse.
+     *
+     * @return array<int, self>
+     */
+    public static function messageTypes(): array
+    {
+        return [
+            self::MessageReceivedByCreator,
+            self::MessageReceivedByAgency,
+            self::MessageRelationshipReceivedByCreator,
+            self::MessageRelationshipReceivedByAgency,
+        ];
+    }
+
+    /**
      * Whether this type is a deferred payment-event alert (coming-soon).
      */
     public function isPaymentAlert(): bool

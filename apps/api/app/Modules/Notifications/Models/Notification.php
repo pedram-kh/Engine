@@ -117,6 +117,39 @@ final class Notification extends Model
     }
 
     /**
+     * Mark one recipient's unread MESSAGE notifications for one subject read
+     * (AH-108). Called when the recipient opens that thread, so the bell, the
+     * Messages badge and the app-icon badge stop counting messages they have
+     * just read. `read_at` is the single source of truth for all three.
+     *
+     * Keyed by (recipient, subject_type, subject_id, type IN message types), never
+     * by the JSON `data` payload: it uses the `idx_notifications_subject` index
+     * and cannot match another thread's row or a non-message row on the same
+     * subject (an `assignment.*` alert on the same assignment stays unread).
+     * Rows already read are excluded by `read_at IS NULL`, so a re-run moves no
+     * timestamp.
+     *
+     * A plain query-builder update on purpose: `Notification` has no model events
+     * or observers to bypass, and one UPDATE beats loading rows to save them.
+     *
+     * @param  string  $subjectType  the subject's `getMorphClass()`
+     * @return int rows newly marked
+     */
+    public static function markMessageNotificationsRead(User $recipient, string $subjectType, int $subjectId): int
+    {
+        return self::query()
+            ->where('recipient_user_id', $recipient->getKey())
+            ->where('subject_type', $subjectType)
+            ->where('subject_id', $subjectId)
+            ->whereIn('type', array_map(
+                static fn (NotificationType $type): string => $type->value,
+                NotificationType::messageTypes(),
+            ))
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array

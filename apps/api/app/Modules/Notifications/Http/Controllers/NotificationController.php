@@ -6,6 +6,7 @@ namespace App\Modules\Notifications\Http\Controllers;
 
 use App\Core\Errors\ErrorResponse;
 use App\Modules\Identity\Models\User;
+use App\Modules\Notifications\Enums\NotificationType;
 use App\Modules\Notifications\Http\Resources\NotificationResource;
 use App\Modules\Notifications\Models\Notification;
 use Illuminate\Database\Eloquent\Builder;
@@ -67,11 +68,30 @@ final class NotificationController
     {
         $user = $this->user($request);
 
+        // ONE aggregate, not two COUNTs (this endpoint is polled every 45 s by every
+        // signed-in creator): the total, and how many of those are new-message rows
+        // (AH-108, the Messages tab badge). `sum(case …)` rather than `FILTER` so the
+        // statement is portable across the SQLite test DB and production Postgres.
+        $messageTypes = array_map(
+            static fn (NotificationType $type): string => $type->value,
+            NotificationType::messageTypes(),
+        );
+        $placeholders = implode(', ', array_fill(0, count($messageTypes), '?'));
+
+        $counts = $this->unreadQuery($user)
+            ->selectRaw(
+                "count(*) as total, coalesce(sum(case when type in ({$placeholders}) then 1 else 0 end), 0) as messages",
+                $messageTypes,
+            )
+            ->toBase()
+            ->first();
+
         return response()->json([
             'data' => [
                 'type' => 'notification_unread_count',
                 'attributes' => [
-                    'unread_count' => $this->unreadQuery($user)->count(),
+                    'unread_count' => (int) ($counts->total ?? 0),
+                    'message_unread_count' => (int) ($counts->messages ?? 0),
                 ],
             ],
         ]);

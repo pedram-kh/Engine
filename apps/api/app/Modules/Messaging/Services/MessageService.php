@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Messaging\Services;
 
+use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Identity\Models\User;
 use App\Modules\Messaging\Enums\MessageKind;
 use App\Modules\Messaging\Enums\MessageSenderRole;
@@ -11,6 +12,7 @@ use App\Modules\Messaging\Exceptions\MessageThreadClosedException;
 use App\Modules\Messaging\Models\Message;
 use App\Modules\Messaging\Models\MessageReadReceipt;
 use App\Modules\Messaging\Models\MessageThread;
+use App\Modules\Notifications\Models\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
@@ -134,9 +136,22 @@ final class MessageService
      * for the viewer's unread messages; a re-read is a no-op via the
      * `(message_id, user_id)` UNIQUE (insertOrIgnore). Returns the count newly
      * marked.
+     *
+     * AH-108: also marks the viewer's message NOTIFICATIONS for this thread read
+     * (the notification subject for campaign chat is the assignment). That write
+     * comes FIRST, before the early return below, because it is independent of
+     * the receipts: the SPA only calls /read when the thread has unread messages,
+     * but a notification can outlive its message's unread state (read on the
+     * other surface, or from before this shipped) and must still clear.
      */
     public function markThreadReadForUser(MessageThread $thread, User $user): int
     {
+        Notification::markMessageNotificationsRead(
+            $user,
+            (new CampaignAssignment)->getMorphClass(),
+            $thread->assignment_id,
+        );
+
         $unreadIds = $this->unreadQuery($thread, $user)->pluck('messages.id');
 
         if ($unreadIds->isEmpty()) {

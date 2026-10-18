@@ -13,6 +13,7 @@ use App\Modules\Messaging\Enums\MessageSenderRole;
 use App\Modules\Messaging\Models\RelationshipMessage;
 use App\Modules\Messaging\Models\RelationshipMessageReadReceipt;
 use App\Modules\Messaging\Models\RelationshipThread;
+use App\Modules\Notifications\Models\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Collection;
@@ -172,14 +173,21 @@ final class RelationshipMessageService
      * for the viewer's unread messages; a re-read is a no-op via the
      * `(message_id, user_id)` UNIQUE (insertOrIgnore). Returns the count newly
      * marked.
+     *
+     * AH-108: also marks the viewer's message NOTIFICATIONS for this thread read
+     * (the notification subject for relationship chat is the thread itself),
+     * BEFORE the no-unread early return: a notification can outlive its message's
+     * unread state and must still clear. See {@see MessageService::markThreadReadForUser()}.
      */
     public function markThreadReadForUser(RelationshipThread $thread, User $user): int
     {
         // Nothing to mark on a transient thread (AH-012 D1) — no row, no
-        // messages, no receipts.
+        // messages, no receipts, and no notifications (they key on the thread id).
         if (! $thread->exists) {
             return 0;
         }
+
+        Notification::markMessageNotificationsRead($user, $thread->getMorphClass(), $thread->id);
 
         $unreadIds = $this->unreadQuery($thread, $user)->pluck('relationship_messages.id');
 
