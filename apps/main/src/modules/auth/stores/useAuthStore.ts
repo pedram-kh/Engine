@@ -51,6 +51,7 @@ import { writeStoredLocale } from '@/composables/useLocalePreference'
 import { nativeTokenStore } from '@/core/auth/tokenStore'
 import { setLocale } from '@/core/i18n'
 import { isNativePlatform, nativePlatform } from '@/core/platform/isNativePlatform'
+import { clearIconBadge } from '@/core/platform/badge/iconBadge'
 import { pushLogoutCleanup } from '@/core/platform/push/pushLogoutCleanup'
 import { setAuthRebootstrap, useAgencyStore } from '@/core/stores/useAgencyStore'
 import { resetWelcomeBackFlag } from '@/modules/onboarding/internal/welcomeBackFlag'
@@ -157,6 +158,10 @@ export const useAuthStore = defineStore('auth', () => {
    * triggers a fresh bootstrap rather than short-circuiting.
    */
   function clearUser(): void {
+    // AH-108 (4b) — every end of a session (sign-out, a lapsed token, a failed
+    // bootstrap) wipes the home-screen badge: it is the previous user's number.
+    // Fire and forget; a no-op off native iOS; never throws.
+    void clearIconBadge()
     user.value = null
     mfaEnrollmentRequired.value = false
     bootstrapStatus.value = 'idle'

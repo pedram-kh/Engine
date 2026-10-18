@@ -41,6 +41,12 @@ export interface NotificationPollHandle {
    * split, so it never touches this.
    */
   messageUnreadCount: Ref<number>
+  /**
+   * AH-108 — true once a count has actually been read from the server (a poll or a
+   * reconcile). Until then `unreadCount` is the placeholder 0, not a fact, and the
+   * home-screen icon badge must not be written from it.
+   */
+  hasLoaded: Ref<boolean>
   isPolling: Ref<boolean>
   /** Start the steady poll (does an immediate first fetch). */
   start: () => Promise<void>
@@ -59,6 +65,7 @@ export interface NotificationPollHandle {
 export function useNotificationPoll(): NotificationPollHandle {
   const unreadCount = ref(0)
   const messageUnreadCount = ref(0)
+  const hasLoaded = ref(false)
   const isPolling = ref(false)
 
   let cancelled = false
@@ -79,6 +86,7 @@ export function useNotificationPoll(): NotificationPollHandle {
 
   function set(count: number): void {
     unreadCount.value = Math.max(0, count)
+    hasLoaded.value = true
   }
 
   function applyMarkRead(): void {
@@ -180,6 +188,7 @@ export function useNotificationPoll(): NotificationPollHandle {
   return {
     unreadCount,
     messageUnreadCount,
+    hasLoaded,
     isPolling,
     start,
     cancel,

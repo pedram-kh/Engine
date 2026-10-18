@@ -65,6 +65,7 @@ function makePoll(): NotificationPollHandle {
   return {
     unreadCount: { value: 0 } as never,
     messageUnreadCount: { value: 0 } as never,
+    hasLoaded: { value: true } as never,
     isPolling: { value: false } as never,
     start: vi.fn(),
     cancel: vi.fn(),

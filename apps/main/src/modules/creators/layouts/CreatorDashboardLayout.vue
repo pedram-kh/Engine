@@ -30,6 +30,7 @@ import { storeToRefs } from 'pinia'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import ImpersonationBanner from '@/modules/impersonation/components/ImpersonationBanner.vue'
 import NotificationBell from '@/modules/notifications/components/NotificationBell.vue'
+import { useIconBadge } from '@/core/platform/badge/useIconBadge'
 import { provideNotificationPoll } from '@/modules/notifications/composables/notificationPollContext'
 import NavBadgeIcon from '../components/NavBadgeIcon.vue'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
@@ -62,6 +63,10 @@ const userMenuOpen = ref(false)
  * bell keeps its own poll.
  */
 const notificationPoll = provideNotificationPoll()
+
+// AH-108 (4b) — the home-screen icon badge follows the same bell total. Native iOS
+// only; inert (no plugin call) everywhere else.
+useIconBadge(notificationPoll)
 
 /** The badge count for a nav item: only Messages carries one; `null` means "no badge". */
 function navBadgeCount(key: string): number | null {

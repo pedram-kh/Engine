@@ -72,6 +72,19 @@ vi.mock('@/core/platform/isNativePlatform', () => ({
   isNativePlatform: () => platform.native,
 }))
 
+// AH-108 (4b) — the shell writes the bell total to the home-screen badge. The module is
+// faked here so the spec asserts what the LAYOUT hands it (the badge's own platform gate
+// and writes are pinned in `core/platform/badge`).
+const iconBadgeFake = vi.hoisted(() => ({
+  enable: vi.fn(),
+  set: vi.fn().mockResolvedValue(undefined),
+  clear: vi.fn().mockResolvedValue(undefined),
+}))
+vi.mock('@/core/platform/badge/iconBadge', () => ({
+  iconBadge: iconBadgeFake,
+  clearIconBadge: () => iconBadgeFake.clear(),
+}))
+
 import CreatorDashboardLayout from './CreatorDashboardLayout.vue'
 
 /**
@@ -757,6 +770,16 @@ describe('CreatorDashboardLayout — Messages unread badge (AH-108)', () => {
     expect(
       mounted.wrapper.find('[data-test="creator-bottom-nav-jobs"]').attributes('aria-label'),
     ).toBeUndefined()
+  })
+
+  it('writes the BELL total (not the message count) to the icon badge once it has loaded', async () => {
+    counts(9, 4)
+    const mounted = await mountLayout({ mobile: true, native: true, applicationStatus: 'approved' })
+    cleanup = mounted.cleanup
+
+    expect(iconBadgeFake.enable).toHaveBeenCalled()
+    expect(iconBadgeFake.set).toHaveBeenCalledWith(9)
+    expect(iconBadgeFake.set).not.toHaveBeenCalledWith(4)
   })
 
   it('runs ONE unread-count request for the bell and the Messages tab together', async () => {

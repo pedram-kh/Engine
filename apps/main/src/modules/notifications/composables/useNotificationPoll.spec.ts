@@ -261,4 +261,38 @@ describe('useNotificationPoll', () => {
       poll.cancel()
     })
   })
+
+  // AH-108 (4b) — the icon badge must not be written from the placeholder 0.
+  describe('hasLoaded (AH-108)', () => {
+    it('is false until a count has really been read, then true', async () => {
+      vi.mocked(notificationsApi.unreadCount).mockResolvedValue(splitEnvelope(0, 0))
+      const poll = useNotificationPoll()
+      expect(poll.hasLoaded.value).toBe(false)
+
+      await poll.start()
+      await flushPromises()
+
+      expect(poll.hasLoaded.value).toBe(true)
+      poll.cancel()
+    })
+
+    it('stays false when the first fetch fails (a failed poll is not a count of zero)', async () => {
+      vi.mocked(notificationsApi.unreadCount).mockRejectedValue(new Error('offline'))
+      const poll = useNotificationPoll()
+
+      await poll.start()
+      await flushPromises()
+
+      expect(poll.hasLoaded.value).toBe(false)
+      poll.cancel()
+    })
+
+    it('a count reconciled from the dropdown (set) also counts as loaded', () => {
+      const poll = useNotificationPoll()
+
+      poll.set(3)
+
+      expect(poll.hasLoaded.value).toBe(true)
+    })
+  })
 })
