@@ -19,6 +19,8 @@ vi.mock('../api/notifications.api', () => ({
 }))
 
 import { notificationsApi } from '../api/notifications.api'
+import { NOTIFICATION_POLL_KEY } from '../composables/notificationPollContext'
+import { useNotificationPoll } from '../composables/useNotificationPoll'
 
 import NotificationBell from './NotificationBell.vue'
 
@@ -26,7 +28,7 @@ function countEnvelope(n: number) {
   return { data: { type: 'notification_unread_count', attributes: { unread_count: n } } }
 }
 
-function mountBell() {
+function mountBell(options: { providedPoll?: ReturnType<typeof useNotificationPoll> } = {}) {
   const i18n = createI18n({
     legacy: false,
     locale: 'en',
@@ -47,7 +49,13 @@ function mountBell() {
 
   const wrapper = mount(NotificationBell, {
     props: { viewAllRoute: 'notifications' },
-    global: { plugins: [i18n, vuetify, router] },
+    global: {
+      plugins: [i18n, vuetify, router],
+      provide:
+        options.providedPoll === undefined
+          ? {}
+          : { [NOTIFICATION_POLL_KEY as symbol]: options.providedPoll },
+    },
     attachTo: document.createElement('div'),
   })
 
@@ -187,6 +195,56 @@ describe('NotificationBell — closes on navigation (AH-101 U1)', () => {
     await flushPromises()
 
     expect(wrapper.findComponent(VMenu).props('modelValue')).toBe(true)
+    wrapper.unmount()
+  })
+})
+
+describe('NotificationBell — badge cap and shared poll (AH-108)', () => {
+  it('draws 99 as 99 and 100 as 99+ (the same cap the Messages tab uses)', async () => {
+    vi.mocked(notificationsApi.unreadCount).mockResolvedValue(countEnvelope(99) as never)
+    const at99 = mountBell()
+    await flushPromises()
+    expect(at99.find('.v-badge__badge').text()).toBe('99')
+    at99.unmount()
+
+    vi.mocked(notificationsApi.unreadCount).mockResolvedValue(countEnvelope(100) as never)
+    const at100 = mountBell()
+    await flushPromises()
+    expect(at100.find('.v-badge__badge').text()).toBe('99+')
+    at100.unmount()
+  })
+
+  it('keeps the REAL count in its accessible name when the glyph is capped', async () => {
+    vi.mocked(notificationsApi.unreadCount).mockResolvedValue(countEnvelope(140) as never)
+    const wrapper = mountBell()
+    await flushPromises()
+
+    expect(wrapper.find('[data-test="notification-bell-btn"]').attributes('aria-label')).toContain(
+      '140',
+    )
+    wrapper.unmount()
+  })
+
+  it('standalone (nothing provided — the agency layout): owns and starts its own poll', async () => {
+    vi.mocked(notificationsApi.unreadCount).mockResolvedValue(countEnvelope(2) as never)
+    const wrapper = mountBell()
+    await flushPromises()
+
+    expect(notificationsApi.unreadCount).toHaveBeenCalledTimes(1)
+    expect(wrapper.find('.v-badge__badge').text()).toBe('2')
+    wrapper.unmount()
+  })
+
+  it('with a shared poll provided: draws ITS count and starts no second poll', async () => {
+    vi.mocked(notificationsApi.unreadCount).mockResolvedValue(countEnvelope(0) as never)
+    const shared = useNotificationPoll()
+    shared.set(7)
+
+    const wrapper = mountBell({ providedPoll: shared })
+    await flushPromises()
+
+    expect(wrapper.find('.v-badge__badge').text()).toBe('7')
+    expect(notificationsApi.unreadCount).not.toHaveBeenCalled()
     wrapper.unmount()
   })
 })

@@ -126,6 +126,12 @@ export interface NotificationUnreadCountEnvelope {
     type: 'notification_unread_count'
     attributes: {
       unread_count: number
+      /**
+       * AH-108 — the part of `unread_count` that is new-message rows (campaign and
+       * relationship chat). Drives the creator Messages tab badge. Absent from an
+       * older backend; read it as 0.
+       */
+      message_unread_count?: number
     }
   }
 }

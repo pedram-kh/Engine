@@ -13,6 +13,8 @@ vi.mock('../api/notifications.api', () => ({
 
 import { notificationsApi } from '../api/notifications.api'
 
+import { requestNotificationsRefresh } from './notificationsRefresh'
+
 import {
   NOTIFICATION_POLL_INTERVAL_MS,
   useNotificationPoll,
@@ -23,6 +25,26 @@ function countEnvelope(n: number): {
   data: { type: 'notification_unread_count'; attributes: { unread_count: number } }
 } {
   return { data: { type: 'notification_unread_count', attributes: { unread_count: n } } }
+}
+
+function splitEnvelope(
+  total: number,
+  messages?: number,
+): {
+  data: {
+    type: 'notification_unread_count'
+    attributes: { unread_count: number; message_unread_count?: number }
+  }
+} {
+  return {
+    data: {
+      type: 'notification_unread_count',
+      attributes: {
+        unread_count: total,
+        ...(messages === undefined ? {} : { message_unread_count: messages }),
+      },
+    },
+  }
 }
 
 function setVisibility(state: 'visible' | 'hidden'): void {
@@ -180,5 +202,63 @@ describe('useNotificationPoll', () => {
 
     expect(vi.mocked(notificationsApi.unreadCount).mock.calls.length).toBe(before)
     expect((handle as NotificationPollHandle | null)?.isPolling.value).toBe(false)
+  })
+
+  // AH-108 — the Messages tab's number rides the same request as the bell's.
+  describe('messageUnreadCount (AH-108)', () => {
+    it('takes the message split from the same unread-count response as the total', async () => {
+      vi.mocked(notificationsApi.unreadCount).mockResolvedValue(splitEnvelope(9, 4))
+      const poll = useNotificationPoll()
+
+      await poll.start()
+      await flushPromises()
+
+      expect(poll.unreadCount.value).toBe(9)
+      expect(poll.messageUnreadCount.value).toBe(4)
+      expect(notificationsApi.unreadCount).toHaveBeenCalledTimes(1)
+      poll.cancel()
+    })
+
+    it('reads an older backend with no split as 0 and clears a stale number', async () => {
+      vi.mocked(notificationsApi.unreadCount).mockResolvedValueOnce(splitEnvelope(5, 5))
+      const poll = useNotificationPoll()
+      await poll.start()
+      await flushPromises()
+      expect(poll.messageUnreadCount.value).toBe(5)
+
+      vi.mocked(notificationsApi.unreadCount).mockResolvedValue(splitEnvelope(5))
+      await vi.advanceTimersByTimeAsync(NOTIFICATION_POLL_INTERVAL_MS)
+      await flushPromises()
+      expect(poll.messageUnreadCount.value).toBe(0)
+      poll.cancel()
+    })
+
+    it('mark-all-read zeroes both numbers at once', async () => {
+      vi.mocked(notificationsApi.unreadCount).mockResolvedValue(splitEnvelope(6, 2))
+      const poll = useNotificationPoll()
+      await poll.start()
+      await flushPromises()
+
+      poll.applyReadAll()
+
+      expect(poll.unreadCount.value).toBe(0)
+      expect(poll.messageUnreadCount.value).toBe(0)
+      poll.cancel()
+    })
+
+    it('re-reads the split on the refresh event (a thread was just read)', async () => {
+      vi.mocked(notificationsApi.unreadCount).mockResolvedValueOnce(splitEnvelope(3, 3))
+      const poll = useNotificationPoll()
+      await poll.start()
+      await flushPromises()
+      expect(poll.messageUnreadCount.value).toBe(3)
+
+      vi.mocked(notificationsApi.unreadCount).mockResolvedValue(splitEnvelope(0, 0))
+      requestNotificationsRefresh()
+      await flushPromises()
+
+      expect(poll.messageUnreadCount.value).toBe(0)
+      poll.cancel()
+    })
   })
 })

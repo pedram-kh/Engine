@@ -35,6 +35,12 @@ export const NOTIFICATION_POLL_INTERVAL_MS = 45000
 
 export interface NotificationPollHandle {
   unreadCount: Ref<number>
+  /**
+   * AH-108 — how many of `unreadCount` are new-message notifications (the
+   * Messages tab badge). Set by the poll only: a feed fetch carries no message
+   * split, so it never touches this.
+   */
+  messageUnreadCount: Ref<number>
   isPolling: Ref<boolean>
   /** Start the steady poll (does an immediate first fetch). */
   start: () => Promise<void>
@@ -52,6 +58,7 @@ export interface NotificationPollHandle {
 
 export function useNotificationPoll(): NotificationPollHandle {
   const unreadCount = ref(0)
+  const messageUnreadCount = ref(0)
   const isPolling = ref(false)
 
   let cancelled = false
@@ -80,13 +87,17 @@ export function useNotificationPoll(): NotificationPollHandle {
 
   function applyReadAll(): void {
     unreadCount.value = 0
+    messageUnreadCount.value = 0
   }
 
   async function fetchCount(): Promise<void> {
     try {
       const envelope = await notificationsApi.unreadCount()
       if (cancelled) return
-      set(envelope.data.attributes.unread_count)
+      const attributes = envelope.data.attributes
+      set(attributes.unread_count)
+      // An older backend sends no split: read it as 0 rather than leave a stale number.
+      messageUnreadCount.value = Math.max(0, attributes.message_unread_count ?? 0)
     } catch {
       // Transient failure — keep the last known count and let the next tick
       // reconcile. A count poll must never surface an error to the user.
@@ -168,6 +179,7 @@ export function useNotificationPoll(): NotificationPollHandle {
 
   return {
     unreadCount,
+    messageUnreadCount,
     isPolling,
     start,
     cancel,

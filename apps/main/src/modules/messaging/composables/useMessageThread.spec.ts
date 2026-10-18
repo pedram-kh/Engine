@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 
 import type { ChatTransport } from '../api/messaging.api'
+import { NOTIFICATIONS_REFRESH_EVENT } from '@/modules/notifications/composables/notificationsRefresh'
 import { THREAD_POLL_INTERVAL_MS, useMessageThread } from './useMessageThread'
 
 function msg(id: string, attrs: Partial<MessageResource['attributes']> = {}): MessageResource {
@@ -91,6 +92,46 @@ describe('useMessageThread', () => {
     expect(t.unreadCount.value).toBe(0)
 
     t.stop()
+  })
+
+  // AH-108 — the server clears the thread's message notifications inside /read, so
+  // the Messages badge must re-read NOW, not on the next 45 s tick.
+  it('asks the unread polls to refresh once /read has resolved, and only then', async () => {
+    const order: string[] = []
+    const onRefresh = (): void => {
+      order.push('refresh')
+    }
+    document.addEventListener(NOTIFICATIONS_REFRESH_EVENT, onRefresh)
+    try {
+      const transport = makeTransport({
+        list: vi.fn().mockResolvedValue(feed([msg('m1')], { unread: 2 })),
+        markRead: vi.fn().mockImplementation(async () => {
+          order.push('read')
+          return { meta: { marked: 2, unread_count: 0 } }
+        }),
+      })
+      const t = useMessageThread(ref(transport))
+
+      await t.start()
+
+      expect(order).toEqual(['read', 'refresh'])
+      t.stop()
+    } finally {
+      document.removeEventListener(NOTIFICATIONS_REFRESH_EVENT, onRefresh)
+    }
+  })
+
+  it('does not ask for a refresh when there was nothing to mark read', async () => {
+    const onRefresh = vi.fn()
+    document.addEventListener(NOTIFICATIONS_REFRESH_EVENT, onRefresh)
+    try {
+      const t = useMessageThread(ref(makeTransport()))
+      await t.start()
+      expect(onRefresh).not.toHaveBeenCalled()
+      t.stop()
+    } finally {
+      document.removeEventListener(NOTIFICATIONS_REFRESH_EVENT, onRefresh)
+    }
   })
 
   it('does not mark read when nothing is unread', async () => {

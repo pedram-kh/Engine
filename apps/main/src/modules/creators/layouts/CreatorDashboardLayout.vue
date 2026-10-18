@@ -30,6 +30,8 @@ import { storeToRefs } from 'pinia'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import ImpersonationBanner from '@/modules/impersonation/components/ImpersonationBanner.vue'
 import NotificationBell from '@/modules/notifications/components/NotificationBell.vue'
+import { provideNotificationPoll } from '@/modules/notifications/composables/notificationPollContext'
+import NavBadgeIcon from '../components/NavBadgeIcon.vue'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { useOnboardingStore } from '@/modules/onboarding/stores/useOnboardingStore'
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
@@ -52,6 +54,29 @@ const { user, isLoggingOut } = storeToRefs(authStore)
 const { applicationStatus } = storeToRefs(onboardingStore)
 const localeOptions = buildLocaleOptions()
 const userMenuOpen = ref(false)
+
+/**
+ * AH-108 (D2) — the shell's ONE unread-count poll. The bell and the Messages nav
+ * item draw numbers from it, so there is a single 45 s request, not one per
+ * consumer. Creator layout only (Q2): the agency layout provides nothing and its
+ * bell keeps its own poll.
+ */
+const notificationPoll = provideNotificationPoll()
+
+/** The badge count for a nav item: only Messages carries one; `null` means "no badge". */
+function navBadgeCount(key: string): number | null {
+  return key === 'messages' ? notificationPoll.messageUnreadCount.value : null
+}
+
+/**
+ * The Messages button's accessible name WITH the count (uncapped: the glyph says
+ * `99+`, a screen reader says the number). `undefined` leaves every other button,
+ * and Messages at zero, on its visible label.
+ */
+function navAriaLabel(key: string): string | undefined {
+  const count = navBadgeCount(key)
+  return count !== null && count > 0 ? t('creator.ui.messagesUnreadAria', { count }) : undefined
+}
 
 /**
  * The logo's wordmark is near-white and vanishes on the light header, so we
@@ -228,11 +253,19 @@ onMounted(() => {
           v-for="item in navItems"
           :key="item.key"
           :to="{ name: item.routeName }"
-          :prepend-icon="item.icon"
+          :prepend-icon="navBadgeCount(item.key) === null ? item.icon : undefined"
+          :aria-label="navAriaLabel(item.key)"
           variant="text"
           class="text-none"
           :data-test="`creator-nav-${item.key}`"
         >
+          <template v-if="navBadgeCount(item.key) !== null" #prepend>
+            <NavBadgeIcon
+              :icon="item.icon"
+              :count="navBadgeCount(item.key)"
+              :data-test="`creator-${item.key}-unread-badge-top`"
+            />
+          </template>
           {{ t(`availability.creatorNav.${item.key}`) }}
         </v-btn>
       </nav>
@@ -339,10 +372,15 @@ onMounted(() => {
         v-for="item in mobilePrimaryItems"
         :key="item.key"
         :to="{ name: item.routeName }"
+        :aria-label="navAriaLabel(item.key)"
         :data-test="`creator-bottom-nav-${item.key}`"
       >
         <span v-if="isNative" class="creator-bottom-nav__line" aria-hidden="true" />
-        <v-icon :icon="item.icon" />
+        <NavBadgeIcon
+          :icon="item.icon"
+          :count="navBadgeCount(item.key)"
+          :data-test="`creator-${item.key}-unread-badge-bottom`"
+        />
         <span class="creator-bottom-nav__label">
           {{ t(`availability.creatorNav.${isNative ? 'tab.' : ''}${item.key}`) }}
         </span>

@@ -11,7 +11,8 @@
  * differs.
  *
  * Owns the steady count poll (`useNotificationPoll`, flat 45 s, tab-visibility
- * gated, torn down on unmount). The dropdown shares that poll handle so
+ * gated, torn down on unmount) unless the shell provides a shared one (AH-108,
+ * `notificationPollContext`), in which case it draws that one's numbers. The dropdown shares that poll handle so
  * mark-read/mark-all reconcile the badge instantly, and each dropdown-open
  * refetch pushes `meta.unread_count` back as a reconcile point.
  */
@@ -20,6 +21,8 @@ import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
+import { formatBadgeCount } from '../formatBadgeCount'
+import { injectNotificationPoll } from '../composables/notificationPollContext'
 import { useNotificationPoll } from '../composables/useNotificationPoll'
 import NotificationCenter from './NotificationCenter.vue'
 
@@ -30,8 +33,14 @@ defineProps<{
 
 const { t } = useI18n()
 
-const poll = useNotificationPoll()
-void poll.start()
+// AH-108 — the creator shell provides ONE poll that the Messages tab shares; use it
+// when it is there and do not start a second. With nothing provided (the agency
+// layout) the bell owns its own poll, exactly as it always did.
+const sharedPoll = injectNotificationPoll()
+const poll = sharedPoll ?? useNotificationPoll()
+if (sharedPoll === null) {
+  void poll.start()
+}
 
 const menuOpen = ref(false)
 const route = useRoute()
@@ -70,7 +79,7 @@ watch(menuOpen, (open) => {
   >
     <template #activator="{ props: menuProps }">
       <v-badge
-        :content="poll.unreadCount.value"
+        :content="formatBadgeCount(poll.unreadCount.value)"
         :model-value="poll.unreadCount.value > 0"
         color="error"
         data-test="notification-badge"

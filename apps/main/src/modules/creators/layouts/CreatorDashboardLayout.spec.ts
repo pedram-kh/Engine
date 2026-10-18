@@ -63,6 +63,7 @@ vi.mock('@/modules/onboarding/api/onboarding.api', () => ({
 }))
 
 import { onboardingApi } from '@/modules/onboarding/api/onboarding.api'
+import { notificationsApi } from '@/modules/notifications/api/notifications.api'
 
 // AH-100 — the Capacitor platform probe. Web unless a test opts in, so every
 // pre-AH-100 test below runs the web shell exactly as before.
@@ -624,5 +625,154 @@ describe('CreatorDashboardLayout — shell back arrow (AH-106)', () => {
     await flushPromises()
 
     expect(router.currentRoute.value.name).toBe('creator.dashboard')
+  })
+})
+
+/**
+ * AH-108 — the Messages tab's unread badge.
+ *
+ * One shell poll feeds both the bell (total) and the Messages item (message
+ * split). The badge is on the Messages item ONLY, hides at zero, caps at 99+,
+ * and keeps the real count in the button's accessible name.
+ */
+describe('CreatorDashboardLayout — Messages unread badge (AH-108)', () => {
+  let cleanup: (() => void) | null = null
+
+  function counts(total: number, messages: number | undefined): void {
+    vi.mocked(notificationsApi.unreadCount).mockResolvedValue({
+      data: {
+        type: 'notification_unread_count',
+        attributes: {
+          unread_count: total,
+          ...(messages === undefined ? {} : { message_unread_count: messages }),
+        },
+      },
+    } as never)
+    // The stubbed VMenu renders the bell's dropdown inline, and an open dropdown
+    // reconciles `meta.unread_count` back into the poll — keep that in step.
+    vi.mocked(notificationsApi.list).mockResolvedValue({
+      data: [],
+      meta: { total: 0, page: 1, per_page: 8, last_page: 1, unread_count: total },
+    } as never)
+  }
+
+  beforeEach(() => vi.clearAllMocks())
+  afterEach(() => {
+    if (cleanup !== null) {
+      cleanup()
+      cleanup = null
+    }
+    // Leave the file-level default (zero) for any later block.
+    counts(0, undefined)
+  })
+
+  it.each([
+    [1, '1'],
+    [12, '12'],
+    [99, '99'],
+    [100, '99+'],
+  ])('draws %i unread messages as "%s" on the native bottom bar', async (count, glyph) => {
+    counts(count, count)
+    const mounted = await mountLayout({ mobile: true, native: true, applicationStatus: 'approved' })
+    cleanup = mounted.cleanup
+
+    const badge = mounted.wrapper.find('[data-test="creator-messages-unread-badge-bottom"]')
+    expect(badge.find('.v-badge__badge').text()).toBe(glyph)
+  })
+
+  it('draws the badge on the web desktop nav too', async () => {
+    counts(12, 12)
+    const mounted = await mountLayout({ applicationStatus: 'approved' })
+    cleanup = mounted.cleanup
+
+    const badge = mounted.wrapper.find('[data-test="creator-messages-unread-badge-top"]')
+    expect(badge.find('.v-badge__badge').text()).toBe('12')
+  })
+
+  it('draws the badge on the web mobile bottom bar too', async () => {
+    counts(3, 3)
+    const mounted = await mountLayout({ mobile: true, applicationStatus: 'approved' })
+    cleanup = mounted.cleanup
+
+    const badge = mounted.wrapper.find('[data-test="creator-messages-unread-badge-bottom"]')
+    expect(badge.find('.v-badge__badge').text()).toBe('3')
+  })
+
+  it('hides the badge at zero message notifications — even with other unread ones', async () => {
+    counts(5, 0)
+    const mounted = await mountLayout({ mobile: true, native: true, applicationStatus: 'approved' })
+    cleanup = mounted.cleanup
+
+    const badge = mounted.wrapper.find('[data-test="creator-messages-unread-badge-bottom"]')
+    expect(badge.exists()).toBe(true)
+    // Vuetify hides a zero badge by `display: none` (model-value), it does not remove it.
+    expect(badge.find('.v-badge__badge').isVisible()).toBe(false)
+  })
+
+  it('reads an older backend (no split) as zero', async () => {
+    counts(5, undefined)
+    const mounted = await mountLayout({ mobile: true, native: true, applicationStatus: 'approved' })
+    cleanup = mounted.cleanup
+
+    const badge = mounted.wrapper.find('[data-test="creator-messages-unread-badge-bottom"]')
+    expect(badge.find('.v-badge__badge').isVisible()).toBe(false)
+  })
+
+  it('puts the badge on Messages only — no other nav item carries one', async () => {
+    counts(9, 9)
+    const mounted = await mountLayout({ mobile: true, native: true, applicationStatus: 'approved' })
+    cleanup = mounted.cleanup
+
+    const bar = mounted.wrapper.find('[data-test="creator-bottom-nav"]')
+    expect(bar.findAll('.v-badge__badge').filter((el) => el.isVisible())).toHaveLength(1)
+    for (const key of ['dashboard', 'jobs', 'assignments']) {
+      expect(bar.find(`[data-test="creator-bottom-nav-${key}"]`).find('.v-badge').exists()).toBe(
+        false,
+      )
+    }
+  })
+
+  it('names the Messages button with the REAL count, not the capped glyph', async () => {
+    counts(140, 140)
+    const mounted = await mountLayout({ mobile: true, native: true, applicationStatus: 'approved' })
+    cleanup = mounted.cleanup
+
+    const button = mounted.wrapper.find('[data-test="creator-bottom-nav-messages"]')
+    expect(button.attributes('aria-label')).toBe('Messages, unread: 140')
+    expect(
+      mounted.wrapper
+        .find('[data-test="creator-messages-unread-badge-bottom"] .v-badge__badge')
+        .text(),
+    ).toBe('99+')
+  })
+
+  it('leaves the visible label as the name at zero, and on every other item', async () => {
+    counts(0, 0)
+    const mounted = await mountLayout({ mobile: true, native: true, applicationStatus: 'approved' })
+    cleanup = mounted.cleanup
+
+    expect(
+      mounted.wrapper.find('[data-test="creator-bottom-nav-messages"]').attributes('aria-label'),
+    ).toBeUndefined()
+    expect(
+      mounted.wrapper.find('[data-test="creator-bottom-nav-jobs"]').attributes('aria-label'),
+    ).toBeUndefined()
+  })
+
+  it('runs ONE unread-count request for the bell and the Messages tab together', async () => {
+    counts(9, 4)
+    const mounted = await mountLayout({ mobile: true, native: true, applicationStatus: 'approved' })
+    cleanup = mounted.cleanup
+
+    expect(notificationsApi.unreadCount).toHaveBeenCalledTimes(1)
+    // The bell shows the TOTAL, the Messages tab the message split, from that one response.
+    expect(mounted.wrapper.find('[data-test="notification-badge"] .v-badge__badge').text()).toBe(
+      '9',
+    )
+    expect(
+      mounted.wrapper
+        .find('[data-test="creator-messages-unread-badge-bottom"] .v-badge__badge')
+        .text(),
+    ).toBe('4')
   })
 })

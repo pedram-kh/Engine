@@ -15,6 +15,8 @@
 import type { MessageResource, MessageThreadMeta, SendMessagePayload } from '@catalyst/api-client'
 import { computed, getCurrentInstance, onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue'
 
+import { requestNotificationsRefresh } from '@/modules/notifications/composables/notificationsRefresh'
+
 export const THREAD_POLL_INTERVAL_MS = 15000
 
 /** The minimal message shape the engine needs: an id + a created_at. */
@@ -98,6 +100,10 @@ export function useMessageThread<
 
       if (options.markRead === true && (threadMeta.value?.unread_count ?? 0) > 0) {
         await client.markRead()
+        // AH-108: the server has just cleared this thread's message notifications, so
+        // ask every running unread poll (the bell, the Messages tab) to re-read now
+        // instead of waiting up to 45 s. A document event: no new endpoint, no store.
+        requestNotificationsRefresh()
         if (!cancelled && threadMeta.value !== null) {
           threadMeta.value = { ...threadMeta.value, unread_count: 0 }
         }
