@@ -30,7 +30,8 @@ import {
  *      assertion is Q2 ("display only; no server gates"): a banner informs, it does
  *      not lock. Tracked as tech debt, "campaign status does not gate creator
  *      actions".
- *   4. At a 360 px phone width the chip is not clipped (AH-106's lesson: a
+ *   4. At a 360 px phone width neither chip is clipped (the campaign-status chip, and the
+ *      assignment-status chip beside the long title) (AH-106's lesson: a
  *      `toHaveText` matches the DOM and cannot see a clipped label).
  *
  * Role swaps go through `signOutViaApi` + a fresh SPA sign-in, as the hand-off
@@ -116,6 +117,15 @@ test.describe('AH-107 — campaign status on the creator side', () => {
     await expect(listChip).toHaveText('Paused', { timeout: 15_000 })
     const cutOff = await listChip.evaluate((el) => el.scrollWidth - el.clientWidth)
     expect(cutOff, 'the campaign-status chip clips its own label').toBeLessThanOrEqual(1)
+
+    // The assignment-status chip shares the card with the long title above; it clipped
+    // ("Contrac…") before it was pinned (found in the AH-107 copy-review screenshots).
+    const assignmentChip = page.locator(
+      `[data-testid="creator-assignment-status-${seeded.assignmentUlid}"]`,
+    )
+    await expect(assignmentChip).toBeVisible()
+    const assignmentCut = await assignmentChip.evaluate((el) => el.scrollWidth - el.clientWidth)
+    expect(assignmentCut, 'the assignment-status chip clips its own label').toBeLessThanOrEqual(1)
   })
 })
 

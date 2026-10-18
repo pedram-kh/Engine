@@ -288,3 +288,13 @@ describe('invitations — the campaign status chip (AH-107, native)', () => {
     )
   })
 })
+
+describe('invitations — the assignment-status pill keeps its width (AH-107, native)', () => {
+  it('carries the width-pinning class too, so the page rule backs up creatorNative.css', async () => {
+    const wrapper = await mountIt(true, [withCampaignStatus('A', 'active')])
+
+    expect(wrapper.find('[data-testid="creator-assignment-status-A"]').classes()).toContain(
+      'assignment__status-chip',
+    )
+  })
+})

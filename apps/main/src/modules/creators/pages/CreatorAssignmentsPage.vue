@@ -175,6 +175,7 @@ onMounted(() => {
                 />
               </div>
               <v-chip
+                class="assignment__status-chip"
                 size="x-small"
                 variant="tonal"
                 :data-status="item.attributes.status"
@@ -271,6 +272,7 @@ onMounted(() => {
               <div class="assignment__title">
                 <span class="assignment__name">{{ item.attributes.campaign?.name ?? '—' }}</span>
                 <v-chip
+                  class="assignment__status-chip"
                   size="x-small"
                   variant="tonal"
                   :data-testid="`creator-assignment-status-${item.id}`"
@@ -454,6 +456,17 @@ onMounted(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* AH-107 (found in the copy-review screenshots) — the assignment-status chip never
+   gives up width: the AH-106 defect, on the one chip AH-106 did not cover. A Vuetify
+   chip is `min-width: 0; overflow: hidden; white-space: nowrap`, so as a flex item
+   in the title row it SHRINKS when a long campaign title leaves it too little room
+   and clips its own label ("Contrac…", "Sous con…"). Pinning it hands the squeeze to
+   the title, which can wrap or ellipsize. The native card also pins it, in
+   creatorNative.css; the class keeps both layouts safe if either rule is edited. */
+.assignment__status-chip {
+  flex: 0 0 auto;
 }
 
 .assignment__meta {

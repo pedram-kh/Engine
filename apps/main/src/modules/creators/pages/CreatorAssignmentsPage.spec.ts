@@ -10,6 +10,8 @@
 
 import type { CreatorAssignmentResource } from '@catalyst/api-client'
 import { flushPromises } from '@vue/test-utils'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { mountAuthPage } from '../../../../tests/unit/helpers/mountAuthPage'
@@ -290,5 +292,37 @@ describe('CreatorAssignmentsPage — the campaign status chip (AH-107, web)', ()
     const title = wrapper.find('.assignment__title')
     expect(title.find('[data-testid="creator-assignment-status-A"]').exists()).toBe(true)
     expect(title.find('[data-testid="creator-assignment-campaign-status-A"]').exists()).toBe(false)
+  })
+})
+
+// ── AH-107 — the assignment-status chip is never squeezed (AH-106's defect, second chip) ──
+//
+// Found in the copy-review screenshots: a long campaign title left the status chip
+// in the title row too little room and Vuetify's `min-width: 0; overflow: hidden`
+// chip clipped its own label ("Contrac…"). A `toHaveText` matches the DOM and cannot
+// see a clipped label, so the guard is the pinning class plus the rule that gives it
+// teeth. The real-Chromium measurement is in the AH-107 harness and the E2E leg.
+
+describe('CreatorAssignmentsPage — the assignment-status chip keeps its width (AH-107)', () => {
+  it('carries the width-pinning class on the web card', async () => {
+    vi.mocked(creatorAssignmentsApi.list).mockResolvedValue({
+      data: [withCampaignStatus('A', 'contracted', 'active')],
+    })
+
+    const { wrapper, unmount } = await mountAuthPage(CreatorAssignmentsPage)
+    teardown = unmount
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="creator-assignment-status-A"]').classes()).toContain(
+      'assignment__status-chip',
+    )
+  })
+
+  it('the class stops the chip from shrinking', () => {
+    const source = readFileSync(resolve(__dirname, 'CreatorAssignmentsPage.vue'), 'utf8')
+    const rule = /\.assignment__status-chip\s*\{([^}]*)\}/.exec(source)
+
+    expect(rule, 'no .assignment__status-chip rule in the page style').not.toBeNull()
+    expect(rule?.[1]).toMatch(/flex:\s*0\s+0\s+auto/)
   })
 })
