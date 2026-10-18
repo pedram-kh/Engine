@@ -200,6 +200,51 @@ it('omits body, data and every collapse field when the message has none; normal 
         ->and($m['apns']['headers']['apns-priority'])->toBe('5');
 });
 
+it('AH-108: aps.badge is emitted when the message has a badge, including a real zero', function (int $badge): void {
+    Http::fake([FCM_OAUTH_URL => Http::response(fcmOauthOk()), FCM_SEND_URL => Http::response([])]);
+
+    fcmSender()->send(new PushMessage(title: 't', badge: $badge), fcmTarget());
+
+    $aps = fcmSendBody()['message']['apns']['payload']['aps'];
+    expect($aps['badge'])->toBe($badge)->and($aps['sound'])->toBe('default');
+})->with([0, 1, 7, 140]);
+
+it('AH-108: aps.badge is ABSENT when the badge is null (a null never clears the icon by sending 0)', function (): void {
+    Http::fake([FCM_OAUTH_URL => Http::response(fcmOauthOk()), FCM_SEND_URL => Http::response([])]);
+
+    fcmSender()->send(new PushMessage(title: 't'), fcmTarget());
+
+    expect(fcmSendBody()['message']['apns']['payload']['aps'])->not->toHaveKey('badge');
+});
+
+it('AH-108 (Q6): the Android block is unchanged by a badge: no notification_count', function (): void {
+    Http::fake([FCM_OAUTH_URL => Http::response(fcmOauthOk()), FCM_SEND_URL => Http::response([])]);
+
+    fcmSender()->send(new PushMessage(title: 't', badge: 9, collapseKey: 'assignment:01XYZ'), fcmTarget());
+
+    $android = fcmSendBody()['message']['android'];
+    expect($android['notification'])->toBe(['channel_id' => PushMessage::DEFAULT_CHANNEL, 'tag' => 'assignment:01XYZ'])
+        ->and(json_encode($android))->not->toContain('notification_count')
+        ->and(json_encode($android))->not->toContain('badge');
+});
+
+it('AH-108: a message queued BEFORE this deploy (serialized without a badge) still sends, and carries no badge', function (): void {
+    Http::fake([FCM_OAUTH_URL => Http::response(fcmOauthOk()), FCM_SEND_URL => Http::response([])]);
+
+    // The exact shape the previous release serialized onto the queue: no `badge` property at all.
+    $legacy = 'O:'.strlen(PushMessage::class).':"'.PushMessage::class.'":7:{'
+        .'s:5:"title";s:1:"t";s:4:"body";N;s:4:"data";a:0:{}s:11:"collapseKey";N;'
+        .'s:9:"channelId";s:16:"catalyst_default";s:10:"ttlSeconds";i:86400;'
+        .'s:8:"priority";E:'.strlen(PushPriority::class.':High').':"'.PushPriority::class.':High";}';
+    $message = unserialize($legacy);
+    expect($message)->toBeInstanceOf(PushMessage::class);
+
+    $result = fcmSender()->send($message, fcmTarget());
+
+    expect($result->isDelivered())->toBeTrue()
+        ->and(fcmSendBody()['message']['apns']['payload']['aps'])->not->toHaveKey('badge');
+});
+
 it('a collapse key over the 64-byte vendor limit is replaced by a stable short digest (same key → same digest)', function (): void {
     Http::fake([FCM_OAUTH_URL => Http::response(fcmOauthOk()), FCM_SEND_URL => Http::response([])]);
     $long = str_repeat('k', 100);

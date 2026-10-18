@@ -7,6 +7,7 @@ namespace App\Modules\Notifications\Push;
 use App\Core\Enums\Locale;
 use App\Modules\Identity\Models\User;
 use App\Modules\Notifications\Enums\NotificationType;
+use App\Modules\Notifications\Models\Notification;
 
 /**
  * Builds the vendor-neutral {@see PushMessage} for one (recipient, type) — and is
@@ -108,6 +109,7 @@ final class PushMessageFactory
             data: $payload,
             collapseKey: self::threadKey($type, $data),
             channelId: PushMessage::DEFAULT_CHANNEL,
+            badge: $this->badgeFor($recipient),
         );
     }
 
@@ -138,6 +140,29 @@ final class PushMessageFactory
     public static function copyKey(NotificationType $type): string
     {
         return str_replace('.', '_', $type->value);
+    }
+
+    /**
+     * AH-108 (Q5) — the home-screen icon number: the recipient's TOTAL unread
+     * (`notifications.read_at IS NULL`), the same number the bell shows. One COUNT
+     * per push.
+     *
+     * Computed at build time, which is AFTER `NotificationService::notify()` has
+     * written the in-app row, so the message that triggered this push is already in
+     * the total. When the recipient has muted `in_app` there is no row, and that one
+     * message is not counted (accepted, tech-debt).
+     *
+     * `null` for a recipient that is not persisted: there is nothing to count, and a
+     * made-up 0 would clear the icon. A persisted recipient with nothing unread gets
+     * a real 0, which is correct.
+     */
+    private function badgeFor(User $recipient): ?int
+    {
+        if (! $recipient->exists) {
+            return null;
+        }
+
+        return Notification::unreadCountFor($recipient);
     }
 
     /**

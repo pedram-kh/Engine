@@ -638,3 +638,50 @@ it('the push throttle never touches the message EMAIL debounce (neither side ref
         ->and($dispatcher)->not->toContain('MessageEmailDebounce')
         ->and($debounce)->not->toContain('Push');
 });
+
+// =============================================================================
+// AH-108 — the icon badge number rides every push
+// =============================================================================
+
+it('AH-108: the push carries the recipient\'s total unread, INCLUDING the row this notify just wrote', function (): void {
+    pdFakeQueue();
+    pdArm();
+    [$user] = pdRecipient();
+    $other = User::factory()->creator()->create();
+
+    Notification::factory()->ofType(NotificationType::AssignmentInvited)->createOne(['recipient_user_id' => $user->id]);
+    Notification::factory()->ofType(NotificationType::AssignmentInvited)->createOne(['recipient_user_id' => $user->id, 'read_at' => now()]);
+    Notification::factory()->ofType(NotificationType::AssignmentInvited)->createOne(['recipient_user_id' => $other->id]);
+
+    pdNotifier()->notify($user, NotificationType::MessageReceivedByCreator, data: pdData(NotificationType::MessageReceivedByCreator));
+
+    // 1 earlier unread + the one just written = 2. Not 1 (counted before the row exists),
+    // not 3 (counting the read row), not 4 (counting someone else's).
+    expect(pdPushed()[0]->message->badge)->toBe(2);
+});
+
+it('AH-108: every eligible type carries the badge, not only the message types', function (): void {
+    pdFakeQueue();
+    pdArm();
+    [$user] = pdRecipient();
+    pdSetPush($user, NotificationType::CampaignJobPosted, true);
+
+    foreach (pdEligible() as $i => $type) {
+        pdNotifier()->notify($user, $type, data: pdData($type, 'THREAD-'.$i));
+    }
+
+    $badges = array_map(static fn (SendPushNotificationJob $j): ?int => $j->message->badge, pdPushed());
+    expect($badges)->toHaveCount(14)->and(array_filter($badges, static fn (?int $b): bool => $b === null))->toBe([]);
+});
+
+it('AH-108 (accepted gap, tech-debt): a push whose in_app is muted is not in the badge total', function (): void {
+    pdFakeQueue();
+    pdArm();
+    [$user] = pdRecipient();
+    Notification::factory()->ofType(NotificationType::AssignmentInvited)->createOne(['recipient_user_id' => $user->id]);
+    pdSetInApp($user, NotificationType::MessageReceivedByCreator, false);
+
+    pdNotifier()->notify($user, NotificationType::MessageReceivedByCreator, data: pdData(NotificationType::MessageReceivedByCreator));
+
+    expect(pdPushed()[0]->message->badge)->toBe(1);
+});

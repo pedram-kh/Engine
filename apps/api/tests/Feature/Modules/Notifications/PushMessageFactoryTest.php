@@ -5,13 +5,15 @@ declare(strict_types=1);
 use App\Core\Enums\Locale;
 use App\Modules\Identity\Models\User;
 use App\Modules\Notifications\Enums\NotificationType;
+use App\Modules\Notifications\Models\Notification;
 use App\Modules\Notifications\Push\PushEligibility;
 use App\Modules\Notifications\Push\PushMessage;
 use App\Modules\Notifications\Push\PushMessageFactory;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Support\NotificationRouteKeys;
 use Tests\TestCase;
 
-uses(TestCase::class);
+uses(TestCase::class, RefreshDatabase::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -513,4 +515,37 @@ it('the value check is not vacuous: en would fail it against itself, and the fla
         expect(Locale::uiValues())->toContain($locale);
         expect(pushLang($locale)['assignment_invited']['title'])->not->toBe($en['assignment_invited']['title']);
     }
+});
+
+// =============================================================================
+// AH-108 — the badge number
+// =============================================================================
+
+it('AH-108: badge is the recipient\'s unread count: read rows and other people\'s rows are not in it', function (): void {
+    $user = User::factory()->creator()->create();
+    $other = User::factory()->creator()->create();
+    Notification::factory()->ofType(NotificationType::AssignmentInvited)->count(3)->create(['recipient_user_id' => $user->id]);
+    Notification::factory()->ofType(NotificationType::AssignmentInvited)->create(['recipient_user_id' => $user->id, 'read_at' => now()]);
+    Notification::factory()->ofType(NotificationType::AssignmentInvited)->count(5)->create(['recipient_user_id' => $other->id]);
+
+    expect(pushMake(NotificationType::AssignmentInvited, $user, ['campaign_name' => 'X'])->badge)->toBe(3);
+});
+
+it('AH-108: a recipient with nothing unread gets badge 0 (a real zero, which clears the icon)', function (): void {
+    $user = User::factory()->creator()->create();
+
+    expect(pushMake(NotificationType::AssignmentInvited, $user, ['campaign_name' => 'X'])->badge)->toBe(0);
+});
+
+it('AH-108: a recipient that is not persisted has no count to give, so the badge is null (never a made-up 0)', function (): void {
+    expect(pushMake(NotificationType::AssignmentInvited, pushRecipient(), ['campaign_name' => 'X'])->badge)->toBeNull();
+});
+
+it('AH-108: the badge is a separate field; it never enters the payload data bag', function (): void {
+    $user = User::factory()->creator()->create();
+    Notification::factory()->ofType(NotificationType::AssignmentInvited)->count(2)->create(['recipient_user_id' => $user->id]);
+
+    $m = pushMake(NotificationType::AssignmentInvited, $user, ['campaign_name' => 'X', 'assignment_ulid' => PUSH_ASSIGN_ULID]);
+
+    expect($m->data)->not->toHaveKey('badge')->and($m->badge)->toBe(2);
 });

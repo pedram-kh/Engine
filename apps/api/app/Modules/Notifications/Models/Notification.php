@@ -135,6 +135,18 @@ final class Notification extends Model
      * @param  string  $subjectType  the subject's `getMorphClass()`
      * @return int rows newly marked
      */
+    /**
+     * How many notifications this user has not read: the bell's number and the
+     * push icon badge (AH-108). `read_at` is the single source of truth.
+     */
+    public static function unreadCountFor(User $recipient): int
+    {
+        return self::query()
+            ->where('recipient_user_id', $recipient->getKey())
+            ->whereNull('read_at')
+            ->count();
+    }
+
     public static function markMessageNotificationsRead(User $recipient, string $subjectType, int $subjectId): int
     {
         return self::query()

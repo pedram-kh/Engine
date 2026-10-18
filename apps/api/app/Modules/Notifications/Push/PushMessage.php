@@ -23,6 +23,7 @@ final readonly class PushMessage
      * @param  string|null  $collapseKey  messages sharing a key REPLACE each other on the device
      * @param  string  $channelId  Android notification channel
      * @param  int  $ttlSeconds  how long the provider may hold an undeliverable message
+     * @param  int|null  $badge  the home-screen icon number the OS should show once this push lands (AH-108): the recipient's total unread. A real 0 clears the icon; null means "no opinion" and the sender omits the key, so a message built without a count can never clear the badge. Vendor-neutral on purpose: no `aps` name here
      */
     public function __construct(
         public string $title,
@@ -32,5 +33,6 @@ final readonly class PushMessage
         public string $channelId = self::DEFAULT_CHANNEL,
         public int $ttlSeconds = 86400,
         public PushPriority $priority = PushPriority::High,
+        public ?int $badge = null,
     ) {}
 }

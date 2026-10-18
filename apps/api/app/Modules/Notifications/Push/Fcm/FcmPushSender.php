@@ -134,6 +134,15 @@ final class FcmPushSender implements PushSender
 
         $aps = ['sound' => 'default'];
 
+        // AH-108 — the icon number. Android gets nothing for it (no `notification_count`;
+        // launcher badges are OEM-dependent, Q6). `isset` rather than `!== null`, on purpose:
+        // a message serialized onto the queue by the PREVIOUS release has no `badge`
+        // property at all, and reading an uninitialised readonly property throws. `isset`
+        // is false for both "never set" and null, and true for a real 0 (which clears).
+        if (isset($message->badge)) {
+            $aps['badge'] = $message->badge;
+        }
+
         $collapse = $this->collapseKey($message->collapseKey);
 
         if ($collapse !== null) {
