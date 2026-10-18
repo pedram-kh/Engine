@@ -133,6 +133,7 @@ function rmnIsRead(Notification $row): bool
     return $row->fresh()?->read_at !== null;
 }
 
+/** @return Collection<int, Notification> */
 function rmnMessageRows(User $recipient, NotificationType $type): Collection
 {
     return Notification::query()->where('recipient_user_id', $recipient->id)->where('type', $type->value)->get();
@@ -205,7 +206,7 @@ it('a second /read is idempotent: read_at of cleared rows does not move', functi
     $this->travel(5)->minutes();
     $this->actingAs($s['creatorUser'])->postJson(rmnCreatorMsgUrl($s['assignment'], '/read'))->assertOk();
 
-    expect($row->fresh()?->read_at?->equalTo($first))->toBeTrue();
+    expect($row->fresh()?->read_at?->toDateTimeString())->toBe($first?->toDateTimeString());
 });
 
 it('a notification whose messages are already read is STILL cleared (write precedes the early return)', function (): void {
@@ -298,8 +299,8 @@ it('an agency member /read on a relationship thread clears their notifications o
 
     $this->actingAs($s['admin'])->postJson(rmnAgencyRelUrl($s['agency'], $s['creator'], '/read'))->assertOk();
 
-    expect(rmnIsRead($adminRows->first()))->toBeTrue()
-        ->and(rmnIsRead($colleagueRows->first()))->toBeFalse();
+    expect(rmnIsRead($adminRows->firstOrFail()))->toBeTrue()
+        ->and(rmnIsRead($colleagueRows->firstOrFail()))->toBeFalse();
 });
 
 it('a relationship notification whose messages are already read is STILL cleared', function (): void {

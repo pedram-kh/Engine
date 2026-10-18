@@ -23,6 +23,9 @@ use App\Modules\Notifications\Enums\NotificationType;
 use App\Modules\Notifications\Models\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
+
+use function Pest\Laravel\actingAs;
+
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
@@ -69,7 +72,7 @@ function crmCampaignChat(): array
 
     // Send through the API so the thread, message and (pre-existing-shape)
     // notification are the ones production creates.
-    test()->actingAs($admin)
+    actingAs($admin)
         ->postJson("/api/v1/agencies/{$agency->ulid}/campaigns/{$campaign->ulid}/assignments/{$assignment->ulid}/messages", ['body' => 'hello'])
         ->assertCreated();
 
@@ -118,7 +121,7 @@ function crmRelationshipChat(): array
         'is_blacklisted' => false,
     ]);
 
-    test()->actingAs($admin)
+    actingAs($admin)
         ->postJson("/api/v1/agencies/{$agency->ulid}/creators/{$creator->ulid}/relationship-messages", ['body' => 'hi'])
         ->assertCreated();
 
@@ -303,10 +306,11 @@ it('is idempotent: a second run finds nothing to mark and moves no timestamp', f
 
     crmRun();
     $first = $row->fresh()?->read_at;
+    expect($first)->not->toBeNull('the first run must have cleared the row, or this test proves nothing');
 
     $this->travel(5)->minutes();
     [, $second] = crmRun();
 
-    expect($row->fresh()?->read_at?->equalTo($first))->toBeTrue()
+    expect($row->fresh()?->read_at?->toDateTimeString())->toBe($first?->toDateTimeString())
         ->and($second)->toContain('Processed 0 unread message notification(s); 0 marked read');
 });
