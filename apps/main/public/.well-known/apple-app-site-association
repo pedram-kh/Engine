@@ -1,0 +1,10 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["LTW9262ZXP.com.catalystgrowth.platform"],
+        "components": [{ "/": "/creator/*" }]
+      }
+    ]
+  }
+}

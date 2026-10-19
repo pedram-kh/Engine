@@ -22,6 +22,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- AH-103b: App Links for creator paths on the production web host
+                 (scope /creator/ only). The filter is built, but NO assetlinks.json is
+                 published (ruling R3: no real signing fingerprint exists yet), so it
+                 stays unverified and links open in the browser until the tech-debt row
+                 "Android App Links are not verified" is resolved. Host and prefix must
+                 equal APP_LINK_HOST / APP_LINK_PATH_PREFIX (appLinkFiles.spec.ts). -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="platform.catalyst-growth.com"
+                    android:pathPrefix="/creator/" />
+            </intent-filter>
+
         </activity>
 
         <!-- AH-102: FCM. Auto-init is OFF so no token is minted before the creator

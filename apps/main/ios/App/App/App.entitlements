@@ -6,5 +6,12 @@
 	     for App Store / TestFlight archives. -->
 	<key>aps-environment</key>
 	<string>development</string>
+	<!-- AH-103b: universal links. Creator paths on the production web host open the app
+	     (the apple-app-site-association file is served from the same host; scope is
+	     /creator/* only). Must equal APP_LINK_HOST (appLinkFiles.spec.ts). -->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:platform.catalyst-growth.com</string>
+	</array>
 </dict>
 </plist>

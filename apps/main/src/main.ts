@@ -8,6 +8,8 @@ import { router } from './core/router'
 import { i18n, setLocale } from './core/i18n'
 import { startAppResumeRefresh } from './core/platform/appResume'
 import { bootNativeShell } from './core/platform/bootNativeShell'
+import { createAppLinkHandler } from './core/platform/links/appLinkRouting'
+import { startAppLinks } from './core/platform/links/startAppLinks'
 import { createPushTapHandler } from './core/platform/push/pushTapRouting'
 import { startPush } from './core/platform/push/startPush'
 import { useAuthStore } from './modules/auth/stores/useAuthStore'
@@ -80,4 +82,11 @@ void Promise.all([
     // registration time — startPush owns that watch, so a spec can drive it.
     userId: () => useAuthStore().user?.id ?? null,
   })
+
+  // AH-103b: creator app only (a no-op on the web) — an https creator link opened
+  // from an email, Notes or Messages opens the screen it names (the dashboard when
+  // the link is ours but unusable; nothing when it is not ours). The handler waits
+  // for the router like the push tap does, and a signed-out tap returns to the
+  // screen after sign-in through the normal `redirect=` flow.
+  startAppLinks({ onLink: createAppLinkHandler(router) })
 })

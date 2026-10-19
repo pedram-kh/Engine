@@ -1,0 +1,5 @@
+# AH-103b: Netlify headers. ONE rule, scoped to ONE path: the iOS association file has no
+# file extension, so Netlify cannot infer its type; Apple wants JSON. Nothing else is set
+# here (the default cache headers stay), and there is deliberately no wildcard.
+/.well-known/apple-app-site-association
+  Content-Type: application/json

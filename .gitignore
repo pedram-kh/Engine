@@ -28,6 +28,11 @@ test-results/
 # .gitignore files.)
 apps/main/.env.native-production
 
+# Netlify's headers file starts with an underscore; a global `_*` ignore (common in
+# personal gitignores) would silently hide it. AH-103b serves the iOS association file
+# with it, so it must always be tracked.
+!apps/main/public/_headers
+
 # Editor / OS
 .idea/
 .vscode/*
