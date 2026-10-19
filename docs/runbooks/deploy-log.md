@@ -39,7 +39,7 @@ happened.
 ### YYYY-MM-DD · <short description> — STATUS
 
 - **Status:** PENDING | DEPLOYED | FAILED / ROLLED BACK
-- **Range:** `<from-SHA>` → `<to-SHA>` (from-SHA exclusive: the previous deployed tip)
+- **Range:** `47d2efc5` (AH-103's last runtime commit, the deployed runtime tip; the commits between it and `8aa11376` are docs, `.env.example` and the iOS camera strings / build 2) → **`222b0d39`** (the pushed tip as of 2026-10-19; the range extends to whatever tip is deployed, and AH-103b and AH-105 commits will land on top before the deploy).
 - **AH entries carried:** AH-NNN → AH-NNN (list them, or name the arc)
 - **Migrations run:** <count> — every name, or "none"
 - **Pre-deploy reads:** command + the number it returned, or "none"
@@ -54,26 +54,31 @@ happened.
 
 ---
 
-## AH-106 + AH-107 — pre-tester UI batch (shell back arrow, clipped Applied chip, campaign status on the creator side) — PENDING
+## AH-106 + AH-107 + AH-108 — pre-tester UI batch (shell back arrow, clipped Applied chip, campaign status on the creator side, unread indicators and icon badge) — PENDING
 
-> **AH-106 is pushed (GitHub only), AH-107 is local; nothing here is deployed.** Opens a new entry because everything below it is DEPLOYED.
-> AH-107 (campaign status) is stacked on this entry as of 2026-10-18; AH-108 (unread indicators) is planned to stack here too, for **one**
-> production deploy and **one** TestFlight build 3 (Q9 ruling), and adds its own obligations (a `queue:restart` and a one-shot backlog
-> command) when it lands.
+> **AH-106, AH-107 and AH-108 are all pushed (GitHub only); nothing here is deployed.** Opens a new entry because everything below it is
+> DEPLOYED. One production deploy and **one** TestFlight build 3 for all three (Q9 ruling). **Timing (Pedram, 2026-10-19): the deploy and
+> build 3 come after AH-105** (the privacy checklist), not before. AH-108 adds a named `queue:restart` and a one-shot backlog command.
 
-- **Status:** PENDING. AH-106 (`1c3c7aaf`, `e390581e`) is pushed to GitHub `origin/main` (CI green). AH-107 (`0801577e`, `b115639e`, `b1fd5e8b`, `77600807`, `480cfcd8`) is local only; push is held until Claude clears it and Pedram triggers it, after the full local Playwright suite.
+- **Status:** PENDING. AH-106 (`1c3c7aaf`, `e390581e`) was pushed 2026-10-17. AH-107 (`0801577e`, `b115639e`, `b1fd5e8b`, `77600807`, `480cfcd8`, `e557d358`) and AH-108 (`59c52ede`, `65df6b6e`, `9f47184f`, `715a1f72`, `3f73c8e7`, `16f06b54`, `4dad01b5`, `031b2e1b`, `0cc86e9a`, plus docs) were pushed 2026-10-19 as `54075f02..222b0d39` (19 commits). The AH-108 device walk passed 1–7 from the Xcode install (reported by Pedram); the production-APNs leg waits for build 3.
 - **Range:** `47d2efc5` (AH-103's last runtime commit, the deployed runtime tip; the commits between it and `8aa11376` are docs, `.env.example` and the iOS camera strings / build 2) → AH-106 tip `e390581e`; AH-107 tip `480cfcd8` (local, not on GitHub; the range extends to whatever tip is pushed).
-- **AH entries carried:** AH-106, AH-107
+- **AH entries carried:** AH-106, AH-107, AH-108
 - **Migrations run:** none.
 - **Pre-deploy reads:** none.
 - **Snapshot ID:** not required by this entry (no schema, no data write). The open snapshot question under AH-103 is unchanged.
-- **Infra:** none for AH-106 or AH-107 (no `queue:restart`, no env, no cron). **API deploy needed for AH-107:** four creator endpoints gain a read-only `campaign_status` / `campaign.status` field (job board card and detail, assignment list, assignment draft show); no migration. Either deploy order is safe (an older backend sends no status; the SPA then renders no chip and no banner). The AH-108 entry will add `queue:restart` (`PushMessageFactory` changes).
-- **One-shot commands:** none.
-- **Post-deploy verification:** web: open the notifications page from the bell and confirm the back arrow returns; apply to a job with a long title at phone width and confirm the Applied chip shows its full label. **AH-107:** on the invitations list at phone width, confirm every card shows a campaign chip (Upcoming / Active / Paused / Completed / Cancelled) and that a long-title card's "Contracted" chip is not cut; pause a test campaign from its Settings tab and confirm the creator's assignment detail shows "Paused" and the banner with the draft form still usable; confirm a paused job shows the Paused chip on the job board. Native: the same checks on build 3.
+- **Infra:** **`php artisan queue:restart` is REQUIRED (AH-108, named step):** `PushMessageFactory` and `FcmPushSender` changed, and a worker holding the old classes keeps sending pushes with no `aps.badge`. A message queued by the previous release still sends safely (pinned by a spec). **API deploy:** AH-107 adds a read-only `campaign_status` / `campaign.status` field on four creator endpoints; AH-108 adds `message_unread_count` on `GET /api/v1/me/notifications/unread-count`. No migration, no env change, no cron, no flag. Either deploy order is safe (an older backend sends no status and no message count; the SPA renders no chip and the tab reads 0; an older app ignores the new fields).
+- **One-shot commands:** **AH-108 backlog command, run right after `queue:restart`:** `php artisan notifications:clear-read-message-notifications`.
+  Every message notification that exists in production today is unread unless the user clicked it, because opening a thread never touched it
+  before this release; without this the first badge a creator sees would be a large false number. **Order: `--dry-run` first, then REPORT THE
+  COUNT TO PEDRAM, and only after he has seen it, the real run.** Both counts are recorded here.
+  - **Dry-run count:** **\_\_** (rows that would be marked read) · run by: **\_\_** · when: **\_\_**
+  - **Reported to Pedram:** yes / no · his go-ahead: **\_\_**
+  - **Real-run count:** **\_\_** (rows marked read) · matches the dry-run? yes / no · run by: **\_\_** · when: **\_\_**
+- **Post-deploy verification:** web: open the notifications page from the bell and confirm the back arrow returns; apply to a job with a long title at phone width and confirm the Applied chip shows its full label. **AH-107:** on the invitations list at phone width, confirm every card shows a campaign chip (Upcoming / Active / Paused / Completed / Cancelled) and that a long-title card's "Contracted" chip is not cut; pause a test campaign from its Settings tab and confirm the creator's assignment detail shows "Paused" and the banner with the draft form still usable; confirm a paused job shows the Paused chip on the job board. Native: the same checks on build 3. **AH-108:** after `queue:restart` and the backlog command, sign in as a creator with old message notifications and confirm the bell and the Messages tab no longer show the old backlog (a small honest number, or nothing); have the agency send one message in a campaign thread and one in the relationship thread and confirm bell and tab read 2 and, on build 3, the icon reads 2; open one thread and confirm the tab and bell drop by one and the icon follows; confirm a push sent after deploy shows the badge (`push_deliveries` row, in-app row Read after opening). On build 2 devices expect in-app badges only.
 - **Flags armed:** none.
-- **Source:** pushed to GitHub `origin/main` 2026-10-17 (tip then `54075f02`; CI green on all four jobs, [run 39046559682](https://github.com/pedram-kh/Engine/actions/runs/39046559682)). **A push is not a deploy:** the colleague mirrors GitHub → Bitbucket and deploys from there (API and both SPAs); the mirror and deploy have not happened.
+- **Source:** pushed to GitHub `origin/main` 2026-10-17 (tip then `54075f02`; CI green on all four jobs, [run 39046559682](https://github.com/pedram-kh/Engine/actions/runs/39046559682)). **A push is not a deploy:** the colleague mirrors GitHub → Bitbucket and deploys from there (API and both SPAs); the mirror and deploy have not happened. **Second push 2026-10-19:** `54075f02..222b0d39` (AH-107 and AH-108, 19 commits); CI [run 39185216676](https://github.com/pedram-kh/Engine/actions/runs/39185216676) was still running when this entry was written, so its result is **not recorded here**; read it before the deploy.
 - **Operator:** not yet.
-- **Anything unexpected:** nothing yet. **Retired 2026-10-18:** the earlier known gap (the AH-106 chip's Playwright leg had not been run) is closed: CI on the pushed AH-106 tip was green on all four jobs, including that leg ([run 39046559682](https://github.com/pedram-kh/Engine/actions/runs/39046559682)). Known gaps carried: no device walk for AH-106 or AH-107; AH-107's `mt`/`ro` creator-visible status strings are unreviewed MT (see tech debt).
+- **Anything unexpected:** nothing yet. **Retired 2026-10-18:** the earlier known gap (the AH-106 chip's Playwright leg had not been run) is closed: CI on the pushed AH-106 tip was green on all four jobs, including that leg ([run 39046559682](https://github.com/pedram-kh/Engine/actions/runs/39046559682)). Known gaps carried: no device walk for AH-106 or AH-107; AH-107's `mt`/`ro` creator-visible status strings are unreviewed MT (see tech debt). Known gaps carried from AH-108: the production-APNs proof (TestFlight build 3, walk items 1–5 again) and the Android check were not run; one unexplained black screen on a first Xcode Run (not reproduced); the new creator aria strings are unreviewed MT. Tech-debt rows are in the AH-108 section of `tech-debt.md`.
 
 ---
 

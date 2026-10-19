@@ -3199,3 +3199,35 @@ It is allowlisted in `tests/unit/architecture/use-theme-is-sot.spec.ts` (the tes
      addendum"), deliberately **not** a new row.
 - **Owner:** creator app (1, 2); i18n (3).
 - **Status:** open (by design). Surfaced at AH-107 Checkpoint A, 2026-10-18.
+
+## AH-108 (unread indicators and the iPhone icon badge) — standing items opened by the build
+
+- **Where:** [`docs/reviews/unread-indicators-plan.md`](reviews/unread-indicators-plan.md) and the walk
+  [`unread-indicators-device-walk.md`](reviews/unread-indicators-device-walk.md); ad-hoc entry AH-108 in
+  [`reviews/adhoc-changes-log.md`](reviews/adhoc-changes-log.md).
+- **What we accepted (2026-10-19):**
+  1. **A push sent while `in_app` is muted is not in the badge total (Q3).** The badge is the count of unread `notifications` rows, and a user
+     who turned the `in_app` channel off for messages gets the push but no row, so that message is missing from the number on the icon
+     (and from the bell and the tab, which already worked this way). **Pinned:** a `PushDispatcherTest` case documents the gap, so closing it
+     is a conscious change. **Resolution:** count message threads with unread messages instead of notification rows for the icon, or write
+     a muted-channel row flagged as hidden; decide with the notification preference matrix in mind. **Owner:** notifications / push.
+  2. **The icon badge is stale until the app opens or returns to the foreground (Q6).** Two causes, both by design. (a) The server sends one
+     push per thread per 60 seconds (`PushDispatcher::THROTTLE_SECONDS`), so a burst in one thread moves the icon once, not per message.
+     (b) The app declares empty presentation options, so a push that lands while the app is in the foreground does not set the badge; the
+     in-app refresh moves the bell and the icon follows. The icon snaps to the bell total on every return to the foreground (a forced write).
+     **How far behind it gets in a burst was not recorded in the device walk.** **Resolution:** if testers report a wrong number, shorten or
+     remove the throttle for badge-bearing pushes, or add a silent badge-only push (needs the `remote-notification` background mode, which
+     `Info.plist` does not declare today). **Owner:** push / mobile.
+  3. **There is no Android launcher badge (Q6).** The FCM payload carries no `notification_count`, the plugin's Android side is a no-op, and
+     launcher badges are OEM-dependent. Android shows the in-app bell and Messages tab only. The walk's Android item A was not run.
+     **Resolution:** a one-line `notification_count` in `FcmPushSender::payload` plus the notification channel's badge setting, after
+     deciding which launchers to support. **Owner:** mobile.
+  4. **The agency nav has no Messages unread badge (Q2 follow-up).** The badge was built for the **creator** layout only; the agency layout
+     provides no shared poll and its bell keeps its own. An agency admin sees unread messages only through the bell and the inbox.
+     **Resolution:** provide the shared poll in `AgencyLayout` and add the same `NavBadgeIcon` to its Messages item (the `message_unread_count`
+     field is already on the API for agency users; the plumbing is the cost). **Owner:** agency SPA.
+- **Also open from this chunk (not rows of their own):** the production-APNs proof for the icon (TestFlight build 3, walk items 1–5 again); the new
+  `creator.ui.messagesUnreadAria` strings are fresh MT and not native-reviewed (`mt` and `ga` least certain), to be swept with the existing
+  unreviewed-MT row.
+- **Owner:** notifications / push (1, 2); mobile (2, 3); agency SPA (4).
+- **Status:** open (by design). Surfaced at AH-108 Checkpoints A and B, 2026-10-18 and 2026-10-19.

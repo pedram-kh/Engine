@@ -70,6 +70,87 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-108 · Pre-tester UI batch, item 4: unread indicators, in-app and on the iPhone icon (Creator App arc)
+
+- **Status:** Landed. Plan: [`unread-indicators-plan.md`](unread-indicators-plan.md). Device walk: [`unread-indicators-device-walk.md`](unread-indicators-device-walk.md)
+  (**PASSED 1–7 on 2026-10-19** from the Xcode install; reported by Pedram). Rides one production deploy and TestFlight build 3 with
+  AH-106 and AH-107 (Q9); neither has happened.
+- **Date:** 2026-10-18 to 2026-10-19.
+- **Why:** TestFlight feedback: a creator had no sign of unread messages except the bell, and nothing on the home-screen icon. The root
+  cause was upstream of the badge: opening a thread never touched its notifications, so message notifications stayed unread forever and
+  any count built on them would only ever grow.
+- **What:**
+  - **Stage 1, backend (4a):** opening a thread (campaign chat and relationship chat, creator and agency sides) marks that viewer's
+    unread message-type notifications for that thread read, in `MessageService::markThreadReadForUser` and `RelationshipMessageService`
+    (D1: inside the two services so no controller can forge or skip it; the write comes before the "nothing unread" early return, keyed by
+    recipient + subject + type, never by JSON `data`). `GET /api/v1/me/notifications/unread-count` gains `message_unread_count` from one
+    aggregate. `NotificationType::messageTypes()` is the single source of what a message type is. One-shot backlog command
+    `notifications:clear-read-message-notifications --dry-run` (Q1) for the pre-existing rows.
+  - **Stage 2, in-app badges (4a):** Messages tab badge (bottom bar and web nav, **creator layout only**, Q2) from the same poll as the
+    bell, shared by provide/inject (Q5: one 45 s request, not a store); `formatBadgeCount` caps both in-app badges at **99+** (the
+    accessible name keeps the real count); `requestNotificationsRefresh()` after `/read` resolves so the badge clears at once;
+    `creator.ui.messagesUnreadAria` in 24 locales (single-form key approved at Checkpoint A).
+  - **Stage 3, push badge (4b):** `PushMessage.badge ?int` (vendor-neutral); `PushMessageFactory` sets it to the recipient's total unread
+    after the in-app row exists (one COUNT); `FcmPushSender` writes `aps.badge` only when set (a real 0 clears the icon; null omits);
+    **no Android `notification_count`** (Q6). `isset()`, not `!== null`, so a message queued by the previous release (no `badge`
+    property) still sends.
+  - **Stage 4, native (4b):** in-repo `CatalystBadge` iOS plugin (`set({count})`, iOS 16+ `setBadgeCount`, older iOS the legacy call)
+    registered by a `MainViewController` subclass; `iconBadge.ts` (iOS-only gate before the plugin, never throws), `useIconBadge`
+    (written from the **bell total**, uncapped; on change and forced on every return to the foreground; nothing written before the first
+    load), `clearIconBadge()` from `clearUser()` on every end of a session; `CURRENT_PROJECT_VERSION` 2 to 3.
+  - **Model:** `notifications.read_at` is the single source of truth. Bell = all unread; Messages tab = message-type unread; **icon =
+    the bell total.**
+- **Touched:** `apps/api` `MessageService`, `RelationshipMessageService`, the unread-count controller, `Notification` model
+  (`unreadCountFor`), `NotificationType::messageTypes()`, `PushMessage`, `PushMessageFactory`, `FcmPushSender`, the backlog console
+  command (+ Pest); `packages/api-client` `types/notification.ts`; `apps/main` `modules/notifications` (poll, `formatBadgeCount`, provide/inject
+  context, `NotificationBell`), `modules/creators` (`NavBadgeIcon`, `CreatorDashboardLayout`), `modules/messaging` (`useMessageThread`),
+  `core/platform/badge/*`, `useAuthStore`, 24 `locales/*/creator.json`, specs and `playwright/specs/creator-messages-badge.spec.ts`;
+  `apps/main/ios` (`CatalystBadge` plugin, `MainViewController`, `project.pbxproj`).
+- **Decisions:** Q1 backlog = one-shot artisan command with `--dry-run`, **the production dry-run count is reported to Pedram before the real
+  run**, both counts in the deploy log, a named step right after `queue:restart`. Q2 creator layout only (agency nav Messages badge is a
+  follow-up row). Q3 the in_app-muted gap accepted (row). Q4 write in both service methods. Q5 provide/inject. Q6 no Android
+  `notification_count`, stale-until-open accepted (row). Q7 small in-repo plugin, no `@capawesome`. Q9 4a + 4b, with the cut line (4a ships
+  alone if 4b fails the walk); **4b passed the walk, so nothing was cut.**
+- **Verification:**
+  - **Break-reverted** at each stage, each mutation confirmed applied and the right spec watched failing, then restored clean. Stage 3: 10
+    of 10 caught (off-by-one count, read rows counted, recipient predicate, unsaved recipient 0 vs null, sender omits `aps.badge`, null
+    sends 0, `isset` to `!== null` caught by the legacy-queue spec, 0 treated as none, Android `notification_count`, badge in the data
+    bag). Stage 4: 11 of 11 caught (gate removed on set and on clear, 99 cap on the icon, no clear on sign-out, clear not suspending late
+    writes, no force on resume, write before first load, shell not wired, message count instead of total, `hasLoaded` true on failure,
+    `enable()` missing). The Stage 1 and 2 counts were reported at their checkpoints and are not restated here.
+  - **Gates at the final state:** `apps/main` Vitest 247 files / 2817 passed, vue-tsc, ESLint, Prettier clean; Pint and PHPStan clean
+    (`vendor/bin/phpstan analyse --no-progress --memory-limit=1G`, no path argument, so `tests/` is included); notification, console and
+    messaging Pest specs pass.
+  - **Full local Playwright at the final state:** `apps/main` 37 passed, 1 failed (`brands.spec.ts:108`, a 30 s timeout on a loading
+    skeleton), **pre-existing locally**: the same test fails 2 of 3 on a clean checkout of `origin/main` `54075f02` (25 to 34 s against a 30 s
+    cap on this machine). `apps/admin` 2 passed. Includes the new `creator-messages-badge.spec.ts`.
+  - **Simulator:** the bridge round trip (`{"applied":true,"count":7}`) and a clean build of the final state (`CFBundleVersion` 3, plugin
+    present).
+  - **Device (2026-10-19):** the seven-item walk passed from the Xcode install on an iPhone 16 Pro (build 3, sandbox APNs, local API).
+    Reported by Pedram; the assistant set up the stack and read the launch console but did not observe the screen.
+  - **Corrected claim:** the Stage 1 close said PHPStan was clean; it had only been run on `app/`, and the Stage 1 spec files carried 14 errors
+    CI would have flagged. Fixed (`16f06b54`).
+- **PROD-DATA RISK: LOW.** No migration, no schema change, no new route, no flag. The one write path is the backlog command, which
+  **marks existing message notifications read** (`read_at` set); it is not reversible from the data alone, hence the dry-run first and the
+  count reported before the real run. The two service changes write `read_at` on the opener's own rows only.
+- **Deploy obligations:** (1) **`php artisan queue:restart`** (named step; `PushMessageFactory` and `FcmPushSender` changed, and a worker
+  holding the old classes sends pushes with no badge). (2) **Right after it, the backlog command: `--dry-run` first, report the count to
+  Pedram, then the real run;** both counts in the deploy log. (3) API deploy for `message_unread_count`; web build for the badges; native
+  needs TestFlight build 3 for the plugin (build 2 testers get the in-app badges but no icon badge from the app; their pushes still carry
+  `aps.badge`, which iOS applies itself). Either deploy order degrades gracefully (old API: the tab reads 0; old app: the new field is
+  ignored). No env change, no cron, no flag.
+- **Not verified:** the **production-APNs leg** (TestFlight build 3, items 1–5 again, after AH-105); **Android** (item A, no badge by design,
+  not run); the walk's "write down what you see" observations (icon lag in a burst, foreground behaviour) were not sent back. The new
+  `creator.ui.messagesUnreadAria` strings are fresh MT, **not native-reviewed** (`mt` and `ga` least certain).
+- **Found while walking, not fixed:** one black screen on the first Run from Xcode, not reproduced, cause not found (the console launch of
+  the same build loaded and reached the API). The launch console's `UIBackgroundModes` / `remote-notification` warning is pre-existing and
+  affects silent pushes only.
+- **Tech-debt rows opened:** "in_app-muted push is not in the badge total"; "icon badge is stale until the app opens (throttle and
+  foreground)"; "no Android launcher badge"; "agency nav Messages badge" (follow-up of Q2). See `tech-debt.md`, "AH-108".
+- **Ref:** `59c52ede` (plugin spike), `65df6b6e` (thread clearing + `message_unread_count`), `9f47184f` (backlog command), `715a1f72` (locales),
+  `3f73c8e7` (SPA badges), `16f06b54` (spec typing), `4dad01b5` (push badge), `031b2e1b` (icon wiring), `0cc86e9a` (build 3), `286c020d`
+  (walk plan). Pushed with AH-107 as `54075f02..222b0d39` on 2026-10-19; a push is not a deploy.
+
 ### AH-107 · Pre-tester UI batch, item 3: campaign status on the creator side (Creator App arc)
 
 - **Status:** Landed locally. **Not pushed, not deployed** (rides one production deploy and TestFlight build 3 with AH-106 and AH-108,
