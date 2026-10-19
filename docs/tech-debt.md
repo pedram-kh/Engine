@@ -3231,3 +3231,35 @@ It is allowlisted in `tests/unit/architecture/use-theme-is-sot.spec.ts` (the tes
   unreviewed-MT row.
 - **Owner:** notifications / push (1, 2); mobile (2, 3); agency SPA (4).
 - **Status:** open (by design). Surfaced at AH-108 Checkpoints A and B, 2026-10-18 and 2026-10-19.
+
+## AH-103b (universal links) — standing item opened by the plan
+
+- **Where:** [`reviews/universal-links-inventory.md`](reviews/universal-links-inventory.md) and
+  [`reviews/universal-links-plan.md`](reviews/universal-links-plan.md).
+- **What we accepted (2026-10-19, ruling R3):**
+  1. **Android App Links are not verified, and no `assetlinks.json` is published.** iOS ships first. The Android handler and the
+     `autoVerify` manifest filter are built, but verification needs the SHA-256 of a real signing certificate, and none exists:
+     `android/app/build.gradle` has no `signingConfigs`, and the only Android build seen so far was a release APK re-signed with a
+     local debug key. Until then an Android tap on a creator link opens the browser (the filter stays unverified) and the app is
+     only an "open by default" option. **Pinned:** a spec fails if `apps/main/public/.well-known/assetlinks.json` appears, so
+     publishing it is a conscious change; the post-deploy check C5 confirms the file is still the SPA fallback on the live host.
+     **Resolution:** a release signing configuration or Play App Signing enrolment (which needs the app in the Play Console), then
+     publish the real fingerprint (Google's app-signing certificate if Play App Signing is used; **never** a per-machine debug
+     fingerprint in production), then a device walk of the Android half. **Owner:** mobile / Pedram (Play Console).
+- **Status:** open (by design). Opened with the AH-103b plan, 2026-10-19.
+
+## Job-posted email footer reads "on the :agency roster" (bug, logged 2026-10-19, not fixed)
+
+- **What:** the footer of the job-posted email (the fan-out mail to a creator when an agency lists a job) shows the literal
+  placeholder: "You are receiving this because you are on the **:agency** roster." The subject and the body are correct.
+- **Cause (read, not run):** `apps/api/resources/views/mail/campaigns/job-posted.blade.php:10` calls
+  `trans('campaigns.job_posted.ignore')` **without** the replacement array, while the body line above it passes
+  `['agency' => $agencyName, …]`. `$agencyName` is already in the view data (`JobPostedMail::content()`), so the fix is one argument:
+  `trans('campaigns.job_posted.ignore', ['agency' => $agencyName])`. It affects **all 24 locales**: every `lang/*/campaigns.php`
+  `job_posted.ignore` string carries `:agency`.
+- **Scope check:** a scan of every single-argument `trans('…')` in `resources/views/**/*.blade.php` against `lang/en` found **no other**
+  string with an unfilled placeholder; this is the only one (PHP-side `trans()` calls were not scanned).
+- **Why the tests missed it:** `JobPostedMailTest` asserts the subject (per locale) and the body, not the footer.
+- **Resolution:** the one-argument fix plus a spec that renders the mail in a few locales and asserts the rendered HTML contains the
+  agency name and no `:agency`. No migration, no i18n key change, no new string. **PROD-DATA RISK: NONE.** Mode B once Pedram asks for it.
+- **Owner:** campaigns / notifications. **Status:** open. Tracked as AH-109 (proposed) in the ad-hoc log's Live Status.

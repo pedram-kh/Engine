@@ -59,9 +59,11 @@ reviews, and conversations.
 
 ## Live Status (open + in-flight)
 
-| ID  | Title                                    | Status  | Notes                                                                |
-| --- | ---------------------------------------- | ------- | -------------------------------------------------------------------- |
-| —   | Campaign Drafts tab — independent review | Pending | Merged in code; review file reads "pending independent review pass." |
+| ID      | Title                                    | Status   | Notes                                                                                     |
+| ------- | ---------------------------------------- | -------- | ----------------------------------------------------------------------------------------- |
+| —       | Campaign Drafts tab — independent review | Pending  | Merged in code; review file reads "pending independent review pass."                      |
+| AH-109  | Job-posted email footer shows ":agency"  | Proposed | Bug logged 2026-10-19; one-argument fix in `job-posted.blade.php:10`; see `tech-debt.md`. |
+| AH-103b | Universal links (iOS first)              | Plan     | [`universal-links-plan.md`](universal-links-plan.md); awaiting review.                    |
 
 > Pointer, not an ad-hoc item: **Sprint 10 (Payments/Escrow)** remains the deepest pending
 > roadmap dependency, Stripe-gated. Tracked in `tech-debt.md`, not here.
