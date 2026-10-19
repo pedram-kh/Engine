@@ -39,7 +39,7 @@ happened.
 ### YYYY-MM-DD · <short description> — STATUS
 
 - **Status:** PENDING | DEPLOYED | FAILED / ROLLED BACK
-- **Range:** `47d2efc5` (AH-103's last runtime commit, the deployed runtime tip; the commits between it and `8aa11376` are docs, `.env.example` and the iOS camera strings / build 2) → **`222b0d39`** (the pushed tip as of 2026-10-19; the range extends to whatever tip is deployed, and AH-103b and AH-105 commits will land on top before the deploy).
+- **Range:** `47d2efc5` (AH-103's last runtime commit, the deployed runtime tip; the commits between it and `8aa11376` are docs, `.env.example` and the iOS camera strings / build 2) → **`222b0d39`** (the pushed tip before AH-103b; the range extends to whatever tip is deployed: AH-103b's last runtime commit is `82c8a2e7`, and AH-109 and AH-105 will land on top before the deploy).
 - **AH entries carried:** AH-NNN → AH-NNN (list them, or name the arc)
 - **Migrations run:** <count> — every name, or "none"
 - **Pre-deploy reads:** command + the number it returned, or "none"
@@ -54,19 +54,19 @@ happened.
 
 ---
 
-## AH-106 + AH-107 + AH-108 — pre-tester UI batch (shell back arrow, clipped Applied chip, campaign status on the creator side, unread indicators and icon badge) — PENDING
+## AH-106 + AH-107 + AH-108 + AH-103b — pre-tester UI batch (shell back arrow, clipped Applied chip, campaign status on the creator side, unread indicators and icon badge) and universal links — PENDING
 
-> **AH-106, AH-107 and AH-108 are all pushed (GitHub only); nothing here is deployed.** Opens a new entry because everything below it is
-> DEPLOYED. One production deploy and **one** TestFlight build 3 for all three (Q9 ruling). **Timing (Pedram, 2026-10-19): the deploy and
+> **AH-106, AH-107, AH-108 and AH-103b are all pushed (GitHub only); nothing here is deployed.** Opens a new entry because everything below it is
+> DEPLOYED. One production deploy and **one** TestFlight build 3 for all of them (Q9 ruling; AH-103b rides the same release, with its own web checks first). **Timing (Pedram, 2026-10-19): the deploy and
 > build 3 come after AH-105** (the privacy checklist), not before. AH-108 adds a named `queue:restart` and a one-shot backlog command.
 
-- **Status:** PENDING. AH-106 (`1c3c7aaf`, `e390581e`) was pushed 2026-10-17. AH-107 (`0801577e`, `b115639e`, `b1fd5e8b`, `77600807`, `480cfcd8`, `e557d358`) and AH-108 (`59c52ede`, `65df6b6e`, `9f47184f`, `715a1f72`, `3f73c8e7`, `16f06b54`, `4dad01b5`, `031b2e1b`, `0cc86e9a`, plus docs) were pushed 2026-10-19 as `54075f02..222b0d39` (19 commits). The AH-108 device walk passed 1–7 from the Xcode install (reported by Pedram); the production-APNs leg waits for build 3.
+- **Status:** PENDING. AH-106 (`1c3c7aaf`, `e390581e`) was pushed 2026-10-17. AH-107 (`0801577e`, `b115639e`, `b1fd5e8b`, `77600807`, `480cfcd8`, `e557d358`) and AH-108 (`59c52ede`, `65df6b6e`, `9f47184f`, `715a1f72`, `3f73c8e7`, `16f06b54`, `4dad01b5`, `031b2e1b`, `0cc86e9a`, plus docs) were pushed 2026-10-19 as `54075f02..222b0d39` (19 commits). The AH-108 device walk passed 1–7 from the Xcode install (reported by Pedram); the production-APNs leg waits for build 3. **AH-103b** (`6ee14c36` plan, `ec172d59`, `7db73f78`, `12ba5d78`, `3b1f7ebf`, `f6cfffd3`, `82c8a2e7`, plus docs) was pushed 2026-10-19 after Stage 3 clearance; its device walk W1–W10 has **not** run and needs the web deploy, C1–C7 and build 3.
 - **Range:** `47d2efc5` (AH-103's last runtime commit, the deployed runtime tip; the commits between it and `8aa11376` are docs, `.env.example` and the iOS camera strings / build 2) → AH-106 tip `e390581e`; AH-107 tip `480cfcd8` (local, not on GitHub; the range extends to whatever tip is pushed).
-- **AH entries carried:** AH-106, AH-107, AH-108
+- **AH entries carried:** AH-106, AH-107, AH-108, AH-103b
 - **Migrations run:** none.
 - **Pre-deploy reads:** none.
 - **Snapshot ID:** not required by this entry (no schema, no data write). The open snapshot question under AH-103 is unchanged.
-- **Infra:** **`php artisan queue:restart` is REQUIRED (AH-108, named step):** `PushMessageFactory` and `FcmPushSender` changed, and a worker holding the old classes keeps sending pushes with no `aps.badge`. A message queued by the previous release still sends safely (pinned by a spec). **API deploy:** AH-107 adds a read-only `campaign_status` / `campaign.status` field on four creator endpoints; AH-108 adds `message_unread_count` on `GET /api/v1/me/notifications/unread-count`. No migration, no env change, no cron, no flag. Either deploy order is safe (an older backend sends no status and no message count; the SPA renders no chip and the tab reads 0; an older app ignores the new fields).
+- **Infra:** **`php artisan queue:restart` is REQUIRED (AH-108, named step):** `PushMessageFactory` and `FcmPushSender` changed, and a worker holding the old classes keeps sending pushes with no `aps.badge`. A message queued by the previous release still sends safely (pinned by a spec). **API deploy:** AH-107 adds a read-only `campaign_status` / `campaign.status` field on four creator endpoints; AH-108 adds `message_unread_count` on `GET /api/v1/me/notifications/unread-count`. No migration, no env change, no cron, no flag. Either deploy order is safe (an older backend sends no status and no message count; the SPA renders no chip and the tab reads 0; an older app ignores the new fields). **AH-103b (web build only, no API change):** the build now publishes `/.well-known/apple-app-site-association` and a one-path `_headers`; both are in `dist/` after `vite build` (verified). **Nothing is configured in the Netlify dashboard unless C1 or C2 fails** (a dashboard rule shadowing the file is the one thing the repo cannot rule out). The SPA fallback is a dashboard rule, not in the repo. **TestFlight build 3 must wait for C1–C7** (below), and must be archived with Associated Domains in its distribution profile (read the archive's entitlements for `applinks:platform.catalyst-growth.com` before uploading). Build 2 testers are unaffected: a creator link keeps opening Safari for them.
 - **One-shot commands:** **AH-108 backlog command, run right after `queue:restart`:** `php artisan notifications:clear-read-message-notifications`.
   Every message notification that exists in production today is unread unless the user clicked it, because opening a thread never touched it
   before this release; without this the first badge a creator sees would be a large false number. **Order: `--dry-run` first, then REPORT THE
@@ -75,17 +75,63 @@ happened.
   - **Reported to Pedram:** yes / no · his go-ahead: **\_\_**
   - **Real-run count:** **\_\_** (rows marked read) · matches the dry-run? yes / no · run by: **\_\_** · when: **\_\_**
 - **Post-deploy verification:** web: open the notifications page from the bell and confirm the back arrow returns; apply to a job with a long title at phone width and confirm the Applied chip shows its full label. **AH-107:** on the invitations list at phone width, confirm every card shows a campaign chip (Upcoming / Active / Paused / Completed / Cancelled) and that a long-title card's "Contracted" chip is not cut; pause a test campaign from its Settings tab and confirm the creator's assignment detail shows "Paused" and the banner with the draft form still usable; confirm a paused job shows the Paused chip on the job board. Native: the same checks on build 3. **AH-108:** after `queue:restart` and the backlog command, sign in as a creator with old message notifications and confirm the bell and the Messages tab no longer show the old backlog (a small honest number, or nothing); have the agency send one message in a campaign thread and one in the relationship thread and confirm bell and tab read 2 and, on build 3, the icon reads 2; open one thread and confirm the tab and bell drop by one and the icon follows; confirm a push sent after deploy shows the badge (`push_deliveries` row, in-app row Read after opening). On build 2 devices expect in-app badges only.
-- **AH-103b web-deploy checks (PLANNED, not built; plan only, see [`universal-links-plan.md`](../reviews/universal-links-plan.md) §6 for the exact commands):**
-  if AH-103b lands before this deploy, the web build also carries `/.well-known/apple-app-site-association` and a one-path `_headers`
-  rule, and **TestFlight build 3 must wait for these checks.** Run from any machine against `https://platform.catalyst-growth.com`;
-  record each result here. **C1** the file answers `200` with JSON, not the SPA's HTML (result: **\_\_**). **C2** its `content-type` is
-  `application/json` (**\_\_**). **C3** no redirect on it: `200`, `num_redirects=0` (**\_\_**). **C4** `jq` finds appID
-  `LTW9262ZXP.com.catalystgrowth.platform` and the single component `/creator/*` (**\_\_**). **C5** `/.well-known/assetlinks.json` is **still**
-  `200 text/html`, i.e. not published (**\_\_**). **C6** `/`, `/sign-in` and a `/creator/jobs/<ulid>` still answer `200 text/html` (**\_\_**).
-  **C7** Apple's CDN copy matches (**\_\_**, when: **\_\_**). **If C1 or C2 fails, do not release build 3:** a Netlify dashboard rule is
-  shadowing the file or `_headers` is not published; report back. **If C5 fails, stop.**
+- **AH-103b web-deploy checks C1–C7 (BUILT; the colleague runs them during the deploy and sends the output to Pedram, who forwards it so the result is recorded here).**
+  Run from any machine against the live host, no login needed. Before this deploy both `.well-known` URLs answer `200 text/html` (the
+  SPA's fallback, 532 bytes), so a failing C1 is the expected "before" state. Source: [`universal-links-plan.md`](../reviews/universal-links-plan.md) §6.
+
+  ```bash
+  H=https://platform.catalyst-growth.com
+  A=$H/.well-known/apple-app-site-association
+
+  # C1 — the static file wins over the SPA fallback (HTTP 200, JSON, NOT index.html)
+  curl -sS -D - -o /tmp/aasa.json "$A" | head -12      # expect: HTTP/2 200, no `location:` header
+  head -c 1 /tmp/aasa.json                             # expect: {   (a `<` means the fallback answered: FAIL)
+  jq . /tmp/aasa.json >/dev/null && echo "C1 valid JSON"
+
+  # C2 — _headers is honoured (content type on that one path)
+  curl -sS -o /dev/null -w '%{content_type}\n' "$A"     # expect: application/json
+
+  # C3 — no redirect on the file (Apple does not follow redirects for it)
+  curl -sS -o /dev/null -w '%{http_code} redirects=%{num_redirects} url_effective=%{url_effective}\n' "$A"
+  #   expect: 200 redirects=0 url_effective=<the same URL>
+
+  # C4 — the content is exactly what the app expects
+  jq -e '.applinks.details[0].appIDs[0]=="LTW9262ZXP.com.catalystgrowth.platform"
+         and .applinks.details[0].components[0]["/"]=="/creator/*"
+         and (.applinks.details|length)==1' /tmp/aasa.json          # expect: true
+
+  # C5 — assetlinks.json is still NOT published (R3): the SPA fallback must still answer it
+  curl -sS -o /dev/null -w '%{http_code} %{content_type}\n' "$H/.well-known/assetlinks.json"
+  #   expect: 200 text/html   (application/json here means a placeholder was published: STOP)
+
+  # C6 — the headers rule did not leak, and the site still works
+  curl -sS -o /dev/null -w '%{http_code} %{content_type}\n' "$H/"          # expect: 200 text/html
+  curl -sS -o /dev/null -w '%{http_code} %{content_type}\n' "$H/sign-in"   # expect: 200 text/html
+  curl -sS -o /dev/null -w '%{http_code} %{content_type}\n' "$H/creator/jobs/01ZZZZZZZZZZZZZZZZZZZZZZZZ"   # expect: 200 text/html
+
+  # C7 — Apple's CDN view of the file (URL form and lag unverified)
+  curl -sS "https://app-site-association.cdn-apple.com/a/v1/platform.catalyst-growth.com" | jq -c .
+  #   expect: the same JSON as C4. It can lag the origin; record when it matches.
+  ```
+
+  **Results (blank until the colleague's output is forwarded):**
+  - **C1** `200`, JSON, not HTML: **\_\_** · **C2** `application/json`: **\_\_** · **C3** `200 redirects=0`: **\_\_** · **C4** `true`: **\_\_**
+  - **C5** `200 text/html` (still not published): **\_\_** · **C6** three `200 text/html`: **\_\_** · **C7** Apple's copy matches: **\_\_** (when: **\_\_**)
+  - Run by: **\_\_** · when: **\_\_** · forwarded by Pedram: **\_\_**
+
+  **If C1 or C2 fails** (HTML or the wrong type): a Netlify dashboard rule is shadowing the file, or `_headers` is not published. **Do not
+  release build 3**; report back. The fix is in the dashboard (exempt the path from the fallback rule, or set the header there), not in
+  the repo. **If C3 fails** (a 3xx): same, and say which hop (a domain-level redirect would also break the file). **If C5 fails: stop**, a
+  placeholder `assetlinks.json` was published, which the ruling forbids. **Gate for build 3:** C1–C6 pass and C7 matches. A tester who
+  installs build 3 before the file is live has no links until they update or reinstall. Order: **web deploy, then C1–C7, then build 3.**
+
+- **AH-103b device walk (after build 3 from TestFlight):** W1–W10 on a real iPhone, in [`universal-links-plan.md`](../reviews/universal-links-plan.md) §7: a
+  creator link opens the app (backgrounded and killed), a signed-out tap returns after sign-in, `/auth/*` and agency links stay in Safari,
+  `/creator/nonsense` opens the dashboard, a real emailed link from the Mail app, a regression check on push taps and the icon badge.
+  **Not run.** Android: an explicit-intent check only (it proves the handler, not verification; `pm get-app-links` is expected to show the
+  domain unverified). Result: **\_\_**
 - **Flags armed:** none.
-- **Source:** pushed to GitHub `origin/main` 2026-10-17 (tip then `54075f02`; CI green on all four jobs, [run 39046559682](https://github.com/pedram-kh/Engine/actions/runs/39046559682)). **A push is not a deploy:** the colleague mirrors GitHub → Bitbucket and deploys from there (API and both SPAs); the mirror and deploy have not happened. **Second push 2026-10-19:** `54075f02..222b0d39` (AH-107 and AH-108, 19 commits), then the docs close-out `fe39bc82`. CI on the push of `222b0d39` ([run 39185216676](https://github.com/pedram-kh/Engine/actions/runs/39185216676)) was **cancelled** by the next push (its frontend and backend jobs had passed; its E2E jobs never finished). **CI on the tip `fe39bc82` is green on all four jobs** ([run 39185656319](https://github.com/pedram-kh/Engine/actions/runs/39185656319)), and that tip contains everything in this entry.
+- **Source:** pushed to GitHub `origin/main` 2026-10-17 (tip then `54075f02`; CI green on all four jobs, [run 39046559682](https://github.com/pedram-kh/Engine/actions/runs/39046559682)). **A push is not a deploy:** the colleague mirrors GitHub → Bitbucket and deploys from there (API and both SPAs); the mirror and deploy have not happened. **Second push 2026-10-19:** `54075f02..222b0d39` (AH-107 and AH-108, 19 commits), then the docs close-out `fe39bc82`. CI on the push of `222b0d39` ([run 39185216676](https://github.com/pedram-kh/Engine/actions/runs/39185216676)) was **cancelled** by the next push (its frontend and backend jobs had passed; its E2E jobs never finished). **CI on the tip `fe39bc82` is green on all four jobs** ([run 39185656319](https://github.com/pedram-kh/Engine/actions/runs/39185656319)); that tip contains AH-106, AH-107 and AH-108. **AH-103b** was pushed on top of it on 2026-10-19 (after `6ee14c36`, which carried its plan); the pushed tip and its CI run are recorded below once read.
 - **Operator:** not yet.
 - **Anything unexpected:** nothing yet. **Retired 2026-10-18:** the earlier known gap (the AH-106 chip's Playwright leg had not been run) is closed: CI on the pushed AH-106 tip was green on all four jobs, including that leg ([run 39046559682](https://github.com/pedram-kh/Engine/actions/runs/39046559682)). Known gaps carried: no device walk for AH-106 or AH-107; AH-107's `mt`/`ro` creator-visible status strings are unreviewed MT (see tech debt). Known gaps carried from AH-108: the production-APNs proof (TestFlight build 3, walk items 1–5 again) and the Android check were not run; one unexplained black screen on a first Xcode Run (not reproduced); the new creator aria strings are unreviewed MT. Tech-debt rows are in the AH-108 section of `tech-debt.md`.
 

@@ -3246,7 +3246,21 @@ It is allowlisted in `tests/unit/architecture/use-theme-is-sot.spec.ts` (the tes
      **Resolution:** a release signing configuration or Play App Signing enrolment (which needs the app in the Play Console), then
      publish the real fingerprint (Google's app-signing certificate if Play App Signing is used; **never** a per-machine debug
      fingerprint in production), then a device walk of the Android half. **Owner:** mobile / Pedram (Play Console).
-- **Status:** open (by design). Opened with the AH-103b plan, 2026-10-19.
+  2. **A creator with an unverified email who follows a link (edge, recorded, not changed).** A signed-out tap goes to
+     `/sign-in?redirect=<fullPath>`, and `SignInPage.postLoginTarget` honours `redirect` **before** its unverified-email branch, so an
+     unverified creator is sent to the link's screen and the destination's guard chain may then turn them away. Unverified creators
+     have no assignments or jobs to be linked to, so the practical exposure is small. **Resolution:** if it ever shows up, check the
+     verification state before honouring `redirect`; not worth a change without a report. **Owner:** auth / creator SPA.
+  3. **The link allow-list must follow the creator route table.** `parseAppLink` accepts only `/creator/` plus segments of
+     `[A-Za-z0-9_-]` and the one query key `focus=messages`. A future creator route with another character in a path segment, or a creator
+     route that reads another query key, will silently fall back to the dashboard from a link. **Pinned:** the route-table parity spec
+     resolves every emailed creator CTA and every `creator.*` route against the real router, so a new route that the allow-list
+     rejects fails a spec rather than a device. **Resolution:** widen the allow-list (and add a hostile-path case) in the same change as
+     the route. **Owner:** creator SPA.
+- **Also open from this chunk (not rows of their own):** the device walk W1–W10 (needs the web deploy, C1–C7 and TestFlight build 3);
+  the Apple association and the distribution profile, unprovable until then; links from other apps' in-app browsers (observation only);
+  the C1–C7 results, to be recorded in the deploy log when the colleague's output is forwarded.
+- **Status:** open (by design). Opened with the AH-103b plan, 2026-10-19; rows 2 and 3 added at the close.
 
 ## Job-posted email footer reads "on the :agency roster" (bug, logged 2026-10-19, not fixed)
 

@@ -63,7 +63,7 @@ reviews, and conversations.
 | ------- | ---------------------------------------- | -------- | ----------------------------------------------------------------------------------------- |
 | —       | Campaign Drafts tab — independent review | Pending  | Merged in code; review file reads "pending independent review pass."                      |
 | AH-109  | Job-posted email footer shows ":agency"  | Proposed | Bug logged 2026-10-19; one-argument fix in `job-posted.blade.php:10`; see `tech-debt.md`. |
-| AH-103b | Universal links (iOS first)              | Plan     | [`universal-links-plan.md`](universal-links-plan.md); awaiting review.                    |
+| AH-103b | Universal links (iOS first)              | Landed   | Pushed, not deployed. Device walk W1–W10 waits for the web deploy, C1–C7 and build 3.     |
 
 > Pointer, not an ad-hoc item: **Sprint 10 (Payments/Escrow)** remains the deepest pending
 > roadmap dependency, Stripe-gated. Tracked in `tech-debt.md`, not here.
@@ -71,6 +71,80 @@ reviews, and conversations.
 ---
 
 ## Change Log (newest first)
+
+### AH-103b · Universal links: a tap on a creator link opens the app (iOS first; the Android handler built, not verified) (Creator App arc)
+
+- **Status:** Landed and pushed 2026-10-19 (after Stage 3 clearance). **Not deployed; the device walk has not been run.** Inventory:
+  [`universal-links-inventory.md`](universal-links-inventory.md). Plan: [`universal-links-plan.md`](universal-links-plan.md). It needs the web
+  deploy (the AASA file and `_headers`), the colleague's checks C1–C7, and TestFlight build 3 installed from TestFlight before W1–W10 can run
+  (all in the `deploy-log.md` entry).
+- **Date:** 2026-10-19.
+- **Why:** the emails the platform sends carry `https://platform.catalyst-growth.com/creator/jobs/<ulid>` and similar. On a phone with the
+  app installed those opened Safari. AH-103 made a push tap land on the right screen; a link tapped anywhere else had no such path.
+- **What:**
+  - **Link policy (pure), `core/platform/links/appLink.ts`:** `parseAppLink` never throws and has three outcomes through
+    `resolveAppLink`. **`route`:** a real `creator.*` screen, push its `fullPath`. **`dashboard`:** in scope but unusable (an unknown
+    route, or a path the allow-list rejects), push the fixed route name `creator.dashboard`; the raw path is never given to the router.
+    **`ignore`:** out of scope, which means not HTTPS, another host or a look-alike, credentials, a port, or a path that is not under
+    `/creator/` after URL normalisation (so `/creator/../auth/x` and `/creator/%2e%2e/auth/x` are ignored). The path allow-list is
+    `^/creator/[A-Za-z0-9_-]+(/[A-Za-z0-9_-]+)*/?$` (max 256 characters; URL max 2048); the only query key kept is `focus=messages`.
+  - **Handler, `appLinkRouting.ts`** (same shape as the push-tap handler): waits for `router.isReady()`, never throws, a newer link
+    supersedes an older one still waiting, a failed screen push falls back to the dashboard, and an identical URL within 3 s is dropped
+    (`appUrlOpen` and `getLaunchUrl()` can deliver one cold-start link twice).
+  - **Wiring, `startAppLinks.ts` and one line in `main.ts`:** native only (a no-op on the web); `App.addListener('appUrlOpen')` plus a read
+    of `App.getLaunchUrl()` after subscribing; subscribe and launch errors and handler throws are swallowed.
+  - **Native and static files:** iOS entitlement `com.apple.developer.associated-domains = applinks:platform.catalyst-growth.com`
+    (no `?mode=developer`); Android `autoVerify` intent filter on `MainActivity` (https, the host, `pathPrefix="/creator/"`);
+    `public/.well-known/apple-app-site-association` (appID `LTW9262ZXP.com.catalystgrowth.platform`, one component `/creator/*`);
+    `public/_headers` with one rule (`Content-Type: application/json` for that one path). **No `assetlinks.json`** (R3).
+  - **Signed out needs no new code:** `requireAuth` sends the user to `/sign-in?redirect=<fullPath>` and sign-in honours it (R5). A spec
+    drives the real router guard to pin it.
+- **Touched:** `apps/main/src/core/platform/links/*` (3 sources and 4 specs), `apps/main/src/main.ts`,
+  `apps/main/ios/App/App/App.entitlements`, `apps/main/android/app/src/main/AndroidManifest.xml`,
+  `apps/main/public/.well-known/apple-app-site-association`, `apps/main/public/_headers`, the repo `.gitignore`. No API, no schema, no
+  route table, no i18n key.
+- **Decisions:** R1 host `platform.catalyst-growth.com` (from a real email). R2 scope `/creator/*` only; `/auth/*` and agency paths stay
+  web. R3 iOS first; the Android handler and manifest built, **no `assetlinks.json` until a real signing fingerprint exists**. R4 the web
+  deploy carries the AASA file and `_headers`, then build 3. R5 a signed-out tap returns to the destination after sign-in. D1 host is a
+  constant, not an env var. **D2 (changed by Pedram at clearance): an in-scope unresolvable link opens the dashboard, not a no-op.** D3 the
+  3 s duplicate guard. D4 no developer mode in the committed entitlement. D5 `pathPrefix` with the trailing slash. `_headers` cache: Netlify's
+  default stays. The colleague runs C1–C7 during the deploy; the output comes back through Pedram into the deploy log.
+- **Verification:**
+  - **Break-reverted: 43 of 43 caught** against the final specs (policy 6, scope 7, resolution 7, handler 9, wiring 6, files and native
+    10), each mutation applied by Python string replacement, confirmed to match exactly once, the failing specs read, the file restored and
+    the tree checked clean against `HEAD`. **The first pass caught 40 of 43; the three that survived were weak specs, now fixed:** the
+    query specs used `toMatchObject({ query: {} })`, which matches any object, so a dropped value was never proven dropped (now
+    `toEqual`); the duplicate-guard test delivered both links before the first run settled, so the supersede rule hid a missing guard (now
+    it settles between the two); an escaped rejection failed the run through vitest's exit code only, with every assertion green (now
+    asserted on `unhandledRejection`). **One unplanned guard:** nothing failed if the `startAppLinks(...)` line was removed from
+    `main.ts`; a two-test text pin now covers it.
+  - **Gates at the final state:** `apps/main` Vitest 251 files / 2952 passed (the `links` folder: 4 specs, 135 tests); `vue-tsc`, ESLint
+    (0 errors; 2 existing `v-html` warnings) and Prettier clean.
+  - **Full local Playwright:** `apps/main` 38 passed in 10 minutes, including `brands.spec.ts:108` (the pre-existing local flake did not fire
+    this run). It runs on the web, where link handling is a no-op, so it shows that the `main.ts` boot is unchanged, not link behaviour.
+  - **Device-build proof that Associated Domains is on the App ID:** a build for the real iPhone with automatic signing. The signed app
+    carries `com.apple.developer.associated-domains = [applinks:platform.catalyst-growth.com]` (and `aps-environment`); the embedded
+    provisioning profile grants `associated-domains: *`; the AASA file and `_headers` are inside the built bundle. Vite also copies both
+    into `dist/`.
+- **PROD-DATA RISK: NONE.** No schema, API, route, validation, policy or job change. The web build gains two static files; the app gains an
+  entitlement. Nothing happens until the web deploy ships the files (and, for iOS, build 3).
+- **Deploy obligations:** the web build carries `/.well-known/apple-app-site-association` and `_headers`, **no API change, no
+  `queue:restart`, no env change, no flag**. **Then the colleague's checks C1–C7 against the live host, and build 3 only after they pass**
+  (`deploy-log.md`, the AH-103b block). Nothing in the Netlify dashboard is touched unless C1 or C2 fails. Build 3 must be archived with
+  Associated Domains in its **distribution** profile (automatic signing adds it; read the archive's entitlements before uploading).
+- **Not verified:** **the device walk W1–W10 has not run**, so no real link has opened the app yet. Not provable until the deploy:
+  Netlify serving the file with the header and no redirect; Apple associating the domain (needs the live file and build 3 from
+  TestFlight); the distribution profile. **Android App Link verification can never be shown until a real signing fingerprint exists** (R3);
+  only the handler is provable, through an explicit intent. No Gradle build was run (the manifest is covered by a parsing spec only).
+  Links from other apps' in-app browsers (Gmail and similar) are walk observations, not claims.
+- **Found while building, not a defect of the app:** the developer machine's global gitignore has `_*`, which silently ignores
+  `apps/main/public/_headers` (a `git add` of it did nothing). The repo `.gitignore` now carries `!apps/main/public/_headers`, and the
+  file-pin spec reads it from disk, so a CI checkout without it fails.
+- **Tech-debt rows opened:** "Android App Links are not verified, and no `assetlinks.json` is published" (with the plan); at close,
+  "a creator with an unverified email who follows a link" and "the link allow-list must follow the creator route table". See
+  `tech-debt.md`, "AH-103b".
+- **Ref:** `6ee14c36` (inventory and plan), `ec172d59` (plan cleared, D2 changed), `7db73f78` (policy and handler), `12ba5d78` (wiring,
+  native, static files), `3b1f7ebf` (file guards), `f6cfffd3` (`main.ts` pin), `82c8a2e7` (three spec gaps the break-reverts found).
 
 ### AH-108 · Pre-tester UI batch, item 4: unread indicators, in-app and on the iPhone icon (Creator App arc)
 
