@@ -143,6 +143,28 @@ describe('the Android manifest filter (AndroidManifest.xml)', () => {
   })
 })
 
+describe('the boot wiring (src/main.ts)', () => {
+  // main.ts boots the whole app and cannot be imported by a spec, so the one line that
+  // starts link handling is pinned as text. Without it the handler is dead code and no
+  // other spec notices; only a device would.
+  const main = read('src/main.ts')
+
+  it('imports the handler and the starter from the links module', () => {
+    expect(main).toMatch(
+      /import \{ createAppLinkHandler \} from '\.\/core\/platform\/links\/appLinkRouting'/,
+    )
+    expect(main).toMatch(
+      /import \{ startAppLinks \} from '\.\/core\/platform\/links\/startAppLinks'/,
+    )
+  })
+
+  it('starts link handling once, with the handler bound to the real router', () => {
+    const calls = main.match(/startAppLinks\(/g) ?? []
+    expect(calls).toHaveLength(1)
+    expect(main).toContain('startAppLinks({ onLink: createAppLinkHandler(router) })')
+  })
+})
+
 describe('no assetlinks.json is published (R3: no real signing fingerprint exists yet)', () => {
   it('apps/main/public/.well-known/assetlinks.json does not exist', () => {
     // If this fails, someone added the file. Publishing it is a conscious change: only
