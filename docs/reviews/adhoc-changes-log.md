@@ -59,11 +59,11 @@ reviews, and conversations.
 
 ## Live Status (open + in-flight)
 
-| ID      | Title                                    | Status   | Notes                                                                                     |
-| ------- | ---------------------------------------- | -------- | ----------------------------------------------------------------------------------------- |
-| —       | Campaign Drafts tab — independent review | Pending  | Merged in code; review file reads "pending independent review pass."                      |
-| AH-109  | Job-posted email footer shows ":agency"  | Proposed | Bug logged 2026-10-19; one-argument fix in `job-posted.blade.php:10`; see `tech-debt.md`. |
-| AH-103b | Universal links (iOS first)              | Landed   | Pushed, not deployed. Device walk W1–W10 waits for the web deploy, C1–C7 and build 3.     |
+| ID      | Title                                    | Status  | Notes                                                                                 |
+| ------- | ---------------------------------------- | ------- | ------------------------------------------------------------------------------------- |
+| —       | Campaign Drafts tab — independent review | Pending | Merged in code; review file reads "pending independent review pass."                  |
+| AH-109  | Job-posted email footer shows ":agency"  | Landed  | Fixed and pushed 2026-10-19 (Mode B); not deployed, rides the API deploy.             |
+| AH-103b | Universal links (iOS first)              | Landed  | Pushed, not deployed. Device walk W1–W10 waits for the web deploy, C1–C7 and build 3. |
 
 > Pointer, not an ad-hoc item: **Sprint 10 (Payments/Escrow)** remains the deepest pending
 > roadmap dependency, Stripe-gated. Tracked in `tech-debt.md`, not here.
@@ -72,9 +72,36 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
+### AH-109 · The job-posted email footer showed a literal ":agency" (bug fix, Mode B)
+
+- **Status:** Landed and pushed 2026-10-19. **Not deployed:** it needs the API deploy (a Blade view change), the same one as the rest of the batch.
+- **Date:** 2026-10-19.
+- **Why:** the footer of the fan-out email a creator gets when an agency lists a job read "You are receiving this because you are on the
+  **:agency** roster." (logged by Pedram at the AH-103b plan). The subject and the body were correct.
+- **What:** one argument. `resources/views/mail/campaigns/job-posted.blade.php` called `trans('campaigns.job_posted.ignore')` without the
+  replacement array; it now passes `['agency' => $agencyName]` (the variable was already in the view data from `JobPostedMail::content()`).
+  All 24 locales carry `:agency` in that string, so all 24 were affected. No translation text, key, migration or route changed.
+- **Touched:** `apps/api/resources/views/mail/campaigns/job-posted.blade.php`; `apps/api/tests/Feature/Modules/Campaigns/JobPostedMailTest.php`.
+- **Why the tests missed it:** the body test asserts the agency name, and the body line carries it, so a wrong footer passed every
+  assertion. The new test pins the footer line itself.
+- **Verification:** a Pest case per shipped locale (24, read from the `lang` directory so a new locale is covered) renders the real
+  mail and asserts the rendered text contains `trans('campaigns.job_posted.ignore', ['agency' => …], $locale)` and no `:agency`; the
+  expected string is asserted to contain the agency name first, so a locale that lost the placeholder cannot make the test vacuous; a
+  second case guards that the locale list is not empty. **Break-reverted:** the old one-argument call put back: exactly the 24 footer cases
+  fail, the original 9 stay green; the footer filled with the wrong value (`$appName`): the same 24 fail. Restored and verified clean
+  (the only diff against `HEAD` is the fix). `JobPostedMailTest`, `JobPostedFanOutTest` and `EmailPreferenceGuardTest`: 88 passed; Pint
+  and PHPStan (`vendor/bin/phpstan analyse --no-progress --memory-limit=1G`, no path argument) clean. The local run prints
+  "deprecated" on every test (a PDO constant notice in the local PHP, present before this change).
+- **PROD-DATA RISK: NONE.** A rendered string in one email; no data, schema, route or job change.
+- **Deploy obligations:** the API deploy. The mail is rendered by the queue worker when it sends; `queue:restart` is already a step of
+  this batch. Mail already queued renders with the new view when the worker picks it up.
+- **Not verified:** a real send in production (the footer of the next job-posted email is the check, noted in the deploy log). The scan
+  of single-argument `trans()` in Blade views found no other unfilled placeholder; PHP-side `trans()` calls were not scanned.
+- **Ref:** `c5600dc3`. Tech-debt row "Job-posted email footer reads on the :agency roster" marked fixed.
+
 ### AH-103b · Universal links: a tap on a creator link opens the app (iOS first; the Android handler built, not verified) (Creator App arc)
 
-- **Status:** Landed and pushed 2026-10-19 (after Stage 3 clearance). **Not deployed; the device walk has not been run.** Inventory:
+- **Status:** Landed and pushed 2026-10-19 (after Stage 3 clearance), `6ee14c36..5e0fa6d9`; **CI green on all four jobs at `5e0fa6d9`** ([run 39216620050](https://github.com/pedram-kh/Engine/actions/runs/39216620050)). **Not deployed; the device walk has not been run.** Inventory:
   [`universal-links-inventory.md`](universal-links-inventory.md). Plan: [`universal-links-plan.md`](universal-links-plan.md). It needs the web
   deploy (the AASA file and `_headers`), the colleague's checks C1–C7, and TestFlight build 3 installed from TestFlight before W1–W10 can run
   (all in the `deploy-log.md` entry).

@@ -3262,7 +3262,10 @@ It is allowlisted in `tests/unit/architecture/use-theme-is-sot.spec.ts` (the tes
   the C1–C7 results, to be recorded in the deploy log when the colleague's output is forwarded.
 - **Status:** open (by design). Opened with the AH-103b plan, 2026-10-19; rows 2 and 3 added at the close.
 
-## Job-posted email footer reads "on the :agency roster" (bug, logged 2026-10-19, not fixed)
+## Job-posted email footer reads "on the :agency roster" (bug, logged 2026-10-19, **FIXED 2026-10-19 as AH-109**, commit `c5600dc3`)
+
+> **Fixed.** One argument in `job-posted.blade.php`, plus a footer assertion per shipped locale in `JobPostedMailTest`. Pushed, not
+> deployed (rides the API deploy). The text below is the original record.
 
 - **What:** the footer of the job-posted email (the fan-out mail to a creator when an agency lists a job) shows the literal
   placeholder: "You are receiving this because you are on the **:agency** roster." The subject and the body are correct.
@@ -3276,4 +3279,4 @@ It is allowlisted in `tests/unit/architecture/use-theme-is-sot.spec.ts` (the tes
 - **Why the tests missed it:** `JobPostedMailTest` asserts the subject (per locale) and the body, not the footer.
 - **Resolution:** the one-argument fix plus a spec that renders the mail in a few locales and asserts the rendered HTML contains the
   agency name and no `:agency`. No migration, no i18n key change, no new string. **PROD-DATA RISK: NONE.** Mode B once Pedram asks for it.
-- **Owner:** campaigns / notifications. **Status:** open. Tracked as AH-109 (proposed) in the ad-hoc log's Live Status.
+- **Owner:** campaigns / notifications. **Status:** fixed in code (AH-109), awaiting the API deploy.
