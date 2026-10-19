@@ -59,13 +59,14 @@ reviews, and conversations.
 
 ## Live Status (open + in-flight)
 
-| ID      | Title                                    | Status   | Notes                                                                                   |
-| ------- | ---------------------------------------- | -------- | --------------------------------------------------------------------------------------- |
-| —       | Campaign Drafts tab — independent review | Pending  | Merged in code; review file reads "pending independent review pass."                    |
-| AH-103d | Reinstall marker (tech-debt 17)          | Proposed | Scoped 2026-10-20, Mode B, not built. Wipe through `nativeLogout()`; rides build 3.     |
-| AH-103c | Biometric unlock                         | Parked   | Deferred to post-launch 2026-10-20. Inventory and rulings in `biometrics-inventory.md`. |
-| AH-109  | Job-posted email footer shows ":agency"  | Landed   | Fixed and pushed 2026-10-19 (Mode B); not deployed, rides the API deploy.               |
-| AH-103b | Universal links (iOS first)              | Landed   | Pushed, not deployed. Device walk W1–W10 waits for the web deploy, C1–C7 and build 3.   |
+| ID      | Title                                    | Status      | Notes                                                                                   |
+| ------- | ---------------------------------------- | ----------- | --------------------------------------------------------------------------------------- |
+| —       | Campaign Drafts tab — independent review | Pending     | Merged in code; review file reads "pending independent review pass."                    |
+| AH-104  | Account deletion                         | In progress | Inventory written 2026-10-20, awaiting review. No plan, no code.                        |
+| AH-103d | Reinstall marker (tech-debt 17)          | Proposed    | Scoped 2026-10-20, Mode B, not built. Wipe through `nativeLogout()`; rides build 3.     |
+| AH-103c | Biometric unlock                         | Parked      | Deferred to post-launch 2026-10-20. Inventory and rulings in `biometrics-inventory.md`. |
+| AH-109  | Job-posted email footer shows ":agency"  | Landed      | Fixed and pushed 2026-10-19 (Mode B); not deployed, rides the API deploy.               |
+| AH-103b | Universal links (iOS first)              | Landed      | Pushed, not deployed. Device walk W1–W10 waits for the web deploy, C1–C7 and build 3.   |
 
 > Pointer, not an ad-hoc item: **Sprint 10 (Payments/Escrow)** remains the deepest pending
 > roadmap dependency, Stripe-gated. Tracked in `tech-debt.md`, not here.
@@ -73,6 +74,21 @@ reviews, and conversations.
 ---
 
 ## Change Log (newest first)
+
+### AH-104 · Account deletion (inventory written, awaiting review)
+
+- **Status:** In progress. The read-only inventory is written; no plan, no code.
+- **Date:** 2026-10-20.
+- **Why:** Apple 5.1.1(v) and Google Play require in-app deletion (and, for Google, a web path) for apps with account creation; GDPR art. 17
+  applies regardless. AH-104b (in-app sign-up) is gated on it, and it is the precondition for the first store build.
+- **What:** [`account-deletion-inventory.md`](account-deletion-inventory.md) covers the store rules (from memory, marked), re-authentication
+  (password always, 2FA when enrolled, a new rate limiter), what is erased, anonymised or retained (assignments, messages, the payments
+  ledger that does not exist yet, audit logs), push tokens, the agency-side view, the model (anonymise in place), and the grace-period options.
+- **Findings worth keeping:** audit rows and `notifications.data` carry copies of the user's name, email and IP that anonymising `users` does not
+  reach, and no audit retention job exists; a soft-delete would break agency pages (`CampaignAssignmentReviewController.php:101` reads
+  `$assignment->creator->display_name` bare); the Security page ruled native-only conflicts with the web path Google and GDPR need.
+- **PROD-DATA RISK (for the chunk): HIGH.** The inventory itself changed nothing.
+- **Ref:** [`account-deletion-inventory.md`](account-deletion-inventory.md).
 
 ### AH-103d · The reinstall marker: a reinstalled iPhone must not come back signed in (tech-debt 17, Mode B)
 
