@@ -59,11 +59,13 @@ reviews, and conversations.
 
 ## Live Status (open + in-flight)
 
-| ID      | Title                                    | Status  | Notes                                                                                 |
-| ------- | ---------------------------------------- | ------- | ------------------------------------------------------------------------------------- |
-| —       | Campaign Drafts tab — independent review | Pending | Merged in code; review file reads "pending independent review pass."                  |
-| AH-109  | Job-posted email footer shows ":agency"  | Landed  | Fixed and pushed 2026-10-19 (Mode B); not deployed, rides the API deploy.             |
-| AH-103b | Universal links (iOS first)              | Landed  | Pushed, not deployed. Device walk W1–W10 waits for the web deploy, C1–C7 and build 3. |
+| ID      | Title                                    | Status   | Notes                                                                                   |
+| ------- | ---------------------------------------- | -------- | --------------------------------------------------------------------------------------- |
+| —       | Campaign Drafts tab — independent review | Pending  | Merged in code; review file reads "pending independent review pass."                    |
+| AH-103d | Reinstall marker (tech-debt 17)          | Proposed | Scoped 2026-10-20, Mode B, not built. Wipe through `nativeLogout()`; rides build 3.     |
+| AH-103c | Biometric unlock                         | Parked   | Deferred to post-launch 2026-10-20. Inventory and rulings in `biometrics-inventory.md`. |
+| AH-109  | Job-posted email footer shows ":agency"  | Landed   | Fixed and pushed 2026-10-19 (Mode B); not deployed, rides the API deploy.               |
+| AH-103b | Universal links (iOS first)              | Landed   | Pushed, not deployed. Device walk W1–W10 waits for the web deploy, C1–C7 and build 3.   |
 
 > Pointer, not an ad-hoc item: **Sprint 10 (Payments/Escrow)** remains the deepest pending
 > roadmap dependency, Stripe-gated. Tracked in `tech-debt.md`, not here.
@@ -71,6 +73,39 @@ reviews, and conversations.
 ---
 
 ## Change Log (newest first)
+
+### AH-103d · The reinstall marker: a reinstalled iPhone must not come back signed in (tech-debt 17, Mode B)
+
+- **Status:** Proposed. Scoped 2026-10-20 when AH-103c was deferred; **not built**.
+- **Date:** 2026-10-20.
+- **Why:** iOS keeps Keychain items across Delete App, so a reinstalled, handed-on or sold phone comes back signed in as the previous
+  creator, and the old push-token row stays live (tech-debt 17, found on a real iPhone 2026-10-11, "decide before the first iOS store build").
+- **What (planned):** a first-launch marker in app storage that iOS clears on delete; if it is missing and a session is present, sign out
+  through `nativeLogout()` (push-token cleanup, revoke, local clear), then write the marker. No session: write the marker, no request.
+  Details, proof expected and the fail-closed behaviour: [`biometrics-inventory.md`](biometrics-inventory.md) §9.
+- **One-time tester sign-out (accepted):** any install made before the marker (TestFlight build 1 or 2) is signed out once on the first
+  launch of build 3. Say so in the build-3 tester note.
+- **PROD-DATA RISK: NONE.** No schema, migration or data command; the only server writes are the existing logout's deletes of the user's
+  own token and push-token row, for installs without the marker.
+- **Stop-gate:** a session wipe is security-relevant (full-loop territory). Mode B is Pedram's explicit ruling of 2026-10-20, recorded here
+  as the exception, flagged in the moment.
+- **Deploy obligations:** none for the API. App only, with TestFlight build 3; the deploy-log disposition is written when it is built.
+- **Ref:** [`biometrics-inventory.md`](biometrics-inventory.md) §9; `tech-debt.md` item 17 (under "AH-102 (push notifications)").
+
+### AH-103c · Biometric unlock (DEFERRED to post-launch)
+
+- **Status:** Parked.
+- **Date:** 2026-10-20.
+- **Why:** Pedram's call: no biometric lock before launch.
+- **What:** the read-only inventory is saved with the rulings Pedram would have given (a UI gate; the `@aparajita/capacitor-biometric-auth`
+  plugin; relock after 1 minute; iOS first; device-passcode fallback). Two things were carved out: **AH-103d** (above) and the native-only
+  **Security page** under More, which is built as part of **AH-104**.
+- **Findings worth keeping:** `@aparajita/capacitor-secure-storage` has no biometric options; `@capacitor-community/biometric-auth` does not exist
+  on npm; the `TokenStore` "decorator" seam is not enough (needs `lock()` and a "has session" check); the chosen plugin's web fallback fakes
+  success with `confirm()`, so it must stay behind `isNativePlatform()`.
+- **Touched:** docs only (the inventory file, `tech-debt.md` item 17 and a new "AH-103c" section, this log, the Resumption).
+- **PROD-DATA RISK: NONE.** No code.
+- **Ref:** [`biometrics-inventory.md`](biometrics-inventory.md).
 
 ### AH-109 · The job-posted email footer showed a literal ":agency" (bug fix, Mode B)
 

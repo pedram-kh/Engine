@@ -2872,7 +2872,7 @@ is_blacklisted)` — sized to the `permitsMessaging()` predicate, and re-check t
   14. **(Android walk) The matrix still shows Push toggles as on while the OS permission is blocked.** The preference is the user's intent and survives granting later, but the toggle does not say it has no effect now (only the banner at the top does). **Resolution:** a caption or dimmed state if it confuses; not done.
   15. **(Android walk) A pending `pm clear`/reinstall without sign-out leaves a live server row for a dead token** until the next real send returns `UNREGISTERED` (the first sends after an uninstall are still accepted). Harmless, self-cleaning; recorded so nobody reads it as a leak.
   16. **(Checkpoint B) `admin-sign-in.spec.ts:69` is the one remaining undiagnosed flake** (failed once and passed on retry in the local run and in CI at Checkpoint A; **it flaked again, and passed on retry, in both CI runs at Checkpoint B's push (`9dd7f167`, `e2501352`): the URL stays on `/sign-in` after submit, at line 106. Three CI runs in a row, so it is no longer a one-off: diagnose it before it hides a real sign-in regression**). **DIAGNOSED AND FIXED in AH-102b C0.2 (`30b5894c`): the Vite pre-bundle list was missing `VProgressLinear` (see the re-close at the "Residual Playwright-retry flakiness" row); the "not settled" caveats and the CI-tally check are stated there.** `creator-wizard-happy-path.spec.ts:91` is covered by item 6's root cause (0 flakes after the fix).
-  17. **(iOS walk) The sign-in survives deleting and reinstalling the app.** Found 2026-10-11 on a real iPhone: after Delete App and a reinstall from Xcode the creator was still signed in (the bearer token lives in the iOS Keychain, which iOS keeps across an app delete; Android clears it). **Consequences:** a reinstalled, handed-on or sold phone comes back signed in as the previous creator, and the old push token row stays live on the server (the same orphan as item 15). **Resolution:** record a first-launch-since-install marker in app storage (which iOS does clear on delete) and wipe the Keychain session when it is missing. Not done; decide before the first iOS store build.
+  17. **(iOS walk) The sign-in survives deleting and reinstalling the app.** Found 2026-10-11 on a real iPhone: after Delete App and a reinstall from Xcode the creator was still signed in (the bearer token lives in the iOS Keychain, which iOS keeps across an app delete; Android clears it). **Consequences:** a reinstalled, handed-on or sold phone comes back signed in as the previous creator, and the old push token row stays live on the server (the same orphan as item 15). **Resolution:** record a first-launch-since-install marker in app storage (which iOS does clear on delete) and wipe the Keychain session when it is missing. Not done; decide before the first iOS store build. **Scheduled 2026-10-20 as AH-103d** (Mode B, small; scoped, not built): the wipe goes through `nativeLogout()` so the server token and push row are revoked too; the one-time sign-out of testers on build 3 is accepted. See [`reviews/biometrics-inventory.md`](reviews/biometrics-inventory.md) §9.
 - **Owner:** notifications (1, 3, 4, 5, 9, 11); identity (2); platform (6, 7, 8, 10, 12, 13).
 - **Status:** open (by design). Surfaced at AH-102 Checkpoint A, 2026-10-10 ([ad-hoc log](reviews/adhoc-changes-log.md)).
 
@@ -3280,3 +3280,17 @@ It is allowlisted in `tests/unit/architecture/use-theme-is-sot.spec.ts` (the tes
 - **Resolution:** the one-argument fix plus a spec that renders the mail in a few locales and asserts the rendered HTML contains the
   agency name and no `:agency`. No migration, no i18n key change, no new string. **PROD-DATA RISK: NONE.** Mode B once Pedram asks for it.
 - **Owner:** campaigns / notifications. **Status:** fixed in code (AH-109), awaiting the API deploy.
+
+## AH-103c (biometric unlock) — deferred to post-launch
+
+- **Where:** [`reviews/biometrics-inventory.md`](reviews/biometrics-inventory.md) (status DEFERRED; the inventory and the rulings).
+- **What we accepted (Pedram, 2026-10-20):** no biometric lock before launch. The creator session is protected by the device being
+  unlocked (the Keychain item is `whenUnlockedThisDeviceOnly`) and nothing else. The rulings to resume with: a UI gate; the
+  `@aparajita/capacitor-biometric-auth` plugin; relock after 1 minute; iOS first; device-passcode fallback.
+  1. **No lock on the creator app.** Anyone holding the unlocked phone can open the app as the creator, for up to the 90-day token ceiling.
+     **Resolution:** the AH-103c plan, post-launch, with its section on the AH-104 Security page.
+  2. **Android has no biometric lock** even after the iOS build (ruling R4). Same row, second step.
+  3. **The `TokenStore` seam comment names "AH-103"** (`apps/main/src/core/auth/tokenStore.ts:5-8`) and calls the gate a decorator; the inventory
+     shows it needs `lock()` and a "has session" check, so the comment is stale. Fix it when the chunk resumes.
+- **Carved out and not deferred:** tech-debt 17 (the reinstall marker) is **AH-103d**; the Security page is built in **AH-104**.
+- **Owner:** mobile / identity. **Status:** open (by design). Opened 2026-10-20.
