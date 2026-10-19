@@ -1,7 +1,8 @@
 # AH-103b — Universal links (iOS first) and the Android handler: plan
 
-- **Status:** **PLAN — awaiting review. No code written.** Plan-pause (Mode A: the chunk parses untrusted URLs handed to the app by
-  the OS, which is a security surface, and it changes native config).
+- **Status:** **PLAN CLEARED by Pedram, 2026-10-19**, with one change (**D2**, below). D1, D3, D4, D5 accepted as written; `_headers`
+  keeps Netlify's default cache; C1–C7 are run by the colleague during the deploy and the output is forwarded for the deploy log.
+  Mode A (the chunk parses untrusted URLs handed to the app by the OS, a security surface, and it changes native config).
 - **Inventory:** [`universal-links-inventory.md`](universal-links-inventory.md) (accepted 2026-10-19). **Rulings:** R1–R5 below,
   baked in.
 - **Stacks on:** AH-106, AH-107, AH-108 (all pushed, none deployed). One production deploy and one TestFlight build 3 for the batch;
@@ -52,8 +53,18 @@ a configuration that can drift from the entitlement and the manifest (which §2.
 ### 2.2 The route check — `resolveAppLink(router, rawUrl)`
 
 `parseAppLink` → `router.resolve({ path, query })` → accept only when `matched.length > 0` **and** `typeof name === 'string'` **and**
-`name.startsWith('creator.')`. Anything else is `null`. So a path that parses but is not a real creator screen (`/creator/nonsense`,
-`/creator/../auth/…`) never navigates. The raw URL is never handed to the router.
+`name.startsWith('creator.')`. The result is one of three outcomes (D2, as cleared):
+
+- **`route`** — a real creator screen: push its `fullPath`.
+- **`dashboard`** — the link is **in scope** (HTTPS, exact host, no credentials, no port, and a path that is under `/creator/` after the
+  URL parser's normalisation) but does not resolve: an unknown route (`/creator/nonsense`), a hostile path form under `/creator/`
+  (encoded slash, backslash, control character, over-long). Push `{ name: 'creator.dashboard' }`, a fixed route name; the offending
+  path is never given to the router.
+- **`ignore`** — **out of scope**: not HTTPS, another host or a look-alike, credentials, a port, or a path that is not under
+  `/creator/` once normalised (`/creator/../auth/…` normalises to `/auth/…`). The OS should not have handed these to the app; if one
+  arrives anyway, do nothing.
+
+The raw URL is never handed to the router.
 
 ### 2.3 The handler — `core/platform/links/appLinkRouting.ts` (same shape as `pushTapRouting.ts`)
 
@@ -61,7 +72,9 @@ a configuration that can drift from the entitlement and the manifest (which §2.
 
 1. `await router.isReady()` (a cold-start link arrives before the router has settled; an immediate push would be overtaken by the
    initial navigation, the lesson of AH-102/103).
-2. `resolveAppLink`; `null` → **do nothing** (D2: the user stays where they are; a link that is not ours must not teleport them).
+2. `resolveAppLink`: `route` → push it; **`dashboard` → push the creator dashboard** (D2, as cleared: the user tapped one of our links, so
+   the app opens somewhere sensible); `ignore` → do nothing (the link is not ours). A signed-out user sent to the dashboard goes
+   through `requireAuth` and sign-in like any other link.
 3. `router.push(resolved.fullPath)`; a rejected push is swallowed; **the whole chain cannot throw**.
 4. A newer link supersedes an older one still waiting on `isReady()` (the `latest` token, as in the push handler).
 5. **Duplicate guard (D3):** on a cold start Capacitor can deliver the same URL through `appUrlOpen` and through `getLaunchUrl()`;
@@ -121,17 +134,18 @@ boot). Web builds register nothing.
 ## 4. Break-reverts planned (each mutation confirmed applied, the right spec watched failing, restored clean)
 
 Host check removed; host matched with `endsWith`; host matched with `includes`; `http:` accepted; credentials allowed; port allowed;
-`/creator/` prefix check removed; prefix check loosened to `/creator`; encoded-slash / dot-segment check removed; route-name check
+`/creator/` prefix check removed; prefix check loosened to `/creator`; the in-scope-unresolvable case sent to `ignore` (the old D2);
+the dashboard fallback pointed at a route that does not exist; encoded-slash / dot-segment check removed; route-name check
 (`creator.`) removed; `matched.length` check removed; query allow-list removed; fragment kept; `isReady()` wait removed; supersede
 removed; duplicate guard removed; a throw let escape from the chain; `getLaunchUrl` read dropped; AASA `components` widened to `/*`;
 `appIDs` team id changed; entitlement domain changed; manifest host changed; `autoVerify` dropped; `assetlinks.json` created.
 
 ## 5. Decisions proposed (for the review)
 
-- **D1** host is a constant, not an env var. **D2** a link that does not resolve does nothing (the alternative, opening the dashboard,
-  moves a user who tapped something that was never ours). **D3** a 3 s duplicate guard between `appUrlOpen` and `getLaunchUrl()`.
+- **D1** host is a constant, not an env var. **D2 (CHANGED by Pedram at clearance)** an **in-scope but unresolvable** link opens the
+  **dashboard**; only a link that is out of scope is ignored (§2.2). The plan originally proposed a no-op. **D3** a 3 s duplicate guard between `appUrlOpen` and `getLaunchUrl()`.
   **D4** no `?mode=developer` in the committed entitlement. **D5** Android `pathPrefix="/creator/"` with the trailing slash.
-- **Recommendation on each:** accept as written. D2 is the only one with a user-visible consequence.
+- **Cleared:** D1, D3, D4, D5 as written; D2 as changed above.
 
 ## 6. Deploy steps for the colleague (the web deploy; goes into the deploy-log PENDING entry)
 
@@ -195,18 +209,18 @@ deploy → C1–C7 → build 3 to TestFlight**.
 install). Links sent to the phone in Notes or Messages. At least one **real emailed** job link (the job-posted email) opened from the
 Mail app. Two accounts: a creator with a contracted assignment and a relationship thread; the same creator signed out. Pre-checks: C1–C7 recorded.
 
-| #   | Do                                                                                                         | Expect                                                                                                                              |
-| --- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| W1  | App in the background, signed in. Tap `https://platform.catalyst-growth.com/creator/jobs/<ulid>` in Notes. | The app opens on that job's detail. **Not Safari.**                                                                                 |
-| W2  | **Kill the app.** Tap `/creator/assignments/<ulid>` in Notes.                                              | Cold start lands **on that assignment**, not the dashboard, still signed in.                                                        |
-| W3  | Sign out. Tap a `/creator/assignments/<ulid>` link.                                                        | Sign-in screen; after signing in you land on **that assignment** (R5). Repeat once from killed.                                     |
-| W4  | Tap `/creator/messages/<agencyUlid>` with an unread message in that thread.                                | The thread opens; the unread clears (AH-108 interplay: bell, tab and icon drop).                                                    |
-| W5  | Tap, from Notes, in turn: `/auth/verify-email?token=x`, `/campaigns/<ulid>`, `/messages/<ulid>`, `/`.      | **Each opens in Safari**, never the app (R2).                                                                                       |
-| W6  | Tap `/creator/nonsense` and `/creator/jobs/not-a-ulid`.                                                    | `nonsense`: the app opens and **stays where it was**, no crash (D2). `not-a-ulid`: the job-detail not-found state, no blank screen. |
-| W7  | Long-press a creator link in Notes or Messages.                                                            | The menu offers **Open in Catalyst**. (Record what it offers for `/auth/…` too: it should not.)                                     |
-| W8  | A real **emailed** job link, tapped in the Mail app.                                                       | Opens the app on the job. Also tap it from **Gmail or another in-app browser** if one is installed: record, do not pass/fail.       |
-| W9  | Regression: a push tap, and the icon badge, after the above.                                               | Push tap still lands on its screen; the icon equals the bell total.                                                                 |
-| W10 | App **deleted**; tap a creator link; then install and tap again.                                           | Without the app: the website opens normally. After install: W1 holds.                                                               |
+| #   | Do                                                                                                         | Expect                                                                                                                        |
+| --- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| W1  | App in the background, signed in. Tap `https://platform.catalyst-growth.com/creator/jobs/<ulid>` in Notes. | The app opens on that job's detail. **Not Safari.**                                                                           |
+| W2  | **Kill the app.** Tap `/creator/assignments/<ulid>` in Notes.                                              | Cold start lands **on that assignment**, not the dashboard, still signed in.                                                  |
+| W3  | Sign out. Tap a `/creator/assignments/<ulid>` link.                                                        | Sign-in screen; after signing in you land on **that assignment** (R5). Repeat once from killed.                               |
+| W4  | Tap `/creator/messages/<agencyUlid>` with an unread message in that thread.                                | The thread opens; the unread clears (AH-108 interplay: bell, tab and icon drop).                                              |
+| W5  | Tap, from Notes, in turn: `/auth/verify-email?token=x`, `/campaigns/<ulid>`, `/messages/<ulid>`, `/`.      | **Each opens in Safari**, never the app (R2).                                                                                 |
+| W6  | Tap `/creator/nonsense` and `/creator/jobs/not-a-ulid`.                                                    | `nonsense`: the app opens on the **dashboard**, no crash (D2). `not-a-ulid`: the job-detail not-found state, no blank screen. |
+| W7  | Long-press a creator link in Notes or Messages.                                                            | The menu offers **Open in Catalyst**. (Record what it offers for `/auth/…` too: it should not.)                               |
+| W8  | A real **emailed** job link, tapped in the Mail app.                                                       | Opens the app on the job. Also tap it from **Gmail or another in-app browser** if one is installed: record, do not pass/fail. |
+| W9  | Regression: a push tap, and the icon badge, after the above.                                               | Push tap still lands on its screen; the icon equals the bell total.                                                           |
+| W10 | App **deleted**; tap a creator link; then install and tap again.                                           | Without the app: the website opens normally. After install: W1 holds.                                                         |
 
 **Pass:** W1–W7, W9 and W10 as expected; W8 as expected for the Mail app (the in-app-browser result is recorded, not judged).
 **A fail on W1 with the deploy checks green** is most often Apple's cache (C7 not yet matching), a link typed into Safari's address
@@ -239,10 +253,8 @@ com.catalystgrowth.platform` is expected to show the domain as **not verified**.
 
 ## 10. Questions for the review
 
-1. **D2** (a link that does not resolve does nothing): accept, or open the dashboard instead?
-2. **D3** (3 s duplicate guard): accept, or rely on the router's own duplicate-navigation no-op?
-3. **Header cache:** the `_headers` rule sets only `Content-Type`; Netlify's default `public, max-age=0, must-revalidate` stays. Accept?
-4. **Build-3 ordering:** the web deploy and checks C1–C7 happen before the archive; who tells the assistant the results so the
-   deploy-log can record them?
+All four answered by Pedram, 2026-10-19: (1) **D2 changed**: an in-scope unresolvable link opens the dashboard. (2) D3, the 3 s guard,
+accepted. (3) `_headers` cache: Netlify's default stays. (4) The colleague runs C1–C7 during the deploy and sends the output to
+Pedram, who forwards it so the assistant records it in the deploy log.
 
 **Stopping here for review.**
