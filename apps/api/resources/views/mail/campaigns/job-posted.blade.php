@@ -7,7 +7,7 @@
 {{ trans('campaigns.job_posted.cta') }}
 @endcomponent
 
-{{ trans('campaigns.job_posted.ignore') }}
+{{ trans('campaigns.job_posted.ignore', ['agency' => $agencyName]) }}
 
 — {{ $appName }}
 @endcomponent

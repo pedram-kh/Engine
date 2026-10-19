@@ -104,6 +104,52 @@ it('renders the body differently in every rendered locale', function (string $lo
         ->and($translated)->toContain('Bright Harbour');
 })->with(['pt', 'it', 'fr', 'de']);
 
+/**
+ * Every locale the app ships, read from the lang directory so a locale added
+ * later is covered without touching this file.
+ *
+ * @return array<string, array{string}>
+ */
+function shippedLocales(): array
+{
+    // Not lang_path(): a Pest dataset closure runs before the app is booted.
+    // __DIR__ is apps/api/tests/Feature/Modules/Campaigns, so four up is apps/api.
+    $dirs = glob(dirname(__DIR__, 4).'/lang/*', GLOB_ONLYDIR) ?: [];
+    $locales = [];
+
+    foreach ($dirs as $dir) {
+        $locales[basename($dir)] = [basename($dir)];
+    }
+
+    return $locales;
+}
+
+// AH-109. The footer used to read "on the :agency roster": the view called
+// trans() without the replacement array. The subject and the body were
+// correct, and the body test already asserts the agency name, so a footer
+// that is wrong passed every other assertion. This one pins the footer line
+// itself, in every locale (all 24 carry :agency in `job_posted.ignore`).
+it('fills the agency name into the footer in every locale, never a literal :agency', function (string $locale): void {
+    [$mail] = jobPostedMail();
+
+    $body = renderJobPosted($mail, $locale)['body'];
+
+    $footer = trans('campaigns.job_posted.ignore', ['agency' => 'Bright Harbour'], $locale);
+
+    // Guards the guard: a locale whose footer string lost :agency would make
+    // the assertions below vacuous.
+    expect($footer)->toContain('Bright Harbour');
+
+    expect($body)->not->toContain(':agency')
+        // The rendered HTML escapes quotes and apostrophes; compare the text.
+        ->and(html_entity_decode($body, ENT_QUOTES | ENT_HTML5))->toContain($footer);
+})->with(fn (): array => shippedLocales());
+
+it('ships every locale directory the footer test is built from', function (): void {
+    expect(array_keys(shippedLocales()))->toContain('en', 'pt', 'it', 'fr', 'de', 'ga', 'mt')
+        ->and(count(shippedLocales()))->toBeGreaterThanOrEqual(24);
+});
+
 it('tags the mail as transactional campaign traffic', function (): void {
     [$mail] = jobPostedMail();
 
