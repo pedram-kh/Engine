@@ -120,7 +120,9 @@ describe('parseAppLink — IN scope', () => {
       ['an arbitrary key', '?utm_source=email&x=1'],
       ['a script-shaped value', '?focus=%3Cscript%3E'],
     ])('drops %s', (_label, qs) => {
-      expect(parseAppLink(`${HOST}/creator/assignments/${ULID}${qs}`)).toMatchObject({
+      // toEqual, not toMatchObject: `toMatchObject({ query: {} })` matches ANY query object.
+      expect(parseAppLink(`${HOST}/creator/assignments/${ULID}${qs}`)).toEqual({
+        kind: 'in-scope',
         path: `/creator/assignments/${ULID}`,
         query: {},
       })
@@ -129,16 +131,24 @@ describe('parseAppLink — IN scope', () => {
     it('uses the first of a repeated key', () => {
       expect(
         parseAppLink(`${HOST}/creator/assignments/${ULID}?focus=bogus&focus=messages`),
-      ).toMatchObject({ query: {} })
+      ).toEqual({ kind: 'in-scope', path: `/creator/assignments/${ULID}`, query: {} })
       expect(
         parseAppLink(`${HOST}/creator/assignments/${ULID}?focus=messages&focus=bogus`),
-      ).toMatchObject({ query: { focus: 'messages' } })
+      ).toEqual({
+        kind: 'in-scope',
+        path: `/creator/assignments/${ULID}`,
+        query: { focus: 'messages' },
+      })
     })
 
     it('keeps the allowed key and drops the rest in one link', () => {
       expect(
         parseAppLink(`${HOST}/creator/assignments/${ULID}?utm=x&focus=messages&tab=y`),
-      ).toMatchObject({ query: { focus: 'messages' } })
+      ).toEqual({
+        kind: 'in-scope',
+        path: `/creator/assignments/${ULID}`,
+        query: { focus: 'messages' },
+      })
     })
   })
 

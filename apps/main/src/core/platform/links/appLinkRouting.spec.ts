@@ -135,10 +135,24 @@ describe('createAppLinkHandler — navigation', () => {
   it('never throws when the router fails to become ready', async () => {
     const { router, push } = fakeRouter({ isReady: () => Promise.reject(new Error('nav failed')) })
     const handler = createAppLinkHandler(router)
+    const unhandled: unknown[] = []
+    const record = (reason: unknown): void => {
+      unhandled.push(reason)
+    }
 
-    expect(() => handler(JOB)).not.toThrow()
-    await settle()
+    // An escaped rejection is not a failed assertion by itself (vitest reports it as a run
+    // error), so record it here and assert on it.
+    process.on('unhandledRejection', record)
+    try {
+      expect(() => handler(JOB)).not.toThrow()
+      await settle()
+      await new Promise((done) => setTimeout(done, 10)) // unhandledRejection fires after the microtask queue drains
+    } finally {
+      process.off('unhandledRejection', record)
+    }
+
     expect(push).not.toHaveBeenCalled()
+    expect(unhandled).toEqual([])
   })
 
   it('a screen whose push FAILS falls back to the dashboard (never a blank screen)', async () => {
@@ -226,9 +240,30 @@ describe('createAppLinkHandler — the 3 s duplicate guard (D3)', () => {
     let t = 1_000
     const handler = createAppLinkHandler(router, { now: () => t })
 
+    // The first delivery has FINISHED navigating before the second arrives. If it had not,
+    // the supersede rule would drop the first run and this test would pass without the
+    // duplicate guard (it did, until the break-revert caught it).
     handler(JOB)
+    await settle()
+    expect(push).toHaveBeenCalledTimes(1)
+
     t += APP_LINK_DUPLICATE_WINDOW_MS - 1
     handler(JOB)
+    await settle()
+
+    expect(push).toHaveBeenCalledTimes(1)
+  })
+
+  it('also yields one navigation when both deliveries land before the router is ready', async () => {
+    const ready = deferred()
+    const { router, push } = fakeRouter({ isReady: () => ready.promise })
+    let t = 1_000
+    const handler = createAppLinkHandler(router, { now: () => t })
+
+    handler(JOB)
+    t += 5
+    handler(JOB)
+    ready.resolve()
     await settle()
 
     expect(push).toHaveBeenCalledTimes(1)
