@@ -3384,3 +3384,12 @@ TRIGGER` on `audit_logs` (table and every column). The owner is `postgres`. Ther
   problem only if retention is lengthened or logs are shipped somewhere (a log service, Sentry) without revisiting this.
 - **Trigger to escalate:** adding any external log, error or analytics sink, or raising log retention above 14 days.
 - **Owner:** platform. **Status:** OPEN (expires by itself, disclosed). Opened 2026-10-21.
+
+## Disable-2FA page navigates to a route that does not exist (BUG, OPEN, found 2026-10-21)
+
+- **Where:** `apps/main/src/modules/auth/pages/DisableTotpPage.vue:36` (`router.push({ name: 'app.settings' })` after a successful disable) and `:99` (the back link). No route has that
+  name: the only settings route is the agency's, named `settings` (`apps/main/src/modules/auth/routes.ts:418`), so a creator or agency member who disables 2FA is not taken anywhere and the back
+  link is dead. `DisableTotpPage.spec.ts:82` pins the wrong name, so the spec passes.
+- **Found by:** the AH-104b-del inventory ([`reviews/account-deletion-request-inventory.md`](reviews/account-deletion-request-inventory.md) F7), because that page is the nearest existing re-auth UI.
+- **Not fixed:** outside that inventory's scope. Fix with the Security page (AH-104b-del), which gives creators a real destination, or earlier as a Mode B one-liner if Pedram prefers.
+- **Owner:** creator and agency web. **Status:** OPEN. Opened 2026-10-21.
