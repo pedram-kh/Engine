@@ -114,10 +114,12 @@ it('keeps the first completion time: recording again never overwrites an entry',
 });
 
 it('refuses to write an entry for something that is not a ulid (a path cannot be smuggled in)', function (): void {
-    mirrorSetup();
+    $disk = Mockery::mock(Filesystem::class);
+    $disk->shouldReceive('exists')->andReturn(false);
+    $disk->shouldNotReceive('put');
+    Storage::set('media', $disk);
 
-    expect(fn () => (new DiskLedgerMirror)->record('../../creators/x', now()))->toThrow(MirrorWriteFailed::class)
-        ->and(mirrorFiles())->toBe([]);
+    expect(fn () => (new DiskLedgerMirror)->record('../../creators/x', now()))->toThrow(MirrorWriteFailed::class);
 });
 
 it('treats a store that says no, or throws, as a failed write (never a silent success)', function (string $how): void {
@@ -209,6 +211,23 @@ it('re-erases them with the same engine and leaves everyone else alone', functio
         ->and(array_values(array_filter($b->files['delete'], fn (string $k): bool => ! Storage::disk('media')->exists($k))))->toBe([])
         ->and(ErasureLedger::query()->where('user_ulid', $a->user->ulid)->sole()->state)->toBe(ErasureLedgerState::Completed)
         ->and($reapply->plan()->subjects)->toBe([]);
+});
+
+it('refuses the whole batch when any one person is refused, so nobody is half-done', function (): void {
+    mirrorSetup();
+    $x = ErasureGraph::seedSubject('a');
+    $y = ErasureGraph::seedSubject('b');
+    $mirror = new DiskLedgerMirror;
+    $mirror->record($x->user->ulid, now());
+    $mirror->record($y->user->ulid, now());
+    // Entries are processed in ulid order: block the one that would be last, so the first would otherwise go through.
+    [$first, $last] = strcmp($x->user->ulid, $y->user->ulid) < 0 ? [$x, $y] : [$y, $x];
+    DB::table('campaign_assignments')->where('creator_id', $last->creator->id)->update(['status' => 'payment_held']);
+    $reapply = app(ErasureReapply::class);
+
+    expect(fn () => $reapply->execute($reapply->plan()->digest(), 2))->toThrow(ErasureRefused::class)
+        ->and(User::withTrashed()->findOrFail($first->user->id)->isErased())->toBeFalse()
+        ->and(ErasureLedger::query()->count())->toBe(0);
 });
 
 it('records who ran the reapply on each ledger row', function (): void {
