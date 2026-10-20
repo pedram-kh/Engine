@@ -59,14 +59,19 @@ reviews, and conversations.
 
 ## Live Status (open + in-flight)
 
-| ID      | Title                                    | Status      | Notes                                                                                   |
-| ------- | ---------------------------------------- | ----------- | --------------------------------------------------------------------------------------- |
-| —       | Campaign Drafts tab — independent review | Pending     | Merged in code; review file reads "pending independent review pass."                    |
-| AH-104  | Account deletion                         | In progress | Inventory written 2026-10-20, awaiting review. No plan, no code.                        |
-| AH-103d | Reinstall marker (tech-debt 17)          | Proposed    | Scoped 2026-10-20, Mode B, not built. Wipe through `nativeLogout()`; rides build 3.     |
-| AH-103c | Biometric unlock                         | Parked      | Deferred to post-launch 2026-10-20. Inventory and rulings in `biometrics-inventory.md`. |
-| AH-109  | Job-posted email footer shows ":agency"  | Landed      | Fixed and pushed 2026-10-19 (Mode B); not deployed, rides the API deploy.               |
-| AH-103b | Universal links (iOS first)              | Landed      | Pushed, not deployed. Device walk W1–W10 waits for the web deploy, C1–C7 and build 3.   |
+| ID          | Title                                     | Status      | Notes                                                                                   |
+| ----------- | ----------------------------------------- | ----------- | --------------------------------------------------------------------------------------- |
+| —           | Campaign Drafts tab — independent review  | Pending     | Merged in code; review file reads "pending independent review pass."                    |
+| AH-104      | Account deletion (umbrella)               | In progress | Inventory and PII map APPROVED 2026-10-20. Split into AH-104a..e below. No code yet.    |
+| AH-104a     | Erasure engine (command, dry-run, ledger) | Plan-pause  | Plan written 2026-10-20, awaiting review. Stage 0 is read-only. No UI.                  |
+| AH-104b-del | Deletion request flow + Security page     | Queued      | After 104a. Web AND native, under the creator account menu.                             |
+| AH-104c     | Admin erasure queue, Erase button, hold   | Queued      | After 104b-del. 14 days, then an admin clicks Erase (confirm + audit row).              |
+| AH-104d     | In-app sign-up (was AH-104b)              | Gated       | Gated on 104a-c. Renamed 2026-10-20; older entries and closed reviews keep "AH-104b".   |
+| AH-104e     | Stop writing PII into audit snapshots     | Queued      | Own chunk, after 104a. Changes audit content: its own stop-gate.                        |
+| AH-103d     | Reinstall marker (tech-debt 17)           | Plan-pause  | Full loop (ruled 2026-10-20), plan written, awaiting review. Rides build 3.             |
+| AH-103c     | Biometric unlock                          | Parked      | Deferred to post-launch 2026-10-20. Inventory and rulings in `biometrics-inventory.md`. |
+| AH-109      | Job-posted email footer shows ":agency"   | Landed      | Fixed and pushed 2026-10-19 (Mode B); not deployed, rides the API deploy.               |
+| AH-103b     | Universal links (iOS first)               | Landed      | Pushed, not deployed. Device walk W1–W10 waits for the web deploy, C1–C7 and build 3.   |
 
 > Pointer, not an ad-hoc item: **Sprint 10 (Payments/Escrow)** remains the deepest pending
 > roadmap dependency, Stripe-gated. Tracked in `tech-debt.md`, not here.
@@ -75,24 +80,39 @@ reviews, and conversations.
 
 ## Change Log (newest first)
 
-### AH-104 · Account deletion (inventory written, awaiting review)
+### AH-104 · Account deletion (inventory and PII map APPROVED; split into AH-104a..e)
 
-- **Status:** In progress. The read-only inventory is written; no plan, no code.
+- **Status:** In progress. The inventory and [`account-deletion-pii-map.md`](account-deletion-pii-map.md) are approved (2026-10-20, D-A to D-G as
+  written). The AH-104a plan is written and awaiting review. No code.
 - **Date:** 2026-10-20.
+- **Rulings (2026-10-20):** high risk. 14-day grace, cancellable by sign-in; lock and revoke tokens, sessions and push at request time; **no
+  automatic erasure** (after 14 days the admin view shows "Ready to erase", an admin clicks Erase with a confirm and an audit row; a legal hold
+  keeps it from showing as ready). Anonymise in place with an explicit marker column, no deletion of anchors. Audit logs and
+  `notifications.data` scrubbed at erasure time, rows kept. Failing-by-default spec for any future payment state. Re-auth is password, plus 2FA
+  when enrolled, rate-limited like login. Security page on web AND native, under the creator account menu.
+- **Split:** **AH-104a** erasure engine (command, dry-run, PII map, erasure ledger, registry spec; no UI) · **AH-104b-del** request flow and
+  Security page · **AH-104c** admin view, Erase button, hold · **AH-104d** in-app sign-up · **AH-104e** stop writing PII into audit snapshots
+  (own chunk, after 104a).
+- **Alias note:** in-app sign-up was called **AH-104b** until 2026-10-20 and is now **AH-104d**. Entries below this one and the closed review
+  files (`creator-app-client-shell-review.md`, `creator-app-eyes-on-fixes-review.md`, `creator-app-figma-passes-review.md`,
+  `notification-prefs-and-ui-batch-review.md`, `deep-links-inventory.md`) keep the old name verbatim (`WORKING-PROCESS` §8). Read "AH-104b" in
+  any of them as "AH-104d".
 - **Why:** Apple 5.1.1(v) and Google Play require in-app deletion (and, for Google, a web path) for apps with account creation; GDPR art. 17
-  applies regardless. AH-104b (in-app sign-up) is gated on it, and it is the precondition for the first store build.
+  applies regardless. AH-104d (in-app sign-up) is gated on it, and it is the precondition for the first store build.
 - **What:** [`account-deletion-inventory.md`](account-deletion-inventory.md) covers the store rules (from memory, marked), re-authentication
   (password always, 2FA when enrolled, a new rate limiter), what is erased, anonymised or retained (assignments, messages, the payments
   ledger that does not exist yet, audit logs), push tokens, the agency-side view, the model (anonymise in place), and the grace-period options.
 - **Findings worth keeping:** audit rows and `notifications.data` carry copies of the user's name, email and IP that anonymising `users` does not
   reach, and no audit retention job exists; a soft-delete would break agency pages (`CampaignAssignmentReviewController.php:101` reads
-  `$assignment->creator->display_name` bare); the Security page ruled native-only conflicts with the web path Google and GDPR need.
+  `$assignment->creator->display_name` bare); the Security page ruled native-only conflicted with the web path Google and GDPR need, now
+  resolved: web AND native.
 - **PROD-DATA RISK (for the chunk): HIGH.** The inventory itself changed nothing.
 - **Ref:** [`account-deletion-inventory.md`](account-deletion-inventory.md).
 
-### AH-103d · The reinstall marker: a reinstalled iPhone must not come back signed in (tech-debt 17, Mode B)
+### AH-103d · The reinstall marker: a reinstalled iPhone must not come back signed in (tech-debt 17, full loop)
 
-- **Status:** Proposed. Scoped 2026-10-20 when AH-103c was deferred; **not built**.
+- **Status:** Plan-pause. Scoped 2026-10-20 when AH-103c was deferred; the plan is [`reinstall-marker-plan.md`](reinstall-marker-plan.md),
+  awaiting review. **Not built.** Ruled **full loop** (Mode A, not Mode B) the same day; the walk includes the reinstall case.
 - **Date:** 2026-10-20.
 - **Why:** iOS keeps Keychain items across Delete App, so a reinstalled, handed-on or sold phone comes back signed in as the previous
   creator, and the old push-token row stays live (tech-debt 17, found on a real iPhone 2026-10-11, "decide before the first iOS store build").
@@ -101,10 +121,11 @@ reviews, and conversations.
   Details, proof expected and the fail-closed behaviour: [`biometrics-inventory.md`](biometrics-inventory.md) §9.
 - **One-time tester sign-out (accepted):** any install made before the marker (TestFlight build 1 or 2) is signed out once on the first
   launch of build 3. Say so in the build-3 tester note.
-- **PROD-DATA RISK: NONE.** No schema, migration or data command; the only server writes are the existing logout's deletes of the user's
-  own token and push-token row, for installs without the marker.
-- **Stop-gate:** a session wipe is security-relevant (full-loop territory). Mode B is Pedram's explicit ruling of 2026-10-20, recorded here
-  as the exception, flagged in the moment.
+- **PROD-DATA RISK: LOW.** No schema, migration or data command, but the build deletes production rows: the existing logout's deletes of the
+  user's own token and push-token row, for every install that has a session and no marker (the testers, once). Corrected from NONE on
+  2026-10-20: the earlier line was wrong.
+- **Stop-gate:** a session wipe is security-relevant, a full-loop trigger. The earlier Mode B scoping was superseded by Pedram's full-loop ruling
+  of 2026-10-20.
 - **Deploy obligations:** none for the API. App only, with TestFlight build 3; the deploy-log disposition is written when it is built.
 - **Ref:** [`biometrics-inventory.md`](biometrics-inventory.md) §9; `tech-debt.md` item 17 (under "AH-102 (push notifications)").
 
@@ -114,8 +135,8 @@ reviews, and conversations.
 - **Date:** 2026-10-20.
 - **Why:** Pedram's call: no biometric lock before launch.
 - **What:** the read-only inventory is saved with the rulings Pedram would have given (a UI gate; the `@aparajita/capacitor-biometric-auth`
-  plugin; relock after 1 minute; iOS first; device-passcode fallback). Two things were carved out: **AH-103d** (above) and the native-only
-  **Security page** under More, which is built as part of **AH-104**.
+  plugin; relock after 1 minute; iOS first; device-passcode fallback). Two things were carved out: **AH-103d** (above) and the **Security page**
+  (web AND native, under the creator account menu, per the 2026-10-20 ruling; first scoped as native-only), built as part of **AH-104b-del**.
 - **Findings worth keeping:** `@aparajita/capacitor-secure-storage` has no biometric options; `@capacitor-community/biometric-auth` does not exist
   on npm; the `TokenStore` "decorator" seam is not enough (needs `lock()` and a "has session" check); the chosen plugin's web fallback fakes
   success with `confirm()`, so it must stay behind `isNativePlatform()`.

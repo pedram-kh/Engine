@@ -1,14 +1,15 @@
 # AH-104 — Account deletion: inventory
 
-- **Status:** **Inventory only (read-only), written 2026-10-20 for Pedram's review.** No plan, no code. Mode A when it proceeds
-  (schema, API shape, policy, state-machine edge, scheduled job, security).
+- **Status:** **Inventory ACCEPTED (2026-10-20).** Rulings on its open questions, the AH-104a/b-del/c/d/e split and the approved PII map are in
+  [`account-deletion-pii-map.md`](account-deletion-pii-map.md) and the AH-104 entry of `adhoc-changes-log.md`; where this file and the map differ
+  (§5.1 tax/KYC, §5.4 audit), **the map wins**. Written read-only; no code. Mode A (schema, API shape, policy, state-machine edge, scheduled job, security).
 - **Written at:** code `d1ad22d8` plus the docs commit `9adc60e0`. Repo claims below are cited `path:line`; store-policy claims are **from
   memory and unverified** (marked), to be checked against Apple's and Google's current text at plan time or in AH-105.
 - **Builds on, and re-verifies:** [`creator-app-inventory.md`](creator-app-inventory.md) M5 (2026-10-05, "The account-deletion gap"),
   `05-SECURITY-COMPLIANCE.md` §2.3-2.5 and §3.4-3.5, [`push-notifications-inventory.md`](push-notifications-inventory.md) (the push seam).
   §2 lists what has changed since M5.
-- **Neighbours (so nothing collides):** **AH-103d** (reinstall marker) is app-only and separate. The **Security page** under More is built
-  _inside_ AH-104 ([`biometrics-inventory.md`](biometrics-inventory.md) §10). **AH-104b** (in-app sign-up) is gated on AH-104. **AH-105**
+- **Neighbours (so nothing collides):** **AH-103d** (reinstall marker) is app-only and separate. The **Security page** (ruled web AND native, under the creator account menu) is built
+  _inside_ AH-104 (as AH-104b-del) ([`biometrics-inventory.md`](biometrics-inventory.md) §10). **AH-104d** (in-app sign-up, formerly AH-104b) is gated on AH-104. **AH-105**
   (privacy checklist) consumes this inventory's retention table. **Biometrics** (AH-103c) are deferred and never stand in for the re-auth
   in §4.
 
@@ -25,7 +26,7 @@
   "AH-104 SEAM", wired to nothing). Audit vocabulary `user.deleted` and `creator.deleted` (`Audit/Enums/AuditAction.php:54, 88`), with a
   mandatory reason for `user.deleted` (`:509`).
 - **Account creation is web-only today.** The native app has no create-account button; it points to the website (AH-100 Q8, see
-  `creator-app-client-shell-review.md` ~:142). In-app sign-up is AH-104b, "gated on AH-104's in-app deletion".
+  `creator-app-client-shell-review.md` ~:142). In-app sign-up is AH-104d (formerly AH-104b; the quoted review keeps the old name), "gated on AH-104's in-app deletion".
 - **The payments ledger does not exist.** `app/Modules/Payments/` holds only `.gitkeep` files and a provider class; the assignment
   states `payment_held` and `payment_released` exist in the state machine but both transitions refuse (vendor-gated, Sprint 10,
   `CampaignAssignmentStateMachine.php` ~:577-590). `payment_processing_enabled`, `creator_payout_method_enabled`,
@@ -55,9 +56,9 @@ without installing the app. The page must say which data is deleted and which is
 
 **How it applies to us.**
 
-- Strictly both rules key on _in-app account creation_, and the app has none until AH-104b. The team already ruled (AH-100 Q8) to couple
+- Strictly both rules key on _in-app account creation_, and the app has none until AH-104d. The team already ruled (AH-100 Q8) to couple
   in-app sign-up to deletion, and a reviewer can still ask where deletion is for a sign-in-only app that links to web sign-up. **Treat AH-104
-  as a precondition for the first store build**, not only for AH-104b.
+  as a precondition for the first store build**, not only for AH-104d.
 - **The web path is a hard requirement for Google and for GDPR art. 17** (`05-SECURITY-COMPLIANCE.md:53`). Web creators use the same SPA, so the
   same flow serves both; a public, unauthenticated page describing the process is the URL Google wants. This **conflicts with the "native-only
   Security page"** ruling if that page is deletion's only home (see open question 1).
@@ -280,7 +281,7 @@ mail in §4 is the mitigation).
 10. **Admin queue:** approval gate (the spec) or a view plus legal hold (recommended)? Who acts on a hold?
 11. **Production vendor state:** are KYC, Stripe payout or social tokens live for any real creator? That decides whether vendor deletion is in
     scope at all. (I could not read production.)
-12. **Order against the other work:** AH-104 before AH-105 (the privacy checklist consumes §5) and before AH-104b. Does it land before the first
+12. **Order against the other work:** AH-104 before AH-105 (the privacy checklist consumes §5) and before AH-104d. Does it land before the first
     store build? §3 says it should.
 13. **Sentry and any other identity-carrying processor:** I did not trace them; add to the AH-105 list or to this chunk?
 

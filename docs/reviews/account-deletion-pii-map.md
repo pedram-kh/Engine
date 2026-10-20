@@ -1,7 +1,7 @@
 # AH-104 — Creator PII map (what erasure touches, table by table)
 
-**Status:** PROPOSED. Awaiting Pedram's approval. No plan, no code. This is the contract the AH-104a erasure engine will be built
-and tested against.
+**Status:** **APPROVED (Pedram, 2026-10-20): D-A through D-G accepted as written, with the three additions in §1.1.** No code. This is the
+contract the AH-104a erasure engine is built and tested against; the plan is [`account-deletion-erasure-plan.md`](account-deletion-erasure-plan.md).
 **Date:** 2026-10-20. **Precedes:** the AH-104a plan. **Builds on:** [`account-deletion-inventory.md`](account-deletion-inventory.md)
 §5 (which this supersedes where they differ; the differences are called out in §7).
 **Risk:** HIGH (irreversible, touches production personal data). **PROD-DATA RISK: HIGH** for the eventual command; this document changes nothing.
@@ -34,7 +34,9 @@ migration; any backfill is a separate command). `users.erased_at` is the login b
 `creators.erased_at` is what agency resources read to emit an `is_erased` flag (the SPA renders the translated "Deleted creator"). **No English
 string is stored or emitted as a display name** (the 24-locale gate): `users.name` gets a non-display sentinel and no resource may render it.
 
-## 1. Decisions this map needs (read these first)
+## 1. Decisions (all APPROVED as written, 2026-10-20)
+
+The right-hand column was "my proposal" when this map was submitted; Pedram accepted every row as written, so it is now the ruling.
 
 | #       | Decision                                                                                                                                                                | My proposal                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -45,6 +47,20 @@ string is stored or emitted as a display name** (the 24-locale gate): `users.nam
 | **D-E** | Tax profile and KYC evidence retention.                                                                                                                                 | ANON the encrypted PII columns now; **keep the row's non-PII skeleton** (status, timestamps, provider) until counsel answers the retention question. No payment has ever been made (ledger not built), so no tax-retention duty has plausibly accrued, but I cannot see production.                                                                                                                             |
 | **D-F** | Re-registration after erasure frees the email (`users.email` is `unique`, `…create_users_table.php:33`). A suspended or blacklisted person can erase and start over.    | Do **not** retain an email hash. The admin **legal hold** (ruling) is the control: an admin can hold a request for a suspended subject. Say so in the AH-104c plan.                                                                                                                                                                                                                                             |
 | **D-G** | `campaign_posted_content.post_url` may embed a handle (TikTok-style `…/@handle/video/…`) and `creator_social_accounts` handles are being erased.                        | **KEEP**: it is the agency's proof of delivery and the post is public on the third party's platform, not ours. Disclosed.                                                                                                                                                                                                                                                                                       |
+
+### 1.1 Additions accepted with the approval
+
+1. **Erasure ledger.** One new table: request id, `users.ulid`, completed-at, nothing else, **no PII**. It is **re-applied after any restore**
+   (RDS snapshot or PITR), so a restore cannot resurrect an erased creator (§5).
+2. **Registry spec.** A failing-by-default spec reads the schema and **fails CI on any table or column that the registry has not classified**
+   (same shape as the payment-state spec). A future migration cannot add a PII-shaped column silently.
+3. **`agency_creator_relations.invitation_token_hash` is nulled** at erasure (already in §3.3).
+4. **Out of this map's chunk:** "stop writing PII into audit snapshots" (§4.1, last paragraph) is its own chunk, **AH-104e**, after AH-104a.
+
+Other rulings this map inherits (2026-10-20): 14-day grace cancellable by sign-in; lock and revoke tokens, sessions and push at request time;
+**no automatic erasure** (the admin sees "Ready to erase" after 14 days, a legal hold keeps it from showing as ready, and an admin clicks Erase with a
+confirm and an audit row); anonymise in place with an explicit marker column; audit logs and `notifications.data` scrubbed at erasure with rows
+kept; re-auth is password plus 2FA when enrolled, rate-limited like login; a failing-by-default spec for any future payment state.
 
 ## 2. Findings that shape the map (new since the inventory)
 

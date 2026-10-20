@@ -5,7 +5,7 @@
   would have given (§0).
 - **Mode when it resumes:** A (security-relevant: token release, lock-out and fallback policy, App Store review copy).
 - **Carved out of this chunk on 2026-10-20 (not deferred):** **AH-103d**, the tech-debt 17 reinstall marker (§9), and the
-  native-only **Security page** placeholder under More, which is built as part of **AH-104** (§10).
+  **Security page** under the creator account menu, **web AND native** (ruled 2026-10-20; first scoped here as native-only), built as part of **AH-104b-del** (§10).
 - **Read first when it resumes:** [`creator-app-token-auth-review.md`](creator-app-token-auth-review.md) (AH-099: the token, its 90-day
   ceiling, the revocation set), `tech-debt.md` item 17 (under "AH-102 (push notifications)"), [`deep-links-inventory.md`](deep-links-inventory.md)
   §3.1 (the cold-start tap behind a prompt).
@@ -142,9 +142,9 @@ a "no biometric code in `dist`" test like the Firebase stub (tech-debt, AH-102 r
 **Not verified:** nothing run on a device; the capgo plugin only skimmed; whether the aparajita plugin's SwiftPM package collides as the
 Firebase one did (the standing "never a bare `cap sync`" trap applies); whether the photo and camera pickers flip the app inactive.
 
-## 9. Carve-out 1 — AH-103d: the tech-debt 17 reinstall marker (Mode B, small)
+## 9. Carve-out 1 — AH-103d: the tech-debt 17 reinstall marker (full loop)
 
-**Scoped on 2026-10-20, not built.** Ad-hoc entry AH-103d (Proposed). Tech-debt item 17 (`tech-debt.md`, "AH-102 (push notifications)") is
+**Scoped on 2026-10-20, not built; ruled full loop (Mode A) the same day, plan in [`reinstall-marker-plan.md`](reinstall-marker-plan.md).** Ad-hoc entry AH-103d (Plan-pause). Tech-debt item 17 (`tech-debt.md`, "AH-102 (push notifications)") is
 the origin; this is its resolution, and it satisfies "decide before the first iOS store build" without the biometric work.
 
 - **Problem:** iOS keeps Keychain items across Delete App; a reinstalled, handed-on or sold phone comes back signed in as the previous creator,
@@ -160,23 +160,24 @@ the origin; this is its resolution, and it satisfies "decide before the first iO
 - **One-time tester sign-out on TestFlight build 3 (accepted, by design):** an install made before the marker existed (any tester on build 1
   or 2) has no marker, so the first launch of build 3 signs that tester out once, revokes their token server-side and clears the push row.
   Say so in the build-3 tester note. It cannot happen after build 3 and there is no store release yet.
-- **PROD-DATA RISK: NONE.** No schema, no migration, no data command. The only server writes are the existing logout's deletes of the user's
-  own token and push-token row, for installs without the marker (the tester set).
-- **Stop-gate note (WORKING-PROCESS §2):** wiping a session is security-relevant, a full-loop trigger. Pedram ruled Mode B explicitly on
-  2026-10-20; this is the exception, **flagged here in the moment**, not shipped-and-confessed.
+- **PROD-DATA RISK: LOW.** (Corrected 2026-10-20 from "NONE", which was wrong.) No schema, no migration, no data command, but the build
+  deletes production rows: the existing logout's deletes of the user's own token and push-token row, for every install with a session and no
+  marker (the tester set, once).
+- **Stop-gate note (WORKING-PROCESS §2):** wiping a session is security-relevant, a full-loop trigger. This section first scoped it as Mode B;
+  Pedram ruled **full loop** on 2026-10-20 ("build now, full loop (not Mode B). Walk includes the reinstall case"), which supersedes that.
 - **Proof expected at build:** a pure policy spec (marker present + token: nothing runs, the over-reach negative; marker missing + token:
   `nativeLogout` runs and the marker is written after it; marker missing + no token: no request); break-reverts including "wipe on every
   launch", "marker written before the wipe" and "local clear instead of `nativeLogout`".
 - **Deploy:** app only; reaches users with TestFlight build 3. Nothing in the API deploy. Deploy-log disposition is added with the build, not now.
 
-## 10. Carve-out 2 — the native-only "Security" page under More (built in AH-104, not now)
+## 10. Carve-out 2 — the "Security" page under the creator account menu (web AND native; built in AH-104b-del, not now)
 
-**Scoped on 2026-10-20, not built, not part of AH-103d.** It is built as part of AH-104 (account deletion), which needs a home anyway.
+**Scoped on 2026-10-20, not built, not part of AH-103d.** It is built as part of **AH-104b-del** (the deletion request flow), which needs a home anyway. **Ruling 2026-10-20: web AND native, under the creator account menu** (first scoped here as native-only; the flag at the end of this section is how that changed).
 
 - **Where:** the creator shell's More menu (`modules/creators/layouts/CreatorDashboardLayout.vue`, the list at ~419-441). Today More holds
   Profile, Availability and **Settings** (which is the notification preferences page in v1, AH-100 Q7). Security is a new entry next to them.
-- **What:** a native-only page with a placeholder. A route-table change, a More-menu entry, new `i18n` keys ×24 (real MT in the flaky 10).
+- **What:** a page on both surfaces (web and the creator app), holding account deletion first; native-only sections (biometrics, post-launch) are gated by `isNativePlatform()` inside it. A route-table change, a More-menu entry, new `i18n` keys ×24 (real MT in the flaky 10).
   Biometric unlock (this file) gets its section here when it resumes post-launch.
-- **Flag for AH-104:** account deletion must be reachable on the **web** creator surface too (Google's web-resource requirement and
-  GDPR art. 17), so the Security page cannot be native-only if it is deletion's only home. See the AH-104 inventory
+- **Flag for AH-104 (resolved by the ruling above):** account deletion must be reachable on the **web** creator surface too (Google's web-resource
+  requirement and GDPR art. 17), so the Security page cannot be native-only if it is deletion's only home. See the AH-104 inventory
   ([`account-deletion-inventory.md`](account-deletion-inventory.md)), open questions.
