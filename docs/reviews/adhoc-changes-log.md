@@ -63,7 +63,7 @@ reviews, and conversations.
 | ----------- | ----------------------------------------- | ------------------- | ----------------------------------------------------------------------------------------------- |
 | —           | Campaign Drafts tab — independent review  | Pending             | Merged in code; review file reads "pending independent review pass."                            |
 | AH-104      | Account deletion (umbrella)               | In progress         | Inventory and PII map APPROVED 2026-10-20. Split into AH-104a..e below. No code yet.            |
-| AH-104a     | Erasure engine (command, dry-run, ledger) | Checkpoint 0        | Plan cleared 2026-10-20; Stage 0 done (enumeration committed). Awaiting clearance + Q10.        |
+| AH-104a     | Erasure engine (command, dry-run, ledger) | Checkpoint A        | Stages 0-7 built except 4e (waits on read-back C); execute refused until then. Not pushed.      |
 | AH-104b-del | Deletion request flow + Security page     | Queued              | After 104a. Web AND native, under the creator account menu.                                     |
 | AH-104c     | Admin erasure queue, Erase button, hold   | Queued              | After 104b-del. 14 days, then an admin clicks Erase (confirm + audit row).                      |
 | AH-104d     | In-app sign-up (was AH-104b)              | Gated               | Gated on 104a-c. Renamed 2026-10-20; older entries and closed reviews keep "AH-104b".           |
@@ -83,8 +83,9 @@ reviews, and conversations.
 ### AH-104 · Account deletion (inventory and PII map APPROVED; split into AH-104a..e)
 
 - **Status:** In progress. The inventory and [`account-deletion-pii-map.md`](account-deletion-pii-map.md) are approved (2026-10-20, D-A to D-G as
-  written). The AH-104a plan is CLEARED (2026-10-20); Stage 0 (the audit enumeration) is done and the chunk is stopped at Checkpoint 0.
-  No production code yet.
+  written). **AH-104a is built through Stage 7 except 4e (the audit scrub, waiting on read-back C) and stopped at Checkpoint A** (artisan only, no route,
+  not scheduled; `--execute` is refused until 4e lands). Not pushed. Stage 8 (runbook, deploy log) not started. The tech-debt entry "AH-104a erasure engine"
+  lists what the proof does not cover (sqlite-only specs, S3 versions never run against real S3).
 - **Date:** 2026-10-20.
 - **Rulings (2026-10-20):** high risk. 14-day grace, cancellable by sign-in; lock and revoke tokens, sessions and push at request time; **no
   automatic erasure** (after 14 days the admin view shows "Ready to erase", an admin clicks Erase with a confirm and an audit row; a legal hold

@@ -6,18 +6,18 @@
 > cd apps/api && php tools/enumerate-audit-actions.php > ../../docs/reviews/account-deletion-audit-enumeration.md
 > ```
 >
-> Source commit: `0d7bad8657f07059867f9d69595a796a73778fb0`. Static analysis only (nikic/php-parser); no Laravel boot, no DB, no application code executed. Scanned 664 PHP files under `apps/api/app`.
+> Source commit: `2af9ed0a13e10d67a8db390fa3d1e111d42e56bd`. Static analysis only (nikic/php-parser); no Laravel boot, no DB, no application code executed. Scanned 710 PHP files under `apps/api/app`.
 
 ## 1. Summary
 
 | Measure | Count |
 |---|---:|
-| `AuditAction` cases | 133 |
-| …with `requiresReason() === true` | 19 |
-| Audit log call sites found | 98 |
-| …with a literal `AuditAction::X` action | 94 |
+| `AuditAction` cases | 134 |
+| …with `requiresReason() === true` | 20 |
+| Audit log call sites found | 99 |
+| …with a literal `AuditAction::X` action | 95 |
 | …with a dynamic action (needs a manual read) | 4 |
-| Cases with a direct call site | 86 |
+| Cases with a direct call site | 87 |
 | Cases referenced only indirectly (passed through a helper, a map, or a listener) | 30 |
 | Cases with no reference in `app/` outside the enum (dead, unless the `Audited` trait derives them) | 17 |
 | `AuditAction::from/tryFrom` dynamic resolvers | 3 |
@@ -30,6 +30,7 @@
 
 | Case | Value | Reason req. | Direct sites | Other refs | `metadata` keys | `before` keys | `after` keys | Dynamic payload parts |
 |---|---|:--:|---|---|---|---|---|---|
+| `AccountErased` | `account.erased` | yes | `apps/api/app/Modules/Erasure/Run/ErasureRun.php:158` | — | `audit_rows_scrubbed`, `counts`, `digest`, `files_deleted`, `ledger_ulid` | — | — | — |
 | `AdminImpersonationEnded` | `admin.impersonation_ended` |  | `apps/api/app/Modules/Identity/Services/ImpersonationService.php:235` | — | `impersonated_user_id`, `impersonation_ulid` | — | — | — |
 | `AdminImpersonationStarted` | `admin.impersonation_started` | yes | `apps/api/app/Modules/Identity/Services/ImpersonationService.php:108` | — | `impersonated_user_id`, `impersonation_ulid` | — | — | — |
 | `AgencyCreatorRelationAdminConnected` | `agency_creator_relation.admin_connected` | yes | `apps/api/app/Modules/Creators/Services/CreatorAgencyDirectConnectService.php:166` | — | `agency_id`, `automation_rule_id`, `fired_by`, `mode` | — | — | — |
@@ -38,7 +39,7 @@
 | `AgencyCreatorRelationDeleted` | `agency_creator_relation.deleted` |  | — | `apps/api/app/Modules/Agencies/Models/AgencyCreatorRelation.php:218` | — | — | — | — |
 | `AgencyCreatorRelationDisconnected` | `agency_creator_relation.disconnected` | yes | `apps/api/app/Modules/Creators/Http/Controllers/Admin/AdminCreatorConnectionController.php:208` | — | `agency_id`, `pool_memberships_deleted` | — | — | — |
 | `AgencyCreatorRelationNotesUpdated` | `agency_creator_relation.notes_updated` |  | `apps/api/app/Modules/Agencies/Http/Controllers/AgencyCreatorDetailController.php:86` | — | — | — | — | — |
-| `AgencyCreatorRelationUpdated` | `agency_creator_relation.updated` |  | — | `apps/api/app/Modules/Agencies/Models/AgencyCreatorRelation.php:219` | — | — | — | — |
+| `AgencyCreatorRelationUpdated` | `agency_creator_relation.updated` |  | — | `apps/api/app/Modules/Agencies/Models/AgencyCreatorRelation.php:217`<br>`apps/api/app/Modules/Agencies/Models/AgencyCreatorRelation.php:219` | — | — | — | — |
 | `AgencyFileDeleted` | `agency_file.deleted` |  | `apps/api/app/Modules/Agencies/Http/Controllers/AgencyFileController.php:192` | — | — | — | — | `before: $before @ apps/api/app/Modules/Agencies/Http/Controllers/AgencyFileController.php:192` |
 | `AgencyFileUploaded` | `agency_file.uploaded` |  | `apps/api/app/Modules/Agencies/Http/Controllers/AgencyFileController.php:149` | — | — | — | — | `after: $file->toArray() @ apps/api/app/Modules/Agencies/Http/Controllers/AgencyFileController.php:149` |
 | `AgencyReactivated` | `agency.reactivated` |  | `apps/api/app/Modules/Admin/Http/Controllers/AdminAgencyController.php:187` | — | — | — | — | — |
@@ -53,8 +54,8 @@
 | `AssignmentDraftApproved` | `assignment.draft_approved` |  | — | `apps/api/app/Modules/Boards/Services/BoardCardService.php:151`<br>`apps/api/app/Modules/Boards/Support/BoardDefaults.php:56`<br>`apps/api/app/Modules/Campaigns/Listeners/SendAssignmentNotifications.php:111`<br>`apps/api/app/Modules/Campaigns/Listeners/WriteSystemMessage.php:39`<br>`apps/api/app/Modules/Campaigns/Services/CampaignAssignmentStateMachine.php:357` | — | — | — | — |
 | `AssignmentDraftOverdue` | `assignment.draft_overdue` |  | — | `apps/api/app/Modules/Boards/Services/OverdueScanService.php:92` | — | — | — | — |
 | `AssignmentDraftRejected` | `assignment.draft_rejected` | yes | — | `apps/api/app/Modules/Boards/Support/BoardDefaults.php:66`<br>`apps/api/app/Modules/Campaigns/Listeners/SendAssignmentNotifications.php:118`<br>`apps/api/app/Modules/Campaigns/Listeners/WriteSystemMessage.php:41`<br>`apps/api/app/Modules/Campaigns/Services/CampaignAssignmentStateMachine.php:395` | — | — | — | — |
-| `AssignmentDraftSubmitted` | `assignment.draft_submitted` |  | — | `apps/api/app/Modules/Boards/Services/BoardCardService.php:141`<br>`apps/api/app/Modules/Campaigns/Listeners/SendAssignmentNotifications.php:110`<br>`apps/api/app/Modules/Campaigns/Listeners/WriteSystemMessage.php:38`<br>`apps/api/app/Modules/Campaigns/Services/CampaignAssignmentStateMachine.php:311` | — | — | — | — |
-| `AssignmentInvited` | `assignment.invited` |  | `apps/api/app/Modules/Campaigns/Services/CampaignInvitationService.php:112` | `apps/api/app/Modules/Boards/Listeners/CreateBoardCard.php:41`<br>`apps/api/app/Modules/Boards/Services/BoardCardService.php:140`<br>`apps/api/app/Modules/Boards/Support/BoardDefaults.php:54`<br>`apps/api/app/Modules/Campaigns/Listeners/CreateMessageThread.php:33`<br>`apps/api/app/Modules/Campaigns/Listeners/SendAssignmentNotifications.php:123`<br>`apps/api/app/Modules/Campaigns/Listeners/SendAssignmentNotifications.php:333`<br>`apps/api/app/Modules/Campaigns/Services/CampaignInvitationService.php:127` | `agreed_fee_currency`, `agreed_fee_minor_units`, `from`, `to` | — | — | — |
+| `AssignmentDraftSubmitted` | `assignment.draft_submitted` |  | — | `apps/api/app/Modules/Boards/Services/BoardCardService.php:141`<br>`apps/api/app/Modules/Boards/Support/BoardDefaults.php:55`<br>`apps/api/app/Modules/Campaigns/Listeners/SendAssignmentNotifications.php:110`<br>`apps/api/app/Modules/Campaigns/Listeners/WriteSystemMessage.php:38`<br>`apps/api/app/Modules/Campaigns/Services/CampaignAssignmentStateMachine.php:311` | — | — | — | — |
+| `AssignmentInvited` | `assignment.invited` |  | `apps/api/app/Modules/Campaigns/Services/CampaignInvitationService.php:112` | `apps/api/app/Modules/Boards/Listeners/CreateBoardCard.php:41`<br>`apps/api/app/Modules/Boards/Services/BoardCardService.php:88`<br>`apps/api/app/Modules/Boards/Services/BoardCardService.php:140`<br>`apps/api/app/Modules/Boards/Support/BoardDefaults.php:54`<br>`apps/api/app/Modules/Campaigns/Listeners/CreateMessageThread.php:33`<br>`apps/api/app/Modules/Campaigns/Listeners/SendAssignmentNotifications.php:123`<br>`apps/api/app/Modules/Campaigns/Listeners/SendAssignmentNotifications.php:333`<br>`apps/api/app/Modules/Campaigns/Services/CampaignInvitationService.php:127` | `agreed_fee_currency`, `agreed_fee_minor_units`, `from`, `to` | — | — | — |
 | `AssignmentLiveVerified` | `assignment.live_verified` |  | — | `apps/api/app/Modules/Boards/Support/BoardDefaults.php:58`<br>`apps/api/app/Modules/Boards/Support/BoardDefaults.php:87`<br>`apps/api/app/Modules/Campaigns/Listeners/SendAssignmentNotifications.php:122`<br>`apps/api/app/Modules/Campaigns/Listeners/WriteSystemMessage.php:48`<br>`apps/api/app/Modules/Campaigns/Services/CampaignAssignmentStateMachine.php:495` | — | — | — | — |
 | `AssignmentManuallyVerified` | `assignment.manually_verified` | yes | — | `apps/api/app/Modules/Boards/Support/BoardDefaults.php:59`<br>`apps/api/app/Modules/Boards/Support/BoardDefaults.php:88`<br>`apps/api/app/Modules/Campaigns/Listeners/SendAssignmentNotifications.php:121`<br>`apps/api/app/Modules/Campaigns/Listeners/WriteSystemMessage.php:49`<br>`apps/api/app/Modules/Campaigns/Services/CampaignAssignmentStateMachine.php:539` | — | — | — | — |
 | `AssignmentPaymentFunded` | `assignment.payment_funded` |  | — | — | — | — | — | — |
@@ -231,10 +232,10 @@ The trait emits `created` / `updated` / `deleted` rows from model events: `after
 |---|---|---|---|
 | `App\Modules\Agencies\Models\AgencyCreatorRelation`<br>`apps/api/app/Modules/Agencies/Models/AgencyCreatorRelation.php:65` | `agency_id`, `creator_id`, `relationship_status`, `is_blacklisted`, `blacklist_scope`, `blacklist_type`, `blacklisted_at`, `blacklisted_by_user_id`, `invitation_sent_at`, `invitation_expires_at`, `invited_by_user_id`, `internal_rating`, `last_engaged_at` | overridden → `AgencyCreatorRelationCreated`, `AgencyCreatorRelationUpdated`, `AgencyCreatorRelationDeleted` | yes (literal cases) |
 | `App\Modules\Agencies\Models\BrandCreatorBlacklist`<br>`apps/api/app/Modules/Agencies/Models/BrandCreatorBlacklist.php:57` | `brand_id`, `creator_id`, `blacklist_type`, `blacklisted_at`, `blacklisted_by_user_id` | overridden → `BrandCreatorBlacklistCreated`, `BrandCreatorBlacklistDeleted` | yes (literal cases) |
-| `App\Modules\Creators\Models\Creator`<br>`apps/api/app/Modules/Creators/Models/Creator.php:78` | `display_name`, `country_code`, `primary_language`, `categories`, `verification_level`, `tier`, `application_status`, `approved_at`, `approved_by_user_id`, `rejected_at`, `profile_completeness_score`, `kyc_status`, `kyc_verified_at`, `kyc_method`, `verified_by_user_id`, `tax_profile_complete`, `payout_method_set`, `submitted_at`, `last_active_at`, `deleted_at` | trait default → `creator.created ✓`, `creator.updated ✓`, `creator.deleted ✓` | yes |
+| `App\Modules\Creators\Models\Creator`<br>`apps/api/app/Modules/Creators/Models/Creator.php:79` | `display_name`, `country_code`, `primary_language`, `categories`, `verification_level`, `tier`, `application_status`, `approved_at`, `approved_by_user_id`, `rejected_at`, `profile_completeness_score`, `kyc_status`, `kyc_verified_at`, `kyc_method`, `verified_by_user_id`, `tax_profile_complete`, `payout_method_set`, `submitted_at`, `last_active_at`, `deleted_at` | trait default → `creator.created ✓`, `creator.updated ✓`, `creator.deleted ✓` | yes |
 | `App\Modules\Creators\Models\CreatorPayoutMethod`<br>`apps/api/app/Modules/Creators/Models/CreatorPayoutMethod.php:37` | `provider`, `provider_account_id`, `currency`, `is_default`, `status`, `verified_at` | overridden → `CreatorPayoutMethodCreated`, `CreatorPayoutMethodUpdated`, `CreatorPayoutMethodDeleted` | yes (literal cases) |
 | `App\Modules\Creators\Models\CreatorTaxProfile`<br>`apps/api/app/Modules/Creators/Models/CreatorTaxProfile.php:45` | `tax_form_type`, `tax_id_country`, `submitted_at`, `verified_at`, `verified_by_user_id` | overridden → `CreatorTaxProfileCreated`, `CreatorTaxProfileUpdated`, `CreatorTaxProfileDeleted` | yes (literal cases) |
-| `App\Modules\Identity\Models\User`<br>`apps/api/app/Modules/Identity/Models/User.php:55` | `email`, `email_verified_at`, `type`, `name`, `last_name`, `preferred_language`, `preferred_currency`, `timezone`, `theme_preference`, `last_login_at`, `last_login_ip`, `mfa_required`, `mfa_exempted_at`, `is_suspended`, `suspended_reason`, `suspended_at`, `deleted_at` | trait default → `user.created ✓`, `user.updated ✓`, `user.deleted ✓` | yes |
+| `App\Modules\Identity\Models\User`<br>`apps/api/app/Modules/Identity/Models/User.php:57` | `email`, `email_verified_at`, `type`, `name`, `last_name`, `preferred_language`, `preferred_currency`, `timezone`, `theme_preference`, `last_login_at`, `last_login_ip`, `mfa_required`, `mfa_exempted_at`, `is_suspended`, `suspended_reason`, `suspended_at`, `deleted_at` | trait default → `user.created ✓`, `user.updated ✓`, `user.deleted ✓` | yes |
 
 ## 5. Union of literal payload keys
 
@@ -251,6 +252,7 @@ The trait emits `created` / `updated` / `deleted` rows from model events: `after
 | `approved_at` |  |  | `audited allowlist` | 1 |
 | `approved_by_user_id` |  |  | `audited allowlist` | 1 |
 | `assignment_id` |  |  | `metadata` | 1 |
+| `audit_rows_scrubbed` |  |  | `metadata` | 1 |
 | `automation_rule_id` |  |  | `metadata` | 1 |
 | `before` |  | **review** | `metadata` | 1 |
 | `blacklist_scope` |  |  | `audited allowlist` | 1 |
@@ -266,9 +268,11 @@ The trait emits `created` / `updated` / `deleted` rows from model events: `after
 | `columns_removed` |  |  | `metadata` | 1 |
 | `columns_seeded` |  |  | `metadata` | 1 |
 | `country_code` |  |  | `audited allowlist` | 1 |
+| `counts` |  |  | `metadata` | 1 |
 | `creator_id` |  |  | `metadata`, `after`, `before`, `audited allowlist` | 7 |
 | `currency` |  |  | `audited allowlist` | 1 |
 | `deleted_at` |  |  | `audited allowlist` | 2 |
+| `digest` |  |  | `metadata` | 1 |
 | `display_name` | yes |  | `audited allowlist` | 1 |
 | `email` | yes |  | `after`, `metadata`, `audited allowlist` | 3 |
 | `email_verified_at` |  | **review** | `audited allowlist` | 1 |
@@ -277,6 +281,7 @@ The trait emits `created` / `updated` / `deleted` rows from model events: `after
 | `error` |  |  | `metadata` | 1 |
 | `event_type` |  |  | `metadata` | 4 |
 | `field` |  | **review** | `metadata` | 1 |
+| `files_deleted` |  |  | `metadata` | 1 |
 | `fired_by` |  |  | `metadata` | 1 |
 | `flag` |  |  | `metadata` | 1 |
 | `from` |  |  | `metadata` | 2 |
@@ -301,6 +306,7 @@ The trait emits `created` / `updated` / `deleted` rows from model events: `after
 | `last_login_at` |  |  | `audited allowlist` | 1 |
 | `last_login_ip` | yes |  | `audited allowlist` | 1 |
 | `last_name` | yes |  | `audited allowlist` | 1 |
+| `ledger_ulid` |  |  | `metadata` | 1 |
 | `mfa` |  |  | `metadata` | 1 |
 | `mfa_exempted_at` |  |  | `audited allowlist` | 1 |
 | `mfa_required` |  |  | `audited allowlist` | 1 |

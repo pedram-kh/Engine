@@ -3321,3 +3321,25 @@ It is allowlisted in `tests/unit/architecture/use-theme-is-sot.spec.ts` (the tes
   `withSchedule` entry **twice**, so `PrunePushDeliveriesCommandTest` "is registered in the scheduler as a daily command" (`toHaveCount(1)`) **fails when run alone** (`--filter`) at the baseline
   (stash-tested), and passes in the full file only because an earlier test has already called Artisan. CI runs whole files so it never shows. The new rider test counts distinct lines to be immune.
   **Resolution:** make the push test count distinct lines too, and find why the first listing doubles (the `withSchedule` callback is evidently applied twice on first resolution). Owner: platform.
+
+---
+
+## AH-104a erasure engine: what is built, what is not, and what is untested (OPEN)
+
+- **Where:** `apps/api/app/Modules/Erasure/`, [`reviews/account-deletion-erasure-plan.md`](reviews/account-deletion-erasure-plan.md).
+- **Why a register entry:** the engine is built and proven on a seeded graph, but its first real run is irreversible. These are the things the proof does not cover.
+  1. **Erasure specs run on sqlite; the pgsql grammar is compiled but not exercised.** Exercise against a Postgres CI job before the first real erasure.
+     (The registry/engine use only the query builder, so the SQL is generated for Postgres in production, but no spec has ever executed it there. Cascade ordering,
+     `whereJsonContains`/JSON path updates and `ON DELETE CASCADE` behaviour are the places a difference would hide.) **Escalates:** before the first real run.
+  2. **Stage 4e (the audit scrub) is not built.** It waits on production read-back C (the scrub role and connection). `AuditScrub` is bound to an implementation that
+     reports itself unavailable, so `erasure:run --execute` and `erasure:reapply --execute` are **refused** in every environment until 4e lands. By design; do not work around it.
+  3. **The S3 version purge has never run against real S3.** It is covered by a fake disk only. The application role needs `s3:ListBucketVersions` and
+     `s3:DeleteObjectVersion` on the media bucket (read-back D); a missing permission fails closed (`ObjectDeletionFailed`, no object key in the message), it does
+     not skip. Also unverified: behaviour on a very large version list (paginated in code, not load-tested).
+  4. **The Object Lock on the `erasure-ledger/` mirror is a nice-to-have, not built.** Versioning is required (ruling Q1); the application has no delete path for the mirror.
+  5. **Residuals the erasure leaves on purpose or cannot reach:** the UI shows a blank name where it reads a nullable `display_name` outside the `[erased]` sentinel;
+     state-machine `context` JSON is not scrubbed; `processing_error` text on portfolio rows is not scrubbed.
+     Each is named in the PII map or the plan; none is a surprise, none is closed.
+  6. **Local-only quirk:** the Identity login specs (and `ErasedLoginBlockTest`) need `SANCTUM_STATEFUL_DOMAINS` set in the environment, as CI does
+     (`.github/workflows/ci.yml`); a local run without it fails them (16 in `LoginTest` alone). Local runs here pass the `.env.example` list. CI is unaffected.
+- **Owner:** platform / identity. **Status:** OPEN. Opened 2026-10-20 at AH-104a Checkpoint A.

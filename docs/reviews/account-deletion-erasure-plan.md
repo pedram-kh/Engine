@@ -1,7 +1,10 @@
 # AH-104a — The erasure engine — PLAN (plan-pause)
 
-- **Status:** **Plan CLEARED (2026-10-20, rulings in §8.1). Stage 0 DONE; stopped at Checkpoint 0**, awaiting clearance before Stage 1. Stage 0's result is in §3.1
-  (it found three things the plan did not know; one of them needs a ruling, Q10).
+- **Status:** **Stages 0 to 7 BUILT except 4e; stopped at Checkpoint A (2026-10-20).** Stage 4e (the audit scrub) waits on read-back C, so `erasure:run --execute`
+  is **refused in every environment** until it lands (`AuditScrub` is bound to an implementation that reports itself unavailable; fail closed). Stage 8 (runbook,
+  deploy-log disposition, privacy-notice inputs) is not started. **Deviation from §5's order:** Stage 6 (payment guard) was committed **before** Stage 5, so there
+  is never a commit with the command and without the guard. **Slot kept:** in `ErasureRun` the audit scrub runs **before** the S3 and vendor steps, so 4e drops in
+  with no reorder. Local commits are not pushed; the push waits for Pedram's trigger at Checkpoint A.
 - **Date:** 2026-10-20
 - **Entry:** **AH-104a** (command, dry-run, registry, ledger, restore replay; **no UI, no route, not scheduled**). **AH-104b-del** (request flow + Security
   page), **AH-104c** (admin queue, Erase, hold), **AH-104d** (in-app sign-up) and **AH-104e** (stop writing PII into audit snapshots) are out of scope here.
