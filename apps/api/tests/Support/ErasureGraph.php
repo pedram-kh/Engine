@@ -152,7 +152,7 @@ final class ErasureGraph
 
         // 4b — satellites.
         CreatorTaxProfile::factory()->createOne(['creator_id' => $creator->id]);
-        CreatorPayoutMethod::factory()->createOne(['creator_id' => $creator->id]);
+        CreatorPayoutMethod::factory()->createOne(['creator_id' => $creator->id, 'provider' => 'mock']);
         CreatorKycVerification::factory()->createOne(['creator_id' => $creator->id, 'provider_session_id' => $kycSessionId]);
         CreatorSocialAccount::factory()->createOne(['creator_id' => $creator->id, 'platform' => SocialPlatform::Instagram]);
         CreatorSocialAccount::factory()->createOne(['creator_id' => $creator->id, 'platform' => SocialPlatform::TikTok])->delete();
