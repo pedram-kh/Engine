@@ -1,6 +1,7 @@
 # AH-104a — The erasure engine — PLAN (plan-pause)
 
-- **Status:** **Awaiting review.** No code until this is cleared. Stage 0 is the only thing that may start early, and only on your say-so (it is read-only).
+- **Status:** **Plan CLEARED (2026-10-20, rulings in §8.1). Stage 0 DONE; stopped at Checkpoint 0**, awaiting clearance before Stage 1. Stage 0's result is in §3.1
+  (it found three things the plan did not know; one of them needs a ruling, Q10).
 - **Date:** 2026-10-20
 - **Entry:** **AH-104a** (command, dry-run, registry, ledger, restore replay; **no UI, no route, not scheduled**). **AH-104b-del** (request flow + Security
   page), **AH-104c** (admin queue, Erase, hold), **AH-104d** (in-app sign-up) and **AH-104e** (stop writing PII into audit snapshots) are out of scope here.
@@ -81,6 +82,36 @@ result is reproducible and Stage 5's guard (§4.7) can reuse the same parser. It
 colleague now**, not at Stage 0's end: it needs lead time, it is read-only and aggregate-only, and its answers decide Stages 4e and 4f. Sections: A vendor and
 driver state, B row counts per affected table, C `audit_logs` grants, D backups / S3 versioning / audit archive, E two questions for you.
 
+### 3.1 Stage 0 result (2026-10-20) — what the enumeration found
+
+Script: `apps/api/tools/enumerate-audit-actions.php` (commit `ffddcdb7`); output: [`account-deletion-audit-enumeration.md`](account-deletion-audit-enumeration.md)
+(generated, deterministic, SHA at the top). Static analysis only; **nothing was run against any database**. Corrections to the plan's own numbers: there are **98 audit
+call sites** (94 literal, 4 dynamic), not "about 149"; **133 cases**, 86 with a direct site, 30 reached only indirectly, 17 with no reference (one of them, `user.deleted`,
+is not dead, see F1); the "41 sites were sampled, not read" caveat is **closed**: all 98 were read by the parser, and the 4 dynamic ones by hand (below).
+
+**F1 — `user.deleted` and the `Audited` trait (needs a ruling: Q10).** The enumeration shows `UserDeleted` / `CreatorDeleted` with no call site, which is what §4.5
+relied on ("existing, currently unused"). They are **not** unused: `User` and `Creator` use the `Audited` trait, whose default `auditAction()` derives
+`lower(class_basename).".".event`, so the trait **emits `user.deleted` / `creator.deleted` on any Eloquent `delete()`** (with a `before` snapshot that holds `email`, `name`,
+`last_name`, `last_login_ip`). Nothing deletes a user today (grep: no `->delete()` / `forceDelete` on either model), so no such row exists yet; but reusing the same
+verb for "this account was erased" would make two different events share one name, and the day anything soft-deletes a user the audit trail cannot tell them apart.
+**Two consequences, both binding on the build whatever Q10 answers:** (i) the erasure steps use the **query builder, never Eloquent**, on the six audited models (a
+model `save()` or `delete()` would emit a `user.updated` / `user.deleted` audit row whose `before`/`after` carry the very PII being erased), and an arch spec asserts it
+for `app/Modules/Erasure/`; (ii) the run's own audit row carries counts only.
+
+**F2 — payload keys the map did not name** (map §4.1 amended, see there): `creator.admin.field_updated` carries `metadata.before` / `metadata.after` = the **old and new
+value of whichever creator field an admin edited** (so a name, a phone, a bio can sit there), plus `field` and `reason`; `creator.approved` carries
+`metadata.welcome_message` (free text, and the live column is already ANON in map §3); `creator.kyc.manually_verified` carries `metadata.note` (free text).
+Nothing else in 98 sites carries a free-text or personal value. Reviewed and **not personal** (flags, enums, timestamps, ids, counts): `email_verified_at`, `has_note`,
+`tax_form_type`, `tax_id_country`, `tax_profile_complete`, and every other key in the enumeration's section 5.
+
+**F3 — whole-model snapshots.** The direct calls listed in the enumeration's section 3.2 pass `->toArray()`, a variable or a helper as `before`/`after` (brands, talent
+pools, agency files, campaigns, automation rules, agency settings), so their keys cannot be read statically. Every one is an **agency-side record**: none has a user or a
+creator as its subject, so none falls under S1–S5. The audit-metadata guard (§4.7) therefore asserts on **literal keys only** and carries those sites as an explicit
+"snapshot of agency data, not creator data" list keyed by `path:line`, so a new non-literal call cannot be added silently. (`CreatorBlacklisted`'s `$metadata` is
+`scope`, `type`, `brand_id`; `BulkInviteCompleted`'s `$stats` is three counters; both read by hand.) The four dynamic-action calls were read by hand: the three `Audited` hooks (F1) and the assignment state machine's `commit()`, whose
+`context` keys at every caller are `draft_id`, `version`, `media_count`, `link_count`, `posted_content_id`, `platform`, `platform_post_id`, the two fee fields,
+`re_offered_after_decline`, `completes_on_approval`: **no PII**.
+
 **0.3 Exit (Checkpoint 0).** You read the enumeration and the read-back answers. I amend map §4.1's key list **only if the script finds keys it does not name**,
 as a docs commit that cites the script output, and the plan's Stage 4e and 4f are confirmed or re-planned. **Stop for your clearance before Stage 1.**
 **PROD-DATA RISK for Stage 0: NONE** (source reading; the colleague's queries are `BEGIN READ ONLY`).
@@ -143,9 +174,10 @@ not complete). An **arch spec** asserts that no other file under `app/` issues a
   captured from the DB (S3 delete is idempotent) → **one database transaction** for every DB step (anonymise, delete, scrub JSON, the audit scrub through its own
   connection immediately after commit, because it cannot share the transaction) → **ledger** `completed`. A failure before the transaction leaves the database
   untouched; a failure after leaves a ledger row in `db_done`, and re-running resumes from there. **Each step is idempotent** (a second run changes nothing).
-- **Audit trail of the run:** it reuses the existing, currently unused `AuditAction::UserDeleted` and `CreatorDeleted` (`AuditAction.php:54,88`; `UserDeleted`
-  requires a reason, `:509`), with `reason = "erasure {ledger ulid}"` and `metadata` holding **only counts**. **No new enum case, so no `AuditAction` change.** A spec
-  asserts the row carries **no email, name or ip of the subject**, and that an agency actor's row is untouched.
+- **Audit trail of the run:** as planned, it reuses `AuditAction::UserDeleted` and `CreatorDeleted` (`AuditAction.php:54,88`; `UserDeleted` requires a reason, `:509`), with
+  `reason = "erasure {ledger ulid}"` and `metadata` holding **only counts**. **Stage 0 amended the premise** ("currently unused"): the `Audited` trait derives these same
+  verbs for any Eloquent delete of a `User`/`Creator` (§3.1 F1), so **Q10** asks whether to add one new case instead. Until Q10 is answered the build does not start
+  Stage 5. Either way a spec asserts the row carries **no email, name or ip of the subject**, and that an agency actor's row is untouched.
 - **Never scheduled, never reachable from HTTP.** A spec asserts the command is absent from `bootstrap/app.php`'s schedule and from every route file.
 
 ### 4.6 The erasure ledger, and the flaw in the obvious design
@@ -254,6 +286,24 @@ Gate list at each checkpoint: Pest for the touched modules, **Pint**, **PHPStan 
    the open `PENDING` deploy-log entry, or hold AH-104a's push until the deploy window? I recommend stack and push, because nothing is armed.
 9. **Q9 — Who can run it.** Read-back item E2. Until the answer, the runbook says "operator named by Pedram, from a machine with production access, never from a laptop
    without the dry-run output attached."
+
+### 8.1 Rulings (2026-10-20, Pedram) and the question Stage 0 added
+
+| Q                          | Ruling                                                                                                                                                                                                                                                       |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Q1**                     | Mirror on the **media bucket**, private prefix `erasure-ledger/`, **versioning on**. **Object Lock: ask the colleague (nice-to-have, not a blocker).** Goes to read-back D.                                                                                  |
+| **Q2**                     | **Both**: the fresh digest **and** a typed confirmation of the subject's ulid.                                                                                                                                                                               |
+| **Q3–Q7**                  | As proposed (column-level registry for the affected set; new `Erasure` module; fail closed on non-`mock` vendors; `[erased]` and `erased-{ulid}@erased.invalid` sentinels; request-time lock and revoke belongs to AH-104b-del).                             |
+| **Q8**                     | **Stack the obligation and push.** Pushes still happen on Pedram's trigger.                                                                                                                                                                                  |
+| **Q9**                     | The operator is **the super admin (Pedram) through the AH-104c Erase button**. A manual `php artisan erasure:run` on the server is a **fallback only**, with the dry-run output attached to the request. The runbook says exactly this.                      |
+| **Read-back A (vendors)**  | **No real external service is enabled in production; every provider is `mock`.** Stage 4g stays **fail-closed** and **no vendor-side deletes are built**. (Re-open only if a non-mock provider is ever enabled; the engine refuses that subject until then.) |
+| **Read-back E (operator)** | As Q9.                                                                                                                                                                                                                                                       |
+| **Read-back B, C, D**      | **Pending** (Pedram's colleague; Pedram forwards the output). **C gates Stage 4e**; D gates the S3-version decision in 4f and the Object Lock note in Q1.                                                                                                    |
+
+**Q10 — NEW from Stage 0 (needs your ruling before Stage 5; does not block Stage 1).** The run's audit row: **(a)** reuse `user.deleted` / `creator.deleted` as ruled
+(zero enum change, but the same verb the `Audited` trait emits for a real model delete, §3.1 F1), or **(b)** add **one** case, `account.erased` (reason required, one row
+per run, `subject = the user`), so "erased" and "deleted" can never be confused. **I recommend (b):** it is one enum line plus the doc table in `05-SECURITY-COMPLIANCE`, and
+it keeps the audit trail honest for the one event a regulator or the person themselves may ask about. Stage 5 waits for the answer.
 
 ---
 

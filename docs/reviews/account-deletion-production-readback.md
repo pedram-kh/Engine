@@ -1,6 +1,9 @@
 # AH-104a — Production read-back list (for the colleague)
 
-**Status:** PROPOSED with the AH-104a plan ([`account-deletion-erasure-plan.md`](account-deletion-erasure-plan.md), Stage 0). Nothing here has been run.
+**Status (2026-10-20):** PROPOSED with the AH-104a plan ([`account-deletion-erasure-plan.md`](account-deletion-erasure-plan.md), Stage 0). Nothing here has been run.
+**Answered so far:** **A** and **E2** by Pedram: **no real external service is enabled in production; every provider is `mock`**, so AH-104a stays fail-closed on any
+non-`mock` row and builds no vendor-side deletes (the last table's A3 row does not apply). **Open, with Pedram's colleague (Pedram forwards the output): B (row counts),
+C (`audit_logs` grants; gates Stage 4e), D (backups, S3 versioning; plus the new Q1 question: can Object Lock be enabled on the `erasure-ledger/` prefix, nice-to-have).**
 **Why it exists:** the PII map is built from code and migrations. It could not see production. Eight things in it are marked "unknown" (map §8),
 and the erasure design changes depending on the answers (the audit grants decide whether the scrub role is possible at all).
 **What it is:** **read-only, aggregate, no PII.** Counts, flag values, grants, settings. No row contents, no emails, no names, no tokens, no secret values.
@@ -232,7 +235,11 @@ Plus, **from the AWS side** (no database access needed):
 2. **Who may run the erasure command** in production, and from which machine? The AH-104c plan makes the Erase click an admin action; AH-104a needs
    to know who can run `php artisan` against production at all.
 
-**Answer E:** _(Pedram)_
+**Answer E (Pedram, 2026-10-20):**
+
+1. _(not asked in this reply; it sets the staging of the first real erasure and stays open.)_
+2. **The operator is Pedram, the super admin, through the AH-104c Erase button.** A manual `php artisan erasure:run` on the server is a **fallback only**, and only
+   with the dry-run output attached to the request. The runbook (plan Stage 8) says exactly this.
 
 ---
 
