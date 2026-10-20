@@ -50,8 +50,9 @@ final class ErasureEngine
 
     /**
      * @param  list<string>  $stages
+     * @param  (Closure(array<string, int>): void)|null  $inTransaction  Called inside the transaction after every step with the per-selection counts: the ledger and the audit row of the run are written here, so they commit with the erasure or not at all.
      */
-    public function run(SubjectSet $subject, ?ConnectionInterface $db = null, array $stages = self::STAGES): ExecutionReport
+    public function run(SubjectSet $subject, ?ConnectionInterface $db = null, array $stages = self::STAGES, ?Closure $inTransaction = null): ExecutionReport
     {
         foreach ($stages as $stage) {
             if (! in_array($stage, self::STAGES, true)) {
@@ -73,7 +74,7 @@ final class ErasureEngine
         usort($selections, fn (Selection $a, Selection $b): int => $rank($a) <=> $rank($b));
 
         /** @var array<string, int> $changed */
-        $changed = $db->transaction(function () use ($selections, $writers, $subject, $db, $now): array {
+        $changed = $db->transaction(function () use ($selections, $writers, $subject, $db, $now, $inTransaction): array {
             $out = [];
             foreach ($selections as $selection) {
                 $write = $writers[$selection->id] ?? throw new InvalidArgumentException("No writer registered for selection {$selection->id}.");
@@ -81,6 +82,10 @@ final class ErasureEngine
                 if ($this->afterStep !== null) {
                     ($this->afterStep)($selection->id);
                 }
+            }
+
+            if ($inTransaction !== null) {
+                $inTransaction($out);
             }
 
             return $out;

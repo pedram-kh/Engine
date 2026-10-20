@@ -183,6 +183,7 @@ Every entry has:
 The following actions REQUIRE a non-empty `reason` field:
 
 - Any deletion (soft or hard)
+- Any account erasure (`account.erased`, AH-104a: one row per run, counts only)
 - Any blacklist (creator, brand, agency)
 - Any account suspension
 - Any payment refund or dispute resolution

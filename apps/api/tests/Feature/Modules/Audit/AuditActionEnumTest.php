@@ -211,6 +211,8 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         'campaign_attachment.added',
         'campaign_attachment.visibility_changed',
         'campaign_attachment.removed',
+        // AH-104a — one row per completed account erasure run.
+        'account.erased',
     ];
 
     $actual = array_map(fn (AuditAction $case): string => $case->value, AuditAction::cases());
@@ -232,6 +234,8 @@ it('reason-mandatory actions match docs/05-SECURITY-COMPLIANCE.md §3.3', functi
     expect($requiredValues)->toEqualCanonicalizing([
         'auth.account_unlocked',
         'user.deleted',
+        // AH-104a — an erasure run answers "why" (the reason names the ledger row).
+        'account.erased',
         'user.suspended',
         'user.unsuspended',
         'assignment.cancelled',

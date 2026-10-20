@@ -7,7 +7,6 @@ use App\Modules\Erasure\Files\FileKeys;
 use App\Modules\Erasure\Files\FileStep;
 use App\Modules\Erasure\Files\MediaDiskObjectStore;
 use App\Modules\Erasure\Files\ObjectDeletionFailed;
-use App\Modules\Erasure\Files\ObjectStore;
 use App\Modules\Erasure\Files\S3VersionPurger;
 use App\Modules\Erasure\Subject\SubjectSet;
 use Aws\History;
@@ -19,39 +18,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Tests\Support\ErasureGraph;
+use Tests\Support\RecordingObjectStore;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
-
-/** An ObjectStore that records every call and can be told to fail. */
-final class RecordingObjectStore implements ObjectStore
-{
-    /** @var list<string> */
-    public array $deleted = [];
-
-    /** @var list<string> */
-    public array $listed = [];
-
-    public ?int $failOnDelete = null;
-
-    public function __construct(private readonly ObjectStore $inner) {}
-
-    public function list(string $prefix): array
-    {
-        $this->listed[] = $prefix;
-
-        return $this->inner->list($prefix);
-    }
-
-    public function delete(string $key): void
-    {
-        if ($this->failOnDelete !== null && count($this->deleted) + 1 === $this->failOnDelete) {
-            throw ObjectDeletionFailed::forObject();
-        }
-        $this->deleted[] = $key;
-        $this->inner->delete($key);
-    }
-}
 
 /** @return array{0: ErasureGraph, 1: SubjectSet, 2: RecordingObjectStore} */
 function erasureFilesFixture(string $tag = 'a'): array

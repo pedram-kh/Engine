@@ -52,6 +52,10 @@ enum AuditAction: string
     case UserCreated = 'user.created';
     case UserUpdated = 'user.updated';
     case UserDeleted = 'user.deleted';
+    // AH-104a: one row per completed erasure run (counts only, reason mandatory).
+    // A new verb on purpose: the Audited trait already emits `user.deleted` for
+    // any Eloquent delete of a User, and "erased" must never be mistaken for it.
+    case AccountErased = 'account.erased';
     case UserSuspended = 'user.suspended';
     case UserUnsuspended = 'user.unsuspended';
 
@@ -507,6 +511,7 @@ enum AuditAction: string
             self::UserSuspended,
             self::UserUnsuspended,
             self::UserDeleted,
+            self::AccountErased,
             // Cancel always carries a mandatory reason (D-9 — the
             // `cancelled_reason` column + this gate enforce it).
             self::AssignmentCancelled,
