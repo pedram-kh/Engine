@@ -10,6 +10,7 @@ use App\Modules\Brands\BrandsServiceProvider;
 use App\Modules\Campaigns\CampaignsServiceProvider;
 use App\Modules\Contracts\ContractsServiceProvider;
 use App\Modules\Creators\CreatorsServiceProvider;
+use App\Modules\Erasure\ErasureServiceProvider;
 use App\Modules\Identity\IdentityServiceProvider;
 use App\Modules\Messaging\MessagingServiceProvider;
 use App\Modules\Notifications\NotificationsServiceProvider;
@@ -34,6 +35,7 @@ return [
     CampaignsServiceProvider::class,
     ContractsServiceProvider::class,
     CreatorsServiceProvider::class,
+    ErasureServiceProvider::class,
     IdentityServiceProvider::class,
     MessagingServiceProvider::class,
     NotificationsServiceProvider::class,

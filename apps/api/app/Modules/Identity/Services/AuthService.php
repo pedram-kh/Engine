@@ -325,6 +325,18 @@ final class AuthService
             return LoginResult::invalidCredentials();
         }
 
+        // AH-104a — an erased account (anonymised by the erasure engine) can never
+        // sign in. It is answered EXACTLY like an unknown email, before the password
+        // is checked, so no response, status or audit reason distinguishes "erased"
+        // from "never existed". This is the one guard both doors share: the SPA
+        // login() and the native issueToken() both run this graph. The engine also
+        // randomises the password and replaces the email, so this is defence in depth.
+        if ($user->isErased()) {
+            $this->recordFailureAndMaybeLock($email, null, $ip, $userAgent, 'unknown_email');
+
+            return LoginResult::invalidCredentials();
+        }
+
         if (! Hash::check($password, $user->password)) {
             $this->recordFailureAndMaybeLock($email, $user, $ip, $userAgent, 'invalid_password');
 

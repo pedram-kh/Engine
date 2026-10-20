@@ -74,6 +74,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ * @property Carbon|null $erased_at AH-104a: set by the erasure engine only; read by agency resources as `is_erased`
  */
 final class Creator extends Model implements Auditable
 {
@@ -350,6 +351,7 @@ final class Creator extends Model implements Auditable
             'last_active_at' => 'datetime',
             'submitted_at' => 'datetime',
             'incomplete_nudge_sent_at' => 'datetime',
+            'erased_at' => 'datetime',
             'click_through_accepted_at' => 'datetime',
             'tax_profile_complete' => 'boolean',
             'payout_method_set' => 'boolean',

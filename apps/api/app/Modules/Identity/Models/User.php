@@ -14,6 +14,7 @@ use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Database\Factories\UserFactory;
 use App\Modules\Identity\Enums\ThemePreference;
 use App\Modules\Identity\Enums\UserType;
+use App\Modules\Identity\Services\AuthService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -51,6 +52,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ * @property Carbon|null $erased_at AH-104a: set by the erasure engine only; the login block
  */
 final class User extends Authenticatable implements Auditable, MustVerifyEmail
 {
@@ -222,6 +224,16 @@ final class User extends Authenticatable implements Auditable, MustVerifyEmail
         return $this->is_suspended;
     }
 
+    /**
+     * AH-104a: true once the erasure engine has anonymised this account. The
+     * marker is the login block ({@see AuthService}) and the exclusion predicate
+     * for fan-outs; it is never set by anything but the engine.
+     */
+    public function isErased(): bool
+    {
+        return $this->erased_at !== null;
+    }
+
     public function hasTwoFactorEnabled(): bool
     {
         return $this->two_factor_confirmed_at !== null;
@@ -272,6 +284,7 @@ final class User extends Authenticatable implements Auditable, MustVerifyEmail
             'mfa_exempted_at' => 'datetime',
             'is_suspended' => 'boolean',
             'suspended_at' => 'datetime',
+            'erased_at' => 'datetime',
         ];
     }
 

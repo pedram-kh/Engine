@@ -93,6 +93,17 @@ final class CreatorFactory extends Factory
     }
 
     /**
+     * AH-104a: carries the erasure marker only (`creators.erased_at`); the
+     * anonymised values are produced by the erasure engine, never by a factory.
+     */
+    public function erased(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'erased_at' => now(),
+        ]);
+    }
+
+    /**
      * GDPR opt-out state (Sprint 6.6a, D-2): the creator has set
      * `is_discoverable = false`, so the discovery gate excludes them even when
      * approved. No write path exists yet — this state exists for the gate's

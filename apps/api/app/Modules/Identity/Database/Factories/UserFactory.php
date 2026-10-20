@@ -73,6 +73,18 @@ final class UserFactory extends Factory
     }
 
     /**
+     * AH-104a: the account carries the erasure marker. Sets ONLY `erased_at`: it
+     * is the login block's input; the anonymised values themselves are produced
+     * by the erasure engine, never by a factory.
+     */
+    public function erased(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'erased_at' => now(),
+        ]);
+    }
+
+    /**
      * 2FA-confirmed state. Note: the two_factor_recovery_codes column
      * is cast to `encrypted:array` and stores bcrypt hashes (chunk 5
      * priority #3); the placeholder values below are valid bcrypt-shaped
