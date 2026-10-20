@@ -56,7 +56,7 @@ final class ErasureEngine
     {
         foreach ($stages as $stage) {
             if (! in_array($stage, self::STAGES, true)) {
-                throw new InvalidArgumentException("Stage {$stage} cannot be executed by the database engine (4e needs the audit scrub connection, 4f the disk, 4g the vendor contracts).");
+                throw new InvalidArgumentException("Stage {$stage} cannot be executed by the database engine (4e is the audit scrub, 4f the disk, 4g the vendor contracts).");
             }
         }
 

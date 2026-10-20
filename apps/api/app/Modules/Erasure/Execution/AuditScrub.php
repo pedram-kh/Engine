@@ -15,13 +15,14 @@ use App\Modules\Erasure\Subject\SubjectSet;
  * could never be finished if the process died in between. Run first, a failure
  * leaves the account intact and the whole run can simply be started again.
  *
- * The scrub updates `audit_logs` through its own connection and role (D-B), so
- * the real implementation waits on read-back C (the grants). Until it exists,
- * {@see UnavailableAuditScrub} is bound and the command refuses to execute.
+ * The real implementation is {@see DatabaseAuditScrub}: the application role
+ * itself (read-back C: it holds UPDATE on `audit_logs`, and no separate role is
+ * planned), constrained in code to five columns. An implementation that reports
+ * itself unavailable makes the command refuse to execute.
  */
 interface AuditScrub
 {
-    /** False when the scrub cannot run here (no scrub connection): an execute is refused. */
+    /** False when the scrub cannot run here: an execute is refused. */
     public function available(): bool;
 
     /**

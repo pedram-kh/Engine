@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Erasure\Execution\AuditScrub;
-use App\Modules\Erasure\Execution\UnavailableAuditScrub;
 use App\Modules\Erasure\Models\ErasureLedger;
 use App\Modules\Identity\Models\User;
 use Illuminate\Console\Scheduling\Schedule;
@@ -25,7 +24,7 @@ uses(TestCase::class, RefreshDatabase::class);
 function erasureCommandFixture(bool $scrubAvailable = true): array
 {
     Storage::fake('media');
-    app()->instance(AuditScrub::class, $scrubAvailable ? new FakeAuditScrub : new UnavailableAuditScrub);
+    app()->instance(AuditScrub::class, tap(new FakeAuditScrub, fn (FakeAuditScrub $f) => $f->available = $scrubAvailable));
     $graph = ErasureGraph::seedSubject('a');
     $graph->putFiles();
 

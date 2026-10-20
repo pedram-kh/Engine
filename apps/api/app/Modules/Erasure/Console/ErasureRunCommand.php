@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Erasure\Console;
 
 use App\Modules\Erasure\Execution\AuditScrubUnavailable;
+use App\Modules\Erasure\Execution\DatabaseAuditScrub;
 use App\Modules\Erasure\Files\ObjectDeletionFailed;
 use App\Modules\Erasure\Guards\ErasureRefused;
 use App\Modules\Erasure\Ledger\MirrorWriteFailed;
@@ -134,10 +135,12 @@ final class ErasureRunCommand extends Command
     private function printPlan(ErasurePlan $plan): void
     {
         $this->line('Erasure plan for user '.$plan->subject->userUlid.' (counts only; no name, email or object key is printed)');
-        $this->table(['stage', 'selection', 'table', 'disposition', 'rows'], array_map(
-            fn (array $l): array => [$l['stage'], $l['id'], $l['table'], $l['disposition'], $l['count']],
+        $this->table(['stage', 'selection', 'table', 'disposition', 'rows', 'read'], array_map(
+            fn (array $l): array => [$l['stage'], $l['id'], $l['table'], $l['disposition'], $l['count'], $l['read']],
             $plan->report->lines,
         ));
+        $cost = $plan->report->cost(DatabaseAuditScrub::CHUNK);
+        $this->line('Cost: '.$cost['rows'].' rows read in about '.$cost['batches'].' batches of '.DatabaseAuditScrub::CHUNK.'; largest read: '.($cost['largest'] === '' ? 'none' : $cost['largest'].' ('.$cost['largest_rows'].' rows)').'. "read" is what a line must scan to find its rows; "rows" is what it changes.');
         $this->line('Objects to delete: '.$plan->files->count().' ('.json_encode($plan->files->summary(), JSON_THROW_ON_ERROR).')');
         $this->line('Vendor calls: 0 (any non-mock provider is a refusal)');
         if (config('erasure.purge_object_versions') !== true) {

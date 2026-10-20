@@ -6,7 +6,6 @@ use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Erasure\Enums\ErasureLedgerState;
 use App\Modules\Erasure\Execution\AuditScrub;
-use App\Modules\Erasure\Execution\UnavailableAuditScrub;
 use App\Modules\Erasure\Files\MediaDiskObjectStore;
 use App\Modules\Erasure\Files\ObjectDeletionFailed;
 use App\Modules\Erasure\Files\ObjectStore;
@@ -91,7 +90,7 @@ it('executes end to end: objects gone, database anonymised, ledger completed, on
         ->and($ledger->run_by_user_id)->toBe($operator->id)
         ->and($ledger->user_ulid)->toBe($graph->user->ulid)
         ->and($ledger->digest)->toBe($plan->digest())
-        ->and($scrub->runs)->toBe(1)
+        ->and($scrub->runs)->toBe(2) // before anything is deleted, and again inside the transaction
         ->and(User::withTrashed()->findOrFail($graph->user->id)->isErased())->toBeTrue()
         ->and(User::withTrashed()->findOrFail($other->user->id)->isErased())->toBeFalse()
         ->and(array_values(array_filter($graph->files['delete'], fn (string $k): bool => Storage::disk('media')->exists($k))))->toBe([])
@@ -106,7 +105,7 @@ it('executes end to end: objects gone, database anonymised, ledger completed, on
         ->and(AuditLog::query()->where('actor_id', $graph->agencyMember->id)->count())->toBe($agencyAuditBefore);
 });
 
-it('puts the stages in order: audit scrub, then objects, then the database', function (): void {
+it('puts the stages in order: audit scrub, then objects, then the database, then a closing audit pass inside it', function (): void {
     [$graph, $run, , , $events] = erasureRunFixture();
     $plan = $run->plan($graph->user);
     DB::listen(function ($query) use ($events): void {
@@ -117,7 +116,7 @@ it('puts the stages in order: audit scrub, then objects, then the database', fun
 
     $run->execute($graph->user, $plan->digest(), $graph->user->ulid);
 
-    expect($events->collapsed())->toBe(['scrub', 'objects', 'database']);
+    expect($events->collapsed())->toBe(['scrub', 'objects', 'database', 'scrub']);
 });
 
 it('refuses, and writes nothing, when a gate fails', function (string $case): void {
@@ -161,7 +160,7 @@ it('refuses, and writes nothing, when a gate fails', function (string $case): vo
 
 it('refuses to execute while the audit scrub is unavailable (stage 4e is not built): nothing is touched', function (): void {
     Storage::fake('media');
-    app()->instance(AuditScrub::class, new UnavailableAuditScrub);
+    app()->instance(AuditScrub::class, tap(new FakeAuditScrub, fn (FakeAuditScrub $f) => $f->available = false));
     $graph = ErasureGraph::seedSubject('a');
     $graph->putFiles();
     $run = app(ErasureRun::class);

@@ -257,8 +257,8 @@ final class ErasureRegistry
                 ...self::scrub('data', 'creator_name and counterparty_name where the subject resolves to the creator; sender_name where actor_user_id is the creator', 'Names embedded in the payload (§4.2).'),
                 ...self::keep('id,ulid,recipient_user_id,actor_user_id,subject_type,subject_id,type,read_at,created_at', 'Row, ids and type kept on agency members\' feeds.'),
             ], 'ERASE-ROW where recipient_user_id = subject user (the creator\'s own feed); the other two populations are scrubbed, not deleted'),
-            'audit_logs' => new TableRule(null, 'Append-only by model and by grant; scrubbed through a dedicated connection, rows kept (§3.6, D-B).', [], [
-                ...self::anon('ip,user_agent', AnonValue::Null, 'Belong to the ACTOR (§2.3): nulled only on S1 and S5 rows.'),
+            'audit_logs' => new TableRule(null, 'Append-only by model, NOT by grant (the app role holds UPDATE in production, read-back C); scrubbed in five columns by DatabaseAuditScrub, rows kept (§3.6, D-B).', [], [
+                ...self::anon('ip,user_agent', AnonValue::Null, 'Belong to the ACTOR (§2.3): nulled on S1 rows and on S5 rows no other user acted in.'),
                 ...self::scrub('before,after,metadata', 'key list: AuditPayloadKeys::scrubKeys(), on predicates S1-S5 (map §4.1)', 'Snapshot copies of data erased elsewhere.'),
                 ...self::keep('id,ulid,agency_id,actor_type,actor_id,actor_role,action,subject_type,subject_id,subject_ulid,created_at,impersonator_user_id', 'Ids and ulids point at an anonymised row, which is the point of pseudonymising (§4.1).'),
                 ...self::keep('reason', 'The deciding party\'s record (D-D).'),

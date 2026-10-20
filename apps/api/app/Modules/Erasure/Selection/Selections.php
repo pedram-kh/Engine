@@ -16,6 +16,7 @@ use App\Modules\Erasure\Subject\SubjectSet;
 use App\Modules\Identity\Models\User;
 use App\Modules\Messaging\Models\MessageThread;
 use App\Modules\Messaging\Models\RelationshipThread;
+use Closure;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Builder;
@@ -166,30 +167,38 @@ final class Selections
         ];
     }
 
-    // ── 4e the audit scrub (counted now; written by Stage 4e) ───────────────
+    // ── 4e the audit scrub ──────────────────────────────────────────────────
 
-    /** @return list<Selection> */
+    /**
+     * Each predicate returns the rows it covers and counts only those the scrub
+     * would still change ({@see AuditRowScrub}); the scrub is `DatabaseAuditScrub`.
+     *
+     * @return list<Selection>
+     */
     private static function auditScrub(): array
     {
+        $changes = static fn (string $p): Closure => static fn (stdClass $row, SubjectSet $s): bool => AuditRowScrub::changes($row, $s, $p) !== [];
+
         return [
             new Selection('audit_logs.S1', 'audit_logs', Disposition::ScrubJson, '4e', 'S1 the subject user as actor',
-                fn (SubjectSet $s, ConnectionInterface $db): Builder => self::auditS1($s, $db)),
+                fn (SubjectSet $s, ConnectionInterface $db): Builder => self::auditS1($s, $db), $changes('S1')),
             new Selection('audit_logs.S2', 'audit_logs', Disposition::ScrubJson, '4e', 'S2 the subject user as subject',
-                fn (SubjectSet $s, ConnectionInterface $db): Builder => self::auditSubject($db->table('audit_logs'), (new User)->getMorphClass(), [$s->userId])),
+                fn (SubjectSet $s, ConnectionInterface $db): Builder => self::auditSubject($db->table('audit_logs'), (new User)->getMorphClass(), [$s->userId]), $changes('S2')),
             new Selection('audit_logs.S3', 'audit_logs', Disposition::ScrubJson, '4e', 'S3 the subject creator as subject',
-                fn (SubjectSet $s, ConnectionInterface $db): Builder => self::auditSubject($db->table('audit_logs'), (new Creator)->getMorphClass(), [$s->creatorId])),
+                fn (SubjectSet $s, ConnectionInterface $db): Builder => self::auditSubject($db->table('audit_logs'), (new Creator)->getMorphClass(), [$s->creatorId]), $changes('S3')),
             new Selection('audit_logs.S4', 'audit_logs', Disposition::ScrubJson, '4e', 'S4 the creator\'s tax profiles, payout methods, relations and blacklists as subject',
-                fn (SubjectSet $s, ConnectionInterface $db): Builder => self::auditS4($s, $db)),
+                fn (SubjectSet $s, ConnectionInterface $db): Builder => self::auditS4($s, $db), $changes('S4')),
             new Selection('audit_logs.S5', 'audit_logs', Disposition::ScrubJson, '4e', 'S5 any actor, metadata.email equal to the old email',
-                fn (SubjectSet $s, ConnectionInterface $db): Builder => self::auditS5($s, $db)),
-            new Selection('audit_logs.union', 'audit_logs', Disposition::ScrubJson, '4e', 'the distinct audit rows in scope (S1 to S5): what the scrub will touch',
+                fn (SubjectSet $s, ConnectionInterface $db): Builder => self::auditS5($s, $db), $changes('S5')),
+            new Selection('audit_logs.union', 'audit_logs', Disposition::ScrubJson, '4e', 'the distinct audit rows (S1 to S5) the scrub will change',
                 fn (SubjectSet $s, ConnectionInterface $db): Builder => $db->table('audit_logs')->where(function (Builder $q) use ($s, $db): void {
                     $q->whereIn('id', self::auditS1($s, $db)->select('id'))
                         ->orWhereIn('id', self::auditSubject($db->table('audit_logs'), (new User)->getMorphClass(), [$s->userId])->select('id'))
                         ->orWhereIn('id', self::auditSubject($db->table('audit_logs'), (new Creator)->getMorphClass(), [$s->creatorId])->select('id'))
                         ->orWhereIn('id', self::auditS4($s, $db)->select('id'))
                         ->orWhereIn('id', self::auditS5($s, $db)->select('id'));
-                })),
+                }),
+                static fn (stdClass $row, SubjectSet $s): bool => AuditRowScrub::changes($row, $s) !== []),
         ];
     }
 
@@ -224,9 +233,11 @@ final class Selections
 
     private static function auditS5(SubjectSet $s, ConnectionInterface $db): Builder
     {
-        $emails = array_values(array_unique([$s->oldEmail, mb_strtolower($s->oldEmail)]));
+        // Case-insensitive: a failed login records the address as typed. No index serves a JSON key
+        // (audit_logs is read once, in full, per erasure; 38 MB at the production read-back).
+        $query = $db->table('audit_logs');
 
-        return $db->table('audit_logs')->whereIn('metadata->email', $emails);
+        return $query->whereRaw('LOWER('.$query->getGrammar()->wrap('metadata->email').') = ?', [mb_strtolower($s->oldEmail)]);
     }
 
     /** Notifications on OTHER feeds whose subject is the creator or one of the creator's own records. */

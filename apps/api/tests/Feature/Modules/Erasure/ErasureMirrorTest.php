@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Modules\Erasure\Enums\ErasureLedgerState;
 use App\Modules\Erasure\Execution\AuditScrub;
-use App\Modules\Erasure\Execution\UnavailableAuditScrub;
 use App\Modules\Erasure\Guards\ErasureRefused;
 use App\Modules\Erasure\Ledger\DiskLedgerMirror;
 use App\Modules\Erasure\Ledger\LedgerMirror;
@@ -280,7 +279,7 @@ it('refuses a reapply, and writes nothing, on a wrong digest, a wrong count, a r
         DB::table('campaign_assignments')->where('creator_id', $a->creator->id)->update(['status' => 'payment_held']);
         $digest = $reapply->plan()->digest();
     } else {
-        app()->instance(AuditScrub::class, new UnavailableAuditScrub);
+        app()->instance(AuditScrub::class, tap(new FakeAuditScrub, fn (FakeAuditScrub $f) => $f->available = false));
         $reapply = app(ErasureReapply::class);
         $digest = $reapply->plan()->digest();
     }

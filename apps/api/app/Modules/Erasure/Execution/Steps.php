@@ -132,14 +132,17 @@ final class Steps
     private static function updateEach(Selection $sel, SubjectSet $s, ConnectionInterface $db, Closure $changes): int
     {
         $changed = 0;
-        // get(), not cursor(): an open cursor on a table that is also being updated
-        // can lock on some drivers. The candidates are narrow (the selection already filtered).
-        foreach ($sel->builder($s, $db)->get() as $row) {
-            if (! $row instanceof stdClass || ! $sel->rowNeedsChange($row, $s)) {
-                continue;
+        // In batches of CHUNK by primary key (`WHERE id > ? ORDER BY id LIMIT n`): never one
+        // unbounded read of a table that holds hundreds of thousands of rows, and no open cursor
+        // on a table that is also being updated. Each batch commits inside the engine's one transaction.
+        $sel->builder($s, $db)->chunkById(self::CHUNK, function ($rows) use ($sel, $s, $db, $changes, &$changed): void {
+            foreach ($rows as $row) {
+                if (! $row instanceof stdClass || ! $sel->rowNeedsChange($row, $s)) {
+                    continue;
+                }
+                $changed += $db->table($sel->table)->where('id', $row->id)->update($changes($row));
             }
-            $changed += $db->table($sel->table)->where('id', $row->id)->update($changes($row));
-        }
+        });
 
         return $changed;
     }

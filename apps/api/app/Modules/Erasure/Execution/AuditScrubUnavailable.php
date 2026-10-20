@@ -8,8 +8,8 @@ use RuntimeException;
 
 final class AuditScrubUnavailable extends RuntimeException
 {
-    public static function noScrubConnection(): self
+    public static function notAvailable(): self
     {
-        return new self('The audit scrub (stage 4e) is not available: no scrub connection is configured. It does not fall back to the application role.');
+        return new self('The audit scrub (stage 4e) is not available here, so the run stops before it changes anything.');
     }
 }

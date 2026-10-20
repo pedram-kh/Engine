@@ -7,7 +7,7 @@ namespace App\Modules\Erasure;
 use App\Modules\Erasure\Console\ErasureReapplyCommand;
 use App\Modules\Erasure\Console\ErasureRunCommand;
 use App\Modules\Erasure\Execution\AuditScrub;
-use App\Modules\Erasure\Execution\UnavailableAuditScrub;
+use App\Modules\Erasure\Execution\DatabaseAuditScrub;
 use App\Modules\Erasure\Files\MediaDiskObjectStore;
 use App\Modules\Erasure\Files\ObjectStore;
 use App\Modules\Erasure\Ledger\DiskLedgerMirror;
@@ -31,8 +31,8 @@ final class ErasureServiceProvider extends ServiceProvider
         $this->app->bind(ObjectStore::class, MediaDiskObjectStore::class);
         // The ledger copy outside the database (Stage 7).
         $this->app->bind(LedgerMirror::class, DiskLedgerMirror::class);
-        // Stage 4e's slot. Unavailable until the scrub role exists (read-back C): execute refuses.
-        $this->app->bind(AuditScrub::class, UnavailableAuditScrub::class);
+        // Stage 4e: the audit scrub, on the application connection (ruling 2026-10-21: no separate role).
+        $this->app->bind(AuditScrub::class, DatabaseAuditScrub::class);
     }
 
     public function boot(): void

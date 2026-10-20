@@ -62,18 +62,34 @@ final readonly class Selection
     /** Rows that WOULD change. Reads only. */
     public function count(SubjectSet $subject, ConnectionInterface $db): int
     {
+        return $this->measure($subject, $db)['count'];
+    }
+
+    /**
+     * Rows that would change, and the rows the run has to READ to find them: the
+     * cost a person approving the dry-run needs (a filtered selection reads every
+     * candidate, a plain one reads exactly what it changes). Reads only.
+     *
+     * @return array{count: int, read: int}
+     */
+    public function measure(SubjectSet $subject, ConnectionInterface $db): array
+    {
         $query = $this->builder($subject, $db);
         if ($this->needsChange === null) {
-            return $query->count();
+            $n = $query->count();
+
+            return ['count' => $n, 'read' => $n];
         }
 
-        $n = 0;
+        $count = 0;
+        $read = 0;
         foreach ($query->cursor() as $row) {
+            $read++;
             if ($row instanceof stdClass && $this->rowNeedsChange($row, $subject)) {
-                $n++;
+                $count++;
             }
         }
 
-        return $n;
+        return ['count' => $count, 'read' => $read];
     }
 }

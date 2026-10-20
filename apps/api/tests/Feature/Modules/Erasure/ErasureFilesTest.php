@@ -220,6 +220,20 @@ it('purges every version and delete marker of the exact key, across pages, and n
         ->and($deletes)->toBe(['a/b.jpg@v1', 'a/b.jpg@m1', 'a/b.jpg@v2']);
 });
 
+it('is a no-op on a bucket without versioning: a key already deleted lists nothing, so nothing more is deleted', function (): void {
+    $mock = new MockHandler;
+    $mock->append(new Result(['IsTruncated' => false]));
+    $client = new S3Client(['region' => 'us-east-1', 'version' => 'latest', 'credentials' => ['key' => 'k', 'secret' => 's'], 'handler' => $mock]);
+    $history = new History;
+    $client->getHandlerList()->appendSign(Middleware::history($history));
+
+    $purged = (new S3VersionPurger($client, 'bucket'))->purge('a/b.jpg');
+
+    $commands = array_map(fn (array $e): string => $e['command']->getName(), $history->toArray());
+
+    expect($purged)->toBe(0)->and($commands)->toBe(['ListObjectVersions']);
+});
+
 it('keeps FileKeys a plain value: sorted unique keys, class counts, a skipped count', function (): void {
     $keys = new FileKeys(['a', 'b'], ['avatar' => 2], 1);
 

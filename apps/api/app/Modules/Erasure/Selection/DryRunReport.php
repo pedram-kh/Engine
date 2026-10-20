@@ -12,7 +12,7 @@ namespace App\Modules\Erasure\Selection;
 final readonly class DryRunReport
 {
     /**
-     * @param  list<array{id: string, table: string, disposition: string, stage: string, description: string, count: int}>  $lines
+     * @param  list<array{id: string, table: string, disposition: string, stage: string, description: string, count: int, read: int}>  $lines
      * @param  array<string, int>  $subject  SubjectSet::summary()
      */
     public function __construct(
@@ -31,6 +31,34 @@ final readonly class DryRunReport
         ksort($out);
 
         return $out;
+    }
+
+    /**
+     * What the run has to read to do its writes, in rows and in batches of `$batch`.
+     * Reported, never hashed: it moves with other people's activity and must not
+     * change the digest.
+     *
+     * @return array{rows: int, batches: int, largest: string, largest_rows: int}
+     */
+    public function cost(int $batch): array
+    {
+        $rows = 0;
+        $batches = 0;
+        $largest = '';
+        $largestRows = 0;
+        foreach ($this->lines as $line) {
+            if ($line['read'] === 0) {
+                continue;
+            }
+            $rows += $line['read'];
+            $batches += intdiv($line['read'] + $batch - 1, $batch);
+            if ($line['read'] > $largestRows) {
+                $largest = $line['id'];
+                $largestRows = $line['read'];
+            }
+        }
+
+        return ['rows' => $rows, 'batches' => $batches, 'largest' => $largest, 'largest_rows' => $largestRows];
     }
 
     public function total(): int

@@ -112,11 +112,12 @@ final class ErasureGraph
             'audit_logs.S1' => 2,
             'audit_logs.S2' => 1,
             'audit_logs.S3' => 1,
-            // S4 = tax profile 1 + payout method 1 + two relations (each emitted a created row via the Audited trait).
-            'audit_logs.S4' => 4,
+            // S4 = the payout method's created row, the one S4 row holding a key to scrub (`provider_account_id`);
+            // the tax profile's and the two relations' rows hold nothing to scrub and are not counted.
+            'audit_logs.S4' => 1,
             'audit_logs.S5' => 1,
-            // S1 2 + S2 1 + S3 1 + S4 4 + S5 1, and no row matches two predicates.
-            'audit_logs.union' => 9,
+            // S1 2 + S2 1 + S3 1 + S4 1 + S5 1, and no row matches two predicates.
+            'audit_logs.union' => 6,
         ];
         ksort($counts);
 

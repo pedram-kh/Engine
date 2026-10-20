@@ -15,23 +15,26 @@ final class FakeAuditScrub implements AuditScrub
 
     public bool $fail = false;
 
+    public bool $available = true;
+
     public function __construct(private readonly ?ErasureEvents $events = null) {}
 
     public function available(): bool
     {
-        return true;
+        return $this->available;
     }
 
     public function run(SubjectSet $subject): array
     {
         if ($this->fail) {
-            throw AuditScrubUnavailable::noScrubConnection();
+            throw AuditScrubUnavailable::notAvailable();
         }
         $this->runs++;
         if ($this->events !== null) {
             $this->events->add('scrub');
         }
 
-        return ['audit_logs.S1' => 2, 'audit_logs.S2' => 1];
+        // Idempotent like the real one: the closing pass finds nothing left.
+        return $this->runs === 1 ? ['audit_logs.S1' => 2, 'audit_logs.S2' => 1] : [];
     }
 }

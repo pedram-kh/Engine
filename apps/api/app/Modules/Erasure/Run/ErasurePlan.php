@@ -44,7 +44,7 @@ final readonly class ErasurePlan
     {
         $blockers = $this->refusals;
         if (! $this->auditScrubAvailable) {
-            $blockers[] = 'the audit scrub (stage 4e) is not available: no scrub connection is configured, so the audit trail would keep the old email';
+            $blockers[] = 'the audit scrub (stage 4e) is not available here, so the audit trail would keep the old email';
         }
 
         return $blockers;

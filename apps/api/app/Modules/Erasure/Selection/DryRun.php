@@ -20,13 +20,15 @@ final class DryRun
         $db ??= DB::connection();
         $lines = [];
         foreach (Selections::all() as $selection) {
+            $measured = $selection->measure($subject, $db);
             $lines[] = [
                 'id' => $selection->id,
                 'table' => $selection->table,
                 'disposition' => $selection->disposition->value,
                 'stage' => $selection->stage,
                 'description' => $selection->description,
-                'count' => $selection->count($subject, $db),
+                'count' => $measured['count'],
+                'read' => $measured['read'],
             ];
         }
 

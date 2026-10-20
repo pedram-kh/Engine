@@ -31,10 +31,11 @@ use Throwable;
  *
  *   resolve the subject            (reads; the old email exists only until step 6)
  *   refuse                         (payment, vendor; nothing has been touched)
- *   1. audit scrub      (4e slot)  first, because it needs the identity that step 6 destroys
+ *   1. audit scrub      (4e)       first, because it needs the identity that step 6 destroys
  *   2. vendors          (4g)       none to call: any real vendor was a refusal above
  *   3. objects          (4f)       keys captured before any write; an already-gone key is done
- *   4. database         (4a-4d)    ONE transaction; the ledger and the audit row commit with it
+ *   4. database         (4a-4d)    ONE transaction; the ledger and the audit row commit with it,
+ *                                  and so does a closing audit pass (rows written since step 1)
  *   5. ledger mirror   (7)         outside the database, so a restore cannot undo it
  *   6. ledger completed
  *
@@ -145,7 +146,14 @@ final class ErasureRun
             $scrubbed = $this->auditScrub->run($subject);
             $deletedObjects = $this->fileStep->run($plan->files);
 
-            (new ErasureEngine)->run($subject, null, ErasureEngine::STAGES, function (array $changed) use ($ledger, $user, $operator, $scrubbed, $deletedObjects, $plan): void {
+            (new ErasureEngine)->run($subject, null, ErasureEngine::STAGES, function (array $changed) use ($ledger, $user, $operator, $scrubbed, $deletedObjects, $plan, $subject): void {
+                // The closing pass. The user is still signed in until this transaction commits, so a
+                // request that landed after the first scrub (a login, a failed attempt) wrote an audit
+                // row the first pass never saw. This pass runs inside the transaction: it narrows that
+                // window to the instant before the commit, and if it fails the erasure rolls back whole.
+                $closing = $this->auditScrub->run($subject);
+                $scrubbed = $this->sumCounts($scrubbed, $closing);
+
                 $ledger->update([
                     'state' => ErasureLedgerState::DbDone,
                     'counts' => [
@@ -181,6 +189,20 @@ final class ErasureRun
         }
 
         return $this->finish($ledger->refresh());
+    }
+
+    /**
+     * @param  array<string, int>  $first
+     * @param  array<string, int>  $closing
+     * @return array<string, int>
+     */
+    private function sumCounts(array $first, array $closing): array
+    {
+        foreach ($closing as $key => $n) {
+            $first[$key] = ($first[$key] ?? 0) + $n;
+        }
+
+        return $first;
     }
 
     private function finish(ErasureLedger $ledger): ErasureLedger
