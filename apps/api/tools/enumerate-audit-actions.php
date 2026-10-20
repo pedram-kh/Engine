@@ -213,7 +213,10 @@ final class Collector extends NodeVisitorAbstract
             && isAuditActionName($n->class)
             && $n->name instanceof Node\Identifier
             && $n->name->toString() !== 'class') {
-            $this->refs[] = ['file' => $this->file, 'line' => $line, 'case' => $n->name->toString(), 'id' => spl_object_id($n)];
+            // `node` keeps the AST node alive: spl_object_id() values are reused once an
+            // object is freed, which made the call-site/reference match below depend on
+            // memory layout (the doc changed with the number of files scanned).
+            $this->refs[] = ['file' => $this->file, 'line' => $line, 'case' => $n->name->toString(), 'id' => spl_object_id($n), 'node' => $n];
         }
 
         if ($n instanceof Node\Expr\StaticCall
@@ -239,6 +242,7 @@ final class Collector extends NodeVisitorAbstract
                 'loc' => $loc,
                 'case' => $case,
                 'actionId' => $actionNode ? spl_object_id($actionNode) : 0,
+                'actionNode' => $actionNode,
                 'actionExpr' => $actionExpr,
                 'has' => [
                     'reason' => isset($map['reason']),
@@ -395,6 +399,39 @@ foreach ($collector->calls as $c) {
         }
     }
     unset($p);
+}
+
+// ── machine-readable mode (used by the AuditPayloadKeysGuardTest spec) ───────
+// `--json` prints only the literal payload keys and the non-literal payload
+// parts, so a spec can fail CI when a new key or a new dynamic payload appears
+// that the erasure registry has not decided. The Markdown output below is
+// unchanged by this flag.
+if (in_array('--json', $argv ?? [], true)) {
+    $jsonKeys = [];
+    $jsonDynamic = [];
+    foreach ($collector->calls as $c) {
+        foreach ($c['payload'] as $param => $d) {
+            foreach ($d['keys'] as $k) {
+                $jsonKeys[$k][$param] = true;
+            }
+            if ($d['dynamic'] !== []) {
+                $jsonDynamic[(string) preg_replace('/:\d+$/', '', $c['loc']).'|'.$param] = true;
+            }
+        }
+    }
+    foreach ($collector->auditedClasses as $m) {
+        foreach ($m['allowlist'] as $k) {
+            $jsonKeys[$k]['audited allowlist'] = true;
+        }
+    }
+    ksort($jsonKeys);
+    ksort($jsonDynamic);
+    echo json_encode([
+        'keys' => array_map(static fn (array $by): array => array_keys($by), $jsonKeys),
+        'dynamic' => array_keys($jsonDynamic),
+        'calls' => count($collector->calls),
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n";
+    exit(0);
 }
 
 // ── render ──────────────────────────────────────────────────────────────────
