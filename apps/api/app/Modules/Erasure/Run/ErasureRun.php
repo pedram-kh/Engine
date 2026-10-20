@@ -13,6 +13,8 @@ use App\Modules\Erasure\Files\FileKeyCollector;
 use App\Modules\Erasure\Files\FileStep;
 use App\Modules\Erasure\Guards\ErasureRefused;
 use App\Modules\Erasure\Guards\Refusals;
+use App\Modules\Erasure\Ledger\LedgerMirror;
+use App\Modules\Erasure\Ledger\MirrorWriteFailed;
 use App\Modules\Erasure\Models\ErasureLedger;
 use App\Modules\Erasure\Selection\DryRun;
 use App\Modules\Erasure\Subject\SubjectNotErasable;
@@ -33,7 +35,8 @@ use Throwable;
  *   2. vendors          (4g)       none to call: any real vendor was a refusal above
  *   3. objects          (4f)       keys captured before any write; an already-gone key is done
  *   4. database         (4a-4d)    ONE transaction; the ledger and the audit row commit with it
- *   5. ledger completed
+ *   5. ledger mirror   (7)         outside the database, so a restore cannot undo it
+ *   6. ledger completed
  *
  * The ledger row is written BEFORE the first step and outside the transaction,
  * so it survives a failure and says how far the run got. A refusal writes
@@ -47,6 +50,7 @@ final class ErasureRun
         private readonly FileStep $fileStep,
         private readonly AuditScrub $auditScrub,
         private readonly AuditLogger $audit,
+        private readonly LedgerMirror $mirror,
     ) {}
 
     /**
@@ -63,6 +67,7 @@ final class ErasureRun
     /**
      * @throws SubjectNotErasable when the subject cannot be resolved
      * @throws ErasureRefused when a gate fails; nothing was written
+     * @throws MirrorWriteFailed after the database stage: the ledger stays db_done and `resume` finishes it
      * @throws Throwable from a step; the ledger row says how far it got
      */
     public function execute(User $user, string $confirmDigest, string $typedUlid, ?User $operator = null): ErasureLedger
@@ -100,6 +105,7 @@ final class ErasureRun
      * erased and cannot be resolved again, so this reads the ledger only.
      *
      * @throws ErasureRefused
+     * @throws MirrorWriteFailed
      */
     public function resume(User $user): ErasureLedger
     {
@@ -179,7 +185,13 @@ final class ErasureRun
 
     private function finish(ErasureLedger $ledger): ErasureLedger
     {
-        $ledger->update(['state' => ErasureLedgerState::Completed, 'completed_at' => $ledger->completed_at ?? now()]);
+        $completedAt = $ledger->completed_at ?? now();
+
+        // Outside the database first: if this fails the ledger stays `db_done`, which is
+        // exactly what `resume` finishes. Completed is never claimed without the mirror.
+        $this->mirror->record($ledger->user_ulid, $completedAt);
+
+        $ledger->update(['state' => ErasureLedgerState::Completed, 'completed_at' => $completedAt]);
 
         return $ledger;
     }

@@ -169,7 +169,7 @@ it('is never scheduled and never reachable from a route', function (): void {
         ->and(preg_match($mine, $files))->toBe(0);
 });
 
-it('is reached only from inside the Erasure module: no other app code imports the run, the engine or the steps', function (): void {
+it('is reached only from inside the Erasure module: no other app code imports the run, the reapply, the engine, the steps or the ledger mirror', function (): void {
     $offenders = [];
     $module = app_path('Modules/Erasure').DIRECTORY_SEPARATOR;
     $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(app_path(), FilesystemIterator::SKIP_DOTS));

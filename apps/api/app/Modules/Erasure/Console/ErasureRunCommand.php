@@ -7,6 +7,7 @@ namespace App\Modules\Erasure\Console;
 use App\Modules\Erasure\Execution\AuditScrubUnavailable;
 use App\Modules\Erasure\Files\ObjectDeletionFailed;
 use App\Modules\Erasure\Guards\ErasureRefused;
+use App\Modules\Erasure\Ledger\MirrorWriteFailed;
 use App\Modules\Erasure\Run\ErasurePlan;
 use App\Modules\Erasure\Run\ErasureRun;
 use App\Modules\Erasure\Subject\SubjectNotErasable;
@@ -93,12 +94,12 @@ final class ErasureRunCommand extends Command
 
         try {
             $ledger = $run->execute($user, $digest, $typed, $operator);
-        } catch (ErasureRefused|SubjectNotErasable|ObjectDeletionFailed|AuditScrubUnavailable $e) {
+        } catch (ErasureRefused|SubjectNotErasable|ObjectDeletionFailed|AuditScrubUnavailable|MirrorWriteFailed $e) {
             $this->error($e->getMessage());
 
             return self::FAILURE;
         } catch (Throwable $e) {
-            $this->error('The run failed ('.class_basename($e).'). Read the ledger row for how far it got; re-running is safe.');
+            $this->error('The run failed ('.class_basename($e).'). Read the ledger row for how far it got; re-running is safe. If the ledger is db_done, run again with --execute alone to finish.');
 
             return self::FAILURE;
         }
@@ -112,7 +113,7 @@ final class ErasureRunCommand extends Command
     {
         try {
             $ledger = $run->resume($user);
-        } catch (ErasureRefused $e) {
+        } catch (ErasureRefused|MirrorWriteFailed $e) {
             $this->error($e->getMessage());
 
             return self::FAILURE;
