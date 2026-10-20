@@ -59,19 +59,19 @@ reviews, and conversations.
 
 ## Live Status (open + in-flight)
 
-| ID          | Title                                     | Status      | Notes                                                                                   |
-| ----------- | ----------------------------------------- | ----------- | --------------------------------------------------------------------------------------- |
-| —           | Campaign Drafts tab — independent review  | Pending     | Merged in code; review file reads "pending independent review pass."                    |
-| AH-104      | Account deletion (umbrella)               | In progress | Inventory and PII map APPROVED 2026-10-20. Split into AH-104a..e below. No code yet.    |
-| AH-104a     | Erasure engine (command, dry-run, ledger) | Plan-pause  | Plan written 2026-10-20, awaiting review. Stage 0 is read-only. No UI.                  |
-| AH-104b-del | Deletion request flow + Security page     | Queued      | After 104a. Web AND native, under the creator account menu.                             |
-| AH-104c     | Admin erasure queue, Erase button, hold   | Queued      | After 104b-del. 14 days, then an admin clicks Erase (confirm + audit row).              |
-| AH-104d     | In-app sign-up (was AH-104b)              | Gated       | Gated on 104a-c. Renamed 2026-10-20; older entries and closed reviews keep "AH-104b".   |
-| AH-104e     | Stop writing PII into audit snapshots     | Queued      | Own chunk, after 104a. Changes audit content: its own stop-gate.                        |
-| AH-103d     | Reinstall marker (tech-debt 17)           | Plan-pause  | Full loop (ruled 2026-10-20), plan written, awaiting review. Rides build 3.             |
-| AH-103c     | Biometric unlock                          | Parked      | Deferred to post-launch 2026-10-20. Inventory and rulings in `biometrics-inventory.md`. |
-| AH-109      | Job-posted email footer shows ":agency"   | Landed      | Fixed and pushed 2026-10-19 (Mode B); not deployed, rides the API deploy.               |
-| AH-103b     | Universal links (iOS first)               | Landed      | Pushed, not deployed. Device walk W1–W10 waits for the web deploy, C1–C7 and build 3.   |
+| ID          | Title                                     | Status              | Notes                                                                                           |
+| ----------- | ----------------------------------------- | ------------------- | ----------------------------------------------------------------------------------------------- |
+| —           | Campaign Drafts tab — independent review  | Pending             | Merged in code; review file reads "pending independent review pass."                            |
+| AH-104      | Account deletion (umbrella)               | In progress         | Inventory and PII map APPROVED 2026-10-20. Split into AH-104a..e below. No code yet.            |
+| AH-104a     | Erasure engine (command, dry-run, ledger) | Checkpoint 0        | Plan cleared 2026-10-20; Stage 0 done (enumeration committed). Awaiting clearance + Q10.        |
+| AH-104b-del | Deletion request flow + Security page     | Queued              | After 104a. Web AND native, under the creator account menu.                                     |
+| AH-104c     | Admin erasure queue, Erase button, hold   | Queued              | After 104b-del. 14 days, then an admin clicks Erase (confirm + audit row).                      |
+| AH-104d     | In-app sign-up (was AH-104b)              | Gated               | Gated on 104a-c. Renamed 2026-10-20; older entries and closed reviews keep "AH-104b".           |
+| AH-104e     | Stop writing PII into audit snapshots     | Queued              | Own chunk, after 104a. Changes audit content: its own stop-gate.                                |
+| AH-103d     | Reinstall marker (tech-debt 17)           | Built, walk pending | Proof report written (22/22 break-reverts). Awaiting Pedram's device walk W1-W6. Rides build 3. |
+| AH-103c     | Biometric unlock                          | Parked              | Deferred to post-launch 2026-10-20. Inventory and rulings in `biometrics-inventory.md`.         |
+| AH-109      | Job-posted email footer shows ":agency"   | Landed              | Fixed and pushed 2026-10-19 (Mode B); not deployed, rides the API deploy.                       |
+| AH-103b     | Universal links (iOS first)               | Landed              | Pushed, not deployed. Device walk W1–W10 waits for the web deploy, C1–C7 and build 3.           |
 
 > Pointer, not an ad-hoc item: **Sprint 10 (Payments/Escrow)** remains the deepest pending
 > roadmap dependency, Stripe-gated. Tracked in `tech-debt.md`, not here.
@@ -83,7 +83,8 @@ reviews, and conversations.
 ### AH-104 · Account deletion (inventory and PII map APPROVED; split into AH-104a..e)
 
 - **Status:** In progress. The inventory and [`account-deletion-pii-map.md`](account-deletion-pii-map.md) are approved (2026-10-20, D-A to D-G as
-  written). The AH-104a plan is written and awaiting review. No code.
+  written). The AH-104a plan is CLEARED (2026-10-20); Stage 0 (the audit enumeration) is done and the chunk is stopped at Checkpoint 0.
+  No production code yet.
 - **Date:** 2026-10-20.
 - **Rulings (2026-10-20):** high risk. 14-day grace, cancellable by sign-in; lock and revoke tokens, sessions and push at request time; **no
   automatic erasure** (after 14 days the admin view shows "Ready to erase", an admin clicks Erase with a confirm and an audit row; a legal hold
@@ -111,12 +112,15 @@ reviews, and conversations.
 
 ### AH-103d · The reinstall marker: a reinstalled iPhone must not come back signed in (tech-debt 17, full loop)
 
-- **Status:** Plan-pause. Scoped 2026-10-20 when AH-103c was deferred; the plan is [`reinstall-marker-plan.md`](reinstall-marker-plan.md),
-  awaiting review. **Not built.** Ruled **full loop** (Mode A, not Mode B) the same day; the walk includes the reinstall case.
+- **Status:** **BUILT 2026-10-20; stopped at the proof report** [`reinstall-marker-review.md`](reinstall-marker-review.md). Awaiting Pedram's device walk (W1-W6, W7
+  optional), then review. **Not pushed.** Scoped 2026-10-20 when AH-103c was deferred; plan [`reinstall-marker-plan.md`](reinstall-marker-plan.md), cleared the same day.
+  Ruled **full loop** (Mode A, not Mode B); the walk includes the reinstall case. Commits `31446982`, `e4a72325`, `4189f57a`.
+- **Rulings (2026-10-20):** Q1 `localStorage`; Q2 no message, the tester note carries it; Q3 5 s bound; Q4 the gated design (two gates plus the eager start); Q5 W7 optional;
+  Q6 **W0 not run**: the walk build replaced the pre-marker install, so the bug can no longer be reproduced on the phone; the break-reverts (22/22) are the detector proof instead.
 - **Date:** 2026-10-20.
 - **Why:** iOS keeps Keychain items across Delete App, so a reinstalled, handed-on or sold phone comes back signed in as the previous
   creator, and the old push-token row stays live (tech-debt 17, found on a real iPhone 2026-10-11, "decide before the first iOS store build").
-- **What (planned):** a first-launch marker in app storage that iOS clears on delete; if it is missing and a session is present, sign out
+- **What (built; this was the plan):** a first-launch marker in app storage that iOS clears on delete; if it is missing and a session is present, sign out
   through `nativeLogout()` (push-token cleanup, revoke, local clear), then write the marker. No session: write the marker, no request.
   Details, proof expected and the fail-closed behaviour: [`biometrics-inventory.md`](biometrics-inventory.md) §9.
 - **One-time tester sign-out (accepted):** any install made before the marker (TestFlight build 1 or 2) is signed out once on the first
@@ -126,7 +130,7 @@ reviews, and conversations.
   2026-10-20: the earlier line was wrong.
 - **Stop-gate:** a session wipe is security-relevant, a full-loop trigger. The earlier Mode B scoping was superseded by Pedram's full-loop ruling
   of 2026-10-20.
-- **Deploy obligations:** none for the API. App only, with TestFlight build 3; the deploy-log disposition is written when it is built.
+- **Deploy obligations:** none for the API. App only, with TestFlight build 3; the disposition is stacked on the open `AH-106 + …` `PENDING` entry in `docs/runbooks/deploy-log.md`, with the tester note.
 - **Ref:** [`biometrics-inventory.md`](biometrics-inventory.md) §9; `tech-debt.md` item 17 (under "AH-102 (push notifications)").
 
 ### AH-103c · Biometric unlock (DEFERRED to post-launch)

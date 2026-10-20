@@ -62,7 +62,14 @@ happened.
 
 - **Status:** PENDING. AH-106 (`1c3c7aaf`, `e390581e`) was pushed 2026-10-17. AH-107 (`0801577e`, `b115639e`, `b1fd5e8b`, `77600807`, `480cfcd8`, `e557d358`) and AH-108 (`59c52ede`, `65df6b6e`, `9f47184f`, `715a1f72`, `3f73c8e7`, `16f06b54`, `4dad01b5`, `031b2e1b`, `0cc86e9a`, plus docs) were pushed 2026-10-19 as `54075f02..222b0d39` (19 commits). The AH-108 device walk passed 1–7 from the Xcode install (reported by Pedram); the production-APNs leg waits for build 3. **AH-103b** (`6ee14c36` plan, `ec172d59`, `7db73f78`, `12ba5d78`, `3b1f7ebf`, `f6cfffd3`, `82c8a2e7`, plus docs) was pushed 2026-10-19 after Stage 3 clearance; its device walk W1–W10 has **not** run and needs the web deploy, C1–C7 and build 3.
 - **Range:** `47d2efc5` (AH-103's last runtime commit, the deployed runtime tip; the commits between it and `8aa11376` are docs, `.env.example` and the iOS camera strings / build 2) → AH-106 tip `e390581e`; AH-107 tip `480cfcd8` (local, not on GitHub; the range extends to whatever tip is pushed).
-- **AH entries carried:** AH-106, AH-107, AH-108, AH-103b, AH-109
+- **AH entries carried:** AH-106, AH-107, AH-108, AH-103b, AH-109, AH-103d
+- **AH-103d (reinstall marker, tech-debt 17) — BUILT 2026-10-20, app only; NOT pushed; rides TestFlight build 3.** Commits `31446982`, `e4a72325`, `4189f57a` (+ the docs commit).
+  **API: untouched, no migration, no config, no deploy step.** **Build-3 obligations it adds:** (1) **the marker build signs every pre-marker install out once** (TestFlight
+  builds 1 and 2, and any Xcode install): the user lands on the normal sign-in page with no message, signs in, and stays signed in. **Tell the testers** (note below).
+  (2) The `personal_access_tokens` and `user_push_tokens` rows of those testers **disappear at that moment, by design** (the wipe is the real sign-out); not an incident.
+  (3) After the first build-3 launch, deleting and reinstalling the app signs the user out, which it did not before. **Tester note (verbatim for build 3):** "This build signs
+  you out once on first launch. Sign in again and you stay signed in as before. It also means deleting and reinstalling the app now signs you out, which it did not before."
+  Proof and the device walk: [`reinstall-marker-review.md`](../reviews/reinstall-marker-review.md). **The walk (W1–W6) is Pedram's and is not yet done.**
 - **Migrations run:** none.
 - **Pre-deploy reads:** none.
 - **Snapshot ID:** not required by this entry (no schema, no data write). The open snapshot question under AH-103 is unchanged.
