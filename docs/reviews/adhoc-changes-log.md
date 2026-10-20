@@ -63,7 +63,7 @@ reviews, and conversations.
 | ----------- | ----------------------------------------- | ------------------- | ----------------------------------------------------------------------------------------------- |
 | —           | Campaign Drafts tab — independent review  | Pending             | Merged in code; review file reads "pending independent review pass."                            |
 | AH-104      | Account deletion (umbrella)               | In progress         | Inventory and PII map APPROVED 2026-10-20. Split into AH-104a..e below. No code yet.            |
-| AH-104a     | Erasure engine (command, dry-run, ledger) | Checkpoint A        | Stages 0-7 built except 4e (waits on read-back C); execute refused until then. Not pushed.      |
+| AH-104a     | Erasure engine (command, dry-run, ledger) | Built               | All stages incl. 4e on the app role; read-backs B-D in. Nothing erased in prod; pgsql unproven. |
 | AH-104b-del | Deletion request flow + Security page     | Queued              | After 104a. Web AND native, under the creator account menu.                                     |
 | AH-104c     | Admin erasure queue, Erase button, hold   | Queued              | After 104b-del. 14 days, then an admin clicks Erase (confirm + audit row).                      |
 | AH-104d     | In-app sign-up (was AH-104b)              | Gated               | Gated on 104a-c. Renamed 2026-10-20; older entries and closed reviews keep "AH-104b".           |
@@ -83,10 +83,13 @@ reviews, and conversations.
 ### AH-104 · Account deletion (inventory and PII map APPROVED; split into AH-104a..e)
 
 - **Status:** In progress. The inventory and [`account-deletion-pii-map.md`](account-deletion-pii-map.md) are approved (2026-10-20, D-A to D-G as
-  written). **AH-104a is built through Stage 7 except 4e (the audit scrub, waiting on read-back C) and stopped at Checkpoint A** (artisan only, no route,
-  not scheduled; `--execute` is refused until 4e lands). Not pushed. Stage 8 (runbook, deploy log) not started. The tech-debt entry "AH-104a erasure engine"
-  lists what the proof does not cover (sqlite-only specs, S3 versions never run against real S3).
-- **Date:** 2026-10-20.
+  written). **AH-104a is BUILT, all stages including 4e** (artisan only: `erasure:run`, `erasure:reapply`; no route, not scheduled). Read-backs B, C and D arrived
+  2026-10-20 and Pedram ruled 2026-10-21: **4e runs on the application role with no separate connection or role**, guarded in code (five columns, one decision function, an architecture spec) plus a
+  closing audit pass inside the transaction; the notification scrub is batched and indexed; backups 7 days and logs 14 days are disclosed; the S3 version purge stays (a no-op on an unversioned bucket).
+  Runbook: [`../runbooks/account-erasure.md`](../runbooks/account-erasure.md). **Nothing has been erased in production**; the specs run on sqlite (tech-debt row 1). The tech-debt entries "AH-104a erasure
+  engine", "audit_logs is not append-only in production" (security, OPEN) and "Daily application logs" list what the proof does not cover. Deploy obligations: three migrations and the media-bucket prefix, in `deploy-log.md`.
+  **Next: AH-104b-del** (request flow and Security page).
+- **Date:** 2026-10-20 (built 2026-10-21).
 - **Rulings (2026-10-20):** high risk. 14-day grace, cancellable by sign-in; lock and revoke tokens, sessions and push at request time; **no
   automatic erasure** (after 14 days the admin view shows "Ready to erase", an admin clicks Erase with a confirm and an audit row; a legal hold
   keeps it from showing as ready). Anonymise in place with an explicit marker column, no deletion of anchors. Audit logs and

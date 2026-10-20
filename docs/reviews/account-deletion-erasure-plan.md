@@ -1,10 +1,9 @@
 # AH-104a — The erasure engine — PLAN (plan-pause)
 
-- **Status:** **Stages 0 to 7 BUILT except 4e; stopped at Checkpoint A (2026-10-20).** Stage 4e (the audit scrub) waits on read-back C, so `erasure:run --execute`
-  is **refused in every environment** until it lands (`AuditScrub` is bound to an implementation that reports itself unavailable; fail closed). Stage 8 (runbook,
-  deploy-log disposition, privacy-notice inputs) is not started. **Deviation from §5's order:** Stage 6 (payment guard) was committed **before** Stage 5, so there
-  is never a commit with the command and without the guard. **Slot kept:** in `ErasureRun` the audit scrub runs **before** the S3 and vendor steps, so 4e drops in
-  with no reorder. Local commits are not pushed; the push waits for Pedram's trigger at Checkpoint A.
+- **Status:** **Stages 0 to 8 BUILT (2026-10-21), including 4e.** Read-backs B, C and D arrived 2026-10-20 and Pedram ruled 2026-10-21: **4e runs on the application role, no separate
+  connection or role** (§4.4 below is rewritten); the notification scrub is batched and indexed and the dry-run prints its cost; backups 7 days and logs 14 days are disclosed; the S3 version
+  purge stays and is a no-op on an unversioned bucket. **Not yet true: nothing has been erased in production**, and the specs have run on sqlite only (tech-debt row 1). **Deviation from §5's
+  order:** Stage 6 (payment guard) was committed **before** Stage 5. **Addition not in the plan:** a closing audit pass inside the database transaction (§4.4).
 - **Date:** 2026-10-20
 - **Entry:** **AH-104a** (command, dry-run, registry, ledger, restore replay; **no UI, no route, not scheduled**). **AH-104b-del** (request flow + Security
   page), **AH-104c** (admin queue, Erase, hold), **AH-104d** (in-app sign-up) and **AH-104e** (stop writing PII into audit snapshots) are out of scope here.
@@ -157,12 +156,26 @@ run's counts on the same graph (a spec runs both and compares); the dry-run leav
 
 ### 4.4 The audit scrub and its role (D-B), stated plainly
 
-`audit_logs` is append-only by model (`AuditLog.php:117,127,138`) and, per the spec, by grant (`05-SECURITY:198`). The scrub is the **only** code that updates it,
-and it does so with the **raw query builder** (never the model) over a **second database connection** (`audit_scrub`) that logs in as a dedicated role holding
-`GRANT UPDATE (ip, user_agent, before, after, metadata) ON audit_logs`. Without that connection configured, **Stage 4e refuses to run** (it does not fall back to the
-app role, and it does not skip silently: the command reports "audit scrub not run: no scrub connection" and the ledger row records it, so the run is **incomplete**,
-not complete). An **arch spec** asserts that no other file under `app/` issues an `UPDATE` against `audit_logs`. The grant itself is the colleague's act and is
-**not** part of any commit; the plan lists the exact statement for them when Stage 4e is reached, after read-back C. Predicates S1–S5 and the key actions are **verbatim map §4.1**.
+**As built (2026-10-21).** Read-back C found one database role, `engine_c_user`, with `UPDATE`, `DELETE` and `TRUNCATE` on `audit_logs`, used by web, worker and migrations, and no plan for a second.
+D-B's "dedicated connection with a column-level grant" is therefore not available, and Pedram ruled not to build a second connection: **the scrub runs on the application connection and the
+protection is in code**, in three layers:
+
+1. **One writer, five columns.** `DatabaseAuditScrub::write()` is the only statement that updates `audit_logs`: `UPDATE audit_logs SET <ip, user_agent, metadata, before, after> WHERE id = ?`, through the
+   raw query builder. It throws `AuditScrubViolation` before sending anything if asked to set another column (`reason`, `action`, `created_at`, an id).
+2. **One decision function.** `AuditRowScrub::changes(row, subject)` is a pure function of the row and the subject: which of S1 to S5 the row is in and the new value of each column that would
+   change. The dry-run counts with it and the scrub writes with it, so they cannot disagree, and a clean row yields no change (a second run writes nothing). It decides per row as well as per query,
+   so a query returning a bystander's row would still change nothing.
+3. **An architecture spec**: no other file under `app/` updates, deletes or truncates `audit_logs`, by builder or raw SQL.
+
+Predicates S1 to S5 and the key actions are **verbatim map §4.1**, with one conservative reading: on S5 (a row naming the old email whoever acted), `ip` and `user_agent` are nulled only when no
+**other user** acted, because an agency member's ip is theirs (the same reason the map keeps `ip` on S2 to S4). S5's email match is case-insensitive (a failed login stores the address as typed).
+
+**The run scrubs twice.** First, before any object is deleted and before the database stage, because it needs the identity the database stage destroys and a failure leaves the account intact. Second, a
+**closing pass inside the database transaction**: the user stays signed in until that transaction commits, so a login during the file step writes an audit row the first pass never saw. A failure of the
+closing pass rolls the whole erasure back. A row written in the milliseconds between the closing pass and the commit is not scrubbed (tech-debt row 8); the account is erased at that commit.
+
+**Consequence for the security posture.** The code constraint narrows what our own code does; it does not stop anyone holding the database credential. That is tracked as its own security item
+(tech-debt, "audit_logs is not append-only in production"); the fix is a least-privilege role split after launch, by the colleague, and `05-SECURITY-COMPLIANCE.md` §3.4 now says what is true.
 
 ### 4.5 The command: two-phase, resumable, refuses
 
@@ -317,9 +330,11 @@ The request flow, re-auth and its rate limiter, the 14-day clock, the "Ready to 
 chunk; the §4.7 guard is what makes it safe to do); the audit retention job and the Glacier archive the spec describes; vendor-side deletes unless read-back A3 forces them;
 the privacy notice text (AH-105 consumes the runbook's retention table).
 
-## 10. Deploy obligations (to be written into the deploy log at Stage 8)
+## 10. Deploy obligations (as built; also in `runbooks/deploy-log.md`)
 
-Two additive migrations (names recorded at build), **no backfill**, **no flag, no env**, **no scheduler change**, no worker restart needed for the code. One infra
-dependency that is **not** a deploy step: the scrub role and connection (Stage 4e) and the mirror prefix (Stage 7), both done by the colleague and both verified by a
-dry-run on a **non-production copy first**. Pre-deploy reads: none beyond the read-back already collected. Post-deploy verification: `/up`, and `php artisan list | grep
-erasure` shows the commands and `php artisan erasure:run <ulid>` with no `--execute` on a **test creator** prints a report and changes nothing.
+**Three** additive migrations: `2026_10_20_100000_add_erased_at_to_users_and_creators`, `2026_10_20_100100_create_erasure_ledger_table` and `2026_10_21_100000_add_actor_index_to_notifications`
+(the last builds `notifications(actor_user_id)` with `CREATE INDEX CONCURRENTLY` on Postgres, so no lock; a failed build leaves an invalid index that `DROP INDEX CONCURRENTLY IF EXISTS` clears before a
+re-run). **No backfill, no flag, no env, no scheduler change**, no worker restart needed for this code. **No scrub role or connection** (ruling 2026-10-21). One infra dependency that is not a deploy
+step: the mirror prefix `erasure-ledger/` on the media bucket (private, versioned) and, if the bucket is versioned, `s3:ListBucketVersions` and `s3:DeleteObjectVersion` for the app role. Post-deploy
+verification: `/up`, `php artisan list | grep erasure` shows both commands, and `php artisan erasure:run <ulid>` **without `--execute`** on a **test creator** prints a report and changes nothing.
+Before the first real erasure: the Postgres CI run of the erasure specs (tech-debt row 1) and the runbook's §2 checklist.

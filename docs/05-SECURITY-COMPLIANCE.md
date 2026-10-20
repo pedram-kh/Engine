@@ -69,6 +69,8 @@ When a creator's erasure is approved:
 - Payment records are NOT deleted (legal retention requirement); the creator's name on payment records becomes "Deleted User."
 - The user record is hard-deleted only after 7 years (legal retention for financial transactions).
 
+> **Status as built (AH-104a):** the engine anonymises in place rather than deleting: `users` and `creators` keep their rows (anchors) with `erased_at` set, the email becomes `erased-{ulid}@erased.invalid`, and encrypted NOT NULL columns hold `[erased]`. The audit scrub keeps the rows and removes the person from five columns. There is no 7-year hard delete. How the run works, what it keeps and for how long: [`runbooks/account-erasure.md`](runbooks/account-erasure.md).
+
 The erasure process is implemented as a background job (`ExecuteDataErasureJob`) with full transaction integrity. If anything fails, the entire erasure rolls back and admin is notified.
 
 ### 2.5 Data residency
@@ -196,8 +198,9 @@ The application enforces this at the service layer. Attempting these actions wit
 
 ### 3.4 Append-only enforcement
 
-- Database role for the application has INSERT and SELECT on `audit_logs`, but NO UPDATE or DELETE.
-- A separate "audit retention" role has DELETE permission, used only by the scheduled retention job.
+- **Target (not yet true in production):** the application's database role has INSERT and SELECT on `audit_logs`, but NO UPDATE or DELETE, and a separate "audit retention" role has DELETE permission, used only by the scheduled retention job.
+- **Actual, as read from production on 2026-10-20 (AH-104a read-back C):** web, worker and migrations all connect as one role, `engine_c_user`, which holds `SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER` on `audit_logs` (table and every column), with no triggers, rules or row-level security. **`audit_logs` is append-only by the model and by convention only, not by grant.** There is no audit-retention role. The least-privilege role split is a post-launch task for the infrastructure owner (see `tech-debt.md`, "audit_logs is not append-only in production").
+- **What stands in for the grant today:** the `AuditLog` model throws on `update()`, `save()` of an existing row and `delete()`; and the only code that writes to the table after insert is the erasure audit scrub (`app/Modules/Erasure/Execution/DatabaseAuditScrub.php`), which can only set `ip`, `user_agent`, `metadata`, `before` and `after`, refuses any other column before a statement is sent, and is the only file under `app/` an architecture spec allows to update or delete the table. This narrows what the application's own code can do; it does not stop a person or a SQL injection using the same role.
 - Periodic checksum verification (Phase 2+): a hash of each entry is computed and stored in a separate hash chain table. Tampering is detectable.
 
 ### 3.5 Storage and retention
@@ -206,6 +209,7 @@ The application enforces this at the service layer. Attempting these actions wit
 - **Cold storage:** Older entries archived to S3 Glacier in Parquet format, accessed for compliance queries only.
 - **Compliance retention:** 7 years for financial-related actions; 3 years for general actions; legal hold overrides retention.
 - Phase 2 introduces table partitioning by month for performance.
+- **Status as built (2026-10-20, read-back D):** none of the above exists yet. There is no cold storage, no archive, no retention job and no audit export; `audit_logs` is one Postgres table (38 MB at the read-back) that is never trimmed. The only copies of an audit row are the table, the database snapshots (RDS automated, 7-day retention) and nothing else.
 
 ### 3.6 Admin actions on production
 
@@ -215,6 +219,8 @@ Admin SPA actions on production data are doubly logged:
 2. To a dedicated S3 audit bucket with object-lock (compliance mode, immutable for retention period).
 
 This double logging means even if the database `audit_logs` table is somehow compromised, the S3 record stands.
+
+> **Status as built (2026-10-20, read-back D):** there is no S3 audit bucket and no object lock; admin actions are logged to `audit_logs` only, and the application role can update and delete that table (§3.4). Nothing in this section is true in production yet.
 
 ### 3.7 Querying audits
 

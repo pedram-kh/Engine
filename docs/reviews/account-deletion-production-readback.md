@@ -255,3 +255,33 @@ Plus, **from the AWS side** (no database access needed):
 | S3 versioning is **on** (D)                                          | Object erasure must delete **versions** and delete markers, and the plan says how it is proven.                                                                                                    |
 | Audit rows are exported outside Postgres (D)                         | The scrub cannot be complete; the plan states the residual and the notice says so.                                                                                                                 |
 | `failed_logins_no_actor` or `rows_with_metadata_email` is large (B2) | The email-value predicate (map S5) needs an index or batching, and the dry-run reports its cost.                                                                                                   |
+
+---
+
+## Results received (2026-10-20, from the colleague, read-only)
+
+**B (row counts).** users 2,763 (creators 2,752; never verified 336; `name = email` 1; with 2FA 8; suspended 0; soft-deleted 0) · creators 2,752 (with DOB 1,033, phone/whatsapp 1,454, address 1,393,
+`content_companions` 1,085, avatar 1,774) · tax profiles 0 · payout methods 0 · KYC 0 · social accounts 2,709 (OAuth token 0) · portfolio items 10,250 · availability blocks 480 · agency relations 857 (live
+invitation token 0) · blacklists 0 · talent-pool rows 249 · job notifications 3,250 · **assignments 709 (payment state 0, `payment_id` 0)** · applications 3,693 (with note 1,074) · drafts 392 · contracts 1,231
+(signed 1,228) · messages 7,149 (attachments 145) · relationship messages 3,798 (attachments 72) · read receipts 11,477 / 7,459 · email debounces 827 · **notifications 288,083** (`creator_name` 182,832,
+`sender_name` 153,800, `counterparty_name` 51) · notification prefs 41 · tokens 4 · sessions 88 · reset tokens 18 · push tokens 4 · push deliveries 20 · failed jobs 8 · jobs 0 · tracked jobs 0 ·
+integration events 0 · features 12 · impersonation sessions 27 · **`audit_logs` 38 MB**; login actions present: `auth.login.failed`, `auth.login.succeeded`. **B2 (ip, user agent, `metadata.email`,
+no-actor, snapshot counts, top-25) was not yet read.**
+
+**C (grants).** Connected as `engine_c_user`; table owner `postgres`. `engine_c_user` holds `SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER` on `audit_logs`, table and every column
+(`relacl {postgres=arwdDxtm/postgres, engine_c_user=arwdDxtm/postgres}`); no triggers, rules or RLS; not superuser, not `CREATEROLE`. Web, worker and migrations all connect as `engine_c_user`; there is
+no audit-retention role. Aurora PostgreSQL 17.7.
+
+**D (copies).** RDS automated snapshots, **7-day** retention. No CloudWatch, no Sentry, no external log or data store, no audit export. Laravel daily log files, **14-day** retention. **S3 media bucket
+versioning: not yet answered.**
+
+### What these answers changed (rulings 2026-10-21)
+
+| Finding                                             | Consequence                                                                                                                                                                                                                                                                                                                                       |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| One role, with UPDATE on `audit_logs` (C)           | No separate scrub connection or role (ruling 1). Stage 4e runs on the application role, constrained in code; the "no scrub connection" refusal is replaced by a column guard. Tech-debt (security): the table is not append-only in production; the role split is post-launch work for the colleague; `05-SECURITY-COMPLIANCE.md` §3.4 corrected. |
+| 182,832 / 153,800 notification rows carry names (B) | The 4d scrub is batched (500 by primary key) and `notifications.actor_user_id` gets an index; the dry-run prints rows read and batches. Per creator the work is a few hundred rows; the indexes make that true.                                                                                                                                   |
+| Payment state 0, payout 0, KYC 0, tax 0 (B, A)      | The payment guard and the vendor refusal are never triggered by today's data; they exist for Sprint 10 and for a vendor being switched on.                                                                                                                                                                                                        |
+| Snapshots 7 days, logs 14 days, no other copy (D)   | Privacy-notice input (`runbooks/account-erasure.md` §7): backups 7 days; logs may hold an email up to 14 days (tech-debt, expires, disclosed). The ledger mirror covers the restore.                                                                                                                                                              |
+| S3 versioning unanswered (D)                        | The version purge stays built and fail-closed; on an unversioned bucket it finds nothing and does nothing (spec). If versioning is off and the app role lacks `s3:ListBucketVersions`, set `ERASURE_PURGE_OBJECT_VERSIONS=false`.                                                                                                                 |
+| B2 not read                                         | The cost of the S5 predicate (`metadata.email`, a full read of 38 MB) is unmeasured; the dry-run reports it. Not blocking.                                                                                                                                                                                                                        |

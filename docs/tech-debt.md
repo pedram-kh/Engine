@@ -3331,8 +3331,10 @@ It is allowlisted in `tests/unit/architecture/use-theme-is-sot.spec.ts` (the tes
   1. **Erasure specs run on sqlite; the pgsql grammar is compiled but not exercised.** Exercise against a Postgres CI job before the first real erasure.
      (The registry/engine use only the query builder, so the SQL is generated for Postgres in production, but no spec has ever executed it there. Cascade ordering,
      `whereJsonContains`/JSON path updates and `ON DELETE CASCADE` behaviour are the places a difference would hide.) **Escalates:** before the first real run.
-  2. **Stage 4e (the audit scrub) is not built.** It waits on production read-back C (the scrub role and connection). `AuditScrub` is bound to an implementation that
-     reports itself unavailable, so `erasure:run --execute` and `erasure:reapply --execute` are **refused** in every environment until 4e lands. By design; do not work around it.
+  2. **Stage 4e (the audit scrub) is built, and it runs as the application role.** Read-back C found one role with UPDATE on `audit_logs` and no plan for a second
+     (ruling 2026-10-21), so the protection is in code (five columns, one writer, an architecture spec), not in a grant. See the security entry below. The scrub has run
+     against sqlite fixtures only (row 1). Its `metadata->email` lookup (S5) cannot use an index: it reads the whole table once per erasure (38 MB at the read-back, a
+     sequential scan); B2 (how many rows carry `metadata.email`) was not yet read, so the cost of S5 is unmeasured. The dry-run reports rows read; run it on production first.
   3. **The S3 version purge has never run against real S3.** It is covered by a fake disk only. The application role needs `s3:ListBucketVersions` and
      `s3:DeleteObjectVersion` on the media bucket (read-back D); a missing permission fails closed (`ObjectDeletionFailed`, no object key in the message), it does
      not skip. Also unverified: behaviour on a very large version list (paginated in code, not load-tested).
@@ -3342,4 +3344,43 @@ It is allowlisted in `tests/unit/architecture/use-theme-is-sot.spec.ts` (the tes
      Each is named in the PII map or the plan; none is a surprise, none is closed.
   6. **Local-only quirk:** the Identity login specs (and `ErasedLoginBlockTest`) need `SANCTUM_STATEFUL_DOMAINS` set in the environment, as CI does
      (`.github/workflows/ci.yml`); a local run without it fails them (16 in `LoginTest` alone). Local runs here pass the `.env.example` list. CI is unaffected.
+  7. **A failed login after an erasure writes the old address again.** `auth.login.failed` stores the typed email in `metadata`; a person (or anyone) who tries the erased
+     address afterwards creates a fresh row holding it, which no scrub will ever visit (the account no longer resolves). Closing it belongs to AH-104e (stop writing PII
+     into audit snapshots): hash or drop the address when no user matches. Until then those rows hold an email and an ip and age out only with the audit retention that does not exist.
+  8. **A request in the window between the two audit passes.** The run scrubs first and again inside the database transaction; a row written after the second pass and
+     before the commit (milliseconds) is not scrubbed. The account is erased at that commit, so it cannot recur.
+  9. **Production index build.** `notifications(actor_user_id)` is created `CONCURRENTLY` on Postgres (288,083 rows at the read-back). It has not been run on Postgres by any spec
+     (row 1); the migration is additive and its failure leaves an invalid index that `DROP INDEX CONCURRENTLY IF EXISTS idx_notifications_actor` clears.
 - **Owner:** platform / identity. **Status:** OPEN. Opened 2026-10-20 at AH-104a Checkpoint A.
+
+---
+
+## audit_logs is not append-only in production: the application role can update, delete and truncate it (OPEN, security)
+
+- **Where:** production database role `engine_c_user`; [`05-SECURITY-COMPLIANCE.md`](05-SECURITY-COMPLIANCE.md) §3.4.
+- **What was found (AH-104a read-back C, 2026-10-20):** web, worker and migrations all connect as `engine_c_user`, which holds `SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES,
+TRIGGER` on `audit_logs` (table and every column). The owner is `postgres`. There are no triggers, rules or row-level security, and no audit-retention role. Aurora PostgreSQL 17.7.
+- **Why it matters:** §3.4 says the application role has INSERT and SELECT only. It does not. The "append-only" property is the `AuditLog` model throwing on update and delete, which stops
+  our own code and nothing else: an SQL injection, a leaked database credential, a bad migration or a person with the connection string can rewrite or empty the audit trail. The same
+  credential also runs migrations, so it cannot simply lose UPDATE without a second role.
+- **What stands in for it today (AH-104a):** the erasure scrub is the only code that updates the table, limited in code to `ip`, `user_agent`, `metadata`, `before`, `after`, with an architecture
+  spec that no other file under `app/` updates or deletes `audit_logs`. That narrows the application's own behaviour; it is not a control against the cases above.
+- **The fix (Pedram's ruling 2026-10-21): a least-privilege role split after launch, by the infrastructure owner.** A runtime role with `SELECT, INSERT` on `audit_logs`; a migrations role that
+  owns the schema; a retention role with `DELETE` for the job that does not exist yet; the erasure scrub then needs `UPDATE (ip, user_agent, metadata, before, after)` for whichever role runs it
+  (the artisan command runs on the server as the runtime role today). Also then: revoke `TRUNCATE`, `REFERENCES`, `TRIGGER` from the runtime role everywhere.
+- **Trigger to escalate:** before the privacy notice is published (it says nothing about audit integrity, but a regulator asking "who can change the log" gets a wrong answer), and before any
+  second person has database access.
+- **Owner:** infrastructure (colleague). **Status:** OPEN. Opened 2026-10-21.
+
+---
+
+## Daily application logs may keep an erased person's email for up to 14 days (OPEN, disclosed)
+
+- **Where:** Laravel daily log files on the server, 14-day retention (production read-back D). No CloudWatch, no Sentry, no external log or data store.
+- **What:** an exception message, a validation failure or a failed-login line can contain an email address. Erasing an account does not and cannot reach the files. After an erasure the
+  address may remain in a daily log for up to **14 days**, then rotates out. The same is true of the database snapshots (RDS automated, **7-day** retention): a restore inside that window
+  brings the account back, which is what `erasure:reapply` and the ledger mirror exist for.
+- **Why it is debt and not a defect:** it is a bounded, expiring residue, and the privacy notice states it (inputs: [`runbooks/account-erasure.md`](runbooks/account-erasure.md) §7). It becomes a
+  problem only if retention is lengthened or logs are shipped somewhere (a log service, Sentry) without revisiting this.
+- **Trigger to escalate:** adding any external log, error or analytics sink, or raising log retention above 14 days.
+- **Owner:** platform. **Status:** OPEN (expires by itself, disclosed). Opened 2026-10-21.
