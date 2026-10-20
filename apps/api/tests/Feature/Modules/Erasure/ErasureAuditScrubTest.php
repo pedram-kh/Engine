@@ -85,9 +85,9 @@ function erasureAuditRead(int $id): array
     return $row;
 }
 
-it('S1: the subject\'s own actions lose ip, user agent and the typed address, and keep everything else', function (): void {
+it('S1: the subject\'s own actions lose ip, user agent and whatever address was typed (whoever\'s), and keep everything else', function (): void {
     [$a, , $subject] = erasureAuditFixture();
-    $id = erasureAuditRow(['actor_type' => 'user', 'actor_id' => $a->user->id, 'actor_role' => 'creator', 'action' => AuditAction::AuthLoginSucceeded->value, 'metadata' => ['email' => $a->email, 'reason' => 'ok'], 'reason' => 'kept reason']);
+    $id = erasureAuditRow(['actor_type' => 'user', 'actor_id' => $a->user->id, 'actor_role' => 'creator', 'action' => AuditAction::AuthLoginSucceeded->value, 'metadata' => ['email' => 'typed-by-someone-else@example.test', 'reason' => 'ok'], 'reason' => 'kept reason']);
 
     (new DatabaseAuditScrub)->run($subject);
     $row = erasureAuditRead($id);
@@ -189,6 +189,26 @@ it('changes only the five columns, on every row, and leaves a bystander\'s rows 
         expect($after[$i])->toBe($row);
     }
     expect($bystander)->not->toBe([]);
+});
+
+it('decides row by row too: a bystander\'s rows are no change for this subject, whatever the query returned', function (): void {
+    [$a, $b, $subject] = erasureAuditFixture();
+    $rows = [
+        ['actor_type' => 'user', 'actor_id' => $b->user->id, 'metadata' => ['email' => $b->email]],
+        ['subject_type' => $b->user->getMorphClass(), 'subject_id' => $b->user->id, 'before' => ['email' => $b->email, 'name' => 'B']],
+        ['subject_type' => $b->creator->getMorphClass(), 'subject_id' => $b->creator->id, 'after' => ['display_name' => 'B']],
+        ['metadata' => ['email' => $b->email]],
+    ];
+
+    foreach ($rows as $shape) {
+        $row = new stdClass;
+        foreach ((array) DB::table('audit_logs')->find(erasureAuditRow($shape)) as $column => $value) {
+            $row->{$column} = $value;
+        }
+        expect(AuditRowScrub::changes($row, $subject))->toBe([]);
+    }
+
+    expect($a->user->id)->not->toBe($b->user->id);
 });
 
 it('leaves nothing of the person in the five columns once it has run', function (): void {
