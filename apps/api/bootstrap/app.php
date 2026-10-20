@@ -54,6 +54,13 @@ return Application::configure(basePath: dirname(__DIR__))
         // admin Push deliveries footer (total rows + oldest row) shows a dead
         // one. Safe to run by hand: `php artisan push:prune-deliveries --dry-run`.
         $schedule->command(PrunePushDeliveries::class)->daily();
+
+        // AH-103d rider (tech-debt "offline reinstall leaves the server token"):
+        // Sanctum rejects an expired token but never deletes the row, and nothing
+        // was pruning them. Deletes only rows whose `expires_at` passed more than
+        // 24 h ago (the framework command's own default, stated explicitly so a
+        // vendor change cannot widen it). Live tokens are never touched.
+        $schedule->command('sanctum:prune-expired', ['--hours=24'])->daily();
     })
     ->withMiddleware(function (Middleware $middleware): void {
         // Sanctum SPA cookie auth. EnsureFrontendRequestsAreStateful is

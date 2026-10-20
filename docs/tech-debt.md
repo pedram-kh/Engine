@@ -3303,8 +3303,9 @@ It is allowlisted in `tests/unit/architecture/use-theme-is-sot.spec.ts` (the tes
   1. **An offline reinstall leaves the server token until `expires_at`.** The 5 s bound clears the phone's session locally at once, but the revoke never reached the
      server, so the `personal_access_tokens` row stays valid server-side until `expires_at` (`SANCTUM_TOKEN_EXPIRATION_MINUTES`, default 129600 = 90 days). It is not a
      usable session (the token is no longer on any device), and the push-token row self-cleans on the next `UNREGISTERED` send, as item 15 records. After `expires_at`
-     Sanctum rejects the token, but **no `sanctum:prune-expired` is scheduled** (grep of `apps/api` found none), so the dead row is never deleted. **Resolution:** schedule
-     `sanctum:prune-expired` (a one-line scheduler change, its own small chunk; not built here).
+     Sanctum rejects the token, but **no `sanctum:prune-expired` is scheduled** (grep of `apps/api` found none), so the dead row is never deleted. **RESOLVED by the AH-103d rider** (own commit, 2026-10-20): `sanctum:prune-expired --hours=24`
+     is scheduled `->daily()` in `bootstrap/app.php`, pinned by `SanctumPruneExpiredScheduleTest` (registration; only tokens expired more than 24 h ago go; no other table touched;
+     break-reverted: line removed, weekly, window 0). The first run after deploy deletes the whole backlog of long-expired rows once (deploy-log entry: count it first).
   2. **A WebView-storage eviction signs the user out once.** The marker lives in `localStorage`, which the OS can evict while the app is installed. The marker then
      reads absent beside a session, which is treated as a reinstall. This is the safe direction (a lost marker can never keep anyone signed in). Accepted.
   3. **`localStorage` unwritable ⇒ the marker cannot persist,** so the sign-out would repeat on every launch. The app has broader problems in that state (push
@@ -3316,3 +3317,7 @@ It is allowlisted in `tests/unit/architecture/use-theme-is-sot.spec.ts` (the tes
      (`catalyst.install.marker`), joining `useLocalePreference.ts` and `usePushPreference.ts`. Same debt as the AH-102 note above: if the
      list grows again, generalise the test to "storage primitives only in the persistence layers" instead of enumerating paths.
 - **Owner:** mobile / identity. **Status:** open (by design). Opened 2026-10-20.
+- **Found while building the rider (pre-existing, not caused by it): the scheduler-registration tests are order-dependent.** In a fresh process the **first** `Artisan::call('schedule:list')` lists every
+  `withSchedule` entry **twice**, so `PrunePushDeliveriesCommandTest` "is registered in the scheduler as a daily command" (`toHaveCount(1)`) **fails when run alone** (`--filter`) at the baseline
+  (stash-tested), and passes in the full file only because an earlier test has already called Artisan. CI runs whole files so it never shows. The new rider test counts distinct lines to be immune.
+  **Resolution:** make the push test count distinct lines too, and find why the first listing doubles (the `withSchedule` callback is evidently applied twice on first resolution). Owner: platform.
