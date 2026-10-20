@@ -382,7 +382,7 @@ async function onSubmit(): Promise<void> {
     <!-- AH-101 Q7: frame 02's "Create an account" button is NOT drawn. A button
          with nowhere in-app to go is dead, and an external account-creation link
          is store-sensitive; the pointer line stays. The button returns with real
-         in-app sign-up (AH-104b). -->
+         in-app sign-up (AH-104d). -->
     <i18n-t
       v-if="isNative"
       keypath="auth.ui.native.create_account"
