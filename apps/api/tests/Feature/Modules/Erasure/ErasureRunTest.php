@@ -291,3 +291,15 @@ it('raises the object failure itself, naming no key', function (): void {
 
     expect($message)->not->toContain('creators/')->and($message)->not->toBe('no exception');
 });
+
+it('refuses when an object appeared after the dry-run: the digest covers the files, not only the rows', function (): void {
+    [$graph, $run, $scrub, $store] = erasureRunFixture();
+    $digest = $run->plan($graph->user)->digest();
+    Storage::disk('media')->put('creators/'.$graph->creator->ulid.'/avatar/uploaded-after-the-dry-run.jpg', 'new');
+
+    $execute = fn () => $run->execute($graph->user, $digest, $graph->user->ulid);
+
+    expect($execute)->toThrow(ErasureRefused::class, 'digest')
+        ->and($scrub->runs)->toBe(0)
+        ->and($store->deleted)->toBe([]);
+});
