@@ -14,6 +14,7 @@ use App\Modules\Erasure\Run\ErasureReapply;
 use App\Modules\Erasure\Run\ErasureRun;
 use App\Modules\Identity\Models\User;
 use Carbon\CarbonInterface;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -50,7 +51,7 @@ it('writes one entry per completed erasure, holding the ulid and a timestamp and
     $graph = ErasureGraph::seedSubject('a');
 
     $ledger = mirrorErase($graph);
-    $key = DiskLedgerMirror::PREFIX.'/'.$graph->user->ulid.'.json';
+    $key = 'erasure-ledger/'.$graph->user->ulid.'.json';
     $content = (string) Storage::disk('media')->get($key);
     $decoded = json_decode($content, true);
 
@@ -118,6 +119,19 @@ it('refuses to write an entry for something that is not a ulid (a path cannot be
     expect(fn () => (new DiskLedgerMirror)->record('../../creators/x', now()))->toThrow(MirrorWriteFailed::class)
         ->and(mirrorFiles())->toBe([]);
 });
+
+it('treats a store that says no, or throws, as a failed write (never a silent success)', function (string $how): void {
+    $disk = Mockery::mock(Filesystem::class);
+    $disk->shouldReceive('exists')->andReturn(false);
+    if ($how === 'returns false') {
+        $disk->shouldReceive('put')->andReturn(false);
+    } else {
+        $disk->shouldReceive('put')->andThrow(new RuntimeException('bucket said no'));
+    }
+    Storage::set('media', $disk);
+
+    expect(fn () => (new DiskLedgerMirror)->record('01JABCDEFGHJKMNPQRSTVWXYZ0', now()))->toThrow(MirrorWriteFailed::class);
+})->with(['returns false', 'throws']);
 
 it('has no way to remove an entry: the mirror class and its directory contain no delete', function (): void {
     $source = '';
@@ -195,6 +209,26 @@ it('re-erases them with the same engine and leaves everyone else alone', functio
         ->and(array_values(array_filter($b->files['delete'], fn (string $k): bool => ! Storage::disk('media')->exists($k))))->toBe([])
         ->and(ErasureLedger::query()->where('user_ulid', $a->user->ulid)->sole()->state)->toBe(ErasureLedgerState::Completed)
         ->and($reapply->plan()->subjects)->toBe([]);
+});
+
+it('records who ran the reapply on each ledger row', function (): void {
+    [$a] = mirrorRestoreScenario();
+    $operator = User::factory()->create();
+    $reapply = app(ErasureReapply::class);
+
+    $reapply->execute($reapply->plan()->digest(), 1, $operator);
+
+    expect(ErasureLedger::query()->where('user_ulid', $a->user->ulid)->sole()->run_by_user_id)->toBe($operator->id);
+});
+
+it('refuses a digest from before the data changed (a stale list is not approved)', function (): void {
+    [$a] = mirrorRestoreScenario();
+    $reapply = app(ErasureReapply::class);
+    $stale = $reapply->plan()->digest();
+    DB::table('creator_payout_methods')->where('creator_id', $a->creator->id)->delete();
+
+    expect(fn () => $reapply->execute($stale, 1))->toThrow(ErasureRefused::class)
+        ->and(User::withTrashed()->findOrFail($a->user->id)->isErased())->toBeFalse();
 });
 
 it('does not skip an entry: every person in the plan is re-erased, in one pass', function (): void {
