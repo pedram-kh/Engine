@@ -6,7 +6,7 @@
 > cd apps/api && php tools/enumerate-audit-actions.php > ../../docs/reviews/account-deletion-audit-enumeration.md
 > ```
 >
-> Source commit: `2af9ed0a13e10d67a8db390fa3d1e111d42e56bd`. Static analysis only (nikic/php-parser); no Laravel boot, no DB, no application code executed. Scanned 710 PHP files under `apps/api/app`.
+> Source commit: `01fde6b0e9e76aeb75a0abc652bde01dcc910334`. Static analysis only (nikic/php-parser); no Laravel boot, no DB, no application code executed. Scanned 712 PHP files under `apps/api/app`.
 
 ## 1. Summary
 
@@ -30,7 +30,7 @@
 
 | Case | Value | Reason req. | Direct sites | Other refs | `metadata` keys | `before` keys | `after` keys | Dynamic payload parts |
 |---|---|:--:|---|---|---|---|---|---|
-| `AccountErased` | `account.erased` | yes | `apps/api/app/Modules/Erasure/Run/ErasureRun.php:158` | — | `audit_rows_scrubbed`, `counts`, `digest`, `files_deleted`, `ledger_ulid` | — | — | — |
+| `AccountErased` | `account.erased` | yes | `apps/api/app/Modules/Erasure/Run/ErasureRun.php:166` | — | `audit_rows_scrubbed`, `counts`, `digest`, `files_deleted`, `ledger_ulid` | — | — | — |
 | `AdminImpersonationEnded` | `admin.impersonation_ended` |  | `apps/api/app/Modules/Identity/Services/ImpersonationService.php:235` | — | `impersonated_user_id`, `impersonation_ulid` | — | — | — |
 | `AdminImpersonationStarted` | `admin.impersonation_started` | yes | `apps/api/app/Modules/Identity/Services/ImpersonationService.php:108` | — | `impersonated_user_id`, `impersonation_ulid` | — | — | — |
 | `AgencyCreatorRelationAdminConnected` | `agency_creator_relation.admin_connected` | yes | `apps/api/app/Modules/Creators/Services/CreatorAgencyDirectConnectService.php:166` | — | `agency_id`, `automation_rule_id`, `fired_by`, `mode` | — | — | — |
@@ -103,9 +103,9 @@
 | `CampaignCreated` | `campaign.created` |  | `apps/api/app/Modules/Campaigns/Http/Controllers/CampaignController.php:130` | — | — | — | — | `after: $this->auditableSnapshot($campaign) @ apps/api/app/Modules/Campaigns/Http/Controllers/CampaignController.php:130` |
 | `CampaignJobPosted` | `campaign.job_posted` |  | — | — | — | — | — | — |
 | `CampaignUpdated` | `campaign.updated` |  | `apps/api/app/Modules/Campaigns/Http/Controllers/CampaignController.php:245` | — | — | — | — | `before: $before @ apps/api/app/Modules/Campaigns/Http/Controllers/CampaignController.php:245`<br>`after: $this->auditableSnapshot($campaign->fresh() ?? $campaign) @ apps/api/app/Modules/Campaigns/Http/Controllers/CampaignController.php:245` |
-| `CreatorAdminFieldUpdated` | `creator.admin.field_updated` |  | `apps/api/app/Modules/Creators/Services/AdminCreatorUpdateService.php:66` | — | `after`, `before`, `field`, `reason` | — | — | — |
+| `CreatorAdminFieldUpdated` | `creator.admin.field_updated` |  | `apps/api/app/Modules/Creators/Services/AdminCreatorUpdateService.php:66` | `apps/api/app/Modules/Erasure/Selection/AuditRowScrub.php:124` | `after`, `before`, `field`, `reason` | — | — | — |
 | `CreatorApplicationReopened` | `creator.application.reopened` |  | `apps/api/app/Modules/Creators/Services/CreatorWizardService.php:385` | — | — | — | — | — |
-| `CreatorApproved` | `creator.approved` |  | `apps/api/app/Modules/Creators/Http/Controllers/Admin/AdminCreatorController.php:278` | — | `welcome_message` | — | — | — |
+| `CreatorApproved` | `creator.approved` |  | `apps/api/app/Modules/Creators/Http/Controllers/Admin/AdminCreatorController.php:278` | `apps/api/app/Modules/Erasure/Selection/AuditRowScrub.php:125` | `welcome_message` | — | — | — |
 | `CreatorBlacklisted` | `creator.blacklisted` |  | `apps/api/app/Modules/Agencies/Http/Controllers/CreatorBlacklistController.php:323` | — | — | — | — | `metadata: $metadata @ apps/api/app/Modules/Agencies/Http/Controllers/CreatorBlacklistController.php:323` |
 | `CreatorCreated` | `creator.created` |  | — | — | — | — | — | — |
 | `CreatorDeleted` | `creator.deleted` |  | — | — | — | — | — | — |
