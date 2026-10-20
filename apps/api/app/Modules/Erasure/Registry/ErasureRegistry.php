@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Erasure\Registry;
 
+use App\Modules\Erasure\Guards\PaymentPolicy;
+
 /**
  * The approved PII map (docs/reviews/account-deletion-pii-map.md), as code.
  *
@@ -21,6 +23,20 @@ final class ErasureRegistry
 {
     /** @var array<string, TableRule>|null */
     private static ?array $tables = null;
+
+    /**
+     * The payment policy of every table whose name marks it as financial
+     * (see {@see PaymentPolicy}). A new financial
+     * table fails the schema spec until it is listed here with a decision.
+     *
+     * @return array<string, string> table => what erasure does about it
+     */
+    public static function paymentPolicies(): array
+    {
+        return [
+            'creator_payout_methods' => 'ERASE-ROW, but only after PaymentGuard finds no assignment in a payment state or with a payment id, and VendorGuard finds no real payment provider.',
+        ];
+    }
 
     /** @return array<string, TableRule> */
     public static function tables(): array

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Erasure\Execution;
 
+use App\Modules\Erasure\Guards\Refusals;
 use App\Modules\Erasure\Selection\Selection;
 use App\Modules\Erasure\Selection\Selections;
 use App\Modules\Erasure\Subject\SubjectSet;
@@ -59,6 +60,11 @@ final class ErasureEngine
         }
 
         $db ??= DB::connection();
+
+        // Defence in depth: the command asks before it deletes any object; this is the
+        // last door before an irreversible database write, so nothing can go around it.
+        Refusals::assertNone($subject, $db);
+
         $now = now()->toDateTimeString();
         $writers = Steps::writers();
 
