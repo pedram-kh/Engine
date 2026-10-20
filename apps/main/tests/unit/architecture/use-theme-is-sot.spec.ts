@@ -93,6 +93,14 @@ const ALLOWLISTED_RELATIVE_PATHS: ReadonlySet<string> = new Set([
   // Mirrors useLocalePreference: it IS the persistence layer and owns the
   // primitives for its keys. Carries a matching note in docs/tech-debt.md.
   'composables/usePushPreference.ts',
+  // AH-103d: installMarker is the persistence layer for the creator app's
+  // "this install has run before" marker (`catalyst.install.marker`) — non-theme,
+  // non-secret, WebView `localStorage`, deleted with the app on iOS (which keeps the
+  // Keychain), so its absence beside a stored session means a reinstall. Losing it
+  // fails CLOSED (one extra sign-in). It IS the persistence layer and owns the
+  // primitives for its one key. Carries a matching note in docs/tech-debt.md
+  // ("AH-103d (reinstall marker)").
+  'core/auth/installMarker.ts',
 ])
 
 const FORBIDDEN_PATTERNS: ReadonlyArray<{ pattern: RegExp; description: string }> = [
