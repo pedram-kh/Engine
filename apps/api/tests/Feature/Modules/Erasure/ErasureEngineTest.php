@@ -6,6 +6,7 @@ use App\Modules\Creators\Models\CreatorTaxProfile;
 use App\Modules\Erasure\Execution\ErasureEngine;
 use App\Modules\Erasure\Execution\Steps;
 use App\Modules\Erasure\Registry\Disposition;
+use App\Modules\Erasure\Registry\ErasureRegistry;
 use App\Modules\Erasure\Selection\DryRun;
 use App\Modules\Erasure\Selection\Selections;
 use App\Modules\Erasure\Subject\SubjectSet;
@@ -273,4 +274,62 @@ it('writes through the raw query builder only: no model, no save, no Eloquent wr
     }
 
     expect($violations)->toBe([]);
+});
+
+it('keeps every KEEP column of every row it anonymises or scrubs (the other parties\' decision records, D-D, and the lifecycle facts)', function (): void {
+    $a = ErasureGraph::seedSubject('a');
+    DB::table('users')->where('id', $a->user->id)->update(['suspended_reason' => 'chargeback fraud', 'is_suspended' => true]);
+    DB::table('creators')->where('id', $a->creator->id)->update(['rejection_reason' => 'portfolio did not meet the bar']);
+    $subject = SubjectSet::resolve($a->user);
+
+    $keepColumns = [];
+    $before = [];
+    foreach (Selections::all() as $selection) {
+        if (! in_array($selection->stage, STAGES_4A_4D, true) || ! in_array($selection->disposition, [Disposition::Anon, Disposition::ScrubJson], true)) {
+            continue;
+        }
+        foreach (ErasureRegistry::tables()[$selection->table]->columns as $column => $rule) {
+            if ($rule->disposition === Disposition::Keep) {
+                $keepColumns[$selection->table][] = $column;
+            }
+        }
+        foreach ($selection->builder($subject, DB::connection())->get() as $row) {
+            $before[$selection->table][(string) $row->id] = (array) $row;
+        }
+    }
+
+    (new ErasureEngine)->run($subject);
+
+    $changed = [];
+    foreach ($before as $table => $rows) {
+        foreach ($rows as $id => $old) {
+            $new = (array) DB::table($table)->where('id', $id)->first();
+            foreach ($keepColumns[$table] ?? [] as $column) {
+                if (($old[$column] ?? null) !== ($new[$column] ?? null)) {
+                    $changed[] = "{$table}#{$id}.{$column} was changed";
+                }
+            }
+        }
+    }
+
+    expect($before)->not->toBe([])
+        ->and($changed)->toBe([])
+        ->and(DB::table('users')->where('id', $a->user->id)->value('suspended_reason'))->toBe('chargeback fraud')
+        ->and(DB::table('creators')->where('id', $a->creator->id)->value('rejection_reason'))->toBe('portfolio did not meet the bar');
+});
+
+it('removes only the personal keys from a JSON column: the rest of the payload, and other people in it, stay', function (): void {
+    $a = ErasureGraph::seedSubject('a');
+    (new ErasureEngine)->run(SubjectSet::resolve($a->user));
+
+    $actorRow = DB::table('notifications')->where('actor_user_id', $a->user->id)->where('recipient_user_id', $a->agencyMember->id)->get()
+        ->map(fn ($r): array => (array) json_decode((string) $r->data, true))->all();
+    $failures = (array) json_decode((string) DB::table('tracked_jobs')->value('result'), true);
+    $events = DB::table('integration_events')->orderBy('provider_event_id')->pluck('payload')->all();
+
+    expect($actorRow)->toContain(['campaign_name' => 'C'])
+        ->and($actorRow)->toContain(['campaign_name' => 'no name key here'])
+        ->and($failures['failures'])->toBe([['row' => 2, 'email' => null, 'reason' => 'x'], ['row' => 3, 'email' => 'other-a@example.test', 'reason' => 'y']])
+        ->and(json_decode((string) $events[0], true))->toBe(['erased' => true])
+        ->and(json_decode((string) $events[2], true))->toBe(['session' => 'unrelated-session-id-1234']);
 });
