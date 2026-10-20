@@ -116,7 +116,7 @@ final class ErasureGraph
     {
         $email = "subject-{$tag}@example.test";
         $user = User::factory()->creator()->createOne(['email' => $email, 'name' => "Subject {$tag}"]);
-        $creator = Creator::factory()->createOne(['user_id' => $user->id, 'display_name' => "Display {$tag}", 'phone' => '+39 333 000 0000']);
+        $creator = Creator::factory()->createOne(['user_id' => $user->id, 'display_name' => "Display {$tag}", 'phone' => '+39 333 000 '.str_pad((string) (crc32($tag) % 10000), 4, '0', STR_PAD_LEFT)]);
         $agencyMember = User::factory()->agencyAdmin()->createOne();
 
         $campaign = Campaign::factory()->createOne();
