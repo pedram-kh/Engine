@@ -156,6 +156,21 @@ it('changes its digest when the set of objects changes between dry-run and execu
     expect($collector->collect($subject)->digest())->not->toBe($first->digest());
 });
 
+it('changes its digest when one object is swapped for another with the same class counts', function (): void {
+    [$graph, $subject, $store] = erasureFilesFixture();
+    $collector = new FileKeyCollector($store);
+    $first = $collector->collect($subject);
+    $own = "creators/{$subject->creatorUlid}/avatar/";
+
+    Storage::disk('media')->delete($own.'a-replaced-long-ago.jpg');
+    Storage::disk('media')->put($own.'a-a-different-one.jpg', 'x');
+    $second = $collector->collect($subject);
+
+    expect($second->byClass)->toBe($first->byClass)
+        ->and($second->keys)->not->toBe($first->keys)
+        ->and($second->digest())->not->toBe($first->digest());
+});
+
 it('prints counts only: the summary and the digest carry no key and no ulid', function (): void {
     [$graph, $subject, $store] = erasureFilesFixture();
     $keys = (new FileKeyCollector($store))->collect($subject);
