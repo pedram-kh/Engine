@@ -329,7 +329,7 @@ it('scrubs a row written after the first pass, inside the same transaction (a lo
 
     // The closing pass is counted in the ledger: the late row is one more S1 row than the dry-run saw.
     expect($late)->not->toBeNull()
-        ->and($counts['audit_scrub']['audit_logs.S1'])->toBe(ErasureGraph::expectedCounts()['audit_logs.S1'] + 1)
+        ->and(data_get($counts, ['audit_scrub', 'audit_logs.S1']))->toBe(ErasureGraph::expectedCounts()['audit_logs.S1'] + 1)
         ->and(erasureAuditRead((int) $late)['ip'])->toBeNull()
         ->and(erasureAuditRead((int) $late)['user_agent'])->toBeNull();
 });
