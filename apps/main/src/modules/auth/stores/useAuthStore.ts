@@ -48,6 +48,11 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
 import { writeStoredLocale } from '@/composables/useLocalePreference'
+import {
+  ensureInstallReconciled,
+  localStorageMarker,
+  type ReconcileOutcome,
+} from '@/core/auth/installMarker'
 import { nativeTokenStore } from '@/core/auth/tokenStore'
 import { setLocale } from '@/core/i18n'
 import { isNativePlatform, nativePlatform } from '@/core/platform/isNativePlatform'
@@ -194,6 +199,10 @@ export const useAuthStore = defineStore('auth', () => {
         // AH-100 — the creator app with no stored token is anonymous;
         // there is nothing to ask `/me` about.
         if (isNativePlatform()) {
+          // AH-103d — a reinstalled phone must be signed out BEFORE the token is
+          // read: iOS keeps the Keychain item across Delete App. Memoised, so this
+          // is the same run `main.ts` started at boot.
+          await reconcileInstall()
           const tokens = nativeTokenStore()
           if ((await tokens.read()) === null) {
             user.value = null
@@ -359,6 +368,10 @@ export const useAuthStore = defineStore('auth', () => {
         platform,
         ...(totpCode !== undefined ? { mfa_code: totpCode } : {}),
       })
+      // AH-103d — `requireGuest` has no bootstrap, so the sign-in page can be reached
+      // first: a late reconcile (marker absent, token present = the NEW token) would
+      // sign out the session just made. Wait for the decision before writing.
+      await reconcileInstall()
       await nativeTokenStore().write(result.token, result.expiresAt)
       setUser(result.user)
     } finally {
@@ -388,6 +401,29 @@ export const useAuthStore = defineStore('auth', () => {
         .catch(() => undefined)
       clearUser()
     }
+  }
+
+  /**
+   * AH-103d — the reinstall marker (tech-debt 17). Creator app only; resolves to
+   * `'skipped-web'` in the browser without touching storage. ONE run per app-open
+   * (`main.ts` starts it at boot, `bootstrap()` and `loginWithToken()` wait for it);
+   * it never rejects. The wipe is `logout()`, which on native runs `nativeLogout()`
+   * verbatim (push cleanup, revoke, local clear), so the ruling "wipe through
+   * nativeLogout" holds without exporting it. The token store is read UN-gated here:
+   * gating the store would deadlock the sign-out, which reads the token to revoke it.
+   */
+  function reconcileInstall(): Promise<ReconcileOutcome> {
+    if (!isNativePlatform()) {
+      // The web SPA authenticates by cookie: no marker, no storage, no token store
+      // (`nativeTokenStore()` throws off native), and nothing memoised.
+      return Promise.resolve('skipped-web')
+    }
+    return ensureInstallReconciled(() => ({
+      isNative: true,
+      marker: localStorageMarker,
+      tokens: nativeTokenStore(),
+      wipe: logout,
+    }))
   }
 
   async function logout(): Promise<void> {
@@ -605,6 +641,7 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     loginWithToken,
     logout,
+    reconcileInstall,
     signUp,
     setPreferredLanguage,
     verifyEmail,

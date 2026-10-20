@@ -29,6 +29,12 @@ import '@catalyst/design-tokens/tokens.css'
 const app = createApp(App)
 
 app.use(createPinia())
+
+// AH-103d: creator app only (a no-op on the web) — decide, before the router's first
+// navigation can read the token, whether this is a reinstall (iOS keeps the Keychain
+// across Delete App) and sign it out. `bootstrap()` and the native sign-in WAIT for
+// this same run; it needs the active Pinia above and nothing else.
+void useAuthStore().reconcileInstall()
 app.use(router)
 app.use(i18n)
 app.use(vuetify)

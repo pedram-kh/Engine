@@ -3,7 +3,9 @@
  * but Vuetify (and many other UI libraries) depend on.
  */
 
-import { vi } from 'vitest'
+import { beforeEach, vi } from 'vitest'
+
+import { INSTALL_MARKER_KEY, resetInstallReconcileForTests } from '@/core/auth/installMarker'
 
 class ResizeObserverStub {
   observe = vi.fn()
@@ -75,3 +77,15 @@ if (typeof globalThis.visualViewport === 'undefined') {
     },
   })
 }
+
+// AH-103d — the reinstall marker. In production the marker is written by the first
+// launch; here every test starts as an install that has already run, so no spec
+// outside the marker's own is silently signed out (or has its token read an extra
+// time) by the reconcile gate in the auth store. The marker's own specs clear it
+// explicitly. The memoised run is forgotten so one test's reconcile never leaks.
+beforeEach(() => {
+  if (typeof window !== 'undefined' && window.localStorage !== undefined) {
+    window.localStorage.setItem(INSTALL_MARKER_KEY, 'test-setup')
+  }
+  resetInstallReconcileForTests()
+})
