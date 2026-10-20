@@ -100,6 +100,15 @@ it('S1: the subject\'s own actions lose ip, user agent and the typed address, an
         ->and($row['actor_role'])->toBe('creator');
 });
 
+it('writes an emptied snapshot back as an empty object, not a list', function (): void {
+    [$a, , $subject] = erasureAuditFixture();
+    $id = erasureAuditRow(['actor_type' => 'user', 'actor_id' => $a->user->id, 'metadata' => ['email' => $a->email]]);
+
+    (new DatabaseAuditScrub)->run($subject);
+
+    expect(DB::table('audit_logs')->where('id', $id)->value('metadata'))->toBe('{}');
+});
+
 it('S2: a snapshot of the user loses the person\'s columns, and keeps the rest and the actor\'s ip', function (): void {
     [$a, , $subject] = erasureAuditFixture();
     $id = erasureAuditRow([
@@ -296,7 +305,11 @@ it('scrubs a row written after the first pass, inside the same transaction (a lo
 
     $run->execute($a->user, $run->plan($a->user)->digest(), $a->user->ulid);
 
+    $counts = ErasureLedger::query()->sole()->counts;
+
+    // The closing pass is counted in the ledger: the late row is one more S1 row than the dry-run saw.
     expect($late)->not->toBeNull()
+        ->and($counts['audit_scrub']['audit_logs.S1'])->toBe(ErasureGraph::expectedCounts()['audit_logs.S1'] + 1)
         ->and(erasureAuditRead((int) $late)['ip'])->toBeNull()
         ->and(erasureAuditRead((int) $late)['user_agent'])->toBeNull();
 });
