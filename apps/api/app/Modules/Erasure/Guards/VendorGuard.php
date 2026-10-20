@@ -8,6 +8,7 @@ use App\Modules\Erasure\Selection\Selections;
 use App\Modules\Erasure\Subject\SubjectSet;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Facades\DB;
+use stdClass;
 
 /**
  * Stage 4g: fail closed on any real vendor.
@@ -57,7 +58,7 @@ final class VendorGuard
 
     /**
      * @param  list<string>  $reasons
-     * @param  iterable<object>  $rows
+     * @param  iterable<stdClass>  $rows
      */
     private function add(array &$reasons, string $table, iterable $rows): void
     {
