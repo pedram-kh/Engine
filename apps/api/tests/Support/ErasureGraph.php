@@ -34,6 +34,7 @@ use App\Modules\Notifications\Models\PushDelivery;
 use App\Modules\Notifications\Models\UserPushToken;
 use App\Modules\TalentPools\Models\TalentPoolMembership;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 /**
@@ -56,7 +57,17 @@ final class ErasureGraph
         public readonly string $email,
         public readonly string $kycSessionId,
         public readonly User $agencyMember,
+        /** @var array{delete: list<string>, keep: list<string>} object keys the file stage must delete / must leave */
+        public readonly array $files = ['delete' => [], 'keep' => []],
     ) {}
+
+    /** Put one small object on the (faked) media disk for every key of the graph. */
+    public function putFiles(): void
+    {
+        foreach ([...$this->files['delete'], ...$this->files['keep']] as $key) {
+            Storage::disk('media')->put($key, 'bytes of '.$key);
+        }
+    }
 
     /**
      * Rows the shape below creates for ONE subject, per selection id. A zero is
@@ -145,8 +156,10 @@ final class ErasureGraph
         CreatorKycVerification::factory()->createOne(['creator_id' => $creator->id, 'provider_session_id' => $kycSessionId]);
         CreatorSocialAccount::factory()->createOne(['creator_id' => $creator->id, 'platform' => SocialPlatform::Instagram]);
         CreatorSocialAccount::factory()->createOne(['creator_id' => $creator->id, 'platform' => SocialPlatform::TikTok])->delete();
-        CreatorPortfolioItem::factory()->createOne(['creator_id' => $creator->id]);
-        CreatorPortfolioItem::factory()->createOne(['creator_id' => $creator->id])->delete();
+        $own = "creators/{$creator->ulid}";
+        CreatorPortfolioItem::factory()->createOne(['creator_id' => $creator->id, 's3_path' => "{$own}/portfolio/{$tag}-1.jpg", 'thumbnail_path' => "{$own}/portfolio/thumbs/{$tag}-1.jpg"]);
+        CreatorPortfolioItem::factory()->createOne(['creator_id' => $creator->id, 's3_path' => "{$own}/portfolio/{$tag}-2.jpg", 'thumbnail_path' => null])->delete();
+        DB::table('creators')->where('id', $creator->id)->update(['avatar_path' => "{$own}/avatar/{$tag}-current.jpg", 'cover_path' => "{$own}/cover-{$tag}.jpg"]);
         CreatorAvailabilityBlock::factory()->count(2)->create(['creator_id' => $creator->id]);
         TalentPoolMembership::factory()->createOne(['creator_id' => $creator->id]);
         CampaignJobNotification::factory()->createOne(['creator_id' => $creator->id]);
@@ -166,13 +179,16 @@ final class ErasureGraph
         AgencyCreatorRelation::factory()->pendingRequest()->createOne(['creator_id' => $creator->id]);
         CampaignApplication::factory()->withNote("pitch {$tag}")->createOne(['creator_id' => $creator->id, 'campaign_id' => $campaign->id]);
         CampaignApplication::factory()->createOne(['creator_id' => $creator->id]);
-        $attachment = [['path' => "messages/{$tag}/file.pdf", 'name' => 'file.pdf']];
-        $ownMessage->forceFill(['attachments' => $attachment])->save();
+        $ownAttachment = [['s3_path' => "messages/{$thread->ulid}/{$tag}-own.pdf", 'name' => 'file.pdf']];
+        $agencyAttachment = [['s3_path' => "messages/{$thread->ulid}/{$tag}-agency.pdf", 'name' => 'brief.pdf']];
+        $ownRelationshipAttachment = [['s3_path' => "relationship-messages/{$relationshipThread->ulid}/{$tag}-own.pdf", 'name' => 'file.pdf']];
+        $agencyRelationshipAttachment = [['s3_path' => "relationship-messages/{$relationshipThread->ulid}/{$tag}-agency.pdf", 'name' => 'brief.pdf']];
+        $ownMessage->forceFill(['attachments' => $ownAttachment])->save();
         Message::factory()->createOne(['thread_id' => $thread->id, 'sender_user_id' => $user->id]);
-        Message::factory()->attachmentOnly($attachment)->createOne(['thread_id' => $thread->id, 'sender_user_id' => $agencyMember->id]);
-        $ownRelationshipMessage->forceFill(['attachments' => $attachment])->save();
+        Message::factory()->attachmentOnly($agencyAttachment)->createOne(['thread_id' => $thread->id, 'sender_user_id' => $agencyMember->id]);
+        $ownRelationshipMessage->forceFill(['attachments' => $ownRelationshipAttachment])->save();
         RelationshipMessage::factory()->createOne(['thread_id' => $relationshipThread->id, 'sender_user_id' => $user->id]);
-        RelationshipMessage::factory()->attachmentOnly($attachment)->createOne(['thread_id' => $relationshipThread->id, 'sender_user_id' => $agencyMember->id]);
+        RelationshipMessage::factory()->attachmentOnly($agencyRelationshipAttachment)->createOne(['thread_id' => $relationshipThread->id, 'sender_user_id' => $agencyMember->id]);
 
         // 4d — JSON scrubs.
         Notification::factory()->count(2)->create(['recipient_user_id' => $user->id, 'data' => ['agency_name' => 'Acme']]);
@@ -209,7 +225,22 @@ final class ErasureGraph
         AuditLog::factory()->count(2)->create(['actor_type' => 'user', 'actor_id' => $user->id, 'action' => AuditAction::AuthLoginSucceeded]);
         AuditLog::factory()->createOne(['actor_type' => 'system', 'actor_id' => null, 'action' => AuditAction::AuthLoginFailed, 'metadata' => ['email' => $email, 'reason' => 'unknown_email']]);
 
-        return new self($user, $creator, $email, $kycSessionId, $agencyMember);
+        $files = [
+            'delete' => [
+                "{$own}/avatar/{$tag}-current.jpg", "{$own}/cover-{$tag}.jpg",
+                "{$own}/portfolio/{$tag}-1.jpg", "{$own}/portfolio/thumbs/{$tag}-1.jpg", "{$own}/portfolio/{$tag}-2.jpg",
+                "{$own}/avatar/{$tag}-replaced-long-ago.jpg", // no row points at it any more
+                $ownAttachment[0]['s3_path'], $ownRelationshipAttachment[0]['s3_path'],
+            ],
+            'keep' => [
+                "{$own}/drafts/{$tag}-draft.mp4", // decision D-C: kept
+                $agencyAttachment[0]['s3_path'], $agencyRelationshipAttachment[0]['s3_path'], // another person's, same prefix
+            ],
+        ];
+        sort($files['delete']);
+        sort($files['keep']);
+
+        return new self($user, $creator, $email, $kycSessionId, $agencyMember, $files);
     }
 
     private static function failedJob(string $payload, string $exception): void

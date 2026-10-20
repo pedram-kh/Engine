@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Erasure;
 
+use App\Modules\Erasure\Files\MediaDiskObjectStore;
+use App\Modules\Erasure\Files\ObjectStore;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -19,7 +21,8 @@ final class ErasureServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        // Plain services; the container autowires them.
+        // Plain services are autowired. The object store is the one door to storage (Stage 4f).
+        $this->app->bind(ObjectStore::class, MediaDiskObjectStore::class);
     }
 
     public function boot(): void
