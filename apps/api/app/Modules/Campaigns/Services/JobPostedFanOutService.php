@@ -204,7 +204,11 @@ final class JobPostedFanOutService
             ->where('agency_creator_relations.agency_id', $campaign->agency_id)
             ->permitsMessaging()
             ->whereHas('creator', function (Builder $creator): void {
+                /** @var Builder<Creator> $creator */
                 $creator->where('creators.application_status', ApplicationStatus::Approved->value)
+                    // AH-104b-del: no job invitation to a creator who asked to
+                    // delete their account, or to an erased one.
+                    ->visibleToAgencies()
                     // Nobody to mail or notify without a user row.
                     ->whereHas('user');
             })

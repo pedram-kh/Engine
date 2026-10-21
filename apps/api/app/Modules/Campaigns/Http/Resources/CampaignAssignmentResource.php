@@ -8,6 +8,7 @@ use App\Modules\Agencies\Http\Resources\CreatorDiscoveryResource;
 use App\Modules\Boards\Http\Resources\BoardCardResource;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Services\AssignmentOfferAttachmentUploadService;
+use App\Modules\Creators\Concerns\EmitsErasedState;
 use App\Modules\Creators\Models\Creator;
 use Illuminate\Filesystem\AwsS3V3Adapter;
 use Illuminate\Http\Request;
@@ -42,6 +43,8 @@ use Illuminate\Support\Facades\Storage;
  */
 final class CampaignAssignmentResource extends JsonResource
 {
+    use EmitsErasedState;
+
     private const int SIGNED_URL_TTL_MINUTES = 60;
 
     /**
@@ -97,6 +100,7 @@ final class CampaignAssignmentResource extends JsonResource
                 'creator' => $creator instanceof Creator ? [
                     'id' => $creator->ulid,
                     'display_name' => $creator->display_name,
+                    'is_erased' => $this->creatorIsErased($creator),
                     'avatar_url' => $this->signedViewUrl($creator->avatar_path),
                 ] : null,
             ],

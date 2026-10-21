@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Agencies\Http\Resources;
 
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
+use App\Modules\Creators\Concerns\EmitsErasedState;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Models\CreatorSocialAccount;
 use App\Modules\Creators\Policies\CreatorPolicy;
@@ -50,6 +51,8 @@ use Illuminate\Support\Facades\Storage;
  */
 final class AgencyCreatorDetailResource extends JsonResource
 {
+    use EmitsErasedState;
+
     /** TTL for the signed view URLs (mirrors CreatorResource). */
     private const int SIGNED_URL_TTL_MINUTES = 60;
 
@@ -121,14 +124,18 @@ final class AgencyCreatorDetailResource extends JsonResource
         $payload = [
             'id' => $creator->ulid,
             'display_name' => $creator->display_name,
+            'is_erased' => $this->creatorIsErased($creator),
             'bio' => $creator->bio,
             // Contact email (D-2a-8). Lives on the related User; eager-loaded
             // by the controller. The agency-with-relation invariant (the
             // relation-exists tenancy check) is what makes this appropriate.
-            'email' => $creator->user?->email,
+            // AH-104b-del: an erased creator's user row carries the placeholder
+            // address (`erased-<ulid>@erased.invalid`); never emit it.
+            'email' => $creator->isErased() ? null : $creator->user?->email,
             // Account-creation identity (sign-up first/last name) — same
             // relation-exists privacy basis as the email. NEVER on discover.
-            'account_name' => $creator->user?->name,
+            // AH-104b-del: the erased user's `name` is the sentinel `[erased]`.
+            'account_name' => $creator->isErased() ? null : $creator->user?->name,
             'account_last_name' => $creator->user?->last_name,
             'country_code' => $creator->country_code,
             'region' => $creator->region,

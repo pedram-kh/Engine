@@ -61,7 +61,7 @@ final class BoardCardController
                 // (board-card facelift + re-offer chunk) — otherwise the card
                 // loses its avatar / fee / decline-history on move.
                 'assignment:id,ulid,status,previously_declined,deliverables,posting_due_at,agreed_fee_minor_units,agreed_fee_currency,fee_per,creator_id',
-                'assignment.creator:id,ulid,display_name,avatar_path',
+                'assignment.creator:id,ulid,display_name,avatar_path,erased_at',
             ]) ?? $card,
         );
     }

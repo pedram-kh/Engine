@@ -221,7 +221,7 @@ final class CampaignAssignmentResolutionController
     private function resource(CampaignAssignment $assignment): CampaignAssignmentResource
     {
         return new CampaignAssignmentResource(
-            $assignment->load(['creator:id,ulid,display_name', 'latestPostedContent']),
+            $assignment->load(['creator:id,ulid,display_name,erased_at', 'latestPostedContent']),
         );
     }
 

@@ -77,6 +77,13 @@ final class SendMessageNotifications
             return;
         }
 
+        // AH-104b-del (C4): an existing thread stays writable for the agency,
+        // but a creator scheduled for deletion (or erased) is told nothing:
+        // no in-app row, no push, no mail. A cancelled request leaves no trace.
+        if ($creator->isUnavailableToAgencies()) {
+            return;
+        }
+
         $this->notifications->notify(
             recipient: $recipient,
             type: NotificationType::MessageReceivedByCreator,

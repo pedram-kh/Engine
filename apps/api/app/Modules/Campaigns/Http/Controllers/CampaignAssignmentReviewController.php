@@ -55,7 +55,7 @@ final class CampaignAssignmentReviewController
         $this->assertAssignmentBelongsToCampaign($assignment, $campaign);
         Gate::authorize('review', $campaign);
 
-        $assignment->loadMissing(['creator:id,ulid,display_name', 'campaign:id,ulid,name,brand_id', 'campaign.brand:id,name']);
+        $assignment->loadMissing(['creator:id,ulid,display_name,erased_at', 'campaign:id,ulid,name,brand_id', 'campaign.brand:id,name']);
 
         $drafts = CampaignDraft::query()
             ->where('assignment_id', $assignment->id)
@@ -99,6 +99,7 @@ final class CampaignAssignmentReviewController
                     'creator' => $assignment->creator !== null ? [
                         'id' => $assignment->creator->ulid,
                         'display_name' => $assignment->creator->display_name,
+                        'is_erased' => $assignment->creator->isErased(),
                     ] : null,
                     'campaign' => $campaignModel !== null ? [
                         'id' => $campaignModel->ulid,

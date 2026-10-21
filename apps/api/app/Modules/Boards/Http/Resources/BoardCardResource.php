@@ -6,6 +6,7 @@ namespace App\Modules\Boards\Http\Resources;
 
 use App\Modules\Agencies\Http\Resources\CreatorDiscoveryResource;
 use App\Modules\Boards\Models\BoardCard;
+use App\Modules\Creators\Concerns\EmitsErasedState;
 use Illuminate\Filesystem\AwsS3V3Adapter;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -30,6 +31,8 @@ use Illuminate\Support\Facades\Storage;
  */
 final class BoardCardResource extends JsonResource
 {
+    use EmitsErasedState;
+
     private const int SIGNED_URL_TTL_MINUTES = 60;
 
     /**
@@ -75,6 +78,7 @@ final class BoardCardResource extends JsonResource
                         'creator' => $creator === null ? null : [
                             'id' => $creator->ulid,
                             'display_name' => $creator->display_name,
+                            'is_erased' => $this->creatorIsErased($creator),
                             'avatar_url' => $this->signedViewUrl($creator->avatar_path),
                         ],
                     ],

@@ -62,6 +62,7 @@ final class MessageableContactsController
                 'type' => 'messageable_creator',
                 'attributes' => [
                     'display_name' => $creator?->display_name,
+                    'is_erased' => $creator?->isErased() ?? false,
                     // AH-013 — signed avatar for the picker row (paginated list,
                     // so per-row signing is bounded; null when unset / non-S3).
                     'avatar_url' => ContactMediaUrl::resolve($creator?->avatar_path),

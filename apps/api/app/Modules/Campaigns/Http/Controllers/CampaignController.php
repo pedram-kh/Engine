@@ -285,7 +285,7 @@ final class CampaignController
      * Returns an empty collection when the campaign has no board yet, which is
      * the common case for a campaign being configured before anyone is invited.
      *
-     * @return Collection<int, array{assignment_ulid: string, card_ulid: string, creator_name: string|null}>
+     * @return Collection<int, array{assignment_ulid: string, card_ulid: string, creator_name: string|null, creator_is_erased: bool}>
      */
     private function cardsOnPostingColumns(Campaign $campaign): Collection
     {
@@ -321,12 +321,13 @@ final class CampaignController
         return BoardCard::query()
             ->where('board_id', $board->id)
             ->whereIn('column_id', $postingOnlyColumnIds)
-            ->with(['assignment:id,ulid,creator_id', 'assignment.creator:id,display_name'])
+            ->with(['assignment:id,ulid,creator_id', 'assignment.creator:id,display_name,erased_at'])
             ->get()
             ->map(fn (BoardCard $card): array => [
                 'assignment_ulid' => (string) $card->assignment?->ulid,
                 'card_ulid' => $card->ulid,
                 'creator_name' => $card->assignment?->creator?->display_name,
+                'creator_is_erased' => $card->assignment?->creator?->isErased() ?? false,
             ])
             ->values();
     }

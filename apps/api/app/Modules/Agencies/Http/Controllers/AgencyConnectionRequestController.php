@@ -75,6 +75,10 @@ final class AgencyConnectionRequestController
             abort(404);
         }
 
+        // AH-104b-del (C4): no NEW request to a creator scheduled for deletion
+        // or erased — neutral 422 `creator.unavailable`.
+        $creator->assertAvailableToAgencies();
+
         // The calling agency's existing relation (if any). The global scope is
         // set to the path agency by tenancy.agency; the explicit agency_id
         // filter is the belt-and-suspenders mirror of the roster controller.

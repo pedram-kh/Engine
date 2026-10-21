@@ -66,7 +66,7 @@ final class AgencyMessageController
 
         $threads = MessageThread::query()
             ->whereHas('assignment', static fn ($q) => $q->where('campaign_id', $campaign->id))
-            ->with(['assignment.creator:id,ulid,display_name', 'latestMessage'])
+            ->with(['assignment.creator:id,ulid,display_name,erased_at', 'latestMessage'])
             ->orderByDesc('last_message_at')
             ->orderByDesc('id')
             ->get();
@@ -80,6 +80,7 @@ final class AgencyMessageController
                     'status' => $thread->assignment?->status->value,
                     'creator' => [
                         'display_name' => $thread->assignment?->creator?->display_name,
+                        'is_erased' => $thread->assignment?->creator?->isErased() ?? false,
                     ],
                     'last_message_at' => $thread->last_message_at?->toIso8601String(),
                     'last_message_preview' => $this->preview($thread->latestMessage),

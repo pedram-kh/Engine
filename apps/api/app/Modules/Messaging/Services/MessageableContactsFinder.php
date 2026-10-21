@@ -52,8 +52,24 @@ final class MessageableContactsFinder
             ->permitsMessaging()
             // The creator-`approved` leg + the optional name search. whereHas
             // also enforces a non-soft-deleted creator exists.
-            ->whereHas('creator', function (Builder $creatorQuery) use ($search): void {
+            ->whereHas('creator', function (Builder $creatorQuery) use ($search, $agency): void {
                 $creatorQuery->where('application_status', ApplicationStatus::Approved->value);
+
+                // AH-104b-del (C4): a creator scheduled for deletion or erased
+                // is not offered as a NEW conversation, but an existing thread
+                // stays reachable (history is unchanged during the grace, and
+                // an erased creator's thread stays readable as "Deleted
+                // creator"). The send path refuses a new thread on its own.
+                $creatorQuery->where(function (Builder $visible) use ($agency): void {
+                    /** @var Builder<Creator> $visible */
+                    $visible->visibleToAgencies()
+                        ->orWhereExists(function ($thread) use ($agency): void {
+                            $thread->from('relationship_threads')
+                                ->whereColumn('relationship_threads.creator_id', 'creators.id')
+                                ->where('relationship_threads.agency_id', $agency->id)
+                                ->selectRaw('1');
+                        });
+                });
 
                 if ($search !== null && $search !== '') {
                     // Simple case-insensitive substring on display_name (D3 of
@@ -61,7 +77,7 @@ final class MessageableContactsFinder
                     $creatorQuery->whereRaw('LOWER(display_name) LIKE ?', ['%'.mb_strtolower($search).'%']);
                 }
             })
-            ->with(['creator:id,ulid,display_name,avatar_path'])
+            ->with(['creator:id,ulid,display_name,avatar_path,erased_at'])
             // display_name ASC via a correlated subquery (the roster precedent —
             // avoids a join + hydration clobber), stable id tiebreaker.
             ->orderBy(

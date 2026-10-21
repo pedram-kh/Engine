@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\TalentPools\Http\Resources;
 
+use App\Modules\Creators\Concerns\EmitsErasedState;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\TalentPools\Models\TalentPoolMembership;
 use Illuminate\Filesystem\AwsS3V3Adapter;
@@ -25,6 +26,8 @@ use Illuminate\Support\Facades\Storage;
  */
 final class TalentPoolMemberResource extends JsonResource
 {
+    use EmitsErasedState;
+
     private const int SIGNED_URL_TTL_MINUTES = 60;
 
     /**
@@ -56,6 +59,7 @@ final class TalentPoolMemberResource extends JsonResource
             'type' => 'talent_pool_members',
             'attributes' => [
                 'display_name' => $creator->display_name,
+                'is_erased' => $this->creatorIsErased($creator),
                 'country_code' => $creator->country_code,
                 'primary_language' => $creator->primary_language,
                 'categories' => $creator->categories,

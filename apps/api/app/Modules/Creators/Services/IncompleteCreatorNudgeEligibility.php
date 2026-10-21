@@ -119,6 +119,9 @@ final class IncompleteCreatorNudgeEligibility
             ->whereNull('incomplete_nudge_sent_at')
             ->where('created_at', '<=', now()->subHours(self::THRESHOLD_HOURS))
             ->whereHas('user', static fn (Builder $q): Builder => $q->where('is_suspended', false))
+            // AH-104b-del: never nudge a person who has asked to delete their
+            // account (or whose account is erased) to finish signing up.
+            ->visibleToAgencies()
             ->whereNotExists(function ($query): void {
                 $query->select(DB::raw('1'))
                     ->from('agency_creator_relations')

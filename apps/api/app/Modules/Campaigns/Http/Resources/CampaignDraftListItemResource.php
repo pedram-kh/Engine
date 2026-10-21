@@ -6,6 +6,7 @@ namespace App\Modules\Campaigns\Http\Resources;
 
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Models\CampaignDraft;
+use App\Modules\Creators\Concerns\EmitsErasedState;
 use App\Modules\Creators\Models\Creator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -26,6 +27,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 final class CampaignDraftListItemResource extends JsonResource
 {
+    use EmitsErasedState;
+
     /**
      * @return array<string, mixed>
      */
@@ -59,6 +62,7 @@ final class CampaignDraftListItemResource extends JsonResource
                     'creator' => $creator instanceof Creator ? [
                         'id' => $creator->ulid,
                         'display_name' => $creator->display_name,
+                        'is_erased' => $this->creatorIsErased($creator),
                     ] : null,
                 ] : null,
             ],

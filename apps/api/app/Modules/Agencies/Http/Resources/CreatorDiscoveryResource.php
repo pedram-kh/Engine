@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Agencies\Http\Resources;
 
+use App\Modules\Creators\Concerns\EmitsErasedState;
 use App\Modules\Creators\Models\Creator;
 use Illuminate\Filesystem\AwsS3V3Adapter;
 use Illuminate\Http\Request;
@@ -36,6 +37,8 @@ use Illuminate\Support\Facades\Storage;
  */
 final class CreatorDiscoveryResource extends JsonResource
 {
+    use EmitsErasedState;
+
     private const int SIGNED_URL_TTL_MINUTES = 60;
 
     /**
@@ -58,6 +61,7 @@ final class CreatorDiscoveryResource extends JsonResource
             'type' => 'creator_discovery',
             'attributes' => [
                 'display_name' => $creator->display_name,
+                'is_erased' => $this->creatorIsErased($creator),
                 'country_code' => $creator->country_code,
                 // AH-088 — the derived age, rendered in the card's icon meta row
                 // beside location and language. Requires `creators.date_of_birth`

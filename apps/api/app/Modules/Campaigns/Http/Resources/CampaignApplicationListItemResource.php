@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Campaigns\Http\Resources;
 
 use App\Modules\Campaigns\Models\CampaignApplication;
+use App\Modules\Creators\Concerns\EmitsErasedState;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Policies\CreatorPolicy;
 use Illuminate\Filesystem\AwsS3V3Adapter;
@@ -42,6 +43,8 @@ use Illuminate\Support\Facades\Storage;
  */
 final class CampaignApplicationListItemResource extends JsonResource
 {
+    use EmitsErasedState;
+
     private const int SIGNED_URL_TTL_MINUTES = 60;
 
     /**
@@ -67,6 +70,7 @@ final class CampaignApplicationListItemResource extends JsonResource
                 'creator' => $creator instanceof Creator ? [
                     'id' => $creator->ulid,
                     'display_name' => $creator->display_name,
+                    'is_erased' => $this->creatorIsErased($creator),
                     'avatar_url' => $this->signedViewUrl($creator->avatar_path),
                 ] : null,
             ],

@@ -123,6 +123,9 @@ final class MessageDigestService
 
         $creators = Creator::query()
             ->whereNotNull('user_id')
+            // AH-104b-del: no digest mail to an address that is about to
+            // disappear, and none to an erased account.
+            ->visibleToAgencies()
             ->with('user')
             ->get();
 
@@ -220,7 +223,14 @@ final class MessageDigestService
     /** The creator (counterparty for an agency recipient) display name. */
     private function creatorName(MessageThread $thread): string
     {
-        $user = $thread->assignment?->creator?->user;
+        $creator = $thread->assignment?->creator;
+        $user = $creator?->user;
+
+        // AH-104b-del: an erased creator's user row carries the sentinel name;
+        // the agency's digest says "unknown", never the sentinel.
+        if ($creator?->isErased() === true) {
+            return __('messages.digest.unknown_counterparty');
+        }
 
         return $user instanceof User ? $user->name : __('messages.digest.unknown_counterparty');
     }

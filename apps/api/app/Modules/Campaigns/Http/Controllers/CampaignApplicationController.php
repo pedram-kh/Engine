@@ -90,7 +90,7 @@ final class CampaignApplicationController
         $this->applyStatusFilter($query, $request);
 
         $paginator = $query
-            ->with(['creator:id,ulid,display_name,avatar_path'])
+            ->with(['creator:id,ulid,display_name,avatar_path,erased_at'])
             // `pending` sorts first via an explicit CASE rather than by relying
             // on the enum's alphabetical accident (accepted < pending < rejected
             // would put answered rows on top).
@@ -204,6 +204,13 @@ final class CampaignApplicationController
 
         $creator = $application->creator;
 
+        // AH-104b-del (C4): accepting creates an assignment, which is a NEW
+        // action. Rejecting stays open (the agency can always clear its
+        // pipeline), and the application itself is left exactly as it was.
+        if ($creator instanceof Creator) {
+            $creator->assertAvailableToAgencies();
+        }
+
         // The approved leg, kept. ⚠ A 422 here, not the invite path's 404: that
         // 404 exists so a DISCOVERY caller cannot probe for a creator's
         // existence, and the agency already holds this creator's application and
@@ -311,7 +318,7 @@ final class CampaignApplicationController
         // AFTER the commit (C1). Both legs of the emission, from one place.
         $notifier->accepted($application->setRelation('campaign', $campaign), $assignment->ulid);
 
-        return (new CampaignAssignmentResource($assignment->load('creator:id,ulid,display_name')))
+        return (new CampaignAssignmentResource($assignment->load('creator:id,ulid,display_name,erased_at')))
             ->response()
             ->setStatusCode($reoffered ? Response::HTTP_OK : Response::HTTP_CREATED);
     }

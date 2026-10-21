@@ -50,7 +50,7 @@ final class BoardController
             'automations.targetColumn:id,ulid',
             'cards.column:id,ulid',
             'cards.assignment:id,ulid,status,previously_declined,deliverables,posting_due_at,agreed_fee_minor_units,agreed_fee_currency,fee_per,creator_id',
-            'cards.assignment.creator:id,ulid,display_name,avatar_path',
+            'cards.assignment.creator:id,ulid,display_name,avatar_path,erased_at',
         ]);
 
         // Force 200: the board may have been lazily CREATED on this GET (D-4),
@@ -75,7 +75,7 @@ final class BoardController
             'automations.targetColumn:id,ulid',
             'cards.column:id,ulid',
             'cards.assignment:id,ulid,status,previously_declined,deliverables,posting_due_at,agreed_fee_minor_units,agreed_fee_currency,fee_per,creator_id',
-            'cards.assignment.creator:id,ulid,display_name,avatar_path',
+            'cards.assignment.creator:id,ulid,display_name,avatar_path,erased_at',
         ]);
 
         return (new BoardResource($board))->response()->setStatusCode(Response::HTTP_OK);

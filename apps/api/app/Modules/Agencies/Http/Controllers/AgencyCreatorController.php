@@ -155,7 +155,7 @@ final class AgencyCreatorController
             // while row-shape unit tests stay green — hence the endpoint-level
             // age assertion in AgencyCreatorRosterTest.
             ->with([
-                'creator:id,ulid,user_id,display_name,country_code,date_of_birth,primary_language,accent,content_companions,categories,application_status,avatar_path',
+                'creator:id,ulid,user_id,display_name,country_code,date_of_birth,primary_language,accent,content_companions,categories,application_status,avatar_path,erased_at',
                 'creator.user:id,email',
             ])
             // Default sort: creator display_name ASC via a correlated
@@ -354,10 +354,11 @@ final class AgencyCreatorController
                 // click-through; this chunk's rows do NOT navigate (D-c5-4).
                 'creator_id' => $creator?->ulid,
                 'display_name' => $creator?->display_name,
+                'is_erased' => $creator?->isErased() ?? false,
                 // Contact email (lives on the related User, eager-loaded). The
                 // agency-holds-a-relation invariant makes this appropriate on
                 // the roster list — the same privacy basis as the detail view.
-                'email' => $creator?->user?->email,
+                'email' => $creator?->isErased() === true ? null : $creator?->user?->email,
                 // Application lifecycle state (Chunk 5b): display-only, NOT
                 // filterable — lets the agency tell an approved/usable creator
                 // from one still pending/incomplete/rejected. Distinct axis

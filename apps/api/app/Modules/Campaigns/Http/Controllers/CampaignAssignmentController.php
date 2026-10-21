@@ -64,7 +64,7 @@ final class CampaignAssignmentController
             // the signed avatar_url the Creators-tab row + CreatorProfileDialog
             // header want (AH-075 precedent). Signing itself happens in the
             // resource, not here.
-            ->with(['creator:id,ulid,display_name,avatar_path', 'latestPostedContent', 'sentContract'])
+            ->with(['creator:id,ulid,display_name,avatar_path,erased_at', 'latestPostedContent', 'sentContract'])
             ->orderByDesc('campaign_assignments.id')
             ->paginate($perPage)
             ->withQueryString();
@@ -165,6 +165,10 @@ final class CampaignAssignmentController
             abort(404);
         }
 
+        // AH-104b-del (C4): pending-deletion and erased creators are not
+        // invitable. Neutral 422 `creator.unavailable`; nothing is written.
+        $creator->assertAvailableToAgencies();
+
         // D-1 (TIER 1 — HARD BLOCK) — either hard-blacklist predicate refuses
         // the invite with a 422, mirroring the connection-request gate.
         if ($gate->isHardBlacklisted($campaign, $creator->id)) {
@@ -215,7 +219,7 @@ final class CampaignAssignmentController
 
             // Every other status is the pre-existing idempotent no-op: no offer
             // is made, so nothing has answered any application either.
-            return (new CampaignAssignmentResource($existing->load('creator:id,ulid,display_name')))
+            return (new CampaignAssignmentResource($existing->load('creator:id,ulid,display_name,erased_at')))
                 ->response()
                 ->setStatusCode(Response::HTTP_OK);
         }
@@ -258,7 +262,7 @@ final class CampaignAssignmentController
 
         $this->emitSettledApplication($notifier, $campaign, $settled, $assignment->ulid);
 
-        return (new CampaignAssignmentResource($assignment->load('creator:id,ulid,display_name')))
+        return (new CampaignAssignmentResource($assignment->load('creator:id,ulid,display_name,erased_at')))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
     }
@@ -367,7 +371,7 @@ final class CampaignAssignmentController
             );
         }
 
-        return new CampaignAssignmentResource($assignment->load('creator:id,ulid,display_name'));
+        return new CampaignAssignmentResource($assignment->load('creator:id,ulid,display_name,erased_at'));
     }
 
     /**

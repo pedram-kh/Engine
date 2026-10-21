@@ -85,6 +85,13 @@ final class RelationshipMessageNotifications
             return;
         }
 
+        // AH-104b-del (C4): silent for a creator scheduled for deletion or
+        // erased — the message is stored and visible to the agency, nothing is
+        // sent (no in-app row, push or mail).
+        if ($creator->isUnavailableToAgencies()) {
+            return;
+        }
+
         $this->notifications->notify(
             recipient: $creatorUser,
             type: NotificationType::MessageRelationshipReceivedByCreator,

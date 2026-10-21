@@ -63,7 +63,7 @@ final class AgencyRelationshipMessageController
             // Only conversations that actually have a message (AH-012 D2) — no
             // empty ghosts, even if a transient/attachment row ever slips in.
             ->has('messages')
-            ->with(['creator:id,ulid,display_name,avatar_path', 'latestMessage'])
+            ->with(['creator:id,ulid,display_name,avatar_path,erased_at', 'latestMessage'])
             ->orderByDesc('last_message_at')
             ->orderByDesc('id')
             ->get();
@@ -76,6 +76,7 @@ final class AgencyRelationshipMessageController
                     'creator' => [
                         'id' => $thread->creator?->ulid,
                         'display_name' => $thread->creator?->display_name,
+                        'is_erased' => $thread->creator?->isErased() ?? false,
                         // AH-013 — signed avatar for the contact-row image
                         // (bounded list → per-row signing is fine; null when
                         // unset or on a non-S3 test disk).

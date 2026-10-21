@@ -12,7 +12,9 @@ use App\Modules\Creators\Enums\ApplicationStatus;
 use App\Modules\Creators\Enums\KycMethod;
 use App\Modules\Creators\Enums\KycStatus;
 use App\Modules\Creators\Enums\VerificationLevel;
+use App\Modules\Creators\Exceptions\CreatorUnavailableException;
 use App\Modules\Identity\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Global creator entity.
@@ -327,6 +330,86 @@ final class Creator extends Model implements Auditable
             'last_active_at',
             'deleted_at',
         ];
+    }
+
+    /**
+     * AH-104b-del (D3, Q5): THE definition of "a creator an agency may still
+     * act on or discover". Defined once, here, so the next agency-facing query
+     * cannot forget one leg:
+     *
+     *   - not erased   (`creators.erased_at`, set by the AH-104a engine), and
+     *   - not pending  (`users.deletion_requested_at`, set by the request).
+     *
+     * "Hidden" is DERIVED, never stored: a cancelled request clears the column
+     * and the creator reappears everywhere with no trace. Used by discovery,
+     * the new-conversation contact list and the fan-outs; the roster and the
+     * existing detail pages deliberately do NOT use it (history stays visible,
+     * see tests/Support/AgencyCreatorSurfaces.php).
+     *
+     * @param  Builder<Creator>  $query
+     * @return Builder<Creator>
+     */
+    public function scopeVisibleToAgencies(Builder $query): Builder
+    {
+        return $query
+            ->whereNull($query->qualifyColumn('erased_at'))
+            ->whereNotExists(function ($sub) use ($query): void {
+                $sub->from('users')
+                    ->whereColumn('users.id', $query->qualifyColumn('user_id'))
+                    ->whereNotNull('users.deletion_requested_at')
+                    ->selectRaw('1');
+            });
+    }
+
+    /**
+     * AH-104b-del (D3): has the erasure engine erased this creator?
+     *
+     * Reads `erased_at`; when a slim `select(...)` did not project that column
+     * (most agency eager-loads do), it asks the database instead of silently
+     * answering "no" — a missing column must never read as "not erased". The
+     * agency eager-loads project the column, so the fallback is a safety net
+     * (and a spec fails if a listed surface needs it).
+     */
+    public function isErased(): bool
+    {
+        if (array_key_exists('erased_at', $this->attributes)) {
+            return $this->erased_at !== null;
+        }
+
+        return $this->exists
+            && DB::table('creators')->where('id', $this->getKey())->whereNotNull('erased_at')->exists();
+    }
+
+    /**
+     * The single-row twin of {@see scopeVisibleToAgencies()}; a spec pins that
+     * the two never disagree. Joins through `creators` rather than reading
+     * `$this->user_id`, which a slim eager-load may not have projected.
+     */
+    public function isUnavailableToAgencies(): bool
+    {
+        if ($this->isErased()) {
+            return true;
+        }
+
+        return $this->exists
+            && DB::table('users')
+                ->join('creators', 'creators.user_id', '=', 'users.id')
+                ->where('creators.id', $this->getKey())
+                ->whereNotNull('users.deletion_requested_at')
+                ->exists();
+    }
+
+    /**
+     * The guard every NEW agency-side action calls (C4): neutral 422
+     * `creator.unavailable`, never "pending deletion".
+     *
+     * @throws CreatorUnavailableException
+     */
+    public function assertAvailableToAgencies(): void
+    {
+        if ($this->isUnavailableToAgencies()) {
+            throw new CreatorUnavailableException;
+        }
     }
 
     /**

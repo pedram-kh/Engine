@@ -167,6 +167,11 @@ final class CampaignApplicationNotifier
             return;
         }
 
+        // AH-104b-del (C4): silent for a creator scheduled for deletion or erased.
+        if ($creator->isUnavailableToAgencies()) {
+            return;
+        }
+
         $this->notifications->notify(
             recipient: $recipient,
             type: NotificationType::CampaignApplicationAccepted,
@@ -223,6 +228,12 @@ final class CampaignApplicationNotifier
         $recipient = $creator->user;
 
         if (! $recipient instanceof User) {
+            return;
+        }
+
+        // AH-104b-del (C4): the auto-reject at a campaign's end also reaches
+        // here; a creator scheduled for deletion or erased is told nothing.
+        if ($creator->isUnavailableToAgencies()) {
             return;
         }
 

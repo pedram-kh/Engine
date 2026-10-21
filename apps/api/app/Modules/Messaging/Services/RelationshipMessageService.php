@@ -55,6 +55,21 @@ final class RelationshipMessageService
      */
     public function provisionForPair(Agency $agency, Creator $creator): RelationshipThread
     {
+        // AH-104b-del (C4): an EXISTING thread stays writable (history and the
+        // conversation are unchanged during the grace), but a NEW conversation
+        // is not started with a creator scheduled for deletion or erased.
+        $existing = RelationshipThread::query()
+            ->withoutGlobalScope(BelongsToAgencyScope::class)
+            ->where('agency_id', $agency->id)
+            ->where('creator_id', $creator->id)
+            ->first();
+
+        if ($existing !== null) {
+            return $existing;
+        }
+
+        $creator->assertAvailableToAgencies();
+
         try {
             return RelationshipThread::query()
                 ->withoutGlobalScope(BelongsToAgencyScope::class)

@@ -175,6 +175,8 @@ it('exposes the slim card shape and carries NONE of the relation block', functio
         // unnoticed.
         'display_name', 'country_code', 'age', 'primary_language', 'accent',
         'content_companions', 'categories', 'avatar_url', 'relationship_status',
+        // AH-104b-del: the one flag an agency card carries about deletion.
+        'is_erased',
     ]);
 
     // The per-agency relation block is absent (only the caller's own status

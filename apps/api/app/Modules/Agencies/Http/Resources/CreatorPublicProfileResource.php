@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Agencies\Http\Resources;
 
+use App\Modules\Creators\Concerns\EmitsErasedState;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Models\CreatorSocialAccount;
 use App\Modules\Creators\Support\PortfolioItemPresenter;
@@ -45,6 +46,8 @@ use Illuminate\Support\Facades\Storage;
  */
 final class CreatorPublicProfileResource extends JsonResource
 {
+    use EmitsErasedState;
+
     private const int SIGNED_URL_TTL_MINUTES = 60;
 
     /**
@@ -63,6 +66,7 @@ final class CreatorPublicProfileResource extends JsonResource
             'type' => 'creator_public_profiles',
             'attributes' => [
                 'display_name' => $creator->display_name,
+                'is_erased' => $this->creatorIsErased($creator),
                 'bio' => $creator->bio,
                 'country_code' => $creator->country_code,
                 'region' => $creator->region,

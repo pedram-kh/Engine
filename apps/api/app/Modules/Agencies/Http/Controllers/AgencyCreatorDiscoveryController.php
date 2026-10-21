@@ -90,6 +90,9 @@ final class AgencyCreatorDiscoveryController
                 'creators.content_companions',
                 'creators.categories',
                 'creators.avatar_path',
+                // AH-104b-del: the resource emits `is_erased`; without the column
+                // in this slim projection it would cost a query per card.
+                'creators.erased_at',
             ])
             ->addSelect(['connected_relationship_status' => $this->connectionSubquery($agency)])
             // Stable display-name ASC sort with an id tiebreaker (mirrors the
@@ -136,7 +139,12 @@ final class AgencyCreatorDiscoveryController
     {
         Gate::authorize('discover', AgencyCreatorRelation::class);
 
-        if ($creator->application_status !== ApplicationStatus::Approved || ! $creator->is_discoverable) {
+        // AH-104b-del: scheduled-for-deletion and erased creators are simply
+        // not in the pool (the same 404 as an opted-out one, so the answer
+        // says nothing about WHY).
+        if ($creator->application_status !== ApplicationStatus::Approved
+            || ! $creator->is_discoverable
+            || $creator->isUnavailableToAgencies()) {
             abort(404);
         }
 
@@ -170,7 +178,11 @@ final class AgencyCreatorDiscoveryController
     {
         return Creator::query()
             ->where('creators.application_status', ApplicationStatus::Approved->value)
-            ->where('creators.is_discoverable', true);
+            ->where('creators.is_discoverable', true)
+            // AH-104b-del (D3): a creator scheduled for deletion, or erased,
+            // is not in the pool. Derived from users.deletion_requested_at, so
+            // a cancelled request puts them straight back.
+            ->visibleToAgencies();
     }
 
     /**

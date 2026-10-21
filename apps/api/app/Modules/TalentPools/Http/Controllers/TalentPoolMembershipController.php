@@ -100,6 +100,10 @@ final class TalentPoolMembershipController
         $creator = $this->resolveCreator($request->validated()['creator_id']);
         $relation = AgencyCreatorRelationGuard::requireExisting($agency, $creator);
 
+        // AH-104b-del (C4): no NEW pool membership for a creator scheduled for
+        // deletion or erased. REMOVE stays open (rows can always be cleaned up).
+        $creator->assertAvailableToAgencies();
+
         // AH-051 follow-up — a SEVERED relation may not be re-pooled. Admin
         // disconnect deletes this pair's memberships (D-6) on the reasoning that
         // pool presence would leak a relationship that has ended; permitting an
