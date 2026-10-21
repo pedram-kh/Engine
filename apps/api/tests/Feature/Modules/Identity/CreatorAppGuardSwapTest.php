@@ -40,6 +40,7 @@ const CA_SWAPPED_URI_PATTERNS = [
     '#^api/v1/me/notifications(/.*)?$#',
     '#^api/v1/me/notification-preferences$#',
     '#^api/v1/creators/me(/.*)?$#',
+    '#^api/v1/me/account-deletion$#',
     '#^api/v1/auth/logout$#',
     '#^api/v1/auth/2fa/(enable|confirm|disable|recovery-codes)$#',
 ];

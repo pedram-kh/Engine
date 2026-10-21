@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Modules\Identity\Http\Controllers\AccountDeletionController;
 use App\Modules\Identity\Http\Controllers\ConfirmTwoFactorController;
 use App\Modules\Identity\Http\Controllers\DisableTwoFactorController;
 use App\Modules\Identity\Http\Controllers\EnableTwoFactorController;
@@ -69,6 +70,15 @@ Route::get('me', MeController::class)
 Route::patch('me', UpdateMeController::class)
     ->middleware(['auth:web,creator_app', 'tenancy.set'])
     ->name('me.update');
+
+// A creator schedules their own account for deletion (AH-104b-del A3).
+// Same posture as `me`: reachable without an agency context, creators only
+// (the controller refuses everyone else), flag-gated (404 when off).
+// Throttled per IP and 3/hour per person; re-authenticates with the password
+// (+ second factor) in the body. Allowlisted in docs/security/tenancy.md §4.
+Route::post('me/account-deletion', AccountDeletionController::class)
+    ->middleware(['auth:web,creator_app', 'tenancy.set', 'throttle:auth-ip', 'throttle:auth-account-deletion'])
+    ->name('me.account-deletion');
 
 // ---------------------------------------------------------------------------
 // Main SPA — guard 'web', cookie 'catalyst_main_session'

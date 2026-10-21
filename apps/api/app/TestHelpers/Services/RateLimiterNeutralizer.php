@@ -75,6 +75,7 @@ final class RateLimiterNeutralizer
         'auth-login-email',
         'auth-password',
         'auth-resend-verification',
+        'auth-account-deletion',
     ];
 
     public function __construct(private readonly CacheRepository $cache) {}

@@ -21,6 +21,7 @@ use App\Modules\Identity\Events\UserSignedUp;
 use App\Modules\Identity\Features\AccountDeletionEnabled;
 use App\Modules\Identity\Guards\CreatorTokenGuard;
 use App\Modules\Identity\Listeners\WriteAuthAuditLog;
+use App\Modules\Identity\Models\User;
 use App\Modules\Identity\Services\PwnedPasswordsClient;
 use Illuminate\Auth\RequestGuard;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -144,6 +145,19 @@ final class IdentityServiceProvider extends ServiceProvider
 
             return Limit::perMinute(1)
                 ->by('verify:'.$email)
+                ->response(static fn (Request $req, array $headers) => $rateLimitResponse($headers));
+        });
+
+        // Account-deletion request (AH-104b-del Q2): 3 per hour per person,
+        // on top of the per-IP cap. Keyed on the signed-in user, never on
+        // the IP, so a shared network cannot lock someone out and a stolen
+        // session cannot be used to probe the password faster. 429 only:
+        // this limiter never suspends, locks or signs anyone out.
+        RateLimiter::for('auth-account-deletion', static function (Request $request) use ($rateLimitResponse): Limit {
+            $user = $request->user();
+
+            return Limit::perHour(3)
+                ->by('account-deletion:'.($user instanceof User ? (string) $user->getKey() : (string) $request->ip()))
                 ->response(static fn (Request $req, array $headers) => $rateLimitResponse($headers));
         });
     }
