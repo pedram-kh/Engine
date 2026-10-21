@@ -33,6 +33,7 @@ final class LoginController
             request: $request,
             guard: $guard,
             mfaCode: $request->mfaCodeInput(),
+            cancelDeletion: $request->cancelDeletionInput(),
         );
 
         return self::respond($request, $result);

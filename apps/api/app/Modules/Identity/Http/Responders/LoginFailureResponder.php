@@ -97,6 +97,19 @@ final class LoginFailureResponder
                 title: trans('auth.login.account_locked'),
             ),
 
+            // Only ever returned AFTER the password and the second factor were
+            // verified, so it tells nobody anything they did not already own.
+            LoginResultStatus::DeletionPending => ErrorResponse::single(
+                request: $request,
+                status: 403,
+                code: 'auth.deletion_pending',
+                title: 'This account is scheduled for deletion.',
+                meta: [
+                    'scheduled_for' => $result->scheduledFor?->toIso8601String(),
+                    'mfa_via' => $result->mfaVia ?? 'none',
+                ],
+            ),
+
             LoginResultStatus::TemporarilyLocked => ErrorResponse::single(
                 request: $request,
                 status: 423,

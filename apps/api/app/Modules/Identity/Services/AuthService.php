@@ -117,6 +117,7 @@ final class AuthService
         private readonly AccountLockoutService $lockout,
         private readonly TwoFactorChallengeService $twoFactorChallenge,
         private readonly TwoFactorVerificationThrottle $twoFactorThrottle,
+        private readonly AccountDeletionService $accountDeletion,
     ) {}
 
     public function login(
@@ -125,6 +126,7 @@ final class AuthService
         Request $request,
         string $guard,
         #[SensitiveParameter] ?string $mfaCode = null,
+        bool $cancelDeletion = false,
     ): LoginResult {
         // Defensive guard: login needs a session to attach the
         // authenticated user to (see step 8 below — `auth->login($user)`
@@ -160,7 +162,7 @@ final class AuthService
             );
         }
 
-        $gates = $this->evaluateGates($email, $password, $request, $guard, $mfaCode);
+        $gates = $this->evaluateGates($email, $password, $request, $guard, $mfaCode, $cancelDeletion);
 
         if ($gates instanceof LoginResult) {
             return $gates;
@@ -223,8 +225,9 @@ final class AuthService
         Request $request,
         string $platform,
         #[SensitiveParameter] ?string $mfaCode = null,
+        bool $cancelDeletion = false,
     ): LoginResult {
-        $gates = $this->evaluateGates($email, $password, $request, self::TOKEN_GUARD, $mfaCode);
+        $gates = $this->evaluateGates($email, $password, $request, self::TOKEN_GUARD, $mfaCode, $cancelDeletion);
 
         if ($gates instanceof LoginResult) {
             return $gates;
@@ -305,6 +308,7 @@ final class AuthService
         Request $request,
         string $guard,
         #[SensitiveParameter] ?string $mfaCode,
+        bool $cancelDeletion = false,
     ): LoginResult|GatesPassed {
         $email = strtolower(trim($email));
         $ip = $request->ip();
@@ -405,6 +409,7 @@ final class AuthService
         }
 
         $usedMfa = false;
+        $mfaVia = 'none';
 
         if ($user->hasTwoFactorEnabled()) {
             // 2FA enrollment can be administratively suspended after the
@@ -460,6 +465,27 @@ final class AuthService
 
             $this->twoFactorThrottle->recordSuccess($user);
             $usedMfa = true;
+            $mfaVia = $challenge->usedRecoveryCode ? 'recovery_code' : 'totp';
+        }
+
+        // AH-104b-del A4 — a creator scheduled for deletion. This gate is LAST on
+        // purpose: it is reached only with the right password AND (where enrolled) a
+        // right second-factor code, so the answer tells nobody what they did not
+        // already own, and every earlier failure is byte-for-byte what it is for an
+        // ordinary account. It is audit-only (like `account_suspended`): it never
+        // feeds the failure or lockout counters, so a pending person is never locked
+        // out for trying again. `cancel_deletion` on any other account is ignored.
+        if ($user->isDeletionPending()) {
+            if (! $cancelDeletion) {
+                $this->events->dispatch(new LoginFailed($email, $user, $ip, $userAgent, 'deletion_pending'));
+
+                return LoginResult::deletionPending($user, $mfaVia);
+            }
+
+            if (! $this->accountDeletion->cancel($user, $ip, $userAgent)) {
+                // Erased between the check and the lock: answered as an unknown account.
+                return LoginResult::invalidCredentials();
+            }
         }
 
         return new GatesPassed($email, $user, $ip, $userAgent, $usedMfa);

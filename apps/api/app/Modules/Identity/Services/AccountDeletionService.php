@@ -132,6 +132,46 @@ final class AccountDeletionService
         return $result;
     }
 
+    /**
+     * The creator signed in with `cancel_deletion` and passed every gate (A4):
+     * clear the two dates and say so. Returns false only when the account was
+     * erased in the meantime (the row is re-read locked), in which case nothing
+     * is restored; the caller answers it as an unknown account.
+     */
+    public function cancel(User $user, ?string $ip, ?string $userAgent): bool
+    {
+        $restored = $this->db->transaction(function () use ($user, $ip, $userAgent): bool {
+            /** @var User $locked */
+            $locked = User::query()->whereKey($user->getKey())->lockForUpdate()->firstOrFail();
+
+            if ($locked->isErased()) {
+                return false;
+            }
+
+            $scheduledFor = $locked->deletion_scheduled_for;
+            if (! $locked->isDeletionPending()) {
+                return true; // already cancelled by a concurrent sign-in: nothing to do
+            }
+
+            $locked->forceFill(['deletion_requested_at' => null, 'deletion_scheduled_for' => null])->saveQuietly();
+
+            $this->audit->log(
+                action: AuditAction::AccountDeletionCancelled,
+                actor: $locked,
+                subject: $locked,
+                metadata: ['was_scheduled_for' => $scheduledFor?->toIso8601String()],
+                ip: $ip,
+                userAgent: $userAgent,
+            );
+
+            return true;
+        });
+
+        $user->refresh();
+
+        return $restored;
+    }
+
     private function checkSecondFactor(
         User $user,
         #[SensitiveParameter] ?string $mfaCode,

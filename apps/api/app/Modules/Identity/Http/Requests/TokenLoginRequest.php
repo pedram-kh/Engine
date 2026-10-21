@@ -32,6 +32,9 @@ final class TokenLoginRequest extends FormRequest
             'email' => ['required', 'string', 'email:rfc', 'max:320'],
             'password' => ['required', 'string', 'min:1', 'max:128'],
             'mfa_code' => ['sometimes', 'nullable', 'string', 'min:6', 'max:32'],
+            // AH-104b-del: re-send the SAME credentials with this set to restore an
+            // account that is scheduled for deletion. Ignored for any other account.
+            'cancel_deletion' => ['sometimes', 'nullable', 'boolean'],
             'platform' => ['required', 'string', 'in:ios,android'],
         ];
     }
@@ -44,6 +47,11 @@ final class TokenLoginRequest extends FormRequest
     public function passwordInput(): string
     {
         return (string) $this->input('password');
+    }
+
+    public function cancelDeletionInput(): bool
+    {
+        return $this->boolean('cancel_deletion');
     }
 
     public function mfaCodeInput(): ?string

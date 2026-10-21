@@ -69,7 +69,9 @@ final class CreatorTokenGuard extends Guard
             return null;
         }
 
-        if ($tokenable->type !== UserType::Creator || $tokenable->isSuspended()) {
+        // A creator scheduled for deletion has no way in (AH-104b-del): their tokens are
+        // revoked at the request, and one that somehow survives is refused here.
+        if ($tokenable->type !== UserType::Creator || $tokenable->isSuspended() || $tokenable->isDeletionPending()) {
             return null;
         }
 

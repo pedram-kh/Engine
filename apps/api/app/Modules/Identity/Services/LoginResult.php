@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Identity\Services;
 
 use App\Modules\Identity\Models\User;
+use Carbon\CarbonInterface;
 use Laravel\Sanctum\NewAccessToken;
 
 /**
@@ -39,6 +40,11 @@ use Laravel\Sanctum\NewAccessToken;
  *                          `auth.account_locked.suspended`. 423.
  *   - TemporarilyLocked  → too many failures in the 15-minute window.
  *                          `auth.account_locked.temporary`. 423.
+ *   - DeletionPending    → credentials (and 2FA) are right but the creator asked
+ *                          for deletion and the grace is running. 403
+ *                          `auth.deletion_pending`; no session or token, no
+ *                          failure counter. The same request with
+ *                          `cancel_deletion` restores the account.
  *   - WrongSpa           → credentials are valid but the user's type is
  *                          not allowed for the SPA the request hit. 403
  *                          with `auth.wrong_spa`. The session is NOT
@@ -55,6 +61,8 @@ final readonly class LoginResult
         public ?User $user = null,
         public ?int $retryAfterSeconds = null,
         public ?NewAccessToken $token = null,
+        public ?CarbonInterface $scheduledFor = null,
+        public ?string $mfaVia = null,
     ) {}
 
     /**
@@ -99,6 +107,15 @@ final readonly class LoginResult
     public static function temporarilyLocked(int $retryAfterSeconds): self
     {
         return new self(LoginResultStatus::TemporarilyLocked, retryAfterSeconds: $retryAfterSeconds);
+    }
+
+    /**
+     * @param  'none'|'totp'|'recovery_code'  $mfaVia  how the second factor was satisfied on THIS request,
+     *                                                 so the client knows whether a recovery code was spent
+     */
+    public static function deletionPending(User $user, string $mfaVia): self
+    {
+        return new self(LoginResultStatus::DeletionPending, user: $user, scheduledFor: $user->deletion_scheduled_for, mfaVia: $mfaVia);
     }
 
     public static function wrongSpa(User $user): self

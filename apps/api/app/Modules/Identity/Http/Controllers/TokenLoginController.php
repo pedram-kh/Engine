@@ -36,6 +36,7 @@ final class TokenLoginController
             request: $request,
             platform: $request->platformInput(),
             mfaCode: $request->mfaCodeInput(),
+            cancelDeletion: $request->cancelDeletionInput(),
         );
 
         if ($result->status === LoginResultStatus::Success && $result->user !== null && $result->token !== null) {

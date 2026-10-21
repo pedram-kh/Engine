@@ -15,6 +15,13 @@ enum LoginResultStatus: string
     case AccountSuspended = 'account_suspended';
     case TemporarilyLocked = 'temporarily_locked';
     /**
+     * Password (and second factor) are right but the creator has asked for the
+     * account to be deleted and the grace has not ended (AH-104b-del A4).
+     * Mapped to `auth.deletion_pending` 403. No session, no token, no failure
+     * counter; the client may repeat the same request with `cancel_deletion`.
+     */
+    case DeletionPending = 'deletion_pending';
+    /**
      * Credentials are valid but the (guard, user.type) combination is not
      * allowed for the SPA the request hit. Mapped to `auth.wrong_spa` 403.
      * The session is NOT attached. See AuthService::login() for the

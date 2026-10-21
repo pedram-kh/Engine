@@ -29,6 +29,9 @@ final class LoginRequest extends FormRequest
             // it set. Width range covers both 6-digit TOTP and the
             // 19-char `xxxx-xxxx-xxxx-xxxx` recovery format.
             'mfa_code' => ['sometimes', 'nullable', 'string', 'min:6', 'max:32'],
+            // AH-104b-del: re-send the SAME credentials with this set to restore an
+            // account that is scheduled for deletion. Ignored for any other account.
+            'cancel_deletion' => ['sometimes', 'nullable', 'boolean'],
         ];
     }
 
@@ -40,6 +43,11 @@ final class LoginRequest extends FormRequest
     public function passwordInput(): string
     {
         return (string) $this->input('password');
+    }
+
+    public function cancelDeletionInput(): bool
+    {
+        return $this->boolean('cancel_deletion');
     }
 
     public function mfaCodeInput(): ?string
