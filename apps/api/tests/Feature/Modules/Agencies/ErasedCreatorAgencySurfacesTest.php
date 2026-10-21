@@ -197,3 +197,18 @@ it('leaves the erased creator out of discovery and out of any new conversation',
         ->getJson("/api/v1/agencies/{$s['agency']->ulid}/creators/discover/{$s['creator']->ulid}")
         ->assertNotFound();
 });
+
+it('does not flag a live, discoverable creator as erased in discovery', function (): void {
+    $s = erasedSurfaceFixture();
+    DB::table('creators')->where('id', $s['other']->id)->update(['is_discoverable' => true]);
+
+    $rows = erRows($this->actingAs($s['admin'])->getJson(erasedSurfaceUrls($s)['discovery'])->assertOk()->json('data'));
+    $row = erFind($rows, 'id', $s['other']->ulid);
+    expect($row)->not->toBeNull('the live creator is discoverable')
+        ->and(data_get($row, 'attributes.is_erased'))->toBeFalse();
+
+    $profile = $this->actingAs($s['admin'])
+        ->getJson("/api/v1/agencies/{$s['agency']->ulid}/creators/discover/{$s['other']->ulid}")
+        ->assertOk()->json('data');
+    expect(data_get($profile, 'attributes.is_erased'))->toBeFalse();
+});
