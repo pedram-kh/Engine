@@ -32,6 +32,7 @@ vi.mock('../api/auth.api', () => ({
     updateMe: vi.fn(),
     login: vi.fn(),
     tokenLogin: vi.fn(),
+    requestAccountDeletion: vi.fn(),
     logout: vi.fn(),
     signUp: vi.fn(),
     verifyEmail: vi.fn(),
@@ -126,6 +127,37 @@ describe('native login', () => {
     expect(mocked.tokenLogin).toHaveBeenCalledWith(
       expect.objectContaining({ mfa_code: '123456', platform: 'ios' }),
     )
+  })
+
+  it('sends cancel_deletion on the token door only when asked', async () => {
+    mocked.tokenLogin.mockResolvedValue({ user: makeUser(), token: 't', expiresAt: null })
+    const store = useAuthStore()
+
+    await store.login('a@b.c', 'pw', undefined, true)
+    expect(mocked.tokenLogin).toHaveBeenLastCalledWith({
+      email: 'a@b.c',
+      password: 'pw',
+      platform: 'ios',
+      cancel_deletion: true,
+    })
+
+    await store.login('a@b.c', 'pw')
+    expect(mocked.tokenLogin).toHaveBeenLastCalledWith({
+      email: 'a@b.c',
+      password: 'pw',
+      platform: 'ios',
+    })
+  })
+
+  it('a 403 auth.deletion_pending stores no token and opens no session', async () => {
+    mocked.tokenLogin.mockRejectedValue(envelopeError(403, 'auth.deletion_pending'))
+    const store = useAuthStore()
+
+    await expect(store.login('a@b.c', 'pw')).rejects.toMatchObject({
+      code: 'auth.deletion_pending',
+    })
+    expect(tokenStore.write).not.toHaveBeenCalled()
+    expect(store.user).toBeNull()
   })
 
   it.each([

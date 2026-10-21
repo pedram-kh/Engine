@@ -22,6 +22,9 @@
 
 import type { HttpClient } from './http'
 import type {
+  AccountDeletionEnvelope,
+  AccountDeletionRequest,
+  AccountDeletionResult,
   ConfirmTotpRequest,
   DisableTotpRequest,
   EnableTotpEnvelope,
@@ -94,6 +97,17 @@ export interface AuthApi {
    * creator-only and has no admin twin.
    */
   tokenLogin(body: TokenLoginRequest): Promise<TokenLoginResult>
+
+  /**
+   * `POST /api/v1/me/account-deletion` (AH-104b-del A3) — a creator schedules
+   * their own account for deletion. Re-authenticates with the password (and a
+   * second-factor code where enrolled). On success every session and token of
+   * the account is already revoked, so the caller must treat itself as signed
+   * out. Re-authentication failures are 403 (never 401, which the SPA treats as
+   * "session ended"); `account_deletion.blocked` (422) carries `meta.reasons`.
+   * Main variant only.
+   */
+  requestAccountDeletion(body: AccountDeletionRequest): Promise<AccountDeletionResult>
 
   /**
    * `POST /api/v1/auth/logout`. The 2xx path destroys the session
@@ -171,6 +185,7 @@ export function createAuthApi(http: HttpClient, options: CreateAuthApiOptions = 
   const loginPath = variant === 'admin' ? '/admin/auth/login' : '/auth/login'
   const logoutPath = variant === 'admin' ? '/admin/auth/logout' : '/auth/logout'
   const tokenLoginPath = '/auth/token'
+  const accountDeletionPath = '/me/account-deletion'
   // Sign-up + email-verification + password-reset live only on the main
   // SPA's surface — the admin SPA's onboarding goes through a separate
   // (eventual) admin-invite flow rather than self-service. We keep the
@@ -209,6 +224,14 @@ export function createAuthApi(http: HttpClient, options: CreateAuthApiOptions = 
         user: envelope.data,
         token: envelope.meta.token,
         expiresAt: envelope.meta.expires_at,
+      }
+    },
+
+    async requestAccountDeletion(body) {
+      const envelope = await http.post<AccountDeletionEnvelope>(accountDeletionPath, body)
+      return {
+        requestedAt: envelope.data.attributes.requested_at,
+        scheduledFor: envelope.data.attributes.scheduled_for,
       }
     },
 

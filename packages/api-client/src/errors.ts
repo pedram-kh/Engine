@@ -31,6 +31,8 @@
  * inspect the unfiltered server reply without re-issuing the call.
  */
 
+import type { DeletionPendingMeta } from './types/auth'
+
 /**
  * The shape of a single error entry inside the envelope's `errors`
  * array. The backend always emits at least one entry per `4xx` / `5xx`
@@ -221,6 +223,27 @@ export function extractFieldErrors<TField extends string = string>(
   }
 
   return out as unknown as Partial<Record<TField, readonly string[]>>
+}
+
+/**
+ * The typed `meta` of an `auth.deletion_pending` answer, or `null` when the
+ * error is anything else (or the server sent no usable date). Never throws:
+ * the sign-in page calls this on every failed attempt.
+ */
+export function deletionPendingMeta(error: unknown): DeletionPendingMeta | null {
+  if (!(error instanceof ApiError) || error.code !== 'auth.deletion_pending') {
+    return null
+  }
+  const meta = error.details[0]?.meta
+  const scheduledFor = meta?.['scheduled_for']
+  if (typeof scheduledFor !== 'string' || scheduledFor.length === 0) {
+    return null
+  }
+  const via = meta?.['mfa_via']
+  return {
+    scheduledFor,
+    mfaVia: via === 'totp' || via === 'recovery_code' ? via : 'none',
+  }
 }
 
 function fieldFromDetail(detail: ApiErrorDetail): string | null {

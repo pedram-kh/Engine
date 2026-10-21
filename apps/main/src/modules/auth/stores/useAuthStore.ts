@@ -331,10 +331,15 @@ export const useAuthStore = defineStore('auth', () => {
    * the creator app it dispatches to {@link loginWithToken}, so no native
    * path can reach the cookie endpoint.
    */
-  async function login(email: string, password: string, totpCode?: string): Promise<void> {
+  async function login(
+    email: string,
+    password: string,
+    totpCode?: string,
+    cancelDeletion = false,
+  ): Promise<void> {
     sessionLapsed.value = false
     if (isNativePlatform()) {
-      return loginWithToken(email, password, totpCode)
+      return loginWithToken(email, password, totpCode, cancelDeletion)
     }
     isLoggingIn.value = true
     try {
@@ -342,6 +347,7 @@ export const useAuthStore = defineStore('auth', () => {
         email,
         password,
         ...(totpCode !== undefined ? { mfa_code: totpCode } : {}),
+        ...(cancelDeletion ? { cancel_deletion: true } : {}),
       })
       setUser(next)
     } finally {
@@ -355,7 +361,12 @@ export const useAuthStore = defineStore('auth', () => {
    * token behind it. Failure envelopes (wrong door, 2FA, suspension)
    * surface unchanged for the page to render.
    */
-  async function loginWithToken(email: string, password: string, totpCode?: string): Promise<void> {
+  async function loginWithToken(
+    email: string,
+    password: string,
+    totpCode?: string,
+    cancelDeletion = false,
+  ): Promise<void> {
     const platform = nativePlatform()
     if (platform === null) {
       throw new Error('loginWithToken() is native-only.')
@@ -367,6 +378,7 @@ export const useAuthStore = defineStore('auth', () => {
         password,
         platform,
         ...(totpCode !== undefined ? { mfa_code: totpCode } : {}),
+        ...(cancelDeletion ? { cancel_deletion: true } : {}),
       })
       // AH-103d — `requireGuest` has no bootstrap, so the sign-in page can be reached
       // first: a late reconcile (marker absent, token present = the NEW token) would

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createAuthApi, type AuthApi } from './auth'
-import { ApiError } from './errors'
+import { ApiError, deletionPendingMeta } from './errors'
 import type { HttpClient } from './http'
 import type { UserEnvelope } from './types/user'
 
@@ -292,6 +292,129 @@ describe('createAuthApi', () => {
       await expect(
         api.tokenLogin({ email: 'a@b.c', password: 'pw', platform: 'ios' }),
       ).rejects.toMatchObject({ status: 403, code: 'auth.wrong_spa' })
+    })
+  })
+
+  describe('cancel_deletion (AH-104b-del)', () => {
+    it('forwards cancel_deletion on the web door, and omits it when not asked for', async () => {
+      http.post.mockResolvedValue(userEnvelope())
+
+      await api.login({ email: 'a@b.c', password: 'pw', cancel_deletion: true })
+      await api.login({ email: 'a@b.c', password: 'pw' })
+
+      expect(http.post).toHaveBeenNthCalledWith(1, '/auth/login', {
+        email: 'a@b.c',
+        password: 'pw',
+        cancel_deletion: true,
+      })
+      expect(http.post).toHaveBeenNthCalledWith(2, '/auth/login', {
+        email: 'a@b.c',
+        password: 'pw',
+      })
+    })
+
+    it('forwards cancel_deletion on the token door', async () => {
+      http.post.mockResolvedValueOnce({
+        ...userEnvelope(),
+        meta: { token: '7|t', token_type: 'Bearer', expires_at: null },
+      })
+
+      await api.tokenLogin({
+        email: 'a@b.c',
+        password: 'pw',
+        platform: 'ios',
+        cancel_deletion: true,
+      })
+
+      expect(http.post).toHaveBeenCalledWith('/auth/token', {
+        email: 'a@b.c',
+        password: 'pw',
+        platform: 'ios',
+        cancel_deletion: true,
+      })
+    })
+  })
+
+  describe('deletionPendingMeta()', () => {
+    it('reads the typed meta of auth.deletion_pending', () => {
+      const err = envelopeError(403, 'auth.deletion_pending', {
+        scheduled_for: '2026-11-16T10:00:00+00:00',
+        mfa_via: 'recovery_code',
+      })
+
+      expect(deletionPendingMeta(err)).toEqual({
+        scheduledFor: '2026-11-16T10:00:00+00:00',
+        mfaVia: 'recovery_code',
+      })
+    })
+
+    it('reads totp, and treats an absent or unknown mfa_via as none', () => {
+      const totp = envelopeError(403, 'auth.deletion_pending', {
+        scheduled_for: 'x',
+        mfa_via: 'totp',
+      })
+      const bare = envelopeError(403, 'auth.deletion_pending', { scheduled_for: 'x' })
+      const odd = envelopeError(403, 'auth.deletion_pending', {
+        scheduled_for: 'x',
+        mfa_via: 'sms',
+      })
+
+      expect(deletionPendingMeta(totp)?.mfaVia).toBe('totp')
+      expect(deletionPendingMeta(bare)?.mfaVia).toBe('none')
+      expect(deletionPendingMeta(odd)?.mfaVia).toBe('none')
+    })
+
+    it('is null for any other error, for a missing date, and for a non-error', () => {
+      expect(deletionPendingMeta(envelopeError(403, 'auth.wrong_spa'))).toBeNull()
+      expect(deletionPendingMeta(envelopeError(403, 'auth.deletion_pending'))).toBeNull()
+      expect(
+        deletionPendingMeta(envelopeError(403, 'auth.deletion_pending', { scheduled_for: '' })),
+      ).toBeNull()
+      expect(deletionPendingMeta(new Error('x'))).toBeNull()
+      expect(deletionPendingMeta(undefined)).toBeNull()
+    })
+  })
+
+  describe('requestAccountDeletion()', () => {
+    it('POSTs to /me/account-deletion and unwraps both dates', async () => {
+      http.post.mockResolvedValueOnce({
+        data: {
+          type: 'account_deletion',
+          attributes: {
+            requested_at: '2026-11-02T10:00:00+00:00',
+            scheduled_for: '2026-11-16T10:00:00+00:00',
+          },
+        },
+      })
+
+      const result = await api.requestAccountDeletion({
+        password: 'pw',
+        mfa_code: '123456',
+        acknowledged: true,
+      })
+
+      expect(http.post).toHaveBeenCalledWith('/me/account-deletion', {
+        password: 'pw',
+        mfa_code: '123456',
+        acknowledged: true,
+      })
+      expect(result).toEqual({
+        requestedAt: '2026-11-02T10:00:00+00:00',
+        scheduledFor: '2026-11-16T10:00:00+00:00',
+      })
+    })
+
+    it('surfaces the blocked reasons verbatim', async () => {
+      http.post.mockRejectedValueOnce(
+        envelopeError(422, 'account_deletion.blocked', { reasons: ['payment'] }),
+      )
+
+      await expect(
+        api.requestAccountDeletion({ password: 'pw', acknowledged: true }),
+      ).rejects.toMatchObject({
+        status: 422,
+        code: 'account_deletion.blocked',
+      })
     })
   })
 

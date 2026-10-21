@@ -26,6 +26,7 @@ vi.mock('../api/auth.api', () => ({
     updateMe: vi.fn(),
     login: vi.fn(),
     tokenLogin: vi.fn(),
+    requestAccountDeletion: vi.fn(),
     logout: vi.fn(),
     signUp: vi.fn(),
     verifyEmail: vi.fn(),
@@ -335,6 +336,36 @@ describe('useAuthStore', () => {
         password: 'pw',
         mfa_code: '123456',
       })
+    })
+
+    it('sends cancel_deletion only when asked, and never as false', async () => {
+      const store = useAuthStore()
+      mocked.login.mockResolvedValue(makeUser())
+
+      await store.login('a@b.c', 'pw', undefined, true)
+      expect(mocked.login).toHaveBeenLastCalledWith({
+        email: 'a@b.c',
+        password: 'pw',
+        cancel_deletion: true,
+      })
+
+      await store.login('a@b.c', 'pw', '123456', false)
+      expect(mocked.login).toHaveBeenLastCalledWith({
+        email: 'a@b.c',
+        password: 'pw',
+        mfa_code: '123456',
+      })
+    })
+
+    it('surfaces auth.deletion_pending without setting a user', async () => {
+      const store = useAuthStore()
+      mocked.login.mockRejectedValueOnce(envelopeError(403, 'auth.deletion_pending'))
+
+      await expect(store.login('a@b.c', 'pw')).rejects.toMatchObject({
+        code: 'auth.deletion_pending',
+      })
+      expect(store.user).toBeNull()
+      expect(store.isAuthenticated).toBe(false)
     })
 
     it('toggles isLoggingIn during the call', async () => {

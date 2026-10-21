@@ -36,6 +36,54 @@ export interface LoginRequest {
   email: string
   password: string
   mfa_code?: string
+  /**
+   * AH-104b-del: re-send the SAME credentials with this set after the server
+   * answered `auth.deletion_pending`, to restore an account that is scheduled
+   * for deletion. The server ignores it on any other account.
+   */
+  cancel_deletion?: boolean
+}
+
+/**
+ * The `meta` of an `auth.deletion_pending` (403) answer: right credentials on
+ * an account scheduled for deletion. Only ever returned AFTER the password and
+ * the second factor were verified.
+ */
+export interface DeletionPendingMeta {
+  /** ISO-8601 instant the account becomes permanently deleted. */
+  scheduledFor: string
+  /**
+   * How the second factor was satisfied on this request: `recovery_code` means
+   * that code is now spent and the restore step needs a different one.
+   */
+  mfaVia: 'none' | 'totp' | 'recovery_code'
+}
+
+/**
+ * `POST /api/v1/me/account-deletion` request body (AH-104b-del A3). Creators
+ * only. `mfa_code` is required when the account has two-factor sign-in.
+ */
+export interface AccountDeletionRequest {
+  password: string
+  mfa_code?: string
+  /** The tick on the consequences list. The typed word is a client-side gate and is not sent. */
+  acknowledged: true
+}
+
+/** The unwrapped 200 body of `POST /api/v1/me/account-deletion`. */
+export interface AccountDeletionResult {
+  /** ISO-8601. */
+  requestedAt: string
+  /** ISO-8601; fixed at request time, never recomputed. */
+  scheduledFor: string
+}
+
+/** The 200 envelope of `POST /api/v1/me/account-deletion`. */
+export interface AccountDeletionEnvelope {
+  data: {
+    type: 'account_deletion'
+    attributes: { requested_at: string; scheduled_for: string }
+  }
 }
 
 /** The native platform a creator-app token is minted for (`creator-app:{platform}`). */

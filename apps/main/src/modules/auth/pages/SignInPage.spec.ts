@@ -68,6 +68,20 @@ const CREATOR_USER_UNVERIFIED = {
   attributes: { ...CREATOR_USER.attributes, email_verified_at: null },
 }
 
+function pendingError(via?: 'totp' | 'recovery_code'): ApiError {
+  return new ApiError({
+    status: 403,
+    code: 'auth.deletion_pending',
+    message: 'This account is scheduled for deletion.',
+    details: [
+      {
+        code: 'auth.deletion_pending',
+        meta: { scheduled_for: '2026-11-04T09:30:00+00:00', ...(via ? { mfa_via: via } : {}) },
+      },
+    ],
+  })
+}
+
 describe('SignInPage', () => {
   let teardown: (() => void) | null = null
 
@@ -495,5 +509,191 @@ describe('SignInPage', () => {
     expect(h.wrapper.find('[data-test="sign-in-submit"]').text()).toContain('Signing in')
     resolveLogin(USER)
     await flushPromises()
+  })
+})
+
+describe('SignInPage — account scheduled for deletion (AH-104b-del)', () => {
+  let teardown: (() => void) | null = null
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    // clearAllMocks keeps queued once-values; a leftover would answer the next test's first call.
+    vi.mocked(authApi.login).mockReset()
+  })
+
+  afterEach(() => {
+    teardown?.()
+    teardown = null
+  })
+
+  async function fill(h: Awaited<ReturnType<typeof mountAuthPage>>): Promise<void> {
+    await h.wrapper.find('input[type="email"]').setValue('a@b.c')
+    await h.wrapper.find('input[type="password"]').setValue('Pa$$w0rd!12')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+  }
+
+  it('swaps the form for the restore step, with the date, once the credentials were right', async () => {
+    vi.mocked(authApi.login).mockRejectedValueOnce(pendingError())
+    const h = await mountAuthPage(SignInPage)
+    teardown = h.unmount
+
+    await fill(h)
+
+    expect(h.wrapper.find('[data-test="sign-in-heading"]').text()).toBe(
+      'Your account is scheduled for deletion',
+    )
+    expect(h.wrapper.find('[data-test="sign-in-deletion-body"]').text()).toContain(
+      'November 4, 2026',
+    )
+    expect(h.wrapper.find('[data-test="sign-in-email"]').exists()).toBe(false)
+    expect(h.wrapper.find('[data-test="sign-in-password"]').exists()).toBe(false)
+    expect(h.wrapper.find('[data-test="sign-in-totp"]').exists()).toBe(false)
+    expect(h.wrapper.find('[data-test="sign-in-submit"]').text()).toBe('Restore my account')
+    expect(h.wrapper.find('[data-test="sign-in-error"]').text()).toBe('')
+    // Nothing signed in: the first answer carried no session.
+    expect(authApi.login).toHaveBeenCalledTimes(1)
+    expect(authApi.login).toHaveBeenCalledWith({ email: 'a@b.c', password: 'Pa$$w0rd!12' })
+  })
+
+  it('restore re-sends the same credentials with cancel_deletion and then signs in', async () => {
+    vi.mocked(authApi.login)
+      .mockRejectedValueOnce(pendingError())
+      .mockResolvedValueOnce(CREATOR_USER)
+    const h = await mountAuthPage(SignInPage)
+    teardown = h.unmount
+    const pushSpy = vi.spyOn(h.router, 'push')
+    await fill(h)
+
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(authApi.login).toHaveBeenLastCalledWith({
+      email: 'a@b.c',
+      password: 'Pa$$w0rd!12',
+      cancel_deletion: true,
+    })
+    expect(pushSpy).toHaveBeenCalledWith({ name: 'onboarding.welcome-back' })
+  })
+
+  it('an authenticator-code account restores with a fresh code and shows the hint', async () => {
+    vi.mocked(authApi.login)
+      .mockRejectedValueOnce(
+        new ApiError({ status: 403, code: 'auth.mfa_required', message: 'no.' }),
+      )
+      .mockRejectedValueOnce(pendingError('totp'))
+      .mockResolvedValueOnce(CREATOR_USER)
+    const h = await mountAuthPage(SignInPage)
+    teardown = h.unmount
+    await fill(h)
+    await h.wrapper.find('[data-test="sign-in-totp"] input').setValue('123456')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(h.wrapper.find('[data-test="sign-in-deletion-hint"]').text()).toBe(
+      'Confirm with a code from your authenticator app.',
+    )
+    expect(h.wrapper.find('[data-test="sign-in-totp"]').exists()).toBe(true)
+
+    await h.wrapper.find('[data-test="sign-in-totp"] input').setValue('654321')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(authApi.login).toHaveBeenLastCalledWith({
+      email: 'a@b.c',
+      password: 'Pa$$w0rd!12',
+      mfa_code: '654321',
+      cancel_deletion: true,
+    })
+  })
+
+  it('a recovery-code sign-in clears the spent code and asks for another', async () => {
+    vi.mocked(authApi.login)
+      .mockRejectedValueOnce(
+        new ApiError({ status: 403, code: 'auth.mfa_required', message: 'no.' }),
+      )
+      .mockRejectedValueOnce(pendingError('recovery_code'))
+      .mockResolvedValueOnce(CREATOR_USER)
+    const h = await mountAuthPage(SignInPage)
+    teardown = h.unmount
+    await fill(h)
+    await h.wrapper.find('[data-test="sign-in-totp"] input').setValue('ABCD-EFGH')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    const field = h.wrapper.find('[data-test="sign-in-totp"] input')
+    expect(field.exists()).toBe(true)
+    expect((field.element as HTMLInputElement).value).toBe('')
+    expect(h.wrapper.find('[data-test="sign-in-deletion-hint"]').text()).toContain('now used up')
+
+    await field.setValue('IJKL-MNOP')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(authApi.login).toHaveBeenLastCalledWith({
+      email: 'a@b.c',
+      password: 'Pa$$w0rd!12',
+      mfa_code: 'IJKL-MNOP',
+      cancel_deletion: true,
+    })
+  })
+
+  it('"Not now" returns to an empty sign-in form and sends nothing', async () => {
+    vi.mocked(authApi.login).mockRejectedValueOnce(pendingError())
+    const h = await mountAuthPage(SignInPage)
+    teardown = h.unmount
+    await fill(h)
+
+    await h.wrapper.find('[data-test="sign-in-deletion-leave"]').trigger('click')
+    await flushPromises()
+
+    expect(authApi.login).toHaveBeenCalledTimes(1)
+    expect(h.wrapper.find('[data-test="sign-in-heading"]').text()).toBe('Sign in')
+    expect(h.wrapper.find('[data-test="sign-in-deletion-body"]').exists()).toBe(false)
+    const password = h.wrapper.find('input[type="password"]').element as HTMLInputElement
+    expect(password.value).toBe('')
+    expect(h.wrapper.find('[data-test="sign-in-submit"]').text()).toBe('Sign in')
+  })
+
+  it('a failed restore keeps the restore step and shows the error in the usual region', async () => {
+    vi.mocked(authApi.login)
+      .mockRejectedValueOnce(pendingError())
+      .mockRejectedValueOnce(
+        new ApiError({ status: 403, code: 'auth.invalid_credentials', message: 'no.' }),
+      )
+    const h = await mountAuthPage(SignInPage)
+    teardown = h.unmount
+    await fill(h)
+
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(h.wrapper.find('[data-test="sign-in-deletion-body"]').exists()).toBe(true)
+    expect(h.wrapper.find('[data-test="sign-in-error"]').text()).not.toBe('')
+  })
+
+  it('an ordinary wrong password never shows the restore step', async () => {
+    vi.mocked(authApi.login).mockRejectedValueOnce(
+      new ApiError({ status: 401, code: 'auth.invalid_credentials', message: 'no.' }),
+    )
+    const h = await mountAuthPage(SignInPage)
+    teardown = h.unmount
+
+    await fill(h)
+
+    expect(h.wrapper.find('[data-test="sign-in-deletion-body"]').exists()).toBe(false)
+    expect(h.wrapper.find('[data-test="sign-in-heading"]').text()).toBe('Sign in')
+  })
+
+  it('an auth.deletion_pending with no usable date is not rendered as a restore step', async () => {
+    vi.mocked(authApi.login).mockRejectedValueOnce(
+      new ApiError({ status: 403, code: 'auth.deletion_pending', message: 'x' }),
+    )
+    const h = await mountAuthPage(SignInPage)
+    teardown = h.unmount
+
+    await fill(h)
+
+    expect(h.wrapper.find('[data-test="sign-in-deletion-body"]').exists()).toBe(false)
   })
 })

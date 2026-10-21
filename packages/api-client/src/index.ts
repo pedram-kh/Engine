@@ -14,7 +14,13 @@
  */
 
 export { createAuthApi, type AuthApi, type AuthVariant, type CreateAuthApiOptions } from './auth'
-export { ApiError, extractFieldErrors, type ApiErrorDetail, type ApiErrorOptions } from './errors'
+export {
+  ApiError,
+  deletionPendingMeta,
+  extractFieldErrors,
+  type ApiErrorDetail,
+  type ApiErrorOptions,
+} from './errors'
 export {
   createHttpClient,
   type CreateHttpClientOptions,

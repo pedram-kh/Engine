@@ -68,6 +68,20 @@ const CREATOR = {
   },
 }
 
+function pendingError(via?: 'totp' | 'recovery_code'): ApiError {
+  return new ApiError({
+    status: 403,
+    code: 'auth.deletion_pending',
+    message: 'This account is scheduled for deletion.',
+    details: [
+      {
+        code: 'auth.deletion_pending',
+        meta: { scheduled_for: '2026-11-04T09:30:00+00:00', ...(via ? { mfa_via: via } : {}) },
+      },
+    ],
+  })
+}
+
 const WEB_SIGN_IN = 'https://platform.catalyst-growth.com/sign-in'
 
 function wrongSpa(): ApiError {
@@ -457,5 +471,74 @@ describe('SignInPage — web polarity of the native branches', () => {
     expect(h.wrapper.find('[data-test="sign-in-password"]').classes()).not.toContain(
       'v-input--error',
     )
+  })
+})
+
+describe('SignInPage — creator app, account scheduled for deletion (AH-104b-del)', () => {
+  let teardown: (() => void) | null = null
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.mocked(authApi.tokenLogin).mockReset()
+    platform.native = true
+  })
+
+  afterEach(() => {
+    teardown?.()
+    teardown = null
+  })
+
+  it('shows the restore step in the sheet and restores through /auth/token with cancel_deletion', async () => {
+    vi.mocked(authApi.tokenLogin)
+      .mockRejectedValueOnce(pendingError())
+      .mockResolvedValueOnce({ user: CREATOR, token: 'tok-1', expiresAt: null })
+    const h = await mountAuthPage(SignInPage)
+    teardown = h.unmount
+    const pushSpy = vi.spyOn(h.router, 'push')
+    await h.wrapper.find('input[type="email"]').setValue('a@b.c')
+    await h.wrapper.find('input[type="password"]').setValue('Pa$$w0rd!12')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(h.wrapper.find('[data-test="sign-in-heading"]').text()).toBe(
+      'Your account is scheduled for deletion',
+    )
+    expect(h.wrapper.find('[data-test="sign-in-deletion-body"]').text()).toContain(
+      'November 4, 2026',
+    )
+    expect(h.wrapper.find('[data-test="sign-in-native-create-account"]').exists()).toBe(false)
+    // No token was stored by the first, refused, attempt.
+    expect(tokenStore.write).not.toHaveBeenCalled()
+
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(authApi.login).not.toHaveBeenCalled()
+    expect(authApi.tokenLogin).toHaveBeenLastCalledWith({
+      email: 'a@b.c',
+      password: 'Pa$$w0rd!12',
+      platform: 'ios',
+      cancel_deletion: true,
+    })
+    expect(tokenStore.write).toHaveBeenCalledWith('tok-1', null)
+    expect(pushSpy).toHaveBeenCalledWith({ name: 'onboarding.welcome-back' })
+  })
+
+  it('"Not now" puts the sheet back, with the sign-up pointer', async () => {
+    vi.mocked(authApi.tokenLogin).mockRejectedValueOnce(pendingError())
+    const h = await mountAuthPage(SignInPage)
+    teardown = h.unmount
+    await h.wrapper.find('input[type="email"]').setValue('a@b.c')
+    await h.wrapper.find('input[type="password"]').setValue('Pa$$w0rd!12')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    await h.wrapper.find('[data-test="sign-in-deletion-leave"]').trigger('click')
+    await flushPromises()
+
+    expect(h.wrapper.find('[data-test="sign-in-heading"]').text()).toBe('Sign in')
+    expect(h.wrapper.find('[data-test="sign-in-native-subtitle"]').exists()).toBe(true)
+    expect(h.wrapper.find('[data-test="sign-in-native-create-account"]').exists()).toBe(true)
+    expect(authApi.tokenLogin).toHaveBeenCalledTimes(1)
   })
 })

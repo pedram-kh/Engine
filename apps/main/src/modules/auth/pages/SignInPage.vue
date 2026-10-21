@@ -37,7 +37,7 @@
  * on `isNative` and styled by `signInNative.css`; the web markup is unchanged.
  */
 
-import { ApiError } from '@catalyst/api-client'
+import { ApiError, deletionPendingMeta, type DeletionPendingMeta } from '@catalyst/api-client'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router'
@@ -49,7 +49,7 @@ import { resolveErrorMessage } from '@/modules/auth/composables/useErrorMessage'
 import { loadMetaPixel } from '@/modules/auth/internal/metaPixel'
 import nativeMark from '@/modules/auth/assets/native-sign-in-mark.svg'
 
-const { t, te } = useI18n()
+const { t, te, locale } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const store = useAuthStore()
@@ -67,6 +67,27 @@ const totpCode = ref('')
  */
 const showTotpField = ref(false)
 
+/**
+ * AH-104b-del: the credentials were right but the account is scheduled for
+ * deletion. The backend answered `auth.deletion_pending` and opened no
+ * session; this page shows the restore step in place of the form. Kept
+ * page-local on purpose — nothing else needs it, and a store field would
+ * outlive the page.
+ */
+const pending = ref<DeletionPendingMeta | null>(null)
+const hintKey = ref<string | null>(null)
+
+const pendingDate = computed(() => {
+  if (pending.value === null) {
+    return ''
+  }
+  const date = new Date(pending.value.scheduledFor)
+  if (Number.isNaN(date.getTime())) {
+    return pending.value.scheduledFor
+  }
+  return new Intl.DateTimeFormat(locale.value, { dateStyle: 'long' }).format(date)
+})
+
 const errorKey = ref<string | null>(null)
 const errorValues = ref<Record<string, string | number>>({})
 
@@ -74,7 +95,7 @@ const isNative = isNativePlatform()
 
 /** The native sheet outlines the credential fields on a failed sign-in (frame 02b). */
 const credentialError = computed(
-  () => errorKey.value !== null && errorKey.value !== 'auth.mfa_required',
+  () => errorKey.value !== null && errorKey.value !== 'auth.mfa_required' && pending.value === null,
 )
 
 /**
@@ -146,9 +167,12 @@ onMounted(() => {
   }
 })
 
-const submitLabel = computed(() =>
-  isLoggingIn.value ? t('auth.ui.loading.logging_in') : t('auth.ui.actions.sign_in'),
-)
+const submitLabel = computed(() => {
+  if (pending.value !== null) {
+    return isLoggingIn.value ? t('auth.ui.deletion.restoring') : t('auth.ui.deletion.restore')
+  }
+  return isLoggingIn.value ? t('auth.ui.loading.logging_in') : t('auth.ui.actions.sign_in')
+})
 
 /**
  * Resolve the post-login navigation target.
@@ -218,9 +242,27 @@ async function onSubmit(): Promise<void> {
   errorKey.value = null
   errorValues.value = {}
   try {
-    await store.login(email.value, password.value, showTotpField.value ? totpCode.value : undefined)
+    await store.login(
+      email.value,
+      password.value,
+      showTotpField.value ? totpCode.value : undefined,
+      pending.value !== null,
+    )
     await router.push(postLoginTarget())
   } catch (err) {
+    const meta = deletionPendingMeta(err)
+    if (meta !== null && pending.value === null) {
+      pending.value = meta
+      if (meta.mfaVia === 'recovery_code') {
+        // The recovery code just spent is burned; the restore needs a fresh one.
+        totpCode.value = ''
+        showTotpField.value = true
+        hintKey.value = 'auth.ui.deletion.code_again'
+      } else if (meta.mfaVia === 'totp') {
+        hintKey.value = 'auth.ui.deletion.code_hint'
+      }
+      return
+    }
     if (err instanceof ApiError && err.code === 'auth.mfa_required') {
       // Reveal the TOTP field and keep the rest of the form intact.
       showTotpField.value = true
@@ -238,6 +280,17 @@ async function onSubmit(): Promise<void> {
       errorKey.value = 'auth.ui.native.wrong_door'
     }
   }
+}
+
+/** "Not now": back to an empty form; nothing was changed server-side. */
+function leaveRestore(): void {
+  pending.value = null
+  hintKey.value = null
+  errorKey.value = null
+  errorValues.value = {}
+  password.value = ''
+  totpCode.value = ''
+  showTotpField.value = false
 }
 </script>
 
@@ -257,10 +310,14 @@ async function onSubmit(): Promise<void> {
     />
 
     <h2 :class="isNative ? 'sign-in-native__title' : 'text-h5 mb-4'" data-test="sign-in-heading">
-      {{ t(headingKey) }}
+      {{ pending !== null ? t('auth.ui.deletion.title') : t(headingKey) }}
     </h2>
 
-    <p v-if="isNative" class="sign-in-native__subtitle" data-test="sign-in-native-subtitle">
+    <p
+      v-if="isNative && pending === null"
+      class="sign-in-native__subtitle"
+      data-test="sign-in-native-subtitle"
+    >
       {{ t('auth.ui.native.sign_in_subtitle') }}
     </p>
 
@@ -275,10 +332,20 @@ async function onSubmit(): Promise<void> {
     </v-alert>
 
     <form novalidate @submit.prevent="onSubmit">
-      <label v-if="isNative" for="sign-in-email" class="sign-in-native__label">
+      <p
+        v-if="pending !== null"
+        class="text-body-1 mb-4"
+        :class="{ 'sign-in-native__subtitle': isNative }"
+        data-test="sign-in-deletion-body"
+      >
+        {{ t('auth.ui.deletion.body', { date: pendingDate }) }}
+      </p>
+
+      <label v-if="isNative && pending === null" for="sign-in-email" class="sign-in-native__label">
         {{ t('auth.ui.labels.email') }}
       </label>
       <v-text-field
+        v-if="pending === null"
         id="sign-in-email"
         v-model="email"
         :label="isNative ? undefined : t('auth.ui.labels.email')"
@@ -291,7 +358,7 @@ async function onSubmit(): Promise<void> {
         data-test="sign-in-email"
       />
 
-      <div v-if="isNative" class="sign-in-native__label-row">
+      <div v-if="isNative && pending === null" class="sign-in-native__label-row">
         <label for="sign-in-password" class="sign-in-native__label">
           {{ t('auth.ui.labels.password') }}
         </label>
@@ -305,6 +372,7 @@ async function onSubmit(): Promise<void> {
         </router-link>
       </div>
       <v-text-field
+        v-if="pending === null"
         id="sign-in-password"
         v-model="password"
         :label="isNative ? undefined : t('auth.ui.labels.password')"
@@ -333,6 +401,13 @@ async function onSubmit(): Promise<void> {
         required
         data-test="sign-in-totp"
       />
+      <p
+        v-if="pending !== null && hintKey !== null"
+        class="text-body-2 mb-2"
+        data-test="sign-in-deletion-hint"
+      >
+        {{ t(hintKey) }}
+      </p>
 
       <div
         role="alert"
@@ -361,9 +436,21 @@ async function onSubmit(): Promise<void> {
       >
         {{ submitLabel }}
       </v-btn>
+      <v-btn
+        v-if="pending !== null"
+        variant="text"
+        block
+        class="mt-2"
+        :size="isNative ? 'large' : undefined"
+        :disabled="isLoggingIn"
+        data-test="sign-in-deletion-leave"
+        @click="leaveRestore"
+      >
+        {{ t('auth.ui.deletion.leave') }}
+      </v-btn>
     </form>
 
-    <div v-if="!isNative" class="mt-4 d-flex justify-space-between text-body-2">
+    <div v-if="!isNative && pending === null" class="mt-4 d-flex justify-space-between text-body-2">
       <!-- AH-086 D2: the agency variant has no signup flow of any kind —
            agencies are Catalyst-created. This link is the creator-signup
            funnel and does not appear here. -->
@@ -384,7 +471,7 @@ async function onSubmit(): Promise<void> {
          is store-sensitive; the pointer line stays. The button returns with real
          in-app sign-up (AH-104d). -->
     <i18n-t
-      v-if="isNative"
+      v-if="isNative && pending === null"
       keypath="auth.ui.native.create_account"
       tag="p"
       class="sign-in-native__pointer"
