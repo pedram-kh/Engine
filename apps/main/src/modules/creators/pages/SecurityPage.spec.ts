@@ -224,6 +224,69 @@ describe.each([
     expect(submit(wrapper).attributes('disabled')).toBeDefined()
   })
 
+  it('keeps the button disabled when ONLY the tick is missing, or is taken back', async () => {
+    const { wrapper } = await mountPage({ native })
+
+    await fill(wrapper, { password: 'Pa$$w0rd!12', word: 'DELETE' })
+    expect(submit(wrapper).attributes('disabled')).toBeDefined() // everything but the tick
+
+    await fill(wrapper, { ack: true })
+    expect(submit(wrapper).attributes('disabled')).toBeUndefined()
+
+    await fill(wrapper, { ack: false })
+    expect(submit(wrapper).attributes('disabled')).toBeDefined()
+  })
+
+  it('sends ONE request while one is in flight (the button is disabled, a second click does nothing)', async () => {
+    let settle: (value: { requestedAt: string; scheduledFor: string }) => void = () => undefined
+    mocked.requestAccountDeletion.mockReturnValue(
+      new Promise((resolve) => {
+        settle = resolve
+      }),
+    )
+    const { wrapper } = await mountPage({ native })
+    await fill(wrapper, { ack: true, password: 'Pa$$w0rd!12', word: 'DELETE' })
+
+    await submit(wrapper).trigger('click')
+    await flushPromises()
+    expect(submit(wrapper).attributes('disabled')).toBeDefined()
+    await submit(wrapper).trigger('click')
+    await flushPromises()
+
+    expect(mocked.requestAccountDeletion).toHaveBeenCalledTimes(1)
+    settle({ requestedAt: '2026-10-21T10:00:00+00:00', scheduledFor: SCHEDULED })
+    await flushPromises()
+  })
+
+  it('a reopened dialog starts clean: the password typed before is gone', async () => {
+    const { wrapper } = await mountPage({ native })
+    await wrapper.find('[data-test="security-delete-open"]').trigger('click')
+    await fill(wrapper, { ack: true, password: 'Pa$$w0rd!12', word: 'DELETE' })
+    expect((field(wrapper, 'password').element as HTMLInputElement).value).toBe('Pa$$w0rd!12')
+
+    await wrapper.find('[data-test="delete-account-cancel"]').trigger('click')
+    await flushPromises()
+    await wrapper.find('[data-test="security-delete-open"]').trigger('click')
+    await flushPromises()
+
+    expect((field(wrapper, 'password').element as HTMLInputElement).value).toBe('')
+    expect((field(wrapper, 'word').element as HTMLInputElement).value).toBe('')
+    expect(submit(wrapper).attributes('disabled')).toBeDefined()
+  })
+
+  it("403 account_deletion.not_available: shown in the reader's language through the error mapper", async () => {
+    mocked.requestAccountDeletion.mockRejectedValue(apiError(403, 'account_deletion.not_available'))
+    const { wrapper } = await mountPage({ native })
+    await fill(wrapper, { ack: true, password: 'Pa$$w0rd!12', word: 'DELETE' })
+
+    await submit(wrapper).trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('[data-test="delete-account-error"]').text()).toBe(
+      enCreator.account_deletion.not_available,
+    )
+  })
+
   it('asks for the 2FA code ONLY when two-factor is enrolled', async () => {
     const plain = await mountPage({ native, twoFactor: false })
     expect(plain.wrapper.find('[data-test="delete-account-code"]').exists()).toBe(false)

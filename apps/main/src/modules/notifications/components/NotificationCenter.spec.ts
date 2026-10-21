@@ -578,8 +578,8 @@ describe('NotificationCenter — localized render per live type', () => {
     it('an unknown reason is shown as the free text it is', async () => {
       const wrapper = await mountCancelled({ ...erasedBag, reason: 'Budget was pulled.' })
 
-      expect(wrapper.find('[data-test="notification-detail"]').text()).toContain(
-        'Budget was pulled.',
+      expect(wrapper.find('[data-test="notification-detail"]').text()).toBe(
+        'Reason: Budget was pulled.',
       )
       wrapper.unmount()
     })
