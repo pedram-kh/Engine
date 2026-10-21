@@ -40,6 +40,7 @@ function emailGuardAllowlist(): array
         'app/Console/Commands/SendMessageDigests.php' => 'Digest — its own `digest` channel, opt-in (default OFF), selected upstream by that channel.',
         'app/Modules/Identity/Services/SignUpService.php' => 'Transactional: email verification at sign-up. No type; the recipient has no account yet.',
         'app/Modules/Identity/Services/PasswordResetService.php' => 'Transactional: password reset. Security-critical, must always arrive.',
+        'app/Modules/Identity/Listeners/SendAccountDeletionRequestedMail.php' => 'Account-lifecycle security notice (AH-104b-del): the confirmation that deletion was requested, with the date and what to do if it was not them. Must always arrive; no NotificationType, so no preference exists.',
         'app/Modules/Agencies/Services/AgencyInvitationService.php' => 'Invites a person who may have no account (and so no preferences) to join an agency.',
         'app/Modules/Admin/Http/Controllers/AdminAgencyMemberController.php' => 'Admin-initiated agency-member invite/reset. Account lifecycle, no type.',
         'app/Modules/Creators/Services/BulkInviteService.php' => 'Admin bulk invite of people who may have no account. No type.',
