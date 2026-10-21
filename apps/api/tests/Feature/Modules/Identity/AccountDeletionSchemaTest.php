@@ -98,6 +98,7 @@ it('writes no data: the migration file touches schema only', function (): void {
 
 it('registers the flag, default OFF, and round-trips it', function (): void {
     expect(AccountDeletionEnabled::NAME)->toBe('account_deletion_enabled')
+        ->and(Feature::defined())->toContain(AccountDeletionEnabled::NAME)
         ->and(Feature::active(AccountDeletionEnabled::NAME))->toBeFalse();
 
     Feature::activate(AccountDeletionEnabled::NAME);
