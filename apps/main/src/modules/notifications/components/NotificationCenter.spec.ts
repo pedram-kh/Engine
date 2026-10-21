@@ -318,7 +318,7 @@ describe('NotificationCenter — feed render + interactions', () => {
 
     it('an unknown (deferred / future) type marks read and stays', async () => {
       const { wrapper, router } = await clickFirstRow([
-        makeRow('assignment.cancelled', { assignment_ulid: ASSIGNMENT }),
+        makeRow('assignment.declined', { assignment_ulid: ASSIGNMENT }),
       ])
 
       expect(router.currentRoute.value.fullPath).toBe('/')
@@ -535,6 +535,79 @@ describe('NotificationCenter — localized render per live type', () => {
       'Insufficient portfolio depth.',
     )
     wrapper.unmount()
+  })
+
+  // AH-104b-del (B6) — the agency's "creator account erased" cancellation notice.
+  describe('assignment.cancelled (the erased-creator notice)', () => {
+    const CAMPAIGN_ULID = '01J9ZK3Q8M5T7WXYCAMPAGNAAA'
+    const erasedBag = {
+      campaign_name: 'Spring Launch',
+      campaign_ulid: CAMPAIGN_ULID,
+      assignment_ulid: '01J9ZK3Q8M5T7WXYABCDEFGHJK',
+      reason: 'creator_account_erased',
+      is_erased: true,
+    }
+
+    async function mountCancelled(data: Record<string, unknown>) {
+      vi.mocked(notificationsApi.list).mockResolvedValue(
+        feed([makeRow('assignment.cancelled', data)]) as never,
+      )
+      const wrapper = mountCenter({ variant: 'page' })
+      await flushPromises()
+      return wrapper
+    }
+
+    it('renders its own body (not the generic fallback) with the campaign name', async () => {
+      const wrapper = await mountCancelled(erasedBag)
+
+      const body = wrapper.find('[data-test="notification-body"]').text()
+      expect(body).toBe('An assignment on Spring Launch was cancelled.')
+      expect(body).not.toBe(enNotifications.notifications.types.fallback)
+      wrapper.unmount()
+    })
+
+    it('shows the reason CODE through i18n, never the raw code', async () => {
+      const wrapper = await mountCancelled(erasedBag)
+
+      const detail = wrapper.find('[data-test="notification-detail"]').text()
+      expect(detail).toContain(enNotifications.notifications.center.reasons.creator_account_erased)
+      expect(detail).not.toContain('creator_account_erased')
+      wrapper.unmount()
+    })
+
+    it('an unknown reason is shown as the free text it is', async () => {
+      const wrapper = await mountCancelled({ ...erasedBag, reason: 'Budget was pulled.' })
+
+      expect(wrapper.find('[data-test="notification-detail"]').text()).toContain(
+        'Budget was pulled.',
+      )
+      wrapper.unmount()
+    })
+
+    it('names no creator anywhere on the row', async () => {
+      const wrapper = await mountCancelled(erasedBag)
+
+      expect(wrapper.text()).not.toContain('{')
+      expect(wrapper.text()).not.toMatch(/undefined|null/u)
+      wrapper.unmount()
+    })
+
+    it('a tap opens the campaign on its creators tab', async () => {
+      vi.mocked(notificationsApi.list).mockResolvedValue(
+        feed([makeRow('assignment.cancelled', erasedBag)]) as never,
+      )
+      vi.mocked(notificationsApi.markRead).mockResolvedValue({} as never)
+      const wrapper = mountCenter({ variant: 'dropdown', poll: makePoll() })
+      await flushPromises()
+
+      await wrapper.find('[data-test~="notification-row"]').trigger('click')
+      await flushPromises()
+
+      expect(wrapper.vm.$router.currentRoute.value.fullPath).toBe(
+        `/campaigns/${CAMPAIGN_ULID}?tab=creators`,
+      )
+      wrapper.unmount()
+    })
   })
 })
 

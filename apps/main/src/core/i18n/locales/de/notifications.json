@@ -10,7 +10,10 @@
       "unreadBadgeLabel": "{count} ungelesene Benachrichtigungen",
       "feedbackLabel": "Feedback",
       "reasonLabel": "Grund",
-      "round": "Entwurf {n}"
+      "round": "Entwurf {n}",
+      "reasons": {
+        "creator_account_erased": "Der Creator hat sein Konto gelöscht."
+      }
     },
     "page": {
       "title": "Benachrichtigungen",
@@ -26,6 +29,7 @@
       "assignment_live_verified": "Dein Post für {campaign_name} wurde verifiziert.",
       "assignment_draft_submitted": "{creator_name} hat einen Entwurf für {campaign_name} eingereicht.",
       "assignment_contracted": "{creator_name} hat den Vertrag für {campaign_name} akzeptiert.",
+      "assignment_cancelled": "Eine Zuweisung für {campaign_name} wurde storniert.",
       "creator_approved": "Dein Creator-Konto wurde genehmigt.",
       "creator_rejected": "Deine Creator-Bewerbung wurde nicht genehmigt.",
       "message_received_by_creator": "{sender_name} hat dir eine Nachricht zu {campaign_name} gesendet.",

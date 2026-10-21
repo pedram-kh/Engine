@@ -10,7 +10,10 @@
       "unreadBadgeLabel": "{count} unread notifications",
       "feedbackLabel": "Feedback",
       "reasonLabel": "Reason",
-      "round": "Чернова {n}"
+      "round": "Чернова {n}",
+      "reasons": {
+        "creator_account_erased": "Създателят изтри акаунта си."
+      }
     },
     "page": {
       "title": "Известия",
@@ -26,6 +29,7 @@
       "assignment_live_verified": "Вашата публикация за {campaign_name} е потвърдена.",
       "assignment_draft_submitted": "{creator_name} submitted a draft for {campaign_name}.",
       "assignment_contracted": "{creator_name} accepted the contract for {campaign_name}.",
+      "assignment_cancelled": "Възлагане по {campaign_name} беше отменено.",
       "creator_approved": "Your creator account has been approved.",
       "creator_rejected": "Your creator application was not approved.",
       "message_received_by_creator": "{sender_name} sent you a message about {campaign_name}.",

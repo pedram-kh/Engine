@@ -10,7 +10,10 @@
       "unreadBadgeLabel": "{count} nepřečtených oznámení",
       "feedbackLabel": "Zpětná vazba",
       "reasonLabel": "Razlog",
-      "round": "Nacrt {n}"
+      "round": "Nacrt {n}",
+      "reasons": {
+        "creator_account_erased": "Kreator je izbrisao svoj račun."
+      }
     },
     "page": {
       "title": "Obavijesti",
@@ -26,6 +29,7 @@
       "assignment_live_verified": "Vaša objava za {campaign_name} je provjerena.",
       "assignment_draft_submitted": "{creator_name} odeslal nacrt pro {campaign_name}.",
       "assignment_contracted": "{creator_name} přijal smlouvu pro {campaign_name}.",
+      "assignment_cancelled": "Dodjela za {campaign_name} je otkazana.",
       "creator_approved": "Váš účet ustvarjalca byl schválen.",
       "creator_rejected": "Vaše prijava ustvarjalca nebyla schválena.",
       "message_received_by_creator": "{sender_name} vám poslal zprávu ohledně {campaign_name}.",

@@ -8,6 +8,8 @@ import {
   NOTIFICATION_FALLBACK_KEY,
   hasLiveTemplate,
   liveNotificationTypes,
+  notificationDestination,
+  notificationRecipient,
   notificationTemplateKey,
   PREFERENCE_CHANNEL_ORDER,
   preferenceColumns,
@@ -41,7 +43,7 @@ const DEFERRED_WITHOUT_EMITTER = [
   'assignment.declined',
   'assignment.countered',
   'assignment.accepted',
-  'assignment.cancelled',
+  // `assignment.cancelled` went live (AH-104b-del B6: the erased-creator notice).
   'assignment.payment_funded',
   'assignment.payment_released',
 ] as const
@@ -514,5 +516,43 @@ describe('AH-102 push column registry', () => {
 
   it('pins the native-only set to exactly `push` (a new native-only channel is a deliberate edit)', () => {
     expect([...NATIVE_ONLY_CHANNELS]).toEqual(['push'])
+  })
+})
+
+describe('assignment.cancelled — the erased-creator notice (AH-104b-del B6)', () => {
+  it('is live, with its own template (not the fallback)', () => {
+    expect(hasLiveTemplate('assignment.cancelled')).toBe(true)
+    expect(notificationTemplateKey('assignment.cancelled')).toBe(
+      'notifications.types.assignment_cancelled',
+    )
+    expect(translationFor('notifications.types.assignment_cancelled')).toContain('{campaign_name}')
+  })
+
+  it('reaches the agency only, and is always-on (no toggle for either role, no push cell)', () => {
+    expect(notificationRecipient('assignment.cancelled')).toBe('agency')
+    for (const role of ['creator', 'agency'] as const) {
+      const types = preferenceGroupsForRole(role, { includeNativeOnly: true }).flatMap((g) =>
+        g.types.map((t) => t.type),
+      )
+      expect(types).not.toContain('assignment.cancelled')
+    }
+  })
+
+  it('opens the campaign on its creators tab', () => {
+    expect(notificationDestination('assignment.cancelled')).toEqual({
+      kind: 'route',
+      name: 'campaigns.detail',
+      params: { ulid: 'campaign_ulid' },
+      query: { tab: 'creators' },
+    })
+  })
+
+  it('the reason code has a localised line, and the template names no creator', () => {
+    expect(
+      (enNotifications.notifications.center as Record<string, unknown>).reasons,
+    ).toHaveProperty('creator_account_erased')
+    expect(translationFor('notifications.types.assignment_cancelled')).not.toContain(
+      '{creator_name}',
+    )
   })
 })

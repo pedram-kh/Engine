@@ -73,6 +73,9 @@ const lastPage = ref(1)
 
 const hasRows = computed(() => rows.value.length > 0)
 
+/** Reason codes the system writes (a stored code, not prose): each has a localised line. */
+const KNOWN_REASON_CODES: ReadonlySet<string> = new Set(['creator_account_erased'])
+
 function bodyText(row: NotificationResource): string {
   const key = notificationTemplateKey(row.attributes.notification_type)
   // Pass the row's `data` bag as named-interpolation params. Each template
@@ -113,6 +116,14 @@ function detailText(row: NotificationResource): { label: string; text: string } 
   }
   if (typeof data.rejection_reason === 'string' && data.rejection_reason !== '') {
     return { label: t('notifications.center.reasonLabel'), text: data.rejection_reason }
+  }
+  // AH-104b-del (B6): a cancellation's stored `reason`. The system's fixed code is rendered
+  // in the reader's language, never as the code; any other value is the free text it is.
+  if (typeof data.reason === 'string' && data.reason !== '') {
+    const text = KNOWN_REASON_CODES.has(data.reason)
+      ? t(`notifications.center.reasons.${data.reason}`)
+      : data.reason
+    return { label: t('notifications.center.reasonLabel'), text }
   }
   return null
 }

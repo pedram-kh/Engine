@@ -10,7 +10,10 @@
       "unreadBadgeLabel": "{count} unread notifications",
       "feedbackLabel": "Feedback",
       "reasonLabel": "Reason",
-      "round": "Melnraksts {n}"
+      "round": "Melnraksts {n}",
+      "reasons": {
+        "creator_account_erased": "Satura veidotājs dzēsa savu kontu."
+      }
     },
     "page": {
       "title": "Paziņojumi",
@@ -26,6 +29,7 @@
       "assignment_live_verified": "Jūsu ieraksts kampaņai {campaign_name} ir apstiprināts.",
       "assignment_draft_submitted": "{creator_name} submitted a draft for {campaign_name}.",
       "assignment_contracted": "{creator_name} accepted the contract for {campaign_name}.",
+      "assignment_cancelled": "Uzdevums kampaņā {campaign_name} tika atcelts.",
       "creator_approved": "Your creator account has been approved.",
       "creator_rejected": "Your creator application was not approved.",
       "message_received_by_creator": "{sender_name} sent you a message about {campaign_name}.",

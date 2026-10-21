@@ -10,7 +10,10 @@
       "unreadBadgeLabel": "{count} nepřečtených oznámení",
       "feedbackLabel": "Zpětná vazba",
       "reasonLabel": "Razlog",
-      "round": "Osnutek {n}"
+      "round": "Osnutek {n}",
+      "reasons": {
+        "creator_account_erased": "Ustvarjalec je izbrisal svoj račun."
+      }
     },
     "page": {
       "title": "Obvestila",
@@ -26,6 +29,7 @@
       "assignment_live_verified": "Vaša objava za {campaign_name} je preverjena.",
       "assignment_draft_submitted": "{creator_name} odeslal osnutek pro {campaign_name}.",
       "assignment_contracted": "{creator_name} přijal smlouvu pro {campaign_name}.",
+      "assignment_cancelled": "Dodelitev pri {campaign_name} je bila preklicana.",
       "creator_approved": "Váš účet ustvarjalca byl schválen.",
       "creator_rejected": "Vaše prijava ustvarjalca nebyla schválena.",
       "message_received_by_creator": "{sender_name} vám poslal zprávu ohledně {campaign_name}.",

@@ -234,6 +234,18 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
     destination: campaignTab('creators'),
     preference: { group: 'assignment', channels: IN_APP_ONLY },
   },
+  // AH-104b-del (B6) — the agency learns an assignment ended because the creator's account
+  // was erased (the only cancellation that notifies: every other is the agency's own act).
+  // Agency-only, in-app only (push-ineligible, no mail). ALWAYS-ON (`preference: null`):
+  // work the agency was counting on ended without anyone on their side acting, so it is
+  // not something to silence. The row carries NO creator name (`is_erased: true` instead,
+  // the person is gone); the stored `reason` code renders through i18n in the center.
+  'assignment.cancelled': {
+    templateKey: 'notifications.types.assignment_cancelled',
+    recipient: 'agency',
+    destination: campaignTab('creators'),
+    preference: null,
+  },
   // Creator review/lifecycle rows — only creators receive these.
   'assignment.revision_requested': {
     templateKey: 'notifications.types.assignment_revision_requested',

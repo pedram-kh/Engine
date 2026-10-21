@@ -10,7 +10,10 @@
       "unreadBadgeLabel": "{count} unread notifications",
       "feedbackLabel": "Feedback",
       "reasonLabel": "Reason",
-      "round": "Luonnos {n}"
+      "round": "Luonnos {n}",
+      "reasons": {
+        "creator_account_erased": "Sisällöntuottaja poisti tilinsä."
+      }
     },
     "page": {
       "title": "Ilmoitukset",
@@ -26,6 +29,7 @@
       "assignment_live_verified": "Julkaisusi kampanjaan {campaign_name} on vahvistettu.",
       "assignment_draft_submitted": "{creator_name} submitted a draft for {campaign_name}.",
       "assignment_contracted": "{creator_name} accepted the contract for {campaign_name}.",
+      "assignment_cancelled": "Toimeksianto kampanjassa {campaign_name} peruttiin.",
       "creator_approved": "Your creator account has been approved.",
       "creator_rejected": "Your creator application was not approved.",
       "message_received_by_creator": "{sender_name} sent you a message about {campaign_name}.",

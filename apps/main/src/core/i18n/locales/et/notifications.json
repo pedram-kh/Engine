@@ -10,7 +10,10 @@
       "unreadBadgeLabel": "{count} unread notifications",
       "feedbackLabel": "Feedback",
       "reasonLabel": "Reason",
-      "round": "Mustand {n}"
+      "round": "Mustand {n}",
+      "reasons": {
+        "creator_account_erased": "Sisulooja kustutas oma konto."
+      }
     },
     "page": {
       "title": "Teavitused",
@@ -26,6 +29,7 @@
       "assignment_live_verified": "Teie postitus kampaaniale {campaign_name} on kinnitatud.",
       "assignment_draft_submitted": "{creator_name} submitted a draft for {campaign_name}.",
       "assignment_contracted": "{creator_name} accepted the contract for {campaign_name}.",
+      "assignment_cancelled": "Määramine kampaanias {campaign_name} tühistati.",
       "creator_approved": "Your creator account has been approved.",
       "creator_rejected": "Your creator application was not approved.",
       "message_received_by_creator": "{sender_name} sent you a message about {campaign_name}.",

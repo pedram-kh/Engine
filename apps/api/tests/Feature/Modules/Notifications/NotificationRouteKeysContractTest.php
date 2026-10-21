@@ -76,6 +76,7 @@ function rkDriverTypes(): array
         'assignment.live_verified',
         'assignment.draft_submitted',
         'assignment.contracted',
+        'assignment.cancelled',
         'message.received_by_creator',
         'message.received_by_agency',
         'message.relationship_received_by_creator',
@@ -216,6 +217,18 @@ function rkDrivers(): array
         'assignment.live_verified' => $listenerCreator(AuditAction::AssignmentLiveVerified),
         'assignment.draft_submitted' => $listenerAgency(AuditAction::AssignmentDraftSubmitted),
         'assignment.contracted' => $listenerAgency(AuditAction::AssignmentContracted),
+
+        // AH-104b-del: the erased-creator cancellation (the system's fixed reason, no acting user).
+        'assignment.cancelled' => static function (mixed $t): array {
+            $w = rkListenerWorld();
+            $w['assignment']->forceFill([
+                'cancelled_reason' => CampaignAssignment::CANCELLED_REASON_CREATOR_ERASED,
+                'cancelled_by_user_id' => null,
+            ])->save();
+            rkFire($w['assignment'], AuditAction::AssignmentCancelled);
+
+            return ['campaign_ulid' => $w['campaign']->ulid];
+        },
 
         // The real HTTP routes — the same ones MessageNotificationTest drives.
         'message.received_by_creator' => function (mixed $t): array {

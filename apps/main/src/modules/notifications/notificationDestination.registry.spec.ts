@@ -82,7 +82,7 @@ describe('registry ⇄ contract parity', () => {
   )
 
   it('an unknown type has no destination', () => {
-    expect(notificationDestination('assignment.cancelled')).toBeNull()
+    expect(notificationDestination('assignment.declined')).toBeNull()
     expect(notificationDestination('nonsense')).toBeNull()
   })
 })

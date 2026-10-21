@@ -368,7 +368,7 @@ describe('the real chain: observed device payload → parse → resolve → push
     for (const data of [
       undefined,
       'nope',
-      { type: 'assignment.cancelled', assignment_ulid: ASSIGNMENT },
+      { type: 'assignment.declined', assignment_ulid: ASSIGNMENT },
       { type: 'assignment.invited', assignment_ulid: '01SPIKEASSIGN' },
     ]) {
       const { handler, push } = chain()

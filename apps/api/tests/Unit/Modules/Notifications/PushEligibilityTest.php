@@ -61,6 +61,7 @@ it('every NOT-eligible type is out — agency-only, live_verified, application.r
         // agency-only recipients — no agency app, no token
         NotificationType::AssignmentDraftSubmitted,
         NotificationType::AssignmentContracted,
+        NotificationType::AssignmentCancelled, // AH-104b-del: live, agency-only, in-app only
         NotificationType::MessageReceivedByAgency,
         NotificationType::MessageRelationshipReceivedByAgency,
         NotificationType::CampaignApplicationSubmitted,
@@ -68,7 +69,6 @@ it('every NOT-eligible type is out — agency-only, live_verified, application.r
         NotificationType::AssignmentDeclined,
         NotificationType::AssignmentCountered,
         NotificationType::AssignmentAccepted,
-        NotificationType::AssignmentCancelled,
         NotificationType::AssignmentPaymentFunded,
         NotificationType::AssignmentPaymentReleased,
     ];

@@ -27,6 +27,7 @@
     "agency_creator_relation.disconnected": { "bag": [], "push": [] },
     "assignment.draft_submitted": { "bag": ["campaign_ulid"], "push": [] },
     "assignment.contracted": { "bag": ["campaign_ulid"], "push": [] },
+    "assignment.cancelled": { "bag": ["campaign_ulid"], "push": [] },
     "message.received_by_agency": { "bag": ["campaign_ulid"], "push": [] },
     "message.relationship_received_by_agency": { "bag": ["thread_ulid"], "push": [] },
     "campaign_application.submitted": { "bag": ["campaign_ulid"], "push": [] }

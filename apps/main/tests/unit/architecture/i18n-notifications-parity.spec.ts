@@ -77,6 +77,8 @@ const LIVE_TYPES = [
   'assignment.live_verified',
   'assignment.draft_submitted',
   'assignment.contracted',
+  // AH-104b-del (B6) — the agency's "creator account erased" cancellation notice.
+  'assignment.cancelled',
   'creator.approved',
   'creator.rejected',
   'message.received_by_creator',
@@ -105,7 +107,6 @@ const EMIT_LESS_TYPES = [
   'assignment.declined',
   'assignment.countered',
   'assignment.accepted',
-  'assignment.cancelled',
   'assignment.payment_funded',
   'assignment.payment_released',
 ] as const
@@ -153,13 +154,14 @@ describe('i18n notifications.* — en/pt/it parity + only-8-templated invariant'
     }
   })
 
-  it('notifications.types holds EXACTLY the 21 live templates + fallback', async () => {
+  it('notifications.types holds EXACTLY the 22 live templates + fallback', async () => {
     const en = await loadBundle('en')
     const typeKeys = Object.keys(en.notifications.types).sort()
 
     const expected = [
       'agency_creator_relation_admin_connected',
       'agency_creator_relation_disconnected',
+      'assignment_cancelled',
       'assignment_completed_on_approval',
       'assignment_contracted',
       'assignment_draft_approved',
@@ -239,6 +241,9 @@ describe('notifications prefs role-partition — single live-set source of truth
   const ALWAYS_ON_TYPES: readonly string[] = [
     'agency_creator_relation.admin_connected',
     'agency_creator_relation.disconnected',
+    // AH-104b-del (B6) — work the agency counted on ended without anyone on their side
+    // acting; an in-app notice only (no mail, no push), not something to silence.
+    'assignment.cancelled',
   ]
 
   it('creator + agency prefs types partition the TOGGLEABLE live types exactly (disjoint, complete)', () => {

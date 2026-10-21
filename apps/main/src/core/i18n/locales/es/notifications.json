@@ -10,7 +10,10 @@
       "unreadBadgeLabel": "{count} notificaciones sin leer",
       "feedbackLabel": "Comentarios",
       "reasonLabel": "Motivo",
-      "round": "Borrador {n}"
+      "round": "Borrador {n}",
+      "reasons": {
+        "creator_account_erased": "El creador eliminó su cuenta."
+      }
     },
     "page": {
       "title": "Notificaciones",
@@ -26,6 +29,7 @@
       "assignment_live_verified": "Tu publicación para {campaign_name} ha sido verificada.",
       "assignment_draft_submitted": "{creator_name} ha enviado un borrador para {campaign_name}.",
       "assignment_contracted": "{creator_name} ha aceptado el contrato para {campaign_name}.",
+      "assignment_cancelled": "Se ha cancelado una asignación en {campaign_name}.",
       "creator_approved": "Tu cuenta de creador se ha aprobado.",
       "creator_rejected": "Tu solicitud de creador no se ha aprobado.",
       "message_received_by_creator": "{sender_name} te ha enviado un mensaje sobre {campaign_name}.",

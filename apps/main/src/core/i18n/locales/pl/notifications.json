@@ -10,7 +10,10 @@
       "unreadBadgeLabel": "{count} nieprzeczytanych powiadomień",
       "feedbackLabel": "Uwagi",
       "reasonLabel": "Powód",
-      "round": "Szkic {n}"
+      "round": "Szkic {n}",
+      "reasons": {
+        "creator_account_erased": "Twórca usunął swoje konto."
+      }
     },
     "page": {
       "title": "Powiadomienia",
@@ -26,6 +29,7 @@
       "assignment_live_verified": "Twój post dla {campaign_name} został zweryfikowany.",
       "assignment_draft_submitted": "{creator_name} przesłał szkic dla {campaign_name}.",
       "assignment_contracted": "{creator_name} zaakceptował umowę dla {campaign_name}.",
+      "assignment_cancelled": "Przydział w kampanii {campaign_name} został anulowany.",
       "creator_approved": "Twoje konto twórcy zostało zatwierdzone.",
       "creator_rejected": "Twoja aplikacja twórcy nie została zatwierdzona.",
       "message_received_by_creator": "{sender_name} wysłał Ci wiadomość dotyczącą {campaign_name}.",

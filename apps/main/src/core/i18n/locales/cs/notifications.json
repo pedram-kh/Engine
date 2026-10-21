@@ -10,7 +10,10 @@
       "unreadBadgeLabel": "{count} nepřečtených oznámení",
       "feedbackLabel": "Zpětná vazba",
       "reasonLabel": "Důvod",
-      "round": "Návrh {n}"
+      "round": "Návrh {n}",
+      "reasons": {
+        "creator_account_erased": "Tvůrce smazal svůj účet."
+      }
     },
     "page": {
       "title": "Oznámení",
@@ -26,6 +29,7 @@
       "assignment_live_verified": "Váš příspěvek pro {campaign_name} byl ověřen.",
       "assignment_draft_submitted": "{creator_name} odeslal návrh pro {campaign_name}.",
       "assignment_contracted": "{creator_name} přijal smlouvu pro {campaign_name}.",
+      "assignment_cancelled": "Přiřazení ke kampani {campaign_name} bylo zrušeno.",
       "creator_approved": "Váš účet tvůrce byl schválen.",
       "creator_rejected": "Vaše přihláška tvůrce nebyla schválena.",
       "message_received_by_creator": "{sender_name} vám poslal zprávu ohledně {campaign_name}.",

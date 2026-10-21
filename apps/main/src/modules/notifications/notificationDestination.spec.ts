@@ -354,7 +354,7 @@ describe('resolveNotificationDestination', () => {
   it('an unknown type → the fallback (AH-102 behaviour; never an error)', async () => {
     expect(
       await resolveNotificationDestination(
-        { type: 'assignment.cancelled', ids: { assignment_ulid: ASSIGNMENT } },
+        { type: 'assignment.declined', ids: { assignment_ulid: ASSIGNMENT } },
         deps(),
       ),
     ).toEqual({ kind: 'fallback' })
