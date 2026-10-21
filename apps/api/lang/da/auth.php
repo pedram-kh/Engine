@@ -41,7 +41,7 @@ return [
     ],
 
     'signup' => [
-        'email_taken' => 'En konto med denne e-mailadresse eksisterer allerede.',
+        'email_taken' => 'Der findes allerede en konto med denne e-mailadresse. Log ind for at bruge den, eller nulstil din adgangskode. Hvis du har bedt om at få kontoen slettet, kan du gendanne den ved at logge ind.',
     ],
 
     'mfa' => [

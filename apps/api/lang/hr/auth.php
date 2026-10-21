@@ -41,7 +41,7 @@ return [
     ],
 
     'signup' => [
-        'email_taken' => 'Račun s ovom adresom e-pošte već postoji.',
+        'email_taken' => 'Račun s ovom adresom e-pošte već postoji. Prijavite se kako biste ga koristili ili poništite lozinku. Ako ste zatražili brisanje ovog računa, prijavom ga možete vratiti.',
     ],
 
     'mfa' => [

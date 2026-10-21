@@ -41,7 +41,7 @@ return [
     ],
 
     'signup' => [
-        'email_taken' => 'Účet s touto e-mailovou adresou už existuje.',
+        'email_taken' => 'Účet s touto e-mailovou adresou už existuje. Prihláste sa a používajte ho, alebo si obnovte heslo. Ak ste požiadali o zmazanie tohto účtu, prihlásením ho môžete obnoviť.',
     ],
 
     'mfa' => [

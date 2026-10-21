@@ -37,7 +37,7 @@ return [
         'already_verified' => 'Tämä sähköpostiosoite on jo vahvistettu.',
     ],
     'signup' => [
-        'email_taken' => 'Tili tällä sähköpostiosoitteella on jo olemassa.',
+        'email_taken' => 'Tili tällä sähköpostiosoitteella on jo olemassa. Kirjaudu sisään käyttääksesi sitä tai nollaa salasanasi. Jos pyysit tämän tilin poistamista, voit palauttaa sen kirjautumalla sisään.',
     ],
     'mfa' => [
         'invalid_code' => 'Kaksivaiheinen koodi on virheellinen. Yritä uudelleen.',

@@ -41,7 +41,7 @@ return [
     ],
 
     'signup' => [
-        'email_taken' => 'Já existe uma conta com este endereço de e-mail.',
+        'email_taken' => 'Já existe uma conta com este endereço de e-mail. Inicie sessão para a usar ou redefina a sua palavra-passe. Se pediu a eliminação desta conta, iniciar sessão permite restaurá-la.',
     ],
 
     'mfa' => [

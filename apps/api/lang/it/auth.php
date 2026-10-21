@@ -41,7 +41,7 @@ return [
     ],
 
     'signup' => [
-        'email_taken' => 'Esiste già un account con questo indirizzo email.',
+        'email_taken' => 'Esiste già un account con questo indirizzo email. Accedi per usarlo oppure reimposta la password. Se hai chiesto l\'eliminazione di questo account, accedendo puoi ripristinarlo.',
     ],
 
     'mfa' => [

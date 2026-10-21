@@ -37,7 +37,7 @@ return [
         'already_verified' => 'Ez az e-mail cím már meg van erősítve.',
     ],
     'signup' => [
-        'email_taken' => 'Már létezik fiók ezzel az e-mail címmel.',
+        'email_taken' => 'Már létezik fiók ezzel az e-mail címmel. Jelentkezz be a használatához, vagy állítsd vissza a jelszavadat. Ha kérted a fiók törlését, bejelentkezéssel visszaállíthatod.',
     ],
     'mfa' => [
         'invalid_code' => 'A kétfaktoros kód érvénytelen. Próbálja újra.',

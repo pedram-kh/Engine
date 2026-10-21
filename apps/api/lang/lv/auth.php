@@ -37,7 +37,7 @@ return [
         'already_verified' => 'Šī e-pasta adrese jau ir apstiprināta.',
     ],
     'signup' => [
-        'email_taken' => 'Konts ar šo e-pasta adresi jau pastāv.',
+        'email_taken' => 'Konts ar šo e-pasta adresi jau pastāv. Piesakieties, lai to izmantotu, vai atiestatiet paroli. Ja esat lūdzis dzēst šo kontu, pieteikšanās ļauj to atjaunot.',
     ],
     'mfa' => [
         'invalid_code' => 'Divfaktoru kods ir nederīgs. Mēģiniet vēlreiz.',

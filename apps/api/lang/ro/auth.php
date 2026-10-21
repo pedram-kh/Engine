@@ -37,7 +37,7 @@ return [
         'already_verified' => 'Această adresă de email a fost deja verificată.',
     ],
     'signup' => [
-        'email_taken' => 'Un cont cu această adresă de email există deja.',
+        'email_taken' => 'Un cont cu această adresă de email există deja. Autentifică-te pentru a-l folosi sau resetează-ți parola. Dacă ai cerut ștergerea acestui cont, autentificarea îți permite să îl restaurezi.',
     ],
     'mfa' => [
         'invalid_code' => 'Codul cu doi factori este invalid. Încercați din nou.',

@@ -37,7 +37,7 @@ return [
         'already_verified' => 'Šis el. pašto adresas jau patvirtintas.',
     ],
     'signup' => [
-        'email_taken' => 'Paskyra su šiuo el. pašto adresu jau egzistuoja.',
+        'email_taken' => 'Paskyra su šiuo el. pašto adresu jau egzistuoja. Prisijunkite, kad ja naudotumėte, arba atkurkite slaptažodį. Jei prašėte ištrinti šią paskyrą, prisijungę galite ją atkurti.',
     ],
     'mfa' => [
         'invalid_code' => 'Dviejų veiksnių kodas yra netinkamas. Bandykite dar kartą.',

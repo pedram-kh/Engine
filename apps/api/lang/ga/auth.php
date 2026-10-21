@@ -37,7 +37,7 @@ return [
         'already_verified' => 'Deimhníodh an seoladh ríomhphoist seo cheana féin.',
     ],
     'signup' => [
-        'email_taken' => 'Tá cuntas leis an seoladh ríomhphoist seo ann cheana féin.',
+        'email_taken' => 'Tá cuntas leis an seoladh ríomhphoist seo ann cheana féin. Sínigh isteach chun é a úsáid, nó athshocraigh do phasfhocal. Má d\'iarr tú go scriosfaí an cuntas seo, is féidir leat é a athchóiríú trí shíniú isteach.',
     ],
     'mfa' => [
         'invalid_code' => 'Tá cód dhá fhachtóir neamhbhailí. Bain triail as arís.',

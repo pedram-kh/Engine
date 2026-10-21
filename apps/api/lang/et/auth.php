@@ -37,7 +37,7 @@ return [
         'already_verified' => 'See e-posti aadress on juba kinnitatud.',
     ],
     'signup' => [
-        'email_taken' => 'Selle e-posti aadressiga konto on juba olemas.',
+        'email_taken' => 'Selle e-posti aadressiga konto on juba olemas. Logi sisse, et seda kasutada, või lähtesta oma parool. Kui palusid selle konto kustutada, saad selle sisselogimisel taastada.',
     ],
     'mfa' => [
         'invalid_code' => 'Kahefaktoriline kood on kehtetu. Proovige uuesti.',

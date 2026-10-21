@@ -37,7 +37,7 @@ return [
         'already_verified' => 'Dan l-indirizz tal-email ġie vverifikat diġà.',
     ],
     'signup' => [
-        'email_taken' => 'Kont b\'dan l-indirizz tal-email diġà jeżisti.',
+        'email_taken' => 'Diġà teżisti kont b\'dan l-indirizz tal-email. Idħol biex tużah, jew irrisettja l-password tiegħek. Jekk talabt li dan il-kont jitħassar, meta tidħol tista\' terġa\' tirrestawrah.',
     ],
     'mfa' => [
         'invalid_code' => 'Il-kodiċi ta\' żewġ fatturi huwa invalidu. Erġa\' pprova.',

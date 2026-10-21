@@ -41,7 +41,7 @@ return [
     ],
 
     'signup' => [
-        'email_taken' => 'Račun s tem e-naslovom že obstaja.',
+        'email_taken' => 'Račun s tem e-naslovom že obstaja. Prijavite se, da ga uporabite, ali ponastavite geslo. Če ste zahtevali izbris tega računa, ga lahko s prijavo obnovite.',
     ],
 
     'mfa' => [
