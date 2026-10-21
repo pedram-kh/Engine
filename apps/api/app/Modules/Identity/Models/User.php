@@ -52,6 +52,8 @@ use Laravel\Sanctum\HasApiTokens;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ * @property Carbon|null $deletion_requested_at AH-104b-del: when the creator asked for deletion; null = no request pending
+ * @property Carbon|null $deletion_scheduled_for AH-104b-del: the end of the 14-day grace, stored at request time
  * @property Carbon|null $erased_at AH-104a: set by the erasure engine only; the login block
  */
 final class User extends Authenticatable implements Auditable, MustVerifyEmail
@@ -234,6 +236,16 @@ final class User extends Authenticatable implements Auditable, MustVerifyEmail
         return $this->erased_at !== null;
     }
 
+    /**
+     * AH-104b-del: true while a deletion request is standing (inside the grace).
+     * An account that has been erased is NOT "pending": erasure supersedes it, and
+     * the two markers are never read together (see {@see isErased()}).
+     */
+    public function isDeletionPending(): bool
+    {
+        return $this->deletion_requested_at !== null && $this->erased_at === null;
+    }
+
     public function hasTwoFactorEnabled(): bool
     {
         return $this->two_factor_confirmed_at !== null;
@@ -285,6 +297,8 @@ final class User extends Authenticatable implements Auditable, MustVerifyEmail
             'is_suspended' => 'boolean',
             'suspended_at' => 'datetime',
             'erased_at' => 'datetime',
+            'deletion_requested_at' => 'datetime',
+            'deletion_scheduled_for' => 'datetime',
         ];
     }
 

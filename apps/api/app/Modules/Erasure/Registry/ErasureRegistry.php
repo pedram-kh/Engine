@@ -116,6 +116,7 @@ final class ErasureRegistry
                 ...self::anon('erased_at', AnonValue::Now, 'The marker: login block and the exclusion predicate for every fan-out.'),
                 ...self::keep('id,ulid,type,email_verified_at,preferred_language,preferred_currency,timezone,theme_preference,last_login_at,created_at,updated_at', 'Not identifying once the rest is gone; ulid is the pseudonymous key audit rows and URLs already hold (§3.1).'),
                 ...self::keep('is_suspended,suspended_reason,suspended_at,mfa_required,mfa_exempted_at,mfa_exemption_reason,two_factor_enrollment_suspended_at', 'Platform safety record by the deciding party (D-D).'),
+                ...self::keep('deletion_requested_at,deletion_scheduled_for', 'AH-104b-del: when the person asked, and when the grace ended. A timestamp, not identifying once the other columns are gone; the record that an erasure followed a request.'),
                 ...self::keep('deleted_at', 'Left null: a soft delete would put creator = null into agency pages. The marker is erased_at.'),
             ]),
             'sessions' => new TableRule(Disposition::EraseRow, 'Live credentials plus IP and UA (§3.1).', [], self::row(Disposition::EraseRow, 'id,user_id,ip_address,user_agent,payload,last_activity', 'Live credentials plus IP and UA.'), 'user_id = subject user'),

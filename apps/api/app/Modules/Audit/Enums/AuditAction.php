@@ -56,6 +56,10 @@ enum AuditAction: string
     // A new verb on purpose: the Audited trait already emits `user.deleted` for
     // any Eloquent delete of a User, and "erased" must never be mistaken for it.
     case AccountErased = 'account.erased';
+    // AH-104b-del: the creator's own request and its cancellation. The actor is the
+    // subject. Neither needs a reason (the person is acting on their own account).
+    case AccountDeletionRequested = 'account.deletion_requested';
+    case AccountDeletionCancelled = 'account.deletion_cancelled';
     case UserSuspended = 'user.suspended';
     case UserUnsuspended = 'user.unsuspended';
 

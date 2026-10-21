@@ -213,6 +213,9 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         'campaign_attachment.removed',
         // AH-104a — one row per completed account erasure run.
         'account.erased',
+        // AH-104b-del — the creator's own request and its cancellation.
+        'account.deletion_requested',
+        'account.deletion_cancelled',
     ];
 
     $actual = array_map(fn (AuditAction $case): string => $case->value, AuditAction::cases());

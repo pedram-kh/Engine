@@ -20,6 +20,7 @@ use App\Modules\Creators\Features\PostVerifiedMailEnabled;
 use App\Modules\Creators\Features\PushNotificationsEnabled;
 use App\Modules\Creators\Features\SocialVerificationEnabled;
 use App\Modules\Identity\Enums\UserType;
+use App\Modules\Identity\Features\AccountDeletionEnabled;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -104,6 +105,10 @@ final class AdminFeatureFlagController
         PushNotificationsEnabled::NAME => [
             'label' => 'Push notifications',
             'description' => 'Sends push notifications to creators\' devices. Gates sending only — device registration and in-app rows are unaffected. Do not arm until the FCM credential is set and `push:test --validate-only` has passed.',
+        ],
+        AccountDeletionEnabled::NAME => [
+            'label' => 'Account deletion (creator request)',
+            'description' => 'Lets a creator request deletion of their own account (the endpoint, the confirmation mail and the Security page entry). Off: no request can be made; a request already made stays pending and can still be cancelled by signing in. Do not arm before the Part A and Part B deploy, and before the build-3 walk has passed.',
         ],
     ];
 

@@ -18,6 +18,7 @@ use App\Modules\Identity\Events\TwoFactorRecoveryCodesRegenerated;
 use App\Modules\Identity\Events\UserLoggedIn;
 use App\Modules\Identity\Events\UserLoggedOut;
 use App\Modules\Identity\Events\UserSignedUp;
+use App\Modules\Identity\Features\AccountDeletionEnabled;
 use App\Modules\Identity\Guards\CreatorTokenGuard;
 use App\Modules\Identity\Listeners\WriteAuthAuditLog;
 use App\Modules\Identity\Services\PwnedPasswordsClient;
@@ -31,6 +32,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Pennant\Feature;
 
 final class IdentityServiceProvider extends ServiceProvider
 {
@@ -44,7 +46,16 @@ final class IdentityServiceProvider extends ServiceProvider
         $this->registerCreatorTokenGuard();
         $this->registerRateLimits();
         $this->registerEventListeners();
+        $this->registerFeatureFlags();
         $this->registerRoutes();
+    }
+
+    /**
+     * AH-104b-del: the creator's deletion request. Default OFF (docs/feature-flags.md).
+     */
+    private function registerFeatureFlags(): void
+    {
+        Feature::define(AccountDeletionEnabled::NAME, AccountDeletionEnabled::default());
     }
 
     /**

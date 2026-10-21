@@ -72,6 +72,13 @@ return [
     'frontend_admin_url' => (string) env('FRONTEND_ADMIN_URL', 'http://127.0.0.1:5174'),
 
     /*
+    | The address a person is told to write to (the account-deletion mail, AH-104b-del).
+    | ONE place in the API; the web app has its own single place (VITE_SUPPORT_EMAIL).
+    | An architecture spec forbids the literal anywhere else.
+    */
+    'support_email' => (string) env('SUPPORT_EMAIL', 'support@catalyst-growth.com'),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
