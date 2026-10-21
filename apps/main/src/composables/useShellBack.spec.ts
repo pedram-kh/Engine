@@ -45,6 +45,9 @@ describe('showsShellBack — which pages get the arrow', () => {
       'creator.notifications',
       'creator.notifications.preferences',
       'creator.profile',
+      // The Security page (AH-104b-del B4) draws no back control of its own, so the shell's arrow is the
+      // way out of it, as for the profile and availability pages.
+      'creator.security',
     ])
   })
 
