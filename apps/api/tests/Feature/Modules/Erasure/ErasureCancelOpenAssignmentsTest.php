@@ -217,10 +217,13 @@ it('stays quiet for every other cancellation: the agency\'s own act, and the fix
     $agency = cancelAgency();
     $own = cancelAssignment($agency, $a->creator->id, AssignmentStatus::Producing);
     $lookalike = cancelAssignment($agency, $a->creator->id, AssignmentStatus::Producing);
+    $bySystem = cancelAssignment($agency, $a->creator->id, AssignmentStatus::Producing);
     Notification::query()->delete();
 
     app(CampaignAssignmentStateMachine::class)->cancel($own, 'Brand pulled the campaign', $agency['admin']);
     app(CampaignAssignmentStateMachine::class)->cancel($lookalike, CREATOR_ERASED, $agency['manager']);
+    // No acting user either, but not the erasure's reason: some other system cancellation stays as quiet as it was.
+    app(CampaignAssignmentStateMachine::class)->cancel($bySystem, 'Campaign closed by the system', null);
 
     expect(Notification::query()->where('type', NotificationType::AssignmentCancelled)->count())->toBe(0);
 });
@@ -242,13 +245,38 @@ it('is repeatable: a second pass finds nothing left to cancel', function (): voi
 
 it('changes the digest when the count changes, so an approval of one state cannot run against another', function (): void {
     $a = ErasureGraph::seedSubject('a');
+    $open = cancelAssignment(cancelAgency(), $a->creator->id, AssignmentStatus::Producing);
+    $before = (new DryRun)->run(SubjectSet::resolve($a->user));
+
+    // The assignment finishes by itself: the number of assignments the subject has does not move, only the number that would be cancelled.
+    DB::table('campaign_assignments')->where('id', $open->id)->update(['status' => 'declined']);
+    $after = (new DryRun)->run(SubjectSet::resolve($a->user));
+
+    expect($after->subject)->toBe($before->subject)
+        ->and($after->counts()[Selections::CANCEL_ASSIGNMENTS])->toBe($before->counts()[Selections::CANCEL_ASSIGNMENTS] - 1)
+        ->and($after->digest())->not->toBe($before->digest());
+});
+
+it('skips an assignment that reached a terminal state after the selection, instead of failing the erasure', function (): void {
+    $a = ErasureGraph::seedSubject('a');
+    $agency = cancelAgency();
+    $first = cancelAssignment($agency, $a->creator->id, AssignmentStatus::Producing);
+    $second = cancelAssignment($agency, $a->creator->id, AssignmentStatus::Producing);
     $subject = SubjectSet::resolve($a->user);
-    $before = (new DryRun)->run($subject)->digest();
+    $planned = (new DryRun)->run($subject)->counts()[Selections::CANCEL_ASSIGNMENTS];
 
-    cancelAssignment(cancelAgency(), $a->creator->id, AssignmentStatus::Producing);
-    $after = (new DryRun)->run(SubjectSet::resolve($a->user))->digest();
+    // While the first one is being cancelled, someone finishes the second (the graph's own comes first by id).
+    Event::listen(AssignmentTransitioned::class, function (AssignmentTransitioned $event) use ($first, $second): void {
+        if ($event->assignment->id === $first->id) {
+            DB::table('campaign_assignments')->where('id', $second->id)->update(['status' => 'declined']);
+        }
+    });
 
-    expect($after)->not->toBe($before);
+    $cancelled = app(CancelOpenAssignments::class)->run($subject);
+
+    expect($cancelled)->toBe($planned - 1)
+        ->and(storedAssignment($second)['status'])->toBe('declined')
+        ->and(storedAssignment($second)['cancelled_reason'])->toBeNull();
 });
 
 it('runs inside the erasure: after the engine\'s writes, before the closing audit pass, and its count is in the ledger', function (): void {
