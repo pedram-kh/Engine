@@ -28,6 +28,7 @@ import { useI18n } from 'vue-i18n'
 
 import { campaignsApi } from '../api/campaigns.api'
 import OfferFieldsForm from './OfferFieldsForm.vue'
+import { creatorLabel } from '@/core/creators/creatorLabel'
 
 type FeeField = 'agreed_fee_minor_units' | 'agreed_fee_currency'
 
@@ -54,8 +55,8 @@ const refusal = ref<string | null>(null)
 const conflictPrompt = ref(false)
 
 const currency = computed(() => props.campaignCurrency ?? 'EUR')
-const creatorName = computed(
-  () => props.application?.attributes.creator?.display_name ?? t('app.campaigns.invite.unnamed'),
+const creatorName = computed(() =>
+  creatorLabel(props.application?.attributes.creator, t, t('app.campaigns.invite.unnamed')),
 )
 const note = computed(() => props.application?.attributes.note ?? null)
 const canSubmit = computed(() => offerValid.value && !submitting.value)
@@ -81,6 +82,10 @@ function close(): void {
  * of the four different things went wrong.
  */
 function refusalMessage(err: ApiError): string {
+  // AH-104b-del: the creator deleted their account (or asked to) while this was open.
+  if (err.code === 'creator.unavailable') {
+    return t('creator.unavailable')
+  }
   const code = (err.raw as { meta?: { code?: string } } | null)?.meta?.code
   const known = [
     'application.not_pending',

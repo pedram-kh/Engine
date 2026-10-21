@@ -17,6 +17,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import AddCreatorsToPoolDialog from '../components/AddCreatorsToPoolDialog.vue'
 import { talentPoolsApi } from '../api/talentPools.api'
+import { creatorAvatarUrl, creatorInitial, creatorLabel } from '@/core/creators/creatorLabel'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -94,7 +95,7 @@ async function removeMember(member: TalentPoolMemberResource): Promise<void> {
     const res = await talentPoolsApi.removeCreator(agencyId, ulid.value, member.id)
     pool.value = res.data
     snackbar.value = t('app.pools.detail.removed', {
-      name: member.attributes.display_name ?? t('app.pools.detail.unnamed'),
+      name: creatorLabel(member.attributes, t, t('app.pools.detail.unnamed')),
     })
     // Reload the current page (it may now have one fewer row).
     await loadMembers()
@@ -222,14 +223,17 @@ onMounted(() => {
         >
           <template #prepend>
             <v-avatar size="40" color="surface-variant">
-              <v-img v-if="member.attributes.avatar_url" :src="member.attributes.avatar_url" />
+              <v-img
+                v-if="creatorAvatarUrl(member.attributes)"
+                :src="creatorAvatarUrl(member.attributes) ?? undefined"
+              />
               <span v-else class="text-caption">
-                {{ (member.attributes.display_name ?? '?')[0]?.toUpperCase() }}
+                {{ creatorInitial(member.attributes) }}
               </span>
             </v-avatar>
           </template>
           <v-list-item-title>
-            {{ member.attributes.display_name ?? t('app.pools.detail.unnamed') }}
+            {{ creatorLabel(member.attributes, t, t('app.pools.detail.unnamed')) }}
             <!-- Blacklist badge (D-5): shows for BOTH hard + soft (informational
                  — warn-don't-remove). The status reflects THIS agency's own
                  blacklist of the member (the backend join is agency-scoped). -->

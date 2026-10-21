@@ -76,6 +76,8 @@ export interface BoardCardAssignmentData {
   creator: {
     id: string
     display_name: string | null
+    /** True once the account is deleted: the name is gone, render the localised label (AH-104b-del). */
+    is_erased?: boolean
     /** Single signed avatar for the card face; bounded (one page of cards). */
     avatar_url?: string | null
   } | null

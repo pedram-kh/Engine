@@ -37,6 +37,12 @@ import { useI18n } from 'vue-i18n'
 import { rosterApi } from '@/modules/roster/api/roster.api'
 import { campaignsApi } from '../api/campaigns.api'
 import OfferFieldsForm from './OfferFieldsForm.vue'
+import {
+  creatorAvatarAlt,
+  creatorAvatarUrl,
+  creatorInitial,
+  creatorLabel,
+} from '@/core/creators/creatorLabel'
 
 const props = defineProps<{
   modelValue: boolean
@@ -192,7 +198,7 @@ function toggleSelect(creatorId: string, row: RosterCreatorListItem): void {
 async function inviteOne(
   creatorId: string,
   acknowledged: boolean,
-): Promise<'ok' | 'blacklist' | 'conflict' | 'error'> {
+): Promise<'ok' | 'blacklist' | 'conflict' | 'unavailable' | 'error'> {
   const built = offer.value
   if (built === null) return 'error'
 
@@ -206,6 +212,9 @@ async function inviteOne(
   } catch (err) {
     if (err instanceof ApiError) {
       if (err.status === 409) return 'conflict'
+      // AH-104b-del: a deleted (or deletion-pending) creator is refused 422 with its own
+      // code. It is not a blacklist, and must not be counted or worded as one.
+      if (err.code === 'creator.unavailable') return 'unavailable'
       if (err.status === 422) return 'blacklist'
     }
     return 'error'
@@ -230,12 +239,14 @@ async function invite(): Promise<void> {
   const ids = [...selected.value]
   let ok = 0
   let blacklisted = 0
+  let unavailable = 0
   const conflicts: string[] = []
 
   for (const id of ids) {
     const outcome = await inviteOne(id, false)
     if (outcome === 'ok') ok++
     else if (outcome === 'blacklist') blacklisted++
+    else if (outcome === 'unavailable') unavailable++
     else if (outcome === 'conflict') conflicts.push(id)
   }
 
@@ -248,15 +259,17 @@ async function invite(): Promise<void> {
     // Carry the first-pass tallies into the summary the modal will finalise.
     pendingOk.value = ok
     pendingBlacklisted.value = blacklisted
+    pendingUnavailable.value = unavailable
     return
   }
 
-  finish(ok, blacklisted, 0)
+  finish(ok, blacklisted, 0, unavailable)
 }
 
 // Tallies carried from the first pass into the acknowledge step.
 const pendingOk = ref(0)
 const pendingBlacklisted = ref(0)
+const pendingUnavailable = ref(0)
 
 /** TIER 2 proceed — re-invite the conflicted creators with acknowledged:true. */
 async function proceedWithConflicts(): Promise<void> {
@@ -268,20 +281,33 @@ async function proceedWithConflicts(): Promise<void> {
     if (outcome === 'ok') ok++
   }
   submitting.value = false
-  finish(ok, pendingBlacklisted.value, 0)
+  finish(ok, pendingBlacklisted.value, 0, pendingUnavailable.value)
 }
 
 function cancelConflicts(): void {
   conflictPrompt.value = false
   // The conflicted creators were NOT invited; report what DID go through.
-  finish(pendingOk.value, pendingBlacklisted.value, conflictedIds.value.length)
+  finish(
+    pendingOk.value,
+    pendingBlacklisted.value,
+    conflictedIds.value.length,
+    pendingUnavailable.value,
+  )
 }
 
-function finish(ok: number, blacklisted: number, skippedConflicts: number): void {
-  emit(
-    'invited',
-    t('app.campaigns.invite.summary', { ok, blacklisted, conflicts: skippedConflicts }),
-  )
+function finish(
+  ok: number,
+  blacklisted: number,
+  skippedConflicts: number,
+  unavailable: number,
+): void {
+  const summary = t('app.campaigns.invite.summary', {
+    ok,
+    blacklisted,
+    conflicts: skippedConflicts,
+  })
+  // A deleted creator is neither "blacklisted" nor a "conflict": say what happened, once.
+  emit('invited', unavailable > 0 ? `${summary} ${t('creator.unavailable')}` : summary)
   emit('update:modelValue', false)
 }
 </script>
@@ -380,19 +406,19 @@ function finish(ok: number, blacklisted: number, skippedConflicts: number): void
                    avatar_url; the initial-letter avatar stays as fallback. -->
               <v-avatar size="40" color="surface-variant">
                 <v-img
-                  v-if="row.attributes.avatar_url"
-                  :src="row.attributes.avatar_url"
-                  :alt="row.attributes.display_name ?? ''"
+                  v-if="creatorAvatarUrl(row.attributes)"
+                  :src="creatorAvatarUrl(row.attributes) ?? undefined"
+                  :alt="creatorAvatarAlt(row.attributes)"
                   cover
                   :data-test="`invite-creators-avatar-${row.attributes.creator_id}`"
                 />
                 <span v-else class="text-caption">
-                  {{ (row.attributes.display_name ?? '?')[0]?.toUpperCase() }}
+                  {{ creatorInitial(row.attributes) }}
                 </span>
               </v-avatar>
             </template>
             <v-list-item-title>
-              {{ row.attributes.display_name ?? t('app.campaigns.invite.unnamed') }}
+              {{ creatorLabel(row.attributes, t, t('app.campaigns.invite.unnamed')) }}
               <BlacklistBadge
                 v-if="row.attributes.is_blacklisted"
                 :type="row.attributes.blacklist_type ?? 'hard'"

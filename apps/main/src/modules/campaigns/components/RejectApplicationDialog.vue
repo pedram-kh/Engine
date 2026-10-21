@@ -36,6 +36,7 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { campaignsApi } from '../api/campaigns.api'
+import { creatorLabel } from '@/core/creators/creatorLabel'
 
 const props = defineProps<{
   modelValue: boolean
@@ -56,8 +57,8 @@ const { t } = useI18n()
 
 const submitting = ref(false)
 
-const creatorName = computed(
-  () => props.application?.attributes.creator?.display_name ?? t('app.campaigns.invite.unnamed'),
+const creatorName = computed(() =>
+  creatorLabel(props.application?.attributes.creator, t, t('app.campaigns.invite.unnamed')),
 )
 
 /**

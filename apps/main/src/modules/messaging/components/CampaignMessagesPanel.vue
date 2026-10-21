@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 
 import { agencyChatTransport, messagingApi, type ChatTransport } from '../api/messaging.api'
 import ChatDialog from './ChatDialog.vue'
+import { creatorLabel } from '@/core/creators/creatorLabel'
 
 const props = defineProps<{
   agencyId: string
@@ -73,7 +74,7 @@ function openThread(row: MessageThreadRollupRow): void {
     props.campaignUlid,
     row.attributes.assignment_id,
   )
-  activeTitle.value = row.attributes.creator.display_name ?? t('app.messaging.title')
+  activeTitle.value = creatorLabel(row.attributes.creator, t, t('app.messaging.title'))
   dialogOpen.value = true
 }
 
@@ -119,7 +120,7 @@ onBeforeUnmount(() => {
         @click="openThread(row)"
       >
         <v-list-item-title>
-          {{ row.attributes.creator.display_name ?? t('app.messaging.participant') }}
+          {{ creatorLabel(row.attributes.creator, t, t('app.messaging.participant')) }}
         </v-list-item-title>
         <v-list-item-subtitle>
           {{ row.attributes.last_message_preview ?? t('app.messaging.rollup.noMessages') }}

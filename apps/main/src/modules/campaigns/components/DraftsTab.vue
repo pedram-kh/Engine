@@ -19,6 +19,7 @@ import { CEmptyState } from '@catalyst/ui'
 
 import { campaignsApi } from '../api/campaigns.api'
 import { roundStateColor, roundStateKey } from '../draftRounds'
+import { creatorLabel } from '@/core/creators/creatorLabel'
 
 type FilterValue = 'all' | DraftReviewStatus
 
@@ -199,7 +200,7 @@ defineExpose({
           rounded="lg"
         >
           <v-list-item-title class="d-flex align-center ga-2 flex-wrap">
-            {{ row.attributes.assignment?.creator?.display_name ?? '—' }}
+            {{ creatorLabel(row.attributes.assignment?.creator, t, '—') }}
             <v-chip
               size="x-small"
               variant="flat"

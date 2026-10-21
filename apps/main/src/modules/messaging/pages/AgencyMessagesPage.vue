@@ -23,6 +23,7 @@ import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { relationshipMessagingApi } from '../api/relationshipMessaging.api'
 import ContactPicker, { type ContactPickerItem } from '../components/ContactPicker.vue'
 import RelationshipInbox, { type RelationshipInboxItem } from '../components/RelationshipInbox.vue'
+import { creatorAvatarUrl, creatorLabel } from '@/core/creators/creatorLabel'
 
 const { t } = useI18n()
 const agencyStore = useAgencyStore()
@@ -54,7 +55,7 @@ const items = computed<RelationshipInboxItem[]>(() =>
     .filter((row) => row.attributes.creator.id !== null)
     .map((row) => {
       const creator = row.attributes.creator
-      const name = creator.display_name ?? t('app.messaging.participant')
+      const name = creatorLabel(creator, t, t('app.messaging.participant'))
       return {
         id: creator.id as string,
         title: name,
@@ -62,7 +63,7 @@ const items = computed<RelationshipInboxItem[]>(() =>
         lastMessageAt: row.attributes.last_message_at,
         unreadCount: row.attributes.unread_count,
         avatarText: name,
-        avatarUrl: creator.avatar_url,
+        avatarUrl: creatorAvatarUrl(creator),
         to: {
           name: 'messages.thread',
           params: { creatorUlid: creator.id as string },
@@ -125,12 +126,12 @@ let searchTimer: ReturnType<typeof setTimeout> | null = null
 
 const pickerItems = computed<ContactPickerItem[]>(() =>
   creators.value.map((row) => {
-    const name = row.attributes.display_name ?? t('app.messaging.participant')
+    const name = creatorLabel(row.attributes, t, t('app.messaging.participant'))
     return {
       id: row.id,
       title: name,
       avatarText: name,
-      avatarUrl: row.attributes.avatar_url,
+      avatarUrl: creatorAvatarUrl(row.attributes),
       to: {
         name: 'messages.thread',
         params: { creatorUlid: row.id },

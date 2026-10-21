@@ -25,6 +25,7 @@ import {
   relationshipMessagingApi,
 } from '../api/relationshipMessaging.api'
 import RelationshipThreadView from '../components/RelationshipThreadView.vue'
+import { creatorAvatarUrl, creatorLabel } from '@/core/creators/creatorLabel'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -50,14 +51,16 @@ const transport = computed(() => {
   return agencyRelationshipTransport(agencyId, creatorUlid.value)
 })
 
-const title = computed(
-  () =>
-    resolvedRow.value?.attributes.creator.display_name ??
-    (nameHint.value || t('app.messaging.relationship.inboxTitle')),
+const title = computed(() =>
+  creatorLabel(
+    resolvedRow.value?.attributes.creator,
+    t,
+    nameHint.value || t('app.messaging.relationship.inboxTitle'),
+  ),
 )
 
 // AH-013 — the signed creator avatar for the thread header (null → initials).
-const avatarUrl = computed(() => resolvedRow.value?.attributes.creator.avatar_url ?? null)
+const avatarUrl = computed(() => creatorAvatarUrl(resolvedRow.value?.attributes.creator))
 
 // Clearing FIRST matters: until the new row lands, the header falls back to the
 // `?name=` hint (correct name, initials) instead of showing the previous

@@ -49,6 +49,7 @@ import BlacklistCreatorDialog from '@/modules/roster/components/BlacklistCreator
 import StarRatingInput from '@/modules/roster/components/StarRatingInput.vue'
 
 import CreatorAvatar from './CreatorAvatar.vue'
+import { creatorAvatarUrl, creatorLabel } from '@/core/creators/creatorLabel'
 
 const props = withDefaults(
   defineProps<{
@@ -84,15 +85,11 @@ const thinProfile = computed<CreatorPublicProfile | null>(() =>
 )
 
 // ── Normalized fields — the shape both payloads share (profile + socials) ──
-const displayName = computed(
-  () =>
-    fullCreator.value?.display_name ??
-    thinProfile.value?.attributes.display_name ??
-    t('app.roster.detail.unnamed'),
-)
-const avatarUrl = computed(
-  () => fullCreator.value?.avatar_url ?? thinProfile.value?.attributes.avatar_url ?? null,
-)
+// Exactly one of the two payloads is present; the shared guard turns it into the label and
+// avatar (a deleted creator reads "Deleted creator" and never draws a photo).
+const identity = computed(() => fullCreator.value ?? thinProfile.value?.attributes ?? null)
+const displayName = computed(() => creatorLabel(identity.value, t, t('app.roster.detail.unnamed')))
+const avatarUrl = computed(() => creatorAvatarUrl(identity.value))
 const bio = computed(() => fullCreator.value?.bio ?? thinProfile.value?.attributes.bio ?? null)
 const countryCode = computed(
   () => fullCreator.value?.country_code ?? thinProfile.value?.attributes.country_code ?? null,

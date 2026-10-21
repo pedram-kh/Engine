@@ -48,6 +48,7 @@ import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { COUNTRY_OPTIONS } from '@/modules/onboarding/data/countries'
 
 import { discoveryApi } from '../api/discovery.api'
+import { creatorAvatarUrl, creatorLabel } from '@/core/creators/creatorLabel'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -75,11 +76,11 @@ const connectionState = computed<DiscoveryConnectionState>(() =>
   deriveConnectionState(attrs.value?.relationship_status ?? null),
 )
 
-const displayName = computed(() => attrs.value?.display_name ?? t('app.discover.unnamed'))
+const displayName = computed(() => creatorLabel(attrs.value, t, t('app.discover.unnamed')))
 
 // Signed avatar for the header (short-lived, re-minted per page load). Null when
 // the creator never uploaded one — CreatorAvatar falls back to the initial.
-const avatarUrl = computed(() => attrs.value?.avatar_url ?? null)
+const avatarUrl = computed(() => creatorAvatarUrl(attrs.value))
 
 // Profile completeness (the same profile_completeness_score the creator sees on
 // their dashboard) surfaced read-only to the agency. The score→colour rule

@@ -238,6 +238,16 @@ describe('CreatorRosterPage (Sprint 4 Chunk 5)', () => {
     expect(harness.wrapper.find(`[data-test="roster-view-${row.id}"]`).exists()).toBe(false)
   })
 
+  it('shows "Deleted creator" in the name cell for an erased creator', async () => {
+    const row = makeRow({ display_name: 'Leaked Name', is_erased: true })
+    const harness = await mountRoster({ rows: [row], realTable: true })
+    cleanup = harness.cleanup
+
+    const nameEl = harness.wrapper.find(`[data-test="roster-name-${row.id}"]`)
+    expect(nameEl.text()).toBe('Deleted creator')
+    expect(harness.wrapper.text()).not.toContain('Leaked Name')
+  })
+
   it('distinguishes a hard blacklist from a soft one in the list chip', async () => {
     const hard = makeRow({ is_blacklisted: true, blacklist_type: 'hard' })
     const soft = {

@@ -41,6 +41,12 @@ import {
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { COUNTRY_OPTIONS } from '@/modules/onboarding/data/countries'
 import { discoveryApi } from '../api/discovery.api'
+import {
+  creatorAvatarAlt,
+  creatorAvatarUrl,
+  creatorInitial,
+  creatorLabel,
+} from '@/core/creators/creatorLabel'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -138,10 +144,6 @@ function languageLabel(code: string | null, accent?: string | null): string | nu
   if (code === null) return null
   const label = languageEndonym(code)
   return accent != null && accent !== '' ? `${label} · ${accent}` : label
-}
-
-function avatarInitial(name: string | null): string {
-  return (name ?? '?').trim().charAt(0).toUpperCase() || '?'
 }
 
 // The three annotation states (Sprint 6.6b, D-5/D-11), derived from the
@@ -364,15 +366,15 @@ function openProfile(item: DiscoveryCreatorListItem): void {
                  falling back to a tinted initial when no avatar is set. -->
             <div class="discover-card__hero">
               <v-img
-                v-if="item.attributes.avatar_url"
-                :src="item.attributes.avatar_url"
-                :alt="item.attributes.display_name ?? ''"
+                v-if="creatorAvatarUrl(item.attributes)"
+                :src="creatorAvatarUrl(item.attributes) ?? undefined"
+                :alt="creatorAvatarAlt(item.attributes)"
                 cover
                 class="discover-card__img"
               />
               <div v-else class="discover-card__fallback">
                 <span class="discover-card__initial text-medium-emphasis">{{
-                  avatarInitial(item.attributes.display_name)
+                  creatorInitial(item.attributes)
                 }}</span>
               </div>
             </div>
@@ -383,7 +385,7 @@ function openProfile(item: DiscoveryCreatorListItem): void {
                   class="discover-card__name font-weight-bold text-truncate"
                   :data-test="`discover-name-${item.id}`"
                 >
-                  {{ item.attributes.display_name ?? t('app.discover.unnamed') }}
+                  {{ creatorLabel(item.attributes, t, t('app.discover.unnamed')) }}
                 </span>
                 <!-- Connected → a verified-style check by the name (the
                      concept's badge position); the footer chip carries the

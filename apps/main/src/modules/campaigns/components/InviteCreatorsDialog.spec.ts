@@ -12,6 +12,7 @@
  * mocked.
  */
 
+import { ApiError } from '@catalyst/api-client'
 import type { RosterCreatorListItem, RosterListResponse } from '@catalyst/api-client'
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -21,6 +22,7 @@ import * as vuetifyComponents from 'vuetify/components'
 import * as vuetifyDirectives from 'vuetify/directives'
 
 import enApp from '@/core/i18n/locales/en/app.json'
+import enCreator from '@/core/i18n/locales/en/creator.json'
 
 import InviteCreatorsDialog from './InviteCreatorsDialog.vue'
 
@@ -36,6 +38,7 @@ vi.mock('../api/campaigns.api', () => ({
 }))
 
 import { rosterApi } from '@/modules/roster/api/roster.api'
+import { campaignsApi } from '../api/campaigns.api'
 
 const CAMPAIGN = '01CAMPAIGNULIDXXXXXXXXXXXX'
 
@@ -81,7 +84,7 @@ function mountDialog(rows: RosterCreatorListItem[]) {
     locale: 'en',
     fallbackLocale: 'en',
     availableLocales: ['en'],
-    messages: { en: enApp } as never,
+    messages: { en: { ...enApp, ...enCreator } } as never,
   }) as unknown as ReturnType<typeof createI18n>
 
   const vuetify = createVuetify({
@@ -271,5 +274,62 @@ describe('InviteCreatorsDialog (campaign invite picker)', () => {
 
     expect(document.querySelector('[data-test="invite-creators-row-01FRESH"]')).not.toBeNull()
     expect(document.querySelector('[data-test="invite-creators-row-01STALE"]')).toBeNull()
+  })
+
+  it('labels an erased roster row "Deleted creator" and never prints a leaked name', async () => {
+    wrapper = mountDialog([
+      rosterRow({ creator_id: '01GONE', display_name: 'Leaked Name', is_erased: true } as never),
+    ])
+    await flushPromises()
+
+    const row = document.querySelector('[data-test="invite-creators-row-01GONE"]')
+    expect(row?.textContent).toContain(enApp.app.creatorErased)
+    expect(row?.textContent).not.toContain('Leaked Name')
+  })
+
+  it('words a creator.unavailable refusal as such, not as a blacklist', async () => {
+    wrapper = mountDialog([
+      rosterRow({ creator_id: '01OK', display_name: 'Ok One' }),
+      rosterRow({ creator_id: '01GONE', display_name: 'Gone' }),
+    ])
+    await flushPromises()
+
+    vi.mocked(campaignsApi.invite).mockImplementation(async (_a, _c, body) => {
+      if ((body as { creator_id: string }).creator_id === '01GONE') {
+        throw new ApiError({
+          status: 422,
+          code: 'creator.unavailable',
+          message: 'This creator is no longer available.',
+          raw: { code: 'creator.unavailable' },
+        })
+      }
+      return {} as never
+    })
+
+    type InviteVm = {
+      toggleSelect: (id: string, row: RosterCreatorListItem) => void
+      offerValid: boolean
+      offerFields: { buildOffer: () => Promise<unknown>; reset: () => void }
+      invite: () => Promise<void>
+    }
+    const vm = wrapper.vm as unknown as InviteVm
+    vm.offerFields = {
+      buildOffer: async () => ({ agreed_fee_minor_units: 1000, agreed_fee_currency: 'GBP' }),
+      reset: () => undefined,
+    }
+    vm.offerValid = true
+    vm.toggleSelect('01OK', rosterRow({ creator_id: '01OK' }))
+    vm.toggleSelect('01GONE', rosterRow({ creator_id: '01GONE' }))
+    await vm.invite()
+    await flushPromises()
+
+    expect(campaignsApi.invite).toHaveBeenCalledTimes(2)
+    const summary = wrapper.emitted('invited')?.[0]?.[0] as string
+    expect(summary).toContain(enCreator.creator.unavailable)
+    // One invited; the deleted creator is NOT counted as blacklisted.
+    expect(summary).toBe(
+      `Invited 1. Skipped 0 (blacklisted), 0 with conflicts. ${enCreator.creator.unavailable}`,
+    )
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe(false)
   })
 })

@@ -54,6 +54,8 @@ import {
 } from '../composables/useCampaignApplications'
 import AcceptApplicationDialog from './AcceptApplicationDialog.vue'
 import RejectApplicationDialog from './RejectApplicationDialog.vue'
+import { creatorLabel } from '@/core/creators/creatorLabel'
+import CreatorIdentityAvatar from '@/components/CreatorIdentityAvatar.vue'
 
 const props = defineProps<{
   agencyId: string
@@ -222,17 +224,10 @@ defineExpose({
               @keydown.enter.prevent="openProfile(row)"
               @keydown.space.prevent="openProfile(row)"
             >
-              <v-avatar size="40" color="surface-variant" class="applications-identity">
-                <v-img
-                  v-if="row.attributes.creator?.avatar_url"
-                  :src="row.attributes.creator.avatar_url"
-                  :alt="row.attributes.creator.display_name ?? ''"
-                  cover
-                />
-                <span v-else class="text-caption">
-                  {{ (row.attributes.creator?.display_name ?? '?')[0]?.toUpperCase() }}
-                </span>
-              </v-avatar>
+              <CreatorIdentityAvatar
+                :creator="row.attributes.creator"
+                class="applications-identity"
+              />
             </div>
           </template>
 
@@ -246,7 +241,7 @@ defineExpose({
               @keydown.enter.prevent="openProfile(row)"
               @keydown.space.prevent="openProfile(row)"
             >
-              {{ row.attributes.creator?.display_name ?? t('app.campaigns.invite.unnamed') }}
+              {{ creatorLabel(row.attributes.creator, t, t('app.campaigns.invite.unnamed')) }}
             </span>
             <v-chip
               size="x-small"

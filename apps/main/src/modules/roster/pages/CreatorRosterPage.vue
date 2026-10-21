@@ -56,6 +56,7 @@ import {
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { COUNTRY_OPTIONS } from '@/modules/onboarding/data/countries'
 import { rosterApi } from '../api/roster.api'
+import { creatorLabel } from '@/core/creators/creatorLabel'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -209,7 +210,7 @@ const categoryFilterItems = computed(() =>
 )
 
 const headers = [
-  { title: t('app.roster.fields.name'), key: 'attributes.display_name', sortable: false },
+  { title: t('app.roster.fields.name'), key: 'name', sortable: false },
   { title: t('app.roster.fields.email'), key: 'attributes.email', sortable: false },
   {
     title: t('app.roster.fields.status'),
@@ -667,9 +668,9 @@ function onRowClick(_event: unknown, ctx: { item: RosterCreatorListItem }): void
       @update:options="onTableUpdate"
       @click:row="onRowClick"
     >
-      <template #item.attributes.display_name="{ item }">
+      <template #item.name="{ item }">
         <span :data-test="`roster-name-${item.id}`">
-          {{ item.attributes.display_name ?? t('app.roster.unnamed') }}
+          {{ creatorLabel(item.attributes, t, t('app.roster.unnamed')) }}
         </span>
         <BlacklistBadge
           v-if="item.attributes.is_blacklisted"

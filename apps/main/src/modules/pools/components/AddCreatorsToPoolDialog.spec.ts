@@ -10,6 +10,7 @@
  * no-op.
  */
 
+import { ApiError } from '@catalyst/api-client'
 import type { RosterCreatorListItem, TalentPoolMemberResource } from '@catalyst/api-client'
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -19,6 +20,7 @@ import * as vuetifyDirectives from 'vuetify/directives'
 import { createI18n } from 'vue-i18n'
 
 import enApp from '@/core/i18n/locales/en/app.json'
+import enCreator from '@/core/i18n/locales/en/creator.json'
 
 import AddCreatorsToPoolDialog from './AddCreatorsToPoolDialog.vue'
 
@@ -99,7 +101,7 @@ function mountDialog(roster: RosterCreatorListItem[], members: TalentPoolMemberR
     locale: 'en',
     fallbackLocale: 'en',
     availableLocales: ['en'],
-    messages: { en: enApp } as never,
+    messages: { en: { ...enApp, ...enCreator } } as never,
   }) as unknown as ReturnType<typeof createI18n>
 
   const vuetify = createVuetify({
@@ -195,6 +197,47 @@ describe('AddCreatorsToPoolDialog (pool-side add)', () => {
     expect(talentPoolsApi.addCreator).toHaveBeenCalledWith('agency-ulid', POOL, '01B')
     expect(wrapper.emitted('added')).toBeTruthy()
     expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe(false)
+  })
+
+  it('says the creator is no longer available when the add is refused with creator.unavailable', async () => {
+    wrapper = mountDialog([rosterRow({ creator_id: '01A', display_name: 'Alice' })], [])
+    await flushPromises()
+    vi.mocked(talentPoolsApi.addCreator).mockRejectedValue(
+      new ApiError({
+        status: 422,
+        code: 'creator.unavailable',
+        message: 'This creator is no longer available.',
+        raw: { code: 'creator.unavailable' },
+      }),
+    )
+
+    const vm = wrapper.vm as unknown as DialogVm
+    vm.toggleSelect('01A')
+    await vm.addSelected()
+    await flushPromises()
+
+    const shown = document.querySelector('[data-test="add-creators-error"]')?.textContent
+    expect(shown).toContain(enCreator.creator.unavailable)
+    expect(shown).not.toContain(enApp.app.pools.addCreators.addFailed)
+    expect(wrapper.emitted('added')).toBeFalsy()
+  })
+
+  it('labels an erased roster row "Deleted creator" and never prints a leaked name', async () => {
+    wrapper = mountDialog(
+      [
+        rosterRow({
+          creator_id: '01GONE',
+          display_name: 'Leaked Name',
+          is_erased: true,
+        } as never),
+      ],
+      [],
+    )
+    await flushPromises()
+
+    const row = document.querySelector('[data-test="add-creators-row-01GONE"]')
+    expect(row?.textContent).toContain(enApp.app.creatorErased)
+    expect(row?.textContent).not.toContain('Leaked Name')
   })
 
   // The dialog (and its search field) is teleported to body, so these drive the

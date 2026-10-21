@@ -23,6 +23,7 @@
 import { formatCurrency, type BoardCardResource } from '@catalyst/api-client'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { creatorAvatarUrl, creatorInitial, creatorLabel } from '@/core/creators/creatorLabel'
 
 const props = defineProps<{
   card: BoardCardResource
@@ -32,16 +33,13 @@ const { t, locale } = useI18n()
 
 const assignment = computed(() => props.card.relationships.assignment.data)
 
-const displayName = computed(
-  () => assignment.value?.creator?.display_name ?? t('app.campaigns.board.card.unnamed'),
+const displayName = computed(() =>
+  creatorLabel(assignment.value?.creator, t, t('app.campaigns.board.card.unnamed')),
 )
 
-const avatarUrl = computed(() => assignment.value?.creator?.avatar_url ?? null)
+const avatarUrl = computed(() => creatorAvatarUrl(assignment.value?.creator))
 
-const avatarInitial = computed(() => {
-  const name = assignment.value?.creator?.display_name?.trim()
-  return name ? name.charAt(0).toUpperCase() : '?'
-})
+const avatarInitial = computed(() => creatorInitial(assignment.value?.creator))
 
 const statusLabel = computed(() => {
   const status = assignment.value?.status

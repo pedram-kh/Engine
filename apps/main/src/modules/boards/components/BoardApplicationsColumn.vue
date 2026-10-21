@@ -54,6 +54,8 @@ import RejectApplicationDialog from '@/modules/campaigns/components/RejectApplic
 import { useCampaignApplications } from '@/modules/campaigns/composables/useCampaignApplications'
 
 import { useBoardStore } from '../stores/useBoardStore'
+import CreatorIdentityAvatar from '@/components/CreatorIdentityAvatar.vue'
+import { creatorLabel } from '@/core/creators/creatorLabel'
 
 const props = defineProps<{
   agencyId: string
@@ -131,7 +133,7 @@ function appliedAt(iso: string | null): string {
 }
 
 function creatorName(row: CampaignApplicationListItemResource): string {
-  return row.attributes.creator?.display_name ?? t('app.campaigns.invite.unnamed')
+  return creatorLabel(row.attributes.creator, t, t('app.campaigns.invite.unnamed'))
 }
 
 onMounted(() => {
@@ -211,15 +213,7 @@ onMounted(() => {
             @keydown.enter.prevent="openProfile(row)"
             @keydown.space.prevent="openProfile(row)"
           >
-            <v-avatar size="28" color="surface-variant">
-              <v-img
-                v-if="row.attributes.creator?.avatar_url"
-                :src="row.attributes.creator.avatar_url"
-                :alt="creatorName(row)"
-                cover
-              />
-              <span v-else class="text-caption">{{ creatorName(row)[0]?.toUpperCase() }}</span>
-            </v-avatar>
+            <CreatorIdentityAvatar :creator="row.attributes.creator" :size="28" />
             <span class="text-body-2 text-truncate">{{ creatorName(row) }}</span>
           </div>
 

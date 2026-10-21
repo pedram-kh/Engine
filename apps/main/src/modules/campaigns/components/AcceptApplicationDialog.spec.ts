@@ -18,6 +18,7 @@ import * as vuetifyComponents from 'vuetify/components'
 import * as vuetifyDirectives from 'vuetify/directives'
 
 import enApp from '@/core/i18n/locales/en/app.json'
+import enCreator from '@/core/i18n/locales/en/creator.json'
 
 vi.mock('../api/campaigns.api', () => ({
   campaignsApi: {
@@ -72,7 +73,7 @@ async function mountDialog() {
     locale: 'en',
     fallbackLocale: 'en',
     availableLocales: ['en'],
-    messages: { en: enApp } as never,
+    messages: { en: { ...enApp, ...enCreator } } as never,
   }) as unknown as ReturnType<typeof createI18n>
 
   const vuetify = createVuetify({ components: vuetifyComponents, directives: vuetifyDirectives })
@@ -263,6 +264,28 @@ describe('AcceptApplicationDialog', () => {
     expect(
       document.querySelector('[data-test="accept-application-refusal"]')?.textContent,
     ).toContain(expected)
+    wrapper.unmount()
+  })
+
+  it('says the creator is no longer available when they deleted their account (creator.unavailable)', async () => {
+    vi.mocked(campaignsApi.acceptApplication).mockRejectedValue(
+      new ApiError({
+        status: 422,
+        code: 'creator.unavailable',
+        message: 'This creator is no longer available.',
+        raw: { code: 'creator.unavailable' },
+      }),
+    )
+    const wrapper = await mountDialog()
+    await fillFee(500)
+
+    submit()
+    await flushPromises()
+
+    const shown = document.querySelector('[data-test="accept-application-refusal"]')?.textContent
+    expect(shown).toContain(enCreator.creator.unavailable)
+    expect(shown).not.toContain(enApp.app.campaigns.applications.refusal.generic)
+    expect(wrapper.emitted('accepted')).toBeFalsy()
     wrapper.unmount()
   })
 

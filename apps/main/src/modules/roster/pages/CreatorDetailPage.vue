@@ -50,6 +50,7 @@ import { rosterApi } from '../api/roster.api'
 import AgencyAvailabilityCalendar from '../components/AgencyAvailabilityCalendar.vue'
 import BlacklistCreatorDialog from '../components/BlacklistCreatorDialog.vue'
 import StarRatingInput from '../components/StarRatingInput.vue'
+import { creatorAvatarUrl, creatorLabel } from '@/core/creators/creatorLabel'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -69,12 +70,12 @@ const canEdit = computed(
 const attrs = computed(() => detail.value?.attributes ?? null)
 const creator = computed(() => detail.value?.attributes.creator ?? null)
 
-const displayName = computed(() => creator.value?.display_name ?? t('app.roster.detail.unnamed'))
+const displayName = computed(() => creatorLabel(creator.value, t, t('app.roster.detail.unnamed')))
 const email = computed(() => creator.value?.email ?? null)
 
 // Signed avatar for the header (60-min TTL, re-minted per page load). Null when
 // the creator never uploaded one — CreatorAvatar falls back to the initial.
-const avatarUrl = computed(() => creator.value?.avatar_url ?? null)
+const avatarUrl = computed(() => creatorAvatarUrl(creator.value))
 
 // Account-creation identity (sign-up first/last name). Same relation-exists
 // privacy basis as the contact email; never surfaced on discover.

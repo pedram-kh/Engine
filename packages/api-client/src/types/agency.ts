@@ -212,6 +212,8 @@ export interface TalentPoolMemberResource {
   type: 'talent_pool_members'
   attributes: {
     display_name: string | null
+    /** True once the account is deleted: the name is gone, render the localised label (AH-104b-del). */
+    is_erased?: boolean
     country_code: string | null
     primary_language: string | null
     categories: string[] | null
@@ -281,6 +283,8 @@ export interface RosterCreatorListItem {
     /** Creator ULID — reserved for Sprint 6 click-through; rows do NOT navigate yet. */
     creator_id: string | null
     display_name: string | null
+    /** True once the account is deleted: the name is gone, render the localised label (AH-104b-del). */
+    is_erased?: boolean
     /**
      * Contact email of the related creator account. Surfaced on the roster
      * list (eager-loaded server-side, not N+1) — appropriate on the same
@@ -390,6 +394,8 @@ export interface RosterListParams {
 export interface AgencyCreatorDetailProfile {
   id: string
   display_name: string | null
+  /** True once the account is deleted: the name is gone, render the localised label (AH-104b-del). */
+  is_erased?: boolean
   bio: string | null
   /** Contact email (D-2a-8). Null only if the related user has none. */
   email: string | null
@@ -552,6 +558,8 @@ export interface DiscoveryCreatorListItem {
   type: 'creator_discovery'
   attributes: {
     display_name: string | null
+    /** True once the account is deleted: the name is gone, render the localised label (AH-104b-del). */
+    is_erased?: boolean
     country_code: string | null
     /** Derived age in whole years, null when unknown (AH-088). */
     age: number | null
@@ -616,6 +624,8 @@ export interface CreatorPublicProfile {
   type: 'creator_public_profiles'
   attributes: {
     display_name: string | null
+    /** True once the account is deleted: the name is gone, render the localised label (AH-104b-del). */
+    is_erased?: boolean
     bio: string | null
     country_code: string | null
     region: string | null

@@ -29,13 +29,19 @@
  * avatar (or a non-S3 disk, where the URL is null).
  */
 
-import type { RosterCreatorListItem, RosterListParams } from '@catalyst/api-client'
+import { ApiError, type RosterCreatorListItem, type RosterListParams } from '@catalyst/api-client'
 import { BlacklistBadge } from '@catalyst/ui'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { rosterApi } from '@/modules/roster/api/roster.api'
 import { talentPoolsApi } from '../api/talentPools.api'
+import {
+  creatorAvatarAlt,
+  creatorAvatarUrl,
+  creatorInitial,
+  creatorLabel,
+} from '@/core/creators/creatorLabel'
 
 const props = defineProps<{
   modelValue: boolean
@@ -220,7 +226,7 @@ async function addSelected(): Promise<void> {
 
   if (hardSelected.length > 0) {
     const names = hardSelected
-      .map((row) => row.attributes.display_name ?? t('app.pools.detail.unnamed'))
+      .map((row) => creatorLabel(row.attributes, t, t('app.pools.detail.unnamed')))
       .join(', ')
     const message =
       hardSelected.length === 1
@@ -237,8 +243,12 @@ async function addSelected(): Promise<void> {
     }
     emit('added', t('app.pools.addCreators.added', { count: ids.length }))
     emit('update:modelValue', false)
-  } catch {
-    error.value = t('app.pools.addCreators.addFailed')
+  } catch (err) {
+    // AH-104b-del: the creator was deleted (or asked to be) since the list loaded.
+    error.value =
+      err instanceof ApiError && err.code === 'creator.unavailable'
+        ? t('creator.unavailable')
+        : t('app.pools.addCreators.addFailed')
   } finally {
     adding.value = false
   }
@@ -334,19 +344,19 @@ async function addSelected(): Promise<void> {
                    (the InviteCreatorsDialog pattern, same roster shape). -->
               <v-avatar size="40" color="surface-variant">
                 <v-img
-                  v-if="row.attributes.avatar_url"
-                  :src="row.attributes.avatar_url"
-                  :alt="row.attributes.display_name ?? ''"
+                  v-if="creatorAvatarUrl(row.attributes)"
+                  :src="creatorAvatarUrl(row.attributes) ?? undefined"
+                  :alt="creatorAvatarAlt(row.attributes)"
                   cover
                   :data-test="`add-creators-avatar-${row.attributes.creator_id}`"
                 />
                 <span v-else class="text-caption">
-                  {{ (row.attributes.display_name ?? '?')[0]?.toUpperCase() }}
+                  {{ creatorInitial(row.attributes) }}
                 </span>
               </v-avatar>
             </template>
             <v-list-item-title>
-              {{ row.attributes.display_name ?? t('app.pools.detail.unnamed') }}
+              {{ creatorLabel(row.attributes, t, t('app.pools.detail.unnamed')) }}
               <!-- Per-row blacklist flag (D-6): shows for BOTH hard + soft so
                    status is visible BEFORE selecting. The HARD-only confirm in
                    addSelected is the friction gate; this badge is the visibility. -->

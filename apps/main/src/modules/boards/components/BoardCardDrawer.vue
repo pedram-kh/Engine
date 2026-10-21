@@ -69,6 +69,12 @@ import ChatPanel from '@/modules/messaging/components/ChatPanel.vue'
 
 import { boardApi } from '../api/board.api'
 import { useBoardStore } from '../stores/useBoardStore'
+import {
+  creatorAvatarAlt,
+  creatorAvatarUrl,
+  creatorInitial,
+  creatorLabel,
+} from '@/core/creators/creatorLabel'
 
 const props = defineProps<{
   modelValue: boolean
@@ -116,8 +122,8 @@ const chatTransport = computed<ChatTransport | null>(() => {
 })
 
 // The chat header label — the creator's name (the counterparty).
-const chatTitle = computed(
-  () => assignmentData.value?.creator?.display_name ?? t('app.campaigns.board.card.unnamed'),
+const chatTitle = computed(() =>
+  creatorLabel(assignmentData.value?.creator, t, t('app.campaigns.board.card.unnamed')),
 )
 
 // Profile tab (AH-080, D2b) — the creator ulid off the card-face data (always
@@ -186,12 +192,9 @@ function onResolveClick(): void {
 
 // Identity header basics come from the CARD FACE (already loaded — avatar,
 // name, fee/per); the detail fetch layers campaign · brand + offer text on top.
-const avatarUrl = computed(() => assignmentData.value?.creator?.avatar_url ?? null)
+const avatarUrl = computed(() => creatorAvatarUrl(assignmentData.value?.creator))
 
-const avatarInitial = computed(() => {
-  const name = assignmentData.value?.creator?.display_name?.trim()
-  return name ? name.charAt(0).toUpperCase() : '?'
-})
+const avatarInitial = computed(() => creatorInitial(assignmentData.value?.creator))
 
 const campaignLine = computed(() => {
   const campaign = detail.value?.attributes.campaign
@@ -420,7 +423,7 @@ function onDraftReviewed(): void {
                   <v-img
                     v-if="avatarUrl"
                     :src="avatarUrl"
-                    :alt="assignmentData?.creator?.display_name ?? ''"
+                    :alt="creatorAvatarAlt(assignmentData?.creator)"
                     data-test="board-card-drawer-avatar"
                   />
                   <span v-else class="text-subtitle-1">{{ avatarInitial }}</span>
@@ -429,8 +432,11 @@ function onDraftReviewed(): void {
                   <div class="d-flex align-center ga-2">
                     <span class="text-subtitle-1 font-weight-bold text-truncate">
                       {{
-                        assignmentData?.creator?.display_name ??
-                        t('app.campaigns.board.card.unnamed')
+                        creatorLabel(
+                          assignmentData?.creator,
+                          t,
+                          t('app.campaigns.board.card.unnamed'),
+                        )
                       }}
                     </span>
                     <v-chip v-if="assignmentData" size="x-small" variant="tonal">

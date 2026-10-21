@@ -48,6 +48,12 @@ import BoardView from '@/modules/boards/components/BoardView.vue'
 import DraftsTab from '../components/DraftsTab.vue'
 import ApplicationsTab from '../components/ApplicationsTab.vue'
 import AttachmentsTab from '../components/AttachmentsTab.vue'
+import {
+  creatorAvatarAlt,
+  creatorAvatarUrl,
+  creatorInitial,
+  creatorLabel,
+} from '@/core/creators/creatorLabel'
 
 const { t, locale } = useI18n()
 const route = useRoute()
@@ -690,17 +696,17 @@ function formatDay(iso: string | null): string {
               <template #prepend>
                 <v-avatar size="40" class="mr-3" :data-test="`creators-avatar-${a.id}`">
                   <v-img
-                    v-if="a.attributes.creator?.avatar_url"
-                    :src="a.attributes.creator.avatar_url"
-                    :alt="a.attributes.creator?.display_name ?? ''"
+                    v-if="creatorAvatarUrl(a.attributes.creator)"
+                    :src="creatorAvatarUrl(a.attributes.creator) ?? undefined"
+                    :alt="creatorAvatarAlt(a.attributes.creator)"
                   />
                   <span v-else class="text-body-2">
-                    {{ (a.attributes.creator?.display_name ?? '?').charAt(0).toUpperCase() }}
+                    {{ creatorInitial(a.attributes.creator) }}
                   </span>
                 </v-avatar>
               </template>
               <v-list-item-title class="d-flex align-center ga-2">
-                {{ a.attributes.creator?.display_name ?? '—' }}
+                {{ creatorLabel(a.attributes.creator, t, '—') }}
                 <!-- History tag: this row was declined, then re-offered
                      (re-offer-after-decline chunk). Shown alongside the live
                      status so the agency sees "declined → re-invited". Reuses

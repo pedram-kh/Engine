@@ -26,6 +26,7 @@ import { useI18n } from 'vue-i18n'
 
 import DraftReviewPanel from './DraftReviewPanel.vue'
 import { campaignsApi } from '../api/campaigns.api'
+import { creatorLabel } from '@/core/creators/creatorLabel'
 
 const props = defineProps<{
   modelValue: boolean
@@ -97,10 +98,10 @@ function onPanelReviewed(message: string): void {
       <v-card-title class="d-flex align-center">
         <span class="text-h6">{{ t('app.campaigns.review.title') }}</span>
         <span
-          v-if="assignment?.attributes.creator?.display_name"
+          v-if="creatorLabel(assignment?.attributes.creator, t) !== ''"
           class="text-body-2 text-medium-emphasis ml-2"
         >
-          · {{ assignment.attributes.creator.display_name }}
+          · {{ creatorLabel(assignment?.attributes.creator, t) }}
         </span>
         <v-spacer />
         <v-btn

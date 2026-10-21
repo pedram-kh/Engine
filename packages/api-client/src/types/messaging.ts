@@ -82,7 +82,7 @@ export interface MessageThreadRollupRow {
   attributes: {
     assignment_id: string | null
     status: string | null
-    creator: { display_name: string | null }
+    creator: { display_name: string | null; is_erased?: boolean }
     last_message_at: string | null
     last_message_preview: string | null
     unread_count: number
@@ -240,7 +240,12 @@ export interface AgencyRelationshipThreadRow {
   id: string
   type: 'relationship_thread'
   attributes: {
-    creator: { id: string | null; display_name: string | null; avatar_url: string | null }
+    creator: {
+      id: string | null
+      display_name: string | null
+      is_erased?: boolean
+      avatar_url: string | null
+    }
     last_message_at: string | null
     last_message_preview: string | null
     unread_count: number
@@ -286,6 +291,8 @@ export interface MessageableCreatorRow {
   type: 'messageable_creator'
   attributes: {
     display_name: string | null
+    /** True once the account is deleted: the name is gone, render the localised label (AH-104b-del). */
+    is_erased?: boolean
     avatar_url: string | null
   }
 }

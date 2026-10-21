@@ -132,6 +132,24 @@ describe('ApplicationsTab', () => {
     wrapper.unmount()
   })
 
+  it('shows "Deleted creator" with no photo for an erased applicant', async () => {
+    const row = makeRow()
+    row.attributes.creator = {
+      id: '01CREATORULIDXXXXXXXXXXXXX',
+      display_name: 'Leaked Name',
+      avatar_url: 'https://cdn/leak.jpg',
+      is_erased: true,
+    }
+    vi.mocked(campaignsApi.listApplications).mockResolvedValue(listResponse([row], 1))
+    const wrapper = await mountTab()
+
+    const el = wrapper.find(`[data-test="applications-row-${PENDING_ID}"]`)
+    expect(el.text()).toContain(enApp.app.creatorErased)
+    expect(el.text()).not.toContain('Leaked Name')
+    expect(el.findComponent({ name: 'VImg' }).exists()).toBe(false)
+    wrapper.unmount()
+  })
+
   it('hoists pending_total — the badge count, not a tally of the rendered rows', async () => {
     const wrapper = await mountTab()
 

@@ -127,6 +127,24 @@ describe('BoardCard', () => {
     expect(wrapper.find('[data-test="board-card-name-k1"]').text()).toBe('Unnamed creator')
   })
 
+  it('says "Deleted creator" with no photo for an erased creator, whatever the payload carries', () => {
+    const wrapper = mountCard(
+      card(
+        assignmentData({
+          creator: {
+            id: 'cr1',
+            display_name: 'Leaked Name',
+            avatar_url: 'https://cdn/x.jpg',
+            is_erased: true,
+          },
+        }),
+      ),
+    )
+    expect(wrapper.find('[data-test="board-card-name-k1"]').text()).toBe('Deleted creator')
+    expect(wrapper.find('[data-test="board-card-avatar-k1"]').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('Leaked Name')
+  })
+
   it('renders a null-safe "removed" tile when the assignment is null', () => {
     const wrapper = mountCard(card(null))
     expect(wrapper.find('[data-test="board-card-removed-k1"]').exists()).toBe(true)
