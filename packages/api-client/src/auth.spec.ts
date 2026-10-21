@@ -366,6 +366,12 @@ describe('createAuthApi', () => {
 
     it('is null for any other error, for a missing date, and for a non-error', () => {
       expect(deletionPendingMeta(envelopeError(403, 'auth.wrong_spa'))).toBeNull()
+      // A date in the meta is not enough: the code decides.
+      expect(
+        deletionPendingMeta(
+          envelopeError(403, 'auth.wrong_spa', { scheduled_for: '2026-11-04T09:30:00+00:00' }),
+        ),
+      ).toBeNull()
       expect(deletionPendingMeta(envelopeError(403, 'auth.deletion_pending'))).toBeNull()
       expect(
         deletionPendingMeta(envelopeError(403, 'auth.deletion_pending', { scheduled_for: '' })),
