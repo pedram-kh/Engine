@@ -19,6 +19,30 @@ database restore from a snapshot (7 days), and `erasure:reapply` then erases the
   the digest; it contains no name, email, ip or object key, so it is safe to paste into a ticket).
 - A legal hold (AH-104c) means the account is not offered for erasure. The command does not know about holds; the check is on the person running it.
 
+### 1a. The request side (AH-104b-del): what an operator will see before an account is ready
+
+A creator asks from the **Security** page (web: avatar menu; native: More), behind the global flag `account_deletion_enabled`. Until the flag is on, the entry is absent, `/creator/security` sends the person to the
+dashboard and `POST /api/v1/me/account-deletion` answers 404. The public page `/delete-account` (no sign-in, no app link) tells a person who cannot open the app how to ask; it is outside `/creator/`, so the app does
+not capture it.
+
+What a request does (full description: `05-SECURITY-COMPLIANCE.md` §3.3a): stamps `users.deletion_requested_at` and `deletion_scheduled_for` (= +14 days), revokes every session, token and push token, writes
+`account.deletion_requested`, sends one confirmation mail. **It erases nothing.** The account is only hidden and locked:
+
+- **Agencies.** The creator leaves discovery, the new-conversation list, the job-posted fan-out, the digest and the nudge (`Creator::scopeVisibleToAgencies()`); a **new** invite, connection request, pool add,
+  accepted application or new thread is refused with the neutral 422 `creator.unavailable` (the same answer for pending and erased: it never says which). The roster, existing threads, assignments and
+  history are unchanged and stay writable, **silently**: no in-app row, push or mail to the creator. Cancelling (signing in again) clears the column and the creator reappears everywhere with no trace.
+- **After the erasure** every agency payload carries `is_erased: true` and no name or avatar, and the agency app shows "Deleted creator" (`creatorLabel()`, one reader; an architecture spec forbids reading
+  `display_name` or `avatar_url` directly in the agency modules). Open assignments were cancelled by the system (§4) and each agency's admins and managers got one in-app notice per assignment
+  (`assignment.cancelled`, reason `creator_account_erased`, no creator name, no mail, no push).
+- **What the operator must check before AH-104c's Erase:** the request is still pending under a row lock (the creator may have cancelled, including after `scheduled_for`), no legal hold, and the dry-run
+  count for `campaign_assignments.cancel`. An assignment in `live_verified` or `manually_verified` will be **refused** (ruled 2026-10-21, to be built in AH-104c: engine guard plus a request-time refusal),
+  not cancelled; today (before AH-104c) the rider still cancels those two states, which is why nothing runs against a real account yet.
+
+**Turning the flag on is the risk event.** It is global; the walk (plan §9) runs on a named test creator with the flag on for a short window and off again after. A creator who already requested stays pending
+and can still cancel by signing in whatever the flag says.
+
+---
+
 ## 2. Before the first real erasure
 
 1. **The deploy is done**: three migrations (`users.erased_at` and `creators.erased_at`, `erasure_ledger`, and the `notifications(actor_user_id)` index, built `CONCURRENTLY`). See the AH-104a

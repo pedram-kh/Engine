@@ -264,6 +264,18 @@ support address are confirmed first."_ Apple needs the in-app path present in th
 | W9  | Sign-up form with the pending address, then with an ordinary taken address                                      | **the same message**, word for word                                                         |
 | W10 | A recovery-code creator (if one exists): pending step, cancel                                                   | the P1 hint appears; the second code works                                                  |
 
+**Part B specifics (added 2026-10-21, at the Part B review).** What the built pages change in the walk and the checklist:
+
+- **W2 and W5** run on the Security page (`/creator/security`) and its dialog: the typed word ignores diacritics and case; a 429 shows a countdown; the entry is behind `features.account_deletion`.
+- **W6** now has two halves: a **pending** creator (hidden; new actions refused with 422 `creator.unavailable`, thread still open and silent) and, from W11, an **erased** one.
+- **W8** also confirms the page is the static one (it reads no flag) and that it lists the support address.
+- **Proposed W11 (agency sees "Deleted creator"):** on a local or seeded database, mark one creator erased and open, as an agency, the roster, a thread, an application, an assignment and a board card; each
+  shows "Deleted creator" with a neutral avatar, and none shows a name, email or photo. It cannot be walked against production (nothing is erased there).
+- **Proposed W12 (the agency bell notice):** on the same seeded database, cancel an erased creator's open assignment through the rider and open the agency bell: one notice per assignment, no creator name, no
+  mail, no push; tapping it opens the campaign's creators tab.
+- **Checklist additions before the flag flips:** the human pass on the **en and es** strings (the machine draft is in 24 locales, C9); W1 to W10 pass; W11 and W12 pass if Pedram accepts them; the snapshot
+  and `queue:restart` of Part A are done.
+
 The walk needs the flag on in production for its duration (it is global, like every flag here). The window is short and the population that can reach the entry is the TestFlight set plus anyone on the web; if you
 prefer a per-user flag scope for the walk, say so (**C8**: it costs a scoped flag class and the admin toggle does not support scoping today).
 
@@ -295,3 +307,12 @@ review file), and again after Part B. No push until you trigger it.
 - **The 22-component count** for the agency label is a grep of `display_name` in `.vue` files; some will turn out to need nothing and some to need more than a label (an avatar or a profile link).
 - **Whether the translation pipeline for legal copy** is what you want (C9).
 - **Assignment counts by state** in production were not read; they matter only for the size of A7's first dry-run, which is AH-104c's concern.
+
+## AH-104c notes (carried from the Part A and Part B reviews)
+
+1. **`live_verified` and `manually_verified` refuse erasure (ruled 2026-10-21).** Same family as the payment states. Build both halves in AH-104c: an engine guard (so `erasure:run` and the Erase button
+   refuse) and a request-time refusal through C3 (so a creator with such an assignment is told at the request, not left pending against a refusal). Until then `CancelOpenAssignments` still cancels them;
+   nothing erases before AH-104c. Tech-debt: "AH-104b-del Part A", item 3.
+2. **Re-check under a lock before erasing:** re-read `deletion_requested_at` with the row locked (the creator may cancel until `erased_at` is set, even after `deletion_scheduled_for`).
+3. **Legal hold:** an account on hold is not offered for erasure; the engine does not know about holds.
+4. **The rider's first real run:** read the dry-run `campaign_assignments.cancel` count first; the agency notice (`assignment.cancelled`) goes to admins and managers, once per assignment, without the creator's name.

@@ -217,6 +217,26 @@ How a creator asks for their account to be deleted, and what the platform does u
 - **At erasure** the creator's open assignments are cancelled by the system (A7, runbook §4), and the agencies are told once.
 - **Not closed in this chunk (tech-debt, "AH-104b-del"):** a cookie session created in the same instant as the request can survive it until the erasure.
 
+**Part B: what the person and the agency see (built, local, not deployed).**
+
+- **Where a creator asks.** The Security page (`/creator/security`, route `creator.security`) holds the "Delete account" entry and the dialog: a plain statement of what is lost and the 14-day period, the
+  password, the second factor when it is set, a checkbox, and the typed word (a usability gate only; diacritics are ignored, and it is **not** a security control). 429 shows a client countdown. The entry is
+  shown only when `features.account_deletion` on `/me` is true (creator-only, and the same value as the flag); with the flag off the route guard `requireAccountDeletionEnabled` sends the person to the
+  dashboard and the endpoint answers 404.
+- **Public page.** `/delete-account` (no sign-in, outside `/creator/`) explains the in-app way to ask, the support address for a person who cannot sign in, what is erased and what is kept, and the 14-day period. It
+  is static (it does not read the flag), so it can be linked from the store listing before the flag is on.
+- **The agency side.** A creator with `deletion_requested_at` set is **hidden** from every agency surface that lists or reaches out (`Creator::scopeVisibleToAgencies()`): discovery, the new-conversation list,
+  invites, pool adds, the job-posted fan-out, the digest and the nudge. A **new** agency action on a pending or an erased creator (invite, connection request, pool add, accepted application, new thread) is refused
+  with **422 `creator.unavailable`**, one answer for both states so the response never says which. Existing threads and assignments remain **writable but silent**: nothing is sent to the pending creator.
+  `tests/Support/AgencyCreatorSurfaces.php` is a static manifest of every agency surface that reads a creator; a spec fails when a surface is not classified.
+- **After erasure.** Agency payloads carry `is_erased: true` (trait `EmitsErasedState`) and no name or avatar; the apps render "Deleted creator" and a neutral avatar through one reader, `creatorLabel()`
+  (an architecture spec forbids reading `display_name` or `avatar_url` in the agency modules). Each agency's admins and managers get **one** in-app notice per cancelled assignment
+  (`assignment.cancelled`, reason `creator_account_erased`): always on, no preference, no mail, no push, and it **never names the creator**.
+- **Not changed by design.** Assignment-lifecycle, contract and verification notices to a pending creator are not silenced (they concern work the creator already holds). Mail ignores notification preferences
+  (the confirmation is a transactional message).
+- **Ruled, to build in AH-104c:** an assignment in `live_verified` or `manually_verified` is an **erasure refusal**, like the payment states (engine guard plus a request-time refusal through C3; see the tech-debt
+  entry "AH-104b-del Part A", item 3). Until then the rider cancels them; nothing erases until AH-104c.
+
 ### 3.4 Append-only enforcement
 
 - **Target (not yet true in production):** the application's database role has INSERT and SELECT on `audit_logs`, but NO UPDATE or DELETE, and a separate "audit retention" role has DELETE permission, used only by the scheduled retention job.
