@@ -88,6 +88,17 @@ happened.
     `--execute` prints a report and changes nothing. Recorded: **\_\_**
   - **Before the first real erasure (not a deploy step):** the erasure specs pass on **Postgres** in CI (tech-debt row 1); a snapshot exists; the runbook §2 checklist.
   - **Read-backs B, C and D are in** ([`account-deletion-production-readback.md`](../reviews/account-deletion-production-readback.md)); S3 media versioning is still unanswered.
+- **AH-104b-del Part A (the deletion request, API + sign-in step) — BUILT 2026-10-21; local, not deployed; Part B (pages) not built.** Plan [`account-deletion-request-plan.md`](../reviews/account-deletion-request-plan.md).
+  **PROD-DATA RISK: LOW at deploy** (one additive migration, the flag is OFF, the endpoint answers 404 until Pedram turns it on). The AH-104a rider (open assignments cancelled at erasure) is **HIGH when AH-104c first
+  runs it** and is a separate, later act.
+  - **Migration (additive):** `2026_10_21_110000_add_deletion_request_to_users` (two nullable timestamp columns on `users`, one index; no default, no backfill; table of a few thousand rows).
+  - **Infra:** **`php artisan queue:restart` is REQUIRED** (a new queued mailable and listener, `AccountDeletionRequestedMail`). No scheduler change. Optional env `SUPPORT_EMAIL` (default
+    `support@catalyst-growth.com`, read through `config('app.support_email')`); nothing breaks if unset.
+  - **Flag:** `account_deletion_enabled` is **OFF** at deploy. **Pedram turns it ON** in the admin Feature-flags page after the device walk passes and before build 3 is submitted (named step on the build-3 checklist).
+  - **Post-deploy verification:** `php artisan migrate:status` shows the migration; `POST /api/v1/me/account-deletion` as a signed-in creator answers **404** (flag off). The production re-run of the walk
+    (**W2, W4, W5 only**, on a **named test creator**, with the flag ON for the window and **OFF again after**) is in the plan §device walk. Recorded: **\_\_**
+  - **Not a deploy step:** the web sign-in step and the new bundle strings ride the next web build; machine-translated copy in 24 locales needs Pedram's pass on **en and es** (the public page and the
+    consequences copy) before the flag flips.
 - **Migrations run:** AH-104a adds three (above); everything else in this entry: none. Recorded: **\_\_**
 - **Pre-deploy reads:** AH-103d: the expired-token count (above). AH-104a: none.
 - **Snapshot ID:** AH-104a's migrations are additive and the table `notifications` (288,083 rows at the read-back) is indexed concurrently, but **take and confirm a snapshot before migrating** (standing rule). The open snapshot question under AH-103 is unchanged. Recorded: **\_\_**

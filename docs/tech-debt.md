@@ -3385,6 +3385,24 @@ TRIGGER` on `audit_logs` (table and every column). The owner is `postgres`. Ther
 - **Trigger to escalate:** adding any external log, error or analytics sink, or raising log retention above 14 days.
 - **Owner:** platform. **Status:** OPEN (expires by itself, disclosed). Opened 2026-10-21.
 
+## AH-104b-del Part A: what the request flow does not close (OPEN)
+
+- **Where:** `apps/api/app/Modules/Identity/Services/AccountDeletionService.php`, `AuthService::evaluateGates()`, `apps/api/app/Modules/Erasure/Cancellation/CancelOpenAssignments.php`;
+  [`reviews/account-deletion-request-plan.md`](reviews/account-deletion-request-plan.md) P8 and C5.
+  1. **A cookie session created in the same instant as the request can survive it (accepted, C5).** The sign-in gate refuses new sign-ins once the columns are set and the request deletes
+     `sessions` and tokens in its own transaction, but a sign-in that passed the gate microseconds earlier can commit a session just after. The bearer side is closed (`CreatorTokenGuard` refuses a
+     pending user); the cookie side is not (no middleware on every creator route). The surviving session ends **at the latest at erasure**, which deletes `sessions`. **Escalates:** any change
+     that lengthens the grace or the session lifetime.
+  2. **AH-104c must re-check, under a lock, before it erases.** The due-date view reads `deletion_scheduled_for`; the Erase click must re-read `deletion_requested_at` with the row locked, because the
+     creator can cancel by signing in until the instant of erasure, **including after `scheduled_for` has passed** (cancelling is allowed until `erased_at` is set, never refused for lateness).
+     An Erase that did not re-check would erase an account that was just restored. Written into the AH-104c plan.
+  3. **The rider cancels delivered work (A7, open question to Pedram).** `CancelOpenAssignments` cancels every non-terminal assignment, which includes `live_verified` and `manually_verified`:
+     the creator delivered, the post is verified, payment is eligible but not yet held (`PaymentGuard` only knows `payment_held` / `payment_released`). Cancelling those loses the agency's
+     record of owed money once Sprint 10 exists. Recommended: treat those two states as a **refusal** (the same family as the payment states) so the erasure waits for the agency to settle them.
+     The dry-run prints `campaign_assignments.cancel`; read it before the first real run. **Nothing erases until AH-104c.**
+  4. **The new `users` index and the cancel step have run on sqlite only** (the same gap as the AH-104a entry, row 1).
+- **Owner:** identity / platform. **Status:** OPEN. Opened 2026-10-21 at the AH-104b-del Part A review.
+
 ## Disable-2FA page navigates to a route that does not exist (BUG, OPEN, found 2026-10-21)
 
 - **Where:** `apps/main/src/modules/auth/pages/DisableTotpPage.vue:36` (`router.push({ name: 'app.settings' })` after a successful disable) and `:99` (the back link). No route has that

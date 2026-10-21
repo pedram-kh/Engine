@@ -149,7 +149,7 @@ The `audit_logs` table is the system's immune system. It must be complete, appen
 - Payment mutations: fund, release, refund, dispute open/close
 - Admin actions: every action in admin SPA, especially impersonation
 - Permission changes: role assignments, policy overrides
-- Data export and erasure requests (creation and execution)
+- Data export and erasure requests (creation and execution). Account deletion (AH-104b-del): `account.deletion_requested` (metadata: `scheduled_for`, `revoked` counts) and `account.deletion_cancelled` (metadata: `was_scheduled_for`), both written by the user's own act; the system's cancellation of an erased creator's open assignments is `assignment.cancelled` with **no actor** and the reason code `creator_account_erased`
 - Integration credential changes
 - Feature flag changes
 
@@ -195,6 +195,27 @@ The following actions REQUIRE a non-empty `reason` field:
 - Any feature flag change in production
 
 The application enforces this at the service layer. Attempting these actions without a reason raises an exception. The HTTP layer enforces it via `X-Action-Reason` header (see `04-API-DESIGN.md` § 26).
+
+### 3.3a Account deletion request (AH-104b-del, built; behind `account_deletion_enabled`, off)
+
+How a creator asks for their account to be deleted, and what the platform does until an admin erases it (the erasure itself is AH-104a, runbook [`runbooks/account-erasure.md`](runbooks/account-erasure.md)).
+
+- **Who and how.** Creators only (suspended accounts cannot ask; an account in onboarding can). `POST /api/v1/me/account-deletion` on both doors (cookie session and the `creator_app` bearer). Body:
+  `password`, `mfa_code` (required when 2FA is confirmed; a recovery code is accepted), `acknowledged: true`. The typed word in the UI is a usability gate, **not** a security control: the control is the
+  re-authentication. Re-authentication failures answer **403** (never 401, which the apps read as "session ended"): `auth.invalid_credentials`, `auth.mfa_required`, `auth.mfa.invalid_code`; 423 for the
+  second-factor lock-outs. A refusal on engine guards (payment, vendor) is 422 `account_deletion.blocked`, before the password is asked for.
+- **Throttles.** The login throttles (`auth-ip`, the second-factor soft 5 / hard 10) apply, plus `auth-account-deletion`, 3 per hour per user, 429. The deletion door **does not feed the failed-login
+  tracker or the lockout**: a wrong password here changes nothing on the account.
+- **What the request does, in one transaction.** Stamps `users.deletion_requested_at` and `deletion_scheduled_for` (= requested + 14 days, stored, so a later change of the grace never alters a request
+  already made); revokes **every** session, API token and push token (`CredentialRevoker`, one list, tied by a spec to the erasure registry); writes `account.deletion_requested`. After commit: one
+  confirmation mail (queued, in the person's language, no link; support address from `config('app.support_email')`). A repeat request is idempotent: 200 with the first date, no new clock, no new mail.
+- **Until the erasure.** The account cannot sign in: right credentials (and second factor) answer **403 `auth.deletion_pending`** with `meta.scheduled_for` and `meta.mfa_via`, and open no session or token.
+  Wrong credentials answer exactly as for any account (a spec compares the envelopes byte for byte, so the state does not leak before the credentials are proven). Signing in again with
+  `cancel_deletion: true` restores the account (`account.deletion_cancelled`); this stays possible after `scheduled_for` has passed and until the account is erased, and does not depend on the flag.
+  A recovery code spent on the pending step is burned; the app asks for another.
+- **Sign-up with the same address** answers the one static "email already exists" message for every taken address, whatever its state (no leak); the message names the way back (sign in).
+- **At erasure** the creator's open assignments are cancelled by the system (A7, runbook §4), and the agencies are told once.
+- **Not closed in this chunk (tech-debt, "AH-104b-del"):** a cookie session created in the same instant as the request can survive it until the erasure.
 
 ### 3.4 Append-only enforcement
 
