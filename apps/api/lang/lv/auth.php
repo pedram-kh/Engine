@@ -75,4 +75,12 @@ return [
             'unexpected' => 'Ja negaidījāt šo izmaiņu, sazinieties ar atbalsta dienestu.',
         ],
     ],
+    'deletion_mail' => [
+        'subject' => 'Jūsu :app konts ir ieplānots dzēšanai',
+        'greeting' => 'Sveiki, :name,',
+        'body' => 'Mēs saņēmām jūsu pieprasījumu dzēst :app kontu. Tas tiks neatgriezeniski dzēsts :date, un pēc tam to vairs nevarēs atsaukt.',
+        'keep' => 'Līdz tam jūsu konts ir bloķēts un nekas nav dzēsts. Lai to saglabātu, pirms šī datuma piesakieties ar savu e-pastu un paroli un izvēlieties to atjaunot.',
+        'unexpected' => 'Ja to nepieprasījāt jūs, iespējams, kāds cits zina jūsu paroli. Atjaunojiet kontu, piesakoties, un pēc tam nomainiet paroli.',
+        'support' => 'Jautājumi? Rakstiet uz :support.',
+    ],
 ];

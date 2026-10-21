@@ -80,4 +80,12 @@ return [
             'unexpected' => 'Jeśli nie spodziewałeś się tej zmiany, skontaktuj się z pomocą techniczną.',
         ],
     ],
+    'deletion_mail' => [
+        'subject' => 'Twoje konto :app zostało zaplanowane do usunięcia',
+        'greeting' => 'Cześć, :name,',
+        'body' => 'Otrzymaliśmy Twoją prośbę o usunięcie konta :app. Zostanie ono trwale usunięte :date i potem nie będzie można tego cofnąć.',
+        'keep' => 'Do tego czasu Twoje konto jest zablokowane i nic nie zostało usunięte. Aby je zachować, zaloguj się przed tą datą swoim adresem e-mail i hasłem i wybierz przywrócenie.',
+        'unexpected' => 'Jeśli to nie Ty o to prosiłeś, ktoś inny może znać Twoje hasło. Przywróć konto, logując się, a następnie zmień hasło.',
+        'support' => 'Pytania? Napisz na :support.',
+    ],
 ];

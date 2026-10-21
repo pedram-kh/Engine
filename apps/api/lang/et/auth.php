@@ -75,4 +75,12 @@ return [
             'unexpected' => 'Kui te seda muudatust ei oodanud, võtke ühendust toega.',
         ],
     ],
+    'deletion_mail' => [
+        'subject' => 'Sinu :app konto on kustutamiseks ajastatud',
+        'greeting' => 'Tere, :name!',
+        'body' => 'Saime sinu taotluse kustutada :app konto. See kustutatakse jäädavalt :date ja pärast seda ei saa seda enam tagasi võtta.',
+        'keep' => 'Seni on sinu konto lukus ja midagi pole kustutatud. Selle säilitamiseks logi enne seda kuupäeva sisse oma e-posti ja parooliga ning vali taastamine.',
+        'unexpected' => 'Kui sa seda ei soovinud, võib keegi teine sinu parooli teada. Taasta konto sisselogimisega ja muuda seejärel oma parool.',
+        'support' => 'Küsimusi? Kirjuta aadressil :support.',
+    ],
 ];

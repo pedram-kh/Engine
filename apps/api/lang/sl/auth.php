@@ -80,4 +80,12 @@ return [
             'unexpected' => 'Če te spremembe niste pričakovali, se obrnite na podporo.',
         ],
     ],
+    'deletion_mail' => [
+        'subject' => 'Vaš račun :app je načrtovan za izbris',
+        'greeting' => 'Pozdravljeni, :name,',
+        'body' => 'Prejeli smo vašo zahtevo za izbris računa :app. Trajno bo izbrisan :date, po tem pa tega ni mogoče razveljaviti.',
+        'keep' => 'Do takrat je vaš račun zaklenjen in nič ni izbrisano. Če ga želite obdržati, se pred tem datumom prijavite z e-pošto in geslom ter izberite obnovitev.',
+        'unexpected' => 'Če tega niste zahtevali vi, morda vaše geslo pozna nekdo drug. Obnovite račun s prijavo, nato spremenite geslo.',
+        'support' => 'Vprašanja? Pišite na :support.',
+    ],
 ];

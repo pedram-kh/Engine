@@ -75,4 +75,12 @@ return [
             'unexpected' => 'Jei šio pakeitimo nesitikėjote, susisiekite su palaikymo komanda.',
         ],
     ],
+    'deletion_mail' => [
+        'subject' => 'Jūsų :app paskyra suplanuota ištrinti',
+        'greeting' => 'Sveiki, :name,',
+        'body' => 'Gavome jūsų prašymą ištrinti :app paskyrą. Ji bus visam laikui ištrinta :date, o po to to atšaukti nebebus galima.',
+        'keep' => 'Iki tol jūsų paskyra užrakinta ir niekas neištrinta. Norėdami ją išsaugoti, prieš tą dieną prisijunkite savo el. paštu ir slaptažodžiu ir pasirinkite ją atkurti.',
+        'unexpected' => 'Jei to neprašėte, galbūt kas nors kitas žino jūsų slaptažodį. Atkurkite paskyrą prisijungdami, tada pakeiskite slaptažodį.',
+        'support' => 'Klausimų? Rašykite adresu :support.',
+    ],
 ];

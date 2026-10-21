@@ -80,4 +80,12 @@ return [
             'unexpected' => "Se non ti aspettavi questa modifica, contatta l'assistenza.",
         ],
     ],
+    'deletion_mail' => [
+        'subject' => 'Il tuo account :app è programmato per l\'eliminazione',
+        'greeting' => 'Ciao :name,',
+        'body' => 'Abbiamo ricevuto la tua richiesta di eliminare il tuo account :app. Verrà eliminato definitivamente il :date e dopo non sarà più possibile annullare.',
+        'keep' => 'Fino ad allora il tuo account è bloccato e non è stato cancellato nulla. Per mantenerlo, accedi con la tua email e la tua password prima di quella data e scegli di ripristinarlo.',
+        'unexpected' => 'Se non l\'hai chiesto tu, qualcun altro potrebbe conoscere la tua password. Ripristina l\'account accedendo, poi cambia la password.',
+        'support' => 'Domande? Scrivi a :support.',
+    ],
 ];

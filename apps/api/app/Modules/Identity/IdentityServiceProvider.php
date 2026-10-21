@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Identity;
 
 use App\Modules\Identity\Contracts\PwnedPasswordsClientContract;
+use App\Modules\Identity\Events\AccountDeletionRequested;
 use App\Modules\Identity\Events\EmailVerificationSent;
 use App\Modules\Identity\Events\EmailVerified;
 use App\Modules\Identity\Events\LoginFailed;
@@ -20,6 +21,7 @@ use App\Modules\Identity\Events\UserLoggedOut;
 use App\Modules\Identity\Events\UserSignedUp;
 use App\Modules\Identity\Features\AccountDeletionEnabled;
 use App\Modules\Identity\Guards\CreatorTokenGuard;
+use App\Modules\Identity\Listeners\SendAccountDeletionRequestedMail;
 use App\Modules\Identity\Listeners\WriteAuthAuditLog;
 use App\Modules\Identity\Models\User;
 use App\Modules\Identity\Services\PwnedPasswordsClient;
@@ -164,6 +166,7 @@ final class IdentityServiceProvider extends ServiceProvider
 
     private function registerEventListeners(): void
     {
+        Event::listen(AccountDeletionRequested::class, SendAccountDeletionRequestedMail::class);
         Event::listen(UserLoggedIn::class, [WriteAuthAuditLog::class, 'handleUserLoggedIn']);
         Event::listen(UserLoggedOut::class, [WriteAuthAuditLog::class, 'handleUserLoggedOut']);
         Event::listen(LoginFailed::class, [WriteAuthAuditLog::class, 'handleLoginFailed']);

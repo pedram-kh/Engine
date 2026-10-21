@@ -80,4 +80,12 @@ return [
             'unexpected' => 'Falls du diese Änderung nicht erwartet hast, wende dich an den Support.',
         ],
     ],
+    'deletion_mail' => [
+        'subject' => 'Dein :app-Konto ist zur Löschung vorgemerkt',
+        'greeting' => 'Hallo :name,',
+        'body' => 'Wir haben deine Anfrage zur Löschung deines :app-Kontos erhalten. Es wird am :date endgültig gelöscht, danach lässt sich das nicht mehr rückgängig machen.',
+        'keep' => 'Bis dahin ist dein Konto gesperrt und es wurde nichts gelöscht. Um es zu behalten, melde dich vor diesem Datum mit deiner E-Mail-Adresse und deinem Passwort an und wähle die Wiederherstellung.',
+        'unexpected' => 'Wenn du das nicht veranlasst hast, kennt möglicherweise jemand anderes dein Passwort. Stelle das Konto durch die Anmeldung wieder her und ändere danach dein Passwort.',
+        'support' => 'Fragen? Schreibe an :support.',
+    ],
 ];

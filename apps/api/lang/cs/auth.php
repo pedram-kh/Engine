@@ -80,4 +80,12 @@ return [
             'unexpected' => 'Pokud jste tuto změnu neočekávali, obraťte se na podporu.',
         ],
     ],
+    'deletion_mail' => [
+        'subject' => 'Váš účet :app je naplánován ke smazání',
+        'greeting' => 'Dobrý den, :name,',
+        'body' => 'Obdrželi jsme vaši žádost o smazání účtu :app. Bude trvale smazán dne :date a poté už to nepůjde vrátit zpět.',
+        'keep' => 'Do té doby je váš účet uzamčen a nic nebylo smazáno. Chcete-li jej zachovat, přihlaste se před tímto datem svým e-mailem a heslem a zvolte jeho obnovení.',
+        'unexpected' => 'Pokud jste o to nežádali, možná zná vaše heslo někdo jiný. Obnovte účet přihlášením a poté změňte heslo.',
+        'support' => 'Otázky? Napište na :support.',
+    ],
 ];

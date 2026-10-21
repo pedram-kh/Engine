@@ -80,4 +80,12 @@ return [
             'unexpected' => 'Hvis du ikke forventede denne ændring, skal du kontakte support.',
         ],
     ],
+    'deletion_mail' => [
+        'subject' => 'Din :app-konto er planlagt til sletning',
+        'greeting' => 'Hej :name,',
+        'body' => 'Vi har modtaget din anmodning om at slette din :app-konto. Den slettes permanent den :date, og det kan ikke fortrydes bagefter.',
+        'keep' => 'Indtil da er din konto låst, og intet er slettet. Hvis du vil beholde den, skal du logge ind med din e-mail og adgangskode inden den dato og vælge at gendanne den.',
+        'unexpected' => 'Hvis du ikke har bedt om dette, kender en anden måske din adgangskode. Gendan kontoen ved at logge ind, og skift derefter din adgangskode.',
+        'support' => 'Spørgsmål? Skriv til :support.',
+    ],
 ];

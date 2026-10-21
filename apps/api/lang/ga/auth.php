@@ -75,4 +75,12 @@ return [
             'unexpected' => 'Mura raibh tú ag súil leis an athrú seo, déan teagmháil leis an tacaíocht.',
         ],
     ],
+    'deletion_mail' => [
+        'subject' => 'Tá do chuntas :app sceidealaithe lena scriosadh',
+        'greeting' => 'Dia duit, :name,',
+        'body' => 'Fuaireamar do iarratas chun do chuntas :app a scriosadh. Scriosfar go buan é ar :date é agus ní féidir é a chealú ina dhiaidh sin.',
+        'keep' => 'Go dtí sin tá do chuntas faoi ghlas agus níor scriosadh aon rud. Chun é a choinneáil, sínigh isteach le do ríomhphost agus do phasfhocal roimh an dáta sin agus roghnaigh é a athchóiríú.',
+        'unexpected' => 'Mura ndearna tú an t-iarratas seo, b\'fhéidir go bhfuil do phasfhocal ar eolas ag duine éigin eile. Athchóirigh an cuntas trí shíniú isteach, ansin athraigh do phasfhocal.',
+        'support' => 'Ceisteanna? Scríobh chuig :support.',
+    ],
 ];
