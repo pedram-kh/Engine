@@ -89,6 +89,13 @@ final class CampaignAssignment extends Model
     use SoftDeletes;
 
     /**
+     * `cancelled_reason` of an assignment the system cancelled because its creator's
+     * account was erased (AH-104b-del). A code, not a sentence: the apps render it in
+     * the reader's language, and any other value is shown as the free text it is.
+     */
+    public const string CANCELLED_REASON_CREATOR_ERASED = 'creator_account_erased';
+
+    /**
      * @var list<string>
      */
     protected $fillable = [

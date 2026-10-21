@@ -38,7 +38,7 @@ it('counts what the graph holds (soft-deleted rows included)', function (): void
     $set = SubjectSet::resolve(ErasureGraph::seedSubject('a')->user);
 
     expect($set->summary())->toBe([
-        'assignments' => 1,
+        'assignments' => 2,
         'applications' => 2,
         'message_threads' => 1,
         'relationship_threads' => 1,

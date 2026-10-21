@@ -27,7 +27,7 @@ uses(TestCase::class, RefreshDatabase::class);
 /** @return array<string, list<Disposition>> table => the acting dispositions the registry gives it */
 function actingDispositions(): array
 {
-    $acting = [Disposition::Anon, Disposition::EraseRow, Disposition::ScrubJson, Disposition::DelMatch];
+    $acting = [Disposition::Anon, Disposition::EraseRow, Disposition::ScrubJson, Disposition::DelMatch, Disposition::Cancel];
     $out = [];
     foreach (ErasureRegistry::tables() as $table => $rule) {
         $found = [];
@@ -73,7 +73,7 @@ it('gives every selection a unique id, a plan stage and a description', function
 
     expect($ids)->toBe(array_values(array_unique($ids)));
     foreach (Selections::all() as $selection) {
-        expect($selection->stage)->toMatch('/^4[a-e]$/')
+        expect($selection->stage)->toMatch('/^4([a-e]|h)$/')
             ->and($selection->description)->not->toBe('');
     }
 });

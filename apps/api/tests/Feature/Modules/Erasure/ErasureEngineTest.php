@@ -21,10 +21,23 @@ uses(TestCase::class, RefreshDatabase::class);
 
 const STAGES_4A_4D = ['4a', '4b', '4c', '4d'];
 
-/** @return array<string, int> every selection id that is not the audit scrub => expected count */
+/** @return list<string> the selection ids the ENGINE executes (4a to 4d): not the audit scrub, not the rider's cancellations */
+function engineSelectionIds(): array
+{
+    $ids = [];
+    foreach (Selections::all() as $selection) {
+        if (in_array($selection->stage, STAGES_4A_4D, true)) {
+            $ids[] = $selection->id;
+        }
+    }
+
+    return $ids;
+}
+
+/** @return array<string, int> every selection the engine executes => expected count */
 function dbStageExpected(): array
 {
-    return array_filter(ErasureGraph::expectedCounts(), fn (string $id): bool => ! str_starts_with($id, 'audit_logs.'), ARRAY_FILTER_USE_KEY);
+    return array_intersect_key(ErasureGraph::expectedCounts(), array_flip(engineSelectionIds()));
 }
 
 /** @return array<string, string> table => md5 of every row, in a stable order */
@@ -56,7 +69,7 @@ function engineRowCounts(): array
 /** @return array<string, int> the dry-run counts of the database stages only */
 function dbStageDryRun(SubjectSet $subject): array
 {
-    return array_filter((new DryRun)->run($subject)->counts(), fn (string $id): bool => ! str_starts_with($id, 'audit_logs.'), ARRAY_FILTER_USE_KEY);
+    return array_intersect_key((new DryRun)->run($subject)->counts(), array_flip(engineSelectionIds()));
 }
 
 it('does what its dry-run said: the executed counts equal the dry-run counts, key for key', function (): void {
@@ -237,13 +250,13 @@ it('is atomic: a failure after any step, even the user marker, rolls the whole r
         ->and(User::withTrashed()->findOrFail($a->user->id)->isErased())->toBeFalse();
 })->with(['first step' => ['sessions'], 'middle step' => ['creator_social_accounts'], 'after the user row' => ['users']]);
 
-it('refuses a stage it cannot execute (audit scrub, files, vendors)', function (string $stage): void {
+it('refuses a stage it cannot execute (audit scrub, files, vendors, the rider\'s cancellations)', function (string $stage): void {
     $subject = SubjectSet::resolve(ErasureGraph::seedSubject('a')->user);
     $before = engineTableDigests();
 
     expect(fn () => (new ErasureEngine)->run($subject, null, [$stage]))->toThrow(InvalidArgumentException::class)
         ->and(engineTableDigests())->toBe($before);
-})->with(['4e', '4f', '4g']);
+})->with(['4e', '4f', '4g', '4h']);
 
 it('has a writer for every selection of 4a to 4d, and no writer for anything else', function (): void {
     $ids = [];

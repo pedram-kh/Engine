@@ -121,8 +121,45 @@ final class SendAssignmentNotifications
             AuditAction::AssignmentManuallyVerified => $this->notifyCreatorOfManualVerification($assignment, $actor),
             AuditAction::AssignmentLiveVerified => $this->notifyCreatorOfLiveVerification($assignment, $actor),
             AuditAction::AssignmentInvited, AuditAction::AssignmentReInvited => $this->notifyCreatorOfInvite($assignment, $event->action, $actor),
+            AuditAction::AssignmentCancelled => $this->notifyAgencyOfErasedCreator($assignment),
             default => null,
         };
+    }
+
+    /**
+     * AH-104b-del (the AH-104a rider) — the agency learns an assignment ended because the
+     * creator's account was erased. The ONLY cancellation that notifies: every other one is
+     * the agency's own act and stays as quiet as it was, so this fires on the system's fixed
+     * reason with no acting user and on nothing else.
+     *
+     * One in-app row per admin/manager (staff excluded, as for the other agency fan-outs); no
+     * mail and no push (the type is push-ineligible, pinned). The payload carries NO creator
+     * name: the person is gone, so there is nothing for the 4d scrub to remove, and the app
+     * renders a localised "deleted creator" from `is_erased`.
+     */
+    private function notifyAgencyOfErasedCreator(CampaignAssignment $assignment): void
+    {
+        if ($assignment->cancelled_reason !== CampaignAssignment::CANCELLED_REASON_CREATOR_ERASED || $assignment->cancelled_by_user_id !== null) {
+            return;
+        }
+
+        $campaign = $assignment->campaign;
+        if ($campaign === null) {
+            return;
+        }
+
+        $this->notifyAgencyMembers(
+            $assignment,
+            NotificationType::AssignmentCancelled,
+            null,
+            [
+                'campaign_name' => $campaign->name,
+                'campaign_ulid' => $campaign->ulid,
+                'assignment_ulid' => $assignment->ulid,
+                'reason' => CampaignAssignment::CANCELLED_REASON_CREATOR_ERASED,
+                'is_erased' => true,
+            ],
+        );
     }
 
     /**

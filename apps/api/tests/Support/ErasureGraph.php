@@ -7,6 +7,7 @@ namespace Tests\Support;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Models\AuditLog;
+use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignApplication;
 use App\Modules\Campaigns\Models\CampaignAssignment;
@@ -102,6 +103,8 @@ final class ErasureGraph
             'message_email_debounces' => 1,
             'agency_creator_relations.invitation' => 1,
             'campaign_applications.note' => 1,
+            // The graph's open assignment; its terminal twin (seeded below) is deliberately not counted.
+            'campaign_assignments.cancel' => 1,
             'messages.attachments' => 1,
             'relationship_messages.attachments' => 1,
             'notifications.own_feed' => 2,
@@ -166,6 +169,8 @@ final class ErasureGraph
         CampaignJobNotification::factory()->createOne(['creator_id' => $creator->id]);
 
         $assignment = CampaignAssignment::factory()->createOne(['campaign_id' => $campaign->id, 'creator_id' => $creator->id]);
+        // A finished one: the rider must leave it as it is (a leak or a miss shows as a count that is not 1).
+        CampaignAssignment::factory()->createOne(['campaign_id' => Campaign::factory()->createOne()->id, 'creator_id' => $creator->id, 'status' => AssignmentStatus::Declined]);
         $thread = MessageThread::factory()->createOne(['assignment_id' => $assignment->id]);
         $ownMessage = Message::factory()->fromCreator()->createOne(['thread_id' => $thread->id, 'sender_user_id' => $user->id]);
         MessageReadReceipt::factory()->createOne(['message_id' => $ownMessage->id, 'user_id' => $user->id]);

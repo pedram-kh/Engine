@@ -6,6 +6,7 @@ namespace App\Modules\Erasure\Run;
 
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Services\AuditLogger;
+use App\Modules\Erasure\Cancellation\CancelOpenAssignments;
 use App\Modules\Erasure\Enums\ErasureLedgerState;
 use App\Modules\Erasure\Execution\AuditScrub;
 use App\Modules\Erasure\Execution\ErasureEngine;
@@ -17,6 +18,7 @@ use App\Modules\Erasure\Ledger\LedgerMirror;
 use App\Modules\Erasure\Ledger\MirrorWriteFailed;
 use App\Modules\Erasure\Models\ErasureLedger;
 use App\Modules\Erasure\Selection\DryRun;
+use App\Modules\Erasure\Selection\Selections;
 use App\Modules\Erasure\Subject\SubjectNotErasable;
 use App\Modules\Erasure\Subject\SubjectSet;
 use App\Modules\Identity\Models\User;
@@ -35,7 +37,9 @@ use Throwable;
  *   2. vendors          (4g)       none to call: any real vendor was a refusal above
  *   3. objects          (4f)       keys captured before any write; an already-gone key is done
  *   4. database         (4a-4d)    ONE transaction; the ledger and the audit row commit with it,
- *                                  and so does a closing audit pass (rows written since step 1)
+ *                                  and so does a closing audit pass (rows written since step 1).
+ *                                  Inside it, after the writes and before the closing pass: the
+ *                                  open assignments are cancelled (4h, the AH-104b-del rider)
  *   5. ledger mirror   (7)         outside the database, so a restore cannot undo it
  *   6. ledger completed
  *
@@ -52,6 +56,7 @@ final class ErasureRun
         private readonly AuditScrub $auditScrub,
         private readonly AuditLogger $audit,
         private readonly LedgerMirror $mirror,
+        private readonly CancelOpenAssignments $cancelOpen,
     ) {}
 
     /**
@@ -147,6 +152,12 @@ final class ErasureRun
             $deletedObjects = $this->fileStep->run($plan->files);
 
             (new ErasureEngine)->run($subject, null, ErasureEngine::STAGES, function (array $changed) use ($ledger, $user, $operator, $scrubbed, $deletedObjects, $plan, $subject): void {
+                // The rider (4h): the creator's open assignments are cancelled through the state machine,
+                // inside this transaction (a failure rolls the erasure back) and BEFORE the closing audit
+                // pass, so the audit rows the cancellations write are covered by it.
+                $changed[Selections::CANCEL_ASSIGNMENTS] = $this->cancelOpen->run($subject);
+                ksort($changed);
+
                 // The closing pass. The user is still signed in until this transaction commits, so a
                 // request that landed after the first scrub (a login, a failed attempt) wrote an audit
                 // row the first pass never saw. This pass runs inside the transaction: it narrows that

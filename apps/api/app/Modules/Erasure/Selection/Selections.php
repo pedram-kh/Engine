@@ -6,6 +6,7 @@ namespace App\Modules\Erasure\Selection;
 
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Agencies\Models\BrandCreatorBlacklist;
+use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Campaigns\Models\CampaignApplication;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Creators\Models\Creator;
@@ -40,8 +41,24 @@ final class Selections
     /** What the erasure writes into an encrypted NOT NULL string column. */
     public const ERASED = '[erased]';
 
+    /** The selection the rider's step reads (it is not a raw write, so the engine skips its stage). */
+    public const string CANCEL_ASSIGNMENTS = 'campaign_assignments.cancel';
+
+    public const string CANCEL_STAGE = '4h';
+
     /** @var list<Selection>|null */
     private static ?array $all = null;
+
+    public static function find(string $id): Selection
+    {
+        foreach (self::all() as $selection) {
+            if ($selection->id === $id) {
+                return $selection;
+            }
+        }
+
+        throw new \InvalidArgumentException("No selection {$id}.");
+    }
 
     /** @return list<Selection> */
     public static function all(): array
@@ -50,6 +67,7 @@ final class Selections
             ...self::identityAndTokens(),
             ...self::satellites(),
             ...self::agencyHeld(),
+            ...self::cancellations(),
             ...self::jsonScrubs(),
             ...self::auditScrub(),
         ];
@@ -142,6 +160,28 @@ final class Selections
             new Selection('relationship_messages.attachments', 'relationship_messages', Disposition::ScrubJson, '4c', 'relationship messages sent by the subject user that still carry attachments',
                 fn (SubjectSet $s, ConnectionInterface $db): Builder => $db->table('relationship_messages')->where('sender_user_id', $s->userId)->whereNotNull('attachments'),
                 static fn (stdClass $row, SubjectSet $s): bool => self::jsonHasContent($row->attachments ?? null)),
+        ];
+    }
+
+    // ── 4h the rider: open assignments are cancelled, not written ───────────
+
+    /**
+     * Not a raw write. The state machine does it (audit row, event, notification), so the
+     * engine never runs this stage; `Cancellation\CancelOpenAssignments` does, inside the
+     * engine's transaction, from the same predicate the dry-run counts.
+     *
+     * @return list<Selection>
+     */
+    private static function cancellations(): array
+    {
+        $terminal = array_values(array_map(
+            static fn (AssignmentStatus $status): string => $status->value,
+            array_filter(AssignmentStatus::cases(), static fn (AssignmentStatus $status): bool => $status->isTerminal()),
+        ));
+
+        return [
+            new Selection(self::CANCEL_ASSIGNMENTS, 'campaign_assignments', Disposition::Cancel, self::CANCEL_STAGE, 'the subject creator\'s assignments that are not yet in a terminal state',
+                fn (SubjectSet $s, ConnectionInterface $db): Builder => $db->table('campaign_assignments')->where('creator_id', $s->creatorId)->whereNull('deleted_at')->whereNotIn('status', $terminal)),
         ];
     }
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Erasure\Registry;
 
 /**
- * The seven codes of the approved PII map (docs/reviews/account-deletion-pii-map.md §0).
+ * The seven codes of the approved PII map, plus {@see self::Cancel} (the AH-104b-del rider) (docs/reviews/account-deletion-pii-map.md §0).
  * The string values are the map's own, so a reader can diff the two.
  */
 enum Disposition: string
@@ -30,4 +30,13 @@ enum Disposition: string
 
     /** No creator data in this table (map §3.7). */
     case NotApplicable = 'N/A';
+
+    /**
+     * Not in the approved map: the AH-104b-del rider. An open (non-terminal) assignment
+     * of the erased creator is moved to `cancelled` through the state machine, with a
+     * fixed reason and no acting user, so the agency is not left waiting on a person
+     * who no longer exists. The row stays (it is an anchor); only its status changes.
+     * Executed by `Cancellation\CancelOpenAssignments`, not by the engine's raw writers.
+     */
+    case Cancel = 'CANCEL';
 }
