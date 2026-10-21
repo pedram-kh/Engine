@@ -230,17 +230,25 @@ it('refuses an unauthenticated caller', function (): void {
     $this->postJson('/api/v1/me/account-deletion', delBody())->assertUnauthorized();
 });
 
-it('refuses an agency user with the not-available code and changes nothing', function (): void {
+it('refuses an agency user before the password or a code is even looked at', function (): void {
     $agencyUser = User::factory()->agencyAdmin()->createOne();
+    $svc = app(TwoFactorService::class);
+    $agencyUser->forceFill([
+        'two_factor_secret' => $svc->generateSecret(),
+        'two_factor_recovery_codes' => [],
+        'two_factor_confirmed_at' => now(),
+    ])->saveQuietly();
 
-    $this->actingAs($agencyUser, 'web')->postJson('/api/v1/me/account-deletion', delBody())
+    // Wrong password, no code, 2FA on: every answer is the same "not available" (no oracle, no counters).
+    $this->actingAs($agencyUser->refresh(), 'web')->postJson('/api/v1/me/account-deletion', delBody(['password' => 'nope']))
         ->assertForbidden()
         ->assertJsonPath('errors.0.code', 'account_deletion.not_available');
 
-    expect(User::query()->findOrFail($agencyUser->id)->deletion_requested_at)->toBeNull();
+    expect(User::query()->findOrFail($agencyUser->id)->deletion_requested_at)->toBeNull()
+        ->and(app(TwoFactorVerificationThrottle::class)->isSoftLocked($agencyUser))->toBeFalse();
 });
 
-it('refuses a suspended creator and an erased one without touching them', function (): void {
+it('refuses a suspended creator and an erased one before the password is looked at, and touches nothing', function (): void {
     [$suspended] = delCreator('s');
     $suspended->forceFill(['is_suspended' => true, 'suspended_reason' => 'x'])->saveQuietly();
     [$erased] = delCreator('e');
@@ -248,7 +256,7 @@ it('refuses a suspended creator and an erased one without touching them', functi
 
     foreach ([$suspended, $erased] as $user) {
         $before = delCreds($user);
-        $this->actingAs($user->refresh(), 'web')->postJson('/api/v1/me/account-deletion', delBody())
+        $this->actingAs($user->refresh(), 'web')->postJson('/api/v1/me/account-deletion', delBody(['password' => 'nope']))
             ->assertForbidden()
             ->assertJsonPath('errors.0.code', 'account_deletion.not_available');
         expect(User::query()->findOrFail($user->id)->deletion_requested_at)->toBeNull()
@@ -363,6 +371,18 @@ it('applies the sign-in second-factor throttle: locked at 5 bad codes, enrollmen
     $this->actingAs($user, 'web')->postJson('/api/v1/me/account-deletion', delBody(['mfa_code' => delTotp($secret)]))
         ->assertStatus(423)
         ->assertJsonPath('errors.0.code', 'auth.mfa.enrollment_suspended');
+    delAssertUntouched($user, $before);
+});
+
+it('refuses a creator whose second factor was suspended by an admin, even with a right code', function (): void {
+    [$user, $secret] = delMfaCreator();
+    $user->forceFill(['two_factor_enrollment_suspended_at' => now()])->saveQuietly();
+    $before = delCreds($user);
+
+    $this->actingAs($user->refresh(), 'web')->postJson('/api/v1/me/account-deletion', delBody(['mfa_code' => delTotp($secret)]))
+        ->assertStatus(423)
+        ->assertJsonPath('errors.0.code', 'auth.mfa.enrollment_suspended');
+
     delAssertUntouched($user, $before);
 });
 
