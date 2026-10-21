@@ -30,6 +30,8 @@
 
 import { ApiError, UI_LOCALES } from '@catalyst/api-client'
 import type {
+  AccountDeletionRequest,
+  AccountDeletionResult,
   ConfirmTotpRequest,
   DisableTotpRequest,
   EnableTotpResponse,
@@ -57,7 +59,7 @@ import { nativeTokenStore } from '@/core/auth/tokenStore'
 import { setLocale } from '@/core/i18n'
 import { isNativePlatform, nativePlatform } from '@/core/platform/isNativePlatform'
 import { clearIconBadge } from '@/core/platform/badge/iconBadge'
-import { pushLogoutCleanup } from '@/core/platform/push/pushLogoutCleanup'
+import { pushForgetLocal, pushLogoutCleanup } from '@/core/platform/push/pushLogoutCleanup'
 import { setAuthRebootstrap, useAgencyStore } from '@/core/stores/useAgencyStore'
 import { resetWelcomeBackFlag } from '@/modules/onboarding/internal/welcomeBackFlag'
 import { authApi } from '../api/auth.api'
@@ -461,6 +463,28 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  /**
+   * AH-104b-del — ask for the creator's own account to be deleted. On success the server
+   * has already revoked every session and token, so there is NO `logout()` here: that
+   * call would 401 and trip the session-lapsed policy. The local state is cleared
+   * directly (the native token store and push record on the app, the in-memory user on
+   * both). A failure throws before anything is cleared, so the form can show its error.
+   */
+  async function requestAccountDeletion(
+    payload: AccountDeletionRequest,
+  ): Promise<AccountDeletionResult> {
+    const result = await authApi.requestAccountDeletion(payload)
+    sessionLapsed.value = false
+    if (isNativePlatform()) {
+      await pushForgetLocal().catch(() => undefined)
+      await nativeTokenStore()
+        .clear()
+        .catch(() => undefined)
+    }
+    clearUser()
+    return result
+  }
+
   async function signUp(payload: SignUpRequest): Promise<User> {
     isSigningUp.value = true
     try {
@@ -653,6 +677,7 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     loginWithToken,
     logout,
+    requestAccountDeletion,
     reconcileInstall,
     signUp,
     setPreferredLanguage,

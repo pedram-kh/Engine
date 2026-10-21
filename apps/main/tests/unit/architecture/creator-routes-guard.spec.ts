@@ -103,6 +103,8 @@ describe('creator-shell routes — requireAuth registration (AH-056, C3)', () =>
       'creator.notifications',
       'creator.notifications.preferences',
       'creator.profile',
+      // AH-104b-del B4 — the delete-account section (flag-gated).
+      'creator.security',
     ])
   })
 
@@ -112,13 +114,21 @@ describe('creator-shell routes — requireAuth registration (AH-056, C3)', () =>
 
     // Non-vacuity: a parser that stops matching would make the loop below pass
     // by having nothing to check.
-    expect(creatorShell.length).toBeGreaterThanOrEqual(11)
+    expect(creatorShell.length).toBeGreaterThanOrEqual(12)
 
     for (const r of creatorShell) {
       expect(r.guards, `creator-shell route ${r.name} is missing requireAuth`).toContain(
         'requireAuth',
       )
     }
+  })
+
+  it('the Security route is flag-gated: requireAuth THEN requireAccountDeletionEnabled (AH-104b-del B4)', async () => {
+    const routes = await parseRoutes(CREATOR_ROUTES)
+    const security = routes.find((r) => r.name === 'creator.security')
+
+    expect(security, 'creator.security must exist').toBeDefined()
+    expect(security?.guards).toEqual(['requireAuth', 'requireAccountDeletionEnabled'])
   })
 
   it('declares NO creator-shell route outside the creators module', async () => {

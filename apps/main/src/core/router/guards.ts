@@ -326,6 +326,31 @@ export async function requireAgencyUser(ctx: GuardContext): Promise<GuardResult>
   return { name: 'onboarding.welcome-back' }
 }
 
+/**
+ * AH-104b-del B4 — the Security page (delete account) exists only while the flag is on.
+ *
+ * The server resolves it per user into `attributes.features.account_deletion` (true only for
+ * a creator with `account_deletion_enabled` active), so the route, the avatar-menu entry and
+ * the native More entry all read the same value. With the flag off the route does not render:
+ * the creator goes to the dashboard, the same place a missing page would send them, and the
+ * API itself answers 404 to the request.
+ *
+ * Composes AFTER `requireAuth` (a resolved user is assumed; none falls through to sign-in).
+ */
+export async function requireAccountDeletionEnabled(ctx: GuardContext): Promise<GuardResult> {
+  const { store } = ctx
+
+  if (store.user === null) {
+    return { name: 'auth.sign-in' }
+  }
+
+  if (store.user.attributes.features?.account_deletion === true) {
+    return null
+  }
+
+  return { name: 'creator.dashboard' }
+}
+
 export const guards: Record<
   | 'requireAuth'
   | 'requireGuest'
@@ -333,7 +358,8 @@ export const guards: Record<
   | 'requireMfaUnlessExempt'
   | 'requireAgencyAdmin'
   | 'requireOnboardingAccess'
-  | 'requireAgencyUser',
+  | 'requireAgencyUser'
+  | 'requireAccountDeletionEnabled',
   (ctx: GuardContext) => Promise<GuardResult>
 > = {
   requireAuth,
@@ -343,4 +369,5 @@ export const guards: Record<
   requireAgencyAdmin,
   requireOnboardingAccess,
   requireAgencyUser,
+  requireAccountDeletionEnabled,
 }

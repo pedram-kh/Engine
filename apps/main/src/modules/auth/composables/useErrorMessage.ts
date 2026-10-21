@@ -113,7 +113,11 @@ function isLikelyBundledCode(code: string): boolean {
     //   invitation.already_accepted, invitation.email_mismatch.
     // Bundle entries live in the en/pt/it `auth.json` files under
     // `invitation.*`.
-    code.startsWith('invitation.')
+    code.startsWith('invitation.') ||
+    // AH-104b-del — `POST /me/account-deletion` answers `account_deletion.blocked` (with
+    // `meta.reasons`) and `account_deletion.not_available`. Bundle entries live in every
+    // locale's `creator.json`; `i18n-account-deletion-codes.spec.ts` walks the controller.
+    code.startsWith('account_deletion.')
   )
 }
 

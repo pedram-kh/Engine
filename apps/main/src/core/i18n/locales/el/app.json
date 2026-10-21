@@ -1264,7 +1264,8 @@
         "uploadFailed": "Δεν ήταν δυνατή η μεταφόρτωση του αρχείου. Δοκιμάστε ξανά.",
         "deleteFailed": "Δεν ήταν δυνατή η διαγραφή του αρχείου. Δοκιμάστε ξανά."
       }
-    }
+    },
+    "creatorErased": "Διαγραμμένος δημιουργός"
   },
   "validation": {
     "field_required": "This field is required."

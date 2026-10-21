@@ -1264,7 +1264,8 @@
         "uploadFailed": "Det gick inte att ladda upp filen. Försök igen.",
         "deleteFailed": "Det gick inte att ta bort filen. Försök igen."
       }
-    }
+    },
+    "creatorErased": "Raderad skapare"
   },
   "validation": {
     "field_required": "Det här fältet är obligatoriskt."

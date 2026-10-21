@@ -45,6 +45,7 @@ import {
   requireAgencyAdmin,
   requireOnboardingAccess,
   requireAgencyUser,
+  requireAccountDeletionEnabled,
   guards,
   type AuthStore,
   type GuardContext,
@@ -471,6 +472,50 @@ describe('requireAgencyUser', () => {
 
   it('is registered in the guards registry', () => {
     expect(guards.requireAgencyUser).toBe(requireAgencyUser)
+  })
+})
+
+describe('requireAccountDeletionEnabled (AH-104b-del B4)', () => {
+  function userWith(features: unknown) {
+    const user = makeUser({ user_type: 'creator' })
+    ;(user.attributes as unknown as Record<string, unknown>)['features'] = features
+    return user
+  }
+
+  it('lets a creator through when the server says the feature is on', async () => {
+    const store = makeStore({ user: userWith({ account_deletion: true }) })
+    const result = await requireAccountDeletionEnabled(
+      makeCtx(store, makeRoute('creator.security', '/creator/security')),
+    )
+    expect(result).toBeNull()
+  })
+
+  it('sends the creator to the dashboard when the feature is off', async () => {
+    const store = makeStore({ user: userWith({ account_deletion: false }) })
+    const result = await requireAccountDeletionEnabled(
+      makeCtx(store, makeRoute('creator.security', '/creator/security')),
+    )
+    expect(result).toEqual({ name: 'creator.dashboard' })
+  })
+
+  it('treats a response without `features` (an older payload) as off', async () => {
+    const store = makeStore({ user: userWith(undefined) })
+    const result = await requireAccountDeletionEnabled(
+      makeCtx(store, makeRoute('creator.security', '/creator/security')),
+    )
+    expect(result).toEqual({ name: 'creator.dashboard' })
+  })
+
+  it('falls through to sign-in when no user is signed in (defensive)', async () => {
+    const store = makeStore({ user: null })
+    const result = await requireAccountDeletionEnabled(
+      makeCtx(store, makeRoute('creator.security', '/creator/security')),
+    )
+    expect(result).toEqual({ name: 'auth.sign-in' })
+  })
+
+  it('is registered in the guards registry', () => {
+    expect(guards.requireAccountDeletionEnabled).toBe(requireAccountDeletionEnabled)
   })
 })
 

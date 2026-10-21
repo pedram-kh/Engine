@@ -121,6 +121,13 @@ export interface UserAttributes {
   mfa_exempt: boolean
   last_login_at: string | null
   created_at: string
+  /**
+   * Server-resolved feature switches that gate SPA surfaces. Optional so a
+   * response from before the field existed (and every older fixture) still types.
+   * `account_deletion` is true only for a creator while `AccountDeletionEnabled`
+   * is on: the Security page, its route and its menu entries all read it.
+   */
+  features?: { account_deletion: boolean }
 }
 
 /**

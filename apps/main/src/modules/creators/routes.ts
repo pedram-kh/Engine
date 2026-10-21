@@ -128,6 +128,18 @@ export const creatorsRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    // AH-104b-del B4 — Security: the delete-account section. Under `/creator/` on purpose
+    // (the creator shell), unlike the public `/delete-account` page, which must stay outside
+    // the AASA-captured prefix. The second guard sends everyone home while the flag is off.
+    path: '/creator/security',
+    name: 'creator.security',
+    component: () => import('./pages/SecurityPage.vue'),
+    meta: {
+      layout: 'creator',
+      guards: ['requireAuth', 'requireAccountDeletionEnabled'],
+    },
+  },
+  {
     // AH-010b — the creator-shell relationship-messaging inbox (top-level
     // "Messages" nav, D9). Lists the creator's 1:1 threads, one per connected
     // agency. Symmetric to the agency inbox (Q5). AH-013: the thread is now a

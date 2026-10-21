@@ -1264,7 +1264,8 @@
         "uploadFailed": "Não foi possível carregar o ficheiro. Tente novamente.",
         "deleteFailed": "Não foi possível eliminar o ficheiro. Tente novamente."
       }
-    }
+    },
+    "creatorErased": "Criador eliminado"
   },
   "validation": {
     "field_required": "Este campo é obrigatório."

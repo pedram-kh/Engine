@@ -603,7 +603,39 @@
         "upload_wrong_type": "This file type is not supported. Use {allowed_types}.",
         "upload_failed": "The upload failed. Please try again.",
         "portfolio_max_reached": "You can upload up to {max} portfolio oġġetti."
+      },
+      "security": {
+        "title": "Sigurtà",
+        "delete": {
+          "title": "Neħħi l-kont",
+          "intro": "Tista' titlobna nħassru l-kont tiegħek. Xejn ma jitneħħa minnufih: għandek 14-il jum biex tbiddel fikrek.",
+          "erasedTitle": "Dak li nħassru",
+          "erased": "Ismek, l-email, in-numru tat-telefon, l-indirizz, id-data tat-twelid, il-bijografija, ir-ritratti u l-fajls tiegħek, u d-dettalji tal-login tiegħek.",
+          "keptTitle": "Dak li jibqa'",
+          "kept": "Il-messaġġi, l-applikazzjonijiet, il-kuntratti u r-rekords tal-kampanji jibqgħu mal-aġenziji li ħdimt magħhom. Ismek jitneħħa minnhom. Is-sensji miftuħa jiġu kkanċellati.",
+          "graceTitle": "Jekk tbiddel fikrek",
+          "grace": "Il-kont tiegħek jingħalaq u titneħħa minn kullimkien malli tikkonferma. Biex tikkanċella, idħol bl-email u l-password fi żmien 14-il jum u agħżel li terġa' tibdih. Wara dan, ma jistax jiġi mreġġa' lura.",
+          "button": "Neħħi l-kont tiegħi"
+        },
+        "dialog": {
+          "title": "Tneħħi l-kont tiegħek?",
+          "acknowledge": "Nifhem x'se jitħassar u x'se jibqa'.",
+          "typePrompt": "Ittajpja {word} biex tikkonferma.",
+          "typeLabel": "Kelma ta' konferma",
+          "word": "ĦASSAR"
+        }
       }
+    },
+    "unavailable": "Dan il-kreatur m'għadux disponibbli."
+  },
+  "account_deletion": {
+    "blocked": "Ma nistgħux inneħħu dan il-kont għadu.",
+    "not_available": "It-tneħħija tal-kont mhix disponibbli għal dan il-kont.",
+    "blockers": {
+      "payment": "Pagament fuq il-kont tiegħek għadu qed jiġi saldat.",
+      "vendor": "Verifika tal-identità jew tal-ħlas ma' fornitur estern għadha miftuħa.",
+      "other": "Xi ħaġa fuq il-kont tiegħek għad trid tiġi solvuta.",
+      "contact": "Ikteb lil {email} u se ngħinuk."
     }
   }
 }

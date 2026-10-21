@@ -1264,7 +1264,8 @@
         "uploadFailed": "Failu nevarēja augšupielādēt. Lūdzu, mēģiniet vēlreiz.",
         "deleteFailed": "Failu nevarēja dzēst. Lūdzu, mēģiniet vēlreiz."
       }
-    }
+    },
+    "creatorErased": "Dzēsts satura veidotājs"
   },
   "validation": {
     "field_required": "This field is required."

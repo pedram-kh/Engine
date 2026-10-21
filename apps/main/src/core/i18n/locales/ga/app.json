@@ -1264,7 +1264,8 @@
         "uploadFailed": "Níorbh fhéidir an comhad a uaslódáil. Bain triail eile as.",
         "deleteFailed": "Níorbh fhéidir an comhad a scriosadh. Bain triail eile as."
       }
-    }
+    },
+    "creatorErased": "Cruthaitheoir scriosta"
   },
   "validation": {
     "field_required": "This field is required."

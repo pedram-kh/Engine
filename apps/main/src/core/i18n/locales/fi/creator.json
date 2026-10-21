@@ -603,7 +603,39 @@
         "upload_wrong_type": "This file type is not supported. Use {allowed_types}.",
         "upload_failed": "The upload failed. Please try again.",
         "portfolio_max_reached": "You can upload up to {max} portfolio kohteet."
+      },
+      "security": {
+        "title": "Turvallisuus",
+        "delete": {
+          "title": "Poista tili",
+          "intro": "Voit pyytää meitä poistamaan tilisi. Mitään ei poisteta heti: sinulla on 14 päivää aikaa muuttaa mielesi.",
+          "erasedTitle": "Mitä poistamme",
+          "erased": "Nimesi, sähköpostiosoitteesi, puhelinnumerosi, osoitteesi, syntymäaikasi, esittelysi, kuvasi ja tiedostosi sekä kirjautumistietosi.",
+          "keptTitle": "Mitä jää",
+          "kept": "Viestit, hakemukset, sopimukset ja kampanjatiedot jäävät toimistoille, joiden kanssa olet työskennellyt. Nimesi poistetaan niistä. Avoimet toimeksiannot perutaan.",
+          "graceTitle": "Jos muutat mielesi",
+          "grace": "Tilisi lukitaan ja sinut kirjataan ulos kaikkialta heti, kun vahvistat. Peruuttaaksesi kirjaudu sisään sähköpostilla ja salasanalla 14 päivän kuluessa ja valitse palautus. Sen jälkeen sitä ei voi perua.",
+          "button": "Poista tilini"
+        },
+        "dialog": {
+          "title": "Poistetaanko tilisi?",
+          "acknowledge": "Ymmärrän, mitä poistetaan ja mitä jää.",
+          "typePrompt": "Vahvista kirjoittamalla {word}.",
+          "typeLabel": "Vahvistussana",
+          "word": "POISTA"
+        }
       }
+    },
+    "unavailable": "Tämä sisällöntuottaja ei ole enää saatavilla."
+  },
+  "account_deletion": {
+    "blocked": "Emme voi vielä poistaa tätä tiliä.",
+    "not_available": "Tilin poistaminen ei ole käytettävissä tälle tilille.",
+    "blockers": {
+      "payment": "Tilisi maksu on vielä käsittelyssä.",
+      "vendor": "Henkilöllisyyden tai maksujen tarkistus ulkopuolisen palveluntarjoajan kanssa on vielä kesken.",
+      "other": "Tililläsi on vielä jotain selvitettävää.",
+      "contact": "Kirjoita osoitteeseen {email}, niin autamme."
     }
   }
 }

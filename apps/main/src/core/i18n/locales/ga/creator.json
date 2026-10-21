@@ -603,7 +603,39 @@
         "upload_wrong_type": "This file type is not supported. Use {allowed_types}.",
         "upload_failed": "The upload failed. Please try again.",
         "portfolio_max_reached": "You can upload up to {max} portfolio míreanna."
+      },
+      "security": {
+        "title": "Slándáil",
+        "delete": {
+          "title": "Scrios an cuntas",
+          "intro": "Is féidir leat iarraidh orainn do chuntas a scriosadh. Ní bhainfear aon rud láithreach: tá 14 lá agat chun d'intinn a athrú.",
+          "erasedTitle": "An méid a scriosaimid",
+          "erased": "D'ainm, do ríomhphost, d'uimhir ghutháin, do sheoladh, do dháta breithe, do bheathaisnéis, do ghrianghraif agus do chomhaid, agus do shonraí sínithe isteach.",
+          "keptTitle": "An méid a fhanann",
+          "kept": "Fanann teachtaireachtaí, iarratais, conarthaí agus taifid feachtais ag na gníomhaireachtaí ar oibrigh tú leo. Baintear d'ainm astu. Cealaítear sannadh oscailte.",
+          "graceTitle": "Má athraíonn tú d'intinn",
+          "grace": "Cuirtear do chuntas faoi ghlas agus sínítear amach thú gach áit a luaithe a dhearbhaíonn tú. Chun cealú, sínigh isteach le do ríomhphost agus do phasfhocal laistigh de 14 lá agus roghnaigh é a athchóiriú. Ina dhiaidh sin, ní féidir é a chealú.",
+          "button": "Scrios mo chuntas"
+        },
+        "dialog": {
+          "title": "An scriosfar do chuntas?",
+          "acknowledge": "Tuigim cad a scriosfar agus cad a fhanfaidh.",
+          "typePrompt": "Clóscríobh {word} le deimhniú.",
+          "typeLabel": "Focal deimhnithe",
+          "word": "SCRIOS"
+        }
       }
+    },
+    "unavailable": "Níl an cruthaitheoir seo ar fáil a thuilleadh."
+  },
+  "account_deletion": {
+    "blocked": "Ní féidir linn an cuntas seo a scriosadh go fóill.",
+    "not_available": "Níl scriosadh cuntais ar fáil don chuntas seo.",
+    "blockers": {
+      "payment": "Tá íocaíocht ar do chuntas á socrú fós.",
+      "vendor": "Tá seiceáil céannachta nó íocaíochta le soláthraí seachtrach oscailte fós.",
+      "other": "Tá rud éigin ar do chuntas nach mór a réiteach fós.",
+      "contact": "Scríobh chuig {email} agus cabhróimid leat."
     }
   }
 }

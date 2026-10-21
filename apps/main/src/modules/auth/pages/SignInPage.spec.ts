@@ -133,6 +133,31 @@ describe('SignInPage', () => {
     )
   })
 
+  it('shows the deletion-scheduled banner, with the date, after the delete-account dialog (AH-104b-del)', async () => {
+    const h = await mountAuthPage(SignInPage, {
+      initialRoute: {
+        path: '/sign-in',
+        query: { reason: 'deletion_scheduled', date: '2026-11-04T10:00:00+00:00' },
+      },
+    })
+    teardown = h.unmount
+    await flushPromises()
+    const banner = h.wrapper.find('[data-test="deletion-scheduled-banner"]')
+    expect(banner.exists()).toBe(true)
+    expect(banner.text()).toContain('November')
+    expect(banner.text()).toContain('2026')
+    expect(h.wrapper.find('[data-test="session-expired-banner"]').exists()).toBe(false)
+  })
+
+  it('shows no deletion banner for a missing or unparseable date', async () => {
+    const h = await mountAuthPage(SignInPage, {
+      initialRoute: { path: '/sign-in', query: { reason: 'deletion_scheduled', date: 'soon' } },
+    })
+    teardown = h.unmount
+    await flushPromises()
+    expect(h.wrapper.find('[data-test="deletion-scheduled-banner"]').exists()).toBe(false)
+  })
+
   it('happy path: agency_user — calls login() and pushes to / on 2xx', async () => {
     vi.mocked(authApi.login).mockResolvedValue(USER)
     const h = await mountAuthPage(SignInPage)

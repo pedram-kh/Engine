@@ -1264,7 +1264,8 @@
         "uploadFailed": "Il-fajl ma setax jiġi uploadjat. Erġa' pprova.",
         "deleteFailed": "Il-fajl ma setax jitħassar. Erġa' pprova."
       }
-    }
+    },
+    "creatorErased": "Kreatur imneħħi"
   },
   "validation": {
     "field_required": "This field is required."

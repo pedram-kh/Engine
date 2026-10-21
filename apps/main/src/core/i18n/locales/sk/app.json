@@ -1264,7 +1264,8 @@
         "uploadFailed": "Súbor sa nepodarilo nahrať. Skúste to znova.",
         "deleteFailed": "Súbor sa nepodarilo odstrániť. Skúste to znova."
       }
-    }
+    },
+    "creatorErased": "Zmazaný tvorca"
   },
   "validation": {
     "field_required": "Toto pole je povinné."

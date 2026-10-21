@@ -104,6 +104,12 @@ export interface PushRegistration {
   start(handlers: PushHandlers): () => void
   /** Sign-out: forget the token server-side and at FCM. Best-effort; never throws. */
   logoutCleanup(timeoutMs?: number): Promise<void>
+  /**
+   * Account deletion: the server has already dropped every token with the credentials,
+   * so there is no `DELETE /me/push-tokens` to make (it would 401 into the session-lapsed
+   * policy). Wipe the local record and the FCM token only. Best-effort; never throws.
+   */
+  forgetLocal(): Promise<void>
 }
 
 export function createPushRegistration(deps: PushRegistrationDeps): PushRegistration {
@@ -318,11 +324,25 @@ export function createPushRegistration(deps: PushRegistrationDeps): PushRegistra
     }
   }
 
+  async function forgetLocal(): Promise<void> {
+    storage.remove(STORAGE_KEYS.token)
+    storage.remove(STORAGE_KEYS.registeredAt)
+    if (!isAvailable()) {
+      return
+    }
+    try {
+      await client.deleteToken()
+    } catch {
+      // Best-effort: the token is already useless server-side.
+    }
+  }
+
   return {
     permission,
     refreshPermission,
     isSoftAskDue,
     accept,
+    forgetLocal,
     decline,
     syncIfGranted,
     registerAfterSignIn,

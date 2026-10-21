@@ -65,10 +65,22 @@ describe('DisableTotpPage', () => {
     )
   })
 
-  it('happy path: calls disableTotp with password + mfa_code, navigates to settings', async () => {
+  async function disableAndGetRedirect(userType: 'creator' | 'agency_user') {
     vi.mocked(authApi.disableTotp).mockResolvedValue(undefined)
-    vi.mocked(authApi.me).mockResolvedValue(USER_AFTER_DISABLE)
-    const h = await mountAuthPage(DisableTotpPage)
+    vi.mocked(authApi.me).mockResolvedValue({
+      ...USER_AFTER_DISABLE,
+      attributes: { ...USER_AFTER_DISABLE.attributes, user_type: userType },
+    })
+    const h = await mountAuthPage(DisableTotpPage, {
+      beforeMount: ({ router }) => {
+        // The auth route table has `settings`; the creator shell's own table owns this one.
+        router.addRoute({
+          path: '/creator/security',
+          name: 'creator.security',
+          component: { template: '<div />' },
+        })
+      },
+    })
     teardown = h.unmount
     const pushSpy = vi.spyOn(h.router, 'push')
     await h.wrapper.find('[data-test="disable-totp-password"] input').setValue('Pa$$w0rd!12')
@@ -79,7 +91,26 @@ describe('DisableTotpPage', () => {
       password: 'Pa$$w0rd!12',
       mfa_code: '123456',
     })
-    expect(pushSpy).toHaveBeenCalledWith({ name: 'app.settings' })
+    return { h, pushSpy }
+  }
+
+  it('happy path (creator): calls disableTotp with password + mfa_code, goes to creator.security', async () => {
+    const { h, pushSpy } = await disableAndGetRedirect('creator')
+    expect(pushSpy).toHaveBeenCalledWith({ name: 'creator.security' })
+    expect(h.router.currentRoute.value.name).toBe('creator.security')
+  })
+
+  it('happy path (agency user): goes to the settings page', async () => {
+    const { h, pushSpy } = await disableAndGetRedirect('agency_user')
+    expect(pushSpy).toHaveBeenCalledWith({ name: 'settings' })
+    // The target is a real, registered route (the old name was not).
+    expect(h.router.hasRoute('settings')).toBe(true)
+  })
+
+  it('never navigates to the old, unregistered `app.settings` route', async () => {
+    const { h } = await disableAndGetRedirect('creator')
+    expect(h.router.hasRoute('app.settings')).toBe(false)
+    expect(h.router.getRoutes().some((r) => r.name === h.router.currentRoute.value.name)).toBe(true)
   })
 
   it('on auth.mfa.invalid_code, renders the i18n string', async () => {

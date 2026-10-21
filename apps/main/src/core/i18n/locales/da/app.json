@@ -1264,7 +1264,8 @@
         "uploadFailed": "Filen kunne ikke uploades. Prøv igen.",
         "deleteFailed": "Filen kunne ikke slettes. Prøv igen."
       }
-    }
+    },
+    "creatorErased": "Slettet creator"
   },
   "validation": {
     "field_required": "Dette felt er påkrævet."

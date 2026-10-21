@@ -603,7 +603,39 @@
         "upload_wrong_type": "Denne filtype understøttes ikke. Brug {allowed_types}.",
         "upload_failed": "Upload mislykkedes. Prøv igen.",
         "portfolio_max_reached": "Du kan uploade op til {max} portfolio-elementer."
+      },
+      "security": {
+        "title": "Sikkerhed",
+        "delete": {
+          "title": "Slet konto",
+          "intro": "Du kan bede os om at slette din konto. Intet fjernes med det samme: du har 14 dage til at fortryde.",
+          "erasedTitle": "Det sletter vi",
+          "erased": "Dit navn, din e-mail, dit telefonnummer, din adresse, din fødselsdato, din bio, dine billeder og filer samt dine loginoplysninger.",
+          "keptTitle": "Det bliver tilbage",
+          "kept": "Beskeder, ansøgninger, kontrakter og kampagneoplysninger bliver hos de bureauer, du har arbejdet med. Dit navn fjernes fra dem. Åbne opgaver annulleres.",
+          "graceTitle": "Hvis du fortryder",
+          "grace": "Din konto låses, og du bliver logget ud overalt, så snart du bekræfter. For at annullere skal du logge ind med din e-mail og adgangskode inden for 14 dage og vælge at gendanne den. Derefter kan det ikke fortrydes.",
+          "button": "Slet min konto"
+        },
+        "dialog": {
+          "title": "Vil du slette din konto?",
+          "acknowledge": "Jeg forstår, hvad der slettes, og hvad der bliver tilbage.",
+          "typePrompt": "Skriv {word} for at bekræfte.",
+          "typeLabel": "Bekræftelsesord",
+          "word": "SLET"
+        }
       }
+    },
+    "unavailable": "Denne creator er ikke længere tilgængelig."
+  },
+  "account_deletion": {
+    "blocked": "Vi kan ikke slette denne konto endnu.",
+    "not_available": "Sletning af konto er ikke tilgængelig for denne konto.",
+    "blockers": {
+      "payment": "En betaling på din konto er stadig under afvikling.",
+      "vendor": "En identitets- eller udbetalingskontrol hos en ekstern leverandør er stadig åben.",
+      "other": "Noget på din konto skal stadig afklares.",
+      "contact": "Skriv til {email}, så hjælper vi dig."
     }
   }
 }

@@ -603,7 +603,39 @@
         "upload_wrong_type": "This file type is not supported. Use {allowed_types}.",
         "upload_failed": "The upload failed. Please try again.",
         "portfolio_max_reached": "You can upload up to {max} portfolio üksused."
+      },
+      "security": {
+        "title": "Turvalisus",
+        "delete": {
+          "title": "Kustuta konto",
+          "intro": "Võid paluda meil oma konto kustutada. Midagi ei eemaldata kohe: sul on 14 päeva meelt muuta.",
+          "erasedTitle": "Mida me kustutame",
+          "erased": "Sinu nime, e-posti, telefoninumbri, aadressi, sünniaja, tutvustuse, fotod ja failid ning sisselogimisandmed.",
+          "keptTitle": "Mis jääb alles",
+          "kept": "Sõnumid, kandideerimised, lepingud ja kampaaniakirjed jäävad agentuuridele, kellega oled töötanud. Sinu nimi eemaldatakse neist. Avatud tööülesanded tühistatakse.",
+          "graceTitle": "Kui muudad meelt",
+          "grace": "Sinu konto lukustatakse ja sind logitakse kõikjal välja kohe, kui kinnitad. Tühistamiseks logi 14 päeva jooksul sisse e-posti ja parooliga ning vali taastamine. Pärast seda ei saa seda enam tagasi võtta.",
+          "button": "Kustuta minu konto"
+        },
+        "dialog": {
+          "title": "Kas kustutada sinu konto?",
+          "acknowledge": "Saan aru, mis kustutatakse ja mis jääb alles.",
+          "typePrompt": "Kinnitamiseks sisesta {word}.",
+          "typeLabel": "Kinnitussõna",
+          "word": "KUSTUTA"
+        }
       }
+    },
+    "unavailable": "See sisulooja ei ole enam saadaval."
+  },
+  "account_deletion": {
+    "blocked": "Me ei saa seda kontot veel kustutada.",
+    "not_available": "Konto kustutamine ei ole selle konto jaoks saadaval.",
+    "blockers": {
+      "payment": "Sinu konto makse on veel arveldamisel.",
+      "vendor": "Isiku- või väljamaksekontroll välise teenusepakkujaga on veel pooleli.",
+      "other": "Midagi sinu kontol tuleb veel lahendada.",
+      "contact": "Kirjuta aadressile {email} ja me aitame."
     }
   }
 }

@@ -1264,7 +1264,8 @@
         "loadFailed": "Failed to load settings.",
         "saveFailed": "Failed to save settings."
       }
-    }
+    },
+    "creatorErased": "Deleted creator"
   },
   "validation": {
     "field_required": "This field is required."

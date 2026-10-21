@@ -603,7 +603,39 @@
         "upload_wrong_type": "Dit bestandstype wordt niet ondersteund. Gebruik {allowed_types}.",
         "upload_failed": "De upload is mislukt. Probeer het opnieuw.",
         "portfolio_max_reached": "Je kunt maximaal {max} portfolio-items uploaden."
+      },
+      "security": {
+        "title": "Beveiliging",
+        "delete": {
+          "title": "Account verwijderen",
+          "intro": "Je kunt ons vragen je account te verwijderen. Er wordt niet meteen iets gewist: je hebt 14 dagen om van gedachten te veranderen.",
+          "erasedTitle": "Wat we verwijderen",
+          "erased": "Je naam, e-mailadres, telefoonnummer, adres, geboortedatum, bio, foto's en bestanden, en je inloggegevens.",
+          "keptTitle": "Wat blijft",
+          "kept": "Berichten, aanmeldingen, contracten en campagnegegevens blijven bij de bureaus waarmee je hebt gewerkt. Je naam wordt daarin verwijderd. Openstaande opdrachten worden geannuleerd.",
+          "graceTitle": "Als je van gedachten verandert",
+          "grace": "Je account wordt vergrendeld en je wordt overal uitgelogd zodra je bevestigt. Om te annuleren log je binnen 14 dagen in met je e-mailadres en wachtwoord en kies je voor herstellen. Daarna kan het niet meer ongedaan worden gemaakt.",
+          "button": "Mijn account verwijderen"
+        },
+        "dialog": {
+          "title": "Je account verwijderen?",
+          "acknowledge": "Ik begrijp wat er wordt verwijderd en wat blijft.",
+          "typePrompt": "Typ {word} om te bevestigen.",
+          "typeLabel": "Bevestigingswoord",
+          "word": "VERWIJDEREN"
+        }
       }
+    },
+    "unavailable": "Deze creator is niet meer beschikbaar."
+  },
+  "account_deletion": {
+    "blocked": "We kunnen dit account nog niet verwijderen.",
+    "not_available": "Account verwijderen is niet beschikbaar voor dit account.",
+    "blockers": {
+      "payment": "Een betaling op je account wordt nog afgewikkeld.",
+      "vendor": "Een identiteits- of uitbetalingscontrole bij een externe partij is nog open.",
+      "other": "Er moet nog iets op je account worden geregeld.",
+      "contact": "Schrijf naar {email} en we helpen je."
     }
   }
 }

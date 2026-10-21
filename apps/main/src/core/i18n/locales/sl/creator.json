@@ -603,7 +603,39 @@
         "upload_wrong_type": "Tento typ souboru není podporován. Použijte {allowed_types}.",
         "upload_failed": "Nahrávání selhalo. Zkuste to znova.",
         "portfolio_max_reached": "Můžete nahrát až {max} položek portfolia."
+      },
+      "security": {
+        "title": "Varnost",
+        "delete": {
+          "title": "Izbriši račun",
+          "intro": "Lahko nas prosite, da izbrišemo vaš račun. Nič se ne odstrani takoj: imate 14 dni, da si premislite.",
+          "erasedTitle": "Kaj izbrišemo",
+          "erased": "Vaše ime, e-pošto, telefonsko številko, naslov, datum rojstva, opis, fotografije in datoteke ter podatke za prijavo.",
+          "keptTitle": "Kaj ostane",
+          "kept": "Sporočila, prijave, pogodbe in zapisi kampanj ostanejo pri agencijah, s katerimi ste sodelovali. Vaše ime se iz njih odstrani. Odprte naloge se prekličejo.",
+          "graceTitle": "Če si premislite",
+          "grace": "Vaš račun se zaklene in odjavljeni ste povsod, takoj ko potrdite. Za preklic se v 14 dneh prijavite z e-pošto in geslom ter izberite obnovitev. Po tem tega ni več mogoče razveljaviti.",
+          "button": "Izbriši moj račun"
+        },
+        "dialog": {
+          "title": "Želite izbrisati račun?",
+          "acknowledge": "Razumem, kaj bo izbrisano in kaj ostane.",
+          "typePrompt": "Za potrditev vnesite {word}.",
+          "typeLabel": "Potrditvena beseda",
+          "word": "IZBRIŠI"
+        }
       }
+    },
+    "unavailable": "Ta ustvarjalec ni več na voljo."
+  },
+  "account_deletion": {
+    "blocked": "Tega računa še ne moremo izbrisati.",
+    "not_available": "Brisanje računa za ta račun ni na voljo.",
+    "blockers": {
+      "payment": "Plačilo na vašem računu se še obdeluje.",
+      "vendor": "Preverjanje identitete ali izplačil pri zunanjem ponudniku je še odprto.",
+      "other": "Nekaj na vašem računu je še treba rešiti.",
+      "contact": "Pišite na {email} in vam bomo pomagali."
     }
   }
 }

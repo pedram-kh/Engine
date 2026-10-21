@@ -603,7 +603,39 @@
         "upload_wrong_type": "Questo tipo di file non è supportato. Utilizza {allowed_types}.",
         "upload_failed": "Il caricamento non è riuscito. Riprova.",
         "portfolio_max_reached": "Puoi caricare fino a {max} elementi nel portfolio."
+      },
+      "security": {
+        "title": "Sicurezza",
+        "delete": {
+          "title": "Elimina account",
+          "intro": "Puoi chiederci di eliminare il tuo account. Non viene rimosso nulla subito: hai 14 giorni per cambiare idea.",
+          "erasedTitle": "Cosa eliminiamo",
+          "erased": "Il tuo nome, e-mail, numero di telefono, indirizzo, data di nascita, bio, foto e file, e i tuoi dati di accesso.",
+          "keptTitle": "Cosa resta",
+          "kept": "Messaggi, candidature, contratti e dati delle campagne restano alle agenzie con cui hai lavorato. Il tuo nome vi viene rimosso. Gli incarichi aperti vengono annullati.",
+          "graceTitle": "Se cambi idea",
+          "grace": "Il tuo account viene bloccato e la tua sessione chiusa ovunque appena confermi. Per annullare, accedi con e-mail e password entro 14 giorni e scegli di ripristinarlo. Dopo, non si può più annullare.",
+          "button": "Elimina il mio account"
+        },
+        "dialog": {
+          "title": "Eliminare il tuo account?",
+          "acknowledge": "Capisco cosa verrà eliminato e cosa resterà.",
+          "typePrompt": "Scrivi {word} per confermare.",
+          "typeLabel": "Parola di conferma",
+          "word": "ELIMINA"
+        }
       }
+    },
+    "unavailable": "Questo creator non è più disponibile."
+  },
+  "account_deletion": {
+    "blocked": "Non possiamo ancora eliminare questo account.",
+    "not_available": "L'eliminazione dell'account non è disponibile per questo account.",
+    "blockers": {
+      "payment": "Un pagamento sul tuo account è ancora in corso di regolamento.",
+      "vendor": "Una verifica di identità o di pagamento con un fornitore esterno è ancora aperta.",
+      "other": "Qualcosa sul tuo account deve ancora essere risolto.",
+      "contact": "Scrivi a {email} e ti aiuteremo."
     }
   }
 }

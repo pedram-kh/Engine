@@ -603,7 +603,39 @@
         "upload_wrong_type": "This file type is not supported. Use {allowed_types}.",
         "upload_failed": "The upload failed. Please try again.",
         "portfolio_max_reached": "You can upload up to {max} portfolio elemente."
+      },
+      "security": {
+        "title": "Securitate",
+        "delete": {
+          "title": "Șterge contul",
+          "intro": "Ne poți cere să îți ștergem contul. Nu se șterge nimic imediat: ai 14 zile să te răzgândești.",
+          "erasedTitle": "Ce ștergem",
+          "erased": "Numele, e-mailul, numărul de telefon, adresa, data nașterii, biografia, fotografiile și fișierele tale, plus datele de autentificare.",
+          "keptTitle": "Ce rămâne",
+          "kept": "Mesajele, candidaturile, contractele și evidențele campaniilor rămân la agențiile cu care ai lucrat. Numele tău este eliminat din ele. Sarcinile deschise sunt anulate.",
+          "graceTitle": "Dacă te răzgândești",
+          "grace": "Contul tău este blocat și ești deconectat peste tot imediat ce confirmi. Pentru a anula, autentifică-te cu e-mailul și parola în 14 zile și alege restaurarea. După aceea, nu se mai poate anula.",
+          "button": "Șterge-mi contul"
+        },
+        "dialog": {
+          "title": "Ștergi contul?",
+          "acknowledge": "Înțeleg ce va fi șters și ce va rămâne.",
+          "typePrompt": "Tastează {word} pentru a confirma.",
+          "typeLabel": "Cuvânt de confirmare",
+          "word": "ȘTERGE"
+        }
       }
+    },
+    "unavailable": "Acest creator nu mai este disponibil."
+  },
+  "account_deletion": {
+    "blocked": "Nu putem șterge încă acest cont.",
+    "not_available": "Ștergerea contului nu este disponibilă pentru acest cont.",
+    "blockers": {
+      "payment": "O plată din contul tău este încă în curs de decontare.",
+      "vendor": "O verificare de identitate sau de plată la un furnizor extern este încă deschisă.",
+      "other": "Ceva din contul tău mai trebuie rezolvat.",
+      "contact": "Scrie la {email} și te vom ajuta."
     }
   }
 }

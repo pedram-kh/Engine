@@ -603,7 +603,39 @@
         "upload_wrong_type": "This file type is not supported. Use {allowed_types}.",
         "upload_failed": "The upload failed. Please try again.",
         "portfolio_max_reached": "You can upload up to {max} portfolio vienumi."
+      },
+      "security": {
+        "title": "Drošība",
+        "delete": {
+          "title": "Dzēst kontu",
+          "intro": "Varat lūgt mūs dzēst jūsu kontu. Nekas netiek noņemts uzreiz: jums ir 14 dienas, lai pārdomātu.",
+          "erasedTitle": "Ko mēs dzēšam",
+          "erased": "Jūsu vārdu, e-pastu, tālruņa numuru, adresi, dzimšanas datumu, aprakstu, fotoattēlus un failus, kā arī pieteikšanās datus.",
+          "keptTitle": "Kas paliek",
+          "kept": "Ziņojumi, pieteikumi, līgumi un kampaņu ieraksti paliek aģentūrās, ar kurām strādājāt. Jūsu vārds no tiem tiek noņemts. Atvērtie uzdevumi tiek atcelti.",
+          "graceTitle": "Ja pārdomāsiet",
+          "grace": "Jūsu konts tiek bloķēts, un jūs tiekat izrakstīts visur, līdzko apstiprināt. Lai atceltu, 14 dienu laikā pierakstieties ar e-pastu un paroli un izvēlieties atjaunošanu. Pēc tam to vairs nevar atcelt.",
+          "button": "Dzēst manu kontu"
+        },
+        "dialog": {
+          "title": "Vai dzēst jūsu kontu?",
+          "acknowledge": "Es saprotu, kas tiks dzēsts un kas paliks.",
+          "typePrompt": "Ierakstiet {word}, lai apstiprinātu.",
+          "typeLabel": "Apstiprinājuma vārds",
+          "word": "DZĒST"
+        }
       }
+    },
+    "unavailable": "Šis satura veidotājs vairs nav pieejams."
+  },
+  "account_deletion": {
+    "blocked": "Šo kontu vēl nevaram dzēst.",
+    "not_available": "Konta dzēšana šim kontam nav pieejama.",
+    "blockers": {
+      "payment": "Maksājums jūsu kontā vēl tiek apstrādāts.",
+      "vendor": "Identitātes vai izmaksu pārbaude pie ārēja pakalpojumu sniedzēja vēl nav pabeigta.",
+      "other": "Kaut kas jūsu kontā vēl jānokārto.",
+      "contact": "Rakstiet uz {email}, un mēs palīdzēsim."
     }
   }
 }

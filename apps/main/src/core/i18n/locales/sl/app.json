@@ -1264,7 +1264,8 @@
         "uploadFailed": "Datoteke ni bilo mogoče naložiti. Poskusite znova.",
         "deleteFailed": "Datoteke ni bilo mogoče izbrisati. Poskusite znova."
       }
-    }
+    },
+    "creatorErased": "Izbrisan ustvarjalec"
   },
   "validation": {
     "field_required": "To polje je obvezno."

@@ -5,12 +5,13 @@
  * Per chunk-5 priority #10: disable requires BOTH the user's current
  * password AND a working 2FA code (TOTP or recovery code).
  *
- * On success, navigates to a placeholder settings route (chunk-7
- * scope owns the real settings surface).
+ * On success, navigates back to where the user manages their account: `creator.security`
+ * for a creator, `settings` for everyone else. (It used to push `app.settings`, a route that
+ * has never existed, so a successful disable ended on a failed navigation. AH-104b-del B5.)
  */
 
 import { ApiError } from '@catalyst/api-client'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
@@ -23,6 +24,13 @@ const router = useRouter()
 const store = useAuthStore()
 const { isDisablingTotp } = storeToRefs(store)
 
+/** Where "done" and "cancel" go: the creator's Security page, or the agency Settings page. */
+const backTo = computed(() =>
+  store.user?.attributes.user_type === 'creator'
+    ? { name: 'creator.security' }
+    : { name: 'settings' },
+)
+
 const password = ref('')
 const code = ref('')
 const errorKey = ref<string | null>(null)
@@ -33,7 +41,7 @@ async function onSubmit(): Promise<void> {
   errorValues.value = {}
   try {
     await store.disableTotp({ password: password.value, mfa_code: code.value })
-    await router.push({ name: 'app.settings' })
+    await router.push(backTo.value)
   } catch (err) {
     if (err instanceof ApiError) {
       const resolved = resolveErrorMessage(err, (k) => te(k))
@@ -96,7 +104,7 @@ async function onSubmit(): Promise<void> {
     </form>
 
     <div class="mt-4 text-body-2">
-      <router-link :to="{ name: 'app.settings' }" data-test="disable-totp-back">
+      <router-link :to="backTo" data-test="disable-totp-back">
         {{ t('auth.ui.actions.cancel') }}
       </router-link>
     </div>

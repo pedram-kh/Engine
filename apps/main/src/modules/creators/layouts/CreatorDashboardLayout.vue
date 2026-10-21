@@ -57,6 +57,13 @@ const localeOptions = buildLocaleOptions()
 const userMenuOpen = ref(false)
 
 /**
+ * AH-104b-del B4 — the Security entry (web avatar menu, native More) shows only while the
+ * server says the feature is on for this creator. The route carries the same check, so a
+ * stale entry cannot open a page that is off.
+ */
+const showSecurity = computed(() => user.value?.attributes.features?.account_deletion === true)
+
+/**
  * AH-108 (D2) — the shell's ONE unread-count poll. The bell and the Messages nav
  * item draw numbers from it, so there is a single 45 s request, not one per
  * consumer. Creator layout only (Q2): the agency layout provides nothing and its
@@ -340,6 +347,14 @@ onMounted(() => {
               @click="userMenuOpen = false"
             />
             <v-list-item
+              v-if="showSecurity"
+              :to="{ name: 'creator.security' }"
+              :title="t('creator.ui.security.title')"
+              prepend-icon="mdi-shield-lock-outline"
+              data-test="security-link"
+              @click="userMenuOpen = false"
+            />
+            <v-list-item
               :disabled="isLoggingOut"
               :title="isLoggingOut ? t('app.userMenu.signingOut') : t('app.userMenu.signOut')"
               prepend-icon="mdi-logout"
@@ -438,6 +453,16 @@ onMounted(() => {
             :title="t('availability.creatorNav.settings')"
             :subtitle="moreSubtitle('settings')"
             data-test="creator-bottom-nav-more-settings"
+            @click="moreMenuOpen = false"
+          />
+          <!-- AH-104b-del B4 — Security is its own row, apart from Settings (which stays the
+               notification preferences). Flag-gated like the route. -->
+          <v-list-item
+            v-if="isNative && showSecurity"
+            :to="{ name: 'creator.security' }"
+            prepend-icon="mdi-shield-lock-outline"
+            :title="t('creator.ui.security.title')"
+            data-test="creator-bottom-nav-more-security"
             @click="moreMenuOpen = false"
           />
         </v-list>

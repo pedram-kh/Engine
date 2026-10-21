@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Modules\Identity\Http\Resources;
 
 use App\Modules\Agencies\Models\AgencyMembership;
+use App\Modules\Identity\Features\AccountDeletionEnabled;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Laravel\Pennant\Feature;
 
 /**
  * Public projection of a {@see User}, shaped per docs/04-API-DESIGN.md §7.
@@ -51,6 +53,14 @@ final class UserResource extends JsonResource
                 'mfa_exempt' => $user->isMfaExempt(),
                 'last_login_at' => $user->last_login_at?->toIso8601String(),
                 'created_at' => $user->created_at->toIso8601String(),
+                // AH-104b-del: the first menu-level flag. The Security entry and
+                // its route read this, never a separate request. Only a creator
+                // can ask for deletion, so everyone else is `false` without
+                // evaluating the flag at all. A gate for the UI only: the API
+                // enforces the flag itself (404), so a stale `true` is harmless.
+                'features' => [
+                    'account_deletion' => $user->isCreator() && Feature::active(AccountDeletionEnabled::NAME),
+                ],
             ],
             'relationships' => [
                 'agency_memberships' => [

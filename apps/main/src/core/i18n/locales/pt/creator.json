@@ -603,7 +603,39 @@
         "upload_wrong_type": "Este tipo de ficheiro não é suportado. Utilize {allowed_types}.",
         "upload_failed": "O carregamento falhou. Por favor tente novamente.",
         "portfolio_max_reached": "Pode carregar até {max} itens no portfólio."
+      },
+      "security": {
+        "title": "Segurança",
+        "delete": {
+          "title": "Eliminar conta",
+          "intro": "Pode pedir-nos que eliminemos a sua conta. Nada é removido de imediato: tem 14 dias para mudar de ideias.",
+          "erasedTitle": "O que eliminamos",
+          "erased": "O seu nome, e-mail, número de telefone, morada, data de nascimento, biografia, fotografias e ficheiros, e os seus dados de acesso.",
+          "keptTitle": "O que permanece",
+          "kept": "As mensagens, candidaturas, contratos e registos de campanhas permanecem nas agências com que trabalhou. O seu nome é removido deles. As atribuições em aberto são canceladas.",
+          "graceTitle": "Se mudar de ideias",
+          "grace": "A sua conta é bloqueada e a sua sessão é terminada em todo o lado assim que confirmar. Para cancelar, inicie sessão com o e-mail e a palavra-passe no prazo de 14 dias e escolha restaurá-la. Depois disso, não é possível desfazer.",
+          "button": "Eliminar a minha conta"
+        },
+        "dialog": {
+          "title": "Eliminar a sua conta?",
+          "acknowledge": "Compreendo o que será eliminado e o que permanece.",
+          "typePrompt": "Escreva {word} para confirmar.",
+          "typeLabel": "Palavra de confirmação",
+          "word": "ELIMINAR"
+        }
       }
+    },
+    "unavailable": "Este criador já não está disponível."
+  },
+  "account_deletion": {
+    "blocked": "Ainda não podemos eliminar esta conta.",
+    "not_available": "A eliminação da conta não está disponível para esta conta.",
+    "blockers": {
+      "payment": "Um pagamento na sua conta ainda está a ser liquidado.",
+      "vendor": "Uma verificação de identidade ou de pagamento junto de um prestador externo ainda está em aberto.",
+      "other": "Há algo na sua conta que ainda precisa de ser resolvido.",
+      "contact": "Escreva para {email} e ajudaremos."
     }
   }
 }

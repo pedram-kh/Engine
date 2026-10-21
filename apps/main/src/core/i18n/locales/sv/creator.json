@@ -603,7 +603,39 @@
         "upload_wrong_type": "Den här filtypen stöds inte. Använd {allowed_types}.",
         "upload_failed": "Uppladdningen misslyckades. Försök igen.",
         "portfolio_max_reached": "Du kan ladda upp upp till {max} portfolioposter."
+      },
+      "security": {
+        "title": "Säkerhet",
+        "delete": {
+          "title": "Radera konto",
+          "intro": "Du kan be oss radera ditt konto. Inget tas bort direkt: du har 14 dagar på dig att ändra dig.",
+          "erasedTitle": "Det här raderar vi",
+          "erased": "Ditt namn, din e-postadress, ditt telefonnummer, din adress, ditt födelsedatum, din presentation, dina foton och filer samt dina inloggningsuppgifter.",
+          "keptTitle": "Det här finns kvar",
+          "kept": "Meddelanden, ansökningar, avtal och kampanjuppgifter finns kvar hos byråerna du arbetat med. Ditt namn tas bort från dem. Öppna uppdrag avbryts.",
+          "graceTitle": "Om du ändrar dig",
+          "grace": "Ditt konto låses och du loggas ut överallt så fort du bekräftar. För att avbryta loggar du in med e-post och lösenord inom 14 dagar och väljer att återställa det. Efter det går det inte att ångra.",
+          "button": "Radera mitt konto"
+        },
+        "dialog": {
+          "title": "Radera ditt konto?",
+          "acknowledge": "Jag förstår vad som raderas och vad som finns kvar.",
+          "typePrompt": "Skriv {word} för att bekräfta.",
+          "typeLabel": "Bekräftelseord",
+          "word": "RADERA"
+        }
       }
+    },
+    "unavailable": "Den här skaparen är inte längre tillgänglig."
+  },
+  "account_deletion": {
+    "blocked": "Vi kan inte radera det här kontot ännu.",
+    "not_available": "Radering av konto är inte tillgängligt för det här kontot.",
+    "blockers": {
+      "payment": "En betalning på ditt konto är fortfarande under hantering.",
+      "vendor": "En identitets- eller utbetalningskontroll hos en extern leverantör är fortfarande öppen.",
+      "other": "Något på ditt konto behöver fortfarande lösas.",
+      "contact": "Skriv till {email} så hjälper vi dig."
     }
   }
 }

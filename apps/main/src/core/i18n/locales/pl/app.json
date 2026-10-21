@@ -1264,7 +1264,8 @@
         "uploadFailed": "Nie udało się wgrać pliku. Spróbuj ponownie.",
         "deleteFailed": "Nie udało się usunąć pliku. Spróbuj ponownie."
       }
-    }
+    },
+    "creatorErased": "Usunięty twórca"
   },
   "validation": {
     "field_required": "To pole jest wymagane."

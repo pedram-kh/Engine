@@ -603,7 +603,39 @@
         "upload_wrong_type": "Ce type de fichier n'est pas pris en charge. Utilisez {allowed_types}.",
         "upload_failed": "Le téléversement a échoué. Veuillez réessayer.",
         "portfolio_max_reached": "Vous pouvez téléverser jusqu'à {max} éléments de portfolio."
+      },
+      "security": {
+        "title": "Sécurité",
+        "delete": {
+          "title": "Supprimer le compte",
+          "intro": "Vous pouvez nous demander de supprimer votre compte. Rien n'est effacé tout de suite : vous avez 14 jours pour changer d'avis.",
+          "erasedTitle": "Ce que nous supprimons",
+          "erased": "Votre nom, e-mail, numéro de téléphone, adresse, date de naissance, biographie, photos et fichiers, ainsi que vos identifiants de connexion.",
+          "keptTitle": "Ce qui reste",
+          "kept": "Les messages, candidatures, contrats et dossiers de campagne restent chez les agences avec lesquelles vous avez travaillé. Votre nom y est retiré. Les missions en cours sont annulées.",
+          "graceTitle": "Si vous changez d'avis",
+          "grace": "Votre compte est verrouillé et vous êtes déconnecté partout dès que vous confirmez. Pour annuler, connectez-vous avec votre e-mail et votre mot de passe dans les 14 jours et choisissez de le restaurer. Après cela, c'est irréversible.",
+          "button": "Supprimer mon compte"
+        },
+        "dialog": {
+          "title": "Supprimer votre compte ?",
+          "acknowledge": "Je comprends ce qui sera supprimé et ce qui restera.",
+          "typePrompt": "Saisissez {word} pour confirmer.",
+          "typeLabel": "Mot de confirmation",
+          "word": "SUPPRIMER"
+        }
       }
+    },
+    "unavailable": "Ce créateur n'est plus disponible."
+  },
+  "account_deletion": {
+    "blocked": "Nous ne pouvons pas encore supprimer ce compte.",
+    "not_available": "La suppression du compte n'est pas disponible pour ce compte.",
+    "blockers": {
+      "payment": "Un paiement sur votre compte est encore en cours de règlement.",
+      "vendor": "Une vérification d'identité ou de versement auprès d'un prestataire externe est encore ouverte.",
+      "other": "Un point de votre compte doit encore être réglé.",
+      "contact": "Écrivez à {email} et nous vous aiderons."
     }
   }
 }

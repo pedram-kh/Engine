@@ -603,7 +603,39 @@
         "upload_wrong_type": "This file type is not supported. Use {allowed_types}.",
         "upload_failed": "The upload failed. Please try again.",
         "portfolio_max_reached": "You can upload up to {max} portfolio items."
+      },
+      "security": {
+        "title": "Security",
+        "delete": {
+          "title": "Delete account",
+          "intro": "You can ask us to delete your account. Nothing is removed right away: you have 14 days to change your mind.",
+          "erasedTitle": "What we delete",
+          "erased": "Your name, email, phone number, address, date of birth, bio, photos and files, and your sign-in details.",
+          "keptTitle": "What stays",
+          "kept": "Messages, applications, contracts and campaign records stay with the agencies you worked with. Your name on them is removed. Open assignments are cancelled.",
+          "graceTitle": "If you change your mind",
+          "grace": "Your account is locked and you are signed out everywhere as soon as you confirm. To cancel, sign in with your email and password within 14 days and choose to restore it. After that, it cannot be undone.",
+          "button": "Delete my account"
+        },
+        "dialog": {
+          "title": "Delete your account?",
+          "acknowledge": "I understand what will be deleted and what will stay.",
+          "typePrompt": "Type {word} to confirm.",
+          "typeLabel": "Confirmation word",
+          "word": "DELETE"
+        }
       }
+    },
+    "unavailable": "This creator is no longer available."
+  },
+  "account_deletion": {
+    "blocked": "We can't delete this account yet.",
+    "not_available": "Account deletion isn't available for this account.",
+    "blockers": {
+      "payment": "A payment on your account is still being settled.",
+      "vendor": "An identity or payout check with an outside provider is still open.",
+      "other": "Something on your account still needs to be settled.",
+      "contact": "Write to {email} and we will help."
     }
   }
 }

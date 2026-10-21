@@ -603,7 +603,39 @@
         "upload_wrong_type": "This file type is not supported. Use {allowed_types}.",
         "upload_failed": "The upload failed. Please try again.",
         "portfolio_max_reached": "You can upload up to {max} portfolio elemek."
+      },
+      "security": {
+        "title": "Biztonság",
+        "delete": {
+          "title": "Fiók törlése",
+          "intro": "Kérheted, hogy töröljük a fiókodat. Semmi nem törlődik azonnal: 14 napod van meggondolni magad.",
+          "erasedTitle": "Amit törlünk",
+          "erased": "A nevedet, e-mail-címedet, telefonszámodat, címedet, születési dátumodat, bemutatkozásodat, fotóidat és fájljaidat, valamint a bejelentkezési adataidat.",
+          "keptTitle": "Ami megmarad",
+          "kept": "Az üzenetek, jelentkezések, szerződések és kampányrekordok azoknál az ügynökségeknél maradnak, amelyekkel dolgoztál. A neved eltávolításra kerül belőlük. A nyitott megbízások törlődnek.",
+          "graceTitle": "Ha meggondolod magad",
+          "grace": "A fiókod zárolódik, és a megerősítés pillanatában mindenhol kijelentkeztetünk. A visszavonáshoz jelentkezz be 14 napon belül e-mail-címeddel és jelszavaddal, és válaszd a visszaállítást. Ezután már nem vonható vissza.",
+          "button": "Fiókom törlése"
+        },
+        "dialog": {
+          "title": "Törlöd a fiókodat?",
+          "acknowledge": "Értem, mi törlődik, és mi marad meg.",
+          "typePrompt": "A megerősítéshez írd be: {word}.",
+          "typeLabel": "Megerősítő szó",
+          "word": "TÖRLÉS"
+        }
       }
+    },
+    "unavailable": "Ez az alkotó már nem érhető el."
+  },
+  "account_deletion": {
+    "blocked": "Ezt a fiókot még nem tudjuk törölni.",
+    "not_available": "A fióktörlés ehhez a fiókhoz nem érhető el.",
+    "blockers": {
+      "payment": "A fiókodon lévő egyik fizetés elszámolása még folyamatban van.",
+      "vendor": "Egy külső szolgáltatónál zajló személyazonosság- vagy kifizetés-ellenőrzés még nyitott.",
+      "other": "A fiókodon még rendezni kell valamit.",
+      "contact": "Írj a(z) {email} címre, és segítünk."
     }
   }
 }

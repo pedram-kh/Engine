@@ -1264,7 +1264,8 @@
         "uploadFailed": "Файлът не можа да бъде качен. Моля, опитайте отново.",
         "deleteFailed": "Файлът не можа да бъде изтрит. Моля, опитайте отново."
       }
-    }
+    },
+    "creatorErased": "Изтрит създател"
   },
   "validation": {
     "field_required": "This field is required."

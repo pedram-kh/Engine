@@ -43,6 +43,7 @@ export type GuardName =
   | 'requireAgencyAdmin'
   | 'requireOnboardingAccess'
   | 'requireAgencyUser'
+  | 'requireAccountDeletionEnabled'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -140,6 +141,17 @@ export const authRoutes: RouteRecordRaw[] = [
     path: '/auth/accept-invite',
     name: 'auth.accept-creator-invite',
     component: () => import('./pages/AcceptCreatorInvitePage.vue'),
+    meta: { layout: 'auth' },
+  },
+
+  // AH-104b-del B5 — the public "how do I delete my account" page the store listings link to.
+  // Public, no guards, auth layout. NOT under `/creator/`: the universal-link scope is
+  // `/creator/*`, so this stays a web page and never opens the app (pinned by a spec on the
+  // association file and the Android manifest).
+  {
+    path: '/delete-account',
+    name: 'auth.delete-account-info',
+    component: () => import('./pages/DeleteAccountInfoPage.vue'),
     meta: { layout: 'auth' },
   },
 

@@ -1264,7 +1264,8 @@
         "uploadFailed": "Tiedoston lataaminen epäonnistui. Yritä uudelleen.",
         "deleteFailed": "Tiedoston poistaminen epäonnistui. Yritä uudelleen."
       }
-    }
+    },
+    "creatorErased": "Poistettu sisällöntuottaja"
   },
   "validation": {
     "field_required": "This field is required."

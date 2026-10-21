@@ -119,6 +119,8 @@ async function mountLayout(
     applicationStatus?: string
     mobile?: boolean
     native?: boolean
+    /** AH-104b-del — `features.account_deletion` on the user (undefined = an older payload). */
+    accountDeletion?: boolean
   } = {},
 ) {
   setViewportWidth(options.mobile === true ? 390 : 1280)
@@ -149,6 +151,9 @@ async function mountLayout(
       preferred_language: 'en',
       preferred_currency: null,
       timezone: null,
+      ...(options.accountDeletion === undefined
+        ? {}
+        : { features: { account_deletion: options.accountDeletion } }),
     },
   } as never
 
@@ -181,6 +186,7 @@ async function mountLayout(
         name: 'creator.notifications.preferences',
         component: { template: '<div />' },
       },
+      { path: '/creator/security', name: 'creator.security', component: { template: '<div />' } },
       { path: '/sign-in', name: 'auth.sign-in', component: { template: '<div />' } },
     ],
   })
@@ -797,5 +803,63 @@ describe('CreatorDashboardLayout — Messages unread badge (AH-108)', () => {
         .find('[data-test="creator-messages-unread-badge-bottom"] .v-badge__badge')
         .text(),
     ).toBe('4')
+  })
+})
+
+describe('CreatorDashboardLayout — Security entries (AH-104b-del B4)', () => {
+  let cleanup: (() => void) | null = null
+
+  beforeEach(() => vi.clearAllMocks())
+  afterEach(() => {
+    cleanup?.()
+    cleanup = null
+  })
+
+  it('web: the avatar menu links to Security when the flag is on', async () => {
+    const m = await mountLayout({ accountDeletion: true })
+    cleanup = m.cleanup
+
+    const link = m.wrapper.find('[data-test="security-link"]')
+    expect(link.exists()).toBe(true)
+    expect(link.text()).toContain('Security')
+    expect(link.attributes('href')).toBe('/creator/security')
+  })
+
+  it.each([
+    ['off', false],
+    ['absent (an older payload)', undefined],
+  ])('web: no Security entry when the flag is %s', async (_label, flag) => {
+    const m = await mountLayout({ accountDeletion: flag })
+    cleanup = m.cleanup
+
+    expect(m.wrapper.find('[data-test="security-link"]').exists()).toBe(false)
+  })
+
+  it('native: More has Security as its own row, apart from Settings', async () => {
+    const m = await mountLayout({
+      native: true,
+      applicationStatus: 'approved',
+      accountDeletion: true,
+    })
+    cleanup = m.cleanup
+
+    const security = m.wrapper.find('[data-test="creator-bottom-nav-more-security"]')
+    expect(security.exists()).toBe(true)
+    expect(security.attributes('href')).toBe('/creator/security')
+    // Settings is still the notification preferences, unchanged.
+    expect(
+      m.wrapper.find('[data-test="creator-bottom-nav-more-settings"]').attributes('href'),
+    ).toBe('/creator/notifications/preferences')
+  })
+
+  it('native: no Security row when the flag is off', async () => {
+    const m = await mountLayout({
+      native: true,
+      applicationStatus: 'approved',
+      accountDeletion: false,
+    })
+    cleanup = m.cleanup
+
+    expect(m.wrapper.find('[data-test="creator-bottom-nav-more-security"]').exists()).toBe(false)
   })
 })

@@ -603,7 +603,39 @@
         "upload_wrong_type": "Este tipo de archivo no es compatible. Usa {allowed_types}.",
         "upload_failed": "La subida ha fallado. Inténtalo de nuevo.",
         "portfolio_max_reached": "Puedes subir hasta {max} elementos al portafolio."
+      },
+      "security": {
+        "title": "Seguridad",
+        "delete": {
+          "title": "Eliminar cuenta",
+          "intro": "Puedes pedirnos que eliminemos tu cuenta. No se borra nada de inmediato: tienes 14 días para cambiar de opinión.",
+          "erasedTitle": "Lo que eliminamos",
+          "erased": "Tu nombre, correo electrónico, número de teléfono, dirección, fecha de nacimiento, biografía, fotos y archivos, y tus datos de acceso.",
+          "keptTitle": "Lo que se conserva",
+          "kept": "Los mensajes, solicitudes, contratos y registros de campañas permanecen en las agencias con las que trabajaste. Tu nombre en ellos se elimina. Las asignaciones abiertas se cancelan.",
+          "graceTitle": "Si cambias de opinión",
+          "grace": "Tu cuenta se bloquea y se cierra tu sesión en todas partes en cuanto confirmes. Para cancelar, inicia sesión con tu correo y contraseña en un plazo de 14 días y elige restaurarla. Después, no se puede deshacer.",
+          "button": "Eliminar mi cuenta"
+        },
+        "dialog": {
+          "title": "¿Eliminar tu cuenta?",
+          "acknowledge": "Entiendo qué se eliminará y qué se conservará.",
+          "typePrompt": "Escribe {word} para confirmar.",
+          "typeLabel": "Palabra de confirmación",
+          "word": "ELIMINAR"
+        }
       }
+    },
+    "unavailable": "Este creador ya no está disponible."
+  },
+  "account_deletion": {
+    "blocked": "Todavía no podemos eliminar esta cuenta.",
+    "not_available": "La eliminación de la cuenta no está disponible para esta cuenta.",
+    "blockers": {
+      "payment": "Hay un pago de tu cuenta que aún se está liquidando.",
+      "vendor": "Hay una verificación de identidad o de cobro con un proveedor externo que sigue abierta.",
+      "other": "Hay algo en tu cuenta que todavía debe resolverse.",
+      "contact": "Escribe a {email} y te ayudaremos."
     }
   }
 }

@@ -603,7 +603,39 @@
         "upload_wrong_type": "Dieser Dateityp wird nicht unterstützt. Verwende {allowed_types}.",
         "upload_failed": "Der Upload ist fehlgeschlagen. Bitte versuche es erneut.",
         "portfolio_max_reached": "Du kannst bis zu {max} Portfolio-Einträge hochladen."
+      },
+      "security": {
+        "title": "Sicherheit",
+        "delete": {
+          "title": "Konto löschen",
+          "intro": "Du kannst uns bitten, dein Konto zu löschen. Es wird nicht sofort etwas entfernt: Du hast 14 Tage Zeit, es dir anders zu überlegen.",
+          "erasedTitle": "Was wir löschen",
+          "erased": "Dein Name, deine E-Mail-Adresse, Telefonnummer, Adresse, dein Geburtsdatum, deine Bio, Fotos und Dateien sowie deine Anmeldedaten.",
+          "keptTitle": "Was bleibt",
+          "kept": "Nachrichten, Bewerbungen, Verträge und Kampagnendaten bleiben bei den Agenturen, mit denen du gearbeitet hast. Dein Name wird darin entfernt. Offene Aufträge werden storniert.",
+          "graceTitle": "Falls du es dir anders überlegst",
+          "grace": "Dein Konto wird gesperrt und du wirst überall abgemeldet, sobald du bestätigst. Zum Abbrechen melde dich innerhalb von 14 Tagen mit E-Mail und Passwort an und wähle die Wiederherstellung. Danach lässt es sich nicht mehr rückgängig machen.",
+          "button": "Mein Konto löschen"
+        },
+        "dialog": {
+          "title": "Dein Konto löschen?",
+          "acknowledge": "Ich verstehe, was gelöscht wird und was bleibt.",
+          "typePrompt": "Gib zur Bestätigung {word} ein.",
+          "typeLabel": "Bestätigungswort",
+          "word": "LÖSCHEN"
+        }
       }
+    },
+    "unavailable": "Dieser Creator ist nicht mehr verfügbar."
+  },
+  "account_deletion": {
+    "blocked": "Wir können dieses Konto noch nicht löschen.",
+    "not_available": "Das Löschen des Kontos ist für dieses Konto nicht verfügbar.",
+    "blockers": {
+      "payment": "Eine Zahlung auf deinem Konto wird noch abgewickelt.",
+      "vendor": "Eine Identitäts- oder Auszahlungsprüfung bei einem externen Anbieter ist noch offen.",
+      "other": "Auf deinem Konto muss noch etwas geklärt werden.",
+      "contact": "Schreibe an {email}, wir helfen dir gern."
     }
   }
 }

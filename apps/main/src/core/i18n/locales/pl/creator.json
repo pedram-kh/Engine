@@ -603,7 +603,39 @@
         "upload_wrong_type": "Ten typ pliku nie jest obsługiwany. Użyj {allowed_types}.",
         "upload_failed": "Przesyłanie nie powiodło się. Spróbuj ponownie.",
         "portfolio_max_reached": "Możesz przesłać do {max} pozycji portfolio."
+      },
+      "security": {
+        "title": "Bezpieczeństwo",
+        "delete": {
+          "title": "Usuń konto",
+          "intro": "Możesz poprosić nas o usunięcie konta. Nic nie jest usuwane od razu: masz 14 dni na zmianę decyzji.",
+          "erasedTitle": "Co usuwamy",
+          "erased": "Twoje imię i nazwisko, e-mail, numer telefonu, adres, datę urodzenia, opis, zdjęcia i pliki oraz dane logowania.",
+          "keptTitle": "Co zostaje",
+          "kept": "Wiadomości, zgłoszenia, umowy i dane kampanii zostają u agencji, z którymi pracowałeś. Twoje imię i nazwisko jest z nich usuwane. Otwarte zlecenia są anulowane.",
+          "graceTitle": "Jeśli zmienisz zdanie",
+          "grace": "Konto zostaje zablokowane, a Ty zostajesz wylogowany wszędzie, gdy tylko potwierdzisz. Aby anulować, zaloguj się w ciągu 14 dni e-mailem i hasłem i wybierz przywrócenie. Potem nie można tego cofnąć.",
+          "button": "Usuń moje konto"
+        },
+        "dialog": {
+          "title": "Usunąć konto?",
+          "acknowledge": "Rozumiem, co zostanie usunięte, a co zostanie.",
+          "typePrompt": "Wpisz {word}, aby potwierdzić.",
+          "typeLabel": "Słowo potwierdzające",
+          "word": "USUŃ"
+        }
       }
+    },
+    "unavailable": "Ten twórca nie jest już dostępny."
+  },
+  "account_deletion": {
+    "blocked": "Nie możemy jeszcze usunąć tego konta.",
+    "not_available": "Usunięcie konta nie jest dostępne dla tego konta.",
+    "blockers": {
+      "payment": "Płatność na Twoim koncie jest jeszcze rozliczana.",
+      "vendor": "Weryfikacja tożsamości lub wypłat u zewnętrznego dostawcy jest nadal otwarta.",
+      "other": "Coś na Twoim koncie wymaga jeszcze uregulowania.",
+      "contact": "Napisz na {email}, a pomożemy."
     }
   }
 }

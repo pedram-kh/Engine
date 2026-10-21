@@ -1264,7 +1264,8 @@
         "uploadFailed": "A fájl feltöltése sikertelen. Kérjük, próbálja újra.",
         "deleteFailed": "A fájl törlése sikertelen. Kérjük, próbálja újra."
       }
-    }
+    },
+    "creatorErased": "Törölt alkotó"
   },
   "validation": {
     "field_required": "This field is required."

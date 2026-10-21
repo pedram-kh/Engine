@@ -1264,7 +1264,8 @@
         "uploadFailed": "Die Datei konnte nicht hochgeladen werden. Bitte versuchen Sie es erneut.",
         "deleteFailed": "Die Datei konnte nicht gelöscht werden. Bitte versuchen Sie es erneut."
       }
-    }
+    },
+    "creatorErased": "Gelöschter Creator"
   },
   "validation": {
     "field_required": "Dieses Feld ist erforderlich."

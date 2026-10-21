@@ -669,3 +669,37 @@ describe('logoutCleanup (R-4)', () => {
     })
   })
 })
+
+describe('forgetLocal (AH-104b-del: the server already dropped the token)', () => {
+  it('wipes the local record and the FCM token, and makes NO server call', async () => {
+    const h = harness()
+    h.state.permission = 'granted'
+    h.storage.data.set(STORAGE_KEYS.token, 'fcm-token-1')
+    h.storage.data.set(STORAGE_KEYS.registeredAt, '1')
+
+    await createPushRegistration(h.deps).forgetLocal()
+
+    expect(h.tokens.forget).not.toHaveBeenCalled() // a bearer DELETE here would 401
+    expect(h.client.deleteToken).toHaveBeenCalledTimes(1)
+    expect(h.storage.data.has(STORAGE_KEYS.token)).toBe(false)
+    expect(h.storage.data.has(STORAGE_KEYS.registeredAt)).toBe(false)
+  })
+
+  it('wipes the local record even where push is unavailable, and touches no plugin', async () => {
+    const h = harness()
+    h.state.available = false
+    h.storage.data.set(STORAGE_KEYS.token, 'fcm-token-1')
+
+    await createPushRegistration(h.deps).forgetLocal()
+
+    expect(h.client.deleteToken).not.toHaveBeenCalled()
+    expect(h.storage.data.has(STORAGE_KEYS.token)).toBe(false)
+  })
+
+  it('never throws when the plugin does', async () => {
+    const h = harness()
+    h.client.deleteToken.mockRejectedValue(new Error('boom'))
+
+    await expect(createPushRegistration(h.deps).forgetLocal()).resolves.toBeUndefined()
+  })
+})

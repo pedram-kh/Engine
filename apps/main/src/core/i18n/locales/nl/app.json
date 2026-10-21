@@ -1264,7 +1264,8 @@
         "uploadFailed": "Het bestand kon niet worden geüpload. Probeer het opnieuw.",
         "deleteFailed": "Het bestand kon niet worden verwijderd. Probeer het opnieuw."
       }
-    }
+    },
+    "creatorErased": "Verwijderde creator"
   },
   "validation": {
     "field_required": "Dit veld is verplicht."

@@ -20,3 +20,21 @@ export async function pushLogoutCleanup(): Promise<void> {
     // Sign-out proceeds regardless.
   }
 }
+
+/**
+ * AH-104b-del — account deletion. The server has already removed this device's token
+ * with every other credential, so the sign-out cleanup above (a bearer `DELETE`) would
+ * only 401. This forgets the local record and the FCM token without any server call.
+ * Never throws.
+ */
+export async function pushForgetLocal(): Promise<void> {
+  if (!pushChannelAvailable()) {
+    return
+  }
+  try {
+    const { usePushRegistration } = await import('./usePushRegistration')
+    await usePushRegistration().forgetLocal()
+  } catch {
+    // The request already succeeded; nothing here may fail it.
+  }
+}

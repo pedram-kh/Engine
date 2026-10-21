@@ -108,6 +108,23 @@ const sessionExpired = computed(
   () => route.query.reason === 'session_expired' || (isNative && sessionLapsed.value),
 )
 
+/**
+ * AH-104b-del — arriving here from the delete-account dialog: `?reason=deletion_scheduled&date=<ISO>`.
+ * A voluntary, successful act, so it is an info banner (not the session-expired warning) naming
+ * the day the account will be deleted and how to keep it. Nothing in the URL is trusted beyond
+ * being a date to format; anything unparseable shows no banner rather than a broken date.
+ */
+const deletionScheduledDate = computed(() => {
+  if (route.query.reason !== 'deletion_scheduled' || typeof route.query.date !== 'string') {
+    return null
+  }
+  const date = new Date(route.query.date)
+  if (Number.isNaN(date.getTime())) {
+    return null
+  }
+  return new Intl.DateTimeFormat(locale.value, { dateStyle: 'long' }).format(date)
+})
+
 /** Where a creator without an account goes (AH-100 Q8: no in-app sign-up in v1). */
 const CREATOR_SIGNUP_SITE = 'platform.catalyst-growth.com'
 
@@ -320,6 +337,16 @@ function leaveRestore(): void {
     >
       {{ t('auth.ui.native.sign_in_subtitle') }}
     </p>
+
+    <v-alert
+      v-if="deletionScheduledDate !== null"
+      type="info"
+      variant="tonal"
+      class="mb-4"
+      data-test="deletion-scheduled-banner"
+    >
+      {{ t('auth.ui.deletion.scheduled_banner', { date: deletionScheduledDate }) }}
+    </v-alert>
 
     <v-alert
       v-if="sessionExpired"

@@ -603,7 +603,39 @@
         "upload_wrong_type": "This file type is not supported. Use {allowed_types}.",
         "upload_failed": "The upload failed. Please try again.",
         "portfolio_max_reached": "You can upload up to {max} portfolio elementai."
+      },
+      "security": {
+        "title": "Saugumas",
+        "delete": {
+          "title": "Ištrinti paskyrą",
+          "intro": "Galite paprašyti mūsų ištrinti jūsų paskyrą. Niekas nepašalinama iš karto: turite 14 dienų apsigalvoti.",
+          "erasedTitle": "Ką ištriname",
+          "erased": "Jūsų vardą, el. paštą, telefono numerį, adresą, gimimo datą, aprašymą, nuotraukas ir failus bei prisijungimo duomenis.",
+          "keptTitle": "Kas lieka",
+          "kept": "Žinutės, paraiškos, sutartys ir kampanijų įrašai lieka agentūrose, su kuriomis dirbote. Jūsų vardas iš jų pašalinamas. Atviros užduotys atšaukiamos.",
+          "graceTitle": "Jei apsigalvosite",
+          "grace": "Jūsų paskyra užrakinama, o jūs atjungiami visur, vos patvirtinus. Norėdami atšaukti, per 14 dienų prisijunkite el. paštu ir slaptažodžiu ir pasirinkite atkūrimą. Po to to atšaukti nebegalima.",
+          "button": "Ištrinti mano paskyrą"
+        },
+        "dialog": {
+          "title": "Ištrinti paskyrą?",
+          "acknowledge": "Suprantu, kas bus ištrinta ir kas liks.",
+          "typePrompt": "Patvirtinimui įveskite {word}.",
+          "typeLabel": "Patvirtinimo žodis",
+          "word": "IŠTRINTI"
+        }
       }
+    },
+    "unavailable": "Šis kūrėjas nebepasiekiamas."
+  },
+  "account_deletion": {
+    "blocked": "Šios paskyros dar negalime ištrinti.",
+    "not_available": "Paskyros ištrynimas šiai paskyrai nepasiekiamas.",
+    "blockers": {
+      "payment": "Mokėjimas jūsų paskyroje dar apdorojamas.",
+      "vendor": "Tapatybės ar išmokų patikra pas išorinį tiekėją dar nebaigta.",
+      "other": "Kai ką jūsų paskyroje dar reikia sutvarkyti.",
+      "contact": "Rašykite adresu {email} ir padėsime."
     }
   }
 }

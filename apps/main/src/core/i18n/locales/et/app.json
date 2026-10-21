@@ -1264,7 +1264,8 @@
         "uploadFailed": "Faili üleslaadimine ebaõnnestus. Proovi uuesti.",
         "deleteFailed": "Faili kustutamine ebaõnnestus. Proovi uuesti."
       }
-    }
+    },
+    "creatorErased": "Kustutatud sisulooja"
   },
   "validation": {
     "field_required": "This field is required."

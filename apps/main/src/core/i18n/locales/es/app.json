@@ -1264,7 +1264,8 @@
         "uploadFailed": "No se pudo subir el archivo. Inténtalo de nuevo.",
         "deleteFailed": "No se pudo eliminar el archivo. Inténtalo de nuevo."
       }
-    }
+    },
+    "creatorErased": "Creador eliminado"
   },
   "validation": {
     "field_required": "Este campo es obligatorio."

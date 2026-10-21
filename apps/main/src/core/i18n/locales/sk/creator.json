@@ -603,7 +603,39 @@
         "upload_wrong_type": "Tento typ souboru není podporován. Použijte {allowed_types}.",
         "upload_failed": "Nahrávanie selhalo. Zkuste to znova.",
         "portfolio_max_reached": "Môžete nahrať až {max} položek portfolia."
+      },
+      "security": {
+        "title": "Zabezpečenie",
+        "delete": {
+          "title": "Zmazať účet",
+          "intro": "Môžete nás požiadať o zmazanie účtu. Nič sa nemaže okamžite: máte 14 dní na rozmyslenie.",
+          "erasedTitle": "Čo mažeme",
+          "erased": "Vaše meno, e-mail, telefónne číslo, adresu, dátum narodenia, medailónik, fotografie a súbory a prihlasovacie údaje.",
+          "keptTitle": "Čo zostáva",
+          "kept": "Správy, prihlášky, zmluvy a záznamy kampaní zostávajú u agentúr, s ktorými ste spolupracovali. Vaše meno z nich bude odstránené. Otvorené zákazky sa zrušia.",
+          "graceTitle": "Ak si to rozmyslíte",
+          "grace": "Váš účet sa po potvrdení uzamkne a budete všade odhlásený. Ak chcete zmazanie zrušiť, prihláste sa do 14 dní e-mailom a heslom a zvoľte obnovenie. Potom už to nemožno vrátiť späť.",
+          "button": "Zmazať môj účet"
+        },
+        "dialog": {
+          "title": "Zmazať váš účet?",
+          "acknowledge": "Rozumiem, čo bude zmazané a čo zostane.",
+          "typePrompt": "Na potvrdenie napíšte {word}.",
+          "typeLabel": "Potvrdzovacie slovo",
+          "word": "ZMAZAŤ"
+        }
       }
+    },
+    "unavailable": "Tento tvorca už nie je k dispozícii."
+  },
+  "account_deletion": {
+    "blocked": "Tento účet zatiaľ nemôžeme zmazať.",
+    "not_available": "Zmazanie účtu nie je pre tento účet k dispozícii.",
+    "blockers": {
+      "payment": "Platba na vašom účte sa stále vysporadúva.",
+      "vendor": "Overenie totožnosti alebo výplat u externého poskytovateľa je stále otvorené.",
+      "other": "Na vašom účte treba ešte niečo vyriešiť.",
+      "contact": "Napíšte na {email} a pomôžeme vám."
     }
   }
 }

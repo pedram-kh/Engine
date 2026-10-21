@@ -1264,7 +1264,8 @@
         "uploadFailed": "Nepavyko įkelti failo. Bandykite dar kartą.",
         "deleteFailed": "Nepavyko ištrinti failo. Bandykite dar kartą."
       }
-    }
+    },
+    "creatorErased": "Ištrintas kūrėjas"
   },
   "validation": {
     "field_required": "This field is required."
