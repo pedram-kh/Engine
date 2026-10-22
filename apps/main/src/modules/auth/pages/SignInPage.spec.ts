@@ -1,5 +1,5 @@
 import { ApiError } from '@catalyst/api-client'
-import { describe, expect, it, vi, afterEach, beforeEach } from 'vitest'
+import { describe, expect, it, vi, afterEach, beforeEach, type MockInstance } from 'vitest'
 import { flushPromises } from '@vue/test-utils'
 
 import { mountAuthPage } from '../../../../tests/unit/helpers/mountAuthPage'
@@ -582,9 +582,11 @@ describe('SignInPage', () => {
 
 describe('SignInPage — account scheduled for deletion (AH-104b-del)', () => {
   let teardown: (() => void) | null = null
+  let focusSpy: MockInstance<(options?: FocusOptions) => void>
 
   beforeEach(() => {
     vi.clearAllMocks()
+    focusSpy = vi.spyOn(HTMLElement.prototype, 'focus')
     // clearAllMocks keeps queued once-values; a leftover would answer the next test's first call.
     vi.mocked(authApi.login).mockReset()
   })
@@ -592,6 +594,7 @@ describe('SignInPage — account scheduled for deletion (AH-104b-del)', () => {
   afterEach(() => {
     teardown?.()
     teardown = null
+    focusSpy.mockRestore()
   })
 
   async function fill(h: Awaited<ReturnType<typeof mountAuthPage>>): Promise<void> {
@@ -662,6 +665,10 @@ describe('SignInPage — account scheduled for deletion (AH-104b-del)', () => {
       'Confirm with a code from your authenticator app.',
     )
     expect(h.wrapper.find('[data-test="sign-in-totp"]').exists()).toBe(true)
+    // The code that was just sent is not left in the field for Restore to send again.
+    const emptied = h.wrapper.find('[data-test="sign-in-totp"] input')
+    expect((emptied.element as HTMLInputElement).value).toBe('')
+    expect(focusSpy.mock.contexts).toContain(emptied.element)
 
     await h.wrapper.find('[data-test="sign-in-totp"] input').setValue('654321')
     await h.wrapper.find('form').trigger('submit')
@@ -685,7 +692,8 @@ describe('SignInPage — account scheduled for deletion (AH-104b-del)', () => {
     const h = await mountAuthPage(SignInPage)
     teardown = h.unmount
     await fill(h)
-    await h.wrapper.find('[data-test="sign-in-totp"] input').setValue('ABCD-EFGH')
+    const typedField = h.wrapper.find('[data-test="sign-in-totp"] input')
+    await typedField.setValue('ABCD-EFGH')
     await h.wrapper.find('form').trigger('submit')
     await flushPromises()
 
@@ -693,6 +701,9 @@ describe('SignInPage — account scheduled for deletion (AH-104b-del)', () => {
     expect(field.exists()).toBe(true)
     expect((field.element as HTMLInputElement).value).toBe('')
     expect(h.wrapper.find('[data-test="sign-in-deletion-hint"]').text()).toContain('now used up')
+    // The cursor is in the emptied field, and it is a fresh element, not the one the code was typed in.
+    expect(focusSpy.mock.contexts).toContain(field.element)
+    expect(field.element).not.toBe(typedField.element)
 
     await field.setValue('IJKL-MNOP')
     await h.wrapper.find('form').trigger('submit')

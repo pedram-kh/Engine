@@ -276,6 +276,15 @@ it('restores the account on right credentials with cancel_deletion, and signs in
     }
 })->with('doors');
 
+it('answers a restore with the user as it is now: the Security feature flag is read at that response, not carried over', function (string $door): void {
+    sdCreator('c@example.test', pending: true);
+    Feature::activate(AccountDeletionEnabled::NAME);
+
+    sdSignIn($this, $door, ['email' => 'c@example.test', 'password' => SD_PASSWORD, 'cancel_deletion' => true])
+        ->assertOk()
+        ->assertJsonPath('data.attributes.features.account_deletion', true);
+})->with('doors');
+
 it('audits the cancellation once with the date it replaced', function (): void {
     [$user] = sdCreator('c@example.test', pending: true);
 

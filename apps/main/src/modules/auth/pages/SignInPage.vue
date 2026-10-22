@@ -38,7 +38,7 @@
  */
 
 import { ApiError, deletionPendingMeta, type DeletionPendingMeta } from '@catalyst/api-client'
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router'
 import { storeToRefs } from 'pinia'
@@ -59,6 +59,13 @@ const { isLoggingIn, userType, sessionLapsed } = storeToRefs(store)
 const email = ref('')
 const password = ref('')
 const totpCode = ref('')
+/**
+ * The code field is rebuilt (new `key`) whenever the page empties it for the restore step, so
+ * the browser's own copy of what was typed cannot outlive the model; `focus()` then lands the
+ * cursor in the fresh field (W10, 2026-10-22: the spent code stayed on screen and was resent).
+ */
+const totpKey = ref(0)
+const totpField = ref<{ focus: () => void } | null>(null)
 const mfaInput = useMfaCodeInput()
 
 /**
@@ -257,6 +264,14 @@ function postLoginTarget(): RouteLocationRaw {
   return '/'
 }
 
+/** Empty the code field (the code in it has been used) and put the cursor in it. */
+async function clearCodeAndFocus(): Promise<void> {
+  totpCode.value = ''
+  totpKey.value += 1
+  await nextTick()
+  totpField.value?.focus()
+}
+
 async function onSubmit(): Promise<void> {
   errorKey.value = null
   errorValues.value = {}
@@ -274,11 +289,12 @@ async function onSubmit(): Promise<void> {
       pending.value = meta
       if (meta.mfaVia === 'recovery_code') {
         // The recovery code just spent is burned; the restore needs a fresh one.
-        totpCode.value = ''
         showTotpField.value = true
         hintKey.value = 'auth.ui.deletion.code_again'
+        await clearCodeAndFocus()
       } else if (meta.mfaVia === 'totp') {
         hintKey.value = 'auth.ui.deletion.code_hint'
+        await clearCodeAndFocus()
       }
       return
     }
@@ -421,6 +437,8 @@ function leaveRestore(): void {
       <v-text-field
         v-if="showTotpField"
         id="sign-in-totp"
+        :key="totpKey"
+        ref="totpField"
         v-model="totpCode"
         :label="isNative ? undefined : t(mfaInput.labelKey.value)"
         :placeholder="mfaInput.placeholder.value"
