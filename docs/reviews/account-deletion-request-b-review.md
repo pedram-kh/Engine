@@ -128,3 +128,43 @@ step; the logs are from the clean rerun.
 
 **Decision needed from you:** accept W11 and W12 (they cannot be walked on production because nothing is erased there), overrule or confirm items 2 and 3 in §5, and say whether to push Part B.
 **I will not push without your trigger.**
+
+## 8. Walk results (Pedram, 2026-10-22, local stack, phone on a dev build)
+
+**AH-104b-del W1 to W12**
+
+| #       | Result   | Note                                                                                                                                                             |
+| ------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| W1      | pass     |                                                                                                                                                                  |
+| W2      | pass     |                                                                                                                                                                  |
+| W3      | pass     |                                                                                                                                                                  |
+| W4      | pass     |                                                                                                                                                                  |
+| W5      | pass     | Restore did not re-ask the password: by design. The sign-in form keeps the credentials and re-sends them with `cancel_deletion`; the server verifies them again. |
+| W6      | pass     |                                                                                                                                                                  |
+| W7      | pass     |                                                                                                                                                                  |
+| W8      | pass     | Local page read only; the live URL is checked after the web deploy.                                                                                              |
+| W9      | pass     |                                                                                                                                                                  |
+| **W10** | **FAIL** | No way to enter a recovery code on the app's sign-in. Gap, fixed in `6aa9af1f`; see below. Re-walk on the new build.                                             |
+| W11     | partial  | Roster, thread and board showed "Deleted creator". The assignment surface is the campaign Creators tab (below).                                                  |
+| W12     | pass     |                                                                                                                                                                  |
+
+**W10 diagnosis.** Not web-only and not hidden. The server accepted a recovery code at sign-in all along (`TwoFactorChallengeService` tries a TOTP, then the recovery codes). The field on the
+sign-in page and in the delete-account dialog was a numeric-keypad field labelled "authenticator code", with no way to say "I have a recovery code". Present since Sprint 1 on every 2FA field in the
+main app. Fixed on the two pages the walk touches: a "Use a recovery code instead" switch relabels the field, swaps the keyboard to text and switches it back (`useMfaCodeInput`, 24 locales, machine
+draft). Nine break-reverts, all caught. The other 2FA fields are in tech-debt ("Second-factor fields without a recovery-code switch").
+
+**W11 path.** There is no standalone agency assignment page. Assignments appear on the campaign's Creators tab (`/campaigns/:ulid?tab=creators`, all statuses; the walk row is Walk Campaign,
+status cancelled) and in the Board card drawer. Re-check: Campaigns, Walk Campaign, Creators tab; the row reads "Deleted creator" and opens a profile dialog without a name.
+
+**UI nit (native "Delete your account?" sheet).** The checkbox glyph sat 13px right of the title's text edge. Fixed in `b7e6d54b`; measured in a browser (title, checkbox glyph and fields
+at x): before 40 / 53 / 48, after 48 / 48 / 48. Not yet seen on the phone.
+
+**`erase-gone.sh` on local Postgres (local evidence only, not specs).** Migrations applied; the dry-run printed one `campaign_assignments.cancel`; the execute run completed (ledger row 1,
+`state: completed`; creator 13 `erased_at` set, `display_name` NULL). This is the first run of the engine on Postgres. The seeded creator has one assignment and no media or objects, so it
+does not cover the S3 purge, volume or the production role.
+
+**AH-103d W1 to W6.** W1, W2, W4, W5 (no `POST /auth/logout` in the API log since the launch), W6 pass. **W3 is not walkable on a dev build**: iOS needs the network to verify the first launch
+after a reinstall. Re-run W3 on TestFlight build 3. AH-103d stays "walk pending" for W3 only.
+
+**Gates for the two fixes (`6aa9af1f`, `b7e6d54b`).** `apps/main` vitest 263 files, 3166 tests, 0 failed; `vue-tsc --noEmit` exit 0; ESLint exit 0 (two existing `v-html` warnings). Admin,
+api-client and the API are untouched. Not pushed.

@@ -3415,3 +3415,13 @@ TRIGGER` on `audit_logs` (table and every column). The owner is `postgres`. Ther
 - **Fixed in AH-104b-del Part B (`6063e768`, B4):** the page now goes to `creator.security` for a creator and `settings` for an agency member (the back link too); the spec pins the real route names and
   asserts the old unregistered `app.settings` name is never used.
 - **Owner:** creator and agency web. **Status:** CLOSED 2026-10-21. Opened 2026-10-21.
+
+## Second-factor fields without a recovery-code switch, and a 422-before-404 on the flag-off route (OPEN, opened 2026-10-22)
+
+- **Where:** the 2FA code field is numeric-keypad-only with no way to enter a recovery code on `VerifyTotpPage`, `DisableTotpPage`, the enrolment confirm in the main app, and the admin app's
+  sign-in and its 2FA pages. The server accepts a recovery code on sign-in and on the re-auth paths that use `TwoFactorChallengeService`; the field simply never offered it. Found by the
+  AH-104b-del walk W10 (2026-10-22). **Fixed only** on the main-app sign-in and the delete-account dialog (`6aa9af1f`, composable `useMfaCodeInput`). Enrolment confirm takes a TOTP
+  code only by design, so it needs no switch; check the rest one by one before copying.
+- **Second item.** `POST` to the deletion request route with the flag off returns 422 for a malformed body, 404 for a valid one (validation runs before the flag check). No data effect;
+  found in the Part B checks, not fixed.
+- **Owner:** identity / creator web, admin web. **Status:** OPEN.

@@ -59,19 +59,19 @@ reviews, and conversations.
 
 ## Live Status (open + in-flight)
 
-| ID          | Title                                     | Status               | Notes                                                                                                                                           |
-| ----------- | ----------------------------------------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| —           | Campaign Drafts tab — independent review  | Pending              | Merged in code; review file reads "pending independent review pass."                                                                            |
-| AH-104      | Account deletion (umbrella)               | In progress          | Inventory and PII map APPROVED 2026-10-20. Split into AH-104a..e below. No code yet.                                                            |
-| AH-104a     | Erasure engine (command, dry-run, ledger) | Built                | All stages incl. 4e on the app role; read-backs B-D in. Nothing erased in prod; pgsql unproven.                                                 |
-| AH-104b-del | Deletion request flow + Security page     | Part B built (local) | Part A pushed (CI green). Part B (Security page, dialog, public page, agency label, notice) built, not pushed; awaiting Pedram's Part B review. |
-| AH-104c     | Admin erasure queue, Erase button, hold   | Queued               | After 104b-del. 14 days, then an admin clicks Erase (confirm + audit row).                                                                      |
-| AH-104d     | In-app sign-up (was AH-104b)              | Gated                | Gated on 104a-c. Renamed 2026-10-20; older entries and closed reviews keep "AH-104b".                                                           |
-| AH-104e     | Stop writing PII into audit snapshots     | Queued               | Own chunk, after 104a. Changes audit content: its own stop-gate.                                                                                |
-| AH-103d     | Reinstall marker (tech-debt 17)           | Built, walk pending  | Proof report written (22/22 break-reverts). Awaiting Pedram's device walk W1-W6. Rides build 3.                                                 |
-| AH-103c     | Biometric unlock                          | Parked               | Deferred to post-launch 2026-10-20. Inventory and rulings in `biometrics-inventory.md`.                                                         |
-| AH-109      | Job-posted email footer shows ":agency"   | Landed               | Fixed and pushed 2026-10-19 (Mode B); not deployed, rides the API deploy.                                                                       |
-| AH-103b     | Universal links (iOS first)               | Landed               | Pushed, not deployed. Device walk W1–W10 waits for the web deploy, C1–C7 and build 3.                                                           |
+| ID          | Title                                     | Status               | Notes                                                                                                                                          |
+| ----------- | ----------------------------------------- | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| —           | Campaign Drafts tab — independent review  | Pending              | Merged in code; review file reads "pending independent review pass."                                                                           |
+| AH-104      | Account deletion (umbrella)               | In progress          | Inventory and PII map APPROVED 2026-10-20. Split into AH-104a..e below. No code yet.                                                           |
+| AH-104a     | Erasure engine (command, dry-run, ledger) | Built                | All stages incl. 4e on the app role; read-backs B-D in. Nothing erased in prod; pgsql unproven.                                                |
+| AH-104b-del | Deletion request flow + Security page     | Part B built (local) | Part A pushed. Part B cleared and pushed; walk 2026-10-22: W10 gap fixed (recovery-code switch), sheet alignment fixed, both unpushed.         |
+| AH-104c     | Admin erasure queue, Erase button, hold   | Queued               | After 104b-del. 14 days, then an admin clicks Erase (confirm + audit row).                                                                     |
+| AH-104d     | In-app sign-up (was AH-104b)              | Gated                | Gated on 104a-c. Renamed 2026-10-20; older entries and closed reviews keep "AH-104b".                                                          |
+| AH-104e     | Stop writing PII into audit snapshots     | Queued               | Own chunk, after 104a. Changes audit content: its own stop-gate.                                                                               |
+| AH-103d     | Reinstall marker (tech-debt 17)           | Built, W3 pending    | Proof report written (22/22 break-reverts). Walk 2026-10-22: W1, W2, W4-W6 pass; W3 not walkable on a dev build, re-run on TestFlight build 3. |
+| AH-103c     | Biometric unlock                          | Parked               | Deferred to post-launch 2026-10-20. Inventory and rulings in `biometrics-inventory.md`.                                                        |
+| AH-109      | Job-posted email footer shows ":agency"   | Landed               | Fixed and pushed 2026-10-19 (Mode B); not deployed, rides the API deploy.                                                                      |
+| AH-103b     | Universal links (iOS first)               | Landed               | Pushed, not deployed. Device walk W1–W10 waits for the web deploy, C1–C7 and build 3.                                                          |
 
 > Pointer, not an ad-hoc item: **Sprint 10 (Payments/Escrow)** remains the deepest pending
 > roadmap dependency, Stripe-gated. Tracked in `tech-debt.md`, not here.
@@ -94,7 +94,8 @@ reviews, and conversations.
   **Part B built locally** (B1-B7): agencies no longer see a creator scheduled for deletion (hidden, new actions refused with 422 `creator.unavailable`) and see "Deleted creator" after erasure; the
   creator Security page, the delete-account dialog, the public `/delete-account` page; the agency's one in-app notice per cancelled assignment (`assignment.cancelled`); the Disable-2FA route fix
   (tech-debt row closed); 24 locales, machine draft. Review in [`account-deletion-request-b-review.md`](account-deletion-request-b-review.md), break-reverts (88, all caught) in
-  [`account-deletion-request-b-break-reverts.md`](account-deletion-request-b-break-reverts.md). Not pushed.
+  [`account-deletion-request-b-break-reverts.md`](account-deletion-request-b-break-reverts.md). Part B cleared 2026-10-21 and pushed. **Walk 2026-10-22** ([`account-deletion-request-b-review.md`](account-deletion-request-b-review.md) §8):
+  all pass except W10 (no recovery-code option on the sign-in field; fixed in `6aa9af1f`, other pages in tech-debt) and W11 (partial: path given); a sheet alignment fix (`b7e6d54b`). Both commits unpushed.
   **Ruled 2026-10-21 (at the Part A review), to build in AH-104c:** `live_verified` and `manually_verified` are an erasure refusal like the payment states (engine guard plus a request-time refusal through
   C3); recorded in tech-debt ("AH-104b-del Part A", item 3) and the plan's AH-104c notes. Until then the rider still cancels them; nothing erases before AH-104c.
 - **Date:** 2026-10-20 (built 2026-10-21).
