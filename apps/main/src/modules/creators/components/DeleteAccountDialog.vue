@@ -30,6 +30,7 @@ import { VDialog } from 'vuetify/components/VDialog'
 import { SUPPORT_EMAIL } from '@/core/config/support'
 import { isNativePlatform } from '@/core/platform/isNativePlatform'
 import { resolveErrorMessage } from '@/modules/auth/composables/useErrorMessage'
+import { useMfaCodeInput } from '@/modules/auth/composables/useMfaCodeInput'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 
 import { typedWordMatches } from '../security/deleteWord'
@@ -46,6 +47,7 @@ const acknowledged = ref(false)
 const password = ref('')
 const code = ref('')
 const typed = ref('')
+const mfaInput = useMfaCodeInput()
 const submitting = ref(false)
 
 const errorKey = ref<string | null>(null)
@@ -105,6 +107,7 @@ function reset(): void {
   password.value = ''
   code.value = ''
   typed.value = ''
+  mfaInput.reset()
   errorKey.value = null
   errorValues.value = {}
   blockers.value = []
@@ -236,14 +239,29 @@ async function submit(): Promise<void> {
           <v-text-field
             v-if="needsCode"
             v-model="code"
-            :label="t('auth.ui.labels.totp_code')"
+            :label="t(mfaInput.labelKey.value)"
+            :placeholder="mfaInput.placeholder.value"
             type="text"
-            inputmode="numeric"
+            :inputmode="mfaInput.inputmode.value"
             maxlength="32"
-            autocomplete="one-time-code"
+            :autocomplete="mfaInput.autocomplete.value"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
             variant="outlined"
             data-test="delete-account-code"
           />
+          <v-btn
+            v-if="needsCode"
+            variant="text"
+            size="small"
+            class="mb-2 px-0"
+            :disabled="submitting"
+            data-test="delete-account-mfa-toggle"
+            @click="mfaInput.toggle"
+          >
+            {{ t(mfaInput.toggleKey.value) }}
+          </v-btn>
 
           <p class="text-body-2 mb-2" data-test="delete-account-type-prompt">
             {{ t('creator.ui.security.dialog.typePrompt', { word }) }}

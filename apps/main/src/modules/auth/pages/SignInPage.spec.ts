@@ -361,6 +361,49 @@ describe('SignInPage', () => {
     })
   })
 
+  it('offers "use a recovery code instead": the field is relabelled, takes the full keyboard, and sends the code as mfa_code', async () => {
+    vi.mocked(authApi.login)
+      .mockRejectedValueOnce(
+        new ApiError({ status: 403, code: 'auth.mfa_required', message: 'no.' }),
+      )
+      .mockResolvedValueOnce(USER)
+    const h = await mountAuthPage(SignInPage)
+    teardown = h.unmount
+    // No second factor asked yet: no switch either.
+    expect(h.wrapper.find('[data-test="sign-in-mfa-toggle"]').exists()).toBe(false)
+    await h.wrapper.find('input[type="email"]').setValue('a@b.c')
+    await h.wrapper.find('input[type="password"]').setValue('Pa$$w0rd!12')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    const field = () => h.wrapper.find('[data-test="sign-in-totp"]')
+    const toggle = () => h.wrapper.find('[data-test="sign-in-mfa-toggle"]')
+    // Authenticator mode first: the numeric keypad, the authenticator wording.
+    expect(field().find('input').attributes('inputmode')).toBe('numeric')
+    expect(field().text()).toContain('Two-factor code')
+    expect(toggle().text()).toBe('Use a recovery code instead')
+
+    await toggle().trigger('click')
+    // A recovery code is letters and dashes: a numeric keypad could not type it (W10).
+    expect(field().find('input').attributes('inputmode')).toBe('text')
+    expect(field().find('input').attributes('autocapitalize')).toBe('off')
+    expect(field().find('input').attributes('placeholder')).toBe('xxxx-xxxx-xxxx-xxxx')
+    expect(field().text()).toContain('Recovery code')
+    expect(toggle().text()).toBe('Use an authenticator code instead')
+
+    await field().find('input').setValue('6aed-6a9e-c520-7c0b')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+    expect(authApi.login).toHaveBeenLastCalledWith({
+      email: 'a@b.c',
+      password: 'Pa$$w0rd!12',
+      mfa_code: '6aed-6a9e-c520-7c0b',
+    })
+
+    await toggle().trigger('click')
+    expect(field().find('input').attributes('inputmode')).toBe('numeric')
+  })
+
   it('on a non-ApiError thrown by the action, falls back to auth.ui.errors.unknown', async () => {
     vi.mocked(authApi.login).mockRejectedValue(new Error('typeerror'))
     const h = await mountAuthPage(SignInPage)

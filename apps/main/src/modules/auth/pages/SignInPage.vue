@@ -46,6 +46,7 @@ import { storeToRefs } from 'pinia'
 import { isNativePlatform } from '@/core/platform/isNativePlatform'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { resolveErrorMessage } from '@/modules/auth/composables/useErrorMessage'
+import { useMfaCodeInput } from '@/modules/auth/composables/useMfaCodeInput'
 import { loadMetaPixel } from '@/modules/auth/internal/metaPixel'
 import nativeMark from '@/modules/auth/assets/native-sign-in-mark.svg'
 
@@ -58,6 +59,7 @@ const { isLoggingIn, userType, sessionLapsed } = storeToRefs(store)
 const email = ref('')
 const password = ref('')
 const totpCode = ref('')
+const mfaInput = useMfaCodeInput()
 
 /**
  * Two-step UI: the form starts with email + password only, and after
@@ -308,6 +310,7 @@ function leaveRestore(): void {
   password.value = ''
   totpCode.value = ''
   showTotpField.value = false
+  mfaInput.reset()
 }
 </script>
 
@@ -413,21 +416,36 @@ function leaveRestore(): void {
       />
 
       <label v-if="isNative && showTotpField" for="sign-in-totp" class="sign-in-native__label">
-        {{ t('auth.ui.labels.totp_code') }}
+        {{ t(mfaInput.labelKey.value) }}
       </label>
       <v-text-field
         v-if="showTotpField"
         id="sign-in-totp"
         v-model="totpCode"
-        :label="isNative ? undefined : t('auth.ui.labels.totp_code')"
+        :label="isNative ? undefined : t(mfaInput.labelKey.value)"
+        :placeholder="mfaInput.placeholder.value"
         :hide-details="isNative"
         type="text"
-        inputmode="numeric"
-        autocomplete="one-time-code"
+        :inputmode="mfaInput.inputmode.value"
+        :autocomplete="mfaInput.autocomplete.value"
+        autocapitalize="off"
+        autocorrect="off"
+        spellcheck="false"
         maxlength="32"
         required
         data-test="sign-in-totp"
       />
+      <v-btn
+        v-if="showTotpField"
+        variant="text"
+        size="small"
+        class="mb-2 px-0"
+        :disabled="isLoggingIn"
+        data-test="sign-in-mfa-toggle"
+        @click="mfaInput.toggle"
+      >
+        {{ t(mfaInput.toggleKey.value) }}
+      </v-btn>
       <p
         v-if="pending !== null && hintKey !== null"
         class="text-body-2 mb-2"

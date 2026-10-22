@@ -300,6 +300,35 @@ describe.each([
     expect(submit(enrolled.wrapper).attributes('disabled')).toBeUndefined()
   })
 
+  it('lets the code field take a recovery code: relabelled, full keyboard, sent as mfa_code', async () => {
+    const { wrapper } = await mountPage({ native, twoFactor: true })
+    const field = () => wrapper.find('[data-test="delete-account-code"]')
+    const toggle = () => wrapper.find('[data-test="delete-account-mfa-toggle"]')
+
+    expect(field().find('input').attributes('inputmode')).toBe('numeric')
+    expect(toggle().text()).toBe('Use a recovery code instead')
+    await toggle().trigger('click')
+    expect(field().find('input').attributes('inputmode')).toBe('text')
+    expect(field().text()).toContain('Recovery code')
+
+    await fill(wrapper, {
+      ack: true,
+      password: 'Pa$$w0rd!12',
+      code: '6aed-6a9e-c520-7c0b',
+      word: 'DELETE',
+    })
+    await submit(wrapper).trigger('click')
+    await flushPromises()
+    expect(mocked.requestAccountDeletion).toHaveBeenCalledWith(
+      expect.objectContaining({ mfa_code: '6aed-6a9e-c520-7c0b' }),
+    )
+  })
+
+  it('has no recovery switch when two-factor is not enrolled', async () => {
+    const { wrapper } = await mountPage({ native, twoFactor: false })
+    expect(wrapper.find('[data-test="delete-account-mfa-toggle"]').exists()).toBe(false)
+  })
+
   it('on success: sends the body, signs the user out locally, and goes to sign-in with the date', async () => {
     const { wrapper, router } = await mountPage({ native, twoFactor: true })
     await fill(wrapper, { ack: true, password: 'Pa$$w0rd!12', code: ' 123456 ', word: 'Delete' })
