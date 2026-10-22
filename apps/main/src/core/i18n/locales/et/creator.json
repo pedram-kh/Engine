@@ -635,7 +635,8 @@
       "payment": "Sinu konto makse on veel arveldamisel.",
       "vendor": "Isiku- või väljamaksekontroll välise teenusepakkujaga on veel pooleli.",
       "other": "Midagi sinu kontol tuleb veel lahendada.",
-      "contact": "Kirjuta aadressile {email} ja me aitame."
+      "contact": "Kirjuta aadressile {email} ja me aitame.",
+      "delivered_work": "Sinu tehtud töö ootab veel tasumist."
     }
   }
 }

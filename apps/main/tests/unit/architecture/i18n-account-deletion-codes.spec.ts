@@ -62,7 +62,7 @@ describe('account_deletion.* copy', () => {
       'account_deletion.blocked',
       'account_deletion.not_available',
     ])
-    expect(await harvestReasons()).toEqual(['payment', 'vendor'])
+    expect(await harvestReasons()).toEqual(['delivered_work', 'payment', 'vendor'])
   })
 
   it.each([...UI_LOCALES])(

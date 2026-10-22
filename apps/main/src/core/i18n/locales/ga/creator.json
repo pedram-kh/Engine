@@ -635,7 +635,8 @@
       "payment": "Tá íocaíocht ar do chuntas á socrú fós.",
       "vendor": "Tá seiceáil céannachta nó íocaíochta le soláthraí seachtrach oscailte fós.",
       "other": "Tá rud éigin ar do chuntas nach mór a réiteach fós.",
-      "contact": "Scríobh chuig {email} agus cabhróimid leat."
+      "contact": "Scríobh chuig {email} agus cabhróimid leat.",
+      "delivered_work": "Tá obair a sheachadadh tú fós ag fanacht le híoc."
     }
   }
 }

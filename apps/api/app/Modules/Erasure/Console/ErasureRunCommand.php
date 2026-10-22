@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Erasure\Console;
 
+use App\Modules\Erasure\Claim\ClaimMode;
+use App\Modules\Erasure\Claim\ErasureClaimer;
 use App\Modules\Erasure\Execution\AuditScrubUnavailable;
 use App\Modules\Erasure\Execution\DatabaseAuditScrub;
 use App\Modules\Erasure\Files\ObjectDeletionFailed;
@@ -25,6 +27,13 @@ use Throwable;
  * the admin Erase button (AH-104c), with the dry-run output attached to the
  * request.
  *
+ * AH-104c: it asks the SAME gate as the button ({@see ErasureClaimer}): the account
+ * must have asked to be deleted and its grace must have ended, it must not be on hold,
+ * and no guard may refuse. The dry-run prints that verdict. Execute claims the account
+ * (the creator can no longer cancel) before the first irreversible step.
+ * `--force-not-requested` is the one way past "has not asked" and "not due": it needs
+ * `--operator` and `--reason`, writes its own audit reason, and never passes a hold.
+ *
  * Output is counts, table names and object counts. It never prints an email, a
  * name, an ip or an object key, and on a failure it prints the exception class,
  * not its message (a database message can carry the bound values).
@@ -36,11 +45,13 @@ final class ErasureRunCommand extends Command
         {--execute : Perform the erasure. Without this flag only a dry-run is printed}
         {--confirm-digest= : The digest printed by the dry-run, recomputed fresh at execute time}
         {--confirm-ulid= : The subject ulid typed again}
-        {--operator= : The ulid of the operator, recorded in the ledger and the audit row}';
+        {--operator= : The ulid of the operator, recorded in the ledger and the audit row}
+        {--force-not-requested : Erase an account that never asked, or whose grace has not ended. Needs --operator and --reason; never passes a hold}
+        {--reason= : With --force-not-requested: why. Kept in the audit row after the erasure, so write no personal details}';
 
     protected $description = 'Dry-run (default) or execute the erasure of one creator account. Irreversible; never scheduled.';
 
-    public function handle(ErasureRun $run): int
+    public function handle(ErasureRun $run, ErasureClaimer $claimer): int
     {
         $user = User::withTrashed()->where('ulid', strtoupper(trim((string) $this->argument('user_ulid'))))->first();
         if ($user === null) {
@@ -64,6 +75,14 @@ final class ErasureRunCommand extends Command
             return $this->option('execute') === true ? $this->resume($run, $user) : $this->alreadyErased();
         }
 
+        $mode = $this->option('force-not-requested') === true ? ClaimMode::ForceNotRequested : ClaimMode::Normal;
+        $reason = $this->reasonFor($mode);
+        if ($mode === ClaimMode::ForceNotRequested && ($operator === null || $reason === null)) {
+            $this->error('--force-not-requested needs --operator and --reason. Nothing was read or written.');
+
+            return self::FAILURE;
+        }
+
         try {
             $plan = $run->plan($user);
         } catch (SubjectNotErasable $e) {
@@ -74,13 +93,24 @@ final class ErasureRunCommand extends Command
 
         $this->printPlan($plan);
 
+        // The gate's own legs (a hold, a request whose grace has ended), printed so the verdict
+        // is read before anything is typed. The guards' refusals are the REFUSED lines above.
+        $gateFailures = $claimer->requestGates($user, $mode);
+        foreach ($gateFailures as $failure) {
+            $this->warn('NOT READY: '.$failure);
+        }
+        if ($user->isErasureClaimed()) {
+            $this->line('Claimed: yes (since '.$user->erasure_started_at?->toDateTimeString().'). A claimed account is not asked again; the run is retried.');
+            $gateFailures = [];
+        }
+
         if ($this->option('execute') !== true) {
-            if ($plan->blockers() !== []) {
+            if ($plan->blockers() !== [] || $gateFailures !== []) {
                 $this->error('An execute would be refused. Nothing was changed.');
 
                 return self::FAILURE;
             }
-            $this->line('Dry-run only. To execute: --execute --confirm-digest='.$plan->digest().' --confirm-ulid='.$user->ulid);
+            $this->line('Dry-run only. To execute: --execute --confirm-digest='.$plan->digest().' --confirm-ulid='.$user->ulid.($mode === ClaimMode::ForceNotRequested ? ' --force-not-requested --operator='.$operator->ulid.' --reason=...' : ''));
 
             return self::SUCCESS;
         }
@@ -93,9 +123,23 @@ final class ErasureRunCommand extends Command
             return self::FAILURE;
         }
 
+        // A stale digest or a mistyped ulid is refused HERE, before the claim: nothing is taken.
+        if (! hash_equals($plan->digest(), $digest) || ! hash_equals($user->ulid, $typed)) {
+            $this->error('The digest or the typed ulid does not match: run the dry-run again and confirm what it prints. Nothing was changed.');
+
+            return self::FAILURE;
+        }
+
         try {
-            $ledger = $run->execute($user, $digest, $typed, $operator);
-        } catch (ErasureRefused|SubjectNotErasable|ObjectDeletionFailed|AuditScrubUnavailable|MirrorWriteFailed $e) {
+            $claim = $claimer->claim($user, $operator, $mode, $reason ?? 'shell erasure: the grace has ended');
+            $ledger = $run->execute($user, $claim, $digest, $typed, $operator);
+        } catch (ErasureRefused $e) {
+            // Refused before anything ran: hand the account back (the claimer refuses when a run began).
+            $claimer->release($user, $operator, 'refused');
+            $this->error($e->getMessage());
+
+            return self::FAILURE;
+        } catch (SubjectNotErasable|ObjectDeletionFailed|AuditScrubUnavailable|MirrorWriteFailed $e) {
             $this->error($e->getMessage());
 
             return self::FAILURE;
@@ -108,6 +152,17 @@ final class ErasureRunCommand extends Command
         $this->info('Erased. Ledger '.$ledger->ulid.' is '.$ledger->state->value.'.');
 
         return self::SUCCESS;
+    }
+
+    /** The audit reason: fixed for the normal gate, the operator's own words (prefixed) when forcing. */
+    private function reasonFor(ClaimMode $mode): ?string
+    {
+        if ($mode === ClaimMode::Normal) {
+            return 'shell erasure: the grace has ended';
+        }
+        $given = $this->option('reason');
+
+        return is_string($given) && trim($given) !== '' ? 'forced, not requested: '.trim($given) : null;
     }
 
     private function resume(ErasureRun $run, User $user): int

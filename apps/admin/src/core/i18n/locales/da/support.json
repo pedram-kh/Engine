@@ -60,7 +60,8 @@
       "target_admin": "Platformadministratorer kan ikke efterlignes.",
       "target_self": "Du kan ikke efterligne dig selv.",
       "already_active": "Du har allerede en aktiv efterligning. Afslut den, før du starter en ny.",
-      "invalid_handoff": "Dette efterlignings-handoff er ugyldigt, allerede brugt eller udløbet."
+      "invalid_handoff": "Dette efterlignings-handoff er ugyldigt, allerede brugt eller udløbet.",
+      "target_unavailable": "Denne konto har bedt om sletning eller er ved at blive slettet og kan ikke åbnes."
     }
   }
 }

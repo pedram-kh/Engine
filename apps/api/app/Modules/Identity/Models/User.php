@@ -55,6 +55,9 @@ use Laravel\Sanctum\HasApiTokens;
  * @property Carbon|null $deletion_requested_at AH-104b-del: when the creator asked for deletion; null = no request pending
  * @property Carbon|null $deletion_scheduled_for AH-104b-del: the end of the 14-day grace, stored at request time
  * @property Carbon|null $erased_at AH-104a: set by the erasure engine only; the login block
+ * @property Carbon|null $erasure_started_at AH-104c: the claim; set by ErasureClaimer only. From here the creator cannot cancel and sign-in answers as for an unknown account
+ * @property Carbon|null $erasure_held_at AH-104c: an admin's hold; the erasure gate refuses while set
+ * @property int|null $erasure_held_by_user_id AH-104c: the admin who held (an admin id, never the subject's data)
  */
 final class User extends Authenticatable implements Auditable, MustVerifyEmail
 {
@@ -246,6 +249,32 @@ final class User extends Authenticatable implements Auditable, MustVerifyEmail
         return $this->deletion_requested_at !== null && $this->erased_at === null;
     }
 
+    /**
+     * AH-104c: true once an admin's Erase (or the shell command) has claimed the account
+     * for erasure. A claimed account is answered as an unknown account at sign-in and
+     * cannot be restored; it stays claimed until it is erased or the claim is released.
+     */
+    public function isErasureClaimed(): bool
+    {
+        return $this->erasure_started_at !== null && $this->erased_at === null;
+    }
+
+    /**
+     * AH-104c: the account is on its way out or gone: a deletion request stands, an admin has
+     * claimed it for erasure (which can happen without a request, by the shell's force mode),
+     * or it is erased. Nobody may be signed in as this account (impersonation refuses it).
+     */
+    public function isLeavingOrErased(): bool
+    {
+        return $this->isErased() || $this->isDeletionPending() || $this->isErasureClaimed();
+    }
+
+    /** AH-104c: an admin's hold; the erasure gate refuses a held account. */
+    public function isErasureHeld(): bool
+    {
+        return $this->erasure_held_at !== null;
+    }
+
     public function hasTwoFactorEnabled(): bool
     {
         return $this->two_factor_confirmed_at !== null;
@@ -299,6 +328,8 @@ final class User extends Authenticatable implements Auditable, MustVerifyEmail
             'erased_at' => 'datetime',
             'deletion_requested_at' => 'datetime',
             'deletion_scheduled_for' => 'datetime',
+            'erasure_started_at' => 'datetime',
+            'erasure_held_at' => 'datetime',
         ];
     }
 

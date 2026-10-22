@@ -635,7 +635,8 @@
       "payment": "Hay un pago de tu cuenta que aún se está liquidando.",
       "vendor": "Hay una verificación de identidad o de cobro con un proveedor externo que sigue abierta.",
       "other": "Hay algo en tu cuenta que todavía debe resolverse.",
-      "contact": "Escribe a {email} y te ayudaremos."
+      "contact": "Escribe a {email} y te ayudaremos.",
+      "delivered_work": "Hay trabajo que entregaste que aún está pendiente de pago."
     }
   }
 }

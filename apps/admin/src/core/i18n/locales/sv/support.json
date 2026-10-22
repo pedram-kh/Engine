@@ -60,7 +60,8 @@
       "target_admin": "Plattformsadministratörer kan inte efterliknas.",
       "target_self": "Du kan inte efterlikna dig själv.",
       "already_active": "Du har redan en aktiv efterlikning. Avsluta den innan du startar en ny.",
-      "invalid_handoff": "Det här efterliknings-handoffet är ogiltigt, redan använt eller utgånget."
+      "invalid_handoff": "Det här efterliknings-handoffet är ogiltigt, redan använt eller utgånget.",
+      "target_unavailable": "Det här kontot har begärt radering, eller raderas, och kan inte öppnas."
     }
   }
 }

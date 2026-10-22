@@ -60,7 +60,8 @@
       "target_admin": "Platformbeheerders kunnen niet worden geïmiteerd.",
       "target_self": "Je kunt jezelf niet imiteren.",
       "already_active": "Je hebt al een actieve imitatie. Beëindig deze voordat je een nieuwe start.",
-      "invalid_handoff": "Deze imitatieoverdracht is ongeldig, al gebruikt of verlopen."
+      "invalid_handoff": "Deze imitatieoverdracht is ongeldig, al gebruikt of verlopen.",
+      "target_unavailable": "Dit account heeft om verwijdering gevraagd, of wordt gewist, en kan niet worden geopend."
     }
   }
 }

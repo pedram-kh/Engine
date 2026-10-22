@@ -60,7 +60,8 @@
       "target_admin": "L'identité des administrateurs de la plateforme ne peut pas être empruntée.",
       "target_self": "Vous ne pouvez pas emprunter votre propre identité.",
       "already_active": "Vous avez déjà un emprunt d'identité actif. Terminez-le avant d'en démarrer un autre.",
-      "invalid_handoff": "Ce transfert d'emprunt d'identité est invalide, déjà utilisé ou expiré."
+      "invalid_handoff": "Ce transfert d'emprunt d'identité est invalide, déjà utilisé ou expiré.",
+      "target_unavailable": "Ce compte a demandé sa suppression, ou est en cours d'effacement, et ne peut pas être ouvert."
     }
   }
 }

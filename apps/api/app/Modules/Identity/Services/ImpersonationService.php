@@ -75,6 +75,11 @@ final class ImpersonationService
             throw ImpersonationException::cannotImpersonateAdmin();
         }
 
+        // AH-104c (F8): not an account that asked to be deleted, is being erased, or is erased.
+        if ($target->isLeavingOrErased()) {
+            throw ImpersonationException::targetUnavailable();
+        }
+
         // No-nesting (Q-D9): an admin may hold at most one live impersonation
         // at a time. A second start while one is still active (unexpired,
         // unended) is refused — the admin must end the first explicitly. This
@@ -144,6 +149,12 @@ final class ImpersonationService
         $target = User::query()->find($session->impersonated_user_id);
         if ($target === null) {
             throw ImpersonationException::invalidHandoff();
+        }
+
+        // AH-104c (F8): a session started before the account asked to leave is refused at the
+        // claim too, before anything is logged in.
+        if ($target->isLeavingOrErased()) {
+            throw ImpersonationException::targetUnavailable();
         }
 
         return DB::transaction(function () use ($session, $target, $request): ImpersonationSession {

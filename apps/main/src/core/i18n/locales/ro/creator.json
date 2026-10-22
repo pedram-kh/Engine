@@ -635,7 +635,8 @@
       "payment": "O plată din contul tău este încă în curs de decontare.",
       "vendor": "O verificare de identitate sau de plată la un furnizor extern este încă deschisă.",
       "other": "Ceva din contul tău mai trebuie rezolvat.",
-      "contact": "Scrie la {email} și te vom ajuta."
+      "contact": "Scrie la {email} și te vom ajuta.",
+      "delivered_work": "O lucrare livrată de dumneavoastră așteaptă încă să fie plătită."
     }
   }
 }

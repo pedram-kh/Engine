@@ -635,7 +635,8 @@
       "payment": "Pagament fuq il-kont tiegħek għadu qed jiġi saldat.",
       "vendor": "Verifika tal-identità jew tal-ħlas ma' fornitur estern għadha miftuħa.",
       "other": "Xi ħaġa fuq il-kont tiegħek għad trid tiġi solvuta.",
-      "contact": "Ikteb lil {email} u se ngħinuk."
+      "contact": "Ikteb lil {email} u se ngħinuk.",
+      "delivered_work": "Xogħol li kkonsenjajt għadu qed jistenna l-ħlas."
     }
   }
 }

@@ -635,7 +635,8 @@
       "payment": "A payment on your account is still being settled.",
       "vendor": "An identity or payout check with an outside provider is still open.",
       "other": "Something on your account still needs to be settled.",
-      "contact": "Write to {email} and we will help."
+      "contact": "Write to {email} and we will help.",
+      "delivered_work": "Work you delivered is still waiting to be paid."
     }
   }
 }

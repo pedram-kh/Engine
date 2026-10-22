@@ -6,6 +6,7 @@ namespace App\Modules\Campaigns\Jobs;
 
 use App\Modules\Campaigns\Enums\PostedContentVerificationStatus;
 use App\Modules\Campaigns\Listeners\DispatchPostedContentVerification;
+use App\Modules\Campaigns\Listeners\RedispatchPostedContentVerification;
 use App\Modules\Campaigns\Mail\PostVerificationFailedMail;
 use App\Modules\Campaigns\Models\CampaignPostedContent;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
@@ -40,6 +41,9 @@ use Laravel\Pennant\Feature;
  *     state really advances; the FE labels it "simulated");
  *   - on `not_found` / `mismatch` → leaves the assignment `posted` (D-13, NO
  *     machine call) + notifies the agency (D-14).
+ *
+ * Held back for a creator who is pending deletion or erased (AH-104c, Q5): the post stays
+ * `pending`, nothing is called or saved, and cancelling the request re-runs the job.
  *
  * Flag-gated (D-11): a no-op when `social_verification_enabled` is OFF — the
  * dispatch listener already gates, this is defense-in-depth so a job queued
@@ -81,6 +85,15 @@ final class VerifyPostedContentJob implements ShouldQueue
 
         $assignment = $posted->assignment;
         if ($assignment === null) {
+            return;
+        }
+
+        // AH-104c C1-5 (Q5): no NEW live verification for a creator who is pending deletion or
+        // erased. Asked BEFORE the provider call and before anything is saved: the post stays
+        // `pending`, so the job can run again, and a cancelled request re-runs it
+        // ({@see RedispatchPostedContentVerification}). An erased creator's assignment is
+        // cancelled by the erasure, not verified.
+        if ($assignment->creator?->isUnavailableToAgencies() === true) {
             return;
         }
 

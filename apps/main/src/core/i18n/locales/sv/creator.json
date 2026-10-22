@@ -635,7 +635,8 @@
       "payment": "En betalning på ditt konto är fortfarande under hantering.",
       "vendor": "En identitets- eller utbetalningskontroll hos en extern leverantör är fortfarande öppen.",
       "other": "Något på ditt konto behöver fortfarande lösas.",
-      "contact": "Skriv till {email} så hjälper vi dig."
+      "contact": "Skriv till {email} så hjälper vi dig.",
+      "delivered_work": "Arbete som du har levererat väntar fortfarande på betalning."
     }
   }
 }

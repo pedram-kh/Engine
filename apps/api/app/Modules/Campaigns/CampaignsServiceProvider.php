@@ -10,10 +10,12 @@ use App\Modules\Campaigns\Events\AssignmentTransitioned;
 use App\Modules\Campaigns\Listeners\CreateAssignmentAvailabilityBlock;
 use App\Modules\Campaigns\Listeners\CreateMessageThread;
 use App\Modules\Campaigns\Listeners\DispatchPostedContentVerification;
+use App\Modules\Campaigns\Listeners\RedispatchPostedContentVerification;
 use App\Modules\Campaigns\Listeners\SendAssignmentNotifications;
 use App\Modules\Campaigns\Listeners\WriteSystemMessage;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Policies\CampaignPolicy;
+use App\Modules\Identity\Events\AccountDeletionCancelled;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
@@ -51,6 +53,10 @@ final class CampaignsServiceProvider extends ServiceProvider
         // sends the review notification set (D-14).
         Event::listen(AssignmentTransitioned::class, [DispatchPostedContentVerification::class, 'handle']);
         Event::listen(AssignmentTransitioned::class, [SendAssignmentNotifications::class, 'handle']);
+
+        // AH-104c C1-5 (Q5): a creator who cancels a deletion request gets the automatic post
+        // checks that were held back while the request stood.
+        Event::listen(AccountDeletionCancelled::class, [RedispatchPostedContentVerification::class, 'handle']);
 
         // Sprint 11 (D-3): the 4th consumer provisions the assignment's message
         // thread on invite. Idempotent (firstOrCreate on the assignment_id

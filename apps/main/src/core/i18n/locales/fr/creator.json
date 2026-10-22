@@ -635,7 +635,8 @@
       "payment": "Un paiement sur votre compte est encore en cours de règlement.",
       "vendor": "Une vérification d'identité ou de versement auprès d'un prestataire externe est encore ouverte.",
       "other": "Un point de votre compte doit encore être réglé.",
-      "contact": "Écrivez à {email} et nous vous aiderons."
+      "contact": "Écrivez à {email} et nous vous aiderons.",
+      "delivered_work": "Un travail que vous avez livré attend encore d'être payé."
     }
   }
 }

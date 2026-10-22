@@ -9,6 +9,7 @@ use App\Modules\Audit\Services\AuditLogger;
 use App\Modules\Erasure\Eligibility\ErasureEligibility;
 use App\Modules\Erasure\Subject\SubjectNotErasable;
 use App\Modules\Identity\Enums\UserType;
+use App\Modules\Identity\Events\AccountDeletionCancelled;
 use App\Modules\Identity\Events\AccountDeletionRequested;
 use App\Modules\Identity\Models\User;
 use Carbon\CarbonImmutable;
@@ -62,7 +63,7 @@ final class AccountDeletionService
         #[SensitiveParameter] ?string $mfaCode,
         Request $request,
     ): AccountDeletionResult {
-        if ($user->type !== UserType::Creator || $user->isErased() || $user->isSuspended()) {
+        if ($user->type !== UserType::Creator || $user->isErased() || $user->isErasureClaimed() || $user->isSuspended()) {
             return AccountDeletionResult::failed(AccountDeletionStatus::NotAvailable);
         }
 
@@ -135,16 +136,22 @@ final class AccountDeletionService
     /**
      * The creator signed in with `cancel_deletion` and passed every gate (A4):
      * clear the two dates and say so. Returns false only when the account was
-     * erased in the meantime (the row is re-read locked), in which case nothing
-     * is restored; the caller answers it as an unknown account.
+     * erased, or claimed for erasure (AH-104c), in the meantime (the row is re-read
+     * locked), in which case nothing is restored; the caller answers it as an
+     * unknown account.
      */
     public function cancel(User $user, ?string $ip, ?string $userAgent): bool
     {
-        $restored = $this->db->transaction(function () use ($user, $ip, $userAgent): bool {
+        $cancelledNow = false;
+
+        $restored = $this->db->transaction(function () use ($user, $ip, $userAgent, &$cancelledNow): bool {
             /** @var User $locked */
             $locked = User::query()->whereKey($user->getKey())->lockForUpdate()->firstOrFail();
 
-            if ($locked->isErased()) {
+            // Erased, or claimed for erasure (AH-104c): the claim ends the creator's right to
+            // cancel. The row is re-read locked, and the claimer locks the same row, so a
+            // cancel and a claim cannot both win.
+            if ($locked->isErased() || $locked->isErasureClaimed()) {
                 return false;
             }
 
@@ -164,10 +171,18 @@ final class AccountDeletionService
                 userAgent: $userAgent,
             );
 
+            $cancelledNow = true;
+
             return true;
         });
 
         $user->refresh();
+
+        // After the commit, and only for the call that actually cancelled: the Campaigns module
+        // re-runs the post checks it held back while the request stood (AH-104c C1-5).
+        if ($cancelledNow) {
+            $this->events->dispatch(new AccountDeletionCancelled($user));
+        }
 
         return $restored;
     }

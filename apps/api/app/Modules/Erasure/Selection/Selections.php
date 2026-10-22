@@ -12,6 +12,8 @@ use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Creators\Models\CreatorPayoutMethod;
 use App\Modules\Creators\Models\CreatorTaxProfile;
+use App\Modules\Erasure\Guards\DeliveredWorkGuard;
+use App\Modules\Erasure\Guards\PaymentGuard;
 use App\Modules\Erasure\Registry\Disposition;
 use App\Modules\Erasure\Subject\SubjectSet;
 use App\Modules\Identity\Models\User;
@@ -179,9 +181,14 @@ final class Selections
             array_filter(AssignmentStatus::cases(), static fn (AssignmentStatus $status): bool => $status->isTerminal()),
         ));
 
+        // AH-104c: delivered work, and money held or paid, are never cancelled by the rider. The guards
+        // refuse the run first, so this is belt and braces: a defect in one place cannot cancel work
+        // that may be payable.
+        $excluded = array_values(array_unique([...$terminal, ...DeliveredWorkGuard::states(), ...PaymentGuard::knownPaymentStates()]));
+
         return [
-            new Selection(self::CANCEL_ASSIGNMENTS, 'campaign_assignments', Disposition::Cancel, self::CANCEL_STAGE, 'the subject creator\'s assignments that are not yet in a terminal state',
-                fn (SubjectSet $s, ConnectionInterface $db): Builder => $db->table('campaign_assignments')->where('creator_id', $s->creatorId)->whereNull('deleted_at')->whereNotIn('status', $terminal)),
+            new Selection(self::CANCEL_ASSIGNMENTS, 'campaign_assignments', Disposition::Cancel, self::CANCEL_STAGE, 'the subject creator\'s assignments that are not yet in a terminal state and carry no delivered work',
+                fn (SubjectSet $s, ConnectionInterface $db): Builder => $db->table('campaign_assignments')->where('creator_id', $s->creatorId)->whereNull('deleted_at')->whereNotIn('status', $excluded)),
         ];
     }
 

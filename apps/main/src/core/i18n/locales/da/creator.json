@@ -635,7 +635,8 @@
       "payment": "En betaling på din konto er stadig under afvikling.",
       "vendor": "En identitets- eller udbetalingskontrol hos en ekstern leverandør er stadig åben.",
       "other": "Noget på din konto skal stadig afklares.",
-      "contact": "Skriv til {email}, så hjælper vi dig."
+      "contact": "Skriv til {email}, så hjælper vi dig.",
+      "delivered_work": "Arbejde, du har leveret, venter stadig på betaling."
     }
   }
 }

@@ -25,6 +25,7 @@ use App\Modules\TalentPools\Models\TalentPoolMembership;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Tests\Support\ErasureClaims;
 use Tests\Support\ErasureEvents;
 use Tests\Support\FakeAuditScrub;
 use Tests\Support\RecordingObjectStore;
@@ -91,7 +92,7 @@ function erasedSurfaceFixture(): array
 
     $run = app(ErasureRun::class);
     $subject = User::query()->findOrFail($creator->user_id);
-    $run->execute($subject, $run->plan($subject)->digest(), $subject->ulid);
+    $run->execute($subject, ErasureClaims::for($subject), $run->plan($subject)->digest(), $subject->ulid);
 
     return compact('agency', 'admin', 'campaign', 'creator', 'other', 'pool');
 }

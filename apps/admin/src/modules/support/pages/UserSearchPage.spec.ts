@@ -192,6 +192,38 @@ describe('UserSearchPage (Sprint 13, D-9)', () => {
     ).toBeTruthy()
   })
 
+  it('says in words that a leaving account cannot be entered (AH-104c), not the raw error code', async () => {
+    vi.mocked(impersonationApi.start).mockRejectedValue(
+      new ApiError({
+        status: 422,
+        code: 'admin.impersonation.target_unavailable',
+        message: 'no',
+      }),
+    )
+
+    const h = await searchFor('dana')
+
+    await h.wrapper
+      .find('[data-testid="admin-user-search-impersonate-01HQUSER0000000000000000AB"]')
+      .trigger('click')
+    await flushPromises()
+
+    const textarea = document.querySelector<HTMLTextAreaElement>(
+      '[data-testid="admin-impersonate-reason"] textarea',
+    )!
+    textarea.value = 'Trying to open a leaving account'
+    textarea.dispatchEvent(new Event('input'))
+    await flushPromises()
+
+    document.querySelector<HTMLButtonElement>('[data-testid="admin-impersonate-confirm"]')!.click()
+    await flushPromises()
+
+    const text =
+      document.querySelector('[data-testid="admin-impersonate-error"]')?.textContent ?? ''
+    expect(text).toContain('cannot be entered')
+    expect(text).not.toContain('admin.impersonation.target_unavailable')
+  })
+
   it('shows the empty state when no users match', async () => {
     vi.mocked(impersonationApi.searchUsers).mockResolvedValue({ data: [] })
     const h = await mountSupportPage(UserSearchPage, {

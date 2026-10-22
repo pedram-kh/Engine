@@ -635,7 +635,8 @@
       "payment": "Plačilo na vašem računu se še obdeluje.",
       "vendor": "Preverjanje identitete ali izplačil pri zunanjem ponudniku je še odprto.",
       "other": "Nekaj na vašem računu je še treba rešiti.",
-      "contact": "Pišite na {email} in vam bomo pomagali."
+      "contact": "Pišite na {email} in vam bomo pomagali.",
+      "delivered_work": "Delo, ki ste ga oddali, še čaka na plačilo."
     }
   }
 }

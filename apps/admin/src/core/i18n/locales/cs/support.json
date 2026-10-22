@@ -60,7 +60,8 @@
       "target_admin": "Administrátoři platformy nemohou být zosobňováni.",
       "target_self": "Nemůžete zosobnit sami sebe.",
       "already_active": "Již máte aktivní zosobnění. Ukončete ho před zahájením nového.",
-      "invalid_handoff": "Toto předání zosobnění je neplatné, již bylo použito nebo vypršelo."
+      "invalid_handoff": "Toto předání zosobnění je neplatné, již bylo použito nebo vypršelo.",
+      "target_unavailable": "Tento účet požádal o smazání nebo se maže a nelze do něj vstoupit."
     }
   }
 }

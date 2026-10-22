@@ -335,7 +335,11 @@ final class AuthService
         // from "never existed". This is the one guard both doors share: the SPA
         // login() and the native issueToken() both run this graph. The engine also
         // randomises the password and replaces the email, so this is defence in depth.
-        if ($user->isErased()) {
+        //
+        // AH-104c — an account an admin has CLAIMED for erasure is answered the same way, from
+        // the claim on: the run deletes files before it erases the row, so the creator must not
+        // be able to sign in (or cancel) in that window. Same branch, same audit reason.
+        if ($user->isErased() || $user->isErasureClaimed()) {
             $this->recordFailureAndMaybeLock($email, null, $ip, $userAgent, 'unknown_email');
 
             return LoginResult::invalidCredentials();
@@ -483,7 +487,7 @@ final class AuthService
             }
 
             if (! $this->accountDeletion->cancel($user, $ip, $userAgent)) {
-                // Erased between the check and the lock: answered as an unknown account.
+                // Erased or claimed for erasure between the check and the lock: answered as an unknown account.
                 return LoginResult::invalidCredentials();
             }
         }

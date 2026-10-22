@@ -216,6 +216,9 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         // AH-104b-del — the creator's own request and its cancellation.
         'account.deletion_requested',
         'account.deletion_cancelled',
+        // AH-104c — the erasure claim and its release.
+        'account.erasure_started',
+        'account.erasure_claim_released',
     ];
 
     $actual = array_map(fn (AuditAction $case): string => $case->value, AuditAction::cases());
@@ -239,6 +242,8 @@ it('reason-mandatory actions match docs/05-SECURITY-COMPLIANCE.md §3.3', functi
         'user.deleted',
         // AH-104a — an erasure run answers "why" (the reason names the ledger row).
         'account.erased',
+        // AH-104c — the claim answers "who took this account, and why". Its release is a system act.
+        'account.erasure_started',
         'user.suspended',
         'user.unsuspended',
         'assignment.cancelled',

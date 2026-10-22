@@ -635,7 +635,8 @@
       "payment": "Um pagamento na sua conta ainda está a ser liquidado.",
       "vendor": "Uma verificação de identidade ou de pagamento junto de um prestador externo ainda está em aberto.",
       "other": "Há algo na sua conta que ainda precisa de ser resolvido.",
-      "contact": "Escreva para {email} e ajudaremos."
+      "contact": "Escreva para {email} e ajudaremos.",
+      "delivered_work": "Um trabalho que entregou ainda aguarda pagamento."
     }
   }
 }

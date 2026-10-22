@@ -60,7 +60,8 @@
       "target_admin": "Administradores da plataforma não podem ser personificados.",
       "target_self": "Não pode personificar-se a si próprio.",
       "already_active": "Já tem uma personificação ativa. Termine-a antes de iniciar outra.",
-      "invalid_handoff": "Esta transferência de personificação é inválida, já foi usada ou expirou."
+      "invalid_handoff": "Esta transferência de personificação é inválida, já foi usada ou expirou.",
+      "target_unavailable": "Esta conta pediu para ser eliminada, ou está a ser apagada, e não pode ser acedida."
     }
   }
 }

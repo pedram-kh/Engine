@@ -60,6 +60,11 @@ enum AuditAction: string
     // subject. Neither needs a reason (the person is acting on their own account).
     case AccountDeletionRequested = 'account.deletion_requested';
     case AccountDeletionCancelled = 'account.deletion_cancelled';
+    // AH-104c: the claim (an admin's Erase, or the shell command, took the account; the
+    // actor is the operator and the reason is mandatory) and its release (the run was
+    // refused or its data had moved, so the creator may cancel again; a system act).
+    case AccountErasureStarted = 'account.erasure_started';
+    case AccountErasureClaimReleased = 'account.erasure_claim_released';
     case UserSuspended = 'user.suspended';
     case UserUnsuspended = 'user.unsuspended';
 
@@ -516,6 +521,8 @@ enum AuditAction: string
             self::UserUnsuspended,
             self::UserDeleted,
             self::AccountErased,
+            // AH-104c: the claim answers "who took this account, and why".
+            self::AccountErasureStarted,
             // Cancel always carries a mandatory reason (D-9 — the
             // `cancelled_reason` column + this gate enforce it).
             self::AssignmentCancelled,

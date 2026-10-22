@@ -635,7 +635,8 @@
       "payment": "Tilisi maksu on vielä käsittelyssä.",
       "vendor": "Henkilöllisyyden tai maksujen tarkistus ulkopuolisen palveluntarjoajan kanssa on vielä kesken.",
       "other": "Tililläsi on vielä jotain selvitettävää.",
-      "contact": "Kirjoita osoitteeseen {email}, niin autamme."
+      "contact": "Kirjoita osoitteeseen {email}, niin autamme.",
+      "delivered_work": "Toimittamasi työ odottaa vielä maksua."
     }
   }
 }

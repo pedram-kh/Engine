@@ -635,7 +635,8 @@
       "payment": "Płatność na Twoim koncie jest jeszcze rozliczana.",
       "vendor": "Weryfikacja tożsamości lub wypłat u zewnętrznego dostawcy jest nadal otwarta.",
       "other": "Coś na Twoim koncie wymaga jeszcze uregulowania.",
-      "contact": "Napisz na {email}, a pomożemy."
+      "contact": "Napisz na {email}, a pomożemy.",
+      "delivered_work": "Dostarczona przez Ciebie praca nadal czeka na zapłatę."
     }
   }
 }

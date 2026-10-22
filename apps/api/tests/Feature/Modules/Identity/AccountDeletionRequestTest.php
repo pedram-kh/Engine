@@ -417,6 +417,29 @@ it('refuses up front while money is held, or a real vendor holds the person, and
     delAssertUntouched($user, $before);
 });
 
+it('refuses up front while the creator has delivered work, in a word, and lets them through when it is gone (AH-104c)', function (string $status): void {
+    $graph = ErasureGraph::seedSubject('del');
+    $user = $graph->user;
+    $user->forceFill(['password' => DEL_PASSWORD])->saveQuietly();
+    $before = delCreds($user);
+
+    $assignmentId = DB::table('campaign_assignments')->where('creator_id', $graph->creator->id)->value('id');
+    DB::table('campaign_assignments')->where('id', $assignmentId)->update(['status' => $status]);
+
+    $response = $this->actingAs($user->refresh(), 'web')->postJson('/api/v1/me/account-deletion', delBody())
+        ->assertStatus(422)
+        ->assertJsonPath('errors.0.code', 'account_deletion.blocked')
+        ->assertJsonPath('errors.0.meta.reasons', ['delivered_work']);
+    expect(str_contains((string) $response->getContent(), 'campaign_assignments'))->toBeFalse()
+        ->and(str_contains((string) $response->getContent(), $graph->email))->toBeFalse();
+
+    delAssertUntouched($user, $before);
+
+    DB::table('campaign_assignments')->where('id', $assignmentId)->update(['status' => 'accepted']);
+
+    $this->actingAs($user->refresh(), 'web')->postJson('/api/v1/me/account-deletion', delBody())->assertOk();
+})->with(['live_verified', 'manually_verified', 'completed_on_approval']);
+
 it('lets a creator with nothing blocking, and with real data around them, through', function (): void {
     $graph = ErasureGraph::seedSubject('ok');
     $graph->user->forceFill(['password' => DEL_PASSWORD])->saveQuietly();

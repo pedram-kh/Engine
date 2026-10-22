@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Erasure\Eligibility;
 
+use App\Modules\Erasure\Guards\DeliveredWorkGuard;
 use App\Modules\Erasure\Guards\PaymentGuard;
 use App\Modules\Erasure\Guards\VendorGuard;
 use App\Modules\Erasure\Subject\SubjectNotErasable;
@@ -29,9 +30,12 @@ final class ErasureEligibility
 
     public const VENDOR = 'vendor';
 
+    /** AH-104c: the creator has delivered work (verified, or completed on approval) that may be payable. */
+    public const DELIVERED_WORK = 'delivered_work';
+
     /**
      * @return list<string> empty when nothing blocks; else a subset of
-     *                      {@see PAYMENT}, {@see VENDOR}
+     *                      {@see PAYMENT}, {@see DELIVERED_WORK}, {@see VENDOR}
      *
      * @throws SubjectNotErasable when the account is not an erasable creator
      */
@@ -42,6 +46,9 @@ final class ErasureEligibility
         $blockers = [];
         if ((new PaymentGuard)->refusals($subject) !== []) {
             $blockers[] = self::PAYMENT;
+        }
+        if ((new DeliveredWorkGuard)->refusals($subject) !== []) {
+            $blockers[] = self::DELIVERED_WORK;
         }
         if ((new VendorGuard)->refusals($subject) !== []) {
             $blockers[] = self::VENDOR;

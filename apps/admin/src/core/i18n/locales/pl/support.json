@@ -60,7 +60,8 @@
       "target_admin": "Administratorzy platformy nie mogą być personifikowani.",
       "target_self": "Nie możesz spersonifikować siebie.",
       "already_active": "Masz już aktywną personifikację. Zakończ ją przed rozpoczęciem nowej.",
-      "invalid_handoff": "To przekazanie personifikacji jest nieprawidłowe, już użyte lub wygasłe."
+      "invalid_handoff": "To przekazanie personifikacji jest nieprawidłowe, już użyte lub wygasłe.",
+      "target_unavailable": "To konto poprosiło o usunięcie lub jest usuwane i nie można do niego wejść."
     }
   }
 }

@@ -121,7 +121,10 @@ async function runAction(kind: ActionKind): Promise<void> {
     if (err instanceof ApiError) {
       fieldErrors.value = extractFieldErrors<ResolutionField>(err)
     }
-    if (Object.keys(fieldErrors.value).length === 0) {
+    if (err instanceof ApiError && err.code === 'creator.unavailable') {
+      // AH-104c: the creator asked to delete their account (or was erased) while this was open.
+      actionError.value = t('creator.unavailable')
+    } else if (Object.keys(fieldErrors.value).length === 0) {
       actionError.value = t('app.campaigns.resolution.toast.error')
     }
   } finally {

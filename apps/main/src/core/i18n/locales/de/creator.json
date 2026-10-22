@@ -635,7 +635,8 @@
       "payment": "Eine Zahlung auf deinem Konto wird noch abgewickelt.",
       "vendor": "Eine Identitäts- oder Auszahlungsprüfung bei einem externen Anbieter ist noch offen.",
       "other": "Auf deinem Konto muss noch etwas geklärt werden.",
-      "contact": "Schreibe an {email}, wir helfen dir gern."
+      "contact": "Schreibe an {email}, wir helfen dir gern.",
+      "delivered_work": "Eine von dir gelieferte Arbeit wartet noch auf Bezahlung."
     }
   }
 }

@@ -18,6 +18,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Tests\Support\ErasureClaims;
 use Tests\Support\ErasureGraph;
 use Tests\Support\ErasureSnapshot;
 use Tests\Support\FakeAuditScrub;
@@ -36,7 +37,7 @@ function mirrorErase(ErasureGraph $graph): ErasureLedger
 {
     $run = app(ErasureRun::class);
 
-    return $run->execute($graph->user, $run->plan($graph->user)->digest(), $graph->user->ulid);
+    return $run->execute($graph->user, ErasureClaims::for($graph->user), $run->plan($graph->user)->digest(), $graph->user->ulid);
 }
 
 /** @return list<string> */
@@ -84,7 +85,7 @@ it('writes the entry before the ledger says completed, and never claims complete
     $run = app(ErasureRun::class);
     $digest = $run->plan($graph->user)->digest();
 
-    expect(fn () => $run->execute($graph->user, $digest, $graph->user->ulid))->toThrow(MirrorWriteFailed::class);
+    expect(fn () => $run->execute($graph->user, ErasureClaims::for($graph->user), $digest, $graph->user->ulid))->toThrow(MirrorWriteFailed::class);
 
     $ledger = ErasureLedger::query()->sole();
 

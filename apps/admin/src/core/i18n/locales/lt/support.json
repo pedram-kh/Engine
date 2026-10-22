@@ -60,7 +60,8 @@
       "target_admin": "Platform admins cannot be impersonated.",
       "target_self": "You cannot impersonate yourself.",
       "already_active": "You already have an active impersonation. End it before starting another.",
-      "invalid_handoff": "This impersonation hand-off is invalid, already used, or expired."
+      "invalid_handoff": "This impersonation hand-off is invalid, already used, or expired.",
+      "target_unavailable": "Ši paskyra paprašė ją ištrinti arba yra trinama, todėl į ją negalima prisijungti."
     }
   }
 }

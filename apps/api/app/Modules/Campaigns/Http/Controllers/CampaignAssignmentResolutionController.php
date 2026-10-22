@@ -17,6 +17,7 @@ use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Models\CampaignPostedContent;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
+use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -64,6 +65,13 @@ final class CampaignAssignmentResolutionController
         if (($guard = $this->guard($request, $agency, $campaign, $assignment)) !== null) {
             return $guard;
         }
+
+        // AH-104c C1-5 (Q5): a creator who is pending deletion (or erased) cannot be newly verified.
+        // Neutral 422 `creator.unavailable`; nothing is written. Asked after the resolvable
+        // precondition so an unresolvable assignment answers as it always did.
+        // A separate full read, not `loadMissing`: the relation must stay whole for the listeners
+        // that follow the transition (the creator's notice needs the user).
+        Creator::query()->find($assignment->creator_id)?->assertAvailableToAgencies();
 
         /** @var User $actor */
         $actor = $request->user();

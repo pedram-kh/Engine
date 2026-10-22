@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Erasure\Execution\AuditScrub;
 use App\Modules\Erasure\Models\ErasureLedger;
@@ -27,6 +28,9 @@ function erasureCommandFixture(bool $scrubAvailable = true): array
     app()->instance(AuditScrub::class, tap(new FakeAuditScrub, fn (FakeAuditScrub $f) => $f->available = $scrubAvailable));
     $graph = ErasureGraph::seedSubject('a');
     $graph->putFiles();
+    // AH-104c: the shell asks the same gate as the button. The fixture is the ordinary case: a creator
+    // who asked to be deleted and whose grace ended yesterday. The gate has its own specs.
+    $graph->user->forceFill(['deletion_requested_at' => now()->subDays(15), 'deletion_scheduled_for' => now()->subDay()])->saveQuietly();
 
     return [$graph, $graph->user->ulid];
 }
@@ -99,7 +103,7 @@ it('refuses an execute without both confirmations, with a wrong digest or ulid, 
 })->with([
     'no confirmations' => [['args' => ['--execute' => true]], 'needs --confirm-digest'],
     'only a digest' => [['args' => ['--execute' => true, '--confirm-digest' => 'abc']], 'needs --confirm-digest'],
-    'a wrong digest' => [['args' => ['--execute' => true, '--confirm-digest' => 'abc', '--confirm-ulid' => 'WHATEVER']], 'Erasure refused'],
+    'a wrong digest' => [['args' => ['--execute' => true, '--confirm-digest' => 'abc', '--confirm-ulid' => 'WHATEVER']], 'does not match'],
     'an unknown subject' => [['subject' => '01ZZZZZZZZZZZZZZZZZZZZZZZZ'], 'No user has that ulid'],
     'an unknown operator' => [['args' => ['--operator' => '01ZZZZZZZZZZZZZZZZZZZZZZZZ']], 'operator ulid'],
 ]);
@@ -108,8 +112,11 @@ it('prints the exception class, not its message, when a step fails (a database m
     [$graph, $ulid] = erasureCommandFixture();
     Artisan::call('erasure:run', ['user_ulid' => $ulid]);
     $digest = erasureDigestFrom(Artisan::output());
-    Event::listen('eloquent.creating: '.AuditLog::class, function () use ($graph): void {
-        throw new RuntimeException('could not write for '.$graph->email);
+    // Fails at the closing `account.erased` row (inside the database stage), after the claim was made.
+    Event::listen('eloquent.creating: '.AuditLog::class, function (AuditLog $log) use ($graph): void {
+        if ($log->action === AuditAction::AccountErased) {
+            throw new RuntimeException('could not write for '.$graph->email);
+        }
     });
 
     $code = Artisan::call('erasure:run', ['user_ulid' => $ulid, '--execute' => true, '--confirm-digest' => $digest, '--confirm-ulid' => $ulid]);
@@ -119,7 +126,10 @@ it('prints the exception class, not its message, when a step fails (a database m
         ->and($out)->toContain('RuntimeException')
         ->and($out)->not->toContain($graph->email)
         ->and(User::withTrashed()->findOrFail($graph->user->id)->isErased())->toBeFalse()
-        ->and(ErasureLedger::query()->sole()->state->value)->toBe('incomplete');
+        ->and(ErasureLedger::query()->sole()->state->value)->toBe('incomplete')
+        // A run that began stays claimed: it is retried, never reopened to the creator (AH-104c).
+        ->and(User::withTrashed()->findOrFail($graph->user->id)->isErasureClaimed())->toBeTrue()
+        ->and(AuditLog::query()->where('action', AuditAction::AccountErasureClaimReleased)->count())->toBe(0);
 });
 
 it('reports an already erased subject, and resumes only a run that stopped after the database stage', function (): void {
@@ -197,4 +207,152 @@ it('leaves the database exactly as it was on a refused execute (no ledger row, n
         ->and(Artisan::output())->toContain('payment state')
         ->and(ErasureSnapshot::tables())->toBe($before)
         ->and(ErasureLedger::query()->count())->toBe(0);
+});
+
+/*
+|--------------------------------------------------------------------------
+| AH-104c C1-6 — the shell asks the same gate as the button
+|--------------------------------------------------------------------------
+*/
+
+it('prints the gate\'s verdict in the dry-run, with the date when the account is not due, and exits non-zero', function (string $case, string $needle): void {
+    [$graph, $ulid] = erasureCommandFixture();
+    match ($case) {
+        'not due' => $graph->user->forceFill(['deletion_scheduled_for' => now()->addDays(3)])->saveQuietly(),
+        'never asked' => $graph->user->forceFill(['deletion_requested_at' => null, 'deletion_scheduled_for' => null])->saveQuietly(),
+        'held' => $graph->user->forceFill(['erasure_held_at' => now()])->saveQuietly(),
+        default => throw new InvalidArgumentException($case),
+    };
+    $before = ErasureSnapshot::tables();
+
+    $code = Artisan::call('erasure:run', ['user_ulid' => $ulid]);
+    $out = Artisan::output();
+
+    expect($code)->toBe(1)
+        ->and($out)->toContain('NOT READY')->toContain($needle)->toContain('An execute would be refused')
+        ->and($out)->not->toContain($graph->email)
+        ->and(ErasureSnapshot::tables())->toBe($before);
+})->with([
+    'not due' => ['not due', 'the grace has not ended: the account is not due until '],
+    'never asked' => ['never asked', 'has not asked to be deleted'],
+    'held' => ['held', 'on hold'],
+]);
+
+it('refuses to execute an account that is not due: nothing claimed, no ledger row, no audit row', function (): void {
+    [$graph, $ulid] = erasureCommandFixture();
+    $graph->user->forceFill(['deletion_scheduled_for' => now()->addDays(3)])->saveQuietly();
+    $digest = erasureDigestFrom((function () use ($ulid): string {
+        Artisan::call('erasure:run', ['user_ulid' => $ulid]);
+
+        return Artisan::output();
+    })());
+    $before = ErasureSnapshot::tables();
+
+    $code = Artisan::call('erasure:run', ['user_ulid' => $ulid, '--execute' => true, '--confirm-digest' => $digest, '--confirm-ulid' => $ulid]);
+
+    expect($code)->toBe(1)
+        ->and(Artisan::output())->toContain('the grace has not ended')
+        ->and(ErasureSnapshot::tables())->toBe($before)
+        ->and(ErasureLedger::query()->count())->toBe(0)
+        ->and(AuditLog::query()->where('action', AuditAction::AccountErasureStarted)->count())->toBe(0);
+});
+
+it('claims the account when it executes: one audit row with the fixed shell reason, the operator in the ledger', function (): void {
+    [$graph, $ulid] = erasureCommandFixture();
+    Artisan::call('erasure:run', ['user_ulid' => $ulid]);
+    $digest = erasureDigestFrom(Artisan::output());
+    $operator = User::factory()->platformAdmin()->createOne();
+
+    $code = Artisan::call('erasure:run', ['user_ulid' => $ulid, '--execute' => true, '--confirm-digest' => $digest, '--confirm-ulid' => $ulid, '--operator' => $operator->ulid]);
+    $row = AuditLog::query()->where('action', AuditAction::AccountErasureStarted)->sole();
+
+    expect($code)->toBe(0)
+        ->and($row->reason)->toBe('shell erasure: the grace has ended')
+        ->and($row->actor_id)->toBe($operator->id)
+        ->and($row->metadata)->toBe(['mode' => 'normal'])
+        ->and(ErasureLedger::query()->sole()->run_by_user_id)->toBe($operator->id);
+});
+
+it('forces an account that never asked: needs --operator and --reason, writes its own audit reason, erases', function (): void {
+    [$graph, $ulid] = erasureCommandFixture();
+    $graph->user->forceFill(['deletion_requested_at' => null, 'deletion_scheduled_for' => null])->saveQuietly();
+    $operator = User::factory()->platformAdmin()->createOne();
+    $force = ['--force-not-requested' => true];
+
+    // Without the operator or the reason: refused before anything is read.
+    $before = ErasureSnapshot::tables();
+    $noOperator = Artisan::call('erasure:run', ['user_ulid' => $ulid] + $force + ['--reason' => 'legal request 4471']);
+    $noOperatorOut = Artisan::output();
+    $noReason = Artisan::call('erasure:run', ['user_ulid' => $ulid] + $force + ['--operator' => $operator->ulid]);
+
+    expect($noOperator)->toBe(1)->and($noOperatorOut)->toContain('needs --operator and --reason')
+        ->and($noReason)->toBe(1)
+        ->and(ErasureSnapshot::tables())->toBe($before);
+
+    // The dry-run with force passes the gate and names the way to execute.
+    $dry = Artisan::call('erasure:run', ['user_ulid' => $ulid] + $force + ['--operator' => $operator->ulid, '--reason' => 'legal request 4471']);
+    $dryOut = Artisan::output();
+    $digest = erasureDigestFrom($dryOut);
+
+    expect($dry)->toBe(0)->and($dryOut)->toContain('--force-not-requested')
+        ->and(str_contains($dryOut, 'NOT READY'))->toBeFalse();
+
+    $code = Artisan::call('erasure:run', ['user_ulid' => $ulid, '--execute' => true, '--confirm-digest' => $digest, '--confirm-ulid' => $ulid, '--operator' => $operator->ulid, '--reason' => 'legal request 4471'] + $force);
+    $row = AuditLog::query()->where('action', AuditAction::AccountErasureStarted)->sole();
+
+    expect($code)->toBe(0)
+        ->and($row->reason)->toBe('forced, not requested: legal request 4471')
+        ->and($row->metadata)->toBe(['mode' => 'force_not_requested'])
+        ->and(User::withTrashed()->findOrFail($graph->user->id)->isErased())->toBeTrue();
+});
+
+it('never forces past a hold or a guard', function (string $obstacle): void {
+    [$graph, $ulid] = erasureCommandFixture();
+    $graph->user->forceFill(['deletion_requested_at' => null, 'deletion_scheduled_for' => null])->saveQuietly();
+    $operator = User::factory()->platformAdmin()->createOne();
+    if ($obstacle === 'hold') {
+        $graph->user->forceFill(['erasure_held_at' => now()])->saveQuietly();
+    } else {
+        DB::table('campaign_assignments')->where('creator_id', $graph->creator->id)->update(['status' => 'live_verified']);
+    }
+    $args = ['user_ulid' => $ulid, '--force-not-requested' => true, '--operator' => $operator->ulid, '--reason' => 'legal request 4471'];
+    Artisan::call('erasure:run', $args);
+    $digest = erasureDigestFrom(Artisan::output());
+    $before = ErasureSnapshot::tables();
+
+    $code = Artisan::call('erasure:run', $args + ['--execute' => true, '--confirm-digest' => $digest, '--confirm-ulid' => $ulid]);
+
+    expect($code)->toBe(1)
+        ->and(ErasureSnapshot::tables())->toBe($before)
+        ->and(ErasureLedger::query()->count())->toBe(0);
+})->with(['hold', 'delivered work']);
+
+it('hands the account back when the run is refused before it began, and says so in the audit trail', function (): void {
+    [$graph, $ulid] = erasureCommandFixture(scrubAvailable: false);
+    $digest = erasureDigestFrom((function () use ($ulid): string {
+        Artisan::call('erasure:run', ['user_ulid' => $ulid]);
+
+        return Artisan::output();
+    })());
+
+    // The audit scrub is not a gate leg of the claim, so the claim is made and the RUN then refuses.
+    $code = Artisan::call('erasure:run', ['user_ulid' => $ulid, '--execute' => true, '--confirm-digest' => $digest, '--confirm-ulid' => $ulid]);
+    $user = User::withTrashed()->findOrFail($graph->user->id);
+
+    expect($code)->toBe(1)
+        ->and(Artisan::output())->toContain('audit scrub')
+        ->and($user->isErasureClaimed())->toBeFalse()
+        ->and($user->deletion_requested_at)->not->toBeNull()
+        ->and(ErasureLedger::query()->count())->toBe(0)
+        ->and(AuditLog::query()->where('action', AuditAction::AccountErasureStarted)->count())->toBe(1)
+        ->and(AuditLog::query()->where('action', AuditAction::AccountErasureClaimReleased)->sole()->metadata)->toBe(['cause' => 'refused']);
+});
+
+it('says in the dry-run that an account is already claimed, and does not ask the gate again', function (): void {
+    [$graph, $ulid] = erasureCommandFixture();
+    $graph->user->forceFill(['erasure_started_at' => now(), 'deletion_scheduled_for' => now()->addDays(3)])->saveQuietly();
+
+    $code = Artisan::call('erasure:run', ['user_ulid' => $ulid]);
+
+    expect($code)->toBe(0)->and(Artisan::output())->toContain('Claimed: yes');
 });

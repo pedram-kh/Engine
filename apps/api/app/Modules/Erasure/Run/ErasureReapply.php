@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Erasure\Run;
 
+use App\Modules\Erasure\Claim\ErasureClaimer;
 use App\Modules\Erasure\Execution\AuditScrubUnavailable;
 use App\Modules\Erasure\Files\ObjectDeletionFailed;
 use App\Modules\Erasure\Guards\ErasureRefused;
@@ -28,7 +29,7 @@ use App\Modules\Identity\Models\User;
  */
 final class ErasureReapply
 {
-    public function __construct(private readonly LedgerMirror $mirror, private readonly ErasureRun $run) {}
+    public function __construct(private readonly LedgerMirror $mirror, private readonly ErasureRun $run, private readonly ErasureClaimer $claimer) {}
 
     public function plan(): ReapplyPlan
     {
@@ -83,7 +84,10 @@ final class ErasureReapply
         $done = [];
         foreach ($plan->subjects as $subject) {
             // Same gates per subject (fresh digest, typed ulid); the batch confirmation above is the operator's.
-            $this->run->execute($subject['user'], $subject['plan']->digest(), $subject['user']->ulid, $operator);
+            // The claim is the mirror's own record that this person was erased (AH-104c): no request,
+            // grace or hold is asked again for an erasure that was already decided and carried out.
+            $claim = $this->claimer->reclaim($subject['user'], $operator);
+            $this->run->execute($subject['user'], $claim, $subject['plan']->digest(), $subject['user']->ulid, $operator);
             $done[] = $subject['user']->ulid;
         }
 

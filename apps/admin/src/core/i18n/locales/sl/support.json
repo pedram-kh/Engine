@@ -60,7 +60,8 @@
       "target_admin": "Administrátoři platformy nemohou být zosobňováni.",
       "target_self": "Nemůžete lažno predstanjei sami sebe.",
       "already_active": "Již máte aktivní lažno predstanjeljanje. Ukončete ho před zahájením nového.",
-      "invalid_handoff": "Toto předání lažno predstanjeljanje je neplatné, již bylo použito nebo vypršelo."
+      "invalid_handoff": "Toto předání lažno predstanjeljanje je neplatné, již bylo použito nebo vypršelo.",
+      "target_unavailable": "Ta račun je zahteval izbris ali se briše in vanj ni mogoče vstopiti."
     }
   }
 }

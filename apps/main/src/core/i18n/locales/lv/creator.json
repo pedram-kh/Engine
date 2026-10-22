@@ -635,7 +635,8 @@
       "payment": "Maksājums jūsu kontā vēl tiek apstrādāts.",
       "vendor": "Identitātes vai izmaksu pārbaude pie ārēja pakalpojumu sniedzēja vēl nav pabeigta.",
       "other": "Kaut kas jūsu kontā vēl jānokārto.",
-      "contact": "Rakstiet uz {email}, un mēs palīdzēsim."
+      "contact": "Rakstiet uz {email}, un mēs palīdzēsim.",
+      "delivered_work": "Jūsu iesniegtais darbs vēl gaida samaksu."
     }
   }
 }

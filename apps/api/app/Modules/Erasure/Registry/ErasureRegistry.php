@@ -108,7 +108,7 @@ final class ErasureRegistry
         $pseudonymous = 'Edge, key or timestamp: not identifying once the other columns are gone (§3.1).';
 
         return [
-            'users' => new TableRule(null, 'The subject user row (§3.1). Anchor: never deleted.', [], [
+            'users' => new TableRule(null, 'The subject user row (§3.1). Anchor: never deleted.', ['erasure_held_by_user_id'], [
                 ...self::anon('email', AnonValue::EmailPlaceholder, 'Frees the address (D-F); a placeholder that can never receive mail.'),
                 ...self::anon('name', AnonValue::Erased, 'Direct identifier; may equal the email for a prospect user (§2.1). Never rendered.'),
                 ...self::anon('last_name,remember_token,two_factor_secret,two_factor_recovery_codes,two_factor_confirmed_at,last_login_ip', AnonValue::Null, 'Direct identifier or authentication material of a person with no login (§3.1).'),
@@ -117,6 +117,7 @@ final class ErasureRegistry
                 ...self::keep('id,ulid,type,email_verified_at,preferred_language,preferred_currency,timezone,theme_preference,last_login_at,created_at,updated_at', 'Not identifying once the rest is gone; ulid is the pseudonymous key audit rows and URLs already hold (§3.1).'),
                 ...self::keep('is_suspended,suspended_reason,suspended_at,mfa_required,mfa_exempted_at,mfa_exemption_reason,two_factor_enrollment_suspended_at', 'Platform safety record by the deciding party (D-D).'),
                 ...self::keep('deletion_requested_at,deletion_scheduled_for', 'AH-104b-del: when the person asked, and when the grace ended. A timestamp, not identifying once the other columns are gone; the record that an erasure followed a request.'),
+                ...self::keep('erasure_started_at,erasure_held_at,erasure_held_by_user_id', 'AH-104c: when an admin claimed the account for erasure, and the hold that may have preceded it. Timestamps and an ADMIN id (never the subject\'s data); the record of how the erasure began. The hold reason lives in the audit row only.'),
                 ...self::keep('deleted_at', 'Left null: a soft delete would put creator = null into agency pages. The marker is erased_at.'),
             ]),
             'sessions' => new TableRule(Disposition::EraseRow, 'Live credentials plus IP and UA (§3.1).', [], self::row(Disposition::EraseRow, 'id,user_id,ip_address,user_agent,payload,last_activity', 'Live credentials plus IP and UA.'), 'user_id = subject user'),

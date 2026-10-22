@@ -635,7 +635,8 @@
       "payment": "A fiókodon lévő egyik fizetés elszámolása még folyamatban van.",
       "vendor": "Egy külső szolgáltatónál zajló személyazonosság- vagy kifizetés-ellenőrzés még nyitott.",
       "other": "A fiókodon még rendezni kell valamit.",
-      "contact": "Írj a(z) {email} címre, és segítünk."
+      "contact": "Írj a(z) {email} címre, és segítünk.",
+      "delivered_work": "Az általad leadott munka díjazása még függőben van."
     }
   }
 }

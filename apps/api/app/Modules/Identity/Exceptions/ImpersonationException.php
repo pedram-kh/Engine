@@ -43,6 +43,19 @@ final class ImpersonationException extends RuntimeException
         );
     }
 
+    /**
+     * AH-104c (F8): the target asked to be deleted, is being erased, or is erased. An admin
+     * must not be able to sign in as an account the creator can no longer reach.
+     */
+    public static function targetUnavailable(): self
+    {
+        return new self(
+            'admin.impersonation.target_unavailable',
+            422,
+            'This account has asked to be deleted, or is being erased, and cannot be impersonated.',
+        );
+    }
+
     public static function invalidHandoff(): self
     {
         return new self(

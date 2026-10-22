@@ -635,7 +635,8 @@
       "payment": "Plaćanje na vašem računu još se obrađuje.",
       "vendor": "Provjera identiteta ili isplate kod vanjskog pružatelja još je otvorena.",
       "other": "Nešto na vašem računu još treba riješiti.",
-      "contact": "Pišite na {email} i pomoći ćemo vam."
+      "contact": "Pišite na {email} i pomoći ćemo vam.",
+      "delivered_work": "Rad koji ste isporučili još čeka isplatu."
     }
   }
 }

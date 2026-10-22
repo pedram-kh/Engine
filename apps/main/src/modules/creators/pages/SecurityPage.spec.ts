@@ -403,6 +403,22 @@ describe.each([
     expect(useAuthStore().user).not.toBeNull()
   })
 
+  it('blocked (422): a delivered-work reason gets its own line, not the generic one (AH-104c)', async () => {
+    mocked.requestAccountDeletion.mockRejectedValue(
+      apiError(422, 'account_deletion.blocked', { reasons: ['delivered_work'] }),
+    )
+    const { wrapper } = await mountPage({ native })
+    await fill(wrapper, { ack: true, password: 'Pa$$w0rd!12', word: 'DELETE' })
+
+    await submit(wrapper).trigger('click')
+    await flushPromises()
+
+    const list = wrapper.find('[data-test="delete-account-blockers"]').text()
+    expect(list).toContain(enCreator.account_deletion.blockers.delivered_work)
+    expect(list).not.toContain(enCreator.account_deletion.blockers.other)
+    expect(list).not.toContain('delivered_work')
+  })
+
   it('429: counts down and keeps the button disabled until the wait is over', async () => {
     vi.useFakeTimers()
     mocked.requestAccountDeletion.mockRejectedValue(

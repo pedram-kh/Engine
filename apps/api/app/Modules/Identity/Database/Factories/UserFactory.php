@@ -85,6 +85,28 @@ final class UserFactory extends Factory
     }
 
     /**
+     * AH-104c: an account an admin's Erase has claimed (and not yet erased). Sets the claim
+     * stamp only, so a spec can reach the "claimed" state without running the claimer.
+     */
+    public function erasureClaimed(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'erasure_started_at' => now(),
+        ]);
+    }
+
+    /**
+     * AH-104c: an account an admin has put on hold. The holder is left null unless given.
+     */
+    public function erasureHeld(?int $heldByUserId = null): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'erasure_held_at' => now(),
+            'erasure_held_by_user_id' => $heldByUserId,
+        ]);
+    }
+
+    /**
      * 2FA-confirmed state. Note: the two_factor_recovery_codes column
      * is cast to `encrypted:array` and stores bcrypt hashes (chunk 5
      * priority #3); the placeholder values below are valid bcrypt-shaped

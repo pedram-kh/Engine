@@ -53,8 +53,9 @@ final class CancelOpenAssignments
                     ->whereKey((int) $id)
                     ->first();
 
-                // Re-read under the lock: it may have reached a terminal state since the selection.
-                if ($assignment === null || $assignment->status->isTerminal()) {
+                // Re-read under the lock: it may have reached a terminal state, or delivered work
+                // (payment-eligible, AH-104c), since the selection. Neither is ever cancelled here.
+                if ($assignment === null || $assignment->status->isTerminal() || $assignment->status->isPaymentEligible()) {
                     continue;
                 }
 

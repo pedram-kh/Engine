@@ -635,7 +635,8 @@
       "payment": "Un pagamento sul tuo account è ancora in corso di regolamento.",
       "vendor": "Una verifica di identità o di pagamento con un fornitore esterno è ancora aperta.",
       "other": "Qualcosa sul tuo account deve ancora essere risolto.",
-      "contact": "Scrivi a {email} e ti aiuteremo."
+      "contact": "Scrivi a {email} e ti aiuteremo.",
+      "delivered_work": "Un lavoro che hai consegnato è ancora in attesa di pagamento."
     }
   }
 }

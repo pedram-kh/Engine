@@ -635,7 +635,8 @@
       "payment": "Een betaling op je account wordt nog afgewikkeld.",
       "vendor": "Een identiteits- of uitbetalingscontrole bij een externe partij is nog open.",
       "other": "Er moet nog iets op je account worden geregeld.",
-      "contact": "Schrijf naar {email} en we helpen je."
+      "contact": "Schrijf naar {email} en we helpen je.",
+      "delivered_work": "Werk dat je hebt opgeleverd wacht nog op betaling."
     }
   }
 }

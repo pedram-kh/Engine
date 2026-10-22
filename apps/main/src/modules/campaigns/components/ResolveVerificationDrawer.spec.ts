@@ -19,6 +19,7 @@ import * as vuetifyComponents from 'vuetify/components'
 import * as vuetifyDirectives from 'vuetify/directives'
 
 import enApp from '@/core/i18n/locales/en/app.json'
+import enCreator from '@/core/i18n/locales/en/creator.json'
 
 vi.mock('../api/campaigns.api', () => ({
   campaignsApi: {
@@ -104,7 +105,7 @@ async function mountOpen() {
     locale: 'en',
     fallbackLocale: 'en',
     availableLocales: ['en'],
-    messages: { en: enApp } as never,
+    messages: { en: { ...enApp, ...enCreator } } as never,
   }) as unknown as ReturnType<typeof createI18n>
 
   const vuetify = createVuetify({ components: vuetifyComponents, directives: vuetifyDirectives })
@@ -198,6 +199,27 @@ describe('ResolveVerificationDrawer (verification-resolution chunk)', () => {
       ASSIGNMENT_ID,
       { feedback: 'The link 404s.' },
     )
+    wrapper.unmount()
+  })
+
+  it('says the creator is no longer available when the server refuses with creator.unavailable (AH-104c)', async () => {
+    vi.mocked(campaignsApi.manuallyVerify).mockRejectedValue(
+      new ApiError({
+        status: 422,
+        code: 'creator.unavailable',
+        message: 'This creator is not available.',
+      }),
+    )
+    const wrapper = await mountOpen()
+
+    await wrapper.find('[data-test="resolution-manually-verify"]').trigger('click')
+    await flushPromises()
+
+    const alert = wrapper.find('[data-test="resolution-action-error"]')
+    expect(alert.exists()).toBe(true)
+    expect(alert.text()).toContain('This creator is no longer available.')
+    expect(alert.text()).not.toContain('delet')
+    expect(wrapper.emitted('resolved')).toBeUndefined()
     wrapper.unmount()
   })
 

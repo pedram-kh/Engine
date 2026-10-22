@@ -60,7 +60,8 @@
       "target_admin": "Los administradores de la plataforma no se pueden suplantar.",
       "target_self": "No puedes suplantarte a ti mismo.",
       "already_active": "Ya tienes una suplantación activa. Finalízala antes de iniciar otra.",
-      "invalid_handoff": "Esta transferencia de suplantación no es válida, ya se ha usado o ha caducado."
+      "invalid_handoff": "Esta transferencia de suplantación no es válida, ya se ha usado o ha caducado.",
+      "target_unavailable": "Esta cuenta ha pedido su eliminación, o se está borrando, y no se puede acceder a ella."
     }
   }
 }

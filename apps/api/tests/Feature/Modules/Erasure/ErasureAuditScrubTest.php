@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Tests\Support\ErasureClaims;
 use Tests\Support\ErasureGraph;
 use Tests\Support\ErasureSnapshot;
 use Tests\TestCase;
@@ -323,7 +324,7 @@ it('scrubs a row written after the first pass, inside the same transaction (a lo
     });
     $run = app(ErasureRun::class);
 
-    $run->execute($a->user, $run->plan($a->user)->digest(), $a->user->ulid);
+    $run->execute($a->user, ErasureClaims::for($a->user), $run->plan($a->user)->digest(), $a->user->ulid);
 
     $counts = ErasureLedger::query()->sole()->counts;
 
@@ -362,7 +363,7 @@ it('rolls the whole erasure back when the closing pass fails: the account is int
     $run = app(ErasureRun::class);
     $digest = $run->plan($a->user)->digest();
 
-    expect(fn () => $run->execute($a->user, $digest, $a->user->ulid))->toThrow(RuntimeException::class)
+    expect(fn () => $run->execute($a->user, ErasureClaims::for($a->user), $digest, $a->user->ulid))->toThrow(RuntimeException::class)
         ->and(User::withTrashed()->findOrFail($a->user->id)->isErased())->toBeFalse()
         ->and(DB::table('sessions')->where('user_id', $a->user->id)->count())->toBe(2)
         ->and(ErasureLedger::query()->sole()->state)->toBe(ErasureLedgerState::Incomplete);

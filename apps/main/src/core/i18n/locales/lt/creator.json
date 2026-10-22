@@ -635,7 +635,8 @@
       "payment": "Mokėjimas jūsų paskyroje dar apdorojamas.",
       "vendor": "Tapatybės ar išmokų patikra pas išorinį tiekėją dar nebaigta.",
       "other": "Kai ką jūsų paskyroje dar reikia sutvarkyti.",
-      "contact": "Rašykite adresu {email} ir padėsime."
+      "contact": "Rašykite adresu {email} ir padėsime.",
+      "delivered_work": "Jūsų pateiktas darbas dar laukia apmokėjimo."
     }
   }
 }

@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
+use Tests\Support\ErasureClaims;
 use Tests\Support\ErasureEvents;
 use Tests\Support\ErasureGraph;
 use Tests\Support\FakeAuditScrub;
@@ -279,6 +280,28 @@ it('skips an assignment that reached a terminal state after the selection, inste
         ->and(storedAssignment($second)['cancelled_reason'])->toBeNull();
 });
 
+it('skips an assignment that was verified after the selection: delivered work is never cancelled by the rider (AH-104c)', function (): void {
+    $a = ErasureGraph::seedSubject('a');
+    $agency = cancelAgency();
+    $first = cancelAssignment($agency, $a->creator->id, AssignmentStatus::Producing);
+    $second = cancelAssignment($agency, $a->creator->id, AssignmentStatus::Posted);
+    $subject = SubjectSet::resolve($a->user);
+    $planned = (new DryRun)->run($subject)->counts()[Selections::CANCEL_ASSIGNMENTS];
+
+    // While the first is being cancelled, a verification lands on the second: it is now delivered work.
+    Event::listen(AssignmentTransitioned::class, function (AssignmentTransitioned $event) use ($first, $second): void {
+        if ($event->assignment->id === $first->id) {
+            DB::table('campaign_assignments')->where('id', $second->id)->update(['status' => 'live_verified']);
+        }
+    });
+
+    $cancelled = app(CancelOpenAssignments::class)->run($subject);
+
+    expect($cancelled)->toBe($planned - 1)
+        ->and(storedAssignment($second)['status'])->toBe('live_verified')
+        ->and(storedAssignment($second)['cancelled_reason'])->toBeNull();
+});
+
 it('runs inside the erasure: after the engine\'s writes, before the closing audit pass, and its count is in the ledger', function (): void {
     [$graph, $run, $events] = cancelRunFixture();
     $open = cancelAssignment(cancelAgency(), $graph->creator->id, AssignmentStatus::Producing);
@@ -292,7 +315,7 @@ it('runs inside the erasure: after the engine\'s writes, before the closing audi
     });
     $plan = $run->plan($graph->user);
 
-    $ledger = $run->execute($graph->user, $plan->digest(), $graph->user->ulid);
+    $ledger = $run->execute($graph->user, ErasureClaims::for($graph->user), $plan->digest(), $graph->user->ulid);
 
     expect($events->collapsed())->toBe(['scrub', 'objects', 'database', 'cancel', 'scrub'])
         ->and($ledger->state)->toBe(ErasureLedgerState::Completed)
@@ -311,7 +334,7 @@ it('rolls the whole erasure back when the step fails: nothing is erased, nothing
     $plan = $run->plan($graph->user);
     $before = storedAssignment($open);
 
-    expect(fn () => $run->execute($graph->user, $plan->digest(), $graph->user->ulid))->toThrow(RuntimeException::class, 'boom');
+    expect(fn () => $run->execute($graph->user, ErasureClaims::for($graph->user), $plan->digest(), $graph->user->ulid))->toThrow(RuntimeException::class, 'boom');
 
     expect(User::withTrashed()->findOrFail($graph->user->id)->isErased())->toBeFalse()
         ->and(storedAssignment($open))->toBe($before)
@@ -327,7 +350,7 @@ it('leaves the other creator\'s open assignments alone through a whole run', fun
     $before = $rows();
     $plan = $run->plan($graph->user);
 
-    $run->execute($graph->user, $plan->digest(), $graph->user->ulid);
+    $run->execute($graph->user, ErasureClaims::for($graph->user), $plan->digest(), $graph->user->ulid);
 
     expect($rows())->toBe($before)
         ->and(collect($before)->pluck('status')->contains('cancelled'))->toBeFalse();

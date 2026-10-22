@@ -60,7 +60,8 @@
       "target_admin": "Plattform-Admins können nicht imitiert werden.",
       "target_self": "Du kannst dich nicht selbst imitieren.",
       "already_active": "Du hast bereits einen aktiven Identitätswechsel. Beende ihn, bevor du einen neuen startest.",
-      "invalid_handoff": "Diese Übergabe für den Identitätswechsel ist ungültig, bereits verwendet oder abgelaufen."
+      "invalid_handoff": "Diese Übergabe für den Identitätswechsel ist ungültig, bereits verwendet oder abgelaufen.",
+      "target_unavailable": "Dieses Konto hat die Löschung beantragt oder wird gelöscht und kann nicht betreten werden."
     }
   }
 }

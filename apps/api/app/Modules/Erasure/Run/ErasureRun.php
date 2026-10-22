@@ -7,6 +7,7 @@ namespace App\Modules\Erasure\Run;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Services\AuditLogger;
 use App\Modules\Erasure\Cancellation\CancelOpenAssignments;
+use App\Modules\Erasure\Claim\ErasureClaim;
 use App\Modules\Erasure\Enums\ErasureLedgerState;
 use App\Modules\Erasure\Execution\AuditScrub;
 use App\Modules\Erasure\Execution\ErasureEngine;
@@ -71,14 +72,26 @@ final class ErasureRun
     }
 
     /**
+     * The claim is the proof that the account passed the gate (`ErasureClaimer`, AH-104c):
+     * a request that has run its grace, no hold, no refusal. It is also re-read here, so a
+     * claim that was released in the meantime cannot start a run.
+     *
      * @throws SubjectNotErasable when the subject cannot be resolved
      * @throws ErasureRefused when a gate fails; nothing was written
      * @throws MirrorWriteFailed after the database stage: the ledger stays db_done and `resume` finishes it
      * @throws Throwable from a step; the ledger row says how far it got
      */
-    public function execute(User $user, string $confirmDigest, string $typedUlid, ?User $operator = null): ErasureLedger
+    public function execute(User $user, ErasureClaim $claim, string $confirmDigest, string $typedUlid, ?User $operator = null): ErasureLedger
     {
         $subject = SubjectSet::resolve($user);
+
+        if (! hash_equals($user->ulid, $claim->userUlid)) {
+            throw new ErasureRefused(['the claim is for a different account']);
+        }
+        if (! User::query()->withTrashed()->whereKey($user->getKey())->whereNotNull('erasure_started_at')->exists()) {
+            throw new ErasureRefused(['the account is not claimed for erasure (the claim was released, or never made)']);
+        }
+
         $plan = $this->planFor($subject);
 
         $gates = [];

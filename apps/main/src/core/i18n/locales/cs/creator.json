@@ -635,7 +635,8 @@
       "payment": "Platba na vašem účtu se stále vypořádává.",
       "vendor": "Ověření totožnosti nebo výplat u externího poskytovatele je stále otevřené.",
       "other": "Na vašem účtu je ještě něco, co je třeba vyřešit.",
-      "contact": "Napište na {email} a pomůžeme vám."
+      "contact": "Napište na {email} a pomůžeme vám.",
+      "delivered_work": "Odvedená práce na vašem účtu stále čeká na zaplacení."
     }
   }
 }
