@@ -45,6 +45,8 @@ read `incomplete`; every step is idempotent, but a run killed after the files st
 longest plausible run, `tries 1`, one process), answers 202 with the ledger id, and the page polls the ledger. This is a **deploy obligation** (Horizon config, `horizon:terminate`, the supervisor in
 the prod environment block) and goes in `deploy-log.md`.
 
+> **Corrected 2026-10-22 (plan P1):** production runs supervisord `queue:work` on the `database` queue (`retry_after` 300, `--tries=3`), not Horizon; the 60-second Horizon timeout above is the local shape. The conclusion stands: a dedicated worker, queue and connection. See [`account-deletion-admin-plan.md`](account-deletion-admin-plan.md) P1.
+
 **F5. The delivered-work refusal has more touchpoints, and one hole.**
 
 - Touchpoints: a third guard beside `PaymentGuard` returning refusals for `live_verified` and `manually_verified` (so `Refusals::for`, the dry-run `REFUSED:` line, `execute` and the button all see it);

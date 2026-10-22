@@ -84,7 +84,7 @@ The harness is not in the repository; the verbatim logs are in the file linked a
 **Decisions I took that you may want to overrule:**
 
 - **A flag-off request is `404`**, as if the route did not exist (the repo's convention for flagged endpoints, read in A1), not a 422 code.
-- **Cancel stays possible after `scheduled_for` and with the flag off**, until the account is erased. The date is when an admin may erase, not when the account is gone. AH-104c must re-check under a lock (tech-debt row 2).
+- **Cancel stays possible after `scheduled_for` and with the flag off**, until the account is erased. The date is when an admin may erase, not when the account is gone. AH-104c must re-check under a lock (tech-debt row 2). **SUPERSEDED 2026-10-22 (Pedram, AH-104c inventory Q3): the claim.** The creator can cancel by signing in until an admin's Erase **claims** the account (`users.erasure_started_at`), not until `erased_at`; from the claim the sign-in answers as an unknown account, and a failed run stays claimed and is retried by an admin, never reopened to the creator. Reason: the run deletes the S3 files before its database transaction, so a lock inside that transaction comes too late. See [`account-deletion-admin-plan.md`](account-deletion-admin-plan.md) C1-2 and C1-3.
 - **The confirmation mail is not preference-gated** (item 2 above).
 
 **Open question for you (needs a ruling before AH-104c, not before Part B):** the rider cancels **`live_verified` and `manually_verified`** assignments too: the creator delivered and is owed money that has not been held yet. I recommend

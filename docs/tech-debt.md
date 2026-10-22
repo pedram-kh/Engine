@@ -3396,6 +3396,9 @@ TRIGGER` on `audit_logs` (table and every column). The owner is `postgres`. Ther
   2. **AH-104c must re-check, under a lock, before it erases.** The due-date view reads `deletion_scheduled_for`; the Erase click must re-read `deletion_requested_at` with the row locked, because the
      creator can cancel by signing in until the instant of erasure, **including after `scheduled_for` has passed** (cancelling is allowed until `erased_at` is set, never refused for lateness).
      An Erase that did not re-check would erase an account that was just restored. Written into the AH-104c plan.
+     **SUPERSEDED 2026-10-22 (Pedram, AH-104c Q3): the claim.** A lock inside the database stage is too late (the S3 files are deleted before it), so the Erase click
+     **claims** the account first (`users.erasure_started_at`, set in one locked transaction after re-reading pending, due and not held); from the claim the creator can no longer cancel, and
+     a failed run stays claimed. Cancelling is possible until the claim, no longer "until `erased_at`". Plan: [`reviews/account-deletion-admin-plan.md`](reviews/account-deletion-admin-plan.md) C1-2.
   3. **The rider cancels delivered work (A7). RULED 2026-10-21: refuse, build in AH-104c.** `CancelOpenAssignments` cancels every non-terminal assignment, which includes `live_verified` and
      `manually_verified`: the creator delivered, the post is verified, payment is eligible but not yet held (`PaymentGuard` only knows `payment_held` / `payment_released`). Cancelling those loses the
      agency's record of owed money once Sprint 10 exists. **Pedram's ruling:** `live_verified` and `manually_verified` are an **erasure refusal**, the same as the payment states, so the erasure waits for the
