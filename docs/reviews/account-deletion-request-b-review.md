@@ -168,3 +168,14 @@ after a reinstall. Re-run W3 on TestFlight build 3. AH-103d stays "walk pending"
 
 **Gates for the two fixes (`6aa9af1f`, `b7e6d54b`).** `apps/main` vitest 263 files, 3166 tests, 0 failed; `vue-tsc --noEmit` exit 0; ESLint exit 0 (two existing `v-html` warnings). Admin,
 api-client and the API are untouched. Not pushed.
+
+### 8a. Re-check of W10 and the Security entry (2026-10-22, build with the recovery switch)
+
+- **Switch works; the recovery code signs in.** Confirmed by Pedram on the phone.
+- **Spent code stayed in the field on the pending screen**, so Restore sent it again and failed ("two-factor code is invalid"). Fixed: when the restore step appears, the code field is emptied,
+  rebuilt (new `key`) and focused, for a recovery code and for an authenticator code. Cause on the device is not proven: the page already cleared its model for a recovery code and the jsdom spec
+  passed, so the fix also remounts the field. **Focus on a real iPhone is not verified**: iOS may refuse to raise the keyboard from code that did not start with a tap. Spec: field empty,
+  focus called on the new element; five break-reverts, all caught.
+- **No Security entry after restoring with an authenticator code: the flag.** `account_deletion_enabled` was OFF locally (turned off after the browser measuring, before this re-check), and the
+  entry is `features.account_deletion` on the user, which the server reads from the flag on every response. The restore response carries it on both doors (new feature test, with a break-revert).
+  Not a refresh bug. Re-check with the flag ON and a fresh sign-in.
