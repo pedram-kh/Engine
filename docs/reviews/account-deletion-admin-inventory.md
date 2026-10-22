@@ -203,4 +203,4 @@ Plus the device-measured alignment fix (3.6) alongside C2 (it is mobile-only and
 | 12  | Scope: C1 to C3, the device-measured alignment fix and the impersonation refusal; the recovery switch on the other 2FA pages stays in tech-debt.                                                                                                                    | the plan     |
 | 13  | The read-only read-back (E) for the colleague: [`account-deletion-production-readback-e.md`](account-deletion-production-readback-e.md).                                                                                                                            | before C4    |
 
-Next: [`account-deletion-admin-plan.md`](account-deletion-admin-plan.md).
+Next: the plan (`account-deletion-admin-plan.md`), written after these rulings.
