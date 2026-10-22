@@ -234,8 +234,29 @@ How a creator asks for their account to be deleted, and what the platform does u
   (`assignment.cancelled`, reason `creator_account_erased`): always on, no preference, no mail, no push, and it **never names the creator**.
 - **Not changed by design.** Assignment-lifecycle, contract and verification notices to a pending creator are not silenced (they concern work the creator already holds). Mail ignores notification preferences
   (the confirmation is a transactional message).
-- **Ruled, to build in AH-104c:** an assignment in `live_verified` or `manually_verified` is an **erasure refusal**, like the payment states (engine guard plus a request-time refusal through C3; see the tech-debt
-  entry "AH-104b-del Part A", item 3). Until then the rider cancels them; nothing erases until AH-104c.
+  **AH-104c C1: the claim, the narrowed writable rule and the delivered-work refusal (built, local, not deployed; no route reaches any of it yet).**
+
+- **The claim.** An erasure begins by **claiming** the account: `users.erasure_started_at`, stamped only by `ErasureClaimer` (an architecture spec forbids any other writer), in one transaction with the
+  user row locked, after it re-reads and passes every leg of the gate, in order: the account is an erasable creator; it is **not held** (`erasure_held_at`); in the normal mode a request stands **and its
+  grace has ended** (no early erasure; the 14 days are a promise); no guard refuses (payment, delivered work, vendor). A refusal writes nothing, not even an audit row. The stamp writes
+  `account.erasure_started` with a reason and the actor (the operator, or null for the system). `--force-not-requested` (the shell only) skips "not requested" and "not due", needs an operator and a reason, and
+  **never passes a hold or a guard**.
+- **From the claim the creator cannot cancel and cannot sign in.** Sign-in answers as for an unknown address, **before** the password check, with the audit reason `unknown_email` (the same branch as an erased
+  account, so no response, status or reason separates them); `cancel()` returns false; a new request is "not available". Cancelling stays possible until the claim, not until `erased_at`: the run deletes the
+  files before its database transaction, so a lock inside that transaction would come too late. A run that fails after its first irreversible step **stays claimed** and is retried; only a refusal or a moved
+  digest before the run began releases the claim (`account.erasure_claim_released`, cause code only), and `release()` refuses once any ledger row exists for the account.
+- **Nobody is signed in as an account that is leaving.** Impersonation `start()` and `claim()` refuse a target that is pending, claimed or erased (422 `admin.impersonation.target_unavailable`, no session row, no
+  start audit row). The admin search still lists them.
+- **"Assignments stay writable", narrowed.** The one new refusal on an existing assignment: an agency cannot run a **new live verification** for a pending (or erased) creator. The manual verify answers the neutral
+  422 `creator.unavailable` and writes nothing; the queued `VerifyPostedContentJob` returns before the provider call and leaves the post `pending`; when the creator cancels, `AccountDeletionCancelled`
+  (dispatched after commit, only by the call that cancelled) re-runs the held-back checks. Every other action on an existing thread or assignment is unchanged and silent. A manifest spec lists every caller
+  of `verifyLive` and `manuallyVerify`, so a new one fails until it asks the same question.
+- **Delivered work refuses erasure.** An assignment in a payment-eligible state (`live_verified`, `manually_verified`, `completed_on_approval`; read from `AssignmentStatus::isPaymentEligible()`, so a state
+  added later refuses by default; soft-deleted rows count) is an **erasure refusal** like the payment states: in the claim, the dry-run, the request (422 `account_deletion.blocked`, reason `delivered_work`) and
+  the rider, which no longer cancels such an assignment. The message names the table and the states, never a person. A total spec classifies every `AssignmentStatus`.
+- **Audit.** Two new verbs, `account.erasure_started` (reason required) and `account.erasure_claim_released`. No spec attaches a retention class to a verb, so none was needed; both are in the pinned list.
+- **Registry.** The three new `users` columns are `KEEP` (timestamps and an **admin** id, never the subject's data); the hold reason is in the audit row only and must carry no personal details.
+- **Not built in C1:** the hold and release endpoints, the queue, the Erase button (C2 and C3). Until they exist the claim is reachable only from `erasure:run`.
 
 ### 3.4 Append-only enforcement
 

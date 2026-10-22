@@ -115,6 +115,19 @@ happened.
   - **Post-deploy verification:** as Part A (endpoint 404 with the flag off) plus: `/delete-account` loads without signing in; an agency's discovery and roster still list every creator (compare the
     count with the day before); `/creator/security` as a creator redirects to the dashboard while the flag is off. Recorded: **\_\_**
   - **Before the flag flips (named build-3 steps):** the device walk W1-W10 passes (and W11, W12, proposed in the review); the machine-translated strings in 24 locales get a human pass in **en and es**.
+- **AH-104c C1 (the gate: claim, delivered-work refusal, pending-creator verification, impersonation refusal) — BUILT 2026-10-22; local, not pushed, not deployed; awaiting Pedram's C1 review.** Plan
+  [`account-deletion-admin-plan.md`](../reviews/account-deletion-admin-plan.md) §4 C1; review [`account-deletion-admin-c1-review.md`](../reviews/account-deletion-admin-c1-review.md). **PROD-DATA RISK: MEDIUM**
+  (one additive migration with no backfill and no data write; no route reaches the claim, so nothing is erased or claimed by deploying; the behaviours that reach everyone are four narrow guards, each with an
+  "ordinary creator is unchanged" spec).
+  - **Migration (additive):** `2026_10_22_100000_add_erasure_claim_and_hold_to_users` (nullable `erasure_started_at`, `erasure_held_at`, and `erasure_held_by_user_id`, a nullable FK to `users` with `nullOnDelete`;
+    `users` was 2,763 rows at read-back B; no default, no index, no backfill; `@migration-risk low`). Snapshot first, as for every deploy that carries a migration.
+  - **Infra:** `php artisan queue:restart` (a changed job and a new listener); **no worker, supervisor, env or flag change in C1.** The worker and `database_erasure` connection are C3.
+  - **Behaviour that reaches everyone, and its check:** (1) `erasure:run` now claims before it runs and refuses a not-due or never-requested account; (2) `VerifyPostedContentJob` returns early for a pending or erased
+    creator (ordinary creators verify as before); (3) the agency manual verify answers 422 `creator.unavailable` for such a creator; (4) impersonation refuses a leaving target. With zero requests and the flag
+    off, (2) to (4) cannot trigger. Post-deploy: `php artisan migrate:status` shows the migration; `php artisan erasure:run <test creator ulid>` (dry-run) prints `NOT READY: the account has not asked to be deleted` and exits 1.
+  - **Rule that starts here (Q10): no deploy and no `queue:restart` while an erasure is claimed** (`select count(*) from users where erasure_started_at is not null and erased_at is null` = 0). Nothing can be claimed
+    until C3 or a shell `--execute`, so the rule bites from the first real erasure.
+  - **Not verified on Postgres:** the claim's row lock (sqlite ignores `lockForUpdate`); tech-debt "AH-104b-del Part A" item 4.
 - **Migrations run:** AH-104a adds three (above); everything else in this entry: none. Recorded: **\_\_**
 - **Pre-deploy reads:** AH-103d: the expired-token count (above). AH-104a: none.
 - **Snapshot ID:** AH-104a's migrations are additive and the table `notifications` (288,083 rows at the read-back) is indexed concurrently, but **take and confirm a snapshot before migrating** (standing rule). The open snapshot question under AH-103 is unchanged. Recorded: **\_\_**

@@ -3399,13 +3399,23 @@ TRIGGER` on `audit_logs` (table and every column). The owner is `postgres`. Ther
      **SUPERSEDED 2026-10-22 (Pedram, AH-104c Q3): the claim.** A lock inside the database stage is too late (the S3 files are deleted before it), so the Erase click
      **claims** the account first (`users.erasure_started_at`, set in one locked transaction after re-reading pending, due and not held); from the claim the creator can no longer cancel, and
      a failed run stays claimed. Cancelling is possible until the claim, no longer "until `erased_at`". Plan: [`reviews/account-deletion-admin-plan.md`](reviews/account-deletion-admin-plan.md) C1-2.
+     **BUILT 2026-10-22 (AH-104c C1, local, not pushed): CLOSED for the gate.** `ErasureClaimer` does it, and `erasure:run` asks it too; the lock is pinned by a source scan because sqlite cannot show a row
+     lock (see item 4). Review: [`reviews/account-deletion-admin-c1-review.md`](reviews/account-deletion-admin-c1-review.md).
   3. **The rider cancels delivered work (A7). RULED 2026-10-21: refuse, build in AH-104c.** `CancelOpenAssignments` cancels every non-terminal assignment, which includes `live_verified` and
      `manually_verified`: the creator delivered, the post is verified, payment is eligible but not yet held (`PaymentGuard` only knows `payment_held` / `payment_released`). Cancelling those loses the
      agency's record of owed money once Sprint 10 exists. **Pedram's ruling:** `live_verified` and `manually_verified` are an **erasure refusal**, the same as the payment states, so the erasure waits for the
      agency to settle them. **To build in AH-104c, not before:** (a) an engine guard in the erasure engine (the same family as `PaymentGuard`, so the command and the Erase button both refuse), and (b) a
      request-time refusal through C3, so a creator with such an assignment is told at the request, not left pending against a refusal. **Until AH-104c lands the rider still cancels those two states**
      (the code is unchanged); that is safe only because **nothing erases until AH-104c** and the dry-run prints `campaign_assignments.cancel`. Read it before the first real run.
-  4. **The new `users` index and the cancel step have run on sqlite only** (the same gap as the AH-104a entry, row 1).
+     **BUILT 2026-10-22 (AH-104c C1, local, not pushed): CLOSED.** `DeliveredWorkGuard` refuses on the payment-eligible states (`live_verified`, `manually_verified`, `completed_on_approval`, read from
+     `AssignmentStatus::isPaymentEligible()`, so a state added later refuses by default), in the claim, the dry-run, the request (422 `account_deletion.blocked`, reason `delivered_work`) and the
+     rider, which no longer cancels them. Until C1 is deployed the rider still does; nothing erases before C3 either way.
+  4. **The new `users` index, the cancel step and the C1 claim have run on sqlite only** (the same gap as the AH-104a entry, row 1). On sqlite `lockForUpdate()` does nothing, so the claim's "two
+     concurrent claims" and "cancel racing a claim" are proven by re-reading inside the transaction and by a source scan that the lock is taken, not by a second connection. Run the claim's specs on
+     Postgres before C3 (the same slot as the Postgres run of the queue's range reads).
+  5. **A claimed account that never asked (shell `--force-not-requested`) is not hidden from agencies during the run.** `Creator::isUnavailableToAgencies()` reads `deletion_requested_at` only, so a
+     creator claimed by force stays discoverable and invitable for the minutes the run takes (a new invite is then cancelled by the rider at erasure). The creator's own sign-in is already refused from the
+     claim. Normal mode is unaffected (a request stands, so the creator is hidden). **Escalates:** the force path gaining a button, or a run that can sit claimed for hours (a stuck retry).
 - **Owner:** identity / platform. **Status:** OPEN. Opened 2026-10-21 at the AH-104b-del Part A review.
 
 ## Disable-2FA page navigates to a route that does not exist (BUG, CLOSED 2026-10-21)

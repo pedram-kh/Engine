@@ -17,7 +17,16 @@ database restore from a snapshot (7 days), and `erasure:reapply` then erases the
   audit row. There is **no automatic erasure**: the command is never scheduled and has no route (specs enforce both).
 - **Until AH-104c exists, or if it is broken, `php artisan erasure:run` on the server is the fallback only**, and only with the **dry-run output attached** to the request (counts and
   the digest; it contains no name, email, ip or object key, so it is safe to paste into a ticket).
-- A legal hold (AH-104c) means the account is not offered for erasure. The command does not know about holds; the check is on the person running it.
+- **The command asks the same gate as the button (AH-104c C1).** `--execute` first **claims** the account through `ErasureClaimer` (a locked transaction; see `05-SECURITY-COMPLIANCE.md` §3.3a), and the
+  dry-run prints the gate's verdict as `NOT READY:` lines (a hold; "has not asked to be deleted"; "the grace has not ended: not due until <date>") and exits 1 when an execute would be refused. A normal
+  execute needs a standing request whose grace has ended and no hold. The audit reason is fixed: `shell erasure: the grace has ended`.
+- **`--force-not-requested --operator={your_ulid} --reason="..."`** is the only way past "not requested" and "not due". It never passes a hold, a payment, delivered work or a vendor. The reason is kept in the audit
+  row after the erasure (`forced, not requested: <reason>`): **write no personal details in it**. Use it only for a legal obligation, and say which.
+- **A claimed account is not asked again.** If a run stopped after the claim, the dry-run says `Claimed: yes (since ...)` and `--execute` retries it. The creator cannot sign in or cancel from the claim; a run
+  refused before it began (a moved digest, a guard) hands the account back and writes `account.erasure_claim_released`.
+- **Deploy rule (Q10): no deploy and no `queue:restart` while an erasure is claimed.** Check first: `select count(*) from users where erasure_started_at is not null and erased_at is null;` must be 0.
+- A legal hold means the account is not offered for erasure. The columns (`erasure_held_at`, `erasure_held_by_user_id`) and the gate's refusal exist from C1; the endpoints that set and release a hold are C2.
+  Until then no hold can be set, and a held account (set by hand) is refused by the command too.
 
 ### 1a. The request side (AH-104b-del): what an operator will see before an account is ready
 
@@ -34,9 +43,9 @@ What a request does (full description: `05-SECURITY-COMPLIANCE.md` §3.3a): stam
 - **After the erasure** every agency payload carries `is_erased: true` and no name or avatar, and the agency app shows "Deleted creator" (`creatorLabel()`, one reader; an architecture spec forbids reading
   `display_name` or `avatar_url` directly in the agency modules). Open assignments were cancelled by the system (§4) and each agency's admins and managers got one in-app notice per assignment
   (`assignment.cancelled`, reason `creator_account_erased`, no creator name, no mail, no push).
-- **What the operator must check before AH-104c's Erase:** the request is still pending under a row lock (the creator may have cancelled, including after `scheduled_for`), no legal hold, and the dry-run
-  count for `campaign_assignments.cancel`. An assignment in `live_verified` or `manually_verified` will be **refused** (ruled 2026-10-21, to be built in AH-104c: engine guard plus a request-time refusal),
-  not cancelled; today (before AH-104c) the rider still cancels those two states, which is why nothing runs against a real account yet.
+- **What the operator must check before the Erase:** the claim re-reads the request under a row lock (the creator may have cancelled; cancelling is possible until the claim, **not** until `erased_at`),
+  that the grace has ended, that there is no legal hold, and the dry-run count for `campaign_assignments.cancel`. An assignment in `live_verified`, `manually_verified` or `completed_on_approval` is
+  **refused** (built in AH-104c C1, local until deployed): the engine guard, the dry-run, the request and the rider all agree, and the rider no longer cancels them.
 
 **Turning the flag on is the risk event.** It is global; the walk (plan §9) runs on a named test creator with the flag on for a short window and off again after. A creator who already requested stays pending
 and can still cancel by signing in whatever the flag says.
@@ -96,7 +105,8 @@ Both confirmations are required. In order, a run does this (one failure leaves t
 affected agency's admins and managers get one in-app notice per assignment (staff none, no email, no push); it carries no creator name, only `is_erased`. It appears in the dry-run as
 `campaign_assignments.cancel` (stage 4h, disposition `CANCEL`) with a count, it is part of the digest, and its count is in the ledger. It runs **inside the database transaction**, after the
 engine's writes and before the closing audit pass, so a failure rolls the whole erasure back. Terminal assignments and every other creator's assignments are left as they are.
-An assignment in `live_verified` or `manually_verified` (delivered work, payment-eligible) **is** cancelled today: read that line of the dry-run before executing.
+An assignment in a payment-eligible state (`live_verified`, `manually_verified`, `completed_on_approval`: delivered work) is **not** cancelled: it is a refusal (§5), and the rider's selection and its re-read under
+the lock both skip it. The dry-run's `campaign_assignments.cancel` count excludes it.
 
 The output is counts and table names. On an unexpected failure it prints the exception class, not its message.
 
@@ -107,14 +117,17 @@ The output is counts and table names. On an unexpected failure it prints the exc
 
 ## 5. Refusals (the command writes nothing)
 
-| Refusal                                                                                         | Why                                                                                            | What to do                                            |
-| ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| Not a creator, or already erased                                                                | The engine only erases creator accounts, once.                                                 | Nothing.                                              |
-| An assignment in `payment_held` / `payment_released`, or a `payment_id`                         | Money is held or owed; erasing would orphan the record. Zero in production at the read-back.   | Settle the payment first (Sprint 10 defines how).     |
-| A provider other than `mock` on KYC, payout, contracts, social, or an event tied to the subject | The vendor still holds data the engine cannot delete. No real vendor is enabled in production. | Build the vendor-side delete for that provider first. |
-| A wrong digest or typed ulid                                                                    | The data moved since the dry-run, or the wrong account.                                        | Re-run the dry-run and confirm the new digest.        |
-| Another run for the subject is in progress                                                      | A lock held up to two hours.                                                                   | Wait; do not delete the lock by hand.                 |
-| `audit scrub not available`                                                                     | Only an implementation that reports itself unavailable; not the production binding.            | Treat as a bug.                                       |
+| Refusal                                                                                           | Why                                                                                            | What to do                                                          |
+| ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Not a creator, or already erased                                                                  | The engine only erases creator accounts, once.                                                 | Nothing.                                                            |
+| An assignment in `payment_held` / `payment_released`, or a `payment_id`                           | Money is held or owed; erasing would orphan the record. Zero in production at the read-back.   | Settle the payment first (Sprint 10 defines how).                   |
+| An assignment in `live_verified`, `manually_verified` or `completed_on_approval` (delivered work) | The creator delivered and the agency may owe for it; erasing would delete the payout method.   | Wait for the agency to settle it; a bulk fix is not a runbook step. |
+| `the account is on hold`                                                                          | An admin's legal hold (the gate, any mode, including `--force-not-requested`).                 | Release the hold first (C2); never bypass it.                       |
+| `the account has not asked to be deleted` / `the grace has not ended`                             | The 14 days are a promise; no early erasure.                                                   | Wait for the date, or `--force-not-requested` with a legal reason.  |
+| A provider other than `mock` on KYC, payout, contracts, social, or an event tied to the subject   | The vendor still holds data the engine cannot delete. No real vendor is enabled in production. | Build the vendor-side delete for that provider first.               |
+| A wrong digest or typed ulid                                                                      | The data moved since the dry-run, or the wrong account.                                        | Re-run the dry-run and confirm the new digest.                      |
+| Another run for the subject is in progress                                                        | A lock held up to two hours.                                                                   | Wait; do not delete the lock by hand.                               |
+| `audit scrub not available`                                                                       | Only an implementation that reports itself unavailable; not the production binding.            | Treat as a bug.                                                     |
 
 A spec makes any **new** table named `payment*`, `payout*` or `escrow*`, and any new assignment state containing "payment", fail CI until the erasure registry says what to do with it.
 
