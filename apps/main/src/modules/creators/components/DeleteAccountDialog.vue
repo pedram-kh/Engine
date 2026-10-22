@@ -212,7 +212,7 @@ async function submit(): Promise<void> {
     @update:model-value="(v: boolean) => emit('update:modelValue', v)"
   >
     <v-card>
-      <v-card-title data-test="delete-account-dialog-title">
+      <v-card-title class="delete-account-title" data-test="delete-account-dialog-title">
         {{ t('creator.ui.security.dialog.title') }}
       </v-card-title>
 
@@ -223,6 +223,7 @@ async function submit(): Promise<void> {
             :label="t('creator.ui.security.dialog.acknowledge')"
             density="compact"
             hide-details
+            class="delete-account-ack"
             data-test="delete-account-ack"
           />
 
@@ -320,3 +321,20 @@ async function submit(): Promise<void> {
     </v-card>
   </component>
 </template>
+
+<style scoped>
+/* One left edge for the whole sheet (the native walk, 2026-10-22). Vuetify pads the title by 16px
+ * and the body by 24px, and a compact checkbox draws its box 5px inside its own left edge (2px of
+ * wrapper slack, 3px of glyph), so the title, the box, the password field and the typed-word label
+ * each started somewhere else. The title takes the body's 24px; the box is pulled back by exactly
+ * what it was inset by. */
+.delete-account-title {
+  padding-inline: 24px;
+  /* A longer translation wraps instead of ending in an ellipsis. */
+  white-space: normal;
+}
+
+.delete-account-ack :deep(.v-selection-control) {
+  margin-inline-start: calc((24px - var(--v-selection-control-size)) / 2 - 3px);
+}
+</style>
