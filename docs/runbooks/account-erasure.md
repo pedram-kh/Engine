@@ -25,8 +25,8 @@ database restore from a snapshot (7 days), and `erasure:reapply` then erases the
 - **A claimed account is not asked again.** If a run stopped after the claim, the dry-run says `Claimed: yes (since ...)` and `--execute` retries it. The creator cannot sign in or cancel from the claim; a run
   refused before it began (a moved digest, a guard) hands the account back and writes `account.erasure_claim_released`.
 - **Deploy rule (Q10): no deploy and no `queue:restart` while an erasure is claimed.** Check first: `select count(*) from users where erasure_started_at is not null and erased_at is null;` must be 0.
-- A legal hold means the account is not offered for erasure. The columns (`erasure_held_at`, `erasure_held_by_user_id`) and the gate's refusal exist from C1; the endpoints that set and release a hold are C2.
-  Until then no hold can be set, and a held account (set by hand) is refused by the command too.
+- A legal hold means the account is not offered for erasure. The columns (`erasure_held_at`, `erasure_held_by_user_id`) and the gate's refusal exist from C1; the admin page sets and releases a hold from C2
+  (§1b). The command refuses a held account too, whoever set the hold.
 
 ### 1a. The request side (AH-104b-del): what an operator will see before an account is ready
 
@@ -49,6 +49,44 @@ What a request does (full description: `05-SECURITY-COMPLIANCE.md` §3.3a): stam
 
 **Turning the flag on is the risk event.** It is global; the walk (plan §9) runs on a named test creator with the flag on for a short window and off again after. A creator who already requested stays pending
 and can still cancel by signing in whatever the flag says.
+
+### 1b. The admin queue and the hold (AH-104c C2)
+
+**Where.** Admin app, Compliance, "Erasure queue" (`/compliance/erasure-queue`). It is **read-only except for Hold and Release**: there is no Erase button until C3. The data comes from
+`GET /api/v1/admin/erasure-queue?tab=&cursor=&per_page=` (platform admin with 2FA only).
+
+**The six tabs, and what each row means** (an account is in exactly one; the first that applies wins: erased, in progress, held, blocked, ready, pending):
+
+| Tab         | The account                                                                                                                                            | What you can do |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------- |
+| Pending     | asked to leave; the 14-day grace has not ended (the row says how many days are left). The creator can still cancel by signing in.                      | Hold            |
+| Ready       | the grace has ended, no hold, no refusal. **Ready is a read, not an action**: nothing erases it. (C3 adds the Erase button.)                           | Hold            |
+| Blocked     | the grace has ended but a guard refuses; the row names the reason: `payment`, `delivered_work`, `vendor`, `not_erasable` (no creator profile).         | Hold            |
+| Held        | an admin placed a legal hold (the page says "On hold"). Nothing in the platform will erase it, including the command.                                  | Release         |
+| In progress | an erasure has begun (the account is claimed: the page says "Erasing"). The creator can no longer sign in or cancel. The row carries the ledger state. | none            |
+| Erased      | the erasure finished. The row carries the date and **nothing of the person** (no name, email, ip or key).                                              | none            |
+
+**The stuck states.** "Erasing" with ledger state `incomplete` means a run stopped part-way: read the dry-run (`erasure:run {ulid}`), fix the cause and run `--execute` again; it resumes the claim. Do **not**
+deploy or `queue:restart` while any account is "Erasing" (Q10; the read is in §1).
+
+**Ready and Blocked are found by a bounded scan.** The guards (vendor above all) cannot be written as SQL, so the page reads the first **200** due accounts (in user-id order, the oldest accounts first) and asks each guard. If more than 200 are due
+the tab says so ("Only the first 200 accounts that are due are checked at a time") and the counts carry `due_scan_capped`. At today's volume (a handful of requests) the cap is never reached; the cost is a few queries per due row and **none for the other four tabs**.
+Work off the rows shown, or raise the cap (`ErasureQueue::DUE_SCAN_CAP`) before the volume does.
+
+**The hold.** Hold and Release each need a **reason of 10 to 1000 characters**, kept in the audit row only (`account.erasure_held`, `account.erasure_hold_released`): **write no personal details in it** (the dialog
+says so). A hold is refused for an account that is already claimed (409: the run has begun; it cannot be held) and for an account that is erased or is not a creator (422). It is idempotent: holding a held
+account changes nothing and writes no second row. **A hold survives the creator cancelling** (the creator's cancel touches only the two request columns), so a person who cancels and asks again is still held.
+
+**The digest and the credentials.** The claim revokes every session and token, so the dry-run's digest does not count those rows (they are still printed). A digest from an older release is not valid on this one: run the dry-run again.
+
+**Agencies.** From the claim the creator is hidden from agencies the same way as from a request (C2-0: a force-claimed creator who never asked is no longer discoverable during the run), and every session and token
+is revoked **at the claim**, in the same transaction.
+
+**What an admin sees elsewhere.** Every admin screen that shows a creator (the lists, the detail, the app-usage list, push deliveries, the impersonation search) reads it through one helper: an erased creator
+reads **"Deleted creator"** with no email (the placeholder `erased-<ulid>@erased.invalid` is never shown), and a creator who has asked to leave carries a **"Deletion requested"** chip. The chip is **admin only**:
+an agency never learns that a request exists, so a cancelled request leaves no trace there.
+
+**Known gap (tech-debt "AH-104c C2-4a", for a ruling):** an admin can still connect a leaving creator to an agency by hand, and an automation rule can still do it. Until that is closed, check the chip first.
 
 ---
 

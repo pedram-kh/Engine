@@ -3416,6 +3416,9 @@ TRIGGER` on `audit_logs` (table and every column). The owner is `postgres`. Ther
   5. **A claimed account that never asked (shell `--force-not-requested`) is not hidden from agencies during the run.** `Creator::isUnavailableToAgencies()` reads `deletion_requested_at` only, so a
      creator claimed by force stays discoverable and invitable for the minutes the run takes (a new invite is then cancelled by the rider at erasure). The creator's own sign-in is already refused from the
      claim. Normal mode is unaffected (a request stands, so the creator is hidden). **Escalates:** the force path gaining a button, or a run that can sit claimed for hours (a stuck retry).
+     **CLOSED 2026-10-25 (AH-104c C2-0, local, not pushed; ruled "yes" at the C1 review).** `Creator::scopeVisibleToAgencies()` and `isUnavailableToAgencies()` now read `users.erasure_started_at`
+     like `deletion_requested_at`, and **the claim revokes every session and token** in the same transaction (`CredentialRevoker::revokeAll`, in `claim()` and `reclaim()`), so a force-claimed
+     creator is hidden from agencies and holds no credential from the instant of the claim. Review: [`reviews/account-deletion-admin-c2-review.md`](reviews/account-deletion-admin-c2-review.md).
 - **Owner:** identity / platform. **Status:** OPEN. Opened 2026-10-21 at the AH-104b-del Part A review.
 
 ## Disable-2FA page navigates to a route that does not exist (BUG, CLOSED 2026-10-21)
@@ -3438,3 +3441,14 @@ TRIGGER` on `audit_logs` (table and every column). The owner is `postgres`. Ther
 - **Second item.** `POST` to the deletion request route with the flag off returns 422 for a malformed body, 404 for a valid one (validation runs before the flag check). No data effect;
   found in the Part B checks, not fixed.
 - **Owner:** identity / creator web, admin web. **Status:** OPEN.
+
+## An admin can connect a leaving creator to an agency, by hand or by an automation rule (OPEN, AH-104c C2-4a, opened 2026-10-25)
+
+- **Where:** `AdminCreatorConnectionController::store` (admin "connect this creator to an agency", the direct and the request modes) and `RunAutomationRuleJob` (the `ConnectToAgency` action of a
+  "creator approved" rule). Neither asks whether the account has a deletion request standing or is erased; the agency-side equivalents all do (`assertAvailableToAgencies()`, AH-104b-del).
+- **Found by:** the C2-4 admin manifest (`tests/Support/AdminCreatorSurfaces.php`, kind `open`), which lists every admin file that reads creators and had to say something true about these two.
+- **Effect today:** an admin could connect a creator who asked to leave (the agency then sees the creator as hidden from the next list, but holds a relation), or a rule could fire on an approval of
+  an account that is leaving. The request mail goes to the creator's real address (pending) or an undeliverable one (erased). No data is lost; nothing erases earlier or later because of it.
+- **Not fixed in C2:** it changes what an admin action does, which is a ruling for Pedram, not part of the read-through. Proposed fix: refuse with `isUnavailableToAgencies()` (the same predicate)
+  in both places, with a spec each. **Escalates:** C4 (the first real erasure) happening with this open.
+- **Owner:** admin / creators. **Status:** OPEN.

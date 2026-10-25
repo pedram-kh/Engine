@@ -258,6 +258,28 @@ How a creator asks for their account to be deleted, and what the platform does u
 - **Registry.** The three new `users` columns are `KEEP` (timestamps and an **admin** id, never the subject's data); the hold reason is in the audit row only and must carry no personal details.
 - **Not built in C1:** the hold and release endpoints, the queue, the Erase button (C2 and C3). Until they exist the claim is reachable only from `erasure:run`.
 
+**AH-104c C2: the hold, the queue and what an admin sees (built, local, not deployed; no migration, no Erase).**
+
+- **The hold.** `ErasureHold::hold()` and `release()`: locked on the user row, idempotent (a second hold changes nothing and writes no second audit row), a reason of 10 to 1000 characters (the request, the
+  service and the audit verb all require it; the reason lives in the **audit row only**, never on the user row). Refused for a claimed account (409: the run has begun), for an erased account and for a
+  non-creator (422). It writes `account.erasure_held` / `account.erasure_hold_released` with the actor. `cancel()` touches only the two request columns, so **a hold survives the creator cancelling**.
+  Endpoints: `POST /api/v1/admin/erasure-queue/{user}/hold` and `/release` (`{user}` is the user ulid), `auth:web_admin` + `EnsureMfaForAdmins` + a `PlatformAdmin` check in the controller (401 without a
+  user, 403 for anyone else). Error codes `admin.erasure.hold.claimed` and `admin.erasure.hold.not_available` (the SPA resolves a code as an `admin.*` key).
+- **The queue.** `GET /api/v1/admin/erasure-queue?tab=&cursor=&per_page=` (same guards). Six tabs, one state per account, precedence erased, in progress, held, blocked, ready, pending. The cursor is an opaque
+  last id (ascending `users.id`; the Erased tab descends by ledger id). Ready and Blocked are found by a **bounded scan of the first 200 due accounts** because the guards are not expressible in SQL
+  (see the C2 review's deviation note); the counts carry `due_scan_capped`. **The Erased tab is read from the ledger and carries `id`, `type` and `attributes{state, ledger_state, erased_at}` only: no name,
+  email, ip or object key** (a key-set spec pins it). A row's blockers are codes (`payment`, `delivered_work`, `vendor`, `not_erasable`), never a person.
+- **A claimed account is hidden from agencies, whoever claimed it (C2-0).** `Creator::scopeVisibleToAgencies()` and `isUnavailableToAgencies()` read `users.erasure_started_at` as well as
+  `deletion_requested_at`, so a creator force-claimed by the shell who never asked is no longer discoverable or invitable during the run. **The claim also revokes every session and token**
+  (`CredentialRevoker::revokeAll`, inside the claim's transaction, in `claim()` and `reclaim()`), so "claimed" means the same in both modes. This closes tech-debt "AH-104b-del Part A" item 5.
+  Because `execute()` recomputes the confirmed digest after the claim, **the digest does not hash the credential tables** (`CredentialRevoker::TABLES`); the dry-run still prints their counts.
+- **The admin read-through.** Five admin payloads carry `is_erased` and `deletion_pending` (`AdminDeletionFlags`, the one place they are spelled): the creator list, the creator detail, the creator-app
+  usage list, push deliveries and the impersonation search. `deletion_pending` is true only for a live account whose request stands. **It exists on admin payloads and nowhere else**: an agency payload
+  carries `is_erased` alone (`EmitsErasedState`), so a request that is later cancelled leaves no trace in any agency; a spec scans the agency modules for the key and the class. The admin SPA reads a
+  creator through `core/creators/creatorLabel.ts` only (an architecture spec fails on a bare `.display_name`), which says "Deleted creator" for an erased creator and never shows the placeholder email.
+- **Not closed (tech-debt "AH-104c C2-4a", for a ruling):** an admin can connect a leaving creator to an agency by hand, and an automation rule can do it too.
+- **Not built in C2:** the Erase button, its flag and its worker (C3).
+
 ### 3.4 Append-only enforcement
 
 - **Target (not yet true in production):** the application's database role has INSERT and SELECT on `audit_logs`, but NO UPDATE or DELETE, and a separate "audit retention" role has DELETE permission, used only by the scheduled retention job.

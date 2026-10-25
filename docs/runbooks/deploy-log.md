@@ -128,6 +128,17 @@ happened.
   - **Rule that starts here (Q10): no deploy and no `queue:restart` while an erasure is claimed** (`select count(*) from users where erasure_started_at is not null and erased_at is null` = 0). Nothing can be claimed
     until C3 or a shell `--execute`, so the rule bites from the first real erasure.
   - **Not verified on Postgres:** the claim's row lock (sqlite ignores `lockForUpdate`); tech-debt "AH-104b-del Part A" item 4.
+- **AH-104c C2 (the hold, the erasure queue, the admin read-through, the sheet's left edge) — BUILT 2026-10-25; local, not pushed, not deployed; awaiting Pedram's C2 review.** Plan
+  [`account-deletion-admin-plan.md`](../reviews/account-deletion-admin-plan.md) §4 C2; review [`account-deletion-admin-c2-review.md`](../reviews/account-deletion-admin-c2-review.md). **PROD-DATA RISK: LOW to
+  MEDIUM** (no migration: the hold columns arrived in C1; the claim now also revokes credentials, which touches `sessions` and `personal_access_tokens` of an account **only at a claim**, and nothing claims
+  until C3 or a shell `--execute`; the hold endpoints write one audit row and one user column each, on a creator an admin chose; the queue and the read-through are reads).
+  - **Migration:** none. **Infra:** `php artisan queue:restart` is not required (no job changed); a normal deploy of the API and both SPAs. **No env, flag, worker or supervisor change.** The admin SPA's
+    `vite.config.ts` gained `VTabs` in the pre-bundle list (dev only).
+  - **Behaviour that reaches everyone, and its check:** (1) five admin payloads (the creator list and detail, the app-usage list, push deliveries, the impersonation search) now carry `is_erased` and `deletion_pending` (additive keys; an
+    admin SPA older than the API ignores them, a newer one reads them as false when absent); (2) an agency payload is unchanged and a spec says so; (3) the delete sheet's checkbox rules (creator app, CSS only); (4) the erasure **digest** no longer counts `sessions`, `personal_access_tokens` and `user_push_tokens` (still printed in the dry-run): a digest printed before this deploy is not valid after it, and none is outstanding because nothing has ever been erased.
+    Post-deploy: open Compliance, Erasure queue: the six tabs load and the counts add up; the Pending tab lists exactly the creators with a standing request.
+  - **Rule from C1 still applies (Q10):** no deploy and no `queue:restart` while an erasure is claimed.
+  - **Not verified on Postgres:** the hold's row lock and the queue's range reads (sqlite ignores `lockForUpdate`); tech-debt "AH-104b-del Part A" item 4. **Not verified on the phone:** the sheet's alignment (see the review).
 - **Migrations run:** AH-104a adds three (above); everything else in this entry: none. Recorded: **\_\_**
 - **Pre-deploy reads:** AH-103d: the expired-token count (above). AH-104a: none.
 - **Snapshot ID:** AH-104a's migrations are additive and the table `notifications` (288,083 rows at the read-back) is indexed concurrently, but **take and confirm a snapshot before migrating** (standing rule). The open snapshot question under AH-103 is unchanged. Recorded: **\_\_**
