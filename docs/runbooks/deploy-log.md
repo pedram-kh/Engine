@@ -139,6 +139,20 @@ happened.
     Post-deploy: open Compliance, Erasure queue: the six tabs load and the counts add up; the Pending tab lists exactly the creators with a standing request.
   - **Rule from C1 still applies (Q10):** no deploy and no `queue:restart` while an erasure is claimed.
   - **Not verified on Postgres:** the hold's row lock and the queue's range reads (sqlite ignores `lockForUpdate`); tech-debt "AH-104b-del Part A" item 4. **Not verified on the phone:** the sheet's alignment (see the review).
+- **AH-104c C3 (the Erase button, its flag, its worker, and C2-4a) — BUILT 2026-10-25; local, not pushed, not deployed; awaiting Pedram's C3 review.** Plan
+  [`account-deletion-admin-plan.md`](../reviews/account-deletion-admin-plan.md) §4 C3; review [`account-deletion-admin-c3-review.md`](../reviews/account-deletion-admin-c3-review.md). **PROD-DATA RISK: the
+  HIGHEST of the arc, and ZERO at deploy:** the flag `account_erasure_execute_enabled` is **off**, so the endpoint answers 409 and nothing can be claimed or erased by this code. The risk event is the first click
+  (C4), not this deploy.
+  - **Migration:** none. **Env:** none (`QUEUE_CONNECTION` stays `database`; the job names its own connection). **Config:** `config/queue.php` gains the connection `database_erasure` (same `jobs` table).
+  - **Infra, REQUIRED before the flag is ever turned on:** a **second supervisor program**, `catalyst-erasure-worker`, `numprocs=1`, `stopwaitsecs=3700`
+    (`production-queue-worker.md` §2a): `reread`, `update`, `start`, and `supervisorctl status` must show it RUNNING. Without it the job waits in the `jobs` table. **`php artisan queue:restart` is required**
+    for the deploy (the API gained a job and changed `AccountDeletionService`'s collaborators), **and the Q10 rule applies: not while an erasure is claimed.**
+  - **Behaviour that reaches everyone, and its check:** (1) the creator's own deletion request now verifies the 2FA code through `SecondFactorStepUp` (a refactor with the same outcomes; its specs are unchanged);
+    (2) an admin can no longer connect a creator who is leaving to an agency (422 `creator.unavailable`; an automation rule skips it); (3) the admin SPA gains the Erase dialog, the polling and ×24 strings.
+    Post-deploy: open Compliance, Erasure queue; a Ready row shows "Erase…", the dialog loads a plan, and **clicking Erase answers "switched off"** (flag off). Check the Feature-flags page lists
+    "Account erasure (admin Erase button)" as off.
+  - **Not verified on Postgres:** the claim's row lock under a concurrent click, `afterCommit` ordering, the plan's reads. **Not measured:** the dry-run's duration on production data (tech-debt "AH-104c C3" item 1,
+    a C4 precondition).
 - **Migrations run:** AH-104a adds three (above); everything else in this entry: none. Recorded: **\_\_**
 - **Pre-deploy reads:** AH-103d: the expired-token count (above). AH-104a: none.
 - **Snapshot ID:** AH-104a's migrations are additive and the table `notifications` (288,083 rows at the read-back) is indexed concurrently, but **take and confirm a snapshot before migrating** (standing rule). The open snapshot question under AH-103 is unchanged. Recorded: **\_\_**

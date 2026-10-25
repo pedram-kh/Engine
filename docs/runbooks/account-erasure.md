@@ -3,8 +3,8 @@
 **What this is.** How an operator erases one creator account, what the command does and refuses, how to recover after a database restore, and what is
 kept and for how long (the retention table in §7 is the input for the privacy notice, AH-105).
 
-**Status (2026-10-21).** The engine is built and proven on sqlite fixtures. **Nothing has been erased in production.** Two things must happen first (§2):
-a Postgres run of the erasure specs (tech-debt row 1) and the deploy (§8). Do not run `--execute` on a real account before both.
+**Status (2026-10-25).** The engine is built and proven on sqlite fixtures, and the admin Erase button (§1c) is built locally behind a flag that is off. **Nothing has been erased in production.** Two things
+must happen first (§2): a Postgres run of the erasure specs (tech-debt row 1) and the deploy (§8). Do not run `--execute`, or turn the flag on, for a real account before both.
 
 **This is irreversible.** An erased account's name, email, phone, address, files and tokens cannot be recovered by the application. The only way back is a
 database restore from a snapshot (7 days), and `erasure:reapply` then erases the account again (§6).
@@ -13,9 +13,10 @@ database restore from a snapshot (7 days), and `erasure:reapply` then erases the
 
 ## 1. Who runs it, and when
 
-- **The operator is the super admin (Pedram), through the AH-104c "Erase" button** once it exists: a request, a 14-day grace period, then an admin clicks Erase with a confirmation and an
-  audit row. There is **no automatic erasure**: the command is never scheduled and has no route (specs enforce both).
-- **Until AH-104c exists, or if it is broken, `php artisan erasure:run` on the server is the fallback only**, and only with the **dry-run output attached** to the request (counts and
+- **The operator is the super admin (Pedram), through the AH-104c "Erase" button** (§1c; built in C3, behind the flag `account_erasure_execute_enabled`, which is off until C4): a request, a 14-day grace
+  period, then an admin clicks Erase with a typed account id, a reason and a fresh 2FA code, and an audit row is written. There is **no automatic erasure**: the command is never scheduled and has no
+  route (specs enforce both), and the only queued path to the engine is the click's job.
+- **If the button is unavailable or broken, `php artisan erasure:run` on the server is the fallback only**, and only with the **dry-run output attached** to the request (counts and
   the digest; it contains no name, email, ip or object key, so it is safe to paste into a ticket).
 - **The command asks the same gate as the button (AH-104c C1).** `--execute` first **claims** the account through `ErasureClaimer` (a locked transaction; see `05-SECURITY-COMPLIANCE.md` §3.3a), and the
   dry-run prints the gate's verdict as `NOT READY:` lines (a hold; "has not asked to be deleted"; "the grace has not ended: not due until <date>") and exits 1 when an execute would be refused. A normal
@@ -52,22 +53,21 @@ and can still cancel by signing in whatever the flag says.
 
 ### 1b. The admin queue and the hold (AH-104c C2)
 
-**Where.** Admin app, Compliance, "Erasure queue" (`/compliance/erasure-queue`). It is **read-only except for Hold and Release**: there is no Erase button until C3. The data comes from
-`GET /api/v1/admin/erasure-queue?tab=&cursor=&per_page=` (platform admin with 2FA only).
+**Where.** Admin app, Compliance, "Erasure queue" (`/compliance/erasure-queue`). It is **read-only except for Hold, Release and (from C3, §1c) Erase**. The data comes from
+`GET /api/v1/admin/compliance/erasure-queue?tab=&cursor=&per_page=` (platform admin with 2FA only).
 
 **The six tabs, and what each row means** (an account is in exactly one; the first that applies wins: erased, in progress, held, blocked, ready, pending):
 
-| Tab         | The account                                                                                                                                            | What you can do |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------- |
-| Pending     | asked to leave; the 14-day grace has not ended (the row says how many days are left). The creator can still cancel by signing in.                      | Hold            |
-| Ready       | the grace has ended, no hold, no refusal. **Ready is a read, not an action**: nothing erases it. (C3 adds the Erase button.)                           | Hold            |
-| Blocked     | the grace has ended but a guard refuses; the row names the reason: `payment`, `delivered_work`, `vendor`, `not_erasable` (no creator profile).         | Hold            |
-| Held        | an admin placed a legal hold (the page says "On hold"). Nothing in the platform will erase it, including the command.                                  | Release         |
-| In progress | an erasure has begun (the account is claimed: the page says "Erasing"). The creator can no longer sign in or cancel. The row carries the ledger state. | none            |
-| Erased      | the erasure finished. The row carries the date and **nothing of the person** (no name, email, ip or key).                                              | none            |
+| Tab         | The account                                                                                                                                       | What you can do |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| Pending     | asked to leave; the 14-day grace has not ended (the row says how many days are left). The creator can still cancel by signing in.                 | Hold            |
+| Ready       | the grace has ended, no hold, no refusal. Nothing erases it by itself: an admin must click Erase (§1c), and only a Ready row has the button.      | Erase, Hold     |
+| Blocked     | the grace has ended but a guard refuses; the row names the reason: `payment`, `delivered_work`, `vendor`, `not_erasable` (no creator profile).    | Hold            |
+| Held        | an admin placed a legal hold (the page says "On hold"). Nothing in the platform will erase it, including the command.                             | Release         |
+| In progress | an erasure has begun (the account is claimed: the page says "Erasing"). The creator can no longer sign in or cancel. The row says how far it got. | see §1c         |
+| Erased      | the erasure finished. The row carries the date and **nothing of the person** (no name, email, ip or key).                                         | none            |
 
-**The stuck states.** "Erasing" with ledger state `incomplete` means a run stopped part-way: read the dry-run (`erasure:run {ulid}`), fix the cause and run `--execute` again; it resumes the claim. Do **not**
-deploy or `queue:restart` while any account is "Erasing" (Q10; the read is in §1).
+**The stuck states** are in §1c (the row says what to do: from C3 an incomplete or stale run is retried with "Review and confirm again"). Do **not** deploy or `queue:restart` while any account is "Erasing" (Q10; the read is in §1).
 
 **Ready and Blocked are found by a bounded scan.** The guards (vendor above all) cannot be written as SQL, so the page reads the first **200** due accounts (in user-id order, the oldest accounts first) and asks each guard. If more than 200 are due
 the tab says so ("Only the first 200 accounts that are due are checked at a time") and the counts carry `due_scan_capped`. At today's volume (a handful of requests) the cap is never reached; the cost is a few queries per due row and **none for the other four tabs**.
@@ -86,7 +86,53 @@ is revoked **at the claim**, in the same transaction.
 reads **"Deleted creator"** with no email (the placeholder `erased-<ulid>@erased.invalid` is never shown), and a creator who has asked to leave carries a **"Deletion requested"** chip. The chip is **admin only**:
 an agency never learns that a request exists, so a cancelled request leaves no trace there.
 
-**Known gap (tech-debt "AH-104c C2-4a", for a ruling):** an admin can still connect a leaving creator to an agency by hand, and an automation rule can still do it. Until that is closed, check the chip first.
+**Closed in C3 (was tech-debt "AH-104c C2-4a"):** an admin can no longer connect a leaving creator (erased, deletion requested, or erasure claimed) to an agency, by hand (422 `creator.unavailable`, both doors) or by an
+automation rule (the rule's action records a refusal and connects nothing).
+
+### 1c. The Erase button (AH-104c C3)
+
+**The switch.** `account_erasure_execute_enabled`, in the admin Feature-flags page, **off by default and off at deploy**. Off: the Erase endpoint answers 409 `admin.erasure.execute.disabled` before it reads
+anything; the queue, the hold, the plan view and the command do not read the flag, and an erasure already claimed is **not** stopped by turning it off. Turn it on, with a reason, for one named account (C4),
+and off again after. It is a pre-condition, not a safety net: the typed id, the digest and the 2FA code are what stand between a click and an erasure.
+
+**Before turning it on.** §2 is done (snapshot, mirror prefix, S3 permissions, the Postgres run); `supervisorctl status` shows `catalyst-erasure-worker` RUNNING (`production-queue-worker.md` §2a); this returns 0:
+`select count(*) from users where erasure_started_at is not null and erased_at is null;`.
+
+**The click** (Ready row, "Erase…"). The dialog reads the **plan** (`GET .../erasure-queue/{user}/plan`, read-only, 6 a minute per admin): the database rows and tables it will change, the files, the open assignments
+it will cancel (each tells its agency), the rows it reads, and the plan reference (the first 12 characters of the digest). Three things must be given before the button enables: the **account id typed**, a
+**reason** (10 to 1000 characters; it goes into the audit row for good, so **no personal details**), and a **2FA code or recovery code**. A recovery code is used up when submitted; a TOTP code is "verified at
+the click" and could be accepted again inside its 30 seconds (the verifier has no replay protection; do not read more into it). Wrong codes count against the same per-user 2FA throttle as sign-in (after 5 wrong codes in 15 minutes
+the code is no longer even checked; 10 suspend the 2FA enrolment) and never against the account lockout. The button is limited to 10 an hour per admin.
+
+**What the server does, in order:** the flag (409), the body, the typed id (422), a **read-only preflight** (422 `not_ready` with the reasons as codes; 409 `in_progress`; both answered **without** touching the 2FA
+code, so a refused click never burns a recovery code), the 2FA code (403 / 423), then the **claim** (one locked transaction; it revokes every session and token and hides the creator from agencies), and only
+after it commits the job is queued (202). A refusal at any point claims nothing and queues nothing.
+
+**The run.** One job, `RunErasureJob`, on connection `database_erasure`, queue `erasure`, read only by its own worker (1 try, 1 hour). It recomputes the digest against the plan the admin saw:
+
+- **the data moved since the plan, or a guard now refuses:** nothing was written; the job **releases the claim** (`account.erasure_claim_released`, cause `data_changed` or `refused`), the creator can sign in and
+  cancel again, and the page says "The erasure did not start ... Nothing was erased". Review the plan and try again.
+- **any other failure** (a crash, a timeout, a storage error): the **claim stays**, because files may already be gone. The ledger says how far it got.
+- **success:** the account is erased; its row leaves the queue and appears on the Erased tab.
+
+**What the Erasing row says, and what to do:**
+
+| The row says                                                | It means                                     | Do                                                                                                                       |
+| ----------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Waiting for the erasure worker to pick it up                | claimed, no ledger row yet                   | wait a few seconds; the page refreshes itself                                                                            |
+| Waiting for over an hour: the worker may be down            | claimed more than 3900 s ago, still no run   | `supervisorctl status`; restart the erasure worker; then **Review and confirm again** (re-plans; queues exactly one job) |
+| Erasing is under way                                        | the ledger says `started`                    | wait; do **not** deploy or `queue:restart`                                                                               |
+| Erasing has been running for over an hour                   | `started` more than 3900 s ago               | read the worker log; then **Review and confirm again**                                                                   |
+| The last run stopped before it finished                     | ledger `incomplete`                          | read the cause in the worker log; **Review and confirm again**                                                           |
+| The database step is done, but the last step did not finish | the account **is erased**; the mirror failed | shell only: `php artisan erasure:run {user_ulid} --execute` alone (§4). The page offers no retry for this one.           |
+
+A second click on a claimed account whose job is queued or running queues nothing (409 `in_progress`). A retry is audited as `account.erasure_started` with `mode: retry`.
+
+**What the button cannot do.** Erase early (only the shell's `--force-not-requested` passes the grace, never a hold, a payment, delivered work or a vendor), erase a held account, or skip the 2FA code. The
+audit rows are `account.erasure_started` (operator, the reason), `account.erasure_claim_released`, and the engine's own `account.erased`.
+
+**Local development.** `composer dev` runs only the default queue listener, so a click leaves the job waiting. Start the worker in a second terminal:
+`php artisan queue:work database_erasure --queue=erasure --tries=1 --timeout=3600`.
 
 ---
 
@@ -123,6 +169,8 @@ Read the **rows** column against what you expect for one creator: tens or hundre
 `creator_name` and 153,800 with `sender_name` across all creators). A number far larger than that is a predicate leaking across people: stop.
 
 ## 4. Execute
+
+**From the admin, the Erase button (§1c) runs this same sequence in a worker.** The rest of this section is the shell command, the fallback.
 
 ```bash
 php artisan erasure:run {user_ulid} --execute --confirm-digest={digest} --confirm-ulid={user_ulid} [--operator={your_ulid}]

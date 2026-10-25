@@ -3442,7 +3442,7 @@ TRIGGER` on `audit_logs` (table and every column). The owner is `postgres`. Ther
   found in the Part B checks, not fixed.
 - **Owner:** identity / creator web, admin web. **Status:** OPEN.
 
-## An admin can connect a leaving creator to an agency, by hand or by an automation rule (OPEN, AH-104c C2-4a, opened 2026-10-25)
+## An admin can connect a leaving creator to an agency, by hand or by an automation rule (CLOSED in AH-104c C3, opened and closed 2026-10-25)
 
 - **Where:** `AdminCreatorConnectionController::store` (admin "connect this creator to an agency", the direct and the request modes) and `RunAutomationRuleJob` (the `ConnectToAgency` action of a
   "creator approved" rule). Neither asks whether the account has a deletion request standing or is erased; the agency-side equivalents all do (`assertAvailableToAgencies()`, AH-104b-del).
@@ -3451,4 +3451,27 @@ TRIGGER` on `audit_logs` (table and every column). The owner is `postgres`. Ther
   an account that is leaving. The request mail goes to the creator's real address (pending) or an undeliverable one (erased). No data is lost; nothing erases earlier or later because of it.
 - **Not fixed in C2:** it changes what an admin action does, which is a ruling for Pedram, not part of the read-through. Proposed fix: refuse with `isUnavailableToAgencies()` (the same predicate)
   in both places, with a spec each. **Escalates:** C4 (the first real erasure) happening with this open.
-- **Owner:** admin / creators. **Status:** OPEN.
+- **Closed in C3 (Pedram ruled "close it in C3", 2026-10-25):** `CreatorAgencyDirectConnectService::connect()` refuses first with `DirectConnectOutcome::CreatorUnavailable` (422 `creator.unavailable`, the agency
+  side's code), which covers Door 2 and `RunAutomationRuleJob` (the rule records a refusal and connects nothing); `AdminCreatorConnectionController::store` guards Door 1 the same way. The admin SPA maps the code
+  to a sentence (`error_unavailable`, ×24). The manifest's two `open` entries became `guarded` and `delegated`, and a spec covers each door, each leaving state and the rule.
+- **Owner:** admin / creators. **Status:** CLOSED.
+
+---
+
+## AH-104c C3 — the Erase button: what is unmeasured, and what is tolerated (OPEN, opened 2026-10-25)
+
+1. **The dry-run's duration on production data is unmeasured (P9).** The audit scrub reads the whole of `audit_logs` once (38 MB at the 2026-10-20 read-back) and the notification scrub is the largest write. The job
+   has a one-hour timeout and the page calls a run stuck after 3900 s, but nobody has timed either against the real tables. **Precondition for C4:** time the dry-run on a copy of production (or on the account
+   itself, read-only) and write the number into the C4 review. **Owner:** Pedram / me. **Escalates:** if the measured run is anywhere near an hour, the timeout and `retry_after` move first.
+2. **The erasure specs have run on sqlite only.** C3 adds `afterCommit` ordering (proved against the real `jobs` table, but sqlite), the claim's row lock under a concurrent second click, and the plan's range reads.
+   Same slot as "AH-104b-del Part A" item 4: a Postgres CI job for the Erasure and Admin erasure specs. **Escalates:** C4.
+3. **Two near-simultaneous retry clicks can queue two jobs.** The second is harmless (the first holds the engine's cache lock; the second, finding the account erased, is a no-op), and `numprocs=1` serialises them.
+   Tolerated; a database-level "one queued job per account" would remove it. **Owner:** erasure. **Status:** OPEN, low.
+4. **A refusal "another run is in progress" releases the claim.** In theory a job refused for that reason hands the account back while another job is working on it. With one erasure worker (`numprocs=1`) two
+   jobs never run side by side, so the window is closed in practice; if `numprocs` is ever raised this must be revisited first. **Status:** OPEN, latent.
+5. **`db_done` (the account is erased, the ledger mirror failed) is finished from the shell only.** The page says so and offers no retry. Acceptable for a first erasure; a button would need its own plan. **Status:** OPEN, low.
+6. **"Fresh 2FA" means verified at the click.** A TOTP code can be accepted again inside its window (the verifier has no replay protection); a recovery code is burned. Ruled (Q4) not to claim more. **Status:** accepted.
+7. **The queue's `GET /{user}` row is polled every four seconds by the open page.** One admin, one account at a time; no cache. Fine at this volume. **Status:** accepted.
+8. **The Erase click's preflight does not refuse `audit_scrub_unavailable`.** The plan shows it as a blocker and the dialog will not offer the click, but a request sent by hand claims the account and the job then
+   releases it as `refused` (audited). The creator is signed out in between. Fix: one line in `EraseStarter`'s preflight and a spec. **Owner:** erasure. **Status:** OPEN, low; recommended before C4.
+9. **`admin.erasure.execute.mfa_not_enrolled` has no locale string.** Unreachable in practice (`EnsureMfaForAdmins` is on the whole admin group); the generic "action failed" sentence would show. **Status:** accepted.

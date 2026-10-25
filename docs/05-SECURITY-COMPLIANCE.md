@@ -263,9 +263,9 @@ How a creator asks for their account to be deleted, and what the platform does u
 - **The hold.** `ErasureHold::hold()` and `release()`: locked on the user row, idempotent (a second hold changes nothing and writes no second audit row), a reason of 10 to 1000 characters (the request, the
   service and the audit verb all require it; the reason lives in the **audit row only**, never on the user row). Refused for a claimed account (409: the run has begun), for an erased account and for a
   non-creator (422). It writes `account.erasure_held` / `account.erasure_hold_released` with the actor. `cancel()` touches only the two request columns, so **a hold survives the creator cancelling**.
-  Endpoints: `POST /api/v1/admin/erasure-queue/{user}/hold` and `/release` (`{user}` is the user ulid), `auth:web_admin` + `EnsureMfaForAdmins` + a `PlatformAdmin` check in the controller (401 without a
+  Endpoints: `POST /api/v1/admin/compliance/erasure-queue/{user}/hold` and `/release` (`{user}` is the user ulid), `auth:web_admin` + `EnsureMfaForAdmins` + a `PlatformAdmin` check in the controller (401 without a
   user, 403 for anyone else). Error codes `admin.erasure.hold.claimed` and `admin.erasure.hold.not_available` (the SPA resolves a code as an `admin.*` key).
-- **The queue.** `GET /api/v1/admin/erasure-queue?tab=&cursor=&per_page=` (same guards). Six tabs, one state per account, precedence erased, in progress, held, blocked, ready, pending. The cursor is an opaque
+- **The queue.** `GET /api/v1/admin/compliance/erasure-queue?tab=&cursor=&per_page=` (same guards). Six tabs, one state per account, precedence erased, in progress, held, blocked, ready, pending. The cursor is an opaque
   last id (ascending `users.id`; the Erased tab descends by ledger id). Ready and Blocked are found by a **bounded scan of the first 200 due accounts** because the guards are not expressible in SQL
   (see the C2 review's deviation note); the counts carry `due_scan_capped`. **The Erased tab is read from the ledger and carries `id`, `type` and `attributes{state, ledger_state, erased_at}` only: no name,
   email, ip or object key** (a key-set spec pins it). A row's blockers are codes (`payment`, `delivered_work`, `vendor`, `not_erasable`), never a person.
@@ -277,8 +277,29 @@ How a creator asks for their account to be deleted, and what the platform does u
   usage list, push deliveries and the impersonation search. `deletion_pending` is true only for a live account whose request stands. **It exists on admin payloads and nowhere else**: an agency payload
   carries `is_erased` alone (`EmitsErasedState`), so a request that is later cancelled leaves no trace in any agency; a spec scans the agency modules for the key and the class. The admin SPA reads a
   creator through `core/creators/creatorLabel.ts` only (an architecture spec fails on a bare `.display_name`), which says "Deleted creator" for an erased creator and never shows the placeholder email.
-- **Not closed (tech-debt "AH-104c C2-4a", for a ruling):** an admin can connect a leaving creator to an agency by hand, and an automation rule can do it too.
-- **Not built in C2:** the Erase button, its flag and its worker (C3).
+- **Closed in C3 (was tech-debt "AH-104c C2-4a"):** no admin hand and no automation rule connects a leaving creator to an agency (see the C3 block).
+- **Not built in C2:** the Erase button, its flag and its worker (built in C3, below).
+
+**AH-104c C3: the Erase button, its flag and its worker (built, local, not deployed; no migration, flag off).**
+
+- **The endpoint.** `POST /api/v1/admin/compliance/erasure-queue/{user}/erase` (same stack as the hold: `auth:web_admin`, `EnsureMfaForAdmins`, a `PlatformAdmin` check, **10 an hour per admin**). Body: the typed
+  account id, the plan's digest, a reason (10 to 1000, no personal details, kept in the audit row only) and a 2FA code. Order: the flag `account_erasure_execute_enabled` (409 `admin.erasure.execute.disabled`;
+  **off by default**), validation, the typed id (422), a read-only **preflight** (422 `not_ready` with codes, 409 `in_progress`), the **second factor**, the **claim**, and only after the claim commits the job
+  (`afterCommit`). 202. A refusal at any step claims nothing, queues nothing and (for the preflight) never touches the 2FA code, so a click that was always going to be refused burns no recovery code.
+- **The plan** (`GET .../{user}/plan`, **6 a minute per admin**) is the dry-run as numbers: it issues SELECTs only, writes nothing (a spec hashes the tables), carries no name, email, ip or object key, and its digest
+  is the command's digest (a spec compares them). The Erase click sends that digest back; the job recomputes it and refuses a plan the data has moved under.
+- **"Fresh 2FA" is "verified at the click"**, through `SecondFactorStepUp` (extracted from the creator's own account-deletion request, which now calls it too): a TOTP or recovery code typed for this one click; a
+  suspended enrolment answers as suspended; past the soft cap (5 in 15 minutes) the verifier is not asked but the attempt counts; a wrong code feeds the per-user TOTP throttle and **never** the account
+  lockout (a spec proves no `LoginFailed` is fired). It is not replay-proof (a TOTP code stays valid for its window); a recovery code is burned. **Nothing here claims more than that.**
+- **The job** (`RunErasureJob`) is the only queued path to `ErasureRun::execute()`. Connection `database_erasure`, queue `erasure`, `tries` 1, `timeout` 3600, `retry_after` 3700, read only by a dedicated
+  supervisor program (`numprocs=1`; `production-queue-worker.md` §2a). It carries ids and the digest, never models. A refusal or a moved digest **releases the claim** with an audit row
+  (`account.erasure_claim_released`, cause `data_changed` or `refused`); any other failure **keeps it**, because files may be gone. It never reads the flag, so turning the flag off cannot strand a claimed account.
+- **What a person sees while it runs.** The claimed creator cannot sign in or cancel, is hidden from agencies, and every session and token is gone (C1/C2). The admin page polls the row and says waiting, under way,
+  stopped, or (past 3900 s) stuck, each with what to do; a run that stopped can be retried from the page (audited as `mode: retry`); a `db_done` run is finished from the shell.
+- **No early erasure.** Only the shell's `--force-not-requested` passes the grace, never a hold, a payment, delivered work or a vendor, and the button has no such mode.
+- **Closed in C3: C2-4a.** `CreatorAgencyDirectConnectService::connect()` and `AdminCreatorConnectionController::store` refuse a creator who is erased, has asked to leave or is claimed, with 422
+  `creator.unavailable` (the agency side's code), so neither an admin nor a `ConnectToAgency` rule can connect one.
+- **Still not built:** the first real erasure (C4), a Postgres run of the specs, a measured dry-run on production data (tech-debt "AH-104c C3").
 
 ### 3.4 Append-only enforcement
 

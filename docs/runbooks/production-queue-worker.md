@@ -86,6 +86,46 @@ sudo supervisorctl status          # → catalyst-worker:catalyst-worker_00  RUN
 Raise `numprocs` only when a single worker can't keep up (watch queue depth,
 §5) — each process must be budgeted ~768 MB+ of RAM.
 
+### 2a. The erasure worker (AH-104c C3, a second supervisor program)
+
+The admin **Erase** button queues one job, `RunErasureJob`, that can run for up to an hour (the audit scrub reads the whole of `audit_logs`; the objects are deleted one by one). It must **not** share the
+default worker: that one has `retry_after` 300 and a 120 s stop budget, so a long job would be released to a second worker mid-run. So the job has its own connection, queue and program.
+
+- **Connection** `database_erasure` (`config/queue.php`): the same `jobs` table and database connection as `database`, queue name `erasure`, **`retry_after` 3700** (above the job's 3600 s timeout, so a
+  running job is never handed to another worker), `after_commit` false (the job asks for `afterCommit()` itself, so it is only pushed once the claim has committed).
+- **The job**: `tries` 1, `timeout` 3600, `failOnTimeout`. It is never retried by the queue: a retry is the admin clicking again (the page offers it when the run is incomplete or has outlasted a run).
+- **No env change.** `QUEUE_CONNECTION` stays `database` for everything else. The job names its own connection.
+
+`/etc/supervisor/conf.d/catalyst-erasure-worker.conf`:
+
+```ini
+[program:catalyst-erasure-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /var/www/catalyst/apps/api/artisan queue:work database_erasure --queue=erasure --tries=1 --timeout=3600 --max-time=3600 --memory=768
+directory=/var/www/catalyst/apps/api
+user=www-data
+numprocs=1
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+; queue:work finishes the in-flight job before exiting; an erasure can take up to an hour.
+stopwaitsecs=3700
+redirect_stderr=true
+stdout_logfile=/var/log/catalyst/erasure-worker.log
+stdout_logfile_maxbytes=10MB
+stdout_logfile_backups=5
+```
+
+**`numprocs=1` is deliberate**: two erasures never run side by side, and the one rare race (a second click resuming a claim while a worker is between its claim and its run) cannot happen with one worker.
+`supervisorctl reread && supervisorctl update && supervisorctl start catalyst-erasure-worker:*`, then `supervisorctl status` must show it `RUNNING` **before** the flag is turned on.
+
+**Rule (Q10): no deploy and no `queue:restart` while an erasure is claimed.** `queue:restart` asks every worker to exit after its current job; `stopwaitsecs=3700` lets a running erasure finish, but a
+deploy replaces the code under a job that holds the old classes. Check first: `select count(*) from users where erasure_started_at is not null and erased_at is null;` must be 0.
+
+**Local development** (`composer dev` runs only the default listener): to see an Erase run locally, start `php artisan queue:work database_erasure --queue=erasure --tries=1 --timeout=3600` in a second
+terminal. Without it the job waits in the `jobs` table and the page says "Waiting for the erasure worker to pick it up" (after an hour: that the worker may be down).
+
 ## 3. systemd (alternative, if supervisord isn't installed)
 
 `/etc/systemd/system/catalyst-worker.service`:
@@ -130,6 +170,8 @@ php artisan queue:restart
 
 Skipping this runs **stale job code** until the next `--max-time` recycle —
 a classic source of "the fix is deployed but the bug still happens" confusion.
+
+This also restarts `catalyst-erasure-worker` (§2a) once its in-flight job is done. **Never run it while an erasure is claimed** (the check is in §2a).
 
 ---
 
