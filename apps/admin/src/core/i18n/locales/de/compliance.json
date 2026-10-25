@@ -15,8 +15,79 @@
       },
       "erasures": {
         "title": "Lösch-Warteschlange",
-        "subtitle": "Anträge auf Vergessenwerden, die auf Überprüfung warten (DSGVO Art. 17).",
-        "empty": "Keine Löschanfragen."
+        "subtitle": "Konten, die auf ihre Löschung warten, und die Sperren, die sie aufhalten (DSGVO Art. 17).",
+        "tabs": {
+          "pending": "Ausstehend",
+          "ready": "Bereit",
+          "blocked": "Blockiert",
+          "held": "Gesperrt",
+          "in_progress": "Wird gelöscht",
+          "erased": "Gelöscht"
+        },
+        "empty": {
+          "pending": "Kein Konto wartet auf das Ende der Karenzzeit.",
+          "ready": "Kein Konto ist zur Löschung bereit.",
+          "blocked": "Kein Konto ist blockiert.",
+          "held": "Kein Konto ist gesperrt.",
+          "in_progress": "Es läuft keine Löschung.",
+          "erased": "Es wurde noch nichts gelöscht."
+        },
+        "columns": {
+          "account": "Konto",
+          "requested": "Beantragt am",
+          "due": "Fällig am",
+          "state": "Stand",
+          "actions": "Aktionen"
+        },
+        "state": {
+          "pending": "Wartet. Die Karenzzeit endet am {date}.",
+          "ready": "Die Karenzzeit ist abgelaufen und nichts steht im Weg.",
+          "blocked": "Die Karenzzeit ist abgelaufen, aber das Konto kann nicht gelöscht werden: {reasons}.",
+          "held": "Gesperrt seit {date}.",
+          "held_by": "Gesperrt von {admin}.",
+          "in_progress": {
+            "claimed": "Die Löschung hat begonnen.",
+            "started": "Die Löschung läuft.",
+            "db_done": "Der Datenbankschritt ist erledigt. Die Dateien und das Audit-Protokoll müssen noch abgeschlossen werden.",
+            "incomplete": "Der letzte Lauf wurde vor dem Abschluss abgebrochen. Dafür braucht es einen Techniker: folge dem Löschungs-Runbook."
+          },
+          "erased": "Gelöscht am {date}."
+        },
+        "blocker": {
+          "payment": "eine Zahlung ist noch in Bearbeitung",
+          "delivered_work": "gelieferte Arbeit ist nicht abgeschlossen",
+          "vendor": "ein Auszahlungsanbieter-Konto ist noch verbunden",
+          "not_erasable": "es gibt kein Creator-Profil zu löschen"
+        },
+        "actions": {
+          "hold": "Sperren",
+          "release": "Sperre aufheben",
+          "load_more": "Mehr laden"
+        },
+        "dialog": {
+          "hold": {
+            "title": "Sperre setzen",
+            "description": "Solange ein Konto gesperrt ist, kann es niemand löschen. Der Creator erfährt nichts und kann einen Löschantrag weiterhin widerrufen: die Sperre bleibt bestehen.",
+            "confirm": "Sperre setzen"
+          },
+          "release": {
+            "title": "Sperre aufheben",
+            "description": "Das Konto kann wieder gelöscht werden, sobald seine Karenzzeit abgelaufen ist.",
+            "confirm": "Sperre aufheben"
+          },
+          "reason_label": "Grund",
+          "reason_hint": "Mindestens {count} Zeichen.",
+          "no_personal_details": "Schreibe hier keine Namen, E-Mail-Adressen oder anderen personenbezogenen Angaben: Der Grund bleibt dauerhaft im Audit-Protokoll.",
+          "cancel": "Abbrechen"
+        },
+        "capped": "Es werden jeweils nur die ersten {count} fälligen Konten geprüft. Bearbeite diese und lade dann neu.",
+        "action_failed": "Das konnte nicht gespeichert werden. Bitte versuche es erneut."
+      }
+    },
+    "erasure": {
+      "hold": {
+        "claimed": "Dieses Konto wird bereits gelöscht und kann daher nicht gesperrt werden.",
+        "not_available": "Dieses Konto kann nicht gesperrt werden."
       }
     }
   }

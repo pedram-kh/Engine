@@ -10,15 +10,17 @@ use Tests\TestCase;
 uses(TestCase::class, RefreshDatabase::class);
 
 /**
- * Sprint 13 (D-11) — the GDPR compliance queue SHELLS.
+ * Sprint 13 (D-11) — the GDPR compliance queue SHELL that is left.
  *
  *   GET /api/v1/admin/compliance/export-requests
- *   GET /api/v1/admin/compliance/erasure-queue
  *
- * Both ship empty this sprint: 200 + `data: []` + `meta.shell: true`,
- * NOT 404. The 404-vs-empty-list distinction is the contract — the
- * surface EXISTS (S14 fills it), it just has no pending requests yet.
+ * It ships empty: 200 + `data: []` + `meta.shell: true`, NOT 404. The
+ * 404-vs-empty-list distinction is the contract — the surface EXISTS
+ * (the export machinery fills it), it just has no pending requests yet.
  * platform_admin-gated like every admin endpoint (401 / 403).
+ *
+ * The erasure queue was the other shell; it is real since AH-104c C2
+ * (AdminErasureQueueTest). The last test here pins that it stopped being one.
  */
 function makeComplianceAdmin(): User
 {
@@ -30,7 +32,6 @@ function makeComplianceAdmin(): User
 
 dataset('compliance shells', [
     'export requests' => ['/api/v1/admin/compliance/export-requests'],
-    'erasure queue' => ['/api/v1/admin/compliance/erasure-queue'],
 ]);
 
 it('401s an unauthenticated request', function (string $url): void {
@@ -56,3 +57,12 @@ it('returns an empty shell list (200, not 404) for an admin', function (string $
     expect($response->json('meta.total'))->toBe(0);
     expect($response->json('meta.shell'))->toBeTrue();
 })->with('compliance shells');
+
+it('no longer answers the erasure queue as a shell (AH-104c C2)', function (): void {
+    $response = $this->actingAs(makeComplianceAdmin(), 'web_admin')->getJson('/api/v1/admin/compliance/erasure-queue');
+
+    expect($response->status())->toBe(200)
+        ->and($response->json('meta.shell'))->toBeNull()
+        ->and($response->json('meta.counts'))->toBeArray()
+        ->and($response->json('meta.tab'))->toBe('pending');
+});

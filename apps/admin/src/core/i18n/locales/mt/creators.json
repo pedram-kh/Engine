@@ -274,7 +274,9 @@
           "close": "Agħlaq",
           "load_failed": "Ma stajniex inraddu l-aċċessi. Jekk jogħġbok erġa' pprova."
         }
-      }
+      },
+      "erased": "Kreatur imneħħi",
+      "deletion_requested": "Talba għat-tneħħija"
     }
   },
   "creator": {

@@ -23,6 +23,9 @@ import { useRoute } from 'vue-router'
 
 import { ApiError, formatDateTime } from '@catalyst/api-client'
 
+import { creatorEmail, creatorLabel } from '@/core/creators/creatorLabel'
+import DeletionRequestedChip from '@/core/creators/DeletionRequestedChip.vue'
+
 import {
   adminPushDeliveriesApi,
   PUSH_NOTIFICATION_TYPES,
@@ -404,9 +407,12 @@ onMounted(() => {
         <tr v-for="row in items" :key="row.id" :data-testid="`admin-push-row-${row.id}`">
           <td>{{ formatDateTime(row.attributes.created_at, locale) }}</td>
           <td>
-            <div>{{ row.attributes.creator?.display_name ?? '—' }}</div>
+            <div>
+              {{ creatorLabel(row.attributes.creator, t, '—') }}
+              <DeletionRequestedChip :account="row.attributes.creator" />
+            </div>
             <div class="text-caption text-medium-emphasis">
-              {{ row.attributes.creator?.email ?? '' }}
+              {{ creatorEmail(row.attributes.creator) ?? '' }}
             </div>
           </td>
           <td>

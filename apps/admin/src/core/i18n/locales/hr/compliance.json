@@ -15,8 +15,79 @@
       },
       "erasures": {
         "title": "Čakalna vrsta smazání",
-        "subtitle": "Žádosti o právo na zapomenutí čekající na preverjanje (GDPR čl. 17).",
-        "empty": "Žádné žádosti o smazání."
+        "subtitle": "Računi koji čekaju brisanje i blokade koje ga zaustavljaju (GDPR čl. 17).",
+        "tabs": {
+          "pending": "Na čekanju",
+          "ready": "Spremno",
+          "blocked": "Blokirano",
+          "held": "Zadržano",
+          "in_progress": "Briše se",
+          "erased": "Obrisano"
+        },
+        "empty": {
+          "pending": "Nijedan račun ne čeka kraj razdoblja mirovanja.",
+          "ready": "Nijedan račun nije spreman za brisanje.",
+          "blocked": "Nijedan račun nije blokiran.",
+          "held": "Nijedan račun nije zadržan.",
+          "in_progress": "Nijedno brisanje nije u tijeku.",
+          "erased": "Još ništa nije obrisano."
+        },
+        "columns": {
+          "account": "Račun",
+          "requested": "Zatraženo",
+          "due": "Dospijeva",
+          "state": "Stanje",
+          "actions": "Radnje"
+        },
+        "state": {
+          "pending": "Čeka. Razdoblje mirovanja završava {date}.",
+          "ready": "Razdoblje mirovanja je završilo i ništa ne stoji na putu.",
+          "blocked": "Razdoblje mirovanja je završilo, ali račun se ne može obrisati: {reasons}.",
+          "held": "Zadržano od {date}.",
+          "held_by": "Zadržao/la: {admin}.",
+          "in_progress": {
+            "claimed": "Brisanje je počelo.",
+            "started": "Brisanje je u tijeku.",
+            "db_done": "Korak u bazi podataka je gotov. Datoteke i revizijski zapisnik tek treba dovršiti.",
+            "incomplete": "Zadnje izvođenje stalo je prije završetka. Potreban je inženjer: slijedite runbook za brisanje."
+          },
+          "erased": "Obrisano {date}."
+        },
+        "blocker": {
+          "payment": "plaćanje je još u tijeku",
+          "delivered_work": "isporučeni rad nije dovršen",
+          "vendor": "račun kod pružatelja isplata još je povezan",
+          "not_erasable": "nema profila kreatora za brisanje"
+        },
+        "actions": {
+          "hold": "Zadrži",
+          "release": "Ukloni zadržavanje",
+          "load_more": "Učitaj više"
+        },
+        "dialog": {
+          "hold": {
+            "title": "Zadrži račun",
+            "description": "Dok je račun zadržan, nitko ga ne može obrisati. Kreator ne dobiva nikakvu obavijest i još uvijek može otkazati zahtjev za brisanje: zadržavanje ostaje.",
+            "confirm": "Zadrži"
+          },
+          "release": {
+            "title": "Ukloni zadržavanje",
+            "description": "Račun se može ponovno obrisati nakon što završi njegovo razdoblje mirovanja.",
+            "confirm": "Ukloni zadržavanje"
+          },
+          "reason_label": "Razlog",
+          "reason_hint": "Najmanje {count} znakova.",
+          "no_personal_details": "Ovdje ne upisujte imena, adrese e-pošte ni druge osobne podatke: razlog se trajno čuva u revizijskom zapisniku.",
+          "cancel": "Odustani"
+        },
+        "capped": "Odjednom se provjerava samo prvih {count} računa kojima je istekao rok. Obradite ih i ponovno učitajte.",
+        "action_failed": "Spremanje nije uspjelo. Pokušajte ponovno."
+      }
+    },
+    "erasure": {
+      "hold": {
+        "claimed": "Ovaj se račun već briše pa ga nije moguće zadržati.",
+        "not_available": "Ovaj račun nije moguće zadržati."
       }
     }
   }

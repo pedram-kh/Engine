@@ -274,7 +274,9 @@
           "close": "Zamknij",
           "load_failed": "Nie udało się wczytać logowań. Spróbuj ponownie."
         }
-      }
+      },
+      "erased": "Usunięty twórca",
+      "deletion_requested": "Wnioskowano o usunięcie"
     }
   },
   "creator": {

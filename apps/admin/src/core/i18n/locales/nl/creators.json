@@ -274,7 +274,9 @@
           "close": "Sluiten",
           "load_failed": "De aanmeldingen konden niet worden geladen. Probeer het opnieuw."
         }
-      }
+      },
+      "erased": "Verwijderde creator",
+      "deletion_requested": "Verwijdering aangevraagd"
     }
   },
   "creator": {

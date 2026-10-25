@@ -274,7 +274,9 @@
           "close": "Închide",
           "load_failed": "Conectările nu au putut fi încărcate. Încearcă din nou."
         }
-      }
+      },
+      "erased": "Creator șters",
+      "deletion_requested": "Ștergere solicitată"
     }
   },
   "creator": {

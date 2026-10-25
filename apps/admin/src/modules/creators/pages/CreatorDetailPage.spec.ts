@@ -134,6 +134,8 @@ function buildCreator(overrides: Partial<CreatorResource['attributes']> = {}): C
       kyc_method: 'manual',
       verified_by_user_id: null,
       kyc_vendor_available: false,
+      is_erased: false,
+      deletion_pending: false,
     },
   }
 }
@@ -925,5 +927,67 @@ describe('CreatorDetailPage — per-field edit (Sprint 3 Chunk 4 sub-step 9)', (
           .exists(),
       ).toBe(false)
     })
+  })
+})
+
+describe('CreatorDetailPage — an account that is leaving (AH-104c C2-4)', () => {
+  let teardown: (() => void) | null = null
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    const empty = { data: [], meta: { total: 0, page: 1, per_page: 25, last_page: 1 } }
+    vi.mocked(adminCreatorsApi.assignments).mockResolvedValue(empty)
+    vi.mocked(adminCreatorsApi.auditLogs).mockResolvedValue(empty)
+    vi.mocked(adminCreatorsApi.connections).mockResolvedValue({ data: [] })
+  })
+
+  afterEach(() => {
+    teardown?.()
+    teardown = null
+    document.body.innerHTML = ''
+  })
+
+  it('says "Deleted creator" and shows no placeholder email for an erased creator', async () => {
+    const erased = withAdmin(buildCreator({ display_name: null }), {
+      email: 'erased-01hqabcd@erased.invalid',
+      is_erased: true,
+    })
+    vi.mocked(adminCreatorsApi.show).mockResolvedValue(envelope(erased))
+
+    const h = await mountCreatorPage(CreatorDetailPage)
+    teardown = h.unmount
+    await flushPromises()
+
+    expect(h.wrapper.find('h1').text()).toBe('Deleted creator')
+    expect(h.wrapper.find('[data-testid="admin-creator-detail-value-display_name"]').text()).toBe(
+      'Deleted creator',
+    )
+    expect(h.wrapper.text()).not.toContain('erased.invalid')
+    expect(h.wrapper.find('[data-testid="admin-deletion-requested-chip"]').exists()).toBe(false)
+  })
+
+  it('marks a creator who has asked to leave, and keeps their name', async () => {
+    vi.mocked(adminCreatorsApi.show).mockResolvedValue(
+      envelope(withAdmin(buildCreator(), { deletion_pending: true })),
+    )
+
+    const h = await mountCreatorPage(CreatorDetailPage)
+    teardown = h.unmount
+    await flushPromises()
+
+    expect(h.wrapper.find('h1').text()).toContain('Jane Doe')
+    expect(h.wrapper.find('h1 [data-testid="admin-deletion-requested-chip"]').text()).toBe(
+      'Deletion requested',
+    )
+  })
+
+  it('shows no chip for an ordinary creator', async () => {
+    vi.mocked(adminCreatorsApi.show).mockResolvedValue(envelope(buildCreator()))
+
+    const h = await mountCreatorPage(CreatorDetailPage)
+    teardown = h.unmount
+    await flushPromises()
+
+    expect(h.wrapper.find('[data-testid="admin-deletion-requested-chip"]').exists()).toBe(false)
   })
 })

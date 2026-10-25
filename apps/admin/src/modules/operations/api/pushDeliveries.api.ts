@@ -66,7 +66,13 @@ export interface AdminPushDelivery {
     code: string | null
     http_status: number | null
     detail: string | null
-    creator: { id: string; display_name: string | null; email: string | null } | null
+    creator: {
+      id: string
+      display_name: string | null
+      email: string | null
+      is_erased: boolean
+      deletion_pending: boolean
+    } | null
     in_app: PushInAppState
   }
 }

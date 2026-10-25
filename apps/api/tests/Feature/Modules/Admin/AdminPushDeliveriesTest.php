@@ -118,6 +118,8 @@ it('lists newest first with an exact, allow-listed attribute set and string ids'
             'id' => $creator->ulid,
             'display_name' => 'Ada Lovelace',
             'email' => pdUser($creator)->email,
+            'is_erased' => false,
+            'deletion_pending' => false,
         ])
         ->and($response->json('meta'))->toHaveKeys(['per_page', 'next_cursor', 'prev_cursor', 'has_more']);
 });
@@ -246,6 +248,8 @@ it('still reads history for a soft-deleted account (creator block resolved withT
             'id' => $creator->ulid,
             'display_name' => 'Deleted Dana',
             'email' => $email,
+            'is_erased' => false,
+            'deletion_pending' => false,
         ]);
 });
 

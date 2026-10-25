@@ -274,7 +274,9 @@
           "close": "Sulge",
           "load_failed": "Sisselogimisi ei õnnestunud laadida. Proovi uuesti."
         }
-      }
+      },
+      "erased": "Kustutatud sisulooja",
+      "deletion_requested": "Kustutamist taotletud"
     }
   },
   "creator": {

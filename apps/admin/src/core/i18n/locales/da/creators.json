@@ -274,7 +274,9 @@
           "close": "Luk",
           "load_failed": "Loginsene kunne ikke indlæses. Prøv igen."
         }
-      }
+      },
+      "erased": "Slettet creator",
+      "deletion_requested": "Sletning anmodet"
     }
   },
   "creator": {

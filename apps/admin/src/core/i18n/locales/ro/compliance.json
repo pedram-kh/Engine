@@ -15,8 +15,79 @@
       },
       "erasures": {
         "title": "Erasure queue",
-        "subtitle": "Right-to-be-forgotten requests awaiting review (GDPR art. 17).",
-        "empty": "Nu erasure requests."
+        "subtitle": "Conturi care așteaptă ștergerea și blocările care o opresc (GDPR art. 17).",
+        "tabs": {
+          "pending": "În așteptare",
+          "ready": "Pregătit",
+          "blocked": "Blocat",
+          "held": "Suspendat",
+          "in_progress": "Se șterge",
+          "erased": "Șters"
+        },
+        "empty": {
+          "pending": "Niciun cont nu așteaptă încheierea perioadei de grație.",
+          "ready": "Niciun cont nu este pregătit pentru ștergere.",
+          "blocked": "Niciun cont nu este blocat.",
+          "held": "Niciun cont nu este suspendat.",
+          "in_progress": "Nicio ștergere nu este în curs.",
+          "erased": "Încă nu s-a șters nimic."
+        },
+        "columns": {
+          "account": "Cont",
+          "requested": "Cerut la",
+          "due": "Scadent la",
+          "state": "Situația",
+          "actions": "Acțiuni"
+        },
+        "state": {
+          "pending": "În așteptare. Perioada de grație se încheie la {date}.",
+          "ready": "Perioada de grație s-a încheiat și nimic nu stă în cale.",
+          "blocked": "Perioada de grație s-a încheiat, dar contul nu poate fi șters: {reasons}.",
+          "held": "Suspendat din {date}.",
+          "held_by": "Suspendat de {admin}.",
+          "in_progress": {
+            "claimed": "Ștergerea a început.",
+            "started": "Ștergerea este în curs.",
+            "db_done": "Pasul din baza de date este încheiat. Mai trebuie finalizate fișierele și jurnalul de audit.",
+            "incomplete": "Ultima rulare s-a oprit înainte de final. E nevoie de un inginer: urmează runbook-ul de ștergere."
+          },
+          "erased": "Șters la {date}."
+        },
+        "blocker": {
+          "payment": "o plată este încă în curs",
+          "delivered_work": "o lucrare livrată nu este finalizată",
+          "vendor": "un cont la un furnizor de plăți este încă conectat",
+          "not_erasable": "nu există un profil de creator de șters"
+        },
+        "actions": {
+          "hold": "Suspendă",
+          "release": "Ridică suspendarea",
+          "load_more": "Încarcă mai multe"
+        },
+        "dialog": {
+          "hold": {
+            "title": "Suspendă contul",
+            "description": "Cât timp un cont este suspendat, nimeni nu îl poate șterge. Creatorul nu este informat și poate în continuare anula o cerere de ștergere: suspendarea rămâne.",
+            "confirm": "Suspendă"
+          },
+          "release": {
+            "title": "Ridică suspendarea",
+            "description": "Contul poate fi șters din nou după încheierea perioadei de grație.",
+            "confirm": "Ridică suspendarea"
+          },
+          "reason_label": "Motiv",
+          "reason_hint": "Cel puțin {count} caractere.",
+          "no_personal_details": "Nu scrie aici nume, adrese de e-mail sau alte date personale: motivul este păstrat permanent în jurnalul de audit.",
+          "cancel": "Anulează"
+        },
+        "capped": "Se verifică la un moment dat doar primele {count} conturi scadente. Tratează-le, apoi reîncarcă.",
+        "action_failed": "Nu s-a putut salva. Încearcă din nou."
+      }
+    },
+    "erasure": {
+      "hold": {
+        "claimed": "Acest cont este deja în curs de ștergere, deci nu poate fi suspendat.",
+        "not_available": "Acest cont nu poate fi suspendat."
       }
     }
   }

@@ -20,6 +20,7 @@ use App\Modules\Erasure\Run\ErasureRun;
 use App\Modules\Erasure\Subject\SubjectNotErasable;
 use App\Modules\Identity\Models\User;
 use App\Modules\Identity\Services\AccountDeletionService;
+use App\Modules\Notifications\Models\UserPushToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -108,6 +109,58 @@ it('refuses, and writes nothing, on every leg of the gate', function (string $le
         ->and(claimerAuditCount())->toBe(0)
         ->and(ErasureSnapshot::tables())->toBe($before);
 })->with(['held', 'never asked', 'not due, one second to go', 'not due, a day to go', 'payment held', 'delivered work', 'real vendor']);
+
+/** @return array{tokens: int, sessions: int, push: int} */
+function claimerCredentials(User $user): array
+{
+    return [
+        'tokens' => DB::table('personal_access_tokens')->where('tokenable_id', $user->id)->count(),
+        'sessions' => DB::table('sessions')->where('user_id', $user->id)->count(),
+        'push' => DB::table('user_push_tokens')->where('user_id', $user->id)->count(),
+    ];
+}
+
+/** Two tokens (each with a push row) and two sessions for the user. */
+function claimerSignIn(User $user, string $tag): void
+{
+    for ($i = 0; $i < 2; $i++) {
+        $token = $user->createToken("device-{$tag}-{$i}");
+        UserPushToken::factory()->createOne(['user_id' => $user->id, 'personal_access_token_id' => $token->accessToken->id]);
+        DB::table('sessions')->insert(['id' => "sess-{$tag}-{$i}", 'user_id' => $user->id, 'ip_address' => '203.0.113.9', 'user_agent' => 'phpunit', 'payload' => 'x', 'last_activity' => time()]);
+    }
+}
+
+it('signs the account out everywhere when it claims it, in both modes, and touches nobody else (AH-104c C2-0)', function (string $mode): void {
+    $subject = claimerSubject($mode === 'force' ? ['deletion_requested_at' => null, 'deletion_scheduled_for' => null] : []);
+    $bystander = claimerSubject();
+    claimerSignIn($subject, 's');
+    claimerSignIn($bystander, 'b');
+    $operator = User::factory()->platformAdmin()->createOne();
+
+    app(ErasureClaimer::class)->claim($subject, $operator, $mode === 'force' ? ClaimMode::ForceNotRequested : ClaimMode::Normal, 'Ready');
+
+    expect(claimerCredentials($subject))->toBe(['tokens' => 0, 'sessions' => 0, 'push' => 0])
+        ->and(claimerCredentials($bystander))->toBe(['tokens' => 2, 'sessions' => 2, 'push' => 2]);
+})->with(['normal', 'force']);
+
+it('leaves the sessions and tokens alone when the gate refuses', function (): void {
+    $user = claimerSubject(['erasure_held_at' => now()]);
+    claimerSignIn($user, 'h');
+
+    expect(fn () => app(ErasureClaimer::class)->claim($user, null, ClaimMode::Normal, 'Ready'))->toThrow(ErasureRefused::class)
+        ->and(claimerCredentials($user))->toBe(['tokens' => 2, 'sessions' => 2, 'push' => 2]);
+});
+
+it('signs the account out when a reapply reclaims it, too', function (): void {
+    Storage::fake('media');
+    $user = claimerSubject(['deletion_requested_at' => null, 'deletion_scheduled_for' => null]);
+    (new DiskLedgerMirror)->record($user->ulid, now()->subDay());
+    claimerSignIn($user, 'r');
+
+    app(ErasureClaimer::class)->reclaim($user, null);
+
+    expect(claimerCredentials($user))->toBe(['tokens' => 0, 'sessions' => 0, 'push' => 0]);
+});
 
 it('passes at the instant the grace ends and not a second before (the 14 days are a promise)', function (): void {
     Carbon::setTestNow('2026-11-20 12:00:00');

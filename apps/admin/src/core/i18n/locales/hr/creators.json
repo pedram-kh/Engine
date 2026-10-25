@@ -274,7 +274,9 @@
           "close": "Zatvori",
           "load_failed": "Nije moguće učitati prijave. Pokušajte ponovno."
         }
-      }
+      },
+      "erased": "Izbrisani kreator",
+      "deletion_requested": "Zatraženo brisanje"
     }
   },
   "creator": {

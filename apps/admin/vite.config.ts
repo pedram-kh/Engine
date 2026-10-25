@@ -70,6 +70,7 @@ const vuetifyComponents = [
   'VTooltip',
   'VList',
   'VSwitch',
+  'VTabs',
   'VSkeletonLoader',
 ].map((name) => `vuetify/components/${name}`)
 

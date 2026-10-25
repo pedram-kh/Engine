@@ -15,8 +15,79 @@
       },
       "erasures": {
         "title": "Erasure queue",
-        "subtitle": "Right-to-be-forgotten requests awaiting review (GDPR art. 17).",
-        "empty": "Nem erasure requests."
+        "subtitle": "Törlésre váró fiókok és a törlést megállító zárolások (GDPR 17. cikk).",
+        "tabs": {
+          "pending": "Függőben",
+          "ready": "Kész",
+          "blocked": "Blokkolt",
+          "held": "Zárolva",
+          "in_progress": "Törlés folyamatban",
+          "erased": "Törölve"
+        },
+        "empty": {
+          "pending": "Egy fiók sem várja a türelmi idő végét.",
+          "ready": "Egy fiók sem áll készen a törlésre.",
+          "blocked": "Egy fiók sem blokkolt.",
+          "held": "Egy fiók sem zárolt.",
+          "in_progress": "Nincs folyamatban törlés.",
+          "erased": "Még semmi sincs törölve."
+        },
+        "columns": {
+          "account": "Fiók",
+          "requested": "Kérve",
+          "due": "Esedékes",
+          "state": "Állapot",
+          "actions": "Műveletek"
+        },
+        "state": {
+          "pending": "Várakozik. A türelmi idő ekkor jár le: {date}.",
+          "ready": "A türelmi idő lejárt, és semmi sem akadályozza a törlést.",
+          "blocked": "A türelmi idő lejárt, de a fiók nem törölhető: {reasons}.",
+          "held": "Zárolva ettől: {date}.",
+          "held_by": "Zárolta: {admin}.",
+          "in_progress": {
+            "claimed": "A törlés megkezdődött.",
+            "started": "A törlés folyamatban van.",
+            "db_done": "Az adatbázis-lépés kész. A fájlokat és az auditnaplót még be kell fejezni.",
+            "incomplete": "Az utolsó futás a befejezés előtt leállt. Mérnök szükséges: kövesd a törlési runbookot."
+          },
+          "erased": "Törölve: {date}."
+        },
+        "blocker": {
+          "payment": "egy fizetés még folyamatban van",
+          "delivered_work": "egy leszállított munka nincs lezárva",
+          "vendor": "egy kifizetési szolgáltatói fiók még össze van kötve",
+          "not_erasable": "nincs törölhető alkotói profil"
+        },
+        "actions": {
+          "hold": "Zárolás",
+          "release": "Zárolás feloldása",
+          "load_more": "Továbbiak betöltése"
+        },
+        "dialog": {
+          "hold": {
+            "title": "Fiók zárolása",
+            "description": "Amíg egy fiók zárolva van, senki sem törölheti. Az alkotó nem kap értesítést, és még visszavonhatja a törlési kérelmet: a zárolás megmarad.",
+            "confirm": "Zárolás"
+          },
+          "release": {
+            "title": "A zárolás feloldása",
+            "description": "A fiók újra törölhető lesz, amint a türelmi ideje lejár.",
+            "confirm": "Zárolás feloldása"
+          },
+          "reason_label": "Indok",
+          "reason_hint": "Legalább {count} karakter.",
+          "no_personal_details": "Ide ne írj neveket, e-mail-címeket vagy más személyes adatot: az indok véglegesen megmarad az auditnaplóban.",
+          "cancel": "Mégse"
+        },
+        "capped": "Egyszerre csak az első {count} esedékes fiók kerül ellenőrzésre. Kezeld ezeket, majd töltsd újra.",
+        "action_failed": "A mentés nem sikerült. Próbáld újra."
+      }
+    },
+    "erasure": {
+      "hold": {
+        "claimed": "Ez a fiók már törlés alatt áll, ezért nem zárolható.",
+        "not_available": "Ez a fiók nem zárolható."
       }
     }
   }

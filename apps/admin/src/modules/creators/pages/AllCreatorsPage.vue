@@ -23,6 +23,9 @@ import { useRouter } from 'vue-router'
 import { ApiError } from '@catalyst/api-client'
 import type { CreatorApplicationStatus, CreatorKycStatus } from '@catalyst/api-client'
 
+import { creatorEmail, creatorLabel } from '@/core/creators/creatorLabel'
+import DeletionRequestedChip from '@/core/creators/DeletionRequestedChip.vue'
+
 import { adminCreatorsApi, type AdminCreatorListItem } from '../api/creators.api'
 
 type StatusFilter = CreatorApplicationStatus | 'all'
@@ -215,12 +218,13 @@ function goToDetail(ulid: string): void {
           :data-testid="`admin-all-creators-name-${item.id}`"
           @click="goToDetail(item.id)"
         >
-          {{ item.attributes.display_name ?? t('admin.creators.list.unnamed') }}
+          {{ creatorLabel(item.attributes, t, t('admin.creators.list.unnamed')) }}
         </button>
+        <DeletionRequestedChip :account="item.attributes" />
       </template>
 
       <template #item.attributes.email="{ item }">
-        {{ item.attributes.email ?? '—' }}
+        {{ creatorEmail(item.attributes) ?? '—' }}
       </template>
 
       <template #item.attributes.application_status="{ item }">

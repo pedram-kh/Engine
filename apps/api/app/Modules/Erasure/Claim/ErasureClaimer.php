@@ -13,6 +13,7 @@ use App\Modules\Erasure\Models\ErasureLedger;
 use App\Modules\Erasure\Subject\SubjectNotErasable;
 use App\Modules\Erasure\Subject\SubjectSet;
 use App\Modules\Identity\Models\User;
+use App\Modules\Identity\Services\CredentialRevoker;
 use Illuminate\Database\ConnectionInterface;
 
 /**
@@ -32,7 +33,8 @@ use Illuminate\Database\ConnectionInterface;
  *   3. normal mode: a request stands AND its grace has ended (no early erasure: the 14 days
  *      are a promise); force mode: an operator and a reason, no request needed;
  *   4. no guard refuses (payment, delivered work, vendor);
- * then stamps the claim and writes the audit row. A refusal throws and writes NOTHING.
+ * then stamps the claim, revokes every session and token of the account (one list, `CredentialRevoker`) and
+ * writes the audit row. A refusal throws and writes NOTHING.
  *
  * An account that is already claimed is returned its claim again without a new audit row:
  * the gate is asked once, at the first claim. (The engine asks the refusals and the digest
@@ -44,6 +46,7 @@ final class ErasureClaimer
         private readonly ConnectionInterface $db,
         private readonly AuditLogger $audit,
         private readonly LedgerMirror $mirror,
+        private readonly CredentialRevoker $credentials,
     ) {}
 
     /**
@@ -77,6 +80,9 @@ final class ErasureClaimer
             }
 
             $locked->forceFill(['erasure_started_at' => now()])->saveQuietly();
+            // "Claimed" means the same in both modes: nobody is signed in as this account (a normal
+            // request already revoked everything; a forced one never did). Idempotent, one user id.
+            $this->credentials->revokeAll($locked);
 
             $this->audit->log(
                 action: AuditAction::AccountErasureStarted,
@@ -127,6 +133,7 @@ final class ErasureClaimer
                 }
 
                 $locked->forceFill(['erasure_started_at' => now()])->saveQuietly();
+                $this->credentials->revokeAll($locked);
 
                 $this->audit->log(
                     action: AuditAction::AccountErasureStarted,

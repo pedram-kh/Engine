@@ -67,6 +67,13 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
+import {
+  creatorEmail as readEmail,
+  creatorFromResource,
+  creatorLabel,
+  creatorRawName,
+} from '@/core/creators/creatorLabel'
+import DeletionRequestedChip from '@/core/creators/DeletionRequestedChip.vue'
 import { adminAgenciesApi } from '@/modules/agencies/api/agencies.api'
 
 import ApproveCreatorDialog from '../components/ApproveCreatorDialog.vue'
@@ -200,7 +207,10 @@ const taxLabel = computed(() =>
   ),
 )
 
-const creatorEmail = computed(() => creator.value?.admin_attributes?.email ?? null)
+// AH-104c C2-4: the creator as every reader takes it (name, email and the two flags), so an
+// erased creator reads "Deleted creator" and never shows the placeholder email.
+const subject = computed(() => creatorFromResource(creator.value))
+const creatorEmail = computed(() => readEmail(subject.value))
 
 // Account-creation identity (sign-up first/last name) — read-only facts,
 // distinct from the editable display_name below.
@@ -275,7 +285,7 @@ const editingCurrentValue = computed<unknown>(() => {
   const attrs = creator.value.attributes
   switch (editingField.value) {
     case 'display_name':
-      return attrs.display_name ?? ''
+      return creatorRawName(subject.value)
     case 'bio':
       return attrs.bio ?? ''
     case 'country_code':
@@ -349,8 +359,8 @@ const isRejecting = ref(false)
 const decisionSnackbarOpen = ref(false)
 const decisionSnackbarKey = ref<string | null>(null)
 
-const creatorDisplayName = computed(
-  () => creator.value?.attributes.display_name ?? t('admin.creators.detail.fallback_title'),
+const creatorDisplayName = computed(() =>
+  creatorLabel(subject.value, t, t('admin.creators.detail.fallback_title')),
 )
 
 const applicationStatus = computed(() => creator.value?.attributes.application_status ?? null)
@@ -672,7 +682,8 @@ const decisionSnackbarColor = computed(() =>
     <header class="admin-creator-detail__header">
       <div class="admin-creator-detail__header-text">
         <h1 class="text-h4">
-          {{ creator?.attributes.display_name ?? t('admin.creators.detail.fallback_title') }}
+          {{ creatorDisplayName }}
+          <DeletionRequestedChip :account="subject" />
         </h1>
         <a
           v-if="creatorEmail"
@@ -782,7 +793,7 @@ const decisionSnackbarColor = computed(() =>
           @edit="openEdit('display_name')"
         >
           <span data-testid="admin-creator-detail-value-display_name">
-            {{ creator.attributes.display_name }}
+            {{ creatorLabel(subject, t) }}
           </span>
         </EditFieldRow>
 

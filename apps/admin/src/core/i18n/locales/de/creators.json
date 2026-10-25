@@ -274,7 +274,9 @@
           "close": "Schließen",
           "load_failed": "Die Anmeldungen konnten nicht geladen werden. Bitte versuche es erneut."
         }
-      }
+      },
+      "erased": "Gelöschter Creator",
+      "deletion_requested": "Löschung beantragt"
     }
   },
   "creator": {

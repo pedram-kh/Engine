@@ -323,18 +323,34 @@ async function submit(): Promise<void> {
 </template>
 
 <style scoped>
-/* One left edge for the whole sheet (the native walk, 2026-10-22). Vuetify pads the title by 16px
- * and the body by 24px, and a compact checkbox draws its box 5px inside its own left edge (2px of
- * wrapper slack, 3px of glyph), so the title, the box, the password field and the typed-word label
- * each started somewhere else. The title takes the body's 24px; the box is pulled back by exactly
- * what it was inset by. */
+/* One left edge for the whole sheet (the native walk, 2026-10-22; re-measured AH-104c C2-5).
+ * Vuetify pads the title by 16px and the body by 24px, so the title takes the body's 24px. The
+ * checkbox is the hard one: its box is a font glyph drawn 3px inside its icon (the mdi outline
+ * path starts at 3 of 24), and the icon sits inside a wider wrapper whose slack changes with the
+ * density, the font size and the native stylesheet (`.v-input--density-compact` is 46px high
+ * there). The first fix subtracted a slack worked out on the web, which left the box 1.3px right
+ * of the fields in the app. So nothing here is worked out: the icon is 24px, its wrapper is
+ * exactly the icon and starts at the edge (no slack), and the box is pulled back by the glyph's own
+ * 3px. */
 .delete-account-title {
   padding-inline: 24px;
   /* A longer translation wraps instead of ending in an ellipsis. */
   white-space: normal;
 }
 
-.delete-account-ack :deep(.v-selection-control) {
-  margin-inline-start: calc((24px - var(--v-selection-control-size)) / 2 - 3px);
+.delete-account-ack :deep(.v-selection-control__wrapper) {
+  width: 24px;
+  justify-content: flex-start;
+}
+
+.delete-account-ack :deep(.v-selection-control__input) {
+  width: 24px;
+  margin-inline-start: -3px;
+}
+
+.delete-account-ack :deep(.v-selection-control__input .v-icon) {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
 }
 </style>

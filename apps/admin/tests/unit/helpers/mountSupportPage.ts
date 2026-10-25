@@ -19,12 +19,15 @@ import { createI18n } from 'vue-i18n'
 import { deepMergeLocale } from '@/core/i18n/deepMerge'
 import enApp from '@/core/i18n/locales/en/app.json'
 import enAuth from '@/core/i18n/locales/en/auth.json'
+import enCreators from '@/core/i18n/locales/en/creators.json'
 import enSupport from '@/core/i18n/locales/en/support.json'
 import itApp from '@/core/i18n/locales/it/app.json'
 import itAuth from '@/core/i18n/locales/it/auth.json'
+import itCreators from '@/core/i18n/locales/it/creators.json'
 import itSupport from '@/core/i18n/locales/it/support.json'
 import ptApp from '@/core/i18n/locales/pt/app.json'
 import ptAuth from '@/core/i18n/locales/pt/auth.json'
+import ptCreators from '@/core/i18n/locales/pt/creators.json'
 import ptSupport from '@/core/i18n/locales/pt/support.json'
 
 import { supportRoutes } from '@/modules/support/routes'
@@ -65,9 +68,9 @@ export async function mountSupportPage<T = unknown>(
   })
 
   const messages = {
-    en: deepMergeLocale(enApp, enAuth, enSupport),
-    pt: deepMergeLocale(ptApp, ptAuth, ptSupport),
-    it: deepMergeLocale(itApp, itAuth, itSupport),
+    en: deepMergeLocale(enApp, enAuth, enCreators, enSupport),
+    pt: deepMergeLocale(ptApp, ptAuth, ptCreators, ptSupport),
+    it: deepMergeLocale(itApp, itAuth, itCreators, itSupport),
   } as unknown as Record<'en' | 'pt' | 'it', Record<string, unknown>>
 
   const i18n = createI18n({

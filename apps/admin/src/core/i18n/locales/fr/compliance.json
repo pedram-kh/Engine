@@ -15,8 +15,79 @@
       },
       "erasures": {
         "title": "File d'effacement",
-        "subtitle": "Demandes de droit à l'oubli en attente d'examen (RGPD art. 17).",
-        "empty": "Aucune demande d'effacement."
+        "subtitle": "Comptes en attente d'effacement, et blocages qui les retiennent (RGPD art. 17).",
+        "tabs": {
+          "pending": "En attente",
+          "ready": "Prêt",
+          "blocked": "Bloqué",
+          "held": "En suspens",
+          "in_progress": "Effacement en cours",
+          "erased": "Effacé"
+        },
+        "empty": {
+          "pending": "Aucun compte n'attend la fin de son délai de grâce.",
+          "ready": "Aucun compte n'est prêt à être effacé.",
+          "blocked": "Aucun compte n'est bloqué.",
+          "held": "Aucun compte n'est en suspens.",
+          "in_progress": "Aucun effacement n'est en cours.",
+          "erased": "Rien n'a encore été effacé."
+        },
+        "columns": {
+          "account": "Compte",
+          "requested": "Demandé le",
+          "due": "Échéance le",
+          "state": "Où en est-il",
+          "actions": "Actions"
+        },
+        "state": {
+          "pending": "En attente. Le délai de grâce prend fin le {date}.",
+          "ready": "Le délai de grâce est terminé et rien ne s'oppose à l'effacement.",
+          "blocked": "Le délai de grâce est terminé, mais le compte ne peut pas être effacé : {reasons}.",
+          "held": "En suspens depuis le {date}.",
+          "held_by": "Suspendu par {admin}.",
+          "in_progress": {
+            "claimed": "L'effacement a commencé.",
+            "started": "L'effacement est en cours.",
+            "db_done": "L'étape de la base de données est terminée. Il reste à terminer les fichiers et le journal d'audit.",
+            "incomplete": "La dernière exécution s'est arrêtée avant la fin. Il faut un ingénieur : suivez le runbook d'effacement."
+          },
+          "erased": "Effacé le {date}."
+        },
+        "blocker": {
+          "payment": "un paiement est encore en cours",
+          "delivered_work": "un travail livré n'est pas terminé",
+          "vendor": "un compte de prestataire de paiement est encore connecté",
+          "not_erasable": "il n'y a pas de profil de créateur à effacer"
+        },
+        "actions": {
+          "hold": "Suspendre",
+          "release": "Lever la suspension",
+          "load_more": "Charger plus"
+        },
+        "dialog": {
+          "hold": {
+            "title": "Suspendre le compte",
+            "description": "Tant qu'un compte est suspendu, personne ne peut l'effacer. Le créateur n'est pas informé et peut toujours annuler une demande de suppression : la suspension reste en place.",
+            "confirm": "Suspendre"
+          },
+          "release": {
+            "title": "Lever la suspension",
+            "description": "Le compte pourra de nouveau être effacé dès la fin de son délai de grâce.",
+            "confirm": "Lever la suspension"
+          },
+          "reason_label": "Motif",
+          "reason_hint": "Au moins {count} caractères.",
+          "no_personal_details": "N'écrivez ici ni noms, ni adresses e-mail, ni autres données personnelles : le motif est conservé définitivement dans le journal d'audit.",
+          "cancel": "Annuler"
+        },
+        "capped": "Seuls les {count} premiers comptes échus sont vérifiés à la fois. Traitez-les, puis rechargez.",
+        "action_failed": "L'enregistrement a échoué. Veuillez réessayer."
+      }
+    },
+    "erasure": {
+      "hold": {
+        "claimed": "Ce compte est déjà en cours d'effacement : il ne peut pas être suspendu.",
+        "not_available": "Ce compte ne peut pas être suspendu."
       }
     }
   }

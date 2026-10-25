@@ -6,6 +6,7 @@ namespace App\Modules\Admin\Http\Controllers;
 
 use App\Core\Errors\ErrorResponse;
 use App\Modules\Admin\Http\Requests\StartImpersonationRequest;
+use App\Modules\Admin\Support\AdminDeletionFlags;
 use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Exceptions\ImpersonationException;
 use App\Modules\Identity\Models\ImpersonationSession;
@@ -55,7 +56,7 @@ final class AdminImpersonationController
             });
         }
 
-        $users = $query->get(['ulid', 'name', 'email', 'type']);
+        $users = $query->get(['ulid', 'name', 'email', 'type', 'deletion_requested_at', 'erased_at']);
 
         $data = $users
             ->map(static fn (User $user): array => [
@@ -65,6 +66,7 @@ final class AdminImpersonationController
                     'name' => $user->name,
                     'email' => $user->email,
                     'user_type' => $user->type->value,
+                    ...AdminDeletionFlags::forUser($user),
                 ],
             ])
             ->all();

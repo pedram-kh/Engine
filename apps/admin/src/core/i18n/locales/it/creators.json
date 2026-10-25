@@ -274,7 +274,9 @@
           "close": "Chiudi",
           "load_failed": "Impossibile caricare gli accessi. Riprova."
         }
-      }
+      },
+      "erased": "Creator eliminato",
+      "deletion_requested": "Eliminazione richiesta"
     }
   },
   "creator": {

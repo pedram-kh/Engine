@@ -274,7 +274,9 @@
           "close": "Zavřít",
           "load_failed": "Přihlášení se nepodařilo načíst. Zkuste to znovu."
         }
-      }
+      },
+      "erased": "Smazaný tvůrce",
+      "deletion_requested": "Požádáno o smazání"
     }
   },
   "creator": {

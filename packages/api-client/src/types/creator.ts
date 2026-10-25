@@ -310,6 +310,17 @@ export interface CreatorAdminAttributes {
   kyc_method: CreatorKycMethod | null
   verified_by_user_id: number | null
   kyc_vendor_available: boolean
+  /**
+   * AH-104c C2-4. The account has been erased: no name, no real email. The admin SPA says
+   * "Deleted creator" (through `core/creators/creatorLabel.ts`) and never shows the email.
+   * Optional only so older fixtures still type-check; the API always sends it.
+   */
+  is_erased?: boolean
+  /**
+   * AH-104c C2-4. The person asked to delete the account and the request stands. ADMIN ONLY:
+   * an agency never receives it (a cancelled request must leave no trace there).
+   */
+  deletion_pending?: boolean
 }
 
 /**

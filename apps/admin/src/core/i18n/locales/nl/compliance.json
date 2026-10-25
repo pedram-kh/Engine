@@ -15,8 +15,79 @@
       },
       "erasures": {
         "title": "Verwijderingswachtrij",
-        "subtitle": "Verzoeken om te worden vergeten die wachten op beoordeling (AVG art. 17).",
-        "empty": "Geen verwijderingsverzoeken."
+        "subtitle": "Accounts die wachten op verwijdering en de blokkades die dat tegenhouden (AVG art. 17).",
+        "tabs": {
+          "pending": "In afwachting",
+          "ready": "Gereed",
+          "blocked": "Geblokkeerd",
+          "held": "In de wacht",
+          "in_progress": "Wordt verwijderd",
+          "erased": "Verwijderd"
+        },
+        "empty": {
+          "pending": "Geen enkel account wacht tot de bedenktijd voorbij is.",
+          "ready": "Geen enkel account is klaar om verwijderd te worden.",
+          "blocked": "Geen enkel account is geblokkeerd.",
+          "held": "Geen enkel account staat in de wacht.",
+          "in_progress": "Er loopt geen verwijdering.",
+          "erased": "Er is nog niets verwijderd."
+        },
+        "columns": {
+          "account": "Account",
+          "requested": "Aangevraagd op",
+          "due": "Vervalt op",
+          "state": "Stand van zaken",
+          "actions": "Acties"
+        },
+        "state": {
+          "pending": "In afwachting. De bedenktijd eindigt op {date}.",
+          "ready": "De bedenktijd is voorbij en er staat niets in de weg.",
+          "blocked": "De bedenktijd is voorbij, maar het account kan niet worden verwijderd: {reasons}.",
+          "held": "In de wacht sinds {date}.",
+          "held_by": "Vastgezet door {admin}.",
+          "in_progress": {
+            "claimed": "De verwijdering is begonnen.",
+            "started": "De verwijdering is bezig.",
+            "db_done": "De databasestap is klaar. De bestanden en het auditlogboek moeten nog worden afgerond.",
+            "incomplete": "De laatste run stopte voordat hij klaar was. Hiervoor is een engineer nodig: volg het verwijderingsrunbook."
+          },
+          "erased": "Verwijderd op {date}."
+        },
+        "blocker": {
+          "payment": "een betaling is nog bezig",
+          "delivered_work": "opgeleverd werk is nog niet afgerond",
+          "vendor": "een account bij een uitbetalingsaanbieder is nog gekoppeld",
+          "not_erasable": "er is geen creatorprofiel om te verwijderen"
+        },
+        "actions": {
+          "hold": "In de wacht zetten",
+          "release": "Wacht opheffen",
+          "load_more": "Meer laden"
+        },
+        "dialog": {
+          "hold": {
+            "title": "Account in de wacht zetten",
+            "description": "Zolang een account in de wacht staat, kan niemand het verwijderen. De creator krijgt niets te horen en kan een verwijderverzoek nog steeds annuleren: de wacht blijft staan.",
+            "confirm": "In de wacht zetten"
+          },
+          "release": {
+            "title": "Wacht opheffen",
+            "description": "Het account kan weer worden verwijderd zodra de bedenktijd voorbij is.",
+            "confirm": "Wacht opheffen"
+          },
+          "reason_label": "Reden",
+          "reason_hint": "Minstens {count} tekens.",
+          "no_personal_details": "Schrijf hier geen namen, e-mailadressen of andere persoonsgegevens: de reden blijft permanent bewaard in het auditlogboek.",
+          "cancel": "Annuleren"
+        },
+        "capped": "Er worden telkens alleen de eerste {count} verlopen accounts gecontroleerd. Handel die af en laad daarna opnieuw.",
+        "action_failed": "Opslaan is niet gelukt. Probeer het opnieuw."
+      }
+    },
+    "erasure": {
+      "hold": {
+        "claimed": "Dit account wordt al verwijderd en kan dus niet in de wacht worden gezet.",
+        "not_available": "Dit account kan niet in de wacht worden gezet."
       }
     }
   }

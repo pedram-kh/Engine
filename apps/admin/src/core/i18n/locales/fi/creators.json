@@ -274,7 +274,9 @@
           "close": "Sulje",
           "load_failed": "Kirjautumisia ei voitu ladata. Yritä uudelleen."
         }
-      }
+      },
+      "erased": "Poistettu sisällöntuottaja",
+      "deletion_requested": "Poistoa pyydetty"
     }
   },
   "creator": {

@@ -274,7 +274,9 @@
           "close": "Dún",
           "load_failed": "Níorbh fhéidir na sínithe isteach a luchtú. Bain triail eile as."
         }
-      }
+      },
+      "erased": "Cruthaitheoir scriosta",
+      "deletion_requested": "Scriosadh iarrtha"
     }
   },
   "creator": {

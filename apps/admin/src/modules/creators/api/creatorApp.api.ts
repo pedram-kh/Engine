@@ -22,7 +22,13 @@ export interface AdminCreatorAppUser {
   id: string
   type: 'creator_app_users'
   attributes: {
-    creator: { id: string; display_name: string | null; email: string | null }
+    creator: {
+      id: string
+      display_name: string | null
+      email: string | null
+      is_erased: boolean
+      deletion_pending: boolean
+    }
     app_status: CreatorAppStatus
     live_sign_ins: number
     platforms: CreatorAppPlatform[]

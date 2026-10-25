@@ -274,7 +274,9 @@
           "close": "Stäng",
           "load_failed": "Det gick inte att ladda inloggningarna. Försök igen."
         }
-      }
+      },
+      "erased": "Raderad skapare",
+      "deletion_requested": "Radering begärd"
     }
   },
   "creator": {

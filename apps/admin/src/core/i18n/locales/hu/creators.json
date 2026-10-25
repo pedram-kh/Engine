@@ -274,7 +274,9 @@
           "close": "Bezárás",
           "load_failed": "A bejelentkezések betöltése nem sikerült. Próbáld újra."
         }
-      }
+      },
+      "erased": "Törölt alkotó",
+      "deletion_requested": "Törlés kérve"
     }
   },
   "creator": {

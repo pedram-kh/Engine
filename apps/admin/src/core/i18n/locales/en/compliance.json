@@ -15,8 +15,79 @@
       },
       "erasures": {
         "title": "Erasure queue",
-        "subtitle": "Right-to-be-forgotten requests awaiting review (GDPR art. 17).",
-        "empty": "No erasure requests."
+        "subtitle": "Accounts waiting to be erased, and the holds that stop them (GDPR art. 17).",
+        "tabs": {
+          "pending": "Pending",
+          "ready": "Ready",
+          "blocked": "Blocked",
+          "held": "On hold",
+          "in_progress": "Erasing",
+          "erased": "Erased"
+        },
+        "empty": {
+          "pending": "No account is waiting out its grace period.",
+          "ready": "No account is ready to be erased.",
+          "blocked": "No account is blocked.",
+          "held": "No account is on hold.",
+          "in_progress": "No erasure is in progress.",
+          "erased": "Nothing has been erased yet."
+        },
+        "columns": {
+          "account": "Account",
+          "requested": "Asked on",
+          "due": "Due on",
+          "state": "Where it stands",
+          "actions": "Actions"
+        },
+        "state": {
+          "pending": "Waiting. The grace period ends on {date}.",
+          "ready": "The grace period has ended and nothing stands in the way.",
+          "blocked": "The grace period has ended, but it cannot be erased: {reasons}.",
+          "held": "On hold since {date}.",
+          "held_by": "Held by {admin}.",
+          "in_progress": {
+            "claimed": "Erasing has begun.",
+            "started": "Erasing is under way.",
+            "db_done": "The database step is done. The files and the audit log are still to be finished.",
+            "incomplete": "The last run stopped before it finished. This needs an engineer: follow the erasure runbook."
+          },
+          "erased": "Erased on {date}."
+        },
+        "blocker": {
+          "payment": "a payment is still in progress",
+          "delivered_work": "delivered work has not been completed",
+          "vendor": "a payout provider account is still connected",
+          "not_erasable": "it has no creator profile to erase"
+        },
+        "actions": {
+          "hold": "Hold",
+          "release": "Release hold",
+          "load_more": "Load more"
+        },
+        "dialog": {
+          "hold": {
+            "title": "Place a hold",
+            "description": "While an account is on hold, nobody can erase it. The creator is told nothing, and can still cancel a deletion request: the hold stays.",
+            "confirm": "Place hold"
+          },
+          "release": {
+            "title": "Release the hold",
+            "description": "The account can be erased again once its grace period has ended.",
+            "confirm": "Release hold"
+          },
+          "reason_label": "Reason",
+          "reason_hint": "At least {count} characters.",
+          "no_personal_details": "Do not write names, email addresses or other personal details here: the reason is kept in the audit log permanently.",
+          "cancel": "Cancel"
+        },
+        "capped": "Only the first {count} accounts that are due are checked at a time. Handle these, then reload.",
+        "action_failed": "This could not be saved. Please try again."
+      }
+    },
+    "erasure": {
+      "hold": {
+        "claimed": "This account is already being erased, so it cannot be held.",
+        "not_available": "This account cannot be held."
       }
     }
   }

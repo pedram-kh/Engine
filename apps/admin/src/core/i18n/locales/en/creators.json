@@ -274,7 +274,9 @@
           "close": "Close",
           "load_failed": "We couldn't load the sign-ins. Please try again."
         }
-      }
+      },
+      "erased": "Deleted creator",
+      "deletion_requested": "Deletion requested"
     }
   },
   "creator": {

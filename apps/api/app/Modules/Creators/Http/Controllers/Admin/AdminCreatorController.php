@@ -8,6 +8,7 @@ use App\Core\Tenancy\BelongsToAgencyScope;
 use App\Modules\Admin\Enums\AutomationEvent;
 use App\Modules\Admin\Jobs\RunAutomationRuleJob;
 use App\Modules\Admin\Models\AdminAutomationRule;
+use App\Modules\Admin\Support\AdminDeletionFlags;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Facades\Audit;
@@ -83,7 +84,7 @@ final class AdminCreatorController
         $perPage = max(1, min($perPage, 100));
 
         $query = Creator::query()
-            ->with('user:id,email')
+            ->with('user:id,email,deletion_requested_at,erased_at')
             ->orderByDesc('submitted_at')
             ->orderByDesc('id');
 
@@ -156,6 +157,7 @@ final class AdminCreatorController
                 'profile_completeness_score' => $creator->profile_completeness_score,
                 'submitted_at' => $creator->submitted_at?->toIso8601String(),
                 'created_at' => $creator->created_at->toIso8601String(),
+                ...AdminDeletionFlags::forCreator($creator),
             ],
         ], $paginator->items());
 

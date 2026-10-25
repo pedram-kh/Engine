@@ -38,6 +38,10 @@ export interface AdminCreatorListItem {
     profile_completeness_score: number
     submitted_at: string | null
     created_at: string
+    /** AH-104c C2-4: erased account (read through `core/creators/creatorLabel.ts`). */
+    is_erased: boolean
+    /** AH-104c C2-4: a deletion request stands. Admin only. */
+    deletion_pending: boolean
   }
 }
 

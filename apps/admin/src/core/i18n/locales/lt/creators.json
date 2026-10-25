@@ -274,7 +274,9 @@
           "close": "Uždaryti",
           "load_failed": "Nepavyko įkelti prisijungimų. Bandykite dar kartą."
         }
-      }
+      },
+      "erased": "Ištrintas kūrėjas",
+      "deletion_requested": "Prašoma ištrinti"
     }
   },
   "creator": {

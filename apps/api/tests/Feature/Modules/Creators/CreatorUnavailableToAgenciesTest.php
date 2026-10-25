@@ -58,13 +58,17 @@ function cuAgency(): array
     ];
 }
 
-/** @param string $state one of 'normal', 'pending', 'erased' */
+/** @param string $state one of 'normal', 'pending', 'claimed' (force-claimed, never asked: AH-104c C2-0), 'erased' */
 function cuCreator(string $state = 'normal', array $creator = []): Creator
 {
     $user = User::factory()->creator()->createOne($state === 'erased' ? ['name' => '[erased]'] : []);
 
     if ($state === 'pending') {
         $user->forceFill(['deletion_requested_at' => now(), 'deletion_scheduled_for' => now()->addDays(14)])->save();
+    }
+
+    if ($state === 'claimed') {
+        $user->forceFill(['erasure_started_at' => now()])->save();
     }
 
     $factory = Creator::factory()->approved();
@@ -100,19 +104,21 @@ function cuRows(mixed $json): array
     return is_array($json) ? array_values($json) : [];
 }
 
-const CU_UNAVAILABLE = ['pending', 'erased'];
+const CU_UNAVAILABLE = ['pending', 'claimed', 'erased'];
 
 // ── The one definition ──────────────────────────────────────────────────────
 
 it('defines "visible to agencies" once: the scope and the single-row check never disagree', function (): void {
     $normal = cuCreator('normal');
     $pending = cuCreator('pending');
+    $claimed = cuCreator('claimed');
     $erased = cuCreator('erased');
 
     $visible = Creator::query()->visibleToAgencies()->pluck('creators.id')->all();
 
     expect($visible)->toBe([$normal->id])
         ->and($normal->isUnavailableToAgencies())->toBeFalse()
+        ->and($claimed->isUnavailableToAgencies())->toBeTrue()
         ->and($pending->isUnavailableToAgencies())->toBeTrue()
         ->and($erased->isUnavailableToAgencies())->toBeTrue()
         ->and($pending->isErased())->toBeFalse()

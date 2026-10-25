@@ -274,7 +274,9 @@
           "close": "Aizvērt",
           "load_failed": "Neizdevās ielādēt pieteikšanās. Mēģiniet vēlreiz."
         }
-      }
+      },
+      "erased": "Dzēsts satura veidotājs",
+      "deletion_requested": "Pieprasīta dzēšana"
     }
   },
   "creator": {

@@ -15,8 +15,79 @@
       },
       "erasures": {
         "title": "Čakalna vrsta smazání",
-        "subtitle": "Žádosti o právo na zapomenutí čekající na preverjanje (GDPR čl. 17).",
-        "empty": "Žádné žádosti o smazání."
+        "subtitle": "Računi, ki čakajo na izbris, in zadržanja, ki ga ustavljajo (GDPR čl. 17).",
+        "tabs": {
+          "pending": "Čaka",
+          "ready": "Pripravljeno",
+          "blocked": "Blokirano",
+          "held": "Zadržano",
+          "in_progress": "Izbrisuje se",
+          "erased": "Izbrisano"
+        },
+        "empty": {
+          "pending": "Noben račun ne čaka na konec odloga.",
+          "ready": "Noben račun ni pripravljen na izbris.",
+          "blocked": "Noben račun ni blokiran.",
+          "held": "Noben račun ni zadržan.",
+          "in_progress": "Noben izbris ni v teku.",
+          "erased": "Nič še ni izbrisano."
+        },
+        "columns": {
+          "account": "Račun",
+          "requested": "Zahtevano",
+          "due": "Zapade",
+          "state": "Stanje",
+          "actions": "Dejanja"
+        },
+        "state": {
+          "pending": "Čaka. Odlog se izteče {date}.",
+          "ready": "Odlog se je iztekel in nič ne stoji na poti.",
+          "blocked": "Odlog se je iztekel, vendar računa ni mogoče izbrisati: {reasons}.",
+          "held": "Zadržano od {date}.",
+          "held_by": "Zadržal(a): {admin}.",
+          "in_progress": {
+            "claimed": "Izbris se je začel.",
+            "started": "Izbris poteka.",
+            "db_done": "Korak v zbirki podatkov je končan. Datoteke in revizijsko sled je treba še dokončati.",
+            "incomplete": "Zadnji zagon se je ustavil pred koncem. Potreben je inženir: sledite runbooku za izbris."
+          },
+          "erased": "Izbrisano {date}."
+        },
+        "blocker": {
+          "payment": "plačilo je še v teku",
+          "delivered_work": "dobavljeno delo ni dokončano",
+          "vendor": "račun pri ponudniku izplačil je še povezan",
+          "not_erasable": "ni profila ustvarjalca za izbris"
+        },
+        "actions": {
+          "hold": "Zadrži",
+          "release": "Odpravi zadržanje",
+          "load_more": "Naloži več"
+        },
+        "dialog": {
+          "hold": {
+            "title": "Zadrži račun",
+            "description": "Dokler je račun zadržan, ga nihče ne more izbrisati. Ustvarjalec ni obveščen in lahko še vedno prekliče zahtevo za izbris: zadržanje ostane.",
+            "confirm": "Zadrži"
+          },
+          "release": {
+            "title": "Odpravi zadržanje",
+            "description": "Račun bo mogoče spet izbrisati, ko se izteče njegov odlog.",
+            "confirm": "Odpravi zadržanje"
+          },
+          "reason_label": "Razlog",
+          "reason_hint": "Vsaj {count} znakov.",
+          "no_personal_details": "Sem ne pišite imen, e-poštnih naslovov ali drugih osebnih podatkov: razlog se trajno hrani v revizijski sledi.",
+          "cancel": "Prekliči"
+        },
+        "capped": "Naenkrat se preveri le prvih {count} računov s potečenim rokom. Obravnavajte jih in znova naložite.",
+        "action_failed": "Shranjevanje ni uspelo. Poskusite znova."
+      }
+    },
+    "erasure": {
+      "hold": {
+        "claimed": "Ta račun se že izbrisuje, zato ga ni mogoče zadržati.",
+        "not_available": "Tega računa ni mogoče zadržati."
       }
     }
   }

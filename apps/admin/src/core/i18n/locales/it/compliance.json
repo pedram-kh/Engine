@@ -15,8 +15,79 @@
       },
       "erasures": {
         "title": "Coda di cancellazione",
-        "subtitle": "Richieste di diritto all'oblio in attesa di revisione (GDPR art. 17).",
-        "empty": "Nessuna richiesta di cancellazione."
+        "subtitle": "Account in attesa di cancellazione e blocchi che li fermano (GDPR art. 17).",
+        "tabs": {
+          "pending": "In attesa",
+          "ready": "Pronto",
+          "blocked": "Bloccato",
+          "held": "In sospeso",
+          "in_progress": "Cancellazione in corso",
+          "erased": "Cancellato"
+        },
+        "empty": {
+          "pending": "Nessun account attende la fine del periodo di grazia.",
+          "ready": "Nessun account è pronto per la cancellazione.",
+          "blocked": "Nessun account è bloccato.",
+          "held": "Nessun account è in sospeso.",
+          "in_progress": "Nessuna cancellazione in corso.",
+          "erased": "Non è ancora stato cancellato nulla."
+        },
+        "columns": {
+          "account": "Account",
+          "requested": "Richiesto il",
+          "due": "Scade il",
+          "state": "Situazione",
+          "actions": "Azioni"
+        },
+        "state": {
+          "pending": "In attesa. Il periodo di grazia termina il {date}.",
+          "ready": "Il periodo di grazia è terminato e nulla impedisce la cancellazione.",
+          "blocked": "Il periodo di grazia è terminato, ma l'account non può essere cancellato: {reasons}.",
+          "held": "In sospeso dal {date}.",
+          "held_by": "Sospeso da {admin}.",
+          "in_progress": {
+            "claimed": "La cancellazione è iniziata.",
+            "started": "La cancellazione è in corso.",
+            "db_done": "Il passaggio sul database è completato. Restano da concludere i file e il registro di audit.",
+            "incomplete": "L'ultima esecuzione si è fermata prima della fine. Serve un tecnico: segui il runbook di cancellazione."
+          },
+          "erased": "Cancellato il {date}."
+        },
+        "blocker": {
+          "payment": "un pagamento è ancora in corso",
+          "delivered_work": "un lavoro consegnato non è stato completato",
+          "vendor": "un account di fornitore di pagamenti è ancora collegato",
+          "not_erasable": "non ha un profilo creator da cancellare"
+        },
+        "actions": {
+          "hold": "Sospendi",
+          "release": "Rimuovi sospensione",
+          "load_more": "Carica altri"
+        },
+        "dialog": {
+          "hold": {
+            "title": "Sospendi l'account",
+            "description": "Finché un account è sospeso, nessuno può cancellarlo. Il creator non riceve alcun avviso e può ancora annullare una richiesta di eliminazione: la sospensione resta.",
+            "confirm": "Sospendi"
+          },
+          "release": {
+            "title": "Rimuovi la sospensione",
+            "description": "L'account potrà essere di nuovo cancellato al termine del suo periodo di grazia.",
+            "confirm": "Rimuovi sospensione"
+          },
+          "reason_label": "Motivo",
+          "reason_hint": "Almeno {count} caratteri.",
+          "no_personal_details": "Non scrivere qui nomi, indirizzi e-mail o altri dati personali: il motivo resta per sempre nel registro di audit.",
+          "cancel": "Annulla"
+        },
+        "capped": "Vengono verificati solo i primi {count} account in scadenza alla volta. Gestiscili, poi ricarica.",
+        "action_failed": "Impossibile salvare. Riprova."
+      }
+    },
+    "erasure": {
+      "hold": {
+        "claimed": "Questo account è già in fase di cancellazione e non può essere sospeso.",
+        "not_available": "Questo account non può essere sospeso."
       }
     }
   }

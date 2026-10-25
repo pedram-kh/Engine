@@ -15,8 +15,79 @@
       },
       "erasures": {
         "title": "Erasure queue",
-        "subtitle": "Right-to-be-forgotten requests awaiting review (GDPR art. 17).",
-        "empty": "Níl erasure requests."
+        "subtitle": "Cuntais atá ag fanacht le scriosadh agus na coinneálacha a stopann iad (GDPR airteagal 17).",
+        "tabs": {
+          "pending": "Ar feitheamh",
+          "ready": "Réidh",
+          "blocked": "Blocáilte",
+          "held": "Coinnithe",
+          "in_progress": "Á scriosadh",
+          "erased": "Scriosta"
+        },
+        "empty": {
+          "pending": "Níl aon chuntas ag fanacht le deireadh na tréimhse fáilte.",
+          "ready": "Níl aon chuntas réidh le scriosadh.",
+          "blocked": "Níl aon chuntas blocáilte.",
+          "held": "Níl aon chuntas coinnithe.",
+          "in_progress": "Níl aon scriosadh ar siúl.",
+          "erased": "Níor scriosadh aon rud go fóill."
+        },
+        "columns": {
+          "account": "Cuntas",
+          "requested": "Iarrtha ar",
+          "due": "Dlite ar",
+          "state": "Cá bhfuil sé",
+          "actions": "Gníomhartha"
+        },
+        "state": {
+          "pending": "Ag fanacht. Críochnaíonn an tréimhse fáilte ar {date}.",
+          "ready": "Tá an tréimhse fáilte caite agus níl aon rud ag cur bac air.",
+          "blocked": "Tá an tréimhse fáilte caite, ach ní féidir an cuntas a scriosadh: {reasons}.",
+          "held": "Coinnithe ó {date}.",
+          "held_by": "Choinnigh {admin} é.",
+          "in_progress": {
+            "claimed": "Tá an scriosadh tosaithe.",
+            "started": "Tá an scriosadh ar siúl.",
+            "db_done": "Tá céim an bhunachair sonraí críochnaithe. Tá na comhaid agus an logchomhad iniúchta le críochnú fós.",
+            "incomplete": "Stop an rith deireanach roimh dheireadh. Tá innealtóir ag teastáil: lean runbook an scriosta."
+          },
+          "erased": "Scriosta ar {date}."
+        },
+        "blocker": {
+          "payment": "tá íocaíocht fós ar siúl",
+          "delivered_work": "níl obair seachadta críochnaithe",
+          "vendor": "tá cuntas soláthraí íocaíochta fós ceangailte",
+          "not_erasable": "níl aon phróifíl cruthaitheora le scriosadh"
+        },
+        "actions": {
+          "hold": "Coinnigh",
+          "release": "Scaoil an choinneáil",
+          "load_more": "Luchtaigh tuilleadh"
+        },
+        "dialog": {
+          "hold": {
+            "title": "Coinnigh an cuntas",
+            "description": "Fad atá cuntas coinnithe, ní féidir le héinne é a scriosadh. Ní insítear rud ar bith don chruthaitheoir agus is féidir leis iarratas scriosta a chealú fós: fanann an choinneáil.",
+            "confirm": "Coinnigh"
+          },
+          "release": {
+            "title": "Scaoil an choinneáil",
+            "description": "Is féidir an cuntas a scriosadh arís nuair a chríochnaíonn a thréimhse fáilte.",
+            "confirm": "Scaoil an choinneáil"
+          },
+          "reason_label": "Cúis",
+          "reason_hint": "{count} charachtar ar a laghad.",
+          "no_personal_details": "Ná scríobh ainmneacha, seoltaí ríomhphoist ná sonraí pearsanta eile anseo: coinnítear an chúis go buan sa logchomhad iniúchta.",
+          "cancel": "Cealaigh"
+        },
+        "capped": "Ní dhéantar ach an chéad {count} chuntas dlite a sheiceáil in aghaidh an ama. Láimhseáil iad agus athluchtaigh.",
+        "action_failed": "Níorbh fhéidir é a shábháil. Bain triail eile as."
+      }
+    },
+    "erasure": {
+      "hold": {
+        "claimed": "Tá an cuntas seo á scriosadh cheana, mar sin ní féidir é a choinneáil.",
+        "not_available": "Ní féidir an cuntas seo a choinneáil."
       }
     }
   }

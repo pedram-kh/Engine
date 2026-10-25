@@ -13,10 +13,10 @@ use Illuminate\Http\Response;
  * Admin GDPR-compliance queues (Sprint 13, D-11) — SHELLS.
  *
  *   GET /api/v1/admin/compliance/export-requests
- *   GET /api/v1/admin/compliance/erasure-queue
  *
- * These are the data-subject export (GDPR art. 15/20) and erasure (art. 17)
- * operator surfaces. They ship THIS sprint as empty shells: the routes,
+ * The data-subject EXPORT (GDPR art. 15/20) operator surface, still a shell.
+ * (The erasure queue, art. 17, left this file in AH-104c C2: it is real now,
+ * see AdminErasureQueueController.) It ships as an empty shell: the routes,
  * the SPA pages, and the response envelope all exist now so Sprint 14 —
  * which lands the `data_export_requests` / `data_erasure_requests` tables
  * and the actual export/erasure machinery — fills data into a finished
@@ -36,13 +36,6 @@ use Illuminate\Http\Response;
 final class AdminComplianceController
 {
     public function exports(Request $request): JsonResponse
-    {
-        $this->authorizePlatformAdmin($request);
-
-        return $this->emptyQueue();
-    }
-
-    public function erasures(Request $request): JsonResponse
     {
         $this->authorizePlatformAdmin($request);
 

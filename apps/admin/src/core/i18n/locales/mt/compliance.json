@@ -15,8 +15,79 @@
       },
       "erasures": {
         "title": "Erasure queue",
-        "subtitle": "Right-to-be-forgotten requests awaiting review (GDPR art. 17).",
-        "empty": "Le erasure requests."
+        "subtitle": "Kontijiet li qed jistennew it-tneħħija u l-iżżamma li twaqqafhom (GDPR artikolu 17).",
+        "tabs": {
+          "pending": "Pendenti",
+          "ready": "Lest",
+          "blocked": "Imblukkat",
+          "held": "Miżmum",
+          "in_progress": "Qed jitneħħa",
+          "erased": "Tneħħa"
+        },
+        "empty": {
+          "pending": "L-ebda kont ma qed jistenna t-tmiem tal-perjodu ta' grazzja.",
+          "ready": "L-ebda kont mhu lest biex jitneħħa.",
+          "blocked": "L-ebda kont mhu mblukkat.",
+          "held": "L-ebda kont mhu miżmum.",
+          "in_progress": "L-ebda tneħħija mhi għaddejja.",
+          "erased": "Għadu ma tneħħa xejn."
+        },
+        "columns": {
+          "account": "Kont",
+          "requested": "Mitlub fi",
+          "due": "Skadenza",
+          "state": "Sitwazzjoni",
+          "actions": "Azzjonijiet"
+        },
+        "state": {
+          "pending": "Qed jistenna. Il-perjodu ta' grazzja jintemm fi {date}.",
+          "ready": "Il-perjodu ta' grazzja intemm u xejn ma jinsab fit-triq.",
+          "blocked": "Il-perjodu ta' grazzja intemm, iżda l-kont ma jistax jitneħħa: {reasons}.",
+          "held": "Miżmum mill-{date}.",
+          "held_by": "Miżmum minn {admin}.",
+          "in_progress": {
+            "claimed": "It-tneħħija bdiet.",
+            "started": "It-tneħħija għaddejja.",
+            "db_done": "Il-pass tad-database tlesta. Il-fajls u r-reġistru tal-awditu għad iridu jitlestew.",
+            "incomplete": "L-aħħar eżekuzzjoni waqfet qabel ma tlestiet. Hemm bżonn ta' inġinier: segwi r-runbook tat-tneħħija."
+          },
+          "erased": "Tneħħa fi {date}."
+        },
+        "blocker": {
+          "payment": "ħlas għadu għaddej",
+          "delivered_work": "xogħol ikkunsinnat għadu ma tlestiex",
+          "vendor": "kont ta' fornitur tal-ħlasijiet għadu konness",
+          "not_erasable": "m'hemm l-ebda profil ta' kreatur biex jitneħħa"
+        },
+        "actions": {
+          "hold": "Żomm",
+          "release": "Neħħi ż-żamma",
+          "load_more": "Ikkarga aktar"
+        },
+        "dialog": {
+          "hold": {
+            "title": "Żomm il-kont",
+            "description": "Sakemm kont ikun miżmum, ħadd ma jista' jneħħih. Il-kreatur ma jiġi infurmat b'xejn u xorta jista' jikkanċella talba għat-tneħħija: iż-żamma tibqa'.",
+            "confirm": "Żomm"
+          },
+          "release": {
+            "title": "Neħħi ż-żamma",
+            "description": "Il-kont jista' jitneħħa mill-ġdid malli jintemm il-perjodu ta' grazzja tiegħu.",
+            "confirm": "Neħħi ż-żamma"
+          },
+          "reason_label": "Raġuni",
+          "reason_hint": "Mill-inqas {count} karattri.",
+          "no_personal_details": "Tikteb hawn l-ebda isem, indirizz tal-email jew data personali oħra: ir-raġuni tinżamm b'mod permanenti fir-reġistru tal-awditu.",
+          "cancel": "Ikkanċella"
+        },
+        "capped": "Kull darba jiġu kkontrollati biss l-ewwel {count} kontijiet skaduti. Ħaddimhom u erġa' ikkarga.",
+        "action_failed": "Ma setgħetx tiġi ssejvjata. Erġa' pprova."
+      }
+    },
+    "erasure": {
+      "hold": {
+        "claimed": "Dan il-kont diġà qed jitneħħa, għalhekk ma jistax jinżamm.",
+        "not_available": "Dan il-kont ma jistax jinżamm."
       }
     }
   }

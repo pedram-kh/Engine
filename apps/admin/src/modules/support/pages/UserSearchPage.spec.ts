@@ -46,6 +46,8 @@ function candidates(): ImpersonationCandidateResponse {
           name: 'Dana Creator',
           email: 'dana@example.com',
           user_type: 'creator',
+          is_erased: false,
+          deletion_pending: false,
         },
       },
     ],
@@ -236,5 +238,41 @@ describe('UserSearchPage (Sprint 13, D-9)', () => {
     await flushPromises()
 
     expect(h.wrapper.find('[data-testid="admin-user-search-empty"]').exists()).toBe(true)
+  })
+
+  it('reads an erased and a leaving account through the reader (AH-104c C2-4)', async () => {
+    const base = candidates().data[0]!
+    vi.mocked(impersonationApi.searchUsers).mockResolvedValue({
+      data: [
+        {
+          ...base,
+          id: '01HQERASED00000000000000AB',
+          attributes: {
+            ...base.attributes,
+            name: 'Zed Quillfeather',
+            email: 'erased-01hqerased@erased.invalid',
+            is_erased: true,
+          },
+        },
+        {
+          ...base,
+          id: '01HQLEAVING0000000000000AB',
+          attributes: { ...base.attributes, deletion_pending: true },
+        },
+      ],
+    })
+    const h = await mountSupportPage(UserSearchPage, {
+      initialRoute: { name: 'app.support.search' },
+    })
+    teardown = h.unmount
+    await h.wrapper.find('[data-testid="admin-user-search-input"] input').setValue('creator')
+    vi.advanceTimersByTime(300)
+    await flushPromises()
+
+    expect(h.wrapper.text()).toContain('Deleted creator')
+    expect(h.wrapper.text()).toContain('Dana Creator')
+    expect(h.wrapper.text()).not.toContain('Quillfeather')
+    expect(h.wrapper.text()).not.toContain('erased.invalid')
+    expect(h.wrapper.findAll('[data-testid="admin-deletion-requested-chip"]')).toHaveLength(1)
   })
 })

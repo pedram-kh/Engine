@@ -15,8 +15,79 @@
       },
       "erasures": {
         "title": "Erasure queue",
-        "subtitle": "Right-to-be-forgotten requests awaiting review (GDPR art. 17).",
-        "empty": "Ei erasure requests."
+        "subtitle": "Kustutamist ootavad kontod ja peatused, mis seda takistavad (GDPR art 17).",
+        "tabs": {
+          "pending": "Ootel",
+          "ready": "Valmis",
+          "blocked": "Blokeeritud",
+          "held": "Peatatud",
+          "in_progress": "Kustutatakse",
+          "erased": "Kustutatud"
+        },
+        "empty": {
+          "pending": "Ükski konto ei oota ooteaja lõppu.",
+          "ready": "Ükski konto pole kustutamiseks valmis.",
+          "blocked": "Ükski konto pole blokeeritud.",
+          "held": "Ükski konto pole peatatud.",
+          "in_progress": "Ühtegi kustutamist ei toimu.",
+          "erased": "Midagi pole veel kustutatud."
+        },
+        "columns": {
+          "account": "Konto",
+          "requested": "Taotletud",
+          "due": "Tähtaeg",
+          "state": "Seis",
+          "actions": "Tegevused"
+        },
+        "state": {
+          "pending": "Ootel. Ooteaeg lõpeb {date}.",
+          "ready": "Ooteaeg on lõppenud ja miski ei takista.",
+          "blocked": "Ooteaeg on lõppenud, kuid kontot ei saa kustutada: {reasons}.",
+          "held": "Peatatud alates {date}.",
+          "held_by": "Peatas: {admin}.",
+          "in_progress": {
+            "claimed": "Kustutamine on alanud.",
+            "started": "Kustutamine käib.",
+            "db_done": "Andmebaasi samm on valmis. Failid ja auditilogi tuleb veel lõpetada.",
+            "incomplete": "Viimane käivitus peatus enne lõppu. Vaja on insenerit: järgi kustutamise runbooki."
+          },
+          "erased": "Kustutatud {date}."
+        },
+        "blocker": {
+          "payment": "makse on veel pooleli",
+          "delivered_work": "tarnitud töö pole lõpetatud",
+          "vendor": "väljamaksete pakkuja konto on veel ühendatud",
+          "not_erasable": "kustutatavat loojaprofiili pole"
+        },
+        "actions": {
+          "hold": "Peata",
+          "release": "Tühista peatamine",
+          "load_more": "Laadi veel"
+        },
+        "dialog": {
+          "hold": {
+            "title": "Peata konto",
+            "description": "Kuni konto on peatatud, ei saa seda keegi kustutada. Loojat ei teavitata ja ta saab kustutamistaotluse siiski tühistada: peatamine jääb kehtima.",
+            "confirm": "Peata"
+          },
+          "release": {
+            "title": "Tühista peatamine",
+            "description": "Konto saab uuesti kustutada, kui selle ooteaeg on lõppenud.",
+            "confirm": "Tühista peatamine"
+          },
+          "reason_label": "Põhjus",
+          "reason_hint": "Vähemalt {count} märki.",
+          "no_personal_details": "Ära kirjuta siia nimesid, e-posti aadresse ega muid isikuandmeid: põhjus säilib auditilogis püsivalt.",
+          "cancel": "Tühista"
+        },
+        "capped": "Korraga kontrollitakse ainult esimest {count} tähtaja ületanud kontot. Töötle need ja laadi uuesti.",
+        "action_failed": "Salvestamine ebaõnnestus. Proovi uuesti."
+      }
+    },
+    "erasure": {
+      "hold": {
+        "claimed": "Seda kontot kustutatakse juba, seega ei saa seda peatada.",
+        "not_available": "Seda kontot ei saa peatada."
       }
     }
   }

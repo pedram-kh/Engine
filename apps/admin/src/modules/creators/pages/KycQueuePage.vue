@@ -18,6 +18,9 @@ import type { CreatorKycStatus } from '@catalyst/api-client'
 
 import { useNavBadges } from '@/core/stores/useNavBadges'
 
+import { creatorEmail, creatorLabel } from '@/core/creators/creatorLabel'
+import DeletionRequestedChip from '@/core/creators/DeletionRequestedChip.vue'
+
 import { adminCreatorsApi, type AdminCreatorListItem } from '../api/creators.api'
 
 type KycFilter = CreatorKycStatus | 'all'
@@ -152,12 +155,13 @@ function formatDate(iso: string | null): string {
           :data-testid="`admin-kyc-queue-name-${item.id}`"
           @click="goToDetail(item.id)"
         >
-          {{ item.attributes.display_name ?? t('admin.creators.list.unnamed') }}
+          {{ creatorLabel(item.attributes, t, t('admin.creators.list.unnamed')) }}
         </button>
+        <DeletionRequestedChip :account="item.attributes" />
       </template>
 
       <template #item.attributes.email="{ item }">
-        {{ item.attributes.email ?? '—' }}
+        {{ creatorEmail(item.attributes) ?? '—' }}
       </template>
 
       <template #item.attributes.kyc_status="{ item }">

@@ -15,8 +15,79 @@
       },
       "erasures": {
         "title": "Kolejka usunięcia",
-        "subtitle": "Żądania bycia zapomnianym oczekujące na weryfikację (RODO art. 17).",
-        "empty": "Brak próśb o usunięcie."
+        "subtitle": "Konta czekające na usunięcie i blokady, które je wstrzymują (RODO art. 17).",
+        "tabs": {
+          "pending": "Oczekuje",
+          "ready": "Gotowe",
+          "blocked": "Zablokowane",
+          "held": "Wstrzymane",
+          "in_progress": "Usuwanie",
+          "erased": "Usunięte"
+        },
+        "empty": {
+          "pending": "Żadne konto nie czeka na koniec okresu karencji.",
+          "ready": "Żadne konto nie jest gotowe do usunięcia.",
+          "blocked": "Żadne konto nie jest zablokowane.",
+          "held": "Żadne konto nie jest wstrzymane.",
+          "in_progress": "Żadne usuwanie nie trwa.",
+          "erased": "Nic nie zostało jeszcze usunięte."
+        },
+        "columns": {
+          "account": "Konto",
+          "requested": "Zgłoszono",
+          "due": "Termin",
+          "state": "Stan",
+          "actions": "Akcje"
+        },
+        "state": {
+          "pending": "Oczekuje. Okres karencji kończy się {date}.",
+          "ready": "Okres karencji minął i nic nie stoi na przeszkodzie.",
+          "blocked": "Okres karencji minął, ale konta nie można usunąć: {reasons}.",
+          "held": "Wstrzymane od {date}.",
+          "held_by": "Wstrzymał(a): {admin}.",
+          "in_progress": {
+            "claimed": "Usuwanie się rozpoczęło.",
+            "started": "Usuwanie trwa.",
+            "db_done": "Etap bazy danych jest zakończony. Pliki i dziennik audytu nadal wymagają dokończenia.",
+            "incomplete": "Ostatnie uruchomienie zatrzymało się przed końcem. Potrzebny jest inżynier: postępuj zgodnie z runbookiem usuwania."
+          },
+          "erased": "Usunięto {date}."
+        },
+        "blocker": {
+          "payment": "płatność jest nadal w toku",
+          "delivered_work": "dostarczona praca nie została ukończona",
+          "vendor": "konto u dostawcy wypłat jest nadal połączone",
+          "not_erasable": "brak profilu twórcy do usunięcia"
+        },
+        "actions": {
+          "hold": "Wstrzymaj",
+          "release": "Zwolnij wstrzymanie",
+          "load_more": "Wczytaj więcej"
+        },
+        "dialog": {
+          "hold": {
+            "title": "Wstrzymaj konto",
+            "description": "Dopóki konto jest wstrzymane, nikt nie może go usunąć. Twórca nie dostaje żadnej informacji i nadal może anulować prośbę o usunięcie: wstrzymanie pozostaje.",
+            "confirm": "Wstrzymaj"
+          },
+          "release": {
+            "title": "Zwolnij wstrzymanie",
+            "description": "Konto będzie można znów usunąć po zakończeniu okresu karencji.",
+            "confirm": "Zwolnij wstrzymanie"
+          },
+          "reason_label": "Powód",
+          "reason_hint": "Co najmniej {count} znaków.",
+          "no_personal_details": "Nie wpisuj tu imion, adresów e-mail ani innych danych osobowych: powód jest trwale przechowywany w dzienniku audytu.",
+          "cancel": "Anuluj"
+        },
+        "capped": "Naraz sprawdzanych jest tylko pierwszych {count} kont z upłyniętym terminem. Obsłuż je i wczytaj ponownie.",
+        "action_failed": "Nie udało się zapisać. Spróbuj ponownie."
+      }
+    },
+    "erasure": {
+      "hold": {
+        "claimed": "To konto jest już usuwane, więc nie można go wstrzymać.",
+        "not_available": "Tego konta nie można wstrzymać."
       }
     }
   }

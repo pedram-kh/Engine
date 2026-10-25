@@ -65,6 +65,10 @@ enum AuditAction: string
     // refused or its data had moved, so the creator may cancel again; a system act).
     case AccountErasureStarted = 'account.erasure_started';
     case AccountErasureClaimReleased = 'account.erasure_claim_released';
+    // AH-104c C2: an admin's legal hold on an account, and its release. The actor is the admin,
+    // the reason is mandatory and is the only place the hold's why is kept (no personal details).
+    case AccountErasureHeld = 'account.erasure_held';
+    case AccountErasureHoldReleased = 'account.erasure_hold_released';
     case UserSuspended = 'user.suspended';
     case UserUnsuspended = 'user.unsuspended';
 
@@ -523,6 +527,8 @@ enum AuditAction: string
             self::AccountErased,
             // AH-104c: the claim answers "who took this account, and why".
             self::AccountErasureStarted,
+            self::AccountErasureHeld,
+            self::AccountErasureHoldReleased,
             // Cancel always carries a mandatory reason (D-9 — the
             // `cancelled_reason` column + this gate enforce it).
             self::AssignmentCancelled,

@@ -338,7 +338,8 @@ final class Creator extends Model implements Auditable
      * cannot forget one leg:
      *
      *   - not erased   (`creators.erased_at`, set by the AH-104a engine), and
-     *   - not pending  (`users.deletion_requested_at`, set by the request).
+     *   - not pending  (`users.deletion_requested_at`, set by the request) and not claimed
+     *     (`users.erasure_started_at`, set by the erasure gate; a force-claimed creator never asked).
      *
      * "Hidden" is DERIVED, never stored: a cancelled request clears the column
      * and the creator reappears everywhere with no trace. Used by discovery,
@@ -356,7 +357,12 @@ final class Creator extends Model implements Auditable
             ->whereNotExists(function ($sub) use ($query): void {
                 $sub->from('users')
                     ->whereColumn('users.id', $query->qualifyColumn('user_id'))
-                    ->whereNotNull('users.deletion_requested_at')
+                    // A request stands, OR an admin has claimed the account for erasure (which the shell's
+                    // force mode can do without a request, AH-104c C2-0).
+                    ->where(function ($leaving): void {
+                        $leaving->whereNotNull('users.deletion_requested_at')
+                            ->orWhereNotNull('users.erasure_started_at');
+                    })
                     ->selectRaw('1');
             });
     }
@@ -395,7 +401,10 @@ final class Creator extends Model implements Auditable
             && DB::table('users')
                 ->join('creators', 'creators.user_id', '=', 'users.id')
                 ->where('creators.id', $this->getKey())
-                ->whereNotNull('users.deletion_requested_at')
+                ->where(function ($leaving): void {
+                    $leaving->whereNotNull('users.deletion_requested_at')
+                        ->orWhereNotNull('users.erasure_started_at');
+                })
                 ->exists();
     }
 

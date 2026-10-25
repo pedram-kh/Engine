@@ -274,7 +274,9 @@
           "close": "Fermer",
           "load_failed": "Impossible de charger les connexions. Veuillez réessayer."
         }
-      }
+      },
+      "erased": "Créateur supprimé",
+      "deletion_requested": "Suppression demandée"
     }
   },
   "creator": {

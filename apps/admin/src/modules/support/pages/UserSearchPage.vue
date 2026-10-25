@@ -20,6 +20,9 @@ import { useI18n } from 'vue-i18n'
 
 import { ApiError } from '@catalyst/api-client'
 
+import { accountLabel, creatorEmail } from '@/core/creators/creatorLabel'
+import DeletionRequestedChip from '@/core/creators/DeletionRequestedChip.vue'
+
 import {
   buildHandoffUrl,
   impersonationApi,
@@ -143,11 +146,12 @@ async function confirmImpersonate(): Promise<void> {
       <v-list-item
         v-for="user in results"
         :key="user.id"
-        :title="user.attributes.name"
-        :subtitle="user.attributes.email"
+        :title="accountLabel(user.attributes, t)"
+        :subtitle="creatorEmail(user.attributes) ?? ''"
         :data-testid="`admin-user-search-row-${user.id}`"
       >
         <template #append>
+          <DeletionRequestedChip :account="user.attributes" class="mr-2" />
           <v-chip size="small" variant="tonal" class="mr-3">
             {{ user.attributes.user_type }}
           </v-chip>

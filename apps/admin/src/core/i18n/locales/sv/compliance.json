@@ -15,8 +15,79 @@
       },
       "erasures": {
         "title": "Raderingskö",
-        "subtitle": "Förfrågningar om att bli bortglömd, som väntar på granskning (GDPR art. 17).",
-        "empty": "Inga raderingsförfrågningar."
+        "subtitle": "Konton som väntar på radering och de spärrar som stoppar dem (GDPR art. 17).",
+        "tabs": {
+          "pending": "Väntar",
+          "ready": "Redo",
+          "blocked": "Blockerat",
+          "held": "Spärrat",
+          "in_progress": "Raderas",
+          "erased": "Raderat"
+        },
+        "empty": {
+          "pending": "Inget konto väntar på att betänketiden ska ta slut.",
+          "ready": "Inget konto är redo att raderas.",
+          "blocked": "Inget konto är blockerat.",
+          "held": "Inget konto är spärrat.",
+          "in_progress": "Ingen radering pågår.",
+          "erased": "Inget har raderats ännu."
+        },
+        "columns": {
+          "account": "Konto",
+          "requested": "Begärt den",
+          "due": "Förfaller den",
+          "state": "Läge",
+          "actions": "Åtgärder"
+        },
+        "state": {
+          "pending": "Väntar. Betänketiden slutar den {date}.",
+          "ready": "Betänketiden har gått ut och inget står i vägen.",
+          "blocked": "Betänketiden har gått ut, men kontot kan inte raderas: {reasons}.",
+          "held": "Spärrat sedan {date}.",
+          "held_by": "Spärrat av {admin}.",
+          "in_progress": {
+            "claimed": "Raderingen har påbörjats.",
+            "started": "Raderingen pågår.",
+            "db_done": "Databassteget är klart. Filerna och granskningsloggen återstår att slutföra.",
+            "incomplete": "Senaste körningen stoppade innan den var klar. Det krävs en tekniker: följ raderingsrutinen."
+          },
+          "erased": "Raderat den {date}."
+        },
+        "blocker": {
+          "payment": "en betalning pågår fortfarande",
+          "delivered_work": "levererat arbete är inte slutfört",
+          "vendor": "ett konto hos en utbetalningsleverantör är fortfarande kopplat",
+          "not_erasable": "det finns ingen skaparprofil att radera"
+        },
+        "actions": {
+          "hold": "Spärra",
+          "release": "Häv spärr",
+          "load_more": "Ladda fler"
+        },
+        "dialog": {
+          "hold": {
+            "title": "Spärra kontot",
+            "description": "Så länge ett konto är spärrat kan ingen radera det. Skaparen får ingen information och kan fortfarande avbryta en raderingsbegäran: spärren ligger kvar.",
+            "confirm": "Spärra"
+          },
+          "release": {
+            "title": "Häv spärren",
+            "description": "Kontot kan raderas igen när betänketiden har gått ut.",
+            "confirm": "Häv spärr"
+          },
+          "reason_label": "Orsak",
+          "reason_hint": "Minst {count} tecken.",
+          "no_personal_details": "Skriv inga namn, e-postadresser eller andra personuppgifter här: orsaken sparas permanent i granskningsloggen.",
+          "cancel": "Avbryt"
+        },
+        "capped": "Bara de första {count} förfallna kontona kontrolleras åt gången. Hantera dem och ladda sedan om.",
+        "action_failed": "Det gick inte att spara. Försök igen."
+      }
+    },
+    "erasure": {
+      "hold": {
+        "claimed": "Kontot raderas redan och kan därför inte spärras.",
+        "not_available": "Kontot kan inte spärras."
       }
     }
   }

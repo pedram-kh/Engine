@@ -15,8 +15,79 @@
       },
       "erasures": {
         "title": "Fronta smazání",
-        "subtitle": "Žádosti o právo na zapomenutí čekající na ověření (GDPR čl. 17).",
-        "empty": "Žádné žádosti o smazání."
+        "subtitle": "Účty čekající na smazání a blokace, které ho zastavují (GDPR čl. 17).",
+        "tabs": {
+          "pending": "Čeká",
+          "ready": "Připraveno",
+          "blocked": "Zablokováno",
+          "held": "Pozastaveno",
+          "in_progress": "Maže se",
+          "erased": "Smazáno"
+        },
+        "empty": {
+          "pending": "Žádný účet nečeká na konec ochranné lhůty.",
+          "ready": "Žádný účet není připraven ke smazání.",
+          "blocked": "Žádný účet není zablokován.",
+          "held": "Žádný účet není pozastaven.",
+          "in_progress": "Neprobíhá žádné mazání.",
+          "erased": "Zatím nebylo nic smazáno."
+        },
+        "columns": {
+          "account": "Účet",
+          "requested": "Požádáno",
+          "due": "Termín",
+          "state": "Stav",
+          "actions": "Akce"
+        },
+        "state": {
+          "pending": "Čeká. Ochranná lhůta končí {date}.",
+          "ready": "Ochranná lhůta skončila a nic nebrání smazání.",
+          "blocked": "Ochranná lhůta skončila, ale účet nelze smazat: {reasons}.",
+          "held": "Pozastaveno od {date}.",
+          "held_by": "Pozastavil(a): {admin}.",
+          "in_progress": {
+            "claimed": "Mazání začalo.",
+            "started": "Mazání probíhá.",
+            "db_done": "Krok v databázi je hotový. Zbývá dokončit soubory a auditní protokol.",
+            "incomplete": "Poslední běh se zastavil před dokončením. Je potřeba technik: postupujte podle runbooku mazání."
+          },
+          "erased": "Smazáno {date}."
+        },
+        "blocker": {
+          "payment": "platba stále probíhá",
+          "delivered_work": "dodaná práce není dokončena",
+          "vendor": "účet u poskytovatele výplat je stále propojen",
+          "not_erasable": "není tu žádný profil tvůrce ke smazání"
+        },
+        "actions": {
+          "hold": "Pozastavit",
+          "release": "Zrušit pozastavení",
+          "load_more": "Načíst další"
+        },
+        "dialog": {
+          "hold": {
+            "title": "Pozastavit účet",
+            "description": "Dokud je účet pozastaven, nikdo ho nemůže smazat. Tvůrce se nic nedozví a stále může zrušit žádost o smazání: pozastavení zůstane.",
+            "confirm": "Pozastavit"
+          },
+          "release": {
+            "title": "Zrušit pozastavení",
+            "description": "Účet bude možné znovu smazat po skončení ochranné lhůty.",
+            "confirm": "Zrušit pozastavení"
+          },
+          "reason_label": "Důvod",
+          "reason_hint": "Alespoň {count} znaků.",
+          "no_personal_details": "Nepište sem jména, e-mailové adresy ani jiné osobní údaje: důvod se trvale uchovává v auditním protokolu.",
+          "cancel": "Zrušit"
+        },
+        "capped": "Najednou se kontroluje jen prvních {count} účtů po termínu. Vyřiďte je a načtěte znovu.",
+        "action_failed": "Uložení se nepodařilo. Zkuste to znovu."
+      }
+    },
+    "erasure": {
+      "hold": {
+        "claimed": "Tento účet se už maže, proto ho nelze pozastavit.",
+        "not_available": "Tento účet nelze pozastavit."
       }
     }
   }

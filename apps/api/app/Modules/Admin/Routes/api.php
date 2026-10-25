@@ -10,6 +10,7 @@ use App\Modules\Admin\Http\Controllers\AdminAutomationRuleController;
 use App\Modules\Admin\Http\Controllers\AdminComplianceController;
 use App\Modules\Admin\Http\Controllers\AdminCreatorAppController;
 use App\Modules\Admin\Http\Controllers\AdminDashboardController;
+use App\Modules\Admin\Http\Controllers\AdminErasureQueueController;
 use App\Modules\Admin\Http\Controllers\AdminFeatureFlagController;
 use App\Modules\Admin\Http\Controllers\AdminHealthController;
 use App\Modules\Admin\Http\Controllers\AdminImpersonationController;
@@ -172,7 +173,10 @@ Route::prefix('admin')
         // data_export_requests / data_erasure_requests tables). Read-only.
         Route::prefix('compliance')->name('compliance.')->group(function (): void {
             Route::get('export-requests', [AdminComplianceController::class, 'exports'])->name('exports');
-            Route::get('erasure-queue', [AdminComplianceController::class, 'erasures'])->name('erasures');
+            // AH-104c C2: the erasure queue is real (the export queue above is still a shell).
+            Route::get('erasure-queue', [AdminErasureQueueController::class, 'index'])->name('erasures');
+            Route::post('erasure-queue/{user}/hold', [AdminErasureQueueController::class, 'hold'])->name('erasures.hold');
+            Route::post('erasure-queue/{user}/release', [AdminErasureQueueController::class, 'release'])->name('erasures.release');
         });
 
         // ─── Operational alerts — admin notification consumer (D-12) ──

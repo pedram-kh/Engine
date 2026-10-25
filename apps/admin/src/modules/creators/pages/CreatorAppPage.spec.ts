@@ -47,7 +47,13 @@ function user(
     id,
     type: 'creator_app_users',
     attributes: {
-      creator: { id, display_name: `Creator ${id}`, email: `${id.toLowerCase()}@example.test` },
+      creator: {
+        id,
+        display_name: `Creator ${id}`,
+        email: `${id.toLowerCase()}@example.test`,
+        is_erased: false,
+        deletion_pending: false,
+      },
       app_status: 'active',
       live_sign_ins: 1,
       platforms: ['ios'],
@@ -392,5 +398,28 @@ describe('Creator app copy and routing (AH-102b)', () => {
     } finally {
       h.unmount()
     }
+  })
+
+  it('reads an erased and a leaving creator through the reader (AH-104c C2-4)', async () => {
+    const erased = user('01HQERASED')
+    erased.attributes.creator = {
+      id: '01HQERASED',
+      display_name: null,
+      email: 'erased-01hqerased@erased.invalid',
+      is_erased: true,
+      deletion_pending: false,
+    }
+    const leaving = user('01HQLEAVING')
+    leaving.attributes.creator.deletion_pending = true
+    vi.mocked(adminCreatorAppApi.users).mockResolvedValue(usersPage([erased, leaving]))
+
+    const h = await mountCreatorPage(CreatorAppPage, { initialRoute: { name: 'app.creators.app' } })
+    await flushPromises()
+
+    expect(h.wrapper.text()).toContain('Deleted creator')
+    expect(h.wrapper.text()).toContain('Creator 01HQLEAVING')
+    expect(h.wrapper.text()).not.toContain('erased.invalid')
+    expect(h.wrapper.findAll('[data-testid="admin-deletion-requested-chip"]')).toHaveLength(1)
+    h.unmount()
   })
 })

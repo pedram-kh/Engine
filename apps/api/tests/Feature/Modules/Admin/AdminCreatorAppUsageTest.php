@@ -393,7 +393,7 @@ it('exposes an exact allow-listed attribute set', function (): void {
             'creator', 'app_status', 'live_sign_ins', 'platforms', 'last_seen_at', 'last_app_sign_in_at',
             'app_version', 'push_state', 'push_invalidation_reason', 'last_push_registered_at',
         ])
-        ->and(array_keys($data['attributes']['creator']))->toBe(['id', 'display_name', 'email']);
+        ->and(array_keys($data['attributes']['creator']))->toBe(['id', 'display_name', 'email', 'is_erased', 'deletion_pending']);
 });
 
 it('resolves a page without N+1: 12 creators cost the same queries as 1', function (): void {

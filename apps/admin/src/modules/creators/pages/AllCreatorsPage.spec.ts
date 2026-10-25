@@ -50,6 +50,8 @@ function listResponse(
           profile_completeness_score: 100,
           submitted_at: '2026-05-14T00:00:00Z',
           created_at: '2026-05-10T00:00:00Z',
+          is_erased: false,
+          deletion_pending: false,
           ...overrides,
         },
       },
@@ -268,5 +270,43 @@ describe('AllCreatorsPage — three-chip filters (AH-079)', () => {
     await flushPromises()
 
     expect(h.wrapper.find('[data-testid="admin-all-creators-error"]').exists()).toBe(true)
+  })
+
+  it('reads an erased creator and a leaving creator through the reader (AH-104c C2-4)', async () => {
+    const base = listResponse().data[0]!
+    vi.mocked(adminCreatorsApi.list).mockResolvedValue({
+      data: [
+        {
+          ...base,
+          id: '01HQERASED',
+          attributes: {
+            ...base.attributes,
+            display_name: null,
+            email: 'erased-01hqerased@erased.invalid',
+            is_erased: true,
+          },
+        },
+        { ...base, id: '01HQLEAVING', attributes: { ...base.attributes, deletion_pending: true } },
+      ],
+      meta: { total: 2, page: 1, per_page: 25, last_page: 1 },
+    })
+
+    const h = await mountCreatorPage(AllCreatorsPage, {
+      initialRoute: { name: 'app.creators.all' },
+    })
+    teardown = h.unmount
+    await flushPromises()
+
+    expect(h.wrapper.find('[data-testid="admin-all-creators-name-01HQERASED"]').text()).toBe(
+      'Deleted creator',
+    )
+    expect(h.wrapper.find('[data-testid="admin-all-creators-name-01HQLEAVING"]').text()).toContain(
+      'Jane Doe',
+    )
+    expect(h.wrapper.text()).not.toContain('erased.invalid')
+    // One chip: on the leaving creator, none on the erased one or the ordinary ones.
+    const chips = h.wrapper.findAll('[data-testid="admin-deletion-requested-chip"]')
+    expect(chips).toHaveLength(1)
+    expect(chips[0]!.text()).toBe('Deletion requested')
   })
 })

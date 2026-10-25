@@ -65,6 +65,8 @@ function listPage(
                 id: '01HQCREATOR',
                 display_name: 'Ada Lovelace',
                 email: 'ada@example.test',
+                is_erased: false,
+                deletion_pending: false,
               },
               in_app: opts.inApp ?? 'unread',
             },
@@ -123,6 +125,41 @@ describe('PushDeliveriesPage (AH-102b)', () => {
     await flushPromises()
     return h
   }
+
+  it('reads an erased and a leaving creator through the reader (AH-104c C2-4)', async () => {
+    const page = listPage()
+    const row = page.data[0]!
+    const erased = {
+      ...row,
+      id: '601',
+      attributes: {
+        ...row.attributes,
+        creator: {
+          id: '01HQERASED',
+          display_name: null,
+          email: 'erased-01hqerased@erased.invalid',
+          is_erased: true,
+          deletion_pending: false,
+        },
+      },
+    }
+    const leaving = {
+      ...row,
+      id: '602',
+      attributes: {
+        ...row.attributes,
+        creator: { ...row.attributes.creator!, deletion_pending: true },
+      },
+    }
+    vi.mocked(adminPushDeliveriesApi.list).mockResolvedValue({ ...page, data: [erased, leaving] })
+
+    const h = await mount()
+
+    expect(h.wrapper.find('[data-testid="admin-push-row-601"]').text()).toContain('Deleted creator')
+    expect(h.wrapper.find('[data-testid="admin-push-row-602"]').text()).toContain('Ada Lovelace')
+    expect(h.wrapper.text()).not.toContain('erased.invalid')
+    expect(h.wrapper.findAll('[data-testid="admin-deletion-requested-chip"]')).toHaveLength(1)
+  })
 
   it('loads the first page and the 7-day summary on mount, and renders tiles and rows', async () => {
     const h = await mount()

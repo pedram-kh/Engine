@@ -20,6 +20,9 @@ import { useRouter } from 'vue-router'
 import { formatDateTime, ApiError } from '@catalyst/api-client'
 import type { CreatorApplicationStatus } from '@catalyst/api-client'
 
+import { creatorEmail, creatorLabel } from '@/core/creators/creatorLabel'
+import DeletionRequestedChip from '@/core/creators/DeletionRequestedChip.vue'
+
 import { adminCreatorsApi, type AdminCreatorListItem } from '../api/creators.api'
 
 type StatusFilter = CreatorApplicationStatus | 'all'
@@ -166,13 +169,14 @@ function formatDate(iso: string | null): string {
           :data-testid="`admin-creator-list-name-${item.id}`"
           @click="goToDetail(item.id)"
         >
-          {{ item.attributes.display_name ?? t('admin.creators.list.unnamed') }}
+          {{ creatorLabel(item.attributes, t, t('admin.creators.list.unnamed')) }}
         </button>
+        <DeletionRequestedChip :account="item.attributes" />
       </template>
 
       <template #item.attributes.email="{ item }">
         <span :data-testid="`admin-creator-list-email-${item.id}`">
-          {{ item.attributes.email ?? '—' }}
+          {{ creatorEmail(item.attributes) ?? '—' }}
         </span>
       </template>
 

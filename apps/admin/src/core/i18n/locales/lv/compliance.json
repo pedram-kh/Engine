@@ -15,8 +15,79 @@
       },
       "erasures": {
         "title": "Erasure queue",
-        "subtitle": "Right-to-be-forgotten requests awaiting review (GDPR art. 17).",
-        "empty": "Nē erasure requests."
+        "subtitle": "Konti, kas gaida dzēšanu, un aizturēšanas, kas to aptur (VDAR 17. pants).",
+        "tabs": {
+          "pending": "Gaida",
+          "ready": "Gatavs",
+          "blocked": "Bloķēts",
+          "held": "Aizturēts",
+          "in_progress": "Tiek dzēsts",
+          "erased": "Dzēsts"
+        },
+        "empty": {
+          "pending": "Neviens konts negaida labojuma perioda beigas.",
+          "ready": "Neviens konts nav gatavs dzēšanai.",
+          "blocked": "Neviens konts nav bloķēts.",
+          "held": "Neviens konts nav aizturēts.",
+          "in_progress": "Nenotiek neviena dzēšana.",
+          "erased": "Vēl nekas nav dzēsts."
+        },
+        "columns": {
+          "account": "Konts",
+          "requested": "Pieprasīts",
+          "due": "Termiņš",
+          "state": "Stāvoklis",
+          "actions": "Darbības"
+        },
+        "state": {
+          "pending": "Gaida. Labojuma periods beidzas {date}.",
+          "ready": "Labojuma periods ir beidzies, un nekas netraucē.",
+          "blocked": "Labojuma periods ir beidzies, taču kontu nevar dzēst: {reasons}.",
+          "held": "Aizturēts kopš {date}.",
+          "held_by": "Aizturēja: {admin}.",
+          "in_progress": {
+            "claimed": "Dzēšana ir sākusies.",
+            "started": "Dzēšana notiek.",
+            "db_done": "Datu bāzes solis ir pabeigts. Faili un audita žurnāls vēl jāpabeidz.",
+            "incomplete": "Pēdējā izpilde apstājās pirms beigām. Vajadzīgs inženieris: sekojiet dzēšanas runbook."
+          },
+          "erased": "Dzēsts {date}."
+        },
+        "blocker": {
+          "payment": "maksājums vēl notiek",
+          "delivered_work": "piegādātais darbs nav pabeigts",
+          "vendor": "izmaksu pakalpojumu sniedzēja konts vēl ir saistīts",
+          "not_erasable": "nav veidotāja profila, ko dzēst"
+        },
+        "actions": {
+          "hold": "Aizturēt",
+          "release": "Atcelt aizturēšanu",
+          "load_more": "Ielādēt vairāk"
+        },
+        "dialog": {
+          "hold": {
+            "title": "Aizturēt kontu",
+            "description": "Kamēr konts ir aizturēts, neviens to nevar dzēst. Veidotājs netiek informēts un joprojām var atcelt dzēšanas pieprasījumu: aizturēšana paliek.",
+            "confirm": "Aizturēt"
+          },
+          "release": {
+            "title": "Atcelt aizturēšanu",
+            "description": "Kontu varēs atkal dzēst, kad beigsies tā labojuma periods.",
+            "confirm": "Atcelt aizturēšanu"
+          },
+          "reason_label": "Iemesls",
+          "reason_hint": "Vismaz {count} rakstzīmes.",
+          "no_personal_details": "Šeit nerakstiet vārdus, e-pasta adreses vai citus personas datus: iemesls tiek glabāts audita žurnālā pastāvīgi.",
+          "cancel": "Atcelt"
+        },
+        "capped": "Vienlaikus tiek pārbaudīti tikai pirmie {count} konti ar beidzies termiņu. Apstrādājiet tos un ielādējiet no jauna.",
+        "action_failed": "Neizdevās saglabāt. Mēģiniet vēlreiz."
+      }
+    },
+    "erasure": {
+      "hold": {
+        "claimed": "Šis konts jau tiek dzēsts, tāpēc to nevar aizturēt.",
+        "not_available": "Šo kontu nevar aizturēt."
       }
     }
   }

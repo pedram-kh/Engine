@@ -15,8 +15,79 @@
       },
       "erasures": {
         "title": "Erasure queue",
-        "subtitle": "Right-to-be-forgotten requests awaiting review (GDPR art. 17).",
-        "empty": "Ne erasure requests."
+        "subtitle": "Paskyros, laukiančios ištrynimo, ir sulaikymai, kurie jį stabdo (BDAR 17 str.).",
+        "tabs": {
+          "pending": "Laukia",
+          "ready": "Paruošta",
+          "blocked": "Užblokuota",
+          "held": "Sulaikyta",
+          "in_progress": "Trinama",
+          "erased": "Ištrinta"
+        },
+        "empty": {
+          "pending": "Nė viena paskyra nelaukia lengvatinio laikotarpio pabaigos.",
+          "ready": "Nė viena paskyra nėra paruošta ištrinti.",
+          "blocked": "Nė viena paskyra nėra užblokuota.",
+          "held": "Nė viena paskyra nėra sulaikyta.",
+          "in_progress": "Šiuo metu nieko netrinama.",
+          "erased": "Dar nieko neištrinta."
+        },
+        "columns": {
+          "account": "Paskyra",
+          "requested": "Paprašyta",
+          "due": "Terminas",
+          "state": "Būsena",
+          "actions": "Veiksmai"
+        },
+        "state": {
+          "pending": "Laukia. Lengvatinis laikotarpis baigiasi {date}.",
+          "ready": "Lengvatinis laikotarpis baigėsi ir niekas netrukdo.",
+          "blocked": "Lengvatinis laikotarpis baigėsi, bet paskyros ištrinti negalima: {reasons}.",
+          "held": "Sulaikyta nuo {date}.",
+          "held_by": "Sulaikė: {admin}.",
+          "in_progress": {
+            "claimed": "Trynimas prasidėjo.",
+            "started": "Trynimas vyksta.",
+            "db_done": "Duomenų bazės žingsnis baigtas. Failus ir audito žurnalą dar reikia užbaigti.",
+            "incomplete": "Paskutinis vykdymas sustojo nebaigtas. Reikia inžinieriaus: laikykitės trynimo runbook."
+          },
+          "erased": "Ištrinta {date}."
+        },
+        "blocker": {
+          "payment": "mokėjimas vis dar vyksta",
+          "delivered_work": "pristatytas darbas nėra užbaigtas",
+          "vendor": "išmokų teikėjo paskyra vis dar susieta",
+          "not_erasable": "nėra kūrėjo profilio, kurį būtų galima ištrinti"
+        },
+        "actions": {
+          "hold": "Sulaikyti",
+          "release": "Panaikinti sulaikymą",
+          "load_more": "Įkelti daugiau"
+        },
+        "dialog": {
+          "hold": {
+            "title": "Sulaikyti paskyrą",
+            "description": "Kol paskyra sulaikyta, niekas negali jos ištrinti. Kūrėjas nieko nežino ir vis dar gali atšaukti ištrynimo prašymą: sulaikymas lieka.",
+            "confirm": "Sulaikyti"
+          },
+          "release": {
+            "title": "Panaikinti sulaikymą",
+            "description": "Paskyrą vėl bus galima ištrinti, kai baigsis jos lengvatinis laikotarpis.",
+            "confirm": "Panaikinti sulaikymą"
+          },
+          "reason_label": "Priežastis",
+          "reason_hint": "Bent {count} simbolių.",
+          "no_personal_details": "Čia nerašykite vardų, el. pašto adresų ar kitų asmens duomenų: priežastis visam laikui saugoma audito žurnale.",
+          "cancel": "Atšaukti"
+        },
+        "capped": "Vienu metu tikrinamos tik pirmosios {count} pasibaigusio termino paskyros. Apdorokite jas ir įkelkite iš naujo.",
+        "action_failed": "Nepavyko išsaugoti. Bandykite dar kartą."
+      }
+    },
+    "erasure": {
+      "hold": {
+        "claimed": "Ši paskyra jau trinama, todėl jos sulaikyti negalima.",
+        "not_available": "Šios paskyros sulaikyti negalima."
       }
     }
   }

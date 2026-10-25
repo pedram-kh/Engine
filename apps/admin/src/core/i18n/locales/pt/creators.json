@@ -274,7 +274,9 @@
           "close": "Fechar",
           "load_failed": "Não foi possível carregar as sessões. Tente novamente."
         }
-      }
+      },
+      "erased": "Criador eliminado",
+      "deletion_requested": "Eliminação pedida"
     }
   },
   "creator": {

@@ -15,8 +15,79 @@
       },
       "erasures": {
         "title": "Sletningskø",
-        "subtitle": "Anmodninger om at blive glemt, der afventer gennemgang (GDPR art. 17).",
-        "empty": "Ingen sletningsanmodninger."
+        "subtitle": "Konti der venter på sletning, og de spærringer, der stopper dem (GDPR art. 17).",
+        "tabs": {
+          "pending": "Afventer",
+          "ready": "Klar",
+          "blocked": "Blokeret",
+          "held": "Spærret",
+          "in_progress": "Slettes",
+          "erased": "Slettet"
+        },
+        "empty": {
+          "pending": "Ingen konti venter på, at fortrydelsesfristen udløber.",
+          "ready": "Ingen konti er klar til sletning.",
+          "blocked": "Ingen konti er blokeret.",
+          "held": "Ingen konti er spærret.",
+          "in_progress": "Ingen sletning er i gang.",
+          "erased": "Intet er slettet endnu."
+        },
+        "columns": {
+          "account": "Konto",
+          "requested": "Anmodet den",
+          "due": "Forfalder den",
+          "state": "Status",
+          "actions": "Handlinger"
+        },
+        "state": {
+          "pending": "Afventer. Fortrydelsesfristen udløber den {date}.",
+          "ready": "Fortrydelsesfristen er udløbet, og intet står i vejen.",
+          "blocked": "Fortrydelsesfristen er udløbet, men kontoen kan ikke slettes: {reasons}.",
+          "held": "Spærret siden {date}.",
+          "held_by": "Spærret af {admin}.",
+          "in_progress": {
+            "claimed": "Sletningen er begyndt.",
+            "started": "Sletningen er i gang.",
+            "db_done": "Databasetrinnet er færdigt. Filerne og revisionsloggen mangler stadig at blive afsluttet.",
+            "incomplete": "Seneste kørsel stoppede, før den var færdig. Det kræver en tekniker: følg sletningsrunbooken."
+          },
+          "erased": "Slettet den {date}."
+        },
+        "blocker": {
+          "payment": "en betaling er stadig i gang",
+          "delivered_work": "leveret arbejde er ikke afsluttet",
+          "vendor": "en konto hos en udbetalingsudbyder er stadig tilknyttet",
+          "not_erasable": "der er ingen skaberprofil at slette"
+        },
+        "actions": {
+          "hold": "Spær",
+          "release": "Ophæv spærring",
+          "load_more": "Indlæs flere"
+        },
+        "dialog": {
+          "hold": {
+            "title": "Spær kontoen",
+            "description": "Så længe en konto er spærret, kan ingen slette den. Skaberen får ingen besked og kan stadig annullere en sletteanmodning: spærringen bliver stående.",
+            "confirm": "Spær"
+          },
+          "release": {
+            "title": "Ophæv spærringen",
+            "description": "Kontoen kan slettes igen, når fortrydelsesfristen er udløbet.",
+            "confirm": "Ophæv spærring"
+          },
+          "reason_label": "Begrundelse",
+          "reason_hint": "Mindst {count} tegn.",
+          "no_personal_details": "Skriv ikke navne, e-mailadresser eller andre personoplysninger her: begrundelsen gemmes permanent i revisionsloggen.",
+          "cancel": "Annuller"
+        },
+        "capped": "Kun de første {count} forfaldne konti kontrolleres ad gangen. Behandl dem, og indlæs derefter igen.",
+        "action_failed": "Det kunne ikke gemmes. Prøv igen."
+      }
+    },
+    "erasure": {
+      "hold": {
+        "claimed": "Denne konto er allerede ved at blive slettet og kan derfor ikke spærres.",
+        "not_available": "Denne konto kan ikke spærres."
       }
     }
   }

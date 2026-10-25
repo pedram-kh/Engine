@@ -15,8 +15,79 @@
       },
       "erasures": {
         "title": "Fila de eliminação",
-        "subtitle": "Pedidos de direito ao esquecimento a aguardar revisão (RGPD art. 17.º).",
-        "empty": "Sem pedidos de eliminação."
+        "subtitle": "Contas à espera de serem apagadas e as retenções que as impedem (RGPD art. 17).",
+        "tabs": {
+          "pending": "Pendente",
+          "ready": "Pronto",
+          "blocked": "Bloqueado",
+          "held": "Retido",
+          "in_progress": "A apagar",
+          "erased": "Apagado"
+        },
+        "empty": {
+          "pending": "Nenhuma conta aguarda o fim do período de carência.",
+          "ready": "Nenhuma conta está pronta para ser apagada.",
+          "blocked": "Nenhuma conta está bloqueada.",
+          "held": "Nenhuma conta está retida.",
+          "in_progress": "Nenhum apagamento em curso.",
+          "erased": "Ainda não foi apagado nada."
+        },
+        "columns": {
+          "account": "Conta",
+          "requested": "Pedido em",
+          "due": "Vence em",
+          "state": "Situação",
+          "actions": "Ações"
+        },
+        "state": {
+          "pending": "Em espera. O período de carência termina em {date}.",
+          "ready": "O período de carência terminou e nada o impede.",
+          "blocked": "O período de carência terminou, mas a conta não pode ser apagada: {reasons}.",
+          "held": "Retida desde {date}.",
+          "held_by": "Retida por {admin}.",
+          "in_progress": {
+            "claimed": "O apagamento começou.",
+            "started": "O apagamento está em curso.",
+            "db_done": "O passo da base de dados está concluído. Faltam concluir os ficheiros e o registo de auditoria.",
+            "incomplete": "A última execução parou antes de terminar. É preciso um engenheiro: siga o runbook de apagamento."
+          },
+          "erased": "Apagada em {date}."
+        },
+        "blocker": {
+          "payment": "um pagamento ainda está em curso",
+          "delivered_work": "um trabalho entregue não foi concluído",
+          "vendor": "uma conta de prestador de pagamentos ainda está ligada",
+          "not_erasable": "não tem perfil de criador para apagar"
+        },
+        "actions": {
+          "hold": "Reter",
+          "release": "Libertar retenção",
+          "load_more": "Carregar mais"
+        },
+        "dialog": {
+          "hold": {
+            "title": "Reter a conta",
+            "description": "Enquanto uma conta estiver retida, ninguém a pode apagar. O criador não é informado e ainda pode cancelar um pedido de eliminação: a retenção mantém-se.",
+            "confirm": "Reter"
+          },
+          "release": {
+            "title": "Libertar a retenção",
+            "description": "A conta poderá voltar a ser apagada quando o período de carência terminar.",
+            "confirm": "Libertar retenção"
+          },
+          "reason_label": "Motivo",
+          "reason_hint": "Pelo menos {count} caracteres.",
+          "no_personal_details": "Não escreva aqui nomes, endereços de email ou outros dados pessoais: o motivo fica guardado permanentemente no registo de auditoria.",
+          "cancel": "Cancelar"
+        },
+        "capped": "Só são verificadas de cada vez as primeiras {count} contas vencidas. Trate-as e volte a carregar.",
+        "action_failed": "Não foi possível guardar. Tente novamente."
+      }
+    },
+    "erasure": {
+      "hold": {
+        "claimed": "Esta conta já está a ser apagada, por isso não pode ser retida.",
+        "not_available": "Esta conta não pode ser retida."
       }
     }
   }

@@ -274,7 +274,9 @@
           "close": "Zapri",
           "load_failed": "Prijav ni bilo mogoče naložiti. Poskusite znova."
         }
-      }
+      },
+      "erased": "Izbrisan ustvarjalec",
+      "deletion_requested": "Zahtevan izbris"
     }
   },
   "creator": {

@@ -15,8 +15,79 @@
       },
       "erasures": {
         "title": "Erasure queue",
-        "subtitle": "Right-to-be-forgotten requests awaiting review (GDPR art. 17).",
-        "empty": "Ei erasure requests."
+        "subtitle": "Poistoa odottavat tilit ja niitä pysäyttävät lukitukset (GDPR 17 artikla).",
+        "tabs": {
+          "pending": "Odottaa",
+          "ready": "Valmis",
+          "blocked": "Estetty",
+          "held": "Lukittu",
+          "in_progress": "Poistetaan",
+          "erased": "Poistettu"
+        },
+        "empty": {
+          "pending": "Mikään tili ei odota harkinta-ajan päättymistä.",
+          "ready": "Mikään tili ei ole valmis poistettavaksi.",
+          "blocked": "Mikään tili ei ole estetty.",
+          "held": "Mikään tili ei ole lukittu.",
+          "in_progress": "Mitään poistoa ei ole käynnissä.",
+          "erased": "Mitään ei ole vielä poistettu."
+        },
+        "columns": {
+          "account": "Tili",
+          "requested": "Pyydetty",
+          "due": "Erääntyy",
+          "state": "Tilanne",
+          "actions": "Toiminnot"
+        },
+        "state": {
+          "pending": "Odottaa. Harkinta-aika päättyy {date}.",
+          "ready": "Harkinta-aika on päättynyt eikä mikään estä poistoa.",
+          "blocked": "Harkinta-aika on päättynyt, mutta tiliä ei voi poistaa: {reasons}.",
+          "held": "Lukittu {date} alkaen.",
+          "held_by": "Lukitsija: {admin}.",
+          "in_progress": {
+            "claimed": "Poisto on alkanut.",
+            "started": "Poisto on käynnissä.",
+            "db_done": "Tietokantavaihe on valmis. Tiedostot ja auditointiloki on vielä viimeisteltävä.",
+            "incomplete": "Viimeisin ajo pysähtyi ennen valmistumista. Tarvitaan insinööri: noudata poiston runbookia."
+          },
+          "erased": "Poistettu {date}."
+        },
+        "blocker": {
+          "payment": "maksu on yhä kesken",
+          "delivered_work": "toimitettu työ ei ole valmis",
+          "vendor": "maksupalveluntarjoajan tili on yhä yhdistetty",
+          "not_erasable": "poistettavaa tekijäprofiilia ei ole"
+        },
+        "actions": {
+          "hold": "Lukitse",
+          "release": "Vapauta lukitus",
+          "load_more": "Lataa lisää"
+        },
+        "dialog": {
+          "hold": {
+            "title": "Lukitse tili",
+            "description": "Kun tili on lukittu, kukaan ei voi poistaa sitä. Tekijälle ei kerrota mitään, ja hän voi yhä peruuttaa poistopyynnön: lukitus säilyy.",
+            "confirm": "Lukitse"
+          },
+          "release": {
+            "title": "Vapauta lukitus",
+            "description": "Tili voidaan poistaa uudelleen, kun sen harkinta-aika on päättynyt.",
+            "confirm": "Vapauta lukitus"
+          },
+          "reason_label": "Syy",
+          "reason_hint": "Vähintään {count} merkkiä.",
+          "no_personal_details": "Älä kirjoita tähän nimiä, sähköpostiosoitteita tai muita henkilötietoja: syy säilyy pysyvästi auditointilokissa.",
+          "cancel": "Peruuta"
+        },
+        "capped": "Kerrallaan tarkistetaan vain {count} ensimmäistä erääntynyttä tiliä. Käsittele ne ja lataa sivu uudelleen.",
+        "action_failed": "Tallennus epäonnistui. Yritä uudelleen."
+      }
+    },
+    "erasure": {
+      "hold": {
+        "claimed": "Tiliä poistetaan jo, joten sitä ei voi lukita.",
+        "not_available": "Tiliä ei voi lukita."
       }
     }
   }

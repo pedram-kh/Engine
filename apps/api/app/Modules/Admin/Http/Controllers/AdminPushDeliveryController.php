@@ -217,7 +217,7 @@ final class AdminPushDeliveryController
      * `withTrashed` so a deleted account's history still reads.
      *
      * @param  list<PushDelivery>  $rows
-     * @return array<int, array{id: string, display_name: string|null, email: string|null}>
+     * @return array<int, array{id: string, display_name: string|null, email: string|null, is_erased: bool, deletion_pending: bool}>
      */
     private function creatorsFor(array $rows): array
     {
@@ -226,14 +226,19 @@ final class AdminPushDeliveryController
             return [];
         }
 
-        $emails = User::withTrashed()->whereIn('id', $userIds)->pluck('email', 'id');
+        $users = User::withTrashed()->whereIn('id', $userIds)->get(['id', 'email', 'deletion_requested_at', 'erased_at'])->keyBy('id');
 
         $out = [];
-        foreach (Creator::withTrashed()->whereIn('user_id', $userIds)->get(['id', 'ulid', 'user_id', 'display_name']) as $creator) {
+        foreach (Creator::withTrashed()->whereIn('user_id', $userIds)->get(['id', 'ulid', 'user_id', 'display_name', 'erased_at']) as $creator) {
+            $user = $users[$creator->user_id] ?? null;
+            $erased = $creator->isErased();
             $out[$creator->user_id] = [
                 'id' => $creator->ulid,
                 'display_name' => $creator->display_name,
-                'email' => $emails[$creator->user_id] ?? null,
+                'email' => $user?->email,
+                // AH-104c C2-4: an account that is leaving, admin only (see AdminDeletionFlags).
+                'is_erased' => $erased,
+                'deletion_pending' => ! $erased && $user?->isDeletionPending() === true,
             ];
         }
 
@@ -266,7 +271,7 @@ final class AdminPushDeliveryController
     }
 
     /**
-     * @param  array{id: string, display_name: string|null, email: string|null}|null  $creator
+     * @param  array{id: string, display_name: string|null, email: string|null, is_erased: bool, deletion_pending: bool}|null  $creator
      * @return array<string, mixed>
      */
     private static function serialize(PushDelivery $row, ?array $creator, string $inApp): array

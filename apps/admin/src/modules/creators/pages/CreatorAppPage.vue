@@ -17,6 +17,9 @@ import { useI18n } from 'vue-i18n'
 
 import { ApiError, formatDateTime } from '@catalyst/api-client'
 
+import { creatorEmail, creatorLabel } from '@/core/creators/creatorLabel'
+import DeletionRequestedChip from '@/core/creators/DeletionRequestedChip.vue'
+
 import {
   adminCreatorAppApi,
   type AdminCreatorAppUser,
@@ -133,7 +136,7 @@ function onTableUpdate(opts: { page: number; itemsPerPage: number }): void {
 }
 
 function openSignIns(row: AdminCreatorAppUser): void {
-  dialogCreator.value = { ulid: row.id, name: row.attributes.creator.display_name }
+  dialogCreator.value = { ulid: row.id, name: creatorLabel(row.attributes.creator, t) }
   dialogOpen.value = true
 }
 
@@ -237,9 +240,12 @@ function statusColor(status: CreatorAppStatus): string | undefined {
       @update:options="onTableUpdate"
     >
       <template #item.creator="{ item }">
-        <div>{{ item.attributes.creator.display_name ?? '—' }}</div>
+        <div>
+          {{ creatorLabel(item.attributes.creator, t, '—') }}
+          <DeletionRequestedChip :account="item.attributes.creator" />
+        </div>
         <div class="text-caption text-medium-emphasis">
-          {{ item.attributes.creator.email ?? '' }}
+          {{ creatorEmail(item.attributes.creator) ?? '' }}
         </div>
       </template>
 

@@ -219,6 +219,9 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         // AH-104c — the erasure claim and its release.
         'account.erasure_started',
         'account.erasure_claim_released',
+        // AH-104c C2 — an admin's legal hold and its release.
+        'account.erasure_held',
+        'account.erasure_hold_released',
     ];
 
     $actual = array_map(fn (AuditAction $case): string => $case->value, AuditAction::cases());
@@ -244,6 +247,9 @@ it('reason-mandatory actions match docs/05-SECURITY-COMPLIANCE.md §3.3', functi
         'account.erased',
         // AH-104c — the claim answers "who took this account, and why". Its release is a system act.
         'account.erasure_started',
+        // AH-104c C2 — a hold and its release both answer "why" (the reason is the only record of it).
+        'account.erasure_held',
+        'account.erasure_hold_released',
         'user.suspended',
         'user.unsuspended',
         'assignment.cancelled',

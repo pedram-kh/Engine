@@ -134,7 +134,7 @@ it('refuses, and writes nothing, when a gate fails', function (string $case): vo
         $ulid = 'NOTTHESUBJECT';
         $why = 'typed ulid';
     } elseif ($case === 'stale digest') {
-        DB::table('sessions')->insert(['id' => 'late', 'user_id' => $graph->user->id, 'ip_address' => '203.0.113.9', 'user_agent' => 'x', 'payload' => 'x', 'last_activity' => time()]);
+        DB::table('features')->insert(['name' => 'late-flag', 'scope' => $graph->user->getMorphClass().'|'.$graph->user->id, 'value' => 'true', 'created_at' => now(), 'updated_at' => now()]);
         $why = 'digest';
     } elseif ($case === 'payment held') {
         DB::table('campaign_assignments')->where('creator_id', $graph->creator->id)->update(['status' => 'payment_held']);

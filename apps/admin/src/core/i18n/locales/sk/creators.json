@@ -274,7 +274,9 @@
           "close": "Zavrieť",
           "load_failed": "Prihlásenia sa nepodarilo načítať. Skúste to znova."
         }
-      }
+      },
+      "erased": "Zmazaný tvorca",
+      "deletion_requested": "Požiadané o vymazanie"
     }
   },
   "creator": {

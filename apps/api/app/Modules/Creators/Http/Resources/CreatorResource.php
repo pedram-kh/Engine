@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Creators\Http\Resources;
 
+use App\Modules\Admin\Support\AdminDeletionFlags;
 use App\Modules\Creators\Enums\WizardStep;
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
@@ -245,6 +246,9 @@ final class CreatorResource extends JsonResource
                 // account facts, distinct from the editable display_name.
                 'account_name' => $creator->user?->name,
                 'account_last_name' => $creator->user?->last_name,
+                // AH-104c C2-4: an account that is leaving, for the admin only
+                // (never an agency: see AdminDeletionFlags).
+                ...AdminDeletionFlags::forCreator($creator),
                 'rejection_reason' => $creator->rejection_reason,
                 'rejected_at' => $creator->rejected_at?->toIso8601String(),
                 'last_active_at' => $creator->last_active_at?->toIso8601String(),

@@ -15,8 +15,79 @@
       },
       "erasures": {
         "title": "Cola de borrado",
-        "subtitle": "Solicitudes de derecho al olvido pendientes de revisión (RGPD art. 17).",
-        "empty": "No hay solicitudes de borrado."
+        "subtitle": "Cuentas a la espera de ser eliminadas y las retenciones que lo impiden (RGPD art. 17).",
+        "tabs": {
+          "pending": "Pendiente",
+          "ready": "Listo",
+          "blocked": "Bloqueado",
+          "held": "Retenido",
+          "in_progress": "Eliminando",
+          "erased": "Eliminado"
+        },
+        "empty": {
+          "pending": "Ninguna cuenta espera el fin de su periodo de gracia.",
+          "ready": "Ninguna cuenta está lista para eliminarse.",
+          "blocked": "Ninguna cuenta está bloqueada.",
+          "held": "Ninguna cuenta está retenida.",
+          "in_progress": "No hay ninguna eliminación en curso.",
+          "erased": "Todavía no se ha eliminado nada."
+        },
+        "columns": {
+          "account": "Cuenta",
+          "requested": "Solicitado el",
+          "due": "Vence el",
+          "state": "Situación",
+          "actions": "Acciones"
+        },
+        "state": {
+          "pending": "En espera. El periodo de gracia termina el {date}.",
+          "ready": "El periodo de gracia ha terminado y nada lo impide.",
+          "blocked": "El periodo de gracia ha terminado, pero la cuenta no se puede eliminar: {reasons}.",
+          "held": "Retenida desde el {date}.",
+          "held_by": "Retenida por {admin}.",
+          "in_progress": {
+            "claimed": "La eliminación ha comenzado.",
+            "started": "La eliminación está en curso.",
+            "db_done": "El paso de la base de datos ha terminado. Faltan por terminar los archivos y el registro de auditoría.",
+            "incomplete": "La última ejecución se detuvo antes de terminar. Hace falta un ingeniero: sigue el runbook de eliminación."
+          },
+          "erased": "Eliminada el {date}."
+        },
+        "blocker": {
+          "payment": "un pago sigue en curso",
+          "delivered_work": "un trabajo entregado no está completado",
+          "vendor": "una cuenta de proveedor de pagos sigue conectada",
+          "not_erasable": "no tiene perfil de creador que eliminar"
+        },
+        "actions": {
+          "hold": "Retener",
+          "release": "Liberar retención",
+          "load_more": "Cargar más"
+        },
+        "dialog": {
+          "hold": {
+            "title": "Retener la cuenta",
+            "description": "Mientras una cuenta esté retenida, nadie puede eliminarla. El creador no recibe ningún aviso y aún puede cancelar una solicitud de eliminación: la retención se mantiene.",
+            "confirm": "Retener"
+          },
+          "release": {
+            "title": "Liberar la retención",
+            "description": "La cuenta podrá volver a eliminarse cuando termine su periodo de gracia.",
+            "confirm": "Liberar retención"
+          },
+          "reason_label": "Motivo",
+          "reason_hint": "Al menos {count} caracteres.",
+          "no_personal_details": "No escribas aquí nombres, correos electrónicos ni otros datos personales: el motivo se conserva de forma permanente en el registro de auditoría.",
+          "cancel": "Cancelar"
+        },
+        "capped": "Solo se comprueban a la vez las primeras {count} cuentas vencidas. Gestiónalas y vuelve a cargar.",
+        "action_failed": "No se pudo guardar. Inténtalo de nuevo."
+      }
+    },
+    "erasure": {
+      "hold": {
+        "claimed": "Esta cuenta ya se está eliminando, por lo que no se puede retener.",
+        "not_available": "Esta cuenta no se puede retener."
       }
     }
   }
