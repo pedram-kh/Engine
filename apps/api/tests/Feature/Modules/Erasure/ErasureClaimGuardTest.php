@@ -49,8 +49,11 @@ it('lets only the claimer build a claim', function (): void {
     expect(claimGuardOffenders('/new\s+(\\\\?App\\\\Modules\\\\Erasure\\\\Claim\\\\)?ErasureClaim\s*\(/', ['Modules/Erasure/Claim/ErasureClaimer.php']))->toBe([]);
 });
 
-it('lets only the command and the reapply call the run\'s execute: no other app code references the run at all', function (): void {
+it('lets only the command, the reapply and the queued job call the run: no other app code references the run at all', function (): void {
     $allowed = [
+        'Modules/Erasure/Jobs/RunErasureJob.php',
+        // Read-only: calls `plan()` for the admin's dry-run view and never `execute()` (pinned below).
+        'Modules/Erasure/Erase/ErasePlanner.php',
         'Modules/Erasure/Run/ErasureRun.php',
         'Modules/Erasure/Run/ErasureReapply.php',
         'Modules/Erasure/Console/ErasureRunCommand.php',
@@ -60,6 +63,16 @@ it('lets only the command and the reapply call the run\'s execute: no other app 
 
     // Code, not prose: an import, a class constant or a type-hinted parameter.
     expect(claimGuardOffenders('/Erasure\\Run\\ErasureRun;|ErasureRun::class|\bErasureRun\s+\$/', $allowed))->toBe([]);
+});
+
+it('lets only the command, the reapply and the queued job call execute()', function (): void {
+    $callers = claimGuardOffenders('/->execute\(\s*\$[A-Za-z]+,\s*\$[A-Za-z]+,/', [
+        'Modules/Erasure/Jobs/RunErasureJob.php',
+        'Modules/Erasure/Console/ErasureRunCommand.php',
+        'Modules/Erasure/Run/ErasureReapply.php',
+    ]);
+
+    expect($callers)->toBe([]);
 });
 
 it('lets only the claimer write the claim stamp', function (): void {

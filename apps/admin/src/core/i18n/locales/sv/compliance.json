@@ -46,10 +46,12 @@
           "held": "Spärrat sedan {date}.",
           "held_by": "Spärrat av {admin}.",
           "in_progress": {
-            "claimed": "Raderingen har påbörjats.",
-            "started": "Raderingen pågår.",
-            "db_done": "Databassteget är klart. Filerna och granskningsloggen återstår att slutföra.",
-            "incomplete": "Senaste körningen stoppade innan den var klar. Det krävs en tekniker: följ raderingsrutinen."
+            "db_done": "Databassteget är klart, men det sista steget blev inte klart. Det kräver en ingenjör: följ raderings-runbooken.",
+            "incomplete": "Den senaste körningen stannade innan den blev klar. Granska planen och bekräfta igen.",
+            "waiting": "Väntar på att raderingsprocessen ska ta upp det.",
+            "waiting_stuck": "Har väntat i över en timme: raderingsprocessen kan ligga nere. Kontrollera den (se raderings-runbooken), granska sedan planen och bekräfta igen.",
+            "running": "Raderingen pågår.",
+            "running_stuck": "Raderingen har pågått i över en timme och kan ha stannat. Granska planen och bekräfta igen."
           },
           "erased": "Raderat den {date}."
         },
@@ -62,7 +64,9 @@
         "actions": {
           "hold": "Spärra",
           "release": "Häv spärr",
-          "load_more": "Ladda fler"
+          "load_more": "Ladda fler",
+          "erase": "Radera…",
+          "retry": "Granska och bekräfta igen"
         },
         "dialog": {
           "hold": {
@@ -78,16 +82,62 @@
           "reason_label": "Orsak",
           "reason_hint": "Minst {count} tecken.",
           "no_personal_details": "Skriv inga namn, e-postadresser eller andra personuppgifter här: orsaken sparas permanent i granskningsloggen.",
-          "cancel": "Avbryt"
+          "cancel": "Avbryt",
+          "erase": {
+            "title": "Radera det här kontot",
+            "warning": "Detta raderar kontot permanent: dess personuppgifter, filer och inloggning. Det går inte att ångra. Varje öppet uppdrag avbryts och dess byrå får besked.",
+            "loading": "Läser planen…",
+            "not_ready": "Det här kontot är inte redo att raderas: {reasons}.",
+            "retry_note": "En tidigare radering av det här kontot stannade. Granska planen och bekräfta sedan igen.",
+            "summary": {
+              "rows": "Databasrader som ändras: {rows}, i {tables} tabeller.",
+              "files": "Filer som raderas: {files}.",
+              "assignments": "Öppna uppdrag som avbryts: {count}. Varje uppdrag meddelar sin byrå.",
+              "read": "Rader som lästs för att ta fram planen: {rows}.",
+              "reference": "Planreferens: {digest}"
+            },
+            "ulid_label": "Skriv kontots id för att bekräfta",
+            "ulid_hint": "Id:t är {ulid}.",
+            "mfa_label": "Tvåfaktorskod eller återställningskod",
+            "mfa_hint": "En återställningskod förbrukas när du skickar den.",
+            "confirm": "Radera permanent"
+          }
         },
         "capped": "Bara de första {count} förfallna kontona kontrolleras åt gången. Hantera dem och ladda sedan om.",
-        "action_failed": "Det gick inte att spara. Försök igen."
+        "action_failed": "Det gick inte att spara. Försök igen.",
+        "reason": {
+          "held": "det är spärrat",
+          "not_requested": "det har aldrig begärt radering",
+          "grace_running": "dess betänketid har inte gått ut",
+          "audit_scrub_unavailable": "revisionsloggens steg är inte tillgängligt här",
+          "erased": "det är redan raderat",
+          "not_available": "det kan inte raderas"
+        },
+        "watch": {
+          "completed": "Kontot raderades. Varje avbrutet uppdrag meddelade sin byrå.",
+          "released": "Raderingen startade inte: datan har ändrats sedan planen, eller en kontroll nekar nu. Inget raderades, och skaparen kan fortfarande ångra sig. Granska planen och försök igen."
+        }
       }
     },
     "erasure": {
       "hold": {
         "claimed": "Kontot raderas redan och kan därför inte spärras.",
         "not_available": "Kontot kan inte spärras."
+      },
+      "execute": {
+        "disabled": "Radering från admin är avstängd. En plattformsadministratör slår på den under funktionsflaggor, med en motivering, för ett namngivet konto.",
+        "ulid_mismatch": "Id:t du skrev matchar inte det här kontot.",
+        "not_ready": "Det här kontot är inte redo att raderas.",
+        "in_progress": "En radering av det här kontot pågår redan.",
+        "mfa_required": "Ange en tvåfaktorskod eller en återställningskod.",
+        "mfa_invalid": "Den koden är inte giltig.",
+        "mfa_rate_limited": "För många felaktiga koder. Vänta 15 minuter och försök igen.",
+        "mfa_suspended": "Din tvåfaktorsinloggning är spärrad. Be en annan plattformsadministratör återställa den.",
+        "rate_limited": "För många försök. Vänta en timme och försök igen."
+      },
+      "plan": {
+        "not_available": "Det går inte att ta fram en raderingsplan för det här kontot.",
+        "rate_limited": "För många planförfrågningar. Vänta en minut och försök igen."
       }
     }
   }

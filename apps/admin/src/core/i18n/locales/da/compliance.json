@@ -46,10 +46,12 @@
           "held": "Spærret siden {date}.",
           "held_by": "Spærret af {admin}.",
           "in_progress": {
-            "claimed": "Sletningen er begyndt.",
-            "started": "Sletningen er i gang.",
-            "db_done": "Databasetrinnet er færdigt. Filerne og revisionsloggen mangler stadig at blive afsluttet.",
-            "incomplete": "Seneste kørsel stoppede, før den var færdig. Det kræver en tekniker: følg sletningsrunbooken."
+            "db_done": "Databasetrinnet er færdigt, men det sidste trin blev ikke afsluttet. Det kræver en ingeniør: følg sletnings-runbooken.",
+            "incomplete": "Den seneste kørsel stoppede, før den blev færdig. Gennemgå planen og bekræft igen.",
+            "waiting": "Venter på, at sletningsprocessen henter den.",
+            "waiting_stuck": "Har ventet i over en time: sletningsprocessen er måske nede. Tjek den (se sletnings-runbooken), gennemgå derefter planen og bekræft igen.",
+            "running": "Sletningen er i gang.",
+            "running_stuck": "Sletningen har kørt i over en time og er måske stoppet. Gennemgå planen og bekræft igen."
           },
           "erased": "Slettet den {date}."
         },
@@ -62,7 +64,9 @@
         "actions": {
           "hold": "Spær",
           "release": "Ophæv spærring",
-          "load_more": "Indlæs flere"
+          "load_more": "Indlæs flere",
+          "erase": "Slet…",
+          "retry": "Gennemgå og bekræft igen"
         },
         "dialog": {
           "hold": {
@@ -78,16 +82,62 @@
           "reason_label": "Begrundelse",
           "reason_hint": "Mindst {count} tegn.",
           "no_personal_details": "Skriv ikke navne, e-mailadresser eller andre personoplysninger her: begrundelsen gemmes permanent i revisionsloggen.",
-          "cancel": "Annuller"
+          "cancel": "Annuller",
+          "erase": {
+            "title": "Slet denne konto",
+            "warning": "Dette sletter kontoen permanent: dens personoplysninger, filer og login. Det kan ikke fortrydes. Hver åben opgave annulleres, og bureauet får besked.",
+            "loading": "Læser planen…",
+            "not_ready": "Denne konto er ikke klar til sletning: {reasons}.",
+            "retry_note": "En tidligere sletning af denne konto stoppede. Gennemgå planen, og bekræft igen.",
+            "summary": {
+              "rows": "Databaserækker, der ændres: {rows}, i {tables} tabeller.",
+              "files": "Filer, der slettes: {files}.",
+              "assignments": "Åbne opgaver, der annulleres: {count}. Hver enkelt giver sit bureau besked.",
+              "read": "Rækker læst for at lave planen: {rows}.",
+              "reference": "Plan-reference: {digest}"
+            },
+            "ulid_label": "Skriv konto-id'et for at bekræfte",
+            "ulid_hint": "Id'et er {ulid}.",
+            "mfa_label": "Tofaktorkode eller gendannelseskode",
+            "mfa_hint": "En gendannelseskode bruges op, når du sender den.",
+            "confirm": "Slet permanent"
+          }
         },
         "capped": "Kun de første {count} forfaldne konti kontrolleres ad gangen. Behandl dem, og indlæs derefter igen.",
-        "action_failed": "Det kunne ikke gemmes. Prøv igen."
+        "action_failed": "Det kunne ikke gemmes. Prøv igen.",
+        "reason": {
+          "held": "den er spærret",
+          "not_requested": "den har aldrig bedt om at blive slettet",
+          "grace_running": "dens fortrydelsesfrist er ikke udløbet",
+          "audit_scrub_unavailable": "revisionslogtrinnet er ikke tilgængeligt her",
+          "erased": "den er allerede slettet",
+          "not_available": "den kan ikke slettes"
+        },
+        "watch": {
+          "completed": "Kontoen blev slettet. Hver annulleret opgave gav sit bureau besked.",
+          "released": "Sletningen startede ikke: data er ændret siden planen, eller en kontrol afviser nu. Intet blev slettet, og skaberen kan stadig fortryde. Gennemgå planen, og prøv igen."
+        }
       }
     },
     "erasure": {
       "hold": {
         "claimed": "Denne konto er allerede ved at blive slettet og kan derfor ikke spærres.",
         "not_available": "Denne konto kan ikke spærres."
+      },
+      "execute": {
+        "disabled": "Sletning fra admin er slået fra. En platformadministrator slår den til under funktionsflag, med en begrundelse, for én navngiven konto.",
+        "ulid_mismatch": "Det id, du skrev, passer ikke til denne konto.",
+        "not_ready": "Denne konto er ikke klar til sletning.",
+        "in_progress": "En sletning af denne konto er allerede i gang.",
+        "mfa_required": "Indtast en tofaktorkode eller en gendannelseskode.",
+        "mfa_invalid": "Den kode er ikke gyldig.",
+        "mfa_rate_limited": "For mange forkerte koder. Vent 15 minutter, og prøv igen.",
+        "mfa_suspended": "Dit tofaktorlogin er suspenderet. Bed en anden platformadministrator om at nulstille det.",
+        "rate_limited": "For mange forsøg. Vent en time, og prøv igen."
+      },
+      "plan": {
+        "not_available": "Der kan ikke laves en sletningsplan for denne konto.",
+        "rate_limited": "For mange planforespørgsler. Vent et minut, og prøv igen."
       }
     }
   }

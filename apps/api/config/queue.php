@@ -48,6 +48,22 @@ return [
             'after_commit' => false,
         ],
 
+        // AH-104c C3 (P1): the same `jobs` table as `database`, a connection of its own so the
+        // erasure run gets its own `retry_after`. An erasure can run for most of an hour; on
+        // `database` (300 s) a run that outlasts retry_after is delivered a SECOND time while the
+        // first is still working. 3700 must stay above `RunErasureJob::$timeout` (3600); a spec
+        // pins the pair. Only the `erasure` queue is read by the dedicated worker
+        // (`queue:work database_erasure --queue=erasure`, docs/runbooks/production-queue-worker.md §2a);
+        // the default worker reads `default` and never picks the job up.
+        'database_erasure' => [
+            'driver' => 'database',
+            'connection' => env('DB_QUEUE_CONNECTION'),
+            'table' => env('DB_QUEUE_TABLE', 'jobs'),
+            'queue' => 'erasure',
+            'retry_after' => 3700,
+            'after_commit' => false,
+        ],
+
         'beanstalkd' => [
             'driver' => 'beanstalkd',
             'host' => env('BEANSTALKD_QUEUE_HOST', 'localhost'),

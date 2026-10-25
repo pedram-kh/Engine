@@ -95,15 +95,19 @@ final class ErasureRun
         $plan = $this->planFor($subject);
 
         $gates = [];
-        if (! hash_equals($user->ulid, $typedUlid)) {
+        $ulidTyped = hash_equals($user->ulid, $typedUlid);
+        $digestHolds = hash_equals($plan->digest(), $confirmDigest);
+        if (! $ulidTyped) {
             $gates[] = 'the typed ulid does not match the subject';
         }
-        if (! hash_equals($plan->digest(), $confirmDigest)) {
+        if (! $digestHolds) {
             $gates[] = 'the digest does not match the data as it is now: run the dry-run again and confirm the new digest';
         }
-        $gates = [...$gates, ...$plan->blockers()];
+        $blockers = $plan->blockers();
+        $gates = [...$gates, ...$blockers];
         if ($gates !== []) {
-            throw new ErasureRefused($gates);
+            // Only the digest is wrong: the data moved since the admin looked (not a refusal of the account).
+            throw new ErasureRefused($gates, dataMoved: $ulidTyped && ! $digestHolds && $blockers === []);
         }
 
         $lock = Cache::lock('erasure-run:'.$user->ulid, 7200);

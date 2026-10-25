@@ -207,7 +207,8 @@
             "failed": "Te povezave ni bilo mogoče ustvariti. Poskusite znova.",
             "not_approved_warning": "Ta ustvarjalec še ni odobren in ga ni mogoče povezati z agencijo. Najprej odobrite njegovo prijavo.",
             "error_not_approved": "Ta ustvarjalec še ni odobren. Pred povezavo z agencijo odobrite njegovo prijavo.",
-            "error_blacklisted": "Ta par ustvarjalec–agencija je na črnem seznamu, zato povezave ni mogoče ustvariti."
+            "error_blacklisted": "Ta par ustvarjalec–agencija je na črnem seznamu, zato povezave ni mogoče ustvariti.",
+            "error_unavailable": "Ta ustvarjalec zapušča platformo in ga ni mogoče povezati z agencijo."
           },
           "disconnect": {
             "title": "Prekiniti povezavo {name} z {agency}?",

@@ -6,6 +6,7 @@ use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Erasure\Execution\AuditScrub;
 use App\Modules\Erasure\Models\ErasureLedger;
+use App\Modules\Identity\Http\Middleware\EnsureMfaForAdmins;
 use App\Modules\Identity\Models\User;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -161,7 +162,7 @@ it('warns when stored object versions will not be purged', function (): void {
     expect(Artisan::output())->toContain('purge_object_versions is OFF');
 });
 
-it('is never scheduled and never reachable from a route', function (): void {
+it('is never scheduled; the only route that queues an erasure is the admin Erase click, behind the admin and MFA gates and a throttle', function (): void {
     $scheduled = array_map(fn ($event): string => (string) ($event->command ?? $event->description ?? ''), app(Schedule::class)->events());
     $routes = array_map(fn ($route): string => $route->uri().' '.$route->getActionName(), Route::getRoutes()->getRoutes());
 
@@ -176,6 +177,18 @@ it('is never scheduled and never reachable from a route', function (): void {
     expect(array_values(array_filter($scheduled, fn (string $c): bool => preg_match($mine, $c) === 1 || stripos($c, 'erasure') !== false)))->toBe([])
         ->and(array_values(array_filter($routes, fn (string $r): bool => preg_match($mine, $r) === 1)))->toBe([])
         ->and(preg_match($mine, $files))->toBe(0);
+
+    // AH-104c C3: exactly one route starts an erasure, and it is the admin's POST.
+    $erase = array_values(array_filter(
+        Route::getRoutes()->getRoutes(),
+        fn ($route): bool => str_ends_with($route->getActionName(), 'AdminErasureQueueController@erase'),
+    ));
+    expect($erase)->toHaveCount(1)
+        ->and($erase[0]->methods())->toBe(['POST'])
+        ->and($erase[0]->uri())->toBe('api/v1/admin/compliance/erasure-queue/{user}/erase')
+        ->and($erase[0]->gatherMiddleware())->toContain('auth:web_admin')
+        ->and($erase[0]->gatherMiddleware())->toContain(EnsureMfaForAdmins::class)
+        ->and($erase[0]->gatherMiddleware())->toContain('throttle:admin-erasure-erase');
 });
 
 it('is reached only from inside the Erasure module: no other app code imports the run, the reapply, the engine, the steps or the ledger mirror', function (): void {

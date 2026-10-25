@@ -46,10 +46,12 @@
           "held": "In sospeso dal {date}.",
           "held_by": "Sospeso da {admin}.",
           "in_progress": {
-            "claimed": "La cancellazione è iniziata.",
-            "started": "La cancellazione è in corso.",
-            "db_done": "Il passaggio sul database è completato. Restano da concludere i file e il registro di audit.",
-            "incomplete": "L'ultima esecuzione si è fermata prima della fine. Serve un tecnico: segui il runbook di cancellazione."
+            "db_done": "Il passaggio sul database è completato, ma l'ultimo passaggio non è terminato. Serve un ingegnere: segui il runbook di cancellazione.",
+            "incomplete": "L'ultima esecuzione si è fermata prima di finire. Esamina il piano e conferma di nuovo.",
+            "waiting": "In attesa che il processo di cancellazione lo prenda in carico.",
+            "waiting_stuck": "In attesa da oltre un'ora: il processo di cancellazione potrebbe essere fermo. Controllalo (vedi il runbook di cancellazione), poi esamina il piano e conferma di nuovo.",
+            "running": "La cancellazione è in corso.",
+            "running_stuck": "La cancellazione è in corso da oltre un'ora e potrebbe essersi fermata. Esamina il piano e conferma di nuovo."
           },
           "erased": "Cancellato il {date}."
         },
@@ -62,7 +64,9 @@
         "actions": {
           "hold": "Sospendi",
           "release": "Rimuovi sospensione",
-          "load_more": "Carica altri"
+          "load_more": "Carica altri",
+          "erase": "Cancella…",
+          "retry": "Esamina e conferma di nuovo"
         },
         "dialog": {
           "hold": {
@@ -78,16 +82,62 @@
           "reason_label": "Motivo",
           "reason_hint": "Almeno {count} caratteri.",
           "no_personal_details": "Non scrivere qui nomi, indirizzi e-mail o altri dati personali: il motivo resta per sempre nel registro di audit.",
-          "cancel": "Annulla"
+          "cancel": "Annulla",
+          "erase": {
+            "title": "Cancella questo account",
+            "warning": "Questo cancella l'account in modo definitivo: i suoi dati personali, i suoi file e il suo accesso. Non si può annullare. Ogni incarico aperto viene annullato e la sua agenzia viene avvisata.",
+            "loading": "Lettura del piano…",
+            "not_ready": "Questo account non è pronto per essere cancellato: {reasons}.",
+            "retry_note": "Una precedente cancellazione di questo account si è fermata. Esamina il piano, poi conferma di nuovo.",
+            "summary": {
+              "rows": "Righe del database da modificare: {rows}, in {tables} tabelle.",
+              "files": "File da eliminare: {files}.",
+              "assignments": "Incarichi aperti da annullare: {count}. Ciascuno avvisa la propria agenzia.",
+              "read": "Righe lette per ricavare il piano: {rows}.",
+              "reference": "Riferimento del piano: {digest}"
+            },
+            "ulid_label": "Digita l'id dell'account per confermare",
+            "ulid_hint": "L'id è {ulid}.",
+            "mfa_label": "Codice a due fattori o codice di recupero",
+            "mfa_hint": "Un codice di recupero si consuma quando lo invii.",
+            "confirm": "Cancella definitivamente"
+          }
         },
         "capped": "Vengono verificati solo i primi {count} account in scadenza alla volta. Gestiscili, poi ricarica.",
-        "action_failed": "Impossibile salvare. Riprova."
+        "action_failed": "Impossibile salvare. Riprova.",
+        "reason": {
+          "held": "è sospeso",
+          "not_requested": "non ha mai chiesto di essere cancellato",
+          "grace_running": "il suo periodo di grazia non è terminato",
+          "audit_scrub_unavailable": "il passaggio del registro di audit non è disponibile qui",
+          "erased": "è già cancellato",
+          "not_available": "non può essere cancellato"
+        },
+        "watch": {
+          "completed": "L'account è stato cancellato. Ogni incarico annullato ha avvisato la propria agenzia.",
+          "released": "La cancellazione non è partita: i dati sono cambiati dopo il piano, oppure un controllo ora la rifiuta. Non è stato cancellato nulla e il creator può ancora annullare. Esamina il piano e riprova."
+        }
       }
     },
     "erasure": {
       "hold": {
         "claimed": "Questo account è già in fase di cancellazione e non può essere sospeso.",
         "not_available": "Questo account non può essere sospeso."
+      },
+      "execute": {
+        "disabled": "La cancellazione dall'area admin è disattivata. Un amministratore della piattaforma la attiva nei flag delle funzionalità, con un motivo, per un solo account indicato.",
+        "ulid_mismatch": "L'id che hai digitato non corrisponde a questo account.",
+        "not_ready": "Questo account non è pronto per essere cancellato.",
+        "in_progress": "Una cancellazione di questo account è già in corso.",
+        "mfa_required": "Inserisci un codice a due fattori o un codice di recupero.",
+        "mfa_invalid": "Quel codice non è valido.",
+        "mfa_rate_limited": "Troppi codici errati. Attendi 15 minuti e riprova.",
+        "mfa_suspended": "Il tuo accesso a due fattori è sospeso. Chiedi a un altro amministratore della piattaforma di reimpostarlo.",
+        "rate_limited": "Troppi tentativi. Attendi un'ora e riprova."
+      },
+      "plan": {
+        "not_available": "Per questo account non si può preparare un piano di cancellazione.",
+        "rate_limited": "Troppe richieste di piano. Attendi un minuto e riprova."
       }
     }
   }

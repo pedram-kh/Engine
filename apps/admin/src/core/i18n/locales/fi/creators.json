@@ -207,7 +207,8 @@
             "failed": "Tätä yhteyttä ei voitu luoda. Yritä uudelleen.",
             "not_approved_warning": "Tätä sisällöntekijää ei ole vielä hyväksytty, eikä häntä voi yhdistää toimistoon. Hyväksy hakemus ensin.",
             "error_not_approved": "Tätä sisällöntekijää ei ole vielä hyväksytty. Hyväksy hakemus ennen kuin yhdistät hänet toimistoon.",
-            "error_blacklisted": "Tämä tekijä–toimisto-pari on estolistalla, joten yhteyttä ei voi luoda."
+            "error_blacklisted": "Tämä tekijä–toimisto-pari on estolistalla, joten yhteyttä ei voi luoda.",
+            "error_unavailable": "Tämä tekijä on poistumassa alustalta, eikä häntä voi yhdistää toimistoon."
           },
           "disconnect": {
             "title": "Katkaistaanko {name} toimistosta {agency}?",

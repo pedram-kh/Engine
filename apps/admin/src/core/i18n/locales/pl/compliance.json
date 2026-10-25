@@ -46,10 +46,12 @@
           "held": "Wstrzymane od {date}.",
           "held_by": "Wstrzymał(a): {admin}.",
           "in_progress": {
-            "claimed": "Usuwanie się rozpoczęło.",
-            "started": "Usuwanie trwa.",
-            "db_done": "Etap bazy danych jest zakończony. Pliki i dziennik audytu nadal wymagają dokończenia.",
-            "incomplete": "Ostatnie uruchomienie zatrzymało się przed końcem. Potrzebny jest inżynier: postępuj zgodnie z runbookiem usuwania."
+            "db_done": "Krok bazy danych jest gotowy, ale ostatni krok się nie zakończył. Potrzebny jest inżynier: postępuj zgodnie z runbookiem usuwania.",
+            "incomplete": "Ostatnie uruchomienie zatrzymało się przed zakończeniem. Przejrzyj plan i potwierdź ponownie.",
+            "waiting": "Czeka, aż proces usuwania go podejmie.",
+            "waiting_stuck": "Czeka od ponad godziny: proces usuwania może nie działać. Sprawdź go (zobacz runbook usuwania), potem przejrzyj plan i potwierdź ponownie.",
+            "running": "Usuwanie trwa.",
+            "running_stuck": "Usuwanie trwa od ponad godziny i mogło się zatrzymać. Przejrzyj plan i potwierdź ponownie."
           },
           "erased": "Usunięto {date}."
         },
@@ -62,7 +64,9 @@
         "actions": {
           "hold": "Wstrzymaj",
           "release": "Zwolnij wstrzymanie",
-          "load_more": "Wczytaj więcej"
+          "load_more": "Wczytaj więcej",
+          "erase": "Usuń…",
+          "retry": "Przejrzyj i potwierdź ponownie"
         },
         "dialog": {
           "hold": {
@@ -78,16 +82,62 @@
           "reason_label": "Powód",
           "reason_hint": "Co najmniej {count} znaków.",
           "no_personal_details": "Nie wpisuj tu imion, adresów e-mail ani innych danych osobowych: powód jest trwale przechowywany w dzienniku audytu.",
-          "cancel": "Anuluj"
+          "cancel": "Anuluj",
+          "erase": {
+            "title": "Usuń to konto",
+            "warning": "To trwale usuwa konto: jego dane osobowe, pliki i logowanie. Nie można tego cofnąć. Każde otwarte zlecenie zostanie anulowane, a jego agencja otrzyma powiadomienie.",
+            "loading": "Wczytywanie planu…",
+            "not_ready": "To konto nie jest gotowe do usunięcia: {reasons}.",
+            "retry_note": "Wcześniejsze usuwanie tego konta zatrzymało się. Przejrzyj plan, a potem potwierdź ponownie.",
+            "summary": {
+              "rows": "Wiersze bazy danych do zmiany: {rows}, w {tables} tabelach.",
+              "files": "Pliki do usunięcia: {files}.",
+              "assignments": "Otwarte zlecenia do anulowania: {count}. Każde powiadamia swoją agencję.",
+              "read": "Wiersze odczytane do ustalenia planu: {rows}.",
+              "reference": "Odniesienie planu: {digest}"
+            },
+            "ulid_label": "Aby potwierdzić, wpisz identyfikator konta",
+            "ulid_hint": "Identyfikator to {ulid}.",
+            "mfa_label": "Kod dwuskładnikowy lub kod odzyskiwania",
+            "mfa_hint": "Kod odzyskiwania zostaje zużyty po wysłaniu.",
+            "confirm": "Usuń trwale"
+          }
         },
         "capped": "Naraz sprawdzanych jest tylko pierwszych {count} kont z upłyniętym terminem. Obsłuż je i wczytaj ponownie.",
-        "action_failed": "Nie udało się zapisać. Spróbuj ponownie."
+        "action_failed": "Nie udało się zapisać. Spróbuj ponownie.",
+        "reason": {
+          "held": "jest wstrzymane",
+          "not_requested": "nigdy nie prosiło o usunięcie",
+          "grace_running": "jego okres karencji jeszcze nie minął",
+          "audit_scrub_unavailable": "krok dziennika audytu nie jest tu dostępny",
+          "erased": "jest już usunięte",
+          "not_available": "nie można go usunąć"
+        },
+        "watch": {
+          "completed": "Konto zostało usunięte. Każde anulowane zlecenie powiadomiło swoją agencję.",
+          "released": "Usuwanie nie ruszyło: dane zmieniły się od czasu planu albo jakaś kontrola teraz odmawia. Nic nie zostało usunięte, a twórca nadal może anulować. Przejrzyj plan i spróbuj ponownie."
+        }
       }
     },
     "erasure": {
       "hold": {
         "claimed": "To konto jest już usuwane, więc nie można go wstrzymać.",
         "not_available": "Tego konta nie można wstrzymać."
+      },
+      "execute": {
+        "disabled": "Usuwanie z panelu admina jest wyłączone. Administrator platformy włącza je we flagach funkcji, z podaniem powodu, dla jednego wskazanego konta.",
+        "ulid_mismatch": "Wpisany identyfikator nie pasuje do tego konta.",
+        "not_ready": "To konto nie jest gotowe do usunięcia.",
+        "in_progress": "Usuwanie tego konta już trwa.",
+        "mfa_required": "Wpisz kod dwuskładnikowy lub kod odzyskiwania.",
+        "mfa_invalid": "Ten kod jest nieprawidłowy.",
+        "mfa_rate_limited": "Zbyt wiele błędnych kodów. Poczekaj 15 minut i spróbuj ponownie.",
+        "mfa_suspended": "Twoje logowanie dwuskładnikowe jest zawieszone. Poproś innego administratora platformy o jego zresetowanie.",
+        "rate_limited": "Zbyt wiele prób. Poczekaj godzinę i spróbuj ponownie."
+      },
+      "plan": {
+        "not_available": "Dla tego konta nie można przygotować planu usunięcia.",
+        "rate_limited": "Zbyt wiele żądań planu. Poczekaj minutę i spróbuj ponownie."
       }
     }
   }

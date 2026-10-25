@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Creators\Enums;
 
+use App\Modules\Creators\Exceptions\CreatorUnavailableException;
 use App\Modules\Creators\Services\CreatorAgencyDirectConnectService;
 
 /**
@@ -48,6 +49,15 @@ enum DirectConnectOutcome: string
      */
     case RelationTerminal = 'relation_terminal';
 
+    /**
+     * AH-104c C2-4a — the creator is leaving: erased, a deletion request stands, or an erasure is
+     * claimed (`Creator::isUnavailableToAgencies()`). No connection, by hand or by a rule, is made
+     * to a person who is about to disappear; the agency would be told of a creator who is gone.
+     * Asked FIRST, before approval: an agency-neutral answer, the same code every agency-side door
+     * gives (`creator.unavailable`).
+     */
+    case CreatorUnavailable = 'creator_unavailable';
+
     public function isConnected(): bool
     {
         return $this === self::Connected;
@@ -84,6 +94,7 @@ enum DirectConnectOutcome: string
             self::Blacklisted => 'connection.direct_blacklisted',
             self::AgencySuspended => 'connection.agency_suspended',
             self::RelationTerminal => 'connection.relation_terminal',
+            self::CreatorUnavailable => CreatorUnavailableException::CODE,
         };
     }
 
@@ -100,6 +111,7 @@ enum DirectConnectOutcome: string
             self::Blacklisted => 'This creator is hard-blacklisted for the selected agency.',
             self::AgencySuspended => 'This agency is suspended and cannot receive connections.',
             self::RelationTerminal => 'This relationship was deliberately ended or declined and is not re-created automatically.',
+            self::CreatorUnavailable => 'This creator is leaving the platform and cannot be connected.',
         };
     }
 

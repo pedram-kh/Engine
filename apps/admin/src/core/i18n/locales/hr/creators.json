@@ -207,7 +207,8 @@
             "failed": "Nismo mogli stvoriti ovu vezu. Pokušajte ponovno.",
             "not_approved_warning": "Ovaj kreator još nije odobren i ne može se povezati s agencijom. Najprije odobrite njegovu prijavu.",
             "error_not_approved": "Ovaj kreator još nije odobren. Odobrite njegovu prijavu prije povezivanja s agencijom.",
-            "error_blacklisted": "Ovaj par kreator–agencija nalazi se na crnoj listi, pa se veza ne može stvoriti."
+            "error_blacklisted": "Ovaj par kreator–agencija nalazi se na crnoj listi, pa se veza ne može stvoriti.",
+            "error_unavailable": "Ovaj kreator napušta platformu i ne može se povezati s agencijom."
           },
           "disconnect": {
             "title": "Prekinuti vezu {name} s {agency}?",

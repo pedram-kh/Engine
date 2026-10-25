@@ -46,10 +46,12 @@
           "held": "On hold since {date}.",
           "held_by": "Held by {admin}.",
           "in_progress": {
-            "claimed": "Erasing has begun.",
-            "started": "Erasing is under way.",
-            "db_done": "The database step is done. The files and the audit log are still to be finished.",
-            "incomplete": "The last run stopped before it finished. This needs an engineer: follow the erasure runbook."
+            "db_done": "The database step is done, but the last step did not finish. This needs an engineer: follow the erasure runbook.",
+            "incomplete": "The last run stopped before it finished. Review the plan and confirm again.",
+            "waiting": "Waiting for the erasure worker to pick it up.",
+            "waiting_stuck": "Waiting for over an hour: the erasure worker may be down. Check it (see the erasure runbook), then review the plan and confirm again.",
+            "running": "Erasing is under way.",
+            "running_stuck": "Erasing has been running for over an hour and may have stopped. Review the plan and confirm again."
           },
           "erased": "Erased on {date}."
         },
@@ -62,7 +64,9 @@
         "actions": {
           "hold": "Hold",
           "release": "Release hold",
-          "load_more": "Load more"
+          "load_more": "Load more",
+          "erase": "Erase…",
+          "retry": "Review and confirm again"
         },
         "dialog": {
           "hold": {
@@ -78,16 +82,62 @@
           "reason_label": "Reason",
           "reason_hint": "At least {count} characters.",
           "no_personal_details": "Do not write names, email addresses or other personal details here: the reason is kept in the audit log permanently.",
-          "cancel": "Cancel"
+          "cancel": "Cancel",
+          "erase": {
+            "title": "Erase this account",
+            "warning": "This permanently erases the account: its personal data, its files and its sign-in. It cannot be undone. Each open assignment is cancelled, and its agency is told.",
+            "loading": "Reading the plan…",
+            "not_ready": "This account is not ready to be erased: {reasons}.",
+            "retry_note": "An earlier erasure of this account stopped. Review the plan, then confirm again.",
+            "summary": {
+              "rows": "Database rows to change: {rows}, in {tables} tables.",
+              "files": "Files to delete: {files}.",
+              "assignments": "Open assignments to cancel: {count}. Each one tells its agency.",
+              "read": "Rows read to work this out: {rows}.",
+              "reference": "Plan reference: {digest}"
+            },
+            "ulid_label": "Type the account id to confirm",
+            "ulid_hint": "The id is {ulid}.",
+            "mfa_label": "Two-factor code or recovery code",
+            "mfa_hint": "A recovery code is used up when you submit it.",
+            "confirm": "Erase permanently"
+          }
         },
         "capped": "Only the first {count} accounts that are due are checked at a time. Handle these, then reload.",
-        "action_failed": "This could not be saved. Please try again."
+        "action_failed": "This could not be saved. Please try again.",
+        "reason": {
+          "held": "it is on hold",
+          "not_requested": "it never asked to be deleted",
+          "grace_running": "its grace period has not ended",
+          "audit_scrub_unavailable": "the audit-log step is not available here",
+          "erased": "it is already erased",
+          "not_available": "it cannot be erased"
+        },
+        "watch": {
+          "completed": "The account was erased. Each cancelled assignment told its agency.",
+          "released": "The erasure did not start: the data changed since the plan, or a check now refuses. Nothing was erased, and the creator can still cancel. Review the plan and try again."
+        }
       }
     },
     "erasure": {
       "hold": {
         "claimed": "This account is already being erased, so it cannot be held.",
         "not_available": "This account cannot be held."
+      },
+      "execute": {
+        "disabled": "Erasing from the admin is switched off. A platform admin turns it on in Feature flags, with a reason, for one named account.",
+        "ulid_mismatch": "The id you typed does not match this account.",
+        "not_ready": "This account is not ready to be erased.",
+        "in_progress": "An erasure of this account is already in progress.",
+        "mfa_required": "Enter a two-factor code or a recovery code.",
+        "mfa_invalid": "That code is not valid.",
+        "mfa_rate_limited": "Too many wrong codes. Wait 15 minutes, then try again.",
+        "mfa_suspended": "Your two-factor sign-in is suspended. Ask another platform admin to reset it.",
+        "rate_limited": "Too many attempts. Wait an hour, then try again."
+      },
+      "plan": {
+        "not_available": "This account cannot be planned for erasure.",
+        "rate_limited": "Too many plan requests. Wait a minute, then try again."
       }
     }
   }

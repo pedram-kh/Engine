@@ -46,10 +46,12 @@
           "held": "Coinnithe ó {date}.",
           "held_by": "Choinnigh {admin} é.",
           "in_progress": {
-            "claimed": "Tá an scriosadh tosaithe.",
-            "started": "Tá an scriosadh ar siúl.",
-            "db_done": "Tá céim an bhunachair sonraí críochnaithe. Tá na comhaid agus an logchomhad iniúchta le críochnú fós.",
-            "incomplete": "Stop an rith deireanach roimh dheireadh. Tá innealtóir ag teastáil: lean runbook an scriosta."
+            "db_done": "Tá céim an bhunachair sonraí déanta, ach níor chríochnaigh an chéim dheireanach. Tá innealtóir ag teastáil: lean runbook an scriosta.",
+            "incomplete": "Stop an rith deireanach sula raibh sé críochnaithe. Athbhreithnigh an plean agus deimhnigh arís.",
+            "waiting": "Ag fanacht go nglacfaidh próiseas an scriosta leis.",
+            "waiting_stuck": "Ag fanacht le breis agus uair an chloig: seans go bhfuil próiseas an scriosta as feidhm. Seiceáil é (féach runbook an scriosta), ansin athbhreithnigh an plean agus deimhnigh arís.",
+            "running": "Tá an scriosadh ar siúl.",
+            "running_stuck": "Tá an scriosadh ar siúl le breis agus uair an chloig agus b'fhéidir gur stop sé. Athbhreithnigh an plean agus deimhnigh arís."
           },
           "erased": "Scriosta ar {date}."
         },
@@ -62,7 +64,9 @@
         "actions": {
           "hold": "Coinnigh",
           "release": "Scaoil an choinneáil",
-          "load_more": "Luchtaigh tuilleadh"
+          "load_more": "Luchtaigh tuilleadh",
+          "erase": "Scrios…",
+          "retry": "Athbhreithnigh agus deimhnigh arís"
         },
         "dialog": {
           "hold": {
@@ -78,16 +82,62 @@
           "reason_label": "Cúis",
           "reason_hint": "{count} charachtar ar a laghad.",
           "no_personal_details": "Ná scríobh ainmneacha, seoltaí ríomhphoist ná sonraí pearsanta eile anseo: coinnítear an chúis go buan sa logchomhad iniúchta.",
-          "cancel": "Cealaigh"
+          "cancel": "Cealaigh",
+          "erase": {
+            "title": "Scrios an cuntas seo",
+            "warning": "Scriosann sé seo an cuntas go buan: a shonraí pearsanta, a chomhaid agus a logáil isteach. Ní féidir é a chealú. Cealaítear gach sannadh oscailte, agus cuirtear a ghníomhaireacht ar an eolas.",
+            "loading": "Ag léamh an phlean…",
+            "not_ready": "Níl an cuntas seo réidh le scriosadh: {reasons}.",
+            "retry_note": "Stop scriosadh roimhe seo den chuntas seo. Athbhreithnigh an plean, ansin deimhnigh arís.",
+            "summary": {
+              "rows": "Sraitheanna bunachair sonraí le hathrú: {rows}, i {tables} tábla.",
+              "files": "Comhaid le scriosadh: {files}.",
+              "assignments": "Sannadh oscailte le cealú: {count}. Cuireann gach ceann acu a ghníomhaireacht ar an eolas.",
+              "read": "Sraitheanna léite chun an plean a oibriú amach: {rows}.",
+              "reference": "Tagairt an phlean: {digest}"
+            },
+            "ulid_label": "Clóscríobh id an chuntais chun deimhniú",
+            "ulid_hint": "Is é an t-id ná {ulid}.",
+            "mfa_label": "Cód dhá fhachtóir nó cód athshlánaithe",
+            "mfa_hint": "Úsáidtear cód athshlánaithe suas nuair a chuirtear isteach é.",
+            "confirm": "Scrios go buan"
+          }
         },
         "capped": "Ní dhéantar ach an chéad {count} chuntas dlite a sheiceáil in aghaidh an ama. Láimhseáil iad agus athluchtaigh.",
-        "action_failed": "Níorbh fhéidir é a shábháil. Bain triail eile as."
+        "action_failed": "Níorbh fhéidir é a shábháil. Bain triail eile as.",
+        "reason": {
+          "held": "tá sé coinnithe",
+          "not_requested": "níor iarr sé scriosadh riamh",
+          "grace_running": "níor tháinig deireadh lena thréimhse fáilte",
+          "audit_scrub_unavailable": "níl céim an loga iniúchta ar fáil anseo",
+          "erased": "tá sé scriosta cheana",
+          "not_available": "ní féidir é a scriosadh"
+        },
+        "watch": {
+          "completed": "Scriosadh an cuntas. Chuir gach sannadh a cealaíodh a ghníomhaireacht ar an eolas.",
+          "released": "Níor tosaíodh an scriosadh: d'athraigh na sonraí ó rinneadh an plean, nó diúltaíonn seiceáil anois. Níor scriosadh aon rud, agus is féidir leis an chruthaitheoir cealú fós. Athbhreithnigh an plean agus bain triail eile as."
+        }
       }
     },
     "erasure": {
       "hold": {
         "claimed": "Tá an cuntas seo á scriosadh cheana, mar sin ní féidir é a choinneáil.",
         "not_available": "Ní féidir an cuntas seo a choinneáil."
+      },
+      "execute": {
+        "disabled": "Tá scriosadh ón riarachán múchta. Casann riarthóir ardáin air é i bhflaganna gnéithe, le cúis, do chuntas amháin ainmnithe.",
+        "ulid_mismatch": "Ní hionann an t-id a chlóscríobh tú agus an cuntas seo.",
+        "not_ready": "Níl an cuntas seo réidh le scriosadh.",
+        "in_progress": "Tá scriosadh den chuntas seo ar siúl cheana.",
+        "mfa_required": "Cuir isteach cód dhá fhachtóir nó cód athshlánaithe.",
+        "mfa_invalid": "Níl an cód sin bailí.",
+        "mfa_rate_limited": "An iomarca códanna mícheart. Fan 15 nóiméad agus bain triail eile as.",
+        "mfa_suspended": "Tá do logáil isteach dhá fhachtóir ar fionraí. Iarr ar riarthóir ardáin eile é a athshocrú.",
+        "rate_limited": "An iomarca iarrachtaí. Fan uair an chloig agus bain triail eile as."
+      },
+      "plan": {
+        "not_available": "Ní féidir plean scriosta a dhéanamh don chuntas seo.",
+        "rate_limited": "An iomarca iarrataí plean. Fan nóiméad agus bain triail eile as."
       }
     }
   }

@@ -368,3 +368,27 @@ it('distinguishes a job-level refusal from a connect-level one', function (): vo
             && $context['connect_outcome'] === null)
         ->once();
 });
+
+it('skips a creator who is leaving: a request standing, a claim, or erased — no relation, no mail, one log line', function (string $leaving): void {
+    Mail::fake();
+    $log = Log::spy();
+    $agency = Agency::factory()->createOne();
+    $rule = AdminAutomationRule::factory()->connectTo($agency)->createOne();
+    $creator = autoCreator();
+    User::query()->whereKey($creator->user_id)->update(match ($leaving) {
+        'request pending' => ['deletion_requested_at' => now(), 'deletion_scheduled_for' => now()->addDays(14)],
+        'claimed' => ['erasure_started_at' => now()],
+        'erased' => ['erased_at' => now()],
+        default => throw new InvalidArgumentException($leaving),
+    });
+    if ($leaving === 'erased') {
+        Creator::query()->whereKey($creator->id)->update(['erased_at' => now()]);
+    }
+
+    autoRun($creator->refresh(), $rule);
+
+    expect(autoRelation($agency, $creator))->toBeNull()
+        ->and($rule->refresh()->fire_count)->toBe(0);
+    Mail::assertNothingQueued();
+    autoExpectLogged($log, 'skipped:creator_unavailable', $rule);
+})->with(['request pending', 'claimed', 'erased']);

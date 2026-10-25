@@ -46,10 +46,12 @@
           "held": "En suspens depuis le {date}.",
           "held_by": "Suspendu par {admin}.",
           "in_progress": {
-            "claimed": "L'effacement a commencé.",
-            "started": "L'effacement est en cours.",
-            "db_done": "L'étape de la base de données est terminée. Il reste à terminer les fichiers et le journal d'audit.",
-            "incomplete": "La dernière exécution s'est arrêtée avant la fin. Il faut un ingénieur : suivez le runbook d'effacement."
+            "db_done": "L'étape de la base de données est terminée, mais la dernière étape n'a pas abouti. Il faut un ingénieur : suivez le runbook d'effacement.",
+            "incomplete": "La dernière exécution s'est arrêtée avant la fin. Examinez le plan et confirmez à nouveau.",
+            "waiting": "En attente de prise en charge par le processus d'effacement.",
+            "waiting_stuck": "En attente depuis plus d'une heure : le processus d'effacement est peut-être à l'arrêt. Vérifiez-le (voir le runbook d'effacement), puis examinez le plan et confirmez à nouveau.",
+            "running": "L'effacement est en cours.",
+            "running_stuck": "L'effacement dure depuis plus d'une heure et s'est peut-être arrêté. Examinez le plan et confirmez à nouveau."
           },
           "erased": "Effacé le {date}."
         },
@@ -62,7 +64,9 @@
         "actions": {
           "hold": "Suspendre",
           "release": "Lever la suspension",
-          "load_more": "Charger plus"
+          "load_more": "Charger plus",
+          "erase": "Effacer…",
+          "retry": "Examiner et confirmer à nouveau"
         },
         "dialog": {
           "hold": {
@@ -78,16 +82,62 @@
           "reason_label": "Motif",
           "reason_hint": "Au moins {count} caractères.",
           "no_personal_details": "N'écrivez ici ni noms, ni adresses e-mail, ni autres données personnelles : le motif est conservé définitivement dans le journal d'audit.",
-          "cancel": "Annuler"
+          "cancel": "Annuler",
+          "erase": {
+            "title": "Effacer ce compte",
+            "warning": "Cela efface définitivement le compte : ses données personnelles, ses fichiers et sa connexion. C'est irréversible. Chaque mission ouverte est annulée et son agence en est informée.",
+            "loading": "Lecture du plan…",
+            "not_ready": "Ce compte n'est pas prêt à être effacé : {reasons}.",
+            "retry_note": "Un effacement précédent de ce compte s'est arrêté. Examinez le plan, puis confirmez à nouveau.",
+            "summary": {
+              "rows": "Lignes de la base de données à modifier : {rows}, dans {tables} tables.",
+              "files": "Fichiers à effacer : {files}.",
+              "assignments": "Missions ouvertes à annuler : {count}. Chacune en informe son agence.",
+              "read": "Lignes lues pour établir le plan : {rows}.",
+              "reference": "Référence du plan : {digest}"
+            },
+            "ulid_label": "Saisissez l'identifiant du compte pour confirmer",
+            "ulid_hint": "L'identifiant est {ulid}.",
+            "mfa_label": "Code à deux facteurs ou code de récupération",
+            "mfa_hint": "Un code de récupération est consommé dès que vous l'envoyez.",
+            "confirm": "Effacer définitivement"
+          }
         },
         "capped": "Seuls les {count} premiers comptes échus sont vérifiés à la fois. Traitez-les, puis rechargez.",
-        "action_failed": "L'enregistrement a échoué. Veuillez réessayer."
+        "action_failed": "L'enregistrement a échoué. Veuillez réessayer.",
+        "reason": {
+          "held": "il est suspendu",
+          "not_requested": "il n'a jamais demandé à être effacé",
+          "grace_running": "son délai de grâce n'est pas terminé",
+          "audit_scrub_unavailable": "l'étape du journal d'audit n'est pas disponible ici",
+          "erased": "il est déjà effacé",
+          "not_available": "il ne peut pas être effacé"
+        },
+        "watch": {
+          "completed": "Le compte a été effacé. Chaque mission annulée en a informé son agence.",
+          "released": "L'effacement n'a pas démarré : les données ont changé depuis le plan, ou une vérification refuse désormais. Rien n'a été effacé, et le créateur peut encore annuler. Examinez le plan et réessayez."
+        }
       }
     },
     "erasure": {
       "hold": {
         "claimed": "Ce compte est déjà en cours d'effacement : il ne peut pas être suspendu.",
         "not_available": "Ce compte ne peut pas être suspendu."
+      },
+      "execute": {
+        "disabled": "L'effacement depuis l'administration est désactivé. Un administrateur de la plateforme l'active dans les drapeaux de fonctionnalités, avec un motif, pour un seul compte nommé.",
+        "ulid_mismatch": "L'identifiant saisi ne correspond pas à ce compte.",
+        "not_ready": "Ce compte n'est pas prêt à être effacé.",
+        "in_progress": "Un effacement de ce compte est déjà en cours.",
+        "mfa_required": "Saisissez un code à deux facteurs ou un code de récupération.",
+        "mfa_invalid": "Ce code n'est pas valide.",
+        "mfa_rate_limited": "Trop de codes erronés. Attendez 15 minutes, puis réessayez.",
+        "mfa_suspended": "Votre connexion à deux facteurs est suspendue. Demandez à un autre administrateur de la plateforme de la réinitialiser.",
+        "rate_limited": "Trop de tentatives. Attendez une heure, puis réessayez."
+      },
+      "plan": {
+        "not_available": "Aucun plan d'effacement ne peut être établi pour ce compte.",
+        "rate_limited": "Trop de demandes de plan. Attendez une minute, puis réessayez."
       }
     }
   }

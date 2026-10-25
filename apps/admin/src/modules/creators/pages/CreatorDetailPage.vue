@@ -588,6 +588,7 @@ const CONNECT_SUCCESS_KEY: Record<string, string> = {
 // generic `failed` message.
 const CONNECT_ERROR_KEY: Record<string, string> = {
   'connection.creator_not_approved': 'admin.creators.detail.connections.connect.error_not_approved',
+  'creator.unavailable': 'admin.creators.detail.connections.connect.error_unavailable',
   'connection.request_blacklisted': 'admin.creators.detail.connections.connect.error_blacklisted',
   'connection.direct_blacklisted': 'admin.creators.detail.connections.connect.error_blacklisted',
 }

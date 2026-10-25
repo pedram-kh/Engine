@@ -385,3 +385,58 @@ it('lists the creator relations across agencies with agency, status, and since',
     $statuses = collect((array) $response->json('data'))->pluck('attributes.relationship_status')->all();
     expect($statuses)->toEqualCanonicalizing(['roster', 'ended']);
 });
+
+// ---------------------------------------------------------------------------
+// AH-104c C2-4a — a leaving creator is connected to no one, by either door
+// ---------------------------------------------------------------------------
+
+it('refuses a creator who is leaving (a deletion request, a claim, or erased) at both doors, neutral 422, nothing written', function (string $mode, string $leaving): void {
+    Mail::fake();
+    $admin = connAdmin();
+    $creator = connCreator();
+    $agency = Agency::factory()->createOne();
+    $stamps = match ($leaving) {
+        'request pending' => ['deletion_requested_at' => now(), 'deletion_scheduled_for' => now()->addDays(14)],
+        'request past its grace' => ['deletion_requested_at' => now()->subDays(15), 'deletion_scheduled_for' => now()->subDay()],
+        'claimed' => ['erasure_started_at' => now()],
+        'erased' => ['erased_at' => now()],
+        default => throw new InvalidArgumentException($leaving),
+    };
+    User::query()->whereKey($creator->user_id)->update($stamps);
+    if ($leaving === 'erased') {
+        Creator::query()->whereKey($creator->id)->update(['erased_at' => now()]);
+    }
+    $body = ['agency_id' => $agency->ulid, 'mode' => $mode] + ($mode === 'direct' ? ['reason' => 'Offline agreement, reference on file'] : []);
+
+    $response = $this->actingAs($admin, 'web_admin')->postJson(connUrl($creator->refresh()), $body);
+
+    $response->assertStatus(422)->assertJsonPath('errors.0.code', 'creator.unavailable');
+    expect((string) $response->getContent())->not->toContain('deletion');
+    expect((string) $response->getContent())->not->toContain('erasure');
+    expect(connRelation($agency, $creator))->toBeNull()
+        ->and(AuditLog::query()->whereIn('action', [AuditAction::AgencyCreatorRelationAdminConnected->value, AuditAction::AgencyCreatorRelationAdminRequested->value])->count())->toBe(0);
+    Mail::assertNothingQueued();
+})->with([
+    'request, pending' => ['request', 'request pending'],
+    'request, past grace' => ['request', 'request past its grace'],
+    'request, claimed' => ['request', 'claimed'],
+    'request, erased' => ['request', 'erased'],
+    'direct, pending' => ['direct', 'request pending'],
+    'direct, past grace' => ['direct', 'request past its grace'],
+    'direct, claimed' => ['direct', 'claimed'],
+    'direct, erased' => ['direct', 'erased'],
+]);
+
+it('connects the same creator again once the request is cancelled (the guard follows the state, it does not stick)', function (): void {
+    Mail::fake();
+    $admin = connAdmin();
+    $creator = connCreator();
+    $agency = Agency::factory()->createOne();
+    User::query()->whereKey($creator->user_id)->update(['deletion_requested_at' => now(), 'deletion_scheduled_for' => now()->addDays(14)]);
+    $body = ['agency_id' => $agency->ulid, 'mode' => 'direct', 'reason' => 'Offline agreement, reference on file'];
+
+    $this->actingAs($admin, 'web_admin')->postJson(connUrl($creator->refresh()), $body)->assertStatus(422);
+    User::query()->whereKey($creator->user_id)->update(['deletion_requested_at' => null, 'deletion_scheduled_for' => null]);
+
+    $this->actingAs($admin, 'web_admin')->postJson(connUrl($creator->refresh()), $body)->assertStatus(201);
+});

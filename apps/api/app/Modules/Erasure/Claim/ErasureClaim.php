@@ -13,7 +13,9 @@ namespace App\Modules\Erasure\Claim;
  * anything but the claimer builds one, and when anything but the queued job and the
  * command calls `execute()`.
  *
- * It carries the subject's ulid and how the claim was taken; no name, no email.
+ * It carries the subject's ulid and how the claim was taken; no name, no email. `$created` is true
+ * only for the call that stamped the claim: a second click on a claimed account gets the claim
+ * back with `created` false, and the caller does not queue a second run for it.
  */
 final readonly class ErasureClaim
 {
@@ -21,5 +23,6 @@ final readonly class ErasureClaim
         public string $userUlid,
         public ClaimMode $mode,
         public ?int $operatorId,
+        public bool $created = false,
     ) {}
 }

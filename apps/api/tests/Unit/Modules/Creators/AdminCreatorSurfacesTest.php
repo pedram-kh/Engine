@@ -83,7 +83,16 @@ it('knows only the kinds it documents', function (): void {
     $kinds = array_unique(array_map(static fn (array $e): string => $e[0], AdminCreatorSurfaces::all()));
     sort($kinds);
 
-    expect($kinds)->toBe(['flagged', 'open', 'reader', 'unchanged']);
+    expect(array_values(array_diff($kinds, ['delegated', 'flagged', 'guarded', 'open', 'reader', 'unchanged'])))->toBe([]);
+});
+
+it('has closed AH-104c C2-4a: nothing is left open, and each delegating file leans on a service that really guards', function (): void {
+    $open = array_keys(array_filter(AdminCreatorSurfaces::all(), static fn (array $e): bool => $e[0] === 'open'));
+    $service = (string) file_get_contents(adminSurfacesRoot().'/Creators/Services/CreatorAgencyDirectConnectService.php');
+
+    expect($open)->toBe([])
+        ->and($service)->toContain('isUnavailableToAgencies()')
+        ->and($service)->toContain('DirectConnectOutcome::CreatorUnavailable');
 });
 
 it('names every open gap in docs/tech-debt.md', function (): void {

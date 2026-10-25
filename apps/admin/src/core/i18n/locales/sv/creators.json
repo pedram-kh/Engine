@@ -207,7 +207,8 @@
             "failed": "Vi kunde inte skapa den här kopplingen. Försök igen.",
             "not_approved_warning": "Den här kreatören har inte godkänts ännu och kan inte kopplas till en byrå. Godkänn ansökan först.",
             "error_not_approved": "Den här kreatören har inte godkänts ännu. Godkänn ansökan innan du kopplar hen till en byrå.",
-            "error_blacklisted": "Det här kreatör–byrå-paret är svartlistat, så en koppling kan inte skapas."
+            "error_blacklisted": "Det här kreatör–byrå-paret är svartlistat, så en koppling kan inte skapas.",
+            "error_unavailable": "Den här skaparen lämnar plattformen och kan inte kopplas till en byrå."
           },
           "disconnect": {
             "title": "Koppla från {name} från {agency}?",

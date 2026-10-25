@@ -46,10 +46,12 @@
           "held": "In de wacht sinds {date}.",
           "held_by": "Vastgezet door {admin}.",
           "in_progress": {
-            "claimed": "De verwijdering is begonnen.",
-            "started": "De verwijdering is bezig.",
-            "db_done": "De databasestap is klaar. De bestanden en het auditlogboek moeten nog worden afgerond.",
-            "incomplete": "De laatste run stopte voordat hij klaar was. Hiervoor is een engineer nodig: volg het verwijderingsrunbook."
+            "db_done": "De databasestap is klaar, maar de laatste stap is niet afgerond. Hiervoor is een engineer nodig: volg het verwijder-runbook.",
+            "incomplete": "De laatste run is gestopt voordat hij klaar was. Bekijk het plan en bevestig opnieuw.",
+            "waiting": "Wacht tot het verwijderproces het oppakt.",
+            "waiting_stuck": "Wacht al meer dan een uur: het verwijderproces ligt mogelijk stil. Controleer het (zie het verwijder-runbook), bekijk dan het plan en bevestig opnieuw.",
+            "running": "Het verwijderen is bezig.",
+            "running_stuck": "Het verwijderen loopt al meer dan een uur en is mogelijk gestopt. Bekijk het plan en bevestig opnieuw."
           },
           "erased": "Verwijderd op {date}."
         },
@@ -62,7 +64,9 @@
         "actions": {
           "hold": "In de wacht zetten",
           "release": "Wacht opheffen",
-          "load_more": "Meer laden"
+          "load_more": "Meer laden",
+          "erase": "Verwijderen…",
+          "retry": "Bekijken en opnieuw bevestigen"
         },
         "dialog": {
           "hold": {
@@ -78,16 +82,62 @@
           "reason_label": "Reden",
           "reason_hint": "Minstens {count} tekens.",
           "no_personal_details": "Schrijf hier geen namen, e-mailadressen of andere persoonsgegevens: de reden blijft permanent bewaard in het auditlogboek.",
-          "cancel": "Annuleren"
+          "cancel": "Annuleren",
+          "erase": {
+            "title": "Dit account verwijderen",
+            "warning": "Hiermee wordt het account definitief verwijderd: de persoonsgegevens, de bestanden en de inlog. Dit kan niet ongedaan worden gemaakt. Elke openstaande toewijzing wordt geannuleerd en het bureau wordt op de hoogte gebracht.",
+            "loading": "Plan wordt gelezen…",
+            "not_ready": "Dit account is niet klaar om te worden verwijderd: {reasons}.",
+            "retry_note": "Een eerdere verwijdering van dit account is gestopt. Bekijk het plan en bevestig dan opnieuw.",
+            "summary": {
+              "rows": "Te wijzigen databaserijen: {rows}, in {tables} tabellen.",
+              "files": "Te verwijderen bestanden: {files}.",
+              "assignments": "Te annuleren openstaande toewijzingen: {count}. Elke toewijzing brengt haar bureau op de hoogte.",
+              "read": "Gelezen rijen om het plan te maken: {rows}.",
+              "reference": "Planreferentie: {digest}"
+            },
+            "ulid_label": "Typ de account-id ter bevestiging",
+            "ulid_hint": "De id is {ulid}.",
+            "mfa_label": "Tweestapscode of herstelcode",
+            "mfa_hint": "Een herstelcode is verbruikt zodra je hem verstuurt.",
+            "confirm": "Definitief verwijderen"
+          }
         },
         "capped": "Er worden telkens alleen de eerste {count} verlopen accounts gecontroleerd. Handel die af en laad daarna opnieuw.",
-        "action_failed": "Opslaan is niet gelukt. Probeer het opnieuw."
+        "action_failed": "Opslaan is niet gelukt. Probeer het opnieuw.",
+        "reason": {
+          "held": "het staat in de wacht",
+          "not_requested": "het heeft nooit om verwijdering gevraagd",
+          "grace_running": "de bedenktijd is nog niet voorbij",
+          "audit_scrub_unavailable": "de stap voor het auditlogboek is hier niet beschikbaar",
+          "erased": "het is al verwijderd",
+          "not_available": "het kan niet worden verwijderd"
+        },
+        "watch": {
+          "completed": "Het account is verwijderd. Elke geannuleerde toewijzing heeft haar bureau op de hoogte gebracht.",
+          "released": "De verwijdering is niet gestart: de gegevens zijn sinds het plan veranderd, of een controle weigert nu. Er is niets verwijderd en de creator kan nog annuleren. Bekijk het plan en probeer het opnieuw."
+        }
       }
     },
     "erasure": {
       "hold": {
         "claimed": "Dit account wordt al verwijderd en kan dus niet in de wacht worden gezet.",
         "not_available": "Dit account kan niet in de wacht worden gezet."
+      },
+      "execute": {
+        "disabled": "Verwijderen vanuit de admin staat uit. Een platformbeheerder zet het aan bij de functievlaggen, met een reden, voor één genoemd account.",
+        "ulid_mismatch": "De getypte id komt niet overeen met dit account.",
+        "not_ready": "Dit account is niet klaar om te worden verwijderd.",
+        "in_progress": "Er loopt al een verwijdering van dit account.",
+        "mfa_required": "Voer een tweestapscode of een herstelcode in.",
+        "mfa_invalid": "Die code is niet geldig.",
+        "mfa_rate_limited": "Te veel foute codes. Wacht 15 minuten en probeer het opnieuw.",
+        "mfa_suspended": "Je tweestapsinlog is opgeschort. Vraag een andere platformbeheerder om hem opnieuw in te stellen.",
+        "rate_limited": "Te veel pogingen. Wacht een uur en probeer het opnieuw."
+      },
+      "plan": {
+        "not_available": "Voor dit account kan geen verwijderplan worden gemaakt.",
+        "rate_limited": "Te veel planaanvragen. Wacht een minuut en probeer het opnieuw."
       }
     }
   }

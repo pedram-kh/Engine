@@ -746,7 +746,11 @@ describe('CreatorDetailPage — per-field edit (Sprint 3 Chunk 4 sub-step 9)', (
       expect(h.wrapper.text()).toContain('Nova Talent')
     })
 
-    it('maps a connect 422 code to a localized message (NOT the raw code)', async () => {
+    it.each([
+      ['connection.creator_not_approved', "This creator hasn't been approved yet"],
+      // AH-104c C2-4a: a creator whose account is being erased is not connectable.
+      ['creator.unavailable', 'This creator is leaving the platform'],
+    ])('maps the connect code %s to a localized message (NOT the raw code)', async (code, text) => {
       vi.mocked(adminCreatorsApi.show).mockResolvedValue(
         envelope(buildCreator({ application_status: 'approved' })),
       )
@@ -756,7 +760,7 @@ describe('CreatorDetailPage — per-field edit (Sprint 3 Chunk 4 sub-step 9)', (
       vi.mocked(adminCreatorsApi.connect).mockRejectedValue(
         new ApiError({
           status: 422,
-          code: 'connection.creator_not_approved',
+          code,
           message: 'This creator is not approved and cannot be connected.',
         }),
       )
@@ -782,8 +786,8 @@ describe('CreatorDetailPage — per-field edit (Sprint 3 Chunk 4 sub-step 9)', (
       const error = document.body.querySelector(
         '[data-testid="admin-creator-connect-dialog-error"]',
       )
-      expect(error?.textContent).toContain("This creator hasn't been approved yet")
-      expect(error?.textContent).not.toContain('connection.creator_not_approved')
+      expect(error?.textContent).toContain(text)
+      expect(error?.textContent).not.toContain(code)
     })
 
     it('maps a disconnect 422 code to a localized message (NOT the raw code)', async () => {

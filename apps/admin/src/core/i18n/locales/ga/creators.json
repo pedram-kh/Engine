@@ -207,7 +207,8 @@
             "failed": "Níorbh fhéidir linn an nasc seo a chruthú. Bain triail eile as.",
             "not_approved_warning": "Níl an cruthaitheoir seo faofa fós agus ní féidir é a nascadh le gníomhaireacht. Faomh a iarratas ar dtús.",
             "error_not_approved": "Níl an cruthaitheoir seo faofa fós. Faomh a iarratas sula nascann tú le gníomhaireacht é.",
-            "error_blacklisted": "Tá an péire cruthaitheoir–gníomhaireacht seo ar an liosta dubh, mar sin ní féidir nasc a chruthú."
+            "error_blacklisted": "Tá an péire cruthaitheoir–gníomhaireacht seo ar an liosta dubh, mar sin ní féidir nasc a chruthú.",
+            "error_unavailable": "Tá an cruthaitheoir seo ag fágáil an ardáin agus ní féidir é a nascadh le gníomhaireacht."
           },
           "disconnect": {
             "title": "Dínasc {name} ó {agency}?",

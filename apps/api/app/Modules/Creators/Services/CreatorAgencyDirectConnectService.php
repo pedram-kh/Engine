@@ -101,6 +101,12 @@ final class CreatorAgencyDirectConnectService
         bool $skipTerminalRelations = false,
         ?string $firedByRuleUlid = null,
     ): DirectConnectResult {
+        // AH-104c C2-4a — a leaving creator (erased, deletion requested, erasure claimed) is not
+        // connected to anyone, by an admin's hand or by a rule. First, so nothing else is read.
+        if ($creator->isUnavailableToAgencies()) {
+            return DirectConnectResult::refused(DirectConnectOutcome::CreatorUnavailable);
+        }
+
         if ($creator->application_status !== ApplicationStatus::Approved) {
             return DirectConnectResult::refused(DirectConnectOutcome::CreatorNotApproved);
         }

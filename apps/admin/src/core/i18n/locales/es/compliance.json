@@ -46,10 +46,12 @@
           "held": "Retenida desde el {date}.",
           "held_by": "Retenida por {admin}.",
           "in_progress": {
-            "claimed": "La eliminación ha comenzado.",
-            "started": "La eliminación está en curso.",
-            "db_done": "El paso de la base de datos ha terminado. Faltan por terminar los archivos y el registro de auditoría.",
-            "incomplete": "La última ejecución se detuvo antes de terminar. Hace falta un ingeniero: sigue el runbook de eliminación."
+            "db_done": "El paso de la base de datos está hecho, pero el último paso no terminó. Hace falta un ingeniero: sigue el runbook de eliminación.",
+            "incomplete": "La última ejecución se detuvo antes de terminar. Revisa el plan y confirma de nuevo.",
+            "waiting": "Esperando a que el proceso de eliminación lo recoja.",
+            "waiting_stuck": "Esperando desde hace más de una hora: el proceso de eliminación puede estar caído. Compruébalo (consulta el runbook de eliminación), revisa el plan y confirma de nuevo.",
+            "running": "La eliminación está en curso.",
+            "running_stuck": "La eliminación lleva más de una hora en marcha y puede haberse detenido. Revisa el plan y confirma de nuevo."
           },
           "erased": "Eliminada el {date}."
         },
@@ -62,7 +64,9 @@
         "actions": {
           "hold": "Retener",
           "release": "Liberar retención",
-          "load_more": "Cargar más"
+          "load_more": "Cargar más",
+          "erase": "Eliminar…",
+          "retry": "Revisar y confirmar de nuevo"
         },
         "dialog": {
           "hold": {
@@ -78,16 +82,62 @@
           "reason_label": "Motivo",
           "reason_hint": "Al menos {count} caracteres.",
           "no_personal_details": "No escribas aquí nombres, correos electrónicos ni otros datos personales: el motivo se conserva de forma permanente en el registro de auditoría.",
-          "cancel": "Cancelar"
+          "cancel": "Cancelar",
+          "erase": {
+            "title": "Eliminar esta cuenta",
+            "warning": "Esto elimina la cuenta de forma permanente: sus datos personales, sus archivos y su inicio de sesión. No se puede deshacer. Cada asignación abierta se cancela y se avisa a su agencia.",
+            "loading": "Leyendo el plan…",
+            "not_ready": "Esta cuenta no está lista para eliminarse: {reasons}.",
+            "retry_note": "Una eliminación anterior de esta cuenta se detuvo. Revisa el plan y confirma de nuevo.",
+            "summary": {
+              "rows": "Filas de la base de datos que cambiarán: {rows}, en {tables} tablas.",
+              "files": "Archivos que se eliminarán: {files}.",
+              "assignments": "Asignaciones abiertas que se cancelarán: {count}. Cada una avisa a su agencia.",
+              "read": "Filas leídas para calcularlo: {rows}.",
+              "reference": "Referencia del plan: {digest}"
+            },
+            "ulid_label": "Escribe el id de la cuenta para confirmar",
+            "ulid_hint": "El id es {ulid}.",
+            "mfa_label": "Código de dos factores o código de recuperación",
+            "mfa_hint": "Un código de recuperación se gasta al enviarlo.",
+            "confirm": "Eliminar definitivamente"
+          }
         },
         "capped": "Solo se comprueban a la vez las primeras {count} cuentas vencidas. Gestiónalas y vuelve a cargar.",
-        "action_failed": "No se pudo guardar. Inténtalo de nuevo."
+        "action_failed": "No se pudo guardar. Inténtalo de nuevo.",
+        "reason": {
+          "held": "está retenida",
+          "not_requested": "nunca solicitó que se eliminara",
+          "grace_running": "su periodo de gracia no ha terminado",
+          "audit_scrub_unavailable": "el paso del registro de auditoría no está disponible aquí",
+          "erased": "ya está eliminada",
+          "not_available": "no se puede eliminar"
+        },
+        "watch": {
+          "completed": "La cuenta se eliminó. Cada asignación cancelada avisó a su agencia.",
+          "released": "La eliminación no se inició: los datos cambiaron desde el plan o una comprobación ahora la rechaza. No se eliminó nada y el creador aún puede cancelar. Revisa el plan e inténtalo de nuevo."
+        }
       }
     },
     "erasure": {
       "hold": {
         "claimed": "Esta cuenta ya se está eliminando, por lo que no se puede retener.",
         "not_available": "Esta cuenta no se puede retener."
+      },
+      "execute": {
+        "disabled": "Eliminar desde el administrador está desactivado. Un administrador de la plataforma lo activa en las funciones (feature flags), con un motivo, para una sola cuenta concreta.",
+        "ulid_mismatch": "El id que escribiste no coincide con esta cuenta.",
+        "not_ready": "Esta cuenta no está lista para eliminarse.",
+        "in_progress": "Ya hay una eliminación de esta cuenta en curso.",
+        "mfa_required": "Introduce un código de dos factores o un código de recuperación.",
+        "mfa_invalid": "Ese código no es válido.",
+        "mfa_rate_limited": "Demasiados códigos incorrectos. Espera 15 minutos e inténtalo de nuevo.",
+        "mfa_suspended": "Tu inicio de sesión de dos factores está suspendido. Pide a otro administrador de la plataforma que lo restablezca.",
+        "rate_limited": "Demasiados intentos. Espera una hora e inténtalo de nuevo."
+      },
+      "plan": {
+        "not_available": "No se puede preparar un plan de eliminación para esta cuenta.",
+        "rate_limited": "Demasiadas solicitudes de plan. Espera un minuto e inténtalo de nuevo."
       }
     }
   }

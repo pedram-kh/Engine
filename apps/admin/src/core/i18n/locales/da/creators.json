@@ -207,7 +207,8 @@
             "failed": "Vi kunne ikke oprette denne forbindelse. Prøv igen.",
             "not_approved_warning": "Denne skaber er endnu ikke godkendt og kan ikke forbindes med et bureau. Godkend ansøgningen først.",
             "error_not_approved": "Denne skaber er endnu ikke godkendt. Godkend ansøgningen, før du forbinder vedkommende med et bureau.",
-            "error_blacklisted": "Dette skaber–bureau-par er sortlistet, så der kan ikke oprettes en forbindelse."
+            "error_blacklisted": "Dette skaber–bureau-par er sortlistet, så der kan ikke oprettes en forbindelse.",
+            "error_unavailable": "Denne skaber forlader platformen og kan ikke forbindes med et bureau."
           },
           "disconnect": {
             "title": "Afbryd {name} fra {agency}?",

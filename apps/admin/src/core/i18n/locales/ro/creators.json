@@ -207,7 +207,8 @@
             "failed": "Nu am putut crea această conexiune. Încearcă din nou.",
             "not_approved_warning": "Acest creator nu a fost încă aprobat și nu poate fi conectat la o agenție. Aprobați-i mai întâi candidatura.",
             "error_not_approved": "Acest creator nu a fost încă aprobat. Aprobați-i candidatura înainte de a-l conecta la o agenție.",
-            "error_blacklisted": "Această pereche creator–agenție este pe lista neagră, așa că nu se poate crea o conexiune."
+            "error_blacklisted": "Această pereche creator–agenție este pe lista neagră, așa că nu se poate crea o conexiune.",
+            "error_unavailable": "Acest creator părăsește platforma și nu poate fi conectat la o agenție."
           },
           "disconnect": {
             "title": "Deconectezi {name} de la {agency}?",

@@ -207,7 +207,8 @@
             "failed": "We konden deze verbinding niet maken. Probeer het opnieuw.",
             "not_approved_warning": "Deze creator is nog niet goedgekeurd en kan niet met een bureau worden verbonden. Keur eerst de aanmelding goed.",
             "error_not_approved": "Deze creator is nog niet goedgekeurd. Keur de aanmelding goed voordat je hem met een bureau verbindt.",
-            "error_blacklisted": "Dit creator-bureau-paar staat op de zwarte lijst, dus er kan geen verbinding worden gemaakt."
+            "error_blacklisted": "Dit creator-bureau-paar staat op de zwarte lijst, dus er kan geen verbinding worden gemaakt.",
+            "error_unavailable": "Deze creator verlaat het platform en kan niet aan een bureau worden gekoppeld."
           },
           "disconnect": {
             "title": "{name} loskoppelen van {agency}?",

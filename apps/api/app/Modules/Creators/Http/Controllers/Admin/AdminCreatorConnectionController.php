@@ -137,6 +137,15 @@ final class AdminCreatorConnectionController
             );
         }
 
+        // AH-104c C2-4a — Door 1 too: no request to a creator who is leaving (the same answer Door 2 gives).
+        if ($creator->isUnavailableToAgencies()) {
+            return $this->error(
+                DirectConnectOutcome::CreatorUnavailable->httpStatus(),
+                DirectConnectOutcome::CreatorUnavailable->apiCode(),
+                DirectConnectOutcome::CreatorUnavailable->detail(),
+            );
+        }
+
         // `approved` binds BOTH doors; is_discoverable is bypassed for admin.
         if ($creator->application_status !== ApplicationStatus::Approved) {
             return $this->error(422, 'connection.creator_not_approved', 'This creator is not approved and cannot be connected.');

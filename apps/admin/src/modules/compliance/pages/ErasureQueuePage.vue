@@ -13,20 +13,27 @@
  *
  * Every row says, in a sentence, where it stands and why: that is the whole point of the page,
  * and the stuck states (an erasure that stopped half way) say what to do. Placing or releasing a
- * hold needs a reason (the dialog). Nothing on this page erases anything: erasing is a separate,
- * later step, so the copy never offers it.
+ * hold needs a reason (the dialog).
+ *
+ * AH-104c C3 adds the Erase button, on a Ready row only (and "Review and confirm again" on an
+ * erasing row the server says can be retried). It opens the plan, asks for the typed account id,
+ * a reason and a fresh two-factor code, and queues the run (202). The page then watches the
+ * account every few seconds until it is erased, or until the claim was released because the data
+ * changed or a check now refuses: the admin is told which, and that nothing was erased.
  *
  * Words: "hold" in the UI; "Erasing" (never "claim") for an account the erasure has taken.
  */
 
-import { computed, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { ApiError, formatDateTime } from '@catalyst/api-client'
 
+import ErasureEraseDialog from '../components/ErasureEraseDialog.vue'
 import ErasureHoldDialog from '../components/ErasureHoldDialog.vue'
 import {
   adminComplianceApi,
+  type ErasurePlan,
   ERASURE_TABS,
   type ErasureQueueCounts,
   type ErasureQueueItem,
@@ -37,6 +44,8 @@ import {
 const { t, te, locale } = useI18n()
 
 const PAGE_SIZE = 25
+/** How often an account that is being erased is looked at again. */
+const POLL_MS = 4000
 
 const tab = ref<ErasureTab>('pending')
 const items = ref<ErasureQueueItem[]>([])
@@ -50,6 +59,21 @@ const dialogMode = ref<'hold' | 'release'>('hold')
 const dialogTarget = ref<ErasureQueueRow | null>(null)
 const dialogSaving = ref(false)
 const dialogErrorKey = ref<string | null>(null)
+
+const eraseOpen = ref(false)
+const eraseTarget = ref<ErasureQueueRow | null>(null)
+const erasePlan = ref<ErasurePlan | null>(null)
+const planLoading = ref(false)
+const planErrorKey = ref<string | null>(null)
+const eraseSaving = ref(false)
+const eraseErrorKey = ref<string | null>(null)
+const eraseErrorCodes = ref<string[]>([])
+
+/** The account the admin just sent to be erased, and how it ended. */
+const watched = ref<ErasureQueueRow | null>(null)
+const watchedUlid = ref<string | null>(null)
+const outcome = ref<'completed' | 'released' | null>(null)
+let timer: ReturnType<typeof setInterval> | null = null
 
 const isErasedTab = computed(() => tab.value === 'erased')
 const showCapNotice = computed(
@@ -83,7 +107,7 @@ const headers = computed(() =>
           key: 'actions',
           sortable: false,
           align: 'end' as const,
-          width: 140,
+          width: 220,
         },
       ],
 )
@@ -126,11 +150,27 @@ function sentence(item: ErasureQueueItem): string {
         ? since
         : `${since} ${t('admin.compliance.erasures.state.held_by', { admin: a.held_by })}`
     }
-    case 'in_progress': {
-      const key = `admin.compliance.erasures.state.in_progress.${a.ledger_state ?? 'claimed'}`
-      return t(te(key) ? key : 'admin.compliance.erasures.state.in_progress.claimed')
-    }
+    case 'in_progress':
+      return t(`admin.compliance.erasures.state.in_progress.${progress(row)}`)
   }
+}
+
+/** Which sentence an erasing row carries: its run, and whether it has outlasted a run. */
+function progress(row: ErasureQueueRow): string {
+  const run = row.attributes.run
+  if (run === null) return 'waiting'
+  if (run.state === 'waiting' || run.state === 'running') {
+    return run.stuck ? `${run.state}_stuck` : run.state
+  }
+  return run.state === 'completed' ? 'running' : run.state
+}
+
+function canErase(row: ErasureQueueRow): boolean {
+  return row.attributes.state === 'ready'
+}
+
+function canRetry(row: ErasureQueueRow): boolean {
+  return row.attributes.state === 'in_progress' && row.attributes.run?.can_retry === true
 }
 
 function canHold(row: ErasureQueueRow): boolean {
@@ -185,12 +225,140 @@ async function confirmDialog(payload: { reason: string }): Promise<void> {
     dialogOpen.value = false
     await load(false)
   } catch (error) {
-    const code = error instanceof ApiError ? error.code : ''
-    dialogErrorKey.value = te(code) ? code : 'admin.compliance.erasures.action_failed'
+    dialogErrorKey.value = codeKey(error)
   } finally {
     dialogSaving.value = false
   }
 }
+
+function codeKey(error: unknown): string {
+  const code = error instanceof ApiError ? error.code : ''
+  return te(code) ? code : 'admin.compliance.erasures.action_failed'
+}
+
+async function openErase(row: ErasureQueueRow): Promise<void> {
+  eraseTarget.value = row
+  erasePlan.value = null
+  planErrorKey.value = null
+  eraseErrorKey.value = null
+  eraseErrorCodes.value = []
+  eraseOpen.value = true
+  planLoading.value = true
+  try {
+    erasePlan.value = (await adminComplianceApi.erasurePlan(row.id)).data
+  } catch (error) {
+    planErrorKey.value = codeKey(error)
+  } finally {
+    planLoading.value = false
+  }
+}
+
+function refusedCodes(error: unknown): string[] {
+  if (!(error instanceof ApiError)) return []
+  const codes = error.details[0]?.meta?.codes
+  return Array.isArray(codes) ? codes.filter((c): c is string => typeof c === 'string') : []
+}
+
+async function confirmErase(payload: {
+  ulid: string
+  reason: string
+  digest: string
+  mfaCode: string
+}): Promise<void> {
+  const row = eraseTarget.value
+  if (row === null) return
+  eraseSaving.value = true
+  eraseErrorKey.value = null
+  eraseErrorCodes.value = []
+  try {
+    const res = await adminComplianceApi.erase(row.id, {
+      ulid: payload.ulid,
+      reason: payload.reason,
+      digest: payload.digest,
+      mfa_code: payload.mfaCode,
+    })
+    eraseOpen.value = false
+    outcome.value = null
+    watchedUlid.value = row.id
+    watched.value = res.data
+    selectTab('in_progress')
+  } catch (error) {
+    eraseErrorKey.value = codeKey(error)
+    eraseErrorCodes.value = refusedCodes(error)
+  } finally {
+    eraseSaving.value = false
+  }
+}
+
+/** Looks at the account just sent off: still erasing, erased (gone from the queue), or released. */
+async function pollWatched(ulid: string): Promise<void> {
+  try {
+    const row = (await adminComplianceApi.erasureRow(ulid)).data
+    if (row.attributes.state === 'in_progress') {
+      watched.value = row
+      return
+    }
+    outcome.value = 'released'
+  } catch (error) {
+    if (!(error instanceof ApiError) || error.status !== 404) return
+    outcome.value = 'completed'
+  }
+  watchedUlid.value = null
+  watched.value = null
+  await load(false)
+}
+
+/** Reloads the Erasing tab without the loading flicker, so its sentences move on by themselves. */
+async function refreshQuietly(): Promise<void> {
+  try {
+    const res = await adminComplianceApi.listErasureQueue({
+      tab: tab.value,
+      cursor: null,
+      perPage: PAGE_SIZE,
+    })
+    items.value = res.data
+    nextCursor.value = res.meta.next_cursor
+    counts.value = res.meta.counts
+  } catch {
+    /* the next tick tries again; the page keeps what it shows */
+  }
+}
+
+const hasRunningRows = computed<boolean>(
+  () =>
+    tab.value === 'in_progress' &&
+    items.value.some((item) => {
+      const run = (item as ErasureQueueRow).attributes.run
+      return run !== null && (run.state === 'waiting' || run.state === 'running')
+    }),
+)
+
+const shouldPoll = computed<boolean>(() => watchedUlid.value !== null || hasRunningRows.value)
+
+function tick(): void {
+  if (watchedUlid.value !== null) {
+    void pollWatched(watchedUlid.value)
+  } else if (hasRunningRows.value) {
+    void refreshQuietly()
+  }
+}
+
+watch(
+  shouldPoll,
+  (on) => {
+    if (on && timer === null) timer = setInterval(tick, POLL_MS)
+    if (!on && timer !== null) {
+      clearInterval(timer)
+      timer = null
+    }
+  },
+  { immediate: true },
+)
+
+onBeforeUnmount(() => {
+  if (timer !== null) clearInterval(timer)
+  timer = null
+})
 
 onMounted(() => {
   void load(false)
@@ -230,6 +398,28 @@ onMounted(() => {
       data-testid="admin-erasure-queue-error"
     >
       {{ t(errorKey) }}
+    </v-alert>
+
+    <v-alert
+      v-if="watched !== null"
+      type="info"
+      variant="tonal"
+      class="mb-4"
+      data-testid="admin-erasure-watch"
+    >
+      {{ sentence(watched) }}
+    </v-alert>
+
+    <v-alert
+      v-if="outcome !== null"
+      :type="outcome === 'completed' ? 'success' : 'warning'"
+      variant="tonal"
+      closable
+      class="mb-4"
+      :data-testid="`admin-erasure-outcome-${outcome}`"
+      @click:close="outcome = null"
+    >
+      {{ t(`admin.compliance.erasures.watch.${outcome}`) }}
     </v-alert>
 
     <v-alert
@@ -275,6 +465,26 @@ onMounted(() => {
       <template #item.actions="{ item }">
         <template v-if="liveRow(item)">
           <v-btn
+            v-if="canErase(liveRow(item) as ErasureQueueRow)"
+            size="small"
+            variant="text"
+            color="error"
+            :data-testid="`admin-erasure-erase-${item.id}`"
+            @click="openErase(liveRow(item) as ErasureQueueRow)"
+          >
+            {{ t('admin.compliance.erasures.actions.erase') }}
+          </v-btn>
+          <v-btn
+            v-if="canRetry(liveRow(item) as ErasureQueueRow)"
+            size="small"
+            variant="text"
+            color="error"
+            :data-testid="`admin-erasure-retry-${item.id}`"
+            @click="openErase(liveRow(item) as ErasureQueueRow)"
+          >
+            {{ t('admin.compliance.erasures.actions.retry') }}
+          </v-btn>
+          <v-btn
             v-if="liveRow(item)?.attributes.state === 'held'"
             size="small"
             variant="text"
@@ -316,6 +526,18 @@ onMounted(() => {
       :is-saving="dialogSaving"
       :error-key="dialogErrorKey"
       @confirm="confirmDialog"
+    />
+
+    <ErasureEraseDialog
+      v-model="eraseOpen"
+      :user-ulid="eraseTarget?.id ?? null"
+      :plan="erasePlan"
+      :plan-loading="planLoading"
+      :plan-error-key="planErrorKey"
+      :is-saving="eraseSaving"
+      :error-key="eraseErrorKey"
+      :error-codes="eraseErrorCodes"
+      @confirm="confirmErase"
     />
   </section>
 </template>

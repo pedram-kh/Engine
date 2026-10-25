@@ -46,10 +46,12 @@
           "held": "Peatatud alates {date}.",
           "held_by": "Peatas: {admin}.",
           "in_progress": {
-            "claimed": "Kustutamine on alanud.",
-            "started": "Kustutamine käib.",
-            "db_done": "Andmebaasi samm on valmis. Failid ja auditilogi tuleb veel lõpetada.",
-            "incomplete": "Viimane käivitus peatus enne lõppu. Vaja on insenerit: järgi kustutamise runbooki."
+            "db_done": "Andmebaasi samm on tehtud, kuid viimane samm jäi lõpetamata. Vaja on insenerit: järgi kustutuse runbook'i.",
+            "incomplete": "Viimane käivitus peatus enne lõppu. Vaata plaan üle ja kinnita uuesti.",
+            "waiting": "Ootab, et kustutusprotsess selle üles võtaks.",
+            "waiting_stuck": "Ootab üle tunni: kustutusprotsess võib olla seisma jäänud. Kontrolli seda (vaata kustutuse runbook'i), seejärel vaata plaan üle ja kinnita uuesti.",
+            "running": "Kustutamine on pooleli.",
+            "running_stuck": "Kustutamine on käinud üle tunni ja võib olla peatunud. Vaata plaan üle ja kinnita uuesti."
           },
           "erased": "Kustutatud {date}."
         },
@@ -62,7 +64,9 @@
         "actions": {
           "hold": "Peata",
           "release": "Tühista peatamine",
-          "load_more": "Laadi veel"
+          "load_more": "Laadi veel",
+          "erase": "Kustuta…",
+          "retry": "Vaata üle ja kinnita uuesti"
         },
         "dialog": {
           "hold": {
@@ -78,16 +82,62 @@
           "reason_label": "Põhjus",
           "reason_hint": "Vähemalt {count} märki.",
           "no_personal_details": "Ära kirjuta siia nimesid, e-posti aadresse ega muid isikuandmeid: põhjus säilib auditilogis püsivalt.",
-          "cancel": "Tühista"
+          "cancel": "Tühista",
+          "erase": {
+            "title": "Kustuta see konto",
+            "warning": "See kustutab konto jäädavalt: selle isikuandmed, failid ja sisselogimise. Seda ei saa tagasi võtta. Iga avatud määramine tühistatakse ja agentuurile antakse sellest teada.",
+            "loading": "Plaani loetakse…",
+            "not_ready": "See konto pole kustutamiseks valmis: {reasons}.",
+            "retry_note": "Selle konto varasem kustutamine peatus. Vaata plaan üle ja kinnita siis uuesti.",
+            "summary": {
+              "rows": "Muudetavad andmebaasi read: {rows}, {tables} tabelis.",
+              "files": "Kustutatavad failid: {files}.",
+              "assignments": "Tühistatavad avatud määramised: {count}. Iga üks teavitab oma agentuuri.",
+              "read": "Plaani koostamiseks loetud read: {rows}.",
+              "reference": "Plaani viide: {digest}"
+            },
+            "ulid_label": "Kinnitamiseks sisesta konto ID",
+            "ulid_hint": "ID on {ulid}.",
+            "mfa_label": "Kaheastmelise kinnituse kood või taastekood",
+            "mfa_hint": "Taastekood kulub ära, kui selle esitad.",
+            "confirm": "Kustuta jäädavalt"
+          }
         },
         "capped": "Korraga kontrollitakse ainult esimest {count} tähtaja ületanud kontot. Töötle need ja laadi uuesti.",
-        "action_failed": "Salvestamine ebaõnnestus. Proovi uuesti."
+        "action_failed": "Salvestamine ebaõnnestus. Proovi uuesti.",
+        "reason": {
+          "held": "see on peatatud",
+          "not_requested": "see pole kunagi kustutamist taotlenud",
+          "grace_running": "selle ooteaeg pole lõppenud",
+          "audit_scrub_unavailable": "auditilogi samm pole siin saadaval",
+          "erased": "see on juba kustutatud",
+          "not_available": "seda ei saa kustutada"
+        },
+        "watch": {
+          "completed": "Konto kustutati. Iga tühistatud määramine teavitas oma agentuuri.",
+          "released": "Kustutamine ei alanud: andmed on pärast plaani muutunud või mõni kontroll nüüd keeldub. Midagi ei kustutatud ja looja saab endiselt tühistada. Vaata plaan üle ja proovi uuesti."
+        }
       }
     },
     "erasure": {
       "hold": {
         "claimed": "Seda kontot kustutatakse juba, seega ei saa seda peatada.",
         "not_available": "Seda kontot ei saa peatada."
+      },
+      "execute": {
+        "disabled": "Kustutamine adminis on välja lülitatud. Platvormi admin lülitab selle sisse funktsioonilippude all, põhjusega, ühe nimetatud konto jaoks.",
+        "ulid_mismatch": "Sisestatud ID ei sobi selle kontoga.",
+        "not_ready": "See konto pole kustutamiseks valmis.",
+        "in_progress": "Selle konto kustutamine on juba pooleli.",
+        "mfa_required": "Sisesta kaheastmelise kinnituse kood või taastekood.",
+        "mfa_invalid": "See kood ei kehti.",
+        "mfa_rate_limited": "Liiga palju valesid koode. Oota 15 minutit ja proovi uuesti.",
+        "mfa_suspended": "Sinu kaheastmeline sisselogimine on peatatud. Palu mõnel teisel platvormi adminil see lähtestada.",
+        "rate_limited": "Liiga palju katseid. Oota tund aega ja proovi uuesti."
+      },
+      "plan": {
+        "not_available": "Selle konto jaoks ei saa kustutusplaani koostada.",
+        "rate_limited": "Liiga palju plaanipäringuid. Oota minut ja proovi uuesti."
       }
     }
   }

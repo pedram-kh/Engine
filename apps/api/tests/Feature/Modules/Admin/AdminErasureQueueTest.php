@@ -363,10 +363,64 @@ it('shapes a live row: the account, the dates, the hold, and no guard sentences'
 
     expect(array_keys($row['attributes']))->toBe([
         'state', 'creator_ulid', 'name', 'email', 'requested_at', 'due_at', 'days_left',
-        'held', 'held_at', 'held_by', 'claimed_at', 'ledger_state', 'blockers',
+        'held', 'held_at', 'held_by', 'claimed_at', 'ledger_state', 'run', 'blockers',
     ])
         ->and($row['id'])->toBe($held->ulid)
         ->and($row['attributes']['name'])->toBe('Held Person')
         ->and($row['attributes']['held_by'])->toBe($admin->name)
         ->and($row['attributes']['days_left'])->toBe(13);
+});
+
+// ── AH-104c C3: the run's state, and the stuck states (P10) ─────────────────
+
+const RUN_STALE_SECONDS = 3900;
+
+it('shows how far a claimed account\'s run has got, and whether it looks stuck', function (string $case, array $run): void {
+    $account = queueCreator('claimed');
+    match ($case) {
+        'waiting' => null,
+        'waiting, stale' => DB::table('users')->where('id', $account->id)->update(['erasure_started_at' => now()->subSeconds(RUN_STALE_SECONDS + 1)]),
+        'waiting, at the boundary' => DB::table('users')->where('id', $account->id)->update(['erasure_started_at' => now()->subSeconds(RUN_STALE_SECONDS)]),
+        'running, at the boundary' => ErasureLedger::query()->create(['user_ulid' => $account->ulid, 'state' => ErasureLedgerState::Started, 'started_at' => now()->subSeconds(RUN_STALE_SECONDS)]),
+        'running' => ErasureLedger::query()->create(['user_ulid' => $account->ulid, 'state' => ErasureLedgerState::Started, 'started_at' => now()->subMinute()]),
+        'running, stale' => ErasureLedger::query()->create(['user_ulid' => $account->ulid, 'state' => ErasureLedgerState::Started, 'started_at' => now()->subSeconds(RUN_STALE_SECONDS + 1)]),
+        'incomplete' => ErasureLedger::query()->create(['user_ulid' => $account->ulid, 'state' => ErasureLedgerState::Incomplete, 'started_at' => now()->subMinute()]),
+        default => throw new InvalidArgumentException($case),
+    };
+
+    $row = actingAs(queueAdmin(), 'web_admin')->getJson(QUEUE_URL.'?tab=in_progress')->json('data.0.attributes');
+
+    expect($row['run'])->toBe($run)
+        ->and($row['state'])->toBe('in_progress');
+})->with([
+    'waiting' => ['waiting', ['state' => 'waiting', 'stuck' => false, 'can_retry' => false]],
+    // Stale means MORE than the window: exactly at it, a run that may still be finishing is not offered a second job.
+    'waiting, at the boundary' => ['waiting, at the boundary', ['state' => 'waiting', 'stuck' => false, 'can_retry' => false]],
+    'running, at the boundary' => ['running, at the boundary', ['state' => 'running', 'stuck' => false, 'can_retry' => false]],
+    'waiting, stale' => ['waiting, stale', ['state' => 'waiting', 'stuck' => true, 'can_retry' => true]],
+    'running' => ['running', ['state' => 'running', 'stuck' => false, 'can_retry' => false]],
+    'running, stale' => ['running, stale', ['state' => 'running', 'stuck' => true, 'can_retry' => true]],
+    'incomplete' => ['incomplete', ['state' => 'incomplete', 'stuck' => false, 'can_retry' => true]],
+]);
+
+it('keeps an account whose run stopped at db_done on the In progress tab, stuck, and drops it once completed', function (): void {
+    $account = queueCreator('claimed');
+    $ledger = ErasureLedger::query()->create(['user_ulid' => $account->ulid, 'state' => ErasureLedgerState::DbDone, 'started_at' => now()->subMinute()]);
+    // The database stage committed: the row is erased. Nothing else in the page would show it.
+    DB::table('users')->where('id', $account->id)->update(['erased_at' => now()]);
+    $admin = queueAdmin();
+
+    $response = actingAs($admin, 'web_admin')->getJson(QUEUE_URL.'?tab=in_progress');
+
+    expect(array_column($response->json('data'), 'id'))->toBe([$account->ulid])
+        ->and($response->json('data.0.attributes.run'))->toBe(['state' => 'db_done', 'stuck' => true, 'can_retry' => false])
+        ->and($response->json('meta.counts.in_progress'))->toBe(1)
+        ->and(queueTab('erased', $admin))->toBe([])
+        ->and(actingAs($admin, 'web_admin')->getJson(QUEUE_URL.'/'.$account->ulid)->json('data.attributes.run.state'))->toBe('db_done');
+
+    $ledger->update(['state' => ErasureLedgerState::Completed, 'completed_at' => now()]);
+
+    expect(queueTab('in_progress', $admin))->toBe([])
+        ->and(queueTab('erased', $admin))->toBe([$account->ulid])
+        ->and(actingAs($admin, 'web_admin')->getJson(QUEUE_URL.'/'.$account->ulid)->status())->toBe(404);
 });

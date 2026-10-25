@@ -207,7 +207,8 @@
             "failed": "Toto prepojenie sa nepodarilo vytvoriť. Skúste to znova.",
             "not_approved_warning": "Tento tvorca ešte nebol schválený a nemožno ho prepojiť s agentúrou. Najprv schváľte jeho prihlášku.",
             "error_not_approved": "Tento tvorca ešte nebol schválený. Pred prepojením s agentúrou schváľte jeho prihlášku.",
-            "error_blacklisted": "Táto dvojica tvorca–agentúra je na čiernej listine, spojenie preto nemožno vytvoriť."
+            "error_blacklisted": "Táto dvojica tvorca–agentúra je na čiernej listine, spojenie preto nemožno vytvoriť.",
+            "error_unavailable": "Tento tvorca opúšťa platformu a nemožno ho prepojiť s agentúrou."
           },
           "disconnect": {
             "title": "Odpojiť {name} od {agency}?",

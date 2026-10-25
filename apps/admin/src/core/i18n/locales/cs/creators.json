@@ -207,7 +207,8 @@
             "failed": "Toto propojení se nepodařilo vytvořit. Zkuste to znovu.",
             "not_approved_warning": "Tento tvůrce ještě nebyl schválen a nelze ho propojit s agenturou. Nejprve schvalte jeho přihlášku.",
             "error_not_approved": "Tento tvůrce ještě nebyl schválen. Před propojením s agenturou schvalte jeho přihlášku.",
-            "error_blacklisted": "Tato dvojice tvůrce–agentura je na černé listině, spojení proto nelze vytvořit."
+            "error_blacklisted": "Tato dvojice tvůrce–agentura je na černé listině, spojení proto nelze vytvořit.",
+            "error_unavailable": "Tento tvůrce opouští platformu a nelze ho propojit s agenturou."
           },
           "disconnect": {
             "title": "Odpojit {name} od {agency}?",

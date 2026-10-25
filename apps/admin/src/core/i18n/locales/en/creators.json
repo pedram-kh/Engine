@@ -207,7 +207,8 @@
             "failed": "We couldn't create this connection. Please try again.",
             "not_approved_warning": "This creator hasn't been approved yet and can't be connected to an agency. Approve their application first.",
             "error_not_approved": "This creator hasn't been approved yet. Approve their application before connecting them to an agency.",
-            "error_blacklisted": "This creator–agency pair is blacklisted, so a connection can't be created."
+            "error_blacklisted": "This creator–agency pair is blacklisted, so a connection can't be created.",
+            "error_unavailable": "This creator is leaving the platform and cannot be connected to an agency."
           },
           "disconnect": {
             "title": "Disconnect {name} from {agency}?",

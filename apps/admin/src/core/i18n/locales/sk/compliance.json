@@ -46,10 +46,12 @@
           "held": "Pozastavené od {date}.",
           "held_by": "Pozastavil(a): {admin}.",
           "in_progress": {
-            "claimed": "Mazanie sa začalo.",
-            "started": "Mazanie prebieha.",
-            "db_done": "Krok v databáze je hotový. Ostáva dokončiť súbory a auditný záznam.",
-            "incomplete": "Posledný beh sa zastavil pred dokončením. Treba technika: postupujte podľa runbooku mazania."
+            "db_done": "Krok s databázou je hotový, ale posledný krok sa nedokončil. Treba inžiniera: postupujte podľa runbooku mazania.",
+            "incomplete": "Posledné spustenie sa zastavilo pred dokončením. Skontrolujte plán a potvrďte znova.",
+            "waiting": "Čaká, kým ho prevezme proces mazania.",
+            "waiting_stuck": "Čaká viac ako hodinu: proces mazania možno nebeží. Skontrolujte ho (pozrite runbook mazania), potom skontrolujte plán a potvrďte znova.",
+            "running": "Prebieha mazanie.",
+            "running_stuck": "Mazanie beží viac ako hodinu a možno sa zastavilo. Skontrolujte plán a potvrďte znova."
           },
           "erased": "Vymazané {date}."
         },
@@ -62,7 +64,9 @@
         "actions": {
           "hold": "Pozastaviť",
           "release": "Zrušiť pozastavenie",
-          "load_more": "Načítať ďalšie"
+          "load_more": "Načítať ďalšie",
+          "erase": "Vymazať…",
+          "retry": "Skontrolovať a potvrdiť znova"
         },
         "dialog": {
           "hold": {
@@ -78,16 +82,62 @@
           "reason_label": "Dôvod",
           "reason_hint": "Aspoň {count} znakov.",
           "no_personal_details": "Nepíšte sem mená, e-mailové adresy ani iné osobné údaje: dôvod sa trvalo uchováva v auditnom zázname.",
-          "cancel": "Zrušiť"
+          "cancel": "Zrušiť",
+          "erase": {
+            "title": "Vymazať tento účet",
+            "warning": "Tým sa účet natrvalo vymaže: jeho osobné údaje, súbory aj prihlásenie. Nedá sa to vrátiť. Každé otvorené pridelenie sa zruší a jeho agentúra sa o tom dozvie.",
+            "loading": "Načítava sa plán…",
+            "not_ready": "Tento účet nie je pripravený na vymazanie: {reasons}.",
+            "retry_note": "Predchádzajúce mazanie tohto účtu sa zastavilo. Skontrolujte plán a potom potvrďte znova.",
+            "summary": {
+              "rows": "Riadky databázy na zmenu: {rows}, v {tables} tabuľkách.",
+              "files": "Súbory na vymazanie: {files}.",
+              "assignments": "Otvorené pridelenia na zrušenie: {count}. Každé informuje svoju agentúru.",
+              "read": "Prečítané riadky na zostavenie plánu: {rows}.",
+              "reference": "Referencia plánu: {digest}"
+            },
+            "ulid_label": "Na potvrdenie zadajte ID účtu",
+            "ulid_hint": "ID je {ulid}.",
+            "mfa_label": "Kód dvojfázového overenia alebo záložný kód",
+            "mfa_hint": "Záložný kód sa odoslaním spotrebuje.",
+            "confirm": "Vymazať natrvalo"
+          }
         },
         "capped": "Naraz sa kontroluje len prvých {count} účtov po termíne. Vybavte ich a načítajte znova.",
-        "action_failed": "Uloženie sa nepodarilo. Skúste to znova."
+        "action_failed": "Uloženie sa nepodarilo. Skúste to znova.",
+        "reason": {
+          "held": "je pozastavený",
+          "not_requested": "nikdy nepožiadal o vymazanie",
+          "grace_running": "jeho ochranná lehota neskončila",
+          "audit_scrub_unavailable": "krok auditného záznamu tu nie je k dispozícii",
+          "erased": "je už vymazaný",
+          "not_available": "nemožno ho vymazať"
+        },
+        "watch": {
+          "completed": "Účet bol vymazaný. Každé zrušené pridelenie informovalo svoju agentúru.",
+          "released": "Mazanie sa nezačalo: údaje sa od plánu zmenili, alebo niektorá kontrola teraz odmieta. Nič sa nevymazalo a tvorca môže stále zrušiť. Skontrolujte plán a skúste to znova."
+        }
       }
     },
     "erasure": {
       "hold": {
         "claimed": "Tento účet sa už maže, preto ho nemožno pozastaviť.",
         "not_available": "Tento účet nemožno pozastaviť."
+      },
+      "execute": {
+        "disabled": "Mazanie z administrácie je vypnuté. Správca platformy ho zapne v príznakoch funkcií, s uvedením dôvodu, pre jeden konkrétny účet.",
+        "ulid_mismatch": "Zadané ID nezodpovedá tomuto účtu.",
+        "not_ready": "Tento účet nie je pripravený na vymazanie.",
+        "in_progress": "Mazanie tohto účtu už prebieha.",
+        "mfa_required": "Zadajte kód dvojfázového overenia alebo záložný kód.",
+        "mfa_invalid": "Tento kód nie je platný.",
+        "mfa_rate_limited": "Príliš veľa chybných kódov. Počkajte 15 minút a skúste to znova.",
+        "mfa_suspended": "Vaše dvojfázové prihlásenie je pozastavené. Požiadajte iného správcu platformy, aby ho obnovil.",
+        "rate_limited": "Príliš veľa pokusov. Počkajte hodinu a skúste to znova."
+      },
+      "plan": {
+        "not_available": "Pre tento účet sa nedá zostaviť plán mazania.",
+        "rate_limited": "Príliš veľa požiadaviek na plán. Počkajte minútu a skúste to znova."
       }
     }
   }

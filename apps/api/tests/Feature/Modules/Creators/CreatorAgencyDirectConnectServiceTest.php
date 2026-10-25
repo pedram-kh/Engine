@@ -342,7 +342,8 @@ it('a terminal pair that is ALSO hard-blacklisted refuses on the blacklist, not 
 
 it('every outcome presents both ways: an api code and a log token', function (): void {
     foreach (DirectConnectOutcome::cases() as $outcome) {
-        expect($outcome->apiCode())->toStartWith('connection.')
+        // `creator.unavailable` (AH-104c) is the one neutral code every agency-side door already uses.
+        expect($outcome->apiCode())->toMatch('/^(connection\.|creator\.unavailable$)/')
             ->and($outcome->detail())->not->toBe('')
             ->and($outcome->httpStatus())->toBeIn([200, 422]);
     }

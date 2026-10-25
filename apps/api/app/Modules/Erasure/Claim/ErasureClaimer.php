@@ -42,6 +42,19 @@ use Illuminate\Database\ConnectionInterface;
  */
 final class ErasureClaimer
 {
+    public const GATE_HELD = 'held';
+
+    public const GATE_NOT_REQUESTED = 'not_requested';
+
+    public const GATE_GRACE_RUNNING = 'grace_running';
+
+    /** @var array<string, string> the command's sentence for each gate code */
+    private const GATE_SENTENCES = [
+        self::GATE_HELD => 'the account is on hold: release the hold first',
+        self::GATE_NOT_REQUESTED => 'the account has not asked to be deleted',
+        self::GATE_GRACE_RUNNING => 'the grace has not ended: the account is not due yet',
+    ];
+
     public function __construct(
         private readonly ConnectionInterface $db,
         private readonly AuditLogger $audit,
@@ -92,7 +105,7 @@ final class ErasureClaimer
                 metadata: ['mode' => $mode->value],
             );
 
-            return new ErasureClaim($locked->ulid, $mode, $operator?->id);
+            return new ErasureClaim($locked->ulid, $mode, $operator?->id, created: true);
         });
     }
 
@@ -151,26 +164,42 @@ final class ErasureClaimer
     /**
      * The gate's own legs, without the guards' refusals: a hold, and (normal mode) a request
      * whose grace has ended. Read-only and lock-free, so the shell's dry-run can print the
-     * verdict; `claim()` asks the same method after it holds the row lock.
+     * verdict and the admin's plan can show it; `claim()` asks the same method after it holds
+     * the row lock.
+     *
+     * @return list<string> {@see GATE_HELD}, {@see GATE_NOT_REQUESTED}, {@see GATE_GRACE_RUNNING}
+     */
+    public function gateCodes(User $user, ClaimMode $mode): array
+    {
+        $codes = [];
+        if ($user->isErasureHeld()) {
+            $codes[] = self::GATE_HELD;
+        }
+
+        if ($mode === ClaimMode::Normal) {
+            if ($user->deletion_requested_at === null || $user->deletion_scheduled_for === null) {
+                $codes[] = self::GATE_NOT_REQUESTED;
+            } elseif ($user->deletion_scheduled_for->isFuture()) {
+                $codes[] = self::GATE_GRACE_RUNNING;
+            }
+        }
+
+        return $codes;
+    }
+
+    /**
+     * The same legs as sentences, for the command's output and the claim's refusal.
      *
      * @return list<string>
      */
     public function requestGates(User $user, ClaimMode $mode): array
     {
-        $gates = [];
-        if ($user->isErasureHeld()) {
-            $gates[] = 'the account is on hold: release the hold first';
-        }
-
-        if ($mode === ClaimMode::Normal) {
-            if ($user->deletion_requested_at === null || $user->deletion_scheduled_for === null) {
-                $gates[] = 'the account has not asked to be deleted';
-            } elseif ($user->deletion_scheduled_for->isFuture()) {
-                $gates[] = 'the grace has not ended: the account is not due until '.$user->deletion_scheduled_for->toDateString();
-            }
-        }
-
-        return $gates;
+        return array_map(
+            fn (string $code): string => $code === self::GATE_GRACE_RUNNING && $user->deletion_scheduled_for !== null
+                ? 'the grace has not ended: the account is not due until '.$user->deletion_scheduled_for->toDateString()
+                : self::GATE_SENTENCES[$code],
+            $this->gateCodes($user, $mode),
+        );
     }
 
     /**

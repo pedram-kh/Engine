@@ -46,10 +46,12 @@
           "held": "Lukittu {date} alkaen.",
           "held_by": "Lukitsija: {admin}.",
           "in_progress": {
-            "claimed": "Poisto on alkanut.",
-            "started": "Poisto on käynnissä.",
-            "db_done": "Tietokantavaihe on valmis. Tiedostot ja auditointiloki on vielä viimeisteltävä.",
-            "incomplete": "Viimeisin ajo pysähtyi ennen valmistumista. Tarvitaan insinööri: noudata poiston runbookia."
+            "db_done": "Tietokantavaihe on valmis, mutta viimeinen vaihe ei valmistunut. Tarvitaan insinööri: seuraa poiston runbookia.",
+            "incomplete": "Edellinen ajo pysähtyi ennen valmistumista. Tarkista suunnitelma ja vahvista uudelleen.",
+            "waiting": "Odottaa, että poistoprosessi poimii sen.",
+            "waiting_stuck": "Odottanut yli tunnin: poistoprosessi voi olla alhaalla. Tarkista se (katso poiston runbook), tarkista sitten suunnitelma ja vahvista uudelleen.",
+            "running": "Poisto on käynnissä.",
+            "running_stuck": "Poisto on ollut käynnissä yli tunnin ja on voinut pysähtyä. Tarkista suunnitelma ja vahvista uudelleen."
           },
           "erased": "Poistettu {date}."
         },
@@ -62,7 +64,9 @@
         "actions": {
           "hold": "Lukitse",
           "release": "Vapauta lukitus",
-          "load_more": "Lataa lisää"
+          "load_more": "Lataa lisää",
+          "erase": "Poista…",
+          "retry": "Tarkista ja vahvista uudelleen"
         },
         "dialog": {
           "hold": {
@@ -78,16 +82,62 @@
           "reason_label": "Syy",
           "reason_hint": "Vähintään {count} merkkiä.",
           "no_personal_details": "Älä kirjoita tähän nimiä, sähköpostiosoitteita tai muita henkilötietoja: syy säilyy pysyvästi auditointilokissa.",
-          "cancel": "Peruuta"
+          "cancel": "Peruuta",
+          "erase": {
+            "title": "Poista tämä tili",
+            "warning": "Tämä poistaa tilin pysyvästi: sen henkilötiedot, tiedostot ja kirjautumisen. Sitä ei voi perua. Jokainen avoin toimeksianto perutaan, ja sen toimisto saa tiedon.",
+            "loading": "Luetaan suunnitelmaa…",
+            "not_ready": "Tämä tili ei ole valmis poistettavaksi: {reasons}.",
+            "retry_note": "Tämän tilin aiempi poisto pysähtyi. Tarkista suunnitelma ja vahvista sitten uudelleen.",
+            "summary": {
+              "rows": "Muutettavat tietokantarivit: {rows}, {tables} taulussa.",
+              "files": "Poistettavat tiedostot: {files}.",
+              "assignments": "Peruttavat avoimet toimeksiannot: {count}. Jokainen ilmoittaa omalle toimistolleen.",
+              "read": "Suunnitelmaa varten luetut rivit: {rows}.",
+              "reference": "Suunnitelman viite: {digest}"
+            },
+            "ulid_label": "Vahvista kirjoittamalla tilin tunnus",
+            "ulid_hint": "Tunnus on {ulid}.",
+            "mfa_label": "Kaksivaiheisen tunnistuksen koodi tai palautuskoodi",
+            "mfa_hint": "Palautuskoodi kuluu loppuun, kun lähetät sen.",
+            "confirm": "Poista pysyvästi"
+          }
         },
         "capped": "Kerrallaan tarkistetaan vain {count} ensimmäistä erääntynyttä tiliä. Käsittele ne ja lataa sivu uudelleen.",
-        "action_failed": "Tallennus epäonnistui. Yritä uudelleen."
+        "action_failed": "Tallennus epäonnistui. Yritä uudelleen.",
+        "reason": {
+          "held": "se on lukittu",
+          "not_requested": "se ei ole koskaan pyytänyt poistoa",
+          "grace_running": "sen harkinta-aika ei ole päättynyt",
+          "audit_scrub_unavailable": "tarkastuslokin vaihe ei ole täällä käytettävissä",
+          "erased": "se on jo poistettu",
+          "not_available": "sitä ei voi poistaa"
+        },
+        "watch": {
+          "completed": "Tili poistettiin. Jokainen peruttu toimeksianto ilmoitti omalle toimistolleen.",
+          "released": "Poisto ei alkanut: tiedot ovat muuttuneet suunnitelman jälkeen tai jokin tarkistus nyt estää sen. Mitään ei poistettu, ja tekijä voi yhä perua. Tarkista suunnitelma ja yritä uudelleen."
+        }
       }
     },
     "erasure": {
       "hold": {
         "claimed": "Tiliä poistetaan jo, joten sitä ei voi lukita.",
         "not_available": "Tiliä ei voi lukita."
+      },
+      "execute": {
+        "disabled": "Poisto ylläpidosta on pois päältä. Alustan ylläpitäjä ottaa sen käyttöön ominaisuuslipuissa, perustelun kanssa, yhdelle nimetylle tilille.",
+        "ulid_mismatch": "Kirjoittamasi tunnus ei vastaa tätä tiliä.",
+        "not_ready": "Tämä tili ei ole valmis poistettavaksi.",
+        "in_progress": "Tämän tilin poisto on jo käynnissä.",
+        "mfa_required": "Syötä kaksivaiheisen tunnistuksen koodi tai palautuskoodi.",
+        "mfa_invalid": "Tämä koodi ei kelpaa.",
+        "mfa_rate_limited": "Liian monta väärää koodia. Odota 15 minuuttia ja yritä uudelleen.",
+        "mfa_suspended": "Kaksivaiheinen kirjautumisesi on jäädytetty. Pyydä toista alustan ylläpitäjää nollaamaan se.",
+        "rate_limited": "Liian monta yritystä. Odota tunti ja yritä uudelleen."
+      },
+      "plan": {
+        "not_available": "Tälle tilille ei voi laatia poistosuunnitelmaa.",
+        "rate_limited": "Liian monta suunnitelmapyyntöä. Odota minuutti ja yritä uudelleen."
       }
     }
   }

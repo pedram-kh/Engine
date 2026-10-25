@@ -46,10 +46,12 @@
           "held": "Zadržano od {date}.",
           "held_by": "Zadržao/la: {admin}.",
           "in_progress": {
-            "claimed": "Brisanje je počelo.",
-            "started": "Brisanje je u tijeku.",
-            "db_done": "Korak u bazi podataka je gotov. Datoteke i revizijski zapisnik tek treba dovršiti.",
-            "incomplete": "Zadnje izvođenje stalo je prije završetka. Potreban je inženjer: slijedite runbook za brisanje."
+            "db_done": "Korak s bazom podataka je gotov, ali posljednji korak nije dovršen. Potreban je inženjer: slijedite runbook brisanja.",
+            "incomplete": "Zadnje izvršavanje zaustavilo se prije završetka. Pregledajte plan i ponovno potvrdite.",
+            "waiting": "Čeka da ga preuzme proces brisanja.",
+            "waiting_stuck": "Čeka dulje od sat vremena: proces brisanja možda ne radi. Provjerite ga (vidi runbook brisanja), zatim pregledajte plan i ponovno potvrdite.",
+            "running": "Brisanje je u tijeku.",
+            "running_stuck": "Brisanje traje dulje od sat vremena i možda se zaustavilo. Pregledajte plan i ponovno potvrdite."
           },
           "erased": "Obrisano {date}."
         },
@@ -62,7 +64,9 @@
         "actions": {
           "hold": "Zadrži",
           "release": "Ukloni zadržavanje",
-          "load_more": "Učitaj više"
+          "load_more": "Učitaj više",
+          "erase": "Obriši…",
+          "retry": "Pregledaj i ponovno potvrdi"
         },
         "dialog": {
           "hold": {
@@ -78,16 +82,62 @@
           "reason_label": "Razlog",
           "reason_hint": "Najmanje {count} znakova.",
           "no_personal_details": "Ovdje ne upisujte imena, adrese e-pošte ni druge osobne podatke: razlog se trajno čuva u revizijskom zapisniku.",
-          "cancel": "Odustani"
+          "cancel": "Odustani",
+          "erase": {
+            "title": "Obriši ovaj račun",
+            "warning": "Ovime se račun trajno briše: njegovi osobni podaci, datoteke i prijava. To se ne može poništiti. Svaki otvoreni angažman se otkazuje, a njegova agencija se obavještava.",
+            "loading": "Čitanje plana…",
+            "not_ready": "Ovaj račun nije spreman za brisanje: {reasons}.",
+            "retry_note": "Prethodno brisanje ovog računa zaustavilo se. Pregledajte plan, zatim ponovno potvrdite.",
+            "summary": {
+              "rows": "Retci baze podataka za promjenu: {rows}, u {tables} tablica.",
+              "files": "Datoteke za brisanje: {files}.",
+              "assignments": "Otvoreni angažmani za otkazivanje: {count}. Svaki obavještava svoju agenciju.",
+              "read": "Pročitani retci za izradu plana: {rows}.",
+              "reference": "Referenca plana: {digest}"
+            },
+            "ulid_label": "Za potvrdu upišite ID računa",
+            "ulid_hint": "ID je {ulid}.",
+            "mfa_label": "Kod za dvofaktorsku provjeru ili kod za oporavak",
+            "mfa_hint": "Kod za oporavak se iskoristi kad ga pošaljete.",
+            "confirm": "Obriši trajno"
+          }
         },
         "capped": "Odjednom se provjerava samo prvih {count} računa kojima je istekao rok. Obradite ih i ponovno učitajte.",
-        "action_failed": "Spremanje nije uspjelo. Pokušajte ponovno."
+        "action_failed": "Spremanje nije uspjelo. Pokušajte ponovno.",
+        "reason": {
+          "held": "je zadržan",
+          "not_requested": "nikada nije zatražio brisanje",
+          "grace_running": "njegovo razdoblje mirovanja nije završilo",
+          "audit_scrub_unavailable": "korak revizijskog zapisnika ovdje nije dostupan",
+          "erased": "već je obrisan",
+          "not_available": "ne može se obrisati"
+        },
+        "watch": {
+          "completed": "Račun je obrisan. Svaki otkazani angažman obavijestio je svoju agenciju.",
+          "released": "Brisanje nije započelo: podaci su se promijenili od izrade plana ili neka provjera sada odbija. Ništa nije obrisano, a kreator i dalje može otkazati. Pregledajte plan i pokušajte ponovno."
+        }
       }
     },
     "erasure": {
       "hold": {
         "claimed": "Ovaj se račun već briše pa ga nije moguće zadržati.",
         "not_available": "Ovaj račun nije moguće zadržati."
+      },
+      "execute": {
+        "disabled": "Brisanje iz administracije je isključeno. Administrator platforme uključuje ga u zastavicama značajki, s razlogom, za jedan imenovani račun.",
+        "ulid_mismatch": "Upisani ID ne odgovara ovom računu.",
+        "not_ready": "Ovaj račun nije spreman za brisanje.",
+        "in_progress": "Brisanje ovog računa već je u tijeku.",
+        "mfa_required": "Unesite kod za dvofaktorsku provjeru ili kod za oporavak.",
+        "mfa_invalid": "Taj kod nije valjan.",
+        "mfa_rate_limited": "Previše pogrešnih kodova. Pričekajte 15 minuta pa pokušajte ponovno.",
+        "mfa_suspended": "Vaša dvofaktorska prijava je suspendirana. Zamolite drugog administratora platforme da je resetira.",
+        "rate_limited": "Previše pokušaja. Pričekajte sat vremena pa pokušajte ponovno."
+      },
+      "plan": {
+        "not_available": "Za ovaj račun nije moguće izraditi plan brisanja.",
+        "rate_limited": "Previše zahtjeva za plan. Pričekajte minutu pa pokušajte ponovno."
       }
     }
   }

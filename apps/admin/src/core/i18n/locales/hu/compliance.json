@@ -46,10 +46,12 @@
           "held": "Zárolva ettől: {date}.",
           "held_by": "Zárolta: {admin}.",
           "in_progress": {
-            "claimed": "A törlés megkezdődött.",
-            "started": "A törlés folyamatban van.",
-            "db_done": "Az adatbázis-lépés kész. A fájlokat és az auditnaplót még be kell fejezni.",
-            "incomplete": "Az utolsó futás a befejezés előtt leállt. Mérnök szükséges: kövesd a törlési runbookot."
+            "db_done": "Az adatbázis-lépés kész, de az utolsó lépés nem fejeződött be. Mérnökre van szükség: kövesd a törlési runbookot.",
+            "incomplete": "Az utolsó futás a befejezés előtt leállt. Nézd át a tervet, és erősítsd meg újra.",
+            "waiting": "Arra vár, hogy a törlési folyamat felvegye.",
+            "waiting_stuck": "Több mint egy órája vár: a törlési folyamat lehet, hogy leállt. Ellenőrizd (lásd a törlési runbookot), majd nézd át a tervet, és erősítsd meg újra.",
+            "running": "A törlés folyamatban van.",
+            "running_stuck": "A törlés több mint egy órája fut, és lehet, hogy leállt. Nézd át a tervet, és erősítsd meg újra."
           },
           "erased": "Törölve: {date}."
         },
@@ -62,7 +64,9 @@
         "actions": {
           "hold": "Zárolás",
           "release": "Zárolás feloldása",
-          "load_more": "Továbbiak betöltése"
+          "load_more": "Továbbiak betöltése",
+          "erase": "Törlés…",
+          "retry": "Átnézés és újbóli megerősítés"
         },
         "dialog": {
           "hold": {
@@ -78,16 +82,62 @@
           "reason_label": "Indok",
           "reason_hint": "Legalább {count} karakter.",
           "no_personal_details": "Ide ne írj neveket, e-mail-címeket vagy más személyes adatot: az indok véglegesen megmarad az auditnaplóban.",
-          "cancel": "Mégse"
+          "cancel": "Mégse",
+          "erase": {
+            "title": "A fiók törlése",
+            "warning": "Ez véglegesen törli a fiókot: a személyes adatait, a fájljait és a bejelentkezését. Nem vonható vissza. Minden nyitott megbízás lemondásra kerül, és az ügynökségét értesítjük.",
+            "loading": "A terv beolvasása…",
+            "not_ready": "Ez a fiók nem áll készen a törlésre: {reasons}.",
+            "retry_note": "Ennek a fióknak egy korábbi törlése leállt. Nézd át a tervet, majd erősítsd meg újra.",
+            "summary": {
+              "rows": "Módosítandó adatbázissorok: {rows}, {tables} táblában.",
+              "files": "Törlendő fájlok: {files}.",
+              "assignments": "Lemondandó nyitott megbízások: {count}. Mindegyik értesíti a saját ügynökségét.",
+              "read": "A terv elkészítéséhez beolvasott sorok: {rows}.",
+              "reference": "Terv azonosítója: {digest}"
+            },
+            "ulid_label": "A megerősítéshez írd be a fiók azonosítóját",
+            "ulid_hint": "Az azonosító: {ulid}.",
+            "mfa_label": "Kétlépcsős kód vagy helyreállítási kód",
+            "mfa_hint": "A helyreállítási kód a beküldéssel elhasználódik.",
+            "confirm": "Végleges törlés"
+          }
         },
         "capped": "Egyszerre csak az első {count} esedékes fiók kerül ellenőrzésre. Kezeld ezeket, majd töltsd újra.",
-        "action_failed": "A mentés nem sikerült. Próbáld újra."
+        "action_failed": "A mentés nem sikerült. Próbáld újra.",
+        "reason": {
+          "held": "zárolva van",
+          "not_requested": "soha nem kérte a törlést",
+          "grace_running": "a türelmi ideje még nem járt le",
+          "audit_scrub_unavailable": "az auditnapló lépése itt nem érhető el",
+          "erased": "már törölve van",
+          "not_available": "nem törölhető"
+        },
+        "watch": {
+          "completed": "A fiók törölve lett. Minden lemondott megbízás értesítette az ügynökségét.",
+          "released": "A törlés nem indult el: az adatok a terv óta megváltoztak, vagy egy ellenőrzés most elutasítja. Semmi sem törlődött, és az alkotó még visszavonhatja. Nézd át a tervet, és próbáld újra."
+        }
       }
     },
     "erasure": {
       "hold": {
         "claimed": "Ez a fiók már törlés alatt áll, ezért nem zárolható.",
         "not_available": "Ez a fiók nem zárolható."
+      },
+      "execute": {
+        "disabled": "A törlés az adminból ki van kapcsolva. A platform adminisztrátora a funkciókapcsolókban kapcsolja be, indoklással, egyetlen megnevezett fiókra.",
+        "ulid_mismatch": "A beírt azonosító nem egyezik ezzel a fiókkal.",
+        "not_ready": "Ez a fiók nem áll készen a törlésre.",
+        "in_progress": "Ennek a fióknak a törlése már folyamatban van.",
+        "mfa_required": "Adj meg egy kétlépcsős kódot vagy helyreállítási kódot.",
+        "mfa_invalid": "Ez a kód érvénytelen.",
+        "mfa_rate_limited": "Túl sok hibás kód. Várj 15 percet, majd próbáld újra.",
+        "mfa_suspended": "A kétlépcsős bejelentkezésed fel van függesztve. Kérj meg egy másik platformadminisztrátort, hogy állítsa vissza.",
+        "rate_limited": "Túl sok kísérlet. Várj egy órát, majd próbáld újra."
+      },
+      "plan": {
+        "not_available": "Ehhez a fiókhoz nem készíthető törlési terv.",
+        "rate_limited": "Túl sok tervkérés. Várj egy percet, majd próbáld újra."
       }
     }
   }

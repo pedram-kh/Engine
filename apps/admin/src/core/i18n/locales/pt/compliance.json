@@ -46,10 +46,12 @@
           "held": "Retida desde {date}.",
           "held_by": "Retida por {admin}.",
           "in_progress": {
-            "claimed": "O apagamento começou.",
-            "started": "O apagamento está em curso.",
-            "db_done": "O passo da base de dados está concluído. Faltam concluir os ficheiros e o registo de auditoria.",
-            "incomplete": "A última execução parou antes de terminar. É preciso um engenheiro: siga o runbook de apagamento."
+            "db_done": "O passo da base de dados está concluído, mas o último passo não terminou. É preciso um engenheiro: siga o runbook de remoção.",
+            "incomplete": "A última execução parou antes de terminar. Reveja o plano e confirme de novo.",
+            "waiting": "A aguardar que o processo de remoção o recolha.",
+            "waiting_stuck": "A aguardar há mais de uma hora: o processo de remoção pode estar parado. Verifique-o (consulte o runbook de remoção), depois reveja o plano e confirme de novo.",
+            "running": "A remoção está em curso.",
+            "running_stuck": "A remoção está a decorrer há mais de uma hora e pode ter parado. Reveja o plano e confirme de novo."
           },
           "erased": "Apagada em {date}."
         },
@@ -62,7 +64,9 @@
         "actions": {
           "hold": "Reter",
           "release": "Libertar retenção",
-          "load_more": "Carregar mais"
+          "load_more": "Carregar mais",
+          "erase": "Apagar…",
+          "retry": "Rever e confirmar de novo"
         },
         "dialog": {
           "hold": {
@@ -78,16 +82,62 @@
           "reason_label": "Motivo",
           "reason_hint": "Pelo menos {count} caracteres.",
           "no_personal_details": "Não escreva aqui nomes, endereços de email ou outros dados pessoais: o motivo fica guardado permanentemente no registo de auditoria.",
-          "cancel": "Cancelar"
+          "cancel": "Cancelar",
+          "erase": {
+            "title": "Apagar esta conta",
+            "warning": "Isto apaga a conta de forma permanente: os dados pessoais, os ficheiros e o início de sessão. Não pode ser desfeito. Cada atribuição aberta é cancelada e a agência é avisada.",
+            "loading": "A ler o plano…",
+            "not_ready": "Esta conta não está pronta para ser apagada: {reasons}.",
+            "retry_note": "Uma remoção anterior desta conta parou. Reveja o plano e confirme de novo.",
+            "summary": {
+              "rows": "Linhas da base de dados a alterar: {rows}, em {tables} tabelas.",
+              "files": "Ficheiros a apagar: {files}.",
+              "assignments": "Atribuições abertas a cancelar: {count}. Cada uma avisa a sua agência.",
+              "read": "Linhas lidas para calcular o plano: {rows}.",
+              "reference": "Referência do plano: {digest}"
+            },
+            "ulid_label": "Escreva o id da conta para confirmar",
+            "ulid_hint": "O id é {ulid}.",
+            "mfa_label": "Código de dois fatores ou código de recuperação",
+            "mfa_hint": "Um código de recuperação é gasto ao ser enviado.",
+            "confirm": "Apagar definitivamente"
+          }
         },
         "capped": "Só são verificadas de cada vez as primeiras {count} contas vencidas. Trate-as e volte a carregar.",
-        "action_failed": "Não foi possível guardar. Tente novamente."
+        "action_failed": "Não foi possível guardar. Tente novamente.",
+        "reason": {
+          "held": "está retida",
+          "not_requested": "nunca pediu para ser apagada",
+          "grace_running": "o seu período de carência não terminou",
+          "audit_scrub_unavailable": "o passo do registo de auditoria não está disponível aqui",
+          "erased": "já foi apagada",
+          "not_available": "não pode ser apagada"
+        },
+        "watch": {
+          "completed": "A conta foi apagada. Cada atribuição cancelada avisou a sua agência.",
+          "released": "A remoção não começou: os dados mudaram desde o plano ou uma verificação recusa agora. Nada foi apagado e o criador ainda pode cancelar. Reveja o plano e tente de novo."
+        }
       }
     },
     "erasure": {
       "hold": {
         "claimed": "Esta conta já está a ser apagada, por isso não pode ser retida.",
         "not_available": "Esta conta não pode ser retida."
+      },
+      "execute": {
+        "disabled": "A remoção a partir da administração está desligada. Um administrador da plataforma liga-a nas funcionalidades (feature flags), com um motivo, para uma única conta indicada.",
+        "ulid_mismatch": "O id que escreveu não corresponde a esta conta.",
+        "not_ready": "Esta conta não está pronta para ser apagada.",
+        "in_progress": "Já está em curso uma remoção desta conta.",
+        "mfa_required": "Introduza um código de dois fatores ou um código de recuperação.",
+        "mfa_invalid": "Esse código não é válido.",
+        "mfa_rate_limited": "Demasiados códigos errados. Aguarde 15 minutos e tente de novo.",
+        "mfa_suspended": "O seu início de sessão de dois fatores está suspenso. Peça a outro administrador da plataforma que o reponha.",
+        "rate_limited": "Demasiadas tentativas. Aguarde uma hora e tente de novo."
+      },
+      "plan": {
+        "not_available": "Não é possível preparar um plano de remoção para esta conta.",
+        "rate_limited": "Demasiados pedidos de plano. Aguarde um minuto e tente de novo."
       }
     }
   }

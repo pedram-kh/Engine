@@ -46,10 +46,12 @@
           "held": "Gesperrt seit {date}.",
           "held_by": "Gesperrt von {admin}.",
           "in_progress": {
-            "claimed": "Die Löschung hat begonnen.",
-            "started": "Die Löschung läuft.",
-            "db_done": "Der Datenbankschritt ist erledigt. Die Dateien und das Audit-Protokoll müssen noch abgeschlossen werden.",
-            "incomplete": "Der letzte Lauf wurde vor dem Abschluss abgebrochen. Dafür braucht es einen Techniker: folge dem Löschungs-Runbook."
+            "db_done": "Der Datenbankschritt ist erledigt, aber der letzte Schritt wurde nicht abgeschlossen. Dafür braucht es einen Techniker: folge dem Löschungs-Runbook.",
+            "incomplete": "Der letzte Lauf wurde vor dem Abschluss abgebrochen. Sieh dir den Plan an und bestätige erneut.",
+            "waiting": "Wartet darauf, dass der Löschprozess es aufnimmt.",
+            "waiting_stuck": "Wartet seit über einer Stunde: Der Löschprozess ist möglicherweise ausgefallen. Prüfe ihn (siehe Löschungs-Runbook), sieh dir dann den Plan an und bestätige erneut.",
+            "running": "Die Löschung läuft.",
+            "running_stuck": "Die Löschung läuft seit über einer Stunde und ist möglicherweise stehen geblieben. Sieh dir den Plan an und bestätige erneut."
           },
           "erased": "Gelöscht am {date}."
         },
@@ -62,7 +64,9 @@
         "actions": {
           "hold": "Sperren",
           "release": "Sperre aufheben",
-          "load_more": "Mehr laden"
+          "load_more": "Mehr laden",
+          "erase": "Löschen…",
+          "retry": "Prüfen und erneut bestätigen"
         },
         "dialog": {
           "hold": {
@@ -78,16 +82,62 @@
           "reason_label": "Grund",
           "reason_hint": "Mindestens {count} Zeichen.",
           "no_personal_details": "Schreibe hier keine Namen, E-Mail-Adressen oder anderen personenbezogenen Angaben: Der Grund bleibt dauerhaft im Audit-Protokoll.",
-          "cancel": "Abbrechen"
+          "cancel": "Abbrechen",
+          "erase": {
+            "title": "Dieses Konto löschen",
+            "warning": "Damit wird das Konto endgültig gelöscht: seine personenbezogenen Daten, seine Dateien und sein Login. Das lässt sich nicht rückgängig machen. Jede offene Zuweisung wird storniert, und die Agentur wird informiert.",
+            "loading": "Plan wird gelesen…",
+            "not_ready": "Dieses Konto ist nicht bereit zur Löschung: {reasons}.",
+            "retry_note": "Eine frühere Löschung dieses Kontos wurde abgebrochen. Sieh dir den Plan an und bestätige dann erneut.",
+            "summary": {
+              "rows": "Zu ändernde Datenbankzeilen: {rows}, in {tables} Tabellen.",
+              "files": "Zu löschende Dateien: {files}.",
+              "assignments": "Zu stornierende offene Zuweisungen: {count}. Jede informiert ihre Agentur.",
+              "read": "Zur Erstellung gelesene Zeilen: {rows}.",
+              "reference": "Plan-Referenz: {digest}"
+            },
+            "ulid_label": "Zur Bestätigung die Konto-ID eingeben",
+            "ulid_hint": "Die ID lautet {ulid}.",
+            "mfa_label": "Zwei-Faktor-Code oder Wiederherstellungscode",
+            "mfa_hint": "Ein Wiederherstellungscode ist nach dem Absenden verbraucht.",
+            "confirm": "Endgültig löschen"
+          }
         },
         "capped": "Es werden jeweils nur die ersten {count} fälligen Konten geprüft. Bearbeite diese und lade dann neu.",
-        "action_failed": "Das konnte nicht gespeichert werden. Bitte versuche es erneut."
+        "action_failed": "Das konnte nicht gespeichert werden. Bitte versuche es erneut.",
+        "reason": {
+          "held": "es ist gesperrt",
+          "not_requested": "es hat nie die Löschung beantragt",
+          "grace_running": "die Karenzzeit ist noch nicht abgelaufen",
+          "audit_scrub_unavailable": "der Audit-Protokoll-Schritt ist hier nicht verfügbar",
+          "erased": "es ist bereits gelöscht",
+          "not_available": "es kann nicht gelöscht werden"
+        },
+        "watch": {
+          "completed": "Das Konto wurde gelöscht. Jede stornierte Zuweisung hat ihre Agentur informiert.",
+          "released": "Die Löschung wurde nicht gestartet: Die Daten haben sich seit dem Plan geändert, oder eine Prüfung lehnt jetzt ab. Es wurde nichts gelöscht, und der Creator kann weiterhin widerrufen. Sieh dir den Plan an und versuche es erneut."
+        }
       }
     },
     "erasure": {
       "hold": {
         "claimed": "Dieses Konto wird bereits gelöscht und kann daher nicht gesperrt werden.",
         "not_available": "Dieses Konto kann nicht gesperrt werden."
+      },
+      "execute": {
+        "disabled": "Löschen im Admin-Bereich ist ausgeschaltet. Ein Plattform-Admin schaltet es unter Feature-Flags ein, mit Begründung, für ein einzelnes benanntes Konto.",
+        "ulid_mismatch": "Die eingegebene ID passt nicht zu diesem Konto.",
+        "not_ready": "Dieses Konto ist nicht bereit zur Löschung.",
+        "in_progress": "Eine Löschung dieses Kontos läuft bereits.",
+        "mfa_required": "Gib einen Zwei-Faktor-Code oder einen Wiederherstellungscode ein.",
+        "mfa_invalid": "Dieser Code ist ungültig.",
+        "mfa_rate_limited": "Zu viele falsche Codes. Warte 15 Minuten und versuche es dann erneut.",
+        "mfa_suspended": "Deine Zwei-Faktor-Anmeldung ist gesperrt. Bitte einen anderen Plattform-Admin, sie zurückzusetzen.",
+        "rate_limited": "Zu viele Versuche. Warte eine Stunde und versuche es dann erneut."
+      },
+      "plan": {
+        "not_available": "Für dieses Konto kann kein Löschplan erstellt werden.",
+        "rate_limited": "Zu viele Planabfragen. Warte eine Minute und versuche es dann erneut."
       }
     }
   }

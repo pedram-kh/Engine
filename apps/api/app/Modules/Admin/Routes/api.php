@@ -177,6 +177,10 @@ Route::prefix('admin')
             Route::get('erasure-queue', [AdminErasureQueueController::class, 'index'])->name('erasures');
             Route::post('erasure-queue/{user}/hold', [AdminErasureQueueController::class, 'hold'])->name('erasures.hold');
             Route::post('erasure-queue/{user}/release', [AdminErasureQueueController::class, 'release'])->name('erasures.release');
+            // AH-104c C3: one row (the page polls it), the read-only plan, and the Erase click (flag-gated, queues the run).
+            Route::get('erasure-queue/{user}', [AdminErasureQueueController::class, 'show'])->name('erasures.show');
+            Route::get('erasure-queue/{user}/plan', [AdminErasureQueueController::class, 'plan'])->middleware('throttle:admin-erasure-plan')->name('erasures.plan');
+            Route::post('erasure-queue/{user}/erase', [AdminErasureQueueController::class, 'erase'])->middleware('throttle:admin-erasure-erase')->name('erasures.erase');
         });
 
         // ─── Operational alerts — admin notification consumer (D-12) ──

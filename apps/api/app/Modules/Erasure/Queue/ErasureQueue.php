@@ -13,6 +13,7 @@ use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /**
  * The erasure queue's read side (AH-104c C2): who is waiting to be erased, in which state, and
@@ -26,7 +27,9 @@ use Illuminate\Support\Carbon;
  * - **ready**: the grace has ended, not held, not claimed, and no guard refuses.
  * - **blocked**: due, but a guard refuses (coarse codes only: payment, delivered_work, vendor).
  * - **held**: an admin's legal hold stands (with or without a request).
- * - **in_progress**: claimed for erasure, not yet erased (the ledger says how far it got).
+ * - **in_progress**: claimed for erasure and not finished (the ledger says how far it got, and
+ *   {@see ErasureRunStatus} whether it looks stuck). An account whose run stopped at `db_done` is already
+ *   erased on its row but still listed here until the ledger mirror is written.
  * - **erased**: read from `erasure_ledger` ONLY. The user row is anonymised, so no name or email
  *   exists to show and nothing here joins to it for one.
  *
@@ -76,7 +79,7 @@ final class ErasureQueue
             self::READY => count(array_filter($due['verdicts'], static fn (array $blockers): bool => $blockers === [])),
             self::BLOCKED => count(array_filter($due['verdicts'], static fn (array $blockers): bool => $blockers !== [])),
             self::HELD => $this->base()->where($this->heldOnly(...))->count(),
-            self::IN_PROGRESS => $this->base()->where($this->claimedOnly(...))->count(),
+            self::IN_PROGRESS => $this->inProgress()->count(),
             self::ERASED => ErasureLedger::query()->where('state', ErasureLedgerState::Completed->value)->count(),
             'due_scan_capped' => $due['capped'],
         ];
@@ -99,13 +102,13 @@ final class ErasureQueue
             return $this->duePage($tab, $after, $perPage);
         }
 
-        $query = $this->base()->orderBy('users.id')->limit($perPage + 1);
-        match ($tab) {
-            self::PENDING => $query->where($this->pendingOnly(...)),
-            self::HELD => $query->where($this->heldOnly(...)),
-            self::IN_PROGRESS => $query->where($this->claimedOnly(...)),
+        $query = match ($tab) {
+            self::PENDING => $this->base()->where($this->pendingOnly(...)),
+            self::HELD => $this->base()->where($this->heldOnly(...)),
+            self::IN_PROGRESS => $this->inProgress(),
             default => throw new \InvalidArgumentException("Unknown queue tab: {$tab}"),
         };
+        $query->orderBy('users.id')->limit($perPage + 1);
         if ($after !== null) {
             $query->where('users.id', '>', $after);
         }
@@ -116,19 +119,51 @@ final class ErasureQueue
         return $this->slice($users, $perPage, fn (array $slice): array => $this->present($slice, null));
     }
 
-    /** The queue row of one account (for the hold and release answers), or null when it is not in the queue. */
+    /** The queue row of one account (for the hold, release and status answers), or null when it is not in the queue. */
     public function rowFor(User $user): ?array
     {
-        if ($user->type !== UserType::Creator || $user->isErased()) {
+        if ($user->type !== UserType::Creator) {
             return null;
         }
-        if ($user->deletion_requested_at === null && ! $user->isErasureHeld() && ! $user->isErasureClaimed()) {
+        if ($user->isErased()) {
+            // An erased account stays on the queue only while its run is unfinished (db_done): it needs a person.
+            if (! $this->hasUnfinishedRun($user)) {
+                return null;
+            }
+        } elseif ($user->deletion_requested_at === null && ! $user->isErasureHeld() && ! $user->isErasureClaimed()) {
             return null;
         }
 
-        $blockers = $this->isDue($user) ? $this->blockersOf($user) : [];
+        $blockers = ! $user->isErased() && $this->isDue($user) ? $this->blockersOf($user) : [];
 
         return $this->present([$user], [$user->id => $blockers])[0];
+    }
+
+    private function hasUnfinishedRun(User $user): bool
+    {
+        return $user->erasure_started_at !== null
+            && ErasureLedger::query()->where('user_ulid', $user->ulid)->where('state', ErasureLedgerState::DbDone->value)->exists();
+    }
+
+    /**
+     * Claimed accounts, plus erased ones whose run stopped at `db_done` (the mirror failed): the
+     * second kind must stay visible, because nothing else in the page would show them (P10).
+     *
+     * @return Builder<User>
+     */
+    private function inProgress(): Builder
+    {
+        return User::query()
+            ->where('users.type', UserType::Creator->value)
+            ->whereNotNull('users.erasure_started_at')
+            ->where(function (Builder $q): void {
+                $q->whereNull('users.erased_at')->orWhereExists(
+                    DB::table('erasure_ledger')
+                        ->selectRaw('1')
+                        ->whereColumn('erasure_ledger.user_ulid', 'users.ulid')
+                        ->where('erasure_ledger.state', ErasureLedgerState::DbDone->value),
+                );
+            });
     }
 
     // ── The cheap tabs' predicates (SQL only) ───────────────────────────────
@@ -144,12 +179,6 @@ final class ErasureQueue
                     ->orWhereNotNull('users.erasure_held_at')
                     ->orWhereNotNull('users.erasure_started_at');
             });
-    }
-
-    /** @param  Builder<User>  $q */
-    private function claimedOnly(Builder $q): void
-    {
-        $q->whereNotNull('users.erasure_started_at');
     }
 
     /** @param  Builder<User>  $q */
@@ -306,13 +335,14 @@ final class ErasureQueue
         $creatorUlids = Creator::query()->whereIn('user_id', $userIds)->pluck('ulid', 'user_id')->all();
         $holderIds = array_values(array_filter(array_map(static fn (User $u): ?int => $u->erasure_held_by_user_id, $users)));
         $holders = $holderIds === [] ? [] : User::query()->withTrashed()->whereIn('id', $holderIds)->pluck('name', 'id')->all();
-        $ulids = array_map(static fn (User $u): string => $u->ulid, array_filter($users, static fn (User $u): bool => $u->isErasureClaimed()));
+        $ulids = array_map(static fn (User $u): string => $u->ulid, array_filter($users, static fn (User $u): bool => $u->erasure_started_at !== null));
         $ledger = $ulids === [] ? [] : ErasureLedger::query()->whereIn('user_ulid', $ulids)->orderBy('id')->get()->keyBy('user_ulid')->all();
 
         $rows = [];
         foreach ($users as $user) {
             $blockers = $verdicts[$user->id] ?? [];
             $state = $this->stateOf($user, $blockers);
+            $run = ErasureRunStatus::for($user, $ledger[$user->ulid] ?? null);
 
             $rows[] = [
                 'id' => $user->ulid,
@@ -329,7 +359,8 @@ final class ErasureQueue
                     'held_at' => $user->erasure_held_at?->toIso8601String(),
                     'held_by' => $user->erasure_held_by_user_id !== null ? ($holders[$user->erasure_held_by_user_id] ?? null) : null,
                     'claimed_at' => $user->erasure_started_at?->toIso8601String(),
-                    'ledger_state' => $user->isErasureClaimed() ? (isset($ledger[$user->ulid]) ? $ledger[$user->ulid]->state->value : 'claimed') : null,
+                    'ledger_state' => $run === null ? null : (isset($ledger[$user->ulid]) ? $ledger[$user->ulid]->state->value : 'claimed'),
+                    'run' => $run?->toArray(),
                     'blockers' => $blockers,
                 ],
             ];
@@ -341,7 +372,7 @@ final class ErasureQueue
     /** @param  list<string>  $blockers */
     private function stateOf(User $user, array $blockers): string
     {
-        if ($user->isErasureClaimed()) {
+        if ($user->erasure_started_at !== null) {
             return self::IN_PROGRESS;
         }
         if ($user->isErasureHeld()) {

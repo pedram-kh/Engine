@@ -46,10 +46,12 @@
           "held": "Sulaikyta nuo {date}.",
           "held_by": "Sulaikė: {admin}.",
           "in_progress": {
-            "claimed": "Trynimas prasidėjo.",
-            "started": "Trynimas vyksta.",
-            "db_done": "Duomenų bazės žingsnis baigtas. Failus ir audito žurnalą dar reikia užbaigti.",
-            "incomplete": "Paskutinis vykdymas sustojo nebaigtas. Reikia inžinieriaus: laikykitės trynimo runbook."
+            "db_done": "Duomenų bazės žingsnis atliktas, bet paskutinis žingsnis nebaigtas. Reikia inžinieriaus: laikykitės ištrynimo runbook.",
+            "incomplete": "Paskutinis vykdymas sustojo nebaigtas. Peržiūrėkite planą ir patvirtinkite dar kartą.",
+            "waiting": "Laukiama, kol ištrynimo procesas jį perims.",
+            "waiting_stuck": "Laukia daugiau nei valandą: ištrynimo procesas gali būti sustojęs. Patikrinkite jį (žr. ištrynimo runbook), tada peržiūrėkite planą ir patvirtinkite dar kartą.",
+            "running": "Vyksta ištrynimas.",
+            "running_stuck": "Ištrynimas vyksta daugiau nei valandą ir gali būti sustojęs. Peržiūrėkite planą ir patvirtinkite dar kartą."
           },
           "erased": "Ištrinta {date}."
         },
@@ -62,7 +64,9 @@
         "actions": {
           "hold": "Sulaikyti",
           "release": "Panaikinti sulaikymą",
-          "load_more": "Įkelti daugiau"
+          "load_more": "Įkelti daugiau",
+          "erase": "Ištrinti…",
+          "retry": "Peržiūrėti ir patvirtinti dar kartą"
         },
         "dialog": {
           "hold": {
@@ -78,16 +82,62 @@
           "reason_label": "Priežastis",
           "reason_hint": "Bent {count} simbolių.",
           "no_personal_details": "Čia nerašykite vardų, el. pašto adresų ar kitų asmens duomenų: priežastis visam laikui saugoma audito žurnale.",
-          "cancel": "Atšaukti"
+          "cancel": "Atšaukti",
+          "erase": {
+            "title": "Ištrinti šią paskyrą",
+            "warning": "Tai visam laikui ištrina paskyrą: jos asmens duomenis, failus ir prisijungimą. To atšaukti negalima. Kiekvienas atviras priskyrimas atšaukiamas, o jo agentūrai pranešama.",
+            "loading": "Skaitomas planas…",
+            "not_ready": "Ši paskyra neparengta ištrynimui: {reasons}.",
+            "retry_note": "Ankstesnis šios paskyros ištrynimas sustojo. Peržiūrėkite planą, tada patvirtinkite dar kartą.",
+            "summary": {
+              "rows": "Keičiamos duomenų bazės eilutės: {rows}, {tables} lentelėse.",
+              "files": "Ištrinami failai: {files}.",
+              "assignments": "Atšaukiami atviri priskyrimai: {count}. Kiekvienas praneša savo agentūrai.",
+              "read": "Planui sudaryti perskaitytos eilutės: {rows}.",
+              "reference": "Plano nuoroda: {digest}"
+            },
+            "ulid_label": "Patvirtindami įveskite paskyros ID",
+            "ulid_hint": "ID yra {ulid}.",
+            "mfa_label": "Dviejų veiksnių kodas arba atkūrimo kodas",
+            "mfa_hint": "Atkūrimo kodas sunaudojamas jį pateikus.",
+            "confirm": "Ištrinti visam laikui"
+          }
         },
         "capped": "Vienu metu tikrinamos tik pirmosios {count} pasibaigusio termino paskyros. Apdorokite jas ir įkelkite iš naujo.",
-        "action_failed": "Nepavyko išsaugoti. Bandykite dar kartą."
+        "action_failed": "Nepavyko išsaugoti. Bandykite dar kartą.",
+        "reason": {
+          "held": "jis sulaikytas",
+          "not_requested": "jis niekada neprašė ištrinti",
+          "grace_running": "jo lengvatinis laikotarpis dar nesibaigė",
+          "audit_scrub_unavailable": "audito žurnalo žingsnis čia nepasiekiamas",
+          "erased": "jis jau ištrintas",
+          "not_available": "jo ištrinti negalima"
+        },
+        "watch": {
+          "completed": "Paskyra ištrinta. Kiekvienas atšauktas priskyrimas pranešė savo agentūrai.",
+          "released": "Ištrynimas neprasidėjo: duomenys pasikeitė nuo plano sudarymo arba kuri nors patikra dabar atsisako. Nieko neištrinta, o kūrėjas vis dar gali atšaukti. Peržiūrėkite planą ir bandykite dar kartą."
+        }
       }
     },
     "erasure": {
       "hold": {
         "claimed": "Ši paskyra jau trinama, todėl jos sulaikyti negalima.",
         "not_available": "Šios paskyros sulaikyti negalima."
+      },
+      "execute": {
+        "disabled": "Ištrynimas iš administravimo išjungtas. Platformos administratorius jį įjungia funkcijų vėliavėlėse, nurodydamas priežastį, vienai įvardytai paskyrai.",
+        "ulid_mismatch": "Įvestas ID neatitinka šios paskyros.",
+        "not_ready": "Ši paskyra neparengta ištrynimui.",
+        "in_progress": "Šios paskyros ištrynimas jau vyksta.",
+        "mfa_required": "Įveskite dviejų veiksnių kodą arba atkūrimo kodą.",
+        "mfa_invalid": "Šis kodas negalioja.",
+        "mfa_rate_limited": "Per daug neteisingų kodų. Palaukite 15 minučių ir bandykite dar kartą.",
+        "mfa_suspended": "Jūsų dviejų veiksnių prisijungimas sustabdytas. Paprašykite kito platformos administratoriaus jį iš naujo nustatyti.",
+        "rate_limited": "Per daug bandymų. Palaukite valandą ir bandykite dar kartą."
+      },
+      "plan": {
+        "not_available": "Šiai paskyrai negalima sudaryti ištrynimo plano.",
+        "rate_limited": "Per daug plano užklausų. Palaukite minutę ir bandykite dar kartą."
       }
     }
   }

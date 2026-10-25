@@ -207,7 +207,8 @@
             "failed": "Ma stajniex noħolqu din il-konnessjoni. Erġa' pprova.",
             "not_approved_warning": "Dan il-kreatur għadu ma ġiex approvat u ma jistax jiġi mgħaqqad ma' aġenzija. L-ewwel approva l-applikazzjoni tiegħu.",
             "error_not_approved": "Dan il-kreatur għadu ma ġiex approvat. Approva l-applikazzjoni tiegħu qabel ma tgħaqqdu ma' aġenzija.",
-            "error_blacklisted": "Dan il-par kreatur–aġenzija jinsab fuq il-lista s-sewda, għalhekk ma tistax tinħoloq konnessjoni."
+            "error_blacklisted": "Dan il-par kreatur–aġenzija jinsab fuq il-lista s-sewda, għalhekk ma tistax tinħoloq konnessjoni.",
+            "error_unavailable": "Dan il-kreatur qed ihalli l-pjattaforma u ma jistax jiġi konness ma' aġenzija."
           },
           "disconnect": {
             "title": "Taqta' l-konnessjoni ta' {name} minn {agency}?",

@@ -90,6 +90,7 @@ it('claims a request whose grace has ended: stamps the account, writes one audit
 });
 
 it('refuses, and writes nothing, on every leg of the gate', function (string $leg): void {
+    $this->freezeTime(); // "one second to go" must still be one second ahead when the claim reads the clock
     $user = claimerSubject();
 
     match ($leg) {
@@ -401,4 +402,41 @@ it('refuses a claim that belongs to another account, and one that was released a
     app(ErasureClaimer::class)->release($a->user->refresh(), null, 'refused');
 
     expect(fn () => $run->execute($a->user->refresh(), $claimOfA, $run->plan($a->user)->digest(), $a->user->ulid))->toThrow(ErasureRefused::class, 'not claimed');
+});
+
+it('names each leg of the gate as a code, and the command\'s sentence is made from the same codes', function (string $leg, array $codes): void {
+    $this->freezeTime();
+    $user = claimerSubject();
+    match ($leg) {
+        'ready' => null,
+        'held' => $user->forceFill(['erasure_held_at' => now()])->saveQuietly(),
+        'never asked' => $user->forceFill(['deletion_requested_at' => null, 'deletion_scheduled_for' => null])->saveQuietly(),
+        'grace running' => $user->forceFill(['deletion_scheduled_for' => now()->addDay()])->saveQuietly(),
+        'held and grace running' => $user->forceFill(['erasure_held_at' => now(), 'deletion_scheduled_for' => now()->addDay()])->saveQuietly(),
+        default => throw new InvalidArgumentException($leg),
+    };
+    $claimer = app(ErasureClaimer::class);
+
+    expect($claimer->gateCodes($user->refresh(), ClaimMode::Normal))->toBe($codes)
+        ->and($claimer->requestGates($user, ClaimMode::Normal))->toHaveCount(count($codes))
+        // Forcing skips the request legs, never the hold.
+        ->and($claimer->gateCodes($user, ClaimMode::ForceNotRequested))->toBe(in_array('held', $codes, true) ? ['held'] : []);
+})->with([
+    'ready' => ['ready', []],
+    'held' => ['held', ['held']],
+    'never asked' => ['never asked', ['not_requested']],
+    'grace running' => ['grace running', ['grace_running']],
+    'held and grace running' => ['held and grace running', ['held', 'grace_running']],
+]);
+
+it('marks only the call that stamped the claim as having created it', function (): void {
+    $user = claimerSubject();
+    $operator = User::factory()->platformAdmin()->createOne();
+    $claimer = app(ErasureClaimer::class);
+
+    $first = $claimer->claim($user, $operator, ClaimMode::Normal, 'Ready: the grace ended');
+    $second = $claimer->claim($user->refresh(), $operator, ClaimMode::Normal, 'Ready: the grace ended');
+
+    expect($first->created)->toBeTrue()
+        ->and($second->created)->toBeFalse();
 });

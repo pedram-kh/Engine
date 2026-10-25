@@ -207,7 +207,8 @@
             "failed": "Nem sikerült létrehozni ezt a kapcsolatot. Próbálja újra.",
             "not_approved_warning": "Ezt az alkotót még nem hagyták jóvá, ezért nem kapcsolható ügynökséghez. Először hagyja jóvá a jelentkezését.",
             "error_not_approved": "Ezt az alkotót még nem hagyták jóvá. Hagyja jóvá a jelentkezését, mielőtt ügynökséghez kapcsolná.",
-            "error_blacklisted": "Ez az alkotó–ügynökség páros feketelistán van, ezért nem hozható létre kapcsolat."
+            "error_blacklisted": "Ez az alkotó–ügynökség páros feketelistán van, ezért nem hozható létre kapcsolat.",
+            "error_unavailable": "Ez az alkotó elhagyja a platformot, és nem köthető ügynökséghez."
           },
           "disconnect": {
             "title": "Leválasztja {name} alkotót a következőről: {agency}?",

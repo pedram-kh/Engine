@@ -20,7 +20,10 @@ namespace Tests\Support;
  *               `AdminDeletionFlags`)
  *   reader    — the one class that spells the flags
  *   unchanged — deliberately NOT changed; a reason is required
- *   open      — a known gap, NOT guarded today; the reason must name the tech-debt entry
+ *   guarded   — refuses a leaving account itself (AH-104c C2-4a); the file asks `isUnavailableToAgencies`
+ *   delegated — acts through a service that refuses a leaving account; the file names the service and
+ *               the service's source is checked for the guard (AH-104c C2-4a)
+ *   open      — a known gap, NOT guarded today; the reason must name the tech-debt entry (none today)
  */
 final class AdminCreatorSurfaces
 {
@@ -42,9 +45,9 @@ final class AdminCreatorSurfaces
             'Admin/Http/Controllers/AdminCreatorAppController.php' => ['flagged', 'The creator-app usage list: the creator block carries both flags.'],
             'Admin/Http/Controllers/AdminDashboardController.php' => ['unchanged', 'Counts of creators awaiting approval or KYC; emits no creator field.'],
             'Admin/Http/Controllers/AdminPushDeliveryController.php' => ['flagged', 'The push-delivery log: the creator block carries both flags.'],
-            'Admin/Jobs/RunAutomationRuleJob.php' => ['open', 'Runs a "creator approved" rule (connect to an agency) with no check that the account is not leaving: tech-debt AH-104c C2-4a.'],
+            'Admin/Jobs/RunAutomationRuleJob.php' => ['delegated', 'Runs a "creator approved" rule through CreatorAgencyDirectConnectService, which refuses a leaving account (skipped:creator_unavailable).'],
             'Admin/Support/AdminDeletionFlags.php' => ['reader', 'The one place the two flags are spelled.'],
-            'Creators/Http/Controllers/Admin/AdminCreatorConnectionController.php' => ['open', 'An admin connecting a creator to an agency has no check that the account is not leaving: tech-debt AH-104c C2-4a.'],
+            'Creators/Http/Controllers/Admin/AdminCreatorConnectionController.php' => ['guarded', 'Door 1 (request) refuses a leaving account here; Door 2 (direct) through the connect service. Both answer 422 creator.unavailable.'],
             'Creators/Http/Controllers/Admin/AdminCreatorController.php' => ['flagged', 'The review queue: each row carries both flags.'],
             'Creators/Http/Controllers/Admin/AdminCreatorHistoryController.php' => ['unchanged', "The creator's audit history: emits the actors' emails, never the creator's own name or email."],
             'Creators/Http/Resources/CreatorResource.php' => ['flagged', 'The admin detail: admin_attributes carries both flags (the creator-facing view carries neither).'],
@@ -59,6 +62,8 @@ final class AdminCreatorSurfaces
         return match ($kind) {
             'flagged' => ['AdminDeletionFlags', 'deletion_pending'],
             'reader' => ['function forCreator', 'function forUser'],
+            'guarded' => ['isUnavailableToAgencies'],
+            'delegated' => ['CreatorAgencyDirectConnectService'],
             default => null,
         };
     }

@@ -46,10 +46,12 @@
           "held": "Zadržano od {date}.",
           "held_by": "Zadržal(a): {admin}.",
           "in_progress": {
-            "claimed": "Izbris se je začel.",
-            "started": "Izbris poteka.",
-            "db_done": "Korak v zbirki podatkov je končan. Datoteke in revizijsko sled je treba še dokončati.",
-            "incomplete": "Zadnji zagon se je ustavil pred koncem. Potreben je inženir: sledite runbooku za izbris."
+            "db_done": "Korak v zbirki podatkov je opravljen, vendar zadnji korak ni končan. Potreben je inženir: sledite runbooku brisanja.",
+            "incomplete": "Zadnji zagon se je ustavil, preden je končal. Preglejte načrt in znova potrdite.",
+            "waiting": "Čaka, da ga prevzame postopek brisanja.",
+            "waiting_stuck": "Čaka več kot uro: postopek brisanja morda ne deluje. Preverite ga (glejte runbook brisanja), nato preglejte načrt in znova potrdite.",
+            "running": "Brisanje poteka.",
+            "running_stuck": "Brisanje poteka več kot uro in se je morda ustavilo. Preglejte načrt in znova potrdite."
           },
           "erased": "Izbrisano {date}."
         },
@@ -62,7 +64,9 @@
         "actions": {
           "hold": "Zadrži",
           "release": "Odpravi zadržanje",
-          "load_more": "Naloži več"
+          "load_more": "Naloži več",
+          "erase": "Izbriši…",
+          "retry": "Preglej in znova potrdi"
         },
         "dialog": {
           "hold": {
@@ -78,16 +82,62 @@
           "reason_label": "Razlog",
           "reason_hint": "Vsaj {count} znakov.",
           "no_personal_details": "Sem ne pišite imen, e-poštnih naslovov ali drugih osebnih podatkov: razlog se trajno hrani v revizijski sledi.",
-          "cancel": "Prekliči"
+          "cancel": "Prekliči",
+          "erase": {
+            "title": "Izbriši ta račun",
+            "warning": "S tem se račun trajno izbriše: njegovi osebni podatki, datoteke in prijava. Tega ni mogoče razveljaviti. Vsaka odprta dodelitev se prekliče, njena agencija pa je obveščena.",
+            "loading": "Branje načrta…",
+            "not_ready": "Ta račun ni pripravljen na brisanje: {reasons}.",
+            "retry_note": "Prejšnje brisanje tega računa se je ustavilo. Preglejte načrt, nato znova potrdite.",
+            "summary": {
+              "rows": "Vrstice zbirke podatkov za spremembo: {rows}, v {tables} tabelah.",
+              "files": "Datoteke za izbris: {files}.",
+              "assignments": "Odprte dodelitve za preklic: {count}. Vsaka obvesti svojo agencijo.",
+              "read": "Prebrane vrstice za izdelavo načrta: {rows}.",
+              "reference": "Referenca načrta: {digest}"
+            },
+            "ulid_label": "Za potrditev vnesite ID računa",
+            "ulid_hint": "ID je {ulid}.",
+            "mfa_label": "Koda za dvostopenjsko preverjanje ali obnovitvena koda",
+            "mfa_hint": "Obnovitvena koda se porabi, ko jo oddate.",
+            "confirm": "Izbriši trajno"
+          }
         },
         "capped": "Naenkrat se preveri le prvih {count} računov s potečenim rokom. Obravnavajte jih in znova naložite.",
-        "action_failed": "Shranjevanje ni uspelo. Poskusite znova."
+        "action_failed": "Shranjevanje ni uspelo. Poskusite znova.",
+        "reason": {
+          "held": "je zadržan",
+          "not_requested": "nikoli ni zahteval brisanja",
+          "grace_running": "njegov odlog se še ni iztekel",
+          "audit_scrub_unavailable": "korak revizijske sledi tu ni na voljo",
+          "erased": "je že izbrisan",
+          "not_available": "ga ni mogoče izbrisati"
+        },
+        "watch": {
+          "completed": "Račun je izbrisan. Vsaka preklicana dodelitev je obvestila svojo agencijo.",
+          "released": "Brisanje se ni začelo: podatki so se od načrta spremenili ali neko preverjanje zdaj zavrača. Nič ni bilo izbrisano, ustvarjalec pa lahko še vedno prekliče. Preglejte načrt in poskusite znova."
+        }
       }
     },
     "erasure": {
       "hold": {
         "claimed": "Ta račun se že izbrisuje, zato ga ni mogoče zadržati.",
         "not_available": "Tega računa ni mogoče zadržati."
+      },
+      "execute": {
+        "disabled": "Brisanje iz administracije je izklopljeno. Skrbnik platforme ga vklopi v zastavicah funkcij, z razlogom, za en poimenovan račun.",
+        "ulid_mismatch": "Vneseni ID se ne ujema s tem računom.",
+        "not_ready": "Ta račun ni pripravljen na brisanje.",
+        "in_progress": "Brisanje tega računa že poteka.",
+        "mfa_required": "Vnesite kodo za dvostopenjsko preverjanje ali obnovitveno kodo.",
+        "mfa_invalid": "Ta koda ni veljavna.",
+        "mfa_rate_limited": "Preveč napačnih kod. Počakajte 15 minut in poskusite znova.",
+        "mfa_suspended": "Vaša dvostopenjska prijava je začasno ustavljena. Prosite drugega skrbnika platforme, naj jo ponastavi.",
+        "rate_limited": "Preveč poskusov. Počakajte eno uro in poskusite znova."
+      },
+      "plan": {
+        "not_available": "Za ta račun ni mogoče pripraviti načrta brisanja.",
+        "rate_limited": "Preveč zahtev za načrt. Počakajte minuto in poskusite znova."
       }
     }
   }

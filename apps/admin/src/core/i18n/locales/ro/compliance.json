@@ -46,10 +46,12 @@
           "held": "Suspendat din {date}.",
           "held_by": "Suspendat de {admin}.",
           "in_progress": {
-            "claimed": "Ștergerea a început.",
-            "started": "Ștergerea este în curs.",
-            "db_done": "Pasul din baza de date este încheiat. Mai trebuie finalizate fișierele și jurnalul de audit.",
-            "incomplete": "Ultima rulare s-a oprit înainte de final. E nevoie de un inginer: urmează runbook-ul de ștergere."
+            "db_done": "Pasul cu baza de date este gata, dar ultimul pas nu s-a încheiat. E nevoie de un inginer: urmează runbook-ul de ștergere.",
+            "incomplete": "Ultima rulare s-a oprit înainte să se termine. Examinează planul și confirmă din nou.",
+            "waiting": "Se așteaptă ca procesul de ștergere să îl preia.",
+            "waiting_stuck": "Așteaptă de peste o oră: procesul de ștergere poate fi oprit. Verifică-l (vezi runbook-ul de ștergere), apoi examinează planul și confirmă din nou.",
+            "running": "Ștergerea este în curs.",
+            "running_stuck": "Ștergerea rulează de peste o oră și poate s-a oprit. Examinează planul și confirmă din nou."
           },
           "erased": "Șters la {date}."
         },
@@ -62,7 +64,9 @@
         "actions": {
           "hold": "Suspendă",
           "release": "Ridică suspendarea",
-          "load_more": "Încarcă mai multe"
+          "load_more": "Încarcă mai multe",
+          "erase": "Șterge…",
+          "retry": "Examinează și confirmă din nou"
         },
         "dialog": {
           "hold": {
@@ -78,16 +82,62 @@
           "reason_label": "Motiv",
           "reason_hint": "Cel puțin {count} caractere.",
           "no_personal_details": "Nu scrie aici nume, adrese de e-mail sau alte date personale: motivul este păstrat permanent în jurnalul de audit.",
-          "cancel": "Anulează"
+          "cancel": "Anulează",
+          "erase": {
+            "title": "Șterge acest cont",
+            "warning": "Aceasta șterge definitiv contul: datele personale, fișierele și autentificarea. Nu se poate anula. Fiecare alocare deschisă este anulată, iar agenția ei este înștiințată.",
+            "loading": "Se citește planul…",
+            "not_ready": "Acest cont nu este pregătit pentru ștergere: {reasons}.",
+            "retry_note": "O ștergere anterioară a acestui cont s-a oprit. Examinează planul, apoi confirmă din nou.",
+            "summary": {
+              "rows": "Rânduri din baza de date de modificat: {rows}, în {tables} tabele.",
+              "files": "Fișiere de șters: {files}.",
+              "assignments": "Alocări deschise de anulat: {count}. Fiecare înștiințează agenția ei.",
+              "read": "Rânduri citite pentru a stabili planul: {rows}.",
+              "reference": "Referința planului: {digest}"
+            },
+            "ulid_label": "Scrie ID-ul contului pentru a confirma",
+            "ulid_hint": "ID-ul este {ulid}.",
+            "mfa_label": "Cod în doi pași sau cod de recuperare",
+            "mfa_hint": "Un cod de recuperare se consumă când îl trimiți.",
+            "confirm": "Șterge definitiv"
+          }
         },
         "capped": "Se verifică la un moment dat doar primele {count} conturi scadente. Tratează-le, apoi reîncarcă.",
-        "action_failed": "Nu s-a putut salva. Încearcă din nou."
+        "action_failed": "Nu s-a putut salva. Încearcă din nou.",
+        "reason": {
+          "held": "este suspendat",
+          "not_requested": "nu a cerut niciodată ștergerea",
+          "grace_running": "perioada de grație nu s-a încheiat",
+          "audit_scrub_unavailable": "pasul jurnalului de audit nu este disponibil aici",
+          "erased": "este deja șters",
+          "not_available": "nu poate fi șters"
+        },
+        "watch": {
+          "completed": "Contul a fost șters. Fiecare alocare anulată a înștiințat agenția ei.",
+          "released": "Ștergerea nu a început: datele s-au schimbat de la plan sau o verificare refuză acum. Nu s-a șters nimic, iar creatorul poate încă anula. Examinează planul și încearcă din nou."
+        }
       }
     },
     "erasure": {
       "hold": {
         "claimed": "Acest cont este deja în curs de ștergere, deci nu poate fi suspendat.",
         "not_available": "Acest cont nu poate fi suspendat."
+      },
+      "execute": {
+        "disabled": "Ștergerea din administrare este dezactivată. Un administrator al platformei o activează în steagurile de funcții, cu un motiv, pentru un singur cont indicat.",
+        "ulid_mismatch": "ID-ul introdus nu corespunde acestui cont.",
+        "not_ready": "Acest cont nu este pregătit pentru ștergere.",
+        "in_progress": "O ștergere a acestui cont este deja în curs.",
+        "mfa_required": "Introdu un cod în doi pași sau un cod de recuperare.",
+        "mfa_invalid": "Codul nu este valid.",
+        "mfa_rate_limited": "Prea multe coduri greșite. Așteaptă 15 minute și încearcă din nou.",
+        "mfa_suspended": "Autentificarea ta în doi pași este suspendată. Roagă un alt administrator al platformei să o reseteze.",
+        "rate_limited": "Prea multe încercări. Așteaptă o oră și încearcă din nou."
+      },
+      "plan": {
+        "not_available": "Pentru acest cont nu se poate întocmi un plan de ștergere.",
+        "rate_limited": "Prea multe cereri de plan. Așteaptă un minut și încearcă din nou."
       }
     }
   }

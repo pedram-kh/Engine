@@ -207,7 +207,8 @@
             "failed": "Seda ühendust ei õnnestunud luua. Proovige uuesti.",
             "not_approved_warning": "See looja pole veel heaks kiidetud ja teda ei saa agentuuriga ühendada. Kinnitage kõigepealt tema taotlus.",
             "error_not_approved": "See looja pole veel heaks kiidetud. Kinnitage tema taotlus enne agentuuriga ühendamist.",
-            "error_blacklisted": "See looja–agentuuri paar on mustas nimekirjas, seega ei saa ühendust luua."
+            "error_blacklisted": "See looja–agentuuri paar on mustas nimekirjas, seega ei saa ühendust luua.",
+            "error_unavailable": "See looja lahkub platvormilt ega saa agentuuriga ühendust."
           },
           "disconnect": {
             "title": "Kas katkestada {name} ühendus agentuuriga {agency}?",

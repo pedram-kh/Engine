@@ -19,6 +19,7 @@ use App\Modules\Creators\Features\PlatformAutomationsEnabled;
 use App\Modules\Creators\Features\PostVerifiedMailEnabled;
 use App\Modules\Creators\Features\PushNotificationsEnabled;
 use App\Modules\Creators\Features\SocialVerificationEnabled;
+use App\Modules\Erasure\Features\AccountErasureExecuteEnabled;
 use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Features\AccountDeletionEnabled;
 use Illuminate\Http\JsonResponse;
@@ -109,6 +110,10 @@ final class AdminFeatureFlagController
         AccountDeletionEnabled::NAME => [
             'label' => 'Account deletion (creator request)',
             'description' => 'Lets a creator request deletion of their own account (the endpoint, the confirmation mail and the Security page entry). Off: no request can be made; a request already made stays pending and can still be cancelled by signing in. Do not arm before the Part A and Part B deploy, and before the build-3 walk has passed.',
+        ],
+        AccountErasureExecuteEnabled::NAME => [
+            'label' => 'Account erasure (admin Erase button)',
+            'description' => 'Lets a platform admin erase one creator account from the erasure queue. Irreversible. Off: the Erase button and its endpoint answer 409; the queue, the hold, the plan view and the command are unaffected, and an erasure already started is not stopped. Turn it on with a reason for one named account and off again after; never leave it on.',
         ],
     ];
 

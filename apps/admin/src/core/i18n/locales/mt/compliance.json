@@ -46,10 +46,12 @@
           "held": "Miżmum mill-{date}.",
           "held_by": "Miżmum minn {admin}.",
           "in_progress": {
-            "claimed": "It-tneħħija bdiet.",
-            "started": "It-tneħħija għaddejja.",
-            "db_done": "Il-pass tad-database tlesta. Il-fajls u r-reġistru tal-awditu għad iridu jitlestew.",
-            "incomplete": "L-aħħar eżekuzzjoni waqfet qabel ma tlestiet. Hemm bżonn ta' inġinier: segwi r-runbook tat-tneħħija."
+            "db_done": "Il-pass tad-database sar, iżda l-aħħar pass ma lestiex. Jinħtieġ inġinier: segwi r-runbook tat-tneħħija.",
+            "incomplete": "L-aħħar tħaddim waqaf qabel ma lesta. Irrevedi l-pjan u kkonferma mill-ġdid.",
+            "waiting": "Qed jistenna li l-proċess tat-tneħħija jerfa' dan.",
+            "waiting_stuck": "Qed jistenna għal aktar minn siegħa: il-proċess tat-tneħħija jista' jkun waqaf. Iċċekkjah (ara r-runbook tat-tneħħija), imbagħad irrevedi l-pjan u kkonferma mill-ġdid.",
+            "running": "It-tneħħija għaddejja.",
+            "running_stuck": "It-tneħħija ilha għaddejja għal aktar minn siegħa u jista' jkun waqfet. Irrevedi l-pjan u kkonferma mill-ġdid."
           },
           "erased": "Tneħħa fi {date}."
         },
@@ -62,7 +64,9 @@
         "actions": {
           "hold": "Żomm",
           "release": "Neħħi ż-żamma",
-          "load_more": "Ikkarga aktar"
+          "load_more": "Ikkarga aktar",
+          "erase": "Neħħi…",
+          "retry": "Irrevedi u kkonferma mill-ġdid"
         },
         "dialog": {
           "hold": {
@@ -78,16 +82,62 @@
           "reason_label": "Raġuni",
           "reason_hint": "Mill-inqas {count} karattri.",
           "no_personal_details": "Tikteb hawn l-ebda isem, indirizz tal-email jew data personali oħra: ir-raġuni tinżamm b'mod permanenti fir-reġistru tal-awditu.",
-          "cancel": "Ikkanċella"
+          "cancel": "Ikkanċella",
+          "erase": {
+            "title": "Neħħi dan il-kont",
+            "warning": "Dan ineħħi l-kont b'mod permanenti: id-data personali tiegħu, il-fajls tiegħu u d-dħul tiegħu. Ma jistax jitreġġa' lura. Kull assenjazzjoni miftuħa tiġi kkanċellata, u l-aġenzija tagħha tiġi nfurmata.",
+            "loading": "Qed jinqara l-pjan…",
+            "not_ready": "Dan il-kont mhuwiex lest biex jitneħħa: {reasons}.",
+            "retry_note": "Tneħħija preċedenti ta' dan il-kont waqfet. Irrevedi l-pjan, imbagħad ikkonferma mill-ġdid.",
+            "summary": {
+              "rows": "Ringieli tad-database li se jinbidlu: {rows}, f'{tables} tabelli.",
+              "files": "Fajls li se jitneħħew: {files}.",
+              "assignments": "Assenjazzjonijiet miftuħa li se jiġu kkanċellati: {count}. Kull waħda tinforma lill-aġenzija tagħha.",
+              "read": "Ringieli maqruha biex jinħadem il-pjan: {rows}.",
+              "reference": "Referenza tal-pjan: {digest}"
+            },
+            "ulid_label": "Ittajpja l-id tal-kont biex tikkonferma",
+            "ulid_hint": "L-id huwa {ulid}.",
+            "mfa_label": "Kodiċi b'żewġ fatturi jew kodiċi ta' rkupru",
+            "mfa_hint": "Kodiċi ta' rkupru jintuża meta tibgħatu.",
+            "confirm": "Neħħi b'mod permanenti"
+          }
         },
         "capped": "Kull darba jiġu kkontrollati biss l-ewwel {count} kontijiet skaduti. Ħaddimhom u erġa' ikkarga.",
-        "action_failed": "Ma setgħetx tiġi ssejvjata. Erġa' pprova."
+        "action_failed": "Ma setgħetx tiġi ssejvjata. Erġa' pprova.",
+        "reason": {
+          "held": "huwa miżmum",
+          "not_requested": "qatt ma talab li jitneħħa",
+          "grace_running": "il-perjodu ta' grazzja tiegħu ma intemmx",
+          "audit_scrub_unavailable": "il-pass tal-ġurnal tal-awditjar mhuwiex disponibbli hawn",
+          "erased": "diġà tneħħa",
+          "not_available": "ma jistax jitneħħa"
+        },
+        "watch": {
+          "completed": "Il-kont tneħħa. Kull assenjazzjoni kkanċellata infurmat lill-aġenzija tagħha.",
+          "released": "It-tneħħija ma bdietx: id-data nbidlet mill-pjan, jew kontroll issa qed jirrifjuta. Ma tneħħa xejn, u l-kreatur jista' xorta jikkanċella. Irrevedi l-pjan u erġa' pprova."
+        }
       }
     },
     "erasure": {
       "hold": {
         "claimed": "Dan il-kont diġà qed jitneħħa, għalhekk ma jistax jinżamm.",
         "not_available": "Dan il-kont ma jistax jinżamm."
+      },
+      "execute": {
+        "disabled": "It-tneħħija mill-admin hija mitfija. Amministratur tal-pjattaforma jixgħaliha fil-bnadar tal-funzjonijiet, b'raġuni, għal kont wieħed imsemmi.",
+        "ulid_mismatch": "L-id li ttajpjajt ma jaqbilx ma' dan il-kont.",
+        "not_ready": "Dan il-kont mhuwiex lest biex jitneħħa.",
+        "in_progress": "Tneħħija ta' dan il-kont diġà għaddejja.",
+        "mfa_required": "Idħol kodiċi b'żewġ fatturi jew kodiċi ta' rkupru.",
+        "mfa_invalid": "Dak il-kodiċi mhuwiex validu.",
+        "mfa_rate_limited": "Wisq kodiċijiet ħżiena. Stenna 15-il minuta u erġa' pprova.",
+        "mfa_suspended": "Id-dħul tiegħek b'żewġ fatturi huwa sospiż. Staqsi lil amministratur ieħor tal-pjattaforma biex jirrisettjah.",
+        "rate_limited": "Wisq tentattivi. Stenna siegħa u erġa' pprova."
+      },
+      "plan": {
+        "not_available": "Ma jistax isir pjan ta' tneħħija għal dan il-kont.",
+        "rate_limited": "Wisq talbiet għall-pjan. Stenna minuta u erġa' pprova."
       }
     }
   }

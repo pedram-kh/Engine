@@ -49,8 +49,7 @@ final class AccountDeletionService
     public function __construct(
         private readonly ConnectionInterface $db,
         private readonly Hasher $hasher,
-        private readonly TwoFactorChallengeService $twoFactorChallenge,
-        private readonly TwoFactorVerificationThrottle $twoFactorThrottle,
+        private readonly SecondFactorStepUp $stepUp,
         private readonly ErasureEligibility $eligibility,
         private readonly CredentialRevoker $revoker,
         private readonly AuditLogger $audit,
@@ -74,11 +73,9 @@ final class AccountDeletionService
         $ip = $request->ip();
         $userAgent = $request->userAgent();
 
-        if ($user->hasTwoFactorEnabled()) {
-            $failure = $this->checkSecondFactor($user, $mfaCode, $ip, $userAgent, $request);
-            if ($failure !== null) {
-                return $failure;
-            }
+        $failure = $this->checkSecondFactor($user, $mfaCode, $request);
+        if ($failure !== null) {
+            return $failure;
         }
 
         try {
@@ -190,42 +187,17 @@ final class AccountDeletionService
     private function checkSecondFactor(
         User $user,
         #[SensitiveParameter] ?string $mfaCode,
-        ?string $ip,
-        ?string $userAgent,
         Request $request,
     ): ?AccountDeletionResult {
-        if ($user->hasTwoFactorEnrollmentSuspended()) {
-            return AccountDeletionResult::failed(AccountDeletionStatus::MfaEnrollmentSuspended);
-        }
-
-        if ($mfaCode === null || trim($mfaCode) === '') {
-            return AccountDeletionResult::failed(AccountDeletionStatus::MfaRequired);
-        }
-
-        // Same rule as sign-in: past the soft cap the verifier does not run
-        // (no oracle for someone hammering codes) but the attempt still
-        // counts, so the hard threshold stays reachable.
-        if ($this->twoFactorThrottle->isSoftLocked($user)) {
-            $this->twoFactorThrottle->recordFailure($user, $ip, $userAgent);
-
-            if ($user->refresh()->hasTwoFactorEnrollmentSuspended()) {
-                return AccountDeletionResult::failed(AccountDeletionStatus::MfaEnrollmentSuspended);
-            }
-
-            return AccountDeletionResult::failed(
+        return match ($this->stepUp->verify($user, $mfaCode, $request)) {
+            SecondFactorOutcome::Passed => null,
+            SecondFactorOutcome::EnrollmentSuspended => AccountDeletionResult::failed(AccountDeletionStatus::MfaEnrollmentSuspended),
+            SecondFactorOutcome::Required, SecondFactorOutcome::NotEnrolled => AccountDeletionResult::failed(AccountDeletionStatus::MfaRequired),
+            SecondFactorOutcome::RateLimited => AccountDeletionResult::failed(
                 AccountDeletionStatus::MfaRateLimited,
-                $this->twoFactorThrottle->retryAfterSeconds($user),
-            );
-        }
-
-        if (! $this->twoFactorChallenge->verify($user, $mfaCode, $request)->passed) {
-            $this->twoFactorThrottle->recordFailure($user, $ip, $userAgent);
-
-            return AccountDeletionResult::failed(AccountDeletionStatus::MfaInvalidCode);
-        }
-
-        $this->twoFactorThrottle->recordSuccess($user);
-
-        return null;
+                $this->stepUp->retryAfterSeconds($user),
+            ),
+            SecondFactorOutcome::Invalid => AccountDeletionResult::failed(AccountDeletionStatus::MfaInvalidCode),
+        };
     }
 }

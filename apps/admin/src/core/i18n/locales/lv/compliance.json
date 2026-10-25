@@ -46,10 +46,12 @@
           "held": "Aizturēts kopš {date}.",
           "held_by": "Aizturēja: {admin}.",
           "in_progress": {
-            "claimed": "Dzēšana ir sākusies.",
-            "started": "Dzēšana notiek.",
-            "db_done": "Datu bāzes solis ir pabeigts. Faili un audita žurnāls vēl jāpabeidz.",
-            "incomplete": "Pēdējā izpilde apstājās pirms beigām. Vajadzīgs inženieris: sekojiet dzēšanas runbook."
+            "db_done": "Datu bāzes solis ir paveikts, bet pēdējais solis netika pabeigts. Vajadzīgs inženieris: sekojiet dzēšanas runbook.",
+            "incomplete": "Pēdējā izpilde apstājās pirms pabeigšanas. Pārskatiet plānu un apstipriniet vēlreiz.",
+            "waiting": "Gaida, līdz dzēšanas process to pārņems.",
+            "waiting_stuck": "Gaida vairāk nekā stundu: dzēšanas process, iespējams, nedarbojas. Pārbaudiet to (skatiet dzēšanas runbook), pēc tam pārskatiet plānu un apstipriniet vēlreiz.",
+            "running": "Dzēšana notiek.",
+            "running_stuck": "Dzēšana ilgst vairāk nekā stundu un, iespējams, ir apstājusies. Pārskatiet plānu un apstipriniet vēlreiz."
           },
           "erased": "Dzēsts {date}."
         },
@@ -62,7 +64,9 @@
         "actions": {
           "hold": "Aizturēt",
           "release": "Atcelt aizturēšanu",
-          "load_more": "Ielādēt vairāk"
+          "load_more": "Ielādēt vairāk",
+          "erase": "Dzēst…",
+          "retry": "Pārskatīt un apstiprināt vēlreiz"
         },
         "dialog": {
           "hold": {
@@ -78,16 +82,62 @@
           "reason_label": "Iemesls",
           "reason_hint": "Vismaz {count} rakstzīmes.",
           "no_personal_details": "Šeit nerakstiet vārdus, e-pasta adreses vai citus personas datus: iemesls tiek glabāts audita žurnālā pastāvīgi.",
-          "cancel": "Atcelt"
+          "cancel": "Atcelt",
+          "erase": {
+            "title": "Dzēst šo kontu",
+            "warning": "Tas neatgriezeniski dzēš kontu: tā personas datus, failus un pieteikšanos. To nevar atsaukt. Katrs atvērtais uzdevums tiek atcelts, un tā aģentūra tiek informēta.",
+            "loading": "Plāns tiek lasīts…",
+            "not_ready": "Šis konts nav gatavs dzēšanai: {reasons}.",
+            "retry_note": "Iepriekšējā šī konta dzēšana apstājās. Pārskatiet plānu, pēc tam apstipriniet vēlreiz.",
+            "summary": {
+              "rows": "Mainīgās datu bāzes rindas: {rows}, {tables} tabulās.",
+              "files": "Dzēšamie faili: {files}.",
+              "assignments": "Atceļamie atvērtie uzdevumi: {count}. Katrs informē savu aģentūru.",
+              "read": "Plānam nolasītās rindas: {rows}.",
+              "reference": "Plāna atsauce: {digest}"
+            },
+            "ulid_label": "Apstiprināšanai ievadiet konta ID",
+            "ulid_hint": "ID ir {ulid}.",
+            "mfa_label": "Divfaktoru kods vai atkopšanas kods",
+            "mfa_hint": "Atkopšanas kods tiek izlietots, kad to iesniedzat.",
+            "confirm": "Dzēst neatgriezeniski"
+          }
         },
         "capped": "Vienlaikus tiek pārbaudīti tikai pirmie {count} konti ar beidzies termiņu. Apstrādājiet tos un ielādējiet no jauna.",
-        "action_failed": "Neizdevās saglabāt. Mēģiniet vēlreiz."
+        "action_failed": "Neizdevās saglabāt. Mēģiniet vēlreiz.",
+        "reason": {
+          "held": "tas ir aizturēts",
+          "not_requested": "tas nekad nav lūdzis dzēšanu",
+          "grace_running": "tā labojuma periods nav beidzies",
+          "audit_scrub_unavailable": "revīzijas žurnāla solis šeit nav pieejams",
+          "erased": "tas jau ir dzēsts",
+          "not_available": "to nevar dzēst"
+        },
+        "watch": {
+          "completed": "Konts tika dzēsts. Katrs atceltais uzdevums informēja savu aģentūru.",
+          "released": "Dzēšana nesākās: dati ir mainījušies kopš plāna vai kāda pārbaude tagad atsaka. Nekas netika dzēsts, un autors joprojām var atcelt. Pārskatiet plānu un mēģiniet vēlreiz."
+        }
       }
     },
     "erasure": {
       "hold": {
         "claimed": "Šis konts jau tiek dzēsts, tāpēc to nevar aizturēt.",
         "not_available": "Šo kontu nevar aizturēt."
+      },
+      "execute": {
+        "disabled": "Dzēšana no administrēšanas ir izslēgta. Platformas administrators to ieslēdz funkciju karodziņos, norādot iemeslu, vienam konkrētam kontam.",
+        "ulid_mismatch": "Ievadītais ID neatbilst šim kontam.",
+        "not_ready": "Šis konts nav gatavs dzēšanai.",
+        "in_progress": "Šī konta dzēšana jau notiek.",
+        "mfa_required": "Ievadiet divfaktoru kodu vai atkopšanas kodu.",
+        "mfa_invalid": "Šis kods nav derīgs.",
+        "mfa_rate_limited": "Pārāk daudz nepareizu kodu. Uzgaidiet 15 minūtes un mēģiniet vēlreiz.",
+        "mfa_suspended": "Jūsu divfaktoru pieteikšanās ir apturēta. Lūdziet citam platformas administratoram to atiestatīt.",
+        "rate_limited": "Pārāk daudz mēģinājumu. Uzgaidiet stundu un mēģiniet vēlreiz."
+      },
+      "plan": {
+        "not_available": "Šim kontam nevar sagatavot dzēšanas plānu.",
+        "rate_limited": "Pārāk daudz plāna pieprasījumu. Uzgaidiet minūti un mēģiniet vēlreiz."
       }
     }
   }
