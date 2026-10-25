@@ -6,6 +6,7 @@ use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Erasure\Claim\ErasureClaimer;
 use App\Modules\Erasure\Enums\ErasureLedgerState;
+use App\Modules\Erasure\Erase\EraseNotReady;
 use App\Modules\Erasure\Erase\EraseStarter;
 use App\Modules\Erasure\Execution\AuditScrub;
 use App\Modules\Erasure\Features\AccountErasureExecuteEnabled;
@@ -299,6 +300,14 @@ it('shows one row for the poll, with the run\'s state, and 404s an account that 
     $this->actingAs($fx['admin'], 'web_admin')->getJson(ERASE_URL.'/'.$fx['ulid'])->assertStatus(404);
 });
 
+/** Binds an audit-log step that cannot run here (the plan calls this a blocker; the job would refuse). */
+function eraseWithoutAuditScrub(): void
+{
+    $scrub = new FakeAuditScrub;
+    $scrub->available = false;
+    app()->instance(AuditScrub::class, $scrub);
+}
+
 // ── Every refusal claims nothing and queues nothing ─────────────────────────
 
 it('refuses, claims nothing and queues nothing, on every gate', function (string $case): void {
@@ -358,6 +367,10 @@ it('refuses, claims nothing and queues nothing, on every gate', function (string
             $user->forceFill(['erased_at' => now()])->saveQuietly();
             [$status, $code] = [422, 'admin.erasure.execute.not_ready'];
             break;
+        case 'audit-log step unavailable':
+            eraseWithoutAuditScrub();
+            [$status, $code] = [422, 'admin.erasure.execute.not_ready'];
+            break;
         case 'admin without 2FA':
             $fx['admin']->forceFill(['two_factor_secret' => null, 'two_factor_confirmed_at' => null])->saveQuietly();
             $over = ['mfa_code' => '123456'];
@@ -390,7 +403,7 @@ it('refuses, claims nothing and queues nothing, on every gate', function (string
     expect(ErasureSnapshot::tables(ERASE_NOISE))->toBe($before);
 })->with([
     'flag off', 'no code', 'wrong code', 'wrong ulid', 'no reason', 'short reason', 'malformed digest',
-    'not due', 'never asked', 'held', 'blocked', 'already erased', 'admin without 2FA',
+    'not due', 'never asked', 'held', 'blocked', 'already erased', 'audit-log step unavailable', 'admin without 2FA',
 ]);
 
 it('says which codes made the account not ready, in the refusal', function (): void {
@@ -405,6 +418,56 @@ it('says which codes made the account not ready, in the refusal', function (): v
         ->and((string) $response->getContent())->not->toContain('payment state');
 });
 
+it('names the audit-log step as the reason, when that is what stops the click', function (): void {
+    $fx = eraseFixture();
+    Feature::activate(AccountErasureExecuteEnabled::NAME);
+    Queue::fake();
+    eraseWithoutAuditScrub();
+
+    $response = eraseClick($fx)->assertStatus(422);
+
+    expect($response->json('errors.0.code'))->toBe('admin.erasure.execute.not_ready')
+        ->and($response->json('errors.0.meta.codes'))->toBe(['audit_scrub_unavailable'])
+        ->and(eraseClaimStamp($fx['ulid']))->toBeNull()
+        ->and(eraseStartedAudit())->toBe(0);
+    Queue::assertNothingPushed();
+});
+
+it('does not claim an account for a retry either, when the audit-log step is not available', function (): void {
+    $fx = eraseFixture();
+    Feature::activate(AccountErasureExecuteEnabled::NAME);
+    Queue::fake();
+    // Bound before the first request (the router keeps the controller, and so its collaborators, between
+    // requests of one test); the step goes away between the two clicks.
+    $scrub = new FakeAuditScrub;
+    app()->instance(AuditScrub::class, $scrub);
+    eraseClick($fx)->assertStatus(202);
+    ErasureLedger::query()->create(['user_ulid' => $fx['ulid'], 'state' => ErasureLedgerState::Incomplete, 'digest' => 'x', 'started_at' => now()]);
+    $scrub->available = false;
+
+    $response = $this->actingAs($fx['admin']->refresh(), 'web_admin')->postJson(ERASE_URL.'/'.$fx['ulid'].'/erase', [
+        'ulid' => $fx['ulid'], 'reason' => 'Plan reviewed again, confirming', 'digest' => str_repeat('a', 64), 'mfa_code' => $fx['codes'][0],
+    ]);
+
+    $response->assertStatus(422);
+    expect($response->json('errors.0.meta.codes'))->toBe(['audit_scrub_unavailable'])
+        ->and(eraseStartedAudit())->toBe(1)
+        ->and($fx['admin']->refresh()->two_factor_recovery_codes)->toHaveCount(count($fx['codes']));
+    Queue::assertPushed(RunErasureJob::class, 1);
+});
+
+it('refuses at the claim itself when the audit-log step went away after the preflight', function (): void {
+    $fx = eraseFixture();
+    Queue::fake();
+    eraseWithoutAuditScrub();
+
+    expect(fn () => app(EraseStarter::class)->start($fx['graph']->user->refresh(), $fx['admin'], 'Subject asked, ticket on file', str_repeat('a', 64), false))
+        ->toThrow(EraseNotReady::class);
+
+    expect(eraseClaimStamp($fx['ulid']))->toBeNull();
+    Queue::assertNothingPushed();
+});
+
 it('does not spend a recovery code, nor feed the throttle, when the click was always going to be refused', function (string $case): void {
     $fx = eraseFixture();
     Feature::activate(AccountErasureExecuteEnabled::NAME);
@@ -413,6 +476,8 @@ it('does not spend a recovery code, nor feed the throttle, when the click was al
         $body['ulid'] = '01ARZ3NDEKTSV4RRFFQ69G5FAV';
     } elseif ($case === 'held') {
         $fx['graph']->user->forceFill(['erasure_held_at' => now()])->saveQuietly();
+    } elseif ($case === 'audit-log step unavailable') {
+        eraseWithoutAuditScrub();
     } else {
         $fx['graph']->user->forceFill(['deletion_scheduled_for' => now()->addDay()])->saveQuietly();
     }
@@ -422,7 +487,7 @@ it('does not spend a recovery code, nor feed the throttle, when the click was al
 
     expect($fx['admin']->refresh()->two_factor_recovery_codes)->toHaveCount(count($fx['codes']))
         ->and(app(TwoFactorVerificationThrottle::class)->isSoftLocked($fx['admin']))->toBeFalse();
-})->with(['wrong ulid', 'held', 'not due']);
+})->with(['wrong ulid', 'held', 'not due', 'audit-log step unavailable']);
 
 // ── The second factor ───────────────────────────────────────────────────────
 

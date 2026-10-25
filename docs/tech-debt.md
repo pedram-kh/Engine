@@ -3472,6 +3472,7 @@ TRIGGER` on `audit_logs` (table and every column). The owner is `postgres`. Ther
 5. **`db_done` (the account is erased, the ledger mirror failed) is finished from the shell only.** The page says so and offers no retry. Acceptable for a first erasure; a button would need its own plan. **Status:** OPEN, low.
 6. **"Fresh 2FA" means verified at the click.** A TOTP code can be accepted again inside its window (the verifier has no replay protection); a recovery code is burned. Ruled (Q4) not to claim more. **Status:** accepted.
 7. **The queue's `GET /{user}` row is polled every four seconds by the open page.** One admin, one account at a time; no cache. Fine at this volume. **Status:** accepted.
-8. **The Erase click's preflight does not refuse `audit_scrub_unavailable`.** The plan shows it as a blocker and the dialog will not offer the click, but a request sent by hand claims the account and the job then
-   releases it as `refused` (audited). The creator is signed out in between. Fix: one line in `EraseStarter`'s preflight and a spec. **Owner:** erasure. **Status:** OPEN, low; recommended before C4.
+8. **The Erase click's preflight did not refuse `audit_scrub_unavailable`. CLOSED (2026-10-25, after the C3 review; Pedram ruled yes, before C4).** `EraseStarter` now asks the audit-log step before the
+   claim, in the first-click preflight, the retry preflight and `start()` itself, and answers 422 `not_ready` with `meta.codes` `['audit_scrub_unavailable']`, before the second factor is checked and
+   before anything is claimed. Specs in `AdminErasureEraseTest`; five break-reverts, all caught. **Status:** CLOSED.
 9. **`admin.erasure.execute.mfa_not_enrolled` has no locale string.** Unreachable in practice (`EnsureMfaForAdmins` is on the whole admin group); the generic "action failed" sentence would show. **Status:** accepted.

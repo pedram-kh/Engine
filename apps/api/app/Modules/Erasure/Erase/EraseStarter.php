@@ -9,6 +9,7 @@ use App\Modules\Audit\Services\AuditLogger;
 use App\Modules\Erasure\Claim\ClaimMode;
 use App\Modules\Erasure\Claim\ErasureClaimer;
 use App\Modules\Erasure\Eligibility\ErasureEligibility;
+use App\Modules\Erasure\Execution\AuditScrub;
 use App\Modules\Erasure\Guards\ErasureRefused;
 use App\Modules\Erasure\Jobs\RunErasureJob;
 use App\Modules\Erasure\Models\ErasureLedger;
@@ -36,6 +37,7 @@ final class EraseStarter
     public function __construct(
         private readonly ErasureClaimer $claimer,
         private readonly ErasureEligibility $eligibility,
+        private readonly AuditScrub $auditScrub,
         private readonly AuditLogger $audit,
     ) {}
 
@@ -59,6 +61,7 @@ final class EraseStarter
             if ($status === null || ! $status->canRetry) {
                 throw new EraseInProgress($status ?? new ErasureRunStatus(ErasureRunStatus::WAITING, false, false));
             }
+            $this->refuseWithoutAuditScrub();
 
             return true;
         }
@@ -67,6 +70,7 @@ final class EraseStarter
         if ($codes !== []) {
             throw new EraseNotReady($codes);
         }
+        $this->refuseWithoutAuditScrub();
 
         return false;
     }
@@ -76,6 +80,10 @@ final class EraseStarter
      */
     public function start(User $user, User $operator, string $reason, string $digest, bool $retry): EraseStarted
     {
+        // The plan shows this as a blocker; a request that skipped the plan must not claim the account
+        // only for the job to hand it back as `refused`.
+        $this->refuseWithoutAuditScrub();
+
         try {
             $claim = $this->claimer->claim($user, $operator, ClaimMode::Normal, $reason);
         } catch (ErasureRefused $e) {
@@ -104,6 +112,16 @@ final class EraseStarter
         RunErasureJob::dispatch($user->ulid, $operator->id, $digest)->afterCommit();
 
         return new EraseStarted($claim, retry: $retry, queued: true);
+    }
+
+    /**
+     * @throws EraseNotReady the audit-log step cannot run here, so the job would refuse; nothing is claimed
+     */
+    private function refuseWithoutAuditScrub(): void
+    {
+        if (! $this->auditScrub->available()) {
+            throw new EraseNotReady([ErasePlanner::AUDIT_SCRUB_UNAVAILABLE]);
+        }
     }
 
     /** @return list<string> */

@@ -153,3 +153,11 @@ None block the commit pair. Three for the review, each with my recommendation:
 2. **Deviation 4 (no string for `mfa_not_enrolled`): leave as is?** _Recommend: yes_, it is unreachable behind `EnsureMfaForAdmins`.
 3. **C4 precondition: do the production dry-run timing and the colleague's read-back E first, with the flag still off.** _Recommend: yes_, in that order; then C4 is the first real erasure, named in the deploy
    log, for one test account.
+
+## 9. Follow-up after the review (Pedram's rulings)
+
+- **Question 1, yes:** the Erase click now refuses when the audit-log step is not available, **before** the second factor is checked and before any claim (first click, retry and `start()` itself). 422
+  `admin.erasure.execute.not_ready` with `meta.codes` `['audit_scrub_unavailable']`; the dialog already has the sentence ("the audit-log step is not available here"). Deviation 3 and tech-debt item 8 are closed.
+  Specs: a dataset case in the every-gate and the no-recovery-code specs, plus three dedicated specs (named reason, retry path, refusal at the claim). Pest 0 failed (4102 deprecated, 18 passed, 21,073
+  assertions), Pint, PHPStan clean; the log has the five break-reverts.
+- **Question 2:** left as is (deviation 4, tech-debt item 9). **Question 3:** the C4 order stands: dry-run timing and read-back E first, flag off.

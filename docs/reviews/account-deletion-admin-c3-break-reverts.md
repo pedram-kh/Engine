@@ -318,3 +318,34 @@ DONE
     caught by: src/modules/creators/pages/CreatorDetailPage.spec.ts > CreatorDetailPage — per-field edit (Sprint 3 Chunk 4 sub-step 9) > agency connections
 [S21 creator.unavailable not mapped] restored: identical
 ```
+
+## Follow-up after the C3 review: the audit-log preflight (review question 1)
+
+Five more mutations against `EraseStarter` and its new specs (the click's preflight, the retry preflight and `start()` refuse when the audit-log step is not available). All caught.
+
+```
+[Q1-a preflight (first click) does not check the audit-log step] BROKEN exit=1 Tests:    51 deprecated, 1 failed (361 assertions)
+    caught by: Tests\Feature\Modules\Admin\AdminErasureEraseTest
+    caught by: it does not spend a recovery code, nor feed the throttle, when the…
+[Q1-a preflight (first click) does not check the audit-log step] restored: identical
+[Q1-b preflight (retry) does not check the audit-log step] BROKEN exit=1 Tests:    51 deprecated, 1 failed (361 assertions)
+    caught by: Tests\Feature\Modules\Admin\AdminErasureEraseTest
+    caught by: it does not claim an account for a retry either, when the audit-log…
+[Q1-b preflight (retry) does not check the audit-log step] restored: identical
+[Q1-c start() does not check the audit-log step] BROKEN exit=1 Tests:    51 deprecated, 1 failed (360 assertions)
+    caught by: Tests\Feature\Modules\Admin\AdminErasureEraseTest
+    caught by: it refuses at the claim itself when the audit-log step went away af…
+[Q1-c start() does not check the audit-log step] restored: identical
+[Q1-d the check never refuses] BROKEN exit=1 Tests:    47 deprecated, 5 failed (343 assertions)
+    caught by: Tests\Feature\Modules\Admin\AdminErasureEraseTest
+    caught by: it refuses, claims nothing and queues nothing, on every gate with (…
+    caught by: it names the audit-log step as the reason, when that is what stops…
+    caught by: it does not claim an account for a retry either, when the audit-log…
+    caught by: it refuses at the claim itself when the audit-log step went away af…
+[Q1-d the check never refuses] restored: identical
+[Q1-e the check refuses with the wrong code] BROKEN exit=1 Tests:    50 deprecated, 2 failed (356 assertions)
+    caught by: Tests\Feature\Modules\Admin\AdminErasureEraseTest
+    caught by: it names the audit-log step as the reason, when that is what stops…
+    caught by: it does not claim an account for a retry either, when the audit-log…
+[Q1-e the check refuses with the wrong code] restored: identical
+```
