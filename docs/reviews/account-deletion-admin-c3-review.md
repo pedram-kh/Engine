@@ -1,7 +1,7 @@
 # AH-104c C3 — review (Erase: the flag, the queue, the plan, the click, the watch)
 
-**Status:** C3 built locally as a feat + docs commit pair, **not pushed**. C2 is cleared and pushed (`3f0060a2..29f1ed0a`); **CI at `29f1ed0a` is green** (run 40224772513, success, 12m32s). This review is the stop
-Pedram asked for: nothing below is pushed or deployed.
+**Status: CLOSED 2026-10-26.** C3 was built as a feat + docs pair, cleared, pushed (`29f1ed0a..5ddcf6e6`, CI green, run 40230258931), walked (W1 to W8 pass, §10) and followed by three small fixes from
+the review and the walk (§9), pushed with CI green at the tip. Nothing is deployed yet; C4 is a named act after the deploy.
 Plan: [`account-deletion-admin-plan.md`](account-deletion-admin-plan.md) §4 C3 and §3.5. Break-revert log, verbatim: [`account-deletion-admin-c3-break-reverts.md`](account-deletion-admin-c3-break-reverts.md).
 
 **PROD-DATA RISK: HIGHEST in what the code can do, ZERO at deploy.** C3 is the first change that can erase a person. It is behind `account_erasure_execute_enabled`, **off at deploy** (a Pennant
@@ -166,3 +166,19 @@ None block the commit pair. Three for the review, each with my recommendation:
   the grey hint is gone (`dialog.erase.ulid_hint` removed, `admin.compliance.erasures.id.*` added, ×24 locales). **The typed confirmation is unchanged and still the only check**: copying does not fill the
   field (a spec pins it). The id is not personal data (the Erased tab already shows it). Admin Vitest 602 passed, ESLint, vue-tsc, Prettier, i18n parity clean; 8 break-reverts, all caught after two were
   closed (log).
+
+## 10. The walk record (Pedram, 2026-10-26, local stack, dev build on the iPhone)
+
+W1 to W8 **pass**.
+
+- **W4 passed as designed.** The page said "Waiting for the erasure worker…" and the creator was signed out. The claimed creator **stayed on the agency's roster** until the erasure: the roster, existing threads,
+  assignments and history are unchanged by a pending request or a claim (AH-104b-del), and C2-0 only makes a claim hide the creator where a request already does (discovery, the new-conversation list,
+  the fan-out, the digest, the nudge, and every new action). My W4 text had said the roster would drop them; that was wrong and is corrected in §3 and §7.
+- **W6 misfired once, and the product was right.** The Erase was confirmed before the data was changed, so `walk-erase-2` was erased normally ("The account was erased", Ready 3 to 2); `undo` then failed
+  on the anonymised email. A second account was reseeded and W6 re-run in the right order (open the dialog, change the data, then confirm).
+- **W8, the device reading** (iPhone 16 Pro, Safari Web Inspector, selector-free snippet): `activeOverlays` 1, `dataTestAttributes` 37, **`titleBox` 1, `ackIconBox` 22, fields 25 and 25**: exactly the expected
+  numbers. **The C2-5 alignment fix is confirmed on the device.**
+- **Found in the walk and fixed:** the account id was not readable (row and dialog; §9), and the dev stack lost its Docker engine three times, which is environmental (Docker Desktop stopped itself; the
+  data and the claim state were intact each time).
+- **Not exercised by the walk:** Postgres CI for the erasure specs (the local walk ran on the Docker Postgres 16, which is the first run of the C1 migration and the whole flow on Postgres, but not the test
+  suite), the dry-run's wall time on production data, and a supervisor-run worker. They remain the C4 preconditions.
