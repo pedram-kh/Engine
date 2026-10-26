@@ -1,6 +1,3 @@
-import { execFileSync } from 'node:child_process'
-import { fileURLToPath } from 'node:url'
-
 import type { APIRequestContext, Page } from '@playwright/test'
 
 /**
@@ -1119,48 +1116,33 @@ export async function seedContractedAssignment(
 }
 
 /**
- * Turn a Laravel Pennant flag ON or OFF for everyone, in the E2E database only.
+ * Turn a Laravel Pennant flag ON or OFF for everyone, through the API under test.
  *
- * There is no `_test` HTTP route for flags, and adding one would put a switch for
- * production behaviour on the test-helper surface. This runs the same call the
- * admin Feature-flags page makes (`Feature::activate()` / `Feature::deactivate()`)
- * through `php artisan tinker` against the E2E database. Pennant's store is the
- * database, so the running `php artisan serve` sees it on the next request.
+ * `POST`/`DELETE /api/v1/_test/feature-flag/{name}` (AH-104d). The call lands in
+ * whatever database the API process the suite started is bound to, so there is no
+ * shell-out and no database name to guess: the first version ran `php artisan
+ * tinker` from this process and refused unless `DB_DATABASE` contained "e2e",
+ * which CI's throwaway Postgres (`catalyst`) correctly tripped.
  *
- * Pair every `true` with a `false` in `afterEach`: the state lives in the E2E
- * database and bleeds into the next spec otherwise.
+ * The server holds an ALLOW-LIST of flag names (a typo, or any flag it does not
+ * list, answers 422 and switches nothing), so this wrapper does not need its own.
  *
- * ⚠ DB isolation (post-incident, 2026-07-08; see `playwright.config.ts`). This
- * pins `DB_DATABASE` to the same value the config and `global-setup.ts` use and
- * REFUSES to run unless that name says it is an E2E database, so a stray
- * `DB_DATABASE=catalyst` in the shell cannot make a spec flip a flag in the
- * developer's real database. `flag` is checked against a name pattern so nothing
- * but a flag name ever reaches the PHP string.
+ * Pair every `true` with a `false` in `afterEach`: the state lives in the Pennant
+ * store and bleeds into the next spec otherwise.
  */
-export function setFeatureFlag(flag: string, on: boolean): void {
-  const database = process.env.DB_DATABASE ?? 'catalyst_e2e'
-  if (!/e2e/i.test(database)) {
+export async function setFeatureFlag(
+  request: APIRequestContext,
+  flag: string,
+  on: boolean,
+): Promise<void> {
+  const url = `http://127.0.0.1:8000/api/v1/_test/feature-flag/${encodeURIComponent(flag)}`
+  const response = on
+    ? await request.post(url, { headers: defaultHeaders })
+    : await request.delete(url, { headers: defaultHeaders })
+
+  if (response.status() !== 200) {
     throw new Error(
-      `setFeatureFlag refuses to run against DB_DATABASE="${database}": the name must contain "e2e".`,
+      `setFeatureFlag(${flag}, ${on}) failed with status ${response.status()}: ${await response.text()}`,
     )
   }
-  if (!/^[a-z][a-z0-9_]*$/.test(flag)) {
-    throw new Error(`setFeatureFlag: "${flag}" is not a flag name.`)
-  }
-  const apiDir = fileURLToPath(new URL('../../../api', import.meta.url))
-  const call = on ? 'activate' : 'deactivate'
-  execFileSync(
-    'php',
-    ['artisan', 'tinker', `--execute=\\Laravel\\Pennant\\Feature::${call}('${flag}');`],
-    {
-      cwd: apiDir,
-      stdio: 'pipe',
-      env: {
-        ...process.env,
-        APP_ENV: 'local',
-        CACHE_STORE: 'array',
-        DB_DATABASE: database,
-      },
-    },
-  )
 }

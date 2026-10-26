@@ -17,6 +17,7 @@ use App\TestHelpers\Http\Controllers\MintVerificationTokenController;
 use App\TestHelpers\Http\Controllers\NeutralizeRateLimiterController;
 use App\TestHelpers\Http\Controllers\ResetClockController;
 use App\TestHelpers\Http\Controllers\SetClockController;
+use App\TestHelpers\Http\Controllers\SetFeatureFlagController;
 use App\TestHelpers\Http\Controllers\SetQueueModeController;
 use App\TestHelpers\Http\Middleware\VerifyTestHelperToken;
 use Illuminate\Support\Facades\Route;
@@ -74,6 +75,14 @@ Route::prefix('_test')
             ->name('rate_limiter.neutralize');
         Route::delete('rate-limiter/{name}', [NeutralizeRateLimiterController::class, 'destroy'])
             ->name('rate_limiter.restore');
+
+        // AH-104d: turn an ALLOW-LISTED Pennant flag on/off for everyone, so a
+        // spec can drive both states of `account_deletion_enabled`. POST must be
+        // paired with DELETE in afterEach (see the controller docblock).
+        Route::post('feature-flag/{name}', [SetFeatureFlagController::class, 'store'])
+            ->name('feature_flag.activate');
+        Route::delete('feature-flag/{name}', [SetFeatureFlagController::class, 'destroy'])
+            ->name('feature_flag.deactivate');
 
         // Chunk 7.6 spec subject provisioning. Production sign-up
         // rejects `platform_admin` (admin onboarding is out-of-band

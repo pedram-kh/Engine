@@ -35,7 +35,7 @@ import {
  *
  * Conventions (chunk-7.1): `auth-ip` is neutralised and restored; no English
  * text is matched, every assertion anchors on `data-test`, a URL or an attribute.
- * The flag is armed through `setFeatureFlag` (E2E database only) and always
+ * The flag is armed through `setFeatureFlag` (the `_test` route, an allow-listed flag) and always
  * switched back in `afterEach`.
  */
 
@@ -57,7 +57,7 @@ test.describe('AH-104d — sign-up consent, verification and the wizard account 
   })
 
   test.afterEach(async ({ request }) => {
-    setFeatureFlag(FLAG, false)
+    await setFeatureFlag(request, FLAG, false)
     await restoreThrottle(request, 'auth-resend-verification')
     await restoreThrottle(request, 'auth-signup-email')
     await restoreThrottle(request, 'auth-ip')
@@ -119,7 +119,7 @@ test.describe('AH-104d — sign-up consent, verification and the wizard account 
     await signUpUser(request, email, PASSWORD, 'Nova')
     await verifyEmailViaApi(request, email)
 
-    setFeatureFlag(FLAG, true)
+    await setFeatureFlag(request, FLAG, true)
     await page.goto('/sign-in')
     await page.locator(dt(testIds.signInEmail)).locator('input').fill(email)
     await page.locator(dt(testIds.signInPassword)).locator('input').fill(PASSWORD)
@@ -133,7 +133,7 @@ test.describe('AH-104d — sign-up consent, verification and the wizard account 
     await expect(page).toHaveURL(/\/creator\/security/, { timeout: 10_000 })
 
     // Flag OFF: a fresh load re-reads /me, and the menu is not there at all.
-    setFeatureFlag(FLAG, false)
+    await setFeatureFlag(request, FLAG, false)
     await page.goto('/onboarding')
     await expect(page).toHaveURL(/\/onboarding/, { timeout: 10_000 })
     await expect(page.locator('[data-test="onboarding-topbar"]')).toBeVisible()
