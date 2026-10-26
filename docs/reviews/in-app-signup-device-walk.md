@@ -1,11 +1,11 @@
 # AH-104d — device walk (in-app creator sign-up)
 
-**Status: NOT WALKED.** The walk is Pedram's; nothing in the review file ([`in-app-signup-review.md`](in-app-signup-review.md)) reads "passed" until he reports it. Written from the cleared plan
+**Status: STACK READY 2026-10-26, NOT WALKED.** The walk is Pedram's; nothing in the review file ([`in-app-signup-review.md`](in-app-signup-review.md)) reads "passed" until he reports it. Written from the cleared plan
 ([`in-app-signup-plan.md`](in-app-signup-plan.md) §7) **with its §0 amendments applied**: the limiter is 5 per hour (W13 is six attempts), the consent line links the **Privacy Policy only** (W3
 taps one link), and the mail catcher is Mailhog. If the wording of a row differs from the plan's, this file wins.
 
 **What the phone cannot show and the desktop does** (so a pass on W14 matters): the web `/sign-up`, `/sign-in`, the confirm page and the wizard's account menu are also covered by the Playwright
-spec `creator-signup-consent.spec.ts`, which needs the dev stack down; see the review file for whether it has run.
+spec `creator-signup-consent.spec.ts` (green locally and in CI at `433f487d`, see the review file), which drives the web only.
 
 **Also on this walk (not in the plan, added at S4–S5):**
 
@@ -15,10 +15,22 @@ spec `creator-signup-consent.spec.ts`, which needs the dev stack down; see the r
 
 ## The walk — a fresh account, end to end (Pedram, iPhone, Xcode install)
 
-**Prerequisites (named, because the first time here they are all new):** the local stack on the Mac's LAN address, as for AH-108; `.env.native-development` pointing at it;
-`FRONTEND_MAIN_URL` set to the same LAN address so the mail link opens in Safari (the default `http://127.0.0.1:5173` is the phone itself); the web dev server reachable on the LAN;
-a queue worker running (the mail is queued); a local mail catcher (**Mailhog**, UI at `localhost:8025`; for the phone, SMTP and the UI must be reachable on the LAN address); `account_deletion_enabled` armed
-locally; an Xcode build of the S4 to S6 state. After the walk: stop the stack, delete the walk accounts, restore `.env.native-development` and the flag.
+**State of the stack at hand-off (2026-10-26, the Mac's LAN address `192.168.1.128`; re-check with `ipconfig getifaddr en0` and say so if it changed, because the build below has it baked in):**
+
+| What                  | Where                                                                                                                                                                                                           |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| API                   | `php artisan serve --host=0.0.0.0 --port=8000`, reachable at `http://192.168.1.128:8000` (the app's `VITE_API_BASE_URL`)                                                                                        |
+| Queue worker          | `php artisan queue:work` (the verification mail is queued), restarted after the last code change                                                                                                                |
+| Web (mail link)       | the main Vite dev server on `0.0.0.0:5173`; the API's `FRONTEND_MAIN_URL` is `http://192.168.1.128:5173`, so the mail link opens in Safari on the phone                                                         |
+| Admin web             | the admin Vite dev server on `0.0.0.0:5174` (restored; not needed for the walk)                                                                                                                                 |
+| Mail catcher          | Mailhog: SMTP `127.0.0.1:1025`; its UI at `http://192.168.1.128:8025` on the phone (a throwaway forwarder, `/tmp/lan-forward-mailhog.py`, because the container binds the UI to loopback only)                  |
+| Deletion flag         | `account_deletion_enabled` is **ON** in the dev database (it was already on; the walk does not change it)                                                                                                       |
+| App build             | `pnpm build:native:dev` and `npx cap sync ios` (iOS only) done; Xcode is open on the workspace; build number 3. **You press Run** (target App, your iPhone)                                                     |
+| Local-only edits made | `apps/main/.env.native-development` (the API URL, **uncommitted**); `apps/api/.env`: `FRONTEND_MAIN_URL`, and the LAN address added to `SANCTUM_STATEFUL_DOMAINS` and `FRONTEND_EXTRA_ORIGINS` (ignored by git) |
+
+**After the walk (restore):** delete the walk accounts; `git checkout apps/main/.env.native-development`; restore `apps/api/.env` from the backup in the agent store
+(`api.env.pre-ah104d-walk`; or delete the `FRONTEND_MAIN_URL` line and the `192.168.1.128` entries); stop the Mailhog forwarder (`pkill -f lan-forward-mailhog`); `php artisan queue:restart`;
+`php artisan config:clear`. Rebuild the app with `pnpm build:native:dev` after restoring if the simulator should talk to `localhost` again.
 
 | #   | Step                                                                                                         | Expect                                                                                                                                                                                                                                                          |
 | --- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
