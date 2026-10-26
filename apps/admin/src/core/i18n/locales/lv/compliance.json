@@ -97,7 +97,6 @@
               "reference": "Plāna atsauce: {digest}"
             },
             "ulid_label": "Apstiprināšanai ievadiet konta ID",
-            "ulid_hint": "ID ir {ulid}.",
             "mfa_label": "Divfaktoru kods vai atkopšanas kods",
             "mfa_hint": "Atkopšanas kods tiek izlietots, kad to iesniedzat.",
             "confirm": "Dzēst neatgriezeniski"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "Konts tika dzēsts. Katrs atceltais uzdevums informēja savu aģentūru.",
           "released": "Dzēšana nesākās: dati ir mainījušies kopš plāna vai kāda pārbaude tagad atsaka. Nekas netika dzēsts, un autors joprojām var atcelt. Pārskatiet plānu un mēģiniet vēlreiz."
+        },
+        "id": {
+          "label": "Konta ID",
+          "copy": "Kopēt konta ID",
+          "copied": "Nokopēts"
         }
       }
     },

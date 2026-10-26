@@ -97,7 +97,6 @@
               "reference": "Plan-Referenz: {digest}"
             },
             "ulid_label": "Zur Bestätigung die Konto-ID eingeben",
-            "ulid_hint": "Die ID lautet {ulid}.",
             "mfa_label": "Zwei-Faktor-Code oder Wiederherstellungscode",
             "mfa_hint": "Ein Wiederherstellungscode ist nach dem Absenden verbraucht.",
             "confirm": "Endgültig löschen"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "Das Konto wurde gelöscht. Jede stornierte Zuweisung hat ihre Agentur informiert.",
           "released": "Die Löschung wurde nicht gestartet: Die Daten haben sich seit dem Plan geändert, oder eine Prüfung lehnt jetzt ab. Es wurde nichts gelöscht, und der Creator kann weiterhin widerrufen. Sieh dir den Plan an und versuche es erneut."
+        },
+        "id": {
+          "label": "Konto-ID",
+          "copy": "Konto-ID kopieren",
+          "copied": "Kopiert"
         }
       }
     },

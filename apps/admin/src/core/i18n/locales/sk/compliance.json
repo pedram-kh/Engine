@@ -97,7 +97,6 @@
               "reference": "Referencia plánu: {digest}"
             },
             "ulid_label": "Na potvrdenie zadajte ID účtu",
-            "ulid_hint": "ID je {ulid}.",
             "mfa_label": "Kód dvojfázového overenia alebo záložný kód",
             "mfa_hint": "Záložný kód sa odoslaním spotrebuje.",
             "confirm": "Vymazať natrvalo"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "Účet bol vymazaný. Každé zrušené pridelenie informovalo svoju agentúru.",
           "released": "Mazanie sa nezačalo: údaje sa od plánu zmenili, alebo niektorá kontrola teraz odmieta. Nič sa nevymazalo a tvorca môže stále zrušiť. Skontrolujte plán a skúste to znova."
+        },
+        "id": {
+          "label": "ID účtu",
+          "copy": "Kopírovať ID účtu",
+          "copied": "Skopírované"
         }
       }
     },

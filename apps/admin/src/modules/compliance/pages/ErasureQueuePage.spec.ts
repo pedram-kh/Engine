@@ -321,6 +321,77 @@ describe('ErasureQueuePage (AH-104c C2)', () => {
     expect(h.wrapper.find('[data-testid="admin-erasure-queue-error"]').exists()).toBe(true)
   })
 
+  describe('the account id (AH-104c C3 walk: an admin must be able to read the id they are asked to type)', () => {
+    let writeText: ReturnType<typeof vi.fn>
+
+    beforeEach(() => {
+      writeText = vi.fn().mockResolvedValue(undefined)
+      Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
+    })
+
+    afterEach(() => {
+      Reflect.deleteProperty(navigator, 'clipboard')
+      vi.useRealTimers()
+    })
+
+    it('shows every account row with its id and a copy button, whatever the state', async () => {
+      const h = await mountPage(
+        response('pending', [
+          liveRow('P1', 'pending'),
+          liveRow('R1', 'ready'),
+          liveRow('B1', 'blocked', { blockers: ['vendor'] }),
+          liveRow('H1', 'held'),
+          liveRow('W1', 'in_progress', { run: run('waiting') }),
+        ]),
+      )
+
+      for (const id of ['P1', 'R1', 'B1', 'H1', 'W1']) {
+        expect(h.wrapper.find(`[data-testid="admin-erasure-id-${id}"]`).text()).toBe(id)
+        expect(h.wrapper.find(`[data-testid="admin-erasure-id-${id}-copy"]`).exists()).toBe(true)
+      }
+    })
+
+    it('copies the id of the row it sits on, and says so, then stops saying so', async () => {
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+      const h = await mountPage(
+        response('pending', [liveRow('P1', 'pending'), liveRow('R1', 'ready')]),
+      )
+
+      await h.wrapper.find('[data-testid="admin-erasure-id-R1-copy"]').trigger('click')
+      await flushPromises()
+
+      expect(writeText).toHaveBeenCalledTimes(1)
+      expect(writeText).toHaveBeenCalledWith('R1')
+      expect(h.wrapper.find('[data-testid="admin-erasure-id-R1-copied"]').text()).toBe('Copied')
+      expect(h.wrapper.find('[data-testid="admin-erasure-id-P1-copied"]').exists()).toBe(false)
+
+      vi.advanceTimersByTime(2100)
+      await flushPromises()
+      expect(h.wrapper.find('[data-testid="admin-erasure-id-R1-copied"]').exists()).toBe(false)
+    })
+
+    it('does not say Copied when the browser refuses the copy', async () => {
+      writeText.mockRejectedValue(new Error('denied'))
+      const h = await mountPage(response('pending', [liveRow('R1', 'ready')]))
+
+      await h.wrapper.find('[data-testid="admin-erasure-id-R1-copy"]').trigger('click')
+      await flushPromises()
+
+      expect(writeText).toHaveBeenCalledWith('R1')
+      expect(h.wrapper.find('[data-testid="admin-erasure-id-R1-copied"]').exists()).toBe(false)
+    })
+
+    it('says nothing is copied, and does not fail, when the browser has no clipboard', async () => {
+      Reflect.deleteProperty(navigator, 'clipboard')
+      const h = await mountPage(response('pending', [liveRow('R1', 'ready')]))
+
+      await h.wrapper.find('[data-testid="admin-erasure-id-R1-copy"]').trigger('click')
+      await flushPromises()
+
+      expect(h.wrapper.find('[data-testid="admin-erasure-id-R1-copied"]').exists()).toBe(false)
+    })
+  })
+
   it('has no shell path left', () => {
     const source = readFileSync(path.resolve(__dirname, 'ErasureQueuePage.vue'), 'utf8')
 
@@ -551,6 +622,24 @@ describe('ErasureQueuePage (AH-104c C2)', () => {
       expect(document.body.querySelector('[data-testid="admin-erasure-erase-dialog-retry"]')).toBe(
         null,
       )
+    })
+
+    it('shows the id the admin is asked to type, above the field, with a copy button', async () => {
+      const writeText = vi.fn().mockResolvedValue(undefined)
+      Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
+      await openFor()
+
+      expect(dialogText('admin-erasure-erase-dialog-id')).toBe(ULID)
+      body('admin-erasure-erase-dialog-id-copy').click()
+      await flushPromises()
+      expect(writeText).toHaveBeenCalledWith(ULID)
+
+      // Copying is not confirming: the typed id is still the check.
+      expect(confirm().disabled).toBe(true)
+      expect(
+        body('admin-erasure-erase-dialog-ulid').querySelector<HTMLInputElement>('input')!.value,
+      ).toBe('')
+      Reflect.deleteProperty(navigator, 'clipboard')
     })
 
     it('keeps the button disabled until the id, the reason and the code are all filled in', async () => {

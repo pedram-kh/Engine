@@ -97,7 +97,6 @@
               "reference": "Plano nuoroda: {digest}"
             },
             "ulid_label": "Patvirtindami įveskite paskyros ID",
-            "ulid_hint": "ID yra {ulid}.",
             "mfa_label": "Dviejų veiksnių kodas arba atkūrimo kodas",
             "mfa_hint": "Atkūrimo kodas sunaudojamas jį pateikus.",
             "confirm": "Ištrinti visam laikui"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "Paskyra ištrinta. Kiekvienas atšauktas priskyrimas pranešė savo agentūrai.",
           "released": "Ištrynimas neprasidėjo: duomenys pasikeitė nuo plano sudarymo arba kuri nors patikra dabar atsisako. Nieko neištrinta, o kūrėjas vis dar gali atšaukti. Peržiūrėkite planą ir bandykite dar kartą."
+        },
+        "id": {
+          "label": "Paskyros ID",
+          "copy": "Kopijuoti paskyros ID",
+          "copied": "Nukopijuota"
         }
       }
     },

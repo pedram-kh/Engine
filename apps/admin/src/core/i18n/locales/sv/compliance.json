@@ -97,7 +97,6 @@
               "reference": "Planreferens: {digest}"
             },
             "ulid_label": "Skriv kontots id för att bekräfta",
-            "ulid_hint": "Id:t är {ulid}.",
             "mfa_label": "Tvåfaktorskod eller återställningskod",
             "mfa_hint": "En återställningskod förbrukas när du skickar den.",
             "confirm": "Radera permanent"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "Kontot raderades. Varje avbrutet uppdrag meddelade sin byrå.",
           "released": "Raderingen startade inte: datan har ändrats sedan planen, eller en kontroll nekar nu. Inget raderades, och skaparen kan fortfarande ångra sig. Granska planen och försök igen."
+        },
+        "id": {
+          "label": "Kontots id",
+          "copy": "Kopiera kontots id",
+          "copied": "Kopierat"
         }
       }
     },

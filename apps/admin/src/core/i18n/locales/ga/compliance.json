@@ -97,7 +97,6 @@
               "reference": "Tagairt an phlean: {digest}"
             },
             "ulid_label": "Clóscríobh id an chuntais chun deimhniú",
-            "ulid_hint": "Is é an t-id ná {ulid}.",
             "mfa_label": "Cód dhá fhachtóir nó cód athshlánaithe",
             "mfa_hint": "Úsáidtear cód athshlánaithe suas nuair a chuirtear isteach é.",
             "confirm": "Scrios go buan"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "Scriosadh an cuntas. Chuir gach sannadh a cealaíodh a ghníomhaireacht ar an eolas.",
           "released": "Níor tosaíodh an scriosadh: d'athraigh na sonraí ó rinneadh an plean, nó diúltaíonn seiceáil anois. Níor scriosadh aon rud, agus is féidir leis an chruthaitheoir cealú fós. Athbhreithnigh an plean agus bain triail eile as."
+        },
+        "id": {
+          "label": "Id an chuntais",
+          "copy": "Cóipeáil id an chuntais",
+          "copied": "Cóipeáilte"
         }
       }
     },

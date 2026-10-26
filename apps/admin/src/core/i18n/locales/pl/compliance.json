@@ -97,7 +97,6 @@
               "reference": "Odniesienie planu: {digest}"
             },
             "ulid_label": "Aby potwierdzić, wpisz identyfikator konta",
-            "ulid_hint": "Identyfikator to {ulid}.",
             "mfa_label": "Kod dwuskładnikowy lub kod odzyskiwania",
             "mfa_hint": "Kod odzyskiwania zostaje zużyty po wysłaniu.",
             "confirm": "Usuń trwale"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "Konto zostało usunięte. Każde anulowane zlecenie powiadomiło swoją agencję.",
           "released": "Usuwanie nie ruszyło: dane zmieniły się od czasu planu albo jakaś kontrola teraz odmawia. Nic nie zostało usunięte, a twórca nadal może anulować. Przejrzyj plan i spróbuj ponownie."
+        },
+        "id": {
+          "label": "Identyfikator konta",
+          "copy": "Kopiuj identyfikator konta",
+          "copied": "Skopiowano"
         }
       }
     },

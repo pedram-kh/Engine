@@ -97,7 +97,6 @@
               "reference": "Referenca načrta: {digest}"
             },
             "ulid_label": "Za potrditev vnesite ID računa",
-            "ulid_hint": "ID je {ulid}.",
             "mfa_label": "Koda za dvostopenjsko preverjanje ali obnovitvena koda",
             "mfa_hint": "Obnovitvena koda se porabi, ko jo oddate.",
             "confirm": "Izbriši trajno"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "Račun je izbrisan. Vsaka preklicana dodelitev je obvestila svojo agencijo.",
           "released": "Brisanje se ni začelo: podatki so se od načrta spremenili ali neko preverjanje zdaj zavrača. Nič ni bilo izbrisano, ustvarjalec pa lahko še vedno prekliče. Preglejte načrt in poskusite znova."
+        },
+        "id": {
+          "label": "ID računa",
+          "copy": "Kopiraj ID računa",
+          "copied": "Kopirano"
         }
       }
     },

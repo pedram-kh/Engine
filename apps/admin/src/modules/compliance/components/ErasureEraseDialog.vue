@@ -17,6 +17,7 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { ErasurePlan } from '../api/compliance.api'
+import AccountIdCopy from './AccountIdCopy.vue'
 
 defineOptions({ name: 'ErasureEraseDialog' })
 
@@ -234,14 +235,21 @@ function onCancel(): void {
           </li>
         </ul>
 
+        <p
+          v-if="userUlid !== null"
+          class="text-body-2 mt-4 mb-1"
+          data-testid="admin-erasure-erase-dialog-account-id"
+        >
+          <span class="font-weight-medium">{{ t('admin.compliance.erasures.id.label') }}:</span>
+          <AccountIdCopy :ulid="userUlid" testid="admin-erasure-erase-dialog-id" />
+        </p>
+
         <v-text-field
           v-model="typedUlid"
           :label="t('admin.compliance.erasures.dialog.erase.ulid_label')"
-          :hint="t('admin.compliance.erasures.dialog.erase.ulid_hint', { ulid: userUlid ?? '' })"
-          persistent-hint
           autocomplete="off"
           spellcheck="false"
-          class="mt-4"
+          class="mt-1"
           data-testid="admin-erasure-erase-dialog-ulid"
         />
 

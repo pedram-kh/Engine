@@ -97,7 +97,6 @@
               "reference": "Referência do plano: {digest}"
             },
             "ulid_label": "Escreva o id da conta para confirmar",
-            "ulid_hint": "O id é {ulid}.",
             "mfa_label": "Código de dois fatores ou código de recuperação",
             "mfa_hint": "Um código de recuperação é gasto ao ser enviado.",
             "confirm": "Apagar definitivamente"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "A conta foi apagada. Cada atribuição cancelada avisou a sua agência.",
           "released": "A remoção não começou: os dados mudaram desde o plano ou uma verificação recusa agora. Nada foi apagado e o criador ainda pode cancelar. Reveja o plano e tente de novo."
+        },
+        "id": {
+          "label": "Id da conta",
+          "copy": "Copiar o id da conta",
+          "copied": "Copiado"
         }
       }
     },

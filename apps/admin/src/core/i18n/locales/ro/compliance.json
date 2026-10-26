@@ -97,7 +97,6 @@
               "reference": "Referința planului: {digest}"
             },
             "ulid_label": "Scrie ID-ul contului pentru a confirma",
-            "ulid_hint": "ID-ul este {ulid}.",
             "mfa_label": "Cod în doi pași sau cod de recuperare",
             "mfa_hint": "Un cod de recuperare se consumă când îl trimiți.",
             "confirm": "Șterge definitiv"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "Contul a fost șters. Fiecare alocare anulată a înștiințat agenția ei.",
           "released": "Ștergerea nu a început: datele s-au schimbat de la plan sau o verificare refuză acum. Nu s-a șters nimic, iar creatorul poate încă anula. Examinează planul și încearcă din nou."
+        },
+        "id": {
+          "label": "ID-ul contului",
+          "copy": "Copiază ID-ul contului",
+          "copied": "Copiat"
         }
       }
     },

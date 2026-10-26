@@ -97,7 +97,6 @@
               "reference": "Terv azonosítója: {digest}"
             },
             "ulid_label": "A megerősítéshez írd be a fiók azonosítóját",
-            "ulid_hint": "Az azonosító: {ulid}.",
             "mfa_label": "Kétlépcsős kód vagy helyreállítási kód",
             "mfa_hint": "A helyreállítási kód a beküldéssel elhasználódik.",
             "confirm": "Végleges törlés"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "A fiók törölve lett. Minden lemondott megbízás értesítette az ügynökségét.",
           "released": "A törlés nem indult el: az adatok a terv óta megváltoztak, vagy egy ellenőrzés most elutasítja. Semmi sem törlődött, és az alkotó még visszavonhatja. Nézd át a tervet, és próbáld újra."
+        },
+        "id": {
+          "label": "Fiók azonosítója",
+          "copy": "Fiók azonosítójának másolása",
+          "copied": "Másolva"
         }
       }
     },

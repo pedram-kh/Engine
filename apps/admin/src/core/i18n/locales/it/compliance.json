@@ -97,7 +97,6 @@
               "reference": "Riferimento del piano: {digest}"
             },
             "ulid_label": "Digita l'id dell'account per confermare",
-            "ulid_hint": "L'id è {ulid}.",
             "mfa_label": "Codice a due fattori o codice di recupero",
             "mfa_hint": "Un codice di recupero si consuma quando lo invii.",
             "confirm": "Cancella definitivamente"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "L'account è stato cancellato. Ogni incarico annullato ha avvisato la propria agenzia.",
           "released": "La cancellazione non è partita: i dati sono cambiati dopo il piano, oppure un controllo ora la rifiuta. Non è stato cancellato nulla e il creator può ancora annullare. Esamina il piano e riprova."
+        },
+        "id": {
+          "label": "Id dell'account",
+          "copy": "Copia l'id dell'account",
+          "copied": "Copiato"
         }
       }
     },

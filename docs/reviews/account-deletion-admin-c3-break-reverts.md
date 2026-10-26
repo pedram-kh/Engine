@@ -349,3 +349,63 @@ Five more mutations against `EraseStarter` and its new specs (the click's prefli
     caught by: it does not claim an account for a retry either, when the audit-log…
 [Q1-e the check refuses with the wrong code] restored: identical
 ```
+
+## Follow-up from the C3 walk: the account id on the row and in the dialog
+
+Eight mutations against `AccountIdCopy`, the queue row and the dialog. Two survived their first run and are re-run below the first block: ID-6 was an **equivalent mutant** (the explicit "no clipboard" guard was
+redundant with the `try`, so I removed the guard and kept the `try`, with a spec for a missing clipboard); ID-7 had no spec for a refused copy (added: "does not say Copied when the browser refuses the copy").
+
+```
+[ID-1 the row does not show the id] BROKEN exit=1
+    caught by: ErasureQueuePage (AH-104c C2) > the account id (AH-104c C3 walk: an admin must be able to read the id they are asked to type) > shows every
+    caught by: ErasureQueuePage (AH-104c C2) > the account id (AH-104c C3 walk: an admin must be able to read the id they are asked to type) > copies the i
+    caught by: ErasureQueuePage (AH-104c C2) > the account id (AH-104c C3 walk: an admin must be able to read the id they are asked to type) > says nothing
+    caught by: src/modules/compliance/pages/ErasureQueuePage.spec.ts > ErasureQueuePage (AH-104c C2) > the account id (AH-104c C3 walk: an admin must be ab
+    caught by: src/modules/compliance/pages/ErasureQueuePage.spec.ts > ErasureQueuePage (AH-104c C2) > the account id (AH-104c C3 walk: an admin must be ab
+[ID-1 the row does not show the id] restored: identical
+[ID-2 the row shows the id of another thing] BROKEN exit=1
+    caught by: ErasureQueuePage (AH-104c C2) > the account id (AH-104c C3 walk: an admin must be able to read the id they are asked to type) > shows every
+    caught by: ErasureQueuePage (AH-104c C2) > the account id (AH-104c C3 walk: an admin must be able to read the id they are asked to type) > copies the i
+    caught by: src/modules/compliance/pages/ErasureQueuePage.spec.ts > ErasureQueuePage (AH-104c C2) > the account id (AH-104c C3 walk: an admin must be ab
+    caught by: src/modules/compliance/pages/ErasureQueuePage.spec.ts > ErasureQueuePage (AH-104c C2) > the account id (AH-104c C3 walk: an admin must be ab
+[ID-2 the row shows the id of another thing] restored: identical
+[ID-3 the dialog does not show the id] BROKEN exit=1
+    caught by: ErasureQueuePage (AH-104c C2) > the Erase click (AH-104c C3) > shows the id the admin is asked to type, above the field, with a copy button
+    caught by: src/modules/compliance/pages/ErasureQueuePage.spec.ts > ErasureQueuePage (AH-104c C2) > the Erase click (AH-104c C3) > shows the id the admi
+[ID-3 the dialog does not show the id] restored: identical
+[ID-4 the copy button copies something else] BROKEN exit=1
+    caught by: ErasureQueuePage (AH-104c C2) > the account id (AH-104c C3 walk: an admin must be able to read the id they are asked to type) > copies the i
+    caught by: ErasureQueuePage (AH-104c C2) > the Erase click (AH-104c C3) > shows the id the admin is asked to type, above the field, with a copy button
+    caught by: src/modules/compliance/pages/ErasureQueuePage.spec.ts > ErasureQueuePage (AH-104c C2) > the account id (AH-104c C3 walk: an admin must be ab
+    caught by: src/modules/compliance/pages/ErasureQueuePage.spec.ts > ErasureQueuePage (AH-104c C2) > the Erase click (AH-104c C3) > shows the id the admi
+[ID-4 the copy button copies something else] restored: identical
+[ID-5 "Copied" never goes away] BROKEN exit=1
+    caught by: ErasureQueuePage (AH-104c C2) > the account id (AH-104c C3 walk: an admin must be able to read the id they are asked to type) > copies the i
+    caught by: src/modules/compliance/pages/ErasureQueuePage.spec.ts > ErasureQueuePage (AH-104c C2) > the account id (AH-104c C3 walk: an admin must be ab
+[ID-5 "Copied" never goes away] restored: identical
+[ID-6 no clipboard guard] BROKEN exit=0
+    !!! NOT CAUGHT
+[ID-6 no clipboard guard] restored: identical
+[ID-7 a failed copy still says Copied] BROKEN exit=0
+    !!! NOT CAUGHT
+[ID-7 a failed copy still says Copied] restored: identical
+[ID-8 the typed check dropped (confirm without the id)] BROKEN exit=1
+    caught by: ErasureQueuePage (AH-104c C2) > the Erase click (AH-104c C3) > keeps the button disabled until the id, the reason and the code are all fille
+    caught by: src/modules/compliance/pages/ErasureQueuePage.spec.ts > ErasureQueuePage (AH-104c C2) > the Erase click (AH-104c C3) > keeps the button disa
+[ID-8 the typed check dropped (confirm without the id)] restored: identical
+```
+
+Re-runs after the guard was removed and the spec added:
+
+```
+[ID-6 (re-run) a missing clipboard still says Copied] BROKEN exit=1
+    caught by: ErasureQueuePage (AH-104c C2) > the account id (AH-104c C3 walk: an admin must be able to read the id they are asked to type) > says nothing
+    caught by: src/modules/compliance/pages/ErasureQueuePage.spec.ts > ErasureQueuePage (AH-104c C2) > the account id (AH-104c C3 walk: an admin must be ab
+[ID-6 (re-run) a missing clipboard still says Copied] restored: identical
+[ID-7 (re-run) a failed copy still says Copied] BROKEN exit=1
+    caught by: ErasureQueuePage (AH-104c C2) > the account id (AH-104c C3 walk: an admin must be able to read the id they are asked to type) > does not say
+    caught by: ErasureQueuePage (AH-104c C2) > the account id (AH-104c C3 walk: an admin must be able to read the id they are asked to type) > says nothing
+    caught by: src/modules/compliance/pages/ErasureQueuePage.spec.ts > ErasureQueuePage (AH-104c C2) > the account id (AH-104c C3 walk: an admin must be ab
+    caught by: src/modules/compliance/pages/ErasureQueuePage.spec.ts > ErasureQueuePage (AH-104c C2) > the account id (AH-104c C3 walk: an admin must be ab
+[ID-7 (re-run) a failed copy still says Copied] restored: identical
+```

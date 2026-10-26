@@ -97,7 +97,6 @@
               "reference": "Référence du plan : {digest}"
             },
             "ulid_label": "Saisissez l'identifiant du compte pour confirmer",
-            "ulid_hint": "L'identifiant est {ulid}.",
             "mfa_label": "Code à deux facteurs ou code de récupération",
             "mfa_hint": "Un code de récupération est consommé dès que vous l'envoyez.",
             "confirm": "Effacer définitivement"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "Le compte a été effacé. Chaque mission annulée en a informé son agence.",
           "released": "L'effacement n'a pas démarré : les données ont changé depuis le plan, ou une vérification refuse désormais. Rien n'a été effacé, et le créateur peut encore annuler. Examinez le plan et réessayez."
+        },
+        "id": {
+          "label": "Identifiant du compte",
+          "copy": "Copier l'identifiant du compte",
+          "copied": "Copié"
         }
       }
     },

@@ -97,7 +97,6 @@
               "reference": "Referencia del plan: {digest}"
             },
             "ulid_label": "Escribe el id de la cuenta para confirmar",
-            "ulid_hint": "El id es {ulid}.",
             "mfa_label": "Código de dos factores o código de recuperación",
             "mfa_hint": "Un código de recuperación se gasta al enviarlo.",
             "confirm": "Eliminar definitivamente"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "La cuenta se eliminó. Cada asignación cancelada avisó a su agencia.",
           "released": "La eliminación no se inició: los datos cambiaron desde el plan o una comprobación ahora la rechaza. No se eliminó nada y el creador aún puede cancelar. Revisa el plan e inténtalo de nuevo."
+        },
+        "id": {
+          "label": "Id de la cuenta",
+          "copy": "Copiar id de la cuenta",
+          "copied": "Copiado"
         }
       }
     },

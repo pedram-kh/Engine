@@ -97,7 +97,6 @@
               "reference": "Suunnitelman viite: {digest}"
             },
             "ulid_label": "Vahvista kirjoittamalla tilin tunnus",
-            "ulid_hint": "Tunnus on {ulid}.",
             "mfa_label": "Kaksivaiheisen tunnistuksen koodi tai palautuskoodi",
             "mfa_hint": "Palautuskoodi kuluu loppuun, kun lähetät sen.",
             "confirm": "Poista pysyvästi"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "Tili poistettiin. Jokainen peruttu toimeksianto ilmoitti omalle toimistolleen.",
           "released": "Poisto ei alkanut: tiedot ovat muuttuneet suunnitelman jälkeen tai jokin tarkistus nyt estää sen. Mitään ei poistettu, ja tekijä voi yhä perua. Tarkista suunnitelma ja yritä uudelleen."
+        },
+        "id": {
+          "label": "Tilin tunnus",
+          "copy": "Kopioi tilin tunnus",
+          "copied": "Kopioitu"
         }
       }
     },

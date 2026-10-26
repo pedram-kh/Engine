@@ -97,7 +97,6 @@
               "reference": "Plan reference: {digest}"
             },
             "ulid_label": "Type the account id to confirm",
-            "ulid_hint": "The id is {ulid}.",
             "mfa_label": "Two-factor code or recovery code",
             "mfa_hint": "A recovery code is used up when you submit it.",
             "confirm": "Erase permanently"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "The account was erased. Each cancelled assignment told its agency.",
           "released": "The erasure did not start: the data changed since the plan, or a check now refuses. Nothing was erased, and the creator can still cancel. Review the plan and try again."
+        },
+        "id": {
+          "label": "Account id",
+          "copy": "Copy account id",
+          "copied": "Copied"
         }
       }
     },

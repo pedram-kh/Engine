@@ -97,7 +97,6 @@
               "reference": "Referenca plana: {digest}"
             },
             "ulid_label": "Za potvrdu upišite ID računa",
-            "ulid_hint": "ID je {ulid}.",
             "mfa_label": "Kod za dvofaktorsku provjeru ili kod za oporavak",
             "mfa_hint": "Kod za oporavak se iskoristi kad ga pošaljete.",
             "confirm": "Obriši trajno"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "Račun je obrisan. Svaki otkazani angažman obavijestio je svoju agenciju.",
           "released": "Brisanje nije započelo: podaci su se promijenili od izrade plana ili neka provjera sada odbija. Ništa nije obrisano, a kreator i dalje može otkazati. Pregledajte plan i pokušajte ponovno."
+        },
+        "id": {
+          "label": "ID računa",
+          "copy": "Kopiraj ID računa",
+          "copied": "Kopirano"
         }
       }
     },

@@ -97,7 +97,6 @@
               "reference": "Plan-reference: {digest}"
             },
             "ulid_label": "Skriv konto-id'et for at bekræfte",
-            "ulid_hint": "Id'et er {ulid}.",
             "mfa_label": "Tofaktorkode eller gendannelseskode",
             "mfa_hint": "En gendannelseskode bruges op, når du sender den.",
             "confirm": "Slet permanent"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "Kontoen blev slettet. Hver annulleret opgave gav sit bureau besked.",
           "released": "Sletningen startede ikke: data er ændret siden planen, eller en kontrol afviser nu. Intet blev slettet, og skaberen kan stadig fortryde. Gennemgå planen, og prøv igen."
+        },
+        "id": {
+          "label": "Konto-id",
+          "copy": "Kopiér konto-id",
+          "copied": "Kopieret"
         }
       }
     },

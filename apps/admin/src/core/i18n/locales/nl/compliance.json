@@ -97,7 +97,6 @@
               "reference": "Planreferentie: {digest}"
             },
             "ulid_label": "Typ de account-id ter bevestiging",
-            "ulid_hint": "De id is {ulid}.",
             "mfa_label": "Tweestapscode of herstelcode",
             "mfa_hint": "Een herstelcode is verbruikt zodra je hem verstuurt.",
             "confirm": "Definitief verwijderen"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "Het account is verwijderd. Elke geannuleerde toewijzing heeft haar bureau op de hoogte gebracht.",
           "released": "De verwijdering is niet gestart: de gegevens zijn sinds het plan veranderd, of een controle weigert nu. Er is niets verwijderd en de creator kan nog annuleren. Bekijk het plan en probeer het opnieuw."
+        },
+        "id": {
+          "label": "Account-id",
+          "copy": "Account-id kopiëren",
+          "copied": "Gekopieerd"
         }
       }
     },

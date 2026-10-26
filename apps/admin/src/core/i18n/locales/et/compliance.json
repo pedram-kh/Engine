@@ -97,7 +97,6 @@
               "reference": "Plaani viide: {digest}"
             },
             "ulid_label": "Kinnitamiseks sisesta konto ID",
-            "ulid_hint": "ID on {ulid}.",
             "mfa_label": "Kaheastmelise kinnituse kood või taastekood",
             "mfa_hint": "Taastekood kulub ära, kui selle esitad.",
             "confirm": "Kustuta jäädavalt"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "Konto kustutati. Iga tühistatud määramine teavitas oma agentuuri.",
           "released": "Kustutamine ei alanud: andmed on pärast plaani muutunud või mõni kontroll nüüd keeldub. Midagi ei kustutatud ja looja saab endiselt tühistada. Vaata plaan üle ja proovi uuesti."
+        },
+        "id": {
+          "label": "Konto ID",
+          "copy": "Kopeeri konto ID",
+          "copied": "Kopeeritud"
         }
       }
     },

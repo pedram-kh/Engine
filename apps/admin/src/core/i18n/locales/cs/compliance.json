@@ -97,7 +97,6 @@
               "reference": "Reference plánu: {digest}"
             },
             "ulid_label": "Pro potvrzení zadejte ID účtu",
-            "ulid_hint": "ID je {ulid}.",
             "mfa_label": "Kód dvoufázového ověření nebo záložní kód",
             "mfa_hint": "Záložní kód se odesláním spotřebuje.",
             "confirm": "Smazat natrvalo"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "Účet byl smazán. Každé zrušené přiřazení informovalo svou agenturu.",
           "released": "Mazání nezačalo: data se od vytvoření plánu změnila, nebo některá kontrola nyní odmítá. Nic nebylo smazáno a tvůrce může stále zrušit žádost. Zkontrolujte plán a zkuste to znovu."
+        },
+        "id": {
+          "label": "ID účtu",
+          "copy": "Zkopírovat ID účtu",
+          "copied": "Zkopírováno"
         }
       }
     },

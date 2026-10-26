@@ -161,3 +161,8 @@ None block the commit pair. Three for the review, each with my recommendation:
   Specs: a dataset case in the every-gate and the no-recovery-code specs, plus three dedicated specs (named reason, retry path, refusal at the claim). Pest 0 failed (4102 deprecated, 18 passed, 21,073
   assertions), Pint, PHPStan clean; the log has the five break-reverts.
 - **Question 2:** left as is (deviation 4, tech-debt item 9). **Question 3:** the C4 order stands: dry-run timing and read-back E first, flag off.
+- **Walk finding: the id was not readable.** The Erase dialog asks the admin to type the account's id, but the queue row showed only the name and email, and the dialog showed the id only as a small grey hint
+  under the field (no way to copy it). Now **every queue row shows its id with a copy button** (`AccountIdCopy`), and the dialog shows "Account id: <id>" above the typed field, also with a copy button;
+  the grey hint is gone (`dialog.erase.ulid_hint` removed, `admin.compliance.erasures.id.*` added, ×24 locales). **The typed confirmation is unchanged and still the only check**: copying does not fill the
+  field (a spec pins it). The id is not personal data (the Erased tab already shows it). Admin Vitest 602 passed, ESLint, vue-tsc, Prettier, i18n parity clean; 8 break-reverts, all caught after two were
+  closed (log).

@@ -97,7 +97,6 @@
               "reference": "Referenza tal-pjan: {digest}"
             },
             "ulid_label": "Ittajpja l-id tal-kont biex tikkonferma",
-            "ulid_hint": "L-id huwa {ulid}.",
             "mfa_label": "Kodiċi b'żewġ fatturi jew kodiċi ta' rkupru",
             "mfa_hint": "Kodiċi ta' rkupru jintuża meta tibgħatu.",
             "confirm": "Neħħi b'mod permanenti"
@@ -116,6 +115,11 @@
         "watch": {
           "completed": "Il-kont tneħħa. Kull assenjazzjoni kkanċellata infurmat lill-aġenzija tagħha.",
           "released": "It-tneħħija ma bdietx: id-data nbidlet mill-pjan, jew kontroll issa qed jirrifjuta. Ma tneħħa xejn, u l-kreatur jista' xorta jikkanċella. Irrevedi l-pjan u erġa' pprova."
+        },
+        "id": {
+          "label": "Id tal-kont",
+          "copy": "Ikkopja l-id tal-kont",
+          "copied": "Ikkopjat"
         }
       }
     },

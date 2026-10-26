@@ -29,6 +29,7 @@ import { useI18n } from 'vue-i18n'
 
 import { ApiError, formatDateTime } from '@catalyst/api-client'
 
+import AccountIdCopy from '../components/AccountIdCopy.vue'
 import ErasureEraseDialog from '../components/ErasureEraseDialog.vue'
 import ErasureHoldDialog from '../components/ErasureHoldDialog.vue'
 import {
@@ -446,6 +447,7 @@ onMounted(() => {
         <template v-if="liveRow(item)">
           <div class="font-weight-medium">{{ liveRow(item)?.attributes.name }}</div>
           <div class="text-caption text-medium-emphasis">{{ liveRow(item)?.attributes.email }}</div>
+          <AccountIdCopy :ulid="item.id" :testid="`admin-erasure-id-${item.id}`" />
         </template>
         <code v-else data-testid="admin-erasure-erased-ref">{{ item.id }}</code>
       </template>
