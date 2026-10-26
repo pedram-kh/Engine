@@ -4,6 +4,7 @@ import { flushPromises } from '@vue/test-utils'
 
 import { mountAuthPage } from '../../../../tests/unit/helpers/mountAuthPage'
 import SignUpPage from './SignUpPage.vue'
+import { FOOTER_PRIVACY_HREF } from '../components/footerLinks'
 
 vi.mock('@/modules/auth/api/auth.api', () => ({
   authApi: {
@@ -115,6 +116,39 @@ describe('SignUpPage', () => {
     await h.wrapper.find('form').trigger('submit')
     await flushPromises()
     expect(authApi.signUp).toHaveBeenCalledWith(expect.objectContaining({ timezone: expectedTz }))
+  })
+
+  it('omits timezone when the browser exposes no zone (the backend falls back to UTC)', async () => {
+    vi.mocked(authApi.signUp).mockResolvedValue(USER)
+    const realFormat = Intl.DateTimeFormat
+    const spy = vi.spyOn(Intl, 'DateTimeFormat').mockImplementation(function (
+      this: unknown,
+      ...args: unknown[]
+    ) {
+      const real = new realFormat(...(args as ConstructorParameters<typeof realFormat>))
+      return {
+        resolvedOptions: () => ({ ...real.resolvedOptions(), timeZone: '' }),
+        format: real.format.bind(real),
+      } as unknown as Intl.DateTimeFormat
+    } as unknown as typeof Intl.DateTimeFormat)
+    let h: Awaited<ReturnType<typeof mountAuthPage>>
+    try {
+      h = await mountAuthPage(SignUpPage)
+    } finally {
+      spy.mockRestore()
+    }
+    teardown = h.unmount
+    await h.wrapper.find('[data-test="sign-up-name"] input').setValue('Alice')
+    await h.wrapper.find('[data-test="sign-up-email"] input').setValue('a@b.c')
+    await h.wrapper.find('[data-test="sign-up-password"] input').setValue('Pa$$w0rd!12')
+    await h.wrapper
+      .find('[data-test="sign-up-password-confirmation"] input')
+      .setValue('Pa$$w0rd!12')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+    const payload = vi.mocked(authApi.signUp).mock.calls[0]?.[0]
+    expect(payload).toBeDefined()
+    expect(payload).not.toHaveProperty('timezone')
   })
 
   it('on auth.signup.email_taken, renders the i18n string inline', async () => {
@@ -423,5 +457,64 @@ describe('SignUpPage', () => {
     expect(h.wrapper.find('[data-test="sign-up-submit"]').text()).toContain('Submitting')
     resolveSignUp(USER)
     await flushPromises()
+  })
+
+  // AH-104d S3 (Q6, C9): the consent line is a notice with the privacy link only.
+  describe('consent line', () => {
+    it('renders the sentence with the privacy policy as an external link', async () => {
+      const h = await mountAuthPage(SignUpPage)
+      teardown = h.unmount
+      const line = h.wrapper.find('[data-test="sign-up-consent"]')
+      expect(line.exists()).toBe(true)
+      expect(line.text()).toBe('By creating an account, you acknowledge our Privacy Policy.')
+      expect(line.text()).not.toContain('{')
+
+      const link = h.wrapper.find('[data-test="sign-up-consent-privacy"]')
+      expect(link.element.tagName).toBe('A')
+      expect(link.attributes('href')).toBe(FOOTER_PRIVACY_HREF)
+      expect(link.attributes('href')).toBe('https://www.catalyst-growth.com/legal/privacy')
+      expect(link.attributes('target')).toBe('_blank')
+      expect(link.attributes('rel')).toBe('noopener noreferrer')
+    })
+
+    it('is a plain anchor outside the router (never a router-link that would stay in the app)', async () => {
+      const h = await mountAuthPage(SignUpPage)
+      teardown = h.unmount
+      const line = h.wrapper.find('[data-test="sign-up-consent"]')
+      expect(line.findComponent({ name: 'RouterLink' }).exists()).toBe(false)
+      expect(line.findAll('a')).toHaveLength(1)
+    })
+
+    it('does not name Terms: there is no Terms page yet, so the line makes no claim about one', async () => {
+      const h = await mountAuthPage(SignUpPage)
+      teardown = h.unmount
+      expect(h.wrapper.find('[data-test="sign-up-consent"]').text().toLowerCase()).not.toContain(
+        'terms',
+      )
+    })
+
+    it('renders localised, with the slot filled, in Portuguese and Italian', async () => {
+      for (const locale of ['pt', 'it'] as const) {
+        const h = await mountAuthPage(SignUpPage, { locale })
+        const text = h.wrapper.find('[data-test="sign-up-consent"]').text()
+        expect(text.length).toBeGreaterThan(20)
+        expect(text).not.toContain('{')
+        expect(text).not.toContain('By creating an account')
+        expect(h.wrapper.find('[data-test="sign-up-consent-privacy"]').exists()).toBe(true)
+        h.unmount()
+      }
+    })
+
+    it('sits below the form, above the back-to-sign-in link', async () => {
+      const h = await mountAuthPage(SignUpPage)
+      teardown = h.unmount
+      const html = h.wrapper.html()
+      const form = html.indexOf('<form')
+      const consent = html.indexOf('data-test="sign-up-consent"')
+      const back = html.indexOf('data-test="sign-up-back-link"')
+      expect(form).toBeGreaterThan(-1)
+      expect(consent).toBeGreaterThan(form)
+      expect(back).toBeGreaterThan(consent)
+    })
   })
 })

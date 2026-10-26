@@ -35,7 +35,7 @@ use Illuminate\Contracts\Cache\Repository as CacheRepository;
  *
  * Allowlist invariant
  * -------------------
- * Only names in {@see ALLOWED_NAMES} can be neutralised — the four named
+ * Only names in {@see ALLOWED_NAMES} can be neutralised — the named
  * limiters {@see App\Modules\Identity\IdentityServiceProvider::registerRateLimits()}
  * registers. Adding a new limiter on the production side requires an
  * explicit add here too; that's intentional, so a typo in a spec
@@ -63,7 +63,7 @@ final class RateLimiterNeutralizer
     public const CACHE_KEY = 'test:rate-limiter:neutralized';
 
     /**
-     * Limiter names a spec is allowed to neutralise. Mirrors the four
+     * Limiter names a spec is allowed to neutralise. Mirrors the
      * `RateLimiter::for(...)` registrations in IdentityServiceProvider.
      * If a future production limiter is added, an explicit entry here
      * is required before specs can target it — a typo or an attempt
@@ -76,6 +76,7 @@ final class RateLimiterNeutralizer
         'auth-password',
         'auth-resend-verification',
         'auth-account-deletion',
+        'auth-signup-email',
     ];
 
     public function __construct(private readonly CacheRepository $cache) {}

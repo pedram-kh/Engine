@@ -25,7 +25,7 @@ import catalystLogo from '@/modules/auth/assets/catalyst-logo.svg'
 import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
 import { buildLocaleOptions } from './localeOptions'
 import { showsMarketingTail } from './marketingTail'
-import { usesNativeSheet } from './nativeSheet'
+import { isSheetRoute, usesNativeSheet } from './nativeSheet'
 
 const { t, locale } = useI18n()
 const { selectLocale } = useLocaleSwitch()
@@ -37,8 +37,8 @@ const localeOptions = buildLocaleOptions()
 // never a stripped-down layout.
 const isHero = computed(() => route.name === 'auth.sign-in' || route.name === 'auth.agency-sign-in')
 const showTail = computed(() => showsMarketingTail(isHero.value))
-// AH-101 U2: the creator app's sign-in is a bottom sheet, not the hero + card.
-const isNativeSheet = computed(() => usesNativeSheet(isHero.value))
+// AH-101 U2 / AH-104d: the creator app's sign-in, sign-up and verify-pending are sheets.
+const isNativeSheet = computed(() => usesNativeSheet(isSheetRoute(route.name)))
 </script>
 
 <template>
@@ -146,14 +146,14 @@ const isNativeSheet = computed(() => usesNativeSheet(isHero.value))
   z-index: 1;
 }
 
-/* Centred-card mode (every page except sign-in). */
-.auth-layout:not(.auth-layout--hero) {
+/* Centred-card mode (every page except sign-in and the native sheets). */
+.auth-layout:not(.auth-layout--hero):not(.auth-layout--native) {
   align-items: center;
   justify-content: center;
 }
 
-.auth-layout:not(.auth-layout--hero) .auth-layout__header,
-.auth-layout:not(.auth-layout--hero) .auth-layout__content {
+.auth-layout:not(.auth-layout--hero):not(.auth-layout--native) .auth-layout__header,
+.auth-layout:not(.auth-layout--hero):not(.auth-layout--native) .auth-layout__content {
   width: 100%;
   max-width: 480px;
 }

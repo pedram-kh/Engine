@@ -162,6 +162,26 @@ final class IdentityServiceProvider extends ServiceProvider
                 ->by('account-deletion:'.($user instanceof User ? (string) $user->getKey() : (string) $request->ip()))
                 ->response(static fn (Request $req, array $headers) => $rateLimitResponse($headers));
         });
+
+        // Sign-up (AH-104d Q9/C7): 5 per hour per email, on top of the
+        // per-IP cap. It counts EVERY attempt, including 422s, so a person
+        // fixing typos spends it too (accepted, and walked in W13). It
+        // limits probing one address through the taken-or-not answer and
+        // noise; it cannot mail-bomb, because the verification mail is only
+        // queued when a row is created. The key holds a hash of the
+        // normalised email, never the address. The limiter runs before
+        // `SignUpRequest::prepareForValidation()`, so it normalises (trim,
+        // lower-case) itself. An empty or non-string email must NOT share
+        // one bucket for everyone, so it falls back to a per-IP bucket.
+        // 429 only: nothing is created, suspended or written.
+        RateLimiter::for('auth-signup-email', static function (Request $request) use ($rateLimitResponse): Limit {
+            $raw = $request->input('email');
+            $email = is_string($raw) ? strtolower(trim($raw)) : '';
+
+            return Limit::perHour(5)
+                ->by($email === '' ? 'signup-ip:'.$request->ip() : 'signup:'.hash('sha256', $email))
+                ->response(static fn (Request $req, array $headers) => $rateLimitResponse($headers));
+        });
     }
 
     private function registerEventListeners(): void

@@ -26,6 +26,8 @@ const SHEETS: { file: string; root: string }[] = [
   // AH-101 U2 — the sign-in sheet: the layout's frame and the page's contents.
   { file: 'modules/auth/layouts/authNative.css', root: '.auth-layout--native' },
   { file: 'modules/auth/pages/signInNative.css', root: '.sign-in-native' },
+  // AH-104d S4 — the sign-up sheet's contents (same look, its own sheet).
+  { file: 'modules/auth/pages/signUpNative.css', root: '.sign-up-native' },
 ]
 
 function selectors(css: string): string[] {

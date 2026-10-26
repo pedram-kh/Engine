@@ -1,0 +1,129 @@
+/*
+ * AH-104d S4 — the sign-up sheet's contents in the creator app. Same look as
+ * the sign-in sheet (`signInNative.css`), repeated here on purpose rather than
+ * shared: two pages should not be coupled through one stylesheet.
+ *
+ * Bound ONLY through `.sign-up-native`, a class the page renders when it runs
+ * inside the Capacitor app, so nothing here can reach the web page. The sheet
+ * itself (full-bleed, pinned to the bottom, 24px top corners, the aurora
+ * hairline) belongs to the layout: `layouts/authNative.css`. Colours, radii and
+ * type are `--native-*` tokens only. Field text stays 16px (AH-100c): the
+ * fields take no font-size override here.
+ *
+ * Five fields make a tall sheet, so the brand mark is the compact one (84px).
+ */
+
+/* The mark sits above the sheet and rides its top edge. */
+.sign-up-native .sign-up-native__mark {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  width: 84px;
+  height: 84px;
+  margin-bottom: 20px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* Heading/H1 and the one-sentence welcome. */
+.sign-up-native .sign-up-native__title {
+  margin: 0 0 4px;
+  font: var(--native-type-h1);
+  letter-spacing: 0;
+  color: var(--native-text-primary);
+}
+
+.sign-up-native .sign-up-native__subtitle {
+  margin: 0 0 20px;
+  font: var(--native-type-body-small);
+  color: var(--native-text-secondary);
+}
+
+.sign-up-native form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Labels sit above their field (Caption/Strong, 8px gap), not inside it. */
+.sign-up-native .sign-up-native__label {
+  display: block;
+  margin-bottom: 8px;
+  font: var(--native-type-caption-strong);
+  color: var(--native-text-secondary);
+}
+
+/* Each field group is followed by a 16px gap; a field's own message (a 422)
+   renders in its details row, which collapses to nothing when empty. */
+.sign-up-native form > .v-input {
+  margin-bottom: 16px;
+}
+
+/* Figma's input radius is `radius/lg` (8px); Vuetify 3.12 hard-codes 4px on
+   `.v-field`, so the sheet sets it on the field itself (see signInNative.css). */
+.sign-up-native form :deep(.v-field) {
+  border-radius: var(--native-radius-lg);
+}
+
+.sign-up-native form :deep(.v-field__prepend-inner > .v-icon) {
+  font-size: 16px;
+  color: var(--native-text-secondary);
+  opacity: 1;
+}
+
+.sign-up-native form :deep(.v-field--focused:not(.v-field--error) .v-field__outline) {
+  color: var(--native-accent-primary);
+}
+
+.sign-up-native form :deep(.v-messages__message) {
+  font: var(--native-type-caption);
+  color: var(--native-status-danger);
+}
+
+/* The error banner leads the form. The live region is always rendered so a
+   screen reader hears it appear, and is empty — zero height — until needed. */
+.sign-up-native .sign-up-native__error {
+  order: -1;
+}
+
+.sign-up-native .sign-up-native__error--on {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 12px;
+  font: var(--native-type-body-small);
+  color: var(--native-text-primary);
+  background: var(--native-status-danger-subtle);
+  border: 1px solid var(--native-status-danger);
+  border-radius: var(--native-radius-lg);
+}
+
+.sign-up-native .sign-up-native__error--on .v-icon {
+  flex: 0 0 auto;
+  color: var(--native-status-danger);
+}
+
+/* The consent notice and the way back, under the button. */
+.sign-up-native .sign-up-native__consent {
+  margin: 16px 0 0;
+  text-align: center;
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+.sign-up-native .sign-up-native__consent a {
+  color: var(--native-accent-primary);
+}
+
+.sign-up-native .sign-up-native__back {
+  margin-top: 20px;
+  padding-top: 20px;
+  text-align: center;
+  font: var(--native-type-caption-strong);
+  border-top: 1px solid var(--native-border-default);
+}
+
+.sign-up-native .sign-up-native__back a {
+  color: var(--native-accent-primary);
+  text-decoration: none;
+}

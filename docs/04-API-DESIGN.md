@@ -541,6 +541,7 @@ Tiered limits enforced via Laravel's `throttle` middleware:
 | Group                             | Limit                             |
 | --------------------------------- | --------------------------------- |
 | Unauthenticated (auth endpoints)  | 10 requests / minute / IP         |
+| Sign-up (`auth/sign-up`)          | and 5 requests / hour / email     |
 | Authenticated, regular            | 120 requests / minute / user      |
 | Authenticated, admin              | 600 requests / minute / user      |
 | Webhooks (inbound from providers) | 1000 requests / minute / provider |

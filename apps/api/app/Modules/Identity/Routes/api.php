@@ -113,7 +113,9 @@ Route::prefix('auth')
             ->middleware('throttle:auth-password')
             ->name('password.reset');
 
+        // AH-104d: 5/hour per email on top of the group's per-IP cap.
         Route::post('sign-up', SignUpController::class)
+            ->middleware('throttle:auth-signup-email')
             ->name('signup');
 
         Route::post('verify-email', VerifyEmailController::class)

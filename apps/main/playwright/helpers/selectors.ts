@@ -47,12 +47,16 @@ export const testIds = {
   signUpPasswordConfirmation: 'sign-up-password-confirmation',
   signUpError: 'sign-up-error',
   signUpSubmit: 'sign-up-submit',
+  signUpConsent: 'sign-up-consent',
+  signUpConsentPrivacy: 'sign-up-consent-privacy',
 
   // ---------------------------------------------------------------
   // Email verification pending (post-sign-up landing page)
   // ---------------------------------------------------------------
   emailVerificationPendingPage: 'email-verification-pending-page',
   emailVerificationPendingHeading: 'email-verification-pending-heading',
+  emailVerificationPendingVerified: 'email-verification-pending-verified',
+  emailVerificationPendingBack: 'email-verification-pending-back',
 
   // ---------------------------------------------------------------
   // Email verification confirm (link-target page)
@@ -60,6 +64,13 @@ export const testIds = {
   emailVerificationConfirmPage: 'email-verification-confirm-page',
   emailVerificationConfirmSuccess: 'email-verification-confirm-success',
   emailVerificationConfirmError: 'email-verification-confirm-error',
+  emailVerificationConfirmAppHint: 'email-verification-confirm-app-hint',
+
+  // ---------------------------------------------------------------
+  // Onboarding wizard account menu (AH-104d)
+  // ---------------------------------------------------------------
+  onboardingAccountMenuBtn: 'onboarding-account-menu-btn',
+  onboardingAccountSecurity: 'onboarding-account-security',
 
   // ---------------------------------------------------------------
   // Enable 2FA (apps/main/src/modules/auth/pages/EnableTotpPage.vue)

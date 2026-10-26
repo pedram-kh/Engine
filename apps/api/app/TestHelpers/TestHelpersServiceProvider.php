@@ -90,7 +90,8 @@ final class TestHelpersServiceProvider extends ServiceProvider
      * `bootstrap/providers.php` lists this provider AFTER
      * `IdentityServiceProvider`, so by the time this method runs the
      * production `auth-ip` / `auth-login-email` / `auth-password` /
-     * `auth-resend-verification` registrations are in place. Calling
+     * `auth-resend-verification` / `auth-account-deletion` /
+     * `auth-signup-email` registrations are in place. Calling
      * `RateLimiter::for($name, …)` again overwrites the registration —
      * that's the same primitive `LoginTest::beforeEach` uses for
      * the chunk-5 in-isolation pattern.

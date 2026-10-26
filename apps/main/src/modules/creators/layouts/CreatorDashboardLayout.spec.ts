@@ -9,6 +9,7 @@
  * are stubbed to keep the mount lean under jsdom.
  */
 
+import { ApiError } from '@catalyst/api-client'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -121,6 +122,8 @@ async function mountLayout(
     native?: boolean
     /** AH-104b-del — `features.account_deletion` on the user (undefined = an older payload). */
     accountDeletion?: boolean
+    /** AH-104d — make the onboarding bootstrap fail (an unverified creator gets a 403). */
+    bootstrapError?: Error
   } = {},
 ) {
   setViewportWidth(options.mobile === true ? 390 : 1280)
@@ -129,12 +132,16 @@ async function mountLayout(
   // Always re-stated (not only when overridden): `vi.clearAllMocks()` clears
   // calls but keeps implementations, so a test that mounts as `approved` would
   // otherwise leak that status into every test after it.
-  vi.mocked(onboardingApi.bootstrap).mockResolvedValue({
-    data: {
-      type: 'creators',
-      attributes: { application_status: options.applicationStatus ?? 'incomplete' },
-    },
-  } as never)
+  if (options.bootstrapError !== undefined) {
+    vi.mocked(onboardingApi.bootstrap).mockRejectedValue(options.bootstrapError)
+  } else {
+    vi.mocked(onboardingApi.bootstrap).mockResolvedValue({
+      data: {
+        type: 'creators',
+        attributes: { application_status: options.applicationStatus ?? 'incomplete' },
+      },
+    } as never)
+  }
 
   const pinia = createPinia()
   setActivePinia(pinia)
@@ -861,5 +868,41 @@ describe('CreatorDashboardLayout — Security entries (AH-104b-del B4)', () => {
     cleanup = m.cleanup
 
     expect(m.wrapper.find('[data-test="creator-bottom-nav-more-security"]').exists()).toBe(false)
+  })
+})
+
+describe('CreatorDashboardLayout — the onboarding bootstrap is best-effort (AH-104d)', () => {
+  let cleanup: (() => void) | null = null
+  const unhandled: unknown[] = []
+  const onUnhandled = (reason: unknown): void => {
+    unhandled.push(reason)
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    unhandled.length = 0
+    process.on('unhandledRejection', onUnhandled)
+  })
+  afterEach(() => {
+    process.off('unhandledRejection', onUnhandled)
+    cleanup?.()
+    cleanup = null
+  })
+
+  it('a 403 from the bootstrap (an unverified creator) is swallowed: the shell renders, nothing is left unhandled', async () => {
+    const forbidden = new ApiError({
+      status: 403,
+      code: 'auth.email_unverified',
+      message: 'Verify your email.',
+      details: [],
+    })
+    const m = await mountLayout({ accountDeletion: true, bootstrapError: forbidden })
+    cleanup = m.cleanup
+    // an unhandled rejection is reported on a later macrotask, not in the microtask drain
+    await new Promise((resolve) => setTimeout(resolve, 20))
+
+    expect(onboardingApi.bootstrap).toHaveBeenCalledTimes(1)
+    expect(m.wrapper.find('[data-test="creator-layout"]').exists()).toBe(true)
+    expect(unhandled).toEqual([])
   })
 })

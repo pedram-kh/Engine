@@ -62,6 +62,13 @@ onMounted(async () => {
       {{ t('auth.ui.banners.email_verified') }}
     </v-alert>
 
+    <!-- AH-104d Q3(a)/C3: this page opens in the phone's browser, where the app
+         cannot be detected, so the line is worded to be true for everyone and
+         is shown to every visitor on success. -->
+    <p v-if="verified" class="text-body-2 mb-2" data-test="email-verification-confirm-app-hint">
+      {{ t('auth.ui.banners.email_verified_app') }}
+    </p>
+
     <div
       role="alert"
       aria-live="polite"

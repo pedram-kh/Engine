@@ -211,10 +211,14 @@ async function signOut(): Promise<void> {
  * pages bootstrapped, so a deep-link/refresh onto Messages/Availability left the
  * nav missing Profile. The `isBootstrapped` guard + the store's in-flight dedupe
  * make this a no-op when a page (or a prior visit) already fetched it.
+ *
+ * AH-104d: the call is best-effort. An unverified creator (who can open Security to
+ * delete the account) gets a 403 here, and nothing on that page needs the result, so
+ * the rejection is swallowed rather than left unhandled on every visit.
  */
 onMounted(() => {
   if (!onboardingStore.isBootstrapped) {
-    void onboardingStore.bootstrap()
+    void onboardingStore.bootstrap().catch(() => undefined)
   }
 })
 </script>

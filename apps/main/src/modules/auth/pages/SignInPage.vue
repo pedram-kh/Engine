@@ -27,9 +27,10 @@
  *
  * AH-100: inside the Capacitor creator app the same page is the app's
  * sign-in screen. `store.login()` goes to `POST /auth/token` there; the
- * page itself only differs in three ways — no Meta Pixel, no sign-up
- * funnel (a pointer to the web instead), and a wrong-door message that
- * names the web address the account belongs to.
+ * page itself only differs in three ways — no Meta Pixel, no web sign-up
+ * link (AH-104d: a "Create an account" button to the in-app sign-up sheet
+ * instead), and a wrong-door message that names the web address the account
+ * belongs to.
  *
  * AH-101 U2: that same native screen takes the Figma sign-in sheet (frame 02):
  * the brand mark above, labels above the fields, "forgot password" in the
@@ -56,7 +57,17 @@ const router = useRouter()
 const store = useAuthStore()
 const { isLoggingIn, userType, sessionLapsed } = storeToRefs(store)
 
-const email = ref('')
+/**
+ * AH-104d C4: the pending page hands the address it was shown to this page as
+ * `?email=` so the person does not retype it. It fills the field and nothing else:
+ * a single string only (an array or an object is ignored), trimmed, capped at the
+ * longest address an email can be, and still fully editable.
+ */
+function prefilledEmail(): string {
+  const raw = route.query.email
+  return typeof raw === 'string' ? raw.trim().slice(0, 320) : ''
+}
+const email = ref(prefilledEmail())
 const password = ref('')
 const totpCode = ref('')
 /**
@@ -133,9 +144,6 @@ const deletionScheduledDate = computed(() => {
   }
   return new Intl.DateTimeFormat(locale.value, { dateStyle: 'long' }).format(date)
 })
-
-/** Where a creator without an account goes (AH-100 Q8: no in-app sign-up in v1). */
-const CREATOR_SIGNUP_SITE = 'platform.catalyst-growth.com'
 
 /**
  * AH-086 — the agency-facing sign-in variant. Same component, same
@@ -315,6 +323,11 @@ async function onSubmit(): Promise<void> {
       errorKey.value = 'auth.ui.native.wrong_door'
     }
   }
+}
+
+/** AH-104d: the app's "Create an account" button opens the in-app sign-up sheet. */
+function goToSignUp(): void {
+  void router.push({ name: 'auth.sign-up' })
 }
 
 /** "Not now": back to an empty form; nothing was changed server-side. */
@@ -529,21 +542,27 @@ function leaveRestore(): void {
       </router-link>
     </div>
 
-    <!-- AH-101 Q7: frame 02's "Create an account" button is NOT drawn. A button
-         with nowhere in-app to go is dead, and an external account-creation link
-         is store-sensitive; the pointer line stays. The button returns with real
-         in-app sign-up (AH-104d). -->
-    <i18n-t
+    <!-- AH-104d: frame 02's "Create an account" button, now that the app has an
+         in-app sign-up (AH-101 Q7 held it back while the only target was the web).
+         The wrapper keeps its `data-test` so absence assertions stay meaningful. -->
+    <div
       v-if="isNative && pending === null"
-      keypath="auth.ui.native.create_account"
-      tag="p"
       class="sign-in-native__pointer"
       data-test="sign-in-native-create-account"
     >
-      <template #site>
-        <span class="sign-in-native__site">{{ CREATOR_SIGNUP_SITE }}</span>
-      </template>
-    </i18n-t>
+      <p class="sign-in-native__new" data-test="sign-in-native-new">
+        {{ t('auth.ui.native.new_to_catalyst') }}
+      </p>
+      <v-btn
+        variant="outlined"
+        block
+        size="large"
+        data-test="sign-in-native-create-account-button"
+        @click="goToSignUp"
+      >
+        {{ t('auth.ui.actions.sign_up') }}
+      </v-btn>
+    </div>
   </section>
 </template>
 <style scoped src="./signInNative.css"></style>

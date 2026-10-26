@@ -28,6 +28,12 @@
  * header (`NativeWizardHeader`) at every width, with "Save and exit" inline
  * beside the menu and safe-area padding. Gated on `isNative`; the web
  * branches above are unchanged.
+ *
+ * AH-104d: Security (and so account deletion) is reachable from the wizard. The
+ * `OnboardingAccountMenu` sits after "Save and exit" on desktop and in the app
+ * header; web-mobile gets a plain Security row in its existing drawer instead of a
+ * second menu. All three follow `features.account_deletion` and render nothing
+ * while it is off.
  */
 
 import { computed, onMounted, ref } from 'vue'
@@ -46,6 +52,7 @@ import OnboardingProgress from '../components/OnboardingProgress.vue'
 import AnimatedWizardChrome, { type WizardChromeStep } from '../components/AnimatedWizardChrome.vue'
 import AnimatedWizardChromeMobile from '../components/AnimatedWizardChromeMobile.vue'
 import NativeWizardHeader from '../components/NativeWizardHeader.vue'
+import OnboardingAccountMenu from '../components/OnboardingAccountMenu.vue'
 import {
   VISIBLE_UX_STEPS,
   WIZARD_TOTAL_STEPS,
@@ -94,6 +101,9 @@ const menuDrawerOpen = ref(false)
  * so a reversible-hide flip needs no edit here.
  */
 const TOTAL_STEPS = WIZARD_TOTAL_STEPS
+
+/** AH-104d — the server's per-user answer; the drawer row follows it like the menu does. */
+const showSecurity = computed(() => authStore.user?.attributes.features?.account_deletion === true)
 
 const showSaveAndExit = computed(() => route.name !== 'onboarding.welcome-back')
 
@@ -248,6 +258,8 @@ async function saveAndExit(): Promise<void> {
           <v-icon icon="mdi-content-save-outline" start />
           {{ t('creator.ui.wizard.actions.save_and_exit') }}
         </v-btn>
+
+        <OnboardingAccountMenu />
       </template>
 
       <!-- Mobile: collapse those controls behind a top-right hamburger.
@@ -264,6 +276,7 @@ async function saveAndExit(): Promise<void> {
         >
           {{ t('creator.ui.wizard.actions.save_and_exit') }}
         </v-btn>
+        <OnboardingAccountMenu v-if="isNative" />
         <!-- AH-101 (U5): in the app the menu held ONE thing, the locale switcher,
              behind a hamburger that every walk read as dead chrome. Native drops
              the menu and its drawer; locale switching is still available at
@@ -313,6 +326,16 @@ async function saveAndExit(): Promise<void> {
         >
           {{ t('creator.ui.wizard.actions.save_and_exit') }}
         </v-btn>
+
+        <v-list v-if="showSecurity" density="compact" class="pa-0">
+          <v-list-item
+            :to="{ name: 'creator.security' }"
+            :title="t('creator.ui.security.title')"
+            prepend-icon="mdi-shield-lock-outline"
+            data-test="onboarding-menu-security"
+            @click="menuDrawerOpen = false"
+          />
+        </v-list>
       </div>
     </v-navigation-drawer>
 

@@ -16,13 +16,16 @@
  */
 
 import { ApiError, extractFieldErrors, type PreferredLanguage } from '@catalyst/api-client'
-import { computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
+import { isNativePlatform } from '@/core/platform/isNativePlatform'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { resolveErrorMessage } from '@/modules/auth/composables/useErrorMessage'
+import { FOOTER_PRIVACY_HREF, footerLinkAttrs } from '@/modules/auth/components/footerLinks'
+import nativeMark from '@/modules/auth/assets/native-sign-in-mark.svg'
 
 const { t, te, locale } = useI18n()
 const router = useRouter()
@@ -30,11 +33,16 @@ const route = useRoute()
 const store = useAuthStore()
 const { isSigningUp } = storeToRefs(store)
 
-const name = ref('')
-const lastName = ref('')
-const email = ref('')
-const password = ref('')
-const passwordConfirmation = ref('')
+/** AH-104d: inside the creator app the page is the sign-up sheet (same form, sign-in's look). */
+const isNative = isNativePlatform()
+
+const form = reactive({
+  name: '',
+  last_name: '',
+  email: '',
+  password: '',
+  password_confirmation: '',
+})
 
 const errorKey = ref<string | null>(null)
 const errorValues = ref<Record<string, string | number>>({})
@@ -62,6 +70,67 @@ const errorValues = ref<Record<string, string | number>>({})
  */
 type SignUpField = 'name' | 'last_name' | 'email' | 'password' | 'password_confirmation'
 const fieldErrors = ref<Partial<Record<SignUpField, readonly string[]>>>({})
+
+/**
+ * The five fields, in order. One list drives both shells so the web form and the
+ * native sheet cannot drift apart: same ids, same `data-test` hooks, same
+ * `autocomplete`, same payload keys. `icon` is drawn on native only.
+ */
+const FIELDS: ReadonlyArray<{
+  key: SignUpField
+  id: string
+  testId: string
+  labelKey: string
+  autocomplete: string
+  type: 'text' | 'email' | 'password'
+  icon: string
+}> = [
+  {
+    key: 'name',
+    id: 'sign-up-name',
+    testId: 'sign-up-name',
+    labelKey: 'auth.ui.labels.first_name',
+    autocomplete: 'given-name',
+    type: 'text',
+    icon: 'mdi-account-outline',
+  },
+  {
+    key: 'last_name',
+    id: 'sign-up-last-name',
+    testId: 'sign-up-last-name',
+    labelKey: 'auth.ui.labels.last_name',
+    autocomplete: 'family-name',
+    type: 'text',
+    icon: 'mdi-account-outline',
+  },
+  {
+    key: 'email',
+    id: 'sign-up-email',
+    testId: 'sign-up-email',
+    labelKey: 'auth.ui.labels.email',
+    autocomplete: 'email',
+    type: 'email',
+    icon: 'mdi-email-outline',
+  },
+  {
+    key: 'password',
+    id: 'sign-up-password',
+    testId: 'sign-up-password',
+    labelKey: 'auth.ui.labels.password',
+    autocomplete: 'new-password',
+    type: 'password',
+    icon: 'mdi-lock-outline',
+  },
+  {
+    key: 'password_confirmation',
+    id: 'sign-up-password-confirmation',
+    testId: 'sign-up-password-confirmation',
+    labelKey: 'auth.ui.labels.password_confirmation',
+    autocomplete: 'new-password',
+    type: 'password',
+    icon: 'mdi-lock-outline',
+  },
+]
 
 /**
  * Sprint 3 Chunk 4 sub-step 4 — magic-link invitation forward path.
@@ -98,11 +167,11 @@ async function onSubmit(): Promise<void> {
   fieldErrors.value = {}
   try {
     await store.signUp({
-      name: name.value,
-      last_name: lastName.value,
-      email: email.value,
-      password: password.value,
-      password_confirmation: passwordConfirmation.value,
+      name: form.name,
+      last_name: form.last_name,
+      email: form.email,
+      password: form.password,
+      password_confirmation: form.password_confirmation,
       // Carry the locale the visitor picked on the pre-auth switcher into
       // the account so it is their server-side preference from the first
       // login (the active i18n locale is always a rendered UI locale).
@@ -124,7 +193,7 @@ async function onSubmit(): Promise<void> {
     }
     await router.push({
       name: 'auth.verify-email.pending',
-      query: { email: email.value },
+      query: { email: form.email },
     })
   } catch (err) {
     if (err instanceof ApiError) {
@@ -140,10 +209,22 @@ async function onSubmit(): Promise<void> {
 </script>
 
 <template>
-  <section data-test="sign-up-page">
-    <h2 class="text-h5 mb-4" data-test="sign-up-heading">
+  <section :class="{ 'sign-up-native': isNative }" data-test="sign-up-page">
+    <img
+      v-if="isNative"
+      :src="nativeMark"
+      alt=""
+      class="sign-up-native__mark"
+      data-test="sign-up-native-mark"
+    />
+
+    <h2 :class="isNative ? 'sign-up-native__title' : 'text-h5 mb-4'" data-test="sign-up-heading">
       {{ t('auth.ui.headings.sign_up') }}
     </h2>
+
+    <p v-if="isNative" class="sign-up-native__subtitle" data-test="sign-up-native-subtitle">
+      {{ t('auth.ui.native.sign_up_subtitle') }}
+    </p>
 
     <v-alert
       v-if="isInvitationFlow"
@@ -156,68 +237,46 @@ async function onSubmit(): Promise<void> {
     </v-alert>
 
     <form novalidate @submit.prevent="onSubmit">
-      <v-text-field
-        id="sign-up-name"
-        v-model="name"
-        :label="t('auth.ui.labels.first_name')"
-        :error-messages="fieldErrors.name"
-        autocomplete="given-name"
-        required
-        data-test="sign-up-name"
-      />
-      <v-text-field
-        id="sign-up-last-name"
-        v-model="lastName"
-        :label="t('auth.ui.labels.last_name')"
-        :error-messages="fieldErrors.last_name"
-        autocomplete="family-name"
-        required
-        data-test="sign-up-last-name"
-      />
-      <v-text-field
-        id="sign-up-email"
-        v-model="email"
-        :label="t('auth.ui.labels.email')"
-        :error-messages="fieldErrors.email"
-        type="email"
-        autocomplete="email"
-        required
-        data-test="sign-up-email"
-      />
-      <v-text-field
-        id="sign-up-password"
-        v-model="password"
-        :label="t('auth.ui.labels.password')"
-        :error-messages="fieldErrors.password"
-        type="password"
-        autocomplete="new-password"
-        required
-        data-test="sign-up-password"
-      />
-      <v-text-field
-        id="sign-up-password-confirmation"
-        v-model="passwordConfirmation"
-        :label="t('auth.ui.labels.password_confirmation')"
-        :error-messages="fieldErrors.password_confirmation"
-        type="password"
-        autocomplete="new-password"
-        required
-        data-test="sign-up-password-confirmation"
-      />
+      <template v-for="field in FIELDS" :key="field.key">
+        <!-- Native: the label sits above the field, as on the sign-in sheet. -->
+        <label v-if="isNative" :for="field.id" class="sign-up-native__label">
+          {{ t(field.labelKey) }}
+        </label>
+        <v-text-field
+          :id="field.id"
+          v-model="form[field.key]"
+          :label="isNative ? undefined : t(field.labelKey)"
+          :prepend-inner-icon="isNative ? field.icon : undefined"
+          :hide-details="isNative ? 'auto' : undefined"
+          :error-messages="fieldErrors[field.key]"
+          :type="field.type"
+          :autocomplete="field.autocomplete"
+          required
+          :data-test="field.testId"
+        />
+      </template>
 
       <div
         role="alert"
         aria-live="polite"
-        class="text-error text-body-2 mb-2"
+        :class="
+          isNative
+            ? ['sign-up-native__error', { 'sign-up-native__error--on': errorKey !== null }]
+            : 'text-error text-body-2 mb-2'
+        "
         data-test="sign-up-error"
       >
-        <template v-if="errorKey !== null">{{ t(errorKey, errorValues) }}</template>
+        <template v-if="errorKey !== null">
+          <v-icon v-if="isNative" icon="mdi-alert-circle-outline" size="18" aria-hidden="true" />
+          {{ t(errorKey, errorValues) }}
+        </template>
       </div>
 
       <v-btn
         type="submit"
         color="primary"
         block
+        :size="isNative ? 'large' : undefined"
         :loading="isSigningUp"
         :disabled="isSigningUp"
         data-test="sign-up-submit"
@@ -226,10 +285,28 @@ async function onSubmit(): Promise<void> {
       </v-btn>
     </form>
 
-    <div class="mt-4 text-body-2">
+    <!-- AH-104d Q6/C9: a notice, not a checkbox, and nothing records it. The
+         Terms link joins when a Terms page exists (tech-debt row); until then
+         the line names the privacy policy only. External link: the system
+         browser on native, a new tab on web. -->
+    <i18n-t
+      keypath="auth.ui.consent.line"
+      tag="p"
+      :class="isNative ? 'sign-up-native__consent' : 'text-caption text-medium-emphasis mt-4 mb-0'"
+      data-test="sign-up-consent"
+    >
+      <template #privacy>
+        <a v-bind="footerLinkAttrs(FOOTER_PRIVACY_HREF)" data-test="sign-up-consent-privacy">{{
+          t('auth.ui.consent.privacy')
+        }}</a>
+      </template>
+    </i18n-t>
+
+    <div :class="isNative ? 'sign-up-native__back' : 'mt-4 text-body-2'">
       <router-link :to="{ name: 'auth.sign-in' }" data-test="sign-up-back-link">
         {{ t('auth.ui.actions.back_to_sign_in') }}
       </router-link>
     </div>
   </section>
 </template>
+<style scoped src="./signUpNative.css"></style>

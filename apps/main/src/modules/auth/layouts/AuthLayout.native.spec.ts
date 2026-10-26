@@ -12,7 +12,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mountAuthPage } from '../../../../tests/unit/helpers/mountAuthPage'
 import AuthLayout from './AuthLayout.vue'
 import { showsMarketingTail } from './marketingTail'
-import { usesNativeSheet } from './nativeSheet'
+import { NATIVE_SHEET_ROUTES, isSheetRoute, usesNativeSheet } from './nativeSheet'
 
 const platform = vi.hoisted(() => ({ native: true }))
 
@@ -114,6 +114,83 @@ describe('AuthLayout — the creator app sign-in (native)', () => {
   })
 })
 
+describe.each([
+  ['auth.sign-up', 'sign-up'],
+  ['auth.verify-email.pending', 'verify-pending'],
+])('AuthLayout — %s as a native sheet (AH-104d)', (routeName) => {
+  let teardown: (() => void) | null = null
+
+  beforeEach(() => {
+    platform.native = true
+  })
+
+  afterEach(() => {
+    teardown?.()
+    teardown = null
+  })
+
+  async function mountRoute(name: string) {
+    return mountAuthPage(
+      {
+        components: { AuthLayout },
+        template: `<AuthLayout><div data-test="slot-child">card ok</div></AuthLayout>`,
+      },
+      { initialRoute: { name } },
+    )
+  }
+
+  it('is arranged as the sheet, but is NOT the hero (no hero class, panel or tail)', async () => {
+    const h = await mountRoute(routeName)
+    teardown = h.unmount
+
+    const layout = h.wrapper.find('.auth-layout')
+    expect(layout.classes()).toContain('auth-layout--native')
+    expect(layout.classes()).not.toContain('auth-layout--hero')
+    expect(h.wrapper.find('[data-test="auth-hero"]').exists()).toBe(false)
+    for (const selector of TAIL) {
+      expect(h.wrapper.find(selector).exists()).toBe(false)
+    }
+    expect(h.wrapper.find('[data-test="auth-card"] [data-test="slot-child"]').exists()).toBe(true)
+    expect(h.wrapper.find('[data-test="auth-locale-switcher"] .mdi-web').exists()).toBe(true)
+  })
+})
+
+describe.each([['auth.sign-up'], ['auth.verify-email.pending']])(
+  'AuthLayout — %s on the web is unchanged (AH-104d polarity)',
+  (routeName) => {
+    let teardown: (() => void) | null = null
+
+    beforeEach(() => {
+      platform.native = false
+    })
+
+    afterEach(() => {
+      teardown?.()
+      teardown = null
+    })
+
+    it('stays the centred card: no sheet, no hero, no tail, no globe', async () => {
+      const h = await mountAuthPage(
+        {
+          components: { AuthLayout },
+          template: `<AuthLayout><div data-test="slot-child">card ok</div></AuthLayout>`,
+        },
+        { initialRoute: { name: routeName } },
+      )
+      teardown = h.unmount
+
+      const classes = h.wrapper.find('.auth-layout').classes()
+      expect(classes).not.toContain('auth-layout--native')
+      expect(classes).not.toContain('auth-layout--hero')
+      expect(h.wrapper.find('[data-test="auth-hero"]').exists()).toBe(false)
+      for (const selector of TAIL) {
+        expect(h.wrapper.find(selector).exists()).toBe(false)
+      }
+      expect(h.wrapper.find('[data-test="auth-locale-switcher"] .mdi-web').exists()).toBe(false)
+    })
+  },
+)
+
 describe('AuthLayout — the web sign-in keeps the full landing (polarity)', () => {
   let teardown: (() => void) | null = null
 
@@ -184,8 +261,8 @@ describe('usesNativeSheet', () => {
     [true, false, false],
     [false, true, false],
     [false, false, false],
-  ])('hero=%s native=%s → %s', (isHero, isNative, expected) => {
-    expect(usesNativeSheet(isHero, isNative)).toBe(expected)
+  ])('sheet=%s native=%s → %s', (isSheet, isNative, expected) => {
+    expect(usesNativeSheet(isSheet, isNative)).toBe(expected)
   })
 
   it('defaults the platform to the live probe', () => {
@@ -193,6 +270,42 @@ describe('usesNativeSheet', () => {
     expect(usesNativeSheet(true)).toBe(true)
     platform.native = false
     expect(usesNativeSheet(true)).toBe(false)
+  })
+})
+
+describe('isSheetRoute', () => {
+  it.each(['auth.sign-in', 'auth.agency-sign-in', 'auth.sign-up', 'auth.verify-email.pending'])(
+    '%s is a sheet route',
+    (name) => {
+      expect(isSheetRoute(name)).toBe(true)
+    },
+  )
+
+  it.each([
+    'auth.forgot-password',
+    'auth.reset-password',
+    'auth.verify-email.confirm',
+    'auth.two-factor',
+    'app.dashboard',
+    'onboarding.welcome-back',
+  ])('%s is not a sheet route', (name) => {
+    expect(isSheetRoute(name)).toBe(false)
+  })
+
+  it('is false for a missing or non-string name', () => {
+    expect(isSheetRoute(undefined)).toBe(false)
+    expect(isSheetRoute(null)).toBe(false)
+    expect(isSheetRoute(Symbol('x'))).toBe(false)
+    expect(isSheetRoute('')).toBe(false)
+  })
+
+  it('lists exactly the four sheet routes', () => {
+    expect([...NATIVE_SHEET_ROUTES].sort()).toEqual([
+      'auth.agency-sign-in',
+      'auth.sign-in',
+      'auth.sign-up',
+      'auth.verify-email.pending',
+    ])
   })
 })
 

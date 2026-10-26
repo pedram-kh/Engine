@@ -430,6 +430,7 @@ The Laravel `APP_KEY` is the encryption master. It is stored in AWS Secrets Mana
 ### 6.2 Brute-force protection
 
 - Rate limiting on `/api/v1/auth/login`: 10 attempts per minute per IP, 5 per minute per email.
+- Rate limiting on `/api/v1/auth/sign-up` (AH-104d): 10 per minute per IP (the auth group) and 5 per hour per email (`auth-signup-email`). The email is normalised and hashed in the key; an empty or non-string email falls back to a per-IP bucket. It counts every attempt including validation failures, answers 429 only, and a taken and a free address count identically.
 - After 5 failed attempts on the same account: account is temporarily locked for 15 minutes.
 - After 10 failed attempts within 24 hours: account is locked until password reset or admin intervention.
 - All login attempts (success and failure) are audit-logged.

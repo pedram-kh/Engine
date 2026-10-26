@@ -225,7 +225,7 @@ export async function resetClock(request: APIRequestContext): Promise<void> {
 }
 
 /**
- * Names of the four production rate limiters a spec is allowed to
+ * Names of the production rate limiters a spec is allowed to
  * neutralise. Mirrors the backend's
  * `App\TestHelpers\Services\RateLimiterNeutralizer::ALLOWED_NAMES`.
  * Adding a name here without a matching backend allowlist entry will
@@ -236,6 +236,8 @@ export type ThrottleName =
   | 'auth-login-email'
   | 'auth-password'
   | 'auth-resend-verification'
+  | 'auth-account-deletion'
+  | 'auth-signup-email'
 
 /**
  * Override the named Laravel rate limiter to `Limit::none()` so the

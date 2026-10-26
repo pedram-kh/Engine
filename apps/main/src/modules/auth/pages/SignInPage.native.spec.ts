@@ -120,15 +120,38 @@ describe('SignInPage — creator app (native)', () => {
     expect(loadMetaPixel).not.toHaveBeenCalled()
   })
 
-  it('replaces the sign-up link with the web sign-up pointer', async () => {
+  it('replaces the web sign-up link with an in-app "Create account" button', async () => {
     const h = await mountAuthPage(SignInPage)
     teardown = h.unmount
 
     expect(h.wrapper.find('[data-test="sign-in-signup-link"]').exists()).toBe(false)
-    expect(h.wrapper.find('[data-test="sign-in-native-create-account"]').text()).toBe(
-      'New to Catalyst? Create your account at platform.catalyst-growth.com, then sign in here.',
+    expect(h.wrapper.find('[data-test="sign-in-native-new"]').text()).toBe('New to Catalyst?')
+    expect(h.wrapper.find('[data-test="sign-in-native-create-account-button"]').text()).toBe(
+      'Create account',
     )
     expect(h.wrapper.find('[data-test="sign-in-forgot-link"]').exists()).toBe(true)
+  })
+
+  it('the Create account button opens the in-app sign-up sheet', async () => {
+    const h = await mountAuthPage(SignInPage)
+    teardown = h.unmount
+    const pushSpy = vi.spyOn(h.router, 'push')
+
+    await h.wrapper.find('[data-test="sign-in-native-create-account-button"]').trigger('click')
+
+    expect(pushSpy).toHaveBeenCalledWith({ name: 'auth.sign-up' })
+  })
+
+  it('retired the "create your account at the website" pointer: no site, no sentence, no link out', async () => {
+    const h = await mountAuthPage(SignInPage)
+    teardown = h.unmount
+
+    const text = h.wrapper.text()
+    expect(text).not.toContain('platform.catalyst-growth.com')
+    expect(text).not.toContain('Create your account at')
+    expect(text).not.toContain('then sign in here')
+    expect(h.wrapper.find('.sign-in-native__site').exists()).toBe(false)
+    expect(h.wrapper.find('[data-test="sign-in-native-create-account"] a').exists()).toBe(false)
   })
 
   it('signs in through /auth/token, stores the token, and lands a creator on welcome-back', async () => {
@@ -310,14 +333,15 @@ describe('SignInPage — creator app (native)', () => {
       expect(links[0]!.element.closest('.sign-in-native__label-row')).not.toBeNull()
     })
 
-    it('the pointer line names the site in its own span, with the full sentence unchanged', async () => {
+    it('the create-account button is the large outlined button, under the divider block', async () => {
       const h = await mountAuthPage(SignInPage)
       teardown = h.unmount
 
-      const pointer = h.wrapper.find('[data-test="sign-in-native-create-account"]')
-      expect(pointer.element.tagName).toBe('P')
-      expect(pointer.find('.sign-in-native__site').text()).toBe('platform.catalyst-growth.com')
-      expect(h.wrapper.text()).not.toContain('Create an account')
+      const block = h.wrapper.find('[data-test="sign-in-native-create-account"]')
+      expect(block.element.tagName).toBe('DIV')
+      const btn = block.find('[data-test="sign-in-native-create-account-button"]')
+      expect(btn.classes()).toContain('v-btn--size-large')
+      expect(btn.classes()).toContain('v-btn--variant-outlined')
     })
 
     it('the sign-in button is the large (44px) primary button', async () => {
@@ -404,7 +428,7 @@ describe('SignInPage — web polarity of the native branches', () => {
     expect(h.wrapper.find('[data-test="session-expired-banner"]').exists()).toBe(false)
   })
 
-  it('loads the Meta Pixel and keeps the sign-up link, with no native pointer', async () => {
+  it('loads the Meta Pixel and keeps the sign-up link, with no native create-account block', async () => {
     const h = await mountAuthPage(SignInPage)
     teardown = h.unmount
 
@@ -524,7 +548,7 @@ describe('SignInPage — creator app, account scheduled for deletion (AH-104b-de
     expect(pushSpy).toHaveBeenCalledWith({ name: 'onboarding.welcome-back' })
   })
 
-  it('"Not now" puts the sheet back, with the sign-up pointer', async () => {
+  it('"Not now" puts the sheet back, with the create-account block', async () => {
     vi.mocked(authApi.tokenLogin).mockRejectedValueOnce(pendingError())
     const h = await mountAuthPage(SignInPage)
     teardown = h.unmount

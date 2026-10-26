@@ -158,6 +158,92 @@ describe('SignInPage', () => {
     expect(h.wrapper.find('[data-test="deletion-scheduled-banner"]').exists()).toBe(false)
   })
 
+  describe('?email= prefill (AH-104d C4: the pending page hands over the address it showed)', () => {
+    const field = (h: Awaited<ReturnType<typeof mountAuthPage>>) =>
+      h.wrapper.find('input[type="email"]')
+
+    it('fills the email field from ?email=', async () => {
+      const h = await mountAuthPage(SignInPage, {
+        initialRoute: { path: '/sign-in', query: { email: 'new@creator.example' } },
+      })
+      teardown = h.unmount
+
+      expect((field(h).element as HTMLInputElement).value).toBe('new@creator.example')
+    })
+
+    it('trims it: the value that would be submitted has no surrounding spaces', async () => {
+      // jsdom strips whitespace from an <input type="email"> on its own, so the
+      // field's displayed value cannot tell; the submitted payload can.
+      vi.mocked(authApi.login).mockResolvedValue(USER)
+      const h = await mountAuthPage(SignInPage, {
+        initialRoute: { path: '/sign-in', query: { email: '  new@creator.example ' } },
+      })
+      teardown = h.unmount
+      await h.wrapper.find('input[type="password"]').setValue('Pa$$w0rd!12')
+      await h.wrapper.find('form').trigger('submit')
+      await flushPromises()
+
+      expect(authApi.login).toHaveBeenCalledWith({
+        email: 'new@creator.example',
+        password: 'Pa$$w0rd!12',
+      })
+    })
+
+    it('leaves the field empty without ?email=', async () => {
+      const h = await mountAuthPage(SignInPage)
+      teardown = h.unmount
+
+      expect((field(h).element as HTMLInputElement).value).toBe('')
+    })
+
+    it('caps the value at 320 characters', async () => {
+      const long = `${'a'.repeat(400)}@example.com`
+      const h = await mountAuthPage(SignInPage, {
+        initialRoute: { path: '/sign-in', query: { email: long } },
+      })
+      teardown = h.unmount
+
+      expect((field(h).element as HTMLInputElement).value).toBe(long.slice(0, 320))
+    })
+
+    it('ignores a repeated ?email=a&email=b (an array), rather than joining or picking one', async () => {
+      const h = await mountAuthPage(SignInPage, {
+        initialRoute: { path: '/sign-in', query: { email: ['a@b.c', 'x@y.z'] } },
+      })
+      teardown = h.unmount
+
+      expect((field(h).element as HTMLInputElement).value).toBe('')
+    })
+
+    it('the field stays editable, and the submit sends what the person sees, not the URL', async () => {
+      vi.mocked(authApi.login).mockResolvedValue(USER)
+      const h = await mountAuthPage(SignInPage, {
+        initialRoute: { path: '/sign-in', query: { email: 'from-url@example.com' } },
+      })
+      teardown = h.unmount
+      await field(h).setValue('typed@example.com')
+      await h.wrapper.find('input[type="password"]').setValue('Pa$$w0rd!12')
+      await h.wrapper.find('form').trigger('submit')
+      await flushPromises()
+
+      expect(authApi.login).toHaveBeenCalledWith({
+        email: 'typed@example.com',
+        password: 'Pa$$w0rd!12',
+      })
+    })
+
+    it('changes nothing else: no banner, no redirect, the form is the normal form', async () => {
+      const h = await mountAuthPage(SignInPage, {
+        initialRoute: { path: '/sign-in', query: { email: 'new@creator.example' } },
+      })
+      teardown = h.unmount
+
+      expect(h.wrapper.find('[data-test="session-expired-banner"]').exists()).toBe(false)
+      expect(h.wrapper.find('input[type="password"]').exists()).toBe(true)
+      expect(h.router.currentRoute.value.path).toBe('/sign-in')
+    })
+  })
+
   it('happy path: agency_user — calls login() and pushes to / on 2xx', async () => {
     vi.mocked(authApi.login).mockResolvedValue(USER)
     const h = await mountAuthPage(SignInPage)

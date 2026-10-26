@@ -4,20 +4,29 @@
  * route query and shows a rate-limited resend button. The api-client
  * surfaces the rate-limit error code, which renders inline via the
  * shared error-resolver.
+ *
+ * AH-104d, inside the creator app only: the person has left for their mail app
+ * and a browser, so the page offers a primary "I've verified, sign in" button
+ * (two states, see `verifiedSignIn`) and, when they hold a session, a text link
+ * to Security so an account that never got verified can still be deleted.
  */
 
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
+import { isNativePlatform } from '@/core/platform/isNativePlatform'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { resolveErrorMessage } from '@/modules/auth/composables/useErrorMessage'
 
 const { t, te } = useI18n()
 const route = useRoute()
+const router = useRouter()
 const store = useAuthStore()
 const { isResendingVerification } = storeToRefs(store)
+
+const isNative = isNativePlatform()
 
 // Primary source is the route query (set by the sign-up flow and the
 // unverified-account bounces). Fall back to the authenticated user's email
@@ -31,6 +40,54 @@ const email = computed(() => {
 const errorKey = ref<string | null>(null)
 const errorValues = ref<Record<string, string | number>>({})
 const resentAt = ref<number | null>(null)
+const isCheckingVerification = ref(false)
+
+/**
+ * Delete link: native, holding a session (the unverified-sign-in bounce leaves one),
+ * and the server says deletion is available to this user. Same gate as every other
+ * Security entry; the route's own guard still decides.
+ */
+const showDeleteLink = computed(
+  () => isNative && store.user?.attributes.features?.account_deletion === true,
+)
+
+function goToSignIn(): Promise<unknown> {
+  return router.push({
+    name: 'auth.sign-in',
+    ...(email.value !== '' ? { query: { email: email.value } } : {}),
+  })
+}
+
+/**
+ * The primary button has two states.
+ *
+ * - Signed out (the usual case, straight after sign-up): go to sign-in with the
+ *   address carried so the field is already filled. `refreshSession()` makes no
+ *   request without a session, so this path touches no API.
+ * - Signed in (an unverified sign-in bounced here holding a session): `/sign-in`
+ *   would be turned away by `requireGuest`, so re-read the account instead. Verified
+ *   now: on to the wizard. Not yet: say so and stay. The refresh can also end the
+ *   session (a dead token), in which case the answer is sign-in again.
+ */
+async function verifiedSignIn(): Promise<void> {
+  errorKey.value = null
+  errorValues.value = {}
+  isCheckingVerification.value = true
+  try {
+    await store.refreshSession()
+  } finally {
+    isCheckingVerification.value = false
+  }
+  if (store.user === null) {
+    await goToSignIn()
+    return
+  }
+  if (store.user.attributes.email_verified_at != null) {
+    await router.push({ name: 'onboarding.welcome-back' })
+    return
+  }
+  errorKey.value = 'auth.ui.errors.not_verified_yet'
+}
 
 async function resend(): Promise<void> {
   if (email.value.length === 0) {
@@ -95,7 +152,27 @@ async function resend(): Promise<void> {
       }}
     </v-btn>
 
-    <div class="mt-4 text-body-2">
+    <v-btn
+      v-if="isNative"
+      color="primary"
+      variant="outlined"
+      block
+      class="mt-3"
+      :loading="isCheckingVerification"
+      :disabled="isCheckingVerification"
+      data-test="email-verification-pending-verified"
+      @click="verifiedSignIn"
+    >
+      {{ t('auth.ui.actions.verified_sign_in') }}
+    </v-btn>
+
+    <div v-if="showDeleteLink" class="mt-4 text-body-2">
+      <router-link :to="{ name: 'creator.security' }" data-test="email-verification-pending-delete">
+        {{ t('creator.ui.security.delete.button') }}
+      </router-link>
+    </div>
+
+    <div v-if="!isNative" class="mt-4 text-body-2">
       <router-link :to="{ name: 'auth.sign-in' }" data-test="email-verification-pending-back">
         {{ t('auth.ui.actions.back_to_sign_in') }}
       </router-link>
