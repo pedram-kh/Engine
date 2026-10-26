@@ -7,7 +7,7 @@ Plan: [`account-deletion-admin-plan.md`](account-deletion-admin-plan.md) §4 C3 
 **PROD-DATA RISK: HIGHEST in what the code can do, ZERO at deploy.** C3 is the first change that can erase a person. It is behind `account_erasure_execute_enabled`, **off at deploy** (a Pennant
 Closure default of false, not a stored row), so deploying C3 erases nothing and claims nothing. **No migration** (the `jobs` table is shared by the new connection). **No env.** One config change
 (`database_erasure` in `config/queue.php`) and **one infra change that is required before the flag is turned on**: a second supervisor program, `catalyst-erasure-worker`
-([`production-queue-worker.md`](../runbooks/production-queue-worker.md) §2a). Without it a click would claim the account (the creator is signed out and hidden from agencies) and nothing would erase it;
+([`production-queue-worker.md`](../runbooks/production-queue-worker.md) §2a). Without it a click would claim the account (the creator is signed out and made unavailable to agencies, see §3) and nothing would erase it;
 the page says so ("Waiting for the erasure worker…", and after an hour "…may be down"). The risk event is still C4, the first real erasure, which is a named act and not code.
 Deploy shape: API and admin SPA deploy; `queue:restart` required (a new job class and changed claim code) **but not while an account is claimed** (Q10; nothing can be claimed until the flag is on);
 add the supervisor program before the flag. Deploy-log entry written.
@@ -42,7 +42,7 @@ add the supervisor program before the flag. Deploy-log entry written.
   TOTP code inside its 30-second window**; this is "verified at the click" and nothing stronger (Q4).
 - **The plan is a promise.** The digest the dialog shows (12 characters of it) is sent with the click. If the data moved between the plan and the job, the job refuses, **releases the claim**, and the page
   says "The erasure did not start: the data changed since the plan…". The creator is back to normal (Ready again) and nothing was erased.
-- **What "claimed" does to the creator.** From the click: signed out everywhere, tokens and push tokens revoked, creator sign-in answers unknown, hidden from agencies (all C2). If the worker is down, they stay
+- **What "claimed" does to the creator.** From the click: signed out everywhere, tokens and push tokens revoked, creator sign-in answers unknown, made unavailable to agencies exactly as a pending request already does (C2-0): gone from discovery, the new-conversation list, the fan-out, the digest and the nudge, and refused for any new invite, connection request, pool add, accepted application or new thread (422 `creator.unavailable`). **The agency's roster, existing threads, assignments and history are unchanged and stay as they are, by the AH-104b-del design** (runbook §1); they read "Deleted creator" only after the erasure. If the worker is down, they stay
   that way, and the page says so (waiting, after an hour waiting-stuck). The creator can still cancel until the claim; after it, no cancel.
 - **The state sentences on the Erasing tab** (en): `waiting` "Waiting for the erasure worker to pick it up."; `waiting_stuck` "Waiting for over an hour: the erasure worker may be down. Check it (see the
   erasure runbook), then review the plan and confirm again."; `running` "Erasing is under way."; `running_stuck` "Erasing has been running for over an hour and may have stopped. Review the plan and confirm
@@ -133,7 +133,7 @@ Redis is not what matters for this walk, the database is. Use a test creator who
    (the confirm stays disabled). Held and Pending rows show no Erase button.
 3. **W3, the plan.** The dialog shows numbers only (rows, tables, files, assignments to cancel, rows read, a 12-character plan reference) and no name or email.
 4. **W4, no worker.** With the erasure worker stopped, do the real click with the right id, a reason and a fresh code. The page moves to Erasing and says "Waiting for the erasure worker to pick it up."; the
-   creator is signed out and an agency's list no longer shows them.
+   creator is signed out. As `walk-agency`: the creator is gone from **Discovery** and from the **new-conversation** list, but **stays on the Roster** (and in existing threads and assignments) until the erasure.
 5. **W5, worker on.** Start the erasure worker. The sentence changes to "Erasing is under way.", then the banner says the account was erased; the Erased tab lists it with no name; an agency that had them now shows
    "Deleted creator"; an assignment that was open told its agency.
 6. **W6, the data moved.** For a second test creator: open the dialog (the plan loads), then in the database change something the plan counts (add a row it hashes), then confirm. The banner says "The erasure
