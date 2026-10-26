@@ -62,7 +62,7 @@ happened.
 
 - **Status:** PENDING. AH-106 (`1c3c7aaf`, `e390581e`) was pushed 2026-10-17. AH-107 (`0801577e`, `b115639e`, `b1fd5e8b`, `77600807`, `480cfcd8`, `e557d358`) and AH-108 (`59c52ede`, `65df6b6e`, `9f47184f`, `715a1f72`, `3f73c8e7`, `16f06b54`, `4dad01b5`, `031b2e1b`, `0cc86e9a`, plus docs) were pushed 2026-10-19 as `54075f02..222b0d39` (19 commits). The AH-108 device walk passed 1–7 from the Xcode install (reported by Pedram); the production-APNs leg waits for build 3. **AH-103b** (`6ee14c36` plan, `ec172d59`, `7db73f78`, `12ba5d78`, `3b1f7ebf`, `f6cfffd3`, `82c8a2e7`, plus docs) was pushed 2026-10-19 after Stage 3 clearance; its device walk W1–W10 has **not** run and needs the web deploy, C1–C7 and build 3.
 - **Range:** `47d2efc5` (AH-103's last runtime commit, the deployed runtime tip; the commits between it and `8aa11376` are docs, `.env.example` and the iOS camera strings / build 2) → AH-106 tip `e390581e`; AH-107 tip `480cfcd8` (local, not on GitHub; the range extends to whatever tip is pushed).
-- **AH entries carried:** AH-106, AH-107, AH-108, AH-103b, AH-109, AH-103d, **AH-104a**
+- **AH entries carried:** AH-106, AH-107, AH-108, AH-103b, AH-109, AH-103d, **AH-104a**, AH-104b-del, AH-104c, **AH-104d**
 - **AH-103d rider: `sanctum:prune-expired --hours=24`, scheduled daily (API change; rides the API deploy).** Deletes `personal_access_tokens` rows whose `expires_at` passed more than
   24 h ago; live tokens are never touched. **PROD-DATA RISK: LOW** (it deletes only rows Sanctum already rejects; the first run clears the whole backlog once).
   - **Pre-deploy read (read-only, record the number):** `SELECT count(*) FROM personal_access_tokens WHERE expires_at < now() - interval '24 hours';` → **\_\_** rows expected to go on the first run.
@@ -153,6 +153,17 @@ happened.
     "Account erasure (admin Erase button)" as off.
   - **Not verified on Postgres:** the claim's row lock under a concurrent click, `afterCommit` ordering, the plan's reads. **Not measured:** the dry-run's duration on production data (tech-debt "AH-104c C3" item 1,
     a C4 precondition).
+- **AH-104d (in-app creator sign-up) — BUILT 2026-10-26; local, not pushed, not deployed; awaiting Pedram's review.** Plan [`in-app-signup-plan.md`](../reviews/in-app-signup-plan.md); review
+  [`in-app-signup-review.md`](../reviews/in-app-signup-review.md). **PROD-DATA RISK: NONE.** No migration, no backfill, no new command, no scheduler change, no env, no flag change.
+  - **API (one change):** a per-email sign-up limiter, `auth-signup-email`, 5 per hour, on `POST /api/v1/auth/sign-up` (cache counters, key = hash of the normalised email; 429 `rate_limit.exceeded` with
+    `Retry-After`). **PHP-FPM reload (opcache) only; no `queue:restart`** (no job, listener or mailable changed). A 422 counts toward the 5, by design. Post-deploy: six sign-ups with one new
+    address in an hour (a throwaway such as `signup-limit-check+<date>@…`; delete the account after) answer 422/201 five times and **429 on the sixth**, with no sixth user row; `auth-ip` still reads 10 per minute.
+  - **Web:** the sign-up sheet and consent line, the sign-in "Create account" button, the pending page's app-only button, `?email=` prefill, the confirm page's app line, the wizard account menu, 7 new
+    keys × 24 locales (35 flow keys corrected in ten). Ships with the API in the same release. An old web build against the new API is unaffected (the limiter is invisible to it until the 6th attempt).
+  - **Build 3 checklist (named steps):** (1) **sign-up ships in build 3**; (2) **`account_deletion_enabled` ON before the build is submitted** (Apple 5.1.1(v): account creation means in-app deletion;
+    the Security entries, the pending-page link and the wizard menu all follow that flag); (3) `contract_signing_enabled` OFF and social OAuth mock/OFF in production (Q8); (4) the device walk
+    W1-W14 ([`in-app-signup-device-walk.md`](../reviews/in-app-signup-device-walk.md)) passes, W3 (does the Privacy link open Safari from the Capacitor view) in particular; (5) the translations ship machine-authored (Pedram, 2026-10-26; tech-debt AH-104d row 12 holds the human pass on `ga` and `mt`); the consent wording is confirmed on the AH-105 checklist, not here.
+  - **Verified 2026-10-26 (Playwright, local, isolated `catalyst_e2e`):** the new spec 3/3; the main suite 40 of 41 (the one miss is the known cold-start `2fa-enrollment-and-sign-in.spec.ts:93`, 3 of 3 in isolation; tech-debt "waits 5 s…"); the admin suite 2 of 2. **Not verified:** the sheet on a device.
 - **Migrations run:** AH-104a adds three (above); everything else in this entry: none. Recorded: **\_\_**
 - **Pre-deploy reads:** AH-103d: the expired-token count (above). AH-104a: none.
 - **Snapshot ID:** AH-104a's migrations are additive and the table `notifications` (288,083 rows at the read-back) is indexed concurrently, but **take and confirm a snapshot before migrating** (standing rule). The open snapshot question under AH-103 is unchanged. Recorded: **\_\_**

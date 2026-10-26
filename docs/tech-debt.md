@@ -2201,6 +2201,12 @@ present (AH-070)`, placed in the one window where `.env` genuinely does not exis
   `Radītājs`) occur **only** inside these still-English strings, never in translated prose. Fixing
   the leakage will change which term looks dominant, so the glossary decision must be re-taken as
   part of the cleanup rather than treated as settled.
+- **AH-104d addendum (2026-10-26) — the sign-up flow's strings fixed; the rest counted.** The strings a new creator meets (sign-up, sign-in, the pending and confirm pages) were retranslated in the ten
+  locales: **35 keys (36 for `ro`)**, listed in `tests/unit/architecture/i18n-signup-flow-strings.spec.ts`, which also catches an English word glued onto a native one and the `-ing` suffix mangles. The
+  plan's 27 keys were too few: an equality-with-English check cannot see a hybrid. **Still English-identical in `auth.json` in those ten locales: 55 distinct keys (520 values)**, counted 2026-10-26,
+  including loanwords ("Email", "Password") and backend-mirror keys the SPA does not render (`auth.login.*`, `auth.mfa.*`); the two-factor, forgot/reset and invitation screens' strings are in that count.
+  **The backend `lang/` was not audited.** The new and corrected strings are **machine-authored (by the agent, in-session) and no native speaker has read them; `ga` and `mt` are the least certain.**
+  **Status:** open; the sign-up flow itself is done.
   The count above is also the heuristic lint proposed below, run by hand — a byte-identity check
   against `en`, filtered to multi-word values, separates the two populations cleanly and is cheap
   enough to run in CI as a **reporting** step (never a blocking one, since some identity is correct).
@@ -3476,3 +3482,33 @@ TRIGGER` on `audit_logs` (table and every column). The owner is `postgres`. Ther
    claim, in the first-click preflight, the retry preflight and `start()` itself, and answers 422 `not_ready` with `meta.codes` `['audit_scrub_unavailable']`, before the second factor is checked and
    before anything is claimed. Specs in `AdminErasureEraseTest`; five break-reverts, all caught. **Status:** CLOSED.
 9. **`admin.erasure.execute.mfa_not_enrolled` has no locale string.** Unreachable in practice (`EnsureMfaForAdmins` is on the whole admin group); the generic "action failed" sentence would show. **Status:** accepted.
+
+## AH-104d in-app creator sign-up — open items (2026-10-26)
+
+Source: [`docs/reviews/in-app-signup-review.md`](reviews/in-app-signup-review.md).
+
+1. **Invited creators stay web-only (Q5).** The `?token=` invitation path works on the web (the invitation mail opens a browser); nothing in the app reaches it. Needs its own plan (universal links for
+   `/sign-up?token=` would be the route). **Status:** OPEN, deliberate.
+2. **`webcredentials` (Associated Domains for password autofill/save) is out of scope (Q10).** The sheet's `autocomplete` attributes are in place; the entitlement is not. **Status:** OPEN.
+3. **The consent line is a notice, and has no Terms link.** Nothing records that it was shown (no `terms_accepted_at`); the Privacy Policy is the only link, because no Terms page exists (C9). Add the Terms
+   link (one i18n slot and one footer constant) when a page exists; revisit whether acceptance must be recorded. **Not legally reviewed.** Ruled 2026-10-26 (Pedram): no legal review now; **"confirm consent wording" is an item on the AH-105 privacy checklist.** **Status:** OPEN until AH-105.
+4. **No bot control beyond two limiters** (`auth-ip`, 10 per minute per IP; `auth-signup-email`, 5 per hour per email). A bot using fresh addresses is limited by IP only, and anyone can spend an address's
+   five attempts, which blocks that address from signing up for up to an hour (not from an existing account). **Escalates:** abuse seen in the sign-up logs. **Status:** accepted for launch.
+5. **The pending page does not advance by itself** when the app returns to the foreground after Safari verification; the creator taps "I've verified, sign in". A resume-refresh `watch` would remove the tap.
+   **Status:** OPEN, low.
+6. **The native wizard has no locale control** (AH-101 Q10, still open). The sign-up sheet has the language pill; the onboarding wizard does not.
+7. **`vitest --coverage` fails its threshold on the whole project** (`AcceptInvitePage.vue`, `VerifyTotpPage.vue`, `useAuthStore.ts`, `SignInPage.vue` lines 102 to 107, the AH-104b-del `pendingDate`
+   computed). Not a CI gate. Whether it was already red at HEAD before AH-104d was not checked in a clean worktree. **Status:** OPEN.
+8. **The Capacitor external link is unproven (C10, device walk W3).** The consent line's Privacy anchor uses `target="_blank"`; whether the app opens Safari or navigates the app's own view is read on the
+   device. If it navigates, use `@capacitor/browser` on the footer-link anchors. **Status:** OPEN until W3.
+9. **`signUpNative.css` repeats the sheet rules in `signInNative.css`** (page-scoped by design: the scoping spec enforces one root class per file). A shared sheet partial would remove the duplicate.
+   **Status:** OPEN, low.
+10. **The sheet's centred-card exclusion in `AuthLayout.vue` has no unit test** (jsdom has no cascade). It is covered by device-walk eyes (W1, W2) and the Playwright run (unrun). **Status:** OPEN.
+11. **A hand-built E2E feature-flag helper** (`setFeatureFlag`, a `php artisan tinker` call) is guarded by an architecture spec, but it shells out to the API's code; a test-helpers HTTP endpoint (like the
+    rate-limiter neutralizer) would be the consistent shape. **Status:** OPEN, low.
+12. **A human pass on the machine-authored translations, `ga` and `mt` first.** Ruled 2026-10-26 (Pedram): ship the machine translations. The 35 flow keys (36 for `ro`) and 7 new keys in the ten
+    flaky locales were authored by the agent in-session; no native speaker has read them. Irish and Maltese are the least certain, then the other eight. Scope for the reviewer: the strings in
+    `i18n-signup-flow-strings.spec.ts` (`FLOW_KEYS`, `NEW_KEYS`). **Owner:** Pedram (a reviewer to be found). **Status:** OPEN.
+13. **The admin Playwright suite cannot be run against the developer's own admin Vite server.** `reuseExistingServer: !process.env.CI` on the admin Vite entry reuses a dev `pnpm dev` whose proxy targets
+    `:8000`, while the E2E API is on `:8001`; both admin specs then fail on a sign-in that never reaches the E2E API (seen 2026-10-26). Stop the admin dev server first, or force `false` locally.
+    **Status:** OPEN, low.

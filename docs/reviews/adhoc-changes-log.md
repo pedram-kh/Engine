@@ -66,7 +66,7 @@ reviews, and conversations.
 | AH-104a     | Erasure engine (command, dry-run, ledger) | Built                | All stages incl. 4e on the app role; read-backs B-D in. Nothing erased in prod; pgsql unproven.                                                    |
 | AH-104b-del | Deletion request flow + Security page     | Part B built (local) | Part A pushed. Part B cleared and pushed; walk 2026-10-22: W10 gap fixed (recovery-code switch), sheet alignment fixed, both unpushed.             |
 | AH-104c     | Admin erasure queue, Erase button, hold   | CLOSED 2026-10-26    | C1, C2, C3 built, cleared, walked (W1 to W8 pass) and pushed; flag off, nothing deployed. C4 (first real erasure) is a named act after the deploy. |
-| AH-104d     | In-app sign-up (was AH-104b)              | Gated                | Gated on 104a-c. Renamed 2026-10-20; older entries and closed reviews keep "AH-104b".                                                              |
+| AH-104d     | In-app sign-up (was AH-104b)              | Built, in review     | S1-S8 built 2026-10-26, committed locally, not pushed. Playwright green; device walk W1-W14 is Pedram's. Review: `in-app-signup-review.md`.        |
 | AH-104e     | Stop writing PII into audit snapshots     | Queued               | Own chunk, after 104a. Changes audit content: its own stop-gate.                                                                                   |
 | AH-103d     | Reinstall marker (tech-debt 17)           | Built, W3 pending    | Proof report written (22/22 break-reverts). Walk 2026-10-22: W1, W2, W4-W6 pass; W3 not walkable on a dev build, re-run on TestFlight build 3.     |
 | AH-103c     | Biometric unlock                          | Parked               | Deferred to post-launch 2026-10-20. Inventory and rulings in `biometrics-inventory.md`.                                                            |
@@ -79,6 +79,21 @@ reviews, and conversations.
 ---
 
 ## Change Log (newest first)
+
+### AH-104d · In-app creator sign-up (BUILT 2026-10-26, in review, committed locally, not pushed)
+
+- **Why:** the native shell had no way to create an account (AH-100 Q8: a "go to the website" pointer), and Apple 5.1.1(v) ties in-app account creation to in-app deletion, which AH-104b-del built.
+  The account a person creates on the phone also had to be able to reach Security and finish email verification without leaving the app in a dead end.
+- **What:** the web sign-up form gets a native sheet fork (same fields, ids, payload) and a consent line (Privacy Policy only, C9; a notice, not recorded); the sign-in sheet's website pointer is retired for a
+  Create account button; the pending page gets an app-only "I've verified, sign in" button and, with `account_deletion_enabled` on, a Delete link; sign-in prefills from `?email=`; the confirm page
+  gains a neutral "return to the Catalyst app" line; the onboarding wizard gets an account menu holding Security only; a per-email sign-up limiter (`auth-signup-email`, 5 per hour, 429 only); the ten flaky locales'
+  flow strings fixed (35 keys, 36 for `ro`, machine-authored, unreviewed) and 7 new keys × 24 locales.
+- **Touched:** `Identity` module (limiter, route), `RateLimiterNeutralizer`, `SignUpPage`, `SignInPage`, `EmailVerificationPendingPage`, `EmailVerificationConfirmPage`, `AuthLayout`, `nativeSheet.ts`,
+  `signUpNative.css`, `signInNative.css`, `CreatorDashboardLayout` (a `.catch`), `OnboardingLayout`, new `OnboardingAccountMenu`, 24 `auth.json`, Playwright fixtures (`setFeatureFlag`) and spec.
+- **Proof:** [`in-app-signup-review.md`](in-app-signup-review.md); break-reverts [`in-app-signup-break-reverts.md`](in-app-signup-break-reverts.md) (69, none uncaught); device walk
+  [`in-app-signup-device-walk.md`](in-app-signup-device-walk.md) (not walked). Plan: [`in-app-signup-plan.md`](in-app-signup-plan.md).
+- **Not done:** Playwright run green (new spec 3/3, main 40/41 with the known cold-start 2FA flake, admin 2/2); coverage threshold red on files this chunk did not touch; Capacitor external-link behaviour (W3) and the sheet's CSS cascade unproven off a device.
+- **Deploy:** rides the combined PENDING entry in `deploy-log.md`. API: PHP-FPM reload for the limiter, no migration, no flag, no command. Web: build and sync.
 
 ### AH-104 · Account deletion (inventory and PII map APPROVED; split into AH-104a..e)
 
