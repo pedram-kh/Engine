@@ -3503,9 +3503,8 @@ Source: [`docs/reviews/in-app-signup-review.md`](reviews/in-app-signup-review.md
    device. If it navigates, use `@capacitor/browser` on the footer-link anchors. **Status:** OPEN until W3.
 9. **`signUpNative.css` repeats the sheet rules in `signInNative.css`** (page-scoped by design: the scoping spec enforces one root class per file). A shared sheet partial would remove the duplicate.
    **Status:** OPEN, low.
-10. **The sheet's centred-card exclusion in `AuthLayout.vue` has no unit test** (jsdom has no cascade). It is covered by device-walk eyes (W1, W2) and the Playwright run (unrun). **Status:** OPEN.
-11. **A hand-built E2E feature-flag helper** (`setFeatureFlag`, a `php artisan tinker` call) is guarded by an architecture spec, but it shells out to the API's code; a test-helpers HTTP endpoint (like the
-    rate-limiter neutralizer) would be the consistent shape. **Status:** OPEN, low.
+10. **The sheet's centred-card exclusion in `AuthLayout.vue` has no unit test** (jsdom has no cascade). It is covered by device-walk eyes (W1, W2) only. **Status:** OPEN.
+11. **The E2E feature-flag helper is a route with an allow-list of one flag (`account_deletion_enabled`).** CLOSED 2026-10-26: the first version (a `tinker` shell-out guarded by a database-name test) was refused by CI's `catalyst` database and was replaced by `POST`/`DELETE /api/v1/_test/feature-flag/{name}`. A second flag needs a deliberate entry in `SetFeatureFlagController::ALLOWED_NAMES`. **Status:** CLOSED.
 12. **A human pass on the machine-authored translations, `ga` and `mt` first.** Ruled 2026-10-26 (Pedram): ship the machine translations. The 35 flow keys (36 for `ro`) and 7 new keys in the ten
     flaky locales were authored by the agent in-session; no native speaker has read them. Irish and Maltese are the least certain, then the other eight. Scope for the reviewer: the strings in
     `i18n-signup-flow-strings.spec.ts` (`FLOW_KEYS`, `NEW_KEYS`). **Owner:** Pedram (a reviewer to be found). **Status:** OPEN.

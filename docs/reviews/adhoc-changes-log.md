@@ -89,7 +89,7 @@ reviews, and conversations.
   gains a neutral "return to the Catalyst app" line; the onboarding wizard gets an account menu holding Security only; a per-email sign-up limiter (`auth-signup-email`, 5 per hour, 429 only); the ten flaky locales'
   flow strings fixed (35 keys, 36 for `ro`, machine-authored, unreviewed) and 7 new keys × 24 locales.
 - **Touched:** `Identity` module (limiter, route), `RateLimiterNeutralizer`, `SignUpPage`, `SignInPage`, `EmailVerificationPendingPage`, `EmailVerificationConfirmPage`, `AuthLayout`, `nativeSheet.ts`,
-  `signUpNative.css`, `signInNative.css`, `CreatorDashboardLayout` (a `.catch`), `OnboardingLayout`, new `OnboardingAccountMenu`, 24 `auth.json`, Playwright fixtures (`setFeatureFlag`) and spec.
+  `signUpNative.css`, `signInNative.css`, `CreatorDashboardLayout` (a `.catch`), `OnboardingLayout`, new `OnboardingAccountMenu`, 24 `auth.json`, Playwright fixtures (`setFeatureFlag`, via the new allow-listed `_test/feature-flag` route) and spec.
 - **Proof:** [`in-app-signup-review.md`](in-app-signup-review.md); break-reverts [`in-app-signup-break-reverts.md`](in-app-signup-break-reverts.md) (69, none uncaught); device walk
   [`in-app-signup-device-walk.md`](in-app-signup-device-walk.md) (not walked). Plan: [`in-app-signup-plan.md`](in-app-signup-plan.md).
 - **Not done:** Playwright run green (new spec 3/3, main 40/41 with the known cold-start 2FA flake, admin 2/2); coverage threshold red on files this chunk did not touch; Capacitor external-link behaviour (W3) and the sheet's CSS cascade unproven off a device.

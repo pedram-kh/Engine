@@ -190,7 +190,9 @@ identical after: True
 restored exit= 0
 ```
 
-## S7 — the `setFeatureFlag` helper's guards (`e2e-feature-flag-helper.spec.ts`)
+## S7 (superseded) — the first `setFeatureFlag`: a `tinker` shell-out guarded by an "e2e" database-name test
+
+Kept as the record of what was proved. **CI refused it** (the throwaway Postgres is named `catalyst`), and it was replaced by the `_test/feature-flag` route; see the next section.
 
 ```
 e2e-name guard removed: exit=1 failing=4
@@ -202,6 +204,28 @@ DB override dropped from the child env: exit=1 failing=1
 off calls activate: exit=1 failing=1
 identical after: True
 restored exit= 0
+```
+
+## S7b — the `_test/feature-flag` route and its Playwright wrapper
+
+Pest, `SetFeatureFlagTest` (5 specs), against `SetFeatureFlagController`; each mutation applied to a copy-restored file, MD5 checked after.
+
+```
+M1 activate does nothing:            exit=1 failing=2
+M2 deactivate does nothing:          exit=1 failing=2
+M3 store skips the allow-list:       exit=1 failing=1
+M4 destroy skips the allow-list:     exit=1 failing=1
+restored identical; clean run exit=0
+```
+
+Vitest, `e2e-feature-flag-helper.spec.ts` (7 specs), against the fixture's `setFeatureFlag`:
+
+```
+X1 verbs swapped (POST for off, DELETE for on): 3 failing
+X2 failure swallowed (status check disabled):   3 failing
+X3 flag name not URL-encoded:                   1 failing
+X4 fixture spawns a process (imports child_process): 1 failing
+restored identical; clean run 7 passed
 ```
 
 ## Not proven by a break-revert, and why
