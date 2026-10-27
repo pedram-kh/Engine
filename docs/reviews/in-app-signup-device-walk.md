@@ -61,3 +61,7 @@ afterwards with its old password. Replayed from the LAN with the app's origin (`
 The app sends the field exactly as typed (`email: form.email`), so it did not alter the address. **No defect; nothing in the product changed.** A spec now pins the invariant (SignUpTest, the "taken address" and "one letter different" cases).
 **Left in the dev DB:** user 28, `walk-creator-a@cataylst.local`, unverified: usable as the **W10** account (sign in, do not verify). Delete it with the other walk accounts.
 **Re-walk:** W4 part 3 only (the taken address, typed exactly). W5 already ran for real on the typo'd account (pending sheet, mail delivered).
+
+**New build (2026-10-27), tech-debt 14:** the signed-out pending sheet now has a **"Use a different address"** link under the resend control. It opens the sign-up sheet with the address prefilled and editable (web does the same on the web pending page).
+Check once on the device: the link shows on the pending sheet after a sign-up; tapping it lands on the sign-up sheet with the address in the field; edit it and submit. It does not show when you are signed in (there you get Delete).
+Then: **re-walk W4 part 3, continue from W5 on this build.** Note: Playwright was not run for the link (the dev stack stays up for the walk); unit specs and break-reverts cover it.

@@ -3513,4 +3513,6 @@ Source: [`docs/reviews/in-app-signup-review.md`](reviews/in-app-signup-review.md
     **Status:** OPEN, low.
 14. **A mistyped address at sign-up cannot be corrected from the pending page.** Found on the AH-104d walk (W4, 2026-10-27): a transposed address created a real, unverified account and mailed a stranger's (or nobody's)
     inbox, and the pending sheet only offers resend and sign-in. The address is shown, but nothing invites a second look and there is no confirm-email field or "wrong address?" action. Standard for sign-up forms, so not a
-    defect; a "Use a different address" link (sign-up form refilled) is the cheap fix. **Status:** OPEN, low.
+    defect; a "Use a different address" link (sign-up form refilled) is the cheap fix. **Status:** CLOSED 2026-10-27 (Pedram's go): the signed-out pending page now links to `/sign-up?email=<address>`; the form
+    opens with the address prefilled and editable (`SignUpPage.vue`, `prefilledEmail()`). Residual, **OPEN, low:** the link does not touch the account already created, so a corrected re-sign-up leaves the
+    mistyped, unverified account behind (an orphan, harmless: it can never verify; no purge job exists). Signed-in unverified users do not get the link (`/sign-up` is guest-only; they have Delete instead).

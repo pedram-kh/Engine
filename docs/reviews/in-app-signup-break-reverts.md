@@ -242,6 +242,27 @@ restored identical; clean run exit=0
 
 S3 is recorded rather than hidden: a spec for a padded new address was added and still cannot fail it, which is how the equivalence showed.
 
+## "Use a different address" link (2026-10-27, tech-debt 14)
+
+Vitest against `EmailVerificationPendingPage.vue`, `SignUpPage.vue` and `hu/auth.json`; each mutation applied in memory, file restored by source plus MD5 (`identical after: True`), exit code read.
+
+```
+M1  link always shown (v-if="true"):               exit=1
+M2  shown while signed in:                          exit=1
+M3  shown with no address:                          exit=1
+M4  link drops the address (no query):              exit=1
+M5  link goes to sign-in instead of sign-up:        exit=1
+M6  sign-up prefill not seeded (email: ''):         exit=1
+M7  prefill not trimmed:                            exit=1
+M8  prefill not capped at 320:                      exit=1
+M9  prefill trusts a non-string (array) query:      exit=1
+M10 hu key missing:                                 exit=1
+M11 hu key left in English:                         exit=1
+restored identical; clean run exit=0
+```
+
+Specs run: `EmailVerificationPendingPage.native.spec.ts`, `SignUpPage.spec.ts`, `i18n-signup-flow-strings.spec.ts`.
+
 ## Not proven by a break-revert, and why
 
 - **The centred-card exclusion in `AuthLayout.vue`** (`:not(.auth-layout--native)` on three selectors). jsdom has no CSS cascade, so no unit spec can see that the sheet rules win over the 480 px card rules.
