@@ -246,6 +246,69 @@ it('rejects a duplicate email regardless of case (Form Request normalises)', fun
     ])->assertEnvelopeValidationErrors(['email']);
 });
 
+// AH-104d walk W4 (2026-10-27): the tester believed a sign-up with an existing address had gone through
+// from the app. It had not: the address typed carried a transposition ("cataylst"), a NEW address, so a
+// new account was correctly created. This pins the invariant the report was really about: a sign-up for
+// an address that exists, in any spelling the phone can produce, creates no row, sends no mail, fires
+// no event, and leaves the existing account (its verification, its password) exactly as it was.
+it('creates nothing, mails nothing and leaves the existing account untouched for a taken address', function (string $typed): void {
+    Mail::fake();
+    Event::fake([UserSignedUp::class, EmailVerificationSent::class]);
+
+    $existing = User::factory()->createOne([
+        'email' => 'walk-creator-a@catalyst.local',
+        'email_verified_at' => now()->subDays(6),
+    ]);
+    $before = $existing->only(['email', 'email_verified_at', 'password']);
+    $usersBefore = DB::table('users')->count();
+
+    $this->withHeaders(['Origin' => 'capacitor://localhost'])
+        ->postJson('/api/v1/auth/sign-up', [
+            ...VALID_PAYLOAD,
+            'email' => $typed,
+        ])->assertEnvelopeValidationErrors(['email']);
+
+    expect(DB::table('users')->count())->toBe($usersBefore);
+    Mail::assertNothingSent();
+    Mail::assertNothingQueued();
+    Event::assertNotDispatched(UserSignedUp::class);
+    Event::assertNotDispatched(EmailVerificationSent::class);
+    expect(User::query()->findOrFail($existing->getKey())->only(['email', 'email_verified_at', 'password']))->toEqual($before);
+})->with([
+    'as stored' => 'walk-creator-a@catalyst.local',
+    'upper case' => 'WALK-CREATOR-A@CATALYST.LOCAL',
+    'leading space' => ' walk-creator-a@catalyst.local',
+    'trailing space' => 'walk-creator-a@catalyst.local ',
+]);
+
+it('treats a one-letter-different address as a different address and creates the account', function (): void {
+    Mail::fake();
+
+    User::factory()->createOne(['email' => 'walk-creator-a@catalyst.local']);
+    $usersBefore = DB::table('users')->count();
+
+    $this->postJson('/api/v1/auth/sign-up', [
+        ...VALID_PAYLOAD,
+        'email' => 'walk-creator-a@cataylst.local',
+    ])->assertCreated();
+
+    expect(DB::table('users')->count())->toBe($usersBefore + 1);
+    Mail::assertQueued(VerifyEmailMail::class, fn (VerifyEmailMail $m): bool => $m->hasTo('walk-creator-a@cataylst.local'));
+});
+
+// The trim only shows on a NEW address: for a taken one `email:rfc` would refuse the padded string with the
+// same 422 even without it (the taken-address spec above cannot tell), so it is pinned here.
+it('stores a new address trimmed when the phone pads it', function (): void {
+    Mail::fake();
+
+    $this->postJson('/api/v1/auth/sign-up', [
+        ...VALID_PAYLOAD,
+        'email' => '  Padded.New@Example.com ',
+    ])->assertCreated();
+
+    expect(User::query()->where('email', 'padded.new@example.com')->count())->toBe(1);
+});
+
 it('rejects a malformed email', function (): void {
     Mail::fake();
 
