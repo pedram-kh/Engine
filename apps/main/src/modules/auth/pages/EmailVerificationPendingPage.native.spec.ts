@@ -75,6 +75,7 @@ type Harness = Awaited<ReturnType<typeof mountAuthPage>>
 const VERIFIED = '[data-test="email-verification-pending-verified"]'
 const DELETE = '[data-test="email-verification-pending-delete"]'
 const BACK = '[data-test="email-verification-pending-back"]'
+const CHANGE = '[data-test="email-verification-pending-change-address"]'
 const ERROR = '[data-test="email-verification-pending-error"]'
 
 describe('EmailVerificationPendingPage — creator app (native)', () => {
@@ -230,7 +231,6 @@ describe('EmailVerificationPendingPage — creator app (native)', () => {
       const h = await mountSignedIn(makeUser(null, { account_deletion: true }))
 
       const link = h.wrapper.find(DELETE)
-      expect(link.exists()).toBe(true)
       expect(link.text()).toBe('Delete my account')
       expect(h.wrapper.findComponent(RouterLinkStub).props('to')).toEqual({
         name: 'creator.security',
@@ -278,5 +278,80 @@ describe('EmailVerificationPendingPage — web polarity of the native additions 
     expect(h.wrapper.find(BACK).exists()).toBe(true)
     expect(h.wrapper.find(VERIFIED).exists()).toBe(false)
     expect(h.wrapper.find(DELETE).exists()).toBe(false)
+  })
+})
+
+describe('EmailVerificationPendingPage — "Use a different address" (AH-104d, W4 2026-10-27)', () => {
+  let teardown: (() => void) | null = null
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    teardown?.()
+    teardown = null
+  })
+
+  async function mountAt(opts: { native: boolean; query?: Record<string, string>; user?: User }) {
+    platform.native = opts.native
+    const h = await mountAuthPage(EmailVerificationPendingPage, {
+      stubs: { RouterLink: RouterLinkStub },
+      initialRoute: { path: '/verify-email/pending', query: opts.query ?? {} },
+      beforeMount: () => {
+        if (opts.user !== undefined) {
+          const store = useAuthStore()
+          store.user = opts.user
+          store.bootstrapStatus = 'ready'
+        }
+      },
+    })
+    teardown = h.unmount
+    return h
+  }
+
+  it.each([
+    ['in the creator app', true],
+    ['on the web', false],
+  ])('offers the link to sign-up %s, carrying the address just typed', async (_label, native) => {
+    const h = await mountAt({ native, query: { email: 'walk-creator-a@cataylst.local' } })
+
+    const change = h.wrapper.find(CHANGE)
+    expect(change.exists()).toBe(true)
+    expect(change.text()).toBe('Use a different address')
+    const target = h.wrapper
+      .findAllComponents(RouterLinkStub)
+      .find((c) => c.attributes('data-test') === 'email-verification-pending-change-address')
+    expect(target?.props('to')).toEqual({
+      name: 'auth.sign-up',
+      query: { email: 'walk-creator-a@cataylst.local' },
+    })
+  })
+
+  it('is absent when there is no address to carry', async () => {
+    const h = await mountAt({ native: true })
+
+    expect(h.wrapper.find(CHANGE).exists()).toBe(false)
+  })
+
+  it('is absent while signed in: the account exists and is theirs, and /sign-up is guest-only', async () => {
+    const h = await mountAt({
+      native: true,
+      query: { email: 'store@user.example' },
+      user: makeUser(null, { account_deletion: true }),
+    })
+
+    expect(h.wrapper.find(CHANGE).exists()).toBe(false)
+    // …and the Delete link is still the way out for that session.
+    expect(h.wrapper.find(DELETE).exists()).toBe(true)
+  })
+
+  it('does not call the API or change the account just by being there', async () => {
+    const h = await mountAt({ native: true, query: { email: 'walk-creator-a@cataylst.local' } })
+
+    expect(h.wrapper.find(CHANGE).exists()).toBe(true)
+    expect(authApi.resendVerification).not.toHaveBeenCalled()
+    expect(authApi.signUp).not.toHaveBeenCalled()
+    expect(authApi.login).not.toHaveBeenCalled()
   })
 })

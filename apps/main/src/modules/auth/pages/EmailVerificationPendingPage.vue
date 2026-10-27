@@ -51,6 +51,16 @@ const showDeleteLink = computed(
   () => isNative && store.user?.attributes.features?.account_deletion === true,
 )
 
+/**
+ * "Use a different address" (AH-104d, W4 2026-10-27: a transposed letter created a
+ * real account and mailed the wrong inbox). Only while signed out: a session means
+ * the account exists and is theirs (the Delete link is the way out), and `/sign-up`
+ * is guest-only. The typed address travels as `?email=` so the field opens with it
+ * and one letter can be fixed; the sign-up page treats it as an editable prefill only.
+ * It does not touch the account already created for the wrong address.
+ */
+const showChangeAddress = computed(() => store.user === null && email.value !== '')
+
 function goToSignIn(): Promise<unknown> {
   return router.push({
     name: 'auth.sign-in',
@@ -165,6 +175,15 @@ async function resend(): Promise<void> {
     >
       {{ t('auth.ui.actions.verified_sign_in') }}
     </v-btn>
+
+    <div v-if="showChangeAddress" class="mt-4 text-body-2">
+      <router-link
+        :to="{ name: 'auth.sign-up', query: { email } }"
+        data-test="email-verification-pending-change-address"
+      >
+        {{ t('auth.ui.actions.different_address') }}
+      </router-link>
+    </div>
 
     <div v-if="showDeleteLink" class="mt-4 text-body-2">
       <router-link :to="{ name: 'creator.security' }" data-test="email-verification-pending-delete">

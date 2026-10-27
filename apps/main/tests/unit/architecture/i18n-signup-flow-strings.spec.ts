@@ -203,6 +203,7 @@ const NEW_KEYS = [
   'auth.ui.banners.email_verified_app',
   'auth.ui.actions.verified_sign_in',
   'auth.ui.errors.not_verified_yet',
+  'auth.ui.actions.different_address',
 ] as const
 
 describe('the AH-104d keys in every locale', () => {

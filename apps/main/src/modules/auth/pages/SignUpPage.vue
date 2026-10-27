@@ -36,10 +36,22 @@ const { isSigningUp } = storeToRefs(store)
 /** AH-104d: inside the creator app the page is the sign-up sheet (same form, sign-in's look). */
 const isNative = isNativePlatform()
 
+/**
+ * AH-104d: `?email=` opens the field filled (the pending page's "Use a different
+ * address" sends the address just typed so one letter can be fixed). A prefill only:
+ * a single string, trimmed, capped at the longest address an email can be, still
+ * fully editable, and never sent anywhere until the person submits. Same rule as the
+ * sign-in page's.
+ */
+function prefilledEmail(): string {
+  const raw = route.query.email
+  return typeof raw === 'string' ? raw.trim().slice(0, 320) : ''
+}
+
 const form = reactive({
   name: '',
   last_name: '',
-  email: '',
+  email: prefilledEmail(),
   password: '',
   password_confirmation: '',
 })

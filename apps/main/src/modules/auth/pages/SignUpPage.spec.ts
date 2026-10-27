@@ -518,3 +518,99 @@ describe('SignUpPage', () => {
     })
   })
 })
+
+describe('SignUpPage — ?email= prefill (AH-104d: "Use a different address" on the pending page)', () => {
+  let teardown: (() => void) | null = null
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    teardown?.()
+    teardown = null
+  })
+
+  const field = (h: Awaited<ReturnType<typeof mountAuthPage>>) =>
+    h.wrapper.find('[data-test="sign-up-email"] input')
+
+  async function mountWith(query: Record<string, string | string[]>) {
+    const h = await mountAuthPage(SignUpPage, { initialRoute: { path: '/sign-up', query } })
+    teardown = h.unmount
+    return h
+  }
+
+  it('opens the email field filled from ?email=, so one letter can be fixed', async () => {
+    const h = await mountWith({ email: 'walk-creator-a@cataylst.local' })
+
+    expect((field(h).element as HTMLInputElement).value).toBe('walk-creator-a@cataylst.local')
+  })
+
+  it('leaves the field empty without ?email=', async () => {
+    const h = await mountAuthPage(SignUpPage)
+    teardown = h.unmount
+
+    expect((field(h).element as HTMLInputElement).value).toBe('')
+  })
+
+  it('submits what the person sees after correcting it, not what the URL carried', async () => {
+    vi.mocked(authApi.signUp).mockResolvedValue(USER)
+    const h = await mountWith({ email: 'walk-creator-a@cataylst.local' })
+
+    await h.wrapper.find('[data-test="sign-up-name"] input').setValue('Alice')
+    await field(h).setValue('walk-creator-a@catalyst.local')
+    await h.wrapper.find('[data-test="sign-up-password"] input').setValue('Pa$$w0rd!12')
+    await h.wrapper
+      .find('[data-test="sign-up-password-confirmation"] input')
+      .setValue('Pa$$w0rd!12')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(authApi.signUp).toHaveBeenCalledWith(
+      expect.objectContaining({ email: 'walk-creator-a@catalyst.local' }),
+    )
+  })
+
+  it('submits the prefilled address untouched when the person changes nothing else', async () => {
+    // jsdom strips whitespace from an <input type="email"> itself, so the payload is the proof of the trim.
+    vi.mocked(authApi.signUp).mockResolvedValue(USER)
+    const h = await mountWith({ email: '  padded@creator.example ' })
+
+    await h.wrapper.find('[data-test="sign-up-name"] input').setValue('Alice')
+    await h.wrapper.find('[data-test="sign-up-password"] input').setValue('Pa$$w0rd!12')
+    await h.wrapper
+      .find('[data-test="sign-up-password-confirmation"] input')
+      .setValue('Pa$$w0rd!12')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(authApi.signUp).toHaveBeenCalledWith(
+      expect.objectContaining({ email: 'padded@creator.example' }),
+    )
+  })
+
+  it('caps the value at 320 characters', async () => {
+    const long = `${'a'.repeat(400)}@example.com`
+    const h = await mountWith({ email: long })
+
+    expect((field(h).element as HTMLInputElement).value).toBe(long.slice(0, 320))
+  })
+
+  it('ignores a repeated ?email=a&email=b (an array), rather than joining or picking one', async () => {
+    const h = await mountWith({ email: ['a@b.c', 'x@y.z'] })
+
+    expect((field(h).element as HTMLInputElement).value).toBe('')
+  })
+
+  it('prefills nothing else and sends nothing by itself: no API call on open', async () => {
+    const h = await mountWith({ email: 'walk-creator-a@cataylst.local' })
+
+    expect(
+      (h.wrapper.find('[data-test="sign-up-name"] input').element as HTMLInputElement).value,
+    ).toBe('')
+    expect(
+      (h.wrapper.find('[data-test="sign-up-password"] input').element as HTMLInputElement).value,
+    ).toBe('')
+    expect(authApi.signUp).not.toHaveBeenCalled()
+  })
+})
