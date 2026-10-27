@@ -17,7 +17,7 @@ env:
 jobs:
   backend:
     name: Backend (Pint + Larastan + Pest)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: apps/api
@@ -108,7 +108,7 @@ jobs:
 
   frontend:
     name: Frontend (lint + typecheck + unit)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -165,7 +165,7 @@ jobs:
   # addendum #3 for the discovery context.
   e2e-main:
     name: E2E — main SPA (Playwright)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [frontend, backend]
     services:
       postgres:
@@ -355,7 +355,7 @@ jobs:
   # enrollment specs (see `apps/admin/playwright/specs/`).
   e2e-admin:
     name: E2E — admin SPA (Playwright)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [frontend, backend]
     services:
       postgres:
