@@ -3511,3 +3511,6 @@ Source: [`docs/reviews/in-app-signup-review.md`](reviews/in-app-signup-review.md
 13. **The admin Playwright suite cannot be run against the developer's own admin Vite server.** `reuseExistingServer: !process.env.CI` on the admin Vite entry reuses a dev `pnpm dev` whose proxy targets
     `:8000`, while the E2E API is on `:8001`; both admin specs then fail on a sign-in that never reaches the E2E API (seen 2026-10-26). Stop the admin dev server first, or force `false` locally.
     **Status:** OPEN, low.
+14. **A mistyped address at sign-up cannot be corrected from the pending page.** Found on the AH-104d walk (W4, 2026-10-27): a transposed address created a real, unverified account and mailed a stranger's (or nobody's)
+    inbox, and the pending sheet only offers resend and sign-in. The address is shown, but nothing invites a second look and there is no confirm-email field or "wrong address?" action. Standard for sign-up forms, so not a
+    defect; a "Use a different address" link (sign-up form refilled) is the cheap fix. **Status:** OPEN, low.

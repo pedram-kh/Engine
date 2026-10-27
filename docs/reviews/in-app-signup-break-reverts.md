@@ -228,6 +228,20 @@ X4 fixture spawns a process (imports child_process): 1 failing
 restored identical; clean run 7 passed
 ```
 
+## W4 follow-up (2026-10-27) — the taken-address guard, `SignUpTest`
+
+`SignUpRequest` mutated, each restored by copy with MD5 checked.
+
+```
+S1 unique rule removed:           exit=1 failing=6
+S2 lower-casing removed:          exit=1 failing=2
+S3 trim removed:                  exit=0  (survives, EQUIVALENT: Laravel's TrimStrings middleware trims every input first; prepareForValidation's trim is redundant)
+S4 whole normalisation removed:   exit=1 failing=2
+restored identical; clean run exit=0
+```
+
+S3 is recorded rather than hidden: a spec for a padded new address was added and still cannot fail it, which is how the equivalence showed.
+
 ## Not proven by a break-revert, and why
 
 - **The centred-card exclusion in `AuthLayout.vue`** (`:not(.auth-layout--native)` on three selectors). jsdom has no CSS cascade, so no unit spec can see that the sheet rules win over the 480 px card rules.

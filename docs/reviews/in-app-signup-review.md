@@ -1,6 +1,6 @@
 # AH-104d — review (in-app creator sign-up)
 
-**Status: CLEARED 2026-10-26 (Pedram), pending Playwright; Playwright run green; PUSHED, CI green at `433f487d` (run 40284652244: frontend, backend, E2E admin, E2E main all success). Device walk (Pedram) is the open item.** S1 to S8 are pushed (the feat + docs pair, then one CI fix and its docs). Not deployed. Plan: [`in-app-signup-plan.md`](in-app-signup-plan.md) (cleared, with its §0 amendments). Inventory: [`in-app-signup-inventory.md`](in-app-signup-inventory.md).
+**Status: CLEARED 2026-10-26 (Pedram), pending Playwright; Playwright run green; PUSHED, CI green at `433f487d` (run 40284652244: frontend, backend, E2E admin, E2E main all success). Device walk (Pedram): W1 to W3 passed as reported; W4 reported FAIL 2026-10-27 and diagnosed as a mistyped address (user 28, `cataylst`), not a defect (see the walk file); W4 part 3 to re-walk.** S1 to S8 are pushed (the feat + docs pair, then one CI fix and its docs). Not deployed. Plan: [`in-app-signup-plan.md`](in-app-signup-plan.md) (cleared, with its §0 amendments). Inventory: [`in-app-signup-inventory.md`](in-app-signup-inventory.md).
 Break-revert log, verbatim: [`in-app-signup-break-reverts.md`](in-app-signup-break-reverts.md). Device walk: [`in-app-signup-device-walk.md`](in-app-signup-device-walk.md) (**not walked**; it is yours).
 
 **PROD-DATA RISK: NONE.** No migration, no backfill, no new command, no scheduler change, no env, no flag changed. One new rate limiter (cache counters, one key per normalised email per hour). Everything else is
