@@ -3516,3 +3516,7 @@ Source: [`docs/reviews/in-app-signup-review.md`](reviews/in-app-signup-review.md
     defect; a "Use a different address" link (sign-up form refilled) is the cheap fix. **Status:** CLOSED 2026-10-27 (Pedram's go): the signed-out pending page now links to `/sign-up?email=<address>`; the form
     opens with the address prefilled and editable (`SignUpPage.vue`, `prefilledEmail()`). Residual, **OPEN, low:** the link does not touch the account already created, so a corrected re-sign-up leaves the
     mistyped, unverified account behind (an orphan, harmless: it can never verify; no purge job exists). Signed-in unverified users do not get the link (`/sign-up` is guest-only; they have Delete instead).
+15. **CI runners are pinned to `ubuntu-24.04` because Playwright does not support Ubuntu 26.04.** On 2026-10-27 `ubuntu-latest` began resolving to 26.04 and both E2E jobs failed at `playwright install --with-deps chromium`
+    (`Playwright does not support chromium on ubuntu26.04-x64`); backend and frontend were unaffected. Pinned in `.github/workflows/ci.yml` (4 jobs) and `commitlint.yml`. **Revisit** when the installed `@playwright/test`
+    lists 26.04 as supported (check its release notes on each Playwright upgrade): then try `ubuntu-latest` again, or deliberately move to `ubuntu-26.04`. 24.04 stays supported by GitHub for years, so this is not urgent.
+    **Owner:** Pedram. **Status:** OPEN, low.
