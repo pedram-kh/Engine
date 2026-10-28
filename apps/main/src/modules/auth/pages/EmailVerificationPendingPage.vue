@@ -19,6 +19,7 @@ import { storeToRefs } from 'pinia'
 import { isNativePlatform } from '@/core/platform/isNativePlatform'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { resolveErrorMessage } from '@/modules/auth/composables/useErrorMessage'
+import { draftState, readSignUpDraft } from './signUpDraft'
 
 const { t, te } = useI18n()
 const route = useRoute()
@@ -55,11 +56,19 @@ const showDeleteLink = computed(
  * "Use a different address" (AH-104d, W4 2026-10-27: a transposed letter created a
  * real account and mailed the wrong inbox). Only while signed out: a session means
  * the account exists and is theirs (the Delete link is the way out), and `/sign-up`
- * is guest-only. The typed address travels as `?email=` so the field opens with it
- * and one letter can be fixed; the sign-up page treats it as an editable prefill only.
+ * is guest-only. It goes back to the sign-up form with the two names the person
+ * typed (carried in `history.state`, see `signUpDraft.ts`) and leaves the email empty
+ * and focused: they are there to change it, so the old address is not offered back.
  * It does not touch the account already created for the wrong address.
  */
 const showChangeAddress = computed(() => store.user === null && email.value !== '')
+
+function changeAddress(): Promise<unknown> {
+  return router.push({
+    name: 'auth.sign-up',
+    state: draftState(readSignUpDraft(router) ?? { name: '', last_name: '' }),
+  })
+}
 
 function goToSignIn(): Promise<unknown> {
   return router.push({
@@ -176,14 +185,17 @@ async function resend(): Promise<void> {
       {{ t('auth.ui.actions.verified_sign_in') }}
     </v-btn>
 
-    <div v-if="showChangeAddress" class="mt-4 text-body-2">
-      <router-link
-        :to="{ name: 'auth.sign-up', query: { email } }"
-        data-test="email-verification-pending-change-address"
-      >
-        {{ t('auth.ui.actions.different_address') }}
-      </router-link>
-    </div>
+    <v-btn
+      v-if="showChangeAddress"
+      color="primary"
+      variant="text"
+      block
+      class="mt-3"
+      data-test="email-verification-pending-change-address"
+      @click="changeAddress"
+    >
+      {{ t('auth.ui.actions.different_address') }}
+    </v-btn>
 
     <div v-if="showDeleteLink" class="mt-4 text-body-2">
       <router-link :to="{ name: 'creator.security' }" data-test="email-verification-pending-delete">

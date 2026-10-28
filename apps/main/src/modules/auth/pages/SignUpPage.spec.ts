@@ -97,6 +97,8 @@ describe('SignUpPage', () => {
     expect(pushSpy).toHaveBeenCalledWith({
       name: 'auth.verify-email.pending',
       query: { email: 'a@b.c' },
+      // AH-104d: the names ride in history.state so "Use a different address" can bring them back.
+      state: { signUpDraft: { name: 'Alice', last_name: 'Smith' } },
     })
   })
 
@@ -519,46 +521,127 @@ describe('SignUpPage', () => {
   })
 })
 
-describe('SignUpPage — ?email= prefill (AH-104d: "Use a different address" on the pending page)', () => {
+describe('SignUpPage — names carried back from "Use a different address" (AH-104d)', () => {
   let teardown: (() => void) | null = null
+  let focusSpy: ReturnType<typeof vi.spyOn> | null = null
 
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
   afterEach(() => {
+    focusSpy?.mockRestore()
+    focusSpy = null
     teardown?.()
     teardown = null
   })
 
-  const field = (h: Awaited<ReturnType<typeof mountAuthPage>>) =>
-    h.wrapper.find('[data-test="sign-up-email"] input')
+  const input = (h: Awaited<ReturnType<typeof mountAuthPage>>, testId: string) =>
+    h.wrapper.find(`[data-test="${testId}"] input`).element as HTMLInputElement
 
-  async function mountWith(query: Record<string, string | string[]>) {
-    const h = await mountAuthPage(SignUpPage, { initialRoute: { path: '/sign-up', query } })
+  async function mountCarrying(state: Record<string, unknown>, query: Record<string, string> = {}) {
+    focusSpy = vi.spyOn(HTMLElement.prototype, 'focus')
+    const h = await mountAuthPage(SignUpPage, {
+      initialRoute: { path: '/sign-up', query, state: state as never },
+    })
     teardown = h.unmount
     return h
   }
 
-  it('opens the email field filled from ?email=, so one letter can be fixed', async () => {
-    const h = await mountWith({ email: 'walk-creator-a@cataylst.local' })
+  it('carries the first and last name over, leaves the email EMPTY, and carries no password', async () => {
+    const h = await mountCarrying({
+      // A password smuggled into the state is never read back.
+      signUpDraft: { name: 'Alice', last_name: 'Walker', password: 'Pa$$w0rd!12' },
+    })
 
-    expect((field(h).element as HTMLInputElement).value).toBe('walk-creator-a@cataylst.local')
+    expect(input(h, 'sign-up-name').value).toBe('Alice')
+    expect(input(h, 'sign-up-last-name').value).toBe('Walker')
+    expect(input(h, 'sign-up-email').value).toBe('')
+    expect(input(h, 'sign-up-password').value).toBe('')
+    expect(input(h, 'sign-up-password-confirmation').value).toBe('')
   })
 
-  it('leaves the field empty without ?email=', async () => {
+  it('focuses the email field (and only that field) when names were carried', async () => {
+    const h = await mountCarrying({ signUpDraft: { name: 'Alice', last_name: 'Walker' } })
+
+    const focused = (focusSpy as ReturnType<typeof vi.spyOn>).mock.contexts as HTMLElement[]
+    expect(focused).toEqual([input(h, 'sign-up-email')])
+  })
+
+  it('ignores the old ?email= in the URL: the address typed before is never offered back', async () => {
+    const h = await mountCarrying(
+      { signUpDraft: { name: 'Alice', last_name: 'Walker' } },
+      { email: 'walk-creator-a@cataylst.local' },
+    )
+
+    expect(input(h, 'sign-up-email').value).toBe('')
+  })
+
+  it('opens blank and focuses nothing on a fresh visit (no carried state)', async () => {
+    const h = await mountCarrying({})
+
+    expect(input(h, 'sign-up-name').value).toBe('')
+    expect(input(h, 'sign-up-last-name').value).toBe('')
+    expect(input(h, 'sign-up-email').value).toBe('')
+    expect((focusSpy as ReturnType<typeof vi.spyOn>).mock.calls).toHaveLength(0)
+  })
+
+  it('does not focus the email when the carried draft holds no names', async () => {
+    await mountCarrying({ signUpDraft: { name: '', last_name: '' } })
+
+    expect((focusSpy as ReturnType<typeof vi.spyOn>).mock.calls).toHaveLength(0)
+  })
+
+  it('trims, caps at 120 characters, and ignores non-string values', async () => {
+    const h = await mountCarrying({
+      signUpDraft: { name: `  ${'a'.repeat(200)} `, last_name: 42 },
+    })
+
+    expect(input(h, 'sign-up-name').value).toBe('a'.repeat(120))
+    expect(input(h, 'sign-up-last-name').value).toBe('')
+  })
+
+  it('ignores a draft that is not a plain object (a string, an array)', async () => {
+    const asString = await mountCarrying({ signUpDraft: 'Alice Walker' })
+    expect(input(asString, 'sign-up-name').value).toBe('')
+    asString.unmount()
+    teardown = null
+
+    const asArray = await mountCarrying({ signUpDraft: ['Alice', 'Walker'] })
+    expect(input(asArray, 'sign-up-name').value).toBe('')
+  })
+
+  it('sends only what the person submits: the typed new address, with the carried names', async () => {
+    vi.mocked(authApi.signUp).mockResolvedValue(USER)
+    const h = await mountCarrying({ signUpDraft: { name: 'Alice', last_name: 'Walker' } })
+    expect(authApi.signUp).not.toHaveBeenCalled()
+
+    await h.wrapper.find('[data-test="sign-up-email"] input').setValue('alice@catalyst.local')
+    await h.wrapper.find('[data-test="sign-up-password"] input').setValue('Pa$$w0rd!12')
+    await h.wrapper
+      .find('[data-test="sign-up-password-confirmation"] input')
+      .setValue('Pa$$w0rd!12')
+    await h.wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(authApi.signUp).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Alice',
+        last_name: 'Walker',
+        email: 'alice@catalyst.local',
+      }),
+    )
+  })
+
+  it('hands the names to the pending page on success, and the address only in the query', async () => {
+    vi.mocked(authApi.signUp).mockResolvedValue(USER)
     const h = await mountAuthPage(SignUpPage)
     teardown = h.unmount
-
-    expect((field(h).element as HTMLInputElement).value).toBe('')
-  })
-
-  it('submits what the person sees after correcting it, not what the URL carried', async () => {
-    vi.mocked(authApi.signUp).mockResolvedValue(USER)
-    const h = await mountWith({ email: 'walk-creator-a@cataylst.local' })
+    const push = vi.spyOn(h.router, 'push')
 
     await h.wrapper.find('[data-test="sign-up-name"] input').setValue('Alice')
-    await field(h).setValue('walk-creator-a@catalyst.local')
+    await h.wrapper.find('[data-test="sign-up-last-name"] input').setValue('Walker')
+    await h.wrapper.find('[data-test="sign-up-email"] input').setValue('alice@catalyst.local')
     await h.wrapper.find('[data-test="sign-up-password"] input').setValue('Pa$$w0rd!12')
     await h.wrapper
       .find('[data-test="sign-up-password-confirmation"] input')
@@ -566,17 +649,20 @@ describe('SignUpPage — ?email= prefill (AH-104d: "Use a different address" on 
     await h.wrapper.find('form').trigger('submit')
     await flushPromises()
 
-    expect(authApi.signUp).toHaveBeenCalledWith(
-      expect.objectContaining({ email: 'walk-creator-a@catalyst.local' }),
-    )
+    expect(push).toHaveBeenCalledWith({
+      name: 'auth.verify-email.pending',
+      query: { email: 'alice@catalyst.local' },
+      state: { signUpDraft: { name: 'Alice', last_name: 'Walker' } },
+    })
   })
 
-  it('submits the prefilled address untouched when the person changes nothing else', async () => {
-    // jsdom strips whitespace from an <input type="email"> itself, so the payload is the proof of the trim.
+  it('the names never appear in the URL', async () => {
     vi.mocked(authApi.signUp).mockResolvedValue(USER)
-    const h = await mountWith({ email: '  padded@creator.example ' })
-
+    const h = await mountAuthPage(SignUpPage)
+    teardown = h.unmount
     await h.wrapper.find('[data-test="sign-up-name"] input').setValue('Alice')
+    await h.wrapper.find('[data-test="sign-up-last-name"] input').setValue('Walker')
+    await h.wrapper.find('[data-test="sign-up-email"] input').setValue('alice@catalyst.local')
     await h.wrapper.find('[data-test="sign-up-password"] input').setValue('Pa$$w0rd!12')
     await h.wrapper
       .find('[data-test="sign-up-password-confirmation"] input')
@@ -584,33 +670,6 @@ describe('SignUpPage — ?email= prefill (AH-104d: "Use a different address" on 
     await h.wrapper.find('form').trigger('submit')
     await flushPromises()
 
-    expect(authApi.signUp).toHaveBeenCalledWith(
-      expect.objectContaining({ email: 'padded@creator.example' }),
-    )
-  })
-
-  it('caps the value at 320 characters', async () => {
-    const long = `${'a'.repeat(400)}@example.com`
-    const h = await mountWith({ email: long })
-
-    expect((field(h).element as HTMLInputElement).value).toBe(long.slice(0, 320))
-  })
-
-  it('ignores a repeated ?email=a&email=b (an array), rather than joining or picking one', async () => {
-    const h = await mountWith({ email: ['a@b.c', 'x@y.z'] })
-
-    expect((field(h).element as HTMLInputElement).value).toBe('')
-  })
-
-  it('prefills nothing else and sends nothing by itself: no API call on open', async () => {
-    const h = await mountWith({ email: 'walk-creator-a@cataylst.local' })
-
-    expect(
-      (h.wrapper.find('[data-test="sign-up-name"] input').element as HTMLInputElement).value,
-    ).toBe('')
-    expect(
-      (h.wrapper.find('[data-test="sign-up-password"] input').element as HTMLInputElement).value,
-    ).toBe('')
-    expect(authApi.signUp).not.toHaveBeenCalled()
+    expect(h.router.currentRoute.value.fullPath).not.toMatch(/Alice|Walker/)
   })
 })

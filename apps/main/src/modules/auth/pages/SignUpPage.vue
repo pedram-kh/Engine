@@ -16,7 +16,7 @@
  */
 
 import { ApiError, extractFieldErrors, type PreferredLanguage } from '@catalyst/api-client'
-import { computed, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
@@ -26,6 +26,7 @@ import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { resolveErrorMessage } from '@/modules/auth/composables/useErrorMessage'
 import { FOOTER_PRIVACY_HREF, footerLinkAttrs } from '@/modules/auth/components/footerLinks'
 import nativeMark from '@/modules/auth/assets/native-sign-in-mark.svg'
+import { draftState, readSignUpDraft } from './signUpDraft'
 
 const { t, te, locale } = useI18n()
 const router = useRouter()
@@ -37,23 +38,28 @@ const { isSigningUp } = storeToRefs(store)
 const isNative = isNativePlatform()
 
 /**
- * AH-104d: `?email=` opens the field filled (the pending page's "Use a different
- * address" sends the address just typed so one letter can be fixed). A prefill only:
- * a single string, trimmed, capped at the longest address an email can be, still
- * fully editable, and never sent anywhere until the person submits. Same rule as the
- * sign-in page's.
+ * AH-104d: the pending page's "Use a different address" brings the person back here
+ * with the two names they already typed (in `history.state`, never the URL). The
+ * email comes back EMPTY and focused (they are here to change it) and the password is
+ * never carried. Everything is editable and nothing is sent until they submit.
  */
-function prefilledEmail(): string {
-  const raw = route.query.email
-  return typeof raw === 'string' ? raw.trim().slice(0, 320) : ''
-}
+const carried = readSignUpDraft(router)
+const carriedNames = carried !== null && (carried.name !== '' || carried.last_name !== '')
 
 const form = reactive({
-  name: '',
-  last_name: '',
-  email: prefilledEmail(),
+  name: carried?.name ?? '',
+  last_name: carried?.last_name ?? '',
+  email: '',
   password: '',
   password_confirmation: '',
+})
+
+const pageRoot = ref<HTMLElement | null>(null)
+
+onMounted(() => {
+  if (carriedNames) {
+    pageRoot.value?.querySelector<HTMLInputElement>('#sign-up-email')?.focus()
+  }
 })
 
 const errorKey = ref<string | null>(null)
@@ -206,6 +212,7 @@ async function onSubmit(): Promise<void> {
     await router.push({
       name: 'auth.verify-email.pending',
       query: { email: form.email },
+      state: draftState({ name: form.name, last_name: form.last_name }),
     })
   } catch (err) {
     if (err instanceof ApiError) {
@@ -221,7 +228,7 @@ async function onSubmit(): Promise<void> {
 </script>
 
 <template>
-  <section :class="{ 'sign-up-native': isNative }" data-test="sign-up-page">
+  <section ref="pageRoot" :class="{ 'sign-up-native': isNative }" data-test="sign-up-page">
     <img
       v-if="isNative"
       :src="nativeMark"

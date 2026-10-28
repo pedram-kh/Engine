@@ -293,11 +293,19 @@ describe('EmailVerificationPendingPage — "Use a different address" (AH-104d, W
     teardown = null
   })
 
-  async function mountAt(opts: { native: boolean; query?: Record<string, string>; user?: User }) {
+  async function mountAt(opts: {
+    native: boolean
+    query?: Record<string, string>
+    state?: Record<string, unknown>
+    user?: User
+  }) {
     platform.native = opts.native
     const h = await mountAuthPage(EmailVerificationPendingPage, {
-      stubs: { RouterLink: RouterLinkStub },
-      initialRoute: { path: '/verify-email/pending', query: opts.query ?? {} },
+      initialRoute: {
+        path: '/verify-email/pending',
+        query: opts.query ?? {},
+        ...(opts.state !== undefined ? { state: opts.state as never } : {}),
+      },
       beforeMount: () => {
         if (opts.user !== undefined) {
           const store = useAuthStore()
@@ -313,19 +321,78 @@ describe('EmailVerificationPendingPage — "Use a different address" (AH-104d, W
   it.each([
     ['in the creator app', true],
     ['on the web', false],
-  ])('offers the link to sign-up %s, carrying the address just typed', async (_label, native) => {
-    const h = await mountAt({ native, query: { email: 'walk-creator-a@cataylst.local' } })
+  ])(
+    'is a full-width text button %s, like the primary actions above it',
+    async (_label, native) => {
+      const h = await mountAt({ native, query: { email: 'walk-creator-a@cataylst.local' } })
 
-    const change = h.wrapper.find(CHANGE)
-    expect(change.exists()).toBe(true)
-    expect(change.text()).toBe('Use a different address')
-    const target = h.wrapper
-      .findAllComponents(RouterLinkStub)
-      .find((c) => c.attributes('data-test') === 'email-verification-pending-change-address')
-    expect(target?.props('to')).toEqual({
+      const change = h.wrapper.find(CHANGE)
+      expect(change.exists()).toBe(true)
+      expect(change.element.tagName).toBe('BUTTON')
+      expect(change.text()).toBe('Use a different address')
+      expect(change.classes()).toContain('v-btn--block')
+      expect(change.classes()).toContain('v-btn--variant-text')
+      // Not a hyperlink: no anchor anywhere in the control.
+      expect(change.element.closest('a')).toBeNull()
+      expect(change.find('a').exists()).toBe(false)
+    },
+  )
+
+  it.each([
+    ['in the creator app', true],
+    ['on the web', false],
+  ])(
+    'goes back to sign-up %s carrying the two names, and NOT the address (it is the thing to change)',
+    async (_label, native) => {
+      const h = await mountAt({
+        native,
+        query: { email: 'walk-creator-a@cataylst.local' },
+        state: { signUpDraft: { name: 'Alice', last_name: 'Walker' } },
+      })
+      const push = vi.spyOn(h.router, 'push').mockResolvedValue(undefined)
+
+      await h.wrapper.find(CHANGE).trigger('click')
+
+      expect(push).toHaveBeenCalledTimes(1)
+      expect(push).toHaveBeenCalledWith({
+        name: 'auth.sign-up',
+        state: { signUpDraft: { name: 'Alice', last_name: 'Walker' } },
+      })
+      // No query at all: the old address is not handed back, not even for analytics.
+      expect(JSON.stringify(push.mock.calls[0])).not.toContain('cataylst')
+    },
+  )
+
+  it('still goes back (with blank names) when this entry carries none, e.g. a bookmark', async () => {
+    const h = await mountAt({ native: true, query: { email: 'walk-creator-a@cataylst.local' } })
+    const push = vi.spyOn(h.router, 'push').mockResolvedValue(undefined)
+
+    await h.wrapper.find(CHANGE).trigger('click')
+
+    expect(push).toHaveBeenCalledWith({
       name: 'auth.sign-up',
-      query: { email: 'walk-creator-a@cataylst.local' },
+      state: { signUpDraft: { name: '', last_name: '' } },
     })
+  })
+
+  it('carries no password: nothing but the two names is ever put in the state', async () => {
+    const h = await mountAt({
+      native: true,
+      query: { email: 'walk-creator-a@cataylst.local' },
+      state: {
+        signUpDraft: { name: 'Alice', last_name: 'Walker', password: 'Pa$$w0rd!12' },
+        password: 'Pa$$w0rd!12',
+      },
+    })
+    const push = vi.spyOn(h.router, 'push').mockResolvedValue(undefined)
+
+    await h.wrapper.find(CHANGE).trigger('click')
+
+    const sent = JSON.stringify(push.mock.calls[0])
+    expect(sent).not.toContain('Pa$$w0rd')
+    expect(Object.keys((push.mock.calls[0]?.[0] as { state: object }).state)).toEqual([
+      'signUpDraft',
+    ])
   })
 
   it('is absent when there is no address to carry', async () => {

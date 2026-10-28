@@ -170,6 +170,7 @@ describe('SignUpPage — creator app (native sheet)', () => {
     expect(pushSpy).toHaveBeenCalledWith({
       name: 'auth.verify-email.pending',
       query: { email: 'a@b.c' },
+      state: { signUpDraft: { name: 'Alice', last_name: 'Smith' } },
     })
   })
 
