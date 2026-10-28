@@ -294,6 +294,27 @@ restored identical (MD5); clean run exit=0
 
 N7 and N12 are recorded as they were: the first versions were not real mutants (one could never fire, one broke compilation), so they were redone, not counted.
 
+## W8 follow-up (2026-10-28): back from Security into the wizard, and the incomplete dashboard card
+
+Vitest, `useShellBack.spec.ts` + `CreatorDashboardPage.spec.ts` (48 tests), each mutation restored by source plus MD5.
+
+```
+W1  wizard previous entry no longer counts as history:      exit=1
+W2  any previous entry counts (sign-in too):                exit=1
+W3  incomplete creators still fall back to the dashboard:   exit=1
+W4  every creator goes to the wizard:                       exit=1
+W5  fallback ignores next_step (always profile):            exit=1
+W6  wizard-name test too loose:                             exit=1
+W7  null next_step no longer defaults to profile:           exit=1
+W8  card links to welcome-back, not the current step:       exit=1
+W9  card link ignores next_step:                            exit=1
+W10 card links to the dashboard (itself):                   exit=1
+W11 card not a link at all (the old behaviour):             exit=1
+restored identical; clean run exit=0
+```
+
+`CreatorDashboardLayout.spec.ts` (the shell arrow, mounted for real) was not in the mutation set; its "nothing to go back to" case changed meaning (an approved creator keeps the dashboard; an incomplete one lands on its wizard step) and both are specced there.
+
 ## Not proven by a break-revert, and why
 
 - **The email field's keyboard on a phone.** `focus()` is proven (spy); whether iOS opens the keyboard for a focus that follows an async page load is a device question (W4 re-check).
