@@ -18,17 +18,25 @@
  * and `useShellBack.spec.ts` pins them against the route records so a rename
  * cannot quietly empty either list.
  *
- * WHERE IT GOES. History when there is some, the dashboard when there is not.
- * "Some" means the entry we came from is another creator-shell page — the same
- * `history.state.back` read as `useBackToList`, but also checked against the
- * route's layout, because a back from here must never unwind into the sign-in
- * screen (a fresh login lands on the dashboard with the sign-in page one entry
- * behind it) or out of the app. A cold start from a push tap has no previous
- * entry at all, which is the case the dashboard fallback exists for.
+ * WHERE IT GOES. History when there is some, otherwise a fallback.
+ * "Some" means the entry we came from is another creator-shell page, or a wizard
+ * step (`onboarding.*`, the account menu's Security entry, W8 2026-10-28) — the
+ * same `history.state.back` read as `useBackToList`, but also checked against the
+ * route, because a back from here must never unwind into the sign-in screen (a
+ * fresh login lands on the dashboard with the sign-in page one entry behind it)
+ * or out of the app.
+ *
+ * The fallback (no usable previous entry: a cold start from a push tap, a reload)
+ * depends on who is asking. A creator whose application is still INCOMPLETE belongs
+ * in the wizard, so they go to its current step, never to a dashboard that can only
+ * tell them to go back to it. Everyone else goes to the dashboard.
  */
 
 import { computed, type ComputedRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+import { useOnboardingStore } from '@/modules/onboarding/stores/useOnboardingStore'
+import { isWizardRouteName, wizardCurrentStepLocation } from '@/modules/onboarding/wizardResume'
 
 /** The bottom-tab destinations (`MOBILE_PRIMARY_KEYS` in the layout). */
 export const SHELL_TAB_ROUTE_NAMES: readonly string[] = [
@@ -63,13 +71,21 @@ export interface ShellBack {
 export function useShellBack(): ShellBack {
   const route = useRoute()
   const router = useRouter()
+  const onboarding = useOnboardingStore()
 
   const visible = computed(() => showsShellBack(route.name))
 
   function goBack(): void {
     const previous = router.options.history.state.back
-    if (typeof previous === 'string' && router.resolve(previous).meta.layout === 'creator') {
-      router.back()
+    if (typeof previous === 'string') {
+      const resolved = router.resolve(previous)
+      if (resolved.meta.layout === 'creator' || isWizardRouteName(resolved.name)) {
+        router.back()
+        return
+      }
+    }
+    if (onboarding.applicationStatus === 'incomplete') {
+      void router.push(wizardCurrentStepLocation(onboarding.nextStep))
       return
     }
     void router.push({ name: SHELL_BACK_FALLBACK_ROUTE_NAME })

@@ -118,6 +118,8 @@ async function mountLayout(
     route?: string
     dark?: boolean
     applicationStatus?: string
+    /** AH-104d (W8) — the wizard's `next_step` on the bootstrapped creator (default `profile`). */
+    nextStep?: string
     mobile?: boolean
     native?: boolean
     /** AH-104b-del — `features.account_deletion` on the user (undefined = an older payload). */
@@ -139,6 +141,7 @@ async function mountLayout(
       data: {
         type: 'creators',
         attributes: { application_status: options.applicationStatus ?? 'incomplete' },
+        wizard: { next_step: options.nextStep ?? 'profile', is_submitted: false },
       },
     } as never)
   }
@@ -181,6 +184,17 @@ async function mountLayout(
       { path: '/creator/messages', name: 'creator.messages', component: { template: '<div />' } },
       { path: '/creator/jobs', name: 'creator.jobs', component: { template: '<div />' } },
       { path: '/creator/profile', name: 'creator.profile', component: { template: '<div />' } },
+      // AH-104d (W8): where an incomplete creator's back arrow lands when there is no history.
+      {
+        path: '/onboarding/profile',
+        name: 'onboarding.profile',
+        component: { template: '<div />' },
+      },
+      {
+        path: '/onboarding/kyc',
+        name: 'onboarding.kyc',
+        component: { template: '<div />' },
+      },
       // Reachable only once VMenu renders inline (the AH-057 stub): the
       // notification bell's "view all" and the avatar menu's preferences link.
       {
@@ -642,8 +656,8 @@ describe('CreatorDashboardLayout — shell back arrow (AH-106)', () => {
     expect([...primaryRouteNames].sort()).toEqual([...SHELL_TAB_ROUTE_NAMES].sort())
   })
 
-  it('goes to the dashboard when there is nothing to go back to', async () => {
-    const m = await mountLayout({ route: '/creator/notifications' })
+  it('goes to the dashboard when there is nothing to go back to (an approved creator)', async () => {
+    const m = await mountLayout({ route: '/creator/notifications', applicationStatus: 'approved' })
     cleanup = m.cleanup
     const router = m.wrapper.vm.$router
 
@@ -651,6 +665,19 @@ describe('CreatorDashboardLayout — shell back arrow (AH-106)', () => {
     await flushPromises()
 
     expect(router.currentRoute.value.name).toBe('creator.dashboard')
+  })
+
+  // AH-104d (W8, 2026-10-28): the wizard's account menu → Security → back landed on a dashboard
+  // that could only say "continue your application". An incomplete creator belongs in the wizard.
+  it('goes to the wizard step the creator is on when there is nothing to go back to (incomplete)', async () => {
+    const m = await mountLayout({ route: '/creator/notifications', nextStep: 'kyc' })
+    cleanup = m.cleanup
+    const router = m.wrapper.vm.$router
+
+    await m.wrapper.find(BACK).trigger('click')
+    await flushPromises()
+
+    expect(router.currentRoute.value.name).toBe('onboarding.kyc')
   })
 })
 

@@ -47,6 +47,7 @@ import DashboardStrengthCard from '../components/DashboardStrengthCard.vue'
 import { useApplicationStatusPoll } from '../../onboarding/composables/useApplicationStatusPoll'
 import { resolveSubmitErrorKey } from '../../onboarding/composables/useSubmitErrorKey'
 import { useOnboardingStore } from '../../onboarding/stores/useOnboardingStore'
+import { wizardCurrentStepLocation } from '../../onboarding/wizardResume'
 import { connectionRequestsApi } from '../connectionRequests.api'
 import { creatorAssignmentsApi } from '../assignments.api'
 
@@ -325,10 +326,22 @@ onMounted(async () => {
       </p>
     </v-alert>
 
-    <v-alert v-else type="warning" variant="tonal" data-testid="dashboard-banner-incomplete">
-      <template #title>{{ t('creator.ui.dashboard.incomplete.title') }}</template>
-      <p>{{ t('creator.ui.dashboard.incomplete.description') }}</p>
-    </v-alert>
+    <!-- AH-104d (W8, 2026-10-28): a creator whose application is still incomplete has nothing
+         else to do here, so the whole card is the way back into the wizard, at its CURRENT step. -->
+    <router-link
+      v-else
+      :to="wizardCurrentStepLocation(store.nextStep)"
+      class="dashboard-incomplete-link"
+      data-testid="dashboard-incomplete-link"
+    >
+      <v-alert type="warning" variant="tonal" data-testid="dashboard-banner-incomplete">
+        <template #title>{{ t('creator.ui.dashboard.incomplete.title') }}</template>
+        <p>{{ t('creator.ui.dashboard.incomplete.description') }}</p>
+        <template #append>
+          <v-icon icon="mdi-chevron-right" aria-hidden="true" />
+        </template>
+      </v-alert>
+    </router-link>
 
     <DashboardStrengthCard v-if="nativeApproved" :score="score" :next-step="nextIncompleteStep" />
     <CompletenessBar
@@ -484,5 +497,12 @@ onMounted(async () => {
   padding-bottom: 16px;
   border-bottom: 2px solid transparent;
   border-image: var(--brand-aurora-gradient) 1;
+}
+
+/* The incomplete-application card is a link: no underline, no link colour, the alert keeps its own. */
+.dashboard-incomplete-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
 }
 </style>

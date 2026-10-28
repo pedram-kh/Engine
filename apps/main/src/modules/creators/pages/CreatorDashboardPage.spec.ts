@@ -1,4 +1,4 @@
-import { flushPromises } from '@vue/test-utils'
+import { RouterLinkStub, flushPromises } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { mountAuthPage } from '../../../../tests/unit/helpers/mountAuthPage'
@@ -219,6 +219,7 @@ describe('CreatorDashboardPage', () => {
     vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap('incomplete'))
 
     const { wrapper, unmount } = await mountAuthPage(CreatorDashboardPage, {
+      stubs: { RouterLink: RouterLinkStub },
       initialRoute: { path: '/creator/dashboard' },
       beforeMount: async () => {
         await useOnboardingStore().bootstrap()
@@ -228,6 +229,81 @@ describe('CreatorDashboardPage', () => {
     await flushPromises()
 
     expect(wrapper.find('[data-testid="dashboard-banner-incomplete"]').exists()).toBe(true)
+  })
+
+  // AH-104d (W8, 2026-10-28): a new creator dumped here had no way back into the wizard.
+  describe('the incomplete card is the way back into the wizard', () => {
+    async function mountIncomplete(nextStep: string | null) {
+      const boot = makeBootstrap('incomplete') as unknown as {
+        data: { wizard: { next_step: string | null } }
+      }
+      boot.data.wizard.next_step = nextStep
+      vi.mocked(onboardingApi.bootstrap).mockResolvedValue(boot as never)
+      const h = await mountAuthPage(CreatorDashboardPage, {
+        stubs: { RouterLink: RouterLinkStub },
+        initialRoute: { path: '/creator/dashboard' },
+        beforeMount: async () => {
+          await useOnboardingStore().bootstrap()
+        },
+      })
+      teardown = h.unmount
+      await flushPromises()
+      return h
+    }
+
+    const link = (h: Awaited<ReturnType<typeof mountIncomplete>>) =>
+      h.wrapper
+        .findAllComponents(RouterLinkStub)
+        .find((c) => c.attributes('data-testid') === 'dashboard-incomplete-link')
+
+    it('wraps the "Continue your application" card in a link', async () => {
+      const h = await mountIncomplete('profile')
+
+      const target = link(h)
+      expect(target).toBeDefined()
+      expect(target?.find('[data-testid="dashboard-banner-incomplete"]').exists()).toBe(true)
+      expect(target?.text()).toContain('Continue your application')
+    })
+
+    it.each([
+      ['profile', 'onboarding.profile'],
+      ['social', 'onboarding.connections'],
+      ['portfolio', 'onboarding.connections'],
+      ['kyc', 'onboarding.kyc'],
+      ['tax', 'onboarding.tax'],
+      ['payout', 'onboarding.payout'],
+      ['contract', 'onboarding.contract'],
+      ['review', 'onboarding.review'],
+    ])("links to the creator's CURRENT step: next_step %s -> %s", async (nextStep, routeName) => {
+      const h = await mountIncomplete(nextStep)
+
+      expect(link(h)?.props('to')).toEqual({ name: routeName })
+    })
+
+    it('starts a brand-new creator (no next_step yet) at the profile step', async () => {
+      const h = await mountIncomplete(null)
+
+      expect(link(h)?.props('to')).toEqual({ name: 'onboarding.profile' })
+    })
+
+    it.each(['pending', 'approved', 'rejected'] as const)(
+      'is absent for a %s application (those have their own banners)',
+      async (status) => {
+        vi.mocked(onboardingApi.bootstrap).mockResolvedValue(makeBootstrap(status))
+        const h = await mountAuthPage(CreatorDashboardPage, {
+          stubs: { RouterLink: RouterLinkStub },
+          initialRoute: { path: '/creator/dashboard' },
+          beforeMount: async () => {
+            await useOnboardingStore().bootstrap()
+          },
+        })
+        teardown = h.unmount
+        await flushPromises()
+
+        expect(link(h as never)).toBeUndefined()
+        expect(h.wrapper.find('[data-testid="dashboard-banner-incomplete"]').exists()).toBe(false)
+      },
+    )
   })
 
   it('renders the completeness bar with the score from the store', async () => {
