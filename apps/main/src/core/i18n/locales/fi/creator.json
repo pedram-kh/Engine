@@ -321,7 +321,7 @@
         "saved": "Profiili tallennettu"
       },
       "dashboard": {
-        "title": "Your application",
+        "title": "Hakemuksesi",
         "greeting": "Tervetuloa, {name}.",
         "completeness": "{percent}% complete",
         "submitted_at": "Lähetäted on {datetime}",

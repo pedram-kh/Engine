@@ -321,7 +321,7 @@
         "saved": "Το προφίλ αποθηκεύτηκε"
       },
       "dashboard": {
-        "title": "Your application",
+        "title": "Η αίτησή σας",
         "greeting": "Καλώς ορίσατε, {name}.",
         "completeness": "{percent}% complete",
         "submitted_at": "Υποβολήted on {datetime}",

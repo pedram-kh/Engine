@@ -321,7 +321,7 @@
         "saved": "Profilis išsaugotas"
       },
       "dashboard": {
-        "title": "Your application",
+        "title": "Jūsų paraiška",
         "greeting": "Sveiki atvykę, {name}.",
         "completeness": "{percent}% complete",
         "submitted_at": "Pateiktited on {datetime}",

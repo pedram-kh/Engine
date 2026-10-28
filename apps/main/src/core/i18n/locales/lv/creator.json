@@ -321,7 +321,7 @@
         "saved": "Profils saglabāts"
       },
       "dashboard": {
-        "title": "Your application",
+        "title": "Jūsu pieteikums",
         "greeting": "Laipni lūgti, {name}.",
         "completeness": "{percent}% complete",
         "submitted_at": "Iesniegtted on {datetime}",

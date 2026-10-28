@@ -321,7 +321,7 @@
         "saved": "Профилът е запазен"
       },
       "dashboard": {
-        "title": "Your application",
+        "title": "Вашата кандидатура",
         "greeting": "Добре дошли, {name}.",
         "completeness": "{percent}% complete",
         "submitted_at": "Изпратетеted on {datetime}",

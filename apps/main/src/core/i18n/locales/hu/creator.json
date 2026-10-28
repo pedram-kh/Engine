@@ -321,7 +321,7 @@
         "saved": "Profil elmentve"
       },
       "dashboard": {
-        "title": "Your application",
+        "title": "Az Ön jelentkezése",
         "greeting": "Üdvözöljük, {name}.",
         "completeness": "{percent}% complete",
         "submitted_at": "Küldésted on {datetime}",
