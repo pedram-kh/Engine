@@ -91,21 +91,31 @@ function goToSignIn(): Promise<unknown> {
 async function verifiedSignIn(): Promise<void> {
   errorKey.value = null
   errorValues.value = {}
+  // Busy until the navigation settles too: the wizard's guard chain asks the server
+  // (`/me`, then the creator) before the next page opens, and a button that looks idle
+  // for that long reads as "it did nothing" (W11).
   isCheckingVerification.value = true
   try {
     await store.refreshSession()
+    if (store.user === null) {
+      await goToSignIn()
+      return
+    }
+    if (store.user.attributes.email_verified_at != null) {
+      // A failure in that chain rejects the push; say so rather than stay silent.
+      try {
+        await router.push({ name: 'onboarding.welcome-back' })
+      } catch (err) {
+        const resolved = resolveErrorMessage(err, (k) => te(k))
+        errorKey.value = resolved.key
+        errorValues.value = resolved.values
+      }
+      return
+    }
+    errorKey.value = 'auth.ui.errors.not_verified_yet'
   } finally {
     isCheckingVerification.value = false
   }
-  if (store.user === null) {
-    await goToSignIn()
-    return
-  }
-  if (store.user.attributes.email_verified_at != null) {
-    await router.push({ name: 'onboarding.welcome-back' })
-    return
-  }
-  errorKey.value = 'auth.ui.errors.not_verified_yet'
 }
 
 async function resend(): Promise<void> {

@@ -147,6 +147,30 @@ describe('refreshSession() — signed in', () => {
   })
 })
 
+describe('refreshSession() — a sign-in made in this app run (AH-104d W11)', () => {
+  it('re-reads /me although nothing has bootstrapped yet (the user is set, the status is idle)', async () => {
+    const store = useAuthStore()
+    store.user = makeUser(undefined, 'Signed in just now')
+    expect(store.bootstrapStatus).toBe('idle')
+    mocked.me.mockResolvedValue(makeUser(undefined, 'Verified since'))
+
+    await store.refreshSession()
+
+    expect(mocked.me).toHaveBeenCalledTimes(1)
+    expect(store.user?.attributes.name).toBe('Verified since')
+  })
+
+  it('does not ask while a cold-load bootstrap is still in flight (it will set the user itself)', async () => {
+    const store = useAuthStore()
+    store.user = makeUser()
+    store.bootstrapStatus = 'loading'
+
+    await store.refreshSession()
+
+    expect(mocked.me).not.toHaveBeenCalled()
+  })
+})
+
 describe('refreshSession() — not signed in', () => {
   it('does not call /me before the first bootstrap', async () => {
     const store = useAuthStore()

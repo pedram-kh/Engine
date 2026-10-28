@@ -273,8 +273,8 @@ export const useAuthStore = defineStore('auth', () => {
    * admin's changes) move while it sleeps.
    *
    * Guards, each a specced polarity:
-   *   - Signed out (no user, or bootstrap not `ready`): returns without a
-   *     request. Resuming onto the sign-in screen must not call `/me`.
+   *   - Signed out (no user), or a cold-load bootstrap still `loading`: returns
+   *     without a request. Resuming onto the sign-in screen must not call `/me`.
    *   - Overlap: one request at a time (see `inFlightRefresh`).
    *   - A sign-out or a different user arriving while the request was in
    *     flight discards the answer, so a late reply can never resurrect a
@@ -291,7 +291,12 @@ export const useAuthStore = defineStore('auth', () => {
     if (inFlightRefresh !== null) {
       return inFlightRefresh
     }
-    if (user.value === null || bootstrapStatus.value !== 'ready') {
+    // `idle` is NOT "signed out": a sign-in made in this app run sets the user and leaves
+    // the status at `idle` (only `bootstrap()` writes `ready`). Skipping it made the app's
+    // resume refresh and the pending page's "I've verified" button no-ops until a cold
+    // start (AH-104d W11). `loading` is a cold-load `/me` still in flight, which will set
+    // the user itself.
+    if (user.value === null || bootstrapStatus.value === 'loading') {
       return
     }
     const requestedFor = user.value.id
