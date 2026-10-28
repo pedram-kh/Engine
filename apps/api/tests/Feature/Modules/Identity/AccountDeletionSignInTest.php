@@ -214,6 +214,92 @@ it('lets suspension win over a pending deletion', function (): void {
 });
 
 // -----------------------------------------------------------------------------
+// An unverified account (AH-104d W10, 2026-10-28)
+// -----------------------------------------------------------------------------
+//
+// The sign-up flow signs a creator in BEFORE their address is verified, and the pending page offers
+// "Delete my account". W10 reported "invalid email or password" afterwards instead of the restore
+// screen; the cause was a mistyped address (walk-su-10 for walk-su10: three `unknown_email` rows),
+// not the gate order. These pin the order anyway: nothing in the graph looks at email verification,
+// so an unverified account answers exactly like a verified one at every gate.
+
+/** @return array{0: User, 1: string} [an unverified creator, the same address as typed in the app] */
+function sdUnverified(string $email, bool $pending = false): array
+{
+    [$user] = sdCreator($email, pending: $pending);
+    $user->forceFill(['email_verified_at' => null])->saveQuietly();
+
+    return [$user->refresh(), $email];
+}
+
+it('answers an UNVERIFIED pending creator with the same 403 auth.deletion_pending as a verified one', function (string $door): void {
+    [$user, $email] = sdUnverified('u@example.test', pending: true);
+    expect($user->email_verified_at)->toBeNull();
+
+    $unverified = sdSignIn($this, $door, ['email' => $email, 'password' => SD_PASSWORD]);
+
+    sdCreator('v@example.test', pending: true);
+    $verified = sdSignIn($this, $door, ['email' => 'v@example.test', 'password' => SD_PASSWORD]);
+
+    $unverified->assertForbidden()->assertJsonPath('errors.0.code', 'auth.deletion_pending');
+    expect(sdEnvelope($unverified)['body']['errors'][0]['code'])->toBe(sdEnvelope($verified)['body']['errors'][0]['code'])
+        ->and($unverified->json('errors.0.meta.mfa_via'))->toBe('none')
+        ->and(sdTokenCount())->toBe(0);
+})->with('doors');
+
+it('restores an UNVERIFIED pending creator with cancel_deletion, and leaves the address unverified', function (string $door): void {
+    [$user, $email] = sdUnverified('u@example.test', pending: true);
+
+    $response = sdSignIn($this, $door, ['email' => $email, 'password' => SD_PASSWORD, 'cancel_deletion' => true]);
+
+    $response->assertOk()->assertJsonPath('data.id', $user->ulid)->assertJsonPath('data.attributes.email_verified_at', null);
+    $fresh = User::query()->findOrFail($user->id);
+    expect($fresh->isDeletionPending())->toBeFalse()
+        ->and($fresh->email_verified_at)->toBeNull();
+})->with('doors');
+
+it('does not let an unverified pending creator past the gates on a wrong password: the ordinary 401', function (string $door): void {
+    sdUnverified('u@example.test', pending: true);
+    sdCreator('plain@example.test');
+
+    $unverified = sdEnvelope(sdSignIn($this, $door, ['email' => 'u@example.test', 'password' => 'wrong-password-12']));
+    $plain = sdEnvelope(sdSignIn($this, $door, ['email' => 'plain@example.test', 'password' => 'wrong-password-12']));
+
+    expect($unverified)->toBe($plain)->and($unverified['body']['errors'][0]['code'] ?? null)->toBe('auth.invalid_credentials');
+})->with('doors');
+
+it('answers a MISTYPED address (a hyphen added) as an unknown email, and writes nothing against the real account', function (string $door): void {
+    sdUnverified('walk-su10@catalyst.local', pending: true);
+
+    $response = sdSignIn($this, $door, ['email' => 'walk-su-10@catalyst.local', 'password' => SD_PASSWORD]);
+
+    $response->assertUnauthorized()->assertJsonPath('errors.0.code', 'auth.invalid_credentials');
+    $row = AuditLog::query()->where('action', AuditAction::AuthLoginFailed)->sole();
+    expect(((array) $row->metadata)['reason'] ?? null)->toBe('unknown_email')
+        ->and(((array) $row->metadata)['email'] ?? null)->toBe('walk-su-10@catalyst.local')
+        ->and(User::query()->where('email', 'walk-su10@catalyst.local')->sole()->isDeletionPending())->toBeTrue();
+})->with('doors');
+
+it('walks the real sequence: an unverified creator requests deletion in the app, then signs in and restores', function (): void {
+    [$user] = sdUnverified('walk@example.test');
+    $plain = $user->createToken('creator-app:ios', ['*'])->plainTextToken;
+    app('auth')->forgetGuards();
+
+    $this->withHeaders(['Origin' => 'capacitor://localhost', 'Authorization' => 'Bearer '.$plain])
+        ->postJson('/api/v1/me/account-deletion', ['password' => SD_PASSWORD, 'acknowledged' => true])
+        ->assertSuccessful();
+    expect(User::query()->findOrFail($user->id)->isDeletionPending())->toBeTrue();
+
+    sdSignIn($this, 'token', ['email' => 'walk@example.test', 'password' => SD_PASSWORD])
+        ->assertForbidden()
+        ->assertJsonPath('errors.0.code', 'auth.deletion_pending');
+
+    sdSignIn($this, 'token', ['email' => 'walk@example.test', 'password' => SD_PASSWORD, 'cancel_deletion' => true])
+        ->assertOk();
+    expect(User::query()->findOrFail($user->id)->isDeletionPending())->toBeFalse();
+});
+
+// -----------------------------------------------------------------------------
 // Second factor
 // -----------------------------------------------------------------------------
 
