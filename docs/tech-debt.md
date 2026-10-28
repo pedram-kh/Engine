@@ -2174,6 +2174,8 @@ present (AH-070)`, placed in the one window where `.env` genuinely does not exis
 
 ## AH-001 i18n completeness — English fragments inside translated values (parity-invisible)
 
+> **Ruling 2026-10-28 (Pedram): the `creator.json` pass for the flaky ten (`bg el et fi ga hu lt lv mt ro`) is its own chunk, AH-110 (i18n completeness), scheduled AFTER AH-105. It is NOT a launch blocker for `en`/`es`. This entry stays the tracker.** Scope as measured 2026-10-28: about 180 to 205 `creator.json` keys per locale still the English string (22 under `creator.ui.dashboard.*`), plus nine English-glued hybrids (listed on "AH-104d open items" row 16, e.g. `creator.ui.dashboard.incomplete.title`). Already done and not part of AH-110: the 35-key sign-up flow set (`i18n-signup-flow-strings.spec.ts`) and `creator.ui.dashboard.title` (`i18n-creator-dashboard-title.spec.ts`). A native-speaker read of `ga` and `mt` (AH-104d row 12) belongs with it.
+
 - **Where:** the AH-001 machine-translation locale baseline across `apps/main` / `apps/admin`
   (`src/core/i18n/locales/**`). Surfaced during the AH-004 i18n pass.
 - **What we found:** at least ~10 locales (`bg`, `et`, `fi`, `el`, `hu`, `ga`, `lv`, `lt`, `mt`,
@@ -3521,7 +3523,7 @@ Source: [`docs/reviews/in-app-signup-review.md`](reviews/in-app-signup-review.md
     **Owner:** Pedram. **Status:** OPEN, low.
 16. **`creator.ui.dashboard.title` ("Your application") shipped as English in the ten "flaky" locales.** Found 2026-10-28 on the W8 walk. **Status:** the one key CLOSED 2026-10-28 (translated in `bg el et fi ga hu lt lv mt ro`; pinned by
     `i18n-creator-dashboard-title.spec.ts`, which fails on the English value, an empty value, a missing key, or any value still containing "application"). **Correction to the first draft of this row:** it said the AH-104d
-    "no English in the flaky ten" rule forbade this; that rule covers the sign-up flow keys only (`i18n-signup-flow-strings.spec.ts`). **Still OPEN, low (the AH-001 i18n-completeness row):** about 180 to 205 keys of
+    "no English in the flaky ten" rule forbade this; that rule covers the sign-up flow keys only (`i18n-signup-flow-strings.spec.ts`). **Still OPEN, low (the AH-001 i18n-completeness row; scheduled as AH-110, after AH-105, not a launch blocker for en/es):** about 180 to 205 keys of
     `creator.json` are still the English string in each of those ten locales (22 of them under `creator.ui.dashboard.*`), and nine keys are hybrids with English glued on, e.g. `creator.ui.dashboard.incomplete.title`
     ("Продължете your application"), the card title of the incomplete-application card linked in the W8 fix, plus `pending_review.description`, `rejected.description`, `rejected.resubmit_failed`,
     `creator.wizard.incomplete`, `creator.wizard.feature_disabled`, `creator.ui.wizard.skipped.explanation` and `creator.ui.wizard.steps.review.title`. These need a real translation pass, not a spec.
