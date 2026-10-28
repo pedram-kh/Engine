@@ -263,8 +263,40 @@ restored identical; clean run exit=0
 
 Specs run: `EmailVerificationPendingPage.native.spec.ts`, `SignUpPage.spec.ts`, `i18n-signup-flow-strings.spec.ts`.
 
+### Revised link (2026-10-28, walk feedback): names carried, email empty and focused
+
+Same harness, four specs (`SignUpPage.spec.ts`, `SignUpPage.native.spec.ts`, `EmailVerificationPendingPage.native.spec.ts`, `signUpDraft.spec.ts`). The M1-M11 above were against the first version; M6-M9 no longer apply (`?email=` prefill removed).
+
+```
+N1  prefill brings the old email back:            exit=1
+N2  first name not carried:                       exit=1
+N3  last name not carried:                        exit=1
+N4  email not focused:                            exit=1
+N5  first name focused instead:                   exit=1
+N6  focus even when no names were carried:        exit=1
+N7  first draft (read of a key nothing sets):     exit=0  INVALID MUTANT (could never fire); replaced by N7b
+N7b password read back from the state:            exit=1  (after adding a smuggled password to the first spec)
+N8  sign-up success drops the state:              exit=1
+N9  names put in the URL query:                   exit=1
+N10 change-address drops the names:               exit=1
+N11 change-address puts the old address in query: exit=1
+N12 first draft (did not compile): not counted;  N12b plain anchor instead of the button: exit=1
+N13 not full width:                               exit=1
+N14 outlined instead of text:                     exit=1
+N15 shown while signed in:                        exit=1
+N16 draft not trimmed:                            exit=1
+N17 draft not capped at 120:                      exit=1
+N18 draft keeps extra keys:                       exit=1
+N19 array accepted as a draft:                    exit=1
+N20 state leaks the old email:                    exit=1
+restored identical (MD5); clean run exit=0
+```
+
+N7 and N12 are recorded as they were: the first versions were not real mutants (one could never fire, one broke compilation), so they were redone, not counted.
+
 ## Not proven by a break-revert, and why
 
+- **The email field's keyboard on a phone.** `focus()` is proven (spy); whether iOS opens the keyboard for a focus that follows an async page load is a device question (W4 re-check).
 - **The centred-card exclusion in `AuthLayout.vue`** (`:not(.auth-layout--native)` on three selectors). jsdom has no CSS cascade, so no unit spec can see that the sheet rules win over the 480 px card rules.
   It is checked by eye on the device walk (W1, W2) and nothing else.
 - **`creator-signup-consent.spec.ts` (Playwright).** See the review file §4: whether it has run, and what it proved.
