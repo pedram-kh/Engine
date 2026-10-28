@@ -315,6 +315,19 @@ restored identical; clean run exit=0
 
 `CreatorDashboardLayout.spec.ts` (the shell arrow, mounted for real) was not in the mutation set; its "nothing to go back to" case changed meaning (an approved creator keeps the dashboard; an incomplete one lands on its wizard step) and both are specced there.
 
+## Tech-debt 16 (2026-10-28): `creator.ui.dashboard.title` in ten locales
+
+`i18n-creator-dashboard-title.spec.ts` (11 tests), mutations applied to the locale files and restored by MD5.
+
+```
+ga back to English:                      exit=1
+mt hybrid (English noun glued on):       exit=1
+ro emptied:                              exit=1
+bg key removed:                          exit=1
+hu back to English:                      exit=1
+restored identical; clean run exit=0
+```
+
 ## Not proven by a break-revert, and why
 
 - **The email field's keyboard on a phone.** `focus()` is proven (spy); whether iOS opens the keyboard for a focus that follows an async page load is a device question (W4 re-check).

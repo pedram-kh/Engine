@@ -3519,6 +3519,9 @@ Source: [`docs/reviews/in-app-signup-review.md`](reviews/in-app-signup-review.md
     (`Playwright does not support chromium on ubuntu26.04-x64`); backend and frontend were unaffected. Pinned in `.github/workflows/ci.yml` (4 jobs) and `commitlint.yml`. **Revisit** when the installed `@playwright/test`
     lists 26.04 as supported (check its release notes on each Playwright upgrade): then try `ubuntu-latest` again, or deliberately move to `ubuntu-26.04`. 24.04 stays supported by GitHub for years, so this is not urgent.
     **Owner:** Pedram. **Status:** OPEN, low.
-16. **`creator.ui.dashboard.title` ("Your application") is still English in ten of the ten flaky locales.** Seen 2026-10-28 while fixing W8: `bg el et fi ga hu lt lv mt ro` carry the English string
-    (`creator.json:324`), which the AH-104d rule "the flaky-10 locales never ship an English fallback" forbids. Not introduced by AH-104d (the key predates it); the dashboard heading of an incomplete creator
-    is the visible case. Needs ten translations of one string and a spec that fails on any English value in those locales for the dashboard keys. **Status:** OPEN, low.
+16. **`creator.ui.dashboard.title` ("Your application") shipped as English in the ten "flaky" locales.** Found 2026-10-28 on the W8 walk. **Status:** the one key CLOSED 2026-10-28 (translated in `bg el et fi ga hu lt lv mt ro`; pinned by
+    `i18n-creator-dashboard-title.spec.ts`, which fails on the English value, an empty value, a missing key, or any value still containing "application"). **Correction to the first draft of this row:** it said the AH-104d
+    "no English in the flaky ten" rule forbade this; that rule covers the sign-up flow keys only (`i18n-signup-flow-strings.spec.ts`). **Still OPEN, low (the AH-001 i18n-completeness row):** about 180 to 205 keys of
+    `creator.json` are still the English string in each of those ten locales (22 of them under `creator.ui.dashboard.*`), and nine keys are hybrids with English glued on, e.g. `creator.ui.dashboard.incomplete.title`
+    ("Продължете your application"), the card title of the incomplete-application card linked in the W8 fix, plus `pending_review.description`, `rejected.description`, `rejected.resubmit_failed`,
+    `creator.wizard.incomplete`, `creator.wizard.feature_disabled`, `creator.ui.wizard.skipped.explanation` and `creator.ui.wizard.steps.review.title`. These need a real translation pass, not a spec.
