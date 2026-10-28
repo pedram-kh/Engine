@@ -328,6 +328,20 @@ hu back to English:                      exit=1
 restored identical; clean run exit=0
 ```
 
+## W10 (2026-10-28): unverified + pending sign-in
+
+`AccountDeletionSignInTest.php` (42 tests, 9 new), mutations applied to `AuthService.php` and restored by MD5.
+
+```
+U1 unverified answered as invalid credentials before the deletion gate (the W10 hypothesis): 5 failed
+U2 unverified skips the deletion gate and signs straight in:                                 3 failed
+U3 deletion gate removed for everyone:                                                       17 failed
+U4 cancel skipped for an unverified account (restore leaves it pending):                     3 failed
+restored identical (MD5); clean run 0 failed
+```
+
+The mistyped-address case (walk-su-10 for walk-su10) is pinned as `unknown_email` with nothing written against the real account. Not proven here: the app screens, which are the user's walk.
+
 ## Not proven by a break-revert, and why
 
 - **The email field's keyboard on a phone.** `focus()` is proven (spy); whether iOS opens the keyboard for a focus that follows an async page load is a device question (W4 re-check).
