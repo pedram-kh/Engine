@@ -7,7 +7,8 @@
  * sign in" link.
  */
 
-import { onMounted, ref } from 'vue'
+import { ApiError } from '@catalyst/api-client'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
@@ -15,12 +16,18 @@ import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { resolveErrorMessage } from '@/modules/auth/composables/useErrorMessage'
 
+const ALREADY_VERIFIED_CODE = 'auth.email.already_verified'
+
 const { t, te } = useI18n()
 const route = useRoute()
 const store = useAuthStore()
 const { isVerifyingEmail } = storeToRefs(store)
 
 const verified = ref(false)
+/** A re-click of a link that already worked: the account IS verified, the link is just spent. */
+const alreadyVerified = ref(false)
+/** The address is verified, whether by this visit or an earlier one. */
+const isVerifiedNow = computed(() => verified.value || alreadyVerified.value)
 const errorKey = ref<string | null>(null)
 const errorValues = ref<Record<string, string | number>>({})
 
@@ -34,6 +41,7 @@ onMounted(async () => {
     await store.verifyEmail({ token })
     verified.value = true
   } catch (err) {
+    alreadyVerified.value = err instanceof ApiError && err.code === ALREADY_VERIFIED_CODE
     const resolved = resolveErrorMessage(err, (k) => te(k))
     errorKey.value = resolved.key
     errorValues.value = resolved.values
@@ -64,8 +72,14 @@ onMounted(async () => {
 
     <!-- AH-104d Q3(a)/C3: this page opens in the phone's browser, where the app
          cannot be detected, so the line is worded to be true for everyone and
-         is shown to every visitor on success. -->
-    <p v-if="verified" class="text-body-2 mb-2" data-test="email-verification-confirm-app-hint">
+         is shown to every visitor whose address is verified: on success, and on
+         the "already verified" answer to a link used twice (W14, 2026-10-28). It
+         is never shown for an expired or invalid link. -->
+    <p
+      v-if="isVerifiedNow"
+      class="text-body-2 mb-2"
+      data-test="email-verification-confirm-app-hint"
+    >
       {{ t('auth.ui.banners.email_verified_app') }}
     </p>
 

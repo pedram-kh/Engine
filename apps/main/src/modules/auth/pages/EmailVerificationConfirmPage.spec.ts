@@ -73,6 +73,39 @@ describe('EmailVerificationConfirmPage', () => {
       )
     })
 
+    it('shows on the "already verified" answer too (a link used twice), with the error text and the way back', async () => {
+      vi.mocked(authApi.verifyEmail).mockRejectedValue(
+        new ApiError({ status: 409, code: 'auth.email.already_verified', message: 'no.' }),
+      )
+      const h = await mountAuthPage(EmailVerificationConfirmPage, {
+        initialRoute: { path: '/auth/verify-email', query: { token: 'tok' } },
+      })
+      teardown = h.unmount
+      await flushPromises()
+      expect(h.wrapper.find('[data-test="email-verification-confirm-app-hint"]').text()).toBe(
+        'Using the Catalyst app? Return to it and sign in.',
+      )
+      expect(h.wrapper.find('[data-test="email-verification-confirm-error"]').text()).not.toBe('')
+      expect(h.wrapper.find('[data-test="email-verification-confirm-success"]').exists()).toBe(
+        false,
+      )
+      expect(h.wrapper.find('[data-test="email-verification-confirm-back"]').exists()).toBe(true)
+    })
+
+    it('is absent on an invalid link (not verified, so nothing to return to)', async () => {
+      vi.mocked(authApi.verifyEmail).mockRejectedValue(
+        new ApiError({ status: 422, code: 'auth.email.verification_invalid', message: 'no.' }),
+      )
+      const h = await mountAuthPage(EmailVerificationConfirmPage, {
+        initialRoute: { path: '/auth/verify-email', query: { token: 'bad' } },
+      })
+      teardown = h.unmount
+      await flushPromises()
+      expect(h.wrapper.find('[data-test="email-verification-confirm-app-hint"]').exists()).toBe(
+        false,
+      )
+    })
+
     it('is absent when verification fails (expired link)', async () => {
       vi.mocked(authApi.verifyEmail).mockRejectedValue(
         new ApiError({ status: 410, code: 'auth.email.verification_expired', message: 'no.' }),

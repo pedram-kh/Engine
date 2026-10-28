@@ -37,6 +37,10 @@ const FLOW_KEYS = [
   'auth.ui.banners.email_verified',
   'auth.ui.actions.resend_verification',
   'auth.creator_invitation.banners.completing_invitation',
+  // the field labels on the sign-up and sign-in sheets (W12 2026-10-28: Maltese showed "Email" / "Password")
+  'auth.ui.labels.email',
+  'auth.ui.labels.password',
+  'auth.ui.labels.password_confirmation',
   // sign-up page chrome
   'auth.ui.headings.sign_up',
   'auth.ui.actions.back_to_sign_in',
@@ -72,9 +76,15 @@ const FLOW_KEYS = [
   'auth.ui.banners.session_expired',
 ] as const
 
-/** One locale-specific key outside the shared list: Romanian had a mangled verb ("Confirmațiați"). */
-const EXTRA_BY_LOCALE: Record<string, readonly string[]> = {
-  ro: ['auth.ui.labels.password_confirmation'],
+/**
+ * Keys that are the English word because the language really uses it, so equality with
+ * English is not a failure there. Each entry is a decision, not a gap: Greek and Romanian
+ * product UIs label this field "Email", and a machine translation would only make it worse.
+ * Maltese is NOT here: it has "Indirizz tal-email".
+ */
+const GENUINE_LOANWORD: Record<string, readonly string[]> = {
+  el: ['auth.ui.labels.email'],
+  ro: ['auth.ui.labels.email'],
 }
 
 async function load(locale: string): Promise<Record<string, unknown>> {
@@ -138,6 +148,28 @@ describe('overlap() — the hybrid detector is not vacuous', () => {
   })
 })
 
+describe('Maltese field labels (W12, 2026-10-28)', () => {
+  it('are Maltese, and consistent with each other', async () => {
+    const mt = await load('mt')
+    expect(lookup(mt, 'auth.ui.labels.email')).toBe('Indirizz tal-email')
+    expect(lookup(mt, 'auth.ui.labels.password')).toBe('Kelma tas-sigriet')
+    expect(lookup(mt, 'auth.ui.labels.password_confirmation')).toBe(
+      'Ikkonferma l-kelma tas-sigriet',
+    )
+  })
+
+  it('the loanword exemptions are exactly the two named, and the keys exist', async () => {
+    expect(GENUINE_LOANWORD).toEqual({
+      el: ['auth.ui.labels.email'],
+      ro: ['auth.ui.labels.email'],
+    })
+    for (const [locale, keys] of Object.entries(GENUINE_LOANWORD)) {
+      for (const key of keys)
+        expect(lookup(await load(locale), key), `${locale} ${key}`).toBe('Email')
+    }
+  })
+})
+
 describe('a native-language mangle no detector can see', () => {
   it('Romanian "Confirm password" is the imperative "Confirmați parola", not "Confirmațiați"', async () => {
     const ro = await load('ro')
@@ -153,13 +185,21 @@ describe('the sign-up flow strings in the flaky ten', () => {
   it('has an explicit, duplicate-free key list', () => {
     expect(new Set(FLOW_KEYS).size).toBe(FLOW_KEYS.length)
     expect(FLOW_KEYS.length).toBeGreaterThanOrEqual(35)
+    expect(FLOW_KEYS).toEqual(
+      expect.arrayContaining([
+        'auth.ui.labels.email',
+        'auth.ui.labels.password',
+        'auth.ui.labels.password_confirmation',
+      ]),
+    )
   })
 
   describe.each([...FLAKY_TEN])('%s', (locale) => {
     it('is not English, not an English hybrid, keeps placeholders and has no "-ing…" mangle', async () => {
       const en = await load('en')
       const bundle = await load(locale)
-      const keys = [...FLOW_KEYS, ...(EXTRA_BY_LOCALE[locale] ?? [])]
+      const keys = [...FLOW_KEYS]
+      const loanwords = GENUINE_LOANWORD[locale] ?? []
       const problems: string[] = []
 
       for (const key of keys) {
@@ -173,8 +213,10 @@ describe('the sign-up flow strings in the flaky ten', () => {
           problems.push(`${key}: missing or empty`)
           continue
         }
-        if (value === english) problems.push(`${key}: equals the English string`)
-        else if (overlap(english, value) >= 0.5) problems.push(`${key}: English hybrid -> ${value}`)
+        if (value === english) {
+          if (!loanwords.includes(key)) problems.push(`${key}: equals the English string`)
+        } else if (overlap(english, value) >= 0.5)
+          problems.push(`${key}: English hybrid -> ${value}`)
         if (placeholders(value).join() !== placeholders(english).join()) {
           problems.push(
             `${key}: placeholders differ (${placeholders(english).join()} vs ${placeholders(value).join()})`,
