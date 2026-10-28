@@ -357,6 +357,24 @@ restored identical (MD5); clean run 39 passed
 
 The existing component specs seeded `bootstrapStatus = 'ready'`, which is the cold-start state, so they could not see this. Not proven: the device itself (a real return from Safari), and the "no message" you saw, which the code does not explain.
 
+## W12 and W14 (2026-10-28): Maltese labels, the app line on already-verified
+
+`i18n-signup-flow-strings.spec.ts` (43 tests) and `EmailVerificationConfirmPage.spec.ts` (13). Mutations applied and restored by MD5.
+
+```
+X1 mt email label back to "Email":                          2 failed
+X2 mt password label back to "Password":                    2 failed
+X3 mt confirmation label back to English:                   2 failed
+X4 label keys dropped from the flow list:                   passed (a survivor: only Maltese was pinned by value)
+X4b same, after adding an assertion that the list holds the three label keys: 1 failed
+X5 app line only on success again (the W14 defect):         1 failed
+X6 app line on every error:                                 3 failed
+X7 "already verified" taken from any ApiError:              2 failed
+restored identical (MD5); clean run 56 passed (and 43 for the flow spec alone)
+```
+
+X4 was a weak spec, not a weak change: dropping the keys left the other nine locales unprotected. Fixed by pinning the keys in the list, then re-run as X4b. Not proven: the Maltese wording itself (machine-authored; tech-debt row 12), and the page on a phone browser beyond the walk's W14.
+
 ## Not proven by a break-revert, and why
 
 - **The email field's keyboard on a phone.** `focus()` is proven (spy); whether iOS opens the keyboard for a focus that follows an async page load is a device question (W4 re-check).

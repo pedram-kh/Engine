@@ -3509,7 +3509,8 @@ Source: [`docs/reviews/in-app-signup-review.md`](reviews/in-app-signup-review.md
 11. **The E2E feature-flag helper is a route with an allow-list of one flag (`account_deletion_enabled`).** CLOSED 2026-10-26: the first version (a `tinker` shell-out guarded by a database-name test) was refused by CI's `catalyst` database and was replaced by `POST`/`DELETE /api/v1/_test/feature-flag/{name}`. A second flag needs a deliberate entry in `SetFeatureFlagController::ALLOWED_NAMES`. **Status:** CLOSED.
 12. **A human pass on the machine-authored translations, `ga` and `mt` first.** Ruled 2026-10-26 (Pedram): ship the machine translations. The 35 flow keys (36 for `ro`) and 7 new keys in the ten
     flaky locales were authored by the agent in-session; no native speaker has read them. Irish and Maltese are the least certain, then the other eight. Scope for the reviewer: the strings in
-    `i18n-signup-flow-strings.spec.ts` (`FLOW_KEYS`, `NEW_KEYS`). **Owner:** Pedram (a reviewer to be found). **Status:** OPEN.
+    `i18n-signup-flow-strings.spec.ts` (`FLOW_KEYS`, `NEW_KEYS`). **Added 2026-10-28 (W12):** the three field labels (email, password, confirm password) are now in the flow set; for `mt` the reviewer should also decide the
+    word for "password" (the labels say "Kelma tas-sigriet", the error messages still say "password") and for `el` and `ro` whether "Email" stays. **Owner:** Pedram (a reviewer to be found). **Status:** OPEN.
 13. **The admin Playwright suite cannot be run against the developer's own admin Vite server.** `reuseExistingServer: !process.env.CI` on the admin Vite entry reuses a dev `pnpm dev` whose proxy targets
     `:8000`, while the E2E API is on `:8001`; both admin specs then fail on a sign-in that never reaches the E2E API (seen 2026-10-26). Stop the admin dev server first, or force `false` locally.
     **Status:** OPEN, low.
@@ -3527,3 +3528,7 @@ Source: [`docs/reviews/in-app-signup-review.md`](reviews/in-app-signup-review.md
     `creator.json` are still the English string in each of those ten locales (22 of them under `creator.ui.dashboard.*`), and nine keys are hybrids with English glued on, e.g. `creator.ui.dashboard.incomplete.title`
     ("Продължете your application"), the card title of the incomplete-application card linked in the W8 fix, plus `pending_review.description`, `rejected.description`, `rejected.resubmit_failed`,
     `creator.wizard.incomplete`, `creator.wizard.feature_disabled`, `creator.ui.wizard.skipped.explanation` and `creator.ui.wizard.steps.review.title`. These need a real translation pass, not a spec.
+17. **Offer "Open the Catalyst app" on the verified page, on a phone.** Asked for 2026-10-28 (W14). On the confirm page, once the address is verified and the visitor is on a phone, show an "Open the Catalyst app" link
+    (a universal link into `/creator/`) beside "Sign in on the web", instead of only the line "Using the Catalyst app? Return to it and sign in." **Gated on:** the deploy, and universal links proven on a device
+    after it (AH-103b is built and pushed but its device walk has not run; the apple-app-site-association file must be served in production first). Until then the line stays text only: a link that opens nothing
+    is worse than none. Needs a phone-only condition (not the app's own webview), the Android App Links counterpart (blocked on the release keystore), and a spec per polarity. **Status:** OPEN, post-deploy.
