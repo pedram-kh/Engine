@@ -342,6 +342,21 @@ restored identical (MD5); clean run 0 failed
 
 The mistyped-address case (walk-su-10 for walk-su10) is pinned as `unknown_email` with nothing written against the real account. Not proven here: the app screens, which are the user's walk.
 
+## W11 (2026-10-28): "I've verified, sign in" after a sign-in in the same app run
+
+`EmailVerificationPendingPage.session.spec.ts` (4 tests: real store, real guard dispatcher, real route table, HTTP faked, starting from the state `loginWithToken()` leaves: user set, status `idle`), `useAuthStore.refresh.spec.ts` (2 new) and the native page spec. Mutations applied and restored by MD5.
+
+```
+W1 refreshSession back to `!== 'ready'` (the defect):      4 failed
+W2 refreshSession also runs while a bootstrap is loading:  1 failed
+W3 a failed push swallowed silently:                       1 failed
+W4 busy cleared before the navigation:                     1 failed
+W5 push not awaited:                                       2 failed
+restored identical (MD5); clean run 39 passed
+```
+
+The existing component specs seeded `bootstrapStatus = 'ready'`, which is the cold-start state, so they could not see this. Not proven: the device itself (a real return from Safari), and the "no message" you saw, which the code does not explain.
+
 ## Not proven by a break-revert, and why
 
 - **The email field's keyboard on a phone.** `focus()` is proven (spy); whether iOS opens the keyboard for a focus that follows an async page load is a device question (W4 re-check).
