@@ -35,6 +35,7 @@ import { provideNotificationPoll } from '@/modules/notifications/composables/not
 import NavBadgeIcon from '../components/NavBadgeIcon.vue'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { useOnboardingStore } from '@/modules/onboarding/stores/useOnboardingStore'
+import { FOOTER_PRIVACY_HREF, footerLinkAttrs } from '@/modules/auth/components/footerLinks'
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
 import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
 import { useMobileShell } from '@/composables/useMobileShell'
@@ -55,6 +56,8 @@ const { user, isLoggingOut } = storeToRefs(authStore)
 const { applicationStatus } = storeToRefs(onboardingStore)
 const localeOptions = buildLocaleOptions()
 const userMenuOpen = ref(false)
+// AH-105 S4 — the signed-in privacy policy link (Apple 5.1.1(i): reachable from inside the app).
+const privacyLinkAttrs = footerLinkAttrs(FOOTER_PRIVACY_HREF)
 
 /**
  * AH-104b-del B4 — the Security entry (web avatar menu, native More) shows only while the
@@ -359,6 +362,13 @@ onMounted(() => {
               @click="userMenuOpen = false"
             />
             <v-list-item
+              v-bind="privacyLinkAttrs"
+              :title="t('auth.ui.consent.privacy')"
+              prepend-icon="mdi-file-document-outline"
+              data-test="privacy-link"
+              @click="userMenuOpen = false"
+            />
+            <v-list-item
               :disabled="isLoggingOut"
               :title="isLoggingOut ? t('app.userMenu.signingOut') : t('app.userMenu.signOut')"
               prepend-icon="mdi-logout"
@@ -467,6 +477,16 @@ onMounted(() => {
             prepend-icon="mdi-shield-lock-outline"
             :title="t('creator.ui.security.title')"
             data-test="creator-bottom-nav-more-security"
+            @click="moreMenuOpen = false"
+          />
+          <!-- AH-105 S4 — the privacy policy, reachable once signed in (it was only on sign-up).
+               Opens the marketing-site page outside the app. -->
+          <v-list-item
+            v-if="isNative"
+            v-bind="privacyLinkAttrs"
+            prepend-icon="mdi-file-document-outline"
+            :title="t('auth.ui.consent.privacy')"
+            data-test="creator-bottom-nav-more-privacy"
             @click="moreMenuOpen = false"
           />
         </v-list>

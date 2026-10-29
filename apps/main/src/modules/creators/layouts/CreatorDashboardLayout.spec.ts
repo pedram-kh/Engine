@@ -21,6 +21,7 @@ import * as vuetifyDirectives from 'vuetify/directives'
 
 import { lightTheme, darkTheme } from '@catalyst/design-tokens/vuetify'
 import enApp from '@/core/i18n/locales/en/app.json'
+import enAuth from '@/core/i18n/locales/en/auth.json'
 import enAvailability from '@/core/i18n/locales/en/availability.json'
 import enCreator from '@/core/i18n/locales/en/creator.json'
 import enNotifications from '@/core/i18n/locales/en/notifications.json'
@@ -220,7 +221,7 @@ async function mountLayout(
     fallbackLocale: 'en',
     availableLocales: ['en', 'pt', 'it', 'fr'],
     messages: {
-      en: { ...enApp, ...enAvailability, ...enCreator, ...enNotifications },
+      en: { ...enApp, ...enAuth, ...enAvailability, ...enCreator, ...enNotifications },
       pt: { ...enApp, ...ptAvailability, ...enNotifications },
       it: { ...enApp, ...itAvailability, ...enNotifications },
       fr: { ...enApp, ...frAvailability, ...enNotifications },
@@ -931,5 +932,46 @@ describe('CreatorDashboardLayout — the onboarding bootstrap is best-effort (AH
     expect(onboardingApi.bootstrap).toHaveBeenCalledTimes(1)
     expect(m.wrapper.find('[data-test="creator-layout"]').exists()).toBe(true)
     expect(unhandled).toEqual([])
+  })
+})
+
+// ── AH-105 S4 — the signed-in privacy policy link ────────────────────────────
+describe('CreatorDashboardLayout — privacy policy link (AH-105 S4)', () => {
+  let cleanup: (() => void) | null = null
+
+  beforeEach(() => vi.clearAllMocks())
+  afterEach(() => {
+    cleanup?.()
+    cleanup = null
+  })
+
+  it('web: the avatar menu links to the privacy policy, in a new tab', async () => {
+    const m = await mountLayout({})
+    cleanup = m.cleanup
+
+    const link = m.wrapper.find('[data-test="privacy-link"]')
+    expect(link.exists()).toBe(true)
+    expect(link.text()).toBe('Privacy Policy')
+    expect(link.attributes('href')).toBe('https://www.catalyst-growth.com/legal/privacy')
+    expect(link.attributes('target')).toBe('_blank')
+    expect(link.attributes('rel')).toBe('noopener noreferrer')
+  })
+
+  it('native: More links to the privacy policy, in a new tab', async () => {
+    const m = await mountLayout({ native: true, applicationStatus: 'approved' })
+    cleanup = m.cleanup
+
+    const link = m.wrapper.find('[data-test="creator-bottom-nav-more-privacy"]')
+    expect(link.exists()).toBe(true)
+    expect(link.text()).toBe('Privacy Policy')
+    expect(link.attributes('href')).toBe('https://www.catalyst-growth.com/legal/privacy')
+    expect(link.attributes('target')).toBe('_blank')
+  })
+
+  it('web: the native More row is not rendered', async () => {
+    const m = await mountLayout({})
+    cleanup = m.cleanup
+
+    expect(m.wrapper.find('[data-test="creator-bottom-nav-more-privacy"]').exists()).toBe(false)
   })
 })
