@@ -3532,3 +3532,17 @@ Source: [`docs/reviews/in-app-signup-review.md`](reviews/in-app-signup-review.md
     (a universal link into `/creator/`) beside "Sign in on the web", instead of only the line "Using the Catalyst app? Return to it and sign in." **Gated on:** the deploy, and universal links proven on a device
     after it (AH-103b is built and pushed but its device walk has not run; the apple-app-site-association file must be served in production first). Until then the line stays text only: a link that opens nothing
     is worse than none. Needs a phone-only condition (not the app's own webview), the Android App Links counterpart (blocked on the release keystore), and a spec per polarity. **Status:** OPEN, post-deploy.
+
+## AH-105 and AH-111 open items (2026-10-29)
+
+Source: [`docs/reviews/store-prep-plan.md`](reviews/store-prep-plan.md) §9 and `docs/store/review-notes.md`.
+
+1. **Reword the web "ships soon" banner after the store release.** AH-111 reworded only the native key; the web key `creator.ui.dashboard.approved.description` still says the full dashboard "ships soon" (Q1, ruled: leave it). Once the store release is out, reword it across 24 locales (Mode A). Tied to tech-debt 17 (the reinstall-marker item that ships in build 3). **Status:** OPEN, after the store release.
+2. **The delete texts say "permanently deleted on {date}"** in three places (`auth.ui.deletion.body`, the scheduled banner, the mail), but erasure is a manual Monday run, so the real day is up to about 7 days later, inside the policy's "within one month of the grace ending". Keep, or reword (Mode A across 24 locales plus the API mail). **Decision:** Pedram. **Status:** OPEN.
+3. **The Monday erasure routine has not started.** Its start condition is "after C4 preconditions close" (`account-erasure.md` §1d, §2); nothing in §2 is closed. Until it starts, the policy's "within one month" is not yet backed. **Status:** OPEN.
+4. **The policy and support texts disagree with the app in places** (menu paths, the "Forgot password" label, the web delete page being informational, the invitation sentence, the iOS display name, the legal-retention sentences, the controller and regulator, the AWS region). The table is in `docs/store/review-notes.md`. **Owner:** Pedram, before publishing. **Status:** OPEN.
+5. **AH-104e conflicts with the policy's "security logs" sentence:** a failed sign-in with the old address after an erasure writes the typed address and IP into an audit row that nothing scrubs. **Status:** OPEN with AH-104e.
+6. **The Report-a-problem fallback copy button has no label of its own** (its accessible name is the whole line: one new key was the instruction). A second key, "Copy", would give a screen reader a short name. **Status:** OPEN, low.
+7. **The App Privacy label must be re-declared** before KYC, tax, payout, social OAuth or payments switch on (`docs/store/app-privacy-answers.md`, last section). **Status:** standing.
+8. **The seeder's strength score is 74 in the test environment, not about 85.** Read the number on a local dashboard before capturing; adjust the seeder, not the profile. **Status:** OPEN until the screenshot run.
+9. **Spanish screenshots and a Spanish App Store screenshot set** are post-launch (Q3). **Status:** OPEN, post-launch.
