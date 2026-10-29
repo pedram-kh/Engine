@@ -163,6 +163,7 @@ const NO_VISUAL: Record<string, string> = {
   'job-detail__card': 'styled by its data-testid (the card is a v-card variant)',
   'chat-panel': 'structural wrapper; the feed, thread and composer inside are styled',
   'chat-panel__header': 'rendered only when a title is passed; the detail page passes none',
+  'chat-panel__report': 'AH-112 "Report a problem" text link, styled by the component itself',
   'chat-panel__feed': 'scroll container; the thread inside is styled',
   'chat-panel__messages': 'structural list; the bubbles in it are styled',
   'chat-panel__load-earlier': 'a centred text button, correct as is',

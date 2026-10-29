@@ -25,6 +25,8 @@
       "attachment": "Attachment",
       "empty": "Не messages yet. Start the conversation.",
       "loadEarlier": "Load earlier messages",
+      "reportProblem": "Съобщи за проблем",
+      "reportFallback": "или имейл до {email} — референция: {reference}",
       "loadError": "We couldn't load this conversation. It will retry shortly.",
       "sendError": "Your message couldn't be sent. Моля try again.",
       "attachmentUploadError": "An attachment failed to upload. Моля try again.",

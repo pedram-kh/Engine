@@ -25,6 +25,8 @@
       "attachment": "Vedhæftning",
       "empty": "Ingen beskeder endnu. Start samtalen.",
       "loadEarlier": "Indlæs tidligere beskeder",
+      "reportProblem": "Rapportér et problem",
+      "reportFallback": "eller e-mail til {email} — reference: {reference}",
       "loadError": "Denne samtale kunne ikke indlæses. Den forsøges igen om lidt.",
       "sendError": "Din besked kunne ikke sendes. Prøv igen.",
       "attachmentUploadError": "En vedhæftning kunne ikke uploades. Prøv igen.",

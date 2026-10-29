@@ -25,6 +25,8 @@
       "attachment": "Załącznik",
       "empty": "Brak wiadomości. Rozpocznij rozmowę.",
       "loadEarlier": "Załaduj wcześniejsze wiadomości",
+      "reportProblem": "Zgłoś problem",
+      "reportFallback": "lub e-mail na {email} — numer referencyjny: {reference}",
       "loadError": "Nie mogliśmy załadować tej rozmowy. Wkrótce spróbuje ponownie.",
       "sendError": "Twoja wiadomość nie mogła zostać wysłana. Spróbuj ponownie.",
       "attachmentUploadError": "Nie udało się przesłać załącznika. Spróbuj ponownie.",

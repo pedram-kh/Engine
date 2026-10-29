@@ -25,6 +25,8 @@
       "attachment": "Attachment",
       "empty": "Ne messages yet. Start the conversation.",
       "loadEarlier": "Load earlier messages",
+      "reportProblem": "Pranešti apie problemą",
+      "reportFallback": "arba el. laišku adresu {email} — nuoroda: {reference}",
       "loadError": "We couldn't load this conversation. It will retry shortly.",
       "sendError": "Your message couldn't be sent. Please try again.",
       "attachmentUploadError": "An attachment failed to upload. Please try again.",

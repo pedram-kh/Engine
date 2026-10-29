@@ -25,6 +25,8 @@
       "attachment": "Attachment",
       "empty": "Nē messages yet. Start the conversation.",
       "loadEarlier": "Load earlier messages",
+      "reportProblem": "Ziņot par problēmu",
+      "reportFallback": "vai e-pasts uz {email} — atsauce: {reference}",
       "loadError": "We couldn't load this conversation. It will retry shortly.",
       "sendError": "Your message couldn't be sent. Please try again.",
       "attachmentUploadError": "An attachment failed to upload. Please try again.",

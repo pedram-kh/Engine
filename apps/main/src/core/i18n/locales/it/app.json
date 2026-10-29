@@ -25,6 +25,8 @@
       "attachment": "Allegato",
       "empty": "Ancora nessun messaggio. Inizia la conversazione.",
       "loadEarlier": "Carica messaggi precedenti",
+      "reportProblem": "Segnala un problema",
+      "reportFallback": "oppure e-mail a {email} — riferimento: {reference}",
       "loadError": "Impossibile caricare questa conversazione. Verrà riprovato a breve.",
       "sendError": "Impossibile inviare il messaggio. Riprova.",
       "attachmentUploadError": "Caricamento di un allegato non riuscito. Riprova.",

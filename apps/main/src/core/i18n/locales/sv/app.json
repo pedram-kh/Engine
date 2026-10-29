@@ -25,6 +25,8 @@
       "attachment": "Bilaga",
       "empty": "Inga meddelanden ännu. Starta konversationen.",
       "loadEarlier": "Ladda tidigare meddelanden",
+      "reportProblem": "Rapportera ett problem",
+      "reportFallback": "eller e-post till {email} — referens: {reference}",
       "loadError": "Vi kunde inte ladda den här konversationen. Den försöker igen strax.",
       "sendError": "Ditt meddelande kunde inte skickas. Försök igen.",
       "attachmentUploadError": "En bilaga misslyckades att ladda upp. Försök igen.",

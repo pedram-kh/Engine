@@ -32,6 +32,8 @@ import { isNativePlatform } from '@/core/platform/isNativePlatform'
 
 import type { RelationshipChatTransport } from '../api/relationshipMessaging.api'
 import { useMessageThread } from '../composables/useMessageThread'
+import { reportHref } from '../utils/reportProblem'
+import ReportFallback from './ReportFallback.vue'
 
 const props = defineProps<{
   transport: RelationshipChatTransport | null
@@ -45,6 +47,12 @@ const props = defineProps<{
    * on desktop two-pane it's omitted, so the chevron is hidden.
    */
   backTo?: RouteLocationRaw | null
+  /**
+   * AH-112 — when set, the header shows a "Report a problem" mailto link carrying this subject.
+   * Only the CREATOR thread page passes it; the agency surfaces that share this view do not, so
+   * they render no link.
+   */
+  reportSubject?: string | null
 }>()
 
 const { t, locale } = useI18n()
@@ -354,7 +362,15 @@ async function submit(): Promise<void> {
         </span>
       </v-avatar>
       <span class="rel-thread__title" data-test="relationship-thread-title">{{ title }}</span>
+      <a
+        v-if="reportSubject"
+        class="rel-thread__report text-caption"
+        :href="reportHref(reportSubject)"
+        data-test="relationship-thread-report"
+        >{{ t('app.messaging.reportProblem') }}</a
+      >
     </header>
+    <ReportFallback v-if="reportSubject" :subject="reportSubject" />
 
     <div ref="feedEl" class="rel-thread__feed" data-test="relationship-thread-feed">
       <v-skeleton-loader v-if="loading" type="list-item-three-line@3" />
@@ -696,6 +712,13 @@ async function submit(): Promise<void> {
 
 .rel-thread__title {
   font-weight: 600;
+}
+
+.rel-thread__report {
+  margin-left: auto;
+  color: rgb(var(--v-theme-primary));
+  text-decoration: underline;
+  white-space: nowrap;
 }
 
 .rel-thread__feed {

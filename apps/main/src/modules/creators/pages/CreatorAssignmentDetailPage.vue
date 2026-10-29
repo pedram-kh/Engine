@@ -52,6 +52,7 @@ import RichBrief from '@/components/RichBrief.vue'
 import { roundStateColor, roundStateKey } from '@/modules/campaigns/draftRounds'
 import { creatorChatTransport } from '@/modules/messaging/api/messaging.api'
 import ChatPanel from '@/modules/messaging/components/ChatPanel.vue'
+import { reportSubject } from '@/modules/messaging/utils/reportProblem'
 
 type DraftField = 'caption' | 'media' | 'links'
 type PostedField = 'platform' | 'post_url'
@@ -78,6 +79,10 @@ const ulid = computed(() => String(route.params.ulid ?? ''))
 
 // The creator's inline chat thread for this assignment (Sprint 11, D-11).
 const chatTransport = computed(() => (ulid.value !== '' ? creatorChatTransport(ulid.value) : null))
+// AH-112 — the creator's "Report a problem" subject carries the assignment ulid.
+const chatReportSubject = computed(() =>
+  ulid.value !== '' ? reportSubject('assignment', ulid.value) : null,
+)
 
 const assignment = ref<CreatorAssignmentDetailResource | null>(null)
 const loading = ref(false)
@@ -642,7 +647,7 @@ onMounted(() => {
           {{ t('app.messaging.title') }}
         </v-card-title>
         <v-card-text>
-          <ChatPanel :transport="chatTransport" />
+          <ChatPanel :transport="chatTransport" :report-subject="chatReportSubject" />
         </v-card-text>
       </v-card>
 

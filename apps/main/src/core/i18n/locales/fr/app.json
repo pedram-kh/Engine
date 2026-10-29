@@ -25,6 +25,8 @@
       "attachment": "Pièce jointe",
       "empty": "Aucun message pour le moment. Lancez la conversation.",
       "loadEarlier": "Charger les messages antérieurs",
+      "reportProblem": "Signaler un problème",
+      "reportFallback": "ou e-mail à {email} — référence : {reference}",
       "loadError": "Nous n'avons pas pu charger cette conversation. Nouvelle tentative sous peu.",
       "sendError": "Votre message n'a pas pu être envoyé. Veuillez réessayer.",
       "attachmentUploadError": "Le téléversement d'une pièce jointe a échoué. Veuillez réessayer.",

@@ -25,6 +25,8 @@
       "attachment": "Adjunto",
       "empty": "Aún no hay mensajes. Inicia la conversación.",
       "loadEarlier": "Cargar mensajes anteriores",
+      "reportProblem": "Informar de un problema",
+      "reportFallback": "o correo a {email} — referencia: {reference}",
       "loadError": "No hemos podido cargar esta conversación. Se reintentará en breve.",
       "sendError": "No se ha podido enviar tu mensaje. Inténtalo de nuevo.",
       "attachmentUploadError": "No se ha podido subir un adjunto. Inténtalo de nuevo.",

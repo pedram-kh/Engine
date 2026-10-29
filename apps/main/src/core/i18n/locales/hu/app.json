@@ -25,6 +25,8 @@
       "attachment": "Attachment",
       "empty": "Nem messages yet. Start the conversation.",
       "loadEarlier": "Load earlier messages",
+      "reportProblem": "Probléma jelentése",
+      "reportFallback": "vagy e-mail ide: {email} — hivatkozás: {reference}",
       "loadError": "We couldn't load this conversation. It will retry shortly.",
       "sendError": "Your message couldn't be sent. Please try again.",
       "attachmentUploadError": "An attachment failed to upload. Please try again.",

@@ -25,6 +25,8 @@
       "attachment": "Příloha",
       "empty": "Žádné zprávy. Zahajte konverzaci.",
       "loadEarlier": "Načíst starší zprávy",
+      "reportProblem": "Prijavi težavo",
+      "reportFallback": "ali e-pošta na {email} — sklic: {reference}",
       "loadError": "Ni nam uspelo načíst tuto konverzaci. Kmalu to zkusíme znova.",
       "sendError": "Vaši zprávu se nepodařilo odeslat. Zkuste to znova.",
       "attachmentUploadError": "Přílohu se nepodařilo nahrát. Zkuste to znova.",

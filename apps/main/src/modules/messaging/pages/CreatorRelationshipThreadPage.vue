@@ -22,6 +22,7 @@ import {
   relationshipMessagingApi,
 } from '../api/relationshipMessaging.api'
 import RelationshipThreadView from '../components/RelationshipThreadView.vue'
+import { reportSubject } from '../utils/reportProblem'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -34,6 +35,10 @@ const backTo = computed<RouteLocationRaw | null>(() =>
 )
 
 const agencyUlid = computed(() => String(route.params.agencyUlid ?? ''))
+// AH-112 — the creator's "Report a problem" subject carries the agency ulid.
+const reportSubjectValue = computed(() =>
+  agencyUlid.value === '' ? null : reportSubject('relationship', agencyUlid.value),
+)
 const nameHint = computed(() => (typeof route.query.name === 'string' ? route.query.name : ''))
 
 const resolvedRow = ref<CreatorRelationshipThreadRow | null>(null)
@@ -84,6 +89,7 @@ watch(
       :title="title"
       :avatar-url="avatarUrl"
       :back-to="backTo"
+      :report-subject="reportSubjectValue"
     />
   </section>
 </template>

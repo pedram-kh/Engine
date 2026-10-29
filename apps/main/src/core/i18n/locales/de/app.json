@@ -25,6 +25,8 @@
       "attachment": "Anhang",
       "empty": "Noch keine Nachrichten. Beginne die Unterhaltung.",
       "loadEarlier": "Frühere Nachrichten laden",
+      "reportProblem": "Problem melden",
+      "reportFallback": "oder E-Mail an {email} — Referenz: {reference}",
       "loadError": "Diese Unterhaltung konnte nicht geladen werden. Sie wird in Kürze erneut versucht.",
       "sendError": "Deine Nachricht konnte nicht gesendet werden. Bitte versuche es erneut.",
       "attachmentUploadError": "Ein Anhang konnte nicht hochgeladen werden. Bitte versuche es erneut.",

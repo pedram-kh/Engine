@@ -25,6 +25,8 @@
       "attachment": "Attachment",
       "empty": "Le messages yet. Start the conversation.",
       "loadEarlier": "Load earlier messages",
+      "reportProblem": "Irrapporta problema",
+      "reportFallback": "jew email lil {email} — referenza: {reference}",
       "loadError": "We couldn't load this conversation. It will retry shortly.",
       "sendError": "Your message couldn't be sent. Please try again.",
       "attachmentUploadError": "An attachment failed to upload. Please try again.",

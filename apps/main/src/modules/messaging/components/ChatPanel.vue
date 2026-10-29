@@ -13,11 +13,19 @@ import { isNativePlatform } from '@/core/platform/isNativePlatform'
 
 import type { ChatTransport } from '../api/messaging.api'
 import { useMessageThread } from '../composables/useMessageThread'
+import { reportHref } from '../utils/reportProblem'
+import ReportFallback from './ReportFallback.vue'
 
 const props = defineProps<{
   transport: ChatTransport | null
   /** The counterparty label shown in the panel header (e.g. the creator/agency name). */
   title?: string
+  /**
+   * AH-112 — when set, a "Report a problem" mailto link carrying this subject renders under the
+   * panel. Only the CREATOR assignment page passes it; the agency surfaces that share this panel
+   * do not, so they render no link.
+   */
+  reportSubject?: string | null
 }>()
 
 const { t, te, locale } = useI18n()
@@ -404,6 +412,15 @@ async function submit(): Promise<void> {
         @change="onFilesPicked"
       />
     </form>
+
+    <a
+      v-if="reportSubject"
+      class="chat-panel__report text-caption"
+      :href="reportHref(reportSubject)"
+      data-test="chat-report"
+      >{{ t('app.messaging.reportProblem') }}</a
+    >
+    <ReportFallback v-if="reportSubject" :subject="reportSubject" />
   </div>
 </template>
 
@@ -416,6 +433,12 @@ async function submit(): Promise<void> {
 
 .chat-panel__header {
   font-weight: 600;
+}
+
+.chat-panel__report {
+  align-self: flex-end;
+  color: rgb(var(--v-theme-primary));
+  text-decoration: underline;
 }
 
 .chat-panel__feed {

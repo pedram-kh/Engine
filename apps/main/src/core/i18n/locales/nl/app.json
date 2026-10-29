@@ -25,6 +25,8 @@
       "attachment": "Bijlage",
       "empty": "Nog geen berichten. Begin het gesprek.",
       "loadEarlier": "Eerdere berichten laden",
+      "reportProblem": "Een probleem melden",
+      "reportFallback": "of e-mail naar {email} — referentie: {reference}",
       "loadError": "Dit gesprek kon niet worden geladen. Er wordt binnenkort opnieuw geprobeerd.",
       "sendError": "Je bericht kon niet worden verstuurd. Probeer het opnieuw.",
       "attachmentUploadError": "Een bijlage kon niet worden geüpload. Probeer het opnieuw.",
