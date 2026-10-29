@@ -4,12 +4,12 @@ This section applies when you use the Catalyst Creators app for iPhone (shown as
 
 ### Who is responsible
 
-Catalyst Performance Ltd, [registered address], London, United Kingdom, is the data controller. Contact: support@catalyst-growth.com.
+Catalyst Performance Ltd, 151 Walworth Road, London SE17 1RS, United Kingdom, is the data controller. Contact: support@catalyst-growth.com.
 
 ### What we collect
 
 - **Account:** name, email address, password (stored in hashed form), two-factor authentication settings, email verification status.
-- **Profile:** profile photo, short bio, languages, date of birth, phone or WhatsApp number, postal address, social-media account names and follower counts, portfolio items and availability. These are provided by you or by the agency you work with.
+- **Profile:** profile photo, short bio, languages, accent, content categories, content companions, videos, date of birth, phone or WhatsApp number, postal address, social-media account names and follower counts, portfolio items and availability. You provide these yourself.
 - **Work:** your agency relationships, campaign applications, assignments, contracts, and the messages and attachments you exchange with agencies and brands.
 - **Device and notifications:** a push-notification token for your device, your notification preferences, whether a notification was delivered, the app version, operating system and device language.
 - **Technical and security:** IP address and app or browser identifier in security logs (sign-ins, failed sign-ins and changes to your account).
@@ -25,7 +25,7 @@ We do not collect precise location, contacts, health data or advertising identif
 
 ### Who processes it for us
 
-- Amazon Web Services: hosting and file storage, in [ Ireland, EU ].
+- Amazon Web Services: hosting and file storage, in Ireland (EU).
 - Google Firebase Cloud Messaging and Apple Push Notification service: delivery of push notifications. They receive your device token and the notification text.
 - Postmark: transactional email.
 
@@ -41,7 +41,7 @@ Each provider acts under a data-processing agreement. Where a provider processes
 
 ### Deleting your account
 
-You can request deletion in the app (More → Security → Delete my account). Instructions are also at https://platform.catalyst-growth.com/delete-account. Your account is locked immediately and hidden from new activity. You have 14 days to change your mind by signing in again. After that period your personal data is erased within one month: your details are removed and replaced by “[erased]” in the records that agencies you worked with keep for their campaigns and contracts. Backups are overwritten within 7 days.
+You can request deletion in the app (More → Security → Delete my account). Instructions are also at https://platform.catalyst-growth.com/delete-account. Your account is locked immediately and hidden from new activity. You have 14 days to change your mind by signing in again. After that period, we erase your personal data within one month: your details are removed and replaced with “[erased]” in the records agencies you worked with keep for their campaigns and contracts. Backups are overwritten within 7 days.
 
 ### Your rights
 
