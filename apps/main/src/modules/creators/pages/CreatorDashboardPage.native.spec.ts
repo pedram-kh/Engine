@@ -121,7 +121,8 @@ describe('CreatorDashboardPage — native, approved (frame 07)', () => {
     expect(banner.classes()).toContain('dash-banner')
     expect(banner.classes()).not.toContain('v-alert')
     expect(banner.text()).toContain("You're approved")
-    expect(banner.text()).toContain('More of your creator dashboard is coming soon.')
+    expect(banner.text()).toContain('Invitations and messages from agencies will appear here.')
+    expect(banner.text()).not.toMatch(/soon|coming/i)
   })
 
   it('draws the strength card, not the web CompletenessBar', async () => {

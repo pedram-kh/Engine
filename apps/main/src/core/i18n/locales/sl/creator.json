@@ -378,7 +378,7 @@
         "native": {
           "welcome": "Dobrodošli, {name}",
           "subtitle": "To danes zahteva vašo pozornost.",
-          "approved_body": "Zdaj lahko prejemate sodelovanja z blagovnimi znamkami. Več vaše nadzorne plošče za ustvarjalce bo kmalu na voljo.",
+          "approved_body": "Zdaj lahko prejemate sodelovanja z blagovnimi znamkami. Povabila in sporočila agencij bodo prikazana tukaj.",
           "strength": {
             "title": "Moč profila",
             "next": "Za dosego 100 % dokončajte ta korak: {step}"

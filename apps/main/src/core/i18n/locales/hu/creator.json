@@ -378,7 +378,7 @@
         "native": {
           "welcome": "Üdvözöljük, {name}",
           "subtitle": "Ez az, ami ma a figyelmét igényli.",
-          "approved_body": "Mostantól márkákkal való együttműködéseket fogadhat. Alkotói vezérlőpultjának további részei hamarosan érkeznek.",
+          "approved_body": "Mostantól márkákkal való együttműködéseket fogadhat. Az ügynökségek meghívói és üzenetei itt jelennek meg.",
           "strength": {
             "title": "Profil erőssége",
             "next": "A 100% eléréséhez fejezze be ezt a lépést: {step}"

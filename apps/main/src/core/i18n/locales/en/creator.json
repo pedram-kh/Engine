@@ -378,7 +378,7 @@
         "native": {
           "welcome": "Welcome, {name}",
           "subtitle": "Here's what needs your attention today.",
-          "approved_body": "You can now receive brand collaborations. More of your creator dashboard is coming soon.",
+          "approved_body": "You can now receive brand collaborations. Invitations and messages from agencies will appear here.",
           "strength": {
             "title": "Profile strength",
             "next": "To reach 100%, finish this step: {step}"

@@ -378,7 +378,7 @@
         "native": {
           "welcome": "Sveiki atvykę, {name}",
           "subtitle": "Štai kam šiandien reikia jūsų dėmesio.",
-          "approved_body": "Dabar galite gauti bendradarbiavimo pasiūlymų iš prekių ženklų. Daugiau jūsų kūrėjo skydelio funkcijų netrukus.",
+          "approved_body": "Dabar galite gauti bendradarbiavimo pasiūlymų iš prekių ženklų. Agentūrų kvietimai ir žinutės bus rodomi čia.",
           "strength": {
             "title": "Profilio stiprumas",
             "next": "Norėdami pasiekti 100 %, užbaikite šį veiksmą: {step}"

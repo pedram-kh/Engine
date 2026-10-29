@@ -378,7 +378,7 @@
         "native": {
           "welcome": "Ciao, {name}",
           "subtitle": "Ecco cosa richiede la tua attenzione oggi.",
-          "approved_body": "Ora puoi ricevere collaborazioni con i brand. Presto arriveranno altre parti della tua dashboard da creator.",
+          "approved_body": "Ora puoi ricevere collaborazioni con i brand. Gli inviti e i messaggi delle agenzie appariranno qui.",
           "strength": {
             "title": "Solidità del profilo",
             "next": "Per arrivare al 100%, completa questo passaggio: {step}"

@@ -378,7 +378,7 @@
         "native": {
           "welcome": "Bienvenue, {name}",
           "subtitle": "Voici ce qui demande votre attention aujourd'hui.",
-          "approved_body": "Vous pouvez désormais recevoir des collaborations avec des marques. Le reste de votre tableau de bord de créateur arrive bientôt.",
+          "approved_body": "Vous pouvez désormais recevoir des collaborations avec des marques. Les invitations et les messages des agences apparaîtront ici.",
           "strength": {
             "title": "Solidité du profil",
             "next": "Pour atteindre 100 %, terminez cette étape : {step}"

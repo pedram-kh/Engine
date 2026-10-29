@@ -378,7 +378,7 @@
         "native": {
           "welcome": "Olá, {name}",
           "subtitle": "Eis o que precisa da sua atenção hoje.",
-          "approved_body": "Já pode receber colaborações com marcas. Em breve, haverá mais novidades no seu painel de criador.",
+          "approved_body": "Já pode receber colaborações com marcas. Os convites e as mensagens das agências aparecerão aqui.",
           "strength": {
             "title": "Força do perfil",
             "next": "Para chegar aos 100%, conclua este passo: {step}"

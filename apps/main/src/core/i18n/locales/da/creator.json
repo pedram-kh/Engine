@@ -378,7 +378,7 @@
         "native": {
           "welcome": "Velkommen, {name}",
           "subtitle": "Det her kræver din opmærksomhed i dag.",
-          "approved_body": "Du kan nu modtage brandsamarbejder. Mere af dit creator-dashboard kommer snart.",
+          "approved_body": "Du kan nu modtage brandsamarbejder. Invitationer og beskeder fra bureauer vises her.",
           "strength": {
             "title": "Profilstyrke",
             "next": "For at nå 100 % skal du gennemføre dette trin: {step}"

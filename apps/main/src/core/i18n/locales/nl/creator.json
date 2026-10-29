@@ -378,7 +378,7 @@
         "native": {
           "welcome": "Welkom, {name}",
           "subtitle": "Dit vraagt vandaag je aandacht.",
-          "approved_body": "Je kunt nu samenwerkingen met merken ontvangen. Binnenkort komt er meer van je creator-dashboard.",
+          "approved_body": "Je kunt nu samenwerkingen met merken ontvangen. Uitnodigingen en berichten van bureaus verschijnen hier.",
           "strength": {
             "title": "Profielsterkte",
             "next": "Voltooi deze stap om 100% te bereiken: {step}"

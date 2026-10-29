@@ -378,7 +378,7 @@
         "native": {
           "welcome": "Willkommen, {name}",
           "subtitle": "Das braucht heute deine Aufmerksamkeit.",
-          "approved_body": "Du kannst jetzt Markenkooperationen erhalten. Weitere Teile deines Creator-Dashboards folgen bald.",
+          "approved_body": "Du kannst jetzt Markenkooperationen erhalten. Einladungen und Nachrichten von Agenturen erscheinen hier.",
           "strength": {
             "title": "Profilstärke",
             "next": "Für 100 % schließe diesen Schritt ab: {step}"

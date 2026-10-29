@@ -378,7 +378,7 @@
         "native": {
           "welcome": "Tervetuloa, {name}",
           "subtitle": "Tässä on, mikä kaipaa huomiotasi tänään.",
-          "approved_body": "Voit nyt vastaanottaa yhteistyöpyyntöjä brändeiltä. Lisää sisällöntuottajan kojelaudasta on tulossa pian.",
+          "approved_body": "Voit nyt vastaanottaa yhteistyöpyyntöjä brändeiltä. Toimistojen kutsut ja viestit näkyvät täällä.",
           "strength": {
             "title": "Profiilin vahvuus",
             "next": "Yltääksesi 100 %:iin viimeistele tämä vaihe: {step}"

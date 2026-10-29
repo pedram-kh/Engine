@@ -378,7 +378,7 @@
         "native": {
           "welcome": "Vitajte, {name}",
           "subtitle": "Toto si dnes vyžaduje vašu pozornosť.",
-          "approved_body": "Teraz môžete prijímať spolupráce so značkami. Ďalšie časti vášho panela tvorcu čoskoro pribudnú.",
+          "approved_body": "Teraz môžete prijímať spolupráce so značkami. Pozvánky a správy od agentúr sa zobrazia tu.",
           "strength": {
             "title": "Sila profilu",
             "next": "Ak chcete dosiahnuť 100 %, dokončite tento krok: {step}"

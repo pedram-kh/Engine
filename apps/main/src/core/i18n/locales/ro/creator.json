@@ -378,7 +378,7 @@
         "native": {
           "welcome": "Bun venit, {name}",
           "subtitle": "Iată ce are nevoie de atenția ta astăzi.",
-          "approved_body": "Acum poți primi colaborări cu branduri. În curând vor apărea mai multe funcții în tabloul tău de bord de creator.",
+          "approved_body": "Acum poți primi colaborări cu branduri. Invitațiile și mesajele de la agenții vor apărea aici.",
           "strength": {
             "title": "Puterea profilului",
             "next": "Pentru a ajunge la 100%, finalizează acest pas: {step}"

@@ -378,7 +378,7 @@
         "native": {
           "welcome": "Witaj, {name}",
           "subtitle": "Oto, co dziś wymaga Twojej uwagi.",
-          "approved_body": "Możesz teraz otrzymywać współprace z markami. Więcej funkcji Twojego pulpitu twórcy pojawi się wkrótce.",
+          "approved_body": "Możesz teraz otrzymywać współprace z markami. Zaproszenia i wiadomości od agencji będą pojawiać się tutaj.",
           "strength": {
             "title": "Siła profilu",
             "next": "Aby osiągnąć 100%, ukończ ten krok: {step}"

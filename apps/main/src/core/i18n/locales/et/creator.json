@@ -378,7 +378,7 @@
         "native": {
           "welcome": "Tere tulemast, {name}",
           "subtitle": "Siin on see, mis vajab täna sinu tähelepanu.",
-          "approved_body": "Nüüd saad vastu võtta koostöid brändidega. Rohkem sinu loojapaneelist tuleb varsti.",
+          "approved_body": "Nüüd saad vastu võtta koostöid brändidega. Agentuuride kutsed ja sõnumid ilmuvad siia.",
           "strength": {
             "title": "Profiili tugevus",
             "next": "100% saavutamiseks lõpeta see samm: {step}"

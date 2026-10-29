@@ -378,7 +378,7 @@
         "native": {
           "welcome": "Laipni lūgti, {name}",
           "subtitle": "Lūk, kam šodien nepieciešama jūsu uzmanība.",
-          "approved_body": "Tagad varat saņemt sadarbības piedāvājumus no zīmoliem. Drīz parādīsies vairāk jūsu satura veidotāja informācijas paneļa.",
+          "approved_body": "Tagad varat saņemt sadarbības piedāvājumus no zīmoliem. Aģentūru uzaicinājumi un ziņojumi tiks rādīti šeit.",
           "strength": {
             "title": "Profila stiprums",
             "next": "Lai sasniegtu 100 %, pabeidziet šo soli: {step}"

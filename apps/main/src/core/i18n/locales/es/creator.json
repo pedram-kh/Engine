@@ -378,7 +378,7 @@
         "native": {
           "welcome": "Hola, {name}",
           "subtitle": "Esto es lo que necesita tu atención hoy.",
-          "approved_body": "Ya puedes recibir colaboraciones con marcas. Pronto llegará más de tu panel de creador.",
+          "approved_body": "Ya puedes recibir colaboraciones con marcas. Las invitaciones y los mensajes de las agencias aparecerán aquí.",
           "strength": {
             "title": "Solidez del perfil",
             "next": "Para llegar al 100 %, completa este paso: {step}"

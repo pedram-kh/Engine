@@ -378,7 +378,7 @@
         "native": {
           "welcome": "Välkommen, {name}",
           "subtitle": "Det här behöver din uppmärksamhet i dag.",
-          "approved_body": "Du kan nu ta emot varumärkessamarbeten. Mer av din creator-dashboard kommer snart.",
+          "approved_body": "Du kan nu ta emot varumärkessamarbeten. Inbjudningar och meddelanden från byråer visas här.",
           "strength": {
             "title": "Profilstyrka",
             "next": "För att nå 100 % behöver du slutföra det här steget: {step}"

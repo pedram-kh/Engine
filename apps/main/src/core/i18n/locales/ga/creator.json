@@ -378,7 +378,7 @@
         "native": {
           "welcome": "Fáilte, {name}",
           "subtitle": "Seo an méid a bhfuil d'aird de dhíth air inniu.",
-          "approved_body": "Is féidir leat comhoibrithe branda a fháil anois. Beidh tuilleadh de do chlár deise cruthaitheora ag teacht go luath.",
+          "approved_body": "Is féidir leat comhoibrithe branda a fháil anois. Beidh cuirí agus teachtaireachtaí ó ghníomhaireachtaí le feiceáil anseo.",
           "strength": {
             "title": "Neart an phróifíle",
             "next": "Chun 100% a bhaint amach, críochnaigh an chéim seo: {step}"
