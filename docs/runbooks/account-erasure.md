@@ -134,6 +134,37 @@ audit rows are `account.erasure_started` (operator, the reason), `account.erasur
 **Local development.** `composer dev` runs only the default queue listener, so a click leaves the job waiting. Start the worker in a second terminal:
 `php artisan queue:work database_erasure --queue=erasure --tries=1 --timeout=3600`.
 
+### 1d. The Monday routine (AH-105 D10)
+
+Nothing erases itself (§1), so a person has to look. **Pedram works the queue once a week, on Monday.** This is the promise the privacy notice makes ("within one month of the grace ending",
+`docs/store/privacy-policy-app-section.md`): the grace is 14 days, a request can wait at most 7 days for the next Monday, so the worst case from the request to the erasure is **about 21 days**, inside the month
+with a margin for one failed run and a retry.
+
+**Start condition: after the C4 preconditions close. No calendar date.** The routine does not begin while §2 is open. Today (2026-10-29) **nothing in §2 is closed** (Pedram's statement; each of its six items stays open
+until you mark it done), and `account_erasure_execute_enabled` is not armed. Until they are, a request that reaches its day is
+**held in the queue as Ready and not erased**: that is the intended state, not a fault. Record the day §2 closes in `deploy-log.md`, and start the routine on the Monday after it.
+
+**Each Monday (10 minutes when the queue is quiet):**
+
+1. **Admin app, Compliance, "Erasure queue".** Read the tab counts. **Pending** are inside the grace (nothing to do; the row says how many days are left). **Ready** are the ones to work. Look at
+   **Blocked** and **In progress** too: a Blocked row names its reason (`payment`, `delivered_work`, `vendor`, `not_erasable`) and needs a decision, not a click; an "Erasing" row older than an hour is a stuck run (the table in §1c).
+2. **For each Ready row, the pre-click checks of §1c, in order:**
+   - `select count(*) from users where erasure_started_at is not null and erased_at is null;` returns **0** (no other erasure is claimed; Q10).
+   - `account_erasure_execute_enabled` is on **for this account only** and you will turn it off again after (C4 posture; §1c "The switch").
+   - Open the plan: read the open assignments it will cancel and the plan reference. If the counts look wrong for the account, **Hold** (reason, no personal details) and stop.
+   - There is **no hold** on the row and no pending support message about this account (step 3). A person who writes in to cancel can still do so by signing in until the claim.
+   - A fresh 2FA code. Type the account id. Write a reason with no personal details. Click Erase.
+3. **The support inbox** (the address in `core/config/support.ts`; the API's `SUPPORT_EMAIL`). Read the week's mail for deletion requests from people who could not use the app (the public page `/delete-account`
+   tells them to write), and for "I changed my mind" notes. A request from outside the app is handled by the creator signing in (which cancels) or by the operator, never by guessing an account from a name.
+4. **After each Erase:** the row moves to **Erased**; check it carries no name, email or key; turn `account_erasure_execute_enabled` back off; run the §1 read of claimed accounts again (0).
+5. **Write one line in the deploy log or the ops notes** only if something was refused, held or retried. A quiet Monday needs no entry.
+
+**If a Monday is missed.** Nothing breaks and nothing is lost: the Ready row waits. Two missed Mondays push the worst case past the month the notice promises; if that happens, work the queue the same
+day it is noticed and say so in the ops notes.
+
+**What this routine does not do.** It does not erase an account whose grace has not ended (only the shell's `--force-not-requested` can, §1), does not pass a hold, a payment, delivered work or a vendor,
+and does not touch the S3 or backup retention (§7: backups 7 days, logs 14 days; those age out by themselves).
+
 ---
 
 ## 2. Before the first real erasure
