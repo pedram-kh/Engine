@@ -2,7 +2,7 @@
 
 **Status: USED 2026-10-12, but not as written.** Pedram's colleague deployed the same night with his usual procedure plus this release's extras; the
 results, and the long list of reads that were **not** taken (P0, P6, P7, the GRANT read-backs and others), are in the AH-103 entry of
-[`deploy-log.md`](deploy-log.md). Kept as the reference checklist for the next deploy. Original status line: _drafted for Pedram's review, nothing run._ Written 2026-10-12 from the repo at `f932eda4` and the
+[`deploy-log.md`](deploy-log.md). Kept as the reference for the P0 discovery reads (mount shape, env file, FPM program); **the checklist for the next deploy is [`deploy-ah104-ah113.md`](deploy-ah104-ah113.md).** Original status line: _drafted for Pedram's review, nothing run._ Written 2026-10-12 from the repo at `f932eda4` and the
 production read-backs Pedram supplied the same day. It merges the six `PENDING` entries in [`deploy-log.md`](deploy-log.md)
 (AH-099, the AH-100 family, AH-101, AH-102, AH-102b, AH-103) with [`production-queue-worker.md`](production-queue-worker.md) §8
 (the checklist), §4 (the worker restart), §7 (the scheduler) and §7.5 (arming push).
