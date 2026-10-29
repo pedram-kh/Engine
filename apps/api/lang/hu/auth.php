@@ -78,7 +78,7 @@ return [
     'deletion_mail' => [
         'subject' => 'A(z) :app fiókod törlésre van ütemezve',
         'greeting' => 'Szia, :name!',
-        'body' => 'Megkaptuk a(z) :app fiókod törlésére vonatkozó kérésedet. A fiók :date napján véglegesen törlődik, és ezt utána nem lehet visszavonni.',
+        'body' => 'Megkaptuk a(z) :app fiókod törlésére vonatkozó kérésedet. A fiók :date után véglegesen törlődik, és ezt utána nem lehet visszavonni.',
         'keep' => 'Addig a fiókod zárolva van, és semmi sem törlődött. Ha meg szeretnéd tartani, jelentkezz be az e-mail-címeddel és a jelszavaddal e dátum előtt, és válaszd a visszaállítást.',
         'unexpected' => 'Ha nem te kérted, lehet, hogy valaki más ismeri a jelszavadat. Állítsd vissza a fiókot bejelentkezéssel, majd változtasd meg a jelszavadat.',
         'support' => 'Kérdésed van? Írj a(z) :support címre.',

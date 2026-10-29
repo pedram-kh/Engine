@@ -83,7 +83,7 @@ return [
     'deletion_mail' => [
         'subject' => 'Ditt :app-konto är schemalagt för radering',
         'greeting' => 'Hej :name,',
-        'body' => 'Vi har tagit emot din begäran om att radera ditt :app-konto. Det raderas permanent den :date och det går inte att ångra efter det.',
+        'body' => 'Vi har tagit emot din begäran om att radera ditt :app-konto. Det raderas permanent efter den :date och det går inte att ångra efter det.',
         'keep' => 'Fram till dess är ditt konto låst och inget har raderats. Vill du behålla det, logga in med din e-postadress och ditt lösenord före det datumet och välj att återställa det.',
         'unexpected' => 'Om du inte har begärt detta kan någon annan känna till ditt lösenord. Återställ kontot genom att logga in och ändra sedan ditt lösenord.',
         'support' => 'Frågor? Skriv till :support.',

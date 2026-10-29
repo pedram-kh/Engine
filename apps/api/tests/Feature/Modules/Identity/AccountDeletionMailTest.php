@@ -183,6 +183,9 @@ it('writes the date in the person\'s language and timezone', function (): void {
 
     expect($en)->toContain('November 16, 2026')
         ->and($es)->toContain('16 de noviembre de 2026')
+        // AH-113: the date is "after", never the day of the erasure.
+        ->and($es)->toContain('después del 16 de noviembre de 2026')
+        ->and($en)->not->toMatch('/deleted on/i')
         ->and($tokyo)->toContain('November 17, 2026')
         ->and($bogus)->toContain('November 16, 2026');
 });
@@ -190,7 +193,7 @@ it('writes the date in the person\'s language and timezone', function (): void {
 it('says how to keep the account and what to do if it was not them, and names no link that changes anything', function (): void {
     $body = dmRender(new AccountDeletionRequestedMail('Ana', Carbon::parse('2026-11-16 10:00:00'), 'UTC'), 'en')['body'];
 
-    expect($body)->toContain('permanently deleted on November 16, 2026')
+    expect($body)->toContain('permanently deleted after November 16, 2026')
         ->and($body)->toContain('sign in with your email and password before that date')
         ->and($body)->toContain('If you did not ask for this');
 

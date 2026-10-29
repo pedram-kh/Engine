@@ -83,7 +83,7 @@ return [
     'deletion_mail' => [
         'subject' => 'Votre compte :app est programmé pour être supprimé',
         'greeting' => 'Bonjour :name,',
-        'body' => 'Nous avons reçu votre demande de suppression de votre compte :app. Il sera supprimé définitivement le :date, et cela ne pourra plus être annulé ensuite.',
+        'body' => 'Nous avons reçu votre demande de suppression de votre compte :app. Il sera supprimé définitivement après le :date, et cela ne pourra plus être annulé ensuite.',
         'keep' => 'D\'ici là, votre compte est verrouillé et rien n\'a été effacé. Pour le conserver, connectez-vous avec votre e-mail et votre mot de passe avant cette date et choisissez de le restaurer.',
         'unexpected' => 'Si vous n\'êtes pas à l\'origine de cette demande, quelqu\'un d\'autre connaît peut-être votre mot de passe. Restaurez le compte en vous connectant, puis changez votre mot de passe.',
         'support' => 'Des questions ? Écrivez à :support.',

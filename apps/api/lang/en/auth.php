@@ -101,7 +101,7 @@ return [
     'deletion_mail' => [
         'subject' => 'Your :app account is scheduled for deletion',
         'greeting' => 'Hi :name,',
-        'body' => 'We received your request to delete your :app account. It will be permanently deleted on :date, and this cannot be undone after that.',
+        'body' => 'We received your request to delete your :app account. It will be permanently deleted after :date, and this cannot be undone after that.',
         'keep' => 'Until then your account is locked and nothing has been erased. To keep it, sign in with your email and password before that date and choose to restore it.',
         'unexpected' => 'If you did not ask for this, someone else may know your password. Restore the account by signing in, then change your password.',
         'support' => 'Questions? Write to :support.',

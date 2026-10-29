@@ -83,7 +83,7 @@ return [
     'deletion_mail' => [
         'subject' => 'A sua conta :app está agendada para eliminação',
         'greeting' => 'Olá, :name,',
-        'body' => 'Recebemos o seu pedido para eliminar a sua conta :app. Será eliminada de forma permanente em :date e, depois disso, não poderá ser desfeito.',
+        'body' => 'Recebemos o seu pedido para eliminar a sua conta :app. Será eliminada de forma permanente depois de :date e, depois disso, não poderá ser desfeito.',
         'keep' => 'Até lá, a sua conta está bloqueada e nada foi apagado. Para a manter, inicie sessão com o seu e-mail e a sua palavra-passe antes dessa data e escolha restaurá-la.',
         'unexpected' => 'Se não foi você quem pediu isto, outra pessoa pode conhecer a sua palavra-passe. Restaure a conta iniciando sessão e depois altere a palavra-passe.',
         'support' => 'Dúvidas? Escreva para :support.',

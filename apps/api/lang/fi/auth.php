@@ -78,7 +78,7 @@ return [
     'deletion_mail' => [
         'subject' => ':app-tilisi on ajastettu poistettavaksi',
         'greeting' => 'Hei :name,',
-        'body' => 'Saimme pyyntösi poistaa :app-tilisi. Se poistetaan pysyvästi :date, eikä sitä voi sen jälkeen perua.',
+        'body' => 'Saimme pyyntösi poistaa :app-tilisi. Se poistetaan pysyvästi :date jälkeen, eikä sitä voi sen jälkeen perua.',
         'keep' => 'Siihen asti tilisi on lukittu, eikä mitään ole poistettu. Säilyttääksesi sen kirjaudu sisään sähköpostilla ja salasanalla ennen tuota päivää ja valitse palautus.',
         'unexpected' => 'Jos et pyytänyt tätä, joku muu saattaa tietää salasanasi. Palauta tili kirjautumalla sisään ja vaihda sitten salasanasi.',
         'support' => 'Kysyttävää? Kirjoita osoitteeseen :support.',

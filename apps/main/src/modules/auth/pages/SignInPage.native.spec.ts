@@ -528,7 +528,7 @@ describe('SignInPage — creator app, account scheduled for deletion (AH-104b-de
       'Your account is scheduled for deletion',
     )
     expect(h.wrapper.find('[data-test="sign-in-deletion-body"]').text()).toContain(
-      'November 4, 2026',
+      'permanently deleted after November 4, 2026',
     )
     expect(h.wrapper.find('[data-test="sign-in-native-create-account"]').exists()).toBe(false)
     // No token was stored by the first, refused, attempt.

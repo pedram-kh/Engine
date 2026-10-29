@@ -83,7 +83,7 @@ return [
     'deletion_mail' => [
         'subject' => 'Je :app-account staat gepland voor verwijdering',
         'greeting' => 'Hoi :name,',
-        'body' => 'We hebben je verzoek ontvangen om je :app-account te verwijderen. Het wordt op :date definitief verwijderd en daarna kan dit niet meer ongedaan worden gemaakt.',
+        'body' => 'We hebben je verzoek ontvangen om je :app-account te verwijderen. Het wordt na :date definitief verwijderd en daarna kan dit niet meer ongedaan worden gemaakt.',
         'keep' => 'Tot die tijd is je account vergrendeld en is er niets gewist. Wil je het behouden, log dan vóór die datum in met je e-mailadres en wachtwoord en kies voor herstellen.',
         'unexpected' => 'Als jij dit niet hebt aangevraagd, kent iemand anders misschien je wachtwoord. Herstel het account door in te loggen en wijzig daarna je wachtwoord.',
         'support' => 'Vragen? Schrijf naar :support.',

@@ -146,6 +146,9 @@ describe('SignInPage', () => {
     expect(banner.exists()).toBe(true)
     expect(banner.text()).toContain('November')
     expect(banner.text()).toContain('2026')
+    // AH-113: the date is a "not before", never a promise of the day (no "deletion on").
+    expect(banner.text()).toMatch(/scheduled for deletion after November \d+, 2026/)
+    expect(banner.text()).not.toMatch(/deletion on/i)
     expect(h.wrapper.find('[data-test="session-expired-banner"]').exists()).toBe(false)
   })
 
@@ -701,7 +704,7 @@ describe('SignInPage — account scheduled for deletion (AH-104b-del)', () => {
       'Your account is scheduled for deletion',
     )
     expect(h.wrapper.find('[data-test="sign-in-deletion-body"]').text()).toContain(
-      'November 4, 2026',
+      'permanently deleted after November 4, 2026',
     )
     expect(h.wrapper.find('[data-test="sign-in-email"]').exists()).toBe(false)
     expect(h.wrapper.find('[data-test="sign-in-password"]').exists()).toBe(false)

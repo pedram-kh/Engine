@@ -83,7 +83,7 @@ return [
     'deletion_mail' => [
         'subject' => 'Tu cuenta de :app está programada para eliminarse',
         'greeting' => 'Hola, :name,',
-        'body' => 'Hemos recibido tu solicitud para eliminar tu cuenta de :app. Se eliminará de forma permanente el :date y, después, no se podrá deshacer.',
+        'body' => 'Hemos recibido tu solicitud para eliminar tu cuenta de :app. Se eliminará de forma permanente después del :date y, una vez eliminada, no se podrá deshacer.',
         'keep' => 'Hasta entonces tu cuenta está bloqueada y no se ha borrado nada. Para conservarla, inicia sesión con tu correo y tu contraseña antes de esa fecha y elige restaurarla.',
         'unexpected' => 'Si no lo pediste tú, es posible que otra persona conozca tu contraseña. Restaura la cuenta iniciando sesión y después cambia tu contraseña.',
         'support' => '¿Dudas? Escribe a :support.',

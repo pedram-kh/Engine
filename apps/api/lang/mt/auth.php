@@ -78,7 +78,7 @@ return [
     'deletion_mail' => [
         'subject' => 'Il-kont tiegħek :app huwa skedat biex jitħassar',
         'greeting' => 'Ħellow :name,',
-        'body' => 'Irċevejna t-talba tiegħek biex titħassar il-kont :app tiegħek. Se jitħassar b\'mod permanenti fl-:date, u wara dan ma jistax jerġa\' jitreġġa\' lura.',
+        'body' => 'Irċevejna t-talba tiegħek biex titħassar il-kont :app tiegħek. Se jitħassar b\'mod permanenti wara l-:date, u wara dan ma jistax jerġa\' jitreġġa\' lura.',
         'keep' => 'Sa dakinhar il-kont tiegħek huwa msakkar u ma tħassar xejn. Biex iżżommu, idħol bl-email u l-password tiegħek qabel dik id-data u agħżel li terġa\' tirrestawrah.',
         'unexpected' => 'Jekk ma talabtx int dan, jista\' jkun li xi ħadd ieħor jaf il-password tiegħek. Irrestawra l-kont billi tidħol, imbagħad biddel il-password tiegħek.',
         'support' => 'Mistoqsijiet? Ikteb lil :support.',

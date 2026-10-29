@@ -78,7 +78,7 @@ return [
     'deletion_mail' => [
         'subject' => 'Contul tău :app este programat pentru ștergere',
         'greeting' => 'Salut, :name,',
-        'body' => 'Am primit cererea ta de a șterge contul :app. Va fi șters definitiv la :date, iar după aceea nu mai poate fi anulat.',
+        'body' => 'Am primit cererea ta de a șterge contul :app. Va fi șters definitiv după :date, iar după aceea nu mai poate fi anulat.',
         'keep' => 'Până atunci contul tău este blocat și nu s-a șters nimic. Ca să îl păstrezi, autentifică-te cu emailul și parola înainte de acea dată și alege să îl restaurezi.',
         'unexpected' => 'Dacă nu ai cerut tu acest lucru, e posibil ca altcineva să îți știe parola. Restaurează contul autentificându-te, apoi schimbă parola.',
         'support' => 'Întrebări? Scrie la :support.',

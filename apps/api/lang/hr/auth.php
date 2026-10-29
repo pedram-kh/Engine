@@ -83,7 +83,7 @@ return [
     'deletion_mail' => [
         'subject' => 'Vaš račun :app zakazan je za brisanje',
         'greeting' => 'Pozdrav, :name,',
-        'body' => 'Primili smo vaš zahtjev za brisanje računa :app. Bit će trajno izbrisan dana :date, a nakon toga se to ne može poništiti.',
+        'body' => 'Primili smo vaš zahtjev za brisanje računa :app. Bit će trajno izbrisan nakon :date, a nakon toga se to ne može poništiti.',
         'keep' => 'Do tada je vaš račun zaključan i ništa nije izbrisano. Da biste ga zadržali, prijavite se svojom e-poštom i lozinkom prije tog datuma i odaberite vraćanje.',
         'unexpected' => 'Ako to niste zatražili vi, netko drugi možda zna vašu lozinku. Vratite račun prijavom, a zatim promijenite lozinku.',
         'support' => 'Pitanja? Pišite na :support.',
