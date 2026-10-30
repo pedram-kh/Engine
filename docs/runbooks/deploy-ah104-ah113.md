@@ -1,6 +1,6 @@
 # Deploy runbook: AH-104 → AH-113, one sitting
 
-**Status: DRAFTED 2026-10-29, nothing run.** For Pedram's colleague (who runs the box), in the shape of [`deploy-ah099-ah103.md`](deploy-ah099-ah103.md).
+**Status: USED 2026-10-29, not as written** (the colleague's run; the record, and what was **not read**, is in the [`deploy-log.md`](deploy-log.md) entry "AH-106 + AH-107 + AH-108 + AH-103b + AH-109 …"). Differences already known: the erasure program is named **`laravel-erasure`** and lives in `apps/api/.docker/prod.supervisord.conf` on the box (not in the GitHub repo); the container was recreated; the mirror shows this file's commit as `a60ffbbf`. Original status line: **DRAFTED 2026-10-29, nothing run.** For Pedram's colleague (who runs the box), in the shape of [`deploy-ah099-ah103.md`](deploy-ah099-ah103.md).
 Written from the repo at `066ff29c` and the `PENDING` entry in [`deploy-log.md`](deploy-log.md)
 ("AH-106 + AH-107 + AH-108 + AH-103b + AH-109 …"), which carries every entry below. Procedure behind it:
 [`production-queue-worker.md`](production-queue-worker.md) §2a (the erasure worker), §4, §7, §8 and [`account-erasure.md`](account-erasure.md).
