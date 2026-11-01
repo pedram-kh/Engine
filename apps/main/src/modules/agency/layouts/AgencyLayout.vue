@@ -21,6 +21,10 @@
  * <ThemeToggle /> and locale v-select live ONLY inside the user menu dropdown.
  *
  * Sign-out: wires to useAuthStore.logout + redirects to /sign-in.
+ *
+ * Theme (AH-114): `<v-app :theme>` is `agency-dark` / `agency-light`, registered at
+ * setup by `useAgencyTheme()` and chosen from the stored preference. The agency
+ * stylesheet is scoped to those two theme classes (see `agency.css`).
  */
 
 import { ref } from 'vue'
@@ -36,6 +40,16 @@ import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
 import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
 import catalystLogo from '@/modules/auth/assets/catalyst-logo.svg'
+import { useThemePreference } from '@/composables/useThemePreference'
+import { useAgencyTheme } from '@/modules/agency/theme/useAgencyTheme'
+import '@/modules/agency/theme/agency.css'
+
+// AH-114: the agency app renders under its own pair of Vuetify themes. The stored
+// theme preference is applied here (the layout owns its first paint), the agency
+// themes are registered here (never at module scope: a creator session must not
+// carry them), and `<v-app :theme>` follows the preference.
+useThemePreference()
+const agencyTheme = useAgencyTheme()
 
 const { t, locale } = useI18n()
 const { selectLocale } = useLocaleSwitch()
@@ -86,7 +100,7 @@ async function onSwitchAgency(agencyId: string): Promise<void> {
 </script>
 
 <template>
-  <v-app data-test="agency-layout">
+  <v-app :theme="agencyTheme" data-test="agency-layout">
     <!-- ─── Impersonation banner (first child → layout reserves its height) ── -->
     <ImpersonationBanner />
 

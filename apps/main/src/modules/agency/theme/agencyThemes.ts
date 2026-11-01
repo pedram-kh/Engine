@@ -28,7 +28,8 @@
  * §2.2). Every pairing is asserted in `agency-color-system-parity.spec.ts`.
  */
 
-import type { ThemeDefinition } from 'vuetify'
+import { unref, type Ref } from 'vue'
+import type { ThemeDefinition, ThemeInstance } from 'vuetify'
 import { lightTheme } from '@catalyst/design-tokens/vuetify'
 import { nativeCssVariables, nativeDarkTheme, nativePalette } from '@catalyst/design-tokens/native'
 
@@ -125,6 +126,16 @@ const OVERLAY_SHADOW = {
   light: '0 12px 32px rgba(24, 24, 27, 0.14)',
 } as const
 
+export type ThemeRegistry = ThemeInstance['themes']['value']
+
+/**
+ * Anything that carries a Vuetify theme registry: the plugin instance (a ref) or
+ * the component-level `$vuetify` (reactive, so the ref arrives already unwrapped).
+ */
+export interface ThemeHost {
+  readonly theme: { readonly themes: Ref<ThemeRegistry> | ThemeRegistry }
+}
+
 export interface AgencyThemeBase {
   readonly light?: ThemeDefinition
   readonly dark?: ThemeDefinition
@@ -168,12 +179,24 @@ export function agencyColors(): Record<AgencyThemeName, Record<string, string>> 
  * Register `agency-dark` and `agency-light` on a Vuetify instance. Idempotent.
  * Call from `AgencyLayout`'s `setup()` only (see the header).
  */
-export function registerAgencyThemes(instance: typeof appVuetify = appVuetify): void {
-  const themes = instance.theme.themes.value
+export function registerAgencyThemes(instance: ThemeHost = appVuetify): void {
+  const themes = unref(instance.theme.themes)
   if (themes[AGENCY_DARK_THEME] && themes[AGENCY_LIGHT_THEME]) return
 
   const built = buildAgencyThemes({ light: themes.light, dark: themes.dark })
   for (const name of [AGENCY_DARK_THEME, AGENCY_LIGHT_THEME] as const) {
     themes[name] = built[name] as (typeof themes)[string]
   }
+}
+
+/**
+ * Remove both agency themes from the instance (no-op if absent). The layout calls
+ * this when it unmounts, so a session that moves from the agency app to the creator
+ * app (sign out, then a creator signs in, no reload) is left with exactly the
+ * creator theme stylesheet it started with.
+ */
+export function unregisterAgencyThemes(instance: ThemeHost = appVuetify): void {
+  const themes = unref(instance.theme.themes)
+  delete themes[AGENCY_DARK_THEME]
+  delete themes[AGENCY_LIGHT_THEME]
 }

@@ -28,7 +28,9 @@ import enCreator from '@/core/i18n/locales/en/creator.json'
 import enNotifications from '@/core/i18n/locales/en/notifications.json'
 import { buildVuetifyOptions } from '@/plugins/vuetify'
 import { registerAgencyThemes } from '@/modules/agency/theme/agencyThemes'
+import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
+import { __resetThemePreferenceForTests } from '@/composables/useThemePreference'
 
 vi.mock('@/core/platform/isNativePlatform', () => ({ isNativePlatform: () => false }))
 
@@ -135,11 +137,34 @@ const ROUTES: RouteRecordRaw[] = [
     meta: { layout: 'onboarding' },
   },
   { path: '/sign-in', name: 'auth.sign-in', component: Page, meta: { layout: 'auth' } },
+  // The agency shell: the nav targets the layout links to, all on the agency layout.
+  ...[
+    'app.dashboard',
+    'roster.list',
+    'discover.list',
+    'pools.list',
+    'brands.list',
+    'campaigns.list',
+    'files.list',
+    'messages.inbox',
+    'agency-users.list',
+    'settings',
+    'notifications',
+    'notifications.preferences',
+  ].map(
+    (name): RouteRecordRaw => ({
+      path: `/agency/${name}`,
+      name,
+      component: Page,
+      meta: { layout: 'agency' },
+    }),
+  ),
 ]
 
 let wrapper: VueWrapper | undefined
 
 async function mountAt(path: string, theme: 'dark' | 'light') {
+  __resetThemePreferenceForTests()
   const pinia = createPinia()
   setActivePinia(pinia)
   useAuthStore().user = {
@@ -155,6 +180,10 @@ async function mountAt(path: string, theme: 'dark' | 'light') {
       timezone: null,
     },
   } as never
+
+  useAgencyStore().initFromUser([
+    { agency_id: '01HWALKAGENCY000000000000', agency_name: 'Northwind', role: 'agency_admin' },
+  ] as never)
 
   const router = createRouter({ history: createMemoryHistory(), routes: ROUTES })
   await router.push(path)
@@ -182,7 +211,7 @@ async function mountAt(path: string, theme: 'dark' | 'light') {
     global: { plugins: [pinia, router, i18n, vuetify] },
   })
   await flushPromises()
-  return vuetify
+  return { vuetify, router }
 }
 
 describe('creator, onboarding and auth trees never carry an agency theme class', () => {
@@ -205,7 +234,7 @@ describe('creator, onboarding and auth trees never carry an agency theme class',
   ]
 
   it.each(CASES)('%s (%s, %s)', async (_label, path, theme) => {
-    const vuetify = await mountAt(path, theme)
+    const { vuetify } = await mountAt(path, theme)
 
     // The agency themes ARE in the instance (worst case), and the creator route
     // still renders its own global theme.
@@ -218,5 +247,33 @@ describe('creator, onboarding and auth trees never carry an agency theme class',
     expect(document.documentElement.className).not.toMatch(/agency/)
     expect(document.body.className).not.toMatch(/agency/)
     expect(document.querySelectorAll('[class*="v-theme--agency"]')).toHaveLength(0)
+  })
+
+  describe('after an agency page has rendered in the same session', () => {
+    it.each(['/creator/dashboard', '/onboarding/profile', '/sign-in'])(
+      'navigating agency -> %s leaves no agency class anywhere',
+      async (target) => {
+        const { router } = await mountAt('/agency/app.dashboard', 'dark')
+
+        // The agency layout IS on the agency theme (the precondition of the test).
+        expect(
+          document.querySelector('[data-test="agency-layout"].v-theme--agency-dark'),
+        ).not.toBeNull()
+
+        await router.push(target)
+        await flushPromises()
+
+        expect(document.querySelector('[data-test="agency-layout"]')).toBeNull()
+        expect(document.querySelector('.v-application')).not.toBeNull()
+        expect(document.body.outerHTML).not.toMatch(/v-theme--agency/)
+        expect(document.documentElement.className).not.toMatch(/agency/)
+        expect(document.body.className).not.toMatch(/agency/)
+        expect(document.querySelectorAll('[class*="v-theme--agency"]')).toHaveLength(0)
+        // ...and the agency layout took its theme rules out of the stylesheet with it.
+        expect(document.getElementById('vuetify-theme-stylesheet')?.innerHTML ?? '').not.toContain(
+          'agency',
+        )
+      },
+    )
   })
 })
