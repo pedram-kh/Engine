@@ -10,6 +10,7 @@ import { ref } from 'vue'
 
 import type { RelationshipChatTransport } from '@/modules/messaging/api/relationshipMessaging.api'
 
+import AgencyKpiCard from '@/modules/agency/components/AgencyKpiCard.vue'
 import AgencyRelationshipInbox, {
   type AgencyInboxItem,
 } from '@/modules/agency/components/AgencyRelationshipInbox.vue'
@@ -262,6 +263,42 @@ const pillTones: Array<[AgencyStatusTone, string]> = [
       <AgencyStatusPill kind="roster" status="pending_request" data-test="extra-pill-roster" />
     </div>
 
+    <!-- S2.4: the KPI card fork, each variant the page can ask for. -->
+    <div class="extra-kpis" data-test="extra-kpis">
+      <AgencyKpiCard
+        label="Creators in roster"
+        :value="128"
+        icon="mdi-account-group-outline"
+        tile-tone="info"
+        to="/campaigns"
+        data-test="extra-kpi-link"
+      />
+      <AgencyKpiCard
+        label="Pending applications"
+        :value="12"
+        icon="mdi-inbox-arrow-down-outline"
+        tile-tone="warning"
+        data-test="extra-kpi-icon"
+      />
+      <AgencyKpiCard
+        label="Active campaigns"
+        :value="0"
+        icon="mdi-bullhorn-outline"
+        to="/campaigns"
+        data-test="extra-kpi-ai"
+      />
+      <AgencyKpiCard
+        label="Payments due"
+        :value="3"
+        icon="mdi-credit-card-outline"
+        tile-tone="success"
+        data-test="extra-kpi-success"
+      />
+      <AgencyKpiCard label="Briefs in draft" :value="4" data-test="extra-kpi-plain" />
+      <AgencyKpiCard label="Payments" :value="null" data-test="extra-kpi-placeholder" />
+      <AgencyKpiCard label="Loading" loading data-test="extra-kpi-loading" />
+    </div>
+
     <!-- S2.2: the inbox fork on stand-in rows, in a 380px pane (the page owns the pane). -->
     <div class="extra-pane" data-test="extra-inbox-pane">
       <AgencyRelationshipInbox
@@ -293,6 +330,13 @@ const pillTones: Array<[AgencyStatusTone, string]> = [
   border-radius: 12px;
   background-color: rgb(var(--v-theme-surface));
   overflow: hidden;
+}
+
+.extra-kpis {
+  display: grid;
+  grid-template-columns: repeat(2, 300px);
+  gap: 16px;
+  margin-block: 12px;
 }
 
 .extra-pane--thread {
