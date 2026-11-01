@@ -21,7 +21,7 @@
  *     inbox item has no brand, and the product has no waves).
  *
  * Existing keys only: the title, subtitle, empty text, start action and "New conversation".
- * Times use `Intl` (a time today, a localised "yesterday", then a short date).
+ * Times use `Intl`: a time today, a day and month this year, the full date in an earlier year.
  */
 
 import { computed, ref } from 'vue'
@@ -104,18 +104,21 @@ const visibleItems = computed(() => {
 
 const timeFormatter = computed(() => new Intl.DateTimeFormat(locale.value, { timeStyle: 'short' }))
 const dayFormatter = computed(
-  () => new Intl.DateTimeFormat(locale.value, { month: 'short', day: 'numeric' }),
+  () => new Intl.DateTimeFormat(locale.value, { day: 'numeric', month: 'short' }),
 )
-const fullFormatter = computed(() => new Intl.DateTimeFormat(locale.value, { dateStyle: 'short' }))
-const relativeFormatter = computed(
-  () => new Intl.RelativeTimeFormat(locale.value, { numeric: 'auto' }),
+const fullFormatter = computed(
+  () => new Intl.DateTimeFormat(locale.value, { day: 'numeric', month: 'short', year: 'numeric' }),
 )
 
 function startOfDay(date: Date): number {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime()
 }
 
-/** A time today, "yesterday", a month and day this year, otherwise a short date. */
+/**
+ * The row stamp (plan §9.2): today a time ("09:30"), earlier this year a day and month
+ * ("14 Mar"), an earlier year the full date ("14 Mar 2020"). Locale-aware through `Intl`, so
+ * the order and the month name follow the language ("Mar 14" in US English).
+ */
 function formatStamp(iso: string | null, now: Date = new Date()): string {
   if (iso === null) {
     return ''
@@ -124,12 +127,8 @@ function formatStamp(iso: string | null, now: Date = new Date()): string {
   if (Number.isNaN(date.getTime())) {
     return ''
   }
-  const dayDiff = Math.round((startOfDay(date) - startOfDay(now)) / 86_400_000)
-  if (dayDiff === 0) {
+  if (startOfDay(date) === startOfDay(now)) {
     return timeFormatter.value.format(date)
-  }
-  if (dayDiff === -1) {
-    return relativeFormatter.value.format(-1, 'day')
   }
   return date.getFullYear() === now.getFullYear()
     ? dayFormatter.value.format(date)

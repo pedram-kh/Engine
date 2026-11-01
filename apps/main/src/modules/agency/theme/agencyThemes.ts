@@ -65,6 +65,9 @@ const AGENCY_DARK_EXTRAS = {
   'info-text': '#70a4ff',
   'warning-text': nativePalette['status-warning'],
   'error-text': '#f3738b',
+  // A solid danger fill that carries WHITE text (the notification count pill): the Figma
+  // #f0506e is 3.46:1 against white, this is 4.78:1 (accepted deviation, plan §9.2).
+  'error-strong': '#d6304f',
   'neutral-text': nativePalette['text-secondary'],
   'ai-text': '#a289ff',
 } as const
@@ -116,6 +119,8 @@ const AGENCY_LIGHT_COLORS = {
   'info-text': '#2457c5',
   'warning-text': '#975900',
   'error-text': '#ba2946',
+  // Same value as dark: a fill, not a text colour (see the dark block).
+  'error-strong': '#d6304f',
   'neutral-text': '#52525b',
   'ai-text': '#6240d8',
 } as const

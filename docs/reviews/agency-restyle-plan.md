@@ -300,10 +300,16 @@ Counting check: 5 + 4 + 8 + 1 + 2 = **20**.
   - `AgencyNotificationBell` (`modules/agency/components/`), a fork of the shared `NotificationBell` (not edited; `NotificationBell.spec.ts` and `NotificationCenter.native.spec.ts` untouched and green). The behaviour is the original's: the shell's shared poll when one is provided, otherwise its own poll started on mount and stopped on unmount; the `NotificationCenter` dropdown (unchanged) reloads on open and closes on any navigation; `formatBadgeCount` (99 reads 99, 100 and over reads 99+); the aria label is the existing `notifications.center.unreadBadgeLabel` with the real count; the `data-test` anchors are the original's. Only the look changes, and `AgencyLayout` swaps its import (the one adoption in L2, in the shell).
   - Figma top-bar bell (node 36:182): a 20px glyph with the danger pill **beside it, touching it**, not overlaid on its corner as the shared bell does. `v-badge inline`, the button 28 by 32, the pill 16px high (1px by 6px padding, full radius, 10.5px bold, 14px line, 0.4px tracking, uppercase, white on the danger fill, the app font rather than Vuetify's Roboto default). The count text sits in the badge slot and a tap on the pill opens the menu too. Zero shows no pill.
   - **Finding fixed by a pin:** `bg-error` forces the on-error text colour (near-black in the agency themes) with `!important`, which made the pill text dark instead of the Figma white; overridden with `!important` on the text colour only.
-  - **Note for review:** white on the danger fill is 3.4:1, which is the Figma's choice and the `text-inverse` ruling; flagged, not changed.
+  - **Note for review:** white on the Figma danger fill is 3.46:1. Flagged here; **lifted to AA in S2.6 (below) under the L2 review ruling.**
   - **Shell effect:** the top bar's bell is narrower than the shared 48px button, so the controls to its right sit slightly closer; the S1.2 shell pins and the full pin set still pass. The harness `ProbeExtraPage` carries three bells on a shared poll holding 0, 7 and 120 (via the harness-only `ProbeBell.vue`), and the shell shot uses a fixture unread count.
   - **Gate:** typecheck, main test (291 files, 3,862 tests, no failures this run), lint (0 errors), admin, package tests and prettier green. Creator walk 142 / 142.
   - Component spec: 11 tests (anchors, count to pill, zero no pill, error colour hook, 99 and 99+, accessible name with the real count and the shared wording, own poll started and stopped, shared poll used and no second poll, inline pill, dropdown opens on the bell and on the pill and closes on navigation).
+
+- **S2.6 (L2 review rulings; MEASURED in Chromium and by spec 4).**
+  - **Bell pill lifted to AA.** New theme key `error-strong` `#d6304f`, the same value in both themes (a fill, so it is in spec 4's `FILL_KEYS`). White (`text-inverse`) on it is **4.78:1** (Figma `#f0506e`: 3.46:1). The pill keeps its position beside the bell and its white text; only the fill changes (`AgencyNotificationBell`, `!important` as `bg-error` is). Spec 4 gained a contrast test per theme (text-inverse on `error-strong` at least 4.5:1) and the key in the same-in-both-themes list. Pin S2.5 now expects `rgb(214, 48, 79)`; break-revert (key set back to `#f0506e`) fails both themes.
+  - **Figma deviation recorded:** node 36:182 pill fill `#f0506e` (`status-danger`) is replaced by `#d6304f`, for the notification count pill only; the `error` slot, danger text and every other danger use are unchanged. For the designer note in S5.1.
+  - **Inbox stamps** (`AgencyRelationshipInbox`, locale-aware through `Intl`): today a time, earlier this year a day and month ("14 Mar"), an earlier year the full date ("14 Mar 2020"). The "yesterday" special case is gone. Component spec: five new tests (today, this year, an ordinary day for yesterday, an earlier year, no timestamp) with the date frozen; pin S2.2 checks that earlier-year rows carry the full date (break-revert to the day-and-month format fails both themes).
+  - **Gate:** typecheck, main test (291 files, 3,870 tests, no failures), lint (0 errors), admin, package tests and prettier green. Pins: 186 pins (the full set; S2.5 and S2.2 sets re-run after each break-revert). Creator walk 142 / 142.
 
 ---
 
@@ -371,6 +377,8 @@ Production stays on `066ff29c` until then. Creator **native build 3** is a bundl
 - **Campaign status counts**: the per-status counts and the "N active" summary on the Campaigns list (needs an API field or N count requests). Separate future chunk (ruling 15).
 - **Discover age filter**: the control for the existing `age_min` / `age_max` (needs a `DiscoveryListParams` type addition and a feature decision). Separate future chunk (ruling 15).
 - **Tech-debt option: lazy-load `agency.css`.** Today `agency.css` (16.5 KB minified, about 2 % of the 790 KB shared sheet) ships in the shared CSS bundle, inert for creator web and native (accepted under P1, §9.1). Loading it from the agency layout would remove it from creator bundles but needs a way to avoid a flash of unstyled agency chrome on first paint, and an `App.vue` or router change (shared). Revisit with AH-115.
+- **Tech-debt: flaky `Step2ProfileBasicsPage.spec.ts`** (5 s timeouts under parallel load, a different test each time; about 6.6 s in isolation). Raise its timeout as its own commit, later (§9.2).
+- **Tech-debt nit: `AgencyKpiCard` loading skeleton** sits about 16px right of the label (§9.2).
 - **Light-mode logo asset.** The light sidebar uses an invert filter on the off-white wordmark as a stopgap (S1.2). A real light asset is requested from Catalyst; replace the filter when it lands (S5.1).
 - **Creator-side Roboto fallback** and the shared theme: AH-115.
 - **AuthLayout screens** (sign-in, sign-up, 2FA enrolment, invitation accept): AH-115 (ruling 13).
@@ -420,6 +428,18 @@ Pedram's message labelled the points P1 to P5 in the order he answered them; the
 - **Inverted light logo accepted as a stopgap;** a real light asset is requested from Catalyst (§7).
 - **Top-bar search omitted: correct.**
 - **Carried into L2 (new step S2.0 below):** the status pill gets the dot (S2.1), the uneven table row dividers, the form description-hint spacing.
+
+---
+
+### 9.2 L2 review rulings (2026-11-01)
+
+- **L2 cleared** at tip `31ad394c`; L0 to L2 pushed.
+- **S3.4 inbox-header i18n keys approved now** (24 locales, `es` by hand, `verify-locale` 24 / 24): search placeholder, "N unread" pill, All / Unread segments, "nothing matches".
+- **`KpiStrip` adopts `AgencyKpiCard` in L4 (S4.4).**
+- **Bell pill lifted to AA** (S2.6): darker danger fill, white text 4.78:1, Figma deviation recorded, position beside the bell kept.
+- **Inbox dates in the agency fork** (S2.6): today a time, this year "14 Mar", older "14 Mar 2020", locale-aware.
+- **17 assignment tones accepted. Thread omissions confirmed** as built in S2.3.
+- **Tech-debt rows (§7):** the flaky `Step2ProfileBasicsPage` spec (timeout fix as its own commit, later); the KPI loading skeleton offset (about 16px right of the label).
 
 ---
 

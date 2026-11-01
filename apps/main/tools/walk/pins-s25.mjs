@@ -33,11 +33,15 @@ export const S25_PINS = [
     height: '20px',
     fontSize: '20px',
   })),
-  pin('pill: danger fill, white, full radius', `${bell(7)} .v-badge__badge`, (c) => ({
-    backgroundColor: c.error,
-    color: c.white,
-    borderTopLeftRadius: '999px',
-  })),
+  pin(
+    'pill: AA danger fill (error-strong), white, full radius',
+    `${bell(7)} .v-badge__badge`,
+    (c) => ({
+      backgroundColor: c.errorStrong,
+      color: c.white,
+      borderTopLeftRadius: '999px',
+    }),
+  ),
   pin('pill: 10.5/14 bold, 0.4px tracking, uppercase', `${bell(7)} .v-badge__badge`, () => ({
     fontSize: '10.5px',
     lineHeight: '14px',

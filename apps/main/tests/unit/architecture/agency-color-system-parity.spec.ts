@@ -89,6 +89,7 @@ const FILL_KEYS = [
   'status-neutral',
   'status-ai',
   'text-inverse',
+  'error-strong',
 ] as const
 
 /** Neutrals and status-as-text colours: must differ between the themes. */
@@ -193,6 +194,13 @@ describe('agency colour system parity', () => {
 
   describe.each(THEMES)('%s contrast (WCAG 2.1, AA-normal 4.5:1)', (name) => {
     const colors = PALETTES[name]
+
+    it('text-inverse (white) on error-strong, the notification pill fill', () => {
+      expect(
+        ratio(rgb(at(colors, 'text-inverse')), rgb(at(colors, 'error-strong'))),
+        `${name} text-inverse on error-strong`,
+      ).toBeGreaterThanOrEqual(AA_NORMAL)
+    })
 
     it.each(ON_FILL_PAIRS)('%s on %s', (on, fill) => {
       expect(

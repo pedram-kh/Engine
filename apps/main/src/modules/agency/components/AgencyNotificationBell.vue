@@ -127,7 +127,7 @@ watch(menuOpen, (open) => {
 }
 
 /* The pill: 16px tall, 6px by 1px padding (on the inner span, so the whole pill is a click
-   target), 10.5px bold with 14px line and 0.4px tracking, white on the danger fill. */
+   target), 10.5px bold with 14px line and 0.4px tracking, white on the AA danger fill (`error-strong`). */
 .agency-bell__badge :deep(.v-badge__badge) {
   min-width: 0;
   height: auto;
@@ -140,8 +140,10 @@ watch(menuOpen, (open) => {
   letter-spacing: 0.4px;
   text-transform: uppercase;
   margin-inline-start: -4px;
-  /* `bg-error` forces the on-error colour (dark in the agency themes) with !important; the
-     Figma pill is white. */
+  /* `bg-error` forces the error fill and the on-error colour (dark in the agency themes) with
+     !important. The pill is white on `error-strong`: the Figma fill is 3.46:1 against white,
+     `error-strong` is 4.78:1 (accepted deviation, plan §9.2). */
+  background-color: rgb(var(--v-theme-error-strong)) !important;
   color: rgb(var(--v-theme-text-inverse)) !important;
 }
 

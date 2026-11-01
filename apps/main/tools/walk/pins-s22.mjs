@@ -194,4 +194,12 @@ export const S22_PINS = [
       fn: `const xs = ['a','u','r','l'].map((id) => document.querySelector('[data-test="relationship-inbox-row-' + id + '"] .v-avatar').getBoundingClientRect().left); return { sameX: xs.every((x) => Math.abs(x - xs[0]) < 0.5) }`,
     },
   ),
+  pin(
+    'stamps: rows from an earlier year carry the full date, not a time or "yesterday"',
+    row('u'),
+    () => ({ allFullDate: true }),
+    {
+      fn: `const t = ['a','u','r','l'].map((id) => document.querySelector('[data-test="relationship-inbox-row-' + id + '"] .agency-inbox-row__time').textContent.trim()); return { allFullDate: t.every((x) => /20(19|20)/.test(x) && !x.includes(':') && !/yesterday/i.test(x)) }`,
+    },
+  ),
 ]

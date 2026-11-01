@@ -10,7 +10,7 @@
  */
 
 import { flushPromises, mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createI18n } from 'vue-i18n'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import { createVuetify } from 'vuetify'
@@ -248,6 +248,62 @@ describe('AgencyRelationshipInbox', () => {
       expect(wrapper.get('[data-test="agency-inbox-tag-c1"]').text()).toBe('Glow Co.')
       expect(wrapper.find('[data-test="agency-inbox-tag-c2"]').exists()).toBe(false)
       expect(wrapper.find('[data-test="agency-inbox-tag-c3"]').exists()).toBe(false)
+    })
+  })
+
+  describe('row stamp (plan §9.2)', () => {
+    const NOW = new Date(2026, 10, 1, 15, 0, 0) // 1 Nov 2026, local time
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    async function stampOf(lastMessageAt: Date): Promise<string> {
+      vi.useFakeTimers({ toFake: ['Date'], now: NOW })
+      const wrapper = await mountInbox({
+        items: [makeItem({ lastMessageAt: lastMessageAt.toISOString() })],
+      })
+      return wrapper.get('.agency-inbox-row__time').text()
+    }
+
+    it('shows a time for today', async () => {
+      const at = new Date(2026, 10, 1, 9, 30)
+      expect(await stampOf(at)).toBe(
+        new Intl.DateTimeFormat('en', { timeStyle: 'short' }).format(at),
+      )
+    })
+
+    it('shows the day and month earlier this year, with no year', async () => {
+      const at = new Date(2026, 2, 14, 9, 30)
+      const stamp = await stampOf(at)
+      expect(stamp).toBe(
+        new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short' }).format(at),
+      )
+      expect(stamp).not.toContain('2026')
+    })
+
+    it('treats yesterday as an ordinary earlier day, not a special word', async () => {
+      const at = new Date(2026, 9, 31, 22, 0)
+      const stamp = await stampOf(at)
+      expect(stamp.toLowerCase()).not.toContain('yesterday')
+      expect(stamp).toContain('31')
+    })
+
+    it('shows the full date for an earlier year', async () => {
+      const at = new Date(2020, 2, 14, 9, 30)
+      const stamp = await stampOf(at)
+      expect(stamp).toBe(
+        new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short', year: 'numeric' }).format(
+          at,
+        ),
+      )
+      expect(stamp).toContain('2020')
+    })
+
+    it('shows nothing for a row with no timestamp', async () => {
+      vi.useFakeTimers({ toFake: ['Date'], now: NOW })
+      const wrapper = await mountInbox({ items: [makeItem({ lastMessageAt: null })] })
+      expect(wrapper.get('.agency-inbox-row__time').text()).toBe('')
     })
   })
 
