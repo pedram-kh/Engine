@@ -349,6 +349,7 @@ const pillTones: Array<[AgencyStatusTone, string]> = [
 
 .extra-kpis {
   display: grid;
+  width: max-content;
   grid-template-columns: repeat(2, 300px);
   gap: 16px;
   margin-block: 12px;

@@ -80,12 +80,23 @@ const browser = await chromium.launch()
 mkdirSync(OUT, { recursive: true })
 const manifest = []
 
-async function crop(page, theme, name, selector, note, kind = 'stand-in') {
+async function crop(page, theme, name, selector, note, kind = 'stand-in', rightEdge = null) {
   const file = `${theme}-${name}.png`
   const el = page.locator(selector).first()
   await el.scrollIntoViewIfNeeded()
   await page.waitForTimeout(250)
-  await el.screenshot({ path: path.join(OUT, file), animations: 'disabled', caret: 'hide' })
+  if (rightEdge === null) {
+    await el.screenshot({ path: path.join(OUT, file), animations: 'disabled', caret: 'hide' })
+  } else {
+    // Only the right-hand `rightEdge` pixels of the element (the top bar's controls).
+    const box = await el.boundingBox()
+    await page.screenshot({
+      path: path.join(OUT, file),
+      animations: 'disabled',
+      caret: 'hide',
+      clip: { x: box.x + box.width - rightEdge, y: box.y, width: rightEdge, height: box.height },
+    })
+  }
   manifest.push({ file, theme, name, kind, note })
 }
 
@@ -144,6 +155,7 @@ try {
         '.v-app-bar',
         `real shell top bar, real bell, fixture unread count ${UNREAD}`,
         'real shell, mock API',
+        360,
       )
     }
     await context.close()

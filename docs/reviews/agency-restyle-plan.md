@@ -302,7 +302,7 @@ Counting check: 5 + 4 + 8 + 1 + 2 = **20**.
   - **Finding fixed by a pin:** `bg-error` forces the on-error text colour (near-black in the agency themes) with `!important`, which made the pill text dark instead of the Figma white; overridden with `!important` on the text colour only.
   - **Note for review:** white on the danger fill is 3.4:1, which is the Figma's choice and the `text-inverse` ruling; flagged, not changed.
   - **Shell effect:** the top bar's bell is narrower than the shared 48px button, so the controls to its right sit slightly closer; the S1.2 shell pins and the full pin set still pass. The harness `ProbeExtraPage` carries three bells on a shared poll holding 0, 7 and 120 (via the harness-only `ProbeBell.vue`), and the shell shot uses a fixture unread count.
-  - **Gate:** typecheck, main test (3,87x tests, no failures this run), lint (0 errors), admin, package tests and prettier green. Creator walk 142 / 142.
+  - **Gate:** typecheck, main test (291 files, 3,862 tests, no failures this run), lint (0 errors), admin, package tests and prettier green. Creator walk 142 / 142.
   - Component spec: 11 tests (anchors, count to pill, zero no pill, error colour hook, 99 and 99+, accessible name with the real count and the shared wording, own poll started and stopped, shared poll used and no second poll, inline pill, dropdown opens on the bell and on the pill and closes on navigation).
 
 ---
