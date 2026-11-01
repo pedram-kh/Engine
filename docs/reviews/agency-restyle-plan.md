@@ -268,6 +268,15 @@ Counting check: 5 + 4 + 8 + 1 + 2 = **20**.
   - **Gate:** typecheck, lint, admin, package tests and prettier green. `main-test` had two 5 s timeouts (`CampaignDetailPage` jobs-board toggle, `Step2ProfileBasicsPage` chip) while the machine was under heavy load (load average above 400 from a Docker restart); both files pass when run alone (81 / 81). Creator walk 142 / 142 identical to the baseline.
   - **Not adopted by any page yet** (L3 does that). The harness `ProbeExtraPage` carries the six tones and two table-mode pills for the pins and the review screenshots.
 
+- **S2.2 (MEASURED in Chromium; `pins.mjs --step S2.2`: 24 pins, 200 checks, both themes; five break-reverts caught).**
+  - `AgencyRelationshipInbox` (`modules/agency/components/`), a fork of the shared `RelationshipInbox` (which, with its specs, is not edited; spec 5 still hashes the same files). Presentation only, as the original: the parent fetches and normalises rows to `AgencyInboxItem` (the shared item plus an optional `tag`). Same `data-test` anchors as the original (`relationship-inbox`, `-list`, `-row-<id>`, `-unread-<id>`, `-empty`, `-start`), so the page that adopts it in S3.4 keeps its specs. The `isNativePlatform()` branch is not carried (agency has no native app).
+  - Figma pieces: header (icon tile 40 / radius 10, title 22/28/600, caption subtitle, "New conversation" icon button), segmented All / Unread control, the list row (unread dot slot 8px that always takes its space so avatars align, 40px avatar, name 14/20/500 and time 12/16/500, preview 13/19 and a 20px count capsule, chevron), active row in the accent tint with the accent border, optional neutral tag (15 % tint).
+  - **No new i18n key.** The title, subtitle, empty text, start action, error and "New conversation" use existing keys. The header controls that have no existing word (search placeholder, "N unread" pill, All / Unread segments, "nothing matches") are **label-driven**: each renders only when the parent passes its word in `labels`, otherwise it is omitted (no placeholder, no English fallback). **S3.4 will need new keys for them: that is the i18n stop-gate (24 locales) and will be raised with you before it is built.**
+  - Not built (the data does not exist): the brand and "wave" filters (an inbox item has no brand, and the product has no waves). The tag renders only if a row carries one; none does today.
+  - Times use `Intl` only (a time today, a localised "yesterday", then a month and day, or a short date in an earlier year).
+  - Break-reverts caught: row padding, dot colour, unread time colour, tag shown on every row, name ellipsis removed. Component spec: 18 tests (anchors, links, states, label-driven controls, search by name and preview, Unread filter, tag, initial).
+  - **Not adopted by any page yet.** The harness `ProbeExtraPage` carries four stand-in rows (one active, one unread with a tag, one read, one with an over-long name) in a 380px pane for the pins and the review screenshots.
+
 ---
 
 ## 4. The seven specs and where each sits

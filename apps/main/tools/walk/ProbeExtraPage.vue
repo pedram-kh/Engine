@@ -7,6 +7,9 @@
 
 import { ref } from 'vue'
 
+import AgencyRelationshipInbox, {
+  type AgencyInboxItem,
+} from '@/modules/agency/components/AgencyRelationshipInbox.vue'
 import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
 import type { AgencyStatusTone } from '@/modules/agency/status/agencyStatusTones'
 
@@ -26,6 +29,54 @@ const tableItems = [
   { name: 'Autumn capsule', budget: 8700 },
   { name: 'Holiday gifting', budget: 10200 },
 ]
+
+// S2.2: fixed old timestamps so the stamps read as dates and the shots do not change daily.
+const inboxItems: AgencyInboxItem[] = [
+  {
+    id: 'a',
+    title: 'Jordan Reyes',
+    preview: 'Perfect, see you at the shoot on Friday.',
+    lastMessageAt: '2020-03-14T16:20:00+00:00',
+    unreadCount: 0,
+    avatarText: 'Jordan Reyes',
+    to: '/campaigns',
+  },
+  {
+    id: 'u',
+    title: 'Nadia Okafor',
+    preview: 'Sounds good, sending the draft tonight.',
+    lastMessageAt: '2020-03-14T09:30:00+00:00',
+    unreadCount: 3,
+    avatarText: 'Nadia Okafor',
+    to: '/campaigns',
+    tag: 'Glow Co.',
+  },
+  {
+    id: 'r',
+    title: 'Ari Cole',
+    preview: 'Contract attached.',
+    lastMessageAt: '2020-03-13T18:05:00+00:00',
+    unreadCount: 0,
+    avatarText: 'Ari Cole',
+    to: '/campaigns',
+  },
+  {
+    id: 'l',
+    title: 'A creator with a very long display name that cannot fit the row',
+    preview: 'And a preview that is also far too long to fit on a single line of the list row.',
+    lastMessageAt: '2019-11-02T12:00:00+00:00',
+    unreadCount: 12,
+    avatarText: 'A creator',
+    to: '/campaigns',
+  },
+]
+const inboxLabels = {
+  search: 'Search conversations',
+  unreadPill: (count: number) => `${count} unread`,
+  all: 'All',
+  unread: 'Unread',
+  noMatch: 'No conversations match',
+}
 
 const pillTones: Array<[AgencyStatusTone, string]> = [
   ['success', 'Approved'],
@@ -121,5 +172,28 @@ const pillTones: Array<[AgencyStatusTone, string]> = [
       <AgencyStatusPill kind="campaign" status="active" data-test="extra-pill-campaign-active" />
       <AgencyStatusPill kind="roster" status="pending_request" data-test="extra-pill-roster" />
     </div>
+
+    <!-- S2.2: the inbox fork on stand-in rows, in a 380px pane (the page owns the pane). -->
+    <div class="extra-pane" data-test="extra-inbox-pane">
+      <AgencyRelationshipInbox
+        :items="inboxItems"
+        :loading="false"
+        :load-error="false"
+        active-id="a"
+        :labels="inboxLabels"
+      />
+    </div>
   </section>
 </template>
+
+<style scoped>
+.extra-pane {
+  width: 380px;
+  height: 560px;
+  margin-block: 12px;
+  border: 1px solid rgb(var(--v-theme-border-color));
+  border-radius: 12px;
+  background-color: rgb(var(--v-theme-surface));
+  overflow: hidden;
+}
+</style>
