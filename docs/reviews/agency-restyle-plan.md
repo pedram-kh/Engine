@@ -228,6 +228,12 @@ Counting check: 5 + 4 + 8 + 1 + 2 = **20**.
 - **S1.1 (MEASURED, dev server and production build identical).**
   - The themes are registered from the Vuetify instance the app installed (injected under Vuetify's own `Symbol.for('vuetify:theme')` key, so `useTheme` stays the only importer of Vuetify's composable), inside `setup()`, and **removed again when the last agency layout unmounts**. Result: a creator page's theme stylesheet is `18863` characters, sha `15e8eb12f4410a49`, no agency rules, equal to the baseline, **including after an agency page has rendered in the same session** (agency to creator: stylesheet equal to a cold creator load).
   - **One residual, for P1's "inert rules" clause.** `agency.css` is imported by `AgencyLayout`, which `App.vue` imports statically, so the built shared CSS bundle carries its five rules (**579 bytes** of 809653) for creator web and native too. No creator element can match any of them (every selector needs an agency theme class or an agency `<v-app>`); computed styles and DOM are unchanged (creator walk 142/142). The only way to remove even this is to load the stylesheet lazily from the agency layout, which risks a flash of unstyled agency chrome on first paint. Not done; your call.
+- **S1.2 (MEASURED in Chromium, `measure.mjs` G_shell, both themes).**
+  - Geometry: drawer 280 (border inside it), top bar 65 (separator drawn as an `::after` inside the 65, not a border), nav item 44 / radius 8, content padding 32 at 1280 (`pa-6 pa-md-8`).
+  - Specificity finding: Vuetify's `.v-app-bar.v-toolbar { background }` is `(0,2,0)` and loads after `agency.css`, so a plain agency rule lost. The top-bar rule is `.agency-topbar.v-toolbar`. The same applies wherever an agency rule meets a Vuetify rule of equal specificity: raise the specificity, never use `!important` unless Vuetify itself does.
+  - Logo: the wordmark is an off-white SVG loaded as an `<img>` (cannot take a theme variable), invisible on the light sidebar. Fixed in `agency.css` for the light theme only with `filter: invert(1) hue-rotate(180deg)`. **Designer note for S5.1:** a light-mode logo asset replaces this stopgap.
+  - **Carried to S1.4:** `v-btn` computes radius 0 because Vuetify's default `rounded: 0` adds `.rounded-0 { border-radius: 0 !important }`; the agency radius 8 on buttons therefore needs `!important` inside the scope (the one case where Vuetify itself uses it).
+  - The top-bar search of the Figma frame is omitted (no API to back it), as ruled.
 
 ---
 

@@ -18,6 +18,8 @@
  *   D  teleported overlay (the user menu): theme class and computed font-family
  *   E  `text-h6` / `text-body-2` computed font-family; `html` background in dark
  *   F  agency -> creator navigation: nothing left behind (classes, stylesheet)
+ *   G  shell geometry and colours (S1.2), dark and light: drawer width, top-bar height,
+ *      nav item height/radius/active styles, fills, separators, content padding, avatar label
  *
  * Dev tool only. No API: every /api and /sanctum request answers 503.
  */
@@ -245,6 +247,75 @@ async function main() {
         sheetLen: after.sheetLen,
         sheetEqualsCreatorLoad: sha(after.sheetText) === out.A_creator.sheetSha,
       }
+      await w.context.close()
+    }
+
+    // G: shell geometry, both themes.
+    out.G_shell = {}
+    for (const theme of ['dark', 'light']) {
+      const w = await open(browser, { route: '/campaigns', user: 'agency', theme, base })
+      out.G_shell[theme] = await w.page.evaluate(() => {
+        const cs = (el) => (el ? getComputedStyle(el) : null)
+        const rect = (el) => {
+          const r = el?.getBoundingClientRect()
+          return r
+            ? { w: Math.round(r.width * 100) / 100, h: Math.round(r.height * 100) / 100 }
+            : null
+        }
+        const drawer = document.querySelector('[data-test="agency-sidebar"]')
+        const bar = document.querySelector('[data-test="agency-topbar"]')
+        const items = [...document.querySelectorAll('[data-test^="nav-"]')]
+        const active = document.querySelector('[data-test^="nav-"].v-list-item--active')
+        const idle = items.find((i) => i !== active)
+        const main = document.querySelector('[data-test="agency-main"] .v-container')
+        const avatarLabel = document.querySelector('[data-test="user-menu-btn"] .v-avatar span')
+        const logo = document.querySelector('.agency-sidebar__logo')
+        const afterBar = bar ? getComputedStyle(bar, '::after') : null
+        return {
+          drawer: {
+            ...rect(drawer),
+            bg: cs(drawer)?.backgroundColor,
+            borderRight: cs(drawer)?.borderRightWidth + ' ' + cs(drawer)?.borderRightColor,
+            shadow: cs(drawer)?.boxShadow,
+          },
+          topbar: {
+            ...rect(bar),
+            bg: cs(bar)?.backgroundColor,
+            shadow: cs(bar)?.boxShadow,
+            separator: afterBar ? { h: afterBar.height, bg: afterBar.backgroundColor } : null,
+          },
+          navItems: items.length,
+          navIdle: idle
+            ? {
+                ...rect(idle),
+                radius: cs(idle).borderRadius,
+                color: cs(idle).color,
+                border: cs(idle).borderTopWidth + ' ' + cs(idle).borderTopColor,
+              }
+            : null,
+          navActive: active
+            ? {
+                ...rect(active),
+                radius: cs(active).borderRadius,
+                color: cs(active).color,
+                bg: cs(active).backgroundColor,
+                border: cs(active).borderTopWidth + ' ' + cs(active).borderTopColor,
+                overlayOpacity: cs(active.querySelector('.v-list-item__overlay'))?.opacity,
+              }
+            : null,
+          content: main
+            ? { paddingLeft: cs(main).paddingLeft, paddingTop: cs(main).paddingTop }
+            : null,
+          avatarLabel: avatarLabel
+            ? { color: cs(avatarLabel).color, classes: avatarLabel.className }
+            : null,
+          logoFilter: logo ? cs(logo).filter : null,
+          mainTop: Math.round(
+            document.querySelector('[data-test="agency-main"]').getBoundingClientRect().top,
+          ),
+          viewportW: window.innerWidth,
+        }
+      })
       await w.context.close()
     }
 

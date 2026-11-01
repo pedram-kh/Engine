@@ -3,7 +3,7 @@
  * AgencyLayout — the primary authenticated shell for agency users.
  *
  * Structure:
- *   v-navigation-drawer (left, fixed, 260px)
+ *   v-navigation-drawer (left, fixed, 280px)
  *     - Workspace name at top
  *     - Nav items: Dashboard, Brands, Team, Settings
  *   v-app-bar (top, fixed)
@@ -105,7 +105,13 @@ async function onSwitchAgency(agencyId: string): Promise<void> {
     <ImpersonationBanner />
 
     <!-- ─── Navigation drawer ─────────────────────────────────── -->
-    <v-navigation-drawer v-model="drawer" permanent width="260" data-test="agency-sidebar">
+    <v-navigation-drawer
+      v-model="drawer"
+      permanent
+      width="280"
+      class="agency-sidebar"
+      data-test="agency-sidebar"
+    >
       <!-- Workspace name -->
       <div class="px-4 py-4 d-flex align-center ga-2" data-test="sidebar-workspace-name">
         <img :src="catalystLogo" alt="Catalyst" class="agency-sidebar__logo" />
@@ -126,13 +132,12 @@ async function onSwitchAgency(agencyId: string): Promise<void> {
           :title="t(`app.nav.${item.key}`)"
           :data-test="`nav-${item.key}`"
           rounded="lg"
-          active-color="primary"
         />
       </v-list>
     </v-navigation-drawer>
 
     <!-- ─── Top bar ────────────────────────────────────────────── -->
-    <v-app-bar elevation="1" data-test="agency-topbar">
+    <v-app-bar elevation="0" height="65" class="agency-topbar" data-test="agency-topbar">
       <v-app-bar-nav-icon @click="drawer = !drawer" />
 
       <!-- Workspace switcher — hidden when user has only one membership (Q2: Option B) -->
@@ -168,7 +173,7 @@ async function onSwitchAgency(agencyId: string): Promise<void> {
         <template #activator="{ props: menuProps }">
           <v-btn v-bind="menuProps" variant="text" class="text-none" data-test="user-menu-btn">
             <v-avatar size="32" color="primary" class="mr-2">
-              <span class="text-caption font-weight-bold text-white">
+              <span class="text-caption font-weight-bold text-on-primary">
                 {{ (user?.attributes.name ?? '?')[0]?.toUpperCase() }}
               </span>
             </v-avatar>
@@ -231,7 +236,7 @@ async function onSwitchAgency(agencyId: string): Promise<void> {
 
     <!-- ─── Main content ──────────────────────────────────────── -->
     <v-main data-test="agency-main">
-      <v-container fluid class="pa-6">
+      <v-container fluid class="pa-6 pa-md-8">
         <slot />
       </v-container>
     </v-main>

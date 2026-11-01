@@ -50,12 +50,17 @@ declare global {
   }
 }
 
+/** `?real=campaigns.list,campaigns.create` keeps those routes' real page components (the screenshot sets feed them fixtures). */
+const realRoutes = new Set(
+  (new URLSearchParams(location.search).get('real') ?? '').split(',').filter(Boolean),
+)
+
 function stub(list: RouteRecordRaw[]): RouteRecordRaw[] {
   return list.map((r) => {
     const out = { ...r } as Record<string, unknown>
     delete out.beforeEnter
     delete out.redirect
-    out.component = ProbePage
+    if (!(typeof r.name === 'string' && realRoutes.has(r.name))) out.component = ProbePage
     if (r.meta) out.meta = { ...r.meta, guards: [] }
     if (r.children) out.children = stub(r.children)
     return out as unknown as RouteRecordRaw

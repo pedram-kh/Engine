@@ -16,7 +16,7 @@
  * is the GLOBAL theme's) and the spec asserts it equals the theme module's
  * `background`, so the two cannot drift.
  *
- * Added in later steps: shell geometry (S1.2), the type re-map and the
+ * Added in later steps: the type re-map and the
  * redefined --catalyst-typography-* (S1.3), primitives (S1.4, S1.5).
  */
 
@@ -54,6 +54,72 @@
  * Roboto; the overlay element itself carries the agency theme class. */
 :is(.v-theme--agency-dark, .v-theme--agency-light).v-overlay {
   font-family: var(--brand-font-primary);
+}
+
+/* ── Shell (S1.2) ─────────────────────────────────────────────────────────
+ * Sidebar and top bar: new fills from the theme (`sidebar`, `topbar`), one 1px
+ * separator, no shadow. The hooks are the classes AgencyLayout puts on its own
+ * drawer and bar, so no other drawer or toolbar in the agency app is touched. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-sidebar {
+  background-color: rgb(var(--v-theme-sidebar));
+  border-inline-end: 1px solid rgb(var(--v-theme-border-color));
+  box-shadow: none;
+}
+
+/* `.v-toolbar` raises specificity above Vuetify's `.v-app-bar.v-toolbar` background,
+ * whose load order relative to this sheet is not guaranteed. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-topbar.v-toolbar {
+  background-color: rgb(var(--v-theme-topbar));
+  box-shadow: none;
+}
+
+/* The separator is drawn inside the bar's 65px (a border would add a 66th pixel). */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-topbar::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1px;
+  background-color: rgb(var(--v-theme-border-color));
+  pointer-events: none;
+}
+
+/* The Catalyst wordmark is an off-white SVG loaded as an <img>, so it cannot take
+ * a theme variable and vanishes on the light sidebar. Inverting its lightness
+ * (hue kept) gives a dark wordmark in light mode only. Stopgap: a light-mode logo
+ * asset from the designer replaces this (noted for the S5.1 review). */
+:is(.v-theme--agency-dark, .v-theme--agency-light).v-theme--agency-light .agency-sidebar__logo {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* Nav items: 44 high, radius 8 (the template's rounded="lg"). Active = subtle
+ * fill + 1px accent border + accent-as-text label (the brand mint fails AA as
+ * text on the light canvas, so the label uses `primary-text`). */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-sidebar .v-list-item {
+  min-height: 44px;
+  border: 1px solid transparent;
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-sidebar .v-list-item--active {
+  background-color: rgb(var(--v-theme-primary-container));
+  border-color: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-primary-text));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .agency-sidebar
+  .v-list-item--active
+  > .v-list-item__overlay {
+  opacity: 0;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .agency-sidebar
+  .v-list-item--active
+  .v-list-item__prepend
+  > .v-icon {
+  opacity: 1;
 }
 
 /* The single non-descendant form: the canvas behind and around the app. */
