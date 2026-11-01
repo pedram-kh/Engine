@@ -422,6 +422,19 @@
   color: rgb(var(--v-theme-text-tertiary));
 }
 
+/* Hint spacing (S2.0). Vuetify gives each message line a 12px line height of its own
+ * (`.v-messages__message`), so a two-line hint was 24px of tightly set text with the next
+ * field 12px below it, and the hint read as part of the next field's label. Messages take
+ * the 16px Caption line height, and a field that HAS a message gets 4px of room under it
+ * (an empty details row keeps Vuetify's 22px and its rhythm). */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-messages__message {
+  line-height: 16px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-input__details:has(.v-messages__message) {
+  padding-bottom: 4px;
+}
+
 :is(.v-theme--agency-dark, .v-theme--agency-light)
   .v-input--error:not(.v-input--disabled)
   .v-input__details
@@ -643,6 +656,20 @@
   > tr
   > :is(th, td) {
   border-bottom-color: rgb(var(--v-theme-border-color));
+}
+
+/* Even rule pitch (S2.0). Every row but the last is `row-height` tall INCLUDING its 1px
+ * rule; the last row has no rule of its own, so it was a full row-height of content and
+ * the rule under it (the footer's, or the table border) landed one pixel late: 53 from
+ * the previous rule instead of 52. One pixel short here makes the pitch exact. */
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-data-table.v-table
+  .v-table__wrapper
+  > table
+  > tbody
+  > tr:last-child:not(.v-data-table-rows-no-data)
+  > td {
+  height: calc(var(--v-table-row-height) - 1px);
 }
 
 /* Tabs: underline style. A 1px rule under the bar, the label in Body/strong, the

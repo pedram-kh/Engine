@@ -22,6 +22,7 @@ import { createServer } from 'vite'
 
 import { RGB } from './pins-colours.mjs'
 import { S14_PINS } from './pins-s14.mjs'
+import { S20_PINS } from './pins-s20.mjs'
 import { S15_PINS } from './pins-s15.mjs'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
@@ -106,6 +107,8 @@ const PINS = [
   ...S14_PINS,
   // ── S1.5 ───────────────────────────────────────────────────────────────────
   ...S15_PINS,
+  // ── S2.0 ───────────────────────────────────────────────────────────────────
+  ...S20_PINS,
 ]
 
 const THEMES = ['dark', 'light']

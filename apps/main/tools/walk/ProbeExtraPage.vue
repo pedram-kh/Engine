@@ -12,6 +12,17 @@ const off = ref(false)
 const text = ref('')
 const combo = ref('')
 const chip = ref(0)
+
+const tableHeaders = [
+  { title: 'Campaign', key: 'name' },
+  { title: 'Budget', key: 'budget' },
+]
+const tableItems = [
+  { name: 'Spring launch', budget: 4200 },
+  { name: 'Summer reset', budget: 7000 },
+  { name: 'Autumn capsule', budget: 8700 },
+  { name: 'Holiday gifting', budget: 10200 },
+]
 </script>
 
 <template>
@@ -77,5 +88,13 @@ const chip = ref(0)
         <v-text-field label="Disabled" disabled data-test="extra-disabled" />
       </div>
     </v-card>
+
+    <!-- A data table WITH its default footer (the default probe table hides it). -->
+    <v-data-table
+      :headers="tableHeaders"
+      :items="tableItems"
+      class="my-3"
+      data-test="extra-table"
+    />
   </section>
 </template>
