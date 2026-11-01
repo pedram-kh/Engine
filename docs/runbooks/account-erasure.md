@@ -165,6 +165,40 @@ day it is noticed and say so in the ops notes.
 **What this routine does not do.** It does not erase an account whose grace has not ended (only the shell's `--force-not-requested` can, §1), does not pass a hold, a payment, delivered work or a vendor,
 and does not touch the S3 or backup retention (§7: backups 7 days, logs 14 days; those age out by themselves).
 
+### 1e. The C4 countdown (opened 2026-11-01)
+
+`account_deletion_enabled` was switched **ON in production on 2026-11-01** (Pedram, in the admin Feature flags, after the build 3 walk; reported, the stored row not read). From then **any creator can request deletion**; the grace is 14 days (`deletion_scheduled_for` = the request time + 14 days, stored when the request is made). Nothing erases itself (§1), so a request that reaches its day waits as **Ready**.
+
+| Fact                                                                                                    | Value                                                                                                                                            |
+| ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Flag ON                                                                                                 | 2026-11-01 (a Sunday)                                                                                                                            |
+| Earliest a real request can reach its day                                                               | **2026-11-15** (a Sunday): a request made on 2026-11-01 plus 14 days. Every later request is due later                                           |
+| First Monday that could work it                                                                         | 2026-11-16                                                                                                                                       |
+| Latest erasure the notice allows for that earliest request ("within one month of the grace ending", Q7) | **2026-12-15** (a Tuesday), so the last Monday inside it is **2026-12-14**                                                                       |
+| Known requests                                                                                          | **One test request, pending.** Its ulid and scheduled date are **to follow from Pedram (not recorded)**. Real requests: not counted (read below) |
+
+Read the standing requests (read-only; run it when the numbers are wanted, none has been run for this entry; the statement is checked against the column names and compiles, the local database was not running to execute it. A cancelled request clears both columns, so it is not counted):
+
+```sh
+php artisan tinker --execute="echo DB::table('users')->whereNotNull('deletion_requested_at')->whereNull('erased_at')->count(), ' ', DB::table('users')->whereNotNull('deletion_requested_at')->whereNull('erased_at')->min('deletion_scheduled_for'), PHP_EOL;"
+```
+
+It prints the number of standing requests and the earliest scheduled date (no name, email or key).
+
+**The §2 preconditions on 2026-11-01. None is marked closed; what is known:**
+
+| §2  | Item                                     | State on 2026-11-01                                                                                                                                       |
+| --- | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | The deploy is done                       | Reported 2026-10-29 (the `deploy-log.md` Deploy record). The migration output, the ledger table's GRANT reads: **not read**                               |
+| 2   | A snapshot that is `available`           | `snapshot-20261029` exists and **predates** every request; its creation time and state were **not read**. Take a fresh one right before the first erasure |
+| 3   | The erasure specs have run on Postgres   | **Open** (tech-debt row 1)                                                                                                                                |
+| 4   | The `erasure-ledger/` prefix, versioning | **Not read** (the P9.1 reads of the deploy runbook are not in)                                                                                            |
+| 5   | S3 versions permission                   | **Not read**                                                                                                                                              |
+| 6   | The dry run's `Cost` line                | **Not run** on production data                                                                                                                            |
+|     | The erasure worker                       | `laravel-erasure` is RUNNING (reported); **`stopwaitsecs=3700` is not confirmed** (tech-debt, "Deploy of 2026-10-29: open items", row 2)                  |
+
+**If §2 is not closed by Monday 2026-12-14, the notice's "within one month" is broken for the earliest request.** A request that becomes due before then simply waits as Ready: that is the intended state, not a fault. Whether the standing test request is used as the first rehearsal is Pedram's decision (it needs `account_erasure_execute_enabled` ON for that one account and OFF after, §1c, and a fresh snapshot first). Record the day §2 closes in `deploy-log.md`; the Monday routine (§1d) starts the Monday after it.
+
 ---
 
 ## 2. Before the first real erasure
