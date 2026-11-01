@@ -7,6 +7,9 @@
 
 import { ref } from 'vue'
 
+import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
+import type { AgencyStatusTone } from '@/modules/agency/status/agencyStatusTones'
+
 const on = ref(true)
 const off = ref(false)
 const text = ref('')
@@ -22,6 +25,15 @@ const tableItems = [
   { name: 'Summer reset', budget: 7000 },
   { name: 'Autumn capsule', budget: 8700 },
   { name: 'Holiday gifting', budget: 10200 },
+]
+
+const pillTones: Array<[AgencyStatusTone, string]> = [
+  ['success', 'Approved'],
+  ['info', 'Contacted'],
+  ['warning', 'Awaiting'],
+  ['danger', 'Declined'],
+  ['neutral', 'Draft'],
+  ['ai', 'Generated'],
 ]
 </script>
 
@@ -96,5 +108,18 @@ const tableItems = [
       class="my-3"
       data-test="extra-table"
     />
+
+    <!-- S2.1: the status pill, every tone, plus table-mode values. -->
+    <div class="d-flex ga-3 align-center flex-wrap my-3" data-test="extra-pills">
+      <AgencyStatusPill
+        v-for="[tone, label] in pillTones"
+        :key="tone"
+        :tone="tone"
+        :label="label"
+        :data-test="`extra-pill-${tone}`"
+      />
+      <AgencyStatusPill kind="campaign" status="active" data-test="extra-pill-campaign-active" />
+      <AgencyStatusPill kind="roster" status="pending_request" data-test="extra-pill-roster" />
+    </div>
   </section>
 </template>

@@ -23,6 +23,14 @@ export const RGB = {
     info: 'rgb(76, 141, 255)',
     infoText: 'rgb(112, 164, 255)',
     overlayShadow: 'rgba(0, 0, 0, 0.55) 0px 12px 32px 0px',
+    pills: {
+      success: { fill: 'rgb(52, 199, 123)', text: 'rgb(52, 199, 123)' },
+      info: { fill: 'rgb(76, 141, 255)', text: 'rgb(112, 164, 255)' },
+      warning: { fill: 'rgb(245, 165, 36)', text: 'rgb(245, 165, 36)' },
+      danger: { fill: 'rgb(240, 80, 110)', text: 'rgb(243, 115, 139)' },
+      neutral: { fill: 'rgb(160, 160, 168)', text: 'rgb(160, 160, 168)' },
+      ai: { fill: 'rgb(139, 108, 255)', text: 'rgb(162, 137, 255)' },
+    },
   },
   light: {
     canvas: 'rgb(244, 244, 245)',
@@ -43,5 +51,13 @@ export const RGB = {
     info: 'rgb(76, 141, 255)',
     infoText: 'rgb(36, 87, 197)',
     overlayShadow: 'rgba(24, 24, 27, 0.14) 0px 12px 32px 0px',
+    pills: {
+      success: { fill: 'rgb(52, 199, 123)', text: 'rgb(21, 118, 72)' },
+      info: { fill: 'rgb(76, 141, 255)', text: 'rgb(36, 87, 197)' },
+      warning: { fill: 'rgb(245, 165, 36)', text: 'rgb(151, 89, 0)' },
+      danger: { fill: 'rgb(240, 80, 110)', text: 'rgb(186, 41, 70)' },
+      neutral: { fill: 'rgb(160, 160, 168)', text: 'rgb(82, 82, 91)' },
+      ai: { fill: 'rgb(139, 108, 255)', text: 'rgb(98, 64, 216)' },
+    },
   },
 }
