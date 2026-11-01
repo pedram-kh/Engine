@@ -494,6 +494,248 @@
   transform: translateX(7px);
 }
 
+/* ── Primitives, group B: surfaces and data (S1.5) ────────────────────────
+ * Cards, banners, tables, tabs, chips and the overlays. No Figma frame draws
+ * pagination or progress, so those inherit the button and type rules and only
+ * take the brand colour. */
+
+/* Dividers: Vuetify draws them in the text colour at 12% opacity; here they are
+ * `border-default` at full strength (same look, one source). Vuetify's own
+ * `--v-border-*` variables are left alone: other components read their opacity. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-divider {
+  border-color: rgb(var(--v-theme-border-color));
+  opacity: 1;
+}
+
+/* Cards: surface fill, 1px border, radius 10, 20 padding, no shadow. Dialog cards
+ * keep Vuetify's own dialog padding (those rules are more specific). */
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-card:is(.v-card--variant-elevated, .v-card--variant-flat) {
+  background-color: rgb(var(--v-theme-surface));
+  border: 1px solid rgb(var(--v-theme-border-color));
+  border-radius: var(--radius-xl);
+  box-shadow: none;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-card-title:not([class*='text-']) {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: normal;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-card > .v-card-title {
+  padding: 20px 20px 0;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-card-text {
+  padding: 20px;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: normal;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-card-title + .v-card-text {
+  padding-top: 8px;
+}
+
+/* Dialog cards: the same 20 padding on title, body and actions, and Body text (the
+ * dialog's own rule inherits the page size and adds tracking). */
+:is(.v-theme--agency-dark, .v-theme--agency-light).v-dialog
+  > .v-overlay__content
+  > :is(.v-card, form > .v-card)
+  > .v-card-text {
+  padding: 8px 20px 20px;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: normal;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light).v-dialog
+  > .v-overlay__content
+  > :is(.v-card, form > .v-card)
+  > .v-card-actions {
+  padding: 0 20px 20px;
+}
+
+/* Banners (the Gate banner shape): status tint at 16%, 1px status border, radius
+ * 10, text in the status `*-text` colour (the fill colour fails AA as text). */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-alert--variant-tonal {
+  border-radius: var(--radius-xl);
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-alert--variant-tonal .v-alert__underlay {
+  background: transparent;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-alert--variant-tonal.text-info {
+  background-color: rgba(var(--v-theme-info), 0.16);
+  border: 1px solid rgb(var(--v-theme-info));
+  color: rgb(var(--v-theme-info-text)) !important;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-alert--variant-tonal.text-success {
+  background-color: rgba(var(--v-theme-success), 0.16);
+  border: 1px solid rgb(var(--v-theme-success));
+  color: rgb(var(--v-theme-success-text)) !important;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-alert--variant-tonal.text-warning {
+  background-color: rgba(var(--v-theme-warning), 0.16);
+  border: 1px solid rgb(var(--v-theme-warning));
+  color: rgb(var(--v-theme-warning-text)) !important;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-alert--variant-tonal.text-error {
+  background-color: rgba(var(--v-theme-error), 0.16);
+  border: 1px solid rgb(var(--v-theme-error));
+  color: rgb(var(--v-theme-error-text)) !important;
+}
+
+/* Data tables: a bordered radius-10 card on the canvas (not when already inside a
+ * card), 34-high header row in Caption/strong secondary text, divider rows,
+ * a hover fill. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-table {
+  --v-table-header-height: 34px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-data-table {
+  border: 1px solid rgb(var(--v-theme-border-color));
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-card .v-data-table {
+  border: 0;
+  border-radius: 0;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-data-table
+  .v-table__wrapper
+  > table
+  > thead
+  > tr
+  > th {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: normal;
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-data-table
+  .v-table__wrapper
+  > table
+  > tbody
+  > tr:not(.v-data-table-rows-no-data):hover
+  > td {
+  background-color: rgb(var(--v-theme-surface-bright));
+}
+
+/* Row and header rules: `border-default`, not the 12% text colour. */
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-data-table.v-table
+  .v-table__wrapper
+  > table
+  :is(thead, tbody)
+  > tr
+  > :is(th, td) {
+  border-bottom-color: rgb(var(--v-theme-border-color));
+}
+
+/* Tabs: underline style. A 1px rule under the bar, the label in Body/strong, the
+ * selected tab and its 2px slider in the accent (`primary-text` for the label so the
+ * light theme passes AA). Tabs are `v-btn`s, so the button radius is taken back. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-tabs {
+  border-bottom: 1px solid rgb(var(--v-theme-border-color));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-tab.v-btn {
+  border-radius: 0 !important;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-tab.v-btn.v-tab--selected {
+  color: rgb(var(--v-theme-primary-text));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-tab__slider {
+  background-color: rgb(var(--v-theme-primary));
+}
+
+/* Chips (baseline): Body small, and the choice chip (outlined) as a surface pill
+ * that turns container + accent when selected. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-chip.v-chip--size-default {
+  font-size: 13px;
+  line-height: 19px;
+  letter-spacing: normal;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-chip--variant-outlined {
+  background-color: rgb(var(--v-theme-surface));
+  border-color: rgb(var(--v-theme-border-color));
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-chip--variant-outlined.v-chip--selected {
+  background-color: rgb(var(--v-theme-primary-container));
+  border-color: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-primary-text));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-chip--variant-outlined .v-chip__underlay {
+  display: none;
+}
+
+/* Progress: the brand colour unless the page sets one. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-progress-linear {
+  color: rgb(var(--v-theme-primary));
+  border-radius: 999px;
+}
+
+/* Overlays (teleported: the overlay element itself carries the theme class).
+ * Raised surface, 1px border, radius 10, the theme's overlay shadow. */
+:is(.v-theme--agency-dark, .v-theme--agency-light).v-menu > .v-overlay__content {
+  border-radius: var(--radius-xl);
+  box-shadow: var(--v-shadow-overlay);
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light).v-menu
+  > .v-overlay__content
+  > :is(.v-card, .v-sheet, .v-list) {
+  background-color: rgb(var(--v-theme-surface-bright));
+  border: 1px solid rgb(var(--v-theme-border-color));
+  border-radius: inherit;
+  box-shadow: none;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light).v-dialog
+  > .v-overlay__content
+  > :is(.v-card, .v-sheet, form > .v-card, form > .v-sheet) {
+  background-color: rgb(var(--v-theme-surface-bright));
+  border: 1px solid rgb(var(--v-theme-border-color));
+  border-radius: var(--radius-xl);
+  box-shadow: var(--v-shadow-overlay);
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light).v-tooltip > .v-overlay__content {
+  background-color: rgb(var(--v-theme-surface-bright));
+  border: 1px solid rgb(var(--v-theme-border-color));
+  border-radius: var(--radius-md);
+  box-shadow: var(--v-shadow-overlay);
+  color: rgb(var(--v-theme-on-surface));
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: normal;
+  padding: 6px 10px;
+}
+
 /* The single non-descendant form: the canvas behind and around the app. */
 :root:has(.v-application.v-theme--agency-dark) {
   background-color: #0b0b0c;

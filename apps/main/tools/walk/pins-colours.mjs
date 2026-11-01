@@ -19,6 +19,10 @@ export const RGB = {
     errorText: 'rgb(243, 115, 139)',
     tertiary: 'rgb(138, 138, 146)',
     white: 'rgb(255, 255, 255)',
+    border: 'rgb(46, 46, 51)',
+    info: 'rgb(76, 141, 255)',
+    infoText: 'rgb(112, 164, 255)',
+    overlayShadow: 'rgba(0, 0, 0, 0.55) 0px 12px 32px 0px',
   },
   light: {
     canvas: 'rgb(244, 244, 245)',
@@ -35,5 +39,9 @@ export const RGB = {
     errorText: 'rgb(186, 41, 70)',
     tertiary: 'rgb(107, 107, 116)',
     white: 'rgb(255, 255, 255)',
+    border: 'rgb(228, 228, 231)',
+    info: 'rgb(76, 141, 255)',
+    infoText: 'rgb(36, 87, 197)',
+    overlayShadow: 'rgba(24, 24, 27, 0.14) 0px 12px 32px 0px',
   },
 }

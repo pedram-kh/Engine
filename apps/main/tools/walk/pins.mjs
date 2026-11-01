@@ -22,6 +22,7 @@ import { createServer } from 'vite'
 
 import { RGB } from './pins-colours.mjs'
 import { S14_PINS } from './pins-s14.mjs'
+import { S15_PINS } from './pins-s15.mjs'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 const APP_ROOT = path.resolve(HERE, '../..')
@@ -103,6 +104,8 @@ const PINS = [
   VARS('mono', 13, 500, 20),
   // ── S1.4 ───────────────────────────────────────────────────────────────────
   ...S14_PINS,
+  // ── S1.5 ───────────────────────────────────────────────────────────────────
+  ...S15_PINS,
 ]
 
 const THEMES = ['dark', 'light']
@@ -137,6 +140,8 @@ async function runTheme(browser, base, theme, pins, probe) {
       if (kind === 'focus') await page.locator(sel).first().focus()
       else if (kind === 'blur') await page.locator(sel).first().blur()
       else if (kind === 'click') await page.locator(sel).first().click({ force: true })
+      else if (kind === 'hover') await page.locator(sel).first().hover({ force: true })
+      else if (kind === 'press') await page.keyboard.press(sel)
       await page.waitForTimeout(400)
     }
   }

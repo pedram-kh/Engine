@@ -11,6 +11,7 @@ const on = ref(true)
 const off = ref(false)
 const text = ref('')
 const combo = ref('')
+const chip = ref(0)
 </script>
 
 <template>
@@ -44,6 +45,13 @@ const combo = ref('')
       <v-btn variant="text" color="error">Text error</v-btn>
       <v-btn variant="outlined" size="small" class="text-none">Small secondary</v-btn>
     </div>
+
+    <v-chip-group v-model="chip" data-test="extra-chips">
+      <v-chip variant="outlined" filter>All</v-chip>
+      <v-chip variant="outlined" filter>Draft</v-chip>
+    </v-chip-group>
+
+    <v-divider class="my-3" data-test="extra-divider" />
 
     <v-card class="pa-4 my-3" data-test="extra-card">
       <div class="d-flex flex-column ga-3" data-test="extra-fields">
