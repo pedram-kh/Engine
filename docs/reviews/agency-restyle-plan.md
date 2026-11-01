@@ -123,6 +123,19 @@ Method: WCAG 2.1 contrast, pill text on its 15 % tint over the three surfaces a 
 
 The status **fills** stay at the Figma values (single-value semantics, `color-system-parity` invariant 1 and its agency sibling). Only text colours move. Success, warning and neutral pill text already pass and are not changed. The deviation record (what Figma says, what ships, why, which ratio) is written in S5.1.
 
+### 2.1b Light pill text, corrected at S0.3 (MEASURED by spec 4)
+
+Inventory §2.2 measured the light status-text values on a tint over **white** only. A pill can also sit on the light canvas (`#f4f4f5`, which is also `surface-bright`), where three of them landed just under 4.5:1. Spec 4 checks every tone on all three pill surfaces and caught it. Each is darkened one step; fills are unchanged.
+
+| Role              | Inventory §2.2 | Shipped   | On canvas tint (before / after) | On white tint (after) |
+| ----------------- | -------------- | --------- | ------------------------------- | --------------------- |
+| success text      | `#16794a`      | `#157648` | 4.43 / 4.61                     | 5.02                  |
+| warning text      | `#9a5b00`      | `#975900` | 4.49 / 4.64                     | 5.05                  |
+| danger text       | `#bf2a48`      | `#ba2946` | 4.42 / 4.60                     | 5.02                  |
+| info, ai, neutral | unchanged      | unchanged | 5.09 / 5.01 / 6.28              |                       |
+
+Also at S0.3: the agency-light `accent` slot (not in the inventory) takes the dark value, so every fill is one value in both themes.
+
 ---
 
 ## 3. The plan: layers and steps
