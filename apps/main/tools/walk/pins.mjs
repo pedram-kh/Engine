@@ -25,6 +25,7 @@ import { S14_PINS } from './pins-s14.mjs'
 import { S20_PINS } from './pins-s20.mjs'
 import { S21_PINS } from './pins-s21.mjs'
 import { S22_PINS } from './pins-s22.mjs'
+import { S23_PINS } from './pins-s23.mjs'
 import { S15_PINS } from './pins-s15.mjs'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
@@ -114,6 +115,7 @@ const PINS = [
   // ── S2.1 ───────────────────────────────────────────────────────────────────
   ...S21_PINS,
   ...S22_PINS,
+  ...S23_PINS,
 ]
 
 const THEMES = ['dark', 'light']

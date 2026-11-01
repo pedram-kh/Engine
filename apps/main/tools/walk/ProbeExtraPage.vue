@@ -5,11 +5,15 @@
  * creator baseline, so adding to it never changes a baseline hash.
  */
 
+import type { RelationshipMessageResource } from '@catalyst/api-client'
 import { ref } from 'vue'
+
+import type { RelationshipChatTransport } from '@/modules/messaging/api/relationshipMessaging.api'
 
 import AgencyRelationshipInbox, {
   type AgencyInboxItem,
 } from '@/modules/agency/components/AgencyRelationshipInbox.vue'
+import AgencyRelationshipThreadView from '@/modules/agency/components/AgencyRelationshipThreadView.vue'
 import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
 import type { AgencyStatusTone } from '@/modules/agency/status/agencyStatusTones'
 
@@ -76,6 +80,91 @@ const inboxLabels = {
   all: 'All',
   unread: 'Unread',
   noMatch: 'No conversations match',
+}
+
+// S2.3: a stand-in conversation behind a fake transport (fixed old dates, so the day separators
+// and the stamps do not change). Nothing here touches the API.
+function threadMessage(
+  id: string,
+  at: string,
+  attrs: Partial<RelationshipMessageResource['attributes']>,
+): RelationshipMessageResource {
+  return {
+    id,
+    type: 'relationship_message',
+    attributes: {
+      kind: 'text',
+      sender_role: 'creator',
+      body: null,
+      attachments: [],
+      is_own: false,
+      sender: { name: 'Nadia Okafor' },
+      read_by_counterparty: null,
+      created_at: at,
+      ...attrs,
+    },
+  }
+}
+
+const threadMessages = [
+  threadMessage('t1', '2020-03-13T09:30:00+00:00', {
+    body: 'Hi! I went through the brief and have a couple of questions about usage rights.',
+  }),
+  threadMessage('t2', '2020-03-13T09:42:00+00:00', {
+    sender_role: 'agency_user',
+    is_own: true,
+    sender: { name: 'Jordan' },
+    read_by_counterparty: true,
+    body: 'Of course, happy to walk you through them. The contract has the details.',
+  }),
+  threadMessage('t3', '2020-03-13T09:45:00+00:00', {
+    sender_role: 'agency_user',
+    is_own: true,
+    sender: { name: 'Jordan' },
+    read_by_counterparty: true,
+    kind: 'attachment_only',
+    attachments: [
+      {
+        kind: 'file',
+        s3_path: 'x',
+        mime_type: 'application/pdf',
+        name: 'Campaign brief.pdf',
+        size_bytes: 1_200_000,
+        view_url: 'https://files.example/brief.pdf',
+      },
+    ],
+  }),
+  threadMessage('t4', '2020-03-14T16:10:00+00:00', {
+    body: 'Thanks, that clears it up. Sending the draft tonight.',
+  }),
+  threadMessage('t5', '2020-03-14T16:12:00+00:00', {
+    sender_role: 'agency_user',
+    is_own: true,
+    sender: { name: 'Jordan' },
+    read_by_counterparty: false,
+    body: 'Perfect, see you on Friday.',
+  }),
+]
+
+const threadTransport: RelationshipChatTransport = {
+  list: () =>
+    Promise.resolve({
+      data: threadMessages,
+      meta: {
+        thread: {
+          id: 'probe-thread',
+          last_message_at: null,
+          unread_count: 0,
+          can_send: true,
+          closed_reason: null,
+        },
+        has_more: false,
+      },
+    }),
+  send: () => Promise.reject(new Error('probe transport: send is not wired')),
+  markRead: () => Promise.resolve({ meta: { marked: 0, unread_count: 0 } }),
+  attachmentInit: () => Promise.reject(new Error('probe transport: not wired')),
+  attachmentComplete: () => Promise.reject(new Error('probe transport: not wired')),
 }
 
 const pillTones: Array<[AgencyStatusTone, string]> = [
@@ -183,6 +272,15 @@ const pillTones: Array<[AgencyStatusTone, string]> = [
         :labels="inboxLabels"
       />
     </div>
+
+    <!-- S2.3: the conversation pane fork behind a stand-in transport, in a 640px pane. -->
+    <div class="extra-pane extra-pane--thread" data-test="extra-thread-pane">
+      <AgencyRelationshipThreadView
+        :transport="threadTransport"
+        title="Nadia Okafor"
+        avatar-text="Nadia Okafor"
+      />
+    </div>
   </section>
 </template>
 
@@ -195,5 +293,9 @@ const pillTones: Array<[AgencyStatusTone, string]> = [
   border-radius: 12px;
   background-color: rgb(var(--v-theme-surface));
   overflow: hidden;
+}
+
+.extra-pane--thread {
+  width: 640px;
 }
 </style>
