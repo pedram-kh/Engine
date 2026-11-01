@@ -1,0 +1,66 @@
+/*
+ * AH-114 (S0.4) — the agency app's stylesheet: everything the two agency Vuetify
+ * themes have no slot for (type, radius, component shapes, status tints).
+ *
+ * SCOPE RULE (pinned by tests/unit/architecture/agency-theme-scoping.spec.ts):
+ * every selector starts with `:is(.v-theme--agency-dark, .v-theme--agency-light)`.
+ * Vuetify puts that class on the agency <v-app> and on every overlay it teleports
+ * (menus, dialogs, tooltips), so the scope covers teleported content and nothing
+ * the creator, onboarding, auth or admin trees render. The prefix is also what
+ * makes a rule beat Vuetify's own utility classes regardless of load order.
+ *
+ * THE ONE EXCEPTION is the canvas rule at the bottom: the browser canvas lives
+ * outside the agency layout, so it is reached with `:root:has(.v-application…)`.
+ * It sets `background-color` and nothing else. Its value is defined in the rule
+ * (the layout's theme variables are not on `:root`; `--v-theme-background` there
+ * is the GLOBAL theme's) and the spec asserts it equals the theme module's
+ * `background`, so the two cannot drift.
+ *
+ * Added in later steps: shell geometry (S1.2), the type re-map and the
+ * redefined --catalyst-typography-* (S1.3), primitives (S1.4, S1.5).
+ */
+
+/* Radius scale: Figma `radius/xl` is 10 (the web token is 12) and `radius/2xl`
+ * is new (12). Redefined inside the scope only, never on :root. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) {
+  --radius-xl: 10px;
+  --radius-2xl: 12px;
+}
+
+/* Vuetify's `.text-*` utilities carry `font-family: "Roboto"`, which is not
+ * installed: every element with one of these classes fell back to the system
+ * sans while its container was Inter. Font only at this step; size, weight and
+ * line height are re-mapped in S1.3. */
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  :is(
+    .text-h1,
+    .text-h2,
+    .text-h3,
+    .text-h4,
+    .text-h5,
+    .text-h6,
+    .text-subtitle-1,
+    .text-subtitle-2,
+    .text-body-1,
+    .text-body-2,
+    .text-caption,
+    .text-overline,
+    .text-button
+  ) {
+  font-family: var(--brand-font-primary);
+}
+
+/* Teleported overlays sit in `.v-overlay-container` under <body>, which computes
+ * Roboto; the overlay element itself carries the agency theme class. */
+:is(.v-theme--agency-dark, .v-theme--agency-light).v-overlay {
+  font-family: var(--brand-font-primary);
+}
+
+/* The single non-descendant form: the canvas behind and around the app. */
+:root:has(.v-application.v-theme--agency-dark) {
+  background-color: #0b0b0c;
+}
+
+:root:has(.v-application.v-theme--agency-light) {
+  background-color: #f4f4f5;
+}
