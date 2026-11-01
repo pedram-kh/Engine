@@ -10,6 +10,7 @@ import { ref } from 'vue'
 
 import type { RelationshipChatTransport } from '@/modules/messaging/api/relationshipMessaging.api'
 
+import ProbeBell from './ProbeBell.vue'
 import AgencyKpiCard from '@/modules/agency/components/AgencyKpiCard.vue'
 import AgencyRelationshipInbox, {
   type AgencyInboxItem,
@@ -263,6 +264,13 @@ const pillTones: Array<[AgencyStatusTone, string]> = [
       <AgencyStatusPill kind="roster" status="pending_request" data-test="extra-pill-roster" />
     </div>
 
+    <!-- S2.5: the bell with a shared poll holding 0, 7 and 120 (the cap), beside each other. -->
+    <div class="extra-bells" data-test="extra-bells">
+      <span data-test="extra-bell-0"><ProbeBell :count="0" /></span>
+      <span data-test="extra-bell-7"><ProbeBell :count="7" /></span>
+      <span data-test="extra-bell-120"><ProbeBell :count="120" /></span>
+    </div>
+
     <!-- S2.4: the KPI card fork, each variant the page can ask for. -->
     <div class="extra-kpis" data-test="extra-kpis">
       <AgencyKpiCard
@@ -330,6 +338,13 @@ const pillTones: Array<[AgencyStatusTone, string]> = [
   border-radius: 12px;
   background-color: rgb(var(--v-theme-surface));
   overflow: hidden;
+}
+
+.extra-bells {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-block: 12px;
 }
 
 .extra-kpis {
