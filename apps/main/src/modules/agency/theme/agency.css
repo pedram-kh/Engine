@@ -16,8 +16,23 @@
  * is the GLOBAL theme's) and the spec asserts it equals the theme module's
  * `background`, so the two cannot drift.
  *
- * Added in later steps: the type re-map and the
- * redefined --catalyst-typography-* (S1.3), primitives (S1.4, S1.5).
+ * Added in later steps: primitives (S1.4, S1.5).
+ *
+ * TYPE MAP (S1.3). Figma text style (size / line / weight / tracking) for each
+ * Vuetify utility class the agency pages use, with the call-site count:
+ *
+ *   .text-h5          Display      28 / 36 / 500            page titles        (31)
+ *   .text-h6          Heading/H3   18 / 24 / 600            section, card, dialog titles (46)
+ *   .text-subtitle-1  Heading/H4   15 / 20 / 600            sub-section headings (7)
+ *   .text-subtitle-2  Body/Strong  14 / 20 / 500            labels, row titles (11)
+ *   .text-body-1      Body         14 / 20 / 400            (Figma has no 16px body) (2)
+ *   .text-body-2      Body         14 / 20 / 400            default body       (85)
+ *   .text-caption     Caption      12 / 16 / 400            secondary lines    (48)
+ *   .text-overline    Overline     11 / 14 / 600, +0.6px, uppercase           (3)
+ *
+ * Size and tracking use !important because Vuetify's utilities do (scope
+ * specificity wins the tie); weight and line height do not, so utilities such as
+ * `font-weight-bold` still win, as they do today.
  */
 
 /* Radius scale: Figma `radius/xl` is 10 (the web token is 12) and `radius/2xl`
@@ -29,8 +44,7 @@
 
 /* Vuetify's `.text-*` utilities carry `font-family: "Roboto"`, which is not
  * installed: every element with one of these classes fell back to the system
- * sans while its container was Inter. Font only at this step; size, weight and
- * line height are re-mapped in S1.3. */
+ * sans while its container was Inter. */
 :is(.v-theme--agency-dark, .v-theme--agency-light)
   :is(
     .text-h1,
@@ -48,6 +62,89 @@
     .text-button
   ) {
   font-family: var(--brand-font-primary);
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .text-h5 {
+  font-size: 28px !important;
+  font-weight: 500;
+  line-height: 36px;
+  letter-spacing: normal !important;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .text-h6 {
+  font-size: 18px !important;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: normal !important;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .text-subtitle-1 {
+  font-size: 15px !important;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: normal !important;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .text-subtitle-2 {
+  font-size: 14px !important;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: normal !important;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) :is(.text-body-1, .text-body-2) {
+  font-size: 14px !important;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: normal !important;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .text-caption {
+  font-size: 12px !important;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: normal !important;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .text-overline {
+  font-size: 11px !important;
+  font-weight: 600;
+  line-height: 14px;
+  letter-spacing: 0.6px !important;
+}
+
+/* The type scale the shared `@catalyst/ui` components read (`typography-consumption`
+ * pins that they only ever use these variables). Redefined inside the scope so those
+ * components follow the Figma styles without being edited. `display-xl`, `body-lg`
+ * and `mono` have no Figma style and keep the shared values. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) {
+  --catalyst-typography-display-size: 28px;
+  --catalyst-typography-display-weight: 500;
+  --catalyst-typography-display-line-height: 36px;
+  --catalyst-typography-heading-1-size: 26px;
+  --catalyst-typography-heading-1-weight: 500;
+  --catalyst-typography-heading-1-line-height: 32px;
+  --catalyst-typography-heading-2-size: 22px;
+  --catalyst-typography-heading-2-weight: 600;
+  --catalyst-typography-heading-2-line-height: 28px;
+  --catalyst-typography-heading-3-size: 18px;
+  --catalyst-typography-heading-3-weight: 600;
+  --catalyst-typography-heading-3-line-height: 24px;
+  --catalyst-typography-heading-4-size: 15px;
+  --catalyst-typography-heading-4-weight: 600;
+  --catalyst-typography-heading-4-line-height: 20px;
+  --catalyst-typography-body-size: 14px;
+  --catalyst-typography-body-weight: 400;
+  --catalyst-typography-body-line-height: 20px;
+  --catalyst-typography-body-sm-size: 13px;
+  --catalyst-typography-body-sm-weight: 400;
+  --catalyst-typography-body-sm-line-height: 19px;
+  --catalyst-typography-caption-size: 12px;
+  --catalyst-typography-caption-weight: 400;
+  --catalyst-typography-caption-line-height: 16px;
+  --catalyst-typography-overline-size: 11px;
+  --catalyst-typography-overline-weight: 600;
+  --catalyst-typography-overline-line-height: 14px;
 }
 
 /* Teleported overlays sit in `.v-overlay-container` under <body>, which computes

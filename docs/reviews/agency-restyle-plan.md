@@ -234,6 +234,11 @@ Counting check: 5 + 4 + 8 + 1 + 2 = **20**.
   - Logo: the wordmark is an off-white SVG loaded as an `<img>` (cannot take a theme variable), invisible on the light sidebar. Fixed in `agency.css` for the light theme only with `filter: invert(1) hue-rotate(180deg)`. **Designer note for S5.1:** a light-mode logo asset replaces this stopgap.
   - **Carried to S1.4:** `v-btn` computes radius 0 because Vuetify's default `rounded: 0` adds `.rounded-0 { border-radius: 0 !important }`; the agency radius 8 on buttons therefore needs `!important` inside the scope (the one case where Vuetify itself uses it).
   - The top-bar search of the Figma frame is omitted (no API to back it), as ruled.
+- **S1.3 (MEASURED in Chromium, `tools/walk/pins.mjs --step S1.3`: 28 pins, 180 checks, both themes; four break-reverts caught).**
+  - The mapping table lives in the `agency.css` header. Choices that were mine: `text-h5` (page titles) is Display 28/36/500; `text-h6` is H3 18/24/600; `text-subtitle-1` is H4 15/20/600; `text-subtitle-2` is Body/Strong; `text-body-1` and `text-body-2` are both Body 14/20 (Figma has no 16px body); `text-caption` is Caption/Default 12/16/**400** (the shared web token is 500); overline tracking is 0.6px (the web token is 0.08em, about 0.88px).
+  - Size and tracking are `!important` (Vuetify's are); weight and line height are not, so `font-weight-bold` and similar utilities still win, as they do today. A pin covers that.
+  - `--catalyst-typography-*` is redefined inside the scope for display, heading-1 to 4, body, body-sm, caption and overline. `display-xl`, `body-lg` and `mono` have no Figma style and keep the shared values (pinned). Shared `@catalyst/ui` components follow without being edited; `typography-consumption.spec.ts` unchanged and green.
+  - `pins.mjs` is the computed-style harness for the later steps: S1.4 and S1.5 add their pins to its `PINS` list.
 
 ---
 
