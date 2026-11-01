@@ -26,6 +26,7 @@ import { routes } from '@/modules/auth/routes'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { vuetify } from '@/plugins/vuetify'
 
+import ProbeExtraPage from './ProbeExtraPage.vue'
 import ProbePage from './ProbePage.vue'
 
 import '@catalyst/ui/assets/fonts/inter.css'
@@ -51,6 +52,7 @@ declare global {
 }
 
 /** `?real=campaigns.list,campaigns.create` keeps those routes' real page components (the screenshot sets feed them fixtures). */
+const probeKind = new URLSearchParams(location.search).get('probe')
 const realRoutes = new Set(
   (new URLSearchParams(location.search).get('real') ?? '').split(',').filter(Boolean),
 )
@@ -60,7 +62,11 @@ function stub(list: RouteRecordRaw[]): RouteRecordRaw[] {
     const out = { ...r } as Record<string, unknown>
     delete out.beforeEnter
     delete out.redirect
-    if (!(typeof r.name === 'string' && realRoutes.has(r.name))) out.component = ProbePage
+    if (!(typeof r.name === 'string' && realRoutes.has(r.name))) {
+      // `?probe=extra` swaps in the second probe page (S1.4 and later pins only); the
+      // creator baseline never passes it, so the default stand-in is unchanged.
+      out.component = probeKind === 'extra' ? ProbeExtraPage : ProbePage
+    }
     if (r.meta) out.meta = { ...r.meta, guards: [] }
     if (r.children) out.children = stub(r.children)
     return out as unknown as RouteRecordRaw

@@ -6,8 +6,8 @@
  *   node tools/walk/pins.mjs                run every pin
  *   node tools/walk/pins.mjs --step S1.3    only one step's pins
  *
- * Each pin injects a snippet into the agency content area, reads computed styles and
- * compares them with the expected values. Exit code 1 on any mismatch. Break-revert
+ * Each pin reads computed styles (of an element on the probe page, an injected snippet,
+ * or a function's result) and compares them with the expected values. Exit code 1 on any mismatch. Break-revert
  * is done by editing `agency.css`, running this, and seeing the pin fail.
  *
  * Add the next step's pins to PINS; keep `expect` values as the Figma numbers, not
@@ -19,6 +19,9 @@ import { fileURLToPath } from 'node:url'
 
 import { chromium } from '@playwright/test'
 import { createServer } from 'vite'
+
+import { RGB } from './pins-colours.mjs'
+import { S14_PINS } from './pins-s14.mjs'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 const APP_ROOT = path.resolve(HERE, '../..')
@@ -98,6 +101,8 @@ const PINS = [
   VARS('display-xl', 48, 700, 56),
   VARS('body-lg', 16, 400, 24),
   VARS('mono', 13, 500, 20),
+  // ── S1.4 ───────────────────────────────────────────────────────────────────
+  ...S14_PINS,
 ]
 
 const THEMES = ['dark', 'light']
@@ -106,9 +111,9 @@ function matches(actual, want) {
   return want instanceof RegExp ? want.test(actual) : actual === want
 }
 
-async function runTheme(browser, base, theme, pins) {
+async function runTheme(browser, base, theme, pins, probe) {
   const context = await browser.newContext({
-    viewport: { width: 1280, height: 800 },
+    viewport: { width: 1280, height: 1000 },
     reducedMotion: 'reduce',
     colorScheme: 'dark',
     locale: 'en-US',
@@ -120,44 +125,62 @@ async function runTheme(browser, base, theme, pins) {
   )
   const page = await context.newPage()
   const qs = new URLSearchParams({ to: '/campaigns', user: 'agency', theme })
+  if (probe !== 'main') qs.set('probe', probe)
   await page.goto(`${base}/tools/walk/index.html?${qs}`, { waitUntil: 'domcontentloaded' })
   await page.waitForFunction(() => window.__walk && window.__walk.ready === true, null, {
     timeout: 60000,
   })
   await page.evaluate(() => document.fonts.ready)
 
-  const results = await page.evaluate(
-    (list) => {
-      const host = document.querySelector('[data-test="agency-main"] .v-container')
-      const app = document.querySelector('.v-application')
-      return list.map((pin) => {
-        if (pin.vars) {
+  const act = async (steps) => {
+    for (const [kind, sel] of steps ?? []) {
+      if (kind === 'focus') await page.locator(sel).first().focus()
+      else if (kind === 'blur') await page.locator(sel).first().blur()
+      else if (kind === 'click') await page.locator(sel).first().click({ force: true })
+      await page.waitForTimeout(400)
+    }
+  }
+
+  const results = []
+  for (const pin of pins) {
+    const expect = typeof pin.expect === 'function' ? pin.expect(RGB[theme]) : pin.expect
+    await act(pin.act)
+    const got = await page.evaluate(
+      ({ p, keys }) => {
+        const host = document.querySelector('[data-test="agency-main"] .v-container')
+        const app = document.querySelector('.v-application')
+        if (p.vars) {
           const cs = getComputedStyle(app)
-          return Object.fromEntries(
-            Object.keys(pin.expect).map((k) => [k, cs.getPropertyValue(k).trim()]),
-          )
+          return Object.fromEntries(keys.map((k) => [k, cs.getPropertyValue(k).trim()]))
         }
-        const wrap = document.createElement('div')
-        wrap.innerHTML = pin.html
-        const el = wrap.firstElementChild
-        host.appendChild(el)
+        if (p.fn) return new Function(p.fn)()
+        let el
+        let injected = false
+        if (p.sel) {
+          el = document.querySelector(p.sel)
+          if (!el) return Object.fromEntries(keys.map((k) => [k, 'MISSING ELEMENT']))
+        } else {
+          const wrap = document.createElement('div')
+          wrap.innerHTML = p.html
+          el = wrap.firstElementChild
+          host.appendChild(el)
+          injected = true
+        }
         const cs = getComputedStyle(el)
-        const got = Object.fromEntries(Object.keys(pin.expect).map((k) => [k, cs[k]]))
-        el.remove()
-        return got
-      })
-    },
-    pins.map((p) => ({ vars: !!p.vars, html: p.html, expect: serialisable(p.expect) })),
-  )
+        const out = Object.fromEntries(keys.map((k) => [k, cs[k]]))
+        if (injected) el.remove()
+        return out
+      },
+      {
+        p: { vars: !!pin.vars, fn: pin.fn ?? null, sel: pin.sel ?? null, html: pin.html ?? null },
+        keys: Object.keys(expect),
+      },
+    )
+    await act(pin.undo)
+    results.push({ expect, got })
+  }
   await context.close()
   return results
-}
-
-/** RegExps cannot cross the evaluate boundary; they are compared on the Node side. */
-function serialisable(expect) {
-  return Object.fromEntries(
-    Object.entries(expect).map(([k, v]) => [k, v instanceof RegExp ? '' : v]),
-  )
 }
 
 const pins = PINS.filter((p) => ONLY_STEP === null || p.step === ONLY_STEP)
@@ -172,19 +195,23 @@ let failures = 0
 let checks = 0
 try {
   for (const theme of THEMES) {
-    const results = await runTheme(browser, `http://127.0.0.1:${PORT}`, theme, pins)
-    pins.forEach((pin, i) => {
-      for (const [key, want] of Object.entries(pin.expect)) {
-        checks += 1
-        const got = results[i][key]
-        if (!matches(got, want)) {
-          failures += 1
-          console.log(
-            `FAIL [${theme}] ${pin.step} ${pin.name} ${key}: expected ${want}, got ${got}`,
-          )
+    for (const probe of ['main', 'extra']) {
+      const group = pins.filter((p) => (p.page ?? 'main') === probe)
+      if (group.length === 0) continue
+      const results = await runTheme(browser, `http://127.0.0.1:${PORT}`, theme, group, probe)
+      group.forEach((pin, i) => {
+        const { expect, got } = results[i]
+        for (const [key, want] of Object.entries(expect)) {
+          checks += 1
+          if (!matches(got[key], want)) {
+            failures += 1
+            console.log(
+              `FAIL [${theme}] ${pin.step} ${pin.name} ${key}: expected ${want}, got ${got[key]}`,
+            )
+          }
         }
-      }
-    })
+      })
+    }
   }
 } finally {
   await browser.close()

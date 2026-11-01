@@ -219,6 +219,281 @@
   opacity: 1;
 }
 
+/* ── Primitives, group A: actions and inputs (S1.4) ───────────────────────
+ * Scoped CSS only: no template edits, no `defaults` edit. Source for each value:
+ * the Figma components page (via the inventory's component table, §4) and the
+ * theme keys in agencyThemes.ts. `outline` is the theme's `border-strong`,
+ * `border-color` is `border-default`. */
+
+/* Buttons. Md is 40 high and Sm 32 (Vuetify: 36 and 28), driven by Vuetify's own
+ * height variable so density and icon-button maths stay consistent; icon-only
+ * buttons keep their size. The radius is 8 and `!important` because Vuetify's
+ * default `rounded: 0` adds `.rounded-0 { border-radius: 0 !important }`: the
+ * shared `defaults.VBtn.style` radius has never rendered (measured 0px), and an
+ * inline style cannot beat an `!important` class. Icon-only buttons take
+ * Vuetify's circle back. */
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-btn.v-btn--size-default:not(.v-btn--icon):not(.v-btn--stacked) {
+  --v-btn-height: 40px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-btn.v-btn--size-small:not(.v-btn--icon):not(.v-btn--stacked) {
+  --v-btn-height: 32px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-btn:not(.v-btn--icon) {
+  border-radius: var(--radius-lg) !important;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-btn.v-btn--icon {
+  border-radius: 50% !important;
+}
+
+/* Button/Default 500; Button/Primary (the accent-filled one) 600. No tracking. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-btn {
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-btn.v-btn--variant-flat.bg-primary {
+  font-weight: 600;
+}
+
+/* Disabled: Vuetify's disabled colours are beaten by `.bg-primary` (an `!important`
+ * utility), so a disabled primary button looked enabled. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-btn--disabled.v-btn--variant-flat.bg-primary {
+  background-color: rgb(var(--v-theme-surface-bright)) !important;
+  color: rgb(var(--v-theme-text-tertiary)) !important;
+}
+
+/* Secondary: outlined, no colour of its own. Surface fill, strong 1px border. */
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-btn--variant-outlined:not(.text-primary):not(.text-error):not(.text-success):not(
+    .text-warning
+  ):not(.text-info) {
+  background-color: rgb(var(--v-theme-surface));
+  border-color: rgb(var(--v-theme-outline));
+  color: rgb(var(--v-theme-on-surface));
+}
+
+/* Soft: tonal, with no colour or the brand colour. Container fill, accent label
+ * (`primary-text`: the mint itself fails AA on the light container). */
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-btn--variant-tonal:not(.text-error):not(.text-success):not(.text-warning):not(.text-info) {
+  background-color: rgb(var(--v-theme-primary-container));
+  color: rgb(var(--v-theme-primary-text)) !important;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-btn--variant-tonal:not(.text-error):not(.text-success):not(.text-warning):not(.text-info)
+  .v-btn__underlay {
+  background: transparent;
+}
+
+/* Brand-coloured outlined, text and plain buttons: the label is `primary-text`. */
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-btn:is(.v-btn--variant-outlined, .v-btn--variant-text, .v-btn--variant-plain).text-primary {
+  color: rgb(var(--v-theme-primary-text)) !important;
+}
+
+/* Danger: outlined + error. Error at 16% on the fill, error border, `error-text`
+ * label. Text-variant error buttons get the label only. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-btn--variant-outlined.text-error {
+  background-color: rgba(var(--v-theme-error), 0.16);
+  border-color: rgb(var(--v-theme-error));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-btn:is(
+    .v-btn--variant-outlined,
+    .v-btn--variant-text,
+    .v-btn--variant-plain,
+    .v-btn--variant-tonal
+  ).text-error {
+  color: rgb(var(--v-theme-error-text)) !important;
+}
+
+/* Fields: v-text-field, v-select, v-autocomplete (outlined by default) and the
+ * v-textarea / v-file-input / v-combobox family (Vuetify's `filled` default, drawn
+ * here as the same outlined box). 40 high comes from `density="compact"`, which the
+ * shared defaults already set; pinned. Canvas fill, 1px strong border, radius 8,
+ * accent border on focus, error border on error, body-size text. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-field {
+  --v-field-border-radius: var(--radius-lg);
+  font-size: 14px;
+  letter-spacing: normal;
+  border-radius: var(--radius-lg);
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-field--variant-outlined {
+  background-color: rgb(var(--v-theme-background));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-field--variant-outlined:not(.v-field--focused):not(.v-field--error)
+  .v-field__outline {
+  --v-field-border-opacity: 1;
+  color: rgb(var(--v-theme-outline));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-field--variant-outlined:not(.v-field--focused):not(.v-field--error):not(
+    .v-field--disabled
+  ):hover
+  .v-field__outline {
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-field--variant-outlined.v-field--focused:not(.v-field--error)
+  .v-field__outline {
+  color: rgb(var(--v-theme-primary));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-field--variant-outlined.v-field--error:not(.v-field--disabled)
+  .v-field__outline {
+  color: rgb(var(--v-theme-error));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-field--variant-filled {
+  background-color: rgb(var(--v-theme-background));
+  border: 1px solid rgb(var(--v-theme-outline));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-field--variant-filled:hover:not(.v-field--focused) {
+  border-color: rgb(var(--v-theme-on-surface-variant));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-field--variant-filled.v-field--focused {
+  border-color: rgb(var(--v-theme-primary));
+  box-shadow: inset 0 0 0 1px rgb(var(--v-theme-primary));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-field--variant-filled.v-field--error:not(.v-field--disabled) {
+  border-color: rgb(var(--v-theme-error));
+  box-shadow: inset 0 0 0 1px rgb(var(--v-theme-error));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-field--variant-filled .v-field__overlay,
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-field--variant-filled .v-field__outline {
+  display: none;
+}
+
+/* Field text. Labels are Body (14) at rest and Caption (12) when floated, in the
+ * secondary text colour at full opacity (Vuetify's 60% on 87% is a washed-out
+ * grey on the light canvas); accent while focused, error text on error. Hint and
+ * error lines are Caption in tertiary text, not 60% opacity. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-field .v-field__input {
+  color: rgb(var(--v-theme-on-surface));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-field .v-label.v-field-label {
+  font-size: 14px;
+  letter-spacing: normal;
+  opacity: 1;
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-field .v-label.v-field-label--floating {
+  font-size: 12px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-field--focused:not(.v-field--error)
+  .v-label.v-field-label {
+  color: rgb(var(--v-theme-primary-text));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-field--error:not(.v-field--disabled)
+  .v-label.v-field-label {
+  color: rgb(var(--v-theme-error-text));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-messages {
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: normal;
+  opacity: 1;
+  color: rgb(var(--v-theme-text-tertiary));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-input--error:not(.v-input--disabled)
+  .v-input__details
+  > .v-messages {
+  color: rgb(var(--v-theme-error-text));
+}
+
+/* Checkbox and switch. The checked state takes the brand colour when the page set
+ * no colour of its own. */
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-selection-control--dirty:not(.v-selection-control--error):not(.v-selection-control--disabled)
+  .v-selection-control__input:not([class*='text-'])
+  > .v-icon {
+  color: rgb(var(--v-theme-primary));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-selection-control .v-label {
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: normal;
+  opacity: 1;
+  color: rgb(var(--v-theme-on-surface));
+}
+
+/* Toggle (inset or not: the agency pages use both): 32 x 18 track, 14 thumb with a 2px inset, white thumb (`text-inverse`).
+ * Vuetify hard-codes the track (36 x 14) and the thumb travel (+/-10px), and a
+ * `color="primary"` switch paints its thumb with `.bg-primary !important`, so the
+ * geometry is restated and the on-state thumb colour needs `!important` too. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-switch .v-switch__track {
+  height: 18px;
+  min-width: 32px;
+  width: 32px;
+  padding: 0;
+  opacity: 1;
+  background-color: rgb(var(--v-theme-outline));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-switch
+  .v-selection-control--dirty:not(.v-selection-control--error)
+  .v-switch__track {
+  background-color: rgb(var(--v-theme-primary));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-switch .v-switch__thumb {
+  height: 14px;
+  width: 14px;
+  box-shadow: none;
+  transform: none;
+  background-color: rgb(var(--v-theme-text-inverse)) !important;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light).v-locale--is-ltr
+  .v-switch
+  .v-selection-control__input,
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-locale--is-ltr.v-switch
+  .v-selection-control__input {
+  transform: translateX(-7px);
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light).v-locale--is-ltr
+  .v-switch
+  .v-selection-control--dirty
+  .v-selection-control__input,
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-locale--is-ltr.v-switch
+  .v-selection-control--dirty
+  .v-selection-control__input {
+  transform: translateX(7px);
+}
+
 /* The single non-descendant form: the canvas behind and around the app. */
 :root:has(.v-application.v-theme--agency-dark) {
   background-color: #0b0b0c;
