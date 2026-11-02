@@ -604,6 +604,13 @@ export interface DiscoveryListParams {
   country?: string
   language?: string
   category?: string
+  /**
+   * Age range (AH-088 backend, AH-116 UI): inclusive bounds on the creator's age,
+   * each INDEPENDENT (`age_min` alone is "18+"). Creators with no birthday are
+   * excluded whenever either bound is set.
+   */
+  age_min?: number
+  age_max?: number
   /** Free-text name/bio search — the shared `?q=` FTS (Postgres tsvector; SQLite LIKE). */
   q?: string
   page?: number

@@ -142,7 +142,8 @@
       },
       "emptyFiltered": {
         "heading": "Žádné shody",
-        "body": "Žádní tvůrci neodpovídají vašim filtrům. Zkuste rozšířit vyhledávání."
+        "body": "Žádní tvůrci neodpovídají vašim filtrům. Zkuste rozšířit vyhledávání.",
+        "ageNote": "Tvůrci, kteří nezadali datum narození, nejsou při filtrování podle věku zahrnuti."
       },
       "errors": {
         "loadFailed": "Nepodařilo se načíst tvůrce. Zkuste to znovu."

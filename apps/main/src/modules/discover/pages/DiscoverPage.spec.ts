@@ -322,6 +322,94 @@ describe('DiscoverPage (Sprint 6.6a)', () => {
     expect(params).not.toHaveProperty('category')
   })
 
+  it('AH-116: draws the two age inputs and re-queries with each bound on its own', async () => {
+    const harness = await mountDiscover({ cards: [makeCard()] })
+    cleanup = harness.cleanup
+    expect(harness.wrapper.find('[data-test="discover-age-min"]').exists()).toBe(true)
+    expect(harness.wrapper.find('[data-test="discover-age-max"]').exists()).toBe(true)
+    // The bounds are not sent until set.
+    const first = vi.mocked(discoveryApi.list).mock.calls[0]?.[1]
+    expect(first).not.toHaveProperty('age_min')
+    expect(first).not.toHaveProperty('age_max')
+
+    const vm = harness.wrapper.vm as unknown as {
+      ageMin: number | null
+      ageMax: number | null
+    }
+
+    vi.mocked(discoveryApi.list).mockClear()
+    vm.ageMin = 21
+    await flushPromises()
+    const minOnly = vi.mocked(discoveryApi.list).mock.calls.at(-1)?.[1]
+    expect(minOnly).toMatchObject({ age_min: 21 })
+    expect(minOnly).not.toHaveProperty('age_max')
+
+    vm.ageMax = 35
+    await flushPromises()
+    expect(vi.mocked(discoveryApi.list).mock.calls.at(-1)?.[1]).toMatchObject({
+      age_min: 21,
+      age_max: 35,
+    })
+
+    vm.ageMin = null
+    await flushPromises()
+    const maxOnly = vi.mocked(discoveryApi.list).mock.calls.at(-1)?.[1]
+    expect(maxOnly).not.toHaveProperty('age_min')
+    expect(maxOnly).toMatchObject({ age_max: 35 })
+  })
+
+  it('AH-116: an age change returns to page 1', async () => {
+    const harness = await mountDiscover({ cards: [makeCard()], url: '/discover?page=3' })
+    cleanup = harness.cleanup
+    expect(vi.mocked(discoveryApi.list).mock.calls[0]?.[1]).toMatchObject({ page: 3 })
+
+    vi.mocked(discoveryApi.list).mockClear()
+    ;(harness.wrapper.vm as unknown as { ageMin: number | null }).ageMin = 30
+    await flushPromises()
+    expect(vi.mocked(discoveryApi.list).mock.calls.at(-1)?.[1]).toMatchObject({
+      page: 1,
+      age_min: 30,
+    })
+  })
+
+  it('AH-116: resumes the age range from the URL, and clamps a hand-edited one', async () => {
+    const harness = await mountDiscover({
+      cards: [makeCard()],
+      url: '/discover?age_min=18&age_max=35',
+    })
+    cleanup = harness.cleanup
+    expect(vi.mocked(discoveryApi.list).mock.calls[0]?.[1]).toMatchObject({
+      age_min: 18,
+      age_max: 35,
+    })
+    harness.cleanup()
+
+    vi.mocked(discoveryApi.list).mockClear()
+    const edited = await mountDiscover({
+      cards: [makeCard()],
+      url: '/discover?age_min=999&age_max=abc',
+    })
+    cleanup = edited.cleanup
+    const params = vi.mocked(discoveryApi.list).mock.calls[0]?.[1]
+    expect(params).toMatchObject({ age_min: 120 })
+    expect(params).not.toHaveProperty('age_max')
+  })
+
+  it('AH-116: the filtered-empty state explains the age rule only while an age filter is on', async () => {
+    const note = "Creators who haven't entered a birthday aren't included when you filter by age."
+
+    const withAge = await mountDiscover({ cards: [], url: '/discover?age_min=40' })
+    cleanup = withAge.cleanup
+    expect(withAge.wrapper.get('[data-test="discover-empty-filtered"]').text()).toContain(note)
+    withAge.cleanup()
+
+    const withCountry = await mountDiscover({ cards: [], url: '/discover?country=PT' })
+    cleanup = withCountry.cleanup
+    const filtered = withCountry.wrapper.get('[data-test="discover-empty-filtered"]')
+    expect(filtered.text()).toContain('No creators match your filters')
+    expect(filtered.text()).not.toContain(note)
+  })
+
   it('writes the page into the URL so the profile can be left and re-entered here', async () => {
     const harness = await mountDiscover({ cards: [makeCard()], lastPage: 5 })
     cleanup = harness.cleanup

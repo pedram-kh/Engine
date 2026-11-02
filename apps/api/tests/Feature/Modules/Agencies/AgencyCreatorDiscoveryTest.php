@@ -217,11 +217,14 @@ it('derives the card age through the slim projection (AH-088 O3)', function (): 
 /**
  * AH-088 (O1 / D7) — discover ACCEPTS `age_min`/`age_max` with no discover UI.
  *
+ * AH-116 update: the Discover page now draws the age control, so the "no UI" half of
+ * D7 is history; this test still pins the API half, which is unchanged.
+ *
  * The age predicate lives in the shared FiltersCreatorColumns trait because it is
  * a pure creators-column predicate, and the trait's whole purpose is that both
- * surfaces read one implementation. The consequence is that discover gains the
- * capability for free while its UI ships no age control (the D7 fence is
- * UI-only). That is a deliberate outcome, so it is pinned: if someone later
+ * surfaces read one implementation. The consequence is that discover gained the
+ * capability for free before its UI had an age control. That was a deliberate
+ * outcome, so it is pinned: if someone later
  * "tidies up" by moving the filter onto the roster controller, this reds and the
  * decision gets re-made on purpose instead of by accident.
  */

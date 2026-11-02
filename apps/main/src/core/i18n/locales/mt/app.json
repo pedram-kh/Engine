@@ -142,7 +142,8 @@
       },
       "emptyFiltered": {
         "heading": "Le matches",
-        "body": "Le creators match your filters. Try broadening your search."
+        "body": "Le creators match your filters. Try broadening your search.",
+        "ageNote": "Il-kreaturi li ma daħlux data tat-twelid ma jiddaħlux meta tfiltra skont l-età."
       },
       "errors": {
         "loadFailed": "Couldn't load creators. Please try again."

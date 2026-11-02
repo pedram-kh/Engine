@@ -142,7 +142,8 @@
       },
       "emptyFiltered": {
         "heading": "Ei matches",
-        "body": "Ei creators match your filters. Try broadening your search."
+        "body": "Ei creators match your filters. Try broadening your search.",
+        "ageNote": "Sisällöntuottajia, jotka eivät ole antaneet syntymäpäiväänsä, ei oteta mukaan, kun suodatat iän mukaan."
       },
       "errors": {
         "loadFailed": "Couldn't load creators. Please try again."

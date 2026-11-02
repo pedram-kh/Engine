@@ -142,7 +142,8 @@
       },
       "emptyFiltered": {
         "heading": "Не matches",
-        "body": "Не creators match your filters. Try broadening your search."
+        "body": "Не creators match your filters. Try broadening your search.",
+        "ageNote": "Създателите, които не са въвели рождена дата, не се включват, когато филтрирате по възраст."
       },
       "errors": {
         "loadFailed": "Couldn't load creators. Моля try again."

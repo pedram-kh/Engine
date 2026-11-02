@@ -142,7 +142,8 @@
       },
       "emptyFiltered": {
         "heading": "Inga träffar",
-        "body": "Inga creators matchar dina filter. Prova att bredda sökningen."
+        "body": "Inga creators matchar dina filter. Prova att bredda sökningen.",
+        "ageNote": "Creators som inte har angett någon födelsedag ingår inte när du filtrerar efter ålder."
       },
       "errors": {
         "loadFailed": "Kunde inte ladda creators. Försök igen."

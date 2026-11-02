@@ -38,6 +38,10 @@ export const discoveryApi = {
       query.set('language', params.language)
     if (params.category !== undefined && params.category !== '')
       query.set('category', params.category)
+    // Age range: each bound threads INDEPENDENTLY ("18+" is age_min alone). A literal 0 is a
+    // real bound, so test for `undefined`, never for truthiness.
+    if (params.age_min !== undefined) query.set('age_min', String(params.age_min))
+    if (params.age_max !== undefined) query.set('age_max', String(params.age_max))
     if (params.q !== undefined && params.q !== '') query.set('q', params.q)
     if (params.page !== undefined) query.set('page', String(params.page))
     if (params.per_page !== undefined) query.set('per_page', String(params.per_page))

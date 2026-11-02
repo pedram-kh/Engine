@@ -142,7 +142,8 @@
       },
       "emptyFiltered": {
         "heading": "Brak pasujących",
-        "body": "Żadni twórcy nie pasują do Twoich filtrów. Spróbuj poszerzyć wyszukiwanie."
+        "body": "Żadni twórcy nie pasują do Twoich filtrów. Spróbuj poszerzyć wyszukiwanie.",
+        "ageNote": "Twórcy, którzy nie podali daty urodzenia, nie są uwzględniani przy filtrowaniu według wieku."
       },
       "errors": {
         "loadFailed": "Nie udało się załadować twórców. Spróbuj ponownie."

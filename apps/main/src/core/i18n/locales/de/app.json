@@ -142,7 +142,8 @@
       },
       "emptyFiltered": {
         "heading": "Keine Treffer",
-        "body": "Kein Creator entspricht deinen Filtern. Versuche deine Suche zu erweitern."
+        "body": "Kein Creator entspricht deinen Filtern. Versuche deine Suche zu erweitern.",
+        "ageNote": "Creator, die keinen Geburtstag angegeben haben, werden beim Filtern nach Alter nicht berücksichtigt."
       },
       "errors": {
         "loadFailed": "Creator konnten nicht geladen werden. Bitte versuche es erneut."

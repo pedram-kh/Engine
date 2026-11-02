@@ -142,7 +142,8 @@
       },
       "emptyFiltered": {
         "heading": "Nessun risultato",
-        "body": "Nessun creator corrisponde ai filtri. Prova ad ampliare la ricerca."
+        "body": "Nessun creator corrisponde ai filtri. Prova ad ampliare la ricerca.",
+        "ageNote": "I creator che non hanno inserito la data di nascita non sono inclusi quando filtri per età."
       },
       "errors": {
         "loadFailed": "Impossibile caricare i creator. Riprova."

@@ -142,7 +142,8 @@
       },
       "emptyFiltered": {
         "heading": "Geen overeenkomsten",
-        "body": "Geen creators komen overeen met je filters. Probeer je zoekopdracht te verbreden."
+        "body": "Geen creators komen overeen met je filters. Probeer je zoekopdracht te verbreden.",
+        "ageNote": "Creators die geen geboortedatum hebben ingevuld, worden niet meegenomen wanneer je op leeftijd filtert."
       },
       "errors": {
         "loadFailed": "Creators konden niet worden geladen. Probeer het opnieuw."

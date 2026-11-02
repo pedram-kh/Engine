@@ -12,7 +12,7 @@
  * (avatar + name + country/language/categories + the calling-agency-only
  * "already-connected" status); clicking a card opens the public profile.
  *
- * Browse context (page + search + the three filters) lives in the URL via
+ * Browse context (page + search + the filters) lives in the URL via
  * `useListQueryState`, NOT in local refs: opening a card unmounts this page, so
  * local state would drop the operator back on page 1 with cleared filters the
  * moment they came back from a profile. See that composable for the rest.
@@ -33,6 +33,7 @@ import { useRouter } from 'vue-router'
 import { CEmptyState } from '@catalyst/ui'
 
 import {
+  boundedIntParam,
   oneOfParam,
   pageParam,
   textParam,
@@ -89,6 +90,11 @@ const CATEGORY_FILTER_KEYS = [
   'other',
 ] as const
 
+// The age filter's clamp bounds, identical to the roster's and to the backend's
+// FiltersCreatorColumns::AGE_FILTER_MIN/MAX, so a URL survives the round trip unchanged.
+const AGE_FILTER_MIN = 0
+const AGE_FILTER_MAX = 120
+
 // URL-backed browse context. The filters are validated against the SAME
 // bounded vocabularies the selects offer, so a hand-typed `?country=ZZ` reads
 // as unset instead of reaching the API.
@@ -98,12 +104,17 @@ const {
   country: countryFilter,
   language: languageFilter,
   category: categoryFilter,
+  // AH-116 — the age range. Like the roster, the two bounds are INDEPENDENT.
+  age_min: ageMin,
+  age_max: ageMax,
 } = useListQueryState({
   page: pageParam,
   q: textParam,
   country: oneOfParam(COUNTRY_OPTIONS.map((c) => c.code)),
   language: oneOfParam(worldLanguageOptions().map((o) => o.value)),
   category: oneOfParam(CATEGORY_FILTER_KEYS),
+  age_min: boundedIntParam(AGE_FILTER_MIN, AGE_FILTER_MAX),
+  age_max: boundedIntParam(AGE_FILTER_MIN, AGE_FILTER_MAX),
 })
 
 // `clearable` writes null on clear, so every read of the search box goes
@@ -150,7 +161,18 @@ const hasActiveFilters = computed(
     searchTerm.value !== '' ||
     countryFilter.value !== null ||
     languageFilter.value !== null ||
-    categoryFilter.value !== null,
+    categoryFilter.value !== null ||
+    ageMin.value !== null ||
+    ageMax.value !== null,
+)
+
+// Creators with no birthday never match an age filter, so say so once, under the
+// filtered-empty message, rather than leaving the operator to guess why a pool shrank.
+const ageFilterActive = computed(() => ageMin.value !== null || ageMax.value !== null)
+const emptyFilteredBody = computed(() =>
+  ageFilterActive.value
+    ? `${t('app.discover.emptyFiltered.body')} ${t('app.discover.emptyFiltered.ageNote')}`
+    : t('app.discover.emptyFiltered.body'),
 )
 
 function countryLabel(code: string | null): string {
@@ -192,6 +214,8 @@ async function loadDiscovery(): Promise<void> {
     if (countryFilter.value !== null) params.country = countryFilter.value
     if (languageFilter.value !== null) params.language = languageFilter.value
     if (categoryFilter.value !== null) params.category = categoryFilter.value
+    if (ageMin.value !== null) params.age_min = ageMin.value
+    if (ageMax.value !== null) params.age_max = ageMax.value
 
     const res = await discoveryApi.list(agencyId, params)
     items.value = res.data
@@ -217,7 +241,7 @@ watch(
 )
 
 // Structured filters reset to page 1 and re-query immediately.
-watch([countryFilter, languageFilter, categoryFilter], () => {
+watch([countryFilter, languageFilter, categoryFilter, ageMin, ageMax], () => {
   page.value = 1
   void loadDiscovery()
 })
@@ -266,7 +290,8 @@ function openProfile(item: DiscoveryCreatorListItem): void {
       data-test="discover-search"
     />
 
-    <!-- Country / language / category filters, as the pills the frame draws. -->
+    <!-- Country / language / category filters, as the pills the frame draws, then the age
+         range (two number inputs, each bound works ALONE; the roster draws the same two). -->
     <div class="discover-filters">
       <AgencyFilterPill
         v-model="countryFilter"
@@ -285,6 +310,38 @@ function openProfile(item: DiscoveryCreatorListItem): void {
         :label="t('app.discover.filters.category')"
         :items="categoryFilterItems"
         data-test="discover-category-filter"
+      />
+      <v-text-field
+        v-model.number="ageMin"
+        type="number"
+        :label="t('app.roster.filters.age.min')"
+        :min="AGE_FILTER_MIN"
+        :max="AGE_FILTER_MAX"
+        density="compact"
+        variant="outlined"
+        hide-details
+        clearable
+        active
+        class="agency-filter"
+        :class="{ 'agency-filter--applied': ageMin !== null }"
+        style="max-width: 150px"
+        data-test="discover-age-min"
+      />
+      <v-text-field
+        v-model.number="ageMax"
+        type="number"
+        :label="t('app.roster.filters.age.max')"
+        :min="AGE_FILTER_MIN"
+        :max="AGE_FILTER_MAX"
+        density="compact"
+        variant="outlined"
+        hide-details
+        clearable
+        active
+        class="agency-filter"
+        :class="{ 'agency-filter--applied': ageMax !== null }"
+        style="max-width: 150px"
+        data-test="discover-age-max"
       />
       <p v-if="resultCount" class="discover-filters__count" data-test="discover-result-count">
         {{ resultCount }}
@@ -318,7 +375,7 @@ function openProfile(item: DiscoveryCreatorListItem): void {
         data-test="discover-empty-filtered"
         title-tag="h2"
         :title="t('app.discover.emptyFiltered.heading')"
-        :body="t('app.discover.emptyFiltered.body')"
+        :body="emptyFilteredBody"
       >
         <template #icon>
           <v-icon icon="mdi-filter-remove-outline" size="48" color="medium-emphasis" />

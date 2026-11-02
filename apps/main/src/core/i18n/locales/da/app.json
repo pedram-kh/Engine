@@ -142,7 +142,8 @@
       },
       "emptyFiltered": {
         "heading": "Ingen matches",
-        "body": "Ingen creatorer matcher dine filtre. Prøv at udvide din søgning."
+        "body": "Ingen creatorer matcher dine filtre. Prøv at udvide din søgning.",
+        "ageNote": "Creatorer, der ikke har angivet en fødselsdag, medtages ikke, når du filtrerer efter alder."
       },
       "errors": {
         "loadFailed": "Creatorer kunne ikke indlæses. Prøv igen."

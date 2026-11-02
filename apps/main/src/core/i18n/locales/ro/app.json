@@ -142,7 +142,8 @@
       },
       "emptyFiltered": {
         "heading": "Nu matches",
-        "body": "Nu creators match your filters. Try broadening your search."
+        "body": "Nu creators match your filters. Try broadening your search.",
+        "ageNote": "Creatorii care nu și-au introdus data nașterii nu sunt incluși atunci când filtrezi după vârstă."
       },
       "errors": {
         "loadFailed": "Couldn't load creators. Please try again."

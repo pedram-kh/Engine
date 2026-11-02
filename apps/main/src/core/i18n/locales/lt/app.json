@@ -142,7 +142,8 @@
       },
       "emptyFiltered": {
         "heading": "Ne matches",
-        "body": "Ne creators match your filters. Try broadening your search."
+        "body": "Ne creators match your filters. Try broadening your search.",
+        "ageNote": "Kūrėjai, kurie nenurodė gimimo datos, neįtraukiami, kai filtruojate pagal amžių."
       },
       "errors": {
         "loadFailed": "Couldn't load creators. Please try again."

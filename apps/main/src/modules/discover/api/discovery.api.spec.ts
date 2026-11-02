@@ -62,6 +62,21 @@ describe('discoveryApi.list', () => {
     expect(query.get('per_page')).toBe('24')
   })
 
+  it('AH-116: threads age_min + age_max into the real query string', () => {
+    void discoveryApi.list('agency-ulid', { age_min: 21, age_max: 35 })
+    expect(lastGetUrl()).toBe('/agencies/agency-ulid/creators/discover?age_min=21&age_max=35')
+  })
+
+  it('AH-116: each age bound is INDEPENDENT, and a literal 0 is still a bound', () => {
+    void discoveryApi.list('agency-ulid', { age_min: 18 })
+    expect(lastListQuery().get('age_min')).toBe('18')
+    expect(lastListQuery().has('age_max')).toBe(false)
+
+    void discoveryApi.list('agency-ulid', { age_max: 0 })
+    expect(lastListQuery().get('age_max')).toBe('0')
+    expect(lastListQuery().has('age_min')).toBe(false)
+  })
+
   it('drops empty-string filter values', () => {
     void discoveryApi.list('agency-ulid', { country: '', q: '' })
     const query = lastListQuery()

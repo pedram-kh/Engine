@@ -142,7 +142,8 @@
       },
       "emptyFiltered": {
         "heading": "Níl matches",
-        "body": "Níl creators match your filters. Try broadening your search."
+        "body": "Níl creators match your filters. Try broadening your search.",
+        "ageNote": "Ní chuirtear cruthaitheoirí nár chuir dáta breithe isteach san áireamh nuair a scagann tú de réir aoise."
       },
       "errors": {
         "loadFailed": "Couldn't load creators. Please try again."

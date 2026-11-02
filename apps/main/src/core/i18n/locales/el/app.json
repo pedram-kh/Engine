@@ -142,7 +142,8 @@
       },
       "emptyFiltered": {
         "heading": "Όχι matches",
-        "body": "Όχι creators match your filters. Try broadening your search."
+        "body": "Όχι creators match your filters. Try broadening your search.",
+        "ageNote": "Οι δημιουργοί που δεν έχουν συμπληρώσει ημερομηνία γέννησης δεν περιλαμβάνονται όταν φιλτράρετε ανά ηλικία."
       },
       "errors": {
         "loadFailed": "Couldn't load creators. Please try again."

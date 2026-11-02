@@ -142,7 +142,8 @@
       },
       "emptyFiltered": {
         "heading": "Nē matches",
-        "body": "Nē creators match your filters. Try broadening your search."
+        "body": "Nē creators match your filters. Try broadening your search.",
+        "ageNote": "Satura veidotāji, kuri nav norādījuši dzimšanas datumu, netiek iekļauti, filtrējot pēc vecuma."
       },
       "errors": {
         "loadFailed": "Couldn't load creators. Please try again."

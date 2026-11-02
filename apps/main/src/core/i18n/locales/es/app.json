@@ -142,7 +142,8 @@
       },
       "emptyFiltered": {
         "heading": "Sin coincidencias",
-        "body": "Ningún creador coincide con tus filtros. Prueba a ampliar la búsqueda."
+        "body": "Ningún creador coincide con tus filtros. Prueba a ampliar la búsqueda.",
+        "ageNote": "Los creadores que no han indicado su fecha de nacimiento no se incluyen al filtrar por edad."
       },
       "errors": {
         "loadFailed": "No se han podido cargar los creadores. Inténtalo de nuevo."

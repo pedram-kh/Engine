@@ -142,7 +142,8 @@
       },
       "emptyFiltered": {
         "heading": "Nem matches",
-        "body": "Nem creators match your filters. Try broadening your search."
+        "body": "Nem creators match your filters. Try broadening your search.",
+        "ageNote": "Azok az alkotók, akik nem adták meg a születési dátumukat, nem jelennek meg, ha életkor szerint szűr."
       },
       "errors": {
         "loadFailed": "Couldn't load creators. Please try again."

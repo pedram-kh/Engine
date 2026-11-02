@@ -142,7 +142,8 @@
       },
       "emptyFiltered": {
         "heading": "Žádné shody",
-        "body": "Žádní ustvarjalci neodpovídají vašim filtrům. Zkuste rozšířit vyhledávání."
+        "body": "Žádní ustvarjalci neodpovídají vašim filtrům. Zkuste rozšířit vyhledávání.",
+        "ageNote": "Ustvarjalci, ki niso vnesli datuma rojstva, niso vključeni, ko filtrirate po starosti."
       },
       "errors": {
         "loadFailed": "Ni uspelo naložiti ustvarjalca. Zkuste to znova."

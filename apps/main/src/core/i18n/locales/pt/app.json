@@ -142,7 +142,8 @@
       },
       "emptyFiltered": {
         "heading": "Sem resultados",
-        "body": "Nenhum criador corresponde aos seus filtros. Tente alargar a pesquisa."
+        "body": "Nenhum criador corresponde aos seus filtros. Tente alargar a pesquisa.",
+        "ageNote": "Os criadores que não indicaram a data de nascimento não são incluídos ao filtrar por idade."
       },
       "errors": {
         "loadFailed": "Não foi possível carregar os criadores. Tente novamente."

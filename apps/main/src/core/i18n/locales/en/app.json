@@ -142,7 +142,8 @@
       },
       "emptyFiltered": {
         "heading": "No matches",
-        "body": "No creators match your filters. Try broadening your search."
+        "body": "No creators match your filters. Try broadening your search.",
+        "ageNote": "Creators who haven't entered a birthday aren't included when you filter by age."
       },
       "errors": {
         "loadFailed": "Couldn't load creators. Please try again."
