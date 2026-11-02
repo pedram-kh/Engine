@@ -257,8 +257,9 @@ export const testIds = {
   bulkInviteCreatorsBtn: 'bulk-invite-creators-btn',
 
   // ---------------------------------------------------------------
-  // Creator roster — Sprint 4 Chunk 5 + Sprint 6 Chunk 1 (search +
-  // disabled affordances) + Sprint 6.5 (real availability range filter).
+  // Creator roster — Sprint 4 Chunk 5 + Sprint 6 Chunk 1 (search) +
+  // Sprint 6.5 (real availability range filter). The disabled Followers and
+  // Engagement placeholders were removed in AH-116.
   // (apps/main/src/modules/roster/pages/CreatorRosterPage.vue)
   // ---------------------------------------------------------------
   rosterPage: 'roster-page',
@@ -266,12 +267,8 @@ export const testIds = {
   rosterTable: 'roster-table',
   rosterSearch: 'roster-search',
   rosterEmptyFiltered: 'roster-empty-filtered',
-  rosterFollowersAffordance: 'roster-followers-affordance',
-  rosterEngagementAffordance: 'roster-engagement-affordance',
-  rosterFollowersFilter: 'roster-followers-filter',
-  rosterEngagementFilter: 'roster-engagement-filter',
   // Sprint 6.5 (D-6): the real availability range control (two native date
-  // inputs) — replaces the old disabled availability affordance.
+  // inputs).
   rosterAvailableFrom: 'roster-available-from',
   rosterAvailableTo: 'roster-available-to',
   // AH-088: the age-range filter (each bound independent). AH-096 gave it its

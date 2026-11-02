@@ -270,17 +270,6 @@
           "to": "Dostupný do"
         }
       },
-      "affordances": {
-        "followers": {
-          "label": "Sledující"
-        },
-        "engagement": {
-          "label": "Míra zapojení"
-        },
-        "metrics": {
-          "tooltip": "Sociální metriky ještě nejsou propojeny."
-        }
-      },
       "languages": {
         "en": "English",
         "pt": "Português",

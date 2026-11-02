@@ -32,8 +32,8 @@ export const rosterApi = {
    * (`?available_from=&available_to=`, Sprint 6.5 D-6 — both bounds required),
    * and the age-range filter (`?age_min=&age_max=`, AH-088 — each bound
    * INDEPENDENT, unlike the availability window). Follower/engagement
-   * filters and talent pools remain deferred (inert affordances on the
-   * page, D-4).
+   * filters remain deferred: the page draws none (AH-116 removed the
+   * disabled placeholders) until the social metrics have data.
    *
    * AH-096 eyes-on: `age_min`/`age_max` were on `RosterListParams` and set by
    * the page since AH-088, but never serialized here — a silent no-op filter

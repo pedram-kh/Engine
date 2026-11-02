@@ -21,14 +21,13 @@
  * so local state would drop the operator back on page 1 with cleared filters
  * the moment they came back from a creator. See that composable for the rest.
  *
- * The METRICS affordance (follower range + engagement) stays a DISABLED,
- * present-but-inert control (D-4): faded, span-wrapped so its tooltip still
- * fires on hover (a disabled control emits no hover events), issuing NO query
- * — blocked by missing DATA (social metrics are null until the adapters land),
- * not dead code.
+ * There is no follower-range or engagement filter. They were drawn as disabled,
+ * inert controls (D-4) while social metrics were null; AH-116 removed them rather
+ * than keep two dead controls on the filter row. They return, as real filters,
+ * when the social adapters land and the metrics have data.
  *
- * Still deferred: handle search (D-2), real follower/engagement filters,
- * talent pools, internal_rating editing (read-only stars here).
+ * Still deferred: handle search (D-2), follower/engagement filters,
+ * internal_rating editing (read-only stars here).
  */
 
 import type {
@@ -68,14 +67,6 @@ const router = useRouter()
 const agencyStore = useAgencyStore()
 
 type StatusFilter = RosterRelationshipStatus | 'all'
-
-// Affordance driver (D-4). A static FE constant — there is no backend signal
-// to drive it yet (no `kyc_vendor_available` equivalent). The METRICS filters
-// (follower range + engagement) stay disabled: blocked by missing DATA
-// (`creator_social_accounts.metrics` is null until the social adapters land).
-// When the data lands, flip this to a backend-driven flag + wire the real
-// control. (Availability is no longer here — Sprint 6.5 made it real.)
-const METRICS_FILTERS_CONNECTED = false
 
 const items = ref<RosterCreatorListItem[]>([])
 const totalItems = ref(0)
@@ -454,9 +445,7 @@ function onRowClick(_event: unknown, ctx: { item: RosterCreatorListItem }): void
          (AH-088: two number inputs, each bound works ALONE, clamped alike here, in the URL
          codec and in the backend) and the availability window (Sprint 6.5, D-6: two native
          date inputs, sent only when BOTH are set). Every input floats its label, so an empty
-         number box reads like a date box. The two metrics controls stay present but inert
-         (D-4): faded, disabled, span-wrapped so the tooltip still fires, NO v-model and NO
-         watcher, so they cannot query. -->
+         number box reads like a date box. -->
     <div class="agency-filters" data-test="roster-filters">
       <AgencyFilterPill
         v-model="countryFilter"
@@ -536,50 +525,6 @@ function onRowClick(_event: unknown, ctx: { item: RosterCreatorListItem }): void
         style="max-width: 190px"
         data-test="roster-available-to"
       />
-      <v-tooltip
-        v-if="!METRICS_FILTERS_CONNECTED"
-        location="top"
-        :text="t('app.roster.affordances.metrics.tooltip')"
-      >
-        <template #activator="{ props: tooltipProps }">
-          <span v-bind="tooltipProps" data-test="roster-followers-affordance">
-            <v-select
-              :label="t('app.roster.affordances.followers.label')"
-              :items="[]"
-              density="compact"
-              variant="outlined"
-              hide-details
-              disabled
-              active
-              class="agency-filter"
-              style="width: 150px"
-              data-test="roster-followers-filter"
-            />
-          </span>
-        </template>
-      </v-tooltip>
-      <v-tooltip
-        v-if="!METRICS_FILTERS_CONNECTED"
-        location="top"
-        :text="t('app.roster.affordances.metrics.tooltip')"
-      >
-        <template #activator="{ props: tooltipProps }">
-          <span v-bind="tooltipProps" data-test="roster-engagement-affordance">
-            <v-select
-              :label="t('app.roster.affordances.engagement.label')"
-              :items="[]"
-              density="compact"
-              variant="outlined"
-              hide-details
-              disabled
-              active
-              class="agency-filter"
-              style="width: 150px"
-              data-test="roster-engagement-filter"
-            />
-          </span>
-        </template>
-      </v-tooltip>
     </div>
 
     <!-- Error alert -->

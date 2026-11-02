@@ -147,13 +147,8 @@ async function mountRoster(
   // render the REAL data-table in exactly one test (row-DOM assertions) and
   // stub it elsewhere; the filter selects + the search field are always
   // stubbed (the specs drive the refs directly, not via input events, so no
-  // coverage is lost — the real table + search + affordance DOM is covered by
-  // the Playwright roster spec, Sprint 6 Chunk 1 D-6). Lean footprint mirrors
-  // BrandListPage.spec.
-  //
-  // Note: VTooltip is intentionally NOT stubbed — the disabled-affordance
-  // tests assert the span-wrapped activator + the disabled control render
-  // (the Chunk-3 KYC idiom), which lives inside the tooltip's activator slot.
+  // coverage is lost — the real table + search DOM is covered by the Playwright
+  // roster spec, Sprint 6 Chunk 1 D-6). Lean footprint mirrors BrandListPage.spec.
   const stubs: Record<string, boolean> = { VSelect: true, VTextField: true }
   if (options.realTable !== true) {
     stubs.VDataTableServer = true
@@ -469,33 +464,32 @@ describe('CreatorRosterPage (Sprint 4 Chunk 5)', () => {
     }
   })
 
-  it('renders metrics as DISABLED affordances that issue no query (D-4)', async () => {
+  // AH-116 (item 3): the Followers and Engagement filters were disabled,
+  // inert placeholders (D-4) while social metrics were null. They are gone, not
+  // hidden: nothing on the page may draw them or send a query for them. This
+  // replaces the old "renders metrics as DISABLED affordances" test.
+  it('draws no Followers or Engagement filter and never queries for one (AH-116)', async () => {
     const harness = await mountRoster({ rows: [makeRow()] })
     cleanup = harness.cleanup
     const wrapper = harness.wrapper
 
-    // The METRICS affordances stay disabled (faded, inert) — blocked on data.
-    // Availability is NO LONGER here (Sprint 6.5 made it a real control), so
-    // it is deliberately absent from this disabled loop.
-    for (const id of ['roster-followers', 'roster-engagement']) {
-      const control = wrapper.find(`[data-test="${id}-filter"]`)
-      expect(control.exists(), `${id}-filter should render`).toBe(true)
-      expect(control.attributes('disabled'), `${id}-filter should be disabled`).toBeDefined()
+    for (const id of [
+      'roster-followers-filter',
+      'roster-engagement-filter',
+      'roster-followers-affordance',
+      'roster-engagement-affordance',
+      // The even older disabled availability placeholder (Sprint 6.5 replaced it).
+      'roster-availability-affordance',
+    ]) {
+      expect(wrapper.find(`[data-test="${id}"]`).exists(), `${id} must not render`).toBe(false)
     }
 
-    // The KYC span-wrap idiom: a disabled control emits no hover, so the
-    // tooltip attaches to a wrapping <span> activator.
-    expect(wrapper.find('[data-test="roster-followers-affordance"]').exists()).toBe(true)
-    expect(wrapper.find('[data-test="roster-engagement-affordance"]').exists()).toBe(true)
-
-    // The old disabled availability affordance is gone (replaced by the real
-    // range control below).
-    expect(wrapper.find('[data-test="roster-availability-affordance"]').exists()).toBe(false)
-
-    // They have NO v-model and NO watcher → they CANNOT query. Only the
-    // initial mount load happened (break-revert: wiring one to a query would
-    // bump this past 1).
+    // Only the initial mount load happened, and no param names either metric.
     expect(rosterApi.list).toHaveBeenCalledTimes(1)
+    const params = vi.mocked(rosterApi.list).mock.calls[0]?.[1] ?? {}
+    for (const key of Object.keys(params)) {
+      expect(key).not.toMatch(/follower|engagement/i)
+    }
   })
 
   it('threads BOTH availability bounds into the query, but only when complete (Sprint 6.5, D-6)', async () => {

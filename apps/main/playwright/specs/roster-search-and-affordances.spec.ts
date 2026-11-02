@@ -9,7 +9,8 @@ import {
 } from '../fixtures/test-helpers'
 
 /**
- * Agency creator roster — search + disabled-affordance E2E spec.
+ * Agency creator roster — search + availability E2E spec (the disabled
+ * metrics placeholders it used to cover were removed in AH-116).
  * Sprint 6 Chunk 1 (D-6): resolves the Chunk-5 jsdom heavy-component
  * tech-debt by covering the REAL table DOM in Playwright (the component spec
  * stubs the heavy Vuetify table/selects freely). Exercises:
@@ -19,17 +20,16 @@ import {
  *     API runs against Postgres, this is also a LIVE exercise of the FTS
  *     `to_tsvector @@ plainto_tsquery` path (the one the unit suite can only
  *     cover via a dormant markTestSkipped under SQLite),
- *   - the METRICS filters render DISABLED, with a hover tooltip delivered
- *     through the span-wrap idiom, and do NOT filter (D-4),
+ *   - the Followers and Engagement placeholders are no longer drawn (AH-116),
  *   - the availability range filter (Sprint 6.5, D-6) renders as TWO ENABLED
- *     native date inputs (no longer the old disabled affordance) and threads
+ *     native date inputs and threads
  *     a window through the live stack without error.
  *
  * The `/roster` route is `requireAuth → requireAgencyUser` (NOT MFA-gated), so
  * a plain agency admin (no 2FA) can reach it directly — no TOTP hop needed.
  */
 
-test.describe('Creator roster — search + disabled affordances', () => {
+test.describe('Creator roster — search + availability', () => {
   let adminEmail: string
   let adminPassword: string
   let agencyUlid: string
@@ -54,7 +54,7 @@ test.describe('Creator roster — search + disabled affordances', () => {
     await restoreThrottle(request, 'auth-ip')
   })
 
-  test('renders the real table, narrows by search, and shows inert filter affordances', async ({
+  test('renders the real table, narrows by search, and no longer draws the disabled metrics filters', async ({
     page,
   }) => {
     // Sign in (no MFA — the roster route is not MFA-gated).
@@ -85,23 +85,12 @@ test.describe('Creator roster — search + disabled affordances', () => {
     await expect(table).toContainText('Ada Lovelace')
     await expect(table).toContainText('Grace Hopper')
 
-    // Metrics affordances: each renders disabled and does NOT filter (D-4).
-    for (const id of [testIds.rosterFollowersFilter, testIds.rosterEngagementFilter]) {
-      await expect(page.locator(dt(id))).toHaveClass(/v-input--disabled/)
-    }
-
-    // The span-wrap idiom delivers a hover tooltip on the disabled metrics
-    // control (a disabled control emits no hover — the wrapping <span> does).
-    // Both metrics affordances (followers + engagement) share this tooltip
-    // text, so intersect with `:visible` to target the one the hover opened
-    // (avoids the strict-mode violation of two matching text nodes in the DOM).
-    await page.locator(dt(testIds.rosterFollowersAffordance)).hover()
-    await expect(
-      page.getByText("Social metrics aren't connected yet.").and(page.locator(':visible')),
-    ).toBeVisible({ timeout: 5000 })
+    // AH-116: the disabled Followers and Engagement placeholders are gone.
+    await expect(page.locator('[data-test="roster-followers-filter"]')).toHaveCount(0)
+    await expect(page.locator('[data-test="roster-engagement-filter"]')).toHaveCount(0)
 
     // Availability range filter (Sprint 6.5, D-6): the real control is two
-    // ENABLED native date inputs — NOT the old disabled affordance.
+    // ENABLED native date inputs.
     const fromInput = page.locator(dt(testIds.rosterAvailableFrom)).locator('input')
     const toInput = page.locator(dt(testIds.rosterAvailableTo)).locator('input')
     await expect(fromInput).toBeEnabled()

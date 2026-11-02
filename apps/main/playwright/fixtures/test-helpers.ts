@@ -700,7 +700,7 @@ export interface SeedRosterCreatorsResult {
 /**
  * Seed approved creators + accepted agency_creator_relations on the given
  * agency via the Sprint 6 Chunk 1 test-helper endpoint, so the roster spec can
- * drive a REAL table + the name/bio search (?q=) + the disabled affordances
+ * drive a REAL table + the name/bio search (?q=) + the availability filter
  * against actual rows. No production path provisions a roster in one call.
  */
 export async function seedRosterCreators(

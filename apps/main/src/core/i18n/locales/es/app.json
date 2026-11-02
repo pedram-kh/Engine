@@ -270,17 +270,6 @@
           "to": "Disponible hasta"
         }
       },
-      "affordances": {
-        "followers": {
-          "label": "Seguidores"
-        },
-        "engagement": {
-          "label": "Tasa de interacción"
-        },
-        "metrics": {
-          "tooltip": "Las métricas sociales aún no están conectadas."
-        }
-      },
       "languages": {
         "en": "English",
         "pt": "Português",

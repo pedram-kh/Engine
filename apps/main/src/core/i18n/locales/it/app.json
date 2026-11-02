@@ -270,17 +270,6 @@
           "to": "Disponibile al"
         }
       },
-      "affordances": {
-        "followers": {
-          "label": "Follower"
-        },
-        "engagement": {
-          "label": "Tasso di engagement"
-        },
-        "metrics": {
-          "tooltip": "Le metriche social non sono ancora collegate."
-        }
-      },
       "languages": {
         "en": "English",
         "pt": "Português",
