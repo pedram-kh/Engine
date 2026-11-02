@@ -862,18 +862,17 @@ const requirementRows = computed<RequirementRow[]>(() => {
                      (re-offer-after-decline chunk). Shown alongside the live
                      status so the agency sees "declined → re-invited". Reuses
                      the declined status label. -->
-                <v-chip
+                <AgencyStatusPill
                   v-if="a.attributes.previously_declined && a.attributes.status !== 'declined'"
-                  size="x-small"
-                  variant="tonal"
-                  color="medium-emphasis"
+                  tone="neutral"
+                  :label="t('app.campaigns.assignmentStatus.declined')"
                   :data-test="`creators-declined-history-${a.id}`"
-                >
-                  {{ t('app.campaigns.assignmentStatus.declined') }}
-                </v-chip>
-                <v-chip size="x-small" variant="tonal" :data-test="`creators-status-${a.id}`">
-                  {{ t(`app.campaigns.assignmentStatus.${a.attributes.status}`) }}
-                </v-chip>
+                />
+                <AgencyStatusPill
+                  kind="assignment"
+                  :status="a.attributes.status"
+                  :data-test="`creators-status-${a.id}`"
+                />
               </v-list-item-title>
               <v-list-item-subtitle :data-test="`creators-fees-${a.id}`">
                 <template v-if="a.attributes.status === 'countered'">
@@ -926,17 +925,14 @@ const requirementRows = computed<RequirementRow[]>(() => {
                 >
                   {{ t('app.campaigns.contract.attach.action') }}
                 </v-btn>
-                <v-chip
+                <AgencyStatusPill
                   v-if="
                     a.attributes.status === 'accepted' && a.attributes.has_pending_contract === true
                   "
-                  size="small"
-                  color="info"
-                  variant="tonal"
+                  tone="info"
+                  :label="t('app.campaigns.contract.pending')"
                   :data-test="`creators-contract-pending-${a.id}`"
-                >
-                  {{ t('app.campaigns.contract.pending') }}
-                </v-chip>
+                />
                 <v-btn
                   v-if="canProceedWithoutContract(a)"
                   color="secondary"

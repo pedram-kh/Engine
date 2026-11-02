@@ -20,6 +20,8 @@ import { CEmptyState } from '@catalyst/ui'
 import { campaignsApi } from '../api/campaigns.api'
 import { roundStateColor, roundStateKey } from '../draftRounds'
 import { creatorLabel } from '@/core/creators/creatorLabel'
+import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
+import { roundStateTone } from '@/modules/agency/status/draftRoundTone'
 
 type FilterValue = 'all' | DraftReviewStatus
 
@@ -201,17 +203,14 @@ defineExpose({
         >
           <v-list-item-title class="d-flex align-center ga-2 flex-wrap">
             {{ creatorLabel(row.attributes.assignment?.creator, t, '—') }}
-            <v-chip
-              size="x-small"
-              variant="flat"
-              :color="
-                roundStateColor(
+            <AgencyStatusPill
+              :tone="
+                roundStateTone(
                   row.attributes.review_status,
                   row.attributes.assignment?.status ?? null,
                 )
               "
-            >
-              {{
+              :label="
                 t(
                   roundStateKey(
                     row.attributes.review_status,
@@ -219,8 +218,8 @@ defineExpose({
                   ),
                   { n: row.attributes.version },
                 )
-              }}
-            </v-chip>
+              "
+            />
           </v-list-item-title>
           <v-list-item-subtitle>
             {{

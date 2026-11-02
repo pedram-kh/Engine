@@ -28,6 +28,7 @@ import { useI18n } from 'vue-i18n'
 
 import { campaignsApi } from '../api/campaigns.api'
 import { creatorLabel } from '@/core/creators/creatorLabel'
+import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
 
 type ResolutionField = 'reason'
 type ActionKind = 'verify' | 'fresh' | 'in_place'
@@ -194,18 +195,15 @@ async function runAction(kind: ActionKind): Promise<void> {
                 <span class="text-caption text-medium-emphasis">{{
                   latestPost.attributes.platform
                 }}</span>
-                <v-chip
-                  size="x-small"
-                  color="error"
-                  variant="tonal"
-                  data-test="resolution-verification-status"
-                >
-                  {{
+                <AgencyStatusPill
+                  tone="danger"
+                  :label="
                     t(
                       `app.campaigns.resolution.verification.${latestPost.attributes.verification_status}`,
                     )
-                  }}
-                </v-chip>
+                  "
+                  data-test="resolution-verification-status"
+                />
                 <span class="text-caption text-medium-emphasis">{{
                   t('app.campaigns.resolution.simulated')
                 }}</span>

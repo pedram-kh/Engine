@@ -62,6 +62,11 @@ async function newPage(browser, theme, base, real) {
   })
   await page.evaluate(() => document.fonts.ready)
   await page.waitForTimeout(1200)
+  // `click`: selectors to click in order (opens a dialog before the shot).
+  for (const sel of real.click ?? []) {
+    await page.locator(sel).first().click()
+    await page.waitForTimeout(700)
+  }
   return { context, page }
 }
 

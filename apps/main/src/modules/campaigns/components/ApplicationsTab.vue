@@ -56,6 +56,7 @@ import AcceptApplicationDialog from './AcceptApplicationDialog.vue'
 import RejectApplicationDialog from './RejectApplicationDialog.vue'
 import { creatorLabel } from '@/core/creators/creatorLabel'
 import CreatorIdentityAvatar from '@/components/CreatorIdentityAvatar.vue'
+import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
 
 const props = defineProps<{
   agencyId: string
@@ -243,14 +244,11 @@ defineExpose({
             >
               {{ creatorLabel(row.attributes.creator, t, t('app.campaigns.invite.unnamed')) }}
             </span>
-            <v-chip
-              size="x-small"
-              variant="tonal"
-              :color="isPending(row) ? 'primary' : undefined"
+            <AgencyStatusPill
+              kind="application"
+              :status="row.attributes.status"
               :data-test="`applications-status-${row.id}`"
-            >
-              {{ t(`app.campaigns.applications.status.${row.attributes.status}`) }}
-            </v-chip>
+            />
           </v-list-item-title>
 
           <v-list-item-subtitle>

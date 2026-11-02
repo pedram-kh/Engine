@@ -196,6 +196,8 @@ const POOLS = [
 ]
 export const POOL_ID = POOLS[0][0]
 const BRAND_ID = '01HBRANDJACKJILL0000000001'
+/** The L3 campaign detail fixture's id (`l3-fixtures.mjs` `DETAIL_ID`; not imported: it imports this file). */
+const DETAIL_ID = '01HCAMPAIGN00000000000001'
 
 function poolResource([id, name, description, brandName, count], i) {
   return {
@@ -380,6 +382,45 @@ export const L4_REAL_PAGES = {
   },
   'dashboard-1600': { to: '/', names: 'app.dashboard', width: 1600, height: 900 },
   'dashboard-1280': { to: '/', names: 'app.dashboard', width: 1280, height: 800 },
+  'dialog-invite-user-1600': {
+    to: '/agency-users',
+    names: 'agency-users.list',
+    width: 1600,
+    height: 900,
+    click: ['[data-test="invite-user-btn"]'],
+  },
+  'dialog-upload-1600': {
+    to: '/files',
+    names: 'files.list',
+    width: 1600,
+    height: 900,
+    click: ['[data-test="files-upload-btn"]'],
+  },
+  'dialog-invite-creators-1600': {
+    to: `/campaigns/${DETAIL_ID}`,
+    names: 'campaigns.detail',
+    width: 1600,
+    height: 900,
+    click: ['[data-test="campaign-detail-invite"]'],
+  },
+  'notifications-1600': {
+    to: '/notifications',
+    names: 'notifications',
+    width: 1600,
+    height: 900,
+  },
+  'notifications-1280': {
+    to: '/notifications',
+    names: 'notifications',
+    width: 1280,
+    height: 800,
+  },
+  'notification-prefs-1600': {
+    to: '/notifications/preferences',
+    names: 'notifications.preferences',
+    width: 1600,
+    height: 1000,
+  },
   'pool-detail-1280': {
     to: `/talent-pools/${POOL_ID}`,
     names: 'pools.detail',
@@ -483,6 +524,52 @@ function poolMembers() {
 export function l4FixtureFor(url, method) {
   const p = url.pathname
   if (method !== 'GET') return null
+  if (p === '/api/v1/me/notifications') {
+    const rows = [
+      ['message.relationship_received_by_agency', { sender_name: 'Maya Thompson' }, null, 0.02],
+      [
+        'campaign_application.submitted',
+        { creator_name: 'Daniel Okafor', campaign_name: 'Summer launch' },
+        null,
+        0.3,
+      ],
+      [
+        'assignment.draft_submitted',
+        { creator_name: 'Sofia Marchetti', campaign_name: 'Summer launch' },
+        ago(1),
+        1,
+      ],
+      ['agency_creator_relation.disconnected', { counterparty_name: 'Lukas Weber' }, ago(5), 6],
+    ]
+    return {
+      data: rows.map(([type, data, readAt, days], i) => ({
+        id: `01HNOTIF0000000000000000${i}`,
+        type: 'notifications',
+        attributes: {
+          notification_type: type,
+          data,
+          read_at: readAt,
+          created_at: ago(days),
+          actor: null,
+          subject: null,
+        },
+      })),
+      meta: { total: rows.length, page: 1, per_page: 20, last_page: 1, unread_count: 2 },
+    }
+  }
+  if (p === '/api/v1/me/notifications/unread-count') return { data: { unread_count: 2 } }
+  if (p === '/api/v1/me/notification-preferences') {
+    return {
+      data: {
+        type: 'notification_preferences',
+        attributes: {
+          preferences: [],
+          defaults: { in_app: true, email: true, digest: false, push: true },
+          type_defaults: {},
+        },
+      },
+    }
+  }
   if (p === `${API}/dashboard/summary`) {
     return {
       data: {

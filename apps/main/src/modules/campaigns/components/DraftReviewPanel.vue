@@ -33,6 +33,7 @@ import { useI18n } from 'vue-i18n'
 
 import { campaignsApi } from '../api/campaigns.api'
 import { roundCardTextStyle, roundStateColor, roundStateKey } from '../draftRounds'
+import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
 
 type ReviewField = 'review_feedback'
 type ActionKind = 'approve' | 'revision' | 'reject'
@@ -327,9 +328,11 @@ async function confirmReject(): Promise<void> {
           <v-list-item-title>{{ post.attributes.post_url }}</v-list-item-title>
           <v-list-item-subtitle class="d-flex align-center ga-2 flex-wrap">
             <span>{{ post.attributes.platform }}</span>
-            <v-chip size="x-small" variant="tonal" :data-test="`review-verification-${post.id}`">
-              {{ t(`app.campaigns.review.verification.${post.attributes.verification_status}`) }}
-            </v-chip>
+            <AgencyStatusPill
+              kind="postedContent"
+              :status="post.attributes.verification_status"
+              :data-test="`review-verification-${post.id}`"
+            />
             <span
               v-if="post.attributes.verification_status === 'verified'"
               class="text-caption text-medium-emphasis"

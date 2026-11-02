@@ -24,6 +24,8 @@ import { useI18n } from 'vue-i18n'
 
 import { campaignsApi } from '../api/campaigns.api'
 import { creatorLabel } from '@/core/creators/creatorLabel'
+import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
+import { agencyStatusEntry, type AgencyStatusTone } from '@/modules/agency/status/agencyStatusTones'
 
 const props = defineProps<{
   modelValue: boolean
@@ -44,10 +46,8 @@ const loadError = ref<string | null>(null)
 
 const postedContent = computed(() => detail.value?.relationships.posted_content ?? [])
 
-function statusColor(status: PostedContentVerificationStatus): string {
-  if (status === 'verified') return 'success'
-  if (status === 'pending') return 'info'
-  return 'error'
+function verificationTone(status: PostedContentVerificationStatus): AgencyStatusTone {
+  return agencyStatusEntry('postedContent', status)?.tone ?? 'neutral'
 }
 
 async function load(): Promise<void> {
@@ -139,16 +139,13 @@ function close(): void {
             <v-card-text>
               <div class="d-flex align-center ga-2 mb-1">
                 <span class="text-subtitle-2">{{ post.attributes.platform }}</span>
-                <v-chip
-                  size="x-small"
-                  :color="statusColor(post.attributes.verification_status)"
-                  variant="tonal"
-                  :data-test="`view-post-status-${index}`"
-                >
-                  {{
+                <AgencyStatusPill
+                  :tone="verificationTone(post.attributes.verification_status)"
+                  :label="
                     t(`app.campaigns.viewPost.verification.${post.attributes.verification_status}`)
-                  }}
-                </v-chip>
+                  "
+                  :data-test="`view-post-status-${index}`"
+                />
                 <v-chip
                   v-if="index === 0"
                   size="x-small"
