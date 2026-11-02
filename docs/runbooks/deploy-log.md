@@ -74,6 +74,46 @@ happened.
 
 ---
 
+## AH-116 API — campaign status counts, pool member filters, archived brand read — PENDING
+
+> **Deploy order, fixed: this entry first, then "AH-116 web" below.** The web build tolerates an old API for the status counts (an absent `status_counts` reads as null and the page shows today's summary), but against an old API the pool page would show a selected country or language over an unfiltered list. The two entries are two sittings with separate rollbacks.
+
+- **Status:** PENDING. Opened 2026-11-02. Pushed (`origin/main`, CI green at `471fe96c`: [run 41499069553](https://github.com/pedram-kh/Engine/actions/runs/41499069553)); **not deployed. Pushing is not deploying.**
+- **Range:** `066ff29c` (production API; production's current state **not read**) → **`471fe96c`** (A3, the last API commit). The API diff over that range is exactly A1 to A3: seven files (`CampaignController`, `TalentPoolMembershipController`, the brands route file, the `FiltersCreatorColumns` docblock, and three Pest files), +483 −2. Every other commit in the range is docs or web. The mirror's SHA for the deployed commit is recorded beside GitHub's (two pairs already differ: `a60ffbbf` = `5d2ecdbc` and `c295185` = `1bc398e8`).
+- **AH entries carried:** AH-116 (steps A1 `0fe5cd6e`, A2 `6ebc6745`, A3 `471fe96c`). No other entry rides this deploy.
+- **Migrations run:** none
+- **Pre-deploy reads:** none (no schema or data read applies). The responses of `GET .../campaigns` and `GET .../talent-pools/{pool}/creators` before the deploy: **not read** (recorded as such). Local evidence, quoted and not read from the server: full Pest at the tip, serial, `memory_limit=2G`: 4184 tests, 21,445 assertions, 0 failed; Pint passed; PHPStan green at A3 (see [`agency-ux-batch-review.md`](../reviews/agency-ux-batch-review.md) §3).
+- **Snapshot ID:** none: no migration, no data change, no one-shot. Not applicable.
+- **Infra:** none required. HTTP controllers only: **no `queue:restart`** (nothing mail-related, no job), no cron or scheduler change, no env change, no `composer` change, no new route. **One route-definition option changes** (`->withTrashed(['show'])` on `brands`, A3; no route is added, no URI or name changes), so a box that runs `route:cache` rebuilds it in its standard deploy: recorded as run or **not read**. Whatever the box's standard code-deploy steps are, they are recorded as run or **not read**; this change does not ask for any.
+- **One-shot commands:** none
+- **Post-deploy verification (to fill, each as read or "not read"):** `/up` 200; an authenticated agency `GET /api/v1/agencies/{agency}/campaigns?per_page=1` returns `meta.status_counts` with the five keys (`draft`, `active`, `paused`, `completed`, `cancelled`), all integers, summing to `meta.total` when unfiltered; the same call with `?status=active` returns an identical `status_counts`; an authenticated `GET .../talent-pools/{pool}/creators?country=<code>` returns only matching members and a smaller `meta.total`; `GET .../brands/{an archived brand's ULID}` in the caller's own agency returns 200 with `status: archived`, and the same ULID from another agency's session returns 404; `GET .../brands` (the list) still excludes the archived brand.
+- **Flags armed:** none. There is no behaviour to arm.
+- **Operator:** to be recorded: the colleague, from the mirror, as for the previous deploys.
+- **Anything unexpected:** to be recorded after the deploy. Before it, one thing to know: this machine's `.env` lacks a bare `localhost` in `SANCTUM_STATEFUL_DOMAINS`, which fails 89 login-family Pest tests locally (the suite was run with the `.env.example` value); that is a local file, not production's.
+- **Rollback:** redeploy the previous API. The web build in production (`1bc398e8`) neither sends nor reads any of the three additions, so a rollback breaks nothing.
+
+---
+
+## AH-116 web — agency UX batch (main SPA only) — PENDING
+
+> **Precondition: the "AH-116 API" entry above reads DEPLOYED.** Do not deploy this build before it (the pool member filters are inert against the old API, so the page would show a filter over an unfiltered list).
+
+- **Status:** PENDING. Opened 2026-11-02. Pushed (`origin/main`); **not deployed.**
+- **Range:** `1bc398e8` (production main SPA; **current state not read**) → **`b3ba3d0d`** (AH-116's last runtime commit: the Discover age-input height fix). The commits after it are a spec (`f4f72591`), dev tools under `apps/main/tools/walk/` (`e0c47919`, `8041b5f0`, not built) and docs; none changes the build's output. The mirror's SHA for the deployed commit is recorded beside GitHub's.
+- **AH entries carried:** AH-116 (steps W3 `5b3bd02b`, W2 `d0472dce`, W1 `d2a51a62`, W4 `1910894d`, W5 `f866109c`, W6 `0d2381c1`, W7 `188336e3`, the W2 fix `b3ba3d0d`). No other entry rides this deploy.
+- **Migrations run:** none
+- **Pre-deploy reads:** **the "AH-116 API" entry is DEPLOYED** (the precondition; its post-deploy `status_counts` read is quoted here when it exists). The figures below are quoted from [`agency-ux-batch-review.md`](../reviews/agency-ux-batch-review.md), as measured locally, **not read from the server:** creator walk `COMPARE OK: 142 targets identical to baseline.json`; forbidden-path diff empty; full Playwright main 41 passed (one blank-page timeout in the first run that did not repeat) and admin 2 passed; the nine agency pages loaded in a production build, dark and light, 18 of 18; the live-site compare 16 of 20 stops identical.
+- **Snapshot ID:** none: no migration, no data change. Not applicable.
+- **Infra:** none. No worker restart, no cron, no env, no `composer`, no `artisan`, no container recreate. **Builds: the main SPA build and its Netlify deploy only.** The admin build is not rebuilt: no file under `apps/admin` changed, and the `packages/api-client` change is types only (two files, +14 lines of optional interface members). TestFlight and the native binary are not touched.
+- **One-shot commands:** none
+- **Post-deploy verification (to fill, each as read or "not read"):** an agency sign-in; the Campaigns list shows a count on every status tab and "N campaigns, M active"; the dashboard shows Active campaigns from the list and no Payments due card; Discover's two age inputs filter, sit at the pill height, and an age-filtered empty result shows the note; a pool's country and language pills narrow its members; the creator, campaign and brand names link on the roster, pools, brands, campaign detail and the thread header (an archived brand's page shows the Archived pill and no Edit or Archive), and the dialog surfaces on the campaign still open the dialog; the Overview files strip and the chat's pinned strip render and download; a pending application whose creator is on the roster shows Message and it opens the thread; the roster no longer shows Followers or Engagement; **a creator web sign-in with the creator pages compared against the pre-deploy screenshots**; the public-page compare (`node tools/walk/prod-compare.mjs --prod <site> --dist <the build>`, expected 16 of 20 identical with the four sign-in stops differing by the `CreatorGuideCta` scoped-style id and the guide PDF link: see the review §6.2).
+- **Flags armed:** none. There is no behaviour to arm.
+- **Operator:** to be recorded: the colleague, from the mirror.
+- **Anything unexpected:** to be recorded after the deploy. Before it: the Message link reads the agency's `messageable-creators` list, capped at the first 1,000 creators (tech-debt AH-116 row 1), so an agency with a very large roster sees it for fewer creators than it could.
+- **Rollback:** redeploy the previous main `dist` (Netlify). The API additions are inert to the old web build. No migration or queue to undo.
+
+---
+
 ## AH-114 — agency app restyle from Figma (web only) — DEPLOYED
 
 - **Status:** DEPLOYED, 2026-11-02, about 08:15 CET (Europe/Madrid). _Source: Pedram's report of the colleague's deploy. Nothing here was read from Netlify or from the server by the assistant. A read that was not reported is written **not read**, never "passed"._

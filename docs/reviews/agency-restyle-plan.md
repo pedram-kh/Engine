@@ -493,8 +493,8 @@ Production stays on `066ff29c` until then. Creator **native build 3** is a bundl
 
 ## 7. Logged for later (not in this chunk)
 
-- **Campaign status counts**: the per-status counts and the "N active" summary on the Campaigns list (needs an API field or N count requests). Separate future chunk (ruling 15).
-- **Discover age filter**: the control for the existing `age_min` / `age_max` (needs a `DiscoveryListParams` type addition and a feature decision). Separate future chunk (ruling 15).
+- **Campaign status counts**: the per-status counts and the "N active" summary on the Campaigns list (needs an API field or N count requests). Separate future chunk (ruling 15). **Done in AH-116 (A1, W1), 2026-11-02.**
+- **Discover age filter**: the control for the existing `age_min` / `age_max` (needs a `DiscoveryListParams` type addition and a feature decision). Separate future chunk (ruling 15). **Done in AH-116 (W2), 2026-11-02.**
 - **Tech-debt option: lazy-load `agency.css`.** Today `agency.css` (16.5 KB minified, about 2 % of the 790 KB shared sheet) ships in the shared CSS bundle, inert for creator web and native (accepted under P1, §9.1). Loading it from the agency layout would remove it from creator bundles but needs a way to avoid a flash of unstyled agency chrome on first paint, and an `App.vue` or router change (shared). Revisit with AH-115.
 - **Tech-debt: flaky `Step2ProfileBasicsPage.spec.ts`** (5 s timeouts under parallel load, a different test each time; about 6.6 s in isolation). Raise its timeout as its own commit, later (§9.2).
 - **Tech-debt nit: `AgencyKpiCard` loading skeleton** sits about 16px right of the label (§9.2).
