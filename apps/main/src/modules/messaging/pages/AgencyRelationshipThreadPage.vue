@@ -25,7 +25,7 @@ import {
   relationshipMessagingApi,
 } from '../api/relationshipMessaging.api'
 import AgencyRelationshipThreadView from '@/modules/agency/components/AgencyRelationshipThreadView.vue'
-import { creatorAvatarUrl, creatorLabel } from '@/core/creators/creatorLabel'
+import { creatorAvatarUrl, creatorIsErased, creatorLabel } from '@/core/creators/creatorLabel'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -39,6 +39,14 @@ const backTo = computed<RouteLocationRaw | null>(() =>
 )
 
 const creatorUlid = computed(() => String(route.params.creatorUlid ?? ''))
+
+// AH-116 — the header's avatar and name open the creator's page. A thread with this agency
+// implies a roster relation, so `roster.detail` resolves. An erased creator has no page to open.
+const profileTo = computed<RouteLocationRaw | null>(() =>
+  creatorUlid.value === '' || creatorIsErased(resolvedRow.value?.attributes.creator)
+    ? null
+    : { name: 'roster.detail', params: { ulid: creatorUlid.value } },
+)
 const nameHint = computed(() => (typeof route.query.name === 'string' ? route.query.name : ''))
 
 const resolvedRow = ref<AgencyRelationshipThreadRow | null>(null)
@@ -96,6 +104,7 @@ watch(
       :avatar-text="title"
       :avatar-url="avatarUrl"
       :back-to="backTo"
+      :profile-to="profileTo"
     />
   </section>
 </template>

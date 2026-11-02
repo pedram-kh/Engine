@@ -58,6 +58,8 @@ async function mountPage(): Promise<ReturnType<typeof mount>> {
         name: 'messages.thread',
         component: { template: '<div />' },
       },
+      // AH-116: the header's avatar and name link to the creator.
+      { path: '/roster/:ulid', name: 'roster.detail', component: { template: '<div />' } },
     ],
   })
   await router.push({

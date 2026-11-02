@@ -57,7 +57,7 @@ Object.defineProperty(globalThis, 'localStorage', {
   writable: true,
 })
 
-function makePool(): TalentPoolResource {
+function makePool(attributes: Partial<TalentPoolResource['attributes']> = {}): TalentPoolResource {
   return {
     id: POOL_ULID,
     type: 'talent_pools',
@@ -70,6 +70,7 @@ function makePool(): TalentPoolResource {
       creators_count: 1,
       created_at: '2026-06-01T10:00:00.000000Z',
       updated_at: '2026-06-01T10:00:00.000000Z',
+      ...attributes,
     },
   }
 }
@@ -104,6 +105,8 @@ async function mountDetail(
     total?: number
     /** The query string the page mounts on — the browse context lives in the URL (AH-116). */
     query?: string
+    /** Overrides on the pool (a brand-scoped pool carries `brand_id` + `brand_name`). */
+    pool?: Partial<TalentPoolResource['attributes']>
   } = {},
 ): Promise<{
   wrapper: ReturnType<typeof mount>
@@ -113,7 +116,7 @@ async function mountDetail(
   const pinia = createPinia()
   setActivePinia(pinia)
 
-  vi.mocked(talentPoolsApi.show).mockResolvedValue({ data: makePool() })
+  vi.mocked(talentPoolsApi.show).mockResolvedValue({ data: makePool(options.pool) })
   vi.mocked(talentPoolsApi.members).mockResolvedValue({
     data: options.members ?? [makeMember()],
     meta: {
@@ -136,6 +139,9 @@ async function mountDetail(
       { path: '/talent-pools', name: 'pools.list', component: { template: '<div />' } },
       { path: '/talent-pools/:ulid', name: 'pools.detail', component: { template: '<div />' } },
       { path: '/talent-pools/:ulid/edit', name: 'pools.edit', component: { template: '<div />' } },
+      // AH-116: a member's avatar and name, and a brand-scoped pool's brand, are links.
+      { path: '/roster/:ulid', name: 'roster.detail', component: { template: '<div />' } },
+      { path: '/brands/:ulid', name: 'brands.detail', component: { template: '<div />' } },
     ],
   })
   await router.push(`/talent-pools/${POOL_ULID}${options.query ?? ''}`)
@@ -388,6 +394,56 @@ describe('PoolDetailPage (Sprint 6 Chunk 2b)', () => {
 
     expect(harness.wrapper.find('[data-test="pool-members-empty"]').exists()).toBe(true)
     expect(harness.wrapper.find('[data-test="pool-members-empty-filtered"]').exists()).toBe(false)
+  })
+
+  // ── AH-116 (item 5): creator and brand links ───────────────────────────────────────────
+  it("AH-116: a member's name and avatar link to the roster profile, and the avatar stays out of the tab order", async () => {
+    const member = makeMember()
+    const harness = await mountDetail({ members: [member] })
+    cleanup = harness.cleanup
+
+    const name = harness.wrapper.get(`[data-test="pool-member-name-link-${member.id}"]`)
+    expect(name.element.tagName).toBe('A')
+    expect(name.attributes('href')).toBe(`/roster/${member.id}`)
+    expect(name.text()).toBe('Ada Lovelace')
+
+    const avatar = harness.wrapper.get(`[data-test="pool-member-avatar-link-${member.id}"]`)
+    expect(avatar.attributes('href')).toBe(`/roster/${member.id}`)
+    expect(avatar.attributes('tabindex')).toBe('-1')
+    expect(avatar.attributes('aria-hidden')).toBe('true')
+  })
+
+  it('AH-116: an erased member is never linked: no name link, no avatar link', async () => {
+    const erased = makeMember('01ERASEDMEMBERXXXXXXXXXXXX', { display_name: null, is_erased: true })
+    const harness = await mountDetail({ members: [erased] })
+    cleanup = harness.cleanup
+
+    expect(harness.wrapper.find(`[data-test="pool-member-${erased.id}"]`).exists()).toBe(true)
+    expect(harness.wrapper.find(`[data-test="pool-member-name-link-${erased.id}"]`).exists()).toBe(
+      false,
+    )
+    expect(
+      harness.wrapper.find(`[data-test="pool-member-avatar-link-${erased.id}"]`).exists(),
+    ).toBe(false)
+    expect(harness.wrapper.find(`[data-test="pool-member-${erased.id}"] a`).exists()).toBe(false)
+  })
+
+  it('AH-116: a brand-scoped pool links its brand in the header', async () => {
+    const harness = await mountDetail({
+      pool: { brand_id: '01BRANDULIDXXXXXXXXXXXXXX', brand_name: 'Acme' },
+    })
+    cleanup = harness.cleanup
+
+    const link = harness.wrapper.get('[data-test="pool-detail-brand-link"]')
+    expect(link.attributes('href')).toBe('/brands/01BRANDULIDXXXXXXXXXXXXXX')
+    expect(link.text()).toBe('Acme')
+  })
+
+  it('AH-116: an agency-wide pool has no brand to link', async () => {
+    const harness = await mountDetail()
+    cleanup = harness.cleanup
+
+    expect(harness.wrapper.find('[data-test="pool-detail-brand-link"]').exists()).toBe(false)
   })
 
   it('clicking remove calls removeCreator and refreshes the member list', async () => {

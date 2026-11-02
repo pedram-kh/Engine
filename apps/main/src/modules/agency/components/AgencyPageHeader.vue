@@ -9,6 +9,9 @@
  * slot; a page with none gets no empty column. A detail page adds a `leading` slot (the back
  * button, 16 before the text) and a `title-suffix` slot (the status pill, 12 after the title).
  *
+ * A page whose subtitle holds a link (a brand, AH-116) passes it through the `subtitle` slot
+ * instead of the string; the line is drawn when either exists, in the same type.
+ *
  * The subtitle is Body small (13 / 19) by default; `subtitleSize="md"` makes it Body (14 / 20),
  * which is what the Discover frame draws.
  *
@@ -36,12 +39,12 @@ defineProps<{
           <slot name="title-suffix" />
         </div>
         <p
-          v-if="subtitle !== undefined && subtitle !== null && subtitle !== ''"
+          v-if="$slots.subtitle || (subtitle !== undefined && subtitle !== null && subtitle !== '')"
           class="agency-page-header__subtitle"
           :class="{ 'agency-page-header__subtitle--md': subtitleSize === 'md' }"
           :data-test="subtitleTest"
         >
-          {{ subtitle }}
+          <slot name="subtitle">{{ subtitle }}</slot>
         </p>
       </div>
     </div>

@@ -18,7 +18,7 @@ import { worldLanguageOptions } from '@catalyst/api-client'
 import { BlacklistBadge, CEmptyState } from '@catalyst/ui'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute, useRouter } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { oneOfParam, pageParam, useListQueryState } from '@/composables/useListQueryState'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
@@ -27,7 +27,12 @@ import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
 import AddCreatorsToPoolDialog from '../components/AddCreatorsToPoolDialog.vue'
 import { COUNTRY_OPTIONS } from '@/modules/onboarding/data/countries'
 import { talentPoolsApi, type TalentPoolMembersParams } from '../api/talentPools.api'
-import { creatorAvatarUrl, creatorInitial, creatorLabel } from '@/core/creators/creatorLabel'
+import {
+  creatorAvatarUrl,
+  creatorInitial,
+  creatorIsErased,
+  creatorLabel,
+} from '@/core/creators/creatorLabel'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -178,6 +183,20 @@ onMounted(() => {
       title-test="pool-detail-name"
       subtitle-test="pool-detail-count"
     >
+      <!-- A brand-scoped pool names its brand as a link (AH-116); the member count stays text.
+           An agency-wide pool has no brand, so it keeps the plain `subtitle` line above. -->
+      <template
+        v-if="pool !== null && pool.attributes.brand_id && pool.attributes.brand_name"
+        #subtitle
+      >
+        <router-link
+          :to="{ name: 'brands.detail', params: { ulid: pool.attributes.brand_id } }"
+          class="agency-entity-link"
+          data-test="pool-detail-brand-link"
+          >{{ pool.attributes.brand_name }}</router-link
+        >
+        {{ ' · ' + t('app.pools.detail.memberCount', { count: pool.attributes.creators_count }) }}
+      </template>
       <template #leading>
         <v-btn
           icon="mdi-arrow-left"
@@ -282,18 +301,48 @@ onMounted(() => {
             :data-test="`pool-member-${member.id}`"
           >
             <template #prepend>
-              <v-avatar size="40" color="surface-variant">
-                <v-img
-                  v-if="creatorAvatarUrl(member.attributes)"
-                  :src="creatorAvatarUrl(member.attributes) ?? undefined"
-                />
-                <span v-else class="text-caption">
-                  {{ creatorInitial(member.attributes) }}
-                </span>
-              </v-avatar>
+              <!-- AH-116: avatar and name open the creator. A pool member always has a relation
+                   with this agency, so the roster page resolves. The avatar link is the same
+                   target as the name beside it, so it leaves the tab order and the reading order.
+                   An erased member is never linked. -->
+              <component
+                :is="creatorIsErased(member.attributes) ? 'span' : RouterLink"
+                v-bind="
+                  creatorIsErased(member.attributes)
+                    ? {}
+                    : {
+                        to: { name: 'roster.detail', params: { ulid: member.id } },
+                        class: 'agency-entity-link',
+                        tabindex: -1,
+                        'aria-hidden': 'true',
+                        'data-test': `pool-member-avatar-link-${member.id}`,
+                      }
+                "
+              >
+                <v-avatar size="40" color="surface-variant">
+                  <v-img
+                    v-if="creatorAvatarUrl(member.attributes)"
+                    :src="creatorAvatarUrl(member.attributes) ?? undefined"
+                  />
+                  <span v-else class="text-caption">
+                    {{ creatorInitial(member.attributes) }}
+                  </span>
+                </v-avatar>
+              </component>
             </template>
             <v-list-item-title>
-              {{ creatorLabel(member.attributes, t, t('app.pools.detail.unnamed')) }}
+              <router-link
+                v-if="!creatorIsErased(member.attributes)"
+                :to="{ name: 'roster.detail', params: { ulid: member.id } }"
+                class="agency-entity-link"
+                :data-test="`pool-member-name-link-${member.id}`"
+                >{{
+                  creatorLabel(member.attributes, t, t('app.pools.detail.unnamed'))
+                }}</router-link
+              >
+              <template v-else>{{
+                creatorLabel(member.attributes, t, t('app.pools.detail.unnamed'))
+              }}</template>
               <!-- Blacklist badge (D-5): shows for BOTH hard + soft (informational
                    — warn-don't-remove). The status reflects THIS agency's own
                    blacklist of the member (the backend join is agency-scoped). -->

@@ -303,7 +303,13 @@ async function confirmRestore(): Promise<void> {
           <span v-else :data-test="`brand-logo-${item.id}`">
             <AgencyBrandMark :name="item.attributes.name" :seed="item.id" />
           </span>
-          <span class="agency-cell__title">{{ item.attributes.name }}</span>
+          <!-- AH-116: archived rows link too (the detail page resolves an archived brand, A3). -->
+          <router-link
+            :to="{ name: 'brands.detail', params: { ulid: item.id } }"
+            class="agency-cell__title agency-entity-link"
+            :data-test="`brand-name-${item.id}`"
+            >{{ item.attributes.name }}</router-link
+          >
         </div>
       </template>
 

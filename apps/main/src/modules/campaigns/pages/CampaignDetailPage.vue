@@ -503,17 +503,15 @@ function formatDay(iso: string | null): string {
 
 // ── AH-114 (S3.2): the header line, and "At a glance" ───────────────────────────────────────
 
-/** "Brand  ·  Starts Oct 8, 2026": what the page knows about the campaign, in one line. */
-const headerLine = computed<string | null>(() => {
+/**
+ * The start half of the header line ("Starts Oct 8, 2026"), or null with no start date. The line
+ * reads "Brand  ·  Starts Oct 8, 2026": the brand is a link (AH-116), so the header draws it
+ * through the `subtitle` slot and this is only the text after the separator.
+ */
+const headerStarts = computed<string | null>(() => {
   const c = campaign.value
-  if (c === null) return null
-  const parts = [c.relationships.brand.data.name]
-  if (c.attributes.starts_at !== null) {
-    parts.push(
-      t('app.campaigns.list.starts', { date: formatDate(c.attributes.starts_at, locale.value) }),
-    )
-  }
-  return parts.join('  ·  ')
+  if (c === null || c.attributes.starts_at === null) return null
+  return t('app.campaigns.list.starts', { date: formatDate(c.attributes.starts_at, locale.value) })
 })
 
 /**
@@ -607,10 +605,18 @@ const requirementRows = computed<RequirementRow[]>(() => {
   <div class="agency-page agency-page--snug" data-test="campaign-detail-page">
     <AgencyPageHeader
       :title="campaign?.attributes.name ?? t('app.campaigns.detail.title')"
-      :subtitle="headerLine"
       title-test="campaign-detail-heading"
       subtitle-test="campaign-detail-subtitle"
     >
+      <template v-if="campaign !== null" #subtitle>
+        <router-link
+          :to="{ name: 'brands.detail', params: { ulid: campaign.relationships.brand.data.id } }"
+          class="agency-entity-link"
+          data-test="campaign-detail-brand-link"
+          >{{ campaign.relationships.brand.data.name }}</router-link
+        >
+        <template v-if="headerStarts !== null">{{ '  ·  ' }}{{ headerStarts }}</template>
+      </template>
       <template #leading>
         <v-btn
           icon="mdi-arrow-left"
@@ -696,7 +702,15 @@ const requirementRows = computed<RequirementRow[]>(() => {
                   <div class="agency-field">
                     <dt class="agency-field__label">{{ t('app.campaigns.fields.brand') }}</dt>
                     <dd class="agency-field__value" data-test="overview-brand">
-                      {{ campaign.relationships.brand.data.name }}
+                      <router-link
+                        :to="{
+                          name: 'brands.detail',
+                          params: { ulid: campaign.relationships.brand.data.id },
+                        }"
+                        class="agency-entity-link"
+                        data-test="overview-brand-link"
+                        >{{ campaign.relationships.brand.data.name }}</router-link
+                      >
                     </dd>
                   </div>
                   <div class="agency-field">
@@ -1107,6 +1121,7 @@ const requirementRows = computed<RequirementRow[]>(() => {
             v-if="tab === 'board' && agencyStore.currentAgencyId"
             :agency-id="agencyStore.currentAgencyId"
             :campaign-id="ulid"
+            :brand-id="campaign?.relationships.brand.data.id ?? null"
             :can-configure="canEdit"
             :can-resolve="canReview"
             :can-review="canReview"

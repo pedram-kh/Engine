@@ -543,9 +543,12 @@ async function commitListing(item: CampaignResource, value: boolean): Promise<vo
     >
       <template #item.attributes.name="{ item }">
         <div class="agency-cell">
-          <span class="agency-cell__title" data-test="campaign-name">{{
-            item.attributes.name
-          }}</span>
+          <router-link
+            :to="{ name: 'campaigns.detail', params: { ulid: item.id } }"
+            class="agency-cell__title agency-entity-link"
+            data-test="campaign-name"
+            >{{ item.attributes.name }}</router-link
+          >
           <span
             v-if="startsLine(item) !== null"
             class="agency-cell__sub"
@@ -561,7 +564,13 @@ async function commitListing(item: CampaignResource, value: boolean): Promise<vo
             :name="item.relationships.brand.data.name"
             :seed="item.relationships.brand.data.id"
           />
-          {{ item.relationships.brand.data.name }}
+          <router-link
+            :to="{ name: 'brands.detail', params: { ulid: item.relationships.brand.data.id } }"
+            class="agency-entity-link"
+            :data-test="`campaign-brand-link-${item.id}`"
+          >
+            {{ item.relationships.brand.data.name }}
+          </router-link>
         </span>
       </template>
 

@@ -186,7 +186,7 @@ describe('CreatorRosterPage (Sprint 4 Chunk 5)', () => {
     cleanup = null
   })
 
-  it('loads scoped to the current agency and renders a rich, non-navigating row', async () => {
+  it('loads scoped to the current agency and renders a rich row, with the name as a link', async () => {
     const row = makeRow({
       internal_rating: 4,
       is_blacklisted: true,
@@ -226,10 +226,12 @@ describe('CreatorRosterPage (Sprint 4 Chunk 5)', () => {
     expect(appStatusChip.element).not.toBe(relationshipChip.element)
     expect(appStatusChip.text()).not.toContain('Prospect')
 
-    // The name is still a plain span (Sprint 6 Chunk 2a navigates via a ROW
-    // click, not a per-cell link/button — so no `roster-view` affordance).
+    // AH-116: the name is a link to the creator (it was a plain span, with navigation by ROW click
+    // only, Sprint 6 Chunk 2a). The row click stays; there is still no separate `roster-view`
+    // affordance, the name IS the link.
     const nameEl = harness.wrapper.find(`[data-test="roster-name-${row.id}"]`)
-    expect(nameEl.element.tagName).toBe('SPAN')
+    expect(nameEl.element.tagName).toBe('A')
+    expect(nameEl.attributes('href')).toBe('/roster/01CREATORULIDXXXXXXXXXXXXXX')
     expect(harness.wrapper.find(`[data-test="roster-view-${row.id}"]`).exists()).toBe(false)
   })
 
@@ -267,15 +269,45 @@ describe('CreatorRosterPage (Sprint 4 Chunk 5)', () => {
 
     const pushSpy = vi.spyOn(harness.router, 'push')
 
-    // Click the row (the name cell bubbles to the <tr>, which Vuetify turns
-    // into a `click:row` event). Navigation keys off the CREATOR ulid.
-    await harness.wrapper.find(`[data-test="roster-name-${row.id}"]`).trigger('click')
+    // Click the row (the email cell bubbles to the <tr>, which Vuetify turns into a `click:row`
+    // event; the NAME is a link now and has its own test below). Navigation keys off the CREATOR
+    // ulid.
+    await harness.wrapper.find(`[data-test="roster-email-${row.id}"]`).trigger('click')
     await flushPromises()
 
+    expect(pushSpy).toHaveBeenCalledTimes(1)
     expect(pushSpy).toHaveBeenCalledWith({
       name: 'roster.detail',
       params: { ulid: '01CREATORULIDXXXXXXXXXXXXXX' },
     })
+  })
+
+  it('AH-116: clicking the name link opens the creator ONCE, not once for the link and once for the row', async () => {
+    const row = makeRow({ creator_id: '01CREATORULIDXXXXXXXXXXXXXX' })
+    const harness = await mountRoster({ rows: [row], realTable: true })
+    cleanup = harness.cleanup
+
+    const pushSpy = vi.spyOn(harness.router, 'push')
+    await harness.wrapper.find(`[data-test="roster-name-${row.id}"]`).trigger('click')
+    await flushPromises()
+
+    expect(pushSpy).toHaveBeenCalledTimes(1)
+    expect(harness.router.currentRoute.value.name).toBe('roster.detail')
+    expect(harness.router.currentRoute.value.params.ulid).toBe('01CREATORULIDXXXXXXXXXXXXXX')
+  })
+
+  it('AH-116: an erased creator, or a row with no creator id, is plain text, not a link', async () => {
+    const erased = makeRow({ display_name: 'Leaked Name', is_erased: true })
+    const noId = { ...makeRow({ creator_id: null }), id: '01HZA1B2C3D4E5F6G7H8J9K0M9' }
+    const harness = await mountRoster({ rows: [erased, noId], realTable: true })
+    cleanup = harness.cleanup
+
+    for (const row of [erased, noId]) {
+      const nameEl = harness.wrapper.find(`[data-test="roster-name-${row.id}"]`)
+      expect(nameEl.exists()).toBe(true)
+      expect(nameEl.element.tagName).toBe('SPAN')
+      expect(nameEl.attributes('href')).toBeUndefined()
+    }
   })
 
   it('does NOT call the API when there is no current agency', async () => {
@@ -333,7 +365,9 @@ describe('CreatorRosterPage (Sprint 4 Chunk 5)', () => {
     vm.onTableUpdate({ page: 3, itemsPerPage: 25 })
     await flushPromises()
     expect(vi.mocked(rosterApi.list).mock.calls.at(-1)?.[1]).toMatchObject({ page: 3 })
-    expect(harness.router.currentRoute.value.query.page).toBe('3')
+    // The URL write is a `router.replace` fired from a watcher, so it settles
+    // on its own schedule rather than inside `flushPromises`.
+    await vi.waitFor(() => expect(harness.router.currentRoute.value.query.page).toBe('3'))
   })
 
   it('re-queries with each filter and ANDs them together', async () => {

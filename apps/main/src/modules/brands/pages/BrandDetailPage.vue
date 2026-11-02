@@ -86,7 +86,10 @@ onMounted(loadBrand)
           data-test="brand-detail-status"
         />
       </template>
-      <template v-if="brand" #actions>
+      <!-- An archived brand is readable (a campaign or pool can still point at one, AH-116 A3) but
+           not editable: its `update` route does not resolve archived brands, so Edit would 404,
+           and Archive is already done. The Archived pill beside the title says why. -->
+      <template v-if="brand && brand.attributes.status === 'active'" #actions>
         <div class="d-flex ga-2">
           <v-btn
             variant="outlined"
@@ -96,7 +99,6 @@ onMounted(loadBrand)
             {{ t('app.brands.actions.edit') }}
           </v-btn>
           <v-btn
-            v-if="brand.attributes.status === 'active'"
             color="warning"
             variant="outlined"
             data-test="brand-archive-btn"

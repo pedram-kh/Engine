@@ -34,6 +34,8 @@ import BoardColumns from './BoardColumns.vue'
 const props = defineProps<{
   agencyId: string
   campaignId: string
+  /** The campaign's brand, handed to the card drawer for its brand link (AH-116). */
+  brandId?: string | null
   canConfigure: boolean
   /** May open the verification-failure resolution drawer (the `review` ability). */
   canResolve?: boolean
@@ -170,6 +172,7 @@ onBeforeUnmount(() => {
       v-model="drawerOpen"
       :agency-id="agencyId"
       :campaign-id="campaignId"
+      :brand-id="brandId ?? null"
       :card="drawerCard"
       :can-resolve="props.canResolve ?? false"
       :can-review="props.canReview ?? false"

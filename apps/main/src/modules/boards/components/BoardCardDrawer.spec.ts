@@ -10,6 +10,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createI18n } from 'vue-i18n'
+import { createMemoryHistory, createRouter } from 'vue-router'
 import { createVuetify } from 'vuetify'
 import * as vuetifyComponents from 'vuetify/components'
 import * as vuetifyDirectives from 'vuetify/directives'
@@ -191,6 +192,8 @@ async function mountDrawer(
     canReview?: boolean
     status?: string
     offerDescription?: string | null
+    /** The campaign's brand id the page hands down (AH-116); omitted = not known. */
+    brandId?: string | null
     postedContent?: ReturnType<typeof postedRow>[]
     /** Newest-first, as the endpoint returns them. Drives the latest-draft row. */
     drafts?: Array<{
@@ -254,17 +257,28 @@ async function mountDrawer(
 
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: enApp } as never })
   const vuetify = createVuetify({ components: vuetifyComponents, directives: vuetifyDirectives })
+  // AH-116: the campaign and brand in the sub-line are route links.
+  const router = createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      { path: '/campaigns/:ulid', name: 'campaigns.detail', component: { template: '<div />' } },
+      { path: '/brands/:ulid', name: 'brands.detail', component: { template: '<div />' } },
+    ],
+  })
+  await router.push('/campaigns/campaign-ulid')
+  await router.isReady()
   const wrapper = mount(BoardCardDrawer, {
     props: {
       modelValue: true,
       agencyId: 'agency-ulid',
       campaignId: 'campaign-ulid',
+      brandId: opts.brandId ?? null,
       card: c,
       canResolve: opts.canResolve ?? false,
       canReview: opts.canReview ?? false,
     },
     global: {
-      plugins: [i18n, vuetify],
+      plugins: [i18n, vuetify, router],
       stubs: {
         VDialog: VDialogStub,
         ChatPanel: ChatPanelStub,
@@ -359,7 +373,7 @@ describe('BoardCardDrawer', () => {
   // ── Detail-tab facelift ────────────────────────────────────────────────────
 
   it('renders the identity header with campaign · brand and the offer terms', async () => {
-    const wrapper = await mountDrawer(card('a1'), [])
+    const wrapper = await mountDrawer(card('a1'), [], { brandId: 'brand-ulid' })
     expect(wrapper.find('[data-test="board-card-drawer-campaign"]').text()).toBe(
       'Summer Push · Acme',
     )
@@ -372,6 +386,27 @@ describe('BoardCardDrawer', () => {
     const attachment = wrapper.find('[data-test="board-card-drawer-attachment"]')
     expect(attachment.text()).toContain('brief.pdf')
     expect(attachment.attributes('href')).toBe('https://cdn/brief.pdf')
+    wrapper.unmount()
+  })
+
+  it('AH-116: the campaign in the sub-line links to the campaign, the brand to the brand', async () => {
+    const wrapper = await mountDrawer(card('a1'), [], { brandId: 'brand-ulid' })
+    const campaign = wrapper.get('[data-test="board-card-drawer-campaign-link"]')
+    expect(campaign.text()).toBe('Summer Push')
+    expect(campaign.attributes('href')).toBe('/campaigns/campaign-ulid')
+    const brand = wrapper.get('[data-test="board-card-drawer-brand-link"]')
+    expect(brand.text()).toBe('Acme')
+    expect(brand.attributes('href')).toBe('/brands/brand-ulid')
+    wrapper.unmount()
+  })
+
+  it('AH-116: with no brand id handed down the brand name stays plain text, never a dead link', async () => {
+    const wrapper = await mountDrawer(card('a1'), [])
+    expect(wrapper.find('[data-test="board-card-drawer-campaign-link"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="board-card-drawer-brand-link"]').exists()).toBe(false)
+    expect(wrapper.find('[data-test="board-card-drawer-campaign"]').text()).toBe(
+      'Summer Push · Acme',
+    )
     wrapper.unmount()
   })
 

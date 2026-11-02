@@ -851,6 +851,25 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* An entity named in a list or a header that is also a way to its page (AH-116): a creator,
+ * a campaign, a brand. At rest it reads as the plain text it replaces (inherited colour, no
+ * underline); hover and keyboard focus underline it, and focus adds a ring. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-entity-link {
+  border-radius: 4px;
+  color: inherit;
+  text-decoration: none;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-entity-link:hover {
+  text-decoration: underline;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-entity-link:focus-visible {
+  outline: 2px solid rgb(var(--v-theme-primary));
+  outline-offset: 2px;
+  text-decoration: underline;
+}
+
 /* Listing table (R5, S3.1; Figma 14:3): 34-high header row on the raised fill in Overline
  * type, 68-high rows (14 above and below a 40px two-line cell), 20px at the card's edges and
  * 16 between columns. A page opts in with the `agency-table` class; the inferred pages join

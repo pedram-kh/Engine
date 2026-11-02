@@ -31,7 +31,7 @@ import type {
 } from '@catalyst/api-client'
 import { computed, nextTick, ref, toRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { RouteLocationRaw } from 'vue-router'
+import { RouterLink, type RouteLocationRaw } from 'vue-router'
 import { useDisplay } from 'vuetify'
 
 import type { RelationshipChatTransport } from '@/modules/messaging/api/relationshipMessaging.api'
@@ -49,6 +49,11 @@ const props = defineProps<{
    * on desktop two-pane it's omitted, so the chevron is hidden.
    */
   backTo?: RouteLocationRaw | null
+  /**
+   * Where the header's avatar and name lead (AH-116): the creator's page. Null (the default)
+   * leaves them plain, which is also what an erased creator gets.
+   */
+  profileTo?: RouteLocationRaw | null
 }>()
 
 const { t, locale } = useI18n()
@@ -421,13 +426,39 @@ async function submit(): Promise<void> {
         :aria-label="t('app.messaging.relationship.back')"
         data-test="relationship-thread-back"
       />
-      <v-avatar size="40" color="primary" class="agency-thread__avatar">
-        <v-img v-if="avatarUrl" :src="avatarUrl" :alt="title" />
-        <span v-else class="agency-thread__initial">
-          {{ (avatarText ?? title ?? '?')[0]?.toUpperCase() }}
-        </span>
-      </v-avatar>
-      <span class="agency-thread__title" data-test="relationship-thread-title">{{ title }}</span>
+      <!-- The avatar and the name are one link to the creator (AH-116). The avatar's copy of it
+           leaves the tab order and the reading order: it is the same target as the name beside it. -->
+      <component
+        :is="profileTo ? RouterLink : 'span'"
+        v-bind="
+          profileTo
+            ? {
+                to: profileTo,
+                class: 'agency-entity-link',
+                tabindex: -1,
+                'aria-hidden': 'true',
+                'data-test': 'relationship-thread-avatar-link',
+              }
+            : {}
+        "
+      >
+        <v-avatar size="40" color="primary" class="agency-thread__avatar">
+          <v-img v-if="avatarUrl" :src="avatarUrl" :alt="title" />
+          <span v-else class="agency-thread__initial">
+            {{ (avatarText ?? title ?? '?')[0]?.toUpperCase() }}
+          </span>
+        </v-avatar>
+      </component>
+      <router-link
+        v-if="profileTo"
+        :to="profileTo"
+        class="agency-thread__title agency-entity-link"
+        data-test="relationship-thread-title"
+        >{{ title }}</router-link
+      >
+      <span v-else class="agency-thread__title" data-test="relationship-thread-title">{{
+        title
+      }}</span>
     </header>
 
     <div ref="feedEl" class="agency-thread__feed" data-test="relationship-thread-feed">

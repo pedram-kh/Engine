@@ -170,6 +170,26 @@ describe('BrandListPage — restore UI (Sprint 3 Chunk 4 sub-step 6)', () => {
     cleanup = null
   })
 
+  it("AH-116: an active brand's name links to its brand page", async () => {
+    const brand = makeBrand({ status: 'active', name: 'Acme Corp' })
+    const harness = await mountBrandList({ brands: [brand] })
+    cleanup = harness.cleanup
+
+    const link = harness.wrapper.get(`[data-test="brand-name-${brand.id}"]`)
+    expect(link.element.tagName).toBe('A')
+    expect(link.attributes('href')).toBe(`/brands/${brand.id}`)
+    expect(link.text()).toBe('Acme Corp')
+  })
+
+  it("AH-116: an archived brand's name links too, now that the brand page opens archived brands", async () => {
+    const brand = makeBrand({ status: 'archived' })
+    const harness = await mountBrandList({ brands: [brand], initialFilter: 'archived' })
+    cleanup = harness.cleanup
+
+    const link = harness.wrapper.get(`[data-test="brand-name-${brand.id}"]`)
+    expect(link.attributes('href')).toBe(`/brands/${brand.id}`)
+  })
+
   it('renders the restore button on an archived row when the user is agency_admin', async () => {
     const brand = makeBrand({ status: 'archived' })
     const harness = await mountBrandList({

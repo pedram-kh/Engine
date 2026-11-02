@@ -80,6 +80,8 @@ const props = defineProps<{
   modelValue: boolean
   agencyId: string
   campaignId: string
+  /** The campaign's brand, for the brand link in the sub-line; null leaves the name plain. */
+  brandId?: string | null
   card: BoardCardResource | null
   /** May open the verification-failure resolution drawer (the `review` ability). */
   canResolve?: boolean
@@ -196,10 +198,15 @@ const avatarUrl = computed(() => creatorAvatarUrl(assignmentData.value?.creator)
 
 const avatarInitial = computed(() => creatorInitial(assignmentData.value?.creator))
 
+// The sub-line is two parts so each can be a link (AH-116): the campaign (`props.campaignId`), and
+// its brand when it has one (`props.brandId`: the assignment payload carries the brand's name but
+// not its id, so the page that already holds the campaign passes the id down). The drawer is a
+// work surface, but these two are plain "where is this from" names, not the creator (whose
+// avatar and name stay as they are).
 const campaignLine = computed(() => {
   const campaign = detail.value?.attributes.campaign
   if (!campaign) return null
-  return campaign.brand_name ? `${campaign.name} · ${campaign.brand_name}` : campaign.name
+  return { campaignName: campaign.name, brandName: campaign.brand_name }
 })
 
 // The agreed fee + its free-text unit ("€200 / script"). Coalesced PER FIELD:
@@ -459,7 +466,23 @@ function onDraftReviewed(): void {
                     class="text-caption text-medium-emphasis text-truncate"
                     data-test="board-card-drawer-campaign"
                   >
-                    {{ campaignLine }}
+                    <router-link
+                      :to="{ name: 'campaigns.detail', params: { ulid: campaignId } }"
+                      class="agency-entity-link"
+                      data-test="board-card-drawer-campaign-link"
+                      >{{ campaignLine.campaignName }}</router-link
+                    >
+                    <template v-if="campaignLine.brandName">
+                      <span aria-hidden="true">{{ ' · ' }}</span>
+                      <router-link
+                        v-if="brandId"
+                        :to="{ name: 'brands.detail', params: { ulid: brandId } }"
+                        class="agency-entity-link"
+                        data-test="board-card-drawer-brand-link"
+                        >{{ campaignLine.brandName }}</router-link
+                      >
+                      <template v-else>{{ campaignLine.brandName }}</template>
+                    </template>
                   </div>
                 </div>
               </div>

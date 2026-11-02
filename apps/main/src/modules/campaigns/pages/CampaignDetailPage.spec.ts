@@ -227,6 +227,8 @@ async function mountDetail(
     routes: [
       { path: '/campaigns', name: 'campaigns.list', component: { template: '<div />' } },
       { path: '/campaigns/:ulid', name: 'campaigns.detail', component: { template: '<div />' } },
+      // AH-116: the header and overview now link the brand.
+      { path: '/brands/:ulid', name: 'brands.detail', component: { template: '<div />' } },
     ],
   })
   await router.push(`/campaigns/${CAMPAIGN_ULID}${opts.query ?? ''}`)
@@ -815,6 +817,7 @@ describe('CampaignDetailPage — Drafts tab review (drafts tab chunk)', () => {
       routes: [
         { path: '/campaigns', name: 'campaigns.list', component: { template: '<div />' } },
         { path: '/campaigns/:ulid', name: 'campaigns.detail', component: { template: '<div />' } },
+        { path: '/brands/:ulid', name: 'brands.detail', component: { template: '<div />' } },
       ],
     })
     await router.push(`/campaigns/${CAMPAIGN_ULID}`)
@@ -1092,6 +1095,24 @@ describe('CampaignDetailPage — agency restyle (AH-114, S3.2)', () => {
     const line = wrapper.find('[data-test="campaign-detail-subtitle"]').text()
     expect(line).not.toContain('Starts')
     expect(line).not.toContain('·')
+  })
+
+  it('AH-116: the header brand name links to the brand page, and the start date stays plain text', async () => {
+    const wrapper = await open('agency_admin', { starts_at: '2026-11-09T00:00:00Z' })
+
+    const link = wrapper.get('[data-test="campaign-detail-brand-link"]')
+    expect(link.element.tagName).toBe('A')
+    expect(link.attributes('href')).toBe('/brands/brand-ulid')
+    expect(link.text()).toBe('Acme')
+    expect(link.text()).not.toContain('Starts')
+  })
+
+  it('AH-116: the Overview details card links the brand too', async () => {
+    const wrapper = await open()
+
+    const link = wrapper.get('[data-test="overview-brand-link"]')
+    expect(link.attributes('href')).toBe('/brands/brand-ulid')
+    expect(link.text()).toBe('Acme')
   })
 
   it.each(['agency_admin', 'agency_manager', 'agency_staff'] as const)(

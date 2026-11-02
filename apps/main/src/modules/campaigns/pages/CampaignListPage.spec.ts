@@ -122,6 +122,7 @@ async function mountList(
       { path: '/campaigns', name: 'campaigns.list', component: { template: '<div />' } },
       { path: '/campaigns/new', name: 'campaigns.create', component: { template: '<div />' } },
       { path: '/campaigns/:ulid', name: 'campaigns.detail', component: { template: '<div />' } },
+      { path: '/brands/:ulid', name: 'brands.detail', component: { template: '<div />' } },
     ],
   })
   await router.push('/campaigns')
@@ -412,6 +413,30 @@ describe('CampaignListPage (Sprint 8 Chunk 1)', () => {
   })
 
   // ── AH-114 (S3.1): the restyled list ────────────────────────────────────────────────────
+  describe('clickable names (AH-116, item 5)', () => {
+    it('links the campaign title to its detail page', async () => {
+      const campaign = makeCampaign({ name: 'Summer launch' })
+      const harness = await mountList([campaign])
+      cleanup = harness.cleanup
+
+      const link = harness.wrapper.get('[data-test="campaign-name"]')
+      expect(link.element.tagName).toBe('A')
+      expect(link.attributes('href')).toBe(`/campaigns/${campaign.id}`)
+      expect(link.text()).toBe('Summer launch')
+    })
+
+    it('links the brand name, and only the name, to the brand page', async () => {
+      const campaign = makeCampaign()
+      const harness = await mountList([campaign])
+      cleanup = harness.cleanup
+
+      const link = harness.wrapper.get(`[data-test="campaign-brand-link-${campaign.id}"]`)
+      expect(link.element.tagName).toBe('A')
+      expect(link.attributes('href')).toBe('/brands/brand-ulid')
+      expect(link.text()).toBe('Acme')
+    })
+  })
+
   describe('agency restyle (AH-114, S3.1)', () => {
     it('reads the header summary off the status counts, and not before the first response', async () => {
       const harness = await mountList([makeCampaign()], 24, COUNTS)
@@ -485,6 +510,7 @@ describe('CampaignListPage (Sprint 8 Chunk 1)', () => {
             name: 'campaigns.detail',
             component: { template: '<div />' },
           },
+          { path: '/brands/:ulid', name: 'brands.detail', component: { template: '<div />' } },
         ],
       })
       await router.push('/campaigns')

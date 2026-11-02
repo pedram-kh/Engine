@@ -83,7 +83,7 @@ const INBOX: AgencyRelationshipInboxEnvelope = {
   ],
 }
 
-async function mountPage(): Promise<{
+async function mountPage(inbox: AgencyRelationshipInboxEnvelope = INBOX): Promise<{
   wrapper: ReturnType<typeof mount>
   router: Router
 }> {
@@ -93,7 +93,7 @@ async function mountPage(): Promise<{
     { agency_id: 'agency-ulid', agency_name: 'Test Agency', role: 'agency_admin' },
   ])
 
-  vi.mocked(relationshipMessagingApi.agencyInbox).mockResolvedValue(INBOX)
+  vi.mocked(relationshipMessagingApi.agencyInbox).mockResolvedValue(inbox)
 
   const router = createRouter({
     history: createMemoryHistory(),
@@ -104,6 +104,8 @@ async function mountPage(): Promise<{
         name: 'messages.thread',
         component: { template: '<div />' },
       },
+      // AH-116: the header's avatar and name link to the creator.
+      { path: '/roster/:ulid', name: 'roster.detail', component: { template: '<div />' } },
     ],
   })
   await router.push({ name: 'messages.thread', params: { creatorUlid: '01NESSA' } })
@@ -144,6 +146,41 @@ describe('AgencyRelationshipThreadPage — two-pane header (AH-013)', () => {
 
     expect(wrapper.find('[data-test="relationship-thread-title"]').text()).toBe('Nessa')
     expect(headerAvatarSrc(wrapper)).toBe('https://signed.example/nessa.jpg')
+
+    wrapper.unmount()
+  })
+
+  it("AH-116: the header name and avatar link to the creator's roster profile", async () => {
+    const { wrapper } = await mountPage()
+
+    const title = wrapper.get('[data-test="relationship-thread-title"]')
+    expect(title.element.tagName).toBe('A')
+    expect(title.attributes('href')).toBe('/roster/01NESSA')
+    const avatar = wrapper.get('[data-test="relationship-thread-avatar-link"]')
+    expect(avatar.attributes('href')).toBe('/roster/01NESSA')
+    expect(avatar.attributes('aria-hidden')).toBe('true')
+    expect(avatar.attributes('tabindex')).toBe('-1')
+
+    wrapper.unmount()
+  })
+
+  it('AH-116: an erased counterparty is not linked, there is no profile left to open', async () => {
+    const erased: AgencyRelationshipInboxEnvelope = {
+      data: [
+        {
+          ...INBOX.data[0]!,
+          attributes: {
+            ...INBOX.data[0]!.attributes,
+            creator: { id: '01NESSA', display_name: null, avatar_url: null, is_erased: true },
+          },
+        },
+      ],
+    }
+    const { wrapper } = await mountPage(erased)
+
+    const title = wrapper.get('[data-test="relationship-thread-title"]')
+    expect(title.element.tagName).not.toBe('A')
+    expect(wrapper.find('[data-test="relationship-thread-avatar-link"]').exists()).toBe(false)
 
     wrapper.unmount()
   })

@@ -257,7 +257,16 @@ async function confirmRestore(): Promise<void> {
       <template #item.attributes.brand_name="{ item }">
         <span v-if="item.attributes.brand_name" class="agency-cell-brand">
           <AgencyBrandMark :name="item.attributes.brand_name" :seed="item.attributes.brand_id" />
-          {{ item.attributes.brand_name }}
+          <!-- A brand-scoped pool links to its brand; "Agency-wide" below stays plain text. -->
+          <router-link
+            v-if="item.attributes.brand_id"
+            :to="{ name: 'brands.detail', params: { ulid: item.attributes.brand_id } }"
+            class="agency-entity-link"
+            :data-test="`pool-brand-link-${item.id}`"
+          >
+            {{ item.attributes.brand_name }}
+          </router-link>
+          <template v-else>{{ item.attributes.brand_name }}</template>
         </span>
         <span v-else class="agency-cell__sub">{{ t('app.pools.agencyWide') }}</span>
       </template>

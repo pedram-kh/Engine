@@ -95,6 +95,8 @@ async function mountList(
       { path: '/talent-pools/new', name: 'pools.create', component: { template: '<div />' } },
       { path: '/talent-pools/:ulid', name: 'pools.detail', component: { template: '<div />' } },
       { path: '/talent-pools/:ulid/edit', name: 'pools.edit', component: { template: '<div />' } },
+      // AH-116: a brand-scoped pool's brand is a link.
+      { path: '/brands/:ulid', name: 'brands.detail', component: { template: '<div />' } },
     ],
   })
   await router.push('/talent-pools')
@@ -213,6 +215,35 @@ describe('PoolListPage (Sprint 6 Chunk 2b)', () => {
   it('shows the agency-wide label when a pool has no brand', async () => {
     const harness = await mountList({ pools: [makePool({ brand_name: null })] })
     cleanup = harness.cleanup
+    expect(harness.wrapper.text()).toContain('Agency-wide')
+  })
+
+  it('AH-116: a brand-scoped pool links its brand name to the brand page', async () => {
+    const pool = makePool({ brand_id: '01BRANDULIDXXXXXXXXXXXXXX', brand_name: 'Acme' })
+    const harness = await mountList({ pools: [pool] })
+    cleanup = harness.cleanup
+
+    const link = harness.wrapper.get(`[data-test="pool-brand-link-${pool.id}"]`)
+    expect(link.element.tagName).toBe('A')
+    expect(link.attributes('href')).toBe('/brands/01BRANDULIDXXXXXXXXXXXXXX')
+    expect(link.text()).toBe('Acme')
+  })
+
+  it('AH-116: a brand name with no brand id behind it stays plain text, never a dead link', async () => {
+    const pool = makePool({ brand_id: null, brand_name: 'Acme' })
+    const harness = await mountList({ pools: [pool] })
+    cleanup = harness.cleanup
+
+    expect(harness.wrapper.find(`[data-test="pool-brand-link-${pool.id}"]`).exists()).toBe(false)
+    expect(harness.wrapper.text()).toContain('Acme')
+  })
+
+  it('AH-116: "Agency-wide" is a label, not a link', async () => {
+    const pool = makePool({ brand_id: null, brand_name: null })
+    const harness = await mountList({ pools: [pool] })
+    cleanup = harness.cleanup
+
+    expect(harness.wrapper.find(`[data-test="pool-brand-link-${pool.id}"]`).exists()).toBe(false)
     expect(harness.wrapper.text()).toContain('Agency-wide')
   })
 })

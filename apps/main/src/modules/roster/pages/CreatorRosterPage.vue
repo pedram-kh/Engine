@@ -55,7 +55,7 @@ import {
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { COUNTRY_OPTIONS } from '@/modules/onboarding/data/countries'
 import { rosterApi } from '../api/roster.api'
-import { creatorLabel } from '@/core/creators/creatorLabel'
+import { creatorIsErased, creatorLabel } from '@/core/creators/creatorLabel'
 
 import AgencyFilterPill from '@/modules/agency/components/AgencyFilterPill.vue'
 import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
@@ -581,7 +581,20 @@ function onRowClick(_event: unknown, ctx: { item: RosterCreatorListItem }): void
       @click:row="onRowClick"
     >
       <template #item.name="{ item }">
-        <span :data-test="`roster-name-${item.id}`">
+        <!-- AH-116: the name is a link to the creator, so it can be opened in a new tab; the row
+             click still opens it from anywhere else on the row. `@click.stop` keeps the link's own
+             navigation from also reaching the row handler (one push, not two). An erased creator
+             stays plain text: there is no profile to open. -->
+        <router-link
+          v-if="item.attributes.creator_id !== null && !creatorIsErased(item.attributes)"
+          :to="{ name: 'roster.detail', params: { ulid: item.attributes.creator_id } }"
+          class="agency-entity-link"
+          :data-test="`roster-name-${item.id}`"
+          @click.stop
+        >
+          {{ creatorLabel(item.attributes, t, t('app.roster.unnamed')) }}
+        </router-link>
+        <span v-else :data-test="`roster-name-${item.id}`">
           {{ creatorLabel(item.attributes, t, t('app.roster.unnamed')) }}
         </span>
         <BlacklistBadge
