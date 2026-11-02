@@ -26,6 +26,20 @@ export interface TalentPoolListParams {
   status?: 'active' | 'archived' | 'all'
 }
 
+/**
+ * The members list's query (AH-116): paging, plus the same `country` / `language` filters the
+ * roster and Discover take (the shared `FiltersCreatorColumns` trait on the API). Named, not
+ * inline, so the AH-096 guard (`api-wrapper-params-serialized.spec.ts`) sees every field.
+ */
+export interface TalentPoolMembersParams {
+  page?: number
+  per_page?: number
+  /** ISO 3166-1 alpha-2, e.g. `PT`. */
+  country?: string
+  /** A language code from the shared registry, e.g. `it`. */
+  language?: string
+}
+
 export interface SingleTalentPoolEnvelope {
   data: TalentPoolResource
 }
@@ -79,11 +93,15 @@ export const talentPoolsApi = {
   members(
     agencyId: string,
     poolId: string,
-    params: { page?: number; per_page?: number } = {},
+    params: TalentPoolMembersParams = {},
   ): Promise<PaginatedCollection<TalentPoolMemberResource>> {
     const query = new URLSearchParams()
     if (params.page !== undefined) query.set('page', String(params.page))
     if (params.per_page !== undefined) query.set('per_page', String(params.per_page))
+    // Filters are sent only when set; an empty string is "no filter", never `?country=`.
+    if (params.country !== undefined && params.country !== '') query.set('country', params.country)
+    if (params.language !== undefined && params.language !== '')
+      query.set('language', params.language)
     const qs = query.toString()
     return http.get<PaginatedCollection<TalentPoolMemberResource>>(
       `${poolsBase(agencyId)}/${poolId}/creators${qs ? `?${qs}` : ''}`,

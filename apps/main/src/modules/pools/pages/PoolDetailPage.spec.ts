@@ -100,8 +100,16 @@ async function mountDetail(
   options: {
     role?: 'agency_admin' | 'agency_manager' | 'agency_staff'
     members?: TalentPoolMemberResource[]
+    /** `meta.total` (defaults to the number of members). */
+    total?: number
+    /** The query string the page mounts on — the browse context lives in the URL (AH-116). */
+    query?: string
   } = {},
-): Promise<{ wrapper: ReturnType<typeof mount>; cleanup: () => void }> {
+): Promise<{
+  wrapper: ReturnType<typeof mount>
+  router: ReturnType<typeof createRouter>
+  cleanup: () => void
+}> {
   const pinia = createPinia()
   setActivePinia(pinia)
 
@@ -109,7 +117,7 @@ async function mountDetail(
   vi.mocked(talentPoolsApi.members).mockResolvedValue({
     data: options.members ?? [makeMember()],
     meta: {
-      total: (options.members ?? [makeMember()]).length,
+      total: options.total ?? (options.members ?? [makeMember()]).length,
       current_page: 1,
       per_page: 25,
       last_page: 1,
@@ -130,7 +138,7 @@ async function mountDetail(
       { path: '/talent-pools/:ulid/edit', name: 'pools.edit', component: { template: '<div />' } },
     ],
   })
-  await router.push(`/talent-pools/${POOL_ULID}`)
+  await router.push(`/talent-pools/${POOL_ULID}${options.query ?? ''}`)
   await router.isReady()
 
   const i18n = createI18n({
@@ -155,6 +163,7 @@ async function mountDetail(
 
   return {
     wrapper,
+    router,
     cleanup: () => {
       wrapper.unmount()
       Object.keys(localStorageStore).forEach((k) => delete localStorageStore[k])
@@ -264,6 +273,121 @@ describe('PoolDetailPage (Sprint 6 Chunk 2b)', () => {
     expect(vi.mocked(talentPoolsApi.show).mock.calls.length).toBe(showCallsBefore + 1)
     expect(vi.mocked(talentPoolsApi.members).mock.calls.length).toBe(membersCallsBefore + 1)
     expect(vm.snackbar).toBe('2 creators added to the pool.')
+  })
+
+  // ── AH-116 (item 4): country and language filters on the members list ──────────────────
+  type DetailVm = {
+    countryFilter: string | null
+    languageFilter: string | null
+    page: number
+  }
+  const lastMembersParams = () => vi.mocked(talentPoolsApi.members).mock.calls.at(-1)?.[2]
+
+  it('AH-116: draws the country and language pills, and sends neither until one is picked', async () => {
+    const harness = await mountDetail()
+    cleanup = harness.cleanup
+
+    expect(harness.wrapper.find('[data-test="pool-members-country-filter"]').exists()).toBe(true)
+    expect(harness.wrapper.find('[data-test="pool-members-language-filter"]').exists()).toBe(true)
+    expect(lastMembersParams()).toEqual({ page: 1, per_page: 25 })
+  })
+
+  it('AH-116: a country filter re-queries with it, one call, and the URL carries it', async () => {
+    const harness = await mountDetail()
+    cleanup = harness.cleanup
+    const vm = harness.wrapper.vm as unknown as DetailVm
+
+    vi.mocked(talentPoolsApi.members).mockClear()
+    vm.countryFilter = 'PT'
+    await flushPromises()
+
+    expect(talentPoolsApi.members).toHaveBeenCalledTimes(1)
+    expect(lastMembersParams()).toEqual({ page: 1, per_page: 25, country: 'PT' })
+    await vi.waitFor(() => expect(harness.router.currentRoute.value.query.country).toBe('PT'))
+  })
+
+  it('AH-116: a language filter re-queries with it, and both together send both', async () => {
+    const harness = await mountDetail()
+    cleanup = harness.cleanup
+    const vm = harness.wrapper.vm as unknown as DetailVm
+
+    vm.languageFilter = 'it'
+    await flushPromises()
+    expect(lastMembersParams()).toEqual({ page: 1, per_page: 25, language: 'it' })
+
+    vm.countryFilter = 'PT'
+    await flushPromises()
+    expect(lastMembersParams()).toEqual({
+      page: 1,
+      per_page: 25,
+      country: 'PT',
+      language: 'it',
+    })
+
+    vm.languageFilter = null
+    await flushPromises()
+    expect(lastMembersParams()).toEqual({ page: 1, per_page: 25, country: 'PT' })
+  })
+
+  it('AH-116: a filter change from page 3 returns to page 1', async () => {
+    const harness = await mountDetail({ query: '?page=3', total: 80 })
+    cleanup = harness.cleanup
+    expect(lastMembersParams()).toMatchObject({ page: 3 })
+
+    vi.mocked(talentPoolsApi.members).mockClear()
+    ;(harness.wrapper.vm as unknown as DetailVm).countryFilter = 'PT'
+    await flushPromises()
+
+    expect(lastMembersParams()).toEqual({ page: 1, per_page: 25, country: 'PT' })
+  })
+
+  it('AH-116: resumes the page and filters from the URL, so leaving a profile and coming back lands here', async () => {
+    const harness = await mountDetail({ query: '?page=2&country=PT&language=it', total: 60 })
+    cleanup = harness.cleanup
+
+    expect(talentPoolsApi.members).toHaveBeenCalledTimes(1)
+    expect(lastMembersParams()).toEqual({ page: 2, per_page: 25, country: 'PT', language: 'it' })
+  })
+
+  it('AH-116: ignores a hand-edited URL that names values the pills do not offer', async () => {
+    const harness = await mountDetail({ query: '?page=zero&country=ZZ&language=xx' })
+    cleanup = harness.cleanup
+
+    expect(lastMembersParams()).toEqual({ page: 1, per_page: 25 })
+  })
+
+  it('AH-116: paging keeps the filters and moves the page in the URL', async () => {
+    const harness = await mountDetail({ query: '?country=PT', total: 80 })
+    cleanup = harness.cleanup
+
+    vi.mocked(talentPoolsApi.members).mockClear()
+    ;(harness.wrapper.vm as unknown as { onPageChange: (n: number) => Promise<void> }).onPageChange(
+      2,
+    )
+    await flushPromises()
+
+    expect(talentPoolsApi.members).toHaveBeenCalledTimes(1)
+    expect(lastMembersParams()).toEqual({ page: 2, per_page: 25, country: 'PT' })
+    await vi.waitFor(() => expect(harness.router.currentRoute.value.query.page).toBe('2'))
+  })
+
+  it('AH-116: no member matching the filters draws the roster\'s filtered-empty block, not "no members"', async () => {
+    const harness = await mountDetail({ members: [], query: '?country=PT' })
+    cleanup = harness.cleanup
+
+    const filtered = harness.wrapper.get('[data-test="pool-members-empty-filtered"]')
+    expect(filtered.text()).toContain('No creators match these filters')
+    expect(harness.wrapper.find('[data-test="pool-members-empty"]').exists()).toBe(false)
+    // The pills stay, so the filter can be cleared from the empty state.
+    expect(harness.wrapper.find('[data-test="pool-members-country-filter"]').exists()).toBe(true)
+  })
+
+  it('AH-116: a pool with no members and no filter keeps its plain empty line', async () => {
+    const harness = await mountDetail({ members: [] })
+    cleanup = harness.cleanup
+
+    expect(harness.wrapper.find('[data-test="pool-members-empty"]').exists()).toBe(true)
+    expect(harness.wrapper.find('[data-test="pool-members-empty-filtered"]').exists()).toBe(false)
   })
 
   it('clicking remove calls removeCreator and refreshes the member list', async () => {

@@ -5,19 +5,28 @@
  * the members endpoint paginates so the signed-avatar minting is bounded.
  *
  * Admin/manager can remove a member inline. Staff see the roster read-only.
+ *
+ * AH-116: the members list takes the roster's country and language filters. Page, country and
+ * language live in the URL (`useListQueryState`), so a member's profile can be left and the view
+ * re-entered as it was; a filter change returns to page 1. The API applies the filters (A2), so
+ * against an API that predates it the list would simply come back unfiltered.
  */
 
 import type { TalentPoolMemberResource, TalentPoolResource } from '@catalyst/api-client'
 import { ApiError } from '@catalyst/api-client'
-import { BlacklistBadge } from '@catalyst/ui'
-import { computed, onMounted, ref } from 'vue'
+import { worldLanguageOptions } from '@catalyst/api-client'
+import { BlacklistBadge, CEmptyState } from '@catalyst/ui'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
+import { oneOfParam, pageParam, useListQueryState } from '@/composables/useListQueryState'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
+import AgencyFilterPill from '@/modules/agency/components/AgencyFilterPill.vue'
 import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
 import AddCreatorsToPoolDialog from '../components/AddCreatorsToPoolDialog.vue'
-import { talentPoolsApi } from '../api/talentPools.api'
+import { COUNTRY_OPTIONS } from '@/modules/onboarding/data/countries'
+import { talentPoolsApi, type TalentPoolMembersParams } from '../api/talentPools.api'
 import { creatorAvatarUrl, creatorInitial, creatorLabel } from '@/core/creators/creatorLabel'
 
 const { t } = useI18n()
@@ -37,8 +46,29 @@ const removingUlid = ref<string | null>(null)
 const snackbar = ref<string | null>(null)
 const addDialogOpen = ref(false)
 
-const page = ref(1)
 const perPage = 25
+
+// URL-backed browse context. The filters are validated against the SAME bounded vocabularies the
+// pills offer, so a hand-typed `?country=ZZ` reads as unset instead of reaching the API.
+const {
+  page,
+  country: countryFilter,
+  language: languageFilter,
+} = useListQueryState({
+  page: pageParam,
+  country: oneOfParam(COUNTRY_OPTIONS.map((c) => c.code)),
+  language: oneOfParam(worldLanguageOptions().map((o) => o.value)),
+})
+
+const countryFilterItems = computed(() =>
+  COUNTRY_OPTIONS.map((c) => ({ title: c.label, value: c.code })),
+)
+const languageFilterItems = computed(() =>
+  worldLanguageOptions().map((o) => ({ title: o.label, value: o.value })),
+)
+const hasActiveFilters = computed(
+  () => countryFilter.value !== null || languageFilter.value !== null,
+)
 
 const canWrite = computed(() => agencyStore.isAdmin || agencyStore.currentRole === 'agency_manager')
 
@@ -67,10 +97,10 @@ async function loadMembers(): Promise<void> {
 
   membersLoading.value = true
   try {
-    const res = await talentPoolsApi.members(agencyId, ulid.value, {
-      page: page.value,
-      per_page: perPage,
-    })
+    const params: TalentPoolMembersParams = { page: page.value, per_page: perPage }
+    if (countryFilter.value !== null) params.country = countryFilter.value
+    if (languageFilter.value !== null) params.language = languageFilter.value
+    const res = await talentPoolsApi.members(agencyId, ulid.value, params)
     members.value = res.data
     totalMembers.value = res.meta.total
   } catch {
@@ -122,6 +152,13 @@ async function onCreatorsAdded(message: string): Promise<void> {
   page.value = 1
   await Promise.all([loadPool(), loadMembers()])
 }
+
+// A filter change returns to page 1 and re-queries (the pager's own loads go through
+// `onPageChange`, so this watcher does not fire a second request for a page move).
+watch([countryFilter, languageFilter], () => {
+  page.value = 1
+  void loadMembers()
+})
 
 function goBack(): void {
   void router.push({ name: 'pools.list' })
@@ -195,11 +232,39 @@ onMounted(() => {
       <section class="agency-card" data-test="pool-members-card">
         <h2 class="agency-card__title">{{ t('app.pools.detail.membersHeading') }}</h2>
 
+        <!-- Country / language, as the roster draws them. -->
+        <div class="pool-members-filters" data-test="pool-members-filters">
+          <AgencyFilterPill
+            v-model="countryFilter"
+            :label="t('app.roster.filters.country')"
+            :items="countryFilterItems"
+            data-test="pool-members-country-filter"
+          />
+          <AgencyFilterPill
+            v-model="languageFilter"
+            :label="t('app.roster.filters.language')"
+            :items="languageFilterItems"
+            data-test="pool-members-language-filter"
+          />
+        </div>
+
         <v-skeleton-loader
           v-if="membersLoading && members.length === 0"
           type="list-item-avatar-two-line@3"
           data-test="pool-members-skeleton"
         />
+
+        <CEmptyState
+          v-else-if="members.length === 0 && hasActiveFilters"
+          data-test="pool-members-empty-filtered"
+          title-tag="h3"
+          :title="t('app.roster.emptyFiltered.heading')"
+          :body="t('app.roster.emptyFiltered.body')"
+        >
+          <template #icon>
+            <v-icon icon="mdi-filter-remove-outline" size="48" color="medium-emphasis" />
+          </template>
+        </CEmptyState>
 
         <div
           v-else-if="members.length === 0"
@@ -295,3 +360,14 @@ onMounted(() => {
     </v-snackbar>
   </div>
 </template>
+
+<style scoped>
+/* The two pills 8 apart, between the heading and the list (the roster's filter row, narrower). */
+.pool-members-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+</style>

@@ -497,20 +497,27 @@ function creatorProfile() {
 }
 
 const MEMBER_ROWS = [
-  ['Maya Thompson', 'US', false],
-  ['Daniel Okafor', 'GB', false],
-  ['Sofia Marchetti', 'IT', true],
-  ['Emma Laurent', 'FR', false],
+  ['Maya Thompson', 'US', false, 'en'],
+  ['Daniel Okafor', 'GB', false, 'en'],
+  ['Sofia Marchetti', 'IT', true, 'it'],
+  ['Emma Laurent', 'FR', false, 'fr'],
 ]
 
-function poolMembers() {
-  return MEMBER_ROWS.map(([name, country, blacklisted], i) => ({
+/** The pool members, narrowed like the API narrows them (AH-116 A2): `country` / `language`, AND. */
+function poolMembers(query = new URLSearchParams()) {
+  const country = query.get('country')
+  const language = query.get('language')
+  // The id follows the row's place in the unfiltered pool, so a member keeps one id.
+  const rows = MEMBER_ROWS.map((row, i) => [row, i]).filter(
+    ([[, c, , l]]) => (!country || c === country) && (!language || l === language),
+  )
+  return rows.map(([[name, country, blacklisted, language], i]) => ({
     id: `01HPOOLMEMBER00000000000${i + 1}`,
     type: 'talent_pool_members',
     attributes: {
       display_name: name,
       country_code: country,
-      primary_language: 'en',
+      primary_language: language,
       categories: ['lifestyle'],
       avatar_url: null,
       application_status: 'approved',
@@ -624,7 +631,8 @@ export function l4FixtureFor(url, method) {
   if (p === `${API}/brands/${BRAND_ID}`) return { data: brandResource(BRAND_ID, 'Jack & Jill') }
   if (p === `${API}/talent-pools/${POOL_ID}`) return { data: poolResource(POOLS[0], 0) }
   if (p === `${API}/talent-pools/${POOL_ID}/creators`) {
-    return { data: poolMembers(), links, meta: pager(MEMBER_ROWS.length) }
+    const members = poolMembers(url.searchParams)
+    return { data: members, links, meta: pager(members.length) }
   }
   if (p === `${API}/creators`) {
     const rows = rosterRows()
