@@ -20,6 +20,7 @@ import { fileURLToPath } from 'node:url'
 import { chromium } from '@playwright/test'
 import { createServer } from 'vite'
 
+import { REAL_PAGES, fixtureFor } from './l3-fixtures.mjs'
 import { RGB } from './pins-colours.mjs'
 import { S14_PINS } from './pins-s14.mjs'
 import { S20_PINS } from './pins-s20.mjs'
@@ -28,6 +29,7 @@ import { S22_PINS } from './pins-s22.mjs'
 import { S23_PINS } from './pins-s23.mjs'
 import { S24_PINS } from './pins-s24.mjs'
 import { S25_PINS } from './pins-s25.mjs'
+import { S31_PINS } from './pins-s31.mjs'
 import { S15_PINS } from './pins-s15.mjs'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
@@ -120,6 +122,8 @@ const PINS = [
   ...S23_PINS,
   ...S24_PINS,
   ...S25_PINS,
+  // ── S3.1 ───────────────────────────────────────────────────────────────────
+  ...S31_PINS,
 ]
 
 const THEMES = ['dark', 'light']
@@ -129,8 +133,11 @@ function matches(actual, want) {
 }
 
 async function runTheme(browser, base, theme, pins, probe) {
+  // `real:<id>` opens the real page component(s) in `REAL_PAGES[id]` over the L3 fixtures.
+  const real = probe.startsWith('real:') ? REAL_PAGES[probe.slice(5)] : null
+  if (probe.startsWith('real:') && !real) throw new Error(`unknown real page ${probe}`)
   const context = await browser.newContext({
-    viewport: { width: 1280, height: 1000 },
+    viewport: { width: real?.width ?? 1280, height: 1000 },
     reducedMotion: 'reduce',
     colorScheme: 'dark',
     locale: 'en-US',
@@ -138,16 +145,23 @@ async function runTheme(browser, base, theme, pins, probe) {
   await context.addInitScript((t) => window.localStorage.setItem('catalyst.main.theme', t), theme)
   await context.route(
     (url) => /^\/(api|sanctum)\//.test(url.pathname),
-    (r) => r.fulfill({ status: 503, contentType: 'application/json', body: '{}' }),
+    (r) => {
+      const body = real ? fixtureFor(new URL(r.request().url()), r.request().method()) : null
+      return body
+        ? r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) })
+        : r.fulfill({ status: 503, contentType: 'application/json', body: '{}' })
+    },
   )
   const page = await context.newPage()
-  const qs = new URLSearchParams({ to: '/campaigns', user: 'agency', theme })
-  if (probe !== 'main') qs.set('probe', probe)
+  const qs = new URLSearchParams({ to: real?.to ?? '/campaigns', user: 'agency', theme })
+  if (real) qs.set('real', real.names)
+  else if (probe !== 'main') qs.set('probe', probe)
   await page.goto(`${base}/tools/walk/index.html?${qs}`, { waitUntil: 'domcontentloaded' })
   await page.waitForFunction(() => window.__walk && window.__walk.ready === true, null, {
     timeout: 60000,
   })
   await page.evaluate(() => document.fonts.ready)
+  if (real) await page.waitForTimeout(900)
 
   const act = async (steps) => {
     for (const [kind, sel] of steps ?? []) {
@@ -214,7 +228,8 @@ let failures = 0
 let checks = 0
 try {
   for (const theme of THEMES) {
-    for (const probe of ['main', 'extra']) {
+    const kinds = [...new Set(pins.map((p) => p.page ?? 'main'))].sort()
+    for (const probe of kinds) {
       const group = pins.filter((p) => (p.page ?? 'main') === probe)
       if (group.length === 0) continue
       const results = await runTheme(browser, `http://127.0.0.1:${PORT}`, theme, group, probe)

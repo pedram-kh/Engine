@@ -246,6 +246,13 @@
   border-radius: var(--radius-lg) !important;
 }
 
+/* Button/Sm label (S3.1 correction to S1.4): Figma's Sm Secondary label is 13 / 20 / 500
+ * (node 4:41); Vuetify's small button is 12. Icon-only buttons keep their glyph size. */
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-btn.v-btn--size-small:not(.v-btn--icon):not(.v-btn--stacked) {
+  --v-btn-size: 13px;
+}
+
 :is(.v-theme--agency-dark, .v-theme--agency-light) .v-btn.v-btn--icon {
   border-radius: 50% !important;
 }
@@ -718,6 +725,233 @@
 
 :is(.v-theme--agency-dark, .v-theme--agency-light) .v-chip--variant-outlined .v-chip__underlay {
   display: none;
+}
+
+/* Page frame (R2, R3): the blocks of a designed page stacked 24 apart. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Filter row (R4, S3.1): controls 12 apart, wrapping on a narrow window. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-filters__end {
+  margin-inline-start: auto;
+}
+
+/* Select-filter (Figma closed chip, S3.1): the real select or date input drawn as a
+ * transparent box with the default border and Body small text; once it holds a value
+ * (`agency-filter--applied`) it takes the container fill, the accent border and the accent
+ * text, as the applied chip does. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-filter .v-field--variant-outlined {
+  background-color: transparent;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .agency-filter
+  .v-field--variant-outlined:not(.v-field--focused):not(.v-field--error)
+  .v-field__outline {
+  color: rgb(var(--v-theme-border-color));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-filter .v-field .v-field__input,
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-filter .v-field .v-label.v-field-label {
+  font-size: 13px;
+  line-height: 19px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .agency-filter--applied
+  .v-field--variant-outlined {
+  background-color: rgb(var(--v-theme-primary-container));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .agency-filter--applied
+  .v-field--variant-outlined:not(.v-field--focused):not(.v-field--error)
+  .v-field__outline,
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .agency-filter--applied
+  .v-field--variant-outlined:not(.v-field--focused):not(.v-field--error):not(
+    .v-field--disabled
+  ):hover
+  .v-field__outline {
+  color: rgb(var(--v-theme-primary));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .agency-filter--applied
+  .v-field
+  :is(.v-field__input, .v-select__selection-text, .v-select__selection),
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .agency-filter--applied
+  .v-field
+  .v-label.v-field-label {
+  color: rgb(var(--v-theme-primary-text));
+}
+
+/* Segmented toggle (Figma "status tabs", S3.1): a surface box with the default border,
+ * radius 8 and 4px padding holding radius-6 segments in Caption type; the selected one is
+ * the raised fill with primary text. Built on `v-chip-group`, so the chips keep their
+ * selection behaviour and `data-test` anchors. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-chip-group.agency-seg {
+  flex: none;
+  width: max-content;
+  padding: 4px;
+  border: 1px solid rgb(var(--v-theme-border-color));
+  border-radius: var(--radius-lg);
+  background-color: rgb(var(--v-theme-surface));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-seg .v-slide-group__content {
+  gap: 4px;
+  padding: 0;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-seg .v-chip.v-chip--size-default {
+  --v-chip-height: 28px;
+  margin: 0;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  background-color: transparent;
+  color: rgb(var(--v-theme-on-surface-variant));
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .agency-seg
+  .v-chip.v-chip--size-default.v-chip--selected {
+  background-color: rgb(var(--v-theme-surface-bright));
+  color: rgb(var(--v-theme-on-surface));
+  font-weight: 500;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .agency-seg
+  .v-chip
+  :is(.v-chip__filter, .v-chip__underlay) {
+  display: none;
+}
+
+/* Listing table (R5, S3.1; Figma 14:3): 34-high header row on the raised fill in Overline
+ * type, 68-high rows (14 above and below a 40px two-line cell), 20px at the card's edges and
+ * 16 between columns. A page opts in with the `agency-table` class; the inferred pages join
+ * in L4. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-data-table.agency-table {
+  --v-table-header-height: 34px;
+  --v-table-row-height: 68px;
+  background-color: rgb(var(--v-theme-surface));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-data-table.agency-table
+  .v-table__wrapper
+  > table
+  > thead
+  > tr
+  > th {
+  padding: 0 8px;
+  background-color: rgb(var(--v-theme-surface-bright));
+  font-size: var(--catalyst-typography-overline-size);
+  font-weight: var(--catalyst-typography-overline-weight);
+  line-height: var(--catalyst-typography-overline-line-height);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-data-table.agency-table
+  .v-table__wrapper
+  > table
+  > tbody
+  > tr
+  > td {
+  padding: 0 8px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-data-table.agency-table
+  .v-table__wrapper
+  > table
+  :is(thead, tbody)
+  > tr
+  > :is(th, td):first-child {
+  padding-inline-start: 20px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .v-data-table.agency-table
+  .v-table__wrapper
+  > table
+  :is(thead, tbody)
+  > tr
+  > :is(th, td):last-child {
+  padding-inline-end: 20px;
+}
+
+/* A two-line cell: the primary line and a Caption line in tertiary text under it. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-cell__title {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: rgb(var(--v-theme-on-surface));
+  overflow-wrap: anywhere;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-cell__sub {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  color: rgb(var(--v-theme-text-tertiary));
+}
+
+/* An icon-and-word cell: the brand mark and its name 8 apart. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-cell-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 19px;
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+
+/* The list footer: "Showing x of y" in Caption tertiary text, the page buttons to its right. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-list-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-list-footer__count {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: rgb(var(--v-theme-text-tertiary));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-list-footer__pages {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* Progress: the brand colour unless the page sets one. */

@@ -160,7 +160,8 @@
           "empty": "Noch keine Portfolio-Einträge.",
           "untitled": "Unbenannter Eintrag"
         }
-      }
+      },
+      "resultCount": "{count} Creator | {count} Creator"
     },
     "roster": {
       "title": "Meine Creator",
@@ -530,7 +531,11 @@
         "title": "Neue Kampagne"
       },
       "detail": {
-        "title": "Kampagnendetails"
+        "title": "Kampagnendetails",
+        "glance": {
+          "title": "Auf einen Blick",
+          "daysUntilStart": "Tage bis zum Start"
+        }
       },
       "settings": {
         "saved": "Kampagneneinstellungen gespeichert."
@@ -949,6 +954,10 @@
           "loadFailed": "Ihre Dateien konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
           "attachedSummary": "{count} Datei(en) angehängt."
         }
+      },
+      "summary": "{count} Kampagne | {count} Kampagnen",
+      "list": {
+        "starts": "Beginnt am {date}"
       }
     },
     "pools": {
@@ -1267,7 +1276,12 @@
         "deleteFailed": "Die Datei konnte nicht gelöscht werden. Bitte versuchen Sie es erneut."
       }
     },
-    "creatorErased": "Gelöschter Creator"
+    "creatorErased": "Gelöschter Creator",
+    "pagination": {
+      "showing": "{shown} von {total} angezeigt",
+      "previous": "Zurück",
+      "next": "Weiter"
+    }
   },
   "validation": {
     "field_required": "Dieses Feld ist erforderlich."

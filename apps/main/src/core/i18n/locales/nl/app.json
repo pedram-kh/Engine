@@ -160,7 +160,8 @@
           "empty": "Nog geen portfolio-items.",
           "untitled": "Naamloos item"
         }
-      }
+      },
+      "resultCount": "{count} creator | {count} creators"
     },
     "roster": {
       "title": "Mijn creators",
@@ -530,7 +531,11 @@
         "title": "Nieuwe campagne"
       },
       "detail": {
-        "title": "Campagnedetails"
+        "title": "Campagnedetails",
+        "glance": {
+          "title": "In één oogopslag",
+          "daysUntilStart": "Dagen tot de start"
+        }
       },
       "settings": {
         "saved": "Campagne-instellingen opgeslagen."
@@ -949,6 +954,10 @@
           "loadFailed": "Je bestanden konden niet worden geladen. Probeer het opnieuw.",
           "attachedSummary": "{count} bestand(en) bijgevoegd."
         }
+      },
+      "summary": "{count} campagne | {count} campagnes",
+      "list": {
+        "starts": "Begint op {date}"
       }
     },
     "pools": {
@@ -1267,7 +1276,12 @@
         "deleteFailed": "Het bestand kon niet worden verwijderd. Probeer het opnieuw."
       }
     },
-    "creatorErased": "Verwijderde creator"
+    "creatorErased": "Verwijderde creator",
+    "pagination": {
+      "showing": "{shown} van {total} weergegeven",
+      "previous": "Vorige",
+      "next": "Volgende"
+    }
   },
   "validation": {
     "field_required": "Dit veld is verplicht."

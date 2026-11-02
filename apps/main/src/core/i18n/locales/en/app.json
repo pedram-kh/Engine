@@ -160,7 +160,8 @@
           "empty": "No portfolio items yet.",
           "untitled": "Untitled item"
         }
-      }
+      },
+      "resultCount": "{count} creator | {count} creators"
     },
     "roster": {
       "title": "My creators",
@@ -530,7 +531,11 @@
         "title": "New campaign"
       },
       "detail": {
-        "title": "Campaign details"
+        "title": "Campaign details",
+        "glance": {
+          "title": "At a glance",
+          "daysUntilStart": "Days until start"
+        }
       },
       "settings": {
         "saved": "Campaign settings saved."
@@ -949,6 +954,10 @@
           "loadFailed": "We couldn't load your files. Please try again.",
           "attachedSummary": "Attached {count} file(s)."
         }
+      },
+      "summary": "{count} campaign | {count} campaigns",
+      "list": {
+        "starts": "Starts {date}"
       }
     },
     "pools": {
@@ -1267,7 +1276,12 @@
         "saveFailed": "Failed to save settings."
       }
     },
-    "creatorErased": "Deleted creator"
+    "creatorErased": "Deleted creator",
+    "pagination": {
+      "showing": "Showing {shown} of {total}",
+      "previous": "Previous",
+      "next": "Next"
+    }
   },
   "validation": {
     "field_required": "This field is required."

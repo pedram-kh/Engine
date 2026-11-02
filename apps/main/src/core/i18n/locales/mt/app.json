@@ -160,7 +160,8 @@
           "empty": "Le portfolio oġġetti yet.",
           "untitled": "Untitled item"
         }
-      }
+      },
+      "resultCount": "{count} kreatur | {count} kreaturi"
     },
     "roster": {
       "title": "My creators",
@@ -530,7 +531,11 @@
         "title": "New campaign"
       },
       "detail": {
-        "title": "Kampanja details"
+        "title": "Kampanja details",
+        "glance": {
+          "title": "F'ħarsa waħda",
+          "daysUntilStart": "Jiem sal-bidu"
+        }
       },
       "settings": {
         "saved": "Kampanja settings saved."
@@ -949,6 +954,10 @@
           "loadFailed": "Il-fajls tiegħek ma setgħux jiġu kkargati. Erġa' pprova.",
           "attachedSummary": "Mehmuż {count} fajl(s)."
         }
+      },
+      "summary": "{count} kampanja | {count} kampanji",
+      "list": {
+        "starts": "Tibda fi {date}"
       }
     },
     "pools": {
@@ -1267,7 +1276,12 @@
         "deleteFailed": "Il-fajl ma setax jitħassar. Erġa' pprova."
       }
     },
-    "creatorErased": "Kreatur imneħħi"
+    "creatorErased": "Kreatur imneħħi",
+    "pagination": {
+      "showing": "Qed turi {shown} minn {total}",
+      "previous": "Preċedenti",
+      "next": "Li jmiss"
+    }
   },
   "validation": {
     "field_required": "This field is required."

@@ -160,7 +160,8 @@
           "empty": "Aucun élément de portfolio pour le moment.",
           "untitled": "Élément sans titre"
         }
-      }
+      },
+      "resultCount": "{count} créateur | {count} créateurs"
     },
     "roster": {
       "title": "Mes créateurs",
@@ -530,7 +531,11 @@
         "title": "Nouvelle campagne"
       },
       "detail": {
-        "title": "Détails de la campagne"
+        "title": "Détails de la campagne",
+        "glance": {
+          "title": "En un coup d'œil",
+          "daysUntilStart": "Jours avant le début"
+        }
       },
       "settings": {
         "saved": "Paramètres de la campagne enregistrés."
@@ -949,6 +954,10 @@
           "loadFailed": "Impossible de charger vos fichiers. Veuillez réessayer.",
           "attachedSummary": "{count} fichier(s) joint(s)."
         }
+      },
+      "summary": "{count} campagne | {count} campagnes",
+      "list": {
+        "starts": "Commence le {date}"
       }
     },
     "pools": {
@@ -1267,7 +1276,12 @@
         "deleteFailed": "Impossible de supprimer le fichier. Veuillez réessayer."
       }
     },
-    "creatorErased": "Créateur supprimé"
+    "creatorErased": "Créateur supprimé",
+    "pagination": {
+      "showing": "{shown} sur {total} affichés",
+      "previous": "Précédent",
+      "next": "Suivant"
+    }
   },
   "validation": {
     "field_required": "Ce champ est obligatoire."

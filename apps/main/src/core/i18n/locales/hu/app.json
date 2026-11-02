@@ -160,7 +160,8 @@
           "empty": "Nem portfolio elemek yet.",
           "untitled": "Untitled item"
         }
-      }
+      },
+      "resultCount": "{count} alkotó | {count} alkotó"
     },
     "roster": {
       "title": "My creators",
@@ -530,7 +531,11 @@
         "title": "New campaign"
       },
       "detail": {
-        "title": "Kampány details"
+        "title": "Kampány details",
+        "glance": {
+          "title": "Dióhéjban",
+          "daysUntilStart": "Napok a kezdésig"
+        }
       },
       "settings": {
         "saved": "Kampány settings saved."
@@ -949,6 +954,10 @@
           "loadFailed": "A fájljai betöltése sikertelen. Kérjük, próbálja újra.",
           "attachedSummary": "{count} fájl csatolva."
         }
+      },
+      "summary": "{count} kampány | {count} kampány",
+      "list": {
+        "starts": "Kezdés: {date}"
       }
     },
     "pools": {
@@ -1267,7 +1276,12 @@
         "deleteFailed": "A fájl törlése sikertelen. Kérjük, próbálja újra."
       }
     },
-    "creatorErased": "Törölt alkotó"
+    "creatorErased": "Törölt alkotó",
+    "pagination": {
+      "showing": "{shown} megjelenítve, összesen {total}",
+      "previous": "Előző",
+      "next": "Következő"
+    }
   },
   "validation": {
     "field_required": "This field is required."

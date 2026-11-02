@@ -160,7 +160,8 @@
           "empty": "Ei portfolio kohteet yet.",
           "untitled": "Untitled item"
         }
-      }
+      },
+      "resultCount": "{count} tekijä | {count} tekijää"
     },
     "roster": {
       "title": "My creators",
@@ -530,7 +531,11 @@
         "title": "New campaign"
       },
       "detail": {
-        "title": "Kampanja details"
+        "title": "Kampanja details",
+        "glance": {
+          "title": "Pähkinänkuoressa",
+          "daysUntilStart": "Päiviä alkuun"
+        }
       },
       "settings": {
         "saved": "Kampanja settings saved."
@@ -949,6 +954,10 @@
           "loadFailed": "Tiedostojesi lataaminen epäonnistui. Yritä uudelleen.",
           "attachedSummary": "{count} tiedosto(a) liitetty."
         }
+      },
+      "summary": "{count} kampanja | {count} kampanjaa",
+      "list": {
+        "starts": "Alkaa {date}"
       }
     },
     "pools": {
@@ -1267,7 +1276,12 @@
         "deleteFailed": "Tiedoston poistaminen epäonnistui. Yritä uudelleen."
       }
     },
-    "creatorErased": "Poistettu sisällöntuottaja"
+    "creatorErased": "Poistettu sisällöntuottaja",
+    "pagination": {
+      "showing": "Näytetään {shown} / {total}",
+      "previous": "Edellinen",
+      "next": "Seuraava"
+    }
   },
   "validation": {
     "field_required": "This field is required."

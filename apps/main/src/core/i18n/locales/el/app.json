@@ -160,7 +160,8 @@
           "empty": "Όχι portfolio στοιχεία yet.",
           "untitled": "Untitled item"
         }
-      }
+      },
+      "resultCount": "{count} δημιουργός | {count} δημιουργοί"
     },
     "roster": {
       "title": "My creators",
@@ -530,7 +531,11 @@
         "title": "New campaign"
       },
       "detail": {
-        "title": "Καμπάνια details"
+        "title": "Καμπάνια details",
+        "glance": {
+          "title": "Με μια ματιά",
+          "daysUntilStart": "Ημέρες μέχρι την έναρξη"
+        }
       },
       "settings": {
         "saved": "Καμπάνια settings saved."
@@ -949,6 +954,10 @@
           "loadFailed": "Δεν ήταν δυνατή η φόρτωση των αρχείων σας. Δοκιμάστε ξανά.",
           "attachedSummary": "Επισυνάφθηκαν {count} αρχείο/α."
         }
+      },
+      "summary": "{count} καμπάνια | {count} καμπάνιες",
+      "list": {
+        "starts": "Ξεκινά στις {date}"
       }
     },
     "pools": {
@@ -1267,7 +1276,12 @@
         "deleteFailed": "Δεν ήταν δυνατή η διαγραφή του αρχείου. Δοκιμάστε ξανά."
       }
     },
-    "creatorErased": "Διαγραμμένος δημιουργός"
+    "creatorErased": "Διαγραμμένος δημιουργός",
+    "pagination": {
+      "showing": "Εμφάνιση {shown} από {total}",
+      "previous": "Προηγούμενη",
+      "next": "Επόμενη"
+    }
   },
   "validation": {
     "field_required": "This field is required."

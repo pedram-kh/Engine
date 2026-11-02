@@ -160,7 +160,8 @@
           "empty": "Nē portfolio vienumi yet.",
           "untitled": "Untitled item"
         }
-      }
+      },
+      "resultCount": "{count} veidotājs | {count} veidotāji"
     },
     "roster": {
       "title": "My creators",
@@ -530,7 +531,11 @@
         "title": "New campaign"
       },
       "detail": {
-        "title": "Kampaņa details"
+        "title": "Kampaņa details",
+        "glance": {
+          "title": "Īsumā",
+          "daysUntilStart": "Dienas līdz sākumam"
+        }
       },
       "settings": {
         "saved": "Kampaņa settings saved."
@@ -949,6 +954,10 @@
           "loadFailed": "Jūsu failus nevarēja ielādēt. Lūdzu, mēģiniet vēlreiz.",
           "attachedSummary": "Pievienoti {count} faili."
         }
+      },
+      "summary": "{count} kampaņa | {count} kampaņas",
+      "list": {
+        "starts": "Sākas {date}"
       }
     },
     "pools": {
@@ -1267,7 +1276,12 @@
         "deleteFailed": "Failu nevarēja dzēst. Lūdzu, mēģiniet vēlreiz."
       }
     },
-    "creatorErased": "Dzēsts satura veidotājs"
+    "creatorErased": "Dzēsts satura veidotājs",
+    "pagination": {
+      "showing": "Rāda {shown} no {total}",
+      "previous": "Iepriekšējā",
+      "next": "Nākamā"
+    }
   },
   "validation": {
     "field_required": "This field is required."

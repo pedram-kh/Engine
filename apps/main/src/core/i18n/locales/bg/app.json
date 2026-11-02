@@ -160,7 +160,8 @@
           "empty": "Не portfolio елементи yet.",
           "untitled": "Untitled item"
         }
-      }
+      },
+      "resultCount": "{count} създател | {count} създатели"
     },
     "roster": {
       "title": "My creators",
@@ -530,7 +531,11 @@
         "title": "New campaign"
       },
       "detail": {
-        "title": "Кампания details"
+        "title": "Кампания details",
+        "glance": {
+          "title": "Накратко",
+          "daysUntilStart": "Дни до началото"
+        }
       },
       "settings": {
         "saved": "Кампания settings saved."
@@ -949,6 +954,10 @@
           "loadFailed": "Файловете ви не можаха да бъдат заредени. Моля, опитайте отново.",
           "attachedSummary": "Прикачени {count} файл(а)."
         }
+      },
+      "summary": "{count} кампания | {count} кампании",
+      "list": {
+        "starts": "Започва на {date}"
       }
     },
     "pools": {
@@ -1267,7 +1276,12 @@
         "deleteFailed": "Файлът не можа да бъде изтрит. Моля, опитайте отново."
       }
     },
-    "creatorErased": "Изтрит създател"
+    "creatorErased": "Изтрит създател",
+    "pagination": {
+      "showing": "Показани {shown} от {total}",
+      "previous": "Предишна",
+      "next": "Следваща"
+    }
   },
   "validation": {
     "field_required": "This field is required."

@@ -160,7 +160,8 @@
           "empty": "Inga portfolioposter ännu.",
           "untitled": "Ej namngiven post"
         }
-      }
+      },
+      "resultCount": "{count} creator | {count} creators"
     },
     "roster": {
       "title": "Mina creators",
@@ -530,7 +531,11 @@
         "title": "Ny kampanj"
       },
       "detail": {
-        "title": "Kampanjdetaljer"
+        "title": "Kampanjdetaljer",
+        "glance": {
+          "title": "I korthet",
+          "daysUntilStart": "Dagar till start"
+        }
       },
       "settings": {
         "saved": "Kampanjinställningar sparade."
@@ -949,6 +954,10 @@
           "loadFailed": "Det gick inte att läsa in dina filer. Försök igen.",
           "attachedSummary": "{count} fil(er) bifogad(e)."
         }
+      },
+      "summary": "{count} kampanj | {count} kampanjer",
+      "list": {
+        "starts": "Startar {date}"
       }
     },
     "pools": {
@@ -1267,7 +1276,12 @@
         "deleteFailed": "Det gick inte att ta bort filen. Försök igen."
       }
     },
-    "creatorErased": "Raderad skapare"
+    "creatorErased": "Raderad skapare",
+    "pagination": {
+      "showing": "Visar {shown} av {total}",
+      "previous": "Föregående",
+      "next": "Nästa"
+    }
   },
   "validation": {
     "field_required": "Det här fältet är obligatoriskt."

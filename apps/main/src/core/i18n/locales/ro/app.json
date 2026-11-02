@@ -160,7 +160,8 @@
           "empty": "Nu portfolio elemente yet.",
           "untitled": "Untitled item"
         }
-      }
+      },
+      "resultCount": "{count} creator | {count} creatori"
     },
     "roster": {
       "title": "My creators",
@@ -530,7 +531,11 @@
         "title": "New campaign"
       },
       "detail": {
-        "title": "Campanie details"
+        "title": "Campanie details",
+        "glance": {
+          "title": "Pe scurt",
+          "daysUntilStart": "Zile până la început"
+        }
       },
       "settings": {
         "saved": "Campanie settings saved."
@@ -949,6 +954,10 @@
           "loadFailed": "Fișierele dvs. nu au putut fi încărcate. Încercați din nou.",
           "attachedSummary": "{count} fișier(e) atașat(e)."
         }
+      },
+      "summary": "{count} campanie | {count} campanii",
+      "list": {
+        "starts": "Începe pe {date}"
       }
     },
     "pools": {
@@ -1267,7 +1276,12 @@
         "deleteFailed": "Fișierul nu a putut fi șters. Încercați din nou."
       }
     },
-    "creatorErased": "Creator șters"
+    "creatorErased": "Creator șters",
+    "pagination": {
+      "showing": "Se afișează {shown} din {total}",
+      "previous": "Anterior",
+      "next": "Următor"
+    }
   },
   "validation": {
     "field_required": "This field is required."

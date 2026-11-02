@@ -160,7 +160,8 @@
           "empty": "Ainda não há itens no portefólio.",
           "untitled": "Item sem título"
         }
-      }
+      },
+      "resultCount": "{count} criador | {count} criadores"
     },
     "roster": {
       "title": "Meus criadores",
@@ -530,7 +531,11 @@
         "title": "Nova campanha"
       },
       "detail": {
-        "title": "Detalhes da campanha"
+        "title": "Detalhes da campanha",
+        "glance": {
+          "title": "Num relance",
+          "daysUntilStart": "Dias até ao início"
+        }
       },
       "settings": {
         "saved": "Configurações da campanha salvas."
@@ -949,6 +954,10 @@
           "loadFailed": "Não foi possível carregar os seus ficheiros. Tente novamente.",
           "attachedSummary": "{count} ficheiro(s) anexado(s)."
         }
+      },
+      "summary": "{count} campanha | {count} campanhas",
+      "list": {
+        "starts": "Começa em {date}"
       }
     },
     "pools": {
@@ -1267,7 +1276,12 @@
         "deleteFailed": "Não foi possível eliminar o ficheiro. Tente novamente."
       }
     },
-    "creatorErased": "Criador eliminado"
+    "creatorErased": "Criador eliminado",
+    "pagination": {
+      "showing": "A mostrar {shown} de {total}",
+      "previous": "Anterior",
+      "next": "Seguinte"
+    }
   },
   "validation": {
     "field_required": "Este campo é obrigatório."

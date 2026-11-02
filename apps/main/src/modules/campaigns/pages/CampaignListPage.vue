@@ -32,7 +32,7 @@
  * reversible and urgent (it is what you reach for when something is wrong).
  */
 
-import { ApiError, extractFieldErrors, formatCurrency } from '@catalyst/api-client'
+import { ApiError, extractFieldErrors, formatCurrency, formatDate } from '@catalyst/api-client'
 import type {
   BrandOptionResource,
   CampaignListParams,
@@ -44,6 +44,9 @@ import { useI18n } from 'vue-i18n'
 import { CEmptyState } from '@catalyst/ui'
 
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
+import AgencyBrandMark from '@/modules/agency/components/AgencyBrandMark.vue'
+import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
+import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
 import { brandsApi } from '@/modules/brands/api/brands.api'
 import { campaignsApi } from '../api/campaigns.api'
 import { type ListingFloorField, missingListingFloorFields } from '../listingFloor'
@@ -66,14 +69,21 @@ const brandOptions = ref<{ title: string; value: string }[]>([])
 
 const tableOptions = ref({ page: 1, itemsPerPage: 25 })
 
+// AH-114 (S3.1) — the Figma column widths (14:3): the campaign takes the rest; brand 180,
+// status 140, job board 110, budget 120 (right), the row action 64 (right).
 const headers = [
   { title: t('app.campaigns.fields.name'), key: 'attributes.name', sortable: false },
-  { title: t('app.campaigns.fields.brand'), key: 'relationships.brand.data.name', sortable: false },
+  {
+    title: t('app.campaigns.fields.brand'),
+    key: 'relationships.brand.data.name',
+    sortable: false,
+    width: 180,
+  },
   {
     title: t('app.campaigns.fields.status'),
     key: 'attributes.status',
     sortable: false,
-    width: 120,
+    width: 140,
   },
   // AH-057 — listing state is ORTHOGONAL to lifecycle status, so it gets its
   // own column rather than a second chip in the status cell: a campaign can be
@@ -83,15 +93,16 @@ const headers = [
     title: t('app.campaigns.fields.jobBoard'),
     key: 'attributes.listed_on_jobs_board',
     sortable: false,
-    width: 120,
+    width: 110,
   },
   {
     title: t('app.campaigns.fields.budget'),
     key: 'attributes.budget_minor_units',
     sortable: false,
-    width: 140,
+    width: 120,
+    align: 'end' as const,
   },
-  { title: '', key: 'actions', sortable: false, width: 80, align: 'end' as const },
+  { title: '', key: 'actions', sortable: false, width: 64, align: 'end' as const },
 ]
 
 const statusFilterItems: { label: string; value: StatusFilter }[] = [
@@ -102,14 +113,6 @@ const statusFilterItems: { label: string; value: StatusFilter }[] = [
   { label: t('app.campaigns.status.completed'), value: 'completed' },
   { label: t('app.campaigns.status.cancelled'), value: 'cancelled' },
 ]
-
-const statusColor: Record<string, string> = {
-  draft: 'default',
-  active: 'success',
-  paused: 'warning',
-  completed: 'info',
-  cancelled: 'error',
-}
 
 async function loadBrandOptions(): Promise<void> {
   const agencyId = agencyStore.currentAgencyId
@@ -148,6 +151,7 @@ async function loadCampaigns(): Promise<void> {
     const res = await campaignsApi.list(agencyId, params)
     items.value = res.data
     totalItems.value = res.meta.total
+    hasLoaded.value = true
   } catch {
     error.value = t('app.campaigns.errors.loadFailed')
   } finally {
@@ -176,12 +180,49 @@ watch([statusFilter, brandFilter, startsFrom, startsTo], () => {
 })
 
 function onTableUpdate(opts: { page: number; itemsPerPage: number }): void {
+  // The table reports its own initial state on mount, and the page buttons below move it
+  // through `goToPage`, which loads; an update that changes nothing is not a second request.
+  if (
+    opts.page === tableOptions.value.page &&
+    opts.itemsPerPage === tableOptions.value.itemsPerPage
+  ) {
+    return
+  }
   tableOptions.value = opts
   void loadCampaigns()
 }
 
 function formatMoney(minor: number | null, currency: string | null): string {
   return formatCurrency(minor, currency, locale.value)
+}
+
+// AH-114 (S3.1) — the header summary and the list footer both read `meta.total`; neither is
+// drawn before the first response (no zero, no placeholder).
+const hasLoaded = ref(false)
+
+const summary = computed(() =>
+  hasLoaded.value && error.value === null
+    ? t('app.campaigns.summary', { count: totalItems.value }, totalItems.value)
+    : null,
+)
+
+/** How far down the list the current page reaches ("9" on a first page of nine rows). */
+const shownCount = computed(
+  () => (tableOptions.value.page - 1) * tableOptions.value.itemsPerPage + items.value.length,
+)
+const canGoPrevious = computed(() => tableOptions.value.page > 1)
+const canGoNext = computed(() => shownCount.value < totalItems.value)
+
+function goToPage(page: number): void {
+  tableOptions.value = { ...tableOptions.value, page }
+  void loadCampaigns()
+}
+
+function startsLine(item: CampaignResource): string | null {
+  const startsAt = item.attributes.starts_at
+  return startsAt === null
+    ? null
+    : t('app.campaigns.list.starts', { date: formatDate(startsAt, locale.value) })
 }
 
 // ── The Job board switch (AH-059, D3) ───────────────────────────────────────
@@ -346,21 +387,28 @@ async function commitListing(item: CampaignResource, value: boolean): Promise<vo
 </script>
 
 <template>
-  <div data-test="campaign-list-page">
-    <div class="d-flex align-center justify-space-between mb-4">
-      <h1 class="text-h5 ma-0" data-test="campaign-list-heading">{{ t('app.campaigns.title') }}</h1>
-      <v-btn
-        color="primary"
-        prepend-icon="mdi-plus"
-        :to="{ name: 'campaigns.create' }"
-        data-test="campaign-create-btn"
-      >
-        {{ t('app.campaigns.actions.create') }}
-      </v-btn>
-    </div>
+  <div class="agency-page" data-test="campaign-list-page">
+    <AgencyPageHeader
+      :title="t('app.campaigns.title')"
+      :subtitle="summary"
+      title-test="campaign-list-heading"
+      subtitle-test="campaign-list-summary"
+    >
+      <template #actions>
+        <v-btn
+          color="primary"
+          prepend-icon="mdi-plus"
+          :to="{ name: 'campaigns.create' }"
+          data-test="campaign-create-btn"
+        >
+          {{ t('app.campaigns.actions.create') }}
+        </v-btn>
+      </template>
+    </AgencyPageHeader>
 
-    <!-- Filters -->
-    <div class="d-flex flex-wrap align-center ga-3 mb-4" data-test="campaign-filters">
+    <!-- Filters: the three controls on the left, the status segments on the right.
+         The segments carry no per-status counts: the list API has none (ruling 15). -->
+    <div class="agency-filters" data-test="campaign-filters">
       <v-select
         v-model="brandFilter"
         :items="brandOptions"
@@ -371,6 +419,8 @@ async function commitListing(item: CampaignResource, value: boolean): Promise<vo
         variant="outlined"
         hide-details
         clearable
+        class="agency-filter"
+        :class="{ 'agency-filter--applied': !!brandFilter }"
         style="max-width: 220px"
         data-test="campaign-filter-brand"
       />
@@ -381,6 +431,8 @@ async function commitListing(item: CampaignResource, value: boolean): Promise<vo
         density="compact"
         variant="outlined"
         hide-details
+        class="agency-filter"
+        :class="{ 'agency-filter--applied': !!startsFrom }"
         style="max-width: 190px"
         data-test="campaign-filter-starts-from"
       />
@@ -391,25 +443,32 @@ async function commitListing(item: CampaignResource, value: boolean): Promise<vo
         density="compact"
         variant="outlined"
         hide-details
+        class="agency-filter"
+        :class="{ 'agency-filter--applied': !!startsTo }"
         style="max-width: 190px"
         data-test="campaign-filter-starts-to"
       />
+
+      <v-chip-group
+        v-model="statusFilter"
+        mandatory
+        class="agency-seg agency-filters__end"
+        data-test="campaign-status-filter"
+      >
+        <v-chip
+          v-for="item in statusFilterItems"
+          :key="item.value"
+          :value="item.value"
+          filter
+          variant="outlined"
+          :data-test="`campaign-filter-${item.value}`"
+        >
+          {{ item.label }}
+        </v-chip>
+      </v-chip-group>
     </div>
 
-    <v-chip-group v-model="statusFilter" mandatory class="mb-4" data-test="campaign-status-filter">
-      <v-chip
-        v-for="item in statusFilterItems"
-        :key="item.value"
-        :value="item.value"
-        filter
-        variant="outlined"
-        :data-test="`campaign-filter-${item.value}`"
-      >
-        {{ item.label }}
-      </v-chip>
-    </v-chip-group>
-
-    <v-alert v-if="error" type="error" variant="tonal" class="mb-4" data-test="campaign-list-error">
+    <v-alert v-if="error" type="error" variant="tonal" data-test="campaign-list-error">
       {{ error }}
     </v-alert>
 
@@ -444,22 +503,41 @@ async function commitListing(item: CampaignResource, value: boolean): Promise<vo
       :items-per-page="tableOptions.itemsPerPage"
       :page="tableOptions.page"
       item-value="id"
+      hide-default-footer
+      class="agency-table"
       data-test="campaign-table"
       @update:options="onTableUpdate"
     >
+      <template #item.attributes.name="{ item }">
+        <div class="agency-cell">
+          <span class="agency-cell__title" data-test="campaign-name">{{
+            item.attributes.name
+          }}</span>
+          <span
+            v-if="startsLine(item) !== null"
+            class="agency-cell__sub"
+            :data-test="`campaign-starts-${item.id}`"
+            >{{ startsLine(item) }}</span
+          >
+        </div>
+      </template>
+
       <template #item.relationships.brand.data.name="{ item }">
-        {{ item.relationships.brand.data.name }}
+        <span class="agency-cell-brand">
+          <AgencyBrandMark
+            :name="item.relationships.brand.data.name"
+            :seed="item.relationships.brand.data.id"
+          />
+          {{ item.relationships.brand.data.name }}
+        </span>
       </template>
 
       <template #item.attributes.status="{ item }">
-        <v-chip
-          :color="statusColor[item.attributes.status] ?? 'default'"
-          size="small"
-          variant="tonal"
+        <AgencyStatusPill
+          kind="campaign"
+          :status="item.attributes.status"
           :data-test="`campaign-status-${item.id}`"
-        >
-          {{ t(`app.campaigns.status.${item.attributes.status}`) }}
-        </v-chip>
+        />
       </template>
 
       <!-- AH-059 (D3) — a SWITCH, not a clickable chip. A chip that silently
@@ -482,13 +560,16 @@ async function commitListing(item: CampaignResource, value: boolean): Promise<vo
       </template>
 
       <template #item.attributes.budget_minor_units="{ item }">
-        {{ formatMoney(item.attributes.budget_minor_units, item.attributes.budget_currency) }}
+        <span class="agency-cell__title" data-test="campaign-budget">{{
+          formatMoney(item.attributes.budget_minor_units, item.attributes.budget_currency)
+        }}</span>
       </template>
 
       <template #item.actions="{ item }">
         <v-btn
           icon="mdi-eye-outline"
           size="small"
+          density="comfortable"
           variant="text"
           :to="{ name: 'campaigns.detail', params: { ulid: item.id } }"
           :aria-label="t('app.campaigns.detail.title')"
@@ -496,6 +577,33 @@ async function commitListing(item: CampaignResource, value: boolean): Promise<vo
         />
       </template>
     </v-data-table-server>
+
+    <!-- The footer: how far down the list this page reaches, and the page buttons. -->
+    <div v-if="totalItems > 0" class="agency-list-footer" data-test="campaign-list-footer">
+      <p class="agency-list-footer__count" data-test="campaign-list-showing">
+        {{ t('app.pagination.showing', { shown: shownCount, total: totalItems }) }}
+      </p>
+      <div class="agency-list-footer__pages">
+        <v-btn
+          variant="outlined"
+          size="small"
+          :disabled="!canGoPrevious || loading"
+          data-test="campaign-page-previous"
+          @click="goToPage(tableOptions.page - 1)"
+        >
+          {{ t('app.pagination.previous') }}
+        </v-btn>
+        <v-btn
+          variant="outlined"
+          size="small"
+          :disabled="!canGoNext || loading"
+          data-test="campaign-page-next"
+          @click="goToPage(tableOptions.page + 1)"
+        >
+          {{ t('app.pagination.next') }}
+        </v-btn>
+      </div>
+    </div>
 
     <!-- The ON confirmation (AH-059, D3). Names the campaign, because the row is
          about to leave the user's focus, and states the consequence: this is the

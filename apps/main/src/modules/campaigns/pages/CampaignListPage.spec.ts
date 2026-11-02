@@ -20,6 +20,7 @@ import enApp from '@/core/i18n/locales/en/app.json'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 
 import CampaignListPage from './CampaignListPage.vue'
+import pageSource from './CampaignListPage.vue?raw'
 
 vi.mock('../api/campaigns.api', () => ({
   campaignsApi: { list: vi.fn(), update: vi.fn() },
@@ -87,13 +88,14 @@ function makeCampaign(overrides: Partial<CampaignResource['attributes']> = {}): 
 
 async function mountList(
   campaigns: CampaignResource[] = [],
+  total: number = campaigns.length,
 ): Promise<{ wrapper: ReturnType<typeof mount>; cleanup: () => void }> {
   const pinia = createPinia()
   setActivePinia(pinia)
 
   vi.mocked(campaignsApi.list).mockResolvedValue({
     data: campaigns,
-    meta: { total: campaigns.length, page: 1, per_page: 25, last_page: 1 },
+    meta: { total, page: 1, per_page: 25, last_page: 1 },
   })
   vi.mocked(brandsApi.listOptions).mockResolvedValue({ data: [] })
 
@@ -395,5 +397,156 @@ describe('CampaignListPage (Sprint 8 Chunk 1)', () => {
     // The floor mirror says the row LOOKED complete, so the refusal falls through
     // to the status reason rather than inventing a field list.
     expect(bodyEl('campaign-listing-refusal-body')?.textContent ?? '').toContain('Raced')
+  })
+
+  // ── AH-114 (S3.1): the restyled list ────────────────────────────────────────────────────
+  describe('agency restyle (AH-114, S3.1)', () => {
+    it('reads the header summary off the list total, and not before the first response', async () => {
+      const harness = await mountList([makeCampaign()], 24)
+      cleanup = harness.cleanup
+      expect(harness.wrapper.get('[data-test="campaign-list-summary"]').text()).toBe('24 campaigns')
+      expect(harness.wrapper.get('[data-test="campaign-list-heading"]').text()).toBe('Campaigns')
+    })
+
+    it('uses the singular for one campaign', async () => {
+      const harness = await mountList([makeCampaign()], 1)
+      cleanup = harness.cleanup
+      expect(harness.wrapper.get('[data-test="campaign-list-summary"]').text()).toBe('1 campaign')
+    })
+
+    it('draws no summary when the load failed', async () => {
+      vi.mocked(campaignsApi.list).mockRejectedValue(new Error('down'))
+      vi.mocked(brandsApi.listOptions).mockResolvedValue({ data: [] })
+      const pinia = createPinia()
+      setActivePinia(pinia)
+      useAgencyStore().initFromUser([
+        { agency_id: 'agency-ulid', agency_name: 'Test Agency', role: 'agency_admin' },
+      ])
+      const router = createRouter({
+        history: createMemoryHistory(),
+        routes: [
+          { path: '/campaigns', name: 'campaigns.list', component: { template: '<div />' } },
+          { path: '/campaigns/new', name: 'campaigns.create', component: { template: '<div />' } },
+          {
+            path: '/campaigns/:ulid',
+            name: 'campaigns.detail',
+            component: { template: '<div />' },
+          },
+        ],
+      })
+      await router.push('/campaigns')
+      const i18n = createI18n({
+        legacy: false,
+        locale: 'en',
+        fallbackLocale: 'en',
+        availableLocales: ['en'],
+        messages: { en: enApp } as never,
+      })
+      const wrapper = mount(CampaignListPage, {
+        global: {
+          plugins: [
+            pinia,
+            router,
+            i18n,
+            createVuetify({ components: vuetifyComponents, directives: vuetifyDirectives }),
+          ],
+        },
+      })
+      await flushPromises()
+      expect(wrapper.find('[data-test="campaign-list-summary"]').exists()).toBe(false)
+      expect(wrapper.find('[data-test="campaign-list-footer"]').exists()).toBe(false)
+      wrapper.unmount()
+    })
+
+    it('every status renders the agency pill with its table tone, and no chip', async () => {
+      const statuses = ['draft', 'active', 'paused', 'completed', 'cancelled'] as const
+      const tones = ['neutral', 'success', 'warning', 'info', 'danger']
+      const rows = statuses.map((status, i) => ({
+        ...makeCampaign({ status, name: `Row ${status}` }),
+        id: `STATUSROW00000000000000000${i}`,
+      }))
+      const harness = await mountList(rows)
+      cleanup = harness.cleanup
+      statuses.forEach((_, i) => {
+        const pill = harness.wrapper.get(`[data-test="campaign-status-${rows[i]?.id}"]`)
+        expect(pill.classes()).toContain('agency-status-pill')
+        expect(pill.attributes('data-tone')).toBe(tones[i])
+      })
+      expect(harness.wrapper.find('[data-test="campaign-table"] .v-chip').exists()).toBe(false)
+    })
+
+    it('the page keeps no colour map of its own for statuses', () => {
+      expect(pageSource).not.toMatch(/statusColor/)
+      expect(pageSource).not.toMatch(/color="\$\{|:color="statusColor/)
+    })
+
+    it('shows the start date line only for a campaign that has one', async () => {
+      const dated = makeCampaign({ name: 'Dated', starts_at: '2026-10-08T00:00:00Z' })
+      const undated = {
+        ...makeCampaign({ name: 'Undated', starts_at: null }),
+        id: 'UNDATEDCAMPAIGN00000000001',
+      }
+      const harness = await mountList([dated, undated])
+      cleanup = harness.cleanup
+      expect(harness.wrapper.get(`[data-test="campaign-starts-${dated.id}"]`).text()).toMatch(
+        /^Starts .*2026$/,
+      )
+      expect(harness.wrapper.find(`[data-test="campaign-starts-${undated.id}"]`).exists()).toBe(
+        false,
+      )
+    })
+
+    it('draws the status segments without counts or check marks', async () => {
+      const harness = await mountList([makeCampaign()], 24)
+      cleanup = harness.cleanup
+      const segments = harness.wrapper.get('[data-test="campaign-status-filter"]')
+      expect(segments.text()).not.toMatch(/\d/)
+      expect(segments.findAll('.v-chip')).toHaveLength(6)
+    })
+
+    it('the footer says how far the page reaches, and Previous is off on the first page', async () => {
+      const harness = await mountList([makeCampaign(), makeCampaign()], 24)
+      cleanup = harness.cleanup
+      expect(harness.wrapper.get('[data-test="campaign-list-showing"]').text()).toBe(
+        'Showing 2 of 24',
+      )
+      expect(
+        harness.wrapper.get<HTMLButtonElement>('[data-test="campaign-page-previous"]').element
+          .disabled,
+      ).toBe(true)
+    })
+
+    it('Next asks for the following page and Previous comes back', async () => {
+      const harness = await mountList([makeCampaign()], 60)
+      cleanup = harness.cleanup
+      const callsBefore = vi.mocked(campaignsApi.list).mock.calls.length
+
+      await harness.wrapper.get('[data-test="campaign-page-next"]').trigger('click')
+      await flushPromises()
+      expect(vi.mocked(campaignsApi.list).mock.calls.length).toBe(callsBefore + 1)
+      expect(vi.mocked(campaignsApi.list).mock.calls.at(-1)?.[1]).toMatchObject({ page: 2 })
+
+      await harness.wrapper.get('[data-test="campaign-page-previous"]').trigger('click')
+      await flushPromises()
+      expect(vi.mocked(campaignsApi.list).mock.calls.at(-1)?.[1]).toMatchObject({ page: 1 })
+    })
+
+    it('Next is off when every campaign is already shown', async () => {
+      const harness = await mountList([makeCampaign()], 1)
+      cleanup = harness.cleanup
+      expect(
+        harness.wrapper.get<HTMLButtonElement>('[data-test="campaign-page-next"]').element.disabled,
+      ).toBe(true)
+    })
+
+    it('marks a filter that holds a value as applied', async () => {
+      const harness = await mountList([makeCampaign()])
+      cleanup = harness.cleanup
+      const from = harness.wrapper.get('[data-test="campaign-filter-starts-from"]')
+      expect(from.classes()).toContain('agency-filter')
+      expect(from.classes()).not.toContain('agency-filter--applied')
+      await from.get('input').setValue('2026-10-01')
+      expect(from.classes()).toContain('agency-filter--applied')
+    })
   })
 })

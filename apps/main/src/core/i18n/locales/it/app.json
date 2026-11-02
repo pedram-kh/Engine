@@ -160,7 +160,8 @@
           "empty": "Ancora nessun elemento nel portfolio.",
           "untitled": "Elemento senza titolo"
         }
-      }
+      },
+      "resultCount": "{count} creator | {count} creator"
     },
     "roster": {
       "title": "I miei creator",
@@ -530,7 +531,11 @@
         "title": "Nuova campagna"
       },
       "detail": {
-        "title": "Dettagli campagna"
+        "title": "Dettagli campagna",
+        "glance": {
+          "title": "In sintesi",
+          "daysUntilStart": "Giorni all'inizio"
+        }
       },
       "settings": {
         "saved": "Impostazioni della campagna salvate."
@@ -949,6 +954,10 @@
           "loadFailed": "Impossibile caricare i tuoi file. Riprova.",
           "attachedSummary": "Allegati {count} file."
         }
+      },
+      "summary": "{count} campagna | {count} campagne",
+      "list": {
+        "starts": "Inizia il {date}"
       }
     },
     "pools": {
@@ -1267,7 +1276,12 @@
         "deleteFailed": "Impossibile eliminare il file. Riprova."
       }
     },
-    "creatorErased": "Creator eliminato"
+    "creatorErased": "Creator eliminato",
+    "pagination": {
+      "showing": "Mostrati {shown} di {total}",
+      "previous": "Precedente",
+      "next": "Successivo"
+    }
   },
   "validation": {
     "field_required": "Questo campo è obbligatorio."

@@ -160,7 +160,8 @@
           "empty": "Ei portfolio üksused yet.",
           "untitled": "Untitled item"
         }
-      }
+      },
+      "resultCount": "{count} sisulooja | {count} sisuloojat"
     },
     "roster": {
       "title": "My creators",
@@ -530,7 +531,11 @@
         "title": "New campaign"
       },
       "detail": {
-        "title": "Kampaania details"
+        "title": "Kampaania details",
+        "glance": {
+          "title": "Lühiülevaade",
+          "daysUntilStart": "Päevi alguseni"
+        }
       },
       "settings": {
         "saved": "Kampaania settings saved."
@@ -949,6 +954,10 @@
           "loadFailed": "Sinu failide laadimine ebaõnnestus. Proovi uuesti.",
           "attachedSummary": "Lisatud {count} fail(i)."
         }
+      },
+      "summary": "{count} kampaania | {count} kampaaniat",
+      "list": {
+        "starts": "Algab {date}"
       }
     },
     "pools": {
@@ -1267,7 +1276,12 @@
         "deleteFailed": "Faili kustutamine ebaõnnestus. Proovi uuesti."
       }
     },
-    "creatorErased": "Kustutatud sisulooja"
+    "creatorErased": "Kustutatud sisulooja",
+    "pagination": {
+      "showing": "Näidatud {shown} / {total}",
+      "previous": "Eelmine",
+      "next": "Järgmine"
+    }
   },
   "validation": {
     "field_required": "This field is required."

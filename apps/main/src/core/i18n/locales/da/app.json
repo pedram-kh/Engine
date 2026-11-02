@@ -160,7 +160,8 @@
           "empty": "Ingen portfolio-elementer endnu.",
           "untitled": "Unavngivet element"
         }
-      }
+      },
+      "resultCount": "{count} creator | {count} creatorer"
     },
     "roster": {
       "title": "Mine creatorer",
@@ -530,7 +531,11 @@
         "title": "Ny kampagne"
       },
       "detail": {
-        "title": "Kampagnedetaljer"
+        "title": "Kampagnedetaljer",
+        "glance": {
+          "title": "Overblik",
+          "daysUntilStart": "Dage til start"
+        }
       },
       "settings": {
         "saved": "Kampagneindstillinger gemt."
@@ -949,6 +954,10 @@
           "loadFailed": "Dine filer kunne ikke indlæses. Prøv igen.",
           "attachedSummary": "{count} fil(er) vedhæftet."
         }
+      },
+      "summary": "{count} kampagne | {count} kampagner",
+      "list": {
+        "starts": "Starter {date}"
       }
     },
     "pools": {
@@ -1267,7 +1276,12 @@
         "deleteFailed": "Filen kunne ikke slettes. Prøv igen."
       }
     },
-    "creatorErased": "Slettet creator"
+    "creatorErased": "Slettet creator",
+    "pagination": {
+      "showing": "Viser {shown} af {total}",
+      "previous": "Forrige",
+      "next": "Næste"
+    }
   },
   "validation": {
     "field_required": "Dette felt er påkrævet."

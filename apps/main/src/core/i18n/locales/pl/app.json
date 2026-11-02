@@ -160,7 +160,8 @@
           "empty": "Brak pozycji portfolio.",
           "untitled": "Nienazwana pozycja"
         }
-      }
+      },
+      "resultCount": "{count} twórca | {count} twórców"
     },
     "roster": {
       "title": "Moi twórcy",
@@ -530,7 +531,11 @@
         "title": "Nowa kampania"
       },
       "detail": {
-        "title": "Szczegóły kampanii"
+        "title": "Szczegóły kampanii",
+        "glance": {
+          "title": "W skrócie",
+          "daysUntilStart": "Dni do rozpoczęcia"
+        }
       },
       "settings": {
         "saved": "Ustawienia kampanii zapisane."
@@ -949,6 +954,10 @@
           "loadFailed": "Nie udało się wczytać Twoich plików. Spróbuj ponownie.",
           "attachedSummary": "Dołączono {count} plik(ów)."
         }
+      },
+      "summary": "{count} kampania | {count} kampanii",
+      "list": {
+        "starts": "Start: {date}"
       }
     },
     "pools": {
@@ -1267,7 +1276,12 @@
         "deleteFailed": "Nie udało się usunąć pliku. Spróbuj ponownie."
       }
     },
-    "creatorErased": "Usunięty twórca"
+    "creatorErased": "Usunięty twórca",
+    "pagination": {
+      "showing": "Wyświetlono {shown} z {total}",
+      "previous": "Poprzednia",
+      "next": "Następna"
+    }
   },
   "validation": {
     "field_required": "To pole jest wymagane."

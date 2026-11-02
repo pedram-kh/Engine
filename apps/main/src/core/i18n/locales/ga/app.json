@@ -160,7 +160,8 @@
           "empty": "Níl portfolio míreanna yet.",
           "untitled": "Untitled item"
         }
-      }
+      },
+      "resultCount": "{count} chruthaitheoir | {count} cruthaitheoir"
     },
     "roster": {
       "title": "My creators",
@@ -530,7 +531,11 @@
         "title": "New campaign"
       },
       "detail": {
-        "title": "Feachtas details"
+        "title": "Feachtas details",
+        "glance": {
+          "title": "Ar léargas",
+          "daysUntilStart": "Laethanta go dtí an tús"
+        }
       },
       "settings": {
         "saved": "Feachtas settings saved."
@@ -949,6 +954,10 @@
           "loadFailed": "Níorbh fhéidir do chomhaid a lódáil. Bain triail eile as.",
           "attachedSummary": "Ceangailte {count} comhad."
         }
+      },
+      "summary": "{count} fheachtas | {count} feachtas",
+      "list": {
+        "starts": "Tosaíonn ar {date}"
       }
     },
     "pools": {
@@ -1267,7 +1276,12 @@
         "deleteFailed": "Níorbh fhéidir an comhad a scriosadh. Bain triail eile as."
       }
     },
-    "creatorErased": "Cruthaitheoir scriosta"
+    "creatorErased": "Cruthaitheoir scriosta",
+    "pagination": {
+      "showing": "Ag taispeáint {shown} as {total}",
+      "previous": "Roimhe seo",
+      "next": "Ar aghaidh"
+    }
   },
   "validation": {
     "field_required": "This field is required."

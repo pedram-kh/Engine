@@ -160,7 +160,8 @@
           "empty": "Zatím žádné položky portfolia.",
           "untitled": "Nepojmenovaná položka"
         }
-      }
+      },
+      "resultCount": "{count} tvorca | {count} tvorcov"
     },
     "roster": {
       "title": "Moji tvorcovia",
@@ -530,7 +531,11 @@
         "title": "Nová kampaň"
       },
       "detail": {
-        "title": "Podrobnosti kampaně"
+        "title": "Podrobnosti kampaně",
+        "glance": {
+          "title": "Prehľad",
+          "daysUntilStart": "Dní do začiatku"
+        }
       },
       "settings": {
         "saved": "Nastavenia kampaně uložené."
@@ -949,6 +954,10 @@
           "loadFailed": "Vaše súbory sa nepodarilo načítať. Skúste to znova.",
           "attachedSummary": "Priložených súborov: {count}."
         }
+      },
+      "summary": "{count} kampaň | {count} kampaní",
+      "list": {
+        "starts": "Začína {date}"
       }
     },
     "pools": {
@@ -1267,7 +1276,12 @@
         "deleteFailed": "Súbor sa nepodarilo odstrániť. Skúste to znova."
       }
     },
-    "creatorErased": "Zmazaný tvorca"
+    "creatorErased": "Zmazaný tvorca",
+    "pagination": {
+      "showing": "Zobrazené {shown} z {total}",
+      "previous": "Predchádzajúca",
+      "next": "Ďalšia"
+    }
   },
   "validation": {
     "field_required": "Toto pole je povinné."

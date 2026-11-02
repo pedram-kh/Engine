@@ -160,7 +160,8 @@
           "empty": "Aún no hay elementos en el portafolio.",
           "untitled": "Elemento sin título"
         }
-      }
+      },
+      "resultCount": "{count} creador | {count} creadores"
     },
     "roster": {
       "title": "Mis creadores",
@@ -530,7 +531,11 @@
         "title": "Nueva campaña"
       },
       "detail": {
-        "title": "Detalles de la campaña"
+        "title": "Detalles de la campaña",
+        "glance": {
+          "title": "De un vistazo",
+          "daysUntilStart": "Días hasta el inicio"
+        }
       },
       "settings": {
         "saved": "Configuración de la campaña guardada."
@@ -949,6 +954,10 @@
           "loadFailed": "No se pudieron cargar tus archivos. Inténtalo de nuevo.",
           "attachedSummary": "{count} archivo(s) adjuntado(s)."
         }
+      },
+      "summary": "{count} campaña | {count} campañas",
+      "list": {
+        "starts": "Empieza el {date}"
       }
     },
     "pools": {
@@ -1267,7 +1276,12 @@
         "deleteFailed": "No se pudo eliminar el archivo. Inténtalo de nuevo."
       }
     },
-    "creatorErased": "Creador eliminado"
+    "creatorErased": "Creador eliminado",
+    "pagination": {
+      "showing": "Mostrando {shown} de {total}",
+      "previous": "Anterior",
+      "next": "Siguiente"
+    }
   },
   "validation": {
     "field_required": "Este campo es obligatorio."

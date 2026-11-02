@@ -160,7 +160,8 @@
           "empty": "Zatím žádné položky portfolia.",
           "untitled": "Nepojmenovaná položka"
         }
-      }
+      },
+      "resultCount": "{count} kreator | {count} kreatora"
     },
     "roster": {
       "title": "Moji kreatori",
@@ -530,7 +531,11 @@
         "title": "Nová kampanja"
       },
       "detail": {
-        "title": "Podrobnosti kampanje"
+        "title": "Podrobnosti kampanje",
+        "glance": {
+          "title": "Ukratko",
+          "daysUntilStart": "Dana do početka"
+        }
       },
       "settings": {
         "saved": "Nastanjeitve kampanje uloženo."
@@ -949,6 +954,10 @@
           "loadFailed": "Vaše datoteke nije moguće učitati. Pokušajte ponovno.",
           "attachedSummary": "Priloženo {count} datoteka."
         }
+      },
+      "summary": "{count} kampanja | {count} kampanja",
+      "list": {
+        "starts": "Počinje {date}"
       }
     },
     "pools": {
@@ -1267,7 +1276,12 @@
         "deleteFailed": "Datoteku nije moguće izbrisati. Pokušajte ponovno."
       }
     },
-    "creatorErased": "Izbrisani kreator"
+    "creatorErased": "Izbrisani kreator",
+    "pagination": {
+      "showing": "Prikazano {shown} od {total}",
+      "previous": "Prethodno",
+      "next": "Sljedeće"
+    }
   },
   "validation": {
     "field_required": "To polje je obavezno."
