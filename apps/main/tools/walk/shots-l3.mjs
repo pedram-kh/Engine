@@ -102,7 +102,9 @@ try {
         const isInput = await hit.evaluate((el) => el.tagName === 'INPUT')
         const raw = isInput ? await hit.inputValue() : await hit.innerText()
         const text = raw.replace(/\s+/g, ' ').trim().slice(0, 160)
-        console.log(`  DOM ${theme}-${id} ${sel} => ${text}`)
+        const box = await hit.boundingBox()
+        const size = box ? ` [${Math.round(box.width)}x${Math.round(box.height)}]` : ''
+        console.log(`  DOM ${theme}-${id} ${sel}${size} => ${text}`)
       }
       await w.page.screenshot({
         path: path.join(OUT, file),

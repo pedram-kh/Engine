@@ -322,6 +322,18 @@ describe('DiscoverPage (Sprint 6.6a)', () => {
     expect(params).not.toHaveProperty('category')
   })
 
+  it('AH-116: both age inputs carry the class that brings them to the filter-pill height', async () => {
+    // jsdom has no layout, so the height itself is read from the walk (the field is 32 tall against
+    // the pill's 32, where it was 40); what a spec can pin is the hook the height rule hangs on.
+    const harness = await mountDiscover({ cards: [makeCard()] })
+    cleanup = harness.cleanup
+    for (const test of ['discover-age-min', 'discover-age-max']) {
+      expect(harness.wrapper.find(`[data-test="${test}"]`).classes()).toContain(
+        'discover-filters__age',
+      )
+    }
+  })
+
   it('AH-116: draws the two age inputs and re-queries with each bound on its own', async () => {
     const harness = await mountDiscover({ cards: [makeCard()] })
     cleanup = harness.cleanup

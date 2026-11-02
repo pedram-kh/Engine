@@ -322,7 +322,7 @@ function openProfile(item: DiscoveryCreatorListItem): void {
         hide-details
         clearable
         active
-        class="agency-filter"
+        class="agency-filter discover-filters__age"
         :class="{ 'agency-filter--applied': ageMin !== null }"
         style="max-width: 150px"
         data-test="discover-age-min"
@@ -338,7 +338,7 @@ function openProfile(item: DiscoveryCreatorListItem): void {
         hide-details
         clearable
         active
-        class="agency-filter"
+        class="agency-filter discover-filters__age"
         :class="{ 'agency-filter--applied': ageMax !== null }"
         style="max-width: 150px"
         data-test="discover-age-max"
@@ -444,6 +444,25 @@ function openProfile(item: DiscoveryCreatorListItem): void {
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
+}
+
+/* The two age inputs sit in the row with the filter pills, which are 32 tall (14 line + 8 + 8
+   padding + the 1px borders). Vuetify's compact field is 40, so the inputs are brought down to
+   the pill height; the label keeps its place on the border and the value stays centred. */
+.discover-filters :deep(.discover-filters__age) {
+  --v-input-control-height: 32px;
+  --v-field-padding-top: 5px;
+  --v-field-padding-bottom: 5px;
+}
+
+.discover-filters :deep(.discover-filters__age .v-field__input) {
+  align-items: center;
+  min-height: 32px;
+  padding-block: 0;
+}
+
+.discover-filters :deep(.discover-filters__age .v-field__input input) {
+  padding-block: 0;
 }
 
 .discover-filters__count {

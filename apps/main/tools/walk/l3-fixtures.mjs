@@ -52,7 +52,12 @@ export const REAL_PAGES = {
     names: 'discover.list',
     width: 1600,
     height: 1000,
-    expect: ['[data-test="discover-age-min"] input', '[data-test="discover-age-max"] input'],
+    expect: [
+      '[data-test="discover-country-filter"]',
+      '[data-test="discover-age-min"]',
+      '[data-test="discover-age-min"] input',
+      '[data-test="discover-age-max"] input',
+    ],
   },
   'campaign-files-1600': {
     to: `/campaigns/${DETAIL_ID}`,
