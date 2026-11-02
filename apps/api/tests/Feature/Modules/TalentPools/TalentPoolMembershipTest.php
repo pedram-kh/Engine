@@ -405,6 +405,194 @@ it('the blacklist join is SCOPED to the pool-owning agency — agency A blacklis
 });
 
 // ---------------------------------------------------------------------------
+// Members list filters (AH-116, item 4) — the shared creator-column trait on
+// the pool detail's members list. Country and language have UI; category, age
+// and `q` ride in with the trait and are pinned so the surface cannot drift.
+// ---------------------------------------------------------------------------
+
+/**
+ * A creator with a relation to the agency, attached to the pool, with the given
+ * creators-column attributes.
+ *
+ * @param  array<string, mixed>  $attributes
+ */
+function pooledMember(Agency $agency, TalentPool $pool, array $attributes = []): Creator
+{
+    $creator = Creator::factory()->createOne($attributes);
+    AgencyCreatorRelation::factory()->create([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+    ]);
+    $pool->creators()->attach($creator->id);
+
+    return $creator;
+}
+
+function poolMembersUrl(Agency $agency, TalentPool $pool, string $query = ''): string
+{
+    return "/api/v1/agencies/{$agency->ulid}/talent-pools/{$pool->ulid}/creators".($query === '' ? '' : "?{$query}");
+}
+
+it('narrows the members by country (data and meta.total)', function (): void {
+    ['agency' => $agency, 'user' => $user] = poolStaff();
+    $pool = TalentPool::factory()->forAgency($agency->id)->createOne();
+    $pt = pooledMember($agency, $pool, ['country_code' => 'PT']);
+    pooledMember($agency, $pool, ['country_code' => 'ES']);
+    pooledMember($agency, $pool, ['country_code' => 'ES']);
+
+    $response = $this->actingAs($user)->getJson(poolMembersUrl($agency, $pool, 'country=PT'))->assertOk();
+
+    expect($response->json('meta.total'))->toBe(1)
+        ->and($response->json('data'))->toHaveCount(1)
+        ->and($response->json('data.0.id'))->toBe($pt->ulid);
+});
+
+it('narrows the members by language', function (): void {
+    ['agency' => $agency, 'user' => $user] = poolStaff();
+    $pool = TalentPool::factory()->forAgency($agency->id)->createOne();
+    $it = pooledMember($agency, $pool, ['primary_language' => 'it']);
+    pooledMember($agency, $pool, ['primary_language' => 'en']);
+
+    $response = $this->actingAs($user)->getJson(poolMembersUrl($agency, $pool, 'language=it'))->assertOk();
+
+    expect($response->json('meta.total'))->toBe(1)
+        ->and($response->json('data.0.id'))->toBe($it->ulid);
+});
+
+it('ANDs country and language together', function (): void {
+    ['agency' => $agency, 'user' => $user] = poolStaff();
+    $pool = TalentPool::factory()->forAgency($agency->id)->createOne();
+    $both = pooledMember($agency, $pool, ['country_code' => 'IT', 'primary_language' => 'it']);
+    pooledMember($agency, $pool, ['country_code' => 'IT', 'primary_language' => 'en']);
+    pooledMember($agency, $pool, ['country_code' => 'ES', 'primary_language' => 'it']);
+
+    $response = $this->actingAs($user)->getJson(poolMembersUrl($agency, $pool, 'country=IT&language=it'))->assertOk();
+
+    expect($response->json('meta.total'))->toBe(1)
+        ->and($response->json('data.0.id'))->toBe($both->ulid);
+});
+
+it('never returns a creator who matches the filter but belongs to a DIFFERENT pool (cross-pool negative)', function (): void {
+    ['agency' => $agency, 'user' => $user] = poolStaff();
+    $pool = TalentPool::factory()->forAgency($agency->id)->createOne();
+    $otherPool = TalentPool::factory()->forAgency($agency->id)->createOne();
+    $mine = pooledMember($agency, $pool, ['country_code' => 'PT']);
+    pooledMember($agency, $otherPool, ['country_code' => 'PT']);
+
+    $response = $this->actingAs($user)->getJson(poolMembersUrl($agency, $pool, 'country=PT'))->assertOk();
+
+    expect($response->json('meta.total'))->toBe(1)
+        ->and($response->json('data.0.id'))->toBe($mine->ulid);
+});
+
+it('keeps another agency\'s pool a 404 under a filter, and does not leak a shared creator across agencies (cross-agency negative)', function (): void {
+    ['agency' => $agency, 'user' => $user] = poolStaff();
+    $foreignAgency = Agency::factory()->createOne();
+    $foreignPool = TalentPool::factory()->forAgency($foreignAgency->id)->createOne();
+    pooledMember($foreignAgency, $foreignPool, ['country_code' => 'PT']);
+
+    $this->actingAs($user)
+        ->getJson("/api/v1/agencies/{$agency->ulid}/talent-pools/{$foreignPool->ulid}/creators?country=PT")
+        ->assertNotFound();
+
+    // A creator in both agencies' pools shows only in the pool asked for.
+    $pool = TalentPool::factory()->forAgency($agency->id)->createOne();
+    $shared = pooledMember($agency, $pool, ['country_code' => 'PT']);
+    $foreignPool->creators()->attach($shared->id);
+
+    $response = $this->actingAs($user)->getJson(poolMembersUrl($agency, $pool, 'country=PT'))->assertOk();
+    expect($response->json('meta.total'))->toBe(1)
+        ->and($response->json('data.0.id'))->toBe($shared->ulid);
+});
+
+it('keeps the blacklist badge on a filtered row, scoped to the pool-owning agency', function (): void {
+    ['agency' => $agency, 'user' => $user] = poolStaff();
+    $pool = TalentPool::factory()->forAgency($agency->id)->createOne();
+
+    $creator = Creator::factory()->createOne(['country_code' => 'PT']);
+    AgencyCreatorRelation::factory()->blacklisted()->create([
+        'agency_id' => $agency->id,
+        'creator_id' => $creator->id,
+    ]);
+    $pool->creators()->attach($creator->id);
+    // Another agency also blacklists a second creator: it must not show here.
+    $clean = Creator::factory()->createOne(['country_code' => 'PT']);
+    AgencyCreatorRelation::factory()->blacklisted()->create([
+        'agency_id' => Agency::factory()->createOne()->id,
+        'creator_id' => $clean->id,
+    ]);
+    AgencyCreatorRelation::factory()->create(['agency_id' => $agency->id, 'creator_id' => $clean->id]);
+    $pool->creators()->attach($clean->id);
+
+    $response = $this->actingAs($user)->getJson(poolMembersUrl($agency, $pool, 'country=PT'))->assertOk();
+
+    expect($response->json('meta.total'))->toBe(2);
+
+    $badges = [];
+    foreach ($response->json('data') as $row) {
+        $badges[(string) $row['id']] = $row['attributes'];
+    }
+
+    expect($badges[$creator->ulid]['is_blacklisted'])->toBeTrue()
+        ->and($badges[$creator->ulid]['blacklist_type'])->toBe('hard')
+        ->and($badges[$clean->ulid]['is_blacklisted'])->toBeFalse();
+});
+
+it('accepts age, category and q through the shared trait (the all-or-nothing surface, pinned)', function (): void {
+    ['agency' => $agency, 'user' => $user] = poolStaff();
+    $pool = TalentPool::factory()->forAgency($agency->id)->createOne();
+    $young = pooledMember($agency, $pool, [
+        'display_name' => 'Young Yara',
+        'categories' => ['fitness'],
+        'date_of_birth' => now()->subYears(22)->toDateString(),
+    ]);
+    pooledMember($agency, $pool, [
+        'display_name' => 'Older Otto',
+        'categories' => ['gaming'],
+        'date_of_birth' => now()->subYears(48)->toDateString(),
+    ]);
+
+    $age = $this->actingAs($user)->getJson(poolMembersUrl($agency, $pool, 'age_min=20&age_max=30'))->assertOk();
+    $category = $this->actingAs($user)->getJson(poolMembersUrl($agency, $pool, 'category=fitness'))->assertOk();
+    $search = $this->actingAs($user)->getJson(poolMembersUrl($agency, $pool, 'q=yara'))->assertOk();
+
+    foreach ([$age, $category, $search] as $response) {
+        expect($response->json('meta.total'))->toBe(1)
+            ->and($response->json('data.0.id'))->toBe($young->ulid);
+    }
+});
+
+it('returns an empty list for an unknown filter value and ignores an empty one', function (): void {
+    ['agency' => $agency, 'user' => $user] = poolStaff();
+    $pool = TalentPool::factory()->forAgency($agency->id)->createOne();
+    pooledMember($agency, $pool, ['country_code' => 'PT']);
+    pooledMember($agency, $pool, ['country_code' => 'ES']);
+
+    $unknown = $this->actingAs($user)->getJson(poolMembersUrl($agency, $pool, 'country=ZZ'))->assertOk();
+    $empty = $this->actingAs($user)->getJson(poolMembersUrl($agency, $pool, 'country=&language='))->assertOk();
+
+    expect($unknown->json('meta.total'))->toBe(0)
+        ->and($unknown->json('data'))->toBe([])
+        ->and($empty->json('meta.total'))->toBe(2);
+});
+
+it('paginates a filtered list: 26 matches give 25 on page 1, one on page 2, total 26', function (): void {
+    ['agency' => $agency, 'user' => $user] = poolStaff();
+    $pool = TalentPool::factory()->forAgency($agency->id)->createOne();
+    for ($i = 0; $i < 26; $i++) {
+        pooledMember($agency, $pool, ['country_code' => 'PT']);
+    }
+    pooledMember($agency, $pool, ['country_code' => 'ES']);
+
+    $page1 = $this->actingAs($user)->getJson(poolMembersUrl($agency, $pool, 'country=PT'))->assertOk();
+    $page2 = $this->actingAs($user)->getJson(poolMembersUrl($agency, $pool, 'country=PT&page=2'))->assertOk();
+
+    expect($page1->json('meta.total'))->toBe(26)
+        ->and($page1->json('data'))->toHaveCount(25)
+        ->and($page2->json('data'))->toHaveCount(1);
+});
+
+// ---------------------------------------------------------------------------
 // Picker fetch (GET creators/{creator}/talent-pools)
 // ---------------------------------------------------------------------------
 

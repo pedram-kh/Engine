@@ -44,6 +44,13 @@ use Illuminate\Support\Carbon;
  * ACCEPTS both parameters even though the discover UI ships no age filter
  * (AH-088 D7 is a UI-only fence). The symmetry is a contract, not an accident —
  * see the discover-side age-filter test.
+ *
+ * AH-116 adds a third consumer: the talent pool's members list
+ * (TalentPoolMembershipController::index, in the TalentPools module; named in
+ * prose, not imported, so this trait keeps no cross-module dependency), which
+ * applies the filters to the underlying builder of its `BelongsToMany` over
+ * `creators`. The pivot table (`talent_pool_creators`) shares no column
+ * name with any predicate here, so the unqualified names stay unambiguous.
  */
 trait FiltersCreatorColumns
 {

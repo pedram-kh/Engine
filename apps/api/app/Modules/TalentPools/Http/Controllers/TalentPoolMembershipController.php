@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\TalentPools\Http\Controllers;
 
 use App\Core\Errors\ErrorResponse;
+use App\Modules\Agencies\Concerns\FiltersCreatorColumns;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Agencies\Support\AgencyCreatorRelationGuard;
@@ -46,19 +47,35 @@ use Illuminate\Support\Facades\Gate;
  */
 final class TalentPoolMembershipController
 {
+    // AH-116 (item 4): the members list takes the SAME creator-column filters as
+    // the roster and discover lists (country, language, category, age, `q`), from
+    // the one implementation, so the three surfaces cannot drift. The trait is
+    // all-or-nothing by design (see its docblock), so the endpoint accepts all of
+    // them; the pool page ships UI for country and language only.
+    use FiltersCreatorColumns;
+
     /**
      * GET /api/v1/agencies/{agency}/talent-pools/{talent_pool}/creators
      *
      * The pool's members, paginated (default 25/page) so the signed-avatar
      * minting in TalentPoolMemberResource is bounded to one page — the
      * D-2b-7 list/detail boundary (counts on the list, the roster on detail).
+     *
+     * Optional `?country=` `?language=` `?category=` `?age_min=` `?age_max=`
+     * `?q=` narrow the members (AND), applied to the creators side of the
+     * relation so a filter can never reach a creator who is not in THIS pool.
+     * Break-revert: query `Creator::query()` instead of the relation and the
+     * cross-pool negative reds.
      */
     public function index(Request $request, Agency $agency, TalentPool $talentPool): AnonymousResourceCollection
     {
         $this->assertBelongsToAgency($talentPool, $agency);
         Gate::authorize('view', $talentPool);
 
-        $members = $talentPool->creators()
+        $membersQuery = $talentPool->creators();
+        $this->applyCreatorFilters($membersQuery->getQuery(), $request);
+
+        $members = $membersQuery
             ->addSelect([
                 // The pool member's blacklist STATUS, scoped to the POOL-OWNING
                 // agency (D-4 — the privacy pin). Two correlated subqueries on
