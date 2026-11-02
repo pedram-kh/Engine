@@ -289,10 +289,12 @@ describe('CreatorRosterPage (Sprint 4 Chunk 5)', () => {
 
     const pushSpy = vi.spyOn(harness.router, 'push')
     await harness.wrapper.find(`[data-test="roster-name-${row.id}"]`).trigger('click')
+    // The router link navigates asynchronously, so wait for the route rather than for one flush;
+    // under a loaded machine a single `flushPromises` is not always enough.
+    await vi.waitFor(() => expect(harness.router.currentRoute.value.name).toBe('roster.detail'))
     await flushPromises()
 
     expect(pushSpy).toHaveBeenCalledTimes(1)
-    expect(harness.router.currentRoute.value.name).toBe('roster.detail')
     expect(harness.router.currentRoute.value.params.ulid).toBe('01CREATORULIDXXXXXXXXXXXXXX')
   })
 
