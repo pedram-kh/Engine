@@ -378,6 +378,8 @@ export const L4_REAL_PAGES = {
     width: 1600,
     height: 900,
   },
+  'dashboard-1600': { to: '/', names: 'app.dashboard', width: 1600, height: 900 },
+  'dashboard-1280': { to: '/', names: 'app.dashboard', width: 1280, height: 800 },
   'pool-detail-1280': {
     to: `/talent-pools/${POOL_ID}`,
     names: 'pools.detail',
@@ -481,6 +483,34 @@ function poolMembers() {
 export function l4FixtureFor(url, method) {
   const p = url.pathname
   if (method !== 'GET') return null
+  if (p === `${API}/dashboard/summary`) {
+    return {
+      data: {
+        creators_in_roster: 142,
+        pending_creator_applications: 7,
+        active_campaigns: null,
+        payments_due: null,
+      },
+    }
+  }
+  if (p === `${API}/dashboard/activity`) {
+    const rows = [
+      ['creator.invited', 'Maya Thompson', 0, {}],
+      ['brand.created', 'Maya Thompson', 1, {}],
+      ['bulk_invite.completed', 'Daniel Okafor', 2, { invited: 24, failed: 1 }],
+      ['agency_creator_relation.created', 'Maya Thompson', 4, {}],
+      ['invitation.accepted', 'Sofia Marchetti', 6, {}],
+    ]
+    return {
+      data: rows.map(([action, actor, days, metadata], i) => ({
+        id: `01HACTIVITY00000000000000${i}`,
+        action,
+        actor_label: actor,
+        created_at: ago(days + 0.1),
+        metadata,
+      })),
+    }
+  }
   if (p === `${API}/settings`) {
     return {
       data: {

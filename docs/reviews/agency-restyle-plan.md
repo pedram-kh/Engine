@@ -365,6 +365,12 @@ Counting check: 5 + 4 + 8 + 1 + 2 = **20**.
   - **Rules per route.** The five create and edit forms: R3 (header with the 36px back button) and R10 (the form in one `agency-card--form`, 720 wide at most; the fields keep the token-level restyle). `/settings`: R3, R10 (header, one card, no back button: it is a top-level route). `/creator-invitations/bulk`: R3 (the description as the header line), R10 (the picker and preview in one card; tracking and complete are cards too).
   - **Correction: `/auth/2fa/disable` is not an agency route.** The plan (ruling 13 row and the S4.3 row) says it is `layout: 'agency'`. `modules/auth/routes.ts` has `layout: 'auth'` for it, so it is an AuthLayout screen and **waits for AH-115 with the other 2FA screens.** It is out of S4.3. That makes L4 **19 routes, not 20**, and the layer gate walks 24 agency routes plus this one as an AuthLayout screen that is not restyled.
   - **Kept as found.** Settings' currency list and the preview tables keep their existing words and structure; no new i18n key, no spec edited, no shared file edited.
+- **S4.4 (Dashboard; MEASURED in Chromium; `pins.mjs --step S4.4`: 10 pins, 42 checks, both themes, 1600 and 1280; four break-reverts caught: the roster link, the strip gap, the page frame, the activity card).**
+  - **Rules for `/`.** R3 (the page frame, 24 apart, under the welcome bar), R7 (the activity feed is one agency card with the 18/24/600 title). **`KpiStrip` now renders `AgencyKpiCard`** (the user's L2 ruling): icon tile each (campaigns, roster, applications, payments), 20 apart on one row. `CKpiCard` is untouched.
+  - **Link only where there is a number.** The roster card links to `/roster`. Active campaigns has a page but no number, so it does not link (a dash with a chevron reads as broken); applications and payments have no page.
+  - **Welcome bar untouched.** `WelcomeBar.vue` is shared and keeps `var(--brand-aurora-gradient)`; a pin reads the aurora edge off the rendered bar.
+  - **Kept, flagged.** The API returns `null` for active campaigns and payments due (`DashboardSummaryController`: stable placeholders), so those two cards show a dash. "Omit anything without data" would drop them, but `DashboardPage.spec.ts` pins four cards in locked order (D-c1-4: "they are NOT removed"). Removing them is an edit to that spec by name; raised in the L4 report.
+  - **No new i18n key, no spec edited, no shared file edited.**
 
 ---
 

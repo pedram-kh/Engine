@@ -68,17 +68,17 @@ watch(
 </script>
 
 <template>
-  <div data-test="dashboard-page">
+  <div class="agency-page" data-test="dashboard-page">
     <WelcomeBar />
 
-    <KpiStrip :summary="summary" :loading="loading" class="mt-6" />
+    <KpiStrip :summary="summary" :loading="loading" />
 
-    <v-alert v-if="error" type="error" variant="tonal" class="mt-6" data-test="dashboard-error">
+    <v-alert v-if="error" type="error" variant="tonal" data-test="dashboard-error">
       {{ error }}
     </v-alert>
 
-    <section class="mt-8" data-test="dashboard-activity">
-      <h2 class="text-h6 mb-3">{{ t('dashboard.activity.title') }}</h2>
+    <section class="agency-card" data-test="dashboard-activity">
+      <h2 class="agency-card__title">{{ t('dashboard.activity.title') }}</h2>
       <ActivityFeed />
     </section>
   </div>
