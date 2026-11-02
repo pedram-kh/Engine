@@ -355,6 +355,12 @@ Counting check: 5 + 4 + 8 + 1 + 2 = **20**.
   - **One-off pill.** The roster application status has no row in `agencyStatusTones.ts`, so the page maps approved / pending / rejected / incomplete to success / warning / danger / neutral with `AgencyStatusPill`'s `tone` + `label` form. Not a tone table change (spec 6 untouched).
   - **Kept, flagged.** The disabled followers / engagement-rate affordances on the roster are kept: an existing spec pins them and D-4 decided them. They have no data, so they conflict with "omit anything without data"; removing them means editing `CreatorRosterPage.spec.ts` by name. Raised in the L4 report.
   - **No spec edited.** No shared file edited.
+- **S4.2 (inferred details: roster creator, Discover profile, brand, talent pool; MEASURED in Chromium; `pins.mjs --step S4.2`: 33 pins, 186 checks, both themes, 1600 and 1280; four break-reverts caught: the brand pill, an agency card on the roster detail, the pool member inset, and the Discover frame class, which the pins found missing on the first run).**
+  - **Rules per route.** `/roster/:ulid`: R3 (name, relationship and application pills, message and add-to-pool actions, 36px back button), R6 (main column plus the 360 management rail, as the page already had), R7 (ten `.agency-card`s, no `v-card`), R9. `/discover/:ulid`: R3 (connection pill from `kind="discovery"`, the status-driven action), R7 (four cards), R9. `/brands/:ulid`: R3 (status pill, edit and archive), R7 (one card, label over value), R9. `/talent-pools/:ulid`: R3 (brand or agency-wide and the member count under the title, edit and add-creators), R7 (description card, members card).
+  - **No side panel invented.** Brand and pool have no side content, so no R6 panel there. The roster detail keeps its existing rail.
+  - **Literals out.** The roster-detail and Discover-profile page styles had `0.75rem` / `0.875rem` font sizes and a literal `rgb(var(--v-theme-...))` palette mix; they now use the type tokens and the agency tertiary and primary-text colours. The application-status tone mapping moved to `roster/applicationStatusTone.ts` so the list and the detail share it.
+  - **Kept as found.** The brand detail "Created" label is a hard-coded English word (as on the brand list); the brand description label reads "Monthly deliverables" (the existing `app.brands.fields.description` text). Neither is mine to change without keys; both are noted for the final report.
+  - **No new i18n key, no spec edited, no shared file edited.**
 
 ---
 

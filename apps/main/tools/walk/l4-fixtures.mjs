@@ -195,6 +195,7 @@ const POOLS = [
   ['01HPOOLGAMING0000000000004', 'Gaming streamers', 'Streamers for gaming launches.', 'Cleo', 3],
 ]
 export const POOL_ID = POOLS[0][0]
+const BRAND_ID = '01HBRANDJACKJILL0000000001'
 
 function poolResource([id, name, description, brandName, count], i) {
   return {
@@ -307,11 +308,158 @@ export const L4_REAL_PAGES = {
   'files-1280': { to: '/files', names: 'files.list', width: 1280, height: 800 },
   'team-1600': { to: '/agency-users', names: 'agency-users.list', width: 1600, height: 1000 },
   'team-1280': { to: '/agency-users', names: 'agency-users.list', width: 1280, height: 900 },
+  'roster-detail-1600': {
+    to: `/roster/${ROSTER_FIRST}`,
+    names: 'roster.detail',
+    width: 1600,
+    height: 1000,
+  },
+  'roster-detail-1280': {
+    to: `/roster/${ROSTER_FIRST}`,
+    names: 'roster.detail',
+    width: 1280,
+    height: 900,
+  },
+  'discover-profile-1600': {
+    to: `/discover/${ROSTER_FIRST}`,
+    names: 'discover.detail',
+    width: 1600,
+    height: 1000,
+  },
+  'discover-profile-1280': {
+    to: `/discover/${ROSTER_FIRST}`,
+    names: 'discover.detail',
+    width: 1280,
+    height: 900,
+  },
+  'brand-detail-1600': {
+    to: `/brands/${BRAND_ID}`,
+    names: 'brands.detail',
+    width: 1600,
+    height: 900,
+  },
+  'brand-detail-1280': {
+    to: `/brands/${BRAND_ID}`,
+    names: 'brands.detail',
+    width: 1280,
+    height: 800,
+  },
+  'pool-detail-1600': {
+    to: `/talent-pools/${POOL_ID}`,
+    names: 'pools.detail',
+    width: 1600,
+    height: 1000,
+  },
+  'pool-detail-1280': {
+    to: `/talent-pools/${POOL_ID}`,
+    names: 'pools.detail',
+    width: 1280,
+    height: 900,
+  },
+}
+
+/** One creator's detail (the agency roster view). */
+function creatorDetail() {
+  return {
+    id: '01HRELATION000000000000001',
+    type: 'agency_creator_details',
+    attributes: {
+      relationship_status: 'roster',
+      internal_rating: 4,
+      internal_notes: 'Reliable and fast. Delivers drafts a day early.',
+      total_campaigns_completed: 12,
+      total_paid_minor_units: 1_080_000,
+      last_engaged_at: ago(1),
+      is_blacklisted: false,
+      blacklist_scope: null,
+      blacklist_type: null,
+      blacklisted_at: null,
+      creator: {
+        id: ROSTER_FIRST,
+        display_name: 'Maya Thompson',
+        bio: 'Lifestyle and tech creator based in Austin. Short videos about daily routines and gadgets.',
+        email: 'maya@example.test',
+        account_name: 'Maya',
+        account_last_name: 'Thompson',
+        country_code: 'US',
+        region: null,
+        age: 28,
+        primary_language: 'en',
+        secondary_languages: ['es'],
+        accent: null,
+        content_companions: null,
+        categories: ['lifestyle', 'tech'],
+        avatar_url: null,
+        cover_url: null,
+        application_status: 'approved',
+        social_accounts: [],
+        portfolio: [],
+      },
+    },
+  }
+}
+
+/** The public profile of the same creator (the Discover view). */
+function creatorProfile() {
+  const d = creatorDetail().attributes.creator
+  return {
+    id: ROSTER_FIRST,
+    type: 'creator_discovery',
+    attributes: {
+      display_name: d.display_name,
+      bio: d.bio,
+      country_code: d.country_code,
+      age: d.age,
+      primary_language: d.primary_language,
+      secondary_languages: d.secondary_languages,
+      accent: null,
+      content_companions: null,
+      categories: d.categories,
+      avatar_url: null,
+      cover_url: null,
+      profile_completeness_score: 86,
+      relationship_status: 'roster',
+      social_accounts: [],
+      portfolio: [],
+    },
+  }
+}
+
+const MEMBER_ROWS = [
+  ['Maya Thompson', 'US', false],
+  ['Daniel Okafor', 'GB', false],
+  ['Sofia Marchetti', 'IT', true],
+  ['Emma Laurent', 'FR', false],
+]
+
+function poolMembers() {
+  return MEMBER_ROWS.map(([name, country, blacklisted], i) => ({
+    id: `01HPOOLMEMBER00000000000${i + 1}`,
+    type: 'talent_pool_members',
+    attributes: {
+      display_name: name,
+      country_code: country,
+      primary_language: 'en',
+      categories: ['lifestyle'],
+      avatar_url: null,
+      application_status: 'approved',
+      is_blacklisted: blacklisted,
+      blacklist_type: blacklisted ? 'soft' : null,
+      added_at: ago(5 + i),
+    },
+  }))
 }
 
 export function l4FixtureFor(url, method) {
   const p = url.pathname
   if (method !== 'GET') return null
+  if (p === `${API}/creators/discover/${ROSTER_FIRST}`) return { data: creatorProfile() }
+  if (p === `${API}/creators/${ROSTER_FIRST}`) return { data: creatorDetail() }
+  if (p === `${API}/brands/${BRAND_ID}`) return { data: brandResource(BRAND_ID, 'Jack & Jill') }
+  if (p === `${API}/talent-pools/${POOL_ID}`) return { data: poolResource(POOLS[0], 0) }
+  if (p === `${API}/talent-pools/${POOL_ID}/creators`) {
+    return { data: poolMembers(), links, meta: pager(MEMBER_ROWS.length) }
+  }
   if (p === `${API}/creators`) {
     const rows = rosterRows()
     return { data: rows, meta: { total: 142, page: 1, per_page: 25, last_page: 6 } }

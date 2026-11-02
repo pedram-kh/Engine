@@ -39,6 +39,8 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
+import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
+import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
 import CreatorAvatar from '@/components/CreatorAvatar.vue'
 import { useBackToList } from '@/composables/useBackToList'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
@@ -46,6 +48,7 @@ import { COUNTRY_OPTIONS } from '@/modules/onboarding/data/countries'
 
 import AddToPoolDialog from '@/modules/pools/components/AddToPoolDialog.vue'
 
+import { applicationStatusTone } from '../applicationStatusTone'
 import { rosterApi } from '../api/roster.api'
 import AgencyAvailabilityCalendar from '../components/AgencyAvailabilityCalendar.vue'
 import BlacklistCreatorDialog from '../components/BlacklistCreatorDialog.vue'
@@ -313,17 +316,74 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="creator-detail" data-test="creator-detail-page">
-    <v-btn
-      variant="text"
-      density="comfortable"
-      prepend-icon="mdi-arrow-left"
-      class="mb-2 px-0"
-      data-test="creator-detail-back"
-      @click="goBack"
+  <div class="creator-detail agency-page agency-page--snug" data-test="creator-detail-page">
+    <AgencyPageHeader
+      :title="
+        detail !== null && attrs !== null && creator !== null ? displayName : t('app.roster.title')
+      "
+      title-test="creator-detail-name"
     >
-      {{ t('app.roster.detail.back') }}
-    </v-btn>
+      <template #leading>
+        <v-btn
+          icon="mdi-arrow-left"
+          variant="text"
+          class="agency-icon-square"
+          :aria-label="t('app.roster.detail.back')"
+          data-test="creator-detail-back"
+          @click="goBack"
+        />
+      </template>
+      <template v-if="detail !== null && attrs !== null && creator !== null" #title-suffix>
+        <AgencyStatusPill
+          kind="roster"
+          :status="attrs.relationship_status"
+          data-test="creator-detail-relationship-status"
+        />
+        <AgencyStatusPill
+          :tone="applicationStatusTone(creator.application_status)"
+          :label="t(`app.roster.applicationStatus.${creator.application_status}`)"
+          data-test="creator-detail-application-status"
+        />
+        <BlacklistBadge
+          v-if="attrs.is_blacklisted"
+          :type="blacklistType"
+          :label="t(`app.roster.blacklist.badge.${blacklistType}`)"
+          size="small"
+          data-test="creator-detail-blacklist"
+        />
+      </template>
+      <template v-if="detail !== null && (canMessage || canAddToPool)" #actions>
+        <!-- Header actions: message shortcut (AH-010b, D9) + add-to-pool
+             (D-2b-9). The message shortcut mirrors the relationship gate; the
+             pool action is admin/manager only (canEdit). -->
+        <div class="d-flex flex-wrap ga-2">
+          <v-btn
+            v-if="canMessage"
+            color="primary"
+            variant="outlined"
+            prepend-icon="mdi-message-text-outline"
+            data-test="creator-detail-message"
+            :to="{
+              name: 'messages.thread',
+              params: { creatorUlid },
+              query: { name: displayName },
+            }"
+          >
+            {{ t('app.messaging.relationship.inboxTitle') }}
+          </v-btn>
+          <v-btn
+            v-if="canAddToPool"
+            color="primary"
+            variant="flat"
+            prepend-icon="mdi-account-multiple-plus-outline"
+            data-test="creator-detail-add-to-pool"
+            @click="poolDialog = true"
+          >
+            {{ t('app.pools.picker.openLabel') }}
+          </v-btn>
+        </div>
+      </template>
+    </AgencyPageHeader>
 
     <v-alert
       v-if="errorMessage"
@@ -342,87 +402,33 @@ onMounted(() => {
     />
 
     <template v-else-if="detail !== null && attrs !== null && creator !== null">
-      <!-- Header: avatar + name + contact email + status chips (D-2a-8) -->
-      <v-card variant="outlined" class="creator-detail__header-card">
-        <v-card-text class="creator-detail__header d-flex align-start justify-space-between ga-3">
-          <div class="d-flex align-start ga-4">
-            <CreatorAvatar
-              :src="avatarUrl"
-              :name="displayName"
-              :preview-label="t('creator.ui.wizard.steps.portfolio.preview_label')"
-              :close-label="t('creator.ui.wizard.steps.portfolio.preview_close')"
-              data-test="creator-detail-avatar"
-            />
-
-            <div class="creator-detail__header-text">
-              <h1 class="text-h5 ma-0" data-test="creator-detail-name">{{ displayName }}</h1>
-              <a
-                v-if="email"
-                :href="`mailto:${email}`"
-                class="creator-detail__email"
-                data-test="creator-detail-email"
-              >
-                {{ email }}
-              </a>
-              <div class="d-flex flex-wrap ga-2 mt-1">
-                <v-chip size="small" variant="tonal" data-test="creator-detail-relationship-status">
-                  {{ t(`app.roster.status.${attrs.relationship_status}`) }}
-                </v-chip>
-                <v-chip size="small" variant="flat" data-test="creator-detail-application-status">
-                  {{ t(`app.roster.applicationStatus.${creator.application_status}`) }}
-                </v-chip>
-                <BlacklistBadge
-                  v-if="attrs.is_blacklisted"
-                  :type="blacklistType"
-                  :label="t(`app.roster.blacklist.badge.${blacklistType}`)"
-                  size="small"
-                  data-test="creator-detail-blacklist"
-                />
-              </div>
-            </div>
-          </div>
-
-          <!-- Header actions: message shortcut (AH-010b, D9) + add-to-pool
-               (D-2b-9). The message shortcut mirrors the relationship gate; the
-               pool action is admin/manager only (canEdit). -->
-          <div class="d-flex flex-wrap ga-2">
-            <v-btn
-              v-if="canMessage"
-              color="primary"
-              variant="tonal"
-              prepend-icon="mdi-message-text-outline"
-              data-test="creator-detail-message"
-              :to="{
-                name: 'messages.thread',
-                params: { creatorUlid },
-                query: { name: displayName },
-              }"
-            >
-              {{ t('app.messaging.relationship.inboxTitle') }}
-            </v-btn>
-            <v-btn
-              v-if="canAddToPool"
-              color="primary"
-              variant="tonal"
-              prepend-icon="mdi-account-multiple-plus-outline"
-              data-test="creator-detail-add-to-pool"
-              @click="poolDialog = true"
-            >
-              {{ t('app.pools.picker.openLabel') }}
-            </v-btn>
-          </div>
-        </v-card-text>
-      </v-card>
+      <!-- Identity: avatar + contact email (D-2a-8). The name and the status pills sit in the
+           page header. -->
+      <section class="agency-card creator-detail__identity" data-test="creator-detail-identity">
+        <CreatorAvatar
+          :src="avatarUrl"
+          :name="displayName"
+          :preview-label="t('creator.ui.wizard.steps.portfolio.preview_label')"
+          :close-label="t('creator.ui.wizard.steps.portfolio.preview_close')"
+          data-test="creator-detail-avatar"
+        />
+        <a
+          v-if="email"
+          :href="`mailto:${email}`"
+          class="creator-detail__email"
+          data-test="creator-detail-email"
+        >
+          {{ email }}
+        </a>
+      </section>
 
       <div class="creator-detail__body">
         <!-- Main column: the creator's public-facing profile content. -->
         <div class="creator-detail__main">
           <!-- Profile -->
-          <v-card variant="outlined" data-test="creator-detail-profile">
-            <v-card-title class="text-h6">
-              {{ t('app.roster.detail.sections.profile') }}
-            </v-card-title>
-            <v-card-text class="d-flex flex-column ga-3">
+          <section class="agency-card" data-test="creator-detail-profile">
+            <h2 class="agency-card__title">{{ t('app.roster.detail.sections.profile') }}</h2>
+            <div class="d-flex flex-column ga-3">
               <p v-if="creator.bio" class="text-body-2 mb-0" data-test="creator-detail-bio">
                 {{ creator.bio }}
               </p>
@@ -458,17 +464,15 @@ onMounted(() => {
                   <CategoryChips :labels="companionLabels" />
                 </div>
               </div>
-            </v-card-text>
-          </v-card>
+            </div>
+          </section>
 
           <!-- Contact details (AH-005) — phone / WhatsApp / mailing address.
                Rendered ONLY when the server surfaced the block (non-blacklisted
                relation). A blacklisted-but-rostered agency sees no card. -->
-          <v-card v-if="hasContactDetails" variant="outlined" data-test="creator-detail-contact">
-            <v-card-title class="text-h6">
-              {{ t('app.roster.detail.sections.contact') }}
-            </v-card-title>
-            <v-card-text class="creator-detail__profile-grid">
+          <section v-if="hasContactDetails" class="agency-card" data-test="creator-detail-contact">
+            <h2 class="agency-card__title">{{ t('app.roster.detail.sections.contact') }}</h2>
+            <div class="creator-detail__profile-grid">
               <div v-if="phone">
                 <span class="creator-detail__label">{{ t('app.roster.fields.phone') }}</span>
                 <a
@@ -489,17 +493,15 @@ onMounted(() => {
                   <span v-for="(line, i) in mailingAddressLines" :key="i">{{ line }}</span>
                 </address>
               </div>
-            </v-card-text>
-          </v-card>
+            </div>
+          </section>
 
           <!-- Account creation details — the fixed sign-up identity (first
                name, surname, email). Same relation-exists privacy basis as
                the contact email in the header. -->
-          <v-card v-if="hasAccountDetails" variant="outlined" data-test="creator-detail-account">
-            <v-card-title class="text-h6">
-              {{ t('app.roster.detail.sections.account') }}
-            </v-card-title>
-            <v-card-text class="creator-detail__profile-grid">
+          <section v-if="hasAccountDetails" class="agency-card" data-test="creator-detail-account">
+            <h2 class="agency-card__title">{{ t('app.roster.detail.sections.account') }}</h2>
+            <div class="creator-detail__profile-grid">
               <div>
                 <span class="creator-detail__label">{{ t('app.roster.fields.firstName') }}</span>
                 <span class="text-body-2" data-test="creator-detail-account-first-name">
@@ -518,28 +520,24 @@ onMounted(() => {
                   {{ email ?? '—' }}
                 </span>
               </div>
-            </v-card-text>
-          </v-card>
+            </div>
+          </section>
 
           <!-- Social accounts (accounts render; metrics are blocked → empty state) -->
-          <v-card variant="outlined" data-test="creator-detail-social">
-            <v-card-title class="text-h6">
-              {{ t('app.roster.detail.sections.social') }}
-            </v-card-title>
-            <v-card-text>
+          <section class="agency-card" data-test="creator-detail-social">
+            <h2 class="agency-card__title">{{ t('app.roster.detail.sections.social') }}</h2>
+            <div>
               <SocialAccountList
                 :accounts="socialAccountRows"
                 :empty-label="t('app.roster.detail.social.empty')"
               />
-            </v-card-text>
-          </v-card>
+            </div>
+          </section>
 
           <!-- Social metrics — data-blocked empty state (D-2a-10) -->
-          <v-card variant="outlined" data-test="creator-detail-metrics">
-            <v-card-title class="text-h6">
-              {{ t('app.roster.detail.sections.metrics') }}
-            </v-card-title>
-            <v-card-text>
+          <section class="agency-card" data-test="creator-detail-metrics">
+            <h2 class="agency-card__title">{{ t('app.roster.detail.sections.metrics') }}</h2>
+            <div>
               <CEmptyState
                 title-tag="h3"
                 data-test="creator-detail-metrics-empty"
@@ -550,16 +548,16 @@ onMounted(() => {
                   <v-icon icon="mdi-chart-line" size="48" color="medium-emphasis" />
                 </template>
               </CEmptyState>
-            </v-card-text>
-          </v-card>
+            </div>
+          </section>
 
           <!-- Portfolio — a collapsible drawer (collapsed by default). The
                header is the toggle; the down-chevron expands the grid in
                place. With no items the grid stays open to show the empty
                state and the chevron is suppressed. -->
-          <v-card variant="outlined" data-test="creator-detail-portfolio">
-            <v-card-title
-              class="d-flex align-center justify-space-between text-h6 creator-detail__portfolio-head"
+          <section class="agency-card" data-test="creator-detail-portfolio">
+            <h2
+              class="agency-card__title d-flex align-center justify-space-between creator-detail__portfolio-head"
               :class="{ 'creator-detail__portfolio-head--clickable': portfolioItems.length > 0 }"
               :role="portfolioItems.length > 0 ? 'button' : undefined"
               :tabindex="portfolioItems.length > 0 ? 0 : undefined"
@@ -591,9 +589,9 @@ onMounted(() => {
                 data-test="creator-detail-portfolio-toggle"
                 @click.stop="portfolioExpanded = !portfolioExpanded"
               />
-            </v-card-title>
+            </h2>
             <v-expand-transition>
-              <v-card-text v-show="portfolioExpanded || portfolioItems.length === 0">
+              <div v-show="portfolioExpanded || portfolioItems.length === 0">
                 <PortfolioGallery
                   :items="portfolioItems"
                   :editable="false"
@@ -607,30 +605,26 @@ onMounted(() => {
                   :download-label="t('creator.ui.wizard.steps.portfolio.download_label')"
                   :copy-link-label="t('creator.ui.wizard.steps.portfolio.copy_link_label')"
                 />
-              </v-card-text>
+              </div>
             </v-expand-transition>
-          </v-card>
+          </section>
 
           <!-- Availability (read-only, consumes the Sprint-5 agency endpoint) -->
-          <v-card variant="outlined" data-test="creator-detail-availability">
-            <v-card-title class="text-h6">
-              {{ t('app.roster.detail.sections.availability') }}
-            </v-card-title>
-            <v-card-text>
+          <section class="agency-card" data-test="creator-detail-availability">
+            <h2 class="agency-card__title">{{ t('app.roster.detail.sections.availability') }}</h2>
+            <div>
               <AgencyAvailabilityCalendar
                 v-if="agencyStore.currentAgencyId"
                 :agency-id="agencyStore.currentAgencyId"
                 :creator-ulid="creatorUlid"
               />
-            </v-card-text>
-          </v-card>
+            </div>
+          </section>
 
           <!-- Campaign history — Sprint-8-blocked empty state (D-2a-10) -->
-          <v-card variant="outlined" data-test="creator-detail-campaigns">
-            <v-card-title class="text-h6">
-              {{ t('app.roster.detail.sections.campaigns') }}
-            </v-card-title>
-            <v-card-text>
+          <section class="agency-card" data-test="creator-detail-campaigns">
+            <h2 class="agency-card__title">{{ t('app.roster.detail.sections.campaigns') }}</h2>
+            <div>
               <CEmptyState
                 title-tag="h3"
                 data-test="creator-detail-campaigns-empty"
@@ -641,19 +635,17 @@ onMounted(() => {
                   <v-icon icon="mdi-history" size="48" color="medium-emphasis" />
                 </template>
               </CEmptyState>
-            </v-card-text>
-          </v-card>
+            </div>
+          </section>
         </div>
 
         <!-- Right rail: the agency's private management tools. Sticky on wide
              screens so rating/notes + blacklist stay in view while scrolling. -->
         <aside class="creator-detail__rail">
           <!-- Rating + notes editor (admin/manager) / read-only (staff) -->
-          <v-card variant="outlined" data-test="creator-detail-rating-notes">
-            <v-card-title class="text-h6">
-              {{ t('app.roster.detail.sections.rating') }}
-            </v-card-title>
-            <v-card-text>
+          <section class="agency-card" data-test="creator-detail-rating-notes">
+            <h2 class="agency-card__title">{{ t('app.roster.detail.sections.rating') }}</h2>
+            <div>
               <div class="creator-detail__rating-row">
                 <span class="creator-detail__label">{{ t('app.roster.fields.rating') }}</span>
                 <StarRatingInput
@@ -732,16 +724,14 @@ onMounted(() => {
                   </span>
                 </div>
               </template>
-            </v-card-text>
-          </v-card>
+            </div>
+          </section>
 
           <!-- Blacklist management (Sprint 7, A7) — admin/manager only. Shows the
                AGENCY-WIDE status (D-2) + the blacklist / un-blacklist actions. -->
-          <v-card v-if="canEdit" variant="outlined" data-test="creator-detail-blacklist-section">
-            <v-card-title class="text-h6">
-              {{ t('app.roster.blacklist.section.title') }}
-            </v-card-title>
-            <v-card-text class="d-flex flex-column ga-3">
+          <section v-if="canEdit" class="agency-card" data-test="creator-detail-blacklist-section">
+            <h2 class="agency-card__title">{{ t('app.roster.blacklist.section.title') }}</h2>
+            <div class="d-flex flex-column ga-3">
               <v-alert
                 v-if="blacklistError"
                 type="error"
@@ -791,8 +781,8 @@ onMounted(() => {
                   </v-btn>
                 </div>
               </template>
-            </v-card-text>
-          </v-card>
+            </div>
+          </section>
         </aside>
       </div>
     </template>
@@ -856,25 +846,18 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.creator-detail {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  max-width: 1200px;
-}
-
-/* Two-column body: a flexible main column + a fixed-width management rail.
-   Stacks to a single column below the md breakpoint. */
+/* The page is `agency-page` (flex column, snug gap). Body: the main column plus the 360px
+   management rail; stacks to one column below the md breakpoint. */
 .creator-detail__body {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 .creator-detail__main,
 .creator-detail__rail {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 @media (min-width: 960px) {
@@ -887,7 +870,7 @@ onMounted(() => {
     min-width: 0;
   }
   .creator-detail__rail {
-    flex: 0 0 340px;
+    flex: 0 0 360px;
     /* keep the agency's rating/notes + blacklist in view while the profile
        column scrolls */
     position: sticky;
@@ -895,15 +878,15 @@ onMounted(() => {
   }
 }
 
-.creator-detail__header-text {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.creator-detail__identity {
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
 }
 
 .creator-detail__email {
-  font-size: 0.875rem;
-  color: rgb(var(--v-theme-primary));
+  font-size: var(--catalyst-typography-body-size);
+  color: rgb(var(--v-theme-primary-text));
   text-decoration: none;
   width: fit-content;
 }
@@ -923,11 +906,12 @@ onMounted(() => {
 
 .creator-detail__label {
   display: block;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
+  font-size: var(--catalyst-typography-overline-size);
+  font-weight: var(--catalyst-typography-overline-weight);
+  line-height: var(--catalyst-typography-overline-line-height);
+  letter-spacing: 0.6px;
   text-transform: uppercase;
-  color: rgb(var(--v-theme-on-surface-variant));
+  color: rgb(var(--v-theme-text-tertiary));
   margin-bottom: 4px;
 }
 
@@ -941,8 +925,8 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   font-style: normal;
-  font-size: 0.875rem;
-  line-height: 1.5;
+  font-size: var(--catalyst-typography-body-size);
+  line-height: var(--catalyst-typography-body-line-height);
 }
 
 .creator-detail__portfolio-head--clickable {

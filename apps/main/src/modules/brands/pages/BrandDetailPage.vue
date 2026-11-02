@@ -6,6 +6,8 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
+import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
+import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
 import { brandsApi } from '../api/brands.api'
 
 const { t, locale } = useI18n()
@@ -63,40 +65,48 @@ onMounted(loadBrand)
 </script>
 
 <template>
-  <div data-test="brand-detail-page">
-    <div class="d-flex align-center mb-6">
-      <v-btn
-        icon="mdi-arrow-left"
-        variant="text"
-        size="small"
-        :to="{ name: 'brands.list' }"
-        class="mr-2"
-        :aria-label="t('app.brands.actions.backToList')"
-      />
-      <h1 class="text-h5 ma-0" data-test="brand-detail-heading">
-        {{ brand?.attributes.name ?? t('app.brands.detail.title') }}
-      </h1>
-      <v-spacer />
-      <template v-if="brand">
+  <div class="agency-page agency-page--snug" data-test="brand-detail-page">
+    <AgencyPageHeader
+      :title="brand?.attributes.name ?? t('app.brands.detail.title')"
+      title-test="brand-detail-heading"
+    >
+      <template #leading>
         <v-btn
-          variant="outlined"
-          :to="{ name: 'brands.edit', params: { ulid } }"
-          class="mr-2"
-          data-test="brand-edit-btn"
-        >
-          {{ t('app.brands.actions.edit') }}
-        </v-btn>
-        <v-btn
-          v-if="brand.attributes.status === 'active'"
-          color="warning"
-          variant="outlined"
-          data-test="brand-archive-btn"
-          @click="archiveDialog = true"
-        >
-          {{ t('app.brands.actions.archive') }}
-        </v-btn>
+          icon="mdi-arrow-left"
+          variant="text"
+          :to="{ name: 'brands.list' }"
+          class="agency-icon-square"
+          :aria-label="t('app.brands.actions.backToList')"
+        />
       </template>
-    </div>
+      <template v-if="brand" #title-suffix>
+        <AgencyStatusPill
+          kind="brand"
+          :status="brand.attributes.status"
+          data-test="brand-detail-status"
+        />
+      </template>
+      <template v-if="brand" #actions>
+        <div class="d-flex ga-2">
+          <v-btn
+            variant="outlined"
+            :to="{ name: 'brands.edit', params: { ulid } }"
+            data-test="brand-edit-btn"
+          >
+            {{ t('app.brands.actions.edit') }}
+          </v-btn>
+          <v-btn
+            v-if="brand.attributes.status === 'active'"
+            color="warning"
+            variant="outlined"
+            data-test="brand-archive-btn"
+            @click="archiveDialog = true"
+          >
+            {{ t('app.brands.actions.archive') }}
+          </v-btn>
+        </div>
+      </template>
+    </AgencyPageHeader>
 
     <!-- Loading skeleton -->
     <v-skeleton-loader v-if="loading" type="article" data-test="brand-detail-skeleton" />
@@ -107,80 +117,77 @@ onMounted(loadBrand)
     </v-alert>
 
     <!-- Brand details -->
-    <v-card v-else-if="brand" class="pa-6" max-width="640" data-test="brand-detail-card">
-      <!--
-        The create flow uploads the logo AFTER the brand row exists (D7), so a
-        failed upload lands here. Say it plainly: the brand was created, the
-        logo was not, and the next edit will require one.
-      -->
-      <v-alert
-        v-if="logoUploadFailed"
-        type="warning"
-        variant="tonal"
-        class="mb-4"
-        data-test="brand-detail-logo-failed"
-      >
-        {{ t('app.brands.logo.errors.uploadFailedAfterCreate') }}
-      </v-alert>
+    <div v-else-if="brand" class="agency-detail">
+      <div class="agency-detail__main">
+        <!--
+          The create flow uploads the logo AFTER the brand row exists (D7), so a
+          failed upload lands here. Say it plainly: the brand was created, the
+          logo was not, and the next edit will require one.
+        -->
+        <v-alert
+          v-if="logoUploadFailed"
+          type="warning"
+          variant="tonal"
+          data-test="brand-detail-logo-failed"
+        >
+          {{ t('app.brands.logo.errors.uploadFailedAfterCreate') }}
+        </v-alert>
 
-      <div class="d-flex align-center ga-4 mb-4">
-        <v-avatar size="72" rounded="lg" color="surface-variant" data-test="brand-detail-logo">
-          <v-img
-            v-if="brand.attributes.logo_url"
-            :src="brand.attributes.logo_url"
-            :alt="t('app.brands.logo.alt')"
-            cover
-          />
-          <v-icon v-else icon="mdi-image-outline" />
-        </v-avatar>
-        <div class="text-h6">{{ brand.attributes.name }}</div>
-      </div>
+        <section class="agency-card" data-test="brand-detail-card">
+          <div class="d-flex align-center ga-4">
+            <v-avatar size="72" rounded="lg" color="surface-variant" data-test="brand-detail-logo">
+              <v-img
+                v-if="brand.attributes.logo_url"
+                :src="brand.attributes.logo_url"
+                :alt="t('app.brands.logo.alt')"
+                cover
+              />
+              <v-icon v-else icon="mdi-image-outline" />
+            </v-avatar>
+            <h2 class="agency-card__title">{{ brand.attributes.name }}</h2>
+          </div>
 
-      <v-list>
-        <v-list-item :title="t('app.brands.fields.name')" :subtitle="brand.attributes.name" />
-        <v-list-item
-          v-if="brand.attributes.slug"
-          :title="t('app.brands.fields.slug')"
-          :subtitle="brand.attributes.slug"
-          data-test="brand-detail-slug"
-        />
-        <v-list-item :title="t('app.brands.fields.status')">
-          <template #subtitle>
-            <v-chip
-              :color="brand.attributes.status === 'active' ? 'success' : 'default'"
-              size="small"
-              variant="tonal"
-              data-test="brand-detail-status"
+          <hr class="agency-card__rule" />
+
+          <dl class="agency-fields">
+            <div v-if="brand.attributes.slug" class="agency-field" data-test="brand-detail-slug">
+              <dt class="agency-field__label">{{ t('app.brands.fields.slug') }}</dt>
+              <dd class="agency-field__value">{{ brand.attributes.slug }}</dd>
+            </div>
+            <div
+              v-if="brand.attributes.industry"
+              class="agency-field"
+              data-test="brand-detail-industry"
             >
-              {{ t(`app.brands.status.${brand.attributes.status}`) }}
-            </v-chip>
+              <dt class="agency-field__label">{{ t('app.brands.fields.industry') }}</dt>
+              <dd class="agency-field__value">{{ brand.attributes.industry }}</dd>
+            </div>
+            <div
+              v-if="brand.attributes.website_url"
+              class="agency-field"
+              data-test="brand-detail-website"
+            >
+              <dt class="agency-field__label">{{ t('app.brands.fields.websiteUrl') }}</dt>
+              <dd class="agency-field__value">{{ brand.attributes.website_url }}</dd>
+            </div>
+            <div class="agency-field" data-test="brand-detail-created-at">
+              <dt class="agency-field__label">{{ 'Created' }}</dt>
+              <dd class="agency-field__value">
+                {{ formatDateTime(brand.attributes.created_at, locale, { dateStyle: 'medium' }) }}
+              </dd>
+            </div>
+          </dl>
+
+          <template v-if="brand.attributes.description">
+            <hr class="agency-card__rule" />
+            <div class="agency-field" data-test="brand-detail-description">
+              <h3 class="agency-field__label">{{ t('app.brands.fields.description') }}</h3>
+              <p class="agency-field__text ma-0">{{ brand.attributes.description }}</p>
+            </div>
           </template>
-        </v-list-item>
-        <v-list-item
-          v-if="brand.attributes.description"
-          :title="t('app.brands.fields.description')"
-          :subtitle="brand.attributes.description"
-          data-test="brand-detail-description"
-        />
-        <v-list-item
-          v-if="brand.attributes.industry"
-          :title="t('app.brands.fields.industry')"
-          :subtitle="brand.attributes.industry"
-          data-test="brand-detail-industry"
-        />
-        <v-list-item
-          v-if="brand.attributes.website_url"
-          :title="t('app.brands.fields.websiteUrl')"
-          :subtitle="brand.attributes.website_url"
-          data-test="brand-detail-website"
-        />
-        <v-list-item
-          :title="'Created'"
-          :subtitle="formatDateTime(brand.attributes.created_at, locale, { dateStyle: 'medium' })"
-          data-test="brand-detail-created-at"
-        />
-      </v-list>
-    </v-card>
+        </section>
+      </div>
+    </div>
 
     <!-- Archive dialog -->
     <v-dialog v-model="archiveDialog" max-width="440" data-test="brand-detail-archive-dialog">

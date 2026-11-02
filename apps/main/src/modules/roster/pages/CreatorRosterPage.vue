@@ -61,7 +61,7 @@ import { creatorLabel } from '@/core/creators/creatorLabel'
 import AgencyFilterPill from '@/modules/agency/components/AgencyFilterPill.vue'
 import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
 import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
-import type { AgencyStatusTone } from '@/modules/agency/status/agencyStatusTones'
+import { applicationStatusTone } from '../applicationStatusTone'
 const { t } = useI18n()
 const router = useRouter()
 
@@ -299,22 +299,6 @@ function languageLabel(code: string | null, accent?: string | null): string {
 // pending=awaiting review (amber), rejected=declined (red), incomplete=not-yet-submitted
 // (neutral). The relationship status beside it comes from the shared table (`kind="roster"`);
 // the two axes differ by their word, as before (Chunk 5b).
-type RosterApplicationStatus = RosterCreatorListItem['attributes']['application_status']
-
-function applicationStatusTone(status: RosterApplicationStatus): AgencyStatusTone {
-  switch (status) {
-    case 'approved':
-      return 'success'
-    case 'pending':
-      return 'warning'
-    case 'rejected':
-      return 'danger'
-    case 'incomplete':
-    default:
-      return 'neutral'
-  }
-}
-
 async function loadRoster(): Promise<void> {
   const agencyId = agencyStore.currentAgencyId
   if (agencyId === null) return

@@ -15,6 +15,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
+import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
 import AddCreatorsToPoolDialog from '../components/AddCreatorsToPoolDialog.vue'
 import { talentPoolsApi } from '../api/talentPools.api'
 import { creatorAvatarUrl, creatorInitial, creatorLabel } from '@/core/creators/creatorLabel'
@@ -79,6 +80,13 @@ async function loadMembers(): Promise<void> {
   }
 }
 
+/** Under the title: the brand (or "Agency-wide") and the member count, as before. */
+const headerLine = computed<string | null>(() => {
+  if (pool.value === null) return null
+  const scope = pool.value.attributes.brand_name ?? t('app.pools.agencyWide')
+  return `${scope} · ${t('app.pools.detail.memberCount', { count: pool.value.attributes.creators_count })}`
+})
+
 const pageCount = computed(() => Math.max(1, Math.ceil(totalMembers.value / perPage)))
 
 async function onPageChange(next: number): Promise<void> {
@@ -126,25 +134,47 @@ onMounted(() => {
 </script>
 
 <template>
-  <div data-test="pool-detail-page">
-    <v-btn
-      variant="text"
-      density="comfortable"
-      prepend-icon="mdi-arrow-left"
-      class="mb-2 px-0"
-      data-test="pool-detail-back"
-      @click="goBack"
+  <div class="agency-page agency-page--snug" data-test="pool-detail-page">
+    <AgencyPageHeader
+      :title="pool?.attributes.name ?? t('app.pools.detail.title')"
+      :subtitle="headerLine"
+      title-test="pool-detail-name"
+      subtitle-test="pool-detail-count"
     >
-      {{ t('app.pools.actions.backToList') }}
-    </v-btn>
+      <template #leading>
+        <v-btn
+          icon="mdi-arrow-left"
+          variant="text"
+          class="agency-icon-square"
+          :aria-label="t('app.pools.actions.backToList')"
+          data-test="pool-detail-back"
+          @click="goBack"
+        />
+      </template>
+      <template v-if="pool !== null && canWrite" #actions>
+        <div class="d-flex ga-2">
+          <v-btn
+            variant="outlined"
+            prepend-icon="mdi-pencil-outline"
+            :to="{ name: 'pools.edit', params: { ulid } }"
+            data-test="pool-detail-edit"
+          >
+            {{ t('app.pools.actions.edit') }}
+          </v-btn>
+          <v-btn
+            color="primary"
+            variant="flat"
+            prepend-icon="mdi-account-plus-outline"
+            data-test="pool-detail-add-creators"
+            @click="addDialogOpen = true"
+          >
+            {{ t('app.pools.addCreators.open') }}
+          </v-btn>
+        </div>
+      </template>
+    </AgencyPageHeader>
 
-    <v-alert
-      v-if="errorMessage"
-      type="error"
-      variant="tonal"
-      class="mb-4"
-      data-test="pool-detail-error"
-    >
+    <v-alert v-if="errorMessage" type="error" variant="tonal" data-test="pool-detail-error">
       {{ errorMessage }}
     </v-alert>
 
@@ -155,124 +185,91 @@ onMounted(() => {
     />
 
     <template v-else-if="pool !== null">
-      <header class="d-flex align-center justify-space-between mb-4">
-        <div>
-          <h1 class="text-h5 ma-0" data-test="pool-detail-name">{{ pool.attributes.name }}</h1>
-          <div class="d-flex flex-wrap ga-2 mt-1 align-center">
-            <v-chip v-if="pool.attributes.brand_name" size="small" variant="tonal">
-              {{ pool.attributes.brand_name }}
-            </v-chip>
-            <span v-else class="text-caption text-medium-emphasis">
-              {{ t('app.pools.agencyWide') }}
-            </span>
-            <span class="text-caption text-medium-emphasis" data-test="pool-detail-count">
-              {{ t('app.pools.detail.memberCount', { count: pool.attributes.creators_count }) }}
-            </span>
-          </div>
+      <section v-if="pool.attributes.description" class="agency-card">
+        <div class="agency-field" data-test="pool-detail-description">
+          <h2 class="agency-field__label">{{ t('app.pools.fields.description') }}</h2>
+          <p class="agency-field__text ma-0">{{ pool.attributes.description }}</p>
         </div>
-        <div v-if="canWrite" class="d-flex ga-2">
-          <v-btn
-            variant="tonal"
-            color="primary"
-            prepend-icon="mdi-account-plus-outline"
-            data-test="pool-detail-add-creators"
-            @click="addDialogOpen = true"
-          >
-            {{ t('app.pools.addCreators.open') }}
-          </v-btn>
-          <v-btn
-            variant="text"
-            prepend-icon="mdi-pencil-outline"
-            :to="{ name: 'pools.edit', params: { ulid } }"
-            data-test="pool-detail-edit"
-          >
-            {{ t('app.pools.actions.edit') }}
-          </v-btn>
-        </div>
-      </header>
+      </section>
 
-      <p
-        v-if="pool.attributes.description"
-        class="text-body-2 mb-4"
-        data-test="pool-detail-description"
-      >
-        {{ pool.attributes.description }}
-      </p>
+      <section class="agency-card" data-test="pool-members-card">
+        <h2 class="agency-card__title">{{ t('app.pools.detail.membersHeading') }}</h2>
 
-      <h2 class="text-h6 mb-2">{{ t('app.pools.detail.membersHeading') }}</h2>
+        <v-skeleton-loader
+          v-if="membersLoading && members.length === 0"
+          type="list-item-avatar-two-line@3"
+          data-test="pool-members-skeleton"
+        />
 
-      <v-skeleton-loader
-        v-if="membersLoading && members.length === 0"
-        type="list-item-avatar-two-line@3"
-        data-test="pool-members-skeleton"
-      />
-
-      <div
-        v-else-if="members.length === 0"
-        class="text-body-2 text-medium-emphasis py-4"
-        data-test="pool-members-empty"
-      >
-        {{ t('app.pools.detail.membersEmpty') }}
-      </div>
-
-      <v-list v-else data-test="pool-members-list">
-        <v-list-item
-          v-for="member in members"
-          :key="member.id"
-          :data-test="`pool-member-${member.id}`"
+        <div
+          v-else-if="members.length === 0"
+          class="text-body-2 text-medium-emphasis"
+          data-test="pool-members-empty"
         >
-          <template #prepend>
-            <v-avatar size="40" color="surface-variant">
-              <v-img
-                v-if="creatorAvatarUrl(member.attributes)"
-                :src="creatorAvatarUrl(member.attributes) ?? undefined"
-              />
-              <span v-else class="text-caption">
-                {{ creatorInitial(member.attributes) }}
-              </span>
-            </v-avatar>
-          </template>
-          <v-list-item-title>
-            {{ creatorLabel(member.attributes, t, t('app.pools.detail.unnamed')) }}
-            <!-- Blacklist badge (D-5): shows for BOTH hard + soft (informational
-                 — warn-don't-remove). The status reflects THIS agency's own
-                 blacklist of the member (the backend join is agency-scoped). -->
-            <BlacklistBadge
-              v-if="member.attributes.is_blacklisted"
-              :type="member.attributes.blacklist_type ?? 'hard'"
-              :label="t(`app.roster.blacklist.badge.${member.attributes.blacklist_type ?? 'hard'}`)"
-              size="x-small"
-              class="ml-2"
-              :data-test="`pool-member-blacklist-${member.id}`"
-            />
-          </v-list-item-title>
-          <v-list-item-subtitle>
-            {{ member.attributes.country_code ?? '' }}
-          </v-list-item-subtitle>
-          <template v-if="canWrite" #append>
-            <v-btn
-              icon="mdi-close"
-              size="small"
-              variant="text"
-              color="error"
-              :loading="removingUlid === member.id"
-              :aria-label="t('app.pools.detail.remove')"
-              :data-test="`pool-member-remove-${member.id}`"
-              @click="removeMember(member)"
-            />
-          </template>
-        </v-list-item>
-      </v-list>
+          {{ t('app.pools.detail.membersEmpty') }}
+        </div>
 
-      <v-pagination
-        v-if="pageCount > 1"
-        :model-value="page"
-        :length="pageCount"
-        density="comfortable"
-        class="mt-2"
-        data-test="pool-members-pagination"
-        @update:model-value="onPageChange"
-      />
+        <v-list v-else data-test="pool-members-list" class="pa-0">
+          <v-list-item
+            v-for="member in members"
+            :key="member.id"
+            class="px-0"
+            :data-test="`pool-member-${member.id}`"
+          >
+            <template #prepend>
+              <v-avatar size="40" color="surface-variant">
+                <v-img
+                  v-if="creatorAvatarUrl(member.attributes)"
+                  :src="creatorAvatarUrl(member.attributes) ?? undefined"
+                />
+                <span v-else class="text-caption">
+                  {{ creatorInitial(member.attributes) }}
+                </span>
+              </v-avatar>
+            </template>
+            <v-list-item-title>
+              {{ creatorLabel(member.attributes, t, t('app.pools.detail.unnamed')) }}
+              <!-- Blacklist badge (D-5): shows for BOTH hard + soft (informational
+                   — warn-don't-remove). The status reflects THIS agency's own
+                   blacklist of the member (the backend join is agency-scoped). -->
+              <BlacklistBadge
+                v-if="member.attributes.is_blacklisted"
+                :type="member.attributes.blacklist_type ?? 'hard'"
+                :label="
+                  t(`app.roster.blacklist.badge.${member.attributes.blacklist_type ?? 'hard'}`)
+                "
+                size="x-small"
+                class="ml-2"
+                :data-test="`pool-member-blacklist-${member.id}`"
+              />
+            </v-list-item-title>
+            <v-list-item-subtitle>
+              {{ member.attributes.country_code ?? '' }}
+            </v-list-item-subtitle>
+            <template v-if="canWrite" #append>
+              <v-btn
+                icon="mdi-close"
+                size="small"
+                variant="text"
+                color="error"
+                :loading="removingUlid === member.id"
+                :aria-label="t('app.pools.detail.remove')"
+                :data-test="`pool-member-remove-${member.id}`"
+                @click="removeMember(member)"
+              />
+            </template>
+          </v-list-item>
+        </v-list>
+
+        <v-pagination
+          v-if="pageCount > 1"
+          :model-value="page"
+          :length="pageCount"
+          density="comfortable"
+          data-test="pool-members-pagination"
+          @update:model-value="onPageChange"
+        />
+      </section>
     </template>
 
     <AddCreatorsToPoolDialog

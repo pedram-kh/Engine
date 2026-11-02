@@ -42,6 +42,8 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
+import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
+import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
 import CreatorAvatar from '@/components/CreatorAvatar.vue'
 import { useBackToList } from '@/composables/useBackToList'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
@@ -230,17 +232,104 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="discover-profile" data-test="discover-profile-page">
-    <v-btn
-      variant="text"
-      density="comfortable"
-      prepend-icon="mdi-arrow-left"
-      class="mb-2 px-0"
-      data-test="discover-profile-back"
-      @click="goBack"
+  <div class="discover-profile agency-page agency-page--snug" data-test="discover-profile-page">
+    <AgencyPageHeader
+      :title="profile !== null && attrs !== null ? displayName : t('app.discover.title')"
+      title-test="discover-profile-name"
     >
-      {{ t('app.discover.detail.back') }}
-    </v-btn>
+      <template #leading>
+        <v-btn
+          icon="mdi-arrow-left"
+          variant="text"
+          class="agency-icon-square"
+          :aria-label="t('app.discover.detail.back')"
+          data-test="discover-profile-back"
+          @click="goBack"
+        />
+      </template>
+      <template v-if="profile !== null && attrs !== null" #title-suffix>
+        <!-- The four connection states are the shared discovery pill; ended is a TRUTHFUL
+             "Previously connected" (AH-051 D-3), NOT the "never connected" state. -->
+        <AgencyStatusPill
+          v-if="connectionState !== 'none'"
+          kind="discovery"
+          :status="connectionState"
+          :data-test="`discover-profile-connection-${connectionState}`"
+        />
+        <span v-else class="agency-field__text" data-test="discover-profile-notconnected">
+          {{ t('app.discover.connection.notConnected') }}
+        </span>
+      </template>
+      <template v-if="profile !== null && attrs !== null" #actions>
+        <!-- Status-driven action (D-10). Admin/manager only (canSend). -->
+        <div class="d-flex align-center ga-2">
+          <!-- connected → the existing READ link to the relation-gated roster
+             detail (keys on `roster` specifically, D-5). -->
+          <v-btn
+            v-if="connectionState === 'connected'"
+            variant="tonal"
+            color="primary"
+            prepend-icon="mdi-account-arrow-right-outline"
+            data-test="discover-profile-view-in-roster"
+            @click="viewInRoster"
+          >
+            {{ t('app.discover.detail.viewInRoster') }}
+          </v-btn>
+
+          <!-- pending → informational, disabled. -->
+          <v-btn
+            v-else-if="connectionState === 'pending'"
+            variant="tonal"
+            color="info"
+            prepend-icon="mdi-clock-outline"
+            disabled
+            data-test="discover-profile-request-pending"
+          >
+            {{ t('app.discover.connection.pending') }}
+          </v-btn>
+
+          <!-- declined → an explicit "Request again" (D-4); admin/manager only. -->
+          <v-btn
+            v-else-if="connectionState === 'declined' && canSend"
+            variant="flat"
+            color="primary"
+            prepend-icon="mdi-refresh"
+            :loading="sending"
+            data-test="discover-profile-request-again"
+            @click="sendConnectionRequest"
+          >
+            {{ t('app.discover.connection.requestAgain') }}
+          </v-btn>
+
+          <!-- ended → re-requestable like declined (AH-051 D-3), but the
+               label reads "Previously connected"; admin/manager only. -->
+          <v-btn
+            v-else-if="connectionState === 'ended' && canSend"
+            variant="flat"
+            color="primary"
+            prepend-icon="mdi-refresh"
+            :loading="sending"
+            data-test="discover-profile-request-again-ended"
+            @click="sendConnectionRequest"
+          >
+            {{ t('app.discover.connection.requestAgain') }}
+          </v-btn>
+
+          <!-- none → "Send request" (W1); admin/manager only. -->
+          <v-btn
+            v-else-if="connectionState === 'none' && canSend"
+            variant="flat"
+            color="primary"
+            prepend-icon="mdi-account-plus-outline"
+            :loading="sending"
+            data-test="discover-profile-send-request"
+            @click="sendConnectionRequest"
+          >
+            {{ t('app.discover.connection.sendRequest') }}
+          </v-btn>
+        </div>
+      </template>
+    </AgencyPageHeader>
 
     <v-alert
       v-if="errorMessage"
@@ -259,159 +348,29 @@ onMounted(() => {
     />
 
     <template v-else-if="profile !== null && attrs !== null">
-      <!-- Header: avatar + name + the three connection annotation states + the
-           status-driven send-request affordance (D-10/D-11). -->
-      <v-card variant="outlined" class="discover-profile__header-card">
-        <v-card-text class="discover-profile__header d-flex align-start ga-4">
-          <CreatorAvatar
-            :src="avatarUrl"
-            :name="displayName"
-            :preview-label="t('creator.ui.wizard.steps.portfolio.preview_label')"
-            :close-label="t('creator.ui.wizard.steps.portfolio.preview_close')"
-            data-test="discover-profile-avatar"
-          />
-
-          <div class="discover-profile__header-text">
-            <h1 class="text-h5 ma-0" data-test="discover-profile-name">{{ displayName }}</h1>
-            <div class="d-flex flex-wrap align-center ga-2 mt-1">
-              <v-chip
-                v-if="connectionState === 'connected'"
-                size="small"
-                color="primary"
-                variant="tonal"
-                prepend-icon="mdi-link-variant"
-                data-test="discover-profile-connection-connected"
-              >
-                {{ t('app.discover.connection.connected') }}
-              </v-chip>
-              <v-chip
-                v-else-if="connectionState === 'pending'"
-                size="small"
-                color="info"
-                variant="tonal"
-                prepend-icon="mdi-clock-outline"
-                data-test="discover-profile-connection-pending"
-              >
-                {{ t('app.discover.connection.pending') }}
-              </v-chip>
-              <v-chip
-                v-else-if="connectionState === 'declined'"
-                size="small"
-                variant="tonal"
-                prepend-icon="mdi-close-circle-outline"
-                data-test="discover-profile-connection-declined"
-              >
-                {{ t('app.discover.connection.declined') }}
-              </v-chip>
-              <!-- ended → a TRUTHFUL "Previously connected" (AH-051 D-3); NOT
-                   the "never connected" empty state. -->
-              <v-chip
-                v-else-if="connectionState === 'ended'"
-                size="small"
-                variant="tonal"
-                prepend-icon="mdi-link-off"
-                data-test="discover-profile-connection-ended"
-              >
-                {{ t('app.discover.connection.ended') }}
-              </v-chip>
-              <span
-                v-else
-                class="text-caption text-medium-emphasis"
-                data-test="discover-profile-notconnected"
-              >
-                {{ t('app.discover.connection.notConnected') }}
-              </span>
-            </div>
-
-            <!-- Read-only profile completeness (same score the creator sees on
-                 their dashboard). Sits with the identity block so the agency
-                 reads it as a property of the profile, not an action. -->
-            <CompletenessBar
-              class="discover-profile__completeness mt-3"
-              :score="completenessScore"
-              :label="completenessLabel"
-              :color="completenessColor"
-              data-test="discover-profile-completeness"
-            />
-          </div>
-
-          <!-- Status-driven action (D-10). Admin/manager only (canSend).
-               `ms-auto` keeps it hard right now that the avatar leads the row. -->
-          <div class="d-flex align-center ga-2 ms-auto">
-            <!-- connected → the existing READ link to the relation-gated roster
-               detail (keys on `roster` specifically, D-5). -->
-            <v-btn
-              v-if="connectionState === 'connected'"
-              variant="tonal"
-              color="primary"
-              prepend-icon="mdi-account-arrow-right-outline"
-              data-test="discover-profile-view-in-roster"
-              @click="viewInRoster"
-            >
-              {{ t('app.discover.detail.viewInRoster') }}
-            </v-btn>
-
-            <!-- pending → informational, disabled. -->
-            <v-btn
-              v-else-if="connectionState === 'pending'"
-              variant="tonal"
-              color="info"
-              prepend-icon="mdi-clock-outline"
-              disabled
-              data-test="discover-profile-request-pending"
-            >
-              {{ t('app.discover.connection.pending') }}
-            </v-btn>
-
-            <!-- declined → an explicit "Request again" (D-4); admin/manager only. -->
-            <v-btn
-              v-else-if="connectionState === 'declined' && canSend"
-              variant="flat"
-              color="primary"
-              prepend-icon="mdi-refresh"
-              :loading="sending"
-              data-test="discover-profile-request-again"
-              @click="sendConnectionRequest"
-            >
-              {{ t('app.discover.connection.requestAgain') }}
-            </v-btn>
-
-            <!-- ended → re-requestable like declined (AH-051 D-3), but the
-                 label reads "Previously connected"; admin/manager only. -->
-            <v-btn
-              v-else-if="connectionState === 'ended' && canSend"
-              variant="flat"
-              color="primary"
-              prepend-icon="mdi-refresh"
-              :loading="sending"
-              data-test="discover-profile-request-again-ended"
-              @click="sendConnectionRequest"
-            >
-              {{ t('app.discover.connection.requestAgain') }}
-            </v-btn>
-
-            <!-- none → "Send request" (W1); admin/manager only. -->
-            <v-btn
-              v-else-if="connectionState === 'none' && canSend"
-              variant="flat"
-              color="primary"
-              prepend-icon="mdi-account-plus-outline"
-              :loading="sending"
-              data-test="discover-profile-send-request"
-              @click="sendConnectionRequest"
-            >
-              {{ t('app.discover.connection.sendRequest') }}
-            </v-btn>
-          </div>
-        </v-card-text>
-      </v-card>
+      <!-- Identity: avatar and the read-only profile completeness (the score the creator sees on
+           their own dashboard). The name, connection state and action sit in the page header. -->
+      <section class="agency-card discover-profile__identity" data-test="discover-profile-identity">
+        <CreatorAvatar
+          :src="avatarUrl"
+          :name="displayName"
+          :preview-label="t('creator.ui.wizard.steps.portfolio.preview_label')"
+          :close-label="t('creator.ui.wizard.steps.portfolio.preview_close')"
+          data-test="discover-profile-avatar"
+        />
+        <CompletenessBar
+          class="discover-profile__completeness"
+          :score="completenessScore"
+          :label="completenessLabel"
+          :color="completenessColor"
+          data-test="discover-profile-completeness"
+        />
+      </section>
 
       <!-- Profile -->
-      <v-card variant="outlined" data-test="discover-profile-profile">
-        <v-card-title class="text-h6">
-          {{ t('app.discover.detail.sections.profile') }}
-        </v-card-title>
-        <v-card-text class="d-flex flex-column ga-3">
+      <section class="agency-card" data-test="discover-profile-profile">
+        <h2 class="agency-card__title">{{ t('app.discover.detail.sections.profile') }}</h2>
+        <div class="d-flex flex-column ga-3">
           <p v-if="attrs.bio" class="text-body-2 mb-0" data-test="discover-profile-bio">
             {{ attrs.bio }}
           </p>
@@ -442,29 +401,27 @@ onMounted(() => {
               <CategoryChips :labels="companionLabels" />
             </div>
           </div>
-        </v-card-text>
-      </v-card>
+        </div>
+      </section>
 
       <!-- Social accounts (accounts render; metrics blocked-on-data) -->
-      <v-card variant="outlined" data-test="discover-profile-social">
-        <v-card-title class="text-h6">
-          {{ t('app.discover.detail.sections.social') }}
-        </v-card-title>
-        <v-card-text>
+      <section class="agency-card" data-test="discover-profile-social">
+        <h2 class="agency-card__title">{{ t('app.discover.detail.sections.social') }}</h2>
+        <div>
           <SocialAccountList
             :accounts="socialAccountRows"
             :empty-label="t('app.discover.detail.social.empty')"
           />
-        </v-card-text>
-      </v-card>
+        </div>
+      </section>
 
       <!-- Portfolio — a collapsible drawer (collapsed by default). The header
            is the toggle; the down-chevron expands the grid in place. With no
            items the grid stays open to show the empty state and the chevron
            is suppressed. -->
-      <v-card variant="outlined" data-test="discover-profile-portfolio">
-        <v-card-title
-          class="d-flex align-center justify-space-between text-h6 discover-profile__portfolio-head"
+      <section class="agency-card" data-test="discover-profile-portfolio">
+        <h2
+          class="agency-card__title d-flex align-center justify-space-between discover-profile__portfolio-head"
           :class="{ 'discover-profile__portfolio-head--clickable': portfolioItems.length > 0 }"
           :role="portfolioItems.length > 0 ? 'button' : undefined"
           :tabindex="portfolioItems.length > 0 ? 0 : undefined"
@@ -496,9 +453,9 @@ onMounted(() => {
             data-test="discover-profile-portfolio-toggle"
             @click.stop="portfolioExpanded = !portfolioExpanded"
           />
-        </v-card-title>
+        </h2>
         <v-expand-transition>
-          <v-card-text v-show="portfolioExpanded || portfolioItems.length === 0">
+          <div v-show="portfolioExpanded || portfolioItems.length === 0">
             <PortfolioGallery
               :items="portfolioItems"
               :editable="false"
@@ -512,9 +469,9 @@ onMounted(() => {
               :download-label="t('creator.ui.wizard.steps.portfolio.download_label')"
               :copy-link-label="t('creator.ui.wizard.steps.portfolio.copy_link_label')"
             />
-          </v-card-text>
+          </div>
         </v-expand-transition>
-      </v-card>
+      </section>
     </template>
 
     <v-snackbar
@@ -534,20 +491,14 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.discover-profile {
-  display: flex;
-  flex-direction: column;
+.discover-profile__identity {
+  flex-direction: row;
+  align-items: center;
   gap: 16px;
-  max-width: 960px;
-}
-
-.discover-profile__header-text {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
 }
 
 .discover-profile__completeness {
+  flex: 1 1 auto;
   max-width: 320px;
 }
 
@@ -563,11 +514,12 @@ onMounted(() => {
 
 .discover-profile__label {
   display: block;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
+  font-size: var(--catalyst-typography-overline-size);
+  font-weight: var(--catalyst-typography-overline-weight);
+  line-height: var(--catalyst-typography-overline-line-height);
+  letter-spacing: 0.6px;
   text-transform: uppercase;
-  color: rgb(var(--v-theme-on-surface-variant));
+  color: rgb(var(--v-theme-text-tertiary));
   margin-bottom: 4px;
 }
 
