@@ -531,6 +531,13 @@
         "glance": {
           "title": "Lühiülevaade",
           "daysUntilStart": "Päevi alguseni"
+        },
+        "files": {
+          "title": "Failid",
+          "viewAll": "Vaata kõiki faile",
+          "more": "+{count} veel",
+          "internal": "Sisene",
+          "download": "Laadi alla {name}"
         }
       },
       "settings": {

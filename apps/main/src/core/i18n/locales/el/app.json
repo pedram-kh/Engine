@@ -531,6 +531,13 @@
         "glance": {
           "title": "Με μια ματιά",
           "daysUntilStart": "Ημέρες μέχρι την έναρξη"
+        },
+        "files": {
+          "title": "Αρχεία",
+          "viewAll": "Προβολή όλων των αρχείων",
+          "more": "+{count} ακόμη",
+          "internal": "Εσωτερικό",
+          "download": "Λήψη του {name}"
         }
       },
       "settings": {

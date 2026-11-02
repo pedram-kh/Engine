@@ -5,7 +5,11 @@
  * shows the empty note.
  */
 
-import type { BoardCardMovementResource, BoardCardResource } from '@catalyst/api-client'
+import type {
+  BoardCardMovementResource,
+  BoardCardResource,
+  CampaignAttachmentResource,
+} from '@catalyst/api-client'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -26,6 +30,8 @@ vi.mock('@/modules/campaigns/api/campaigns.api', () => ({
     approveDraft: vi.fn(),
     requestRevision: vi.fn(),
     rejectDraft: vi.fn(),
+    // AH-116: the chat strip reads the campaign's attachments.
+    listAttachments: vi.fn(),
   },
 }))
 // The Messages tab (campaign-messages chunk) builds an agency chat transport;
@@ -194,6 +200,8 @@ async function mountDrawer(
     offerDescription?: string | null
     /** The campaign's brand id the page hands down (AH-116); omitted = not known. */
     brandId?: string | null
+    /** The campaign's attached files (default: none); `'error'` makes the read fail (AH-116). */
+    files?: CampaignAttachmentResource[] | 'error'
     postedContent?: ReturnType<typeof postedRow>[]
     /** Newest-first, as the endpoint returns them. Drives the latest-draft row. */
     drafts?: Array<{
@@ -208,6 +216,11 @@ async function mountDrawer(
   setActivePinia(createPinia())
   await seedStore()
   mockBoard.movements.mockResolvedValue({ data: movements })
+  if (opts.files === 'error') {
+    mockCampaigns.listAttachments.mockRejectedValue(new Error('network down'))
+  } else {
+    mockCampaigns.listAttachments.mockResolvedValue({ data: opts.files ?? [] })
+  }
   mockCampaigns.showAssignment.mockResolvedValue({
     data: {
       id: 'a1',
@@ -360,6 +373,64 @@ describe('BoardCardDrawer', () => {
     expect(panel.props('transport')).toBeTruthy()
     // No "no conversation" fallback for a card with an assignment.
     expect(wrapper.find('[data-test="board-card-drawer-messages-none"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  // ── AH-116 (item 6): the campaign's files, pinned above the chat ───────────────────────
+  function attachment(id: string, visible: boolean): CampaignAttachmentResource {
+    return {
+      id,
+      type: 'campaign_attachments',
+      attributes: {
+        original_filename: `${id}.pdf`,
+        mime_type: 'application/pdf',
+        size_bytes: 2048,
+        visible_to_creators: visible,
+        download_url: `https://files.example/${id}`,
+        attached_at: '2026-10-01T10:00:00Z',
+      },
+      relationships: { attached_by: null },
+    }
+  }
+
+  it('AH-116: pins the creator-visible files above the chat, with no Internal tag', async () => {
+    const wrapper = await mountDrawer(card('a1'), [], {
+      files: [attachment('shared', true), attachment('secret', false)],
+    })
+
+    expect(mockCampaigns.listAttachments).toHaveBeenCalledWith('agency-ulid', 'campaign-ulid')
+    const strip = wrapper.get('[data-test="campaign-files-chat"]')
+    expect(strip.find('[data-test="campaign-file-shared"]').exists()).toBe(true)
+    expect(strip.find('[data-test="campaign-file-secret"]').exists()).toBe(false)
+    expect(strip.text()).not.toContain('Internal')
+    // Above the thread, not after it.
+    const panel = wrapper.get('[data-test="chat-panel-stub"]').element
+    expect(
+      strip.element.compareDocumentPosition(panel) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    wrapper.unmount()
+  })
+
+  it('AH-116: draws no strip when every file is internal, or there are none', async () => {
+    const internalOnly = await mountDrawer(card('a1'), [], { files: [attachment('secret', false)] })
+    expect(internalOnly.find('[data-test="campaign-files-chat"]').exists()).toBe(false)
+    internalOnly.unmount()
+
+    const none = await mountDrawer(card('a1'), [])
+    expect(none.find('[data-test="campaign-files-chat"]').exists()).toBe(false)
+    none.unmount()
+  })
+
+  it('AH-116: a card with no assignment has no chat, so no strip', async () => {
+    const wrapper = await mountDrawer(card(null), [], { files: [attachment('shared', true)] })
+    expect(wrapper.find('[data-test="campaign-files-chat"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('AH-116: a failed files read draws no strip and leaves the chat working', async () => {
+    const wrapper = await mountDrawer(card('a1'), [], { files: 'error' })
+    expect(wrapper.find('[data-test="campaign-files-chat"]').exists()).toBe(false)
+    expect(wrapper.findComponent(ChatPanelStub).exists()).toBe(true)
     wrapper.unmount()
   })
 

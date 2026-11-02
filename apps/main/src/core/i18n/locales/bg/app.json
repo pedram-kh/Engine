@@ -531,6 +531,13 @@
         "glance": {
           "title": "Накратко",
           "daysUntilStart": "Дни до началото"
+        },
+        "files": {
+          "title": "Файлове",
+          "viewAll": "Всички файлове",
+          "more": "+{count} още",
+          "internal": "Вътрешен",
+          "download": "Изтегляне на {name}"
         }
       },
       "settings": {

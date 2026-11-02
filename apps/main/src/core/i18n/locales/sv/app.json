@@ -531,6 +531,13 @@
         "glance": {
           "title": "I korthet",
           "daysUntilStart": "Dagar till start"
+        },
+        "files": {
+          "title": "Filer",
+          "viewAll": "Visa alla filer",
+          "more": "+{count} till",
+          "internal": "Intern",
+          "download": "Ladda ner {name}"
         }
       },
       "settings": {

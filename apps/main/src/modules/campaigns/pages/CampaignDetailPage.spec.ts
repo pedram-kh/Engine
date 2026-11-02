@@ -8,6 +8,7 @@
 
 import type {
   CampaignAssignmentResource,
+  CampaignAttachmentResource,
   CampaignDraftListItemResource,
   CampaignResource,
 } from '@catalyst/api-client'
@@ -45,6 +46,8 @@ vi.mock('../api/campaigns.api', () => ({
     requestRevision: vi.fn(),
     rejectDraft: vi.fn(),
     proceedWithoutContract: vi.fn(),
+    // AH-116: the Overview files strip reads the campaign's attachments.
+    listAttachments: vi.fn(),
   },
 }))
 
@@ -192,6 +195,10 @@ async function mountDetail(
     campaign?: Partial<CampaignResource['attributes']>
     /** AH-103: the query string the page is opened with, e.g. `?tab=drafts`. */
     query?: string
+    /** AH-116: the campaign's attached files (default: none). */
+    files?: CampaignAttachmentResource[]
+    /** AH-116: the files read fails. */
+    filesError?: boolean
   } = {},
 ): Promise<{
   wrapper: ReturnType<typeof mount>
@@ -218,6 +225,11 @@ async function mountDetail(
     data: [],
     meta: { total: 0, page: 1, per_page: 25, last_page: 1 },
   })
+  if (opts.filesError) {
+    vi.mocked(campaignsApi.listAttachments).mockRejectedValue(new Error('network down'))
+  } else {
+    vi.mocked(campaignsApi.listAttachments).mockResolvedValue({ data: opts.files ?? [] })
+  }
 
   const agency = useAgencyStore()
   agency.initFromUser([{ agency_id: 'agency-ulid', agency_name: 'Test Agency', role }])
@@ -1068,8 +1080,9 @@ describe('CampaignDetailPage — agency restyle (AH-114, S3.2)', () => {
   async function open(
     role: 'agency_admin' | 'agency_manager' | 'agency_staff' = 'agency_admin',
     campaign: Partial<CampaignResource['attributes']> = {},
+    files: CampaignAttachmentResource[] = [],
   ) {
-    const harness = await mountDetail(role, [], { campaign })
+    const harness = await mountDetail(role, [], { campaign, files })
     cleanup = harness.cleanup
     return harness.wrapper
   }
@@ -1266,6 +1279,117 @@ describe('CampaignDetailPage — agency restyle (AH-114, S3.2)', () => {
       expect(text).not.toContain('Creators confirmed')
       expect(text).not.toContain('Budget used')
       expect(text).not.toContain('Next steps')
+    })
+  })
+
+  // AH-116 (item 6): the files strip under "At a glance".
+  describe('Campaign files strip (AH-116)', () => {
+    const FUTURE = { starts_at: '2026-11-09T00:00:00Z' } // + the applications row = two glance rows
+
+    function makeFile(
+      id: string,
+      overrides: Partial<CampaignAttachmentResource['attributes']> = {},
+    ): CampaignAttachmentResource {
+      return {
+        id,
+        type: 'campaign_attachments',
+        attributes: {
+          original_filename: `${id}.pdf`,
+          mime_type: 'application/pdf',
+          size_bytes: 2048,
+          visible_to_creators: true,
+          download_url: `https://files.example/${id}?sig=1`,
+          attached_at: '2026-10-01T10:00:00Z',
+          ...overrides,
+        },
+        relationships: { attached_by: null },
+      }
+    }
+
+    it('draws the strip under the glance block, as its sibling, when there are files', async () => {
+      const wrapper = await open('agency_admin', FUTURE, [makeFile('brief')])
+
+      const glance = wrapper.get('[data-test="overview-glance"]').element
+      const strip = wrapper.get('[data-test="campaign-files-overview"]').element
+      expect(glance.contains(strip)).toBe(false)
+      expect(glance.compareDocumentPosition(strip) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+      expect(wrapper.get('[data-test="overview-aside"]').element.contains(strip)).toBe(true)
+    })
+
+    it('draws the strip ALONE, with no glance block, when fewer than two glance rows are left', async () => {
+      const wrapper = await open('agency_admin', {}, [makeFile('brief')])
+
+      expect(wrapper.find('[data-test="overview-glance"]').exists()).toBe(false)
+      expect(wrapper.find('[data-test="overview-aside"]').exists()).toBe(true)
+      expect(wrapper.find('[data-test="campaign-files-overview"]').exists()).toBe(true)
+      expect(wrapper.find('.agency-detail').classes()).toContain('agency-detail--with-panel')
+    })
+
+    it('draws neither the aside nor the strip with no files and fewer than two glance rows', async () => {
+      const wrapper = await open()
+
+      expect(wrapper.find('[data-test="overview-aside"]').exists()).toBe(false)
+      expect(wrapper.find('[data-test="campaign-files-overview"]').exists()).toBe(false)
+      expect(wrapper.find('.agency-detail').classes()).not.toContain('agency-detail--with-panel')
+    })
+
+    it('tags a file creators cannot see "Internal", and only that one', async () => {
+      const wrapper = await open('agency_admin', FUTURE, [
+        makeFile('public'),
+        makeFile('private', { visible_to_creators: false }),
+      ])
+
+      expect(wrapper.find('[data-test="campaign-file-internal-private"]').text()).toBe('Internal')
+      expect(wrapper.find('[data-test="campaign-file-internal-public"]').exists()).toBe(false)
+      // Overview lists every file, internal ones included.
+      expect(wrapper.find('[data-test="campaign-file-private"]').exists()).toBe(true)
+    })
+
+    it('caps at four chips, says how many more, and "View all files" opens the Attachments tab', async () => {
+      const wrapper = await open(
+        'agency_admin',
+        FUTURE,
+        ['a', 'b', 'c', 'd', 'e', 'f'].map((id) => makeFile(id)),
+      )
+
+      expect(wrapper.findAll('.agency-files__list > li')).toHaveLength(4)
+      expect(wrapper.get('[data-test="campaign-files-more"]').text()).toBe('+2 more')
+
+      await wrapper.get('[data-test="campaign-files-view-all"]').trigger('click')
+      expect((wrapper.vm as unknown as { tab: string }).tab).toBe('attachments')
+    })
+
+    it('a file is a download link on its signed URL, opening in a new tab', async () => {
+      const wrapper = await open('agency_admin', FUTURE, [makeFile('brief')])
+
+      const link = wrapper.get('[data-test="campaign-file-brief"] a')
+      expect(link.attributes('href')).toBe('https://files.example/brief?sig=1')
+      expect(link.attributes('target')).toBe('_blank')
+      expect(link.attributes('rel')).toBe('noopener noreferrer')
+      expect(link.attributes('aria-label')).toBe('Download brief.pdf')
+    })
+
+    it('a failed read draws no strip and does not break the page', async () => {
+      const harness = await mountDetail('agency_admin', [], { campaign: FUTURE, filesError: true })
+      cleanup = harness.cleanup
+      const wrapper = harness.wrapper
+
+      expect(wrapper.find('[data-test="campaign-detail-heading"]').text()).toBe('Summer launch')
+      expect(wrapper.find('[data-test="overview-glance"]').exists()).toBe(true)
+      expect(wrapper.find('[data-test="campaign-files-overview"]').exists()).toBe(false)
+    })
+
+    it('reads the files again when the operator returns to Overview from another tab', async () => {
+      const wrapper = await open('agency_admin', FUTURE, [makeFile('brief')])
+      const reads = () => vi.mocked(campaignsApi.listAttachments).mock.calls.length
+      const afterMount = reads()
+
+      ;(wrapper.vm as unknown as { tab: string }).tab = 'creators'
+      await flushPromises()
+      expect(reads()).toBe(afterMount)
+      ;(wrapper.vm as unknown as { tab: string }).tab = 'overview'
+      await flushPromises()
+      expect(reads()).toBe(afterMount + 1)
     })
   })
 

@@ -531,6 +531,13 @@
         "glance": {
           "title": "At a glance",
           "daysUntilStart": "Days until start"
+        },
+        "files": {
+          "title": "Files",
+          "viewAll": "View all files",
+          "more": "+{count} more",
+          "internal": "Internal",
+          "download": "Download {name}"
         }
       },
       "settings": {

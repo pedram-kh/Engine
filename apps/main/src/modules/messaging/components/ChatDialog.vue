@@ -41,6 +41,12 @@ function close(): void {
         />
       </v-card-title>
       <v-divider />
+      <!-- AH-116: content pinned above the thread (the campaign's files strip). The card is
+           `scrollable`, so `v-card-text` below is the scroller and this sibling stays put while
+           the messages scroll. ChatPanel itself has no slot and is untouched. -->
+      <div v-if="modelValue && $slots.pinned" class="px-4" data-test="chat-dialog-pinned">
+        <slot name="pinned" />
+      </div>
       <v-card-text>
         <ChatPanel v-if="modelValue" :transport="transport" />
       </v-card-text>

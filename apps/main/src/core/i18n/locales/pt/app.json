@@ -531,6 +531,13 @@
         "glance": {
           "title": "Num relance",
           "daysUntilStart": "Dias até ao início"
+        },
+        "files": {
+          "title": "Ficheiros",
+          "viewAll": "Ver todos os ficheiros",
+          "more": "+{count} mais",
+          "internal": "Interno",
+          "download": "Transferir {name}"
         }
       },
       "settings": {

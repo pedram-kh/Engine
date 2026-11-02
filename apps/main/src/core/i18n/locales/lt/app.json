@@ -531,6 +531,13 @@
         "glance": {
           "title": "Trumpai",
           "daysUntilStart": "Dienų iki pradžios"
+        },
+        "files": {
+          "title": "Failai",
+          "viewAll": "Peržiūrėti visus failus",
+          "more": "+{count} daugiau",
+          "internal": "Vidinis",
+          "download": "Atsisiųsti {name}"
         }
       },
       "settings": {

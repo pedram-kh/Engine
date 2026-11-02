@@ -531,6 +531,13 @@
         "glance": {
           "title": "In sintesi",
           "daysUntilStart": "Giorni all'inizio"
+        },
+        "files": {
+          "title": "File",
+          "viewAll": "Mostra tutti i file",
+          "more": "+{count} altri",
+          "internal": "Interno",
+          "download": "Scarica {name}"
         }
       },
       "settings": {

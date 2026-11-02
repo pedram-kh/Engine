@@ -62,7 +62,9 @@ import { useI18n } from 'vue-i18n'
 import CreatorProfileContent from '@/components/CreatorProfileContent.vue'
 import RichBrief from '@/components/RichBrief.vue'
 import { campaignsApi } from '@/modules/campaigns/api/campaigns.api'
+import CampaignFilesStrip from '@/modules/campaigns/components/CampaignFilesStrip.vue'
 import DraftReviewPanel from '@/modules/campaigns/components/DraftReviewPanel.vue'
+import { useCampaignFiles } from '@/modules/campaigns/composables/useCampaignFiles'
 import { roundStateKey } from '@/modules/campaigns/draftRounds'
 import { agencyChatTransport, type ChatTransport } from '@/modules/messaging/api/messaging.api'
 import ChatPanel from '@/modules/messaging/components/ChatPanel.vue'
@@ -329,10 +331,20 @@ async function loadDrawer(resetTab = true): Promise<void> {
   }
 }
 
+// The campaign's files, pinned above the chat (AH-116). Its own read, apart from the detail and
+// movements fetch above: a failure here draws no strip and never touches the drawer.
+const { files: campaignFiles, load: loadCampaignFiles } = useCampaignFiles(
+  () => props.agencyId,
+  () => props.campaignId,
+)
+
 watch(
   () => props.modelValue,
   (open) => {
-    if (open) void loadDrawer()
+    if (open) {
+      void loadDrawer()
+      void loadCampaignFiles()
+    }
   },
   { immediate: true },
 )
@@ -397,6 +409,12 @@ function onDraftReviewed(): void {
                ChatDialog pattern). Independent of the detail/movements fetch —
                a detail load error never blocks messaging. -->
           <v-window-item value="messages">
+            <!-- The campaign's creator-visible files, above the thread (AH-116). -->
+            <CampaignFilesStrip
+              v-if="modelValue && chatTransport"
+              :files="campaignFiles"
+              mode="chat"
+            />
             <ChatPanel
               v-if="modelValue && chatTransport"
               :transport="chatTransport"

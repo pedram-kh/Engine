@@ -6,6 +6,8 @@ import { useI18n } from 'vue-i18n'
 import { agencyChatTransport, messagingApi, type ChatTransport } from '../api/messaging.api'
 import ChatDialog from './ChatDialog.vue'
 import { creatorLabel } from '@/core/creators/creatorLabel'
+import CampaignFilesStrip from '@/modules/campaigns/components/CampaignFilesStrip.vue'
+import { useCampaignFiles } from '@/modules/campaigns/composables/useCampaignFiles'
 
 const props = defineProps<{
   agencyId: string
@@ -78,9 +80,18 @@ function openThread(row: MessageThreadRollupRow): void {
   dialogOpen.value = true
 }
 
+// The campaign's files, pinned above an open thread (AH-116). Read when a thread opens, so the
+// strip is as fresh as the conversation and costs nothing while the dialog stays closed.
+const { files: campaignFiles, load: loadCampaignFiles } = useCampaignFiles(
+  () => props.agencyId,
+  () => props.campaignUlid,
+)
+
 // When the operator closes a thread, refresh the badges (they just read it).
 watch(dialogOpen, (open) => {
-  if (!open) {
+  if (open) {
+    void loadCampaignFiles()
+  } else {
     void loadRollup()
   }
 })
@@ -137,7 +148,11 @@ onBeforeUnmount(() => {
       </v-list-item>
     </v-list>
 
-    <ChatDialog v-model="dialogOpen" :transport="activeTransport" :title="activeTitle" />
+    <ChatDialog v-model="dialogOpen" :transport="activeTransport" :title="activeTitle">
+      <template #pinned>
+        <CampaignFilesStrip :files="campaignFiles" mode="chat" />
+      </template>
+    </ChatDialog>
   </div>
 </template>
 

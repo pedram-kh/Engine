@@ -531,6 +531,13 @@
         "glance": {
           "title": "Dióhéjban",
           "daysUntilStart": "Napok a kezdésig"
+        },
+        "files": {
+          "title": "Fájlok",
+          "viewAll": "Összes fájl megtekintése",
+          "more": "+{count} további",
+          "internal": "Belső",
+          "download": "{name} letöltése"
         }
       },
       "settings": {

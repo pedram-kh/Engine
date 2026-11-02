@@ -531,6 +531,13 @@
         "glance": {
           "title": "In één oogopslag",
           "daysUntilStart": "Dagen tot de start"
+        },
+        "files": {
+          "title": "Bestanden",
+          "viewAll": "Alle bestanden bekijken",
+          "more": "+{count} meer",
+          "internal": "Intern",
+          "download": "{name} downloaden"
         }
       },
       "settings": {

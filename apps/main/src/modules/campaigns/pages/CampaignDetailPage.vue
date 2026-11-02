@@ -50,6 +50,8 @@ import BoardView from '@/modules/boards/components/BoardView.vue'
 import DraftsTab from '../components/DraftsTab.vue'
 import ApplicationsTab from '../components/ApplicationsTab.vue'
 import AttachmentsTab from '../components/AttachmentsTab.vue'
+import CampaignFilesStrip from '../components/CampaignFilesStrip.vue'
+import { useCampaignFiles } from '../composables/useCampaignFiles'
 import {
   creatorAvatarAlt,
   creatorAvatarUrl,
@@ -424,6 +426,18 @@ async function loadPendingApplications(): Promise<void> {
 onMounted(() => {
   void loadCampaign()
   void loadPendingApplications()
+  void loadCampaignFiles()
+})
+
+// The Overview files strip (AH-116). The Overview panel stays mounted while another tab is open,
+// so a file attached, hidden or detached on the Attachments tab would leave the strip stale:
+// read again each time the operator comes back to Overview.
+const { files: campaignFiles, load: loadCampaignFiles } = useCampaignFiles(
+  () => agencyStore.currentAgencyId,
+  () => ulid.value,
+)
+watch(tab, (value, previous) => {
+  if (value === 'overview' && previous !== 'overview') void loadCampaignFiles()
 })
 
 // `immediate`: a deep link can open ON this tab, where a change-only watch would
@@ -566,6 +580,9 @@ const glanceItems = computed<GlanceItem[]>(() => {
   return items
 })
 const showGlance = computed(() => glanceItems.value.length >= 2)
+// The right panel draws when there is anything for it: the glance rows (two or more) or files
+// (AH-116). The glance block keeps its own two-row rule inside it.
+const showAside = computed(() => showGlance.value || campaignFiles.value.length > 0)
 
 interface RequirementRow {
   key: string
@@ -693,7 +710,7 @@ const requirementRows = computed<RequirementRow[]>(() => {
       <v-window v-model="tab">
         <!-- Overview -->
         <v-window-item value="overview" data-test="panel-overview">
-          <div class="agency-detail" :class="{ 'agency-detail--with-panel': showGlance }">
+          <div class="agency-detail" :class="{ 'agency-detail--with-panel': showAside }">
             <div class="agency-detail__main">
               <section class="agency-card" data-test="overview-details-card">
                 <h2 class="agency-card__title">{{ t('app.campaigns.detail.title') }}</h2>
@@ -788,8 +805,8 @@ const requirementRows = computed<RequirementRow[]>(() => {
               </section>
             </div>
 
-            <aside v-if="showGlance" class="agency-detail__panel" data-test="overview-glance">
-              <section class="agency-card">
+            <aside v-if="showAside" class="agency-detail__panel" data-test="overview-aside">
+              <section v-if="showGlance" class="agency-card" data-test="overview-glance">
                 <h2 class="agency-card__title">{{ t('app.campaigns.detail.glance.title') }}</h2>
                 <div
                   v-for="item in glanceItems"
@@ -804,6 +821,12 @@ const requirementRows = computed<RequirementRow[]>(() => {
                   <span class="agency-glance-row__value">{{ item.value }}</span>
                 </div>
               </section>
+              <!-- A sibling of the glance block, not inside it: files can stand alone. -->
+              <CampaignFilesStrip
+                :files="campaignFiles"
+                mode="overview"
+                @view-all="tab = 'attachments'"
+              />
             </aside>
           </div>
         </v-window-item>

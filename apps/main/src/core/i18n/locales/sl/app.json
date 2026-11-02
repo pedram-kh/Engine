@@ -531,6 +531,13 @@
         "glance": {
           "title": "Na kratko",
           "daysUntilStart": "Dni do začetka"
+        },
+        "files": {
+          "title": "Datoteke",
+          "viewAll": "Prikaži vse datoteke",
+          "more": "+{count} več",
+          "internal": "Interno",
+          "download": "Prenesi {name}"
         }
       },
       "settings": {

@@ -531,6 +531,13 @@
         "glance": {
           "title": "F'ħarsa waħda",
           "daysUntilStart": "Jiem sal-bidu"
+        },
+        "files": {
+          "title": "Fajls",
+          "viewAll": "Ara l-fajls kollha",
+          "more": "+{count} oħra",
+          "internal": "Intern",
+          "download": "Niżżel {name}"
         }
       },
       "settings": {

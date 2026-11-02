@@ -531,6 +531,13 @@
         "glance": {
           "title": "Pe scurt",
           "daysUntilStart": "Zile până la început"
+        },
+        "files": {
+          "title": "Fișiere",
+          "viewAll": "Vezi toate fișierele",
+          "more": "+{count} în plus",
+          "internal": "Intern",
+          "download": "Descarcă {name}"
         }
       },
       "settings": {

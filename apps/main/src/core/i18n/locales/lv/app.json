@@ -531,6 +531,13 @@
         "glance": {
           "title": "Īsumā",
           "daysUntilStart": "Dienas līdz sākumam"
+        },
+        "files": {
+          "title": "Faili",
+          "viewAll": "Skatīt visus failus",
+          "more": "+{count} vēl",
+          "internal": "Iekšējs",
+          "download": "Lejupielādēt {name}"
         }
       },
       "settings": {

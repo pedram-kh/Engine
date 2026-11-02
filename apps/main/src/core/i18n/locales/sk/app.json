@@ -531,6 +531,13 @@
         "glance": {
           "title": "Prehľad",
           "daysUntilStart": "Dní do začiatku"
+        },
+        "files": {
+          "title": "Súbory",
+          "viewAll": "Zobraziť všetky súbory",
+          "more": "+{count} ďalších",
+          "internal": "Interný",
+          "download": "Stiahnuť {name}"
         }
       },
       "settings": {
