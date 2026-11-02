@@ -361,6 +361,10 @@ Counting check: 5 + 4 + 8 + 1 + 2 = **20**.
   - **Literals out.** The roster-detail and Discover-profile page styles had `0.75rem` / `0.875rem` font sizes and a literal `rgb(var(--v-theme-...))` palette mix; they now use the type tokens and the agency tertiary and primary-text colours. The application-status tone mapping moved to `roster/applicationStatusTone.ts` so the list and the detail share it.
   - **Kept as found.** The brand detail "Created" label is a hard-coded English word (as on the brand list); the brand description label reads "Monthly deliverables" (the existing `app.brands.fields.description` text). Neither is mine to change without keys; both are noted for the final report.
   - **No new i18n key, no spec edited, no shared file edited.**
+- **S4.3 (forms and settings: brand create and edit, campaign create, talent pool create and edit, Settings, bulk invite; MEASURED in Chromium; `pins.mjs --step S4.3`: 28 pins, 190 checks, both themes; four break-reverts caught: the frame class, the back button, the form card width, the Settings header).**
+  - **Rules per route.** The five create and edit forms: R3 (header with the 36px back button) and R10 (the form in one `agency-card--form`, 720 wide at most; the fields keep the token-level restyle). `/settings`: R3, R10 (header, one card, no back button: it is a top-level route). `/creator-invitations/bulk`: R3 (the description as the header line), R10 (the picker and preview in one card; tracking and complete are cards too).
+  - **Correction: `/auth/2fa/disable` is not an agency route.** The plan (ruling 13 row and the S4.3 row) says it is `layout: 'agency'`. `modules/auth/routes.ts` has `layout: 'auth'` for it, so it is an AuthLayout screen and **waits for AH-115 with the other 2FA screens.** It is out of S4.3. That makes L4 **19 routes, not 20**, and the layer gate walks 24 agency routes plus this one as an AuthLayout screen that is not restyled.
+  - **Kept as found.** Settings' currency list and the preview tables keep their existing words and structure; no new i18n key, no spec edited, no shared file edited.
 
 ---
 

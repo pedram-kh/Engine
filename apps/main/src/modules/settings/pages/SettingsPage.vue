@@ -12,6 +12,7 @@ import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
+import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
 import { settingsApi } from '../api/settings.api'
 
 const { t } = useI18n()
@@ -87,8 +88,8 @@ onMounted(loadSettings)
 </script>
 
 <template>
-  <div data-test="settings-page">
-    <h1 class="text-h5 mb-6" data-test="settings-heading">{{ t('app.settings.title') }}</h1>
+  <div class="agency-page" data-test="settings-page">
+    <AgencyPageHeader :title="t('app.settings.title')" title-test="settings-heading" />
 
     <!-- Loading skeleton -->
     <v-skeleton-loader v-if="loading" type="article" data-test="settings-skeleton" />
@@ -99,15 +100,9 @@ onMounted(loadSettings)
     </v-alert>
 
     <!-- Settings form -->
-    <v-card v-else class="pa-6" max-width="560">
+    <section v-else class="agency-card agency-card--form">
       <!-- Read-only notice for non-admins -->
-      <v-alert
-        v-if="!isAdmin"
-        type="info"
-        variant="tonal"
-        class="mb-4"
-        data-test="settings-readonly-notice"
-      >
+      <v-alert v-if="!isAdmin" type="info" variant="tonal" data-test="settings-readonly-notice">
         {{ t('app.settings.readOnly') }}
       </v-alert>
 
@@ -116,7 +111,6 @@ onMounted(loadSettings)
         v-if="saveSuccess"
         type="success"
         variant="tonal"
-        class="mb-4"
         closable
         data-test="settings-success"
         @click:close="saveSuccess = false"
@@ -158,7 +152,7 @@ onMounted(loadSettings)
           class="mb-2"
           data-test="settings-blacklist-notification"
         />
-        <p class="text-caption text-medium-emphasis mb-4" data-test="settings-blacklist-hint">
+        <p class="agency-field__text mb-4" data-test="settings-blacklist-hint">
           {{ t('app.settings.fields.blacklistNotificationPolicyHint') }}
         </p>
 
@@ -185,6 +179,6 @@ onMounted(loadSettings)
           </v-btn>
         </div>
       </form>
-    </v-card>
+    </section>
   </div>
 </template>

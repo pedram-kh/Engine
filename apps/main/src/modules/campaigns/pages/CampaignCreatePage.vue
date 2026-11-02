@@ -13,6 +13,7 @@ import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { brandsApi } from '@/modules/brands/api/brands.api'
 import { campaignsApi } from '../api/campaigns.api'
 import CampaignForm from '../components/CampaignForm.vue'
+import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -94,22 +95,20 @@ async function onSubmit(): Promise<void> {
 </script>
 
 <template>
-  <div data-test="campaign-create-page">
-    <div class="d-flex align-center mb-6">
-      <v-btn
-        icon="mdi-arrow-left"
-        variant="text"
-        size="small"
-        :to="{ name: 'campaigns.list' }"
-        class="mr-2"
-        :aria-label="t('app.campaigns.actions.backToList')"
-      />
-      <h1 class="text-h5 ma-0" data-test="campaign-create-heading">
-        {{ t('app.campaigns.create.title') }}
-      </h1>
-    </div>
+  <div class="agency-page agency-page--snug" data-test="campaign-create-page">
+    <AgencyPageHeader :title="t('app.campaigns.create.title')" title-test="campaign-create-heading">
+      <template #leading>
+        <v-btn
+          icon="mdi-arrow-left"
+          variant="text"
+          :to="{ name: 'campaigns.list' }"
+          class="agency-icon-square"
+          :aria-label="t('app.campaigns.actions.backToList')"
+        />
+      </template>
+    </AgencyPageHeader>
 
-    <v-card class="pa-6" max-width="720">
+    <section class="agency-card agency-card--form">
       <CampaignForm
         v-model="form"
         :brands="brands"
@@ -119,6 +118,6 @@ async function onSubmit(): Promise<void> {
         :field-errors="fieldErrors"
         @submit="onSubmit"
       />
-    </v-card>
+    </section>
   </div>
 </template>

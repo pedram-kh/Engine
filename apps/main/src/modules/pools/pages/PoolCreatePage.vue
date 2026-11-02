@@ -8,6 +8,7 @@ import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { brandsApi } from '@/modules/brands/api/brands.api'
 import { talentPoolsApi } from '../api/talentPools.api'
 import PoolForm, { type BrandOption } from '../components/PoolForm.vue'
+import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -64,22 +65,20 @@ onMounted(loadBrands)
 </script>
 
 <template>
-  <div data-test="pool-create-page">
-    <div class="d-flex align-center mb-6">
-      <v-btn
-        icon="mdi-arrow-left"
-        variant="text"
-        size="small"
-        :to="{ name: 'pools.list' }"
-        class="mr-2"
-        :aria-label="t('app.pools.actions.backToList')"
-      />
-      <h1 class="text-h5 ma-0" data-test="pool-create-heading">
-        {{ t('app.pools.create.title') }}
-      </h1>
-    </div>
+  <div class="agency-page agency-page--snug" data-test="pool-create-page">
+    <AgencyPageHeader :title="t('app.pools.create.title')" title-test="pool-create-heading">
+      <template #leading>
+        <v-btn
+          icon="mdi-arrow-left"
+          variant="text"
+          :to="{ name: 'pools.list' }"
+          class="agency-icon-square"
+          :aria-label="t('app.pools.actions.backToList')"
+        />
+      </template>
+    </AgencyPageHeader>
 
-    <v-card class="pa-6" max-width="640">
+    <section class="agency-card agency-card--form">
       <PoolForm
         v-model="form"
         :submitting="submitting"
@@ -89,6 +88,6 @@ onMounted(loadBrands)
         :field-errors="fieldErrors"
         @submit="onSubmit"
       />
-    </v-card>
+    </section>
   </div>
 </template>

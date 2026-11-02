@@ -35,6 +35,7 @@ import { S33_PINS } from './pins-s33.mjs'
 import { S40_PINS } from './pins-s40.mjs'
 import { S41_PINS } from './pins-s41.mjs'
 import { S42_PINS } from './pins-s42.mjs'
+import { S43_PINS } from './pins-s43.mjs'
 import { S34_PINS } from './pins-s34.mjs'
 import { S15_PINS } from './pins-s15.mjs'
 
@@ -136,6 +137,7 @@ const PINS = [
   ...S40_PINS,
   ...S41_PINS,
   ...S42_PINS,
+  ...S43_PINS,
 ]
 
 const THEMES = ['dark', 'light']

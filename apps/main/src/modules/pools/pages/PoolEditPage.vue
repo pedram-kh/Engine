@@ -8,6 +8,7 @@ import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { brandsApi } from '@/modules/brands/api/brands.api'
 import { talentPoolsApi } from '../api/talentPools.api'
 import PoolForm, { type BrandOption } from '../components/PoolForm.vue'
+import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -91,18 +92,18 @@ onMounted(() => {
 </script>
 
 <template>
-  <div data-test="pool-edit-page">
-    <div class="d-flex align-center mb-6">
-      <v-btn
-        icon="mdi-arrow-left"
-        variant="text"
-        size="small"
-        :to="{ name: 'pools.detail', params: { ulid } }"
-        class="mr-2"
-        :aria-label="t('app.pools.actions.backToDetail')"
-      />
-      <h1 class="text-h5 ma-0" data-test="pool-edit-heading">{{ t('app.pools.edit.title') }}</h1>
-    </div>
+  <div class="agency-page agency-page--snug" data-test="pool-edit-page">
+    <AgencyPageHeader :title="t('app.pools.edit.title')" title-test="pool-edit-heading">
+      <template #leading>
+        <v-btn
+          icon="mdi-arrow-left"
+          variant="text"
+          :to="{ name: 'pools.detail', params: { ulid } }"
+          class="agency-icon-square"
+          :aria-label="t('app.pools.actions.backToDetail')"
+        />
+      </template>
+    </AgencyPageHeader>
 
     <v-skeleton-loader v-if="loading" type="article" data-test="pool-edit-skeleton" />
 
@@ -110,7 +111,7 @@ onMounted(() => {
       {{ loadError }}
     </v-alert>
 
-    <v-card v-else class="pa-6" max-width="640">
+    <section v-else class="agency-card agency-card--form">
       <PoolForm
         v-model="form"
         :submitting="submitting"
@@ -120,6 +121,6 @@ onMounted(() => {
         :field-errors="fieldErrors"
         @submit="onSubmit"
       />
-    </v-card>
+    </section>
   </div>
 </template>

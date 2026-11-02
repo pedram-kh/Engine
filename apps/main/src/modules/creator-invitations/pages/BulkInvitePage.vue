@@ -38,6 +38,7 @@ import { computed, onBeforeUnmount, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
+import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
 import {
   bulkInviteApi,
   type BulkInviteJobStatus,
@@ -224,11 +225,12 @@ defineExpose({ onFileSelected })
 </script>
 
 <template>
-  <div data-test="bulk-invite-page">
-    <h1 class="text-h5 mb-2">{{ t('app.bulkInvite.title') }}</h1>
-    <p class="text-body-2 text-medium-emphasis mb-6">
-      {{ t('app.bulkInvite.description') }}
-    </p>
+  <div class="agency-page agency-page--snug" data-test="bulk-invite-page">
+    <AgencyPageHeader
+      :title="t('app.bulkInvite.title')"
+      :subtitle="t('app.bulkInvite.description')"
+      title-test="bulk-invite-heading"
+    />
 
     <!-- ── File picker / idle / parsing / preview ─────────────────── -->
     <template
@@ -236,127 +238,124 @@ defineExpose({ onFileSelected })
         phase === 'idle' || phase === 'parsing' || phase === 'preview' || phase === 'submitting'
       "
     >
-      <v-file-input
-        :label="t('app.bulkInvite.file.label')"
-        :hint="t('app.bulkInvite.file.hint')"
-        persistent-hint
-        accept=".csv,text/csv"
-        show-size
-        prepend-icon="mdi-file-upload"
-        :disabled="phase === 'submitting' || phase === 'parsing'"
-        data-test="bulk-invite-file-input"
-        @update:model-value="
-          (v: File | File[] | null) => onFileSelected(Array.isArray(v) ? (v[0] ?? null) : v)
-        "
-      />
-
-      <v-alert
-        v-if="previewFatal !== null"
-        type="error"
-        variant="tonal"
-        class="mt-4"
-        data-test="bulk-invite-fatal"
-      >
-        {{ previewFatal.detail }}
-      </v-alert>
-
-      <template v-else-if="parseResult !== null">
-        <v-alert
-          v-if="exceedsSoftWarning"
-          type="warning"
-          variant="tonal"
-          class="mt-4"
-          data-test="bulk-invite-soft-warning"
-        >
-          {{ t('app.bulkInvite.softWarning', { count: parseResult.rowCount }) }}
-        </v-alert>
-
-        <div class="d-flex align-center justify-space-between mt-4 mb-2">
-          <h2 class="text-subtitle-1 ma-0" data-test="bulk-invite-preview-heading">
-            {{ t('app.bulkInvite.preview.heading', { count: parseResult.rowCount }) }}
-          </h2>
-          <span class="text-body-2 text-medium-emphasis" data-test="bulk-invite-error-count">
-            {{ t('app.bulkInvite.preview.errorCount', { count: previewErrors.length }) }}
-          </span>
-        </div>
-
-        <v-table
-          v-if="previewRows.length > 0"
-          density="compact"
-          class="mb-4"
-          data-test="bulk-invite-preview-table"
-        >
-          <thead>
-            <tr>
-              <th>{{ t('app.bulkInvite.preview.row') }}</th>
-              <th>{{ t('app.bulkInvite.preview.email') }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="row in previewRows.slice(0, 10)"
-              :key="row.rowNumber"
-              :data-test="`bulk-invite-preview-row-${row.rowNumber}`"
-            >
-              <td>{{ row.rowNumber }}</td>
-              <td>{{ row.email }}</td>
-            </tr>
-          </tbody>
-        </v-table>
+      <section class="agency-card agency-card--form">
+        <v-file-input
+          :label="t('app.bulkInvite.file.label')"
+          :hint="t('app.bulkInvite.file.hint')"
+          persistent-hint
+          accept=".csv,text/csv"
+          show-size
+          prepend-icon="mdi-file-upload"
+          :disabled="phase === 'submitting' || phase === 'parsing'"
+          data-test="bulk-invite-file-input"
+          @update:model-value="
+            (v: File | File[] | null) => onFileSelected(Array.isArray(v) ? (v[0] ?? null) : v)
+          "
+        />
 
         <v-alert
-          v-if="previewErrors.length > 0"
-          type="warning"
+          v-if="previewFatal !== null"
+          type="error"
           variant="tonal"
-          class="mb-4"
-          data-test="bulk-invite-preview-errors"
+          data-test="bulk-invite-fatal"
         >
-          <p class="font-weight-medium mb-2">
-            {{ t('app.bulkInvite.preview.errorHeading') }}
-          </p>
-          <ul class="bulk-invite__error-list">
-            <li
-              v-for="err in previewErrors.slice(0, 20)"
-              :key="`${err.rowNumber}-${err.code}`"
-              :data-test="`bulk-invite-preview-error-${err.rowNumber}`"
-            >
-              {{
-                t('app.bulkInvite.preview.errorItem', { row: err.rowNumber, detail: err.detail })
-              }}
-            </li>
-          </ul>
+          {{ previewFatal.detail }}
         </v-alert>
 
-        <div class="d-flex justify-end ga-2">
-          <v-btn variant="text" data-test="bulk-invite-reset" @click="startOver">
-            {{ t('app.bulkInvite.actions.reset') }}
-          </v-btn>
-          <v-btn
-            color="primary"
-            :disabled="!canSubmit"
-            :loading="phase === 'submitting'"
-            data-test="bulk-invite-submit"
-            @click="onSubmit"
+        <template v-else-if="parseResult !== null">
+          <v-alert
+            v-if="exceedsSoftWarning"
+            type="warning"
+            variant="tonal"
+            data-test="bulk-invite-soft-warning"
           >
-            {{ t('app.bulkInvite.actions.submit', { count: parseResult.rowCount }) }}
-          </v-btn>
-        </div>
-      </template>
+            {{ t('app.bulkInvite.softWarning', { count: parseResult.rowCount }) }}
+          </v-alert>
 
-      <v-alert
-        v-if="submitError !== null"
-        type="error"
-        variant="tonal"
-        class="mt-4"
-        data-test="bulk-invite-submit-error"
-      >
-        {{ t(submitError) }}
-      </v-alert>
+          <div class="d-flex align-center justify-space-between">
+            <h2 class="text-subtitle-1 ma-0" data-test="bulk-invite-preview-heading">
+              {{ t('app.bulkInvite.preview.heading', { count: parseResult.rowCount }) }}
+            </h2>
+            <span class="text-body-2 text-medium-emphasis" data-test="bulk-invite-error-count">
+              {{ t('app.bulkInvite.preview.errorCount', { count: previewErrors.length }) }}
+            </span>
+          </div>
+
+          <v-table
+            v-if="previewRows.length > 0"
+            density="compact"
+            data-test="bulk-invite-preview-table"
+          >
+            <thead>
+              <tr>
+                <th>{{ t('app.bulkInvite.preview.row') }}</th>
+                <th>{{ t('app.bulkInvite.preview.email') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="row in previewRows.slice(0, 10)"
+                :key="row.rowNumber"
+                :data-test="`bulk-invite-preview-row-${row.rowNumber}`"
+              >
+                <td>{{ row.rowNumber }}</td>
+                <td>{{ row.email }}</td>
+              </tr>
+            </tbody>
+          </v-table>
+
+          <v-alert
+            v-if="previewErrors.length > 0"
+            type="warning"
+            variant="tonal"
+            data-test="bulk-invite-preview-errors"
+          >
+            <p class="font-weight-medium mb-2">
+              {{ t('app.bulkInvite.preview.errorHeading') }}
+            </p>
+            <ul class="bulk-invite__error-list">
+              <li
+                v-for="err in previewErrors.slice(0, 20)"
+                :key="`${err.rowNumber}-${err.code}`"
+                :data-test="`bulk-invite-preview-error-${err.rowNumber}`"
+              >
+                {{
+                  t('app.bulkInvite.preview.errorItem', { row: err.rowNumber, detail: err.detail })
+                }}
+              </li>
+            </ul>
+          </v-alert>
+
+          <div class="d-flex justify-end ga-2">
+            <v-btn variant="text" data-test="bulk-invite-reset" @click="startOver">
+              {{ t('app.bulkInvite.actions.reset') }}
+            </v-btn>
+            <v-btn
+              color="primary"
+              :disabled="!canSubmit"
+              :loading="phase === 'submitting'"
+              data-test="bulk-invite-submit"
+              @click="onSubmit"
+            >
+              {{ t('app.bulkInvite.actions.submit', { count: parseResult.rowCount }) }}
+            </v-btn>
+          </div>
+        </template>
+
+        <v-alert
+          v-if="submitError !== null"
+          type="error"
+          variant="tonal"
+          data-test="bulk-invite-submit-error"
+        >
+          {{ t(submitError) }}
+        </v-alert>
+      </section>
     </template>
 
     <!-- ── Tracking ──────────────────────────────────────────────── -->
     <template v-if="phase === 'tracking'">
-      <v-card class="pa-6" data-test="bulk-invite-tracking">
+      <section class="agency-card agency-card--form" data-test="bulk-invite-tracking">
         <div class="d-flex align-center mb-3">
           <v-progress-circular indeterminate color="primary" size="32" class="mr-4" />
           <div role="status" aria-live="polite">
@@ -370,12 +369,12 @@ defineExpose({ onFileSelected })
           </div>
         </div>
         <v-progress-linear :model-value="progressPercent" color="primary" rounded />
-      </v-card>
+      </section>
     </template>
 
     <!-- ── Complete ──────────────────────────────────────────────── -->
     <template v-if="phase === 'complete' && jobResult !== null">
-      <v-card class="pa-6 mb-4" data-test="bulk-invite-complete">
+      <section class="agency-card" data-test="bulk-invite-complete">
         <h2 class="text-subtitle-1 mb-3">{{ t('app.bulkInvite.complete.heading') }}</h2>
         <div class="d-flex ga-6 mb-4 flex-wrap">
           <div data-test="bulk-invite-stat-invited">
@@ -420,7 +419,7 @@ defineExpose({ onFileSelected })
             </tr>
           </tbody>
         </v-table>
-      </v-card>
+      </section>
       <v-btn color="primary" data-test="bulk-invite-start-over" @click="startOver">
         {{ t('app.bulkInvite.actions.startOver') }}
       </v-btn>

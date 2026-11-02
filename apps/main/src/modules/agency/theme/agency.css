@@ -1144,6 +1144,10 @@
   background-color: rgb(var(--v-theme-surface));
 }
 
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-card--form {
+  max-width: 720px;
+}
+
 :is(.v-theme--agency-dark, .v-theme--agency-light) .agency-card__title {
   margin: 0;
   font-size: 18px;

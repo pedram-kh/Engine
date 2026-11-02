@@ -350,6 +350,34 @@ export const L4_REAL_PAGES = {
     width: 1600,
     height: 1000,
   },
+  'brand-create-1600': { to: '/brands/new', names: 'brands.create', width: 1600, height: 1000 },
+  'brand-edit-1600': {
+    to: `/brands/${BRAND_ID}/edit`,
+    names: 'brands.edit',
+    width: 1600,
+    height: 1000,
+  },
+  'campaign-create-1600': {
+    to: '/campaigns/new',
+    names: 'campaigns.create',
+    width: 1600,
+    height: 1000,
+  },
+  'pool-create-1600': { to: '/talent-pools/new', names: 'pools.create', width: 1600, height: 900 },
+  'pool-edit-1600': {
+    to: `/talent-pools/${POOL_ID}/edit`,
+    names: 'pools.edit',
+    width: 1600,
+    height: 900,
+  },
+  'settings-1600': { to: '/settings', names: 'settings', width: 1600, height: 900 },
+  'settings-1280': { to: '/settings', names: 'settings', width: 1280, height: 800 },
+  'bulk-invite-1600': {
+    to: '/creator-invitations/bulk',
+    names: 'creator-invitations.bulk',
+    width: 1600,
+    height: 900,
+  },
   'pool-detail-1280': {
     to: `/talent-pools/${POOL_ID}`,
     names: 'pools.detail',
@@ -453,6 +481,19 @@ function poolMembers() {
 export function l4FixtureFor(url, method) {
   const p = url.pathname
   if (method !== 'GET') return null
+  if (p === `${API}/settings`) {
+    return {
+      data: {
+        id: AGENCY,
+        type: 'agency_settings',
+        attributes: {
+          default_currency: 'EUR',
+          default_language: 'en',
+          blacklist_notification_policy: false,
+        },
+      },
+    }
+  }
   if (p === `${API}/creators/discover/${ROSTER_FIRST}`) return { data: creatorProfile() }
   if (p === `${API}/creators/${ROSTER_FIRST}`) return { data: creatorDetail() }
   if (p === `${API}/brands/${BRAND_ID}`) return { data: brandResource(BRAND_ID, 'Jack & Jill') }

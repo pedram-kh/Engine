@@ -22,6 +22,7 @@ import { useRouter } from 'vue-router'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { brandsApi } from '../api/brands.api'
 import BrandForm from '../components/BrandForm.vue'
+import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -107,22 +108,20 @@ async function onSubmit(): Promise<void> {
 </script>
 
 <template>
-  <div data-test="brand-create-page">
-    <div class="d-flex align-center mb-6">
-      <v-btn
-        icon="mdi-arrow-left"
-        variant="text"
-        size="small"
-        :to="{ name: 'brands.list' }"
-        class="mr-2"
-        :aria-label="t('app.brands.actions.backToList')"
-      />
-      <h1 class="text-h5 ma-0" data-test="brand-create-heading">
-        {{ t('app.brands.create.title') }}
-      </h1>
-    </div>
+  <div class="agency-page agency-page--snug" data-test="brand-create-page">
+    <AgencyPageHeader :title="t('app.brands.create.title')" title-test="brand-create-heading">
+      <template #leading>
+        <v-btn
+          icon="mdi-arrow-left"
+          variant="text"
+          :to="{ name: 'brands.list' }"
+          class="agency-icon-square"
+          :aria-label="t('app.brands.actions.backToList')"
+        />
+      </template>
+    </AgencyPageHeader>
 
-    <v-card class="pa-6" max-width="640">
+    <section class="agency-card agency-card--form">
       <BrandForm
         v-model="form"
         :submitting="submitting"
@@ -135,6 +134,6 @@ async function onSubmit(): Promise<void> {
         @logo-selected="setLogo"
         @logo-removed="setLogo(null)"
       />
-    </v-card>
+    </section>
   </div>
 </template>

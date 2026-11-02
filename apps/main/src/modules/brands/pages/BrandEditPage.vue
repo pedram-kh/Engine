@@ -20,6 +20,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { brandsApi } from '../api/brands.api'
 import BrandForm from '../components/BrandForm.vue'
+import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -142,20 +143,18 @@ onMounted(loadBrand)
 </script>
 
 <template>
-  <div data-test="brand-edit-page">
-    <div class="d-flex align-center mb-6">
-      <v-btn
-        icon="mdi-arrow-left"
-        variant="text"
-        size="small"
-        :to="{ name: 'brands.detail', params: { ulid } }"
-        class="mr-2"
-        :aria-label="t('app.brands.actions.backToDetail')"
-      />
-      <h1 class="text-h5 ma-0" data-test="brand-edit-heading">
-        {{ t('app.brands.edit.title') }}
-      </h1>
-    </div>
+  <div class="agency-page agency-page--snug" data-test="brand-edit-page">
+    <AgencyPageHeader :title="t('app.brands.edit.title')" title-test="brand-edit-heading">
+      <template #leading>
+        <v-btn
+          icon="mdi-arrow-left"
+          variant="text"
+          :to="{ name: 'brands.detail', params: { ulid } }"
+          class="agency-icon-square"
+          :aria-label="t('app.brands.actions.backToDetail')"
+        />
+      </template>
+    </AgencyPageHeader>
 
     <v-skeleton-loader v-if="loading" type="article" data-test="brand-edit-skeleton" />
 
@@ -163,7 +162,7 @@ onMounted(loadBrand)
       {{ loadError }}
     </v-alert>
 
-    <v-card v-else class="pa-6" max-width="640">
+    <section v-else class="agency-card agency-card--form">
       <BrandForm
         v-model="form"
         :submitting="submitting"
@@ -177,6 +176,6 @@ onMounted(loadBrand)
         @logo-selected="onLogoSelected"
         @logo-removed="onLogoRemoved"
       />
-    </v-card>
+    </section>
   </div>
 </template>
