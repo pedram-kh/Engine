@@ -424,6 +424,12 @@ Counting check: 5 + 4 + 8 + 1 + 2 = **20**.
 
 **Fixture fixes found by the walk.** The mock API lacked `/auth/impersonation/status` and the roster availability endpoint, so the roster detail showed "We couldn't load your availability" in its calendar; both now answer (empty window, not impersonating).
 
+#### L5 close-out notes (2026-11-02)
+
+- **S5.1 (docs).** `agency-restyle-review.md` (per-layer evidence, the break-revert table, the Figma deviation list, the omission lists, the designer note, the rulings), the AH-114 entry in `adhoc-changes-log.md`, 13 tech-debt rows, the `PENDING` deploy-log entry, the resumption template refresh. Housekeeping commit: `pins-s32.mjs`, `docs/store/check-listing.mjs` and `scripts/i18n/verify-locale.mjs` formatted; `.mjs` added to the lint-staged prettier glob (CI has no `format:check` step, so the commit hook is the gate); `app.brands.fields.createdAt` x 24 replaces the hard-coded "Created" on the brand detail and the brand list column (the list was the same hard-coded word; one key serves both).
+- **S5.2 (final proof).** Full board; creator walk 142 / 142; `measure.mjs --build` on the five spike items; the shared-path diff empty; the creator stylesheet delta +28,660 bytes raw (+4,477 gzip) in the shared `index-*.css`. **The real-data check** (`tools/walk/prod-compare.mjs`) compared the live production site with a production build of the tip on the five public creator routes: 16 of 20 identical; the 4 sign-in stops differ by one scoped-style id (`CreatorGuideCta`), identical to the pre-AH-114 build, so the tip differs from the pre-AH-114 build on 0 of 20. The signed-in comparison was not run (no credentials). Figures in review §4.
+- **S5.3 (deploy log).** Entry opened `PENDING` in `deploy-log.md`. Nothing is deployed by this chunk.
+
 ---
 
 ## 4. The seven specs and where each sits

@@ -74,6 +74,24 @@ happened.
 
 ---
 
+## AH-114 — agency app restyle from Figma (web only) — PENDING
+
+- **Status:** PENDING
+- **Range:** `066ff29c` (the runtime tip of the 2026-10-29 deploy; production's current state **not read**) → **`cefe0a25`** (AH-114's last runtime commit; the commits after it are docs and the dev tools under `apps/main/tools/walk/`, which are not built). Commits between `066ff29c` and `4780b8a6` are docs only and are not counted. The first AH-114 commit is `b99dd437` (docs), the first code is `b63b592b`.
+- **AH entries carried:** AH-114 (steps S0.1 to S5.3). No other entry rides this deploy.
+- **Migrations run:** none
+- **Pre-deploy reads:** none (no server read applies to a front-end build). The proof figures are quoted from [`agency-restyle-review.md`](../reviews/agency-restyle-review.md) §4, as measured locally, not read from the server: creator walk 142 / 142 identical to the S0.2 baseline; the production-build probe of the five spike items; 96-stop agency walk; creator stylesheet delta +28,660 bytes raw (+4,477 gzip).
+- **Snapshot ID:** none. No migration and no data change, so not applicable.
+- **Infra:** none. No worker restart, no cron or scheduler change, no env change, no `composer`, no `artisan`, no container recreate. **Builds: the main SPA build and its Netlify deploy only.** The admin build is not rebuilt (no `apps/admin` or `packages/*` file changed; spec 3 and spec 5 are the evidence). No new environment variable. TestFlight and the native binary are not touched: the creator native build is a bundled app, so this web deploy does not reach it.
+- **One-shot commands:** none
+- **Post-deploy verification (to fill, each as read or "not read"):** the served main bundle's file names equal the L5 build's; an agency sign-in works and shows the new look; the theme toggle flips `agency-dark` and `agency-light`; Campaigns, Campaign detail, Discover, Messages, the Roster list and detail and the Dashboard walked in dark and light; a creator web sign-in and the creator dashboard, campaigns and messages unchanged against the pre-deploy screenshots; the public pages unchanged (the AH-114 production compare, `node tools/walk/prod-compare.mjs --prod <site> --dist <the build>`, expected 16 of 20 identical with the same four sign-in stops differing by the `CreatorGuideCta` scoped id: see the review §4.1). **The signed-in real-data comparison with a test creator (tech-debt AH-114 row 12) is still owed.**
+- **Flags armed:** none. There is no behaviour to arm.
+- **Operator:** to be recorded: the colleague, from the mirror, as for the previous deploys.
+- **Anything unexpected:** to be recorded after the deploy. Before it, one thing to read: the live sign-in page renders a scoped-style id (`data-v-b5682d48` on `CreatorGuideCta.vue`) that a local production build of the same source does not (`f90c534f`); it is harmless but means the Netlify build used different bytes or a different path (tech-debt AH-114 row 13). Read the Netlify build settings once.
+- **Rollback:** redeploy the previous main `dist` (Netlify). No migration or queue to undo.
+
+---
+
 ## AH-106 + AH-107 + AH-108 + AH-103b + AH-109 — pre-tester UI batch (shell back arrow, clipped Applied chip, campaign status on the creator side, unread indicators and icon badge) and universal links — DEPLOYED
 
 > **Deployed 2026-10-29 (evening, Europe/Madrid), one sitting for the whole entry (AH-103b through AH-113), by Pedram's colleague from the Bitbucket mirror.** The note under it is the pre-deploy text, kept as written; the **Deploy record** below is what is known of the sitting, and **everything not listed there is "not read"**. One production deploy and **one** TestFlight build 3 for all of them (Q9 ruling; AH-103b rides the same release, with its own web checks first). **Timing (Pedram, 2026-10-19): the deploy and

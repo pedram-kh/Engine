@@ -28,6 +28,7 @@ cd apps/main
 node tools/walk/walk.mjs --set creator --out /tmp/run.json --compare ../../docs/reviews/ah-114-creator-baseline/baseline.json
 node tools/walk/walk.mjs --set creator --only creator.dashboard --compare <baseline>   # subset
 node tools/walk/walk.mjs --set shell --out /tmp/shell.json --shots /tmp/shell-shots     # agency shell screenshots
+node tools/walk/prod-compare.mjs --prod https://platform.catalyst-growth.com --dist <a vite build outDir>   # live public pages vs a build (S5.2, read-only, needs network)
 ```
 
 Playwright needs its browsers (`~/Library/Caches/ms-playwright`); inside the Cursor sandbox `PLAYWRIGHT_BROWSERS_PATH` points somewhere empty, so run it unsandboxed or `unset PLAYWRIGHT_BROWSERS_PATH`. A full creator walk takes about four minutes.
