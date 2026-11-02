@@ -6,7 +6,8 @@
  * Layout (D-c1-3 — single column, adapting §11's two-column intent while
  * campaigns/deadlines don't exist):
  *   - Welcome bar (name + date + aurora edge).
- *   - KPI strip (four cards, locked order D-c1-4).
+ *   - KPI strip (locked order D-c1-4; the Payments due card is drawn only once the API
+ *     reports a number for it, AH-116).
  *   - Activity feed region (single column). 1b renders a `CEmptyState`
  *     placeholder; 1c replaces it with the real `ActivityFeed` (which keeps
  *     `CEmptyState` as its own zero-rows fallback).
@@ -24,6 +25,8 @@ import { useI18n } from 'vue-i18n'
 
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 
+import { campaignsApi } from '@/modules/campaigns/api/campaigns.api'
+
 import { dashboardApi, type DashboardSummary } from '../api/dashboard.api'
 import ActivityFeed from '../components/ActivityFeed.vue'
 import KpiStrip from '../components/KpiStrip.vue'
@@ -33,6 +36,10 @@ const { t } = useI18n()
 const agencyStore = useAgencyStore()
 
 const summary = ref<DashboardSummary | null>(null)
+// AH-116 — the Active campaigns figure comes from the campaigns list's `meta.status_counts`
+// (one row asked for, only the meta is read). Null when the call fails or the API sends no
+// counts; the card then draws its muted placeholder and the other cards are unaffected.
+const activeCampaigns = ref<number | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
 
@@ -43,14 +50,23 @@ async function loadSummary(): Promise<void> {
   loading.value = true
   error.value = null
 
-  try {
-    const res = await dashboardApi.summary(agencyId)
-    summary.value = res.data
-  } catch {
+  // The two calls run side by side and fail apart: the list is only the Active campaigns card.
+  const [summaryResult, campaignsResult] = await Promise.allSettled([
+    dashboardApi.summary(agencyId),
+    campaignsApi.list(agencyId, { per_page: 1 }),
+  ])
+
+  if (summaryResult.status === 'fulfilled') {
+    summary.value = summaryResult.value.data
+  } else {
     error.value = t('dashboard.errors.loadFailed')
-  } finally {
-    loading.value = false
   }
+  activeCampaigns.value =
+    campaignsResult.status === 'fulfilled'
+      ? (campaignsResult.value.meta.status_counts?.active ?? null)
+      : null
+
+  loading.value = false
 }
 
 onMounted(() => {
@@ -71,7 +87,7 @@ watch(
   <div class="agency-page" data-test="dashboard-page">
     <WelcomeBar />
 
-    <KpiStrip :summary="summary" :loading="loading" />
+    <KpiStrip :summary="summary" :active-campaigns="activeCampaigns" :loading="loading" />
 
     <v-alert v-if="error" type="error" variant="tonal" data-test="dashboard-error">
       {{ error }}

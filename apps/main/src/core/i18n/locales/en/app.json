@@ -954,7 +954,8 @@
       "summary": "{count} campaign | {count} campaigns",
       "list": {
         "starts": "Starts {date}"
-      }
+      },
+      "summaryActive": "{count} campaign, {active} active | {count} campaigns, {active} active"
     },
     "pools": {
       "title": "Talent pools",

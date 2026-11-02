@@ -954,7 +954,8 @@
       "summary": "{count} καμπάνια | {count} καμπάνιες",
       "list": {
         "starts": "Ξεκινά στις {date}"
-      }
+      },
+      "summaryActive": "{count} καμπάνια, ενεργές: {active} | {count} καμπάνιες, ενεργές: {active}"
     },
     "pools": {
       "title": "Talent pools",

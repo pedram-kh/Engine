@@ -86,16 +86,28 @@ function makeCampaign(overrides: Partial<CampaignResource['attributes']> = {}): 
   }
 }
 
+/** AH-116 — the five statuses with a count each, as `meta.status_counts` sends them. */
+type StatusCounts = Record<'draft' | 'active' | 'paused' | 'completed' | 'cancelled', number>
+const COUNTS: StatusCounts = { draft: 4, active: 5, paused: 3, completed: 11, cancelled: 1 }
+
 async function mountList(
   campaigns: CampaignResource[] = [],
   total: number = campaigns.length,
+  /** Omitted = an API that predates `status_counts` (the key is absent from `meta`). */
+  statusCounts?: StatusCounts,
 ): Promise<{ wrapper: ReturnType<typeof mount>; cleanup: () => void }> {
   const pinia = createPinia()
   setActivePinia(pinia)
 
   vi.mocked(campaignsApi.list).mockResolvedValue({
     data: campaigns,
-    meta: { total, page: 1, per_page: 25, last_page: 1 },
+    meta: {
+      total,
+      page: 1,
+      per_page: 25,
+      last_page: 1,
+      ...(statusCounts === undefined ? {} : { status_counts: statusCounts }),
+    },
   })
   vi.mocked(brandsApi.listOptions).mockResolvedValue({ data: [] })
 
@@ -401,17 +413,58 @@ describe('CampaignListPage (Sprint 8 Chunk 1)', () => {
 
   // ── AH-114 (S3.1): the restyled list ────────────────────────────────────────────────────
   describe('agency restyle (AH-114, S3.1)', () => {
-    it('reads the header summary off the list total, and not before the first response', async () => {
-      const harness = await mountList([makeCampaign()], 24)
+    it('reads the header summary off the status counts, and not before the first response', async () => {
+      const harness = await mountList([makeCampaign()], 24, COUNTS)
       cleanup = harness.cleanup
-      expect(harness.wrapper.get('[data-test="campaign-list-summary"]').text()).toBe('24 campaigns')
+      expect(harness.wrapper.get('[data-test="campaign-list-summary"]').text()).toBe(
+        '24 campaigns, 5 active',
+      )
       expect(harness.wrapper.get('[data-test="campaign-list-heading"]').text()).toBe('Campaigns')
     })
 
     it('uses the singular for one campaign', async () => {
-      const harness = await mountList([makeCampaign()], 1)
+      const harness = await mountList([makeCampaign()], 1, {
+        draft: 0,
+        active: 1,
+        paused: 0,
+        completed: 0,
+        cancelled: 0,
+      })
       cleanup = harness.cleanup
-      expect(harness.wrapper.get('[data-test="campaign-list-summary"]').text()).toBe('1 campaign')
+      expect(harness.wrapper.get('[data-test="campaign-list-summary"]').text()).toBe(
+        '1 campaign, 1 active',
+      )
+    })
+
+    it('falls back to the plain total when the API sends no status counts', async () => {
+      const harness = await mountList([makeCampaign()], 24)
+      cleanup = harness.cleanup
+      expect(harness.wrapper.get('[data-test="campaign-list-summary"]').text()).toBe('24 campaigns')
+      const one = await mountList([makeCampaign()], 1)
+      expect(one.wrapper.get('[data-test="campaign-list-summary"]').text()).toBe('1 campaign')
+      one.cleanup()
+    })
+
+    it('keeps the counts, and the total, while a status tab narrows the list', async () => {
+      const harness = await mountList([makeCampaign()], 24, COUNTS)
+      cleanup = harness.cleanup
+
+      // The API ignores the status filter in `status_counts`, but `meta.total` follows it.
+      vi.mocked(campaignsApi.list).mockResolvedValue({
+        data: [makeCampaign()],
+        meta: { total: 5, page: 1, per_page: 25, last_page: 1, status_counts: COUNTS },
+      })
+      await harness.wrapper.get('[data-test="campaign-filter-active"]').trigger('click')
+      await flushPromises()
+
+      expect(vi.mocked(campaignsApi.list).mock.calls.at(-1)?.[1]).toMatchObject({
+        status: 'active',
+      })
+      expect(harness.wrapper.get('[data-test="campaign-list-summary"]').text()).toBe(
+        '24 campaigns, 5 active',
+      )
+      expect(harness.wrapper.get('[data-test="campaign-filter-count-all"]').text()).toBe('24')
+      expect(harness.wrapper.get('[data-test="campaign-filter-count-draft"]').text()).toBe('4')
     })
 
     it('draws no summary when the load failed', async () => {
@@ -496,12 +549,37 @@ describe('CampaignListPage (Sprint 8 Chunk 1)', () => {
       )
     })
 
-    it('draws the status segments without counts or check marks', async () => {
+    it('draws the status segments with their counts and no check marks', async () => {
+      const harness = await mountList([makeCampaign()], 24, COUNTS)
+      cleanup = harness.cleanup
+      const segments = harness.wrapper.get('[data-test="campaign-status-filter"]')
+      expect(segments.findAll('.v-chip')).toHaveLength(6)
+      const read = (status: string): string =>
+        segments.get(`[data-test="campaign-filter-count-${status}"]`).text()
+      // "All" is the sum of the five, not `meta.total`.
+      expect(read('all')).toBe('24')
+      expect(read('draft')).toBe('4')
+      expect(read('active')).toBe('5')
+      expect(read('paused')).toBe('3')
+      expect(read('completed')).toBe('11')
+      expect(read('cancelled')).toBe('1')
+      expect(segments.findAll('.v-chip').map((c) => c.text().replace(/\s+/g, ' '))).toEqual([
+        'All 24',
+        'Draft 4',
+        'Active 5',
+        'Paused 3',
+        'Completed 11',
+        'Cancelled 1',
+      ])
+    })
+
+    it('draws the status segments plain when the API sends no counts', async () => {
       const harness = await mountList([makeCampaign()], 24)
       cleanup = harness.cleanup
       const segments = harness.wrapper.get('[data-test="campaign-status-filter"]')
       expect(segments.text()).not.toMatch(/\d/)
       expect(segments.findAll('.v-chip')).toHaveLength(6)
+      expect(segments.find('.agency-seg__count').exists()).toBe(false)
     })
 
     it('the footer says how far the page reaches, and Previous is off on the first page', async () => {

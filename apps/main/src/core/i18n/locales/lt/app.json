@@ -954,7 +954,8 @@
       "summary": "{count} kampanija | {count} kampanijos",
       "list": {
         "starts": "Prasideda {date}"
-      }
+      },
+      "summaryActive": "{count} kampanija, aktyvių: {active} | {count} kampanijos, aktyvių: {active}"
     },
     "pools": {
       "title": "Talent pools",

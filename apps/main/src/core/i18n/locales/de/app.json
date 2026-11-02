@@ -954,7 +954,8 @@
       "summary": "{count} Kampagne | {count} Kampagnen",
       "list": {
         "starts": "Beginnt am {date}"
-      }
+      },
+      "summaryActive": "{count} Kampagne, {active} aktiv | {count} Kampagnen, {active} aktiv"
     },
     "pools": {
       "title": "Talent-Pools",

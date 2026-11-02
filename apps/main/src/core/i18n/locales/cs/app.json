@@ -954,7 +954,8 @@
       "summary": "{count} kampaň | {count} kampaní",
       "list": {
         "starts": "Začíná {date}"
-      }
+      },
+      "summaryActive": "{count} kampaň, aktivní: {active} | {count} kampaní, aktivní: {active}"
     },
     "pools": {
       "title": "Talentové skupiny",

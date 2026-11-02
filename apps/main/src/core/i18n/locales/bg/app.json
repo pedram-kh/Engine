@@ -954,7 +954,8 @@
       "summary": "{count} кампания | {count} кампании",
       "list": {
         "starts": "Започва на {date}"
-      }
+      },
+      "summaryActive": "{count} кампания, активни: {active} | {count} кампании, активни: {active}"
     },
     "pools": {
       "title": "Talent pools",

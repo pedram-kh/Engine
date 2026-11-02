@@ -1,12 +1,14 @@
 <script setup lang="ts">
 /**
- * KpiStrip — the four workspace-home KPI cards (§11; Sprint 4 Chunk 1, 1b).
+ * KpiStrip — the workspace-home KPI cards (§11; Sprint 4 Chunk 1, 1b).
  *
- * Locked order (D-c1-4): Active campaigns [placeholder] → Creators in roster
- * [real] → Pending creator applications [real] → Payments due [placeholder].
- * Placeholder cards hold their slots (campaigns / payments) and render a
- * muted `—` driven by `null`; they become real in place when those surfaces
- * ship — they are NOT removed.
+ * Locked order (D-c1-4): Active campaigns → Creators in roster → Pending creator
+ * applications → Payments due.
+ *
+ * Active campaigns reads the campaigns list's status counts (AH-116, the `activeCampaigns`
+ * prop; a muted `—` while null). Payments due has no number behind it yet, so its card is NOT
+ * DRAWN while `summary.payments_due` is null, and returns in its slot the day the API sends one
+ * (the key, the label and the order are kept). A card that always reads `—` is noise.
  *
  * Real cards bind to the summary payload; while it loads, every card shows
  * the skeleton. The cards are the agency `AgencyKpiCard` (AH-114 L4; the shared `CKpiCard` stays
@@ -24,16 +26,18 @@ import type { DashboardSummary } from '../api/dashboard.api'
 
 const props = defineProps<{
   summary: DashboardSummary | null
+  /** `meta.status_counts.active` off the campaigns list; null when unavailable. */
+  activeCampaigns?: number | null
   loading: boolean
 }>()
 
 const { t } = useI18n()
 
-const cards = computed(() => [
+const allCards = computed(() => [
   {
     key: 'activeCampaigns',
     label: t('dashboard.kpi.activeCampaigns'),
-    value: props.summary?.active_campaigns ?? null,
+    value: props.activeCampaigns ?? null,
     icon: 'mdi-bullhorn-outline',
     tileTone: 'ai' as const,
   },
@@ -60,6 +64,10 @@ const cards = computed(() => [
     tileTone: 'warning' as const,
   },
 ])
+
+const cards = computed(() =>
+  allCards.value.filter((card) => card.key !== 'paymentsDue' || card.value !== null),
+)
 </script>
 
 <template>

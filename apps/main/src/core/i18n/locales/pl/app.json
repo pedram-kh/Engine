@@ -954,7 +954,8 @@
       "summary": "{count} kampania | {count} kampanii",
       "list": {
         "starts": "Start: {date}"
-      }
+      },
+      "summaryActive": "{count} kampania, aktywnych: {active} | {count} kampanii, aktywnych: {active}"
     },
     "pools": {
       "title": "Pule talentów",

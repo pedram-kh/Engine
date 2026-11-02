@@ -954,7 +954,8 @@
       "summary": "{count} campanie | {count} campanii",
       "list": {
         "starts": "Începe pe {date}"
-      }
+      },
+      "summaryActive": "{count} campanie, active: {active} | {count} campanii, active: {active}"
     },
     "pools": {
       "title": "Talent pools",

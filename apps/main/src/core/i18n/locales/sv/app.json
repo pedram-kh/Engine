@@ -954,7 +954,8 @@
       "summary": "{count} kampanj | {count} kampanjer",
       "list": {
         "starts": "Startar {date}"
-      }
+      },
+      "summaryActive": "{count} kampanj, aktiva: {active} | {count} kampanjer, aktiva: {active}"
     },
     "pools": {
       "title": "Talangpooler",

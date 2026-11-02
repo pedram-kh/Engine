@@ -12,8 +12,9 @@ import { http } from '@/core/api'
 
 /**
  * The single summary payload (D-c1-6). Two real KPIs; two stable `null`
- * placeholders (campaigns / payments) that slot in when those surfaces
- * ship — the SPA renders a muted `—` for `null`.
+ * placeholders (campaigns / payments). The SPA no longer reads `active_campaigns` (the Active
+ * campaigns card takes the campaigns list's `status_counts`, AH-116) and draws no Payments due
+ * card while `payments_due` is null.
  */
 export interface DashboardSummary {
   creators_in_roster: number

@@ -954,7 +954,8 @@
       "summary": "{count} kampanja | {count} kampanj",
       "list": {
         "starts": "Začne se {date}"
-      }
+      },
+      "summaryActive": "{count} kampanja, aktivnih: {active} | {count} kampanj, aktivnih: {active}"
     },
     "pools": {
       "title": "Talentne skupine",

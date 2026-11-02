@@ -37,6 +37,7 @@ import type {
   BrandOptionResource,
   CampaignListParams,
   CampaignResource,
+  CampaignStatus,
 } from '@catalyst/api-client'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -63,6 +64,9 @@ const startsTo = ref<string>('')
 
 const items = ref<CampaignResource[]>([])
 const totalItems = ref(0)
+// AH-116 — campaigns per status, from `meta.status_counts`. Null until the first response and
+// whenever the API omits the key (an older API), in which case no counts are drawn.
+const statusCounts = ref<Partial<Record<CampaignStatus, number>> | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
 const brandOptions = ref<{ title: string; value: string }[]>([])
@@ -151,6 +155,7 @@ async function loadCampaigns(): Promise<void> {
     const res = await campaignsApi.list(agencyId, params)
     items.value = res.data
     totalItems.value = res.meta.total
+    statusCounts.value = res.meta.status_counts ?? null
     hasLoaded.value = true
   } catch {
     error.value = t('app.campaigns.errors.loadFailed')
@@ -200,11 +205,31 @@ function formatMoney(minor: number | null, currency: string | null): string {
 // drawn before the first response (no zero, no placeholder).
 const hasLoaded = ref(false)
 
-const summary = computed(() =>
-  hasLoaded.value && error.value === null
-    ? t('app.campaigns.summary', { count: totalItems.value }, totalItems.value)
-    : null,
+/** All campaigns, every status: the sum of the counts (`meta.total` is narrowed by the tab). */
+const allCount = computed(() =>
+  statusCounts.value === null
+    ? null
+    : Object.values(statusCounts.value).reduce((sum, n) => sum + (n ?? 0), 0),
 )
+
+/** The number drawn beside a status segment; null (no number) when the API sent no counts. */
+function segmentCount(value: StatusFilter): number | null {
+  if (statusCounts.value === null) return null
+  return value === 'all' ? allCount.value : (statusCounts.value[value] ?? 0)
+}
+
+const summary = computed(() => {
+  if (!hasLoaded.value || error.value !== null) return null
+  // "N campaigns, M active" while the API sends the counts; today's "N campaigns" without them.
+  if (allCount.value !== null && statusCounts.value !== null) {
+    return t(
+      'app.campaigns.summaryActive',
+      { count: allCount.value, active: statusCounts.value.active ?? 0 },
+      allCount.value,
+    )
+  }
+  return t('app.campaigns.summary', { count: totalItems.value }, totalItems.value)
+})
 
 /** How far down the list the current page reaches ("9" on a first page of nine rows). */
 const shownCount = computed(
@@ -406,8 +431,8 @@ async function commitListing(item: CampaignResource, value: boolean): Promise<vo
       </template>
     </AgencyPageHeader>
 
-    <!-- Filters: the three controls on the left, the status segments on the right.
-         The segments carry no per-status counts: the list API has none (ruling 15). -->
+    <!-- Filters: the three controls on the left, the status segments on the right. Each
+         segment carries its count (`meta.status_counts`, AH-116), and "All" the sum. -->
     <div class="agency-filters" data-test="campaign-filters">
       <v-select
         v-model="brandFilter"
@@ -465,6 +490,13 @@ async function commitListing(item: CampaignResource, value: boolean): Promise<vo
           :data-test="`campaign-filter-${item.value}`"
         >
           {{ item.label }}
+          <span
+            v-if="segmentCount(item.value) !== null"
+            class="agency-seg__count"
+            :data-test="`campaign-filter-count-${item.value}`"
+          >
+            {{ segmentCount(item.value) }}
+          </span>
         </v-chip>
       </v-chip-group>
     </div>

@@ -954,7 +954,8 @@
       "summary": "{count} fheachtas | {count} feachtas",
       "list": {
         "starts": "Tosaíonn ar {date}"
-      }
+      },
+      "summaryActive": "{count} fheachtas, gníomhacha: {active} | {count} feachtas, gníomhacha: {active}"
     },
     "pools": {
       "title": "Talent pools",

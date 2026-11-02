@@ -954,7 +954,8 @@
       "summary": "{count} kampagne | {count} kampagner",
       "list": {
         "starts": "Starter {date}"
-      }
+      },
+      "summaryActive": "{count} kampagne, aktive: {active} | {count} kampagner, aktive: {active}"
     },
     "pools": {
       "title": "Talentpuljer",

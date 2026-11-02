@@ -297,7 +297,14 @@ export function fixtureFor(url, method) {
   if (method === 'GET' && p === `/api/v1/agencies/${AGENCY}/campaigns`) {
     return {
       data: CAMPAIGNS,
-      meta: { total: 24, page: 1, per_page: 25, last_page: 1 },
+      // AH-116: `status_counts` sums to the 24 the fixture models; it ignores the status tab.
+      meta: {
+        total: 24,
+        page: 1,
+        per_page: 25,
+        last_page: 1,
+        status_counts: { draft: 4, active: 11, paused: 3, completed: 5, cancelled: 1 },
+      },
     }
   }
   if (method === 'GET' && p === `/api/v1/agencies/${AGENCY}/brands`) {

@@ -954,7 +954,8 @@
       "summary": "{count} kampaņa | {count} kampaņas",
       "list": {
         "starts": "Sākas {date}"
-      }
+      },
+      "summaryActive": "{count} kampaņa, aktīvās: {active} | {count} kampaņas, aktīvās: {active}"
     },
     "pools": {
       "title": "Talent pools",

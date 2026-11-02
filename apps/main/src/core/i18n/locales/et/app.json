@@ -954,7 +954,8 @@
       "summary": "{count} kampaania | {count} kampaaniat",
       "list": {
         "starts": "Algab {date}"
-      }
+      },
+      "summaryActive": "{count} kampaania, aktiivseid: {active} | {count} kampaaniat, aktiivseid: {active}"
     },
     "pools": {
       "title": "Talent pools",

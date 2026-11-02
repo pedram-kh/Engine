@@ -159,6 +159,13 @@ export interface CampaignListResponse {
     page: number
     per_page: number
     last_page: number
+    /**
+     * Campaigns per status for the whole agency (AH-116), zero-filled for every
+     * status. It ignores the `status` filter on purpose, so the status tabs keep
+     * their numbers while one is selected; it honours `brand` and the date range.
+     * Optional: an API that predates it omits the key and the UI draws no counts.
+     */
+    status_counts?: Record<CampaignStatus, number>
   }
 }
 

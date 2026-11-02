@@ -843,6 +843,14 @@
   display: none;
 }
 
+/* The count beside a segment's label (AH-116): the same type, one step quieter, and aligned so
+ * a column of segments reads as a row of figures. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-seg .agency-seg__count {
+  margin-inline-start: 6px;
+  color: rgb(var(--v-theme-text-tertiary));
+  font-variant-numeric: tabular-nums;
+}
+
 /* Listing table (R5, S3.1; Figma 14:3): 34-high header row on the raised fill in Overline
  * type, 68-high rows (14 above and below a 40px two-line cell), 20px at the card's edges and
  * 16 between columns. A page opts in with the `agency-table` class; the inferred pages join

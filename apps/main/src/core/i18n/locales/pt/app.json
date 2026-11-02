@@ -954,7 +954,8 @@
       "summary": "{count} campanha | {count} campanhas",
       "list": {
         "starts": "Começa em {date}"
-      }
+      },
+      "summaryActive": "{count} campanha, ativas: {active} | {count} campanhas, ativas: {active}"
     },
     "pools": {
       "title": "Grupos de talentos",

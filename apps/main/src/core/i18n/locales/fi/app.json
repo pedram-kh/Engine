@@ -954,7 +954,8 @@
       "summary": "{count} kampanja | {count} kampanjaa",
       "list": {
         "starts": "Alkaa {date}"
-      }
+      },
+      "summaryActive": "{count} kampanja, aktiivisia: {active} | {count} kampanjaa, aktiivisia: {active}"
     },
     "pools": {
       "title": "Talent pools",
