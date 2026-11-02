@@ -11,10 +11,13 @@
  */
 
 export const AGENCY = '01HWALKAGENCY000000000000'
+export const DETAIL_ID = '01HCAMPAIGN00000000000001'
 
 export const REAL_PAGES = {
   'campaigns-1600': { to: '/campaigns', names: 'campaigns.list,campaigns.create', width: 1600 },
   'campaigns-1280': { to: '/campaigns', names: 'campaigns.list,campaigns.create', width: 1280 },
+  'campaign-detail-1600': { to: `/campaigns/${DETAIL_ID}`, names: 'campaigns.detail', width: 1600 },
+  'campaign-detail-1280': { to: `/campaigns/${DETAIL_ID}`, names: 'campaigns.detail', width: 1280 },
 }
 
 // ── Campaigns list (Figma 14:3: nine rows of twenty-four) ─────────────────────────────────
@@ -87,8 +90,39 @@ export function campaignFixture(i, row) {
 
 export const CAMPAIGNS = CAMPAIGN_ROWS.map((row, i) => campaignFixture(i, row))
 
+// ── Campaign detail (Figma 16:38): the first campaign, starting a week from today ───────────
+
+/** Local date `n` days from today as YYYY-MM-DD (the page counts days from the local date). */
+export function daysFromToday(n) {
+  const d = new Date()
+  d.setDate(d.getDate() + n)
+  const pad = (v) => String(v).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+}
+
+export function detailCampaign() {
+  const c = campaignFixture(0, CAMPAIGN_ROWS[0])
+  c.id = DETAIL_ID
+  c.attributes.starts_at = `${daysFromToday(7)}T00:00:00Z`
+  c.attributes.ends_at = `${daysFromToday(60)}T00:00:00Z`
+  c.attributes.budget_minor_units = 150000
+  c.attributes.description =
+    'Short videos from business professionals in the US. Show a real working day, say what you ' +
+    'use the product for, keep it under a minute.'
+  return c
+}
+
 export function fixtureFor(url, method) {
   const p = url.pathname
+  if (method === 'GET' && p === `/api/v1/agencies/${AGENCY}/campaigns/${DETAIL_ID}`) {
+    return { data: detailCampaign() }
+  }
+  if (method === 'GET' && p === `/api/v1/agencies/${AGENCY}/campaigns/${DETAIL_ID}/applications`) {
+    return {
+      data: [],
+      meta: { total: 3, page: 1, per_page: 1, last_page: 3, pending_total: 1 },
+    }
+  }
   if (method === 'GET' && p === `/api/v1/agencies/${AGENCY}/campaigns`) {
     return {
       data: CAMPAIGNS,

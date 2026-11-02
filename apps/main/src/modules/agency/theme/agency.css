@@ -960,6 +960,215 @@
   border-radius: 999px;
 }
 
+/* ── Campaign detail (Figma 16:38, S3.2) ──────────────────────────────────────────────────
+ * Opt-in pieces for a detail page; nothing here changes a page that does not use the classes. */
+
+/* A 36px square icon button (the back button): surface, default border, radius 8. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-btn.v-btn--icon.agency-icon-square {
+  --v-btn-height: 36px;
+  --v-btn-size: 16px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgb(var(--v-theme-border-color));
+  border-radius: var(--radius-lg) !important;
+  background-color: rgb(var(--v-theme-surface));
+  color: rgb(var(--v-theme-on-surface));
+}
+
+/* Page with 20px between its blocks (the detail frames) rather than 24. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-page.agency-page--snug {
+  gap: 20px;
+}
+
+/* Tab bar as drawn on detail pages: tabs 24 apart with no side padding, label 14/20 on
+ * 8 above / 12 below; the selected label is the primary text colour (not the accent) with the
+ * 2px accent underline; idle tabs are secondary, regular weight. The count badge is the
+ * accent pill, 12/16/500, 6px sides. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .v-tabs.agency-tabs {
+  --v-tabs-height: 40px;
+  height: 40px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-tabs .v-slide-group__content {
+  gap: 24px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-tabs .v-tab.v-btn {
+  min-width: 0;
+  height: 40px;
+  padding: 8px 0 12px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: rgb(var(--v-theme-on-surface-variant));
+  opacity: 1;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-tabs .v-tab.v-btn.v-tab--selected {
+  font-weight: 500;
+  color: rgb(var(--v-theme-on-surface));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-tabs .v-badge--inline .v-badge__badge {
+  min-width: 0;
+  height: 18px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background-color: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary));
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-tabs .v-badge--inline {
+  margin-inline-start: 8px;
+}
+
+/* Main column + 360 panel, 24 apart. Without the panel the main column takes the width. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-detail__main {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-detail__panel {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 20px;
+  width: 360px;
+}
+
+/* Card: surface, default border, radius 12, padding 24, 20 between its blocks. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  border: 1px solid rgb(var(--v-theme-border-color));
+  border-radius: var(--radius-2xl);
+  background-color: rgb(var(--v-theme-surface));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-card__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: normal;
+  color: rgb(var(--v-theme-on-surface));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-card__rule {
+  height: 1px;
+  margin: 0;
+  border: 0;
+  background-color: rgb(var(--v-theme-border-color));
+}
+
+/* Label over value: the label is the Overline (11/14/600, +0.6, uppercase, tertiary), the
+ * value 14/20/500. Three columns, 24 apart. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px 24px;
+  margin: 0;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  margin: 0;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-field__label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 14px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: rgb(var(--v-theme-text-tertiary));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-field__value {
+  display: flex;
+  align-items: center;
+  min-height: 20px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: rgb(var(--v-theme-on-surface));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-field__text {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+
+/* A setting row: the label (14/20/500) and its switch, 16 apart. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-switch-row__label {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: rgb(var(--v-theme-on-surface));
+}
+
+/* "At a glance" row: a 32px tile (container fill, radius 8, 16px icon), the label 14/20
+ * secondary, the value 14/20/500 at the end. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-glance-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-glance-row__tile {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-lg);
+  background-color: rgb(var(--v-theme-primary-container));
+  color: rgb(var(--v-theme-primary-text));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-glance-row__label {
+  flex: 1 1 auto;
+  font-size: 14px;
+  line-height: 20px;
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-glance-row__value {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: rgb(var(--v-theme-on-surface));
+}
+
 /* Overlays (teleported: the overlay element itself carries the theme class).
  * Raised surface, 1px border, radius 10, the theme's overlay shadow. */
 :is(.v-theme--agency-dark, .v-theme--agency-light).v-menu > .v-overlay__content {

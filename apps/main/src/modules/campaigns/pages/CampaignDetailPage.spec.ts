@@ -24,6 +24,8 @@ import { createI18n } from 'vue-i18n'
 import enApp from '@/core/i18n/locales/en/app.json'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import BoardView from '@/modules/boards/components/BoardView.vue'
+import InviteCreatorsDialog from '../components/InviteCreatorsDialog.vue'
+import pageSource from './CampaignDetailPage.vue?raw'
 
 import CampaignDetailPage from './CampaignDetailPage.vue'
 import { CAMPAIGN_DETAIL_TABS } from '../campaignTabs'
@@ -1031,5 +1033,224 @@ describe('CampaignDetailPage — jobs board toggle (AH-054)', () => {
 
     expect(duration.value).toBe('4 weeks')
     expect(examples.value).toBe('https://example.com/refs')
+  })
+})
+
+// AH-114 S3.2 — the agency restyle of the detail page: header, tab bar, the Overview cards
+// and "At a glance". The DOM contract the older tests rely on (`campaign-detail-heading`,
+// `overview-description`, the tab anchors) is untouched; what moved is named below.
+describe('CampaignDetailPage — agency restyle (AH-114, S3.2)', () => {
+  let cleanup: (() => void) | null = null
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date(2026, 10, 2, 12, 0, 0))
+    vi.mocked(campaignsApi.listDrafts).mockResolvedValue({
+      data: [],
+      meta: { total: 0, page: 1, per_page: 25, last_page: 1 },
+    })
+    vi.mocked(campaignsApi.listApplications).mockResolvedValue({
+      data: [],
+      meta: { total: 3, page: 1, per_page: 1, last_page: 3, pending_total: 2 },
+    })
+  })
+
+  afterEach(() => {
+    cleanup?.()
+    cleanup = null
+    vi.useRealTimers()
+  })
+
+  async function open(
+    role: 'agency_admin' | 'agency_manager' | 'agency_staff' = 'agency_admin',
+    campaign: Partial<CampaignResource['attributes']> = {},
+  ) {
+    const harness = await mountDetail(role, [], { campaign })
+    cleanup = harness.cleanup
+    return harness.wrapper
+  }
+
+  const glanceRows = (wrapper: Awaited<ReturnType<typeof open>>) =>
+    wrapper.findAll('[data-test="overview-glance"] .agency-glance-row').map((r) => r.text())
+
+  it('header: the name, the status pill and a Brand · Starts line', async () => {
+    const wrapper = await open('agency_admin', {
+      status: 'active',
+      starts_at: '2026-11-09T00:00:00Z',
+    })
+
+    expect(wrapper.find('[data-test="campaign-detail-heading"]').text()).toBe('Summer launch')
+    expect(wrapper.find('[data-test="campaign-detail-status"]').text()).toBe('Active')
+    const line = wrapper.find('[data-test="campaign-detail-subtitle"]').text()
+    expect(line).toMatch(/^.+ {2}·\s+Starts Nov 9, 2026$/)
+  })
+
+  it('header: a campaign with no start date shows the brand alone', async () => {
+    const wrapper = await open()
+
+    const line = wrapper.find('[data-test="campaign-detail-subtitle"]').text()
+    expect(line).not.toContain('Starts')
+    expect(line).not.toContain('·')
+  })
+
+  it.each(['agency_admin', 'agency_manager', 'agency_staff'] as const)(
+    'header: %s sees Invite creators; it opens the dialog on the Creators tab',
+    async (role) => {
+      const wrapper = await open(role)
+
+      await wrapper.find('[data-test="campaign-detail-invite"]').trigger('click')
+      await flushPromises()
+
+      expect((wrapper.vm as unknown as { tab: string }).tab).toBe('creators')
+      expect(wrapper.findComponent(InviteCreatorsDialog).props('modelValue')).toBe(true)
+    },
+  )
+
+  it('header: the Creators tab keeps its own invite button', async () => {
+    const wrapper = await open()
+    ;(wrapper.vm as unknown as { tab: string }).tab = 'creators'
+    await flushPromises()
+
+    expect(wrapper.find('[data-test="invite-creators-open"]').exists()).toBe(true)
+  })
+
+  it('header: no Share brief, no Created by, no Edit button (nothing behind them)', async () => {
+    const wrapper = await open('agency_admin', { starts_at: '2026-11-09T00:00:00Z' })
+    const text = wrapper.text()
+
+    expect(text).not.toContain('Share brief')
+    expect(text).not.toContain('Created by')
+    expect(wrapper.findAll('button').some((b) => b.text() === 'Edit')).toBe(false)
+  })
+
+  it('the tab bar is the agency underline style and every tab is still there', async () => {
+    const wrapper = await open()
+
+    expect(wrapper.find('[data-test="campaign-tabs"]').classes()).toContain('agency-tabs')
+    for (const t of CAMPAIGN_DETAIL_TABS) {
+      expect(wrapper.find(`[data-test="tab-${t}"]`).exists(), t).toBe(true)
+    }
+  })
+
+  it('details card: brand, status, budget, start and end, in that order', async () => {
+    const wrapper = await open('agency_admin', {
+      status: 'active',
+      starts_at: '2026-11-09T00:00:00Z',
+      ends_at: '2027-01-01T00:00:00Z',
+    })
+
+    const labels = wrapper
+      .findAll('[data-test="overview-details-card"] .agency-fields .agency-field__label')
+      .map((l) => l.text())
+    expect(labels).toEqual(['Brand', 'Status', 'Budget', 'Start date', 'End date'])
+    expect(wrapper.find('[data-test="overview-status"]').text()).toBe('Active')
+    expect(wrapper.find('[data-test="overview-starts-at"]').text()).toBe('Nov 9, 2026')
+    expect(wrapper.find('[data-test="overview-ends-at"]').text()).toBe('Jan 1, 2027')
+    expect(wrapper.find('[data-test="overview-budget"]').text()).toContain('2,500')
+  })
+
+  it('details card: a missing date reads as a dash, not a blank', async () => {
+    const wrapper = await open()
+
+    expect(wrapper.find('[data-test="overview-starts-at"]').text()).toBe('—')
+  })
+
+  it('details card: no description, no description block', async () => {
+    const wrapper = await open('agency_admin', { description: null as unknown as string })
+
+    expect(wrapper.find('[data-test="overview-description"]').exists()).toBe(false)
+  })
+
+  it('settings card: the three switches read the campaign and cannot be flipped', async () => {
+    const wrapper = await open('agency_admin', {
+      requires_per_campaign_contract: true,
+      creator_posts_content: false,
+      listed_on_jobs_board: true,
+    })
+
+    const rows = wrapper.findAll('[data-test="overview-requirements-card"] .agency-switch-row')
+    expect(rows.map((r) => r.attributes('data-test'))).toEqual([
+      'overview-requirement-contract',
+      'overview-requirement-creator-posts',
+      'overview-requirement-job-board',
+    ])
+    const checked = (test: string) =>
+      (wrapper.find(`[data-test="${test}"] input`).element as HTMLInputElement).checked
+    expect(checked('overview-requires-contract')).toBe(true)
+    expect(checked('overview-creator-posts-content')).toBe(false)
+    expect(checked('overview-listed-on-jobs-board')).toBe(true)
+
+    await wrapper.find('[data-test="overview-creator-posts-content"] input').setValue(true)
+    expect(checked('overview-creator-posts-content')).toBe(false)
+  })
+
+  describe('At a glance (drawn only with two rows)', () => {
+    it('shows applications and days until start', async () => {
+      const wrapper = await open('agency_admin', { starts_at: '2026-11-09T00:00:00Z' })
+
+      expect(glanceRows(wrapper)).toEqual(['Applications2', 'Days until start7'])
+    })
+
+    it('counts days from the date part, whatever the time of day', async () => {
+      vi.setSystemTime(new Date(2026, 10, 2, 23, 59, 0))
+      const wrapper = await open('agency_admin', { starts_at: '2026-11-03T00:00:00Z' })
+
+      expect(glanceRows(wrapper)).toContain('Days until start1')
+    })
+
+    it('a start date that is today or past leaves one row, so no panel at all', async () => {
+      for (const startsAt of ['2026-11-02T00:00:00Z', '2026-10-01T00:00:00Z']) {
+        const wrapper = await open('agency_admin', { starts_at: startsAt })
+        expect(wrapper.find('[data-test="overview-glance"]').exists(), startsAt).toBe(false)
+        cleanup?.()
+      }
+    })
+
+    it('no start date: no panel', async () => {
+      const wrapper = await open()
+
+      expect(wrapper.find('[data-test="overview-glance"]').exists()).toBe(false)
+    })
+
+    it('a completed or cancelled campaign has nothing to count down to: no panel', async () => {
+      for (const status of ['completed', 'cancelled'] as const) {
+        const wrapper = await open('agency_admin', { status, starts_at: '2026-11-09T00:00:00Z' })
+        expect(wrapper.find('[data-test="overview-glance"]').exists(), status).toBe(false)
+        cleanup?.()
+      }
+    })
+
+    it('a failed applications count is not drawn as a zero: one row left, no panel', async () => {
+      vi.mocked(campaignsApi.listApplications).mockRejectedValue(new Error('network down'))
+      const wrapper = await open('agency_admin', { starts_at: '2026-11-09T00:00:00Z' })
+
+      expect(wrapper.find('[data-test="overview-glance"]').exists()).toBe(false)
+    })
+
+    it('a real zero is drawn as 0', async () => {
+      vi.mocked(campaignsApi.listApplications).mockResolvedValue({
+        data: [],
+        meta: { total: 0, page: 1, per_page: 1, last_page: 1, pending_total: 0 },
+      })
+      const wrapper = await open('agency_admin', { starts_at: '2026-11-09T00:00:00Z' })
+
+      expect(glanceRows(wrapper)).toContain('Applications0')
+    })
+
+    it('omits what the API cannot supply: creators confirmed, budget used, next steps', async () => {
+      const wrapper = await open('agency_admin', { starts_at: '2026-11-09T00:00:00Z' })
+      const text = wrapper.find('[data-test="overview-glance"]').text()
+
+      expect(text).not.toContain('Creators confirmed')
+      expect(text).not.toContain('Budget used')
+      expect(text).not.toContain('Next steps')
+    })
+  })
+
+  it('the page source holds no colour literal and none of the retired words', () => {
+    expect(pageSource).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
+    expect(pageSource).not.toMatch(/\brgba?\(/)
+    expect(pageSource).not.toMatch(/\bWave\b/)
   })
 })

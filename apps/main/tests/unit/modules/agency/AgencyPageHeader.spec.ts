@@ -1,5 +1,5 @@
 /**
- * AH-114 (S3.1) — `AgencyPageHeader`: the title is the page's h1 and carries the page's own
+ * AH-114 (S3.1, S3.2) — `AgencyPageHeader`: the title is the page's h1 and carries the page's own
  * anchor, the subtitle and the actions column render only when the page supplies them.
  * Type and spacing are pinned in a real browser by `tools/walk/pins-s31.mjs`.
  */
@@ -42,5 +42,25 @@ describe('AgencyPageHeader', () => {
       slots: { actions: '<button data-test="go">New</button>' },
     })
     expect(withActions.get('.agency-page-header__actions [data-test="go"]').text()).toBe('New')
+  })
+
+  it('puts a leading slot (the back button) before the text, in the same lead row', () => {
+    const wrapper = mount(AgencyPageHeader, {
+      props: { title: 'Summer launch' },
+      slots: { leading: '<button data-test="back">Back</button>' },
+    })
+    const lead = wrapper.get('.agency-page-header__lead')
+    expect(lead.element.firstElementChild?.getAttribute('data-test')).toBe('back')
+    expect(lead.element.lastElementChild?.classList.contains('agency-page-header__text')).toBe(true)
+  })
+
+  it('puts a title-suffix slot (the status pill) after the h1, in the heading row', () => {
+    const wrapper = mount(AgencyPageHeader, {
+      props: { title: 'Summer launch' },
+      slots: { 'title-suffix': '<span data-test="pill">Active</span>' },
+    })
+    const row = wrapper.get('.agency-page-header__heading')
+    expect(row.element.firstElementChild?.tagName).toBe('H1')
+    expect(row.element.lastElementChild?.getAttribute('data-test')).toBe('pill')
   })
 })

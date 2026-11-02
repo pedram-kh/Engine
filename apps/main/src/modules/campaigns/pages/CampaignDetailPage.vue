@@ -33,6 +33,8 @@ import { CEmptyState } from '@catalyst/ui'
 import CreatorProfileDialog from '@/components/CreatorProfileDialog.vue'
 import RichBrief from '@/components/RichBrief.vue'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
+import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
+import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
 import { campaignsApi } from '../api/campaigns.api'
 import CampaignForm from '../components/CampaignForm.vue'
 import { campaignTabFromQuery, DEFAULT_CAMPAIGN_TAB } from '../campaignTabs'
@@ -188,6 +190,8 @@ const draftsTabRef = ref<InstanceType<typeof DraftsTab> | null>(null)
 // `applicant_count`, which is interest semantics and would never clear.
 const applicationsTabRef = ref<InstanceType<typeof ApplicationsTab> | null>(null)
 const pendingApplications = ref(0)
+// The count is drawn in "At a glance" only once it is a real number: a failed read is not a zero.
+const pendingKnown = ref(false)
 const applicationsSnackbar = ref<string | null>(null)
 
 function onApplicationAnswered(message: string): void {
@@ -245,6 +249,17 @@ const ulid = computed(() => String(route.params.ulid))
 // opens the default. A second link to the SAME campaign changes only the query, so
 // the page watches it instead of assuming a fresh mount.
 const tab = ref<string>(campaignTabFromQuery(route.query.tab) ?? DEFAULT_CAMPAIGN_TAB)
+
+/**
+ * The header's "Invite creators" (AH-114 S3.2): the invite dialog lives with the Creators tab
+ * (it is mounted there, and a successful invite refreshes that list), so the button takes you
+ * to that tab and opens the dialog on it.
+ */
+function openInvite(): void {
+  tab.value = 'creators'
+  inviteDialog.value = true
+}
+
 watch(
   () => route.query.tab,
   (value) => {
@@ -398,9 +413,11 @@ async function loadPendingApplications(): Promise<void> {
   try {
     const res = await campaignsApi.listApplications(agencyId, ulid.value, { per_page: 1 })
     pendingApplications.value = res.meta.pending_total
+    pendingKnown.value = true
   } catch {
     // A failed count is not worth an error surface — the tab reports its own.
     pendingApplications.value = 0
+    pendingKnown.value = false
   }
 }
 
@@ -483,31 +500,147 @@ function formatMoney(minor: number | null, currency: string | null): string {
 function formatDay(iso: string | null): string {
   return iso ? formatDate(iso, locale.value) : '—'
 }
+
+// ── AH-114 (S3.2): the header line, and "At a glance" ───────────────────────────────────────
+
+/** "Brand  ·  Starts Oct 8, 2026": what the page knows about the campaign, in one line. */
+const headerLine = computed<string | null>(() => {
+  const c = campaign.value
+  if (c === null) return null
+  const parts = [c.relationships.brand.data.name]
+  if (c.attributes.starts_at !== null) {
+    parts.push(
+      t('app.campaigns.list.starts', { date: formatDate(c.attributes.starts_at, locale.value) }),
+    )
+  }
+  return parts.join('  ·  ')
+})
+
+/**
+ * Whole days from today (local) to the start date, read from the date part of `starts_at` so a
+ * time zone cannot move it by a day. `null` when there is no start date, it has passed, or the
+ * campaign is over (an ended campaign has nothing to count down to).
+ */
+const daysUntilStart = computed<number | null>(() => {
+  const c = campaign.value
+  const startsAt = c?.attributes.starts_at
+  if (c === null || startsAt === null || startsAt === undefined) return null
+  if (c.attributes.status === 'completed' || c.attributes.status === 'cancelled') return null
+  const [y, m, d] = startsAt.slice(0, 10).split('-').map(Number)
+  if (!y || !m || !d) return null
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
+  const days = Math.round((new Date(y, m - 1, d).getTime() - today) / 86_400_000)
+  return days >= 1 ? days : null
+})
+
+interface GlanceItem {
+  key: string
+  icon: string
+  label: string
+  value: string
+}
+
+/**
+ * The right panel (360, Figma "At a glance") holds only what the page can supply: the pending
+ * applications count and the days until start. The frame's "creators confirmed 0 of 6", "budget
+ * used" and "next steps" have no data behind them (ruling 15). With fewer than two rows left the
+ * panel is not drawn at all (P5): one row alone is not a panel.
+ */
+const glanceItems = computed<GlanceItem[]>(() => {
+  const items: GlanceItem[] = []
+  if (pendingKnown.value) {
+    items.push({
+      key: 'applications',
+      icon: 'mdi-file-document-outline',
+      label: t('app.campaigns.tabs.applications'),
+      value: String(pendingApplications.value),
+    })
+  }
+  if (daysUntilStart.value !== null) {
+    items.push({
+      key: 'days-until-start',
+      icon: 'mdi-calendar-outline',
+      label: t('app.campaigns.detail.glance.daysUntilStart'),
+      value: String(daysUntilStart.value),
+    })
+  }
+  return items
+})
+const showGlance = computed(() => glanceItems.value.length >= 2)
+
+interface RequirementRow {
+  key: string
+  label: string
+  value: boolean
+  test: string
+}
+
+/** The three on/off campaign settings, in the Figma "Requirements" card's order. */
+const requirementRows = computed<RequirementRow[]>(() => {
+  const c = campaign.value
+  if (c === null) return []
+  return [
+    {
+      key: 'contract',
+      label: t('app.campaigns.fields.requiresContract'),
+      value: c.attributes.requires_per_campaign_contract === true,
+      test: 'overview-requires-contract',
+    },
+    {
+      key: 'creator-posts',
+      label: t('app.campaigns.fields.creatorPostsContent'),
+      value: c.attributes.creator_posts_content === true,
+      test: 'overview-creator-posts-content',
+    },
+    {
+      key: 'job-board',
+      label: t('app.campaigns.fields.listedOnJobsBoard'),
+      value: c.attributes.listed_on_jobs_board === true,
+      test: 'overview-listed-on-jobs-board',
+    },
+  ]
+})
 </script>
 
 <template>
-  <div data-test="campaign-detail-page">
-    <div class="d-flex align-center mb-4">
-      <v-btn
-        icon="mdi-arrow-left"
-        variant="text"
-        size="small"
-        :to="{ name: 'campaigns.list' }"
-        class="mr-2"
-        :aria-label="t('app.campaigns.actions.backToList')"
-      />
-      <h1 class="text-h5 ma-0" data-test="campaign-detail-heading">
-        {{ campaign?.attributes.name ?? t('app.campaigns.detail.title') }}
-      </h1>
-    </div>
-
-    <v-alert
-      v-if="error"
-      type="error"
-      variant="tonal"
-      class="mb-4"
-      data-test="campaign-detail-error"
+  <div class="agency-page agency-page--snug" data-test="campaign-detail-page">
+    <AgencyPageHeader
+      :title="campaign?.attributes.name ?? t('app.campaigns.detail.title')"
+      :subtitle="headerLine"
+      title-test="campaign-detail-heading"
+      subtitle-test="campaign-detail-subtitle"
     >
+      <template #leading>
+        <v-btn
+          icon="mdi-arrow-left"
+          variant="text"
+          :to="{ name: 'campaigns.list' }"
+          class="agency-icon-square"
+          :aria-label="t('app.campaigns.actions.backToList')"
+          data-test="campaign-detail-back"
+        />
+      </template>
+      <template v-if="campaign" #title-suffix>
+        <AgencyStatusPill
+          kind="campaign"
+          :status="campaign.attributes.status"
+          data-test="campaign-detail-status"
+        />
+      </template>
+      <template v-if="campaign && canInvite" #actions>
+        <v-btn
+          color="primary"
+          variant="flat"
+          data-test="campaign-detail-invite"
+          @click="openInvite"
+        >
+          {{ t('app.campaigns.invite.open') }}
+        </v-btn>
+      </template>
+    </AgencyPageHeader>
+
+    <v-alert v-if="error" type="error" variant="tonal" data-test="campaign-detail-error">
       {{ error }}
     </v-alert>
 
@@ -518,7 +651,7 @@ function formatDay(iso: string | null): string {
     />
 
     <template v-else-if="campaign">
-      <v-tabs v-model="tab" class="mb-4" data-test="campaign-tabs">
+      <v-tabs v-model="tab" class="agency-tabs" data-test="campaign-tabs">
         <v-tab value="overview" data-test="tab-overview">{{
           t('app.campaigns.tabs.overview')
         }}</v-tab>
@@ -554,93 +687,111 @@ function formatDay(iso: string | null): string {
       <v-window v-model="tab">
         <!-- Overview -->
         <v-window-item value="overview" data-test="panel-overview">
-          <v-card class="pa-4" max-width="720">
-            <v-list density="comfortable">
-              <v-list-item
-                :title="t('app.campaigns.fields.name')"
-                :subtitle="campaign.attributes.name"
-                data-test="overview-name"
-              />
-              <v-list-item
-                :title="t('app.campaigns.fields.brand')"
-                :subtitle="campaign.relationships.brand.data.name"
-              />
-              <v-list-item :title="t('app.campaigns.fields.status')">
-                <template #subtitle>
-                  <v-chip size="small" variant="tonal" data-test="overview-status">
-                    {{ t(`app.campaigns.status.${campaign.attributes.status}`) }}
-                  </v-chip>
+          <div class="agency-detail" :class="{ 'agency-detail--with-panel': showGlance }">
+            <div class="agency-detail__main">
+              <section class="agency-card" data-test="overview-details-card">
+                <h2 class="agency-card__title">{{ t('app.campaigns.detail.title') }}</h2>
+
+                <dl class="agency-fields">
+                  <div class="agency-field">
+                    <dt class="agency-field__label">{{ t('app.campaigns.fields.brand') }}</dt>
+                    <dd class="agency-field__value" data-test="overview-brand">
+                      {{ campaign.relationships.brand.data.name }}
+                    </dd>
+                  </div>
+                  <div class="agency-field">
+                    <dt class="agency-field__label">{{ t('app.campaigns.fields.status') }}</dt>
+                    <dd class="agency-field__value">
+                      <AgencyStatusPill
+                        kind="campaign"
+                        :status="campaign.attributes.status"
+                        data-test="overview-status"
+                      />
+                    </dd>
+                  </div>
+                  <div class="agency-field">
+                    <dt class="agency-field__label">{{ t('app.campaigns.fields.budget') }}</dt>
+                    <dd class="agency-field__value" data-test="overview-budget">
+                      {{
+                        formatMoney(
+                          campaign.attributes.budget_minor_units,
+                          campaign.attributes.budget_currency,
+                        )
+                      }}
+                    </dd>
+                  </div>
+                  <div class="agency-field">
+                    <dt class="agency-field__label">{{ t('app.campaigns.fields.startsAt') }}</dt>
+                    <dd class="agency-field__value" data-test="overview-starts-at">
+                      {{ formatDay(campaign.attributes.starts_at) }}
+                    </dd>
+                  </div>
+                  <div class="agency-field">
+                    <dt class="agency-field__label">{{ t('app.campaigns.fields.endsAt') }}</dt>
+                    <dd class="agency-field__value" data-test="overview-ends-at">
+                      {{ formatDay(campaign.attributes.ends_at) }}
+                    </dd>
+                  </div>
+                </dl>
+
+                <template v-if="campaign.attributes.description">
+                  <hr class="agency-card__rule" />
+                  <div class="agency-field overview-description" data-test="overview-description">
+                    <h3 class="agency-field__label">
+                      {{ t('app.campaigns.fields.description') }}
+                    </h3>
+                    <!-- Minimal rich text (AH-081) via RichBrief. -->
+                    <RichBrief
+                      :text="campaign.attributes.description"
+                      class="overview-description__text agency-field__text"
+                    />
+                  </div>
                 </template>
-              </v-list-item>
-              <v-list-item
-                :title="t('app.campaigns.fields.budget')"
-                :subtitle="
-                  formatMoney(
-                    campaign.attributes.budget_minor_units,
-                    campaign.attributes.budget_currency,
-                  )
-                "
-              />
-              <v-list-item
-                :title="t('app.campaigns.fields.startsAt')"
-                :subtitle="formatDay(campaign.attributes.starts_at)"
-                data-test="overview-starts-at"
-              />
-              <v-list-item
-                :title="t('app.campaigns.fields.endsAt')"
-                :subtitle="formatDay(campaign.attributes.ends_at)"
-                data-test="overview-ends-at"
-              />
-              <v-list-item
-                v-if="campaign.attributes.description"
-                class="overview-description"
-                :title="t('app.campaigns.fields.description')"
-                data-test="overview-description"
-              >
-                <template #subtitle>
-                  <!-- Minimal rich text (AH-081) via RichBrief. -->
-                  <RichBrief
-                    :text="campaign.attributes.description"
-                    class="overview-description__text"
+              </section>
+
+              <!-- The three campaign settings, read-only here: they are edited in Settings
+                   (and the job board one from the list). -->
+              <section class="agency-card" data-test="overview-requirements-card">
+                <h2 class="agency-card__title">{{ t('app.campaigns.tabs.settings') }}</h2>
+                <div
+                  v-for="row in requirementRows"
+                  :key="row.key"
+                  class="agency-switch-row"
+                  :data-test="`overview-requirement-${row.key}`"
+                >
+                  <span class="agency-switch-row__label">{{ row.label }}</span>
+                  <v-switch
+                    :model-value="row.value"
+                    readonly
+                    inset
+                    hide-details
+                    density="compact"
+                    color="primary"
+                    :aria-label="row.label"
+                    :data-test="row.test"
                   />
-                </template>
-              </v-list-item>
-              <v-list-item :title="t('app.campaigns.fields.requiresContract')">
-                <template #subtitle>
-                  <v-icon
-                    :icon="
-                      campaign.attributes.requires_per_campaign_contract
-                        ? 'mdi-check-circle'
-                        : 'mdi-minus-circle-outline'
-                    "
-                    :color="
-                      campaign.attributes.requires_per_campaign_contract
-                        ? 'success'
-                        : 'medium-emphasis'
-                    "
-                    size="small"
-                    data-test="overview-requires-contract"
-                  />
-                </template>
-              </v-list-item>
-              <v-list-item :title="t('app.campaigns.fields.creatorPostsContent')">
-                <template #subtitle>
-                  <v-icon
-                    :icon="
-                      campaign.attributes.creator_posts_content
-                        ? 'mdi-check-circle'
-                        : 'mdi-minus-circle-outline'
-                    "
-                    :color="
-                      campaign.attributes.creator_posts_content ? 'success' : 'medium-emphasis'
-                    "
-                    size="small"
-                    data-test="overview-creator-posts-content"
-                  />
-                </template>
-              </v-list-item>
-            </v-list>
-          </v-card>
+                </div>
+              </section>
+            </div>
+
+            <aside v-if="showGlance" class="agency-detail__panel" data-test="overview-glance">
+              <section class="agency-card">
+                <h2 class="agency-card__title">{{ t('app.campaigns.detail.glance.title') }}</h2>
+                <div
+                  v-for="item in glanceItems"
+                  :key="item.key"
+                  class="agency-glance-row"
+                  :data-test="`overview-glance-${item.key}`"
+                >
+                  <span class="agency-glance-row__tile" aria-hidden="true">
+                    <v-icon :icon="item.icon" size="16" />
+                  </span>
+                  <span class="agency-glance-row__label">{{ item.label }}</span>
+                  <span class="agency-glance-row__value">{{ item.value }}</span>
+                </div>
+              </section>
+            </aside>
+          </div>
         </v-window-item>
 
         <!-- Attachments (Campaign attachments from the Files library, chunk B,
@@ -1142,19 +1293,6 @@ function formatDay(iso: string | null): string {
 </template>
 
 <style scoped>
-/* The Overview description must render in full — override Vuetify's default
-   single-line clamp on list subtitles (white-space: nowrap + ellipsis). */
-.overview-description :deep(.v-list-item-subtitle) {
-  white-space: normal;
-  overflow: visible;
-  -webkit-line-clamp: unset;
-  opacity: 1;
-}
-
-.overview-description :deep(.v-list-item__content) {
-  overflow: visible;
-}
-
 .overview-description__text {
   /* RichBrief's own <p>/<br> markup owns line breaks now (AH-081) — pre-wrap
      would additionally render the sanitized HTML's literal whitespace

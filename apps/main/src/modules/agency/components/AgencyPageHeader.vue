@@ -6,7 +6,8 @@
  *
  * The subtitle renders only when the page has one (no empty line, no placeholder): a page
  * whose number is not loaded yet passes nothing. Actions come in through the `actions`
- * slot; a page with none gets no empty column.
+ * slot; a page with none gets no empty column. A detail page adds a `leading` slot (the back
+ * button, 16 before the text) and a `title-suffix` slot (the status pill, 12 after the title).
  *
  * `titleTest` and `subtitleTest` carry the page's own `data-test` anchors, so a page
  * swapping its heading for this component keeps its specs.
@@ -22,15 +23,21 @@ defineProps<{
 
 <template>
   <header class="agency-page-header" data-test="agency-page-header">
-    <div class="agency-page-header__text">
-      <h1 class="agency-page-header__title" :data-test="titleTest">{{ title }}</h1>
-      <p
-        v-if="subtitle !== undefined && subtitle !== null && subtitle !== ''"
-        class="agency-page-header__subtitle"
-        :data-test="subtitleTest"
-      >
-        {{ subtitle }}
-      </p>
+    <div class="agency-page-header__lead">
+      <slot name="leading" />
+      <div class="agency-page-header__text">
+        <div class="agency-page-header__heading">
+          <h1 class="agency-page-header__title" :data-test="titleTest">{{ title }}</h1>
+          <slot name="title-suffix" />
+        </div>
+        <p
+          v-if="subtitle !== undefined && subtitle !== null && subtitle !== ''"
+          class="agency-page-header__subtitle"
+          :data-test="subtitleTest"
+        >
+          {{ subtitle }}
+        </p>
+      </div>
     </div>
     <div v-if="$slots.actions" class="agency-page-header__actions">
       <slot name="actions" />
@@ -46,10 +53,24 @@ defineProps<{
   gap: var(--space-4, 16px);
 }
 
+.agency-page-header__lead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4, 16px);
+  min-width: 0;
+}
+
 .agency-page-header__text {
   display: flex;
   flex-direction: column;
   gap: var(--space-1, 4px);
+  min-width: 0;
+}
+
+.agency-page-header__heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
   min-width: 0;
 }
 
