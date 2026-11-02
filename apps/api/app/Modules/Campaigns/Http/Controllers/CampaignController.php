@@ -71,6 +71,7 @@ final class CampaignController
                 'page' => $paginator->currentPage(),
                 'per_page' => $paginator->perPage(),
                 'last_page' => $paginator->lastPage(),
+                'status_counts' => $this->statusCounts($request, $agency),
             ],
         ]);
     }
@@ -330,6 +331,51 @@ final class CampaignController
                 'creator_is_erased' => $card->assignment?->creator?->isErased() ?? false,
             ])
             ->values();
+    }
+
+    /**
+     * The per-status breakdown the Campaigns list shows on its status tabs
+     * and in its "N total, M active" summary (AH-116, item 1).
+     *
+     * One grouped `COUNT(*)` over the same agency-scoped, soft-delete-aware
+     * base the list uses. It applies the BRAND and DATE filters, so a filter
+     * narrows the counts exactly as it narrows the list, and it does NOT apply
+     * the STATUS filter: each tab shows what it would contain, which a count
+     * that collapsed to the selected status could never do. Break-revert: call
+     * applyStatusFilter here and the counts collapse to one non-zero key.
+     *
+     * Zero-filled over every CampaignStatus case so the client reads five
+     * integers, never an absent key. Cast to int because Postgres returns
+     * COUNT as a string through some PDO modes.
+     *
+     * @return array<string, int>
+     */
+    private function statusCounts(Request $request, Agency $agency): array
+    {
+        $query = Campaign::query()->where('campaigns.agency_id', $agency->id);
+
+        $this->applyBrandFilter($query, $request, $agency);
+        $this->applyDateFilters($query, $request);
+
+        $counts = [];
+        foreach (CampaignStatus::cases() as $case) {
+            $counts[$case->value] = 0;
+        }
+
+        $rows = $query->toBase()
+            ->select('campaigns.status')
+            ->selectRaw('COUNT(*) as aggregate')
+            ->groupBy('campaigns.status')
+            ->get();
+
+        foreach ($rows as $row) {
+            $status = (string) $row->status;
+            if (array_key_exists($status, $counts)) {
+                $counts[$status] = (int) $row->aggregate;
+            }
+        }
+
+        return $counts;
     }
 
     /**

@@ -9,6 +9,7 @@ use App\Modules\Campaigns\Enums\CampaignStatus;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
@@ -229,6 +230,152 @@ it('still lists + shows a campaign whose brand was ARCHIVED (soft-deleted) — t
     $this->actingAs($admin)->getJson(campaignsUrl($agency)."/{$campaign->ulid}")
         ->assertOk()
         ->assertJsonPath('data.relationships.brand.data.name', 'Bolt Food');
+});
+
+// ── List: meta.status_counts (AH-116, item 1) ────────────────────────────────
+
+/**
+ * Seed one campaign per status/count spec for an agency and return the admin.
+ *
+ * @param  array<string, int>  $perStatus  status value => how many to create
+ */
+function seedStatusMix(Agency $agency, array $perStatus, ?Brand $brand = null, ?string $startsAt = null): void
+{
+    foreach ($perStatus as $status => $count) {
+        for ($i = 0; $i < $count; $i++) {
+            $attributes = ['status' => CampaignStatus::from($status)];
+            if ($brand !== null) {
+                $attributes['brand_id'] = $brand->id;
+            }
+            if ($startsAt !== null) {
+                $attributes['starts_at'] = $startsAt;
+            }
+            Campaign::factory()->forAgency($agency->id)->create($attributes);
+        }
+    }
+}
+
+it('returns status_counts with exactly the five statuses, zero-filled, for an agency with no campaigns', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+
+    $response = $this->actingAs($admin)->getJson(campaignsUrl($agency))->assertOk();
+
+    expect($response->json('meta.status_counts'))->toBe([
+        'draft' => 0,
+        'active' => 0,
+        'paused' => 0,
+        'completed' => 0,
+        'cancelled' => 0,
+    ]);
+});
+
+it('counts campaigns per status, and the counts sum to meta.total when no filter is applied', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    seedStatusMix($agency, ['draft' => 2, 'active' => 3, 'paused' => 1, 'completed' => 4, 'cancelled' => 1]);
+
+    $response = $this->actingAs($admin)->getJson(campaignsUrl($agency))->assertOk();
+
+    $counts = $response->json('meta.status_counts');
+    expect($counts)->toBe(['draft' => 2, 'active' => 3, 'paused' => 1, 'completed' => 4, 'cancelled' => 1])
+        ->and(array_sum($counts))->toBe($response->json('meta.total'));
+    foreach ($counts as $value) {
+        expect($value)->toBeInt();
+    }
+});
+
+it('never counts another agency\'s campaigns (tenancy negative)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $other = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    seedStatusMix($agency, ['active' => 1]);
+    seedStatusMix($other, ['draft' => 3, 'active' => 5, 'paused' => 2, 'completed' => 2, 'cancelled' => 2]);
+
+    $this->actingAs($admin)->getJson(campaignsUrl($agency))
+        ->assertOk()
+        ->assertJsonPath('meta.status_counts', ['draft' => 0, 'active' => 1, 'paused' => 0, 'completed' => 0, 'cancelled' => 0]);
+});
+
+it('does not count soft-deleted campaigns (the same exclusion as the list)', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    seedStatusMix($agency, ['active' => 2]);
+    Campaign::factory()->forAgency($agency->id)->create(['status' => CampaignStatus::Active])->delete();
+
+    $response = $this->actingAs($admin)->getJson(campaignsUrl($agency))->assertOk();
+
+    expect($response->json('meta.status_counts.active'))->toBe(2)
+        ->and($response->json('meta.total'))->toBe(2);
+});
+
+it('ignores the status filter: every tab shows what it would contain', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    seedStatusMix($agency, ['draft' => 2, 'active' => 3]);
+
+    $response = $this->actingAs($admin)->getJson(campaignsUrl($agency, 'status=active'))->assertOk();
+
+    expect($response->json('meta.total'))->toBe(3)
+        ->and($response->json('meta.status_counts'))->toBe(['draft' => 2, 'active' => 3, 'paused' => 0, 'completed' => 0, 'cancelled' => 0]);
+});
+
+it('narrows the counts by the brand filter, and an unknown brand gives all zeros', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    $brandA = Brand::factory()->forAgency($agency->id)->createOne();
+    $brandB = Brand::factory()->forAgency($agency->id)->createOne();
+    seedStatusMix($agency, ['active' => 2, 'draft' => 1], $brandA);
+    seedStatusMix($agency, ['active' => 5], $brandB);
+
+    $this->actingAs($admin)->getJson(campaignsUrl($agency, "brand={$brandA->ulid}"))
+        ->assertJsonPath('meta.status_counts', ['draft' => 1, 'active' => 2, 'paused' => 0, 'completed' => 0, 'cancelled' => 0]);
+
+    $this->actingAs($admin)->getJson(campaignsUrl($agency, 'brand=01ARZ3NDEKTSV4RRFFQ69G5FAV'))
+        ->assertJsonPath('meta.total', 0)
+        ->assertJsonPath('meta.status_counts', ['draft' => 0, 'active' => 0, 'paused' => 0, 'completed' => 0, 'cancelled' => 0]);
+});
+
+it('narrows the counts by the date filters', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    seedStatusMix($agency, ['active' => 2], null, '2026-07-01');
+    seedStatusMix($agency, ['active' => 1, 'draft' => 1], null, '2026-09-01');
+
+    $this->actingAs($admin)->getJson(campaignsUrl($agency, 'starts_from=2026-08-01'))
+        ->assertJsonPath('meta.status_counts', ['draft' => 1, 'active' => 1, 'paused' => 0, 'completed' => 0, 'cancelled' => 0]);
+
+    $this->actingAs($admin)->getJson(campaignsUrl($agency, 'starts_to=2026-07-31'))
+        ->assertJsonPath('meta.status_counts', ['draft' => 0, 'active' => 2, 'paused' => 0, 'completed' => 0, 'cancelled' => 0]);
+});
+
+it('counts a campaign whose brand was archived, as the list returns it', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    $brand = Brand::factory()->forAgency($agency->id)->createOne();
+    seedStatusMix($agency, ['active' => 1], $brand);
+    $brand->delete();
+
+    $this->actingAs($admin)->getJson(campaignsUrl($agency))
+        ->assertOk()
+        ->assertJsonPath('meta.total', 1)
+        ->assertJsonPath('meta.status_counts.active', 1);
+});
+
+it('adds exactly one grouped query to the list request', function (): void {
+    $agency = Agency::factory()->createOne();
+    $admin = User::factory()->agencyAdmin($agency)->createOne();
+    seedStatusMix($agency, ['draft' => 1, 'active' => 1, 'completed' => 1]);
+
+    $this->actingAs($admin);
+    DB::enableQueryLog();
+    $this->getJson(campaignsUrl($agency))->assertOk();
+    $grouped = collect(DB::getQueryLog())
+        ->filter(fn (array $q): bool => str_contains(strtolower((string) $q['query']), 'group by')
+            && str_contains(strtolower((string) $q['query']), 'campaigns'));
+    DB::disableQueryLog();
+
+    expect($grouped)->toHaveCount(1);
 });
 
 // ── Show / tenancy ────────────────────────────────────────────────────────────
