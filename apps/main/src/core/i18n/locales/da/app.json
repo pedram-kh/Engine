@@ -87,7 +87,12 @@
           "loadMore": "Indlæs flere",
           "loadError": "Vi kunne ikke indlæse dine kontakter. Prøv igen.",
           "close": "Luk"
-        }
+        },
+        "inboxSearch": "Søg efter skabere eller beskeder",
+        "inboxUnreadPill": "{count} ulæst | {count} ulæste",
+        "inboxFilterAll": "Alle",
+        "inboxFilterUnread": "Ulæste",
+        "inboxNoMatch": "Ingen samtaler matcher."
       }
     },
     "nav": {

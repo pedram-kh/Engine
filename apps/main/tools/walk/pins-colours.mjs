@@ -7,6 +7,7 @@ export const RGB = {
   dark: {
     canvas: 'rgb(11, 11, 12)',
     surface: 'rgb(27, 27, 29)',
+    sidebar: 'rgb(21, 21, 22)',
     raised: 'rgb(35, 35, 38)',
     outline: 'rgb(58, 58, 64)',
     onSurface: 'rgb(237, 237, 237)',
@@ -36,6 +37,7 @@ export const RGB = {
   light: {
     canvas: 'rgb(244, 244, 245)',
     surface: 'rgb(255, 255, 255)',
+    sidebar: 'rgb(250, 250, 250)',
     raised: 'rgb(244, 244, 245)',
     outline: 'rgb(212, 212, 216)',
     onSurface: 'rgb(24, 24, 27)',

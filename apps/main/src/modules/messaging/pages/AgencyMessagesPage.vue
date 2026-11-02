@@ -22,7 +22,10 @@ import { useAgencyStore } from '@/core/stores/useAgencyStore'
 
 import { relationshipMessagingApi } from '../api/relationshipMessaging.api'
 import ContactPicker, { type ContactPickerItem } from '../components/ContactPicker.vue'
-import RelationshipInbox, { type RelationshipInboxItem } from '../components/RelationshipInbox.vue'
+import AgencyRelationshipInbox, {
+  type AgencyInboxItem,
+  type AgencyInboxLabels,
+} from '@/modules/agency/components/AgencyRelationshipInbox.vue'
 import { creatorAvatarUrl, creatorLabel } from '@/core/creators/creatorLabel'
 
 const { t } = useI18n()
@@ -39,6 +42,15 @@ const hasSelection = computed(() => activeCreatorUlid.value !== '')
 const showList = computed(() => isDesktop.value || !hasSelection.value)
 const showDetail = computed(() => isDesktop.value || hasSelection.value)
 
+// S3.4 — the words the inbox header switches its search, unread pill and All / Unread toggle on with.
+const inboxLabels = computed<AgencyInboxLabels>(() => ({
+  search: t('app.messaging.relationship.inboxSearch'),
+  unreadPill: (count: number) => t('app.messaging.relationship.inboxUnreadPill', { count }, count),
+  all: t('app.messaging.relationship.inboxFilterAll'),
+  unread: t('app.messaging.relationship.inboxFilterUnread'),
+  noMatch: t('app.messaging.relationship.inboxNoMatch'),
+}))
+
 const INBOX_POLL_INTERVAL_MS = 45000
 const PICKER_PER_PAGE = 25
 const SEARCH_DEBOUNCE_MS = 300
@@ -50,7 +62,7 @@ const loadError = ref(false)
 let cancelled = false
 let timer: ReturnType<typeof setTimeout> | null = null
 
-const items = computed<RelationshipInboxItem[]>(() =>
+const items = computed<AgencyInboxItem[]>(() =>
   rows.value
     .filter((row) => row.attributes.creator.id !== null)
     .map((row) => {
@@ -223,29 +235,14 @@ onBeforeUnmount(() => {
     :class="{ 'msg-shell--split': isDesktop }"
   >
     <div v-if="showList" class="msg-shell__list" data-test="messages-list-pane">
-      <header class="msg-shell__list-header">
-        <h1 class="text-h6 ma-0">{{ t('app.messaging.relationship.inboxTitle') }}</h1>
-        <v-btn
-          color="primary"
-          variant="tonal"
-          size="small"
-          prepend-icon="mdi-message-plus-outline"
-          data-test="agency-new-conversation"
-          @click="openPicker"
-        >
-          {{ t('app.messaging.relationship.newConversation') }}
-        </v-btn>
-      </header>
-
-      <div class="msg-shell__list-body">
-        <RelationshipInbox
-          :items="items"
-          :loading="loading"
-          :load-error="loadError"
-          :active-id="activeCreatorUlid"
-          @start="openPicker"
-        />
-      </div>
+      <AgencyRelationshipInbox
+        :items="items"
+        :loading="loading"
+        :load-error="loadError"
+        :active-id="activeCreatorUlid"
+        :labels="inboxLabels"
+        @start="openPicker"
+      />
     </div>
 
     <div v-if="showDetail" class="msg-shell__detail" data-test="messages-detail-pane">
@@ -275,45 +272,34 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-/* AH-013 — desktop two-pane (WhatsApp Web). Mobile falls back to plain flow
-   (single pane at a time), so the split rules are gated on .msg-shell--split. */
-.msg-shell--split {
+/* S3.4 — full-bleed (the layout drops its padding on this route). The shell is the viewport below
+   the app bar. Desktop: a 460px list pane on the sidebar fill with a right border, the thread
+   taking the rest. Below md one pane at a time, filling the width. */
+.msg-shell {
   display: flex;
-  gap: 24px;
-  height: calc(100vh - 150px);
-  min-height: 420px;
+  height: calc(100dvh - var(--v-layout-top, 0px));
+  min-height: 0;
 }
 
 .msg-shell__list {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
+  min-width: 0;
   min-height: 0;
+  background-color: rgb(var(--v-theme-sidebar));
 }
 
 .msg-shell--split .msg-shell__list {
-  flex: 0 0 340px;
-  max-width: 340px;
-  border-right: 1px solid rgba(var(--v-theme-on-surface), 0.08);
-  padding-right: 8px;
-}
-
-.msg-shell__list-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.msg-shell__list-body {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
+  flex: 0 0 460px;
+  max-width: 460px;
+  border-right: 1px solid rgb(var(--v-theme-border-color));
 }
 
 .msg-shell__detail {
   flex: 1 1 auto;
   min-width: 0;
+  min-height: 0;
 }
 
 .msg-shell__placeholder {
@@ -322,8 +308,7 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
   height: 100%;
-  min-height: 320px;
-  opacity: 0.55;
+  color: rgb(var(--v-theme-on-surface-variant));
   text-align: center;
 }
 </style>

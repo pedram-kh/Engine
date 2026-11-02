@@ -87,7 +87,12 @@
           "loadMore": "Cargar más",
           "loadError": "No pudimos cargar tus contactos. Inténtalo de nuevo.",
           "close": "Cerrar"
-        }
+        },
+        "inboxSearch": "Buscar creadores o mensajes",
+        "inboxUnreadPill": "{count} sin leer | {count} sin leer",
+        "inboxFilterAll": "Todas",
+        "inboxFilterUnread": "Sin leer",
+        "inboxNoMatch": "Ninguna conversación coincide."
       }
     },
     "nav": {

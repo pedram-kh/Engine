@@ -87,7 +87,12 @@
           "loadMore": "Lataa lisää",
           "loadError": "Yhteystietojesi lataaminen epäonnistui. Yritä uudelleen.",
           "close": "Sulje"
-        }
+        },
+        "inboxSearch": "Hae tekijöitä tai viestejä",
+        "inboxUnreadPill": "{count} lukematon | {count} lukematonta",
+        "inboxFilterAll": "Kaikki",
+        "inboxFilterUnread": "Lukemattomat",
+        "inboxNoMatch": "Ei hakua vastaavia keskusteluja."
       }
     },
     "nav": {

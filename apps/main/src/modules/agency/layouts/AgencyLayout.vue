@@ -27,9 +27,9 @@
  * stylesheet is scoped to those two theme classes (see `agency.css`).
  */
 
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
 import ThemeToggle from '@/components/ThemeToggle.vue'
@@ -54,6 +54,12 @@ const agencyTheme = useAgencyTheme()
 const { t, locale } = useI18n()
 const { selectLocale } = useLocaleSwitch()
 const router = useRouter()
+const route = useRoute()
+
+// S3.4 — Messages is a full-bleed two-pane surface (the list pane meets the sidebar, the thread
+// meets the right edge), so its container drops the page padding. Keyed on the route NAME so
+// no shared route file is touched.
+const fullBleed = computed(() => route.matched.some((r) => r.name === 'messages.inbox'))
 const agencyStore = useAgencyStore()
 const authStore = useAuthStore()
 
@@ -236,7 +242,7 @@ async function onSwitchAgency(agencyId: string): Promise<void> {
 
     <!-- ─── Main content ──────────────────────────────────────── -->
     <v-main data-test="agency-main">
-      <v-container fluid class="pa-6 pa-md-8">
+      <v-container fluid :class="fullBleed ? 'pa-0' : 'pa-6 pa-md-8'">
         <slot />
       </v-container>
     </v-main>

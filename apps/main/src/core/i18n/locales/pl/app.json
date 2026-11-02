@@ -87,7 +87,12 @@
           "loadMore": "Załaduj więcej",
           "loadError": "Nie udało się załadować kontaktów. Spróbuj ponownie.",
           "close": "Zamknij"
-        }
+        },
+        "inboxSearch": "Szukaj twórców lub wiadomości",
+        "inboxUnreadPill": "{count} nieprzeczytana | {count} nieprzeczytane",
+        "inboxFilterAll": "Wszystkie",
+        "inboxFilterUnread": "Nieprzeczytane",
+        "inboxNoMatch": "Brak pasujących rozmów."
       }
     },
     "nav": {

@@ -87,7 +87,12 @@
           "loadMore": "Načítať viac",
           "loadError": "Nepodarilo sa načítať vaše kontakty. Skúste to znova.",
           "close": "Zavrieť"
-        }
+        },
+        "inboxSearch": "Hľadať tvorcov alebo správy",
+        "inboxUnreadPill": "{count} neprečítaná | {count} neprečítaných",
+        "inboxFilterAll": "Všetky",
+        "inboxFilterUnread": "Neprečítané",
+        "inboxNoMatch": "Žiadne zodpovedajúce konverzácie."
       }
     },
     "nav": {

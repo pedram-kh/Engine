@@ -87,7 +87,12 @@
           "loadMore": "Mehr laden",
           "loadError": "Wir konnten deine Kontakte nicht laden. Bitte versuche es erneut.",
           "close": "Schließen"
-        }
+        },
+        "inboxSearch": "Creator oder Nachrichten suchen",
+        "inboxUnreadPill": "{count} ungelesen | {count} ungelesen",
+        "inboxFilterAll": "Alle",
+        "inboxFilterUnread": "Ungelesen",
+        "inboxNoMatch": "Keine Unterhaltungen gefunden."
       }
     },
     "nav": {

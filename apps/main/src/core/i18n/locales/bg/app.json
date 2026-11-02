@@ -87,7 +87,12 @@
           "loadMore": "Зареди още",
           "loadError": "Не успяхме да заредим контактите ви. Моля, опитайте отново.",
           "close": "Затвори"
-        }
+        },
+        "inboxSearch": "Търсене на създатели или съобщения",
+        "inboxUnreadPill": "{count} непрочетен | {count} непрочетени",
+        "inboxFilterAll": "Всички",
+        "inboxFilterUnread": "Непрочетени",
+        "inboxNoMatch": "Няма съвпадащи разговори."
       }
     },
     "nav": {

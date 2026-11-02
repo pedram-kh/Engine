@@ -87,7 +87,12 @@
           "loadMore": "Meer laden",
           "loadError": "We konden je contacten niet laden. Probeer het opnieuw.",
           "close": "Sluiten"
-        }
+        },
+        "inboxSearch": "Zoek makers of berichten",
+        "inboxUnreadPill": "{count} ongelezen | {count} ongelezen",
+        "inboxFilterAll": "Alles",
+        "inboxFilterUnread": "Ongelezen",
+        "inboxNoMatch": "Geen gesprekken gevonden."
       }
     },
     "nav": {

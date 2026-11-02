@@ -87,7 +87,12 @@
           "loadMore": "Încarcă mai multe",
           "loadError": "Nu am putut încărca contactele. Încearcă din nou.",
           "close": "Închide"
-        }
+        },
+        "inboxSearch": "Caută creatori sau mesaje",
+        "inboxUnreadPill": "{count} necitită | {count} necitite",
+        "inboxFilterAll": "Toate",
+        "inboxFilterUnread": "Necitite",
+        "inboxNoMatch": "Nicio conversație nu se potrivește."
       }
     },
     "nav": {

@@ -87,7 +87,12 @@
           "loadMore": "Učitaj više",
           "loadError": "Nismo mogli učitati vaše kontakte. Pokušajte ponovno.",
           "close": "Zatvori"
-        }
+        },
+        "inboxSearch": "Pretraži kreatore ili poruke",
+        "inboxUnreadPill": "{count} nepročitana | {count} nepročitanih",
+        "inboxFilterAll": "Sve",
+        "inboxFilterUnread": "Nepročitano",
+        "inboxNoMatch": "Nema podudarnih razgovora."
       }
     },
     "nav": {

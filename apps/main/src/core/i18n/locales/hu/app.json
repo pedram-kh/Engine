@@ -87,7 +87,12 @@
           "loadMore": "Több betöltése",
           "loadError": "Nem sikerült betölteni a névjegyeket. Próbáld újra.",
           "close": "Bezárás"
-        }
+        },
+        "inboxSearch": "Alkotók vagy üzenetek keresése",
+        "inboxUnreadPill": "{count} olvasatlan | {count} olvasatlan",
+        "inboxFilterAll": "Mind",
+        "inboxFilterUnread": "Olvasatlan",
+        "inboxNoMatch": "Nincs találat a beszélgetések között."
       }
     },
     "nav": {

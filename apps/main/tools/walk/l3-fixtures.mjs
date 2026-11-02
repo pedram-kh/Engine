@@ -13,6 +13,9 @@
 export const AGENCY = '01HWALKAGENCY000000000000'
 export const DETAIL_ID = '01HCAMPAIGN00000000000001'
 
+const MESSAGES_NAMES = 'messages.inbox,messages.thread'
+const THREAD_CREATOR = '01HCREATORMAYA00000000001'
+
 export const REAL_PAGES = {
   'campaigns-1600': { to: '/campaigns', names: 'campaigns.list,campaigns.create', width: 1600 },
   'campaigns-1280': { to: '/campaigns', names: 'campaigns.list,campaigns.create', width: 1280 },
@@ -20,6 +23,21 @@ export const REAL_PAGES = {
   'campaign-detail-1280': { to: `/campaigns/${DETAIL_ID}`, names: 'campaigns.detail', width: 1280 },
   'discover-1600': { to: '/discover', names: 'discover.list', width: 1600 },
   'discover-1280': { to: '/discover', names: 'discover.list', width: 1280 },
+  // Messages: the list pane alone, then a conversation open in the right pane.
+  'messages-1600': { to: '/messages', names: MESSAGES_NAMES, width: 1600, height: 900 },
+  'messages-1280': { to: '/messages', names: MESSAGES_NAMES, width: 1280, height: 800 },
+  'messages-thread-1600': {
+    to: `/messages/${THREAD_CREATOR}?name=Maya%20Thompson`,
+    names: MESSAGES_NAMES,
+    width: 1600,
+    height: 900,
+  },
+  'messages-thread-1280': {
+    to: `/messages/${THREAD_CREATOR}?name=Maya%20Thompson`,
+    names: MESSAGES_NAMES,
+    width: 1280,
+    height: 800,
+  },
 }
 
 // ── Campaigns list (Figma 14:3: nine rows of twenty-four) ─────────────────────────────────
@@ -146,8 +164,118 @@ export const DISCOVER_CREATORS = CREATOR_ROWS.map(
   }),
 )
 
+// ── Messages (Figma 18:71 / 21:85: Maya Thompson open) ────────────────────────────────────
+
+/** An ISO time `days` days and `minutes` minutes before now (inbox dates are relative). */
+function ago(days, minutes = 0) {
+  return new Date(Date.now() - days * 86_400_000 - minutes * 60_000).toISOString()
+}
+
+const THREADS = [
+  [
+    THREAD_CREATOR,
+    'Maya Thompson',
+    ago(0, 25),
+    'Perfect, I will film the hook variations tomorrow morning and send the raw footage',
+    2,
+  ],
+  [
+    '01HCREATORDANIEL000000002',
+    'Daniel Okafor',
+    ago(1, 40),
+    'Sent over the raw footage, let me know if you need any retakes',
+    1,
+  ],
+  ['01HCREATORPRIYA0000000003', 'Priya Shah', ago(9), 'Contract signed and returned', 0],
+  ['01HCREATORLUKAS0000000004', 'Lukas Meyer', ago(40), 'Thanks for the update, speak soon', 0],
+  ['01HCREATORAMARA0000000005', 'Amara Nwosu', ago(400), 'Happy to join the next campaign', 0],
+]
+
+function inboxRows() {
+  return THREADS.map(([id, name, at, preview, unread]) => ({
+    id: `thread-${id}`,
+    type: 'relationship_thread',
+    attributes: {
+      creator: { id, display_name: name, avatar_url: null },
+      last_message_at: at,
+      last_message_preview: preview,
+      unread_count: unread,
+    },
+  }))
+}
+
+function feedMessage(id, at, body, own) {
+  return {
+    id,
+    type: 'relationship_message',
+    attributes: {
+      kind: 'text',
+      sender_role: own ? 'agency_user' : 'creator',
+      body,
+      attachments: [],
+      is_own: own,
+      sender: { name: own ? 'Jordan' : 'Maya Thompson' },
+      read_by_counterparty: own ? true : null,
+      created_at: at,
+    },
+  }
+}
+
+function threadFeed() {
+  return {
+    data: [
+      feedMessage(
+        'm1',
+        ago(1, 95),
+        'Hi Maya, the brief is attached. Three hook variations, each under a minute.',
+        true,
+      ),
+      feedMessage(
+        'm2',
+        ago(1, 70),
+        'Amazing, thank you! Just read through it. Should I film all three hook variations in the same outfit or switch it up?',
+        false,
+      ),
+      feedMessage(
+        'm3',
+        ago(1, 50),
+        'Switch it up, a different look for each one works best.',
+        true,
+      ),
+      feedMessage(
+        'm4',
+        ago(0, 25),
+        'Perfect, I will film the hook variations tomorrow morning and send the raw footage by end of day.',
+        false,
+      ),
+    ],
+    meta: {
+      thread: {
+        id: 'thread-x',
+        last_message_at: ago(0, 25),
+        unread_count: 0,
+        can_send: true,
+        closed_reason: null,
+      },
+      has_more: false,
+    },
+  }
+}
+
 export function fixtureFor(url, method) {
   const p = url.pathname
+  if (method === 'GET' && p === `/api/v1/agencies/${AGENCY}/relationship-threads`) {
+    return { data: inboxRows() }
+  }
+  if (p === `/api/v1/agencies/${AGENCY}/creators/${THREAD_CREATOR}/relationship-messages/read`) {
+    return { meta: { marked: 0, unread_count: 0 } }
+  }
+  if (
+    method === 'GET' &&
+    p === `/api/v1/agencies/${AGENCY}/creators/${THREAD_CREATOR}/relationship-messages`
+  ) {
+    return threadFeed()
+  }
   if (method === 'GET' && p === `/api/v1/agencies/${AGENCY}/creators/discover`) {
     return {
       data: DISCOVER_CREATORS,

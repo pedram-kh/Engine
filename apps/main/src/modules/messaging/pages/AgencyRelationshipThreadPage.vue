@@ -24,7 +24,7 @@ import {
   agencyRelationshipTransport,
   relationshipMessagingApi,
 } from '../api/relationshipMessaging.api'
-import RelationshipThreadView from '../components/RelationshipThreadView.vue'
+import AgencyRelationshipThreadView from '@/modules/agency/components/AgencyRelationshipThreadView.vue'
 import { creatorAvatarUrl, creatorLabel } from '@/core/creators/creatorLabel'
 
 const { t } = useI18n()
@@ -90,7 +90,7 @@ watch(
 
 <template>
   <section data-test="agency-thread-page">
-    <RelationshipThreadView
+    <AgencyRelationshipThreadView
       :transport="transport"
       :title="title"
       :avatar-text="title"
@@ -99,3 +99,11 @@ watch(
     />
   </section>
 </template>
+
+<style scoped>
+/* The thread fills the detail pane the messages shell gives it. */
+[data-test='agency-thread-page'] {
+  height: 100%;
+  min-height: 0;
+}
+</style>

@@ -87,7 +87,12 @@
           "loadMore": "Itgħabba aktar",
           "loadError": "Ma stajniex intellgħu l-kuntatti tiegħek. Jekk jogħġbok erġa' pprova.",
           "close": "Agħlaq"
-        }
+        },
+        "inboxSearch": "Fittex kreaturi jew messaġġi",
+        "inboxUnreadPill": "{count} mhux moqrija | {count} mhux moqrijin",
+        "inboxFilterAll": "Kollha",
+        "inboxFilterUnread": "Mhux moqrija",
+        "inboxNoMatch": "Ma sabet ebda konversazzjoni."
       }
     },
     "nav": {

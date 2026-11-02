@@ -87,7 +87,12 @@
           "loadMore": "Lódáil tuilleadh",
           "loadError": "Níorbh fhéidir do theagmhálaithe a lódáil. Bain triail eile as.",
           "close": "Dún"
-        }
+        },
+        "inboxSearch": "Cuardaigh cruthaitheoirí nó teachtaireachtaí",
+        "inboxUnreadPill": "{count} gan léamh | {count} gan léamh",
+        "inboxFilterAll": "Uile",
+        "inboxFilterUnread": "Gan léamh",
+        "inboxNoMatch": "Níl aon chomhrá ag teacht leis."
       }
     },
     "nav": {

@@ -87,7 +87,12 @@
           "loadMore": "Ladda fler",
           "loadError": "Vi kunde inte ladda dina kontakter. Försök igen.",
           "close": "Stäng"
-        }
+        },
+        "inboxSearch": "Sök skapare eller meddelanden",
+        "inboxUnreadPill": "{count} oläst | {count} olästa",
+        "inboxFilterAll": "Alla",
+        "inboxFilterUnread": "Olästa",
+        "inboxNoMatch": "Inga konversationer matchar."
       }
     },
     "nav": {

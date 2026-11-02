@@ -87,7 +87,12 @@
           "loadMore": "Įkelti daugiau",
           "loadError": "Nepavyko įkelti jūsų kontaktų. Bandykite dar kartą.",
           "close": "Uždaryti"
-        }
+        },
+        "inboxSearch": "Ieškoti kūrėjų ar žinučių",
+        "inboxUnreadPill": "{count} neskaityta | {count} neskaitytos",
+        "inboxFilterAll": "Visi",
+        "inboxFilterUnread": "Neskaityti",
+        "inboxNoMatch": "Pokalbių nerasta."
       }
     },
     "nav": {

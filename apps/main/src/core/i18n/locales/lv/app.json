@@ -87,7 +87,12 @@
           "loadMore": "Ielādēt vairāk",
           "loadError": "Neizdevās ielādēt jūsu kontaktus. Lūdzu, mēģiniet vēlreiz.",
           "close": "Aizvērt"
-        }
+        },
+        "inboxSearch": "Meklēt veidotājus vai ziņojumus",
+        "inboxUnreadPill": "{count} nelasīta | {count} nelasītas",
+        "inboxFilterAll": "Visi",
+        "inboxFilterUnread": "Nelasītās",
+        "inboxNoMatch": "Nav atbilstošu sarunu."
       }
     },
     "nav": {

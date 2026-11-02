@@ -87,7 +87,12 @@
           "loadMore": "Load more",
           "loadError": "We couldn't load your contacts. Please try again.",
           "close": "Close"
-        }
+        },
+        "inboxSearch": "Search creators or messages",
+        "inboxUnreadPill": "{count} unread | {count} unread",
+        "inboxFilterAll": "All",
+        "inboxFilterUnread": "Unread",
+        "inboxNoMatch": "No conversations match."
       }
     },
     "nav": {

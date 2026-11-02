@@ -87,7 +87,12 @@
           "loadMore": "Naloži več",
           "loadError": "Vaših stikov ni bilo mogoče naložiti. Poskusite znova.",
           "close": "Zapri"
-        }
+        },
+        "inboxSearch": "Išči ustvarjalce ali sporočila",
+        "inboxUnreadPill": "{count} neprebrano | {count} neprebranih",
+        "inboxFilterAll": "Vse",
+        "inboxFilterUnread": "Neprebrano",
+        "inboxNoMatch": "Ni ujemajočih pogovorov."
       }
     },
     "nav": {

@@ -87,7 +87,12 @@
           "loadMore": "Laadi veel",
           "loadError": "Kontaktide laadimine ebaõnnestus. Palun proovi uuesti.",
           "close": "Sulge"
-        }
+        },
+        "inboxSearch": "Otsi sisuloojaid või sõnumeid",
+        "inboxUnreadPill": "{count} lugemata | {count} lugemata",
+        "inboxFilterAll": "Kõik",
+        "inboxFilterUnread": "Lugemata",
+        "inboxNoMatch": "Ühtegi vestlust ei leitud."
       }
     },
     "nav": {
