@@ -273,6 +273,74 @@ it('cross-tenant brand show returns 404', function (): void {
         ->assertNotFound();
 });
 
+// AH-116 (A3) — `show` resolves ARCHIVED brands in the caller's own agency, so a
+// brand link from a campaign or a pool never 404s; every other route is unchanged.
+
+it('shows an archived brand to every role in its own agency, with status archived', function (callable $makeUser): void {
+    ['agency' => $agency, 'user' => $user] = $makeUser();
+    $brand = archiveBrand(Brand::factory()->forAgency($agency->id)->createOne(['name' => 'Bolt Food']));
+
+    $this->actingAs($user)
+        ->getJson("/api/v1/agencies/{$agency->ulid}/brands/{$brand->ulid}")
+        ->assertOk()
+        ->assertJsonPath('data.id', $brand->ulid)
+        ->assertJsonPath('data.attributes.name', 'Bolt Food')
+        ->assertJsonPath('data.attributes.status', 'archived');
+})->with([
+    'agency_admin' => [fn () => makeAdmin()],
+    'agency_manager' => [fn () => makeManager()],
+    'agency_staff' => [fn () => makeStaff()],
+]);
+
+it('returns 404 for ANOTHER agency\'s archived brand (the tenancy contract holds under withTrashed)', function (): void {
+    ['agency' => $agency, 'user' => $user] = makeAdmin();
+    $otherAgency = Agency::factory()->createOne();
+    $brand = archiveBrand(Brand::factory()->forAgency($otherAgency->id)->createOne());
+
+    $this->actingAs($user)
+        ->getJson("/api/v1/agencies/{$agency->ulid}/brands/{$brand->ulid}")
+        ->assertNotFound();
+});
+
+it('still 404s a ULID that does not exist', function (): void {
+    ['agency' => $agency, 'user' => $user] = makeAdmin();
+
+    $this->actingAs($user)
+        ->getJson("/api/v1/agencies/{$agency->ulid}/brands/01ARZ3NDEKTSV4RRFFQ69G5FAV")
+        ->assertNotFound();
+});
+
+it('keeps an archived brand OUT of the default list even though show now resolves it', function (): void {
+    ['agency' => $agency, 'user' => $user] = makeAdmin();
+    Brand::factory()->forAgency($agency->id)->createOne(['name' => 'Live']);
+    $archived = archiveBrand(Brand::factory()->forAgency($agency->id)->createOne(['name' => 'Gone']));
+
+    $this->actingAs($user)
+        ->getJson("/api/v1/agencies/{$agency->ulid}/brands/{$archived->ulid}")
+        ->assertOk();
+
+    $default = $this->actingAs($user)->getJson("/api/v1/agencies/{$agency->ulid}/brands")->assertOk();
+    $archivedOnly = $this->actingAs($user)->getJson("/api/v1/agencies/{$agency->ulid}/brands?status=archived")->assertOk();
+
+    expect($default->json('data.*.attributes.name'))->toBe(['Live'])
+        ->and($archivedOnly->json('data.*.attributes.name'))->toBe(['Gone']);
+});
+
+it('leaves update and archive on the default binding: an archived brand still 404s there', function (): void {
+    ['agency' => $agency, 'user' => $user] = makeAdmin();
+    $brand = archiveBrand(Brand::factory()->forAgency($agency->id)->createOne());
+
+    $this->actingAs($user)
+        ->patchJson("/api/v1/agencies/{$agency->ulid}/brands/{$brand->ulid}", ['name' => 'Renamed'])
+        ->assertNotFound();
+
+    $this->actingAs($user)
+        ->deleteJson("/api/v1/agencies/{$agency->ulid}/brands/{$brand->ulid}")
+        ->assertNotFound();
+
+    expect(Brand::withTrashed()->where('ulid', $brand->ulid)->firstOrFail()->name)->not->toBe('Renamed');
+});
+
 // ---------------------------------------------------------------------------
 // Update
 // ---------------------------------------------------------------------------

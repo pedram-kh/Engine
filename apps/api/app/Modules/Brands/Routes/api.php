@@ -25,7 +25,15 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
     ->group(function (): void {
         // CRUD — index, store, show, update, destroy (archive) are all
         // handled by BrandController via authorizeResource().
-        Route::apiResource('brands', BrandController::class);
+        //
+        // AH-116 (A3): `show` ALONE resolves soft-deleted (archived) brands, so a
+        // brand name can link to its page from a campaign or a pool even after the
+        // brand is archived, and the page can say "Archived" instead of 404ing.
+        // `update` and `destroy` keep the default binding (an archived brand cannot
+        // be edited or archived again) and the list is untouched. The tenancy 404
+        // for another agency's brand is BrandController::show()'s own
+        // assertBelongsToAgency(), which runs after binding either way.
+        Route::apiResource('brands', BrandController::class)->withTrashed(['show']);
 
         // Sprint 3 Chunk 4 sub-step 6 — Brand Restore UI.
         // Reverses an archive (soft-delete + status flip). Surfaces the
