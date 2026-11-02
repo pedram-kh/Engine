@@ -524,6 +524,14 @@ function poolMembers() {
 export function l4FixtureFor(url, method) {
   const p = url.pathname
   if (method !== 'GET') return null
+  // Cold-load banner hydration: not impersonating.
+  if (p === '/api/v1/auth/impersonation/status') return { data: { active: false } }
+  // The roster-detail availability calendar: an empty window (not the error state).
+  if (/^\/api\/v1\/agencies\/[^/]+\/creators\/[^/]+\/availability$/.test(p)) {
+    const from = url.searchParams.get('from') ?? '2026-11-01T00:00:00Z'
+    const to = url.searchParams.get('to') ?? '2026-12-01T00:00:00Z'
+    return { data: [], meta: { window: { from, to } } }
+  }
   if (p === '/api/v1/me/notifications') {
     const rows = [
       ['message.relationship_received_by_agency', { sender_name: 'Maya Thompson' }, null, 0.02],
