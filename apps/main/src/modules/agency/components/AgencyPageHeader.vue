@@ -9,6 +9,9 @@
  * slot; a page with none gets no empty column. A detail page adds a `leading` slot (the back
  * button, 16 before the text) and a `title-suffix` slot (the status pill, 12 after the title).
  *
+ * The subtitle is Body small (13 / 19) by default; `subtitleSize="md"` makes it Body (14 / 20),
+ * which is what the Discover frame draws.
+ *
  * `titleTest` and `subtitleTest` carry the page's own `data-test` anchors, so a page
  * swapping its heading for this component keeps its specs.
  */
@@ -16,6 +19,8 @@
 defineProps<{
   title: string
   subtitle?: string | null
+  /** Body small (13 / 19, the default) or Body (14 / 20). */
+  subtitleSize?: 'sm' | 'md'
   titleTest?: string
   subtitleTest?: string
 }>()
@@ -33,6 +38,7 @@ defineProps<{
         <p
           v-if="subtitle !== undefined && subtitle !== null && subtitle !== ''"
           class="agency-page-header__subtitle"
+          :class="{ 'agency-page-header__subtitle--md': subtitleSize === 'md' }"
           :data-test="subtitleTest"
         >
           {{ subtitle }}
@@ -89,6 +95,12 @@ defineProps<{
   font-weight: var(--catalyst-typography-body-sm-weight);
   line-height: var(--catalyst-typography-body-sm-line-height);
   color: rgb(var(--v-theme-on-surface-variant));
+}
+
+.agency-page-header__subtitle--md {
+  font-size: var(--catalyst-typography-body-size);
+  font-weight: var(--catalyst-typography-body-weight);
+  line-height: var(--catalyst-typography-body-line-height);
 }
 
 .agency-page-header__actions {

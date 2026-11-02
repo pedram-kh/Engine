@@ -18,6 +18,8 @@ export const REAL_PAGES = {
   'campaigns-1280': { to: '/campaigns', names: 'campaigns.list,campaigns.create', width: 1280 },
   'campaign-detail-1600': { to: `/campaigns/${DETAIL_ID}`, names: 'campaigns.detail', width: 1600 },
   'campaign-detail-1280': { to: `/campaigns/${DETAIL_ID}`, names: 'campaigns.detail', width: 1280 },
+  'discover-1600': { to: '/discover', names: 'discover.list', width: 1600 },
+  'discover-1280': { to: '/discover', names: 'discover.list', width: 1280 },
 }
 
 // ── Campaigns list (Figma 14:3: nine rows of twenty-four) ─────────────────────────────────
@@ -112,8 +114,46 @@ export function detailCampaign() {
   return c
 }
 
+// ── Discover (Figma 17:52: two rows of four of 412) ───────────────────────────────────────
+
+/** [name, country, age, language, categories, relationship_status] */
+const CREATOR_ROWS = [
+  ['Maya Thompson', 'US', 28, 'en', ['lifestyle', 'tech'], 'roster'],
+  ['Daniel Okafor', 'US', 34, 'en', ['fitness', 'sports', 'travel'], 'roster'],
+  ['Sofia Marchetti', 'IT', 26, 'it', ['fashion', 'beauty'], null],
+  ['Lukas Weber', 'DE', 31, 'de', ['gaming', 'tech'], 'pending_request'],
+  ['Inês Carvalho', 'PT', 24, 'pt', ['food', 'travel', 'lifestyle'], null],
+  ['Emma Laurent', 'FR', 29, 'fr', ['beauty'], 'roster'],
+  ['Mateo García', 'ES', 33, 'es', ['music', 'comedy'], null],
+  ['Noor van Dijk', 'NL', 27, 'nl', ['design', 'art', 'home'], null],
+]
+
+export const DISCOVER_CREATORS = CREATOR_ROWS.map(
+  ([name, country, age, language, categories, relationship], i) => ({
+    id: `01HCREATOR000000000000000${String(i + 1).padStart(2, '0')}`,
+    type: 'creator_discovery',
+    attributes: {
+      display_name: name,
+      country_code: country,
+      age,
+      primary_language: language,
+      accent: null,
+      content_companions: null,
+      categories,
+      avatar_url: null,
+      relationship_status: relationship,
+    },
+  }),
+)
+
 export function fixtureFor(url, method) {
   const p = url.pathname
+  if (method === 'GET' && p === `/api/v1/agencies/${AGENCY}/creators/discover`) {
+    return {
+      data: DISCOVER_CREATORS,
+      meta: { total: 412, page: 1, per_page: 8, last_page: 52 },
+    }
+  }
   if (method === 'GET' && p === `/api/v1/agencies/${AGENCY}/campaigns/${DETAIL_ID}`) {
     return { data: detailCampaign() }
   }

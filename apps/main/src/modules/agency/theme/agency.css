@@ -960,6 +960,74 @@
   border-radius: 999px;
 }
 
+/* Search field (Figma "Input", Discover 17:435): a 40px box on the canvas fill with the
+ * default border, radius 8, 16px sides, a 16px leading icon and 14/20 text, tertiary
+ * placeholder. The real `v-text-field` (`variant="outlined" density="compact"`) drawn that
+ * way, so typing, clearing and the debounce stay Vuetify's. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-search .v-field {
+  --v-field-padding-start: 16px;
+  --v-field-padding-end: 16px;
+}
+
+/* An icon in front of the text sits 16 in (Vuetify's own inset for it is 12). */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-search .v-field--prepended {
+  padding-inline-start: 16px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-search .v-field--appended {
+  padding-inline-end: 16px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-search .v-field--variant-outlined {
+  border-radius: var(--radius-lg);
+  background-color: rgb(var(--v-theme-background));
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* The outline reads the default border colour (not the stronger `outline`) until it is
+ * focused or in error, as the Figma input does. */
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .agency-search
+  .v-field--variant-outlined:not(.v-field--focused):not(.v-field--error)
+  .v-field__outline,
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .agency-search
+  .v-field--variant-outlined:not(.v-field--focused):not(.v-field--error):not(
+    .v-field--disabled
+  ):hover
+  .v-field__outline {
+  color: rgb(var(--v-theme-border-color));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-search .v-field__input {
+  min-height: 40px;
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: rgb(var(--v-theme-on-surface));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-search .v-field__input::placeholder {
+  color: rgb(var(--v-theme-text-tertiary));
+  opacity: 1;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-search .v-field__prepend-inner {
+  padding-top: 0;
+  align-items: center;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .agency-search
+  .v-field__prepend-inner
+  > .v-icon {
+  font-size: 16px;
+  opacity: 1;
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+
 /* ── Campaign detail (Figma 16:38, S3.2) ──────────────────────────────────────────────────
  * Opt-in pieces for a detail page; nothing here changes a page that does not use the classes. */
 

@@ -25,6 +25,7 @@ import enCreator from '@/core/i18n/locales/en/creator.json'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 
 import DiscoverPage from './DiscoverPage.vue'
+import pageSource from './DiscoverPage.vue?raw'
 
 vi.mock('../api/discovery.api', () => ({
   discoveryApi: { list: vi.fn() },
@@ -74,6 +75,8 @@ async function mountDiscover(
     agencyId?: string | null
     reject?: boolean
     lastPage?: number
+    /** `meta.total` (defaults to the number of cards). */
+    total?: number
     /** The URL the page mounts on — the browse context lives in its query. */
     url?: string
   } = {},
@@ -91,7 +94,12 @@ async function mountDiscover(
     const cards = options.cards ?? []
     vi.mocked(discoveryApi.list).mockResolvedValue({
       data: cards,
-      meta: { total: cards.length, page: 1, per_page: 24, last_page: options.lastPage ?? 1 },
+      meta: {
+        total: options.total ?? cards.length,
+        page: 1,
+        per_page: 24,
+        last_page: options.lastPage ?? 1,
+      },
     })
   }
 
@@ -354,5 +362,193 @@ describe('DiscoverPage (Sprint 6.6a)', () => {
     await flushPromises()
 
     expect(pushSpy).toHaveBeenCalledWith({ name: 'discover.detail', params: { ulid: card.id } })
+  })
+})
+
+// AH-114 S3.3 — the agency restyle of Discover: header, filter pills, result count, four-column
+// grid of agency cards, and the Previous / Next footer. The anchors the older tests use
+// (`discover-card-*`, `discover-connection-*`, `discover-notconnected-*`, the empty states and
+// the error) are unchanged; what moved is named below.
+describe('DiscoverPage — agency restyle (AH-114, S3.3)', () => {
+  let cleanup: (() => void) | null = null
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    cleanup?.()
+    cleanup = null
+    document.body.innerHTML = ''
+  })
+
+  const text = (wrapper: ReturnType<typeof mount>, test: string) =>
+    wrapper.find(`[data-test="${test}"]`).text()
+
+  it('header: the title and subtitle, no actions', async () => {
+    const harness = await mountDiscover({ cards: [makeCard()] })
+    cleanup = harness.cleanup
+
+    expect(text(harness.wrapper, 'discover-heading')).toBe('Discover creators')
+    expect(harness.wrapper.find('.agency-page-header__subtitle').text()).toBe(
+      'Browse and search the global creator pool.',
+    )
+    expect(harness.wrapper.find('.agency-page-header__actions').exists()).toBe(false)
+  })
+
+  it('result count: the pool total, plural-aware', async () => {
+    const many = await mountDiscover({ cards: [makeCard()], total: 412 })
+    expect(text(many.wrapper, 'discover-result-count')).toBe('412 creators')
+    many.cleanup()
+
+    const one = await mountDiscover({ cards: [makeCard()], total: 1 })
+    cleanup = one.cleanup
+    expect(text(one.wrapper, 'discover-result-count')).toBe('1 creator')
+  })
+
+  it('result count: not drawn after a failed load (no zero, no stale number)', async () => {
+    const harness = await mountDiscover({ reject: true })
+    cleanup = harness.cleanup
+
+    expect(harness.wrapper.find('[data-test="discover-result-count"]').exists()).toBe(false)
+  })
+
+  it('three filter pills, and picking one re-queries with it; picking it again re-queries without', async () => {
+    const harness = await mountDiscover({ cards: [makeCard()], total: 5 })
+    cleanup = harness.cleanup
+    expect(harness.wrapper.findAll('.agency-filter-pill')).toHaveLength(3)
+
+    await harness.wrapper
+      .get('[data-test="discover-country-filter"] [data-test="agency-filter-pill-button"]')
+      .trigger('click')
+    await flushPromises()
+    vi.mocked(discoveryApi.list).mockClear()
+    document.querySelector<HTMLElement>('[data-test="agency-filter-pill-option"]')?.click()
+    await flushPromises()
+
+    const country = vi.mocked(discoveryApi.list).mock.calls.at(-1)?.[1]?.country
+    expect(typeof country).toBe('string')
+    expect(harness.wrapper.get('[data-test="discover-country-filter"]').classes()).toContain(
+      'agency-filter-pill--applied',
+    )
+
+    vi.mocked(discoveryApi.list).mockClear()
+    await harness.wrapper.get('[data-test="agency-filter-pill-clear"]').trigger('click')
+    await flushPromises()
+
+    expect(vi.mocked(discoveryApi.list).mock.calls.at(-1)?.[1]).not.toHaveProperty('country')
+  })
+
+  it('draws one agency card per creator in the grid', async () => {
+    const cards = [
+      makeCard({}, '01AAAAAAAAAAAAAAAAAAAAAAAA'),
+      makeCard({}, '01BBBBBBBBBBBBBBBBBBBBBBBB'),
+    ]
+    const harness = await mountDiscover({ cards })
+    cleanup = harness.cleanup
+
+    const grid = harness.wrapper.get('[data-test="discover-grid"]')
+    expect(grid.findAll('.agency-creator-card')).toHaveLength(2)
+    expect(grid.get('[data-test="discover-name-01AAAAAAAAAAAAAAAAAAAAAAAA"]').text()).toBe(
+      'Ada Lovelace',
+    )
+  })
+
+  it('a card shows the country, age, language and category the creator has', async () => {
+    const harness = await mountDiscover({
+      cards: [
+        makeCard({ categories: ['tech', 'fitness', 'travel'] }, '01AAAAAAAAAAAAAAAAAAAAAAAA'),
+      ],
+    })
+    cleanup = harness.cleanup
+
+    const card = harness.wrapper.get('[data-test="discover-card-01AAAAAAAAAAAAAAAAAAAAAAAA"]')
+    expect(card.findAll('.agency-creator-card__line')[0]?.text()).toContain('36')
+    expect(card.findAll('.agency-creator-card__chip')).toHaveLength(3)
+    expect(card.get('[data-test="discover-cats-more-01AAAAAAAAAAAAAAAAAAAAAAAA"]').text()).toBe(
+      '+1',
+    )
+  })
+
+  it('Enter on a card opens the profile', async () => {
+    const card = makeCard({}, '01CARDKEYXXXXXXXXXXXXXXXXX')
+    const harness = await mountDiscover({ cards: [card] })
+    cleanup = harness.cleanup
+    const pushSpy = vi.spyOn(harness.router, 'push')
+
+    await harness.wrapper.get(`[data-test="discover-card-${card.id}"]`).trigger('keydown', {
+      key: 'Enter',
+    })
+
+    expect(pushSpy).toHaveBeenCalledWith({ name: 'discover.detail', params: { ulid: card.id } })
+  })
+
+  describe('footer', () => {
+    it('one page: no footer', async () => {
+      const harness = await mountDiscover({ cards: [makeCard()], lastPage: 1 })
+      cleanup = harness.cleanup
+
+      expect(harness.wrapper.find('[data-test="discover-pagination"]').exists()).toBe(false)
+    })
+
+    it('first of several: "Showing 1 of 50", Previous off, Next on', async () => {
+      const harness = await mountDiscover({ cards: [makeCard()], total: 50, lastPage: 3 })
+      cleanup = harness.cleanup
+
+      expect(text(harness.wrapper, 'discover-showing')).toBe('Showing 1 of 50')
+      expect(
+        harness.wrapper.get('[data-test="discover-page-previous"]').attributes('disabled'),
+      ).toBeDefined()
+      expect(
+        harness.wrapper.get('[data-test="discover-page-next"]').attributes('disabled'),
+      ).toBeUndefined()
+    })
+
+    it('Next asks for the next page; the count moves down the pool', async () => {
+      const harness = await mountDiscover({ cards: [makeCard()], total: 50, lastPage: 3 })
+      cleanup = harness.cleanup
+
+      vi.mocked(discoveryApi.list).mockClear()
+      await harness.wrapper.get('[data-test="discover-page-next"]').trigger('click')
+      await flushPromises()
+
+      expect(vi.mocked(discoveryApi.list).mock.calls.at(-1)?.[1]).toMatchObject({ page: 2 })
+      expect(text(harness.wrapper, 'discover-showing')).toBe('Showing 25 of 50')
+    })
+
+    it('last page: Next off, Previous on', async () => {
+      const harness = await mountDiscover({
+        cards: [makeCard()],
+        total: 50,
+        lastPage: 3,
+        url: '/discover?page=3',
+      })
+      cleanup = harness.cleanup
+
+      expect(
+        harness.wrapper.get('[data-test="discover-page-next"]').attributes('disabled'),
+      ).toBeDefined()
+      expect(
+        harness.wrapper.get('[data-test="discover-page-previous"]').attributes('disabled'),
+      ).toBeUndefined()
+    })
+  })
+
+  it('omits what nothing backs: heart, video count, verified badge, toggle, extra filters', async () => {
+    const harness = await mountDiscover({ cards: [makeCard({ relationship_status: 'roster' })] })
+    cleanup = harness.cleanup
+    const page = harness.wrapper.get('[data-test="discover-page"]')
+
+    expect(page.find('.mdi-heart').exists()).toBe(false)
+    expect(page.find('.mdi-check-decagram').exists()).toBe(false)
+    expect(page.text()).not.toContain('videos')
+    expect(page.text()).not.toContain('Saved searches')
+    expect(page.text()).not.toContain('Add to talent pool')
+  })
+
+  it('the page source holds no font-size or colour literal', () => {
+    expect(pageSource).not.toMatch(/font-size:\s*[\d.]+(px|rem|em|cqi)/)
+    expect(pageSource).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
+    expect(pageSource).not.toMatch(/\brgba?\(\s*\d/)
   })
 })

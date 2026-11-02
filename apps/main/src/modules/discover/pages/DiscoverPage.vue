@@ -39,6 +39,9 @@ import {
   useListQueryState,
 } from '@/composables/useListQueryState'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
+import AgencyCreatorCard from '@/modules/agency/components/AgencyCreatorCard.vue'
+import AgencyFilterPill from '@/modules/agency/components/AgencyFilterPill.vue'
+import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
 import { COUNTRY_OPTIONS } from '@/modules/onboarding/data/countries'
 import { discoveryApi } from '../api/discovery.api'
 import {
@@ -114,6 +117,21 @@ const perPage = 24
 const loading = ref(false)
 const error = ref<string | null>(null)
 
+// AH-114 (S3.3) — the result count and the footer read `meta.total`; neither is drawn before
+// the first response (no zero, no placeholder) or after a failed one.
+const hasLoaded = ref(false)
+const resultCount = computed(() =>
+  hasLoaded.value && error.value === null
+    ? t('app.discover.resultCount', { count: totalItems.value }, totalItems.value)
+    : null,
+)
+/** How far down the pool the current page reaches. */
+const shownCount = computed(() =>
+  Math.min((page.value - 1) * perPage + items.value.length, totalItems.value),
+)
+const canGoPrevious = computed(() => page.value > 1)
+const canGoNext = computed(() => page.value < lastPage.value)
+
 const countryFilterItems = computed(() =>
   COUNTRY_OPTIONS.map((c) => ({ title: c.label, value: c.code })),
 )
@@ -146,46 +164,19 @@ function languageLabel(code: string | null, accent?: string | null): string | nu
   return accent != null && accent !== '' ? `${label} · ${accent}` : label
 }
 
-// The three annotation states (Sprint 6.6b, D-5/D-11), derived from the
-// calling-agency-only relationship_status alone (the boolean is_connected was
-// removed). `connected` keys on `roster` specifically — NOT "has any relation".
-const CONNECTION_CHIP: Record<
-  Exclude<DiscoveryConnectionState, 'none'>,
-  { color: string; icon: string; key: string }
-> = {
-  connected: {
-    color: 'primary',
-    icon: 'mdi-link-variant',
-    key: 'app.discover.connection.connected',
-  },
-  pending: { color: 'info', icon: 'mdi-clock-outline', key: 'app.discover.connection.pending' },
-  declined: {
-    color: 'default',
-    icon: 'mdi-close-circle-outline',
-    key: 'app.discover.connection.declined',
-  },
-  // AH-051 (D-3) — a severed prior connection reads as "Previously connected",
-  // NOT the "never connected" empty state (which is the `none` no-chip case).
-  ended: {
-    color: 'default',
-    icon: 'mdi-link-off',
-    key: 'app.discover.connection.ended',
-  },
-}
-
+// The annotation states (Sprint 6.6b, D-5/D-11), derived from the calling-agency-only
+// relationship_status alone (the boolean is_connected was removed). `connected` keys on
+// `roster` specifically — NOT "has any relation". The card draws the shared status pill
+// (`kind="discovery"`) for the four states and its own "Not connected" word for none.
 function connectionState(item: DiscoveryCreatorListItem): DiscoveryConnectionState {
   return deriveConnectionState(item.attributes.relationship_status)
 }
 
-// The chip descriptor for the item's state, or null for `none` (no chip). Kept
-// in the script (not an inline template cast) so the `Exclude<…, 'none'>`
-// generic never lands in a `{{ }}` expression — Prettier's HTML parser reads the
-// `<` as an opening tag and chokes.
-function connectionChip(
-  item: DiscoveryCreatorListItem,
-): { color: string; icon: string; key: string } | null {
-  const state = connectionState(item)
-  return state === 'none' ? null : CONNECTION_CHIP[state]
+/** The page props of one card, localised here so the card holds no data of its own. */
+function categoryLabels(item: DiscoveryCreatorListItem): string[] {
+  return (item.attributes.categories ?? []).map((cat) =>
+    t(`creator.ui.wizard.categories.${cat}`, cat),
+  )
 }
 
 async function loadDiscovery(): Promise<void> {
@@ -206,6 +197,7 @@ async function loadDiscovery(): Promise<void> {
     items.value = res.data
     totalItems.value = res.meta.total
     lastPage.value = res.meta.last_page
+    hasLoaded.value = true
   } catch {
     error.value = t('app.discover.errors.loadFailed')
   } finally {
@@ -251,76 +243,62 @@ function openProfile(item: DiscoveryCreatorListItem): void {
 </script>
 
 <template>
-  <div data-test="discover-page">
-    <div class="d-flex flex-column mb-4">
-      <h1 class="text-h5 ma-0" data-test="discover-heading">{{ t('app.discover.title') }}</h1>
-      <p class="text-body-2 text-medium-emphasis ma-0 mt-1">{{ t('app.discover.subtitle') }}</p>
-    </div>
+  <div class="agency-page agency-page--snug" data-test="discover-page">
+    <AgencyPageHeader
+      :title="t('app.discover.title')"
+      :subtitle="t('app.discover.subtitle')"
+      subtitle-size="md"
+      title-test="discover-heading"
+    />
 
     <!-- Name/bio full-text search (reuses the Chunk-1 FTS → ?q=). -->
     <v-text-field
       v-model="searchQuery"
-      :label="t('app.discover.search.label')"
+      :aria-label="t('app.discover.search.label')"
       :placeholder="t('app.discover.search.placeholder')"
+      persistent-placeholder
       prepend-inner-icon="mdi-magnify"
       density="compact"
       variant="outlined"
       hide-details
       clearable
-      class="mb-3"
+      class="agency-search"
       data-test="discover-search"
     />
 
-    <!-- Country / language / category selects -->
-    <v-row dense class="mb-2">
-      <v-col cols="12" sm="4">
-        <v-select
-          v-model="countryFilter"
-          :items="countryFilterItems"
-          :label="t('app.discover.filters.country')"
-          density="compact"
-          variant="outlined"
-          hide-details
-          clearable
-          data-test="discover-country-filter"
-        />
-      </v-col>
-      <v-col cols="12" sm="4">
-        <v-select
-          v-model="languageFilter"
-          :items="languageFilterItems"
-          :label="t('app.discover.filters.language')"
-          density="compact"
-          variant="outlined"
-          hide-details
-          clearable
-          data-test="discover-language-filter"
-        />
-      </v-col>
-      <v-col cols="12" sm="4">
-        <v-select
-          v-model="categoryFilter"
-          :items="categoryFilterItems"
-          :label="t('app.discover.filters.category')"
-          density="compact"
-          variant="outlined"
-          hide-details
-          clearable
-          data-test="discover-category-filter"
-        />
-      </v-col>
-    </v-row>
+    <!-- Country / language / category filters, as the pills the frame draws. -->
+    <div class="discover-filters">
+      <AgencyFilterPill
+        v-model="countryFilter"
+        :label="t('app.discover.filters.country')"
+        :items="countryFilterItems"
+        data-test="discover-country-filter"
+      />
+      <AgencyFilterPill
+        v-model="languageFilter"
+        :label="t('app.discover.filters.language')"
+        :items="languageFilterItems"
+        data-test="discover-language-filter"
+      />
+      <AgencyFilterPill
+        v-model="categoryFilter"
+        :label="t('app.discover.filters.category')"
+        :items="categoryFilterItems"
+        data-test="discover-category-filter"
+      />
+      <p v-if="resultCount" class="discover-filters__count" data-test="discover-result-count">
+        {{ resultCount }}
+      </p>
+    </div>
 
-    <v-alert v-if="error" type="error" variant="tonal" class="mb-4" data-test="discover-error">
+    <v-alert v-if="error" type="error" variant="tonal" data-test="discover-error">
       {{ error }}
     </v-alert>
 
     <!-- Loading skeleton -->
-    <v-row v-if="loading && items.length === 0" dense data-test="discover-skeleton">
-      <v-col v-for="n in 8" :key="n" cols="12" sm="6" md="4" lg="3">
-        <v-skeleton-loader type="card" />
-      </v-col>
-    </v-row>
+    <div v-if="loading && items.length === 0" class="discover-grid" data-test="discover-skeleton">
+      <v-skeleton-loader v-for="n in 8" :key="n" type="card" />
+    </div>
 
     <!-- Empty states -->
     <template v-else-if="!loading && items.length === 0 && !error">
@@ -348,251 +326,99 @@ function openProfile(item: DiscoveryCreatorListItem): void {
       </CEmptyState>
     </template>
 
-    <!-- Card grid -->
+    <!-- Card grid: four columns, 20 apart (fewer on a narrow window). -->
     <template v-else>
-      <v-row dense data-test="discover-grid">
-        <!-- ~30% smaller cards: tighter breakpoints pack more per row (2→3,
-             3→4, 4→6), shrinking each card proportionally (hero keeps its
-             concept-matched 5:4 landscape ratio). -->
-        <v-col v-for="item in items" :key="item.id" cols="6" sm="4" md="3" lg="2">
-          <v-card
-            variant="outlined"
-            class="discover-card h-100 d-flex flex-column"
-            hover
-            :data-test="`discover-card-${item.id}`"
-            @click="openProfile(item)"
-          >
-            <!-- Photo-forward hero (concept-inspired): a full-bleed portrait,
-                 falling back to a tinted initial when no avatar is set. -->
-            <div class="discover-card__hero">
-              <v-img
-                v-if="creatorAvatarUrl(item.attributes)"
-                :src="creatorAvatarUrl(item.attributes) ?? undefined"
-                :alt="creatorAvatarAlt(item.attributes)"
-                cover
-                class="discover-card__img"
-              />
-              <div v-else class="discover-card__fallback">
-                <span class="discover-card__initial text-medium-emphasis">{{
-                  creatorInitial(item.attributes)
-                }}</span>
-              </div>
-            </div>
-
-            <div class="discover-card__body d-flex flex-column flex-grow-1">
-              <div class="discover-card__namerow d-flex align-center">
-                <span
-                  class="discover-card__name font-weight-bold text-truncate"
-                  :data-test="`discover-name-${item.id}`"
-                >
-                  {{ creatorLabel(item.attributes, t, t('app.discover.unnamed')) }}
-                </span>
-                <!-- Connected → a verified-style check by the name (the
-                     concept's badge position); the footer chip carries the
-                     label + the annotation the specs assert. -->
-                <v-icon
-                  v-if="connectionState(item) === 'connected'"
-                  icon="mdi-check-decagram"
-                  size="16"
-                  color="primary"
-                  :data-test="`discover-verified-${item.id}`"
-                />
-              </div>
-
-              <!-- Icon meta row, concept-style (pin · language) with our data. -->
-              <div class="discover-card__meta d-flex flex-wrap align-center text-medium-emphasis">
-                <span class="d-inline-flex align-center ga-1">
-                  <v-icon icon="mdi-map-marker-outline" size="14" />
-                  {{ countryLabel(item.attributes.country_code) }}
-                </span>
-                <!-- AH-088 — age joins the icon meta row rather than the chip
-                     row: the chip row is single-line by design (categories +N),
-                     and a number reads better beside location than as a chip.
-                     Hidden when unknown — no "age unknown" placeholder. -->
-                <span
-                  v-if="item.attributes.age !== null"
-                  class="d-inline-flex align-center ga-1"
-                  :data-test="`discover-age-${item.id}`"
-                >
-                  <v-icon icon="mdi-cake-variant-outline" size="14" />
-                  {{ item.attributes.age }}
-                </span>
-                <span
-                  v-if="languageLabel(item.attributes.primary_language)"
-                  class="d-inline-flex align-center ga-1"
-                >
-                  <v-icon icon="mdi-translate" size="14" />
-                  {{ languageLabel(item.attributes.primary_language, item.attributes.accent) }}
-                </span>
-              </div>
-
-              <!-- Single-line chip row (concept keeps categories on one row):
-                   show at most 2, collapse the rest into a "+N" chip so the
-                   body height — and thus the content-to-image proportion —
-                   stays identical across breakpoints. -->
-              <div class="discover-card__cats d-flex">
-                <v-chip
-                  v-for="cat in (item.attributes.categories ?? []).slice(0, 2)"
-                  :key="cat"
-                  size="x-small"
-                  variant="outlined"
-                  class="flex-shrink-0"
-                >
-                  {{ t(`creator.ui.wizard.categories.${cat}`, cat) }}
-                </v-chip>
-                <v-chip
-                  v-if="(item.attributes.categories?.length ?? 0) > 2"
-                  size="x-small"
-                  variant="tonal"
-                  class="flex-shrink-0"
-                  :data-test="`discover-cats-more-${item.id}`"
-                >
-                  +{{ (item.attributes.categories?.length ?? 0) - 2 }}
-                </v-chip>
-              </div>
-
-              <!-- Footer strip — calling-agency-only connection annotation,
-                   three states (D-5/D-11), pinned to the bottom of the card. -->
-              <div class="discover-card__footer">
-                <v-chip
-                  v-if="connectionChip(item)"
-                  size="small"
-                  :color="connectionChip(item)!.color"
-                  variant="tonal"
-                  :prepend-icon="connectionChip(item)!.icon"
-                  :data-test="`discover-connection-${connectionState(item)}-${item.id}`"
-                >
-                  {{ t(connectionChip(item)!.key) }}
-                </v-chip>
-                <span
-                  v-else
-                  class="text-caption text-disabled"
-                  :data-test="`discover-notconnected-${item.id}`"
-                >
-                  {{ t('app.discover.connection.notConnected') }}
-                </span>
-              </div>
-            </div>
-          </v-card>
-        </v-col>
-      </v-row>
-
-      <div v-if="lastPage > 1" class="d-flex justify-center mt-4">
-        <v-pagination
-          v-model="page"
-          :length="lastPage"
-          :total-visible="7"
-          density="comfortable"
-          data-test="discover-pagination"
+      <div class="discover-grid" data-test="discover-grid">
+        <AgencyCreatorCard
+          v-for="item in items"
+          :id="item.id"
+          :key="item.id"
+          :name="creatorLabel(item.attributes, t, t('app.discover.unnamed'))"
+          :avatar-url="creatorAvatarUrl(item.attributes)"
+          :avatar-alt="creatorAvatarAlt(item.attributes)"
+          :initial="creatorInitial(item.attributes)"
+          :country="
+            item.attributes.country_code === null
+              ? null
+              : countryLabel(item.attributes.country_code)
+          "
+          :age="item.attributes.age"
+          :language="languageLabel(item.attributes.primary_language, item.attributes.accent)"
+          :categories="categoryLabels(item)"
+          :connection="connectionState(item)"
+          :not-connected-label="t('app.discover.connection.notConnected')"
+          @open="openProfile(item)"
         />
+      </div>
+
+      <div v-if="lastPage > 1" class="agency-list-footer" data-test="discover-pagination">
+        <p class="agency-list-footer__count" data-test="discover-showing">
+          {{ t('app.pagination.showing', { shown: shownCount, total: totalItems }) }}
+        </p>
+        <div class="agency-list-footer__pages">
+          <v-btn
+            variant="outlined"
+            size="small"
+            :disabled="!canGoPrevious || loading"
+            data-test="discover-page-previous"
+            @click="page = page - 1"
+          >
+            {{ t('app.pagination.previous') }}
+          </v-btn>
+          <v-btn
+            variant="outlined"
+            size="small"
+            :disabled="!canGoNext || loading"
+            data-test="discover-page-next"
+            @click="page = page + 1"
+          >
+            {{ t('app.pagination.next') }}
+          </v-btn>
+        </div>
       </div>
     </template>
   </div>
 </template>
 
 <style scoped>
-.discover-card {
-  cursor: pointer;
-  overflow: hidden;
-  /* The card is its own query container: everything inside sizes off the
-     card's width (cqi units), so the whole card scales as one unit. */
-  container-type: inline-size;
-  transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
-}
-.discover-card:hover {
-  box-shadow: 0 2px 12px rgba(var(--v-theme-on-surface), 0.14);
-}
-.discover-card__hero {
-  position: relative;
-  aspect-ratio: 5 / 4;
-  overflow: hidden;
-  background: rgba(var(--v-theme-on-surface), 0.06);
-}
-.discover-card__img {
-  height: 100%;
-  width: 100%;
-}
-.discover-card__fallback {
-  height: 100%;
-  width: 100%;
+/* The filter pills 8 apart, the result count at the end (Figma 17:441). */
+.discover-filters {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  background: linear-gradient(
-    135deg,
-    rgba(var(--v-theme-primary), 0.18),
-    rgba(var(--v-theme-surface), 0.4)
-  );
-}
-.discover-card__initial {
-  font-size: clamp(1.5rem, 22cqi, 3rem);
-  font-weight: 300;
+  gap: 8px;
 }
 
-/* Base type tracks the card width (clamped so it never gets illegible, nor
-   larger than the big-monitor reference the design was tuned at). Every inner
-   size is expressed in em/cqi off this base, so text, icons, chips, gaps and
-   padding all shrink and grow together with the card. */
-.discover-card__body {
-  font-size: clamp(0.6rem, 6.2cqi, 0.8rem);
-  padding: 1.15em;
-}
-.discover-card__namerow {
-  column-gap: 0.35em;
-}
-.discover-card__name {
-  min-width: 0;
-  font-size: 1.3em;
-  line-height: 1.25;
-}
-.discover-card__namerow :deep(.v-icon) {
-  font-size: 1.25em;
-  width: 1.25em;
-  height: 1.25em;
-}
-.discover-card__meta {
-  margin-top: 0.4em;
-  column-gap: 0.9em;
-  row-gap: 0.2em;
-}
-.discover-card__meta > span {
-  column-gap: 0.3em;
-}
-.discover-card__meta :deep(.v-icon) {
-  font-size: 1.05em;
-  width: 1.05em;
-  height: 1.05em;
-}
-.discover-card__cats {
-  flex-wrap: nowrap;
-  overflow: hidden;
-  gap: 0.35em;
-  margin-top: 0.6em;
-  min-height: 1.7em;
-}
-.discover-card__footer {
-  margin-top: auto;
-  padding-top: 0.8em;
-  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+.discover-filters__count {
+  margin: 0;
+  margin-inline-start: auto;
+  font-size: var(--catalyst-typography-body-sm-size);
+  line-height: var(--catalyst-typography-body-sm-line-height);
+  color: rgb(var(--v-theme-text-tertiary));
 }
 
-/* Chips (categories + connection annotation) scale off the same em base. */
-.discover-card :deep(.v-chip) {
-  height: auto;
-  min-height: 0;
-  font-size: 0.85em;
-  padding-inline: 0.6em;
-  border-radius: 0.5em;
+/* Four equal columns 20 apart; three, two and one as the window narrows. */
+.discover-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
 }
-.discover-card :deep(.v-chip__content) {
-  padding-block: 0.24em;
-  line-height: 1.2;
+
+@media (max-width: 1099px) {
+  .discover-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
-.discover-card :deep(.v-chip .v-icon) {
-  font-size: 1.1em;
-  width: 1.1em;
-  height: 1.1em;
+
+@media (max-width: 799px) {
+  .discover-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 519px) {
+  .discover-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 </style>
