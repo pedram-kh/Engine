@@ -171,6 +171,13 @@ For whoever owns the Figma file:
 - The brand detail and list "Created" label is one i18n key, `app.brands.fields.createdAt`, 24 locales, `verify-locale` 24 / 24 (the flaky-ten locales carry real translations, no English fallback; the translations are single words from the model, not reviewed by a native speaker).
 - The posted-content pending colour change and the roster table's horizontal scroll at 1280 are accepted.
 
+**Status: CLOSED pending deploy and Pedram's walk** (close-out accepted at `1bc398e8`, 2026-11-02). Rulings on the open items:
+
+- The signed-in creator comparison is skipped. Pedram's browser walk on the local stack covers it (creator sign-in, old render).
+- The 23 non-English `createdAt` translations are accepted as machine-consistent.
+- The sign-in `data-v-` id difference is accepted as pre-existing (the tech-debt row is kept).
+- The `deploy-log.md` entry stays `PENDING` until the colleague publishes the main Netlify site.
+
 ## 7. Open items and where they are logged
 
 All are rows in [`tech-debt.md`](../tech-debt.md), section "AH-114 (agency restyle) — open items": lazy-load `agency.css`; the `AgencyKpiCard` skeleton offset; the flaky `Step2ProfileBasicsPage` spec (and the `CreatorProfilePage` timeout); the roster Followers and Engagement filters; the dashboard KPI nulls; the Notifications layout (AH-115); the light logo asset; plus the AuthLayout screens, the creator-side Roboto fallback, the existing em-dash and Title Case strings, the data the designs show with no source, the future chunks (campaign status counts, the Discover age filter), the signed-in real-data check, and the build id mismatch on the sign-in page.
