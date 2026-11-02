@@ -419,9 +419,10 @@ async function commitListing(item: CampaignResource, value: boolean): Promise<vo
         variant="outlined"
         hide-details
         clearable
+        active
         class="agency-filter"
         :class="{ 'agency-filter--applied': !!brandFilter }"
-        style="max-width: 220px"
+        style="max-width: 190px"
         data-test="campaign-filter-brand"
       />
       <v-text-field
