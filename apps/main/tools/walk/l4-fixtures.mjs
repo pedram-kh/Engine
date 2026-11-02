@@ -365,6 +365,14 @@ export const L4_REAL_PAGES = {
     width: 1600,
     height: 1000,
   },
+  // AH-116 (W4): the members list narrowed by a country, like the API narrows it.
+  'pool-members-filtered-1600': {
+    to: `/talent-pools/${POOL_ID}?country=GB`,
+    names: 'pools.detail',
+    width: 1600,
+    height: 1000,
+    expect: ['[data-test="pool-members-country-filter"]', '[data-test^="pool-member-0"]'],
+  },
   'pool-create-1600': { to: '/talent-pools/new', names: 'pools.create', width: 1600, height: 900 },
   'pool-edit-1600': {
     to: `/talent-pools/${POOL_ID}/edit`,

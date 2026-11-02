@@ -19,7 +19,12 @@ const MESSAGES_NAMES = 'messages.inbox,messages.thread'
 const THREAD_CREATOR = '01HCREATORMAYA00000000001'
 
 export const REAL_PAGES = {
-  'campaigns-1600': { to: '/campaigns', names: 'campaigns.list,campaigns.create', width: 1600 },
+  'campaigns-1600': {
+    to: '/campaigns',
+    names: 'campaigns.list,campaigns.create',
+    width: 1600,
+    expect: ['[data-test="campaign-list-summary"]', '[data-test="campaign-filter-count-active"]'],
+  },
   'campaigns-1280': { to: '/campaigns', names: 'campaigns.list,campaigns.create', width: 1280 },
   'campaign-detail-1600': { to: `/campaigns/${DETAIL_ID}`, names: 'campaigns.detail', width: 1600 },
   'campaign-detail-1280': { to: `/campaigns/${DETAIL_ID}`, names: 'campaigns.detail', width: 1280 },
@@ -39,6 +44,37 @@ export const REAL_PAGES = {
     names: MESSAGES_NAMES,
     width: 1280,
     height: 800,
+  },
+  // AH-116 (W2, W6, W7): the Discover age filter, the Campaign files strip, the chat with the
+  // files pinned, and an application row with Message.
+  'discover-age-1600': {
+    to: '/discover?age_min=21&age_max=34',
+    names: 'discover.list',
+    width: 1600,
+    height: 1000,
+    expect: ['[data-test="discover-age-min"] input', '[data-test="discover-age-max"] input'],
+  },
+  'campaign-files-1600': {
+    to: `/campaigns/${DETAIL_ID}`,
+    names: 'campaigns.detail',
+    width: 1600,
+    height: 1000,
+    expect: ['[data-test="overview-glance"]', '[data-test="campaign-files-overview"]'],
+  },
+  'campaign-chat-files-1600': {
+    to: `/campaigns/${DETAIL_ID}?tab=messages`,
+    names: 'campaigns.detail',
+    width: 1600,
+    height: 1000,
+    click: ['[data-test^="thread-row-"]'],
+    expect: ['[data-test="chat-dialog-pinned"] [data-test="campaign-files-chat"]'],
+  },
+  'application-message-1600': {
+    to: `/campaigns/${DETAIL_ID}?tab=applications`,
+    names: 'campaigns.detail',
+    width: 1600,
+    height: 1000,
+    expect: ['[data-test="applications-message-01HAPPLICATION0000000001"]'],
   },
   ...L4_REAL_PAGES,
 }
@@ -265,8 +301,157 @@ function threadFeed() {
   }
 }
 
+// ── Campaign files, applications and the campaign chat (AH-116, W6 and W7) ──────────────────
+
+const ASSIGNMENT_ID = '01HASSIGNMENT00000000001'
+const DANIEL = '01HCREATORDANIEL00000001'
+const SOFIA = '01HCREATORSOFIA000000001'
+
+/** [id, name, mime, bytes, visible to creators] */
+const FILES = [
+  ['01HFILE000000000000000001', 'Campaign brief.pdf', 'application/pdf', 482_000, true],
+  ['01HFILE000000000000000002', 'Brand guidelines.pdf', 'application/pdf', 2_300_000, true],
+  ['01HFILE000000000000000003', 'Talent rate card.xlsx', 'application/vnd.ms-excel', 38_000, false],
+  ['01HFILE000000000000000004', 'Mood board.png', 'image/png', 5_900_000, true],
+  ['01HFILE000000000000000005', 'Usage rights.docx', 'application/msword', 71_000, false],
+]
+
+function attachments() {
+  return FILES.map(([id, name, mime, bytes, visible]) => ({
+    id,
+    type: 'campaign_attachments',
+    attributes: {
+      original_filename: name,
+      mime_type: mime,
+      size_bytes: bytes,
+      visible_to_creators: visible,
+      download_url: `https://files.example.test/${id}`,
+      attached_at: ago(3),
+    },
+    relationships: { attached_by: null },
+  }))
+}
+
+/** The Applications tab rows: two pending (one messageable) and one already accepted. */
+function applicationRows() {
+  return [
+    [
+      '01HAPPLICATION0000000001',
+      THREAD_CREATOR,
+      'Maya Thompson',
+      'pending',
+      'Shot two campaigns for this brand.',
+    ],
+    ['01HAPPLICATION0000000002', DANIEL, 'Daniel Okafor', 'pending', null],
+    ['01HAPPLICATION0000000003', SOFIA, 'Sofia Marchetti', 'accepted', null],
+  ].map(([id, creatorId, name, status, note]) => ({
+    id,
+    type: 'campaign_application_list_item',
+    attributes: {
+      status,
+      note,
+      applied_at: ago(2),
+      responded_at: status === 'pending' ? null : ago(1),
+      creator: { id: creatorId, display_name: name, avatar_url: null },
+    },
+  }))
+}
+
+function campaignChatFeed() {
+  const msg = (id, at, body, own) => ({
+    id,
+    type: 'message',
+    attributes: {
+      kind: 'text',
+      sender_role: own ? 'agency_user' : 'creator',
+      body,
+      attachments: [],
+      system_event_key: null,
+      is_own: own,
+      sender: { name: own ? 'Jordan' : 'Maya Thompson' },
+      created_at: at,
+    },
+  })
+  return {
+    data: [
+      msg('c1', ago(1, 95), 'Hi Maya, the brief and guidelines are in the campaign files.', true),
+      msg(
+        'c2',
+        ago(1, 70),
+        'Got them, thank you. I will start with the first hook tomorrow.',
+        false,
+      ),
+      msg(
+        'c3',
+        ago(0, 40),
+        'Great. Send the draft when it is ready and we will turn it round fast.',
+        true,
+      ),
+    ],
+    meta: {
+      thread: {
+        id: 'thread-c',
+        assignment_id: ASSIGNMENT_ID,
+        last_message_at: ago(0, 40),
+        unread_count: 0,
+        human_send_blocked: false,
+      },
+      has_more: false,
+    },
+  }
+}
+
 export function fixtureFor(url, method) {
   const p = url.pathname
+  if (method === 'GET' && p === `/api/v1/agencies/${AGENCY}/campaigns/${DETAIL_ID}/attachments`) {
+    return { data: attachments() }
+  }
+  if (
+    method === 'GET' &&
+    p === `/api/v1/agencies/${AGENCY}/campaigns/${DETAIL_ID}/message-threads`
+  ) {
+    return {
+      data: [
+        {
+          id: 'thread-c',
+          type: 'message_thread',
+          attributes: {
+            assignment_id: ASSIGNMENT_ID,
+            status: 'accepted',
+            creator: { display_name: 'Maya Thompson' },
+            last_message_at: ago(0, 40),
+            last_message_preview: 'Great. Send the draft when it is ready...',
+            unread_count: 0,
+          },
+        },
+      ],
+    }
+  }
+  if (
+    p ===
+    `/api/v1/agencies/${AGENCY}/campaigns/${DETAIL_ID}/assignments/${ASSIGNMENT_ID}/messages/read`
+  ) {
+    return { meta: { marked: 0, unread_count: 0 } }
+  }
+  if (
+    method === 'GET' &&
+    p === `/api/v1/agencies/${AGENCY}/campaigns/${DETAIL_ID}/assignments/${ASSIGNMENT_ID}/messages`
+  ) {
+    return campaignChatFeed()
+  }
+  // Only Maya is messageable: Daniel's row shows no Message, which is the gate working.
+  if (method === 'GET' && p === `/api/v1/agencies/${AGENCY}/messageable-creators`) {
+    return {
+      data: [
+        {
+          id: THREAD_CREATOR,
+          type: 'messageable_creator',
+          attributes: { display_name: 'Maya Thompson', avatar_url: null },
+        },
+      ],
+      meta: { total: 1, page: 1, per_page: 100, last_page: 1 },
+    }
+  }
   if (method === 'GET' && p === `/api/v1/agencies/${AGENCY}/relationship-threads`) {
     return { data: inboxRows() }
   }
@@ -289,9 +474,17 @@ export function fixtureFor(url, method) {
     return { data: detailCampaign() }
   }
   if (method === 'GET' && p === `/api/v1/agencies/${AGENCY}/campaigns/${DETAIL_ID}/applications`) {
+    // The glance row asks for one row (`per_page=1`) and only reads `pending_total`; the tab asks
+    // for a page of them.
+    if (url.searchParams.get('per_page') === '1') {
+      return {
+        data: [],
+        meta: { total: 3, page: 1, per_page: 1, last_page: 3, pending_total: 2 },
+      }
+    }
     return {
-      data: [],
-      meta: { total: 3, page: 1, per_page: 1, last_page: 3, pending_total: 1 },
+      data: applicationRows(),
+      meta: { total: 3, page: 1, per_page: 25, last_page: 1, pending_total: 2 },
     }
   }
   if (method === 'GET' && p === `/api/v1/agencies/${AGENCY}/campaigns`) {

@@ -94,6 +94,16 @@ try {
       if (!real) throw new Error(`unknown page ${id}`)
       const w = await newPage(browser, theme, base, real)
       const file = `${theme}-${id}.png`
+      // `expect`: selectors that must be on the page before the shot; their text is printed, so
+      // each screenshot is confirmed against a DOM read from the same step (the stale-frame rule).
+      for (const sel of real.expect ?? []) {
+        const hit = w.page.locator(sel).first()
+        if ((await hit.count()) === 0) throw new Error(`${theme}-${id}: ${sel} is not on the page`)
+        const isInput = await hit.evaluate((el) => el.tagName === 'INPUT')
+        const raw = isInput ? await hit.inputValue() : await hit.innerText()
+        const text = raw.replace(/\s+/g, ' ').trim().slice(0, 160)
+        console.log(`  DOM ${theme}-${id} ${sel} => ${text}`)
+      }
       await w.page.screenshot({
         path: path.join(OUT, file),
         animations: 'disabled',
