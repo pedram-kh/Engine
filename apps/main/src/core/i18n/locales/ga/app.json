@@ -602,6 +602,10 @@
             "blacklisted": "Tá an cruthaitheoir seo ar an liosta dubh agus ní féidir cuireadh a thabhairt dó chuig an bhfeachtas seo."
           },
           "generic": "Chuaigh rud éigin mícheart. Bain triail eile as."
+        },
+        "message": {
+          "action": "Teachtaireacht",
+          "label": "Teachtaireacht: {name}"
         }
       },
       "fees": {

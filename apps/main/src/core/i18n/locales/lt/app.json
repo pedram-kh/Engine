@@ -602,6 +602,10 @@
             "blacklisted": "Šis kūrėjas yra juodajame sąraše ir negali būti pakviestas į šią kampaniją."
           },
           "generic": "Kažkas nepavyko. Bandyk dar kartą."
+        },
+        "message": {
+          "action": "Žinutė",
+          "label": "Žinutė: {name}"
         }
       },
       "fees": {

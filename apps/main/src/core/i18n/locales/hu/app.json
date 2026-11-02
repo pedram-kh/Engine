@@ -602,6 +602,10 @@
             "blacklisted": "Ez az alkotó tiltólistán van, és nem hívható meg ebbe a kampányba."
           },
           "generic": "Valami hiba történt. Próbáld újra."
+        },
+        "message": {
+          "action": "Üzenet",
+          "label": "Üzenet: {name}"
         }
       },
       "fees": {

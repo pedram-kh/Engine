@@ -602,6 +602,10 @@
             "blacklisted": "Ovaj kreator je na crnoj listi i ne može se pozvati u ovu kampanju."
           },
           "generic": "Nešto je pošlo po zlu. Pokušaj ponovno."
+        },
+        "message": {
+          "action": "Poruka",
+          "label": "Poruka: {name}"
         }
       },
       "fees": {

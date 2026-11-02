@@ -602,6 +602,10 @@
             "blacklisted": "Den här creatorn är svartlistad och kan inte bjudas in till den här kampanjen."
           },
           "generic": "Något gick fel. Försök igen."
+        },
+        "message": {
+          "action": "Meddelande",
+          "label": "Meddelande: {name}"
         }
       },
       "fees": {

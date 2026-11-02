@@ -602,6 +602,10 @@
             "blacklisted": "Acest creator este pe lista neagră și nu poate fi invitat în această campanie."
           },
           "generic": "Ceva nu a mers bine. Încearcă din nou."
+        },
+        "message": {
+          "action": "Mesaj",
+          "label": "Mesaj: {name}"
         }
       },
       "fees": {

@@ -602,6 +602,10 @@
             "blacklisted": "Ta ustvarjalec je na črnem seznamu in ga ni mogoče povabiti v to kampanjo."
           },
           "generic": "Nekaj je šlo narobe. Poskusi znova."
+        },
+        "message": {
+          "action": "Sporočilo",
+          "label": "Sporočilo: {name}"
         }
       },
       "fees": {

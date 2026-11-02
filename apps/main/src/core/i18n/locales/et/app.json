@@ -602,6 +602,10 @@
             "blacklisted": "See looja on mustas nimekirjas ja teda ei saa sellesse kampaaniasse kutsuda."
           },
           "generic": "Midagi läks valesti. Palun proovi uuesti."
+        },
+        "message": {
+          "action": "Sõnum",
+          "label": "Sõnum: {name}"
         }
       },
       "fees": {

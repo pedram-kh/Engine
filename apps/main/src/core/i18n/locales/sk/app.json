@@ -602,6 +602,10 @@
             "blacklisted": "Tento tvorca je na čiernej listine a nie je možné ho pozvať do tejto kampane."
           },
           "generic": "Niečo sa pokazilo. Skús to znova."
+        },
+        "message": {
+          "action": "Správa",
+          "label": "Správa: {name}"
         }
       },
       "fees": {

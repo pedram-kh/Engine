@@ -45,7 +45,7 @@
 
 import type { CampaignApplicationListItemResource } from '@catalyst/api-client'
 import { formatDateTime } from '@catalyst/api-client'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import CreatorProfileDialog from '@/components/CreatorProfileDialog.vue'
@@ -55,7 +55,8 @@ import { useCampaignApplications } from '@/modules/campaigns/composables/useCamp
 
 import { useBoardStore } from '../stores/useBoardStore'
 import CreatorIdentityAvatar from '@/components/CreatorIdentityAvatar.vue'
-import { creatorLabel } from '@/core/creators/creatorLabel'
+import { creatorIsErased, creatorLabel } from '@/core/creators/creatorLabel'
+import { useMessageableCreatorIds } from '@/modules/agency/composables/useMessageableCreatorIds'
 
 const props = defineProps<{
   agencyId: string
@@ -83,6 +84,36 @@ const applications = useCampaignApplications(
 )
 
 const { rows, loading, loadError, actionError, hasRows, load, pendingTotal } = applications
+
+// AH-116 — "Message" beside the two answers, the same rule as the Applications tab: for someone
+// who can act, a creator the messaging gate lets this agency write to, never an erased account.
+// Every row here is pending (the composable pins that), and the set is read once, only when
+// there is a row to put a button on.
+const messageable = useMessageableCreatorIds(() => props.agencyId)
+
+function canMessage(row: CampaignApplicationListItemResource): boolean {
+  const creator = row.attributes.creator
+  return creator !== null && !creatorIsErased(creator) && messageable.canMessage(creator.id)
+}
+
+function messageTo(row: CampaignApplicationListItemResource) {
+  const creator = row.attributes.creator
+  // Read through the one creator-label reader; '' when there is no name to show.
+  const name = creatorLabel(creator, t, '')
+  return {
+    name: 'messages.thread',
+    params: { creatorUlid: creator?.id ?? '' },
+    query: name !== '' ? { name } : {},
+  }
+}
+
+watch(
+  () => props.canAct && rows.value.length > 0,
+  (wanted) => {
+    if (wanted) void messageable.ensureLoaded()
+  },
+  { immediate: true },
+)
 
 const acceptDialog = ref(false)
 const rejectDialog = ref(false)
@@ -246,6 +277,18 @@ onMounted(() => {
           <!-- The actions on the card too, for the same reason. Same ability gate
                as the tab: accept and reject sit under one `invite` tier. -->
           <div v-if="canAct" class="d-flex ga-2 mt-3">
+            <v-btn
+              v-if="canMessage(row)"
+              variant="text"
+              size="x-small"
+              :to="messageTo(row)"
+              :aria-label="
+                t('app.campaigns.applications.message.label', { name: creatorName(row) })
+              "
+              :data-test="`board-application-message-${row.id}`"
+            >
+              {{ t('app.campaigns.applications.message.action') }}
+            </v-btn>
             <v-btn
               variant="outlined"
               size="x-small"

@@ -602,6 +602,10 @@
             "blacklisted": "Este criador está na lista negra e não pode ser convidado para esta campanha."
           },
           "generic": "Algo correu mal. Tenta novamente."
+        },
+        "message": {
+          "action": "Mensagem",
+          "label": "Mensagem: {name}"
         }
       },
       "fees": {

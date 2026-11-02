@@ -602,6 +602,10 @@
             "blacklisted": "This creator is blacklisted and can't be invited to this campaign."
           },
           "generic": "Something went wrong. Please try again."
+        },
+        "message": {
+          "action": "Message",
+          "label": "Message {name}"
         }
       },
       "fees": {

@@ -24,6 +24,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createI18n } from 'vue-i18n'
+import { createMemoryHistory, createRouter, type Router } from 'vue-router'
 import { createVuetify } from 'vuetify'
 import * as vuetifyComponents from 'vuetify/components'
 import * as vuetifyDirectives from 'vuetify/directives'
@@ -41,7 +42,14 @@ vi.mock('../api/board.api', () => ({
   boardApi: { show: vi.fn(), moveCard: vi.fn(), reorderColumns: vi.fn() },
 }))
 
+// AH-116 (item 7): the Message action reads which creators the agency can message.
+vi.mock('@/modules/messaging/api/relationshipMessaging.api', () => ({
+  relationshipMessagingApi: { messageableCreators: vi.fn() },
+}))
+
+import { MAX_PAGES } from '@/modules/agency/composables/useMessageableCreatorIds'
 import { campaignsApi } from '@/modules/campaigns/api/campaigns.api'
+import { relationshipMessagingApi } from '@/modules/messaging/api/relationshipMessaging.api'
 
 import { boardApi } from '../api/board.api'
 import { useBoardStore } from '../stores/useBoardStore'
@@ -88,8 +96,34 @@ function boardPayload() {
   }
 }
 
+/** One page of the messageable-creators list holding exactly these creator ULIDs. */
+function messageablePage(ids: string[], page = 1, lastPage = 1) {
+  return {
+    data: ids.map((id) => ({
+      id,
+      type: 'messageable_creator' as const,
+      attributes: { display_name: null, avatar_url: null },
+    })),
+    meta: { total: ids.length, page, per_page: 100, last_page: lastPage },
+  }
+}
+
+let router: Router
+
 async function mountColumn(canAct = true) {
   setActivePinia(createPinia())
+  router = createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      {
+        path: '/messages/:creatorUlid',
+        name: 'messages.thread',
+        component: { template: '<div />' },
+      },
+    ],
+  })
+  await router.push('/messages/start')
+  await router.isReady()
 
   // The column only ever exists on a loaded board (BoardColumns renders under
   // the store's `v-else`), and `refresh()` is a no-op on an unloaded store — so
@@ -107,7 +141,7 @@ async function mountColumn(canAct = true) {
       campaignCurrency: 'EUR',
     },
     global: {
-      plugins: [i18n, vuetify],
+      plugins: [i18n, vuetify, router],
       // CreatorProfileDialog's own full/thin/§5.34 rendering is
       // CreatorProfileContent.spec.ts's job; here we only pin the click
       // wiring (D2c), so a real mount never fires an unmocked network call.
@@ -126,6 +160,8 @@ describe('BoardApplicationsColumn — the pending working surface', () => {
       listPayload([application('app-1', 'Ada'), application('app-2', 'Grace')]) as never,
     )
     vi.mocked(boardApi.show).mockResolvedValue(boardPayload() as never)
+    // Default: nobody is messageable, so every existing test keeps its current expectation.
+    vi.mocked(relationshipMessagingApi.messageableCreators).mockResolvedValue(messageablePage([]))
   })
 
   afterEach(() => vi.restoreAllMocks())
@@ -317,6 +353,113 @@ describe('BoardApplicationsColumn — the pending working surface', () => {
     await wrapper.find('[data-test="board-application-profile-app-1"]').trigger('click')
     await flushPromises()
 
+    expect(wrapper.findComponent({ name: 'AcceptApplicationDialog' }).exists()).toBe(false)
+    expect(wrapper.findComponent({ name: 'RejectApplicationDialog' }).exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  // ── Message (AH-116, item 7) ───────────────────────────────────────────────────────────
+
+  const messageBtn = (wrapper: Awaited<ReturnType<typeof mountColumn>>, id = 'app-1') =>
+    wrapper.find(`[data-test="board-application-message-${id}"]`)
+
+  it('AH-116: offers Message on a card whose creator the agency can message, and only that card', async () => {
+    vi.mocked(relationshipMessagingApi.messageableCreators).mockResolvedValue(
+      messageablePage(['cr-app-1']),
+    )
+    const wrapper = await mountColumn()
+
+    const button = messageBtn(wrapper, 'app-1')
+    expect(button.exists()).toBe(true)
+    expect(button.text()).toBe('Message')
+    expect(button.attributes('aria-label')).toBe('Message Ada')
+    expect(button.attributes('href')).toBe('/messages/cr-app-1?name=Ada')
+    expect(messageBtn(wrapper, 'app-2').exists()).toBe(false)
+    // Beside the two answers, which stay on both cards.
+    expect(wrapper.find('[data-test="board-application-accept-app-1"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="board-application-reject-app-2"]').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('AH-116: no Message for an erased applicant, even if the list names them', async () => {
+    vi.mocked(relationshipMessagingApi.messageableCreators).mockResolvedValue(
+      messageablePage(['cr-app-1']),
+    )
+    const erased = application('app-1', 'Ada')
+    erased.attributes.creator = {
+      ...erased.attributes.creator!,
+      display_name: null,
+      is_erased: true,
+    }
+    vi.mocked(campaignsApi.listApplications).mockResolvedValue(listPayload([erased]) as never)
+    const wrapper = await mountColumn()
+
+    expect(messageBtn(wrapper).exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('AH-116: a viewer without the invite ability gets no Message, and no lookup is made', async () => {
+    vi.mocked(relationshipMessagingApi.messageableCreators).mockResolvedValue(
+      messageablePage(['cr-app-1']),
+    )
+    const wrapper = await mountColumn(false)
+
+    expect(messageBtn(wrapper).exists()).toBe(false)
+    expect(relationshipMessagingApi.messageableCreators).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  it('AH-116: an empty column makes no lookup', async () => {
+    vi.mocked(campaignsApi.listApplications).mockResolvedValue(listPayload([]) as never)
+    const wrapper = await mountColumn()
+
+    expect(relationshipMessagingApi.messageableCreators).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  it('AH-116: a failing lookup hides Message (fails closed) and leaves Accept and Reject alone', async () => {
+    vi.mocked(relationshipMessagingApi.messageableCreators).mockRejectedValue(new Error('boom'))
+    const wrapper = await mountColumn()
+
+    expect(messageBtn(wrapper).exists()).toBe(false)
+    expect(wrapper.find('[data-test="board-application-accept-app-1"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="board-application-reject-app-1"]').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('AH-116: finds a creator on a later page, and stops at the cap (fails closed)', async () => {
+    vi.mocked(relationshipMessagingApi.messageableCreators)
+      .mockResolvedValueOnce(messageablePage(['cr-other'], 1, 2))
+      .mockResolvedValueOnce(messageablePage(['cr-app-1'], 2, 2))
+    const found = await mountColumn()
+    expect(messageBtn(found).exists()).toBe(true)
+    found.unmount()
+
+    vi.mocked(relationshipMessagingApi.messageableCreators).mockReset()
+    vi.mocked(relationshipMessagingApi.messageableCreators).mockImplementation(
+      async (_agency, params) =>
+        messageablePage(
+          params?.page === MAX_PAGES + 1 ? ['cr-app-1'] : [`cr-filler-${params?.page}`],
+          params?.page ?? 1,
+          MAX_PAGES + 1,
+        ),
+    )
+    const capped = await mountColumn()
+    expect(relationshipMessagingApi.messageableCreators).toHaveBeenCalledTimes(MAX_PAGES)
+    expect(messageBtn(capped).exists()).toBe(false)
+    capped.unmount()
+  })
+
+  it('AH-116: clicking Message does NOT also open the profile dialog (D5)', async () => {
+    vi.mocked(relationshipMessagingApi.messageableCreators).mockResolvedValue(
+      messageablePage(['cr-app-1']),
+    )
+    const wrapper = await mountColumn()
+
+    await messageBtn(wrapper).trigger('click')
+    await flushPromises()
+
+    expect(wrapper.findComponent({ name: 'CreatorProfileDialog' }).exists()).toBe(false)
     expect(wrapper.findComponent({ name: 'AcceptApplicationDialog' }).exists()).toBe(false)
     expect(wrapper.findComponent({ name: 'RejectApplicationDialog' }).exists()).toBe(false)
     wrapper.unmount()

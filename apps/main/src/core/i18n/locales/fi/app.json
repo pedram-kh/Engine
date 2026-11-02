@@ -602,6 +602,10 @@
             "blacklisted": "Tämä tekijä on estolistalla, eikä häntä voi kutsua tähän kampanjaan."
           },
           "generic": "Jokin meni pieleen. Yritä uudelleen."
+        },
+        "message": {
+          "action": "Viesti",
+          "label": "Viesti: {name}"
         }
       },
       "fees": {

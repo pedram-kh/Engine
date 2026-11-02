@@ -12,6 +12,7 @@ import type { CampaignApplicationListItemResource } from '@catalyst/api-client'
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createI18n } from 'vue-i18n'
+import { createMemoryHistory, createRouter, type Router } from 'vue-router'
 import { createVuetify } from 'vuetify'
 import * as vuetifyComponents from 'vuetify/components'
 import * as vuetifyDirectives from 'vuetify/directives'
@@ -28,9 +29,18 @@ vi.mock('../api/campaigns.api', () => ({
   },
 }))
 
+// AH-116 (item 7): the Message action reads which creators the agency can message.
+vi.mock('@/modules/messaging/api/relationshipMessaging.api', () => ({
+  relationshipMessagingApi: { messageableCreators: vi.fn() },
+}))
+
+import { relationshipMessagingApi } from '@/modules/messaging/api/relationshipMessaging.api'
+
 import { campaignsApi } from '../api/campaigns.api'
+import { MAX_PAGES } from '@/modules/agency/composables/useMessageableCreatorIds'
 import ApplicationsTab from './ApplicationsTab.vue'
 
+const CREATOR_ULID = '01CREATORULIDXXXXXXXXXXXXX'
 const PENDING_ID = '01APPPENDINGXXXXXXXXXXXXXX'
 const ANSWERED_ID = '01APPREJECTEDXXXXXXXXXXXXX'
 
@@ -69,7 +79,34 @@ function listResponse(rows: CampaignApplicationListItemResource[], pendingTotal 
   }
 }
 
+/** One page of the messageable-creators list holding exactly these creator ULIDs. */
+function messageablePage(ids: string[], page = 1, lastPage = 1) {
+  return {
+    data: ids.map((id) => ({
+      id,
+      type: 'messageable_creator' as const,
+      attributes: { display_name: null, avatar_url: null },
+    })),
+    meta: { total: ids.length, page, per_page: 100, last_page: lastPage },
+  }
+}
+
+let router: Router
+
 async function mountTab(canAct = true) {
+  router = createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      {
+        path: '/messages/:creatorUlid',
+        name: 'messages.thread',
+        component: { template: '<div />' },
+      },
+    ],
+  })
+  await router.push('/messages/start')
+  await router.isReady()
+
   const i18n = createI18n({
     legacy: false,
     locale: 'en',
@@ -88,7 +125,7 @@ async function mountTab(canAct = true) {
       campaignCurrency: 'EUR',
     },
     global: {
-      plugins: [i18n, vuetify],
+      plugins: [i18n, vuetify, router],
       // CreatorProfileDialog's own rendering is CreatorProfileContent.spec.ts's
       // job; here we only pin the click wiring (D2c), so a real mount never
       // fires an unmocked roster/discover network call.
@@ -112,6 +149,8 @@ describe('ApplicationsTab', () => {
       },
       meta: { code: 'application.rejected' },
     })
+    // Default: nobody is messageable, so every existing test keeps its current expectation.
+    vi.mocked(relationshipMessagingApi.messageableCreators).mockResolvedValue(messageablePage([]))
   })
 
   afterEach(() => {
@@ -318,6 +357,174 @@ describe('ApplicationsTab', () => {
     const wrapper = await mountTab()
 
     await wrapper.find(`[data-test="applications-reject-${PENDING_ID}"]`).trigger('click')
+    await flushPromises()
+    expect(wrapper.findComponent({ name: 'CreatorProfileDialog' }).exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  // ── Message (AH-116, item 7) ───────────────────────────────────────────────────────────
+
+  const messageBtn = (wrapper: Awaited<ReturnType<typeof mountTab>>, id = PENDING_ID) =>
+    wrapper.find(`[data-test="applications-message-${id}"]`)
+
+  it('AH-116: offers Message on a pending row whose creator the agency can message', async () => {
+    vi.mocked(relationshipMessagingApi.messageableCreators).mockResolvedValue(
+      messageablePage([CREATOR_ULID]),
+    )
+    const wrapper = await mountTab()
+
+    const button = messageBtn(wrapper)
+    expect(button.exists()).toBe(true)
+    expect(button.text()).toBe('Message')
+    expect(button.attributes('aria-label')).toBe('Message Maria Lopez')
+    expect(button.attributes('href')).toBe(`/messages/${CREATOR_ULID}?name=Maria+Lopez`)
+    // Beside the two answers, which stay.
+    expect(wrapper.find(`[data-test="applications-accept-${PENDING_ID}"]`).exists()).toBe(true)
+    expect(wrapper.find(`[data-test="applications-reject-${PENDING_ID}"]`).exists()).toBe(true)
+    expect(relationshipMessagingApi.messageableCreators).toHaveBeenCalledWith('agency-ulid', {
+      page: 1,
+      perPage: 100,
+    })
+    wrapper.unmount()
+  })
+
+  it('AH-116: hides Message when the creator is not messageable (not on the roster, blacklisted, ...)', async () => {
+    vi.mocked(relationshipMessagingApi.messageableCreators).mockResolvedValue(
+      messageablePage(['01SOMEONEELSEXXXXXXXXXXXXX']),
+    )
+    const wrapper = await mountTab()
+
+    expect(messageBtn(wrapper).exists()).toBe(false)
+    expect(wrapper.find(`[data-test="applications-accept-${PENDING_ID}"]`).exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('AH-116: no Message on an accepted or rejected row, only on a pending one', async () => {
+    vi.mocked(relationshipMessagingApi.messageableCreators).mockResolvedValue(
+      messageablePage([CREATOR_ULID]),
+    )
+    vi.mocked(campaignsApi.listApplications).mockResolvedValue(
+      listResponse(
+        [
+          makeRow(PENDING_ID),
+          makeRow(ANSWERED_ID, 'rejected', null),
+          makeRow('01APPACCEPTEDXXXXXXXXXXXXXX', 'accepted', null),
+        ],
+        1,
+      ),
+    )
+    const wrapper = await mountTab()
+
+    expect(messageBtn(wrapper, PENDING_ID).exists()).toBe(true)
+    expect(messageBtn(wrapper, ANSWERED_ID).exists()).toBe(false)
+    expect(messageBtn(wrapper, '01APPACCEPTEDXXXXXXXXXXXXXX').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('AH-116: no Message for an erased applicant, even if the list names them', async () => {
+    vi.mocked(relationshipMessagingApi.messageableCreators).mockResolvedValue(
+      messageablePage([CREATOR_ULID]),
+    )
+    const row = makeRow()
+    row.attributes.creator = { ...row.attributes.creator!, display_name: null, is_erased: true }
+    vi.mocked(campaignsApi.listApplications).mockResolvedValue(listResponse([row], 1))
+    const wrapper = await mountTab()
+
+    expect(messageBtn(wrapper).exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('AH-116: a viewer without the execute ability gets no Message, and no lookup is made', async () => {
+    vi.mocked(relationshipMessagingApi.messageableCreators).mockResolvedValue(
+      messageablePage([CREATOR_ULID]),
+    )
+    const wrapper = await mountTab(false)
+
+    expect(messageBtn(wrapper).exists()).toBe(false)
+    expect(relationshipMessagingApi.messageableCreators).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  it('AH-116: with no pending row there is nothing to put a button on, so no lookup', async () => {
+    vi.mocked(campaignsApi.listApplications).mockResolvedValue(
+      listResponse([makeRow(ANSWERED_ID, 'rejected', null)], 0),
+    )
+    const wrapper = await mountTab()
+
+    expect(relationshipMessagingApi.messageableCreators).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  it('AH-116: a failing lookup hides Message (fails closed) and leaves Accept and Reject alone', async () => {
+    vi.mocked(relationshipMessagingApi.messageableCreators).mockRejectedValue(new Error('boom'))
+    const wrapper = await mountTab()
+
+    expect(messageBtn(wrapper).exists()).toBe(false)
+    expect(wrapper.find(`[data-test="applications-accept-${PENDING_ID}"]`).exists()).toBe(true)
+    expect(wrapper.find(`[data-test="applications-reject-${PENDING_ID}"]`).exists()).toBe(true)
+    expect(wrapper.find('[data-test="applications-action-error"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('AH-116: finds a creator on a later page of the messageable list', async () => {
+    vi.mocked(relationshipMessagingApi.messageableCreators)
+      .mockResolvedValueOnce(messageablePage(['01OTHERXXXXXXXXXXXXXXXXXXX'], 1, 2))
+      .mockResolvedValueOnce(messageablePage([CREATOR_ULID], 2, 2))
+    const wrapper = await mountTab()
+
+    expect(messageBtn(wrapper).exists()).toBe(true)
+    expect(relationshipMessagingApi.messageableCreators).toHaveBeenCalledTimes(2)
+    expect(relationshipMessagingApi.messageableCreators).toHaveBeenLastCalledWith('agency-ulid', {
+      page: 2,
+      perPage: 100,
+    })
+    wrapper.unmount()
+  })
+
+  it('AH-116: a creator past the page cap is not offered Message (fails closed)', async () => {
+    // 11 pages, the creator only on the last: the lookup stops at 10, so they are never seen.
+    vi.mocked(relationshipMessagingApi.messageableCreators).mockImplementation(
+      async (_agency, params) =>
+        messageablePage(
+          params?.page === MAX_PAGES + 1 ? [CREATOR_ULID] : [`01FILLER${params?.page}`],
+          params?.page ?? 1,
+          MAX_PAGES + 1,
+        ),
+    )
+    const wrapper = await mountTab()
+
+    expect(relationshipMessagingApi.messageableCreators).toHaveBeenCalledTimes(MAX_PAGES)
+    expect(messageBtn(wrapper).exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('AH-116: reads the messageable list once per mount, not once per reload', async () => {
+    vi.mocked(relationshipMessagingApi.messageableCreators).mockResolvedValue(
+      messageablePage([CREATOR_ULID]),
+    )
+    const wrapper = await mountTab()
+
+    await (wrapper.vm as { reload: () => Promise<void> }).reload()
+    await flushPromises()
+
+    expect(relationshipMessagingApi.messageableCreators).toHaveBeenCalledTimes(1)
+    wrapper.unmount()
+  })
+
+  it("AH-116: Message is a link to that creator's thread, and clicking it does not open the profile dialog (D5)", async () => {
+    vi.mocked(relationshipMessagingApi.messageableCreators).mockResolvedValue(
+      messageablePage([CREATOR_ULID]),
+    )
+    const wrapper = await mountTab()
+
+    const thread = router.resolve({
+      name: 'messages.thread',
+      params: { creatorUlid: CREATOR_ULID },
+      query: { name: 'Maria Lopez' },
+    })
+    expect(messageBtn(wrapper).attributes('href')).toBe(thread.href)
+
+    await messageBtn(wrapper).trigger('click')
     await flushPromises()
     expect(wrapper.findComponent({ name: 'CreatorProfileDialog' }).exists()).toBe(false)
     wrapper.unmount()

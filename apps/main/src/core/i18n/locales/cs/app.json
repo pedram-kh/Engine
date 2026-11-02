@@ -602,6 +602,10 @@
             "blacklisted": "Tento tvůrce je na černé listině a nelze ho do této kampaně pozvat."
           },
           "generic": "Něco se pokazilo. Zkuste to prosím znovu."
+        },
+        "message": {
+          "action": "Napsat",
+          "label": "Napsat {name}"
         }
       },
       "fees": {

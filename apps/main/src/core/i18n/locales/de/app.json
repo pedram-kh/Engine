@@ -602,6 +602,10 @@
             "blacklisted": "Dieser Creator ist gesperrt und kann nicht zu dieser Kampagne eingeladen werden."
           },
           "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+        },
+        "message": {
+          "action": "Nachricht",
+          "label": "Nachricht an {name}"
         }
       },
       "fees": {

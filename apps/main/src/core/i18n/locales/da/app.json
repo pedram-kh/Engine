@@ -602,6 +602,10 @@
             "blacklisted": "Denne creator er sortlistet og kan ikke inviteres til denne kampagne."
           },
           "generic": "Noget gik galt. Prøv igen."
+        },
+        "message": {
+          "action": "Skriv",
+          "label": "Skriv til {name}"
         }
       },
       "fees": {

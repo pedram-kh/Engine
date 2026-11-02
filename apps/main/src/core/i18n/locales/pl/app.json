@@ -602,6 +602,10 @@
             "blacklisted": "Ten twórca jest na czarnej liście i nie może zostać zaproszony do tej kampanii."
           },
           "generic": "Coś poszło nie tak. Spróbuj ponownie."
+        },
+        "message": {
+          "action": "Wiadomość",
+          "label": "Wiadomość: {name}"
         }
       },
       "fees": {

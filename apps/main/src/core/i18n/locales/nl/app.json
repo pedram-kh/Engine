@@ -602,6 +602,10 @@
             "blacklisted": "Deze creator staat op de zwarte lijst en kan niet voor deze campagne worden uitgenodigd."
           },
           "generic": "Er is iets misgegaan. Probeer het opnieuw."
+        },
+        "message": {
+          "action": "Bericht",
+          "label": "Bericht: {name}"
         }
       },
       "fees": {

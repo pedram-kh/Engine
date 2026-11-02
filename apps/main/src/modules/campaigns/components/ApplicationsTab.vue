@@ -57,6 +57,8 @@ import RejectApplicationDialog from './RejectApplicationDialog.vue'
 import { creatorLabel } from '@/core/creators/creatorLabel'
 import CreatorIdentityAvatar from '@/components/CreatorIdentityAvatar.vue'
 import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
+import { useMessageableCreatorIds } from '@/modules/agency/composables/useMessageableCreatorIds'
+import { creatorIsErased } from '@/core/creators/creatorLabel'
 
 const props = defineProps<{
   agencyId: string
@@ -90,6 +92,36 @@ const applications = useCampaignApplications(
 
 const { rows, loading, loadError, page, lastPage, filter, actionError, hasRows, load, isPending } =
   applications
+
+// AH-116 — "Message" beside the two answers. Offered only for a PENDING row, to someone who can
+// act, for a creator the messaging gate lets this agency write to (an erased account is never
+// offered one). The set is read once, and only when there is a pending row to put a button on.
+const messageable = useMessageableCreatorIds(() => props.agencyId)
+
+function canMessage(row: CampaignApplicationListItemResource): boolean {
+  const creator = row.attributes.creator
+  return creator !== null && !creatorIsErased(creator) && messageable.canMessage(creator.id)
+}
+
+function messageTo(row: CampaignApplicationListItemResource) {
+  const creator = row.attributes.creator
+  // Read through the one creator-label reader; '' when there is no name to show.
+  const name = creatorLabel(creator, t, '')
+  return {
+    name: 'messages.thread',
+    params: { creatorUlid: creator?.id ?? '' },
+    // The thread header shows this until the inbox resolves the name. Omitted when unknown.
+    query: name !== '' ? { name } : {},
+  }
+}
+
+watch(
+  () => props.canAct && rows.value.some((row) => isPending(row)),
+  (wanted) => {
+    if (wanted) void messageable.ensureLoaded()
+  },
+  { immediate: true },
+)
 
 const acceptDialog = ref(false)
 const acceptTarget = ref<CampaignApplicationListItemResource | null>(null)
@@ -268,6 +300,25 @@ defineExpose({
 
           <template v-if="canAct && isPending(row)" #append>
             <div class="d-flex align-center ga-2">
+              <v-btn
+                v-if="canMessage(row)"
+                variant="text"
+                size="small"
+                prepend-icon="mdi-message-text-outline"
+                :to="messageTo(row)"
+                :aria-label="
+                  t('app.campaigns.applications.message.label', {
+                    name: creatorLabel(
+                      row.attributes.creator,
+                      t,
+                      t('app.campaigns.invite.unnamed'),
+                    ),
+                  })
+                "
+                :data-test="`applications-message-${row.id}`"
+              >
+                {{ t('app.campaigns.applications.message.action') }}
+              </v-btn>
               <v-btn
                 variant="outlined"
                 size="small"

@@ -602,6 +602,10 @@
             "blacklisted": "Dan il-kreatur qiegħed fil-lista sewda u ma jistax jiġi mistieden f'din il-kampanja."
           },
           "generic": "Xi ħaġa marret ħażin. Erġa' pprova."
+        },
+        "message": {
+          "action": "Messaġġ",
+          "label": "Messaġġ: {name}"
         }
       },
       "fees": {

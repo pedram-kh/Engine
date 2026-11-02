@@ -602,6 +602,10 @@
             "blacklisted": "Šis autors ir melnajā sarakstā, un viņu nevar uzaicināt uz šo kampaņu."
           },
           "generic": "Kaut kas nogāja greizi. Lūdzu, mēģini vēlreiz."
+        },
+        "message": {
+          "action": "Ziņa",
+          "label": "Ziņa: {name}"
         }
       },
       "fees": {
