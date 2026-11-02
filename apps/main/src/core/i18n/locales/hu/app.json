@@ -385,6 +385,7 @@
         "status": "Állapot",
         "descriptionHint": "Amit az alkotó havonta készít (pl. 2 Reels és 3 Stories), valamint a felhasználási feltételek.",
         "slugHint": "A névből automatikusan javasolt. Az URL-ekben használjuk.",
+        "createdAt": "Létrehozva",
         "logo": "Logó"
       },
       "status": {

@@ -385,6 +385,7 @@
         "status": "Status",
         "descriptionHint": "Was der Creator jeden Monat produziert (z. B. 2 Reels und 3 Stories), plus Nutzungsbedingungen.",
         "slugHint": "Wird automatisch aus dem Namen vorgeschlagen. Wird in URLs verwendet.",
+        "createdAt": "Erstellt",
         "logo": "Logo"
       },
       "status": {

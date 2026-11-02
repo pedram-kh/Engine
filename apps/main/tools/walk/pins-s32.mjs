@@ -37,12 +37,17 @@ export const S32_PINS = [
     fontWeight: '500',
     color: c.onSurface,
   })),
-  pin(WIDE, 'subline: body small 13/19, secondary', '[data-test="campaign-detail-subtitle"]', (c) => ({
-    fontSize: '13px',
-    lineHeight: '19px',
-    fontWeight: '400',
-    color: c.onSurfaceVariant,
-  })),
+  pin(
+    WIDE,
+    'subline: body small 13/19, secondary',
+    '[data-test="campaign-detail-subtitle"]',
+    (c) => ({
+      fontSize: '13px',
+      lineHeight: '19px',
+      fontWeight: '400',
+      color: c.onSurfaceVariant,
+    }),
+  ),
   pin(
     WIDE,
     'subline reads "Brand · Starts <date>" and nothing about who created it',
@@ -83,27 +88,32 @@ export const S32_PINS = [
       fn: `const p = document.querySelector('[data-test="campaign-detail-status"]').getBoundingClientRect(); const h = document.querySelector('[data-test="campaign-detail-heading"]'); const r = document.createRange(); r.selectNodeContents(h); const t = r.getBoundingClientRect(); return { gap: Math.round(p.left - t.right), centred: Math.abs((p.top + p.height / 2) - (t.top + t.height / 2)) <= 1 }`,
     },
   ),
-  pin(WIDE, 'primary button: accent fill, dark label', '[data-test="campaign-detail-invite"]', (c) => ({
-    backgroundColor: c.primary,
-    color: c.onPrimary,
-    borderTopLeftRadius: '8px',
-  })),
-  ...both(
-    'the primary button ends flush with the content column',
-    root,
-    () => ({ flush: true }),
-    {
-      fn: `const b = document.querySelector('[data-test="campaign-detail-invite"]').getBoundingClientRect(); const t = document.querySelector('[data-test="campaign-tabs"]').getBoundingClientRect(); return { flush: Math.abs(b.right - t.right) < 0.5 }`,
-    },
+  pin(
+    WIDE,
+    'primary button: accent fill, dark label',
+    '[data-test="campaign-detail-invite"]',
+    (c) => ({
+      backgroundColor: c.primary,
+      color: c.onPrimary,
+      borderTopLeftRadius: '8px',
+    }),
   ),
+  ...both('the primary button ends flush with the content column', root, () => ({ flush: true }), {
+    fn: `const b = document.querySelector('[data-test="campaign-detail-invite"]').getBoundingClientRect(); const t = document.querySelector('[data-test="campaign-tabs"]').getBoundingClientRect(); return { flush: Math.abs(b.right - t.right) < 0.5 }`,
+  }),
   pin(WIDE, 'blocks stacked 20 apart', root, () => ({ rowGap: '20px', display: 'flex' })),
 
   // ── tabs ──────────────────────────────────────────────────────────────────────────────
-  pin(WIDE, 'tab bar: 40 high with a 1px default-border rule under it', '[data-test="campaign-tabs"]', (c) => ({
-    height: '40px',
-    borderBottomWidth: '1px',
-    borderBottomColor: c.border,
-  })),
+  pin(
+    WIDE,
+    'tab bar: 40 high with a 1px default-border rule under it',
+    '[data-test="campaign-tabs"]',
+    (c) => ({
+      height: '40px',
+      borderBottomWidth: '1px',
+      borderBottomColor: c.border,
+    }),
+  ),
   pin(
     WIDE,
     'tab selected: primary text, 500, 14/20, 8 above and 12 below, no side padding',
@@ -119,21 +129,19 @@ export const S32_PINS = [
       paddingRight: '0px',
     }),
   ),
-  pin(
-    WIDE,
-    'tab idle: secondary, 400',
-    tab('attachments'),
-    (c) => ({ color: c.onSurfaceVariant, fontWeight: '400', fontSize: '14px', lineHeight: '20px' }),
-  ),
+  pin(WIDE, 'tab idle: secondary, 400', tab('attachments'), (c) => ({
+    color: c.onSurfaceVariant,
+    fontWeight: '400',
+    fontSize: '14px',
+    lineHeight: '20px',
+  })),
   ...both('tabs are 24 apart', '[data-test="campaign-tabs"]', () => ({ gap: 24 }), {
     fn: `const a = document.querySelector('[data-test="tab-overview"]').getBoundingClientRect(); const b = document.querySelector('[data-test="tab-attachments"]').getBoundingClientRect(); return { gap: Math.round(b.left - a.right) }`,
   }),
-  pin(
-    WIDE,
-    'tab underline: 2px, the accent',
-    '[data-test="tab-overview"] .v-tab__slider',
-    (c) => ({ height: '2px', backgroundColor: c.primary }),
-  ),
+  pin(WIDE, 'tab underline: 2px, the accent', '[data-test="tab-overview"] .v-tab__slider', (c) => ({
+    height: '2px',
+    backgroundColor: c.primary,
+  })),
   pin(
     WIDE,
     'applications badge: accent pill, dark 12/16/500 label, 6px sides, 8 after the label',
@@ -182,27 +190,38 @@ export const S32_PINS = [
     fontWeight: '600',
     color: c.onSurface,
   })),
-  pin(WIDE, 'field label: Overline 11/14/600, +0.6, uppercase, tertiary', `${card} .agency-field__label`, (c) => ({
-    fontSize: '11px',
-    lineHeight: '14px',
-    fontWeight: '600',
-    letterSpacing: '0.6px',
-    textTransform: 'uppercase',
-    color: c.tertiary,
-  })),
+  pin(
+    WIDE,
+    'field label: Overline 11/14/600, +0.6, uppercase, tertiary',
+    `${card} .agency-field__label`,
+    (c) => ({
+      fontSize: '11px',
+      lineHeight: '14px',
+      fontWeight: '600',
+      letterSpacing: '0.6px',
+      textTransform: 'uppercase',
+      color: c.tertiary,
+    }),
+  ),
   pin(WIDE, 'field value: 14/20/500', '[data-test="overview-budget"]', (c) => ({
     fontSize: '14px',
     lineHeight: '20px',
     fontWeight: '500',
     color: c.onSurface,
   })),
-  pin(WIDE, 'fields: three columns, 24 apart', `${card} .agency-fields`, () => ({
-    display: 'grid',
-    columnGap: '24px',
-    columns: 3,
-  }), {
-    fn: `const g = document.querySelector('[data-test="overview-details-card"] .agency-fields'); const s = getComputedStyle(g); return { display: s.display, columnGap: s.columnGap, columns: s.gridTemplateColumns.split(' ').length }`,
-  }),
+  pin(
+    WIDE,
+    'fields: three columns, 24 apart',
+    `${card} .agency-fields`,
+    () => ({
+      display: 'grid',
+      columnGap: '24px',
+      columns: 3,
+    }),
+    {
+      fn: `const g = document.querySelector('[data-test="overview-details-card"] .agency-fields'); const s = getComputedStyle(g); return { display: s.display, columnGap: s.columnGap, columns: s.gridTemplateColumns.split(' ').length }`,
+    },
+  ),
   pin(
     WIDE,
     'fields: first row is brand, status, budget; second is start, end',
@@ -245,9 +264,15 @@ export const S32_PINS = [
     '[data-test="overview-requirement-contract"] .agency-switch-row__label',
     (c) => ({ fontSize: '14px', lineHeight: '20px', fontWeight: '500', color: c.onSurface }),
   ),
-  pin(WIDE, 'three rows, in the Figma order', reqCard, () => ({ rows: 'contract|creator-posts|job-board' }), {
-    fn: `return { rows: [...document.querySelectorAll('[data-test="overview-requirements-card"] .agency-switch-row')].map((e) => e.dataset.test.replace('overview-requirement-', '')).join('|') }`,
-  }),
+  pin(
+    WIDE,
+    'three rows, in the Figma order',
+    reqCard,
+    () => ({ rows: 'contract|creator-posts|job-board' }),
+    {
+      fn: `return { rows: [...document.querySelectorAll('[data-test="overview-requirements-card"] .agency-switch-row')].map((e) => e.dataset.test.replace('overview-requirement-', '')).join('|') }`,
+    },
+  ),
   pin(
     WIDE,
     'switches are read-only and set',
@@ -277,25 +302,35 @@ export const S32_PINS = [
     fontWeight: '600',
     color: c.onSurface,
   })),
-  pin(WIDE, 'glance tile: 32 square, container fill, radius 8', `${glance} .agency-glance-row__tile`, (c) => ({
-    width: '32px',
-    height: '32px',
-    backgroundColor: c.primaryContainer,
-    borderTopLeftRadius: '8px',
-    color: c.primaryText,
-  })),
+  pin(
+    WIDE,
+    'glance tile: 32 square, container fill, radius 8',
+    `${glance} .agency-glance-row__tile`,
+    (c) => ({
+      width: '32px',
+      height: '32px',
+      backgroundColor: c.primaryContainer,
+      borderTopLeftRadius: '8px',
+      color: c.primaryText,
+    }),
+  ),
   pin(WIDE, 'glance label: 14/20, secondary', `${glance} .agency-glance-row__label`, (c) => ({
     fontSize: '14px',
     lineHeight: '20px',
     fontWeight: '400',
     color: c.onSurfaceVariant,
   })),
-  pin(WIDE, 'glance value: 14/20/500, ends at the card edge', `${glance} .agency-glance-row__value`, (c) => ({
-    fontSize: '14px',
-    lineHeight: '20px',
-    fontWeight: '500',
-    color: c.onSurface,
-  })),
+  pin(
+    WIDE,
+    'glance value: 14/20/500, ends at the card edge',
+    `${glance} .agency-glance-row__value`,
+    (c) => ({
+      fontSize: '14px',
+      lineHeight: '20px',
+      fontWeight: '500',
+      color: c.onSurface,
+    }),
+  ),
   pin(
     WIDE,
     'glance holds applications and days until start, nothing else',
@@ -305,12 +340,9 @@ export const S32_PINS = [
       fn: `return { rows: [...document.querySelectorAll('[data-test="overview-glance"] .agency-glance-row')].map((e) => e.dataset.test.replace('overview-glance-', '') + ':' + e.querySelector('.agency-glance-row__value').textContent.trim()).join('|') }`,
     },
   ),
-  pin(
-    WIDE,
-    'tile icon is 16',
-    `${glance} .agency-glance-row__tile .v-icon`,
-    () => ({ fontSize: '16px' }),
-  ),
+  pin(WIDE, 'tile icon is 16', `${glance} .agency-glance-row__tile .v-icon`, () => ({
+    fontSize: '16px',
+  })),
 
   // ── what the page does not draw (nothing behind it) ───────────────────────────────────
   pin(

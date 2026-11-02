@@ -62,7 +62,12 @@ const tableOptions = ref({ page: 1, itemsPerPage: 25 })
 const headers = [
   { title: t('app.brands.fields.name'), key: 'attributes.name', sortable: false },
   { title: t('app.brands.fields.status'), key: 'attributes.status', sortable: false, width: 120 },
-  { title: 'Created', key: 'attributes.created_at', sortable: false, width: 160 },
+  {
+    title: t('app.brands.fields.createdAt'),
+    key: 'attributes.created_at',
+    sortable: false,
+    width: 160,
+  },
   { title: '', key: 'actions', sortable: false, width: 120, align: 'end' as const },
 ]
 

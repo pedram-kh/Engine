@@ -385,6 +385,7 @@
         "status": "Statuss",
         "descriptionHint": "Ko veidotājs izveido katru mēnesi (piem., 2 Reels un 3 Stories), kā arī lietošanas nosacījumi.",
         "slugHint": "Automātiski ieteikts no nosaukuma. Tiek izmantots URL adresēs.",
+        "createdAt": "Izveidots",
         "logo": "Logotips"
       },
       "status": {

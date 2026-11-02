@@ -171,7 +171,7 @@ onMounted(loadBrand)
               <dd class="agency-field__value">{{ brand.attributes.website_url }}</dd>
             </div>
             <div class="agency-field" data-test="brand-detail-created-at">
-              <dt class="agency-field__label">{{ 'Created' }}</dt>
+              <dt class="agency-field__label">{{ t('app.brands.fields.createdAt') }}</dt>
               <dd class="agency-field__value">
                 {{ formatDateTime(brand.attributes.created_at, locale, { dateStyle: 'medium' }) }}
               </dd>

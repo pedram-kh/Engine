@@ -20,7 +20,9 @@ const LIMITS = [
 ]
 
 let failed = false
-for (const file of readdirSync(dir).filter((f) => /^listing-.*\.md$/.test(f)).sort()) {
+for (const file of readdirSync(dir)
+  .filter((f) => /^listing-.*\.md$/.test(f))
+  .sort()) {
   const lines = readFileSync(path.join(dir, file), 'utf8').split('\n')
   console.log(file)
   for (let i = 0; i < lines.length; i++) {
@@ -34,7 +36,9 @@ for (const file of readdirSync(dir).filter((f) => /^listing-.*\.md$/.test(f)).so
     const n = [...text].length
     const ok = n <= rule[1]
     if (!ok) failed = true
-    console.log(`  ${ok ? 'ok  ' : 'OVER'} ${rule[2].padEnd(16)} ${String(n).padStart(4)} / ${rule[1]}`)
+    console.log(
+      `  ${ok ? 'ok  ' : 'OVER'} ${rule[2].padEnd(16)} ${String(n).padStart(4)} / ${rule[1]}`,
+    )
     if (rule[2] === 'keywords' && /,\s/.test(text)) {
       failed = true
       console.log('  OVER keywords contain a space after a comma (ASC counts it)')

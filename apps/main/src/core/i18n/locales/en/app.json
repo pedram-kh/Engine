@@ -385,6 +385,7 @@
         "status": "Status",
         "descriptionHint": "What the creator produces each month (e.g. 2 Reels and 3 Stories), plus usage terms.",
         "slugHint": "Auto-suggested from the name. Used in URLs.",
+        "createdAt": "Created",
         "logo": "Logo"
       },
       "status": {

@@ -385,6 +385,7 @@
         "status": "Stav",
         "descriptionHint": "Co tvůrce každý měsíc vytvoří (např. 2 Reels a 3 Stories) a podmínky užití.",
         "slugHint": "Automaticky navrženo podle názvu. Používá se v URL adresách.",
+        "createdAt": "Vytvořeno",
         "logo": "Logo"
       },
       "status": {

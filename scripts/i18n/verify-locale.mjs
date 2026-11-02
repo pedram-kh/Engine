@@ -45,7 +45,11 @@ function collectLeaves(node, prefix, out) {
 
 function loadLeaves(spa, locale, file) {
   const out = new Map()
-  collectLeaves(JSON.parse(readFileSync(path.join(localesRoot(spa), locale, file), 'utf8')), '', out)
+  collectLeaves(
+    JSON.parse(readFileSync(path.join(localesRoot(spa), locale, file), 'utf8')),
+    '',
+    out,
+  )
   return out
 }
 
@@ -98,10 +102,14 @@ function verify(spa, locale, violations) {
       const enForms = enValue.split('|').length
       const tgtForms = targetValue.split('|').length
       if (enForms !== tgtForms) {
-        violations.push(`${spa}/${locale}/${file}: ${key} ${tgtForms} plural forms != en ${enForms}`)
+        violations.push(
+          `${spa}/${locale}/${file}: ${key} ${tgtForms} plural forms != en ${enForms}`,
+        )
       }
       if (enForms > cats) {
-        violations.push(`${spa}/${locale}/${file}: ${key} en form count ${enForms} > ${locale} categories ${cats}`)
+        violations.push(
+          `${spa}/${locale}/${file}: ${key} en form count ${enForms} > ${locale} categories ${cats}`,
+        )
       }
     }
   }

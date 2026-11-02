@@ -385,6 +385,7 @@
         "status": "Status",
         "descriptionHint": "Co twórca przygotowuje co miesiąc (np. 2 Reels i 3 Stories) oraz warunki wykorzystania.",
         "slugHint": "Proponowany automatycznie na podstawie nazwy. Używany w adresach URL.",
+        "createdAt": "Utworzono",
         "logo": "Logo"
       },
       "status": {
