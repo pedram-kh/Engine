@@ -48,6 +48,8 @@ import { invitationsApi } from '../api/invitations.api'
 import { membersApi } from '../api/members.api'
 import InviteUserModal from '../components/InviteUserModal.vue'
 
+import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
+import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
 const { t, locale } = useI18n()
 const agencyStore = useAgencyStore()
 
@@ -230,37 +232,35 @@ function onInvited(email: string): void {
 </script>
 
 <template>
-  <div data-test="agency-users-page">
-    <div class="d-flex align-center justify-space-between mb-6">
-      <h1 class="text-h5 ma-0" data-test="agency-users-heading">
-        {{ t('app.agencyUsers.title') }}
-      </h1>
-      <div v-if="agencyStore.isAdmin" class="d-flex ga-2">
-        <v-btn
-          variant="outlined"
-          prepend-icon="mdi-account-multiple-plus"
-          data-test="bulk-invite-creators-btn"
-          :to="{ name: 'creator-invitations.bulk' }"
-        >
-          {{ t('app.agencyUsers.bulkInviteCreators.button') }}
-        </v-btn>
-        <v-btn
-          color="primary"
-          prepend-icon="mdi-account-plus"
-          data-test="invite-user-btn"
-          @click="inviteModalOpen = true"
-        >
-          {{ t('app.agencyUsers.invite.button') }}
-        </v-btn>
-      </div>
-    </div>
+  <div class="agency-page" data-test="agency-users-page">
+    <AgencyPageHeader :title="t('app.agencyUsers.title')" title-test="agency-users-heading">
+      <template v-if="agencyStore.isAdmin" #actions>
+        <div class="d-flex ga-2">
+          <v-btn
+            variant="outlined"
+            prepend-icon="mdi-account-multiple-plus"
+            data-test="bulk-invite-creators-btn"
+            :to="{ name: 'creator-invitations.bulk' }"
+          >
+            {{ t('app.agencyUsers.bulkInviteCreators.button') }}
+          </v-btn>
+          <v-btn
+            color="primary"
+            prepend-icon="mdi-account-plus"
+            data-test="invite-user-btn"
+            @click="inviteModalOpen = true"
+          >
+            {{ t('app.agencyUsers.invite.button') }}
+          </v-btn>
+        </div>
+      </template>
+    </AgencyPageHeader>
 
     <v-alert
       v-if="successMessage"
       type="success"
       variant="tonal"
       closable
-      class="mb-4"
       data-test="invite-success-alert"
       @click:close="successMessage = null"
     >
@@ -268,107 +268,112 @@ function onInvited(email: string): void {
     </v-alert>
 
     <!-- ─── Members section ─────────────────────────────────────── -->
-    <h2 class="text-subtitle-1 font-weight-semibold mb-3" data-test="members-heading">
-      {{ t('app.agencyUsers.members.heading') }}
-    </h2>
+    <section class="agency-section" data-test="members-section">
+      <h2 class="agency-section__title" data-test="members-heading">
+        {{ t('app.agencyUsers.members.heading') }}
+      </h2>
 
-    <div class="d-flex align-center ga-4 mb-3 flex-wrap">
-      <v-chip-group v-model="memberRoleFilter" mandatory data-test="member-role-filter">
-        <v-chip
-          v-for="item in memberRoleFilterItems"
-          :key="item.value"
-          :value="item.value"
-          filter
+      <div class="agency-filters">
+        <v-chip-group
+          v-model="memberRoleFilter"
+          mandatory
+          class="agency-seg"
+          data-test="member-role-filter"
+        >
+          <v-chip
+            v-for="item in memberRoleFilterItems"
+            :key="item.value"
+            :value="item.value"
+            filter
+            variant="outlined"
+            :data-test="`member-role-filter-${item.value}`"
+          >
+            {{ item.label }}
+          </v-chip>
+        </v-chip-group>
+
+        <v-text-field
+          v-model="memberSearch"
+          :aria-label="t('app.agencyUsers.search.label')"
+          :placeholder="t('app.agencyUsers.search.placeholder')"
+          persistent-placeholder
+          prepend-inner-icon="mdi-magnify"
+          density="compact"
           variant="outlined"
-          :data-test="`member-role-filter-${item.value}`"
+          hide-details
+          clearable
+          class="agency-search agency-filters__end member-search"
+          data-test="member-search"
+        />
+      </div>
+
+      <v-alert v-if="memberError" type="error" variant="tonal" data-test="members-error">
+        {{ memberError }}
+      </v-alert>
+
+      <template v-if="memberLoading && memberItems.length === 0">
+        <v-skeleton-loader type="table" data-test="members-skeleton" />
+      </template>
+      <template v-else-if="!memberLoading && memberItems.length === 0 && !memberError">
+        <CEmptyState
+          v-if="memberRoleFilter === 'all' && memberSearch.trim() === ''"
+          data-test="members-empty-state"
+          :body="t('app.agencyUsers.empty.body')"
         >
-          {{ item.label }}
-        </v-chip>
-      </v-chip-group>
+          <template #icon>
+            <v-icon icon="mdi-account-group-outline" size="48" color="medium-emphasis" />
+          </template>
+        </CEmptyState>
+        <CEmptyState
+          v-else
+          data-test="members-empty-filtered"
+          :body="t('app.agencyUsers.emptyFiltered')"
+        >
+          <template #icon>
+            <v-icon icon="mdi-filter-remove-outline" size="48" color="medium-emphasis" />
+          </template>
+        </CEmptyState>
+      </template>
 
-      <v-text-field
-        v-model="memberSearch"
-        :label="t('app.agencyUsers.search.label')"
-        :placeholder="t('app.agencyUsers.search.placeholder')"
-        prepend-inner-icon="mdi-magnify"
-        density="compact"
-        variant="outlined"
-        hide-details
-        clearable
-        class="member-search"
-        data-test="member-search"
-      />
-    </div>
-
-    <v-alert v-if="memberError" type="error" variant="tonal" class="mb-4" data-test="members-error">
-      {{ memberError }}
-    </v-alert>
-
-    <template v-if="memberLoading && memberItems.length === 0">
-      <v-skeleton-loader type="table" data-test="members-skeleton" />
-    </template>
-    <template v-else-if="!memberLoading && memberItems.length === 0 && !memberError">
-      <CEmptyState
-        v-if="memberRoleFilter === 'all' && memberSearch.trim() === ''"
-        data-test="members-empty-state"
-        :body="t('app.agencyUsers.empty.body')"
-      >
-        <template #icon>
-          <v-icon icon="mdi-account-group-outline" size="48" color="medium-emphasis" />
-        </template>
-      </CEmptyState>
-      <CEmptyState
+      <v-data-table-server
         v-else
-        data-test="members-empty-filtered"
-        :body="t('app.agencyUsers.emptyFiltered')"
+        :headers="memberHeaders"
+        :items="memberItems"
+        :items-length="memberTotal"
+        :loading="memberLoading"
+        :items-per-page="memberTableOptions.itemsPerPage"
+        :page="memberTableOptions.page"
+        item-value="id"
+        class="agency-table"
+        data-test="members-table"
+        @update:options="onMembersTableUpdate"
       >
-        <template #icon>
-          <v-icon icon="mdi-filter-remove-outline" size="48" color="medium-emphasis" />
+        <template #item.attributes.role="{ item }">
+          {{ t(`app.agencyUsers.roles.${item.attributes.role}`) }}
         </template>
-      </CEmptyState>
-    </template>
-
-    <v-data-table-server
-      v-else
-      :headers="memberHeaders"
-      :items="memberItems"
-      :items-length="memberTotal"
-      :loading="memberLoading"
-      :items-per-page="memberTableOptions.itemsPerPage"
-      :page="memberTableOptions.page"
-      item-value="id"
-      class="mb-8"
-      data-test="members-table"
-      @update:options="onMembersTableUpdate"
-    >
-      <template #item.attributes.role="{ item }">
-        {{ t(`app.agencyUsers.roles.${item.attributes.role}`) }}
-      </template>
-      <template #item.attributes.status="{ item }">
-        <v-chip
-          :color="item.attributes.status === 'active' ? 'success' : 'warning'"
-          size="small"
-          variant="tonal"
-          :data-test="`member-status-${item.id}`"
-        >
-          {{ t(`app.agencyUsers.status.${item.attributes.status}`) }}
-        </v-chip>
-      </template>
-      <template #item.attributes.created_at="{ item }">
-        {{ formatDateTime(item.attributes.created_at, locale, { dateStyle: 'medium' }) }}
-      </template>
-    </v-data-table-server>
+        <template #item.attributes.status="{ item }">
+          <AgencyStatusPill
+            kind="membership"
+            :status="item.attributes.status"
+            :data-test="`member-status-${item.id}`"
+          />
+        </template>
+        <template #item.attributes.created_at="{ item }">
+          {{ formatDateTime(item.attributes.created_at, locale, { dateStyle: 'medium' }) }}
+        </template>
+      </v-data-table-server>
+    </section>
 
     <!-- ─── Invitation history (admin-only) ────────────────────── -->
-    <template v-if="agencyStore.isAdmin">
-      <h2 class="text-subtitle-1 font-weight-semibold mb-3" data-test="invitations-heading">
+    <section v-if="agencyStore.isAdmin" class="agency-section" data-test="invitations-section">
+      <h2 class="agency-section__title" data-test="invitations-heading">
         {{ t('app.agencyUsers.invitations.heading') }}
       </h2>
 
       <v-chip-group
         v-model="invitationStatusFilter"
         mandatory
-        class="mb-3"
+        class="agency-seg"
         data-test="invitation-status-filter"
       >
         <v-chip
@@ -383,13 +388,7 @@ function onInvited(email: string): void {
         </v-chip>
       </v-chip-group>
 
-      <v-alert
-        v-if="invitationError"
-        type="error"
-        variant="tonal"
-        class="mb-4"
-        data-test="invitations-error"
-      >
+      <v-alert v-if="invitationError" type="error" variant="tonal" data-test="invitations-error">
         {{ invitationError }}
       </v-alert>
 
@@ -416,6 +415,7 @@ function onInvited(email: string): void {
         :items-per-page="invitationTableOptions.itemsPerPage"
         :page="invitationTableOptions.page"
         item-value="id"
+        class="agency-table"
         data-test="invitations-table"
         @update:options="onInvitationsTableUpdate"
       >
@@ -423,20 +423,11 @@ function onInvited(email: string): void {
           {{ t(`app.agencyUsers.roles.${item.attributes.role}`) }}
         </template>
         <template #item.attributes.status="{ item }">
-          <v-chip
-            :color="
-              item.attributes.status === 'accepted'
-                ? 'success'
-                : item.attributes.status === 'pending'
-                  ? 'warning'
-                  : 'default'
-            "
-            size="small"
-            variant="tonal"
+          <AgencyStatusPill
+            kind="invitation"
+            :status="item.attributes.status"
             :data-test="`invitation-status-${item.id}`"
-          >
-            {{ t(`app.agencyUsers.invitations.status.${item.attributes.status}`) }}
-          </v-chip>
+          />
         </template>
         <template #item.attributes.invited_at="{ item }">
           {{ formatDateTime(item.attributes.invited_at, locale, { dateStyle: 'medium' }) }}
@@ -445,7 +436,7 @@ function onInvited(email: string): void {
           {{ item.attributes.invited_by_user_name ?? '—' }}
         </template>
       </v-data-table-server>
-    </template>
+    </section>
 
     <InviteUserModal v-model="inviteModalOpen" @invited="onInvited" />
   </div>

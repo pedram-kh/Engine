@@ -13,6 +13,8 @@
 export const AGENCY = '01HWALKAGENCY000000000000'
 export const DETAIL_ID = '01HCAMPAIGN00000000000001'
 
+import { L4_REAL_PAGES, brandResource, l4FixtureFor } from './l4-fixtures.mjs'
+
 const MESSAGES_NAMES = 'messages.inbox,messages.thread'
 const THREAD_CREATOR = '01HCREATORMAYA00000000001'
 
@@ -38,6 +40,7 @@ export const REAL_PAGES = {
     width: 1280,
     height: 800,
   },
+  ...L4_REAL_PAGES,
 }
 
 // ── Campaigns list (Figma 14:3: nine rows of twenty-four) ─────────────────────────────────
@@ -299,8 +302,20 @@ export function fixtureFor(url, method) {
   }
   if (method === 'GET' && p === `/api/v1/agencies/${AGENCY}/brands`) {
     return {
-      data: BRANDS.map(([id, name]) => ({ id, type: 'brands', attributes: { name } })),
+      data: BRANDS.map(([id, name], i) =>
+        brandResource(id, name, i === 8 ? 'archived' : 'active', i),
+      ),
+      links: { first: null, last: null, prev: null, next: null },
+      meta: {
+        total: BRANDS.length,
+        current_page: 1,
+        from: 1,
+        to: BRANDS.length,
+        per_page: 25,
+        last_page: 1,
+        page: 1,
+      },
     }
   }
-  return null
+  return l4FixtureFor(url, method)
 }

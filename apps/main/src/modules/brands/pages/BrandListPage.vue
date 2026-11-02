@@ -20,6 +20,9 @@ import { CEmptyState } from '@catalyst/ui'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { brandsApi } from '../api/brands.api'
 
+import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
+import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
+import AgencyBrandMark from '@/modules/agency/components/AgencyBrandMark.vue'
 const { t, locale } = useI18n()
 
 const agencyStore = useAgencyStore()
@@ -191,21 +194,27 @@ async function confirmRestore(): Promise<void> {
 </script>
 
 <template>
-  <div data-test="brand-list-page">
-    <div class="d-flex align-center justify-space-between mb-4">
-      <h1 class="text-h5 ma-0" data-test="brand-list-heading">{{ t('app.brands.title') }}</h1>
-      <v-btn
-        color="primary"
-        prepend-icon="mdi-plus"
-        :to="{ name: 'brands.create' }"
-        data-test="brand-create-btn"
-      >
-        {{ t('app.brands.actions.create') }}
-      </v-btn>
-    </div>
+  <div class="agency-page" data-test="brand-list-page">
+    <AgencyPageHeader :title="t('app.brands.title')" title-test="brand-list-heading">
+      <template #actions>
+        <v-btn
+          color="primary"
+          prepend-icon="mdi-plus"
+          :to="{ name: 'brands.create' }"
+          data-test="brand-create-btn"
+        >
+          {{ t('app.brands.actions.create') }}
+        </v-btn>
+      </template>
+    </AgencyPageHeader>
 
     <!-- Status filter chips -->
-    <v-chip-group v-model="statusFilter" mandatory class="mb-4" data-test="brand-status-filter">
+    <v-chip-group
+      v-model="statusFilter"
+      mandatory
+      class="agency-seg"
+      data-test="brand-status-filter"
+    >
       <v-chip
         v-for="item in statusFilterItems"
         :key="item.value"
@@ -219,7 +228,7 @@ async function confirmRestore(): Promise<void> {
     </v-chip-group>
 
     <!-- Error alert -->
-    <v-alert v-if="error" type="error" variant="tonal" class="mb-4" data-test="brand-list-error">
+    <v-alert v-if="error" type="error" variant="tonal" data-test="brand-list-error">
       {{ error }}
     </v-alert>
 
@@ -269,41 +278,36 @@ async function confirmRestore(): Promise<void> {
       :items-per-page="tableOptions.itemsPerPage"
       :page="tableOptions.page"
       item-value="id"
+      class="agency-table"
       data-test="brand-table"
       @update:options="onTableUpdate"
     >
       <!-- Logo alongside the name (AH-053, D7) — the mark is how an agency
-           recognises a brand at a glance. Falls back to a placeholder icon
-           for brands that predate the floor. -->
+           recognises a brand at a glance. A brand with no logo gets the initial mark the
+           other agency tables use (no placeholder image). -->
       <template #item.attributes.name="{ item }">
-        <div class="d-flex align-center ga-3">
+        <div class="agency-cell-brand">
           <v-avatar
+            v-if="item.attributes.logo_url"
             size="32"
             rounded="sm"
-            color="surface-variant"
             :data-test="`brand-logo-${item.id}`"
           >
-            <v-img
-              v-if="item.attributes.logo_url"
-              :src="item.attributes.logo_url"
-              :alt="t('app.brands.logo.alt')"
-              cover
-            />
-            <v-icon v-else icon="mdi-image-outline" size="16" />
+            <v-img :src="item.attributes.logo_url" :alt="t('app.brands.logo.alt')" cover />
           </v-avatar>
-          <span>{{ item.attributes.name }}</span>
+          <span v-else :data-test="`brand-logo-${item.id}`">
+            <AgencyBrandMark :name="item.attributes.name" :seed="item.id" />
+          </span>
+          <span class="agency-cell__title">{{ item.attributes.name }}</span>
         </div>
       </template>
 
       <template #item.attributes.status="{ item }">
-        <v-chip
-          :color="item.attributes.status === 'active' ? 'success' : 'default'"
-          size="small"
-          variant="tonal"
+        <AgencyStatusPill
+          kind="brand"
+          :status="item.attributes.status"
           :data-test="`brand-status-${item.id}`"
-        >
-          {{ t(`app.brands.status.${item.attributes.status}`) }}
-        </v-chip>
+        />
       </template>
 
       <template #item.attributes.created_at="{ item }">

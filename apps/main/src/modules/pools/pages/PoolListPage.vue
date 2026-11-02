@@ -15,6 +15,8 @@ import { CEmptyState } from '@catalyst/ui'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { talentPoolsApi } from '../api/talentPools.api'
 
+import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
+import AgencyBrandMark from '@/modules/agency/components/AgencyBrandMark.vue'
 const { t } = useI18n()
 
 const agencyStore = useAgencyStore()
@@ -168,21 +170,27 @@ async function confirmRestore(): Promise<void> {
 </script>
 
 <template>
-  <div data-test="pool-list-page">
-    <div class="d-flex align-center justify-space-between mb-4">
-      <h1 class="text-h5 ma-0" data-test="pool-list-heading">{{ t('app.pools.title') }}</h1>
-      <v-btn
-        v-if="canWrite"
-        color="primary"
-        prepend-icon="mdi-plus"
-        :to="{ name: 'pools.create' }"
-        data-test="pool-create-btn"
-      >
-        {{ t('app.pools.actions.create') }}
-      </v-btn>
-    </div>
+  <div class="agency-page" data-test="pool-list-page">
+    <AgencyPageHeader :title="t('app.pools.title')" title-test="pool-list-heading">
+      <template #actions>
+        <v-btn
+          v-if="canWrite"
+          color="primary"
+          prepend-icon="mdi-plus"
+          :to="{ name: 'pools.create' }"
+          data-test="pool-create-btn"
+        >
+          {{ t('app.pools.actions.create') }}
+        </v-btn>
+      </template>
+    </AgencyPageHeader>
 
-    <v-chip-group v-model="statusFilter" mandatory class="mb-4" data-test="pool-status-filter">
+    <v-chip-group
+      v-model="statusFilter"
+      mandatory
+      class="agency-seg"
+      data-test="pool-status-filter"
+    >
       <v-chip
         v-for="item in statusFilterItems"
         :key="item.value"
@@ -195,7 +203,7 @@ async function confirmRestore(): Promise<void> {
       </v-chip>
     </v-chip-group>
 
-    <v-alert v-if="error" type="error" variant="tonal" class="mb-4" data-test="pool-list-error">
+    <v-alert v-if="error" type="error" variant="tonal" data-test="pool-list-error">
       {{ error }}
     </v-alert>
 
@@ -242,16 +250,16 @@ async function confirmRestore(): Promise<void> {
       :items-per-page="tableOptions.itemsPerPage"
       :page="tableOptions.page"
       item-value="id"
+      class="agency-table"
       data-test="pool-table"
       @update:options="onTableUpdate"
     >
       <template #item.attributes.brand_name="{ item }">
-        <v-chip v-if="item.attributes.brand_name" size="small" variant="tonal">
+        <span v-if="item.attributes.brand_name" class="agency-cell-brand">
+          <AgencyBrandMark :name="item.attributes.brand_name" :seed="item.attributes.brand_id" />
           {{ item.attributes.brand_name }}
-        </v-chip>
-        <span v-else class="text-medium-emphasis text-caption">
-          {{ t('app.pools.agencyWide') }}
         </span>
+        <span v-else class="agency-cell__sub">{{ t('app.pools.agencyWide') }}</span>
       </template>
 
       <template #item.attributes.creators_count="{ item }">

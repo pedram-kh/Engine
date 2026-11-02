@@ -954,6 +954,23 @@
   gap: 8px;
 }
 
+/* A titled section of a page (L4, S4.1): a section title and its blocks 16 apart. The page frame
+ * stacks sections 24 apart. The title is the card title type (18 / 24 / 600). */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-section__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: normal;
+  color: rgb(var(--v-theme-on-surface));
+}
+
 /* Progress: the brand colour unless the page sets one. */
 :is(.v-theme--agency-dark, .v-theme--agency-light) .v-progress-linear {
   color: rgb(var(--v-theme-primary));

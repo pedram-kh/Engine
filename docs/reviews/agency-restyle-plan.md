@@ -348,6 +348,13 @@ Counting check: 5 + 4 + 8 + 1 + 2 = **20**.
   - **Spec edits, by name:** new `AgencyMessagesPage.spec.ts` (7 tests: the fork's header, the words handed to it, the French plural, the picker, both panes and the placeholder, the open row, one pane below md), new `AgencyRelationshipThreadPage.agency.spec.ts` (2) and new `AgencyLayout.bleed.spec.ts` (3). No existing spec changed; `AgencyRelationshipThreadPage.spec.ts` and `AgencyLayout.shell.spec.ts` pass as they were, and the shared messaging specs are untouched.
   - **Gate:** typecheck, main test (298 files, 3,963 tests), lint (0 errors), admin, package tests and prettier green. Creator walk 142 / 142.
   - **Finding:** `tools/walk/pins-s32.mjs` was committed in S3.2 with prettier-unclean formatting (lint-staged does not cover `.mjs`; the gate's prettier only checks `ts, vue, css, md, json`). Left as is here to keep this commit to its own step; to be formatted in a housekeeping commit.
+- **S4.0 (Campaigns filter row, carry-forward nit; `pins.mjs --step S4.0`: 3 pins).** The Brand select takes `active` (label floated, one height with the native date inputs) and `max-width: 190px`. Agency-only: `CampaignListPage.vue` is not shared. The empty floated Brand select is noted for the final report.
+- **S4.1 (inferred lists: roster, brands, talent pools, files, team; MEASURED in Chromium; `pins.mjs --step S4.1`: 47 pins, 208 checks, both themes, 1600 and 1280; four break-reverts caught: `active` on the roster inputs, `agency-table` on pools, `agency-seg` on brands, the membership pill on team).**
+  - **Rules per route.** `/roster`: R2, R3, R4, R5, R9. `/brands`: R2, R3, R5, R9 (brand mark in the name cell). `/talent-pools`: R2, R3, R5 (brand mark in the brand column). `/files`: R2, R3, R5. `/team`: R2, R3, R4, R5, R9, plus a section title per table (`.agency-section`, new in `agency.css`).
+  - **No new i18n key.** Headers carry no subtitle (no key, so omitted). The search placeholders use existing keys.
+  - **One-off pill.** The roster application status has no row in `agencyStatusTones.ts`, so the page maps approved / pending / rejected / incomplete to success / warning / danger / neutral with `AgencyStatusPill`'s `tone` + `label` form. Not a tone table change (spec 6 untouched).
+  - **Kept, flagged.** The disabled followers / engagement-rate affordances on the roster are kept: an existing spec pins them and D-4 decided them. They have no data, so they conflict with "omit anything without data"; removing them means editing `CreatorRosterPage.spec.ts` by name. Raised in the L4 report.
+  - **No spec edited.** No shared file edited.
 
 ---
 

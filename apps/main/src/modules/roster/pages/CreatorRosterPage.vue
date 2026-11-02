@@ -58,6 +58,10 @@ import { COUNTRY_OPTIONS } from '@/modules/onboarding/data/countries'
 import { rosterApi } from '../api/roster.api'
 import { creatorLabel } from '@/core/creators/creatorLabel'
 
+import AgencyFilterPill from '@/modules/agency/components/AgencyFilterPill.vue'
+import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
+import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
+import type { AgencyStatusTone } from '@/modules/agency/status/agencyStatusTones'
 const { t } = useI18n()
 const router = useRouter()
 
@@ -210,7 +214,7 @@ const categoryFilterItems = computed(() =>
 )
 
 const headers = [
-  { title: t('app.roster.fields.name'), key: 'name', sortable: false },
+  { title: t('app.roster.fields.name'), key: 'name', sortable: false, minWidth: 170 },
   { title: t('app.roster.fields.email'), key: 'attributes.email', sortable: false },
   {
     title: t('app.roster.fields.status'),
@@ -291,24 +295,23 @@ function languageLabel(code: string | null, accent?: string | null): string {
   return accent != null && accent !== '' ? `${label} · ${accent}` : label
 }
 
-// Semantic colour per application state — deliberately a different visual
-// register from the neutral tonal relationship-status chip (Chunk 5b: the
-// two status axes must not read as interchangeable). approved=usable (green),
-// pending=awaiting review (amber), rejected=declined (red), incomplete=
-// not-yet-submitted (neutral grey).
+// Tone per application state (rule R9: one pill, one tone table). approved=usable (green),
+// pending=awaiting review (amber), rejected=declined (red), incomplete=not-yet-submitted
+// (neutral). The relationship status beside it comes from the shared table (`kind="roster"`);
+// the two axes differ by their word, as before (Chunk 5b).
 type RosterApplicationStatus = RosterCreatorListItem['attributes']['application_status']
 
-function applicationStatusColor(status: RosterApplicationStatus): string {
+function applicationStatusTone(status: RosterApplicationStatus): AgencyStatusTone {
   switch (status) {
     case 'approved':
       return 'success'
     case 'pending':
       return 'warning'
     case 'rejected':
-      return 'error'
+      return 'danger'
     case 'incomplete':
     default:
-      return 'grey'
+      return 'neutral'
   }
 }
 
@@ -425,27 +428,32 @@ function onRowClick(_event: unknown, ctx: { item: RosterCreatorListItem }): void
 </script>
 
 <template>
-  <div data-test="roster-page">
-    <div class="d-flex align-center justify-space-between mb-4">
-      <h1 class="text-h5 ma-0" data-test="roster-heading">{{ t('app.roster.title') }}</h1>
-    </div>
+  <div class="agency-page" data-test="roster-page">
+    <AgencyPageHeader :title="t('app.roster.title')" title-test="roster-heading" />
 
     <!-- Name/bio full-text search (D-1). Debounced → ?q=. -->
     <v-text-field
       v-model="searchQuery"
-      :label="t('app.roster.search.label')"
+      :aria-label="t('app.roster.search.label')"
       :placeholder="t('app.roster.search.placeholder')"
+      persistent-placeholder
       prepend-inner-icon="mdi-magnify"
       density="compact"
       variant="outlined"
       hide-details
       clearable
-      class="mb-3"
+      class="agency-search"
       data-test="roster-search"
     />
 
-    <!-- Status filter chips -->
-    <v-chip-group v-model="statusFilter" mandatory class="mb-2" data-test="roster-status-filter">
+    <!-- Status segments. The default one is "Active", not "All": it shows only working
+         relationships (see `statusFilterItems`). -->
+    <v-chip-group
+      v-model="statusFilter"
+      mandatory
+      class="agency-seg"
+      data-test="roster-status-filter"
+    >
       <v-chip
         v-for="item in statusFilterItems"
         :key="item.value"
@@ -458,166 +466,140 @@ function onRowClick(_event: unknown, ctx: { item: RosterCreatorListItem }): void
       </v-chip>
     </v-chip-group>
 
-    <!-- Country / language / category selects -->
-    <v-row dense class="mb-2">
-      <v-col cols="12" sm="4">
-        <v-select
-          v-model="countryFilter"
-          :items="countryFilterItems"
-          :label="t('app.roster.filters.country')"
-          density="compact"
-          variant="outlined"
-          hide-details
-          clearable
-          data-test="roster-country-filter"
-        />
-      </v-col>
-      <v-col cols="12" sm="4">
-        <v-select
-          v-model="languageFilter"
-          :items="languageFilterItems"
-          :label="t('app.roster.filters.language')"
-          density="compact"
-          variant="outlined"
-          hide-details
-          clearable
-          data-test="roster-language-filter"
-        />
-      </v-col>
-      <v-col cols="12" sm="4">
-        <v-select
-          v-model="categoryFilter"
-          :items="categoryFilterItems"
-          :label="t('app.roster.filters.category')"
-          density="compact"
-          variant="outlined"
-          hide-details
-          clearable
-          data-test="roster-category-filter"
-        />
-      </v-col>
-    </v-row>
-
-    <!-- AH-088 — the age-range filter. Two number inputs rather than a slider:
-         an agency filtering a roster has a specific bracket in mind ("21–35" for
-         a brief), and typing two numbers beats dragging two handles. Each bound
-         works ALONE, unlike the availability window below. Bounds are clamped
-         identically here, in the URL codec, and in the backend, so a shared link
-         resolves to the same rows everywhere. -->
-    <v-row dense class="mb-2">
-      <v-col cols="6" sm="3">
-        <v-text-field
-          v-model.number="ageMin"
-          type="number"
-          :label="t('app.roster.filters.age.min')"
-          :min="AGE_FILTER_MIN"
-          :max="AGE_FILTER_MAX"
-          density="compact"
-          variant="outlined"
-          hide-details
-          clearable
-          data-test="roster-age-min"
-        />
-      </v-col>
-      <v-col cols="6" sm="3">
-        <v-text-field
-          v-model.number="ageMax"
-          type="number"
-          :label="t('app.roster.filters.age.max')"
-          :min="AGE_FILTER_MIN"
-          :max="AGE_FILTER_MAX"
-          density="compact"
-          variant="outlined"
-          hide-details
-          clearable
-          data-test="roster-age-max"
-        />
-      </v-col>
-    </v-row>
-
-    <!-- Availability range filter (Sprint 6.5, D-6) + the still-disabled
-         metrics affordances (D-4). The availability control is now REAL: two
-         native date inputs (from/to). Native date fields thread + test cleanly
-         and are honestly better UX than a heavy picker for a range filter (the
-         same jsdom discipline as the read-only star icons). The window is sent
-         only when BOTH bounds are set (a one-sided range issues no param). The
-         METRICS controls stay present-but-inert: faded, disabled, span-wrapped
-         so the tooltip still fires (a disabled control emits no hover events —
-         the Chunk-3 KYC idiom), with NO v-model + NO watcher, so they CANNOT
-         query. They flip live when the social-metrics data lands. -->
-    <v-row dense class="mb-2">
-      <v-col cols="12" sm="3">
-        <v-text-field
-          v-model="availableFrom"
-          type="date"
-          :label="t('app.roster.filters.availability.from')"
-          :max="availableTo || undefined"
-          density="compact"
-          variant="outlined"
-          hide-details
-          clearable
-          data-test="roster-available-from"
-        />
-      </v-col>
-      <v-col cols="12" sm="3">
-        <v-text-field
-          v-model="availableTo"
-          type="date"
-          :label="t('app.roster.filters.availability.to')"
-          :min="availableFrom || undefined"
-          density="compact"
-          variant="outlined"
-          hide-details
-          clearable
-          data-test="roster-available-to"
-        />
-      </v-col>
-      <v-col cols="12" sm="3">
-        <v-tooltip
-          v-if="!METRICS_FILTERS_CONNECTED"
-          location="top"
-          :text="t('app.roster.affordances.metrics.tooltip')"
-        >
-          <template #activator="{ props: tooltipProps }">
-            <span v-bind="tooltipProps" data-test="roster-followers-affordance">
-              <v-select
-                :label="t('app.roster.affordances.followers.label')"
-                :items="[]"
-                density="compact"
-                variant="outlined"
-                hide-details
-                disabled
-                data-test="roster-followers-filter"
-              />
-            </span>
-          </template>
-        </v-tooltip>
-      </v-col>
-      <v-col cols="12" sm="3">
-        <v-tooltip
-          v-if="!METRICS_FILTERS_CONNECTED"
-          location="top"
-          :text="t('app.roster.affordances.metrics.tooltip')"
-        >
-          <template #activator="{ props: tooltipProps }">
-            <span v-bind="tooltipProps" data-test="roster-engagement-affordance">
-              <v-select
-                :label="t('app.roster.affordances.engagement.label')"
-                :items="[]"
-                density="compact"
-                variant="outlined"
-                hide-details
-                disabled
-                data-test="roster-engagement-filter"
-              />
-            </span>
-          </template>
-        </v-tooltip>
-      </v-col>
-    </v-row>
+    <!-- Country / language / category as the pills Discover draws, then the age range
+         (AH-088: two number inputs, each bound works ALONE, clamped alike here, in the URL
+         codec and in the backend) and the availability window (Sprint 6.5, D-6: two native
+         date inputs, sent only when BOTH are set). Every input floats its label, so an empty
+         number box reads like a date box. The two metrics controls stay present but inert
+         (D-4): faded, disabled, span-wrapped so the tooltip still fires, NO v-model and NO
+         watcher, so they cannot query. -->
+    <div class="agency-filters" data-test="roster-filters">
+      <AgencyFilterPill
+        v-model="countryFilter"
+        :label="t('app.roster.filters.country')"
+        :items="countryFilterItems"
+        data-test="roster-country-filter"
+      />
+      <AgencyFilterPill
+        v-model="languageFilter"
+        :label="t('app.roster.filters.language')"
+        :items="languageFilterItems"
+        data-test="roster-language-filter"
+      />
+      <AgencyFilterPill
+        v-model="categoryFilter"
+        :label="t('app.roster.filters.category')"
+        :items="categoryFilterItems"
+        data-test="roster-category-filter"
+      />
+      <v-text-field
+        v-model.number="ageMin"
+        type="number"
+        :label="t('app.roster.filters.age.min')"
+        :min="AGE_FILTER_MIN"
+        :max="AGE_FILTER_MAX"
+        density="compact"
+        variant="outlined"
+        hide-details
+        clearable
+        active
+        class="agency-filter"
+        :class="{ 'agency-filter--applied': ageMin !== null }"
+        style="max-width: 150px"
+        data-test="roster-age-min"
+      />
+      <v-text-field
+        v-model.number="ageMax"
+        type="number"
+        :label="t('app.roster.filters.age.max')"
+        :min="AGE_FILTER_MIN"
+        :max="AGE_FILTER_MAX"
+        density="compact"
+        variant="outlined"
+        hide-details
+        clearable
+        active
+        class="agency-filter"
+        :class="{ 'agency-filter--applied': ageMax !== null }"
+        style="max-width: 150px"
+        data-test="roster-age-max"
+      />
+      <v-text-field
+        v-model="availableFrom"
+        type="date"
+        :label="t('app.roster.filters.availability.from')"
+        :max="availableTo || undefined"
+        density="compact"
+        variant="outlined"
+        hide-details
+        clearable
+        class="agency-filter"
+        :class="{ 'agency-filter--applied': !!availableFrom }"
+        style="max-width: 190px"
+        data-test="roster-available-from"
+      />
+      <v-text-field
+        v-model="availableTo"
+        type="date"
+        :label="t('app.roster.filters.availability.to')"
+        :min="availableFrom || undefined"
+        density="compact"
+        variant="outlined"
+        hide-details
+        clearable
+        class="agency-filter"
+        :class="{ 'agency-filter--applied': !!availableTo }"
+        style="max-width: 190px"
+        data-test="roster-available-to"
+      />
+      <v-tooltip
+        v-if="!METRICS_FILTERS_CONNECTED"
+        location="top"
+        :text="t('app.roster.affordances.metrics.tooltip')"
+      >
+        <template #activator="{ props: tooltipProps }">
+          <span v-bind="tooltipProps" data-test="roster-followers-affordance">
+            <v-select
+              :label="t('app.roster.affordances.followers.label')"
+              :items="[]"
+              density="compact"
+              variant="outlined"
+              hide-details
+              disabled
+              active
+              class="agency-filter"
+              style="width: 150px"
+              data-test="roster-followers-filter"
+            />
+          </span>
+        </template>
+      </v-tooltip>
+      <v-tooltip
+        v-if="!METRICS_FILTERS_CONNECTED"
+        location="top"
+        :text="t('app.roster.affordances.metrics.tooltip')"
+      >
+        <template #activator="{ props: tooltipProps }">
+          <span v-bind="tooltipProps" data-test="roster-engagement-affordance">
+            <v-select
+              :label="t('app.roster.affordances.engagement.label')"
+              :items="[]"
+              density="compact"
+              variant="outlined"
+              hide-details
+              disabled
+              active
+              class="agency-filter"
+              style="width: 150px"
+              data-test="roster-engagement-filter"
+            />
+          </span>
+        </template>
+      </v-tooltip>
+    </div>
 
     <!-- Error alert -->
-    <v-alert v-if="error" type="error" variant="tonal" class="mb-4" data-test="roster-error">
+    <v-alert v-if="error" type="error" variant="tonal" data-test="roster-error">
       {{ error }}
     </v-alert>
 
@@ -664,6 +646,7 @@ function onRowClick(_event: unknown, ctx: { item: RosterCreatorListItem }): void
       :page="page"
       item-value="id"
       hover
+      class="agency-table"
       data-test="roster-table"
       @update:options="onTableUpdate"
       @click:row="onRowClick"
@@ -689,23 +672,22 @@ function onRowClick(_event: unknown, ctx: { item: RosterCreatorListItem }): void
       </template>
 
       <template #item.attributes.relationship_status="{ item }">
-        <v-chip size="small" variant="tonal" :data-test="`roster-status-${item.id}`">
-          {{ t(`app.roster.status.${item.attributes.relationship_status}`) }}
-        </v-chip>
+        <AgencyStatusPill
+          kind="roster"
+          :status="item.attributes.relationship_status"
+          :data-test="`roster-status-${item.id}`"
+        />
       </template>
 
       <!-- Application status (Chunk 5b): display-only, NOT filterable. Solid
            colour-coded chip — visually distinct from the neutral tonal
            relationship chip above so the two axes don't read as the same. -->
       <template #item.attributes.application_status="{ item }">
-        <v-chip
-          size="small"
-          variant="flat"
-          :color="applicationStatusColor(item.attributes.application_status)"
+        <AgencyStatusPill
+          :tone="applicationStatusTone(item.attributes.application_status)"
+          :label="t(`app.roster.applicationStatus.${item.attributes.application_status}`)"
           :data-test="`roster-app-status-${item.id}`"
-        >
-          {{ t(`app.roster.applicationStatus.${item.attributes.application_status}`) }}
-        </v-chip>
+        />
       </template>
 
       <template #item.attributes.country_code="{ item }">

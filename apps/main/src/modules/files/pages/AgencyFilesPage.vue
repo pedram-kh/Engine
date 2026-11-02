@@ -21,6 +21,7 @@ import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { filesApi } from '../api/files.api'
 import AgencyFileUploadDialog from '../components/AgencyFileUploadDialog.vue'
 
+import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
 const { t, locale } = useI18n()
 
 const agencyStore = useAgencyStore()
@@ -139,20 +140,21 @@ async function confirmDelete(): Promise<void> {
 </script>
 
 <template>
-  <div data-test="agency-files-page">
-    <div class="d-flex align-center justify-space-between mb-4">
-      <h1 class="text-h5 ma-0" data-test="files-heading">{{ t('app.files.title') }}</h1>
-      <v-btn
-        color="primary"
-        prepend-icon="mdi-upload"
-        data-test="files-upload-btn"
-        @click="uploadDialog = true"
-      >
-        {{ t('app.files.actions.upload') }}
-      </v-btn>
-    </div>
+  <div class="agency-page" data-test="agency-files-page">
+    <AgencyPageHeader :title="t('app.files.title')" title-test="files-heading">
+      <template #actions>
+        <v-btn
+          color="primary"
+          prepend-icon="mdi-upload"
+          data-test="files-upload-btn"
+          @click="uploadDialog = true"
+        >
+          {{ t('app.files.actions.upload') }}
+        </v-btn>
+      </template>
+    </AgencyPageHeader>
 
-    <v-alert v-if="error" type="error" variant="tonal" class="mb-4" data-test="files-list-error">
+    <v-alert v-if="error" type="error" variant="tonal" data-test="files-list-error">
       {{ error }}
     </v-alert>
 
@@ -187,6 +189,7 @@ async function confirmDelete(): Promise<void> {
       :items-per-page="tableOptions.itemsPerPage"
       :page="tableOptions.page"
       item-value="id"
+      class="agency-table"
       data-test="files-table"
       @update:options="onTableUpdate"
     >
