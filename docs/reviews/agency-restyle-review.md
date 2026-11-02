@@ -1,6 +1,6 @@
 # AH-114: agency app restyle from Figma (web only) — REVIEW
 
-**Status: CLOSED 2026-11-02 (L0 to L5 built, cleared layer by layer by Pedram, pushed; NOT deployed).** Inventory: [`agency-restyle-inventory.md`](agency-restyle-inventory.md). Plan, with the step-by-step build notes (§3.1) and every ruling: [`agency-restyle-plan.md`](agency-restyle-plan.md). Creator baseline: [`ah-114-creator-baseline/`](ah-114-creator-baseline/README.md). Ad-hoc entry: AH-114 in [`adhoc-changes-log.md`](adhoc-changes-log.md). Deploy entry (PENDING): [`deploy-log.md`](../runbooks/deploy-log.md).
+**Status: CLOSED 2026-11-02 (L0 to L5 built, cleared layer by layer by Pedram, pushed; DEPLOYED 2026-11-02 about 08:15 CET).** Inventory: [`agency-restyle-inventory.md`](agency-restyle-inventory.md). Plan, with the step-by-step build notes (§3.1) and every ruling: [`agency-restyle-plan.md`](agency-restyle-plan.md). Creator baseline: [`ah-114-creator-baseline/`](ah-114-creator-baseline/README.md). Ad-hoc entry: AH-114 in [`adhoc-changes-log.md`](adhoc-changes-log.md). Deploy entry (DEPLOYED): [`deploy-log.md`](../runbooks/deploy-log.md).
 
 **Evidence labels.** MEASURED = read in a real browser or by a spec in this chunk. INFERRED = reasoned from code or from measurements, not read directly. REPORTED = told to me, not read by me. "Not read" is written as "not read".
 
@@ -171,12 +171,12 @@ For whoever owns the Figma file:
 - The brand detail and list "Created" label is one i18n key, `app.brands.fields.createdAt`, 24 locales, `verify-locale` 24 / 24 (the flaky-ten locales carry real translations, no English fallback; the translations are single words from the model, not reviewed by a native speaker).
 - The posted-content pending colour change and the roster table's horizontal scroll at 1280 are accepted.
 
-**Status: CLOSED pending deploy and Pedram's walk** (close-out accepted at `1bc398e8`, 2026-11-02). Rulings on the open items:
+**Status: CLOSED and DEPLOYED** (close-out accepted at `1bc398e8`, 2026-11-02; deployed the same morning from that commit; Pedram's production check was still in progress when this was written). Rulings on the open items:
 
 - The signed-in creator comparison is skipped. Pedram's browser walk on the local stack covers it (creator sign-in, old render).
 - The 23 non-English `createdAt` translations are accepted as machine-consistent.
 - The sign-in `data-v-` id difference is accepted as pre-existing (the tech-debt row is kept).
-- The `deploy-log.md` entry stays `PENDING` until the colleague publishes the main Netlify site.
+- The `deploy-log.md` entry stayed `PENDING` until the colleague published the main Netlify site. It was flipped to `DEPLOYED` the same day (see §8).
 
 ## 7. Open items and where they are logged
 
@@ -184,4 +184,4 @@ All are rows in [`tech-debt.md`](../tech-debt.md), section "AH-114 (agency resty
 
 ## 8. Deploy
 
-Web build of `apps/main` only. API: none. No migration, no flag, no env change. Rollback: redeploy the previous `dist`. The entry is `PENDING` in [`deploy-log.md`](../runbooks/deploy-log.md). Nothing was deployed by this chunk; the creator native build 3 is a bundled binary and is not reached by a web deploy.
+Web build of `apps/main` only. API: none. No migration, no flag, no env change. Rollback: redeploy the previous `dist`. **Deployed 2026-11-02 about 08:15 CET by Pedram's colleague**: the main Netlify site, published from mirror commit `c295185`, which is GitHub `1bc398e8`; served bundle `assets/index-HaK4z1fD.js`; API untouched (reported). The entry is `DEPLOYED` in [`deploy-log.md`](../runbooks/deploy-log.md), with what was reported and what is **not read**: the colleague reported agency and creator sign-in checks (details not recorded); Pedram's own production check was still running and is not recorded yet. The creator native build 3 is a bundled binary and is not reached by a web deploy.
