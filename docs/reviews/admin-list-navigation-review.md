@@ -322,7 +322,7 @@ All in [`tech-debt.md`](../tech-debt.md), section "AH-117 (admin list navigation
 
 ## 11. CI
 
-_Filled in after the push (see the commit that adds it)._
+`22eb4d20` (the D1 docs commit, on top of S1 to S7): all four jobs green, [run 41829219866](https://github.com/pedram-kh/Engine/actions/runs/41829219866). Frontend (lint, typecheck, unit): `apps/admin` 65 files, 690 passed; `apps/main` 307 files, 4071 passed; `packages/api-client` 228, `packages/ui` 47, `packages/design-tokens` 42 passed. Backend: Pest 4183 passed, 1 skipped, 21,445 assertions (the same counts as AH-116's last run: nothing under `apps/api` changed). E2E admin SPA: 2 passed. E2E main SPA: 41 passed. The plan commit `9872a5a4` was green earlier ([run 41803299270](https://github.com/pedram-kh/Engine/actions/runs/41803299270)). Runs are per push, so this run covers S1 to S7 together; no per-step CI exists. The docs commit that adds this section changes no code.
 
 ## 12. Deploy
 
