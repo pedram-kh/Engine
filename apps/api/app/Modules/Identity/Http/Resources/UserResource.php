@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Modules\Identity\Http\Resources;
 
 use App\Modules\Agencies\Models\AgencyMembership;
+use App\Modules\Creators\Features\AssignmentOfferEditEnabled;
+use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
 use App\Modules\Identity\Features\AccountDeletionEnabled;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\Request;
@@ -60,6 +62,11 @@ final class UserResource extends JsonResource
                 // enforces the flag itself (404), so a stale `true` is harmless.
                 'features' => [
                     'account_deletion' => $user->isCreator() && Feature::active(AccountDeletionEnabled::NAME),
+                    // AH-118 — agency-side switches. UI gates only (the API enforces
+                    // each flag itself); `false` without evaluating the flag for a
+                    // creator or a platform admin, the `account_deletion` shape.
+                    'campaign_region_restriction' => $this->isAgencySide($user) && Feature::active(CampaignRegionRestrictionEnabled::NAME),
+                    'assignment_offer_edit' => $this->isAgencySide($user) && Feature::active(AssignmentOfferEditEnabled::NAME),
                 ],
             ],
             'relationships' => [
@@ -68,6 +75,15 @@ final class UserResource extends JsonResource
                 ],
             ],
         ];
+    }
+
+    /**
+     * An agency user: neither a creator nor a platform admin. The AH-118 menu
+     * flags are evaluated for this audience only.
+     */
+    private function isAgencySide(User $user): bool
+    {
+        return ! $user->isCreator() && ! $user->isPlatformAdmin();
     }
 
     /**

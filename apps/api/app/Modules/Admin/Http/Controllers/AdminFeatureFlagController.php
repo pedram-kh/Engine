@@ -8,6 +8,8 @@ use App\Modules\Admin\Http\Requests\ToggleFeatureFlagRequest;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Facades\Audit;
 use App\Modules\Creators\Features\ApplicationNotificationsEnabled;
+use App\Modules\Creators\Features\AssignmentOfferEditEnabled;
+use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
 use App\Modules\Creators\Features\IncompleteCreatorNudgeEnabled;
@@ -110,6 +112,14 @@ final class AdminFeatureFlagController
         AccountDeletionEnabled::NAME => [
             'label' => 'Account deletion (creator request)',
             'description' => 'Lets a creator request deletion of their own account (the endpoint, the confirmation mail and the Security page entry). Off: no request can be made; a request already made stays pending and can still be cancelled by signing in. Do not arm before the Part A and Part B deploy, and before the build-3 walk has passed.',
+        ],
+        CampaignRegionRestrictionEnabled::NAME => [
+            'label' => 'Campaign region restriction',
+            'description' => 'Lets an agency limit who can apply to a listed campaign to the creators in its listed regions. Off: the switch cannot be turned on, nobody is region-locked and fan-out is unchanged. Creators outside the regions still see the job when it is on; invitations are never affected.',
+        ],
+        AssignmentOfferEditEnabled::NAME => [
+            'label' => 'Assignment offer edit',
+            'description' => 'Lets an agency edit the offer amount of an assignment until a contract is sent or payment starts. Each edit notifies the creator (in-app, push and email) and writes a line in the conversation. Off: the endpoint answers 404 and nothing is sent.',
         ],
         AccountErasureExecuteEnabled::NAME => [
             'label' => 'Account erasure (admin Erase button)',

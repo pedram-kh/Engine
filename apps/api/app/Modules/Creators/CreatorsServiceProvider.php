@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Modules\Creators;
 
 use App\Modules\Creators\Features\ApplicationNotificationsEnabled;
+use App\Modules\Creators\Features\AssignmentOfferEditEnabled;
+use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
 use App\Modules\Creators\Features\IncompleteCreatorNudgeEnabled;
@@ -268,6 +270,8 @@ final class CreatorsServiceProvider extends ServiceProvider
         Feature::define(PlatformAutomationsEnabled::NAME, PlatformAutomationsEnabled::default());
         Feature::define(PostVerifiedMailEnabled::NAME, PostVerifiedMailEnabled::default());
         Feature::define(PushNotificationsEnabled::NAME, PushNotificationsEnabled::default());
+        Feature::define(CampaignRegionRestrictionEnabled::NAME, CampaignRegionRestrictionEnabled::default());
+        Feature::define(AssignmentOfferEditEnabled::NAME, AssignmentOfferEditEnabled::default());
     }
 
     private function registerRoutes(): void
