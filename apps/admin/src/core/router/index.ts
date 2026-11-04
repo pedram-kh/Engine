@@ -26,6 +26,7 @@ import {
   createRouter as createVueRouter,
   createWebHistory,
   type Router,
+  type RouterScrollBehavior,
   type RouteLocationNormalized,
   type RouteLocationRaw,
 } from 'vue-router'
@@ -64,6 +65,62 @@ export async function runGuards(
 }
 
 /**
+ * How long scroll restoration will wait for an async list to render tall
+ * enough to hold the saved offset before giving up and scrolling as far as it
+ * can. Longer than a warm list request, short enough that a genuinely slow
+ * page does not feel stuck mid-navigation. (Mirror of main's, AH-076.)
+ */
+const SCROLL_RESTORE_TIMEOUT_MS = 1200
+
+const SCROLL_RESTORE_POLL_MS = 50
+
+/** Is the document already tall enough to scroll to `top`? */
+function canScrollTo(top: number): boolean {
+  const el = document.documentElement
+  return el.scrollHeight - el.clientHeight >= top
+}
+
+/**
+ * Restoring a scroll offset only works once the content that made the page
+ * that tall is back on screen: the admin lists paint an empty table, then
+ * fetch. Scrolling at `nextTick` would land at the bottom of the empty table.
+ * Poll instead, and cap the wait so a failed request cannot hang the
+ * navigation.
+ */
+async function waitForScrollHeight(top: number): Promise<void> {
+  const deadline = Date.now() + SCROLL_RESTORE_TIMEOUT_MS
+  while (!canScrollTo(top) && Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, SCROLL_RESTORE_POLL_MS))
+  }
+}
+
+/**
+ * Back/forward returns the operator where they were; a new page starts at the
+ * top; a query-only change on the same route (paging, a chip, a search term:
+ * the list writing its own state into the URL) leaves the scroll alone.
+ *
+ * Mirror of main's (AH-076), which has no third branch: AH-117 diverges in the
+ * query-only rule, because every admin list now `replace`s its URL on every
+ * page and chip change and would otherwise jump to the top each time. The
+ * `from.name != null` guard keeps the first navigation (from
+ * `START_LOCATION`, which has no name but path `/`) from matching the
+ * dashboard at `/`.
+ *
+ * Exported for direct unit testing; the router only ever calls it in a real
+ * browser.
+ */
+export const scrollBehavior: RouterScrollBehavior = async (to, from, savedPosition) => {
+  if (savedPosition !== null) {
+    await waitForScrollHeight(savedPosition.top)
+    return savedPosition
+  }
+  if (from.name != null && to.path === from.path) {
+    return false
+  }
+  return { top: 0 }
+}
+
+/**
  * Build a fresh `Router` instance. Production wiring uses the
  * module-level singleton `router`; tests that need a clean router
  * (e.g. to avoid leaked navigation history between cases) call this
@@ -80,6 +137,7 @@ export function createRouter(
   const r = createVueRouter({
     history: historyFactory(),
     routes,
+    scrollBehavior,
   })
 
   r.beforeEach(async (to, from) => {

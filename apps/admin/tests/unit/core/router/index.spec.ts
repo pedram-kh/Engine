@@ -17,10 +17,10 @@
  * directly without mounting components.
  */
 
-import type { RouteLocationNormalized } from 'vue-router'
-import { describe, expect, it, vi } from 'vitest'
+import { START_LOCATION, type RouteLocationNormalized } from 'vue-router'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { createRouter, runGuards } from '@/core/router'
+import { createRouter, runGuards, scrollBehavior } from '@/core/router'
 
 import type { AuthStore } from '@/core/router/guards'
 
@@ -289,5 +289,149 @@ describe('createRouter', () => {
     await r.push(preservedAfterEnrolment)
     expect(r.currentRoute.value.name).toBe('app.settings')
     expect(r.currentRoute.value.path).toBe('/settings')
+  })
+})
+
+/**
+ * AH-117 S2 — `scrollBehavior`. Mirror of main's `scrollBehavior` describe
+ * (AH-076) plus the query-only branch.
+ */
+describe('scrollBehavior', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  function setDocumentHeight(scrollHeight: number, clientHeight = 800): void {
+    Object.defineProperty(document.documentElement, 'scrollHeight', {
+      configurable: true,
+      value: scrollHeight,
+    })
+    Object.defineProperty(document.documentElement, 'clientHeight', {
+      configurable: true,
+      value: clientHeight,
+    })
+  }
+
+  function loc(
+    name: string,
+    path: string,
+    query: Record<string, string> = {},
+  ): RouteLocationNormalized {
+    return {
+      name,
+      path,
+      fullPath: path,
+      params: {},
+      query,
+      hash: '',
+      matched: [],
+      meta: {},
+      redirectedFrom: undefined,
+    } as unknown as RouteLocationNormalized
+  }
+
+  function call(
+    to: RouteLocationNormalized,
+    from: RouteLocationNormalized,
+    savedPosition: { top: number; left: number } | null,
+  ) {
+    return scrollBehavior.call(undefined as never, to, from, savedPosition)
+  }
+
+  const approvals = loc('app.creators.list', '/creators')
+  const kyc = loc('app.creators.kyc', '/creators/kyc')
+
+  it('starts a navigation to a different route at the top', async () => {
+    await expect(call(kyc, approvals, null)).resolves.toEqual({ top: 0 })
+  })
+
+  it('starts the first navigation at the top, even onto the dashboard at "/" (START_LOCATION also has path "/")', async () => {
+    const dashboard = loc('app.dashboard', '/')
+    await expect(call(dashboard, START_LOCATION, null)).resolves.toEqual({ top: 0 })
+  })
+
+  it('returns the saved position at once when the page is already tall enough', async () => {
+    setDocumentHeight(4000)
+    await expect(
+      call(approvals, loc('app.creators.detail', '/creators/X'), { top: 1200, left: 0 }),
+    ).resolves.toEqual({
+      top: 1200,
+      left: 0,
+    })
+  })
+
+  it('waits for the async list to render before restoring the offset', async () => {
+    setDocumentHeight(0)
+    const pending = Promise.resolve(
+      call(approvals, loc('app.creators.detail', '/creators/X'), { top: 1200, left: 0 }),
+    )
+
+    let settled = false
+    void pending.then(() => {
+      settled = true
+    })
+    await new Promise((resolve) => setTimeout(resolve, 60))
+    expect(settled).toBe(false)
+
+    setDocumentHeight(4000)
+    await expect(pending).resolves.toEqual({ top: 1200, left: 0 })
+  })
+
+  it('gives up rather than hanging the navigation when the content never arrives', async () => {
+    setDocumentHeight(0)
+    vi.useFakeTimers()
+    const pending = call(approvals, loc('app.creators.detail', '/creators/X'), {
+      top: 5000,
+      left: 0,
+    })
+    await vi.advanceTimersByTimeAsync(1500)
+    await expect(pending).resolves.toEqual({ top: 5000, left: 0 })
+  })
+
+  it('restores a saved position even when the route is the same (the saved position wins)', async () => {
+    setDocumentHeight(4000)
+    await expect(
+      call(loc('app.creators.list', '/creators', { page: '2' }), approvals, { top: 900, left: 0 }),
+    ).resolves.toEqual({ top: 900, left: 0 })
+  })
+
+  it('leaves the scroll alone for a query-only change on the same route (paging, a chip)', async () => {
+    await expect(
+      call(
+        loc('app.creators.list', '/creators', { status: 'approved', page: '2' }),
+        loc('app.creators.list', '/creators', { status: 'approved' }),
+        null,
+      ),
+    ).resolves.toBe(false)
+  })
+
+  it('leaves the scroll alone for a bare sidebar click on the same route', async () => {
+    await expect(
+      call(approvals, loc('app.creators.list', '/creators', { page: '3' }), null),
+    ).resolves.toBe(false)
+  })
+
+  it('starts at the top when only a param differs on the same route name (creator A to creator B)', async () => {
+    await expect(
+      call(
+        loc('app.creators.detail', '/creators/B'),
+        loc('app.creators.detail', '/creators/A'),
+        null,
+      ),
+    ).resolves.toEqual({ top: 0 })
+  })
+
+  it('starts at the top for a different route name that carries the same query', async () => {
+    await expect(
+      call(
+        loc('app.creators.kyc', '/creators/kyc', { page: '2' }),
+        loc('app.creators.list', '/creators', { page: '2' }),
+        null,
+      ),
+    ).resolves.toEqual({ top: 0 })
+  })
+
+  it('is wired into the router instance', () => {
+    expect(createRouter().options.scrollBehavior).toBe(scrollBehavior)
   })
 })
