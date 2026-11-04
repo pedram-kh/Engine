@@ -9,6 +9,12 @@
  * + page/per_page). Click-through navigates to the existing creator
  * detail drill-in.
  *
+ * AH-117: the browse context (page, page size, status chip) lives in the URL
+ * query (`useListQueryState`), so the detail drill-in's browser back lands on
+ * the same page of the same filter. One watcher over the three refs is the
+ * only load trigger; the table's own `update:options` is ignored when it just
+ * echoes what the refs already hold.
+ *
  * Gated by `requireAuth` + `requireMfaEnrolled` (the backend enforces
  * platform_admin via CreatorPolicy::viewAny).
  */
@@ -22,6 +28,13 @@ import type { CreatorApplicationStatus } from '@catalyst/api-client'
 
 import { creatorEmail, creatorLabel } from '@/core/creators/creatorLabel'
 import DeletionRequestedChip from '@/core/creators/DeletionRequestedChip.vue'
+import {
+  exceedsLastPage,
+  oneOfParamWithFallback,
+  pageParam,
+  perPageParam,
+  useListQueryState,
+} from '@/composables/useListQueryState'
 
 import { adminCreatorsApi, type AdminCreatorListItem } from '../api/creators.api'
 
@@ -30,13 +43,29 @@ type StatusFilter = CreatorApplicationStatus | 'all'
 const { t, locale } = useI18n()
 const router = useRouter()
 
-const statusFilter = ref<StatusFilter>('pending')
+const STATUS_FILTERS = [
+  'pending',
+  'approved',
+  'rejected',
+  'incomplete',
+  'all',
+] as const satisfies readonly StatusFilter[]
+const PER_PAGE_OPTIONS = [10, 25, 50, 100]
+
+const {
+  page,
+  per_page: perPage,
+  status: statusFilter,
+} = useListQueryState({
+  page: pageParam,
+  per_page: perPageParam(PER_PAGE_OPTIONS, 25),
+  status: oneOfParamWithFallback<StatusFilter>(STATUS_FILTERS, 'pending'),
+})
+
 const items = ref<AdminCreatorListItem[]>([])
 const totalItems = ref(0)
 const loading = ref(false)
 const errorKey = ref<string | null>(null)
-
-const tableOptions = ref({ page: 1, itemsPerPage: 25 })
 
 const headers = [
   { title: t('admin.creators.list.fields.name'), key: 'attributes.display_name', sortable: false },
@@ -76,21 +105,37 @@ const statusFilterItems: { label: string; value: StatusFilter }[] = [
   { label: t('admin.creators.list.filters.all'), value: 'all' },
 ]
 
+// A response that is no longer the newest request is dropped (a slow page 1
+// must not overwrite a fast page 2).
+let requestSeq = 0
+
 async function load(): Promise<void> {
+  const seq = ++requestSeq
   loading.value = true
   errorKey.value = null
   try {
     const res = await adminCreatorsApi.list({
       status: statusFilter.value === 'all' ? undefined : statusFilter.value,
-      page: tableOptions.value.page,
-      per_page: tableOptions.value.itemsPerPage,
+      page: page.value,
+      per_page: perPage.value,
     })
-    items.value = res.data
+    if (seq !== requestSeq) return
+    // The table must know the real row count BEFORE the page moves: with
+    // `items-length` still 0 it would clamp the new page to 1 on its own.
     totalItems.value = res.meta.total
+    // A stale link (`?page=9` after the queue shrank): go to the last page the
+    // server reports. The watcher below refetches once; the empty response is
+    // never rendered.
+    if (exceedsLastPage(page.value, res.meta.last_page)) {
+      page.value = res.meta.last_page
+      return
+    }
+    items.value = res.data
   } catch (error) {
+    if (seq !== requestSeq) return
     errorKey.value = error instanceof ApiError ? error.code : 'admin.creators.list.load_failed'
   } finally {
-    loading.value = false
+    if (seq === requestSeq) loading.value = false
   }
 }
 
@@ -98,14 +143,17 @@ onMounted(() => {
   void load()
 })
 
-watch(statusFilter, () => {
-  tableOptions.value.page = 1
+watch([page, perPage, statusFilter], () => {
   void load()
 })
 
 function onTableUpdate(opts: { page: number; itemsPerPage: number }): void {
-  tableOptions.value = opts
-  void load()
+  // No echo guard and no direct `load()`: the table echoes the controlled page
+  // and size back on mount, and writing equal values into the refs changes
+  // nothing, so the watcher above (the only load trigger) stays quiet. Calling
+  // `load()` from here is what would make a second request on mount.
+  page.value = opts.page
+  perPage.value = opts.itemsPerPage
 }
 
 function goToDetail(ulid: string): void {
@@ -156,8 +204,9 @@ function formatDate(iso: string | null): string {
       :items="items"
       :items-length="totalItems"
       :loading="loading"
-      :items-per-page="tableOptions.itemsPerPage"
-      :page="tableOptions.page"
+      :items-per-page="perPage"
+      :items-per-page-options="PER_PAGE_OPTIONS"
+      :page="page"
       item-value="id"
       data-testid="admin-creator-list-table"
       @update:options="onTableUpdate"
