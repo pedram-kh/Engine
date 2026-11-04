@@ -68,8 +68,17 @@ function user(
   }
 }
 
-function usersPage(data: AdminCreatorAppUser[], total = data.length): AdminCreatorAppUsersResponse {
-  return { data, meta: { total, page: 1, per_page: 25, last_page: 1 } }
+function usersPage(
+  data: AdminCreatorAppUser[],
+  total = data.length,
+  page = 1,
+): AdminCreatorAppUsersResponse {
+  // `last_page` follows the total, as the backend's does: the page's Q10 clamp
+  // reads it, so a fixed 1 would clamp every page forward.
+  return {
+    data,
+    meta: { total, page, per_page: 25, last_page: Math.max(1, Math.ceil(total / 25)) },
+  }
 }
 
 function signIn(over: Partial<AdminCreatorAppSignIn> = {}): AdminCreatorAppSignIn {
@@ -114,8 +123,10 @@ describe('CreatorAppPage (AH-102b)', () => {
     document.body.innerHTML = ''
   })
 
-  async function mount() {
-    const h = await mountCreatorPage(CreatorAppPage, { initialRoute: { name: 'app.creators.app' } })
+  async function mount(query: Record<string, string> = {}) {
+    const h = await mountCreatorPage(CreatorAppPage, {
+      initialRoute: { name: 'app.creators.app', query },
+    })
     teardown = h.unmount
     await flushPromises()
     return h
@@ -211,12 +222,9 @@ describe('CreatorAppPage (AH-102b)', () => {
   })
 
   it('filters AND-compose and a filter change resets paging to page 1', async () => {
-    vi.mocked(adminCreatorAppApi.users).mockResolvedValue(usersPage([user('01HQACTIVE')], 80))
-    const h = await mount()
-
-    // Page 2 via the table's own pager.
-    await h.wrapper.find('button[aria-label="Next page"]').trigger('click')
-    await flushPromises()
+    vi.mocked(adminCreatorAppApi.users).mockResolvedValue(usersPage([user('01HQACTIVE')], 80, 2))
+    // Page 2 arrives through the URL, as it does on a back from the push deliveries page.
+    const h = await mount({ page: '2' })
     expect(adminCreatorAppApi.users).toHaveBeenLastCalledWith({ ...BASE, page: 2 })
 
     await h.wrapper.find('[data-testid="admin-creator-app-filter-status-active"]').trigger('click')
@@ -230,6 +238,10 @@ describe('CreatorAppPage (AH-102b)', () => {
       platform: 'ios',
       page: 1,
     })
+    // The URL carries both chips and no page.
+    await vi.waitFor(() =>
+      expect(h.router.currentRoute.value.query).toEqual({ status: 'active', platform: 'ios' }),
+    )
   })
 
   it('the search is debounced: many keystrokes, ONE request after the pause, from page 1', async () => {
@@ -242,13 +254,19 @@ describe('CreatorAppPage (AH-102b)', () => {
       await input.setValue(text)
       vi.advanceTimersByTime(100)
     }
+    // 300 ms after the FIRST keystroke is not a pause: the last one was 100 ms ago.
+    await flushPromises()
     expect(adminCreatorAppApi.users).not.toHaveBeenCalled()
+    expect(h.router.currentRoute.value.query).toEqual({})
 
     vi.advanceTimersByTime(300)
     await flushPromises()
 
     expect(adminCreatorAppApi.users).toHaveBeenCalledTimes(1)
     expect(adminCreatorAppApi.users).toHaveBeenCalledWith({ ...BASE, search: 'ada' })
+    // `q` reaches the URL after the pause, and not before it.
+    vi.useRealTimers()
+    await vi.waitFor(() => expect(h.router.currentRoute.value.query).toEqual({ q: 'ada' }))
   })
 
   it('shows the empty state and the error surface', async () => {
@@ -274,6 +292,260 @@ describe('CreatorAppPage (AH-102b)', () => {
     expect(error).toContain("We couldn't load creator app usage")
     expect(error).not.toContain('http.unknown_error')
     expect(h.wrapper.text()).not.toContain('No creators match these filters.')
+  })
+
+  describe('URL-backed browse context (AH-117)', () => {
+    it('seeds the chips, the page and the text field from the URL, with one request; a junk URL reads as the defaults', async () => {
+      vi.mocked(adminCreatorAppApi.users).mockResolvedValue(usersPage([user('01HQACTIVE')], 120, 3))
+
+      const seeded = await mount({
+        status: 'signed_out',
+        platform: 'android',
+        push: 'dead',
+        q: 'ada',
+        page: '3',
+        per_page: '10',
+      })
+
+      expect(adminCreatorAppApi.users).toHaveBeenCalledTimes(1)
+      expect(adminCreatorAppApi.users).toHaveBeenCalledWith({
+        app_status: 'signed_out',
+        platform: 'android',
+        push: 'dead',
+        search: 'ada',
+        page: 3,
+        per_page: 10,
+      })
+      const input = seeded.wrapper.find('[data-testid="admin-creator-app-search"] input')
+      expect((input.element as HTMLInputElement).value).toBe('ada')
+      // Nothing was rewritten: the URL the operator arrived on is the URL they keep.
+      await new Promise((resolve) => setTimeout(resolve, 400))
+      expect(seeded.router.currentRoute.value.query).toEqual({
+        status: 'signed_out',
+        platform: 'android',
+        push: 'dead',
+        q: 'ada',
+        page: '3',
+        per_page: '10',
+      })
+      expect(adminCreatorAppApi.users).toHaveBeenCalledTimes(1)
+      seeded.unmount()
+      teardown = null
+      vi.mocked(adminCreatorAppApi.users).mockClear()
+
+      await mount({
+        status: 'bogus',
+        platform: 'windows',
+        push: 'maybe',
+        page: '-2',
+        per_page: '100000',
+      })
+
+      expect(adminCreatorAppApi.users).toHaveBeenCalledTimes(1)
+      expect(adminCreatorAppApi.users).toHaveBeenCalledWith(BASE)
+    })
+
+    it('a chip click from page 3 goes to page 1: one request, and the URL has the chip and no page', async () => {
+      vi.mocked(adminCreatorAppApi.users).mockResolvedValue(usersPage([user('01HQACTIVE')], 120, 3))
+      const h = await mount({ page: '3' })
+      vi.mocked(adminCreatorAppApi.users).mockClear()
+
+      await h.wrapper.find('[data-testid="admin-creator-app-filter-push-dead"]').trigger('click')
+      await flushPromises()
+
+      await vi.waitFor(() => expect(h.router.currentRoute.value.query).toEqual({ push: 'dead' }))
+      expect(adminCreatorAppApi.users).toHaveBeenCalledTimes(1)
+      expect(adminCreatorAppApi.users).toHaveBeenCalledWith({ ...BASE, push: 'dead' })
+    })
+
+    it('a typed term resets to page 1 with one request, and a trailing space is not a new term', async () => {
+      vi.mocked(adminCreatorAppApi.users).mockResolvedValue(usersPage([user('01HQACTIVE')], 120, 3))
+      const h = await mount({ page: '3', q: 'ada' })
+      vi.mocked(adminCreatorAppApi.users).mockClear()
+
+      const input = h.wrapper.find('[data-testid="admin-creator-app-search"] input')
+      await input.setValue('ada ')
+      await new Promise((resolve) => setTimeout(resolve, 450))
+      expect(adminCreatorAppApi.users).not.toHaveBeenCalled()
+      expect(h.router.currentRoute.value.query).toEqual({ page: '3', q: 'ada' })
+      expect((input.element as HTMLInputElement).value).toBe('ada ')
+
+      await input.setValue('adam')
+      await new Promise((resolve) => setTimeout(resolve, 450))
+      await vi.waitFor(() => expect(h.router.currentRoute.value.query).toEqual({ q: 'adam' }))
+      expect(adminCreatorAppApi.users).toHaveBeenCalledTimes(1)
+      expect(adminCreatorAppApi.users).toHaveBeenCalledWith({ ...BASE, search: 'adam' })
+    })
+
+    it('clearing the search (Vuetify emits null) reloads with no term and takes `q` out of the URL', async () => {
+      const h = await mount({ q: 'ada' })
+      vi.mocked(adminCreatorAppApi.users).mockClear()
+
+      const field = h.wrapper.findComponent<typeof import('vuetify/components').VTextField>(
+        '[data-testid="admin-creator-app-search"]',
+      )
+      field.vm.$emit('update:modelValue', null)
+      await new Promise((resolve) => setTimeout(resolve, 450))
+
+      await vi.waitFor(() => expect(h.router.currentRoute.value.query).toEqual({}))
+      expect(adminCreatorAppApi.users).toHaveBeenCalledTimes(1)
+      expect(adminCreatorAppApi.users).toHaveBeenCalledWith(BASE)
+      expect(h.wrapper.find('[data-testid="admin-creator-app-error"]').exists()).toBe(false)
+    })
+
+    it('re-seeds when the route changes underneath it: a bare sidebar URL clears the chips, the text field and the page', async () => {
+      vi.mocked(adminCreatorAppApi.users).mockResolvedValue(usersPage([user('01HQACTIVE')], 120, 3))
+      const h = await mount({ status: 'active', push: 'dead', q: 'ada', page: '3' })
+      vi.mocked(adminCreatorAppApi.users).mockClear()
+
+      await h.router.replace({ name: 'app.creators.app' })
+      await flushPromises()
+
+      await vi.waitFor(() => expect(h.router.currentRoute.value.query).toEqual({}))
+      const input = h.wrapper.find('[data-testid="admin-creator-app-search"] input')
+      expect((input.element as HTMLInputElement).value).toBe('')
+      // Let any (wrongly) armed debounce fire before counting.
+      await new Promise((resolve) => setTimeout(resolve, 450))
+      expect(adminCreatorAppApi.users).toHaveBeenCalledTimes(1)
+      expect(adminCreatorAppApi.users).toHaveBeenCalledWith(BASE)
+    })
+
+    it('a route re-seed drops the keystrokes still waiting on the pause', async () => {
+      vi.mocked(adminCreatorAppApi.users).mockResolvedValue(usersPage([user('01HQACTIVE')], 120, 3))
+      const h = await mount({ q: 'ada', page: '3' })
+      vi.mocked(adminCreatorAppApi.users).mockClear()
+
+      await h.wrapper.find('[data-testid="admin-creator-app-search"] input').setValue('adamx')
+      await new Promise((resolve) => setTimeout(resolve, 100))
+      await h.router.replace({ name: 'app.creators.app' })
+      await flushPromises()
+      await new Promise((resolve) => setTimeout(resolve, 450))
+
+      expect(h.router.currentRoute.value.query).toEqual({})
+      expect(adminCreatorAppApi.users).toHaveBeenCalledTimes(1)
+      expect(adminCreatorAppApi.users).toHaveBeenCalledWith(BASE)
+    })
+
+    it('clamps a page past the last one to the last page: ONE refetch, the empty page never shown', async () => {
+      let resolveLast!: (value: AdminCreatorAppUsersResponse) => void
+      vi.mocked(adminCreatorAppApi.users).mockImplementation((params) =>
+        params?.page === 2
+          ? new Promise<AdminCreatorAppUsersResponse>((resolve) => {
+              resolveLast = resolve
+            })
+          : Promise.resolve({
+              data: [user('01HQOUTOFRANGE')],
+              meta: { total: 30, page: 9, per_page: 25, last_page: 2 },
+            }),
+      )
+      const h = await mount({ page: '9' })
+
+      // The out-of-range response is on screen at no point while the refetch is out.
+      expect(h.wrapper.text()).not.toContain('Creator 01HQOUTOFRANGE')
+
+      resolveLast(usersPage([user('01HQLASTPAGE')], 30, 2))
+      await flushPromises()
+      await vi.waitFor(() => expect(h.router.currentRoute.value.query).toEqual({ page: '2' }))
+
+      expect(adminCreatorAppApi.users).toHaveBeenCalledTimes(2)
+      expect(vi.mocked(adminCreatorAppApi.users).mock.calls[1]![0]).toEqual({ ...BASE, page: 2 })
+      expect(h.wrapper.text()).toContain('Creator 01HQLASTPAGE')
+      expect(h.wrapper.text()).not.toContain('Creator 01HQOUTOFRANGE')
+    })
+
+    it('pages through the table by REPLACING the URL, and offers 10, 25, 50 and 100 rows (no "All")', async () => {
+      vi.mocked(adminCreatorAppApi.users).mockResolvedValue(usersPage([user('01HQACTIVE')], 120))
+      const h = await mount()
+      vi.mocked(adminCreatorAppApi.users).mockClear()
+      const push = vi.spyOn(h.router, 'push')
+
+      expect(
+        h.wrapper.findComponent({ name: 'VDataTableServer' }).props('itemsPerPageOptions'),
+      ).toEqual([10, 25, 50, 100])
+
+      await h.wrapper.find('button[aria-label="Next page"]').trigger('click')
+      await flushPromises()
+      await vi.waitFor(() => expect(h.router.currentRoute.value.query).toEqual({ page: '2' }))
+
+      expect(adminCreatorAppApi.users).toHaveBeenCalledTimes(1)
+      expect(adminCreatorAppApi.users).toHaveBeenCalledWith({ ...BASE, page: 2 })
+      expect(push).not.toHaveBeenCalled()
+    })
+
+    it('a page-size change from the table is one request and lands in the URL', async () => {
+      vi.mocked(adminCreatorAppApi.users).mockResolvedValue(usersPage([user('01HQACTIVE')], 120))
+      const h = await mount()
+      vi.mocked(adminCreatorAppApi.users).mockClear()
+
+      h.wrapper.findComponent({ name: 'VDataTableServer' }).vm.$emit('update:options', {
+        page: 1,
+        itemsPerPage: 50,
+        sortBy: [],
+        groupBy: [],
+        search: undefined,
+      })
+      await flushPromises()
+      await vi.waitFor(() => expect(h.router.currentRoute.value.query).toEqual({ per_page: '50' }))
+      expect(adminCreatorAppApi.users).toHaveBeenCalledTimes(1)
+      expect(adminCreatorAppApi.users).toHaveBeenCalledWith({ ...BASE, per_page: 50 })
+    })
+
+    it('Creator app → push deliveries → back returns to the same list state, writing nothing on the way', async () => {
+      vi.mocked(adminCreatorAppApi.users).mockResolvedValue(usersPage([user('01HQACTIVE')], 120, 3))
+      const seededQuery = { status: 'signed_out', q: 'ada', page: '3' }
+      const h = await mount(seededQuery)
+      vi.mocked(adminCreatorAppApi.users).mockClear()
+      const replace = vi.spyOn(h.router, 'replace')
+
+      // The dialog's deep link: a real push (the browser's click), with its own query.
+      await h.router.push({
+        name: 'app.operations.push-deliveries',
+        query: { creator: '01HQACTIVE', creator_name: 'Creator 01HQACTIVE' },
+      })
+      await flushPromises()
+      expect(h.router.currentRoute.value.name).toBe('app.operations.push-deliveries')
+      // The list neither re-seeded from, nor wrote onto, the other page's URL.
+      expect(h.router.currentRoute.value.query).toEqual({
+        creator: '01HQACTIVE',
+        creator_name: 'Creator 01HQACTIVE',
+      })
+
+      h.router.back()
+      await vi.waitFor(() => expect(h.router.currentRoute.value.name).toBe('app.creators.app'))
+      await flushPromises()
+      await new Promise((resolve) => setTimeout(resolve, 400))
+
+      expect(h.router.currentRoute.value.query).toEqual(seededQuery)
+      const input = h.wrapper.find('[data-testid="admin-creator-app-search"] input')
+      expect((input.element as HTMLInputElement).value).toBe('ada')
+      expect(replace).not.toHaveBeenCalled()
+      expect(adminCreatorAppApi.users).not.toHaveBeenCalled()
+    })
+
+    it('drops a stale response: the slow first request cannot overwrite the newer one', async () => {
+      let resolveFirst!: (value: AdminCreatorAppUsersResponse) => void
+      vi.mocked(adminCreatorAppApi.users)
+        .mockImplementationOnce(
+          () =>
+            new Promise<AdminCreatorAppUsersResponse>((resolve) => {
+              resolveFirst = resolve
+            }),
+        )
+        .mockResolvedValue(usersPage([user('01HQNEWER')]))
+      const h = await mount()
+
+      await h.wrapper
+        .find('[data-testid="admin-creator-app-filter-status-active"]')
+        .trigger('click')
+      await flushPromises()
+      expect(h.wrapper.text()).toContain('Creator 01HQNEWER')
+
+      resolveFirst(usersPage([user('01HQSTALE')]))
+      await flushPromises()
+
+      expect(h.wrapper.text()).toContain('Creator 01HQNEWER')
+      expect(h.wrapper.text()).not.toContain('Creator 01HQSTALE')
+    })
   })
 
   describe('sign-ins dialog', () => {
