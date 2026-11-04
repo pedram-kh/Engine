@@ -74,6 +74,26 @@ happened.
 
 ---
 
+## AH-117 — admin list navigation (admin SPA only) — PENDING
+
+> **No API dependency.** The build works against the API that is live now; it reads the same list endpoints with the same parameters. It can be deployed before, after or without the AH-116 entries below. Do not combine it with them: their web build is the **main** site.
+
+- **Status:** PENDING. Opened 2026-11-04. Pushed (`origin/main`); **not deployed. Pushing is not deploying.**
+- **Range:** the admin production tip, **reported** as the 2026-10-29 build (Pedram used the Erasure queue page in production on 2026-11-01, which exists only in builds from 2026-10-25 on); **not read by the assistant; the bundle hash (`assets/index-<hash>.js` at admin.catalyst-growth.com) and the commit it was built from are read by Pedram before the deploy and written here:** `<to fill>` → **`7a4e7bab`** (S7, AH-117's last runtime commit; the D1 docs commits on top change no build output). The mirror's SHA for the deployed commit is recorded beside GitHub's (the mirror rewrites SHAs).
+- **AH entries carried:** AH-117 (S1 `06e8f7b7`, S2 `a9350513`, S3 `95148533`, S4 `7de315f4`, S5 `5cb37a81`, S6 `5d445ba7`, S7 `7a4e7bab`). **Two other commits in the range touch `packages/`:** AH-116 W1 `d2a51a62` (`packages/api-client/src/types/campaign.ts`, +7) and W2 `d0472dce` (`packages/api-client/src/types/agency.ts`, +7), optional interface members, **types only** (erased at build; no byte comparison of the admin bundle was made). `git log <admin tip>..HEAD -- apps/admin packages` is run at deploy time against the real admin tip and pasted here, because the build tip is the thing to be sure of. No other entry rides this deploy.
+- **Migrations run:** none
+- **Pre-deploy reads:** the admin bundle name served at admin.catalyst-growth.com and the commit it was built from (Pedram); the `git log` above. The figures below are quoted from [`admin-list-navigation-review.md`](../reviews/admin-list-navigation-review.md), as measured locally, **not read from the server:** admin Vitest 65 files, 690 of 690; `vue-tsc`, ESLint and Prettier clean; forbidden-path diff empty; admin Playwright 2 of 2; Approvals walked in a browser on the dev stack (review §7).
+- **Snapshot ID:** none: no migration, no data change. Not applicable.
+- **Infra:** none. No worker restart, no cron, no env, no `composer`, no `artisan`, no container recreate. **Builds: the admin SPA build and its Netlify deploy only** (`unique-taffy-3d2553.netlify.app`, served as admin.catalyst-growth.com). The main SPA is not rebuilt (no `apps/main` file changes in AH-117). TestFlight and the native binary are not touched.
+- **One-shot commands:** none
+- **Post-deploy verification (to fill, each as read or "not read"):** the admin sign-in and the MFA step land correctly; walks W1, W2, W3, W4, W6, W7, W9 and W10 of plan §5 ([`admin-list-navigation-plan.md`](../reviews/admin-list-navigation-plan.md)) on production, with per-page 10 so three pages exist: W1 list → row → back keeps the filter (Approvals, KYC queue, All creators, Agencies); W2 page 3 and a chip, scrolled, row, back; W3 sidebar "Pending approvals" from `?status=approved&page=3` gives a bare `/creators` and one request; W4 reload keeps the state; W6 `?page=99` lands on the last page, two requests at most; W7 the footer offers 10, 25, 50, 100 and no "All"; W9 Creator app → sign-ins dialog → View deliveries → back; W10 one list request on a cold load of each converted page. `/up` is not applicable (no API change).
+- **Flags armed:** none. There is no behaviour to arm.
+- **Operator:** to be recorded: the colleague, from the mirror (both SHAs).
+- **Anything unexpected:** to be recorded after the deploy. Before it, one thing to know: KYC queue, All creators, Agencies and Creator app were **not walked in a browser** before the deploy (Approvals was); their proof is Vitest and break-reverts (review §8).
+- **Rollback:** redeploy the previous admin `dist` (Netlify). No API, migration or queue to undo.
+
+---
+
 ## AH-116 API — campaign status counts, pool member filters, archived brand read — PENDING
 
 > **Deploy order, fixed: this entry first, then "AH-116 web" below.** The web build tolerates an old API for the status counts (an absent `status_counts` reads as null and the page shows today's summary), but against an old API the pool page would show a selected country or language over an unfiltered list. The two entries are two sittings with separate rollbacks.
