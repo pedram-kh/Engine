@@ -37,10 +37,13 @@ final class MessageFactory extends Factory
 
     /**
      * A system message — no human sender (D-2), keyed by the AuditAction verb.
+     *
+     * @param  array<string, mixed>|null  $data  AH-118: the line's amounts, when it has any.
      */
-    public function system(string $eventKey): static
+    public function system(string $eventKey, ?array $data = null): static
     {
         return $this->state(fn (array $attributes): array => [
+            'system_event_data' => $data,
             'sender_user_id' => null,
             'sender_role' => MessageSenderRole::System,
             'kind' => MessageKind::System,

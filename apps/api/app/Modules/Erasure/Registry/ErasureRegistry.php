@@ -232,7 +232,7 @@ final class ErasureRegistry
         return [
             'messages' => new TableRule(null, 'Body kept (D-C); the creator\'s attachments scrubbed (§3.4).', ['sender_user_id'], [
                 ...self::scrub('attachments', 'attachments of messages whose sender_user_id is the subject user: set to null', $attachments),
-                ...self::keep('id,ulid,thread_id,sender_user_id,sender_role,kind,body,system_event_key,created_at,updated_at,deleted_at', $conversation),
+                ...self::keep('id,ulid,thread_id,sender_user_id,sender_role,kind,body,system_event_key,system_event_data,created_at,updated_at,deleted_at', $conversation),
             ]),
             'relationship_messages' => new TableRule(null, 'Body kept (D-C); the creator\'s attachments scrubbed (§3.4).', ['sender_user_id'], [
                 ...self::scrub('attachments', 'attachments of messages whose sender_user_id is the subject user: set to null', $attachments),

@@ -103,6 +103,17 @@ final class CampaignFactory extends Factory
     }
 
     /**
+     * AH-118 — only creators in the listed regions may apply. Pair it with a
+     * non-empty `listing_regions` (`jobReady()` / `listed()` carry IE and FR).
+     */
+    public function regionRestricted(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'restrict_to_listing_regions' => true,
+        ]);
+    }
+
+    /**
      * The AH-069 toggle-OFF campaign: the creator does NOT post the deliverable,
      * so approving a draft completes the assignment
      * (`approved → completed_on_approval`, D3).

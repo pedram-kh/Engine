@@ -39,6 +39,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $body
  * @property array<int, array<string, mixed>>|null $attachments
  * @property string|null $system_event_key
+ * @property array<string, mixed>|null $system_event_data
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
@@ -62,6 +63,7 @@ final class Message extends Model
         'body',
         'attachments',
         'system_event_key',
+        'system_event_data',
     ];
 
     /**
@@ -104,6 +106,7 @@ final class Message extends Model
             'sender_role' => MessageSenderRole::class,
             'kind' => MessageKind::class,
             'attachments' => 'array',
+            'system_event_data' => 'array',
         ];
     }
 

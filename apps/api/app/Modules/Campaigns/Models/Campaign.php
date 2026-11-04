@@ -59,6 +59,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $listing_fee
  * @property list<string>|null $listing_languages
  * @property list<string>|null $listing_regions
+ * @property bool $restrict_to_listing_regions
  * @property string|null $listing_examples_url
  * @property Carbon|null $listed_at
  * @property Carbon $created_at
@@ -95,6 +96,8 @@ final class Campaign extends Model
         // `false` explicitly; the default only governs the paths that don't.
         'creator_posts_content' => true,
         'listed_on_jobs_board' => false,
+        // AH-118 — mirrors the column's DB default: no restriction.
+        'restrict_to_listing_regions' => false,
     ];
 
     /**
@@ -128,6 +131,7 @@ final class Campaign extends Model
         'listing_fee',
         'listing_languages',
         'listing_regions',
+        'restrict_to_listing_regions',
         'listing_examples_url',
         // AH-056 D4 — DISPLAY metadata, written only on the false→true listing
         // flip in CampaignController::update(). Fillable for factory/test
@@ -284,6 +288,7 @@ final class Campaign extends Model
             'listed_on_jobs_board' => 'boolean',
             'listing_languages' => 'array',
             'listing_regions' => 'array',
+            'restrict_to_listing_regions' => 'boolean',
             'listed_at' => 'datetime',
         ];
     }

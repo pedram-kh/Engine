@@ -464,6 +464,8 @@ final class CampaignController
             // question the trail must be able to answer.
             'creator_posts_content' => $campaign->creator_posts_content,
             'listed_on_jobs_board' => $campaign->listed_on_jobs_board,
+            // AH-118 — who restricted applications to the listed regions, and when.
+            'restrict_to_listing_regions' => $campaign->restrict_to_listing_regions,
         ];
     }
 
