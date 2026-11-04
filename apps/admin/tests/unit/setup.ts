@@ -46,6 +46,12 @@ if (!('matchMedia' in globalThis)) {
   })
 }
 
+// jsdom does not implement `window.scrollTo` (it logs a "not implemented" error).
+// vue-router's scroll handling and the list composable's re-seed both call it.
+if (typeof window !== 'undefined') {
+  window.scrollTo = vi.fn() as unknown as typeof window.scrollTo
+}
+
 if (typeof CSS === 'undefined' || typeof CSS.supports !== 'function') {
   Object.defineProperty(globalThis, 'CSS', {
     writable: true,
