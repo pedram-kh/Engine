@@ -197,6 +197,7 @@ final class CreatorJobBoardController
         // AH-118 — detail only (Q10). Computed here, where the caller is known,
         // and handed to the resource as an attribute (the `caller_*` pattern).
         $job->setAttribute('caller_region_locked', $job->isRegionLockedFor($creator));
+        $job->setAttribute('caller_region_lock_reason', $job->regionLockReasonFor($creator));
 
         $job->load(['attachments' => fn ($q) => $q->creatorVisible()->with('agencyFile')]);
 
@@ -258,8 +259,10 @@ final class CreatorJobBoardController
 
         // AH-118 — after the visibility 404 and the duplicate 409 (an existing
         // application or assignment is never touched, Q13), before the insert.
-        if ($job->isRegionLockedFor($creator)) {
-            $missing = trim((string) $creator->country_code) === '';
+        $lockReason = $job->regionLockReasonFor($creator);
+
+        if ($lockReason !== null) {
+            $missing = $lockReason === 'country_missing';
 
             abort(response()->json([
                 'errors' => [[

@@ -96,11 +96,20 @@ final class CreatorJobDetailResource extends CreatorJobCardResource
                 // AH-118 — ALWAYS present (false while the flag or switch is off),
                 // so the exact keyset does not depend on data.
                 'is_region_locked' => (bool) $campaign->getAttribute('caller_region_locked'),
+                // AH-118 — why: `country_missing` | `outside_regions` | null. Always present.
+                'region_lock_reason' => $this->regionLockReason($campaign),
                 'assignment_ulid' => $this->callerAssignmentUlid($campaign),
                 'attachments' => CreatorCampaignAttachmentResource::collection($this->creatorVisibleAttachments($campaign))->resolve($request),
                 'brand' => $brand,
             ],
         ];
+    }
+
+    private function regionLockReason(Campaign $campaign): ?string
+    {
+        $reason = $campaign->getAttribute('caller_region_lock_reason');
+
+        return is_string($reason) ? $reason : null;
     }
 
     private function callerAssignmentUlid(Campaign $campaign): ?string

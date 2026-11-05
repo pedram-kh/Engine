@@ -181,6 +181,30 @@ it('reports is_region_locked on the detail, and only there', function (): void {
     $this->actingAs($in->user)->getJson($in->jobUrl())->assertJsonPath('data.attributes.is_region_locked', false);
 });
 
+it('names the reason on the detail: country_missing, outside_regions, or null', function (): void {
+    $out = regionJob('PT');
+    $this->actingAs($out->user)->getJson($out->jobUrl())->assertOk()
+        ->assertJsonPath('data.attributes.region_lock_reason', 'outside_regions');
+
+    $none = regionJob(null);
+    $this->actingAs($none->user)->getJson($none->jobUrl())
+        ->assertJsonPath('data.attributes.region_lock_reason', 'country_missing');
+
+    $blank = regionJob('  ');
+    $this->actingAs($blank->user)->getJson($blank->jobUrl())
+        ->assertJsonPath('data.attributes.region_lock_reason', 'country_missing');
+
+    $in = regionJob('fr');
+    $this->actingAs($in->user)->getJson($in->jobUrl())
+        ->assertJsonPath('data.attributes.region_lock_reason', null)
+        ->assertJsonPath('data.attributes.is_region_locked', false);
+
+    // Flag OFF: no reason either, and the key is still present.
+    $off = regionJob('PT', flag: false);
+    $body = $this->actingAs($off->user)->getJson($off->jobUrl())->assertOk()->json('data.attributes');
+    expect($body)->toHaveKey('region_lock_reason')->and($body['region_lock_reason'])->toBeNull();
+});
+
 it('still shows a locked creator the job, and says false while the flag is OFF', function (): void {
     $flagOff = regionJob('PT', flag: false);
 

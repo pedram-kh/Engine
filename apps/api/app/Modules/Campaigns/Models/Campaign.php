@@ -270,13 +270,27 @@ final class Campaign extends Model
      */
     public function isRegionLockedFor(Creator $creator): bool
     {
+        return $this->regionLockReasonFor($creator) !== null;
+    }
+
+    /**
+     * AH-118 — WHY this creator is region-locked: `country_missing` (no country
+     * on the profile) or `outside_regions`; null when not locked. Same rule as
+     * `isRegionLockedFor`, which is defined in terms of it so the two cannot drift.
+     */
+    public function regionLockReasonFor(Creator $creator): ?string
+    {
         if (! $this->restrictsApplicationsToRegions()) {
-            return false;
+            return null;
         }
 
         $country = is_string($creator->country_code) ? strtoupper(trim($creator->country_code)) : '';
 
-        return $country === '' || ! in_array($country, $this->normalizedListingRegions(), true);
+        if ($country === '') {
+            return 'country_missing';
+        }
+
+        return in_array($country, $this->normalizedListingRegions(), true) ? null : 'outside_regions';
     }
 
     /**
