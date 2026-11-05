@@ -35,7 +35,8 @@ it('adds messages.system_event_data as a nullable jsonb that existing messages l
     $withData = Message::factory()
         ->system('assignment.offer_edited', ['previous_minor' => 50000, 'new_minor' => 60000, 'currency' => 'EUR'])
         ->createOne();
-    expect($withData->fresh()?->system_event_data)->toBe(['previous_minor' => 50000, 'new_minor' => 60000, 'currency' => 'EUR']);
+    // toEqual: Postgres jsonb does not keep key order.
+    expect($withData->fresh()?->system_event_data)->toEqual(['previous_minor' => 50000, 'new_minor' => 60000, 'currency' => 'EUR']);
 });
 
 it('keeps both migrations schema-only: no data write, and an honest down()', function (): void {

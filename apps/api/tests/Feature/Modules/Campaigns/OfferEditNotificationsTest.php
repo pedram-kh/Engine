@@ -137,7 +137,8 @@ it('writes a system message with the amounts, and both sides read it', function 
     ['assignment' => $assignment, 'creatorUser' => $creatorUser, 's' => $s] = editOffer($this);
 
     $message = Message::query()->where('system_event_key', 'assignment.offer_edited')->sole();
-    expect($message->system_event_data)->toBe(['previous_amount' => 100_00, 'new_amount' => 250_00, 'currency' => 'EUR'])
+    // toEqual: Postgres jsonb does not keep key order.
+    expect($message->system_event_data)->toEqual(['previous_amount' => 100_00, 'new_amount' => 250_00, 'currency' => 'EUR'])
         ->and($message->body)->toBeNull()
         ->and($message->sender_user_id)->toBeNull();
 
@@ -148,7 +149,7 @@ it('writes a system message with the amounts, and both sides read it', function 
     // … and so does the agency.
     $agencyLines = messageLines($this->actingAs($s['admin'])->getJson("/api/v1/agencies/{$s['agency']->ulid}/campaigns/{$s['campaign']->ulid}/assignments/{$assignment->ulid}/messages")->assertOk());
     $line = array_values(array_filter($agencyLines, static fn (array $l): bool => $l['attributes']['system_event_key'] === 'assignment.offer_edited'))[0];
-    expect($line['attributes']['system_event_data'])->toBe(['previous_amount' => 100_00, 'new_amount' => 250_00, 'currency' => 'EUR']);
+    expect($line['attributes']['system_event_data'])->toEqual(['previous_amount' => 100_00, 'new_amount' => 250_00, 'currency' => 'EUR']);
 });
 
 it('emits system_event_data on every message, null for ordinary and lifecycle lines', function (): void {
