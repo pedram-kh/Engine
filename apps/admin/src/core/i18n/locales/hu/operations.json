@@ -87,7 +87,8 @@
           "creator_approved": "Alkotó jóváhagyva",
           "creator_rejected": "Alkotó elutasítva",
           "agency_creator_relation_admin_connected": "Adminisztrátor által összekapcsolva",
-          "agency_creator_relation_disconnected": "Kapcsolat megszűnt"
+          "agency_creator_relation_disconnected": "Kapcsolat megszűnt",
+          "assignment_offer_edited": "Ajánlat összege szerkesztve"
         }
       }
     }

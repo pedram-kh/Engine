@@ -87,7 +87,8 @@
           "creator_approved": "Satura veidotājs apstiprināts",
           "creator_rejected": "Satura veidotājs noraidīts",
           "agency_creator_relation_admin_connected": "Administratora izveidots savienojums",
-          "agency_creator_relation_disconnected": "Savienojums beidzies"
+          "agency_creator_relation_disconnected": "Savienojums beidzies",
+          "assignment_offer_edited": "Piedāvājuma summa rediģēta"
         }
       }
     }

@@ -87,7 +87,8 @@
           "creator_approved": "Creator approvato",
           "creator_rejected": "Creator rifiutato",
           "agency_creator_relation_admin_connected": "Collegato da un amministratore",
-          "agency_creator_relation_disconnected": "Collegamento terminato"
+          "agency_creator_relation_disconnected": "Collegamento terminato",
+          "assignment_offer_edited": "Importo dell'offerta modificato"
         }
       }
     }

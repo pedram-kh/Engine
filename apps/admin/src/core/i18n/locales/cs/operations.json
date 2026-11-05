@@ -87,7 +87,8 @@
           "creator_approved": "Tvůrce schválen",
           "creator_rejected": "Tvůrce zamítnut",
           "agency_creator_relation_admin_connected": "Propojeno administrátorem",
-          "agency_creator_relation_disconnected": "Propojení ukončeno"
+          "agency_creator_relation_disconnected": "Propojení ukončeno",
+          "assignment_offer_edited": "Částka nabídky upravena"
         }
       }
     }

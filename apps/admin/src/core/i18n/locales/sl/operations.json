@@ -87,7 +87,8 @@
           "creator_approved": "Ustvarjalec odobren",
           "creator_rejected": "Ustvarjalec zavrnjen",
           "agency_creator_relation_admin_connected": "Povezal skrbnik",
-          "agency_creator_relation_disconnected": "Povezava prekinjena"
+          "agency_creator_relation_disconnected": "Povezava prekinjena",
+          "assignment_offer_edited": "Znesek ponudbe urejen"
         }
       }
     }

@@ -36,6 +36,7 @@ export const PUSH_NOTIFICATION_TYPES = [
   'assignment.draft_rejected',
   'assignment.completed_on_approval',
   'assignment.manually_verified',
+  'assignment.offer_edited',
   'message.received_by_creator',
   'message.relationship_received_by_creator',
   'campaign_application.accepted',

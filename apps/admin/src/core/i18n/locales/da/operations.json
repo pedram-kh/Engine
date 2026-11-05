@@ -87,7 +87,8 @@
           "creator_approved": "Creator godkendt",
           "creator_rejected": "Creator afvist",
           "agency_creator_relation_admin_connected": "Forbundet af en administrator",
-          "agency_creator_relation_disconnected": "Forbindelse afsluttet"
+          "agency_creator_relation_disconnected": "Forbindelse afsluttet",
+          "assignment_offer_edited": "Tilbuddets beløb redigeret"
         }
       }
     }

@@ -87,7 +87,8 @@
           "creator_approved": "Twórca zatwierdzony",
           "creator_rejected": "Twórca odrzucony",
           "agency_creator_relation_admin_connected": "Połączono przez administratora",
-          "agency_creator_relation_disconnected": "Połączenie zakończone"
+          "agency_creator_relation_disconnected": "Połączenie zakończone",
+          "assignment_offer_edited": "Kwota oferty edytowana"
         }
       }
     }

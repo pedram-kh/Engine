@@ -87,7 +87,8 @@
           "creator_approved": "Creator genehmigt",
           "creator_rejected": "Creator abgelehnt",
           "agency_creator_relation_admin_connected": "Von einem Admin verbunden",
-          "agency_creator_relation_disconnected": "Verbindung beendet"
+          "agency_creator_relation_disconnected": "Verbindung beendet",
+          "assignment_offer_edited": "Angebotsbetrag bearbeitet"
         }
       }
     }

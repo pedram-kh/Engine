@@ -87,7 +87,8 @@
           "creator_approved": "Kreatur approvat",
           "creator_rejected": "Kreatur miċħud",
           "agency_creator_relation_admin_connected": "Konness minn amministratur",
-          "agency_creator_relation_disconnected": "Konnessjoni intemmet"
+          "agency_creator_relation_disconnected": "Konnessjoni intemmet",
+          "assignment_offer_edited": "L-ammont tal-offerta ġie editjat"
         }
       }
     }

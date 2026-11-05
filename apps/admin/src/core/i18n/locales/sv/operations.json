@@ -87,7 +87,8 @@
           "creator_approved": "Creator godkänd",
           "creator_rejected": "Creator avvisad",
           "agency_creator_relation_admin_connected": "Ansluten av en administratör",
-          "agency_creator_relation_disconnected": "Anslutning avslutad"
+          "agency_creator_relation_disconnected": "Anslutning avslutad",
+          "assignment_offer_edited": "Erbjudandets belopp redigerat"
         }
       }
     }

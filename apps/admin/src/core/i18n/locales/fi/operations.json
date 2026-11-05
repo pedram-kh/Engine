@@ -87,7 +87,8 @@
           "creator_approved": "Sisällöntuottaja hyväksytty",
           "creator_rejected": "Sisällöntuottaja hylätty",
           "agency_creator_relation_admin_connected": "Ylläpitäjän luoma yhteys",
-          "agency_creator_relation_disconnected": "Yhteys päättynyt"
+          "agency_creator_relation_disconnected": "Yhteys päättynyt",
+          "assignment_offer_edited": "Tarjouksen summaa muokattu"
         }
       }
     }

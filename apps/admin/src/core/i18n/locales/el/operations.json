@@ -87,7 +87,8 @@
           "creator_approved": "Ο δημιουργός εγκρίθηκε",
           "creator_rejected": "Ο δημιουργός απορρίφθηκε",
           "agency_creator_relation_admin_connected": "Σύνδεση από διαχειριστή",
-          "agency_creator_relation_disconnected": "Η σύνδεση έληξε"
+          "agency_creator_relation_disconnected": "Η σύνδεση έληξε",
+          "assignment_offer_edited": "Το ποσό της προσφοράς επεξεργάστηκε"
         }
       }
     }

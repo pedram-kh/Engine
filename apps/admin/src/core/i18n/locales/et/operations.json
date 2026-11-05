@@ -87,7 +87,8 @@
           "creator_approved": "Looja kinnitatud",
           "creator_rejected": "Looja tagasi lükatud",
           "agency_creator_relation_admin_connected": "Administraatori loodud ühendus",
-          "agency_creator_relation_disconnected": "Ühendus lõpetatud"
+          "agency_creator_relation_disconnected": "Ühendus lõpetatud",
+          "assignment_offer_edited": "Pakkumise summat muudetud"
         }
       }
     }

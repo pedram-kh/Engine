@@ -87,7 +87,8 @@
           "creator_approved": "Kreator odobren",
           "creator_rejected": "Kreator odbijen",
           "agency_creator_relation_admin_connected": "Povezao administrator",
-          "agency_creator_relation_disconnected": "Veza prekinuta"
+          "agency_creator_relation_disconnected": "Veza prekinuta",
+          "assignment_offer_edited": "Iznos ponude uređen"
         }
       }
     }

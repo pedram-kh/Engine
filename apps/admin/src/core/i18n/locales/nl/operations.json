@@ -87,7 +87,8 @@
           "creator_approved": "Creator goedgekeurd",
           "creator_rejected": "Creator afgewezen",
           "agency_creator_relation_admin_connected": "Door een beheerder gekoppeld",
-          "agency_creator_relation_disconnected": "Koppeling beëindigd"
+          "agency_creator_relation_disconnected": "Koppeling beëindigd",
+          "assignment_offer_edited": "Bedrag van het aanbod gewijzigd"
         }
       }
     }
