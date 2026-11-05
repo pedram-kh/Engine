@@ -554,7 +554,10 @@
             "ended": "Această lucrare s-a încheiat."
           },
           "viewOffer": "Vezi oferta",
-          "viewAssignment": "Vezi misiunea"
+          "viewAssignment": "Vezi misiunea",
+          "regionLocked": "Indisponibil în regiunea ta",
+          "regionLockedNoCountry": "Adaugă țara ta în profil pentru a aplica la joburile limitate pe regiuni.",
+          "regionLockedProfileLink": "Deschide profilul meu"
         },
         "applyDialog": {
           "title": "Aplică la acest job",
@@ -569,7 +572,8 @@
           "alreadyApplied": "Ai aplicat deja la acest job.",
           "applicationRejected": "Nu ai fost selectat pentru acest job, așa că nu poți aplica din nou.",
           "gone": "Acest job nu mai este disponibil.",
-          "error": "Ceva nu a mers bine. Încearcă din nou."
+          "error": "Ceva nu a mers bine. Încearcă din nou.",
+          "regionNotAllowed": "Acest job este deschis doar creatorilor din anumite regiuni."
         }
       },
       "upload": {

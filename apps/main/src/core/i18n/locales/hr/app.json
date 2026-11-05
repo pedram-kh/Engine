@@ -45,7 +45,8 @@
           "live_verified": "Živý příspěvek byl ověřen.",
           "manually_verified": "Příspěvek byl ověřen ročno.",
           "resubmit_requested": "Bylo požadováno opětovné odeslání.",
-          "payment_released": "Platba byla uvolněna."
+          "payment_released": "Platba byla uvolněna.",
+          "offer_edited": "Ponuda se promijenila s {from} na {to}."
         }
       },
       "rollup": {
@@ -480,7 +481,9 @@
         "listingExamplesUrl": "Poveznica na primjere",
         "listingExamplesUrlHint": "Neobavezna poveznica na referentne radove.",
         "listedOnJobsBoard": "Dodaj na ploču poslova",
-        "jobBoard": "Oglasi za rad"
+        "jobBoard": "Oglasi za rad",
+        "restrictToRegions": "Prijaviti se mogu samo kreatori iz navedenih regija",
+        "restrictToRegionsHint": "Kreatori izvan tih regija i dalje vide posao, ali se ne mogu prijaviti. Pozivi nisu zahvaćeni."
       },
       "insertLink": {
         "buttonLabel": "Umetni poveznicu",
@@ -890,7 +893,8 @@
       },
       "errors": {
         "loadFailed": "Ni uspelo učitajti kampanje.",
-        "saveFailed": "Ni uspelo spremiti kampanja."
+        "saveFailed": "Ni uspelo spremiti kampanja.",
+        "restrictNeedsRegions": "Odaberi barem jednu regiju kako bi ograničio prijave."
       },
       "listing": {
         "sectionTitle": "Oglas na ploči poslova",
@@ -966,7 +970,24 @@
       "list": {
         "starts": "Počinje {date}"
       },
-      "summaryActive": "{count} kampanja, aktivnih: {active} | {count} kampanja, aktivnih: {active}"
+      "summaryActive": "{count} kampanja, aktivnih: {active} | {count} kampanja, aktivnih: {active}",
+      "offerEdit": {
+        "action": "Uredi ponudu",
+        "title": "Uredi iznos ponude",
+        "body": "Kreator dobiva obavijest, a promjena se bilježi u razgovoru.",
+        "amountLabel": "Nova naknada ({currency})",
+        "cancel": "Odustani",
+        "submit": "Spremi",
+        "success": "Ponuda je ažurirana.",
+        "unchanged": "To je trenutni iznos.",
+        "locked": {
+          "status": "Ponuda se u ovoj fazi više ne može uređivati.",
+          "contract_pending": "Ugovor čeka potpis kreatora.",
+          "contract_signed": "Ugovor je potpisan.",
+          "payment": "Plaćanje je započelo."
+        },
+        "error": "Ponudu nije bilo moguće promijeniti. Pokušaj ponovno."
+      }
     },
     "pools": {
       "title": "Talentne skupine",

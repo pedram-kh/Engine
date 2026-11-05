@@ -42,7 +42,8 @@
       "campaign_application_submitted": "{creator_name} a aplicat la {campaign_name}.",
       "campaign_application_accepted": "{agency_name} a acceptat candidatura ta pentru {campaign_name}.",
       "campaign_application_rejected": "Candidatura ta pentru {campaign_name} nu a fost selectată.",
-      "fallback": "You have a new notification."
+      "fallback": "You have a new notification.",
+      "assignment_offer_edited": "Oferta pentru {campaign_name} s-a schimbat de la {previous_amount} la {new_amount}."
     },
     "preferences": {
       "title": "Setări notificări",
@@ -91,7 +92,8 @@
         "campaign_job_posted": "Este publicat un job nou",
         "campaign_application_submitted": "Un creator aplică la o campanie",
         "campaign_application_accepted": "O candidatură este acceptată",
-        "campaign_application_rejected": "O candidatură este respinsă"
+        "campaign_application_rejected": "O candidatură este respinsă",
+        "assignment_offer_edited": "Agenția îți modifică oferta"
       }
     },
     "push": {

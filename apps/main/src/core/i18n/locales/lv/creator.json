@@ -554,7 +554,10 @@
             "ended": "Šis darbs ir beidzies."
           },
           "viewOffer": "Skatīt piedāvājumu",
-          "viewAssignment": "Skatīt uzdevumu"
+          "viewAssignment": "Skatīt uzdevumu",
+          "regionLocked": "Tavā reģionā nav pieejams",
+          "regionLockedNoCountry": "Pievieno savu valsti profilam, lai varētu pieteikties darbiem, kas ierobežoti pēc reģiona.",
+          "regionLockedProfileLink": "Atvērt manu profilu"
         },
         "applyDialog": {
           "title": "Pieteikties šim darbam",
@@ -569,7 +572,8 @@
           "alreadyApplied": "Tu jau esi pieteicies šim darbam.",
           "applicationRejected": "Šim darbam tu netiki izvēlēts, tāpēc atkārtoti pieteikties nevar.",
           "gone": "Šis darbs vairs nav pieejams.",
-          "error": "Kaut kas nogāja greizi. Lūdzu, mēģini vēlreiz."
+          "error": "Kaut kas nogāja greizi. Lūdzu, mēģini vēlreiz.",
+          "regionNotAllowed": "Šis darbs ir atvērts tikai noteiktu reģionu satura veidotājiem."
         }
       },
       "upload": {

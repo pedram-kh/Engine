@@ -45,7 +45,8 @@
           "live_verified": "The live post was verified.",
           "manually_verified": "The post was manually verified.",
           "resubmit_requested": "A resubmission was requested.",
-          "payment_released": "Maksu was released."
+          "payment_released": "Maksu was released.",
+          "offer_edited": "Tarjous muuttui: {from} → {to}."
         }
       },
       "rollup": {
@@ -480,7 +481,9 @@
         "listingExamplesUrl": "Linkki esimerkkeihin",
         "listingExamplesUrlHint": "Valinnainen linkki referenssitöihin.",
         "listedOnJobsBoard": "Lisää työtauluun",
-        "jobBoard": "Työpaikat"
+        "jobBoard": "Työpaikat",
+        "restrictToRegions": "Vain mainittujen alueiden sisällöntuottajat voivat hakea",
+        "restrictToRegionsHint": "Näiden alueiden ulkopuoliset sisällöntuottajat näkevät työn mutta eivät voi hakea. Kutsut eivät muutu."
       },
       "insertLink": {
         "buttonLabel": "Lisää linkki",
@@ -890,7 +893,8 @@
       },
       "errors": {
         "loadFailed": "Failed to load campaigns.",
-        "saveFailed": "Failed to save campaign."
+        "saveFailed": "Failed to save campaign.",
+        "restrictNeedsRegions": "Valitse vähintään yksi alue rajataksesi hakemukset."
       },
       "listing": {
         "sectionTitle": "Ilmoitus työtaulussa",
@@ -966,7 +970,24 @@
       "list": {
         "starts": "Alkaa {date}"
       },
-      "summaryActive": "{count} kampanja, aktiivisia: {active} | {count} kampanjaa, aktiivisia: {active}"
+      "summaryActive": "{count} kampanja, aktiivisia: {active} | {count} kampanjaa, aktiivisia: {active}",
+      "offerEdit": {
+        "action": "Muokkaa tarjousta",
+        "title": "Muokkaa tarjouksen summaa",
+        "body": "Sisällöntuottajalle ilmoitetaan, ja muutos kirjataan keskusteluun.",
+        "amountLabel": "Uusi palkkio ({currency})",
+        "cancel": "Peruuta",
+        "submit": "Tallenna",
+        "success": "Tarjous päivitetty.",
+        "unchanged": "Tämä on nykyinen summa.",
+        "locked": {
+          "status": "Tarjousta ei voi enää muokata tässä vaiheessa.",
+          "contract_pending": "Sopimus odottaa sisällöntuottajan allekirjoitusta.",
+          "contract_signed": "Sopimus on allekirjoitettu.",
+          "payment": "Maksu on alkanut."
+        },
+        "error": "Tarjouksen muuttaminen ei onnistunut. Yritä uudelleen."
+      }
     },
     "pools": {
       "title": "Talent pools",

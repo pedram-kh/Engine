@@ -45,7 +45,8 @@
           "live_verified": "Der Live-Post wurde verifiziert.",
           "manually_verified": "Der Post wurde manuell verifiziert.",
           "resubmit_requested": "Eine erneute Einreichung wurde angefordert.",
-          "payment_released": "Die Zahlung wurde freigegeben."
+          "payment_released": "Die Zahlung wurde freigegeben.",
+          "offer_edited": "Das Angebot wurde von {from} auf {to} geändert."
         }
       },
       "rollup": {
@@ -480,7 +481,9 @@
         "listingExamplesUrl": "Link zu Beispielen",
         "listingExamplesUrlHint": "Optionaler Link zu Referenzarbeiten.",
         "listedOnJobsBoard": "Zum Jobboard hinzufügen",
-        "jobBoard": "Jobbörse"
+        "jobBoard": "Jobbörse",
+        "restrictToRegions": "Nur Creator in den aufgeführten Regionen können sich bewerben",
+        "restrictToRegionsHint": "Creator außerhalb dieser Regionen sehen den Job weiterhin, können sich aber nicht bewerben. Einladungen sind nicht betroffen."
       },
       "insertLink": {
         "buttonLabel": "Link einfügen",
@@ -890,7 +893,8 @@
       },
       "errors": {
         "loadFailed": "Kampagnen konnten nicht geladen werden.",
-        "saveFailed": "Kampagne konnte nicht gespeichert werden."
+        "saveFailed": "Kampagne konnte nicht gespeichert werden.",
+        "restrictNeedsRegions": "Wähle mindestens eine Region, um Bewerbungen einzuschränken."
       },
       "listing": {
         "sectionTitle": "Jobboard-Eintrag",
@@ -966,7 +970,24 @@
       "list": {
         "starts": "Beginnt am {date}"
       },
-      "summaryActive": "{count} Kampagne, {active} aktiv | {count} Kampagnen, {active} aktiv"
+      "summaryActive": "{count} Kampagne, {active} aktiv | {count} Kampagnen, {active} aktiv",
+      "offerEdit": {
+        "action": "Angebot bearbeiten",
+        "title": "Angebotsbetrag bearbeiten",
+        "body": "Der Creator wird benachrichtigt und die Änderung wird in der Unterhaltung festgehalten.",
+        "amountLabel": "Neue Vergütung ({currency})",
+        "cancel": "Abbrechen",
+        "submit": "Speichern",
+        "success": "Angebot aktualisiert.",
+        "unchanged": "Das ist der aktuelle Betrag.",
+        "locked": {
+          "status": "Das Angebot kann in dieser Phase nicht mehr bearbeitet werden.",
+          "contract_pending": "Ein Vertrag wartet auf die Unterschrift des Creators.",
+          "contract_signed": "Der Vertrag ist unterschrieben.",
+          "payment": "Die Zahlung hat begonnen."
+        },
+        "error": "Das Angebot konnte nicht geändert werden. Bitte versuche es erneut."
+      }
     },
     "pools": {
       "title": "Talent-Pools",

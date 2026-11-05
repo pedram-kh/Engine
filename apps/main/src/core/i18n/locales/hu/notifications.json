@@ -42,7 +42,8 @@
       "campaign_application_submitted": "{creator_name} jelentkezett a következőre: {campaign_name}.",
       "campaign_application_accepted": "A(z) {agency_name} elfogadta a jelentkezésedet a következőre: {campaign_name}.",
       "campaign_application_rejected": "A jelentkezésed nem járt sikerrel a következőnél: {campaign_name}.",
-      "fallback": "You have a new notification."
+      "fallback": "You have a new notification.",
+      "assignment_offer_edited": "A(z) {campaign_name} ajánlata {previous_amount} összegről {new_amount} összegre változott."
     },
     "preferences": {
       "title": "Nemtification settings",
@@ -91,7 +92,8 @@
         "campaign_job_posted": "Új munkát hirdetnek meg",
         "campaign_application_submitted": "Egy alkotó jelentkezik egy kampányra",
         "campaign_application_accepted": "Egy jelentkezést elfogadnak",
-        "campaign_application_rejected": "Egy jelentkezést elutasítanak"
+        "campaign_application_rejected": "Egy jelentkezést elutasítanak",
+        "assignment_offer_edited": "Az ügynökség módosítja az ajánlatodat"
       }
     },
     "push": {

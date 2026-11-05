@@ -554,7 +554,10 @@
             "ended": "See töö on lõppenud."
           },
           "viewOffer": "Vaata pakkumist",
-          "viewAssignment": "Vaata ülesannet"
+          "viewAssignment": "Vaata ülesannet",
+          "regionLocked": "Sinu piirkonnas pole saadaval",
+          "regionLockedNoCountry": "Lisa oma riik profiilile, et kandideerida piirkonniti piiratud töödele.",
+          "regionLockedProfileLink": "Ava minu profiil"
         },
         "applyDialog": {
           "title": "Kandideeri sellele tööle",
@@ -569,7 +572,8 @@
           "alreadyApplied": "Oled sellele tööle juba kandideerinud.",
           "applicationRejected": "Sa ei osutunud sellele tööle valituks, seega uuesti kandideerida ei saa.",
           "gone": "See töö pole enam saadaval.",
-          "error": "Midagi läks valesti. Palun proovi uuesti."
+          "error": "Midagi läks valesti. Palun proovi uuesti.",
+          "regionNotAllowed": "See töö on avatud ainult teatud piirkondade sisuloojatele."
         }
       },
       "upload": {

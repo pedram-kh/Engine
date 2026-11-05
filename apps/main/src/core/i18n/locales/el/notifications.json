@@ -42,7 +42,8 @@
       "campaign_application_submitted": "Ο/Η {creator_name} υπέβαλε αίτηση για {campaign_name}.",
       "campaign_application_accepted": "Η {agency_name} αποδέχτηκε την αίτησή σας για {campaign_name}.",
       "campaign_application_rejected": "Η αίτησή σας για {campaign_name} δεν ευδοκίμησε.",
-      "fallback": "You have a new notification."
+      "fallback": "You have a new notification.",
+      "assignment_offer_edited": "Η προσφορά για το {campaign_name} άλλαξε από {previous_amount} σε {new_amount}."
     },
     "preferences": {
       "title": "Όχιtification settings",
@@ -91,7 +92,8 @@
         "campaign_job_posted": "Δημοσιεύεται μια νέα αγγελία",
         "campaign_application_submitted": "Ένας δημιουργός υποβάλλει αίτηση για καμπάνια",
         "campaign_application_accepted": "Μια αίτηση γίνεται αποδεκτή",
-        "campaign_application_rejected": "Μια αίτηση απορρίπτεται"
+        "campaign_application_rejected": "Μια αίτηση απορρίπτεται",
+        "assignment_offer_edited": "Το πρακτορείο αλλάζει την προσφορά σου"
       }
     },
     "push": {

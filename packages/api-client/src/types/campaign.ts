@@ -114,6 +114,12 @@ export interface CampaignAttributes {
   listing_languages: string[] | null
   /** ISO-3166-1 alpha-2, uppercase. */
   listing_regions: string[] | null
+  /**
+   * AH-118: when true, only creators whose profile country is in
+   * `listing_regions` can apply (they still see the job). The STORED value;
+   * the server only enforces it while `campaign_region_restriction_enabled`.
+   */
+  restrict_to_listing_regions: boolean
   listing_examples_url: string | null
   published_at: string | null
   completed_at: string | null
@@ -219,6 +225,12 @@ export interface CreateCampaignPayload {
   listing_fee?: string | null
   listing_languages?: string[] | null
   listing_regions?: string[] | null
+  /**
+   * AH-118. Sending `true` while `campaign_region_restriction_enabled` is OFF is
+   * a 422 `campaign.region_restriction_disabled`; with the switch ON the regions
+   * must be non-empty (422 on `listing_regions`).
+   */
+  restrict_to_listing_regions?: boolean
   listing_examples_url?: string | null
 }
 
@@ -317,6 +329,19 @@ export interface AssignmentOfferAttachment {
   url: string | null
 }
 
+/** Mirrors `App\Modules\Campaigns\Enums\OfferLockReason` (AH-118). */
+export type OfferEditLockReason =
+  | 'feature_disabled'
+  | 'payment'
+  | 'contract_signed'
+  | 'contract_pending'
+  | 'status'
+
+/** PATCH `…/assignments/{assignment}/offer` (AH-118). The currency is never sent. */
+export interface EditAssignmentOfferPayload {
+  agreed_fee_minor_units: number
+}
+
 export interface CampaignAssignmentResource {
   id: string
   type: 'campaign_assignments'
@@ -355,6 +380,10 @@ export interface CampaignAssignmentResource {
      * was not loaded.
      */
     has_pending_contract: boolean | null
+    /** AH-118: server-computed. True when the offer amount can no longer be edited. */
+    offer_edit_locked?: boolean
+    /** AH-118: why it is locked (`null` when editable). */
+    offer_edit_lock_reason?: OfferEditLockReason | null
     creator: {
       id: string
       display_name: string | null
@@ -684,6 +713,9 @@ export interface AgencyAssignmentDetailResource {
     status: AssignmentStatus
     agreed_fee_minor_units: number | null
     agreed_fee_currency: string | null
+    /** AH-118: same verdict as the list payload. */
+    offer_edit_locked?: boolean
+    offer_edit_lock_reason?: OfferEditLockReason | null
     /** Invite-offer context (board-drawer detail facelift). */
     fee_per?: string | null
     offer_description?: string | null
@@ -1057,6 +1089,12 @@ export interface CreatorJobDetailResource {
     description: string | null
     listing_languages: string[] | null
     listing_regions: string[] | null
+    /**
+     * AH-118: true when the campaign restricts applying to its listed regions
+     * and the caller's profile country is outside them (or missing). Always
+     * present; false while the region flag is OFF.
+     */
+    is_region_locked: boolean
     /** External link; rendered with rel="noopener". */
     listing_examples_url: string | null
     /**

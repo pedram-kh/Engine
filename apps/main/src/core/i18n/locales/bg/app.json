@@ -45,7 +45,8 @@
           "live_verified": "The live post was verified.",
           "manually_verified": "The post was manually verified.",
           "resubmit_requested": "A resubmission was requested.",
-          "payment_released": "Плащане was released."
+          "payment_released": "Плащане was released.",
+          "offer_edited": "Офертата се промени от {from} на {to}."
         }
       },
       "rollup": {
@@ -480,7 +481,9 @@
         "listingExamplesUrl": "Връзка към примери",
         "listingExamplesUrlHint": "Незадължителна връзка към референтни работи.",
         "listedOnJobsBoard": "Добавяне към борсата за задачи",
-        "jobBoard": "Работни обяви"
+        "jobBoard": "Работни обяви",
+        "restrictToRegions": "Само създатели от посочените региони могат да кандидатстват",
+        "restrictToRegionsHint": "Създателите извън тези региони все още виждат обявата, но не могат да кандидатстват. Поканите не се засягат."
       },
       "insertLink": {
         "buttonLabel": "Вмъкване на връзка",
@@ -890,7 +893,8 @@
       },
       "errors": {
         "loadFailed": "Failed to load campaigns.",
-        "saveFailed": "Failed to save campaign."
+        "saveFailed": "Failed to save campaign.",
+        "restrictNeedsRegions": "Избери поне един регион, за да ограничиш кандидатурите."
       },
       "listing": {
         "sectionTitle": "Обява в борсата за задачи",
@@ -966,7 +970,24 @@
       "list": {
         "starts": "Започва на {date}"
       },
-      "summaryActive": "{count} кампания, активни: {active} | {count} кампании, активни: {active}"
+      "summaryActive": "{count} кампания, активни: {active} | {count} кампании, активни: {active}",
+      "offerEdit": {
+        "action": "Редактиране на офертата",
+        "title": "Редактиране на сумата на офертата",
+        "body": "Създателят получава известие, а промяната се записва в разговора.",
+        "amountLabel": "Ново възнаграждение ({currency})",
+        "cancel": "Отказ",
+        "submit": "Запази",
+        "success": "Офертата е обновена.",
+        "unchanged": "Това е текущата сума.",
+        "locked": {
+          "status": "На този етап офертата вече не може да се редактира.",
+          "contract_pending": "Договор чака подписа на създателя.",
+          "contract_signed": "Договорът е подписан.",
+          "payment": "Плащането е започнало."
+        },
+        "error": "Офертата не можа да бъде променена. Опитай отново."
+      }
     },
     "pools": {
       "title": "Talent pools",

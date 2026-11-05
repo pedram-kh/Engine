@@ -45,7 +45,8 @@
           "live_verified": "The live post was verified.",
           "manually_verified": "The post was manually verified.",
           "resubmit_requested": "A resubmission was requested.",
-          "payment_released": "Plată was released."
+          "payment_released": "Plată was released.",
+          "offer_edited": "Oferta s-a schimbat de la {from} la {to}."
         }
       },
       "rollup": {
@@ -480,7 +481,9 @@
         "listingExamplesUrl": "Link către exemple",
         "listingExamplesUrlHint": "Link opțional către lucrări de referință.",
         "listedOnJobsBoard": "Adaugă în panoul de joburi",
-        "jobBoard": "Anunțuri de lucru"
+        "jobBoard": "Anunțuri de lucru",
+        "restrictToRegions": "Doar creatorii din regiunile listate pot aplica",
+        "restrictToRegionsHint": "Creatorii din afara acestor regiuni văd în continuare jobul, dar nu pot aplica. Invitațiile nu sunt afectate."
       },
       "insertLink": {
         "buttonLabel": "Inserează link",
@@ -890,7 +893,8 @@
       },
       "errors": {
         "loadFailed": "Failed to load campaigns.",
-        "saveFailed": "Failed to save campaign."
+        "saveFailed": "Failed to save campaign.",
+        "restrictNeedsRegions": "Alege cel puțin o regiune pentru a restricționa aplicările."
       },
       "listing": {
         "sectionTitle": "Anunț în panoul de joburi",
@@ -966,7 +970,24 @@
       "list": {
         "starts": "Începe pe {date}"
       },
-      "summaryActive": "{count} campanie, active: {active} | {count} campanii, active: {active}"
+      "summaryActive": "{count} campanie, active: {active} | {count} campanii, active: {active}",
+      "offerEdit": {
+        "action": "Editează oferta",
+        "title": "Editează suma ofertei",
+        "body": "Creatorul este notificat, iar modificarea este înregistrată în conversație.",
+        "amountLabel": "Onorariu nou ({currency})",
+        "cancel": "Anulează",
+        "submit": "Salvează",
+        "success": "Oferta a fost actualizată.",
+        "unchanged": "Aceasta este suma curentă.",
+        "locked": {
+          "status": "Oferta nu mai poate fi editată în această etapă.",
+          "contract_pending": "Un contract așteaptă semnătura creatorului.",
+          "contract_signed": "Contractul este semnat.",
+          "payment": "Plata a început."
+        },
+        "error": "Oferta nu a putut fi modificată. Încearcă din nou."
+      }
     },
     "pools": {
       "title": "Talent pools",

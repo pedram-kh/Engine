@@ -42,7 +42,8 @@
       "campaign_application_submitted": "{creator_name} pieteicās darbam {campaign_name}.",
       "campaign_application_accepted": "{agency_name} pieņēma jūsu pieteikumu darbam {campaign_name}.",
       "campaign_application_rejected": "Jūsu pieteikums darbam {campaign_name} netika izraudzīts.",
-      "fallback": "You have a new notification."
+      "fallback": "You have a new notification.",
+      "assignment_offer_edited": "Piedāvājums kampaņai {campaign_name} mainījās no {previous_amount} uz {new_amount}."
     },
     "preferences": {
       "title": "Nētification settings",
@@ -91,7 +92,8 @@
         "campaign_job_posted": "Tiek publicēts jauns darba piedāvājums",
         "campaign_application_submitted": "Radītājs piesakās kampaņai",
         "campaign_application_accepted": "Pieteikums tiek pieņemts",
-        "campaign_application_rejected": "Pieteikums tiek atteikts"
+        "campaign_application_rejected": "Pieteikums tiek atteikts",
+        "assignment_offer_edited": "Aģentūra maina tavu piedāvājumu"
       }
     },
     "push": {

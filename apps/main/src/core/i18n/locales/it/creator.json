@@ -554,7 +554,10 @@
             "ended": "Questo lavoro è terminato."
           },
           "viewOffer": "Vedi offerta",
-          "viewAssignment": "Visualizza incarico"
+          "viewAssignment": "Visualizza incarico",
+          "regionLocked": "Non disponibile nella tua regione",
+          "regionLockedNoCountry": "Aggiungi il tuo paese al profilo per candidarti alle offerte limitate per regione.",
+          "regionLockedProfileLink": "Apri il mio profilo"
         },
         "applyDialog": {
           "title": "Candidati a questa offerta",
@@ -569,7 +572,8 @@
           "alreadyApplied": "Ti sei già candidato a questa offerta.",
           "applicationRejected": "Non sei stato selezionato per questa offerta, quindi non è possibile candidarsi di nuovo.",
           "gone": "Questa offerta non è più disponibile.",
-          "error": "Qualcosa è andato storto. Riprova."
+          "error": "Qualcosa è andato storto. Riprova.",
+          "regionNotAllowed": "Questa offerta è aperta solo ai creator di determinate regioni."
         }
       },
       "upload": {

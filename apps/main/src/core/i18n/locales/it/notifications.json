@@ -42,7 +42,8 @@
       "campaign_application_submitted": "{creator_name} si è candidato a {campaign_name}.",
       "campaign_application_accepted": "{agency_name} ha accettato la tua candidatura per {campaign_name}.",
       "campaign_application_rejected": "La tua candidatura per {campaign_name} non è stata accolta.",
-      "fallback": "Hai una nuova notifica."
+      "fallback": "Hai una nuova notifica.",
+      "assignment_offer_edited": "L'offerta per {campaign_name} è passata da {previous_amount} a {new_amount}."
     },
     "preferences": {
       "title": "Impostazioni notifiche",
@@ -91,7 +92,8 @@
         "campaign_job_posted": "Viene pubblicato un nuovo lavoro",
         "campaign_application_submitted": "Un creator si candida a una campagna",
         "campaign_application_accepted": "Una candidatura viene accettata",
-        "campaign_application_rejected": "Una candidatura viene rifiutata"
+        "campaign_application_rejected": "Una candidatura viene rifiutata",
+        "assignment_offer_edited": "L'agenzia modifica la tua offerta"
       }
     },
     "push": {

@@ -45,7 +45,8 @@
           "live_verified": "The live post was verified.",
           "manually_verified": "The post was manually verified.",
           "resubmit_requested": "A resubmission was requested.",
-          "payment_released": "Ħlas was released."
+          "payment_released": "Ħlas was released.",
+          "offer_edited": "L-offerta nbidlet minn {from} għal {to}."
         }
       },
       "rollup": {
@@ -480,7 +481,9 @@
         "listingExamplesUrl": "Link għal eżempji",
         "listingExamplesUrlHint": "Link mhux obbligatorju għal xogħol ta' referenza.",
         "listedOnJobsBoard": "Żid mal-bord tax-xogħlijiet",
-        "jobBoard": "Bord tax-xogħol"
+        "jobBoard": "Bord tax-xogħol",
+        "restrictToRegions": "Il-kreaturi biss fir-reġjuni elenkati jistgħu japplikaw",
+        "restrictToRegionsHint": "Il-kreaturi barra minn dawn ir-reġjuni xorta jaraw ix-xogħol imma ma jistgħux japplikaw. L-istediniet ma jaffettwawx."
       },
       "insertLink": {
         "buttonLabel": "Daħħal link",
@@ -890,7 +893,8 @@
       },
       "errors": {
         "loadFailed": "Failed to load campaigns.",
-        "saveFailed": "Failed to save campaign."
+        "saveFailed": "Failed to save campaign.",
+        "restrictNeedsRegions": "Agħżel mill-inqas reġjun wieħed biex tillimita l-applikazzjonijiet."
       },
       "listing": {
         "sectionTitle": "Avviż fuq il-bord tax-xogħlijiet",
@@ -966,7 +970,24 @@
       "list": {
         "starts": "Tibda fi {date}"
       },
-      "summaryActive": "{count} kampanja, attivi: {active} | {count} kampanji, attivi: {active}"
+      "summaryActive": "{count} kampanja, attivi: {active} | {count} kampanji, attivi: {active}",
+      "offerEdit": {
+        "action": "Editja l-offerta",
+        "title": "Editja l-ammont tal-offerta",
+        "body": "Il-kreatur jiġi nnotifikat u l-bidla tiġi rreġistrata fil-konversazzjoni.",
+        "amountLabel": "Miżata ġdida ({currency})",
+        "cancel": "Ikkanċella",
+        "submit": "Issejvja",
+        "success": "L-offerta ġiet aġġornata.",
+        "unchanged": "Dan huwa l-ammont attwali.",
+        "locked": {
+          "status": "L-offerta ma tistax tiġi editjata aktar f'dan l-istadju.",
+          "contract_pending": "Kuntratt qed jistenna l-firma tal-kreatur.",
+          "contract_signed": "Il-kuntratt huwa ffirmat.",
+          "payment": "Il-ħlas beda."
+        },
+        "error": "L-offerta ma setgħetx tinbidel. Erġa' pprova."
+      }
     },
     "pools": {
       "title": "Talent pools",

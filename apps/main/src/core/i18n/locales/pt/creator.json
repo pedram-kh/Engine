@@ -554,7 +554,10 @@
             "ended": "Este trabalho foi encerrado."
           },
           "viewOffer": "Ver proposta",
-          "viewAssignment": "Ver atribuição"
+          "viewAssignment": "Ver atribuição",
+          "regionLocked": "Não disponível na tua região",
+          "regionLockedNoCountry": "Adiciona o teu país ao perfil para te candidatares a ofertas limitadas por região.",
+          "regionLockedProfileLink": "Abrir o meu perfil"
         },
         "applyDialog": {
           "title": "Candidatar-me a esta oferta",
@@ -569,7 +572,8 @@
           "alreadyApplied": "Já te candidataste a esta oferta.",
           "applicationRejected": "Não foste selecionado para esta oferta, por isso não é possível candidatar-te de novo.",
           "gone": "Esta oferta já não está disponível.",
-          "error": "Algo correu mal. Tenta novamente."
+          "error": "Algo correu mal. Tenta novamente.",
+          "regionNotAllowed": "Esta oferta está aberta apenas a criadores de regiões específicas."
         }
       },
       "upload": {

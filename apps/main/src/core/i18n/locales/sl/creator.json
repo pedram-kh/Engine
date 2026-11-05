@@ -554,7 +554,10 @@
             "ended": "To delo je končano."
           },
           "viewOffer": "Ogled ponudbe",
-          "viewAssignment": "Prikaži nalogo"
+          "viewAssignment": "Prikaži nalogo",
+          "regionLocked": "V tvoji regiji ni na voljo",
+          "regionLockedNoCountry": "Dodaj svojo državo v profil, da se lahko prijaviš na dela, omejena po regijah.",
+          "regionLockedProfileLink": "Odpri moj profil"
         },
         "applyDialog": {
           "title": "Prijavi se na to delo",
@@ -569,7 +572,8 @@
           "alreadyApplied": "Na to delo si se že prijavil.",
           "applicationRejected": "Za to delo nisi bil izbran, zato se ni mogoče znova prijaviti.",
           "gone": "To delo ni več na voljo.",
-          "error": "Nekaj je šlo narobe. Poskusi znova."
+          "error": "Nekaj je šlo narobe. Poskusi znova.",
+          "regionNotAllowed": "To delo je odprto samo za ustvarjalce iz določenih regij."
         }
       },
       "upload": {

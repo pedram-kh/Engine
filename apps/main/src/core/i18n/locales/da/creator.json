@@ -554,7 +554,10 @@
             "ended": "Dette job er ophørt."
           },
           "viewOffer": "Se tilbud",
-          "viewAssignment": "Se opgaven"
+          "viewAssignment": "Se opgaven",
+          "regionLocked": "Ikke tilgængeligt i din region",
+          "regionLockedNoCountry": "Tilføj dit land til din profil for at søge job, der er begrænset til bestemte regioner.",
+          "regionLockedProfileLink": "Åbn min profil"
         },
         "applyDialog": {
           "title": "Søg dette job",
@@ -569,7 +572,8 @@
           "alreadyApplied": "Du har allerede søgt dette job.",
           "applicationRejected": "Du blev ikke valgt til dette job, så du kan ikke søge igen.",
           "gone": "Dette job er ikke længere tilgængeligt.",
-          "error": "Noget gik galt. Prøv igen."
+          "error": "Noget gik galt. Prøv igen.",
+          "regionNotAllowed": "Dette job er kun åbent for creators i bestemte regioner."
         }
       },
       "upload": {

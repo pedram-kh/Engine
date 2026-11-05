@@ -45,7 +45,8 @@
           "live_verified": "A publicação ao vivo foi verificada.",
           "manually_verified": "A publicação foi verificada manualmente.",
           "resubmit_requested": "Foi solicitado um reenvio.",
-          "payment_released": "O pagamento foi liberado."
+          "payment_released": "O pagamento foi liberado.",
+          "offer_edited": "A oferta mudou de {from} para {to}."
         }
       },
       "rollup": {
@@ -480,7 +481,9 @@
         "listingExamplesUrl": "Ligação para exemplos",
         "listingExamplesUrlHint": "Ligação opcional para trabalhos de referência.",
         "listedOnJobsBoard": "Adicionar ao quadro de trabalhos",
-        "jobBoard": "Ofertas de trabalho"
+        "jobBoard": "Ofertas de trabalho",
+        "restrictToRegions": "Só criadores das regiões indicadas podem candidatar-se",
+        "restrictToRegionsHint": "Os criadores fora destas regiões continuam a ver a oferta, mas não se podem candidatar. Os convites não são afetados."
       },
       "insertLink": {
         "buttonLabel": "Inserir link",
@@ -890,7 +893,8 @@
       },
       "errors": {
         "loadFailed": "Falha ao carregar campanhas.",
-        "saveFailed": "Falha ao salvar campanha."
+        "saveFailed": "Falha ao salvar campanha.",
+        "restrictNeedsRegions": "Escolhe pelo menos uma região para limitar as candidaturas."
       },
       "listing": {
         "sectionTitle": "Anúncio no quadro de trabalhos",
@@ -966,7 +970,24 @@
       "list": {
         "starts": "Começa em {date}"
       },
-      "summaryActive": "{count} campanha, ativas: {active} | {count} campanhas, ativas: {active}"
+      "summaryActive": "{count} campanha, ativas: {active} | {count} campanhas, ativas: {active}",
+      "offerEdit": {
+        "action": "Editar oferta",
+        "title": "Editar o valor da oferta",
+        "body": "O criador é notificado e a alteração fica registada na conversa.",
+        "amountLabel": "Novo cachê ({currency})",
+        "cancel": "Cancelar",
+        "submit": "Guardar",
+        "success": "Oferta atualizada.",
+        "unchanged": "Esse é o valor atual.",
+        "locked": {
+          "status": "A oferta já não pode ser editada nesta fase.",
+          "contract_pending": "Há um contrato à espera da assinatura do criador.",
+          "contract_signed": "O contrato está assinado.",
+          "payment": "O pagamento já começou."
+        },
+        "error": "Não foi possível alterar a oferta. Tenta novamente."
+      }
     },
     "pools": {
       "title": "Grupos de talentos",

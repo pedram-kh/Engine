@@ -45,7 +45,8 @@
           "live_verified": "The live post was verified.",
           "manually_verified": "The post was manually verified.",
           "resubmit_requested": "A resubmission was requested.",
-          "payment_released": "Πληρωμή was released."
+          "payment_released": "Πληρωμή was released.",
+          "offer_edited": "Η προσφορά άλλαξε από {from} σε {to}."
         }
       },
       "rollup": {
@@ -480,7 +481,9 @@
         "listingExamplesUrl": "Σύνδεσμος παραδειγμάτων",
         "listingExamplesUrlHint": "Προαιρετικός σύνδεσμος σε δείγματα εργασίας.",
         "listedOnJobsBoard": "Προσθήκη στον πίνακα εργασιών",
-        "jobBoard": "Αγγελίες"
+        "jobBoard": "Αγγελίες",
+        "restrictToRegions": "Μόνο δημιουργοί από τις αναφερόμενες περιοχές μπορούν να κάνουν αίτηση",
+        "restrictToRegionsHint": "Οι δημιουργοί εκτός αυτών των περιοχών εξακολουθούν να βλέπουν την αγγελία αλλά δεν μπορούν να κάνουν αίτηση. Οι προσκλήσεις δεν επηρεάζονται."
       },
       "insertLink": {
         "buttonLabel": "Εισαγωγή συνδέσμου",
@@ -890,7 +893,8 @@
       },
       "errors": {
         "loadFailed": "Failed to load campaigns.",
-        "saveFailed": "Failed to save campaign."
+        "saveFailed": "Failed to save campaign.",
+        "restrictNeedsRegions": "Επίλεξε τουλάχιστον μία περιοχή για να περιορίσεις τις αιτήσεις."
       },
       "listing": {
         "sectionTitle": "Αγγελία στον πίνακα εργασιών",
@@ -966,7 +970,24 @@
       "list": {
         "starts": "Ξεκινά στις {date}"
       },
-      "summaryActive": "{count} καμπάνια, ενεργές: {active} | {count} καμπάνιες, ενεργές: {active}"
+      "summaryActive": "{count} καμπάνια, ενεργές: {active} | {count} καμπάνιες, ενεργές: {active}",
+      "offerEdit": {
+        "action": "Επεξεργασία προσφοράς",
+        "title": "Επεξεργασία ποσού προσφοράς",
+        "body": "Ο δημιουργός ειδοποιείται και η αλλαγή καταγράφεται στη συνομιλία.",
+        "amountLabel": "Νέα αμοιβή ({currency})",
+        "cancel": "Ακύρωση",
+        "submit": "Αποθήκευση",
+        "success": "Η προσφορά ενημερώθηκε.",
+        "unchanged": "Αυτό είναι το τρέχον ποσό.",
+        "locked": {
+          "status": "Η προσφορά δεν μπορεί πλέον να επεξεργαστεί σε αυτό το στάδιο.",
+          "contract_pending": "Ένα συμβόλαιο περιμένει την υπογραφή του δημιουργού.",
+          "contract_signed": "Το συμβόλαιο έχει υπογραφεί.",
+          "payment": "Η πληρωμή έχει ξεκινήσει."
+        },
+        "error": "Δεν ήταν δυνατή η αλλαγή της προσφοράς. Δοκίμασε ξανά."
+      }
     },
     "pools": {
       "title": "Talent pools",

@@ -42,7 +42,8 @@
       "campaign_application_submitted": "{creator_name} кандидатства за {campaign_name}.",
       "campaign_application_accepted": "{agency_name} прие вашата кандидатура за {campaign_name}.",
       "campaign_application_rejected": "Вашата кандидатура за {campaign_name} не беше успешна.",
-      "fallback": "You have a new notification."
+      "fallback": "You have a new notification.",
+      "assignment_offer_edited": "Офертата за {campaign_name} се промени от {previous_amount} на {new_amount}."
     },
     "preferences": {
       "title": "Неtification settings",
@@ -91,7 +92,8 @@
         "campaign_job_posted": "Публикувана е нова обява",
         "campaign_application_submitted": "Създател кандидатства за кампания",
         "campaign_application_accepted": "Кандидатура е приета",
-        "campaign_application_rejected": "Кандидатура е отхвърлена"
+        "campaign_application_rejected": "Кандидатура е отхвърлена",
+        "assignment_offer_edited": "Агенцията променя офертата ти"
       }
     },
     "push": {

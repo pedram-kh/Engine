@@ -42,7 +42,8 @@
       "campaign_application_submitted": "{creator_name} se prijavio na {campaign_name}.",
       "campaign_application_accepted": "{agency_name} je prihvatila vašu prijavu za {campaign_name}.",
       "campaign_application_rejected": "Vaša prijava za {campaign_name} nije bila uspješna.",
-      "fallback": "Máte nové oznámení."
+      "fallback": "Máte nové oznámení.",
+      "assignment_offer_edited": "Ponuda za {campaign_name} promijenila se s {previous_amount} na {new_amount}."
     },
     "preferences": {
       "title": "Nastanjeitve oznámení",
@@ -91,7 +92,8 @@
         "campaign_job_posted": "Objavljen je novi posao",
         "campaign_application_submitted": "Kreator se prijavljuje na kampanju",
         "campaign_application_accepted": "Prijava je prihvaćena",
-        "campaign_application_rejected": "Prijava je odbijena"
+        "campaign_application_rejected": "Prijava je odbijena",
+        "assignment_offer_edited": "Agencija mijenja tvoju ponudu"
       }
     },
     "push": {

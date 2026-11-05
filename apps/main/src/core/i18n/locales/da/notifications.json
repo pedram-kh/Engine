@@ -42,7 +42,8 @@
       "campaign_application_submitted": "{creator_name} har søgt {campaign_name}.",
       "campaign_application_accepted": "{agency_name} har accepteret din ansøgning til {campaign_name}.",
       "campaign_application_rejected": "Din ansøgning til {campaign_name} blev ikke imødekommet.",
-      "fallback": "Du har en ny notifikation."
+      "fallback": "Du har en ny notifikation.",
+      "assignment_offer_edited": "Tilbuddet til {campaign_name} er ændret fra {previous_amount} til {new_amount}."
     },
     "preferences": {
       "title": "Notifikationsindstillinger",
@@ -91,7 +92,8 @@
         "campaign_job_posted": "Et nyt job slås op",
         "campaign_application_submitted": "En creator søger en kampagne",
         "campaign_application_accepted": "En ansøgning accepteres",
-        "campaign_application_rejected": "En ansøgning afvises"
+        "campaign_application_rejected": "En ansøgning afvises",
+        "assignment_offer_edited": "Bureauet ændrer dit tilbud"
       }
     },
     "push": {

@@ -45,7 +45,8 @@
           "live_verified": "The live post was verified.",
           "manually_verified": "The post was manually verified.",
           "resubmit_requested": "A resubmission was requested.",
-          "payment_released": "Fizetés was released."
+          "payment_released": "Fizetés was released.",
+          "offer_edited": "Az ajánlat {from} összegről {to} összegre változott."
         }
       },
       "rollup": {
@@ -480,7 +481,9 @@
         "listingExamplesUrl": "Példák linkje",
         "listingExamplesUrlHint": "Opcionális link referenciamunkákhoz.",
         "listedOnJobsBoard": "Hozzáadás a munkatáblához",
-        "jobBoard": "Álláshirdetések"
+        "jobBoard": "Álláshirdetések",
+        "restrictToRegions": "Csak a felsorolt régiók alkotói jelentkezhetnek",
+        "restrictToRegionsHint": "Az ezeken a régiókon kívüli alkotók továbbra is látják a munkát, de nem jelentkezhetnek. A meghívókat ez nem érinti."
       },
       "insertLink": {
         "buttonLabel": "Link beszúrása",
@@ -890,7 +893,8 @@
       },
       "errors": {
         "loadFailed": "Failed to load campaigns.",
-        "saveFailed": "Failed to save campaign."
+        "saveFailed": "Failed to save campaign.",
+        "restrictNeedsRegions": "Válassz legalább egy régiót a jelentkezések korlátozásához."
       },
       "listing": {
         "sectionTitle": "Hirdetés a munkatáblán",
@@ -966,7 +970,24 @@
       "list": {
         "starts": "Kezdés: {date}"
       },
-      "summaryActive": "{count} kampány, {active} aktív | {count} kampány, {active} aktív"
+      "summaryActive": "{count} kampány, {active} aktív | {count} kampány, {active} aktív",
+      "offerEdit": {
+        "action": "Ajánlat szerkesztése",
+        "title": "Az ajánlat összegének szerkesztése",
+        "body": "Az alkotó értesítést kap, a változás pedig bekerül a beszélgetésbe.",
+        "amountLabel": "Új díj ({currency})",
+        "cancel": "Mégse",
+        "submit": "Mentés",
+        "success": "Az ajánlat frissítve.",
+        "unchanged": "Ez a jelenlegi összeg.",
+        "locked": {
+          "status": "Az ajánlat ebben a szakaszban már nem szerkeszthető.",
+          "contract_pending": "Egy szerződés az alkotó aláírására vár.",
+          "contract_signed": "A szerződés alá van írva.",
+          "payment": "A fizetés megkezdődött."
+        },
+        "error": "Az ajánlatot nem sikerült módosítani. Próbáld újra."
+      }
     },
     "pools": {
       "title": "Talent pools",

@@ -554,7 +554,10 @@
             "ended": "To zlecenie zostało zakończone."
           },
           "viewOffer": "Zobacz ofertę",
-          "viewAssignment": "Zobacz zlecenie"
+          "viewAssignment": "Zobacz zlecenie",
+          "regionLocked": "Niedostępne w twoim regionie",
+          "regionLockedNoCountry": "Dodaj swój kraj do profilu, aby aplikować na zlecenia ograniczone regionalnie.",
+          "regionLockedProfileLink": "Otwórz mój profil"
         },
         "applyDialog": {
           "title": "Aplikuj na to zlecenie",
@@ -569,7 +572,8 @@
           "alreadyApplied": "Już zgłosiłeś się na to zlecenie.",
           "applicationRejected": "Nie zostałeś wybrany na to zlecenie, więc nie można zgłosić się ponownie.",
           "gone": "To zlecenie nie jest już dostępne.",
-          "error": "Coś poszło nie tak. Spróbuj ponownie."
+          "error": "Coś poszło nie tak. Spróbuj ponownie.",
+          "regionNotAllowed": "To zlecenie jest otwarte tylko dla twórców z określonych regionów."
         }
       },
       "upload": {

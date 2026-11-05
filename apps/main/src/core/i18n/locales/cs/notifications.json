@@ -42,7 +42,8 @@
       "campaign_application_submitted": "{creator_name} se přihlásil na {campaign_name}.",
       "campaign_application_accepted": "{agency_name} přijala vaši přihlášku na {campaign_name}.",
       "campaign_application_rejected": "Vaše přihláška na {campaign_name} nebyla úspěšná.",
-      "fallback": "Máte nové oznámení."
+      "fallback": "Máte nové oznámení.",
+      "assignment_offer_edited": "Nabídka pro {campaign_name} se změnila z {previous_amount} na {new_amount}."
     },
     "preferences": {
       "title": "Nastavení oznámení",
@@ -91,7 +92,8 @@
         "campaign_job_posted": "Je zveřejněna nová nabídka",
         "campaign_application_submitted": "Tvůrce se přihlásí na kampaň",
         "campaign_application_accepted": "Přihláška je přijata",
-        "campaign_application_rejected": "Přihláška je odmítnuta"
+        "campaign_application_rejected": "Přihláška je odmítnuta",
+        "assignment_offer_edited": "Agentura mění tvou nabídku"
       }
     },
     "push": {

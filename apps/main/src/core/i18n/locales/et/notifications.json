@@ -42,7 +42,8 @@
       "campaign_application_submitted": "{creator_name} kandideeris tööle {campaign_name}.",
       "campaign_application_accepted": "{agency_name} võttis teie kandideerimise tööle {campaign_name} vastu.",
       "campaign_application_rejected": "Teie kandideerimine tööle {campaign_name} ei osutunud edukaks.",
-      "fallback": "You have a new notification."
+      "fallback": "You have a new notification.",
+      "assignment_offer_edited": "Pakkumine kampaaniale {campaign_name} muutus: {previous_amount} → {new_amount}."
     },
     "preferences": {
       "title": "Eitification settings",
@@ -91,7 +92,8 @@
         "campaign_job_posted": "Avaldatakse uus tööpakkumine",
         "campaign_application_submitted": "Looja kandideerib kampaaniale",
         "campaign_application_accepted": "Kandideerimine võetakse vastu",
-        "campaign_application_rejected": "Kandideerimine lükatakse tagasi"
+        "campaign_application_rejected": "Kandideerimine lükatakse tagasi",
+        "assignment_offer_edited": "Agentuur muudab sinu pakkumist"
       }
     },
     "push": {

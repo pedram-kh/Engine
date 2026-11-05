@@ -42,7 +42,8 @@
       "campaign_application_submitted": "Chuir {creator_name} iarratas isteach ar {campaign_name}.",
       "campaign_application_accepted": "Ghlac {agency_name} le d'iarratas ar {campaign_name}.",
       "campaign_application_rejected": "Níor éirigh le d'iarratas ar {campaign_name}.",
-      "fallback": "You have a new notification."
+      "fallback": "You have a new notification.",
+      "assignment_offer_edited": "Athraíodh an tairiscint do {campaign_name} ó {previous_amount} go {new_amount}."
     },
     "preferences": {
       "title": "Níltification settings",
@@ -91,7 +92,8 @@
         "campaign_job_posted": "Foilsítear post nua",
         "campaign_application_submitted": "Cuireann cruthaitheoir iarratas isteach ar fheachtas",
         "campaign_application_accepted": "Glacadh le hiarratas",
-        "campaign_application_rejected": "Diúltaítear iarratas"
+        "campaign_application_rejected": "Diúltaítear iarratas",
+        "assignment_offer_edited": "Athraíonn an ghníomhaireacht do thairiscint"
       }
     },
     "push": {

@@ -45,7 +45,8 @@
           "live_verified": "Det live opslag er verificeret.",
           "manually_verified": "Opslaget er manuelt verificeret.",
           "resubmit_requested": "Der er anmodet om genindsendelse.",
-          "payment_released": "Betalingen er frigivet."
+          "payment_released": "Betalingen er frigivet.",
+          "offer_edited": "Tilbuddet er ændret fra {from} til {to}."
         }
       },
       "rollup": {
@@ -480,7 +481,9 @@
         "listingExamplesUrl": "Link til eksempler",
         "listingExamplesUrlHint": "Valgfrit link til referencearbejde.",
         "listedOnJobsBoard": "Føj til opgavetavlen",
-        "jobBoard": "Jobopslag"
+        "jobBoard": "Jobopslag",
+        "restrictToRegions": "Kun creators i de angivne regioner kan søge",
+        "restrictToRegionsHint": "Creators uden for disse regioner kan stadig se jobbet, men kan ikke søge. Invitationer påvirkes ikke."
       },
       "insertLink": {
         "buttonLabel": "Indsæt link",
@@ -890,7 +893,8 @@
       },
       "errors": {
         "loadFailed": "Kampagner kunne ikke indlæses.",
-        "saveFailed": "Kampagne kunne ikke gemmes."
+        "saveFailed": "Kampagne kunne ikke gemmes.",
+        "restrictNeedsRegions": "Vælg mindst én region for at begrænse ansøgninger."
       },
       "listing": {
         "sectionTitle": "Opslag på opgavetavlen",
@@ -966,7 +970,24 @@
       "list": {
         "starts": "Starter {date}"
       },
-      "summaryActive": "{count} kampagne, aktive: {active} | {count} kampagner, aktive: {active}"
+      "summaryActive": "{count} kampagne, aktive: {active} | {count} kampagner, aktive: {active}",
+      "offerEdit": {
+        "action": "Rediger tilbud",
+        "title": "Rediger tilbuddets beløb",
+        "body": "Creatoren får besked, og ændringen registreres i samtalen.",
+        "amountLabel": "Nyt honorar ({currency})",
+        "cancel": "Annuller",
+        "submit": "Gem",
+        "success": "Tilbuddet er opdateret.",
+        "unchanged": "Det er det nuværende beløb.",
+        "locked": {
+          "status": "Tilbuddet kan ikke længere redigeres på dette trin.",
+          "contract_pending": "En kontrakt venter på creatorens underskrift.",
+          "contract_signed": "Kontrakten er underskrevet.",
+          "payment": "Betalingen er startet."
+        },
+        "error": "Tilbuddet kunne ikke ændres. Prøv igen."
+      }
     },
     "pools": {
       "title": "Talentpuljer",

@@ -42,7 +42,8 @@
       "campaign_application_submitted": "{creator_name} haki työhön {campaign_name}.",
       "campaign_application_accepted": "{agency_name} hyväksyi hakemuksesi työhön {campaign_name}.",
       "campaign_application_rejected": "Hakemuksesi työhön {campaign_name} ei tullut valituksi.",
-      "fallback": "You have a new notification."
+      "fallback": "You have a new notification.",
+      "assignment_offer_edited": "Tarjous kampanjaan {campaign_name} muuttui: {previous_amount} → {new_amount}."
     },
     "preferences": {
       "title": "Eitification settings",
@@ -91,7 +92,8 @@
         "campaign_job_posted": "Uusi työ julkaistaan",
         "campaign_application_submitted": "Sisällöntuottaja hakee kampanjaan",
         "campaign_application_accepted": "Hakemus hyväksytään",
-        "campaign_application_rejected": "Hakemus hylätään"
+        "campaign_application_rejected": "Hakemus hylätään",
+        "assignment_offer_edited": "Toimisto muuttaa tarjoustasi"
       }
     },
     "push": {

@@ -554,7 +554,10 @@
             "ended": "Deze opdracht is beëindigd."
           },
           "viewOffer": "Aanbod bekijken",
-          "viewAssignment": "Opdracht bekijken"
+          "viewAssignment": "Opdracht bekijken",
+          "regionLocked": "Niet beschikbaar in jouw regio",
+          "regionLockedNoCountry": "Voeg je land toe aan je profiel om te reageren op opdrachten die per regio beperkt zijn.",
+          "regionLockedProfileLink": "Mijn profiel openen"
         },
         "applyDialog": {
           "title": "Solliciteren op deze opdracht",
@@ -569,7 +572,8 @@
           "alreadyApplied": "Je hebt al op deze opdracht gesolliciteerd.",
           "applicationRejected": "Je bent niet gekozen voor deze opdracht, dus opnieuw solliciteren kan niet.",
           "gone": "Deze opdracht is niet meer beschikbaar.",
-          "error": "Er is iets misgegaan. Probeer het opnieuw."
+          "error": "Er is iets misgegaan. Probeer het opnieuw.",
+          "regionNotAllowed": "Deze opdracht staat alleen open voor creators in bepaalde regio's."
         }
       },
       "upload": {

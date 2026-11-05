@@ -45,7 +45,8 @@
           "live_verified": "The live post was verified.",
           "manually_verified": "The post was manually verified.",
           "resubmit_requested": "A resubmission was requested.",
-          "payment_released": "Payment was released."
+          "payment_released": "Payment was released.",
+          "offer_edited": "The offer changed from {from} to {to}."
         }
       },
       "rollup": {
@@ -480,7 +481,9 @@
         "listingExamplesUrl": "Examples link",
         "listingExamplesUrlHint": "Optional link to reference work.",
         "listedOnJobsBoard": "Add to jobs board",
-        "jobBoard": "Job board"
+        "jobBoard": "Job board",
+        "restrictToRegions": "Only creators in the listed regions can apply",
+        "restrictToRegionsHint": "Creators outside these regions can still see the job but cannot apply. Invitations are not affected."
       },
       "insertLink": {
         "buttonLabel": "Insert link",
@@ -890,7 +893,8 @@
       },
       "errors": {
         "loadFailed": "Failed to load campaigns.",
-        "saveFailed": "Failed to save campaign."
+        "saveFailed": "Failed to save campaign.",
+        "restrictNeedsRegions": "Choose at least one region to restrict applications."
       },
       "listing": {
         "sectionTitle": "Jobs board listing",
@@ -966,7 +970,24 @@
       "list": {
         "starts": "Starts {date}"
       },
-      "summaryActive": "{count} campaign, {active} active | {count} campaigns, {active} active"
+      "summaryActive": "{count} campaign, {active} active | {count} campaigns, {active} active",
+      "offerEdit": {
+        "action": "Edit offer",
+        "title": "Edit the offer amount",
+        "body": "The creator is notified and the change is recorded in the conversation.",
+        "amountLabel": "New fee ({currency})",
+        "cancel": "Cancel",
+        "submit": "Save",
+        "success": "Offer updated.",
+        "unchanged": "That is the current amount.",
+        "locked": {
+          "status": "The offer can no longer be edited at this stage.",
+          "contract_pending": "A contract is waiting for the creator to sign.",
+          "contract_signed": "The contract is signed.",
+          "payment": "Payment has started."
+        },
+        "error": "The offer could not be changed. Please try again."
+      }
     },
     "pools": {
       "title": "Talent pools",

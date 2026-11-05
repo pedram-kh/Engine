@@ -554,7 +554,10 @@
             "ended": "Ovaj posao je prekinut."
           },
           "viewOffer": "Pogledaj ponudu",
-          "viewAssignment": "Prikaži zadatak"
+          "viewAssignment": "Prikaži zadatak",
+          "regionLocked": "Nije dostupno u tvojoj regiji",
+          "regionLockedNoCountry": "Dodaj svoju zemlju u profil kako bi se mogao prijaviti na poslove ograničene po regijama.",
+          "regionLockedProfileLink": "Otvori moj profil"
         },
         "applyDialog": {
           "title": "Prijavi se na ovaj posao",
@@ -569,7 +572,8 @@
           "alreadyApplied": "Već si se prijavio na ovaj posao.",
           "applicationRejected": "Nisi odabran za ovaj posao pa se nije moguće ponovno prijaviti.",
           "gone": "Ovaj posao više nije dostupan.",
-          "error": "Nešto je pošlo po zlu. Pokušaj ponovno."
+          "error": "Nešto je pošlo po zlu. Pokušaj ponovno.",
+          "regionNotAllowed": "Ovaj je posao otvoren samo kreatorima iz određenih regija."
         }
       },
       "upload": {

@@ -45,7 +45,8 @@
           "live_verified": "The live post was verified.",
           "manually_verified": "The post was manually verified.",
           "resubmit_requested": "A resubmission was requested.",
-          "payment_released": "Mokėjimas was released."
+          "payment_released": "Mokėjimas was released.",
+          "offer_edited": "Pasiūlymas pasikeitė iš {from} į {to}."
         }
       },
       "rollup": {
@@ -480,7 +481,9 @@
         "listingExamplesUrl": "Pavyzdžių nuoroda",
         "listingExamplesUrlHint": "Neprivaloma nuoroda į pavyzdinius darbus.",
         "listedOnJobsBoard": "Įtraukti į darbų lentą",
-        "jobBoard": "Darbo skelbimai"
+        "jobBoard": "Darbo skelbimai",
+        "restrictToRegions": "Kandidatuoti gali tik nurodytų regionų kūrėjai",
+        "restrictToRegionsHint": "Kūrėjai ne iš šių regionų darbą vis tiek mato, bet kandidatuoti negali. Kvietimų tai neliečia."
       },
       "insertLink": {
         "buttonLabel": "Įterpti nuorodą",
@@ -890,7 +893,8 @@
       },
       "errors": {
         "loadFailed": "Failed to load campaigns.",
-        "saveFailed": "Failed to save campaign."
+        "saveFailed": "Failed to save campaign.",
+        "restrictNeedsRegions": "Pasirink bent vieną regioną, kad apribotum kandidatūras."
       },
       "listing": {
         "sectionTitle": "Skelbimas darbų lentoje",
@@ -966,7 +970,24 @@
       "list": {
         "starts": "Prasideda {date}"
       },
-      "summaryActive": "{count} kampanija, aktyvių: {active} | {count} kampanijos, aktyvių: {active}"
+      "summaryActive": "{count} kampanija, aktyvių: {active} | {count} kampanijos, aktyvių: {active}",
+      "offerEdit": {
+        "action": "Redaguoti pasiūlymą",
+        "title": "Redaguoti pasiūlymo sumą",
+        "body": "Kūrėjas gauna pranešimą, o pakeitimas įrašomas į pokalbį.",
+        "amountLabel": "Naujas atlygis ({currency})",
+        "cancel": "Atšaukti",
+        "submit": "Išsaugoti",
+        "success": "Pasiūlymas atnaujintas.",
+        "unchanged": "Tai dabartinė suma.",
+        "locked": {
+          "status": "Šiame etape pasiūlymo redaguoti nebegalima.",
+          "contract_pending": "Sutartis laukia kūrėjo parašo.",
+          "contract_signed": "Sutartis pasirašyta.",
+          "payment": "Mokėjimas prasidėjo."
+        },
+        "error": "Pasiūlymo pakeisti nepavyko. Bandyk dar kartą."
+      }
     },
     "pools": {
       "title": "Talent pools",

@@ -45,7 +45,8 @@
           "live_verified": "La publication en ligne a été vérifiée.",
           "manually_verified": "La publication a été vérifiée manuellement.",
           "resubmit_requested": "Une nouvelle soumission a été demandée.",
-          "payment_released": "Le paiement a été versé."
+          "payment_released": "Le paiement a été versé.",
+          "offer_edited": "L'offre est passée de {from} à {to}."
         }
       },
       "rollup": {
@@ -480,7 +481,9 @@
         "listingExamplesUrl": "Lien vers des exemples",
         "listingExamplesUrlHint": "Lien facultatif vers des travaux de référence.",
         "listedOnJobsBoard": "Ajouter au tableau des missions",
-        "jobBoard": "Offres d'emploi"
+        "jobBoard": "Offres d'emploi",
+        "restrictToRegions": "Seuls les créateurs des régions indiquées peuvent postuler",
+        "restrictToRegionsHint": "Les créateurs hors de ces régions voient toujours l'offre mais ne peuvent pas postuler. Les invitations ne sont pas concernées."
       },
       "insertLink": {
         "buttonLabel": "Insérer un lien",
@@ -890,7 +893,8 @@
       },
       "errors": {
         "loadFailed": "Échec du chargement des campagnes.",
-        "saveFailed": "Échec de l'enregistrement de la campagne."
+        "saveFailed": "Échec de l'enregistrement de la campagne.",
+        "restrictNeedsRegions": "Choisissez au moins une région pour limiter les candidatures."
       },
       "listing": {
         "sectionTitle": "Annonce sur le tableau des missions",
@@ -966,7 +970,24 @@
       "list": {
         "starts": "Commence le {date}"
       },
-      "summaryActive": "{count} campagne, actives: {active} | {count} campagnes, actives: {active}"
+      "summaryActive": "{count} campagne, actives: {active} | {count} campagnes, actives: {active}",
+      "offerEdit": {
+        "action": "Modifier l'offre",
+        "title": "Modifier le montant de l'offre",
+        "body": "Le créateur est informé et la modification est consignée dans la conversation.",
+        "amountLabel": "Nouveaux honoraires ({currency})",
+        "cancel": "Annuler",
+        "submit": "Enregistrer",
+        "success": "Offre mise à jour.",
+        "unchanged": "C'est le montant actuel.",
+        "locked": {
+          "status": "L'offre ne peut plus être modifiée à ce stade.",
+          "contract_pending": "Un contrat attend la signature du créateur.",
+          "contract_signed": "Le contrat est signé.",
+          "payment": "Le paiement a commencé."
+        },
+        "error": "L'offre n'a pas pu être modifiée. Veuillez réessayer."
+      }
     },
     "pools": {
       "title": "Viviers de talents",

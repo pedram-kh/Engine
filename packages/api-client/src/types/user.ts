@@ -127,7 +127,13 @@ export interface UserAttributes {
    * `account_deletion` is true only for a creator while `AccountDeletionEnabled`
    * is on: the Security page, its route and its menu entries all read it.
    */
-  features?: { account_deletion: boolean }
+  features?: {
+    account_deletion: boolean
+    /** AH-118: agency-side only; false for a creator or a platform admin. */
+    campaign_region_restriction?: boolean
+    /** AH-118: agency-side only; false for a creator or a platform admin. */
+    assignment_offer_edit?: boolean
+  }
 }
 
 /**

@@ -45,7 +45,8 @@
           "live_verified": "De live post is geverifieerd.",
           "manually_verified": "De post is handmatig geverifieerd.",
           "resubmit_requested": "Er is een herindienst gevraagd.",
-          "payment_released": "De betaling is vrijgegeven."
+          "payment_released": "De betaling is vrijgegeven.",
+          "offer_edited": "Het aanbod is gewijzigd van {from} naar {to}."
         }
       },
       "rollup": {
@@ -480,7 +481,9 @@
         "listingExamplesUrl": "Link naar voorbeelden",
         "listingExamplesUrlHint": "Optionele link naar referentiewerk.",
         "listedOnJobsBoard": "Toevoegen aan het opdrachtenbord",
-        "jobBoard": "Vacaturebord"
+        "jobBoard": "Vacaturebord",
+        "restrictToRegions": "Alleen creators in de genoemde regio's kunnen reageren",
+        "restrictToRegionsHint": "Creators buiten deze regio's zien de opdracht nog wel, maar kunnen niet reageren. Uitnodigingen worden niet beïnvloed."
       },
       "insertLink": {
         "buttonLabel": "Link invoegen",
@@ -890,7 +893,8 @@
       },
       "errors": {
         "loadFailed": "Campagnes konden niet worden geladen.",
-        "saveFailed": "Campagne kon niet worden opgeslagen."
+        "saveFailed": "Campagne kon niet worden opgeslagen.",
+        "restrictNeedsRegions": "Kies minstens één regio om reacties te beperken."
       },
       "listing": {
         "sectionTitle": "Vermelding op het opdrachtenbord",
@@ -966,7 +970,24 @@
       "list": {
         "starts": "Begint op {date}"
       },
-      "summaryActive": "{count} campagne, {active} actief | {count} campagnes, {active} actief"
+      "summaryActive": "{count} campagne, {active} actief | {count} campagnes, {active} actief",
+      "offerEdit": {
+        "action": "Aanbod bewerken",
+        "title": "Bedrag van het aanbod bewerken",
+        "body": "De creator krijgt een melding en de wijziging wordt vastgelegd in het gesprek.",
+        "amountLabel": "Nieuwe vergoeding ({currency})",
+        "cancel": "Annuleren",
+        "submit": "Opslaan",
+        "success": "Aanbod bijgewerkt.",
+        "unchanged": "Dat is het huidige bedrag.",
+        "locked": {
+          "status": "Het aanbod kan in deze fase niet meer worden bewerkt.",
+          "contract_pending": "Er ligt een contract te wachten op de handtekening van de creator.",
+          "contract_signed": "Het contract is ondertekend.",
+          "payment": "De betaling is gestart."
+        },
+        "error": "Het aanbod kon niet worden gewijzigd. Probeer het opnieuw."
+      }
     },
     "pools": {
       "title": "Talentpools",

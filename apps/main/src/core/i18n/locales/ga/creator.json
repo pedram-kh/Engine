@@ -554,7 +554,10 @@
             "ended": "Tá an post seo thart."
           },
           "viewOffer": "Féach ar an tairiscint",
-          "viewAssignment": "Féach ar an sannadh"
+          "viewAssignment": "Féach ar an sannadh",
+          "regionLocked": "Níl sé ar fáil i do réigiún",
+          "regionLockedNoCountry": "Cuir do thír le do phróifíl chun cur isteach ar phoist atá teoranta de réir réigiúin.",
+          "regionLockedProfileLink": "Oscail mo phróifíl"
         },
         "applyDialog": {
           "title": "Cuir isteach ar an bpost seo",
@@ -569,7 +572,8 @@
           "alreadyApplied": "Chuir tú isteach ar an bpost seo cheana féin.",
           "applicationRejected": "Níor roghnaíodh thú don phost seo, mar sin ní féidir cur isteach air arís.",
           "gone": "Níl an post seo ar fáil a thuilleadh.",
-          "error": "Chuaigh rud éigin mícheart. Bain triail eile as."
+          "error": "Chuaigh rud éigin mícheart. Bain triail eile as.",
+          "regionNotAllowed": "Níl an post seo oscailte ach do chruthaitheoirí i réigiúin áirithe."
         }
       },
       "upload": {

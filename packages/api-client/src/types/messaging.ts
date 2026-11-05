@@ -36,6 +36,8 @@ export interface MessageAttributes {
   body: string | null
   attachments: MessageAttachment[]
   system_event_key: string | null
+  /** AH-118: structured primitives for a system line (`assignment.offer_edited`: `previous_amount`, `new_amount` in minor units, `currency`); null for every other message. */
+  system_event_data: Record<string, unknown> | null
   is_own: boolean
   sender: MessageSender | null
   created_at: string

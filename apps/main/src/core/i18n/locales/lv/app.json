@@ -45,7 +45,8 @@
           "live_verified": "The live post was verified.",
           "manually_verified": "The post was manually verified.",
           "resubmit_requested": "A resubmission was requested.",
-          "payment_released": "Maksājums was released."
+          "payment_released": "Maksājums was released.",
+          "offer_edited": "Piedāvājums mainījās no {from} uz {to}."
         }
       },
       "rollup": {
@@ -480,7 +481,9 @@
         "listingExamplesUrl": "Saite uz piemēriem",
         "listingExamplesUrlHint": "Neobligāta saite uz atsauces darbiem.",
         "listedOnJobsBoard": "Pievienot darbu tāfelei",
-        "jobBoard": "Darba piedāvājumi"
+        "jobBoard": "Darba piedāvājumi",
+        "restrictToRegions": "Pieteikties var tikai norādīto reģionu satura veidotāji",
+        "restrictToRegionsHint": "Satura veidotāji ārpus šiem reģioniem darbu joprojām redz, bet nevar pieteikties. Uzaicinājumus tas neietekmē."
       },
       "insertLink": {
         "buttonLabel": "Ievietot saiti",
@@ -890,7 +893,8 @@
       },
       "errors": {
         "loadFailed": "Failed to load campaigns.",
-        "saveFailed": "Failed to save campaign."
+        "saveFailed": "Failed to save campaign.",
+        "restrictNeedsRegions": "Izvēlies vismaz vienu reģionu, lai ierobežotu pieteikumus."
       },
       "listing": {
         "sectionTitle": "Sludinājums darbu tāfelē",
@@ -966,7 +970,24 @@
       "list": {
         "starts": "Sākas {date}"
       },
-      "summaryActive": "{count} kampaņa, aktīvās: {active} | {count} kampaņas, aktīvās: {active}"
+      "summaryActive": "{count} kampaņa, aktīvās: {active} | {count} kampaņas, aktīvās: {active}",
+      "offerEdit": {
+        "action": "Rediģēt piedāvājumu",
+        "title": "Rediģēt piedāvājuma summu",
+        "body": "Satura veidotājs saņem paziņojumu, un izmaiņas tiek ierakstītas sarunā.",
+        "amountLabel": "Jaunais atalgojums ({currency})",
+        "cancel": "Atcelt",
+        "submit": "Saglabāt",
+        "success": "Piedāvājums atjaunināts.",
+        "unchanged": "Šī ir pašreizējā summa.",
+        "locked": {
+          "status": "Šajā posmā piedāvājumu vairs nevar rediģēt.",
+          "contract_pending": "Līgums gaida satura veidotāja parakstu.",
+          "contract_signed": "Līgums ir parakstīts.",
+          "payment": "Maksājums ir sākts."
+        },
+        "error": "Piedāvājumu neizdevās mainīt. Mēģini vēlreiz."
+      }
     },
     "pools": {
       "title": "Talent pools",

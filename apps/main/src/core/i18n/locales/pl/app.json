@@ -45,7 +45,8 @@
           "live_verified": "Aktywny post został zweryfikowany.",
           "manually_verified": "Post został zweryfikowany ręcznie.",
           "resubmit_requested": "Zażądano ponownego przesłania.",
-          "payment_released": "Płatność została zwolniona."
+          "payment_released": "Płatność została zwolniona.",
+          "offer_edited": "Oferta zmieniła się z {from} na {to}."
         }
       },
       "rollup": {
@@ -480,7 +481,9 @@
         "listingExamplesUrl": "Link do przykładów",
         "listingExamplesUrlHint": "Opcjonalny link do prac referencyjnych.",
         "listedOnJobsBoard": "Dodaj do tablicy zleceń",
-        "jobBoard": "Oferty pracy"
+        "jobBoard": "Oferty pracy",
+        "restrictToRegions": "Aplikować mogą tylko twórcy z wymienionych regionów",
+        "restrictToRegionsHint": "Twórcy spoza tych regionów nadal widzą zlecenie, ale nie mogą aplikować. Zaproszenia nie są objęte ograniczeniem."
       },
       "insertLink": {
         "buttonLabel": "Wstaw link",
@@ -890,7 +893,8 @@
       },
       "errors": {
         "loadFailed": "Nie udało się załadować kampanii.",
-        "saveFailed": "Nie udało się zapisać kampanii."
+        "saveFailed": "Nie udało się zapisać kampanii.",
+        "restrictNeedsRegions": "Wybierz co najmniej jeden region, aby ograniczyć zgłoszenia."
       },
       "listing": {
         "sectionTitle": "Ogłoszenie na tablicy zleceń",
@@ -966,7 +970,24 @@
       "list": {
         "starts": "Start: {date}"
       },
-      "summaryActive": "{count} kampania, aktywnych: {active} | {count} kampanii, aktywnych: {active}"
+      "summaryActive": "{count} kampania, aktywnych: {active} | {count} kampanii, aktywnych: {active}",
+      "offerEdit": {
+        "action": "Edytuj ofertę",
+        "title": "Edytuj kwotę oferty",
+        "body": "Twórca otrzyma powiadomienie, a zmiana zostanie zapisana w rozmowie.",
+        "amountLabel": "Nowe wynagrodzenie ({currency})",
+        "cancel": "Anuluj",
+        "submit": "Zapisz",
+        "success": "Oferta zaktualizowana.",
+        "unchanged": "To jest obecna kwota.",
+        "locked": {
+          "status": "Na tym etapie oferty nie można już edytować.",
+          "contract_pending": "Umowa czeka na podpis twórcy.",
+          "contract_signed": "Umowa jest podpisana.",
+          "payment": "Płatność została rozpoczęta."
+        },
+        "error": "Nie udało się zmienić oferty. Spróbuj ponownie."
+      }
     },
     "pools": {
       "title": "Pule talentów",

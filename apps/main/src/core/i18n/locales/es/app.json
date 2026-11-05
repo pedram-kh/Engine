@@ -45,7 +45,8 @@
           "live_verified": "La publicación en directo se ha verificado.",
           "manually_verified": "La publicación se ha verificado manualmente.",
           "resubmit_requested": "Se ha solicitado un reenvío.",
-          "payment_released": "Se ha liberado el pago."
+          "payment_released": "Se ha liberado el pago.",
+          "offer_edited": "La oferta cambió de {from} a {to}."
         }
       },
       "rollup": {
@@ -480,7 +481,9 @@
         "listingExamplesUrl": "Enlace a ejemplos",
         "listingExamplesUrlHint": "Enlace opcional a trabajos de referencia.",
         "listedOnJobsBoard": "Añadir al tablón de trabajos",
-        "jobBoard": "Bolsa de trabajo"
+        "jobBoard": "Bolsa de trabajo",
+        "restrictToRegions": "Solo pueden aplicar los creadores de las regiones indicadas",
+        "restrictToRegionsHint": "Los creadores de fuera de estas regiones siguen viendo la oferta, pero no pueden aplicar. Las invitaciones no se ven afectadas."
       },
       "insertLink": {
         "buttonLabel": "Insertar enlace",
@@ -890,7 +893,8 @@
       },
       "errors": {
         "loadFailed": "No se han podido cargar las campañas.",
-        "saveFailed": "No se ha podido guardar la campaña."
+        "saveFailed": "No se ha podido guardar la campaña.",
+        "restrictNeedsRegions": "Elige al menos una región para limitar las solicitudes."
       },
       "listing": {
         "sectionTitle": "Anuncio en el tablón de trabajos",
@@ -966,7 +970,24 @@
       "list": {
         "starts": "Empieza el {date}"
       },
-      "summaryActive": "{count} campaña, activas: {active} | {count} campañas, activas: {active}"
+      "summaryActive": "{count} campaña, activas: {active} | {count} campañas, activas: {active}",
+      "offerEdit": {
+        "action": "Editar oferta",
+        "title": "Editar el importe de la oferta",
+        "body": "El creador recibe un aviso y el cambio queda registrado en la conversación.",
+        "amountLabel": "Nueva tarifa ({currency})",
+        "cancel": "Cancelar",
+        "submit": "Guardar",
+        "success": "Oferta actualizada.",
+        "unchanged": "Ese es el importe actual.",
+        "locked": {
+          "status": "La oferta ya no se puede editar en esta fase.",
+          "contract_pending": "Hay un contrato pendiente de firma por el creador.",
+          "contract_signed": "El contrato está firmado.",
+          "payment": "El pago ya ha comenzado."
+        },
+        "error": "No se pudo cambiar la oferta. Inténtalo de nuevo."
+      }
     },
     "pools": {
       "title": "Grupos de talento",

@@ -554,7 +554,10 @@
             "ended": "Tato práce byla ukončena."
           },
           "viewOffer": "Zobrazit nabídku",
-          "viewAssignment": "Zobrazit zakázku"
+          "viewAssignment": "Zobrazit zakázku",
+          "regionLocked": "Ve tvém regionu není dostupné",
+          "regionLockedNoCountry": "Přidej do profilu svou zemi, abys mohl reagovat na nabídky omezené podle regionu.",
+          "regionLockedProfileLink": "Otevřít můj profil"
         },
         "applyDialog": {
           "title": "Přihlásit se na tuto nabídku",
@@ -569,7 +572,8 @@
           "alreadyApplied": "Na tuto nabídku ses už přihlásil.",
           "applicationRejected": "Pro tuto nabídku jsi nebyl vybrán, proto se nelze přihlásit znovu.",
           "gone": "Tato nabídka již není dostupná.",
-          "error": "Něco se pokazilo. Zkus to prosím znovu."
+          "error": "Něco se pokazilo. Zkus to prosím znovu.",
+          "regionNotAllowed": "Tato nabídka je otevřená jen tvůrcům z určitých regionů."
         }
       },
       "upload": {

@@ -45,7 +45,8 @@
           "live_verified": "Il post dal vivo è stato verificato.",
           "manually_verified": "Il post è stato verificato manualmente.",
           "resubmit_requested": "È stato richiesto un nuovo invio.",
-          "payment_released": "Il pagamento è stato rilasciato."
+          "payment_released": "Il pagamento è stato rilasciato.",
+          "offer_edited": "L'offerta è passata da {from} a {to}."
         }
       },
       "rollup": {
@@ -480,7 +481,9 @@
         "listingExamplesUrl": "Link agli esempi",
         "listingExamplesUrlHint": "Link facoltativo a lavori di riferimento.",
         "listedOnJobsBoard": "Aggiungi alla bacheca lavori",
-        "jobBoard": "Offerte di lavoro"
+        "jobBoard": "Offerte di lavoro",
+        "restrictToRegions": "Solo i creator delle regioni indicate possono candidarsi",
+        "restrictToRegionsHint": "I creator al di fuori di queste regioni vedono comunque l'offerta ma non possono candidarsi. Gli inviti non sono interessati."
       },
       "insertLink": {
         "buttonLabel": "Inserisci link",
@@ -890,7 +893,8 @@
       },
       "errors": {
         "loadFailed": "Caricamento campagne fallito.",
-        "saveFailed": "Salvataggio campagna fallito."
+        "saveFailed": "Salvataggio campagna fallito.",
+        "restrictNeedsRegions": "Scegli almeno una regione per limitare le candidature."
       },
       "listing": {
         "sectionTitle": "Annuncio nella bacheca lavori",
@@ -966,7 +970,24 @@
       "list": {
         "starts": "Inizia il {date}"
       },
-      "summaryActive": "{count} campagna, attive: {active} | {count} campagne, attive: {active}"
+      "summaryActive": "{count} campagna, attive: {active} | {count} campagne, attive: {active}",
+      "offerEdit": {
+        "action": "Modifica offerta",
+        "title": "Modifica l'importo dell'offerta",
+        "body": "Il creator viene avvisato e la modifica viene registrata nella conversazione.",
+        "amountLabel": "Nuovo compenso ({currency})",
+        "cancel": "Annulla",
+        "submit": "Salva",
+        "success": "Offerta aggiornata.",
+        "unchanged": "Questo è l'importo attuale.",
+        "locked": {
+          "status": "L'offerta non può più essere modificata in questa fase.",
+          "contract_pending": "Un contratto è in attesa della firma del creator.",
+          "contract_signed": "Il contratto è firmato.",
+          "payment": "Il pagamento è iniziato."
+        },
+        "error": "Non è stato possibile modificare l'offerta. Riprova."
+      }
     },
     "pools": {
       "title": "Pool di talenti",

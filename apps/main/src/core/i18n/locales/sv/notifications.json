@@ -42,7 +42,8 @@
       "campaign_application_submitted": "{creator_name} har sökt {campaign_name}.",
       "campaign_application_accepted": "{agency_name} har accepterat din ansökan till {campaign_name}.",
       "campaign_application_rejected": "Din ansökan till {campaign_name} gick inte vidare.",
-      "fallback": "Du har en ny avisering."
+      "fallback": "Du har en ny avisering.",
+      "assignment_offer_edited": "Erbjudandet för {campaign_name} ändrades från {previous_amount} till {new_amount}."
     },
     "preferences": {
       "title": "Aviseringsinställningar",
@@ -91,7 +92,8 @@
         "campaign_job_posted": "Ett nytt jobb publiceras",
         "campaign_application_submitted": "En creator söker en kampanj",
         "campaign_application_accepted": "En ansökan accepteras",
-        "campaign_application_rejected": "En ansökan avslås"
+        "campaign_application_rejected": "En ansökan avslås",
+        "assignment_offer_edited": "Byrån ändrar ditt erbjudande"
       }
     },
     "push": {

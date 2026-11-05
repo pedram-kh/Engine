@@ -554,7 +554,10 @@
             "ended": "Dan ix-xogħol intemm."
           },
           "viewOffer": "Ara l-offerta",
-          "viewAssignment": "Ara l-inkarigu"
+          "viewAssignment": "Ara l-inkarigu",
+          "regionLocked": "Mhux disponibbli fir-reġjun tiegħek",
+          "regionLockedNoCountry": "Żid il-pajjiż tiegħek mal-profil tiegħek biex tapplika għal impjiegi limitati skont ir-reġjun.",
+          "regionLockedProfileLink": "Iftaħ il-profil tiegħi"
         },
         "applyDialog": {
           "title": "Applika għal dan ix-xogħol",
@@ -569,7 +572,8 @@
           "alreadyApplied": "Diġà applikajt għal dan ix-xogħol.",
           "applicationRejected": "Ma ġejtx magħżul għal dan ix-xogħol, għalhekk ma tistax terġa' tapplika.",
           "gone": "Dan ix-xogħol m'għadux disponibbli.",
-          "error": "Xi ħaġa marret ħażin. Erġa' pprova."
+          "error": "Xi ħaġa marret ħażin. Erġa' pprova.",
+          "regionNotAllowed": "Dan ix-xogħol huwa miftuħ biss għal kreaturi f'reġjuni speċifiċi."
         }
       },
       "upload": {

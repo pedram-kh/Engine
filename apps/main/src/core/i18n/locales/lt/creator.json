@@ -554,7 +554,10 @@
             "ended": "Šis darbas baigėsi."
           },
           "viewOffer": "Peržiūrėti pasiūlymą",
-          "viewAssignment": "Peržiūrėti užduotį"
+          "viewAssignment": "Peržiūrėti užduotį",
+          "regionLocked": "Tavo regione neprieinama",
+          "regionLockedNoCountry": "Pridėk savo šalį į profilį, kad galėtum kandidatuoti į darbus, ribojamus pagal regioną.",
+          "regionLockedProfileLink": "Atidaryti mano profilį"
         },
         "applyDialog": {
           "title": "Kandidatuoti į šį darbą",
@@ -569,7 +572,8 @@
           "alreadyApplied": "Į šį darbą jau kandidatavai.",
           "applicationRejected": "Į šį darbą nebuvai pasirinktas, todėl kandidatuoti iš naujo negalima.",
           "gone": "Šis darbas nebepasiekiamas.",
-          "error": "Kažkas nepavyko. Bandyk dar kartą."
+          "error": "Kažkas nepavyko. Bandyk dar kartą.",
+          "regionNotAllowed": "Šis darbas atviras tik tam tikrų regionų kūrėjams."
         }
       },
       "upload": {

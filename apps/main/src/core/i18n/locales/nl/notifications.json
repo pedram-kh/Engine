@@ -42,7 +42,8 @@
       "campaign_application_submitted": "{creator_name} heeft gereageerd op {campaign_name}.",
       "campaign_application_accepted": "{agency_name} heeft je aanmelding voor {campaign_name} geaccepteerd.",
       "campaign_application_rejected": "Je aanmelding voor {campaign_name} is niet geselecteerd.",
-      "fallback": "Je hebt een nieuwe melding."
+      "fallback": "Je hebt een nieuwe melding.",
+      "assignment_offer_edited": "Het aanbod voor {campaign_name} is gewijzigd van {previous_amount} naar {new_amount}."
     },
     "preferences": {
       "title": "Meldingsinstellingen",
@@ -91,7 +92,8 @@
         "campaign_job_posted": "Er wordt een nieuwe opdracht geplaatst",
         "campaign_application_submitted": "Een creator meldt zich aan voor een campagne",
         "campaign_application_accepted": "Een aanmelding wordt geaccepteerd",
-        "campaign_application_rejected": "Een aanmelding wordt afgewezen"
+        "campaign_application_rejected": "Een aanmelding wordt afgewezen",
+        "assignment_offer_edited": "Het bureau wijzigt je aanbod"
       }
     },
     "push": {

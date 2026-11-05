@@ -554,7 +554,10 @@
             "ended": "Este trabajo ha finalizado."
           },
           "viewOffer": "Ver oferta",
-          "viewAssignment": "Ver asignación"
+          "viewAssignment": "Ver asignación",
+          "regionLocked": "No disponible en tu región",
+          "regionLockedNoCountry": "Añade tu país a tu perfil para aplicar a ofertas limitadas por región.",
+          "regionLockedProfileLink": "Abrir mi perfil"
         },
         "applyDialog": {
           "title": "Aplicar a esta oferta",
@@ -569,7 +572,8 @@
           "alreadyApplied": "Ya has aplicado a esta oferta.",
           "applicationRejected": "No has sido seleccionado para esta oferta, así que no se puede volver a aplicar.",
           "gone": "Esta oferta ya no está disponible.",
-          "error": "Algo ha salido mal. Inténtalo de nuevo."
+          "error": "Algo ha salido mal. Inténtalo de nuevo.",
+          "regionNotAllowed": "Esta oferta solo está abierta a creadores de regiones concretas."
         }
       },
       "upload": {

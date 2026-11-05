@@ -42,7 +42,8 @@
       "campaign_application_submitted": "{creator_name} pateikė paraišką dėl {campaign_name}.",
       "campaign_application_accepted": "{agency_name} priėmė jūsų paraišką dėl {campaign_name}.",
       "campaign_application_rejected": "Jūsų paraiška dėl {campaign_name} nebuvo atrinkta.",
-      "fallback": "You have a new notification."
+      "fallback": "You have a new notification.",
+      "assignment_offer_edited": "Pasiūlymas kampanijai {campaign_name} pasikeitė iš {previous_amount} į {new_amount}."
     },
     "preferences": {
       "title": "Netification settings",
@@ -91,7 +92,8 @@
         "campaign_job_posted": "Paskelbiamas naujas darbo pasiūlymas",
         "campaign_application_submitted": "Kūrėjas pateikia paraišką dėl kampanijos",
         "campaign_application_accepted": "Paraiška priimama",
-        "campaign_application_rejected": "Paraiška atmetama"
+        "campaign_application_rejected": "Paraiška atmetama",
+        "assignment_offer_edited": "Agentūra keičia tavo pasiūlymą"
       }
     },
     "push": {

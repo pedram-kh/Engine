@@ -42,7 +42,8 @@
       "campaign_application_submitted": "{creator_name} zgłosił się do {campaign_name}.",
       "campaign_application_accepted": "{agency_name} zaakceptowała Twoje zgłoszenie do {campaign_name}.",
       "campaign_application_rejected": "Twoje zgłoszenie do {campaign_name} nie zostało wybrane.",
-      "fallback": "Masz nowe powiadomienie."
+      "fallback": "Masz nowe powiadomienie.",
+      "assignment_offer_edited": "Oferta dla {campaign_name} zmieniła się z {previous_amount} na {new_amount}."
     },
     "preferences": {
       "title": "Ustawienia powiadomień",
@@ -91,7 +92,8 @@
         "campaign_job_posted": "Zostaje opublikowane nowe zlecenie",
         "campaign_application_submitted": "Twórca zgłasza się do kampanii",
         "campaign_application_accepted": "Zgłoszenie zostaje zaakceptowane",
-        "campaign_application_rejected": "Zgłoszenie zostaje odrzucone"
+        "campaign_application_rejected": "Zgłoszenie zostaje odrzucone",
+        "assignment_offer_edited": "Agencja zmienia twoją ofertę"
       }
     },
     "push": {

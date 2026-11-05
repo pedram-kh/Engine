@@ -45,7 +45,8 @@
           "live_verified": "Det live-publicerade inlägget verifierades.",
           "manually_verified": "Inlägget verifierades manuellt.",
           "resubmit_requested": "En ny inlämning begärdes.",
-          "payment_released": "Betalning släpptes."
+          "payment_released": "Betalning släpptes.",
+          "offer_edited": "Erbjudandet ändrades från {from} till {to}."
         }
       },
       "rollup": {
@@ -480,7 +481,9 @@
         "listingExamplesUrl": "Länk till exempel",
         "listingExamplesUrlHint": "Valfri länk till referensarbeten.",
         "listedOnJobsBoard": "Lägg till på uppdragstavlan",
-        "jobBoard": "Jobbanslag"
+        "jobBoard": "Jobbanslag",
+        "restrictToRegions": "Bara creators i de angivna regionerna kan ansöka",
+        "restrictToRegionsHint": "Creators utanför dessa regioner ser fortfarande jobbet men kan inte ansöka. Inbjudningar påverkas inte."
       },
       "insertLink": {
         "buttonLabel": "Infoga länk",
@@ -890,7 +893,8 @@
       },
       "errors": {
         "loadFailed": "Kunde inte ladda kampanjer.",
-        "saveFailed": "Kunde inte spara kampanj."
+        "saveFailed": "Kunde inte spara kampanj.",
+        "restrictNeedsRegions": "Välj minst en region för att begränsa ansökningar."
       },
       "listing": {
         "sectionTitle": "Annons på uppdragstavlan",
@@ -966,7 +970,24 @@
       "list": {
         "starts": "Startar {date}"
       },
-      "summaryActive": "{count} kampanj, aktiva: {active} | {count} kampanjer, aktiva: {active}"
+      "summaryActive": "{count} kampanj, aktiva: {active} | {count} kampanjer, aktiva: {active}",
+      "offerEdit": {
+        "action": "Redigera erbjudande",
+        "title": "Redigera erbjudandets belopp",
+        "body": "Creatorn får en avisering och ändringen sparas i konversationen.",
+        "amountLabel": "Ny ersättning ({currency})",
+        "cancel": "Avbryt",
+        "submit": "Spara",
+        "success": "Erbjudandet har uppdaterats.",
+        "unchanged": "Det är det nuvarande beloppet.",
+        "locked": {
+          "status": "Erbjudandet kan inte längre redigeras i det här skedet.",
+          "contract_pending": "Ett avtal väntar på att creatorn ska skriva under.",
+          "contract_signed": "Avtalet är undertecknat.",
+          "payment": "Betalningen har påbörjats."
+        },
+        "error": "Erbjudandet kunde inte ändras. Försök igen."
+      }
     },
     "pools": {
       "title": "Talangpooler",

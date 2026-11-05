@@ -45,7 +45,8 @@
           "live_verified": "Živý příspěvek byl ověřen.",
           "manually_verified": "Příspěvek byl ověřen ručně.",
           "resubmit_requested": "Bylo požadováno opětovné odeslání.",
-          "payment_released": "Platba byla uvolněna."
+          "payment_released": "Platba byla uvolněna.",
+          "offer_edited": "Nabídka se změnila z {from} na {to}."
         }
       },
       "rollup": {
@@ -480,7 +481,9 @@
         "listingExamplesUrl": "Odkaz na ukázky",
         "listingExamplesUrlHint": "Volitelný odkaz na referenční práce.",
         "listedOnJobsBoard": "Přidat na nástěnku zakázek",
-        "jobBoard": "Nabídky práce"
+        "jobBoard": "Nabídky práce",
+        "restrictToRegions": "Přihlásit se mohou jen tvůrci z uvedených regionů",
+        "restrictToRegionsHint": "Tvůrci mimo tyto regiony nabídku stále vidí, ale nemohou se přihlásit. Pozvánky se to netýká."
       },
       "insertLink": {
         "buttonLabel": "Vložit odkaz",
@@ -890,7 +893,8 @@
       },
       "errors": {
         "loadFailed": "Nepodařilo se načíst kampaně.",
-        "saveFailed": "Nepodařilo se uložit kampaň."
+        "saveFailed": "Nepodařilo se uložit kampaň.",
+        "restrictNeedsRegions": "Vyber alespoň jeden region, abys omezil přihlášky."
       },
       "listing": {
         "sectionTitle": "Nabídka na nástěnce zakázek",
@@ -966,7 +970,24 @@
       "list": {
         "starts": "Začíná {date}"
       },
-      "summaryActive": "{count} kampaň, aktivní: {active} | {count} kampaní, aktivní: {active}"
+      "summaryActive": "{count} kampaň, aktivní: {active} | {count} kampaní, aktivní: {active}",
+      "offerEdit": {
+        "action": "Upravit nabídku",
+        "title": "Upravit částku nabídky",
+        "body": "Tvůrce dostane upozornění a změna se zapíše do konverzace.",
+        "amountLabel": "Nová odměna ({currency})",
+        "cancel": "Zrušit",
+        "submit": "Uložit",
+        "success": "Nabídka byla aktualizována.",
+        "unchanged": "To je aktuální částka.",
+        "locked": {
+          "status": "Nabídku už v této fázi nelze upravit.",
+          "contract_pending": "Smlouva čeká na podpis tvůrce.",
+          "contract_signed": "Smlouva je podepsaná.",
+          "payment": "Platba už začala."
+        },
+        "error": "Nabídku se nepodařilo změnit. Zkus to znovu."
+      }
     },
     "pools": {
       "title": "Talentové skupiny",

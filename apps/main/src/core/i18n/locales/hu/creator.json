@@ -554,7 +554,10 @@
             "ended": "Ez a munka lezárult."
           },
           "viewOffer": "Ajánlat megtekintése",
-          "viewAssignment": "Megbízás megtekintése"
+          "viewAssignment": "Megbízás megtekintése",
+          "regionLocked": "A te régiódban nem elérhető",
+          "regionLockedNoCountry": "Add meg az országodat a profilodban, hogy jelentkezhess a régióhoz kötött munkákra.",
+          "regionLockedProfileLink": "Profilom megnyitása"
         },
         "applyDialog": {
           "title": "Jelentkezés erre a munkára",
@@ -569,7 +572,8 @@
           "alreadyApplied": "Erre a munkára már jelentkeztél.",
           "applicationRejected": "Nem téged választottak erre a munkára, ezért újra nem lehet jelentkezni.",
           "gone": "Ez a munka már nem elérhető.",
-          "error": "Valami hiba történt. Próbáld újra."
+          "error": "Valami hiba történt. Próbáld újra.",
+          "regionNotAllowed": "Ez a munka csak bizonyos régiók alkotói számára nyitott."
         }
       },
       "upload": {

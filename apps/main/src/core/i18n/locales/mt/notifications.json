@@ -42,7 +42,8 @@
       "campaign_application_submitted": "{creator_name} applika għal {campaign_name}.",
       "campaign_application_accepted": "{agency_name} aċċettat l-applikazzjoni tiegħek għal {campaign_name}.",
       "campaign_application_rejected": "L-applikazzjoni tiegħek għal {campaign_name} ma ntgħażlitx.",
-      "fallback": "You have a new notification."
+      "fallback": "You have a new notification.",
+      "assignment_offer_edited": "L-offerta għal {campaign_name} nbidlet minn {previous_amount} għal {new_amount}."
     },
     "preferences": {
       "title": "Letification settings",
@@ -91,7 +92,8 @@
         "campaign_job_posted": "Jiġi ppubblikat xogħol ġdid",
         "campaign_application_submitted": "Kreatur japplika għal kampanja",
         "campaign_application_accepted": "Applikazzjoni tiġi aċċettata",
-        "campaign_application_rejected": "Applikazzjoni tiġi rifjutata"
+        "campaign_application_rejected": "Applikazzjoni tiġi rifjutata",
+        "assignment_offer_edited": "L-aġenzija tbiddel l-offerta tiegħek"
       }
     },
     "push": {
