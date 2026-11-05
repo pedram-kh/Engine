@@ -95,6 +95,10 @@ final class UpdateCampaignRequest extends FormRequest
                 return;
             }
 
+            // AH-118 — before the listed-state early return below: a restricted
+            // campaign needs regions whether or not it is on the board.
+            $this->validateRegionRestriction($validator, $campaign);
+
             $resultingListed = $this->has('listed_on_jobs_board')
                 ? $this->boolean('listed_on_jobs_board')
                 : $campaign->listed_on_jobs_board;

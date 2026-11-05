@@ -20,6 +20,7 @@ use App\Modules\Campaigns\Http\Resources\CampaignResource;
 use App\Modules\Campaigns\Jobs\AutoRejectPendingApplicationsJob;
 use App\Modules\Campaigns\Jobs\SendJobPostedNotificationsJob;
 use App\Modules\Campaigns\Models\Campaign;
+use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
 use App\Modules\Identity\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -27,6 +28,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
+use Laravel\Pennant\Feature;
 
 /**
  * Agency-side campaign CRUD (Sprint 8 Chunk 1, D-8/D-10).
@@ -83,6 +85,10 @@ final class CampaignController
     {
         Gate::authorize('create', Campaign::class);
 
+        if ($refused = $this->refuseDisabledRegionRestriction($request)) {
+            return $refused;
+        }
+
         /** @var User $actor */
         $actor = $request->user();
         $validated = $request->validated();
@@ -125,6 +131,9 @@ final class CampaignController
             'listing_fee' => $validated['listing_fee'] ?? null,
             'listing_languages' => $validated['listing_languages'] ?? null,
             'listing_regions' => $validated['listing_regions'] ?? null,
+            // AH-118 — whitelist, not `$fillable` (the AH-054 catch). Absent means
+            // unrestricted, which is the column default.
+            'restrict_to_listing_regions' => $validated['restrict_to_listing_regions'] ?? false,
             'listing_examples_url' => $validated['listing_examples_url'] ?? null,
         ]);
 
@@ -165,6 +174,10 @@ final class CampaignController
     {
         $this->assertBelongsToAgency($campaign, $agency);
         Gate::authorize('update', $campaign);
+
+        if ($refused = $this->refuseDisabledRegionRestriction($request)) {
+            return $refused;
+        }
 
         $before = $this->auditableSnapshot($campaign);
 
@@ -467,6 +480,31 @@ final class CampaignController
             // AH-118 — who restricted applications to the listed regions, and when.
             'restrict_to_listing_regions' => $campaign->restrict_to_listing_regions,
         ];
+    }
+
+    /**
+     * AH-118 — while `campaign_region_restriction_enabled` is OFF the switch
+     * cannot be turned ON: a write that sets it true is a 422 with a domain code
+     * (not a silent ignore: the agency would believe a restriction was in force
+     * that nothing enforces). Turning it OFF is always allowed.
+     */
+    private function refuseDisabledRegionRestriction(Request $request): ?JsonResponse
+    {
+        if (! $request->has('restrict_to_listing_regions') || ! $request->boolean('restrict_to_listing_regions')) {
+            return null;
+        }
+
+        if (Feature::active(CampaignRegionRestrictionEnabled::NAME)) {
+            return null;
+        }
+
+        return ErrorResponse::single(
+            $request,
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+            'campaign.region_restriction_disabled',
+            'Limiting applications to the listed regions is not available yet.',
+            source: ['pointer' => '/data/attributes/restrict_to_listing_regions'],
+        );
     }
 
     /**

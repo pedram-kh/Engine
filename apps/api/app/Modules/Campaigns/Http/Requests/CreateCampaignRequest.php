@@ -7,6 +7,7 @@ namespace App\Modules\Campaigns\Http\Requests;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Campaigns\Enums\CampaignObjective;
 use App\Modules\Campaigns\Http\Requests\Concerns\ValidatesJobsBoardListing;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
@@ -88,6 +89,13 @@ final class CreateCampaignRequest extends FormRequest
             'brief.usage_rights' => ['sometimes', 'nullable', 'string', 'max:5000'],
             'brief.attachments' => ['sometimes', 'array'],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            $this->validateRegionRestriction($validator, null);
+        });
     }
 
     /**

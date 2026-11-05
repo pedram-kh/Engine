@@ -63,6 +63,8 @@ final class CampaignResource extends JsonResource
                 'listing_fee' => $campaign->listing_fee,
                 'listing_languages' => $campaign->listing_languages,
                 'listing_regions' => $campaign->listing_regions,
+                // AH-118 — the STORED switch (it is inert while the flag is off).
+                'restrict_to_listing_regions' => $campaign->restrict_to_listing_regions,
                 'listing_examples_url' => $campaign->listing_examples_url,
                 'published_at' => $campaign->published_at?->toIso8601String(),
                 'completed_at' => $campaign->completed_at?->toIso8601String(),

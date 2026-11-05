@@ -6,7 +6,10 @@ namespace App\Modules\Campaigns\Http\Requests\Concerns;
 
 use App\Core\Enums\Locale;
 use App\Modules\Campaigns\Models\Campaign;
+use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\Rule;
+use Laravel\Pennant\Feature;
 
 /**
  * The jobs-board listing contract (AH-054, D2 + D3), shared by the create and
@@ -81,7 +84,48 @@ trait ValidatesJobsBoardListing
             'listing_regions.*' => ['string', 'size:2', 'distinct', 'regex:/^[A-Z]{2}$/'],
 
             'listing_examples_url' => ['sometimes', 'nullable', 'string', 'url', 'max:2048'],
+
+            // AH-118 — the "only creators in the listed regions can apply"
+            // switch. Accepted on create AND edit (it describes who may apply,
+            // not whether the job is advertised). The flag-OFF refusal lives in
+            // the controller ({@see CampaignController}), where it can answer
+            // with a domain code.
+            'restrict_to_listing_regions' => ['sometimes', 'boolean'],
         ];
+    }
+
+    /**
+     * AH-118 — the switch with no regions would lock every creator out, so a
+     * restricted campaign must carry at least one region. Judged on the RESULT
+     * of the write (the payload where it speaks, the stored row elsewhere), the
+     * same merged-state discipline as {@see self::missingListingFloorFields()}.
+     *
+     * Evaluated only while `campaign_region_restriction_enabled` is ON: with the
+     * flag off the switch cannot be turned on at all, and a stored value is
+     * inert.
+     */
+    protected function validateRegionRestriction(Validator $validator, ?Campaign $campaign): void
+    {
+        if (! Feature::active(CampaignRegionRestrictionEnabled::NAME)) {
+            return;
+        }
+
+        $restricted = $this->has('restrict_to_listing_regions')
+            ? $this->boolean('restrict_to_listing_regions')
+            : ($campaign instanceof Campaign && $campaign->restrict_to_listing_regions);
+
+        if (! $restricted) {
+            return;
+        }
+
+        $regions = $this->has('listing_regions') ? $this->input('listing_regions') : $campaign?->listing_regions;
+
+        if (! self::listingValueFilled($regions)) {
+            $validator->errors()->add(
+                'listing_regions',
+                'Choose at least one region before limiting applications to the listed regions.',
+            );
+        }
     }
 
     /**
