@@ -33,7 +33,7 @@ function basePayload(overrides: Partial<CreateCampaignPayload> = {}): CreateCamp
   }
 }
 
-function mountForm(modelValue: CreateCampaignPayload) {
+function mountForm(modelValue: CreateCampaignPayload, extra: Record<string, unknown> = {}) {
   const i18n = createI18n({
     legacy: false,
     locale: 'en',
@@ -51,6 +51,7 @@ function mountForm(modelValue: CreateCampaignPayload) {
       submitting: false,
       submitLabel: 'Save',
       error: null,
+      ...extra,
     },
     global: { plugins: [i18n, vuetify] },
     attachTo: document.body,
@@ -136,5 +137,56 @@ describe('CampaignForm — insert-link integration (AH-082)', () => {
     const emitted = wrapper.emitted('update:modelValue')
     const last = emitted?.at(-1)?.[0] as CreateCampaignPayload
     expect(last.description).toBe('shoot [a video](https://example.com/brief) please')
+  })
+})
+
+describe('CampaignForm — the region switch (AH-118)', () => {
+  const SWITCH = '[data-test="campaign-restrict-to-regions"]'
+
+  it('renders nothing while the feature flag is off, even for a stored true', () => {
+    const wrapper = mountForm(
+      basePayload({ listing_regions: ['IE'], restrict_to_listing_regions: true }),
+    )
+    expect(wrapper.find(SWITCH).exists()).toBe(false)
+  })
+
+  it('renders the switch with its label and the hint that invitations are not affected', () => {
+    const wrapper = mountForm(basePayload({ listing_regions: ['IE'] }), {
+      regionRestrictionEnabled: true,
+    })
+    expect(wrapper.find(SWITCH).exists()).toBe(true)
+    expect(wrapper.text()).toContain('Only creators in the listed regions can apply')
+    expect(wrapper.text()).toContain('Invitations are not affected.')
+    expect((wrapper.find(`${SWITCH} input`).element as HTMLInputElement).checked).toBe(false)
+  })
+
+  it('is disabled while no region is chosen, enabled once one is', () => {
+    const empty = mountForm(basePayload({ listing_regions: [] }), {
+      regionRestrictionEnabled: true,
+    })
+    expect((empty.find(`${SWITCH} input`).element as HTMLInputElement).disabled).toBe(true)
+
+    const chosen = mountForm(basePayload({ listing_regions: ['PT'] }), {
+      regionRestrictionEnabled: true,
+    })
+    expect((chosen.find(`${SWITCH} input`).element as HTMLInputElement).disabled).toBe(false)
+  })
+
+  it('emits restrict_to_listing_regions true when turned on', async () => {
+    const wrapper = mountForm(basePayload({ listing_regions: ['PT'] }), {
+      regionRestrictionEnabled: true,
+    })
+    await wrapper.find(`${SWITCH} input`).setValue(true)
+
+    const emitted = wrapper.emitted('update:modelValue')?.at(-1)?.[0] as CreateCampaignPayload
+    expect(emitted.restrict_to_listing_regions).toBe(true)
+  })
+
+  it('says to choose a region when the switch is ON with none (the merged-state rule, mirrored)', () => {
+    const wrapper = mountForm(
+      basePayload({ listing_regions: [], restrict_to_listing_regions: true }),
+      { regionRestrictionEnabled: true },
+    )
+    expect(wrapper.text()).toContain('Choose at least one region to restrict applications.')
   })
 })

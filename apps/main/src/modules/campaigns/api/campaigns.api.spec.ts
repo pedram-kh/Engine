@@ -131,6 +131,17 @@ describe('campaignsApi create / update / assignments', () => {
     )
   })
 
+  it('PATCHes the offer amount to the /offer path with the amount only (AH-118)', () => {
+    mockHttp.patch.mockResolvedValue({ data: {} })
+    void campaignsApi.editOffer('agency-ulid', 'campaign-ulid', 'assignment-ulid', {
+      agreed_fee_minor_units: 250_00,
+    })
+    expect(mockHttp.patch).toHaveBeenCalledWith(
+      '/agencies/agency-ulid/campaigns/campaign-ulid/assignments/assignment-ulid/offer',
+      { agreed_fee_minor_units: 250_00 },
+    )
+  })
+
   it('POSTs the manual-verify override with its reason (verification-resolution, ACT1)', () => {
     void campaignsApi.manuallyVerify('agency-ulid', 'campaign-ulid', 'assignment-ulid', {
       reason: 'Checked by hand — live and on-brief.',

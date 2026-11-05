@@ -40,6 +40,7 @@ import type {
   ProceedWithoutContractResponse,
   RejectDraftPayload,
   ReinviteAssignmentPayload,
+  EditAssignmentOfferPayload,
   RejectApplicationResponse,
   RequestResubmitFreshPayload,
   RequestResubmitInPlacePayload,
@@ -270,6 +271,24 @@ export const campaignsApi = {
   ): Promise<{ data: CampaignAssignmentResource }> {
     return http.post<{ data: CampaignAssignmentResource }>(
       `${campaignsBase(agencyId)}/${campaignId}/assignments/${assignmentId}/reinvite`,
+      payload,
+    )
+  },
+
+  /**
+   * AH-118 — change the offer amount of an assignment until a contract is sent
+   * or signed, or payment starts. 404 while `assignment_offer_edit_enabled` is
+   * off; 422 `assignment.offer_locked` (with `meta.reason`) or
+   * `assignment.offer_unchanged`. The currency is never sent.
+   */
+  editOffer(
+    agencyId: string,
+    campaignId: string,
+    assignmentId: string,
+    payload: EditAssignmentOfferPayload,
+  ): Promise<{ data: CampaignAssignmentResource }> {
+    return http.patch<{ data: CampaignAssignmentResource }>(
+      `${campaignsBase(agencyId)}/${campaignId}/assignments/${assignmentId}/offer`,
       payload,
     )
   },

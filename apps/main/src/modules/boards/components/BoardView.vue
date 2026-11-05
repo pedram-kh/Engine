@@ -41,6 +41,8 @@ const props = defineProps<{
   canResolve?: boolean
   /** May review a submitted draft — the same `review` ability as `canResolve`. */
   canReview?: boolean
+  /** AH-118: may edit an offer amount (the `invite` ability while the flag is on). */
+  canEditOffer?: boolean
   /**
    * The execute tier (invite). Gates accept/reject on the Applications
    * pseudo-column (AH-059, D4) — the same ability the Applications tab uses, so
@@ -176,6 +178,7 @@ onBeforeUnmount(() => {
       :card="drawerCard"
       :can-resolve="props.canResolve ?? false"
       :can-review="props.canReview ?? false"
+      :can-edit-offer="props.canEditOffer ?? false"
       @resolve="onResolve"
     />
 

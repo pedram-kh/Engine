@@ -64,6 +64,7 @@ import RichBrief from '@/components/RichBrief.vue'
 import { campaignsApi } from '@/modules/campaigns/api/campaigns.api'
 import CampaignFilesStrip from '@/modules/campaigns/components/CampaignFilesStrip.vue'
 import DraftReviewPanel from '@/modules/campaigns/components/DraftReviewPanel.vue'
+import EditOfferDialog from '@/modules/campaigns/components/EditOfferDialog.vue'
 import { useCampaignFiles } from '@/modules/campaigns/composables/useCampaignFiles'
 import { roundStateKey } from '@/modules/campaigns/draftRounds'
 import { agencyChatTransport, type ChatTransport } from '@/modules/messaging/api/messaging.api'
@@ -89,6 +90,11 @@ const props = defineProps<{
   canResolve?: boolean
   /** May review a submitted draft — the same `review` ability as `canResolve`. */
   canReview?: boolean
+  /**
+   * AH-118: may edit the offer amount: the `invite` ability while
+   * `assignment_offer_edit` is on. The page computes it; the drawer only renders.
+   */
+  canEditOffer?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -227,6 +233,24 @@ const feeLabel = computed(() => {
 
 const offerDescription = computed(() => detail.value?.attributes.offer_description ?? null)
 const offerAttachment = computed(() => detail.value?.attributes.offer_attachment ?? null)
+// AH-118 — edit the offer amount from the Detail tab. Hidden for a `status`
+// lock (nothing to do at that stage); contract and payment locks stay visible so
+// the dialog can say why.
+const editOfferOpen = ref(false)
+const editOfferLockReason = computed(() => detail.value?.attributes.offer_edit_lock_reason ?? null)
+const showEditOffer = computed(
+  () =>
+    props.canEditOffer === true &&
+    detail.value !== null &&
+    editOfferLockReason.value !== 'status' &&
+    editOfferLockReason.value !== 'feature_disabled',
+)
+
+async function onOfferEdited(): Promise<void> {
+  await loadDrawer(false)
+  void store.refresh()
+}
+
 const deliverables = computed(() => assignmentData.value?.deliverables ?? [])
 
 const postingDueLabel = computed(() => {
@@ -515,6 +539,28 @@ function onDraftReviewed(): void {
                 <div v-if="feeLabel" class="text-body-2" data-test="board-card-drawer-fee">
                   {{ feeLabel }}
                 </div>
+                <v-btn
+                  v-if="showEditOffer"
+                  variant="tonal"
+                  size="small"
+                  class="mt-2"
+                  :data-locked="detail?.attributes.offer_edit_locked === true ? 'true' : 'false'"
+                  data-test="board-card-drawer-edit-offer"
+                  @click="editOfferOpen = true"
+                >
+                  {{ t('app.campaigns.offerEdit.action') }}
+                </v-btn>
+                <EditOfferDialog
+                  v-if="showEditOffer"
+                  v-model="editOfferOpen"
+                  :agency-id="agencyId"
+                  :campaign-id="campaignId"
+                  :assignment-id="detail?.id ?? null"
+                  :current-minor="detail?.attributes.agreed_fee_minor_units ?? null"
+                  :currency="detail?.attributes.agreed_fee_currency ?? null"
+                  :lock-reason="editOfferLockReason"
+                  @success="onOfferEdited"
+                />
                 <!-- Minimal rich text (AH-081) via RichBrief. -->
                 <RichBrief
                   v-if="offerDescription"

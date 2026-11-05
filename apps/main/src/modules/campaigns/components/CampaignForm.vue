@@ -56,10 +56,18 @@ const props = withDefaults(
     fieldErrors?: FieldErrors
     /** Hide the brand picker on the Settings edit (brand is immutable). */
     hideBrand?: boolean
+    /**
+     * AH-118: the `campaign_region_restriction` feature switch (from `/me`). The
+     * "only listed regions can apply" switch renders only while it is on; the
+     * server refuses a `true` while the flag is off, so the control is hidden
+     * rather than offered.
+     */
+    regionRestrictionEnabled?: boolean
   }>(),
   {
     fieldErrors: () => ({}),
     hideBrand: false,
+    regionRestrictionEnabled: false,
   },
 )
 
@@ -126,6 +134,14 @@ const listingDurationErrors = computed(() => fieldErrorList('listing_duration'))
 const listingFeeErrors = computed(() => fieldErrorList('listing_fee'))
 const listingLanguagesErrors = computed(() => fieldErrorList('listing_languages'))
 const listingRegionsErrors = computed(() => fieldErrorList('listing_regions'))
+// AH-118: the merged-state rule mirrored client-side. The switch ON with no
+// regions would be a 422 on `listing_regions`; say so before the round trip.
+const regionsEmpty = computed(() => (local.value.listing_regions ?? []).length === 0)
+const restrictRegionsErrors = computed(() =>
+  local.value.restrict_to_listing_regions === true && regionsEmpty.value
+    ? [t('app.campaigns.errors.restrictNeedsRegions')]
+    : [],
+)
 const listingExamplesUrlErrors = computed(() => fieldErrorList('listing_examples_url'))
 
 // A campaign's production languages follow the operating markets, so the
@@ -310,6 +326,21 @@ const descriptionTextareaHandle = computed<TextareaHandle | null>(
       closable-chips
       data-test="campaign-listing-regions"
       @update:model-value="update('listing_regions', $event)"
+    />
+
+    <v-switch
+      v-if="regionRestrictionEnabled"
+      :model-value="local.restrict_to_listing_regions ?? false"
+      :label="t('app.campaigns.fields.restrictToRegions')"
+      :hint="t('app.campaigns.fields.restrictToRegionsHint')"
+      :error-messages="restrictRegionsErrors"
+      :disabled="regionsEmpty && local.restrict_to_listing_regions !== true"
+      persistent-hint
+      color="primary"
+      density="compact"
+      class="mb-3"
+      data-test="campaign-restrict-to-regions"
+      @update:model-value="update('restrict_to_listing_regions', $event === true)"
     />
 
     <v-text-field

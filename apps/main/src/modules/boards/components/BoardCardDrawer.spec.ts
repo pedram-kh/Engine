@@ -196,6 +196,10 @@ async function mountDrawer(
   opts: {
     canResolve?: boolean
     canReview?: boolean
+    /** AH-118: may edit the offer (the page's `invite` ability while the flag is on). */
+    canEditOffer?: boolean
+    /** AH-118: the server's lock verdict for the assignment (null = editable). */
+    offerLock?: string | null
     status?: string
     offerDescription?: string | null
     /** The campaign's brand id the page hands down (AH-116); omitted = not known. */
@@ -229,6 +233,8 @@ async function mountDrawer(
         status: opts.status ?? 'posted',
         agreed_fee_minor_units: 20000,
         agreed_fee_currency: 'EUR',
+        offer_edit_locked: (opts.offerLock ?? null) !== null,
+        offer_edit_lock_reason: opts.offerLock ?? null,
         fee_per: 'script',
         offer_description: opts.offerDescription ?? 'Two hooks, one CTA.',
         offer_attachment: {
@@ -289,6 +295,7 @@ async function mountDrawer(
       card: c,
       canResolve: opts.canResolve ?? false,
       canReview: opts.canReview ?? false,
+      canEditOffer: opts.canEditOffer ?? false,
     },
     global: {
       plugins: [i18n, vuetify, router],
@@ -773,6 +780,54 @@ describe('BoardCardDrawer', () => {
     await flushPromises()
 
     expect(wrapper.find('[data-test="creator-profile-content-stub"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  // ── AH-118: edit the offer from the Detail tab ─────────────────────────────
+
+  it('AH-118: offers Edit offer next to the fee when the page allows it and the offer is editable', async () => {
+    const wrapper = await mountDrawer(card('a1'), [], { canEditOffer: true })
+    const button = wrapper.find('[data-test="board-card-drawer-edit-offer"]')
+    expect(button.exists()).toBe(true)
+    expect(button.attributes('data-locked')).toBe('false')
+    wrapper.unmount()
+  })
+
+  it('AH-118: offers nothing without the page permission (flag off, or no invite ability)', async () => {
+    const wrapper = await mountDrawer(card('a1'), [], { canEditOffer: false })
+    expect(wrapper.find('[data-test="board-card-drawer-edit-offer"]').exists()).toBe(false)
+    expect(wrapper.findComponent({ name: 'EditOfferDialog' }).exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it.each(['contract_pending', 'contract_signed', 'payment'])(
+    'AH-118: keeps Edit offer, marked locked, for a %s offer (the dialog says why)',
+    async (reason) => {
+      const wrapper = await mountDrawer(card('a1'), [], { canEditOffer: true, offerLock: reason })
+      const button = wrapper.find('[data-test="board-card-drawer-edit-offer"]')
+      expect(button.attributes('data-locked')).toBe('true')
+      expect(wrapper.findComponent({ name: 'EditOfferDialog' }).props('lockReason')).toBe(reason)
+      wrapper.unmount()
+    },
+  )
+
+  it('AH-118: hides Edit offer where the stage itself ends editing (status lock)', async () => {
+    const wrapper = await mountDrawer(card('a1'), [], { canEditOffer: true, offerLock: 'status' })
+    expect(wrapper.find('[data-test="board-card-drawer-edit-offer"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('AH-118: after a save the drawer re-reads the assignment and refreshes the board', async () => {
+    const wrapper = await mountDrawer(card('a1'), [], { canEditOffer: true })
+    const store = useBoardStore()
+    const refresh = vi.spyOn(store, 'refresh').mockResolvedValue()
+    mockCampaigns.showAssignment.mockClear()
+
+    wrapper.findComponent({ name: 'EditOfferDialog' }).vm.$emit('success')
+    await flushPromises()
+
+    expect(mockCampaigns.showAssignment).toHaveBeenCalledTimes(1)
+    expect(refresh).toHaveBeenCalledTimes(1)
     wrapper.unmount()
   })
 })

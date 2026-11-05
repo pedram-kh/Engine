@@ -5,11 +5,12 @@ import {
   type BrandOptionResource,
   type CreateCampaignPayload,
 } from '@catalyst/api-client'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
+import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { brandsApi } from '@/modules/brands/api/brands.api'
 import { campaignsApi } from '../api/campaigns.api'
 import CampaignForm from '../components/CampaignForm.vue'
@@ -18,6 +19,11 @@ import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
 const { t } = useI18n()
 const router = useRouter()
 const agencyStore = useAgencyStore()
+const authStore = useAuthStore()
+// AH-118: the region switch renders only while the flag is on (`/me` features).
+const regionRestrictionEnabled = computed(
+  () => authStore.user?.attributes.features?.campaign_region_restriction === true,
+)
 
 function emptyForm(): CreateCampaignPayload {
   // `objective` is omitted — the server defaults it to `ugc` (D-1).
@@ -116,6 +122,7 @@ async function onSubmit(): Promise<void> {
         :submit-label="t('app.campaigns.actions.save')"
         :error="error"
         :field-errors="fieldErrors"
+        :region-restriction-enabled="regionRestrictionEnabled"
         @submit="onSubmit"
       />
     </section>

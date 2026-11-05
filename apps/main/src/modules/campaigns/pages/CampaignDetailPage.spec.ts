@@ -24,6 +24,7 @@ import { createI18n } from 'vue-i18n'
 
 import enApp from '@/core/i18n/locales/en/app.json'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
+import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import BoardView from '@/modules/boards/components/BoardView.vue'
 import InviteCreatorsDialog from '../components/InviteCreatorsDialog.vue'
 import pageSource from './CampaignDetailPage.vue?raw'
@@ -144,6 +145,7 @@ function makeCampaign(
       listing_fee: null,
       listing_languages: null,
       listing_regions: null,
+      restrict_to_listing_regions: false,
       listing_examples_url: null,
       published_at: null,
       completed_at: null,
@@ -197,6 +199,8 @@ async function mountDetail(
     query?: string
     /** AH-116: the campaign's attached files (default: none). */
     files?: CampaignAttachmentResource[]
+    /** AH-118: the `/me` feature switches (default: both off). */
+    features?: { campaign_region_restriction?: boolean; assignment_offer_edit?: boolean }
     /** AH-116: the files read fails. */
     filesError?: boolean
   } = {},
@@ -233,6 +237,9 @@ async function mountDetail(
 
   const agency = useAgencyStore()
   agency.initFromUser([{ agency_id: 'agency-ulid', agency_name: 'Test Agency', role }])
+  useAuthStore().user = {
+    attributes: { features: { account_deletion: false, ...opts.features } },
+  } as never
 
   const router = createRouter({
     history: createMemoryHistory(),
@@ -1397,5 +1404,138 @@ describe('CampaignDetailPage — agency restyle (AH-114, S3.2)', () => {
     expect(pageSource).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
     expect(pageSource).not.toMatch(/\brgba?\(/)
     expect(pageSource).not.toMatch(/\bWave\b/)
+  })
+})
+
+describe('CampaignDetailPage — AH-118 offer edit and the region switch', () => {
+  let cleanup: (() => void) | null = null
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.mocked(campaignsApi.listDrafts).mockResolvedValue({
+      data: [],
+      meta: { total: 0, page: 1, per_page: 25, last_page: 1 },
+    })
+  })
+
+  afterEach(() => {
+    cleanup?.()
+    cleanup = null
+  })
+
+  function withLock(
+    a: CampaignAssignmentResource,
+    reason: NonNullable<CampaignAssignmentResource['attributes']['offer_edit_lock_reason']> | null,
+  ): CampaignAssignmentResource {
+    a.attributes.offer_edit_locked = reason !== null
+    a.attributes.offer_edit_lock_reason = reason
+    return a
+  }
+
+  async function openCreators(
+    assignments: CampaignAssignmentResource[],
+    features: { assignment_offer_edit?: boolean } = { assignment_offer_edit: true },
+    role: 'agency_admin' | 'agency_manager' | 'agency_staff' = 'agency_manager',
+  ) {
+    const harness = await mountDetail(role, assignments, { features })
+    cleanup = harness.cleanup
+    ;(harness.wrapper.vm as unknown as { tab: string }).tab = 'creators'
+    await flushPromises()
+    return harness.wrapper
+  }
+
+  it('shows Edit offer on an editable row while the flag is on', async () => {
+    const wrapper = await openCreators([withLock(makeAssignment('A', 'invited'), null)])
+    const button = wrapper.find('[data-test="creators-edit-offer-A"]')
+    expect(button.exists()).toBe(true)
+    expect(button.attributes('data-locked')).toBe('false')
+  })
+
+  it('shows no Edit offer at all while the flag is off', async () => {
+    const wrapper = await openCreators([withLock(makeAssignment('A', 'invited'), null)], {
+      assignment_offer_edit: false,
+    })
+    expect(wrapper.find('[data-test="creators-edit-offer-A"]').exists()).toBe(false)
+  })
+
+  it.each(['contract_pending', 'contract_signed', 'payment'] as const)(
+    'keeps Edit offer on a %s row, marked locked, so the dialog can say why',
+    async (reason) => {
+      const wrapper = await openCreators([withLock(makeAssignment('A', 'accepted'), reason)])
+      const button = wrapper.find('[data-test="creators-edit-offer-A"]')
+      expect(button.exists()).toBe(true)
+      expect(button.attributes('data-locked')).toBe('true')
+    },
+  )
+
+  it('hides Edit offer where the stage itself ends editing (status lock)', async () => {
+    const wrapper = await openCreators([withLock(makeAssignment('A', 'posted'), 'status')])
+    expect(wrapper.find('[data-test="creators-edit-offer-A"]').exists()).toBe(false)
+  })
+
+  it('opens the dialog locked, with the reason sentence, for a contract_pending row', async () => {
+    const wrapper = await openCreators([
+      withLock(makeAssignment('A', 'accepted'), 'contract_pending'),
+    ])
+    await wrapper.find('[data-test="creators-edit-offer-A"]').trigger('click')
+    await flushPromises()
+
+    const dialog = wrapper.findComponent({ name: 'EditOfferDialog' })
+    expect(dialog.props()).toMatchObject({ assignmentId: 'A', lockReason: 'contract_pending' })
+  })
+
+  it('refetches the roster and shows the success snackbar after a save', async () => {
+    const wrapper = await openCreators([withLock(makeAssignment('A', 'invited'), null)])
+    vi.mocked(campaignsApi.assignments).mockClear()
+
+    await wrapper.find('[data-test="creators-edit-offer-A"]').trigger('click')
+    wrapper.findComponent({ name: 'EditOfferDialog' }).vm.$emit('success')
+    await flushPromises()
+
+    expect(campaignsApi.assignments).toHaveBeenCalled()
+    expect((wrapper.vm as unknown as { editOfferSnackbar: string | null }).editOfferSnackbar).toBe(
+      'Offer updated.',
+    )
+  })
+
+  it('never sends restrict_to_listing_regions on a Settings save while the region flag is off', async () => {
+    // A stored `true` with the flag later turned off must not turn every
+    // ordinary save into a 422 campaign.region_restriction_disabled.
+    const harness = await mountDetail('agency_admin', [], {
+      campaign: { listing_regions: ['IE'], restrict_to_listing_regions: true },
+    })
+    cleanup = harness.cleanup
+    ;(harness.wrapper.vm as unknown as { tab: string }).tab = 'settings'
+    await flushPromises()
+    vi.mocked(campaignsApi.update).mockResolvedValue({ data: makeCampaign() })
+
+    await harness.wrapper.find('[data-test="campaign-form"]').trigger('submit')
+    await flushPromises()
+
+    const payload = vi.mocked(campaignsApi.update).mock.calls[0]?.[2] as Record<string, unknown>
+    expect('restrict_to_listing_regions' in payload).toBe(false)
+  })
+
+  it('seeds and sends the stored switch on a Settings save while the region flag is on', async () => {
+    const harness = await mountDetail('agency_admin', [], {
+      campaign: { listing_regions: ['IE'], restrict_to_listing_regions: true },
+      features: { campaign_region_restriction: true },
+    })
+    cleanup = harness.cleanup
+    ;(harness.wrapper.vm as unknown as { tab: string }).tab = 'settings'
+    await flushPromises()
+    vi.mocked(campaignsApi.update).mockResolvedValue({ data: makeCampaign() })
+
+    const toggle = harness.wrapper.find('[data-test="campaign-restrict-to-regions"] input')
+    expect((toggle.element as HTMLInputElement).checked).toBe(true)
+
+    await harness.wrapper.find('[data-test="campaign-form"]').trigger('submit')
+    await flushPromises()
+
+    expect(campaignsApi.update).toHaveBeenCalledWith(
+      'agency-ulid',
+      CAMPAIGN_ULID,
+      expect.objectContaining({ restrict_to_listing_regions: true }),
+    )
   })
 })

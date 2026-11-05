@@ -33,6 +33,7 @@ import { CEmptyState } from '@catalyst/ui'
 import CreatorProfileDialog from '@/components/CreatorProfileDialog.vue'
 import RichBrief from '@/components/RichBrief.vue'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
+import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
 import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
 import { campaignsApi } from '../api/campaigns.api'
@@ -41,6 +42,7 @@ import { campaignTabFromQuery, DEFAULT_CAMPAIGN_TAB } from '../campaignTabs'
 import { LISTING_FLOOR_FIELDS, missingListingFloorFields } from '../listingFloor'
 import InviteCreatorsDialog from '../components/InviteCreatorsDialog.vue'
 import AttachContractDialog from '../components/AttachContractDialog.vue'
+import EditOfferDialog from '../components/EditOfferDialog.vue'
 import ReinviteDialog from '../components/ReinviteDialog.vue'
 import ReviewDraftDrawer from '../components/ReviewDraftDrawer.vue'
 import ResolveVerificationDrawer from '../components/ResolveVerificationDrawer.vue'
@@ -62,6 +64,14 @@ import {
 const { t, locale } = useI18n()
 const route = useRoute()
 const agencyStore = useAgencyStore()
+const authStore = useAuthStore()
+// AH-118: `/me` feature switches (agency side). UI gates only; the API enforces both.
+const regionRestrictionEnabled = computed(
+  () => authStore.user?.attributes.features?.campaign_region_restriction === true,
+)
+const offerEditEnabled = computed(
+  () => authStore.user?.attributes.features?.assignment_offer_edit === true,
+)
 const { currentRole } = storeToRefs(agencyStore)
 
 const canEdit = computed(
@@ -111,6 +121,33 @@ function openReinvite(assignment: CampaignAssignmentResource): void {
 
 function onReinvited(): void {
   reinviteSnackbar.value = t('app.campaigns.reinvite.success')
+  void loadAssignments()
+}
+
+// AH-118 — edit the offer amount. The entry point is hidden while the flag is
+// off, and also when the stage itself ends editing (`status` lock): there is
+// nothing the agency can do there (a counter has Re-invite). The contract and
+// payment locks stay visible so the agency learns WHY, in the dialog.
+const editOfferDialog = ref(false)
+const editOfferTarget = ref<CampaignAssignmentResource | null>(null)
+const editOfferSnackbar = ref<string | null>(null)
+
+function canShowEditOffer(a: CampaignAssignmentResource): boolean {
+  return (
+    offerEditEnabled.value &&
+    canInvite.value &&
+    a.attributes.offer_edit_lock_reason !== 'status' &&
+    a.attributes.offer_edit_lock_reason !== 'feature_disabled'
+  )
+}
+
+function openEditOffer(assignment: CampaignAssignmentResource): void {
+  editOfferTarget.value = assignment
+  editOfferDialog.value = true
+}
+
+function onOfferEdited(): void {
+  editOfferSnackbar.value = t('app.campaigns.offerEdit.success')
   void loadAssignments()
 }
 
@@ -365,6 +402,12 @@ function seedEditForm(c: CampaignResource): void {
     listing_fee: c.attributes.listing_fee ?? undefined,
     listing_languages: c.attributes.listing_languages ?? [],
     listing_regions: c.attributes.listing_regions ?? [],
+    // AH-118: seeded only while the flag is on. With it off the field is left
+    // out of every save, so a stored `true` can never turn an ordinary settings
+    // save into a 422 `campaign.region_restriction_disabled`.
+    ...(regionRestrictionEnabled.value
+      ? { restrict_to_listing_regions: c.attributes.restrict_to_listing_regions }
+      : {}),
     listing_examples_url: c.attributes.listing_examples_url ?? undefined,
   }
   editStatus.value = c.attributes.status
@@ -939,6 +982,17 @@ const requirementRows = computed<RequirementRow[]>(() => {
               </v-list-item-subtitle>
               <template #append>
                 <v-btn
+                  v-if="canShowEditOffer(a)"
+                  variant="tonal"
+                  size="small"
+                  class="mr-2"
+                  :data-test="`creators-edit-offer-${a.id}`"
+                  :data-locked="a.attributes.offer_edit_locked === true ? 'true' : 'false'"
+                  @click.stop="openEditOffer(a)"
+                >
+                  {{ t('app.campaigns.offerEdit.action') }}
+                </v-btn>
+                <v-btn
                   v-if="a.attributes.status === 'countered' && canInvite"
                   color="primary"
                   variant="flat"
@@ -1040,6 +1094,36 @@ const requirementRows = computed<RequirementRow[]>(() => {
             :campaign-currency="campaign?.attributes.budget_currency ?? null"
             @success="onReinvited"
           />
+
+          <EditOfferDialog
+            v-if="offerEditEnabled && canInvite && agencyStore.currentAgencyId"
+            v-model="editOfferDialog"
+            :agency-id="agencyStore.currentAgencyId"
+            :campaign-id="ulid"
+            :assignment-id="editOfferTarget?.id ?? null"
+            :current-minor="editOfferTarget?.attributes.agreed_fee_minor_units ?? null"
+            :currency="
+              editOfferTarget?.attributes.agreed_fee_currency ??
+              campaign?.attributes.budget_currency ??
+              null
+            "
+            :lock-reason="editOfferTarget?.attributes.offer_edit_lock_reason ?? null"
+            @success="onOfferEdited"
+          />
+
+          <v-snackbar
+            :model-value="editOfferSnackbar !== null"
+            :timeout="4000"
+            color="success"
+            data-test="edit-offer-snackbar"
+            @update:model-value="
+              (v) => {
+                if (!v) editOfferSnackbar = null
+              }
+            "
+          >
+            {{ editOfferSnackbar }}
+          </v-snackbar>
 
           <AttachContractDialog
             v-if="canAttachContract && agencyStore.currentAgencyId"
@@ -1148,6 +1232,7 @@ const requirementRows = computed<RequirementRow[]>(() => {
             :can-configure="canEdit"
             :can-resolve="canReview"
             :can-review="canReview"
+            :can-edit-offer="offerEditEnabled && canInvite"
             :can-act="canInvite"
             :campaign-currency="campaign?.attributes.budget_currency ?? null"
             @resolve="openResolve"
@@ -1264,6 +1349,7 @@ const requirementRows = computed<RequirementRow[]>(() => {
               :submit-label="t('app.campaigns.actions.saveSettings')"
               :error="saveError"
               :field-errors="fieldErrors"
+              :region-restriction-enabled="regionRestrictionEnabled"
               @submit="onSaveSettings"
             />
             <v-snackbar

@@ -31,6 +31,13 @@ vi.mock('@/core/stores/useAgencyStore', () => ({
   useAgencyStore: () => ({ currentAgencyId: 'agency-ulid' }),
 }))
 
+// AH-118: the page reads `/me` features through the auth store; the real store
+// pulls in the agency store this spec replaces, so it is replaced here too.
+const features: { campaign_region_restriction?: boolean } = {}
+vi.mock('@/modules/auth/stores/useAuthStore', () => ({
+  useAuthStore: () => ({ user: { attributes: { features } } }),
+}))
+
 const push = vi.fn()
 vi.mock('vue-router', () => ({
   useRouter: () => ({ push }),
@@ -41,7 +48,10 @@ import { campaignsApi } from '../api/campaigns.api'
 import CampaignForm from '../components/CampaignForm.vue'
 import CampaignCreatePage from './CampaignCreatePage.vue'
 
-async function mountPage() {
+async function mountPage(flags: { campaign_region_restriction?: boolean } = {}) {
+  delete features.campaign_region_restriction
+  Object.assign(features, flags)
+
   const i18n = createI18n({
     legacy: false,
     locale: 'en',
@@ -133,5 +143,37 @@ describe('CampaignCreatePage — the brand select (AH-085)', () => {
     const form = wrapper.findComponent(CampaignForm)
     expect(form.props('brands')).toHaveLength(30)
     expect(form.props('brands')).toContainEqual({ id: 'brand-29', name: 'Brand 29' })
+  })
+})
+
+describe('CampaignCreatePage — the region switch (AH-118)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.mocked(brandsApi.listOptions).mockResolvedValue({ data: [] })
+    vi.mocked(campaignsApi.create).mockResolvedValue({ data: { id: 'new-ulid' } } as never)
+  })
+
+  it('shows no switch while the flag is off, and sends no restrict field', async () => {
+    const wrapper = await mountPage()
+    expect(wrapper.find('[data-test="campaign-restrict-to-regions"]').exists()).toBe(false)
+
+    await wrapper.find('[data-test="campaign-name"] input').setValue('Autumn UGC')
+    await wrapper.find('[data-test="campaign-form"]').trigger('submit')
+    await flushPromises()
+
+    const payload = vi.mocked(campaignsApi.create).mock.calls[0]?.[1] as unknown as Record<
+      string,
+      unknown
+    >
+    expect('restrict_to_listing_regions' in payload).toBe(false)
+  })
+
+  it('shows the switch OFF by default while the flag is on', async () => {
+    const wrapper = await mountPage({ campaign_region_restriction: true })
+    const toggle = wrapper.find('[data-test="campaign-restrict-to-regions"] input')
+    expect(toggle.exists()).toBe(true)
+    expect((toggle.element as HTMLInputElement).checked).toBe(false)
+    // Nothing to restrict to yet: disabled until a region is chosen.
+    expect((toggle.element as HTMLInputElement).disabled).toBe(true)
   })
 })
