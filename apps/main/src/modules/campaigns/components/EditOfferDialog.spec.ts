@@ -128,6 +128,8 @@ describe('EditOfferDialog (AH-118)', () => {
       expect(alert.text()).toBe(sentence)
       expect(alert.attributes('data-reason')).toBe(reason)
       expect(wrapper.findComponent({ name: 'VTextField' }).props('disabled')).toBe(true)
+      // The prefilled (= current) amount is not flagged "unchanged" while locked.
+      expect(wrapper.text()).not.toContain('That is the current amount')
 
       await wrapper.find('[data-test="edit-offer-amount"] input').setValue('250')
       await wrapper.find('[data-test="edit-offer-submit"]').trigger('click')

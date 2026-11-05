@@ -297,3 +297,13 @@ Run against a throwaway local Postgres 16 database `catalyst_test` (never the de
 - Whole `tests/Feature/Modules/Campaigns` + `Messaging` on Postgres: 4 failures remain, **all pre-existing on `origin/main`** (`CampaignApplication*`, `CampaignAttachment*` abort the transaction; `CampaignCrudTest` and `InviteEmailNotificationTest` assert jsonb key order). Logged as tech-debt, not touched.
 - **Found by the Postgres run:** two of our own asserts compared `system_event_data` key order, which jsonb does not keep; fixed with `toEqual` (`cc224c09`). The behaviour was right, the assertions were not.
 - **Limit, stated plainly:** this proves the SQL (`FOR UPDATE`) runs on Postgres and the re-check logic, in ONE connection. It is not a two-connection concurrency proof; that remains untested.
+
+## 15. Recorded deviations from this plan (as built, web)
+
+1. **The edit-offer dialog opens locked, not a disabled button.** A disabled button cannot explain itself on a touch screen. The button stays enabled when the offer is locked for `contract_pending`, `contract_signed` or `payment`. The dialog opens with the reason sentence and a disabled form. For `status` and `feature_disabled` the button is hidden.
+2. **The no-country variant needs `meta.reason`.** The job-detail payload carries only `is_region_locked`. The "add your country" line shows only after a 422 `job.region_not_allowed` with `meta.reason = country_missing`. On first load a creator with no country sees the generic locked note plus the profile link. Open for Pedram: add `region_lock_reason` to the job-detail payload (small additive API change), or accept.
+3. **Feature key names on `/me`:** `campaign_region_restriction` and `assignment_offer_edit` (without `_enabled`), agency-side only.
+4. **Saving campaign settings with the region flag OFF** omits `restrict_to_listing_regions`, so a stored `true` cannot 422 an ordinary save.
+5. **Frozen shared components** `ChatPanel.vue` (C4) and `NotificationCenter.vue` (C5) were edited on purpose. Their hashes in `shared-components-frozen.spec.ts` are re-pinned, with a comment.
+6. **Locked-dialog hint:** the "That is the current amount" error is suppressed while the dialog is locked (found in the screenshots).
+7. **Icon:** `mdi-cash-edit` is used for the notification. It renders in the walk harness. It is not verified against the bundled native icon subset.

@@ -73,7 +73,7 @@ const valid = computed(() => minorValue.value !== null && minorValue.value > 0)
 const amountErrors = computed<string[]>(() => {
   const server = fieldErrors.value.agreed_fee_minor_units
   if (server !== undefined && server.length > 0) return [...server]
-  return unchanged.value ? [t('app.campaigns.offerEdit.unchanged')] : []
+  return unchanged.value && !locked.value ? [t('app.campaigns.offerEdit.unchanged')] : []
 })
 
 watch(

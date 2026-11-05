@@ -134,6 +134,15 @@ const fakeUser = {
     mfa_exempt: false,
     last_login_at: null,
     created_at: '2026-01-01T00:00:00Z',
+    // AH-118 shots: `?features=a,b` turns those agency-side flags on. Absent => no `features`
+    // key at all, so every existing walk target is unchanged.
+    ...(params.get('features')
+      ? {
+          features: Object.fromEntries(
+            (params.get('features') ?? '').split(',').map((k) => [k, true]),
+          ),
+        }
+      : {}),
   },
   relationships: {
     agency_memberships: {
