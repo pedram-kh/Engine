@@ -1095,6 +1095,11 @@ export interface CreatorJobDetailResource {
      * present; false while the region flag is OFF.
      */
     is_region_locked: boolean
+    /**
+     * AH-118: why the job is locked for the caller. Null when not locked.
+     * Optional for an older backend that does not send it.
+     */
+    region_lock_reason?: 'country_missing' | 'outside_regions' | null
     /** External link; rendered with rel="noopener". */
     listing_examples_url: string | null
     /**

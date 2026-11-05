@@ -56,6 +56,7 @@ function detail(overrides: Record<string, unknown> = {}) {
         listing_languages: ['en', 'pt'],
         listing_regions: ['PT', 'ES'],
         is_region_locked: false,
+        region_lock_reason: null,
         listing_examples_url: 'https://examples.test/work',
         assignment_ulid: null,
         attachments: [],
@@ -698,10 +699,24 @@ describe('CreatorJobDetailPage — region-locked jobs (AH-118)', () => {
     },
   )
 
-  it('does not explain a missing country on load (the payload says THAT, the refusal says WHY)', async () => {
-    mockApi.show.mockResolvedValue(detail({ is_region_locked: true }) as never)
+  it('explains a missing country on FIRST LOAD from region_lock_reason (no refusal needed)', async () => {
+    mockApi.show.mockResolvedValue(
+      detail({ is_region_locked: true, region_lock_reason: 'country_missing' }) as never,
+    )
     const wrapper = await mountPage()
 
+    expect(wrapper.find('[data-testid="creator-job-region-locked-no-country"]').text()).toBe(
+      'Add your country to your profile to apply to jobs that are limited by region.',
+    )
+  })
+
+  it('shows no country hint on load when the creator is simply outside the regions', async () => {
+    mockApi.show.mockResolvedValue(
+      detail({ is_region_locked: true, region_lock_reason: 'outside_regions' }) as never,
+    )
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-region-locked"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="creator-job-region-locked-no-country"]').exists()).toBe(
       false,
     )

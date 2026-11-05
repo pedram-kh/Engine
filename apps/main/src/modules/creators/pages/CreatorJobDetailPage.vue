@@ -86,10 +86,6 @@ const dialogOpen = ref(false)
 const note = ref('')
 const submitting = ref(false)
 const snackbar = ref<{ color: string; text: string } | null>(null)
-// AH-118: learned from a 422 `job.region_not_allowed` whose `meta.reason` is
-// `country_missing`: the detail payload says THAT the job is locked, the
-// refusal says WHY.
-const countryMissing = ref(false)
 
 const ulid = computed(() => String(route.params.ulid ?? ''))
 const status = computed(() => job.value?.attributes.application_status ?? null)
@@ -100,6 +96,11 @@ const lifecycleState = computed<JobLifecycleState | null>(
 )
 const canApply = computed(() => job.value !== null && status.value === null)
 const regionLocked = computed(() => job.value?.attributes.is_region_locked === true)
+// AH-118: the payload names WHY on load (`region_lock_reason`); a stale-page 422
+// writes the same field from its `meta.reason`, so both paths read one place.
+const countryMissing = computed(
+  () => job.value?.attributes.region_lock_reason === 'country_missing',
+)
 // Campaign attachments from the Files library, chunk B (AH-092, S6). Same
 // shared block as the assignment-detail page — see CreatorAttachmentsBlock.
 const attachments = computed(() => job.value?.attributes.attachments ?? [])
@@ -149,8 +150,11 @@ function refusalToast(code: string): { color: string; text: string } {
  * the page to the locked state without a reload (the reload follows anyway).
  */
 function lockFromRefusal(error: ApiError): void {
-  countryMissing.value = error.details[0]?.meta?.reason === 'country_missing'
-  if (job.value !== null) job.value.attributes.is_region_locked = true
+  if (job.value !== null) {
+    job.value.attributes.is_region_locked = true
+    job.value.attributes.region_lock_reason =
+      error.details[0]?.meta?.reason === 'country_missing' ? 'country_missing' : 'outside_regions'
+  }
   snackbar.value = { color: 'error', text: t('creator.ui.jobs.toast.regionNotAllowed') }
 }
 
