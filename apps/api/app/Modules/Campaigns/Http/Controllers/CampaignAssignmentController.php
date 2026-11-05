@@ -7,7 +7,9 @@ namespace App\Modules\Campaigns\Http\Controllers;
 use App\Core\Errors\ErrorResponse;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
+use App\Modules\Campaigns\Exceptions\AssignmentOfferEditException;
 use App\Modules\Campaigns\Exceptions\AssignmentTransitionException;
+use App\Modules\Campaigns\Http\Requests\EditAssignmentOfferRequest;
 use App\Modules\Campaigns\Http\Requests\InviteAssignmentRequest;
 use App\Modules\Campaigns\Http\Requests\ReinviteAssignmentRequest;
 use App\Modules\Campaigns\Http\Resources\CampaignAssignmentResource;
@@ -16,12 +18,14 @@ use App\Modules\Campaigns\Models\CampaignApplication;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Services\AssignmentInviteGate;
 use App\Modules\Campaigns\Services\AssignmentOfferAttachmentUploadService;
+use App\Modules\Campaigns\Services\AssignmentOfferEditor;
 use App\Modules\Campaigns\Services\CampaignApplicationDecisionService;
 use App\Modules\Campaigns\Services\CampaignApplicationNotifier;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
 use App\Modules\Campaigns\Services\CampaignInvitationService;
 use App\Modules\Campaigns\ValueObjects\AssignmentOffer;
 use App\Modules\Creators\Enums\ApplicationStatus;
+use App\Modules\Creators\Features\AssignmentOfferEditEnabled;
 use App\Modules\Creators\Features\PerCampaignContractEnabled;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
@@ -372,6 +376,47 @@ final class CampaignAssignmentController
         }
 
         return new CampaignAssignmentResource($assignment->load('creator:id,ulid,display_name,erased_at'));
+    }
+
+    /**
+     * PATCH /api/v1/agencies/{agency}/campaigns/{campaign}/assignments/{assignment}/offer
+     *
+     * AH-118 item 2 — the agency edits the offer amount. NOT a machine edge
+     * (see {@see AssignmentOfferEditor}). 404 while `assignment_offer_edit_enabled`
+     * is OFF, the `account_deletion_enabled` precedent: the surface does not exist.
+     */
+    public function editOffer(
+        EditAssignmentOfferRequest $request,
+        Agency $agency,
+        Campaign $campaign,
+        CampaignAssignment $assignment,
+        AssignmentOfferEditor $editor,
+    ): JsonResponse|CampaignAssignmentResource {
+        if (! Feature::active(AssignmentOfferEditEnabled::NAME)) {
+            abort(404);
+        }
+
+        $this->assertBelongsToAgency($campaign, $agency);
+        $this->assertAssignmentBelongsToCampaign($assignment, $campaign);
+        Gate::authorize('invite', $campaign);
+
+        /** @var User $actor */
+        $actor = $request->user();
+
+        try {
+            $updated = $editor->edit($assignment, (int) $request->validated('agreed_fee_minor_units'), $actor);
+        } catch (AssignmentOfferEditException $e) {
+            return ErrorResponse::single(
+                request: $request,
+                status: Response::HTTP_UNPROCESSABLE_ENTITY,
+                code: $e->errorCode,
+                title: 'The offer cannot be edited',
+                detail: $e->getMessage(),
+                meta: $e->reason !== null ? ['reason' => $e->reason->value] : null,
+            );
+        }
+
+        return new CampaignAssignmentResource($updated->load(['creator:id,ulid,display_name,erased_at', 'sentContract']));
     }
 
     /**

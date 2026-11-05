@@ -16,6 +16,7 @@ use App\Modules\Campaigns\Policies\CampaignPolicy;
 use App\Modules\Creators\Database\Factories\CreatorFactory;
 use App\Modules\Creators\Enums\ContractKind;
 use App\Modules\Creators\Enums\ContractStatus;
+use App\Modules\Creators\Features\AssignmentOfferEditEnabled;
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\PerCampaignContractEnabled;
 use App\Modules\Creators\Models\Contract;
@@ -588,4 +589,70 @@ it('the Creators listing exposes has_pending_contract once a contract is sent (i
         ->assertOk()
         ->assertJsonPath('data.0.attributes.status', 'accepted')
         ->assertJsonPath('data.0.attributes.has_pending_contract', true);
+});
+
+// ── AH-118 — attach vs. offer edit ──────────────────────────────────────────
+//
+// The two writers serialise on the assignment's row lock (`lockForUpdate` in
+// both). The suite runs on sqlite, where that lock is a no-op, so what is pinned
+// here is the OUTCOME of either ordering, not the lock itself:
+//
+//   attach commits first → the edit sees `contract_pending` and is refused;
+//   edit commits first   → the attach proceeds and the contract is created.
+//
+// The edit's re-read of the committed row (the half that matters when the
+// caller's model is stale) is pinned in AssignmentOfferEditTest.
+
+it('refuses an offer edit once a contract has been attached, and leaves the amount alone', function (): void {
+    Mail::fake();
+    Feature::activate(AssignmentOfferEditEnabled::NAME);
+    [$agency, $campaign, $assignment] = contractSetup();
+    $assignment->forceFill(['agreed_fee_minor_units' => 100_00, 'agreed_fee_currency' => 'EUR'])->save();
+    $staff = User::factory()->agencyStaff($agency)->createOne();
+    $editUrl = "/api/v1/agencies/{$agency->ulid}/campaigns/{$campaign->ulid}/assignments/{$assignment->ulid}/offer";
+
+    $this->actingAs($staff)->postJson(agencyContractUrl($agency, $campaign, $assignment, 'attach'), [
+        'title' => 'Campaign addendum',
+        'body_markdown' => 'Terms.',
+    ])->assertCreated();
+
+    $this->actingAs($staff)->patchJson($editUrl, ['agreed_fee_minor_units' => 250_00])
+        ->assertStatus(422)
+        ->assertJsonPath('errors.0.code', 'assignment.offer_locked')
+        ->assertJsonPath('errors.0.meta.reason', 'contract_pending');
+
+    expect($assignment->fresh()?->agreed_fee_minor_units)->toBe(100_00);
+});
+
+it('still attaches a contract after an offer edit, at the edited amount', function (): void {
+    Mail::fake();
+    Feature::activate(AssignmentOfferEditEnabled::NAME);
+    [$agency, $campaign, $assignment] = contractSetup();
+    $assignment->forceFill(['agreed_fee_minor_units' => 100_00, 'agreed_fee_currency' => 'EUR'])->save();
+    $staff = User::factory()->agencyStaff($agency)->createOne();
+
+    $this->actingAs($staff)
+        ->patchJson("/api/v1/agencies/{$agency->ulid}/campaigns/{$campaign->ulid}/assignments/{$assignment->ulid}/offer", ['agreed_fee_minor_units' => 250_00])
+        ->assertOk();
+
+    $this->actingAs($staff)->postJson(agencyContractUrl($agency, $campaign, $assignment, 'attach'), [
+        'title' => 'Campaign addendum',
+        'body_markdown' => 'Terms.',
+    ])->assertCreated();
+
+    expect($assignment->fresh()?->agreed_fee_minor_units)->toBe(250_00)
+        ->and(Contract::query()->where('subject_id', $assignment->id)->count())->toBe(1);
+});
+
+it('does not attach a second contract while one is pending', function (): void {
+    Mail::fake();
+    [$agency, $campaign, $assignment] = contractSetup();
+    $staff = User::factory()->agencyStaff($agency)->createOne();
+    $payload = ['title' => 'Campaign addendum', 'body_markdown' => 'Terms.'];
+
+    $this->actingAs($staff)->postJson(agencyContractUrl($agency, $campaign, $assignment, 'attach'), $payload)->assertCreated();
+    $this->actingAs($staff)->postJson(agencyContractUrl($agency, $campaign, $assignment, 'attach'), $payload)
+        ->assertStatus(422)->assertJsonPath('errors.0.code', 'contract.already_attached');
+
+    expect(Contract::query()->where('subject_id', $assignment->id)->count())->toBe(1);
 });

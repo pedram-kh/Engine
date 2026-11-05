@@ -2,15 +2,18 @@
 
 declare(strict_types=1);
 
+use App\Modules\Agencies\Models\Agency;
 use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Campaigns\Enums\CampaignStatus;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Creators\Database\Factories\CreatorFactory;
+use App\Modules\Creators\Features\AssignmentOfferEditEnabled;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Pennant\Feature;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
@@ -86,6 +89,26 @@ it('lists the creator\'s OWN assignments across all agencies (scope bypass)', fu
         ->getJson('/api/v1/creators/me/assignments')
         ->assertOk()
         ->assertJsonCount(2, 'data');
+});
+
+it('shows the creator an agency-edited offer amount, and never the agency-only lock keys (AH-118)', function (): void {
+    Feature::activate(AssignmentOfferEditEnabled::NAME);
+    [$user, $creator] = creatorUser();
+    $assignment = invitedAssignmentFor($creator);
+    $agency = Agency::query()->findOrFail($assignment->agency_id);
+    $agencyAdmin = User::factory()->agencyAdmin($agency)->createOne();
+    $campaign = Campaign::query()->findOrFail($assignment->campaign_id);
+
+    $this->actingAs($agencyAdmin)
+        ->patchJson("/api/v1/agencies/{$agency->ulid}/campaigns/{$campaign->ulid}/assignments/{$assignment->ulid}/offer", ['agreed_fee_minor_units' => 650_000])
+        ->assertOk();
+
+    $row = $this->actingAs($user)->getJson('/api/v1/creators/me/assignments')->assertOk()->json('data.0.attributes');
+
+    expect($row['agreed_fee_minor_units'])->toBe(650_000)
+        ->and($row['status'])->toBe('invited')
+        ->and($row)->not->toHaveKey('offer_edit_locked')
+        ->and($row)->not->toHaveKey('offer_edit_lock_reason');
 });
 
 it('emits EXACTLY the campaign sub-keyset on the list row, including the status (AH-107)', function (): void {

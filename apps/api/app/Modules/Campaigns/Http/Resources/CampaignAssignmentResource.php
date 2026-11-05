@@ -8,6 +8,7 @@ use App\Modules\Agencies\Http\Resources\CreatorDiscoveryResource;
 use App\Modules\Boards\Http\Resources\BoardCardResource;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Services\AssignmentOfferAttachmentUploadService;
+use App\Modules\Campaigns\Services\AssignmentOfferLock;
 use App\Modules\Creators\Concerns\EmitsErasedState;
 use App\Modules\Creators\Models\Creator;
 use Illuminate\Filesystem\AwsS3V3Adapter;
@@ -67,6 +68,8 @@ final class CampaignAssignmentResource extends JsonResource
             $hasPendingContract = $assignment->sentContract !== null;
         }
 
+        $offerLock = app(AssignmentOfferLock::class)->evaluate($assignment);
+
         return [
             'id' => $assignment->ulid,
             'type' => 'campaign_assignments',
@@ -77,6 +80,10 @@ final class CampaignAssignmentResource extends JsonResource
                 // Invite-offer context (invite-offer-details batch). The
                 // attachment URL is a short-lived signed GET minted here, so
                 // the download inherits this surface's view authz (AH-004).
+                // AH-118 — the server's verdict on "can the agency still edit
+                // this amount?", ALWAYS present. The SPA never re-derives it.
+                'offer_edit_locked' => $offerLock !== null,
+                'offer_edit_lock_reason' => $offerLock?->value,
                 'fee_per' => $assignment->fee_per,
                 'offer_description' => $assignment->offer_description,
                 'offer_attachment' => $assignment->offer_attachment_path !== null ? [

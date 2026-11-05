@@ -16,6 +16,7 @@ use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Models\CampaignDraft;
 use App\Modules\Campaigns\Models\CampaignPostedContent;
 use App\Modules\Campaigns\Services\AssignmentOfferAttachmentUploadService;
+use App\Modules\Campaigns\Services\AssignmentOfferLock;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -68,6 +69,7 @@ final class CampaignAssignmentReviewController
             ->get();
 
         $campaignModel = $assignment->campaign;
+        $offerLock = app(AssignmentOfferLock::class)->evaluate($assignment);
 
         return response()->json([
             'data' => [
@@ -82,6 +84,9 @@ final class CampaignAssignmentReviewController
                     // drawer can show the terms the invitation was sent with.
                     // The attachment URL is a short-lived signed GET minted
                     // here, inheriting this surface's review authz (AH-004).
+                    // AH-118 — same verdict the list payload carries.
+                    'offer_edit_locked' => $offerLock !== null,
+                    'offer_edit_lock_reason' => $offerLock?->value,
                     'fee_per' => $assignment->fee_per,
                     'offer_description' => $assignment->offer_description,
                     'offer_attachment' => $assignment->offer_attachment_path !== null ? [

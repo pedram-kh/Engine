@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Campaigns\Http\Controllers;
 
 use App\Core\Errors\ErrorResponse;
+use App\Core\Tenancy\BelongsToAgencyScope;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Campaigns\Exceptions\AssignmentTransitionException;
@@ -22,6 +23,7 @@ use App\Modules\Identity\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Pennant\Feature;
@@ -163,20 +165,45 @@ final class CampaignAssignmentContractController
         /** @var User $actor */
         $actor = $request->user();
 
-        $contract = Contract::query()->create([
-            'agency_id' => $agency->id,
-            'kind' => ContractKind::PerCampaign,
-            'subject_type' => Contract::SUBJECT_CAMPAIGN_ASSIGNMENT,
-            'subject_id' => $assignment->id,
-            'version' => 1,
-            'title' => (string) $validated['title'],
-            'body_markdown' => $bodyMarkdown,
-            'body_pdf_path' => $bodyPdfPath !== '' ? $bodyPdfPath : null,
-            'signature_provider' => Contract::PROVIDER_INTERNAL,
-            'status' => ContractStatus::Sent,
-            'sent_at' => now(),
-            'created_by_user_id' => $actor->id,
-        ]);
+        // AH-118 — take the assignment's row lock before the contract exists, so
+        // an in-flight offer edit (which holds the same lock while it re-checks
+        // `AssignmentOfferLock`) and this attach serialise: whichever commits
+        // first, the other sees it. The status and pending-contract checks above
+        // read the route-bound model, so they are repeated against the locked row.
+        $contract = DB::transaction(function () use ($agency, $assignment, $validated, $bodyMarkdown, $bodyPdfPath, $actor): ?Contract {
+            $locked = CampaignAssignment::query()
+                ->withoutGlobalScope(BelongsToAgencyScope::class)
+                ->lockForUpdate()
+                ->findOrFail($assignment->id);
+
+            if ($locked->status !== AssignmentStatus::Accepted || $this->pendingContract($locked) !== null) {
+                return null;
+            }
+
+            return Contract::query()->create([
+                'agency_id' => $agency->id,
+                'kind' => ContractKind::PerCampaign,
+                'subject_type' => Contract::SUBJECT_CAMPAIGN_ASSIGNMENT,
+                'subject_id' => $assignment->id,
+                'version' => 1,
+                'title' => (string) $validated['title'],
+                'body_markdown' => $bodyMarkdown,
+                'body_pdf_path' => $bodyPdfPath !== '' ? $bodyPdfPath : null,
+                'signature_provider' => Contract::PROVIDER_INTERNAL,
+                'status' => ContractStatus::Sent,
+                'sent_at' => now(),
+                'created_by_user_id' => $actor->id,
+            ]);
+        });
+
+        if (! $contract instanceof Contract) {
+            return ErrorResponse::single(
+                $request,
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                'assignment.not_accepted',
+                'Only an accepted assignment without a pending contract can receive one.',
+            );
+        }
 
         $this->notifyCreator($assignment, $contract);
 

@@ -93,6 +93,10 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         Route::post('campaigns/{campaign}/assignments/{assignment}/reinvite', [CampaignAssignmentController::class, 'reinvite'])
             ->name('campaigns.assignments.reinvite');
 
+        // AH-118 — the agency edits the offer amount (flag-gated, 404 while OFF).
+        Route::patch('campaigns/{campaign}/assignments/{assignment}/offer', [CampaignAssignmentController::class, 'editOffer'])
+            ->name('campaigns.assignments.offer.edit');
+
         // Agency-side draft review (Sprint 9 Chunk 2). The drawer read (D-7) +
         // the three per-action review endpoints (D-4), gated on the `review`
         // ability (admin + manager + staff, D-6).
