@@ -55,6 +55,9 @@ use Illuminate\Validation\ValidationException;
  *   - `listing_fee`       — string|null, optional (display-only copy).
  *   - `listing_duration`  — string|null, optional.
  *   - `description`       — string|null, optional (the job copy).
+ *   - `creator_country`   — string(2)|null, optional (AH-118). The creator's profile country.
+ *   - `restrict_to_listing_regions` — bool, optional (AH-118). Default false.
+ *   - `listing_regions`   — string[]|null, optional (AH-118). Default [PT, ES].
  *   - `attachments`       — array|null, optional. Campaign attachments from the
  *                           Files library, chunk B (AH-092, S7 c3 leg). Each
  *                           entry: `{ filename: string, visible?: bool }`.
@@ -80,6 +83,11 @@ final class CreateListedJobController
                 'listing_fee' => ['nullable', 'string', 'max:255'],
                 'listing_duration' => ['nullable', 'string', 'max:255'],
                 'description' => ['nullable', 'string', 'max:5000'],
+                // AH-118 — the region rule. `creator_country` sets the caller's profile country.
+                'creator_country' => ['nullable', 'string', 'size:2'],
+                'restrict_to_listing_regions' => ['sometimes', 'boolean'],
+                'listing_regions' => ['sometimes', 'array', 'max:10'],
+                'listing_regions.*' => ['string', 'size:2'],
                 'attachments' => ['nullable', 'array', 'max:5'],
                 'attachments.*.filename' => ['required', 'string', 'max:255'],
                 'attachments.*.visible' => ['sometimes', 'boolean'],
@@ -108,6 +116,9 @@ final class CreateListedJobController
         $creator->application_status = ApplicationStatus::Approved;
         if ($creator->approved_at === null) {
             $creator->approved_at = now();
+        }
+        if (isset($validated['creator_country'])) {
+            $creator->country_code = $validated['creator_country'];
         }
         $creator->save();
 
@@ -148,7 +159,8 @@ final class CreateListedJobController
             'listing_fee' => $this->text($validated, 'listing_fee', '€300 per video'),
             'listing_duration' => $this->text($validated, 'listing_duration', '4 weeks'),
             'listing_languages' => ['en', 'pt'],
-            'listing_regions' => ['PT', 'ES'],
+            'listing_regions' => $validated['listing_regions'] ?? ['PT', 'ES'],
+            'restrict_to_listing_regions' => (bool) ($validated['restrict_to_listing_regions'] ?? false),
             'listing_examples_url' => 'https://examples.example/work',
             // Never expires, so a long-lived branch cannot start failing this
             // spec on a date rollover.

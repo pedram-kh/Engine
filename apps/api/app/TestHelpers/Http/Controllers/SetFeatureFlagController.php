@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\TestHelpers\Http\Controllers;
 
+use App\Modules\Creators\Features\AssignmentOfferEditEnabled;
+use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
 use App\Modules\Identity\Features\AccountDeletionEnabled;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -44,6 +46,9 @@ final class SetFeatureFlagController
     /** @var list<string> */
     public const ALLOWED_NAMES = [
         AccountDeletionEnabled::NAME,
+        // AH-118 — both OFF at deploy; the E2E legs drive each state.
+        CampaignRegionRestrictionEnabled::NAME,
+        AssignmentOfferEditEnabled::NAME,
     ];
 
     public function store(Request $request, string $name): JsonResponse

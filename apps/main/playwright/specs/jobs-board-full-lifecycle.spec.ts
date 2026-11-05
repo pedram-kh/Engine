@@ -6,7 +6,9 @@ import {
   neutralizeThrottle,
   restoreThrottle,
   seedAgencyAdmin,
+  seedContractedAssignment,
   seedListableCampaign,
+  setFeatureFlag,
   signOutViaApi,
   signUpUser,
   verifyEmailViaApi,
@@ -87,6 +89,7 @@ test.describe('AH-059 (D6) — the jobs board, end to end, both roles', () => {
   })
 
   test.afterEach(async ({ page }) => {
+    await setFeatureFlag(page.context().request, 'campaign_region_restriction_enabled', false)
     await restoreThrottle(page.context().request, 'auth-ip')
     await signOutViaApi(page.context().request)
   })
@@ -279,6 +282,57 @@ test.describe('AH-059 (D6) — the jobs board, end to end, both roles', () => {
         })
         .locator(`[data-test="board-card-${boardCardId}"]`),
     ).toHaveCount(1)
+  })
+})
+
+test.describe('AH-118 — an agency invite is not a region question', () => {
+  test.beforeEach(async ({ page }) => {
+    await neutralizeThrottle(page.context().request, 'auth-ip')
+  })
+
+  test.afterEach(async ({ page }) => {
+    await setFeatureFlag(page.context().request, 'campaign_region_restriction_enabled', false)
+    await restoreThrottle(page.context().request, 'auth-ip')
+    await signOutViaApi(page.context().request)
+  })
+
+  test('an out-of-region creator who is INVITED sees the engagement and can accept, not the region lock', async ({
+    page,
+  }) => {
+    test.setTimeout(120_000)
+    const request = page.context().request
+    const creatorEmail = uniqueEmail('region-invited')
+
+    await setFeatureFlag(request, 'campaign_region_restriction_enabled', true)
+    const admin = await seedAgencyAdmin(request)
+    await signUpUser(request, creatorEmail, CREATOR_PASSWORD, 'Region Invited')
+    await verifyEmailViaApi(request, creatorEmail)
+    const seeded = await seedContractedAssignment(request, admin.agencyUlid, creatorEmail, {
+      campaignName: 'Invite beats region',
+      status: 'invited',
+      restrictToListingRegions: true,
+      listingRegions: ['FR'],
+      creatorCountry: 'PT',
+    })
+
+    await signInAsCreator(page, creatorEmail, CREATOR_PASSWORD)
+
+    // The assignment list offers the accept — region never enters into it.
+    await page.goto('/creator/assignments')
+    await expect(page.locator('[data-testid^="creator-assignment-accept-"]').first()).toBeVisible({
+      timeout: 15_000,
+    })
+    await expect(page.locator('[data-testid="creator-assignments-list"]')).toContainText(
+      'Invite beats region',
+    )
+
+    // (The job page branch order — an engagement beats the region note — is
+    // pinned by CreatorJobDetailPage.spec; this seed is not listed on the board.)
+    await page.goto('/creator/assignments')
+    await page.locator('[data-testid^="creator-assignment-accept-"]').first().click()
+    await expect(page.locator('[data-testid="creator-assignments-snackbar"]')).toBeVisible({
+      timeout: 15_000,
+    })
   })
 })
 

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Modules\Creators\Features\AssignmentOfferEditEnabled;
+use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
 use App\Modules\Identity\Features\AccountDeletionEnabled;
 use App\TestHelpers\Http\Controllers\SetFeatureFlagController;
 use App\TestHelpers\Http\Middleware\VerifyTestHelperToken;
@@ -72,8 +74,12 @@ it('refuses a flag that is not on the allow-list, on both verbs, and switches no
     expect(Feature::active(AccountDeletionEnabled::NAME))->toBeFalse();
 });
 
-it('allows exactly the flag this chunk needs (a new entry is a reviewed change)', function (): void {
-    expect(SetFeatureFlagController::ALLOWED_NAMES)->toBe([AccountDeletionEnabled::NAME]);
+it('allows exactly the flags the E2E legs need (a new entry is a reviewed change)', function (): void {
+    expect(SetFeatureFlagController::ALLOWED_NAMES)->toBe([
+        AccountDeletionEnabled::NAME,
+        CampaignRegionRestrictionEnabled::NAME,
+        AssignmentOfferEditEnabled::NAME,
+    ]);
 });
 
 it('is not reachable when the gate is closed', function (): void {

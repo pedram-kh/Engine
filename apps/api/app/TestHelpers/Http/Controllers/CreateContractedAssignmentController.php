@@ -12,7 +12,10 @@ use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Creators\Enums\ApplicationStatus;
+use App\Modules\Creators\Enums\ContractKind;
+use App\Modules\Creators\Enums\ContractStatus;
 use App\Modules\Creators\Enums\RelationshipStatus;
+use App\Modules\Creators\Models\Contract;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -55,6 +58,9 @@ use Illuminate\Validation\ValidationException;
  *   - `email`          — string, required. The signed-in CREATOR's account email.
  *   - `campaign_name`  — string|null, optional.
  *   - `brand_name`     — string|null, optional.
+ *   - `status`         — `invited` | `contracted` (default), optional (AH-118).
+ *   - `contract_sent`  — bool, optional (AH-118). Adds a `sent` contract (lock reason `contract_pending`).
+ *   - `restrict_to_listing_regions`, `listing_regions`, `creator_country` — optional (AH-118).
  *
  * Response (201):
  *   { "data": { "agency_ulid", "campaign_ulid", "campaign_name", "brand_name",
@@ -69,6 +75,14 @@ final class CreateContractedAssignmentController
                 'email' => ['required', 'string', 'email:rfc', 'max:254'],
                 'campaign_name' => ['nullable', 'string', 'max:255'],
                 'brand_name' => ['nullable', 'string', 'max:255'],
+                // AH-118 — `invited` seeds an editable offer (EUR 100.00); default stays contracted.
+                'status' => ['sometimes', 'string', 'in:invited,contracted'],
+                // AH-118 — a contract in `sent` status on the assignment (lock reason `contract_pending`).
+                'contract_sent' => ['sometimes', 'boolean'],
+                'restrict_to_listing_regions' => ['sometimes', 'boolean'],
+                'listing_regions' => ['sometimes', 'array', 'max:10'],
+                'listing_regions.*' => ['string', 'size:2'],
+                'creator_country' => ['nullable', 'string', 'size:2'],
             ]);
         } catch (ValidationException $e) {
             return new JsonResponse([
@@ -94,6 +108,9 @@ final class CreateContractedAssignmentController
         $creator->application_status = ApplicationStatus::Approved;
         if ($creator->approved_at === null) {
             $creator->approved_at = now();
+        }
+        if (isset($validated['creator_country'])) {
+            $creator->country_code = $validated['creator_country'];
         }
         $creator->save();
 
@@ -121,18 +138,43 @@ final class CreateContractedAssignmentController
             // class docblock.
             'creator_posts_content' => true,
 
+            // AH-118 — optional region rule.
+            'listing_regions' => $validated['listing_regions'] ?? null,
+            'restrict_to_listing_regions' => (bool) ($validated['restrict_to_listing_regions'] ?? false),
+
             'ends_at' => null,
         ]);
 
+        $invited = ($validated['status'] ?? 'contracted') === 'invited';
+
         /** @var CampaignAssignment $assignment */
-        $assignment = CampaignAssignment::factory()->status(AssignmentStatus::Contracted)->create([
-            'agency_id' => $agency->id,
-            'campaign_id' => $campaign->id,
-            'brand_id' => $brand->id,
-            'creator_id' => $creator->id,
-            'invited_at' => now()->subDay(),
-            'accepted_at' => now()->subDay(),
-        ]);
+        $assignment = CampaignAssignment::factory()
+            ->status($invited ? AssignmentStatus::Invited : AssignmentStatus::Contracted)
+            ->create([
+                'agency_id' => $agency->id,
+                'campaign_id' => $campaign->id,
+                'brand_id' => $brand->id,
+                'creator_id' => $creator->id,
+                'invited_at' => now()->subDay(),
+                'accepted_at' => $invited ? null : now()->subDay(),
+                'agreed_fee_minor_units' => 10000,
+                'agreed_fee_currency' => 'EUR',
+            ]);
+
+        if ((bool) ($validated['contract_sent'] ?? false)) {
+            Contract::query()->create([
+                'agency_id' => $agency->id,
+                'kind' => ContractKind::PerCampaign,
+                'subject_type' => Contract::SUBJECT_CAMPAIGN_ASSIGNMENT,
+                'subject_id' => $assignment->id,
+                'version' => 1,
+                'title' => 'Addendum',
+                'body_markdown' => 'Terms.',
+                'signature_provider' => Contract::PROVIDER_INTERNAL,
+                'status' => ContractStatus::Sent,
+                'sent_at' => now(),
+            ]);
+        }
 
         $boards->forCampaign($campaign);
 

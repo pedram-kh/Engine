@@ -83,6 +83,14 @@ test.describe('AH-101 — notification preference matrix', () => {
       page.locator('[data-test="prefs-grid-messaging"] [data-test="prefs-column-digest"]'),
     ).toBeVisible()
 
+    // AH-118 — the agency-edited-offer notice is a normal toggleable row.
+    await expect(
+      page.locator('[data-test="prefs-toggle-assignment.offer_edited-email"] input'),
+    ).toBeChecked()
+    await expect(
+      page.locator('[data-test="prefs-toggle-assignment.offer_edited-in_app"] input'),
+    ).toBeChecked()
+
     // Account-lifecycle mail is shown, and cannot be switched.
     await expect(page.locator('[data-test="prefs-always-on-creator.approved-email"]')).toHaveText(
       'Always on',

@@ -5,7 +5,10 @@ import { dt, testIds } from '../helpers/selectors'
 import {
   neutralizeThrottle,
   restoreThrottle,
+  editOfferAsAgency,
   seedAgencyAdmin,
+  seedContractedAssignment,
+  setFeatureFlag,
   seedListableCampaign,
   signOutViaApi,
   signUpUser,
@@ -60,6 +63,7 @@ test.describe('AH-103 — a notification opens the screen it is about (web, agen
   })
 
   test.afterEach(async ({ page }) => {
+    await setFeatureFlag(page.context().request, 'assignment_offer_edit_enabled', false)
     await restoreThrottle(page.context().request, 'auth-ip')
     await signOutViaApi(page.context().request)
   })
@@ -128,6 +132,40 @@ test.describe('AH-103 — a notification opens the screen it is about (web, agen
     await expect(page.locator('[data-test="notification-dropdown-card"]')).toBeHidden()
     await page.locator('[data-test="notification-bell-btn"]').click()
     await expect(page.locator('[data-test~="notification-row--unread"]')).toHaveCount(0, {
+      timeout: 10_000,
+    })
+  })
+
+  // AH-118 — the new `assignment.offer_edited` type resolves to the assignment
+  // screen on the CREATOR bell (the route-keys contract, walked for real).
+  test('the agency edits an offer; the creator clicks the bell row and lands on that assignment', async ({
+    page,
+  }) => {
+    test.setTimeout(120_000)
+
+    const request = page.context().request
+    const creatorEmail = uniqueEmail('deeplink-offer')
+
+    await setFeatureFlag(request, 'assignment_offer_edit_enabled', true)
+    const admin = await seedAgencyAdmin(request)
+    await signUpUser(request, creatorEmail, CREATOR_PASSWORD, 'Deep Link Offer')
+    await verifyEmailViaApi(request, creatorEmail)
+    const seeded = await seedContractedAssignment(request, admin.agencyUlid, creatorEmail, {
+      status: 'invited',
+    })
+
+    await signInAsAgency(page, admin.email, admin.password)
+    await editOfferAsAgency(page, seeded.campaignUlid, seeded.assignmentUlid, '180')
+
+    await signOutViaApi(request)
+    await signInAsCreator(page, creatorEmail, CREATOR_PASSWORD)
+    await page.goto('/creator/dashboard')
+    await page.locator('[data-test="notification-bell-btn"]').click()
+    const row = page.locator('[data-test~="notification-row--unread"]').first()
+    await expect(row).toBeVisible({ timeout: 15_000 })
+    await row.click()
+
+    await expect(page).toHaveURL(new RegExp(`/creator/assignments/${seeded.assignmentUlid}`), {
       timeout: 10_000,
     })
   })

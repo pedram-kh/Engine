@@ -5,6 +5,7 @@ import {
   neutralizeThrottle,
   restoreThrottle,
   seedListedJob,
+  setFeatureFlag,
   signOutViaApi,
   signUpUser,
   verifyEmailViaApi,
@@ -38,6 +39,7 @@ test.describe('AH-056 — creator jobs board', () => {
   })
 
   test.afterEach(async ({ request }) => {
+    await setFeatureFlag(request, 'campaign_region_restriction_enabled', false)
     await restoreThrottle(request, 'auth-ip')
     await signOutViaApi(request)
   })
@@ -268,5 +270,116 @@ test.describe('AH-056 — creator jobs board', () => {
     expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(
       (card?.x ?? 0) + (card?.width ?? 0) + 1,
     )
+  })
+
+  // ── AH-118 — a region-restricted job: listed, readable, not applicable ─────
+  test('AH-118 — an out-of-region creator sees the job but cannot apply; a creator with no country is told to add one', async ({
+    page,
+  }) => {
+    const request = page.context().request
+    await setFeatureFlag(request, 'campaign_region_restriction_enabled', true)
+
+    // ── Outside the regions ────────────────────────────────────────────────
+    const outside = uniqueEmail()
+    await signUpUser(request, outside, PASSWORD, 'Region Outside E2E')
+    await verifyEmailViaApi(request, outside)
+    const job = await seedListedJob(request, outside, {
+      campaignName: 'Region locked job',
+      restrictToListingRegions: true,
+      listingRegions: ['FR'],
+      creatorCountry: 'PT',
+    })
+
+    await page.goto('/sign-in')
+    await page.locator(dt(testIds.signInEmail)).locator('input').fill(outside)
+    await page.locator(dt(testIds.signInPassword)).locator('input').fill(PASSWORD)
+    await page.locator(dt(testIds.signInSubmit)).click()
+    await expect(page).not.toHaveURL(/\/sign-in/, { timeout: 10_000 })
+
+    // The board still LISTS it (Q10: the card carries no lock).
+    await page.goto('/creator/jobs')
+    await expect(page.locator(`[data-testid="creator-job-${job.campaignUlid}"]`)).toBeVisible({
+      timeout: 10_000,
+    })
+
+    await page.goto(`/creator/jobs/${job.campaignUlid}`)
+    await expect(page.locator('[data-testid="creator-job-detail-name"]')).toHaveText(
+      'Region locked job',
+      { timeout: 10_000 },
+    )
+    await expect(page.locator('[data-testid="creator-job-region-locked"]')).toBeVisible()
+    await expect(page.locator('[data-testid="creator-job-apply"]')).toHaveCount(0)
+    await expect(page.locator('[data-testid="creator-job-region-locked-no-country"]')).toHaveCount(
+      0,
+    )
+    await expect(page.locator('[data-testid="creator-job-region-locked-profile"]')).toBeVisible()
+
+    // The server refuses a direct POST past the UI, with the reason code.
+    const cookies = await page.context().cookies()
+    const xsrf = cookies.find((c) => c.name === 'XSRF-TOKEN')
+    const refused = await request.post(
+      `http://127.0.0.1:8000/api/v1/creators/me/jobs/${job.campaignUlid}/apply`,
+      {
+        headers: {
+          Accept: 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          Referer: 'http://127.0.0.1:5173/',
+          'X-XSRF-TOKEN': xsrf ? decodeURIComponent(xsrf.value) : '',
+        },
+        data: {},
+      },
+    )
+    expect(refused.status()).toBe(422)
+    expect(await refused.text()).toContain('job.region_not_allowed')
+    expect(await refused.text()).toContain('outside_regions')
+
+    // ── No country on the profile: the hint is there on FIRST LOAD ─────────
+    await signOutViaApi(request)
+    const nowhere = uniqueEmail()
+    await signUpUser(request, nowhere, PASSWORD, 'Region Nowhere E2E')
+    await verifyEmailViaApi(request, nowhere)
+    const job2 = await seedListedJob(request, nowhere, {
+      campaignName: 'Region locked job 2',
+      restrictToListingRegions: true,
+      listingRegions: ['FR'],
+    })
+
+    await page.goto('/sign-in')
+    await page.locator(dt(testIds.signInEmail)).locator('input').fill(nowhere)
+    await page.locator(dt(testIds.signInPassword)).locator('input').fill(PASSWORD)
+    await page.locator(dt(testIds.signInSubmit)).click()
+    await expect(page).not.toHaveURL(/\/sign-in/, { timeout: 10_000 })
+
+    await page.goto(`/creator/jobs/${job2.campaignUlid}`)
+    await expect(page.locator('[data-testid="creator-job-region-locked"]')).toBeVisible({
+      timeout: 10_000,
+    })
+    await expect(page.locator('[data-testid="creator-job-region-locked-no-country"]')).toBeVisible()
+    await expect(page.locator('[data-testid="creator-job-apply"]')).toHaveCount(0)
+  })
+
+  test('AH-118 — with the region flag OFF the same restricted job is applicable', async ({
+    page,
+  }) => {
+    const request = page.context().request
+    const email = uniqueEmail()
+    await signUpUser(request, email, PASSWORD, 'Region Off E2E')
+    await verifyEmailViaApi(request, email)
+    const job = await seedListedJob(request, email, {
+      campaignName: 'Region flag off job',
+      restrictToListingRegions: true,
+      listingRegions: ['FR'],
+      creatorCountry: 'PT',
+    })
+
+    await page.goto('/sign-in')
+    await page.locator(dt(testIds.signInEmail)).locator('input').fill(email)
+    await page.locator(dt(testIds.signInPassword)).locator('input').fill(PASSWORD)
+    await page.locator(dt(testIds.signInSubmit)).click()
+    await expect(page).not.toHaveURL(/\/sign-in/, { timeout: 10_000 })
+
+    await page.goto(`/creator/jobs/${job.campaignUlid}`)
+    await expect(page.locator('[data-testid="creator-job-apply"]')).toBeVisible({ timeout: 10_000 })
+    await expect(page.locator('[data-testid="creator-job-region-locked"]')).toHaveCount(0)
   })
 })

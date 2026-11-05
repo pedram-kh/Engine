@@ -7,14 +7,18 @@ use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Boards\Models\Board;
 use App\Modules\Boards\Models\BoardCard;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
+use App\Modules\Campaigns\Enums\OfferLockReason;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignAssignment;
+use App\Modules\Campaigns\Services\AssignmentOfferLock;
 use App\Modules\Creators\Database\Factories\CreatorFactory;
 use App\Modules\Creators\Enums\ApplicationStatus;
 use App\Modules\Creators\Enums\RelationshipStatus;
+use App\Modules\Creators\Features\AssignmentOfferEditEnabled;
 use App\Modules\Identity\Models\User;
 use App\TestHelpers\Http\Middleware\VerifyTestHelperToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Pennant\Feature;
 use Tests\TestCase;
 
 /**
@@ -154,4 +158,76 @@ it('returns 404 when the helper gate is closed (no token header)', function (): 
             'email' => 'handoff-creator@example.com',
         ])
         ->assertStatus(404);
+});
+
+// ── AH-118 — the options the offer-edit and region E2E legs use ─────────────
+
+it('seeds an INVITED assignment with an EUR 100.00 offer when asked (the editable state)', function (): void {
+    [$creator, $agency] = contractedAssignmentCreator();
+
+    $response = $this->postJson("/api/v1/_test/agencies/{$agency->ulid}/contracted-assignment", [
+        'email' => 'handoff-creator@example.com',
+        'status' => 'invited',
+    ])->assertStatus(201);
+
+    $assignment = CampaignAssignment::query()->withoutGlobalScopes()
+        ->where('ulid', $response->json('data.assignment_ulid'))->firstOrFail();
+
+    expect($assignment->status)->toBe(AssignmentStatus::Invited)
+        ->and($assignment->accepted_at)->toBeNull()
+        ->and($assignment->agreed_fee_minor_units)->toBe(10000)
+        ->and($assignment->agreed_fee_currency)->toBe('EUR');
+});
+
+it('keeps CONTRACTED as the default, and refuses an unknown status', function (): void {
+    [, $agency] = contractedAssignmentCreator();
+
+    $this->postJson("/api/v1/_test/agencies/{$agency->ulid}/contracted-assignment", [
+        'email' => 'handoff-creator@example.com',
+        'status' => 'posted',
+    ])->assertStatus(422);
+
+    $response = $this->postJson("/api/v1/_test/agencies/{$agency->ulid}/contracted-assignment", [
+        'email' => 'handoff-creator@example.com',
+    ])->assertStatus(201);
+
+    $assignment = CampaignAssignment::query()->withoutGlobalScopes()
+        ->where('ulid', $response->json('data.assignment_ulid'))->firstOrFail();
+    expect($assignment->status)->toBe(AssignmentStatus::Contracted);
+});
+
+it('applies the region options to the campaign and the creator country', function (): void {
+    [$creator, $agency] = contractedAssignmentCreator();
+
+    $response = $this->postJson("/api/v1/_test/agencies/{$agency->ulid}/contracted-assignment", [
+        'email' => 'handoff-creator@example.com',
+        'status' => 'invited',
+        'restrict_to_listing_regions' => true,
+        'listing_regions' => ['FR'],
+        'creator_country' => 'PT',
+    ])->assertStatus(201);
+
+    $campaign = Campaign::query()->withoutGlobalScopes()
+        ->where('ulid', $response->json('data.campaign_ulid'))->firstOrFail();
+
+    expect($campaign->restrict_to_listing_regions)->toBeTrue()
+        ->and($campaign->listing_regions)->toBe(['FR'])
+        ->and($creator->fresh()->country_code)->toBe('PT');
+});
+
+it('adds a SENT contract when asked, which locks the offer with contract_pending', function (): void {
+    [, $agency] = contractedAssignmentCreator();
+    Feature::activate(AssignmentOfferEditEnabled::NAME);
+
+    $response = $this->postJson("/api/v1/_test/agencies/{$agency->ulid}/contracted-assignment", [
+        'email' => 'handoff-creator@example.com',
+        'status' => 'invited',
+        'contract_sent' => true,
+    ])->assertStatus(201);
+
+    $assignment = CampaignAssignment::query()->withoutGlobalScopes()
+        ->where('ulid', $response->json('data.assignment_ulid'))->firstOrFail();
+
+    expect((new AssignmentOfferLock)->evaluate($assignment))
+        ->toBe(OfferLockReason::ContractPending);
 });

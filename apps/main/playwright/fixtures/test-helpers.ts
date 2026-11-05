@@ -979,6 +979,12 @@ export interface SeedListedJobInput {
   listingFee?: string
   listingDuration?: string
   description?: string
+  /** AH-118 — the caller's profile country (2 letters). Unset leaves it as is (null). */
+  creatorCountry?: string
+  /** AH-118 — the campaign's "only creators in the listed regions can apply" switch. */
+  restrictToListingRegions?: boolean
+  /** AH-118 — the campaign's listing regions (default PT, ES). */
+  listingRegions?: string[]
   /**
    * Campaign attachments from the Files library, chunk B (AH-092, S7 c3
    * leg) — seeded directly via the `AgencyFile` + `CampaignAttachment`
@@ -1014,6 +1020,9 @@ export async function seedListedJob(
       listing_fee: input.listingFee,
       listing_duration: input.listingDuration,
       description: input.description,
+      creator_country: input.creatorCountry,
+      restrict_to_listing_regions: input.restrictToListingRegions,
+      listing_regions: input.listingRegions,
       attachments: input.attachments,
     },
   })
@@ -1072,7 +1081,17 @@ export async function seedContractedAssignment(
   request: APIRequestContext,
   agencyUlid: string,
   creatorEmail: string,
-  options: { campaignName?: string; brandName?: string } = {},
+  options: {
+    campaignName?: string
+    brandName?: string
+    /** AH-118 — `invited` seeds an editable EUR 100.00 offer. Default: contracted. */
+    status?: 'invited' | 'contracted'
+    /** AH-118 — adds a `sent` contract (the offer locks with `contract_pending`). */
+    contractSent?: boolean
+    restrictToListingRegions?: boolean
+    listingRegions?: string[]
+    creatorCountry?: string
+  } = {},
 ): Promise<SeedContractedAssignmentResult> {
   const response = await request.post(
     `http://127.0.0.1:8000/api/v1/_test/agencies/${agencyUlid}/contracted-assignment`,
@@ -1082,6 +1101,11 @@ export async function seedContractedAssignment(
         email: creatorEmail,
         campaign_name: options.campaignName ?? null,
         brand_name: options.brandName ?? null,
+        status: options.status,
+        contract_sent: options.contractSent,
+        restrict_to_listing_regions: options.restrictToListingRegions,
+        listing_regions: options.listingRegions,
+        creator_country: options.creatorCountry,
       },
     },
   )
@@ -1145,4 +1169,27 @@ export async function setFeatureFlag(
       `setFeatureFlag(${flag}, ${on}) failed with status ${response.status()}: ${await response.text()}`,
     )
   }
+}
+
+/**
+ * AH-118 — as the signed-in AGENCY user, edit an assignment's offer amount
+ * through the real Creators-tab button and dialog, and wait for the success
+ * snackbar. Assumes the agency session is already signed in.
+ */
+export async function editOfferAsAgency(
+  page: Page,
+  campaignUlid: string,
+  assignmentUlid: string,
+  amount: string,
+): Promise<void> {
+  await page.goto(`/campaigns/${campaignUlid}`)
+  await page.locator('[data-test="tab-creators"]').click()
+  await page
+    .locator(`[data-test="creators-edit-offer-${assignmentUlid}"]`)
+    .click({ timeout: 15_000 })
+  await page.locator('[data-test="edit-offer-amount"] input').fill(amount)
+  await page.locator('[data-test="edit-offer-submit"]').click()
+  await page
+    .locator('[data-test="edit-offer-snackbar"]')
+    .waitFor({ state: 'visible', timeout: 15_000 })
 }
