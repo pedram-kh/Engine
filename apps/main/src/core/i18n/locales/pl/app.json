@@ -483,7 +483,8 @@
         "listedOnJobsBoard": "Dodaj do tablicy zleceń",
         "jobBoard": "Oferty pracy",
         "restrictToRegions": "Aplikować mogą tylko twórcy z wymienionych regionów",
-        "restrictToRegionsHint": "Twórcy spoza tych regionów nadal widzą zlecenie, ale nie mogą aplikować. Zaproszenia nie są objęte ograniczeniem."
+        "restrictToRegionsHint": "Twórcy spoza tych regionów nadal widzą zlecenie, ale nie mogą aplikować. Zaproszenia nie są objęte ograniczeniem.",
+        "regionsRestricted": "Ograniczone"
       },
       "insertLink": {
         "buttonLabel": "Wstaw link",

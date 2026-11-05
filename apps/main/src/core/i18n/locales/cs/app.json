@@ -483,7 +483,8 @@
         "listedOnJobsBoard": "Přidat na nástěnku zakázek",
         "jobBoard": "Nabídky práce",
         "restrictToRegions": "Přihlásit se mohou jen tvůrci z uvedených regionů",
-        "restrictToRegionsHint": "Tvůrci mimo tyto regiony nabídku stále vidí, ale nemohou se přihlásit. Pozvánky se to netýká."
+        "restrictToRegionsHint": "Tvůrci mimo tyto regiony nabídku stále vidí, ale nemohou se přihlásit. Pozvánky se to netýká.",
+        "regionsRestricted": "Omezeno"
       },
       "insertLink": {
         "buttonLabel": "Vložit odkaz",

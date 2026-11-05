@@ -483,7 +483,8 @@
         "listedOnJobsBoard": "Añadir al tablón de trabajos",
         "jobBoard": "Bolsa de trabajo",
         "restrictToRegions": "Solo pueden aplicar los creadores de las regiones indicadas",
-        "restrictToRegionsHint": "Los creadores de fuera de estas regiones siguen viendo la oferta, pero no pueden aplicar. Las invitaciones no se ven afectadas."
+        "restrictToRegionsHint": "Los creadores de fuera de estas regiones siguen viendo la oferta, pero no pueden aplicar. Las invitaciones no se ven afectadas.",
+        "regionsRestricted": "Restringido"
       },
       "insertLink": {
         "buttonLabel": "Insertar enlace",

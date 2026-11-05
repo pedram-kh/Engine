@@ -483,7 +483,8 @@
         "listedOnJobsBoard": "Adaugă în panoul de joburi",
         "jobBoard": "Anunțuri de lucru",
         "restrictToRegions": "Doar creatorii din regiunile listate pot aplica",
-        "restrictToRegionsHint": "Creatorii din afara acestor regiuni văd în continuare jobul, dar nu pot aplica. Invitațiile nu sunt afectate."
+        "restrictToRegionsHint": "Creatorii din afara acestor regiuni văd în continuare jobul, dar nu pot aplica. Invitațiile nu sunt afectate.",
+        "regionsRestricted": "Restricționat"
       },
       "insertLink": {
         "buttonLabel": "Inserează link",

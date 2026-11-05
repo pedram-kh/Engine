@@ -483,7 +483,8 @@
         "listedOnJobsBoard": "Zum Jobboard hinzufügen",
         "jobBoard": "Jobbörse",
         "restrictToRegions": "Nur Creator in den aufgeführten Regionen können sich bewerben",
-        "restrictToRegionsHint": "Creator außerhalb dieser Regionen sehen den Job weiterhin, können sich aber nicht bewerben. Einladungen sind nicht betroffen."
+        "restrictToRegionsHint": "Creator außerhalb dieser Regionen sehen den Job weiterhin, können sich aber nicht bewerben. Einladungen sind nicht betroffen.",
+        "regionsRestricted": "Eingeschränkt"
       },
       "insertLink": {
         "buttonLabel": "Link einfügen",

@@ -13,6 +13,7 @@
  */
 
 import {
+  COUNTRY_OPTIONS,
   formatCurrency,
   formatDate,
   ApiError,
@@ -627,6 +628,62 @@ const showGlance = computed(() => glanceItems.value.length >= 2)
 // (AH-116). The glance block keeps its own two-row rule inside it.
 const showAside = computed(() => showGlance.value || campaignFiles.value.length > 0)
 
+// ── AH-118 (W1): the region restriction on Overview ─────────────────────────────────────────
+
+/** The listing regions as country names (a code the list does not know shows as itself). */
+const regionNames = computed<string[]>(() =>
+  (campaign.value?.attributes.listing_regions ?? []).map(
+    (code) => COUNTRY_OPTIONS.find((c) => c.code === code)?.label ?? code,
+  ),
+)
+
+const restrictOn = computed(() => campaign.value?.attributes.restrict_to_listing_regions === true)
+
+/**
+ * Same rule as the Settings form: the switch needs a listing with regions to mean anything.
+ * Turning an already-ON switch OFF is never gated (as the jobs-board switch), so a campaign
+ * that was delisted or lost its regions cannot be stuck restricted.
+ */
+const restrictToggleDisabled = computed(() => {
+  const c = campaign.value
+  if (c === null || !canEdit.value || restrictSaving.value) return true
+  if (restrictOn.value) return false
+  return c.attributes.listed_on_jobs_board !== true || regionNames.value.length === 0
+})
+
+const restrictSaving = ref(false)
+const restrictError = ref<string | null>(null)
+// A refused flip leaves `restrictOn` unchanged, so Vue sees no change and the switch would keep
+// the position the user clicked. Bumping the key redraws it from the server's value.
+const restrictSwitchKey = ref(0)
+
+/** PATCH only this field; the switch always shows the server's value (it is not a local copy). */
+async function onToggleRestrict(value: boolean | null): Promise<void> {
+  const agencyId = agencyStore.currentAgencyId
+  if (agencyId === null || campaign.value === null) return
+  restrictSaving.value = true
+  restrictError.value = null
+  try {
+    const res = await campaignsApi.update(agencyId, ulid.value, {
+      restrict_to_listing_regions: value === true,
+    })
+    campaign.value = res.data
+    // Keep the Settings form in step without discarding what is typed there.
+    if (editForm.value !== null) {
+      editForm.value = {
+        ...editForm.value,
+        restrict_to_listing_regions: res.data.attributes.restrict_to_listing_regions,
+      }
+    }
+  } catch (err) {
+    restrictError.value =
+      err instanceof ApiError ? err.message : t('app.campaigns.errors.saveFailed')
+    restrictSwitchKey.value += 1
+  } finally {
+    restrictSaving.value = false
+  }
+}
+
 interface RequirementRow {
   key: string
   label: string
@@ -806,6 +863,25 @@ const requirementRows = computed<RequirementRow[]>(() => {
                       {{ formatDay(campaign.attributes.ends_at) }}
                     </dd>
                   </div>
+                  <div
+                    v-if="regionNames.length > 0"
+                    class="agency-field"
+                    style="grid-column: 1 / -1"
+                    data-test="overview-regions-field"
+                  >
+                    <dt class="agency-field__label">
+                      {{ t('app.campaigns.fields.listingRegions') }}
+                    </dt>
+                    <dd class="agency-field__value" style="flex-wrap: wrap; gap: 8px">
+                      <span data-test="overview-regions">{{ regionNames.join(', ') }}</span>
+                      <AgencyStatusPill
+                        v-if="regionRestrictionEnabled && restrictOn"
+                        tone="warning"
+                        :label="t('app.campaigns.fields.regionsRestricted')"
+                        data-test="overview-regions-restricted"
+                      />
+                    </dd>
+                  </div>
                 </dl>
 
                 <template v-if="campaign.attributes.description">
@@ -844,6 +920,39 @@ const requirementRows = computed<RequirementRow[]>(() => {
                     :aria-label="row.label"
                     :data-test="row.test"
                   />
+                </div>
+                <!-- AH-118: the one switch here that edits (PATCHes by itself); hidden while
+                     the region flag is off. -->
+                <div v-if="regionRestrictionEnabled" data-test="overview-requirement-restrict">
+                  <div class="agency-switch-row">
+                    <span class="agency-switch-row__label">{{
+                      t('app.campaigns.fields.restrictToRegions')
+                    }}</span>
+                    <v-switch
+                      :key="restrictSwitchKey"
+                      :model-value="restrictOn"
+                      :disabled="restrictToggleDisabled"
+                      :loading="restrictSaving"
+                      inset
+                      hide-details
+                      density="compact"
+                      color="primary"
+                      :aria-label="t('app.campaigns.fields.restrictToRegions')"
+                      data-test="overview-restrict-to-regions"
+                      @update:model-value="onToggleRestrict"
+                    />
+                  </div>
+                  <p class="agency-field__label" style="text-transform: none; letter-spacing: 0">
+                    {{ t('app.campaigns.fields.restrictToRegionsHint') }}
+                  </p>
+                  <p
+                    v-if="restrictError !== null"
+                    class="text-error"
+                    role="alert"
+                    data-test="overview-restrict-error"
+                  >
+                    {{ restrictError }}
+                  </p>
                 </div>
               </section>
             </div>

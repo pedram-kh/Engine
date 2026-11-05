@@ -483,7 +483,8 @@
         "listedOnJobsBoard": "Add to jobs board",
         "jobBoard": "Job board",
         "restrictToRegions": "Only creators in the listed regions can apply",
-        "restrictToRegionsHint": "Creators outside these regions can still see the job but cannot apply. Invitations are not affected."
+        "restrictToRegionsHint": "Creators outside these regions can still see the job but cannot apply. Invitations are not affected.",
+        "regionsRestricted": "Restricted"
       },
       "insertLink": {
         "buttonLabel": "Insert link",

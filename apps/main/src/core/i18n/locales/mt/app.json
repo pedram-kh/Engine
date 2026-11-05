@@ -483,7 +483,8 @@
         "listedOnJobsBoard": "Żid mal-bord tax-xogħlijiet",
         "jobBoard": "Bord tax-xogħol",
         "restrictToRegions": "Il-kreaturi biss fir-reġjuni elenkati jistgħu japplikaw",
-        "restrictToRegionsHint": "Il-kreaturi barra minn dawn ir-reġjuni xorta jaraw ix-xogħol imma ma jistgħux japplikaw. L-istediniet ma jaffettwawx."
+        "restrictToRegionsHint": "Il-kreaturi barra minn dawn ir-reġjuni xorta jaraw ix-xogħol imma ma jistgħux japplikaw. L-istediniet ma jaffettwawx.",
+        "regionsRestricted": "Ristrett"
       },
       "insertLink": {
         "buttonLabel": "Daħħal link",

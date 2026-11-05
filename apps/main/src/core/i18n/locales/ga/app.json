@@ -483,7 +483,8 @@
         "listedOnJobsBoard": "Cuir leis an gclár post",
         "jobBoard": "Clár post",
         "restrictToRegions": "Ní féidir ach le cruthaitheoirí sna réigiúin liostaithe cur isteach",
-        "restrictToRegionsHint": "Is féidir le cruthaitheoirí lasmuigh de na réigiúin seo an post a fheiceáil fós ach ní féidir leo cur isteach. Ní chuirtear isteach ar chuirí."
+        "restrictToRegionsHint": "Is féidir le cruthaitheoirí lasmuigh de na réigiúin seo an post a fheiceáil fós ach ní féidir leo cur isteach. Ní chuirtear isteach ar chuirí.",
+        "regionsRestricted": "Srianta"
       },
       "insertLink": {
         "buttonLabel": "Ionsáigh nasc",

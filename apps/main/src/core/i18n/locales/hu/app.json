@@ -483,7 +483,8 @@
         "listedOnJobsBoard": "Hozzáadás a munkatáblához",
         "jobBoard": "Álláshirdetések",
         "restrictToRegions": "Csak a felsorolt régiók alkotói jelentkezhetnek",
-        "restrictToRegionsHint": "Az ezeken a régiókon kívüli alkotók továbbra is látják a munkát, de nem jelentkezhetnek. A meghívókat ez nem érinti."
+        "restrictToRegionsHint": "Az ezeken a régiókon kívüli alkotók továbbra is látják a munkát, de nem jelentkezhetnek. A meghívókat ez nem érinti.",
+        "regionsRestricted": "Korlátozott"
       },
       "insertLink": {
         "buttonLabel": "Link beszúrása",

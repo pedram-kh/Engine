@@ -483,7 +483,8 @@
         "listedOnJobsBoard": "Įtraukti į darbų lentą",
         "jobBoard": "Darbo skelbimai",
         "restrictToRegions": "Kandidatuoti gali tik nurodytų regionų kūrėjai",
-        "restrictToRegionsHint": "Kūrėjai ne iš šių regionų darbą vis tiek mato, bet kandidatuoti negali. Kvietimų tai neliečia."
+        "restrictToRegionsHint": "Kūrėjai ne iš šių regionų darbą vis tiek mato, bet kandidatuoti negali. Kvietimų tai neliečia.",
+        "regionsRestricted": "Apribota"
       },
       "insertLink": {
         "buttonLabel": "Įterpti nuorodą",

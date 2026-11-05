@@ -1538,4 +1538,126 @@ describe('CampaignDetailPage — AH-118 offer edit and the region switch', () =>
       expect.objectContaining({ restrict_to_listing_regions: true }),
     )
   })
+
+  // ── W1: the restriction on Overview ──────────────────────────────────────────────────────
+  const REGION_ON = { campaign_region_restriction: true }
+  const LISTED_ES_PT = {
+    listed_on_jobs_board: true,
+    listing_regions: ['ES', 'PT'],
+    restrict_to_listing_regions: false,
+  }
+  const overviewSwitch = (w: ReturnType<typeof mount>) =>
+    w.find('[data-test="overview-restrict-to-regions"] input')
+
+  it('Overview: no restriction row, no pill while the region flag is off; regions still listed', async () => {
+    const harness = await mountDetail('agency_admin', [], {
+      campaign: { ...LISTED_ES_PT, restrict_to_listing_regions: true },
+    })
+    cleanup = harness.cleanup
+    expect(harness.wrapper.find('[data-test="overview-requirement-restrict"]').exists()).toBe(false)
+    expect(harness.wrapper.find('[data-test="overview-regions-restricted"]').exists()).toBe(false)
+    expect(harness.wrapper.find('[data-test="overview-regions"]').text()).toBe('Spain, Portugal')
+  })
+
+  it('Overview: the Regions field names the countries and carries the Restricted pill when on', async () => {
+    const harness = await mountDetail('agency_admin', [], {
+      campaign: { ...LISTED_ES_PT, restrict_to_listing_regions: true },
+      features: REGION_ON,
+    })
+    cleanup = harness.cleanup
+    expect(harness.wrapper.find('[data-test="overview-regions"]').text()).toBe('Spain, Portugal')
+    expect(harness.wrapper.find('[data-test="overview-regions-restricted"]').text()).toBe(
+      'Restricted',
+    )
+    expect((overviewSwitch(harness.wrapper).element as HTMLInputElement).checked).toBe(true)
+  })
+
+  it('Overview: no Regions field without regions, and no pill when the switch is off', async () => {
+    const none = await mountDetail('agency_admin', [], { features: REGION_ON })
+    expect(none.wrapper.find('[data-test="overview-regions-field"]').exists()).toBe(false)
+    none.cleanup()
+
+    const off = await mountDetail('agency_admin', [], {
+      campaign: LISTED_ES_PT,
+      features: REGION_ON,
+    })
+    cleanup = off.cleanup
+    expect(off.wrapper.find('[data-test="overview-regions"]').exists()).toBe(true)
+    expect(off.wrapper.find('[data-test="overview-regions-restricted"]').exists()).toBe(false)
+  })
+
+  it('Overview: the switch shows the hint and PATCHes only restrict_to_listing_regions', async () => {
+    const harness = await mountDetail('agency_admin', [], {
+      campaign: LISTED_ES_PT,
+      features: REGION_ON,
+    })
+    cleanup = harness.cleanup
+    expect(harness.wrapper.find('[data-test="overview-requirement-restrict"]').text()).toContain(
+      'Creators outside these regions can still see the job but cannot apply.',
+    )
+    vi.mocked(campaignsApi.update).mockResolvedValue({
+      data: makeCampaign(false, { ...LISTED_ES_PT, restrict_to_listing_regions: true }),
+    })
+
+    await overviewSwitch(harness.wrapper).setValue(true)
+    await flushPromises()
+
+    expect(campaignsApi.update).toHaveBeenCalledWith('agency-ulid', CAMPAIGN_ULID, {
+      restrict_to_listing_regions: true,
+    })
+    expect(harness.wrapper.find('[data-test="overview-regions-restricted"]').exists()).toBe(true)
+  })
+
+  it('Overview: a refused PATCH leaves the switch where the server has it and shows the error', async () => {
+    const harness = await mountDetail('agency_admin', [], {
+      campaign: LISTED_ES_PT,
+      features: REGION_ON,
+    })
+    cleanup = harness.cleanup
+    vi.mocked(campaignsApi.update).mockRejectedValue(
+      new ApiError({
+        message: 'Add at least one region first.',
+        status: 422,
+        code: 'campaign.restrict_needs_regions',
+      }),
+    )
+
+    await overviewSwitch(harness.wrapper).setValue(true)
+    await flushPromises()
+
+    expect(harness.wrapper.find('[data-test="overview-restrict-error"]').text()).toContain(
+      'Add at least one region first.',
+    )
+    expect((overviewSwitch(harness.wrapper).element as HTMLInputElement).checked).toBe(false)
+  })
+
+  it('Overview: the switch is disabled when not listed, without regions, or for staff', async () => {
+    const notListed = await mountDetail('agency_admin', [], {
+      campaign: { ...LISTED_ES_PT, listed_on_jobs_board: false },
+      features: REGION_ON,
+    })
+    expect(overviewSwitch(notListed.wrapper).attributes('disabled')).toBeDefined()
+    notListed.cleanup()
+
+    const noRegions = await mountDetail('agency_admin', [], {
+      campaign: { ...LISTED_ES_PT, listing_regions: [] },
+      features: REGION_ON,
+    })
+    expect(overviewSwitch(noRegions.wrapper).attributes('disabled')).toBeDefined()
+    noRegions.cleanup()
+
+    const staff = await mountDetail('agency_staff', [], {
+      campaign: LISTED_ES_PT,
+      features: REGION_ON,
+    })
+    expect(overviewSwitch(staff.wrapper).attributes('disabled')).toBeDefined()
+    staff.cleanup()
+
+    const ok = await mountDetail('agency_admin', [], {
+      campaign: LISTED_ES_PT,
+      features: REGION_ON,
+    })
+    cleanup = ok.cleanup
+    expect(overviewSwitch(ok.wrapper).attributes('disabled')).toBeUndefined()
+  })
 })

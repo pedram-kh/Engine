@@ -483,7 +483,8 @@
         "listedOnJobsBoard": "Lisa tööde tahvlile",
         "jobBoard": "Tööpakkumised",
         "restrictToRegions": "Kandideerida saavad ainult loetletud piirkondade sisuloojad",
-        "restrictToRegionsHint": "Nendest piirkondadest väljaspool olevad sisuloojad näevad tööd endiselt, kuid ei saa kandideerida. Kutseid see ei mõjuta."
+        "restrictToRegionsHint": "Nendest piirkondadest väljaspool olevad sisuloojad näevad tööd endiselt, kuid ei saa kandideerida. Kutseid see ei mõjuta.",
+        "regionsRestricted": "Piiratud"
       },
       "insertLink": {
         "buttonLabel": "Lisa link",

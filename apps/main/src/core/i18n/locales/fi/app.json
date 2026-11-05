@@ -483,7 +483,8 @@
         "listedOnJobsBoard": "Lisää työtauluun",
         "jobBoard": "Työpaikat",
         "restrictToRegions": "Vain mainittujen alueiden sisällöntuottajat voivat hakea",
-        "restrictToRegionsHint": "Näiden alueiden ulkopuoliset sisällöntuottajat näkevät työn mutta eivät voi hakea. Kutsut eivät muutu."
+        "restrictToRegionsHint": "Näiden alueiden ulkopuoliset sisällöntuottajat näkevät työn mutta eivät voi hakea. Kutsut eivät muutu.",
+        "regionsRestricted": "Rajoitettu"
       },
       "insertLink": {
         "buttonLabel": "Lisää linkki",

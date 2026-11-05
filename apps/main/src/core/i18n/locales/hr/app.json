@@ -483,7 +483,8 @@
         "listedOnJobsBoard": "Dodaj na ploču poslova",
         "jobBoard": "Oglasi za rad",
         "restrictToRegions": "Prijaviti se mogu samo kreatori iz navedenih regija",
-        "restrictToRegionsHint": "Kreatori izvan tih regija i dalje vide posao, ali se ne mogu prijaviti. Pozivi nisu zahvaćeni."
+        "restrictToRegionsHint": "Kreatori izvan tih regija i dalje vide posao, ali se ne mogu prijaviti. Pozivi nisu zahvaćeni.",
+        "regionsRestricted": "Ograničeno"
       },
       "insertLink": {
         "buttonLabel": "Umetni poveznicu",

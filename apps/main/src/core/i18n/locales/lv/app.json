@@ -483,7 +483,8 @@
         "listedOnJobsBoard": "Pievienot darbu tāfelei",
         "jobBoard": "Darba piedāvājumi",
         "restrictToRegions": "Pieteikties var tikai norādīto reģionu satura veidotāji",
-        "restrictToRegionsHint": "Satura veidotāji ārpus šiem reģioniem darbu joprojām redz, bet nevar pieteikties. Uzaicinājumus tas neietekmē."
+        "restrictToRegionsHint": "Satura veidotāji ārpus šiem reģioniem darbu joprojām redz, bet nevar pieteikties. Uzaicinājumus tas neietekmē.",
+        "regionsRestricted": "Ierobežots"
       },
       "insertLink": {
         "buttonLabel": "Ievietot saiti",

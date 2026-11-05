@@ -483,7 +483,8 @@
         "listedOnJobsBoard": "Adicionar ao quadro de trabalhos",
         "jobBoard": "Ofertas de trabalho",
         "restrictToRegions": "Só criadores das regiões indicadas podem candidatar-se",
-        "restrictToRegionsHint": "Os criadores fora destas regiões continuam a ver a oferta, mas não se podem candidatar. Os convites não são afetados."
+        "restrictToRegionsHint": "Os criadores fora destas regiões continuam a ver a oferta, mas não se podem candidatar. Os convites não são afetados.",
+        "regionsRestricted": "Restrito"
       },
       "insertLink": {
         "buttonLabel": "Inserir link",

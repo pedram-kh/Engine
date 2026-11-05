@@ -483,7 +483,8 @@
         "listedOnJobsBoard": "Lägg till på uppdragstavlan",
         "jobBoard": "Jobbanslag",
         "restrictToRegions": "Bara creators i de angivna regionerna kan ansöka",
-        "restrictToRegionsHint": "Creators utanför dessa regioner ser fortfarande jobbet men kan inte ansöka. Inbjudningar påverkas inte."
+        "restrictToRegionsHint": "Creators utanför dessa regioner ser fortfarande jobbet men kan inte ansöka. Inbjudningar påverkas inte.",
+        "regionsRestricted": "Begränsat"
       },
       "insertLink": {
         "buttonLabel": "Infoga länk",

@@ -483,7 +483,8 @@
         "listedOnJobsBoard": "Toevoegen aan het opdrachtenbord",
         "jobBoard": "Vacaturebord",
         "restrictToRegions": "Alleen creators in de genoemde regio's kunnen reageren",
-        "restrictToRegionsHint": "Creators buiten deze regio's zien de opdracht nog wel, maar kunnen niet reageren. Uitnodigingen worden niet beïnvloed."
+        "restrictToRegionsHint": "Creators buiten deze regio's zien de opdracht nog wel, maar kunnen niet reageren. Uitnodigingen worden niet beïnvloed.",
+        "regionsRestricted": "Beperkt"
       },
       "insertLink": {
         "buttonLabel": "Link invoegen",

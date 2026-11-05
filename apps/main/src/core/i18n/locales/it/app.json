@@ -483,7 +483,8 @@
         "listedOnJobsBoard": "Aggiungi alla bacheca lavori",
         "jobBoard": "Offerte di lavoro",
         "restrictToRegions": "Solo i creator delle regioni indicate possono candidarsi",
-        "restrictToRegionsHint": "I creator al di fuori di queste regioni vedono comunque l'offerta ma non possono candidarsi. Gli inviti non sono interessati."
+        "restrictToRegionsHint": "I creator al di fuori di queste regioni vedono comunque l'offerta ma non possono candidarsi. Gli inviti non sono interessati.",
+        "regionsRestricted": "Limitato"
       },
       "insertLink": {
         "buttonLabel": "Inserisci link",

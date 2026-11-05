@@ -483,7 +483,8 @@
         "listedOnJobsBoard": "Ajouter au tableau des missions",
         "jobBoard": "Offres d'emploi",
         "restrictToRegions": "Seuls les créateurs des régions indiquées peuvent postuler",
-        "restrictToRegionsHint": "Les créateurs hors de ces régions voient toujours l'offre mais ne peuvent pas postuler. Les invitations ne sont pas concernées."
+        "restrictToRegionsHint": "Les créateurs hors de ces régions voient toujours l'offre mais ne peuvent pas postuler. Les invitations ne sont pas concernées.",
+        "regionsRestricted": "Restreint"
       },
       "insertLink": {
         "buttonLabel": "Insérer un lien",

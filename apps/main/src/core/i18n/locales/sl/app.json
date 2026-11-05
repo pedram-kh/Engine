@@ -483,7 +483,8 @@
         "listedOnJobsBoard": "Dodaj na oglasno desko del",
         "jobBoard": "Oglasi za delo",
         "restrictToRegions": "Prijavijo se lahko samo ustvarjalci iz navedenih regij",
-        "restrictToRegionsHint": "Ustvarjalci zunaj teh regij delo še vedno vidijo, vendar se ne morejo prijaviti. Povabila niso prizadeta."
+        "restrictToRegionsHint": "Ustvarjalci zunaj teh regij delo še vedno vidijo, vendar se ne morejo prijaviti. Povabila niso prizadeta.",
+        "regionsRestricted": "Omejeno"
       },
       "insertLink": {
         "buttonLabel": "Vstavi povezavo",

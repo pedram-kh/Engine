@@ -483,7 +483,8 @@
         "listedOnJobsBoard": "Føj til opgavetavlen",
         "jobBoard": "Jobopslag",
         "restrictToRegions": "Kun creators i de angivne regioner kan søge",
-        "restrictToRegionsHint": "Creators uden for disse regioner kan stadig se jobbet, men kan ikke søge. Invitationer påvirkes ikke."
+        "restrictToRegionsHint": "Creators uden for disse regioner kan stadig se jobbet, men kan ikke søge. Invitationer påvirkes ikke.",
+        "regionsRestricted": "Begrænset"
       },
       "insertLink": {
         "buttonLabel": "Indsæt link",
