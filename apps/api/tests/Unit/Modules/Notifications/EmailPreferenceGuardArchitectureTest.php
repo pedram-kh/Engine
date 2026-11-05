@@ -161,6 +161,7 @@ it('the guarded sites are exactly the files the AH-101 guard test drives', funct
 
     expect($guarded)->toBe([
         'app/Modules/Campaigns/Listeners/SendAssignmentNotifications.php',
+        'app/Modules/Campaigns/Services/AssignmentOfferEditedNotifier.php',
         'app/Modules/Campaigns/Services/CampaignApplicationNotifier.php',
         'app/Modules/Campaigns/Services/JobPostedFanOutService.php',
         'app/Modules/Messaging/Services/DebouncedMessageMailer.php',

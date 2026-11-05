@@ -31,6 +31,8 @@ it('NotificationType catalogue lists exactly the curated membership', function (
         // (Q3 — this type mails, the approval does not, on this campaign type)
         // lives in the listener, not in the catalogue.
         'assignment.completed_on_approval',
+        // AH-118 — creator-facing, the agency edited the offer amount.
+        'assignment.offer_edited',
         'assignment.manually_verified',
         // AH-101 (⑦) — the silent success branch of verification, now creator-facing.
         'assignment.live_verified',

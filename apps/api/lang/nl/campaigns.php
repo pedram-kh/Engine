@@ -47,6 +47,14 @@ return [
                 'cta' => 'Opdracht bekijken',
             ],
         ],
+        'offer_edited' => [
+            'email' => [
+                'subject' => 'Het aanbod voor :campaign is bijgewerkt',
+                'greeting' => 'Hallo :name,',
+                'body' => 'Het bureau heeft het aanbod voor “:campaign” bijgewerkt. Het bedrag is gewijzigd van :previous naar :new.',
+                'cta' => 'Bekijk het aanbod',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Je post voor :campaign is geaccepteerd',

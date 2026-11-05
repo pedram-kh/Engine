@@ -47,6 +47,14 @@ return [
                 'cta' => 'Ver la asignación',
             ],
         ],
+        'offer_edited' => [
+            'email' => [
+                'subject' => 'La oferta de :campaign se ha actualizado',
+                'greeting' => 'Hola :name:',
+                'body' => 'La agencia ha actualizado la oferta de «:campaign». El importe ha cambiado de :previous a :new.',
+                'cta' => 'Ver la oferta',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Tu publicación para :campaign se ha aceptado',

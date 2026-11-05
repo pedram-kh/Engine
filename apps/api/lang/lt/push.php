@@ -33,6 +33,10 @@ return [
         'title' => 'Kampanija baigta',
         'body' => 'Baigta: :campaign_name',
     ],
+    'assignment_offer_edited' => [
+        'title' => 'Pasiūlymas atnaujintas',
+        'body' => 'Pasiūlymas kampanijai :campaign_name buvo atnaujintas',
+    ],
     'assignment_manually_verified' => [
         'title' => 'Įrašas patvirtintas',
         'body' => 'Jūsų įrašas patvirtintas: :campaign_name',

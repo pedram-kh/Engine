@@ -33,6 +33,10 @@ return [
         'title' => 'Campagne terminée',
         'body' => 'Terminée : :campaign_name',
     ],
+    'assignment_offer_edited' => [
+        'title' => 'Offre mise à jour',
+        'body' => 'L\'offre pour :campaign_name a été mise à jour',
+    ],
     'assignment_manually_verified' => [
         'title' => 'Publication vérifiée',
         'body' => 'Votre publication a été vérifiée : :campaign_name',

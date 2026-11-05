@@ -33,6 +33,10 @@ return [
         'title' => 'Kampaania lõpetatud',
         'body' => 'Lõpetatud: :campaign_name',
     ],
+    'assignment_offer_edited' => [
+        'title' => 'Pakkumine uuendatud',
+        'body' => 'Kampaania :campaign_name pakkumist uuendati',
+    ],
     'assignment_manually_verified' => [
         'title' => 'Postitus kinnitatud',
         'body' => 'Sinu postitus kinnitati: :campaign_name',

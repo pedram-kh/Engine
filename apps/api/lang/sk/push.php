@@ -33,6 +33,10 @@ return [
         'title' => 'Kampaň dokončená',
         'body' => 'Dokončené: :campaign_name',
     ],
+    'assignment_offer_edited' => [
+        'title' => 'Ponuka aktualizovaná',
+        'body' => 'Ponuka pre :campaign_name bola aktualizovaná',
+    ],
     'assignment_manually_verified' => [
         'title' => 'Príspevok overený',
         'body' => 'Váš príspevok bol overený: :campaign_name',

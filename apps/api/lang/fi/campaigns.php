@@ -47,6 +47,14 @@ return [
                 'cta' => 'Katso tehtävä',
             ],
         ],
+        'offer_edited' => [
+            'email' => [
+                'subject' => 'Kampanjan :campaign tarjousta päivitettiin',
+                'greeting' => 'Hei, :name,',
+                'body' => 'Toimisto on päivittänyt kampanjan ”:campaign” tarjouksen. Summa muuttui: :previous → :new.',
+                'cta' => 'Näytä tarjous',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Julkaisusi kampanjaan :campaign on hyväksytty',

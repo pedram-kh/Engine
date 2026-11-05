@@ -47,6 +47,14 @@ return [
                 'cta' => 'Voir la mission',
             ],
         ],
+        'offer_edited' => [
+            'email' => [
+                'subject' => 'L\'offre pour :campaign a été mise à jour',
+                'greeting' => 'Bonjour :name,',
+                'body' => 'L\'agence a mis à jour l\'offre pour « :campaign ». Le montant est passé de :previous à :new.',
+                'cta' => 'Voir l\'offre',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Votre publication pour :campaign a été acceptée',

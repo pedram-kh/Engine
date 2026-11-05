@@ -47,6 +47,14 @@ return [
                 'cta' => 'Виж задачата',
             ],
         ],
+        'offer_edited' => [
+            'email' => [
+                'subject' => 'Офертата за :campaign беше актуализирана',
+                'greeting' => 'Здравей, :name,',
+                'body' => 'Агенцията актуализира офертата за „:campaign“. Сумата се промени от :previous на :new.',
+                'cta' => 'Виж офертата',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Вашата публикация за :campaign е приета',

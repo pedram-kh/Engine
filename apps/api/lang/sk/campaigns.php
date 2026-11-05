@@ -47,6 +47,14 @@ return [
                 'cta' => 'Zobraziť úlohu',
             ],
         ],
+        'offer_edited' => [
+            'email' => [
+                'subject' => 'Ponuka pre :campaign bola aktualizovaná',
+                'greeting' => 'Dobrý deň, :name,',
+                'body' => 'Agentúra aktualizovala ponuku pre „:campaign“. Suma sa zmenila z :previous na :new.',
+                'cta' => 'Zobraziť ponuku',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Váš príspevok pre :campaign bol prijatý',

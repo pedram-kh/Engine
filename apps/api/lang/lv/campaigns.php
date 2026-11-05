@@ -47,6 +47,14 @@ return [
                 'cta' => 'Skatīt uzdevumu',
             ],
         ],
+        'offer_edited' => [
+            'email' => [
+                'subject' => 'Piedāvājums kampaņai :campaign ir atjaunināts',
+                'greeting' => 'Sveiki, :name,',
+                'body' => 'Aģentūra ir atjauninājusi piedāvājumu kampaņai “:campaign”. Summa mainījās no :previous uz :new.',
+                'cta' => 'Skatīt piedāvājumu',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Jūsu ieraksts priekš :campaign ir pieņemts',

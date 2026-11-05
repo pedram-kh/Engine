@@ -15,10 +15,12 @@ use App\Modules\Campaigns\Mail\DraftReviewedMail;
 use App\Modules\Campaigns\Mail\DraftSubmittedForReviewMail;
 use App\Modules\Campaigns\Mail\InviteReceivedMail;
 use App\Modules\Campaigns\Mail\JobPostedMail;
+use App\Modules\Campaigns\Mail\OfferEditedMail;
 use App\Modules\Campaigns\Mail\PostManuallyVerifiedMail;
 use App\Modules\Campaigns\Mail\PostVerifiedMail;
 use App\Modules\Campaigns\Models\CampaignApplication;
 use App\Modules\Campaigns\Models\CampaignAssignment;
+use App\Modules\Campaigns\Services\AssignmentOfferEditedNotifier;
 use App\Modules\Campaigns\Services\CampaignApplicationNotifier;
 use App\Modules\Campaigns\Services\JobPostedFanOutService;
 use App\Modules\Creators\Features\ApplicationNotificationsEnabled;
@@ -183,6 +185,12 @@ function guardSites(array $w): array
             'fire' => $listener(AuditAction::AssignmentCompletedOnApproval),
             'sent' => fn (): int => guardSent(AssignmentCompletedOnApprovalMail::class, $w['creatorUser']),
         ],
+        'assignment.offer_edited' => [
+            'type' => NotificationType::AssignmentOfferEdited,
+            'recipient' => $w['creatorUser'],
+            'fire' => fn () => app(AssignmentOfferEditedNotifier::class)->notify($w['assignment'], 100_00, 250_00, null),
+            'sent' => fn (): int => guardSent(OfferEditedMail::class, $w['creatorUser']),
+        ],
         'assignment.manually_verified' => [
             'type' => NotificationType::AssignmentManuallyVerified,
             'recipient' => $w['creatorUser'],
@@ -274,6 +282,7 @@ function guardSiteKeys(): array
     return [
         'assignment.invited',
         'assignment.completed_on_approval',
+        'assignment.offer_edited',
         'assignment.manually_verified',
         'assignment.live_verified',
         'assignment.draft_approved',

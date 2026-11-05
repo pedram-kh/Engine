@@ -24,7 +24,7 @@ uses(TestCase::class, RefreshDatabase::class);
 |    `data` bag each emit site produces (not a test-shaped bag).
 | 2. PRIVACY (Q6): sentinel strings planted in every field a lock screen must
 |    never show (feedback, rejection_reason, message text, welcome message…) must
-|    not appear ANYWHERE in the message — 14 types × 24 locales.
+|    not appear ANYWHERE in the message — 15 types × 24 locales.
 | 3. Names: injected untranslated, sanitised, capped; a missing name drops the
 |    body, never the push.
 | 4. Locale discipline: explicit locale, caller's locale untouched.
@@ -47,6 +47,7 @@ function pushRealBags(): array
         'assignment.draft_rejected' => ['campaign_name' => 'Summer Launch', 'creator_name' => 'Nora Creator', 'outcome' => 'rejected', 'feedback' => 'SENTINEL-FEEDBACK-xyz', 'assignment_ulid' => PUSH_ASSIGN_ULID, 'version' => 1],
         'assignment.completed_on_approval' => ['campaign_name' => 'Summer Launch', 'creator_name' => 'Nora Creator', 'assignment_ulid' => PUSH_ASSIGN_ULID, 'version' => 1],
         'assignment.manually_verified' => ['campaign_name' => 'Summer Launch', 'creator_name' => 'Nora Creator', 'assignment_ulid' => PUSH_ASSIGN_ULID],
+        'assignment.offer_edited' => ['campaign_name' => 'Summer Launch', 'assignment_ulid' => PUSH_ASSIGN_ULID, 'previous_amount' => 100_00, 'new_amount' => 250_00, 'currency' => 'EUR'],
         'message.received_by_creator' => ['campaign_name' => 'Summer Launch', 'sender_name' => 'Acme Agent', 'assignment_ulid' => PUSH_ASSIGN_ULID, 'body' => 'SENTINEL-MESSAGE-TEXT-xyz'],
         'message.relationship_received_by_creator' => ['agency_name' => 'Acme Agency', 'creator_name' => 'Nora Creator', 'sender_name' => 'Acme Agent', 'thread_ulid' => PUSH_THREAD_ULID, 'body' => 'SENTINEL-MESSAGE-TEXT-xyz'],
         'campaign_application.accepted' => ['agency_name' => 'Acme Agency', 'campaign_name' => 'Summer Launch', 'assignment_ulid' => PUSH_ASSIGN_ULID],
@@ -67,7 +68,7 @@ const PUSH_CAMPAIGN_ULID = '01J9ZK3Q8M5T7WXYCAMPAGNAAA';
 
 const PUSH_SENTINELS = ['SENTINEL-FEEDBACK-xyz', 'SENTINEL-MESSAGE-TEXT-xyz', 'SENTINEL-WELCOME-xyz', 'SENTINEL-REJECTION-REASON-xyz'];
 
-/** @return list<NotificationType> the 14 eligible types */
+/** @return list<NotificationType> the 15 eligible types */
 function pushEligibleTypes(): array
 {
     return [...PushEligibility::TOGGLEABLE, ...PushEligibility::ALWAYS_ON];
@@ -110,16 +111,16 @@ function pushLang(string $locale): array
 }
 
 // =============================================================================
-// 1. Real rendering matrix — 14 types × 24 locales
+// 1. Real rendering matrix — 15 types × 24 locales
 // =============================================================================
 
-it('the fixture bags cover exactly the 14 eligible types', function (): void {
+it('the fixture bags cover exactly the 15 eligible types', function (): void {
     $types = array_map(fn (NotificationType $t): string => $t->value, pushEligibleTypes());
     sort($types);
     $bags = array_keys(pushRealBags());
     sort($bags);
 
-    expect($bags)->toBe($types)->and($types)->toHaveCount(14);
+    expect($bags)->toBe($types)->and($types)->toHaveCount(15);
 });
 
 it('renders a real title AND body for every eligible type in every UI locale, with the names injected and no placeholder left', function (): void {
@@ -176,7 +177,7 @@ it('account-lifecycle copy carries no names at all', function (): void {
 // 2. Privacy — the sentinel matrix (BR-7 target)
 // =============================================================================
 
-it('PRIVACY: no feedback / rejection reason / message text / welcome text reaches ANY field — 14 types × 24 locales', function (): void {
+it('PRIVACY: no feedback / rejection reason / message text / welcome text reaches ANY field — 15 types × 24 locales', function (): void {
     $bags = pushRealBags();
 
     foreach (Locale::uiValues() as $locale) {
@@ -432,7 +433,7 @@ it('returns null for every ineligible type (nothing to send)', function (): void
         $checked++;
     }
 
-    expect($checked)->toBe(count(NotificationType::cases()) - 14)->and($checked)->toBeGreaterThan(10);
+    expect($checked)->toBe(count(NotificationType::cases()) - 15)->and($checked)->toBeGreaterThan(10);
 });
 
 it('collapse key: per-assignment / per-thread for the two message types only; null otherwise or when the ulid is absent', function (): void {

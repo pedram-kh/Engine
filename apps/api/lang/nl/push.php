@@ -33,6 +33,10 @@ return [
         'title' => 'Campagne afgerond',
         'body' => 'Afgerond: :campaign_name',
     ],
+    'assignment_offer_edited' => [
+        'title' => 'Aanbod bijgewerkt',
+        'body' => 'Het aanbod voor :campaign_name is bijgewerkt',
+    ],
     'assignment_manually_verified' => [
         'title' => 'Post geverifieerd',
         'body' => 'Je post is geverifieerd: :campaign_name',

@@ -47,6 +47,14 @@ return [
                 'cta' => 'Se opgave',
             ],
         ],
+        'offer_edited' => [
+            'email' => [
+                'subject' => 'Tilbuddet til :campaign er opdateret',
+                'greeting' => 'Hej :name,',
+                'body' => 'Bureauet har opdateret tilbuddet til ":campaign". Beløbet er ændret fra :previous til :new.',
+                'cta' => 'Se tilbuddet',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Dit opslag for :campaign er accepteret',

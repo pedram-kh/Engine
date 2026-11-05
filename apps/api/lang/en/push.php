@@ -33,6 +33,10 @@ return [
         'title' => 'Campaign completed',
         'body' => 'Completed: :campaign_name',
     ],
+    'assignment_offer_edited' => [
+        'title' => 'Offer updated',
+        'body' => 'The offer for :campaign_name was updated',
+    ],
     'assignment_manually_verified' => [
         'title' => 'Post verified',
         'body' => 'Your post was verified: :campaign_name',

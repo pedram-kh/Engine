@@ -47,6 +47,14 @@ return [
                 'cta' => 'Προβολή εργασίας',
             ],
         ],
+        'offer_edited' => [
+            'email' => [
+                'subject' => 'Η προσφορά για :campaign ενημερώθηκε',
+                'greeting' => 'Γεια σας, :name,',
+                'body' => 'Το πρακτορείο ενημέρωσε την προσφορά για «:campaign». Το ποσό άλλαξε από :previous σε :new.',
+                'cta' => 'Προβολή προσφοράς',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Η δημοσίευσή σας για την καμπάνια :campaign έγινε δεκτή',

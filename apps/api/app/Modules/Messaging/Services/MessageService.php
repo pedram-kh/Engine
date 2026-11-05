@@ -84,8 +84,14 @@ final class MessageService
      * (the FE + digest render the localized line from it — never stored text,
      * D-5). NOT terminal-guarded: system messages write on terminal events too
      * (the closing event IS a system message). Stamps `last_message_at`.
+     *
+     * `$data` (AH-118) is the structured payload the rendered line interpolates
+     * (amounts, never prose): stored as-is in `system_event_data`, null for the
+     * lifecycle lines that need none.
+     *
+     * @param  array<string, scalar|null>|null  $data
      */
-    public function writeSystemMessage(MessageThread $thread, string $eventKey): Message
+    public function writeSystemMessage(MessageThread $thread, string $eventKey, ?array $data = null): Message
     {
         $message = new Message([
             'thread_id' => $thread->id,
@@ -95,6 +101,7 @@ final class MessageService
             'body' => null,
             'attachments' => null,
             'system_event_key' => $eventKey,
+            'system_event_data' => $data,
         ]);
         $message->save();
 

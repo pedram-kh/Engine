@@ -47,6 +47,14 @@ return [
                 'cta' => 'Poglej nalogo',
             ],
         ],
+        'offer_edited' => [
+            'email' => [
+                'subject' => 'Ponudba za :campaign je bila posodobljena',
+                'greeting' => 'Pozdravljeni, :name,',
+                'body' => 'Agencija je posodobila ponudbo za »:campaign«. Znesek se je spremenil iz :previous v :new.',
+                'cta' => 'Oglej si ponudbo',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Vaša objava za :campaign je bila sprejeta',

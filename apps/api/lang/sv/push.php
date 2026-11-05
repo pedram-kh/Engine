@@ -33,6 +33,10 @@ return [
         'title' => 'Kampanj slutförd',
         'body' => 'Slutförd: :campaign_name',
     ],
+    'assignment_offer_edited' => [
+        'title' => 'Erbjudandet uppdaterat',
+        'body' => 'Erbjudandet för :campaign_name har uppdaterats',
+    ],
     'assignment_manually_verified' => [
         'title' => 'Inlägg verifierat',
         'body' => 'Ditt inlägg har verifierats: :campaign_name',

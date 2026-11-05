@@ -51,6 +51,14 @@ return [
                 'cta' => 'View the assignment',
             ],
         ],
+        'offer_edited' => [
+            'email' => [
+                'subject' => 'The offer for :campaign was updated',
+                'greeting' => 'Hi :name,',
+                'body' => 'The agency has updated the offer for ":campaign". The amount changed from :previous to :new.',
+                'cta' => 'View the offer',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Your post for :campaign was accepted',

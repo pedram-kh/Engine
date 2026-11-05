@@ -33,6 +33,10 @@ return [
         'title' => 'Kampanja valmis',
         'body' => 'Valmis: :campaign_name',
     ],
+    'assignment_offer_edited' => [
+        'title' => 'Tarjous päivitetty',
+        'body' => 'Kampanjan :campaign_name tarjousta päivitettiin',
+    ],
     'assignment_manually_verified' => [
         'title' => 'Julkaisu vahvistettu',
         'body' => 'Julkaisusi vahvistettiin: :campaign_name',

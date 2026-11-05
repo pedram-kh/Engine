@@ -33,6 +33,10 @@ return [
         'title' => 'Η καμπάνια ολοκληρώθηκε',
         'body' => 'Ολοκληρώθηκε: :campaign_name',
     ],
+    'assignment_offer_edited' => [
+        'title' => 'Η προσφορά ενημερώθηκε',
+        'body' => 'Η προσφορά για :campaign_name ενημερώθηκε',
+    ],
     'assignment_manually_verified' => [
         'title' => 'Η ανάρτηση επαληθεύτηκε',
         'body' => 'Η ανάρτησή σας επαληθεύτηκε: :campaign_name',

@@ -158,7 +158,7 @@ function pdPushed(): array
 // The dispatch matrix
 // =============================================================================
 
-it('pushes every one of the 14 eligible types, once, to the live token, with the type in the payload', function (NotificationType $type): void {
+it('pushes every one of the 15 eligible types, once, to the live token, with the type in the payload', function (NotificationType $type): void {
     pdFakeQueue();
     pdArm();
     [$user, $token] = pdRecipient();
@@ -180,8 +180,8 @@ it('pushes every one of the 14 eligible types, once, to the live token, with the
     array_map(static fn (NotificationType $t): array => [$t], pdEligible()),
 ));
 
-it('the eligible set is exactly 14 and every other type (agency, live_verified, application.rejected, not-yet-live) NEVER pushes', function (): void {
-    expect(pdEligible())->toHaveCount(14);
+it('the eligible set is exactly 15 and every other type (agency, live_verified, application.rejected, not-yet-live) NEVER pushes', function (): void {
+    expect(pdEligible())->toHaveCount(15);
 
     pdFakeQueue();
     pdArm();
@@ -671,7 +671,7 @@ it('AH-108: every eligible type carries the badge, not only the message types', 
     }
 
     $badges = array_map(static fn (SendPushNotificationJob $j): ?int => $j->message->badge, pdPushed());
-    expect($badges)->toHaveCount(14)->and(array_filter($badges, static fn (?int $b): bool => $b === null))->toBe([]);
+    expect($badges)->toHaveCount(15)->and(array_filter($badges, static fn (?int $b): bool => $b === null))->toBe([]);
 });
 
 it('AH-108 (accepted gap, tech-debt): a push whose in_app is muted is not in the badge total', function (): void {

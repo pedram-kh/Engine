@@ -33,6 +33,10 @@ return [
         'title' => 'Kampanja završena',
         'body' => 'Završeno: :campaign_name',
     ],
+    'assignment_offer_edited' => [
+        'title' => 'Ponuda ažurirana',
+        'body' => 'Ponuda za :campaign_name je ažurirana',
+    ],
     'assignment_manually_verified' => [
         'title' => 'Objava potvrđena',
         'body' => 'Vaša objava je potvrđena: :campaign_name',

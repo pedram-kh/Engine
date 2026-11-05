@@ -47,6 +47,14 @@ return [
                 'cta' => 'Feladat megtekintése',
             ],
         ],
+        'offer_edited' => [
+            'email' => [
+                'subject' => 'A(z) :campaign ajánlata frissült',
+                'greeting' => 'Kedves :name,',
+                'body' => 'Az ügynökség frissítette a(z) „:campaign” ajánlatát. Az összeg :previous értékről :new értékre változott.',
+                'cta' => 'Ajánlat megtekintése',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'A(z) :campaign kampányhoz tartozó bejegyzése elfogadva',

@@ -10,8 +10,8 @@ uses(TestCase::class);
 
 /**
  * AH-102 — the push eligibility policy, pinned to the ruled sets (Q2 + Q11).
- * 14 eligible: 10 toggleable (job_posted among them, default OFF per type) and
- * 4 always-on. Everything else is out.
+ * 15 eligible: 11 toggleable (job_posted among them, default OFF per type; AH-118
+ * adds assignment.offer_edited, default ON) and 4 always-on. Everything else is out.
  */
 function pushValues(array $types): array
 {
@@ -21,13 +21,14 @@ function pushValues(array $types): array
     return $values;
 }
 
-it('the toggleable set is exactly the ruled ten', function (): void {
+it('the toggleable set is exactly the ruled eleven', function (): void {
     expect(pushValues(PushEligibility::TOGGLEABLE))->toBe([
         'assignment.completed_on_approval',
         'assignment.draft_approved',
         'assignment.draft_rejected',
         'assignment.invited',
         'assignment.manually_verified',
+        'assignment.offer_edited',
         'assignment.revision_requested',
         'campaign.job_posted',
         'campaign_application.accepted',
@@ -45,12 +46,12 @@ it('the always-on set is exactly the ruled four', function (): void {
     ]);
 });
 
-it('the two sets are disjoint and together make fourteen eligible types', function (): void {
+it('the two sets are disjoint and together make fifteen eligible types', function (): void {
     $both = array_intersect(pushValues(PushEligibility::TOGGLEABLE), pushValues(PushEligibility::ALWAYS_ON));
     $eligible = array_filter(NotificationType::cases(), PushEligibility::isEligible(...));
 
     expect($both)->toBe([])
-        ->and($eligible)->toHaveCount(14);
+        ->and($eligible)->toHaveCount(15);
 });
 
 it('every NOT-eligible type is out — agency-only, live_verified, application.rejected, the non-live cases', function (): void {
@@ -79,8 +80,8 @@ it('every NOT-eligible type is out — agency-only, live_verified, application.r
             ->and(PushEligibility::isToggleable($type))->toBeFalse();
     }
 
-    // 27 cases = 14 eligible + 13 out: the enumeration above is complete.
-    expect(count(NotificationType::cases()))->toBe(14 + count($out));
+    // 28 cases = 15 eligible + 13 out: the enumeration above is complete.
+    expect(count(NotificationType::cases()))->toBe(15 + count($out));
 });
 
 it('always-on and toggleable are mutually exclusive per type', function (): void {

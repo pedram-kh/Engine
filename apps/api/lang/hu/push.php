@@ -33,6 +33,10 @@ return [
         'title' => 'Kampány lezárva',
         'body' => 'Lezárva: :campaign_name',
     ],
+    'assignment_offer_edited' => [
+        'title' => 'Az ajánlat frissült',
+        'body' => 'A(z) :campaign_name ajánlata frissült',
+    ],
     'assignment_manually_verified' => [
         'title' => 'Bejegyzés ellenőrizve',
         'body' => 'A bejegyzésedet ellenőrizték: :campaign_name',

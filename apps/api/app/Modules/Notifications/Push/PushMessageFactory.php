@@ -56,6 +56,7 @@ final class PushMessageFactory
         'assignment.draft_approved' => ['assignment_ulid'],
         'assignment.draft_rejected' => ['assignment_ulid'],
         'assignment.completed_on_approval' => ['assignment_ulid'],
+        'assignment.offer_edited' => ['assignment_ulid'],
         'assignment.manually_verified' => ['assignment_ulid'],
         'message.received_by_creator' => ['assignment_ulid'],
         'message.relationship_received_by_creator' => ['thread_ulid'],

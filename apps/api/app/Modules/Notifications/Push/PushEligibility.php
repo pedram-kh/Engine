@@ -37,6 +37,7 @@ final class PushEligibility
         NotificationType::AssignmentDraftApproved,
         NotificationType::AssignmentDraftRejected,
         NotificationType::AssignmentCompletedOnApproval,
+        NotificationType::AssignmentOfferEdited,
         NotificationType::AssignmentManuallyVerified,
         NotificationType::MessageReceivedByCreator,
         NotificationType::MessageRelationshipReceivedByCreator,

@@ -47,6 +47,14 @@ return [
                 'cta' => 'Visa uppdraget',
             ],
         ],
+        'offer_edited' => [
+            'email' => [
+                'subject' => 'Erbjudandet för :campaign har uppdaterats',
+                'greeting' => 'Hej :name,',
+                'body' => 'Byrån har uppdaterat erbjudandet för ”:campaign”. Beloppet har ändrats från :previous till :new.',
+                'cta' => 'Visa erbjudandet',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Ditt inlägg för :campaign accepterades',

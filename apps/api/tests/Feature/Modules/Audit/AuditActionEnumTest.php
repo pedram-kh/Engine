@@ -132,6 +132,8 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         // on the verb: sharing one would have made the completion invisible to
         // the listeners that must react and indistinguishable to the rest.
         'assignment.completed_on_approval',
+        // AH-118 — the agency edited the offer amount (not a transition).
+        'assignment.offer_edited',
         'assignment.posted_by_creator',
         'assignment.live_verified',
         'assignment.payment_funded',

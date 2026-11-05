@@ -47,6 +47,14 @@ return [
                 'cta' => 'Auftrag ansehen',
             ],
         ],
+        'offer_edited' => [
+            'email' => [
+                'subject' => 'Das Angebot für :campaign wurde aktualisiert',
+                'greeting' => 'Hallo :name,',
+                'body' => 'Die Agentur hat das Angebot für „:campaign“ aktualisiert. Der Betrag hat sich von :previous auf :new geändert.',
+                'cta' => 'Angebot ansehen',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Dein Post für :campaign wurde akzeptiert',

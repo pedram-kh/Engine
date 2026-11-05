@@ -15,6 +15,7 @@ use App\Modules\Campaigns\Services\JobPostedFanOutService;
 use App\Modules\Creators\Database\Factories\CreatorFactory;
 use App\Modules\Creators\Enums\RelationshipStatus;
 use App\Modules\Creators\Features\ApplicationNotificationsEnabled;
+use App\Modules\Creators\Features\AssignmentOfferEditEnabled;
 use App\Modules\Creators\Features\JobPostedNotificationsEnabled;
 use App\Modules\Creators\Features\MissingCreatorMailsEnabled;
 use App\Modules\Creators\Features\PostVerifiedMailEnabled;
@@ -72,6 +73,7 @@ function rkDriverTypes(): array
         'assignment.draft_approved',
         'assignment.draft_rejected',
         'assignment.completed_on_approval',
+        'assignment.offer_edited',
         'assignment.manually_verified',
         'assignment.live_verified',
         'assignment.draft_submitted',
@@ -228,6 +230,24 @@ function rkDrivers(): array
             rkFire($w['assignment'], AuditAction::AssignmentCancelled);
 
             return ['campaign_ulid' => $w['campaign']->ulid];
+        },
+
+        // The real offer-edit endpoint (AH-118).
+        'assignment.offer_edited' => function (mixed $t): array {
+            Mail::fake();
+            Feature::activate(AssignmentOfferEditEnabled::NAME);
+            $s = rkMessageWorld();
+            $s['assignment']->forceFill([
+                'status' => AssignmentStatus::Invited,
+                'agreed_fee_minor_units' => 100_00,
+                'agreed_fee_currency' => 'EUR',
+            ])->save();
+
+            $t->actingAs($s['admin'])
+                ->patchJson("/api/v1/agencies/{$s['agency']->ulid}/campaigns/{$s['campaign']->ulid}/assignments/{$s['assignment']->ulid}/offer", ['agreed_fee_minor_units' => 250_00])
+                ->assertOk();
+
+            return ['assignment_ulid' => $s['assignment']->ulid];
         },
 
         // The real HTTP routes — the same ones MessageNotificationTest drives.

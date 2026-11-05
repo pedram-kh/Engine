@@ -33,6 +33,10 @@ return [
         'title' => 'Feachtas críochnaithe',
         'body' => 'Críochnaithe: :campaign_name',
     ],
+    'assignment_offer_edited' => [
+        'title' => 'Tairiscint nuashonraithe',
+        'body' => 'Nuashonraíodh an tairiscint do :campaign_name',
+    ],
     'assignment_manually_verified' => [
         'title' => 'Postáil fíoraithe',
         'body' => 'Fíoraíodh do phostáil: :campaign_name',

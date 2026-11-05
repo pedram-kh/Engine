@@ -33,6 +33,10 @@ return [
         'title' => 'Campanie finalizată',
         'body' => 'Finalizată: :campaign_name',
     ],
+    'assignment_offer_edited' => [
+        'title' => 'Ofertă actualizată',
+        'body' => 'Oferta pentru :campaign_name a fost actualizată',
+    ],
     'assignment_manually_verified' => [
         'title' => 'Postare verificată',
         'body' => 'Postarea ta a fost verificată: :campaign_name',

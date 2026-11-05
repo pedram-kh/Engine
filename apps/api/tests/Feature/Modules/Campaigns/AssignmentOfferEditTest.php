@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Modules\Agencies\Models\Agency;
-use App\Modules\Brands\Models\Brand;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Campaigns\Enums\OfferLockReason;
 use App\Modules\Campaigns\Events\AssignmentTransitioned;
@@ -12,18 +11,16 @@ use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Services\AssignmentOfferEditor;
 use App\Modules\Campaigns\Services\AssignmentOfferLock;
-use App\Modules\Creators\Database\Factories\CreatorFactory;
-use App\Modules\Creators\Enums\ContractKind;
 use App\Modules\Creators\Enums\ContractStatus;
-use App\Modules\Creators\Features\AssignmentOfferEditEnabled;
 use App\Modules\Creators\Models\Contract;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
-use Laravel\Pennant\Feature;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
+
+require_once dirname(__DIR__, 3).'/Support/OfferEditHelpers.php';
 
 /**
  * AH-118 A5 — the agency edits an assignment's offer amount: the lock rule (all
@@ -31,61 +28,6 @@ uses(TestCase::class, RefreshDatabase::class);
  * the role matrix and the no-op. The attach-vs-edit race lives in
  * CampaignAssignmentContractTest next to the attach it races.
  */
-
-/**
- * @return array{agency: Agency, campaign: Campaign, assignment: CampaignAssignment, admin: User}
- */
-function offerEditSetup(AssignmentStatus $status = AssignmentStatus::Invited, bool $flag = true): array
-{
-    $flag
-        ? Feature::activate(AssignmentOfferEditEnabled::NAME)
-        : Feature::deactivate(AssignmentOfferEditEnabled::NAME);
-
-    $agency = Agency::factory()->createOne();
-    $brand = Brand::factory()->forAgency($agency->id)->createOne();
-    $campaign = Campaign::factory()->createOne(['agency_id' => $agency->id, 'brand_id' => $brand->id, 'budget_currency' => 'EUR']);
-    $creator = CreatorFactory::new()->approved()->createOne(['user_id' => User::factory()->createOne()->id]);
-
-    $assignment = CampaignAssignment::factory()->status($status)->createOne([
-        'agency_id' => $agency->id,
-        'campaign_id' => $campaign->id,
-        'brand_id' => $brand->id,
-        'creator_id' => $creator->id,
-        'agreed_fee_minor_units' => 100_00,
-        'agreed_fee_currency' => 'EUR',
-        'fee_per' => 'video',
-        'contract_id' => null,
-        'payment_id' => null,
-    ]);
-
-    return [
-        'agency' => $agency,
-        'campaign' => $campaign,
-        'assignment' => $assignment,
-        'admin' => User::factory()->agencyAdmin($agency)->createOne(),
-    ];
-}
-
-function offerEditUrl(Agency $agency, Campaign $campaign, CampaignAssignment $assignment): string
-{
-    return "/api/v1/agencies/{$agency->ulid}/campaigns/{$campaign->ulid}/assignments/{$assignment->ulid}/offer";
-}
-
-function sendContractFor(CampaignAssignment $assignment, ContractStatus $status = ContractStatus::Sent): Contract
-{
-    return Contract::query()->create([
-        'agency_id' => $assignment->agency_id,
-        'kind' => ContractKind::PerCampaign,
-        'subject_type' => Contract::SUBJECT_CAMPAIGN_ASSIGNMENT,
-        'subject_id' => $assignment->id,
-        'version' => 1,
-        'title' => 'Addendum',
-        'body_markdown' => 'Terms.',
-        'signature_provider' => Contract::PROVIDER_INTERNAL,
-        'status' => $status,
-        'sent_at' => now(),
-    ]);
-}
 
 // ── the lock matrix ─────────────────────────────────────────────────────────
 

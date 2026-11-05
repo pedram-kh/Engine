@@ -14,6 +14,7 @@
     "assignment.draft_approved": { "bag": ["assignment_ulid"], "push": ["assignment_ulid"] },
     "assignment.draft_rejected": { "bag": ["assignment_ulid"], "push": ["assignment_ulid"] },
     "assignment.completed_on_approval": { "bag": ["assignment_ulid"], "push": ["assignment_ulid"] },
+    "assignment.offer_edited": { "bag": ["assignment_ulid"], "push": ["assignment_ulid"] },
     "assignment.manually_verified": { "bag": ["assignment_ulid"], "push": ["assignment_ulid"] },
     "assignment.live_verified": { "bag": ["assignment_ulid"], "push": [] },
     "message.received_by_creator": { "bag": ["assignment_ulid"], "push": ["assignment_ulid"] },

@@ -299,6 +299,10 @@ enum AuditAction: string
     // Logged by CampaignAssignmentStateMachine::completeOnApproval(), chained
     // from the approve path inside the SAME transaction.
     case AssignmentCompletedOnApproval = 'assignment.completed_on_approval';
+    // AH-118 — the agency edited the offer amount of an assignment that has no
+    // contract yet. NOT a transition (the status does not move), so it is logged
+    // by AssignmentOfferEditor and never goes through the state machine.
+    case AssignmentOfferEdited = 'assignment.offer_edited';
     case AssignmentPostedByCreator = 'assignment.posted_by_creator';
     case AssignmentLiveVerified = 'assignment.live_verified';
     // Verification-resolution chunk — the agency's resolution of a FAILED

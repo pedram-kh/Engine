@@ -33,6 +33,10 @@ return [
         'title' => 'Kampanja kompluta',
         'body' => 'Komplut: :campaign_name',
     ],
+    'assignment_offer_edited' => [
+        'title' => 'Offerta aġġornata',
+        'body' => 'L-offerta għal :campaign_name ġiet aġġornata',
+    ],
     'assignment_manually_verified' => [
         'title' => 'Post ivverifikat',
         'body' => 'Il-post tiegħek ġie vverifikat: :campaign_name',

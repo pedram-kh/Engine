@@ -47,6 +47,14 @@ return [
                 'cta' => 'Vaata ülesannet',
             ],
         ],
+        'offer_edited' => [
+            'email' => [
+                'subject' => 'Kampaania :campaign pakkumist uuendati',
+                'greeting' => 'Tere, :name,',
+                'body' => 'Agentuur uuendas kampaania „:campaign“ pakkumist. Summa muutus: :previous → :new.',
+                'cta' => 'Vaata pakkumist',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Teie postitus kampaaniale :campaign on vastu võetud',

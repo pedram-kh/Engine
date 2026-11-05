@@ -47,6 +47,14 @@ return [
                 'cta' => 'Ara l-kompitu',
             ],
         ],
+        'offer_edited' => [
+            'email' => [
+                'subject' => 'L-offerta għal :campaign ġiet aġġornata',
+                'greeting' => 'Bonġu, :name,',
+                'body' => 'L-aġenzija aġġornat l-offerta għal “:campaign”. L-ammont inbidel minn :previous għal :new.',
+                'cta' => 'Ara l-offerta',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Il-post tiegħek għal :campaign ġie aċċettat',

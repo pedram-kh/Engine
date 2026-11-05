@@ -47,6 +47,14 @@ return [
                 'cta' => 'Pogledaj zadatak',
             ],
         ],
+        'offer_edited' => [
+            'email' => [
+                'subject' => 'Ponuda za :campaign je ažurirana',
+                'greeting' => 'Pozdrav, :name,',
+                'body' => 'Agencija je ažurirala ponudu za „:campaign”. Iznos se promijenio s :previous na :new.',
+                'cta' => 'Pogledaj ponudu',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Vaša objava za :campaign je prihvaćena',

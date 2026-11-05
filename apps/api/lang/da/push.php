@@ -33,6 +33,10 @@ return [
         'title' => 'Kampagne afsluttet',
         'body' => 'Afsluttet: :campaign_name',
     ],
+    'assignment_offer_edited' => [
+        'title' => 'Tilbud opdateret',
+        'body' => 'Tilbuddet til :campaign_name er blevet opdateret',
+    ],
     'assignment_manually_verified' => [
         'title' => 'Opslag bekræftet',
         'body' => 'Dit opslag er bekræftet: :campaign_name',

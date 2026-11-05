@@ -13,6 +13,7 @@ use App\Modules\Creators\Features\AssignmentOfferEditEnabled;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Pennant\Feature;
 use Tests\TestCase;
 
@@ -92,6 +93,7 @@ it('lists the creator\'s OWN assignments across all agencies (scope bypass)', fu
 });
 
 it('shows the creator an agency-edited offer amount, and never the agency-only lock keys (AH-118)', function (): void {
+    Mail::fake();
     Feature::activate(AssignmentOfferEditEnabled::NAME);
     [$user, $creator] = creatorUser();
     $assignment = invitedAssignmentFor($creator);

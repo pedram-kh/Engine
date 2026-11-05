@@ -47,6 +47,14 @@ return [
                 'cta' => 'Féach ar chúram',
             ],
         ],
+        'offer_edited' => [
+            'email' => [
+                'subject' => 'Nuashonraíodh an tairiscint do :campaign',
+                'greeting' => 'Dia duit, :name,',
+                'body' => 'Nuashonraigh an ghníomhaireacht an tairiscint do “:campaign”. Athraíodh an méid ó :previous go :new.',
+                'cta' => 'Féach ar an tairiscint',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Glacadh le do phostáil do :campaign',

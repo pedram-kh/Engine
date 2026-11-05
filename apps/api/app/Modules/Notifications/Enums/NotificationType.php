@@ -66,6 +66,9 @@ enum NotificationType: string
     // (default OFF) and does not arm until production runs a real, non-mock
     // verification driver — see the AH-101 review.
     case AssignmentLiveVerified = 'assignment.live_verified';
+    // AH-118 — the agency edited the offer amount. Creator-facing; in-app, push
+    // (toggleable, default ON) and mail (rides `assignment_offer_edit_enabled`).
+    case AssignmentOfferEdited = 'assignment.offer_edited';
     case AssignmentCancelled = 'assignment.cancelled';
 
     // Forward payment verbs (deferred-S10 escrow alerts — drop-in, D-5).

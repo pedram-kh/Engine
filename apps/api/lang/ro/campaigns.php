@@ -47,6 +47,14 @@ return [
                 'cta' => 'Vizualizați sarcina',
             ],
         ],
+        'offer_edited' => [
+            'email' => [
+                'subject' => 'Oferta pentru :campaign a fost actualizată',
+                'greeting' => 'Bună ziua, :name,',
+                'body' => 'Agenția a actualizat oferta pentru „:campaign”. Suma s-a modificat de la :previous la :new.',
+                'cta' => 'Vezi oferta',
+            ],
+        ],
         'manually_verified' => [
             'email' => [
                 'subject' => 'Postarea dvs. pentru :campaign a fost acceptată',

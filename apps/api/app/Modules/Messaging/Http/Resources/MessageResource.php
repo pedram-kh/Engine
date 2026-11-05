@@ -37,6 +37,8 @@ final class MessageResource extends JsonResource
                 'body' => $this->body,
                 'attachments' => $this->presentAttachments(),
                 'system_event_key' => $this->system_event_key,
+                // AH-118 — ALWAYS present, null for lines that carry no data.
+                'system_event_data' => $this->system_event_data,
                 'is_own' => $this->sender_user_id !== null && $this->sender_user_id === $viewerId,
                 'sender' => $this->sender_user_id !== null && $this->relationLoaded('sender') && $this->sender !== null
                     ? ['name' => $this->sender->name]
