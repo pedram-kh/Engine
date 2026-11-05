@@ -14,7 +14,7 @@ Not pushed. Native build not started.
 
 - vue-tsc clean (main, admin); api-client tsc clean.
 - ESLint 0 errors (2 existing warnings); Prettier clean.
-- Vitest main: 4136 tests, 2 failed. Both are `appIconAssets.spec` (splash.png). They also fail at `270d097e` without these changes, so they are environment-dependent and pre-existing.
+- Vitest main: 4136 tests, 2 failed. Both are `appIconAssets.spec` (splash.png). They also fail on a clean checkout of `270d097e` (a worktree at that commit, node_modules linked, not `origin/main`), so they are environment-dependent and pre-existing (tech-debt "pixel-exact icon spec").
 - Vitest admin 690/690. api-client 228/228.
 - Break-reverts, all caught: region switch flag gate, omit-restrict-when-OFF, 422 offer_locked race handling, status-hide (detail and drawer), money format (chat, notification), chat fallback, locked-branch order, 422 region handler, `is_region_locked` computed, locked-dialog unchanged hint.
 - Native polarity: job detail (web and native), creator assignment list (native and web), creator assignment detail (web and native), `ChatPanel.native.spec`.

@@ -74,6 +74,28 @@ happened.
 
 ---
 
+## AH-118 — campaign rules (API + main web + admin web), both flags OFF — PENDING
+
+> **One entry, one sitting, in this order: snapshot, migrate (M1, M2), API, verify both flags OFF, main web, admin web.** The API goes first: the new web calls the new endpoints, and an old API under the new web would show a region switch that the API ignores. The two flags stay OFF at deploy; Pedram flips them afterwards (below). **Native build 4 follows the web deploy.**
+
+- **Status:** PENDING. Opened 2026-11-05. Pushed (`origin/main`); **not deployed. Pushing is not deploying.**
+- **Range:** the production API **`066ff29c`** (reported 2026-10-29, current state **not read**) and the production main SPA **`1bc398e8`** (reported), admin at the 2026-10-29 build (reported) → **`60b908fc`** (the pushed tip; the last runtime commit is `86b0a7e0`, after it only tests and docs). CI at the tip: run `41950195214` (https://github.com/pedram-kh/Engine/actions/runs/41950195214): **green, all four jobs (Frontend, Backend, E2E admin, E2E main)**. The mirror may rewrite SHAs (unconfirmed); these are GitHub's.
+- **AH entries carried:** AH-118. AH-116 and AH-117 are also pushed and not deployed, with their own `PENDING` entries; they are independent and may go before or after. The AH-116 API entry and this one both touch the API: deploy them in one sitting if they are not already out.
+- **Migrations run:** **two**, both additive and schema-only (no row is rewritten): **M1** `2026_11_05_100000_add_restrict_to_listing_regions_to_campaigns` (one boolean column, default false, on `campaigns`) and **M2** `2026_11_05_100001_add_system_event_data_to_messages` (one nullable jsonb column on `messages`). Pre-deploy: `php artisan migrate --pretend` read and recorded.
+- **Pre-deploy reads:** `php artisan migrate:status` (the two are Pending); the count of `campaigns` and `messages` rows (for the post-read). Local evidence, quoted and **not read from the server:** Pest serial 4314 passed, 1 skipped; Pint and PHPStan clean; Vitest main 4135 of 4137 (the 2 are the pixel-exact icon spec, failing on a clean checkout too), admin 690, api-client 228; Playwright main 48 of 48, admin 2 of 2.
+- **Preconditions (all must be recorded before the sitting opens):** (1) **Postgres run of the lock tests recorded**: `CampaignAssignmentContractTest`, `AssignmentOfferEditTest`, `OfferEditNotificationsTest`, `CampaignRulesSchemaTest` on Postgres 16, 70 passed, in `campaign-rules-plan.md` section 14 (done at `cc224c09`; **re-run against the tip's DB before the sitting if the box's Postgres differs**). (2) The snapshot is `available`. (3) CI green at the pushed tip (above). (4) No erasure claimed during the API step (the runbook rule).
+- **Snapshot ID:** `<to fill>` · confirmed `available` before migrating? `<yes/no>` (taken **before** the migrate, recorded before it runs).
+- **Infra:** `queue:restart` **required** (a new mailable, a new notification type, a new push type and lang files must load), done after the API code is in place. No cron, scheduler or env change. `composer install`: the lock is unchanged at drafting (confirm). Builds: the **main** SPA and the **admin** SPA, each its own Netlify deploy. The admin build is **needed**: its push-deliveries type filter is a hardcoded list that gains `assignment.offer_edited`; without it rows still list but the filter and label lack the new type.
+- **One-shot commands:** none.
+- **Post-deploy verification (to fill, each as read or "not read"):** `/up` 200; an agency user's `/me` shows `features.campaign_region_restriction` and `features.assignment_offer_edit` both `false`; a campaign created with the switch ON reports `restrict_to_listing_regions: false` while the flag is OFF (422 `campaign.region_restriction_disabled` on the write); `PATCH .../assignments/<built-in function id>/offer` answers 404 while its flag is OFF; the creator job detail still shows Apply and carries `is_region_locked: false` and `region_lock_reason: null`; the agency campaign form shows **no** new switch; the creator job board and detail work on build 3 (old native) unchanged; the admin Push deliveries filter lists "Offer amount edited"; `migrate:status` shows M1 and M2 Ran; the row counts match the pre-read.
+- **Flags armed:** **none at deploy (both OFF).** Afterwards, by Pedram, in the admin Feature-flags page, each with a reason: `campaign_region_restriction_enabled` first (read one restricted test campaign end to end), then `assignment_offer_edit_enabled`. Read-back of each: `<to fill>`.
+- **After this entry: native build 4** (`CURRENT_PROJECT_VERSION` 3 to 4 in both configs of the iOS project), then the N1 to N10 device walk (`campaign-rules-plan.md` section 6). Build 4 is **not** a precondition for the web deploy, but the creator-side native surfaces only render these changes in build 4.
+- **Operator:** to be recorded: the colleague, from the mirror (both SHAs).
+- **Anything unexpected:** to be recorded after the deploy.
+- **Rollback:** redeploy the previous API and both SPA builds. The two columns are additive and unread by old code, so they stay; with both flags OFF no behaviour depends on them. `queue:restart` again after an API rollback. Snapshot restore only if data was damaged (none is written by the migrations).
+
+---
+
 ## AH-117 — admin list navigation (admin SPA only) — PENDING
 
 > **No API dependency.** The build works against the API that is live now; it reads the same list endpoints with the same parameters. It can be deployed before, after or without the AH-116 entries below. Do not combine it with them: their web build is the **main** site.
