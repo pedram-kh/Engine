@@ -307,7 +307,7 @@ test.describe('AH-118 — an agency invite is not a region question', () => {
     const admin = await seedAgencyAdmin(request)
     await signUpUser(request, creatorEmail, CREATOR_PASSWORD, 'Region Invited')
     await verifyEmailViaApi(request, creatorEmail)
-    const seeded = await seedContractedAssignment(request, admin.agencyUlid, creatorEmail, {
+    await seedContractedAssignment(request, admin.agencyUlid, creatorEmail, {
       campaignName: 'Invite beats region',
       status: 'invited',
       restrictToListingRegions: true,
