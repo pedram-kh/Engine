@@ -75,7 +75,7 @@
 ### A3 — Item 1: validation, storage, resource
 
 - `ValidatesJobsBoardListing` gains `restrict_to_listing_regions` (`sometimes`, `boolean`) and a merged-state rule: the switch ON with an empty `listing_regions` (payload where it speaks, stored row elsewhere) is a 422 on `listing_regions`.
-- Flag OFF: the field is accepted and ignored on write (the stored value does not change) and the resource reports `false`; ON: stored and reported. (Chosen so a stale client cannot error; VERIFY AT BUILD against how `creator_posts_content` behaved before AH-069.)
+- **Ruling 1 (supersedes accept-and-ignore):** while `campaign_region_restriction_enabled` is OFF, a write that sets the switch ON is rejected with 422 `campaign.region_restriction_disabled`; a write that sets it OFF (or omits it) is fine. **Recorded deviation:** the resource reports the STORED value, not a flag-masked `false` (the apply and detail paths are what the flag gates, via `isRegionLockedFor`).
 - `CampaignController::store` whitelist (`:124-128`) gains the column (`?? false`); `update` goes through `fill`. `CampaignResource` (`:62-66`) emits it.
 - **Specs:** `CampaignCrudTest`, `CampaignJobsBoardListingTest`.
 
@@ -91,7 +91,7 @@
 ### A5 — Item 2: the edit service and endpoint
 
 - `AssignmentOfferEditor::edit(CampaignAssignment, int $newAmount, User $actor)`: in one transaction, `lockForUpdate` the assignment, re-evaluate `AssignmentOfferLock`, refuse if locked, refuse if the amount equals the current one (`assignment.offer_unchanged`), write `agreed_fee_minor_units` only, then audit, then the history line. Notification and mail are dispatched after the commit, never inside it.
-- Route: `PATCH agencies/{agency}/campaigns/{campaign}/assignments/{assignment}/offer`, middleware as its siblings, ability `invite`, body `{ agreed_fee_minor_units }` (integer, min 1; the currency is not accepted, Q12). Errors: 422 `assignment.offer_locked` with `meta.reason`, 422 `assignment.offer_unchanged`, 404 `not_found` while the flag is OFF (the `account_deletion_enabled` precedent), 404 on a cross-tenant or cross-campaign assignment.
+- Route: `PATCH agencies/{agency}/campaigns/{campaign}/assignments/{assignment}/offer`, middleware as its siblings, ability `invite`, body `{ agreed_fee_minor_units }` (integer, min 1; the currency is not accepted, Q12). Errors: 422 `assignment.offer_locked` with `meta.reason` (the lock reasons other than `feature_disabled`), 422 `assignment.offer_unchanged` with no notification (ruling 3), 404 `not_found` while the flag is OFF (ruling 4; the `account_deletion_enabled` precedent), 404 on a cross-tenant or cross-campaign assignment. A non-member or a creator also gets 404, never 403: `tenancy.agency` hides the agency before the policy runs (house convention); the `invite` Gate itself is covered by a test that denies it and expects 403.
 - Contract attach (`CampaignAssignmentContractController::attach`, `:103`) takes `lockForUpdate` on the assignment before it creates the contract row, so an in-flight edit and an attach serialize.
 - Payload: `CampaignAssignmentResource` and `CampaignAssignmentReviewController::show` carry `offer_edit_locked` and `offer_edit_lock_reason`.
 - **Break-reverts:** each of the five lock legs (the `payment_id` leg seeded by hand, as `payment_id` is never set today); the in-transaction re-check; `lockForUpdate` on edit and on attach (a concurrency test that interleaves the two); the ability gate; the tenancy check; the flag 404; currency not writable; the notification dispatched inside the transaction.
@@ -239,7 +239,13 @@ Opened `PENDING` in D1, stacked onto an open entry if one exists. Order:
 7. **Native build 4** after the web deploy, then the §6 walk.
 8. Record both SHAs (the mirror rewrites them) and the snapshot ID. One-shot commands: none.
 
-No admin deploy is required; the admin SPA is unchanged unless §8 finds the push-type label is needed.
+**Admin deploy IS in the entry (ruling 5, decided after reading the admin code):** `PushDeliveriesPage.vue` builds its type filter from the hardcoded `PUSH_NOTIFICATION_TYPES` list plus a label key, so the new push type `assignment.offer_edited` is missing from the filter until the admin SPA is rebuilt. Rows still list; only the filter and label are affected. Admin deploy follows the main web deploy.
+
+**Preconditions (all must be recorded before the entry opens):**
+
+1. **Postgres run of the lock tests:** `CampaignAssignmentContractTest`, `AssignmentOfferEditTest`, `OfferEditNotificationsTest`, `CampaignRulesSchemaTest` against local Postgres (not sqlite, where `lockForUpdate` is a no-op), result written in the review.
+2. Full serial Pest, Pint, PHPStan green at the pushed tip, CI cited.
+3. The API and the web contract (`notification-route-keys.json` consumers) pushed together.
 
 ---
 
@@ -262,8 +268,32 @@ Full backend Pest serial (`-d memory_limit=2G`), Pint `--all`, PHPStan (no path 
 
 ## 12. Questions for the plan review
 
-1. **Flag OFF on write (A3):** the switch is accepted and ignored while `campaign_region_restriction_enabled` is OFF. Alternative: reject with 422. Recommendation: accept and ignore.
-2. **Null-country reason (A4):** a `meta.reason = country_missing` on the 422, so the creator page can link to the profile. Confirm.
+1. **Flag OFF on write (A3):** RULED: reject with 422 `campaign.region_restriction_disabled` (not accept-and-ignore).
+2. **Null-country reason (A4):** a `meta.reason = country_missing` on the 422 (ruling 2; the other reason on this code is `outside_regions`, a recorded deviation: the apply 422 always carries `meta.reason`), so the creator page can link to the profile. RULED yes.
 3. **No-op edit (A5):** an edit to the same amount is a 422 `assignment.offer_unchanged` with no notification. Confirm.
 4. **Flag OFF on the edit endpoint:** 404 (as `account_deletion_enabled`) rather than 403. Confirm.
 5. **Admin push-type label:** if the admin SPA must show the new push type by name, an admin deploy joins the entry. Decide after the A6 read.
+
+---
+
+## 13. Recorded deviations from this plan (as built, API checkpoint `cc224c09`)
+
+1. **Region switch with the flag OFF:** 422 `campaign.region_restriction_disabled` (ruling 1), and the resource reports the stored value (not masked).
+2. **Apply 422 `meta.reason`:** `country_missing` or `outside_regions`.
+3. **History-line payload keys:** `system_event_data = { previous_amount, new_amount, currency }` (minor units), not `previous_minor`/`new_minor`.
+4. **Audit metadata:** `{ from, previous_agreed_fee_minor_units, agreed_fee_minor_units, agreed_fee_currency }` (no `to`, no `status`). The audit row and the history line are written inside the editor's transaction (A6); the notifier runs after commit.
+5. **Notifier has no flag check:** the endpoint 404s while the flag is OFF, so every caller holds it; the mail still honours the recipient's `email` preference.
+6. **Notifier is silent for an unavailable creator** (erased, pending deletion, erasure-claimed; `AgencyCreatorSurfaces` row `silent`): the edit, audit and history line still happen, no mail, in-app row or push.
+7. **Lock reasons:** `feature_disabled`, `payment`, `contract_signed`, `contract_pending`, `status`, evaluated in that order. The editable window is `invited` and `accepted` only.
+8. **API `messages.php` lang lines skipped** (unused).
+9. **Authz:** 404 (tenancy) for non-members and creators; `CampaignPolicy::invite` checks the role only, not the campaign's agency, so tenancy is the cross-agency boundary (pre-existing, shared by every ability).
+10. **Web contract specs** (`templates.spec.ts`, `notificationDestination.registry.spec.ts`) read `notification-route-keys.json` and are red until C1; API and C1 go out together.
+
+## 14. Postgres run (precondition record)
+
+Run against a throwaway local Postgres 16 database `catalyst_test` (never the dev `catalyst` DB; its counts were identical before and after: users 3, audit_logs 3, migrations 87, the rest 0).
+
+- `CampaignAssignmentContractTest`, `AssignmentOfferEditTest`, `OfferEditNotificationsTest`, `CampaignRulesSchemaTest`: **70 passed** at `cc224c09`.
+- Whole `tests/Feature/Modules/Campaigns` + `Messaging` on Postgres: 4 failures remain, **all pre-existing on `origin/main`** (`CampaignApplication*`, `CampaignAttachment*` abort the transaction; `CampaignCrudTest` and `InviteEmailNotificationTest` assert jsonb key order). Logged as tech-debt, not touched.
+- **Found by the Postgres run:** two of our own asserts compared `system_event_data` key order, which jsonb does not keep; fixed with `toEqual` (`cc224c09`). The behaviour was right, the assertions were not.
+- **Limit, stated plainly:** this proves the SQL (`FOR UPDATE`) runs on Postgres and the re-check logic, in ONE connection. It is not a two-connection concurrency proof; that remains untested.
