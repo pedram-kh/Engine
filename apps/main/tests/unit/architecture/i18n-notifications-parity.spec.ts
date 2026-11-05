@@ -73,6 +73,8 @@ const LIVE_TYPES = [
   // approval, so a missing translation would be visible immediately.
   'assignment.completed_on_approval',
   'assignment.manually_verified',
+  // AH-118 — the agency changed the amount of the creator's offer.
+  'assignment.offer_edited',
   // AH-101 (⑦) — the creator's automatic-verification notice, 20 → 21.
   'assignment.live_verified',
   'assignment.draft_submitted',
@@ -154,7 +156,7 @@ describe('i18n notifications.* — en/pt/it parity + only-8-templated invariant'
     }
   })
 
-  it('notifications.types holds EXACTLY the 22 live templates + fallback', async () => {
+  it('notifications.types holds EXACTLY the 23 live templates + fallback', async () => {
     const en = await loadBundle('en')
     const typeKeys = Object.keys(en.notifications.types).sort()
 
@@ -170,6 +172,7 @@ describe('i18n notifications.* — en/pt/it parity + only-8-templated invariant'
       'assignment_invited',
       'assignment_live_verified',
       'assignment_manually_verified',
+      'assignment_offer_edited',
       'assignment_revision_requested',
       'campaign_application_accepted',
       'campaign_application_rejected',
@@ -262,7 +265,7 @@ describe('notifications prefs role-partition — single live-set source of truth
     }
   })
 
-  it('the known role split is honest (creator = 14 invite/review/lifecycle/messaging/jobs, agency = 5 fan-out/messaging/jobs)', () => {
+  it('the known role split is honest (creator = 15 invite/review/lifecycle/messaging/jobs, agency = 5 fan-out/messaging/jobs)', () => {
     expect([...creatorTypes].sort()).toEqual(
       [
         // AH-083 — the invite dual-emit. Creator-only by construction: the
@@ -275,6 +278,8 @@ describe('notifications prefs role-partition — single live-set source of truth
         'assignment.draft_approved',
         'assignment.draft_rejected',
         'assignment.manually_verified',
+        // AH-118 — creator-only by construction: the AGENCY changed the offer.
+        'assignment.offer_edited',
         // AH-101 (⑦) — creator-only: the platform's own check passed.
         'assignment.live_verified',
         'assignment.revision_requested',
@@ -333,7 +338,7 @@ describe('notifications prefs role-partition — single live-set source of truth
     ].flatMap((g) => g.types)
 
     const withEmail = rows.filter((r) => r.channels.includes('email')).map((r) => r.type)
-    expect(withEmail).toHaveLength(13)
+    expect(withEmail).toHaveLength(14)
     // The agency-inviter mails and the account-lifecycle mails never get a switch.
     for (const type of [
       'assignment.draft_submitted',

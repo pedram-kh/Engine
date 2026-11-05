@@ -99,21 +99,21 @@ describe('NotificationPreferencesPage', () => {
     wrapper.unmount()
   })
 
-  it('role filter — a CREATOR sees 14 types / 27 toggles across 4 groups (matrix: in-app + email + digest)', async () => {
+  it('role filter — a CREATOR sees 15 types / 29 toggles across 4 groups (matrix: in-app + email + digest)', async () => {
     vi.mocked(notificationsApi.getPreferences).mockResolvedValue(envelope())
     const wrapper = mountPage('creator')
     await flushPromises()
 
-    // 14 types, 27 toggles (AH-101): 14 in_app (one per type) + 12 email + 1 digest.
+    // 15 types, 29 toggles (AH-101 + AH-118): 15 in_app (one per type) + 13 email + 1 digest.
     // The 12 email cells are exactly the creator types whose send site now reads
     // the `email` preference — invited, the three draft outcomes, completion,
     // manual + automatic verification, both message kinds, job posted, and the
     // two application answers. `creator.approved` / `creator.rejected` have NO
     // email switch (always-on caption instead), and the campaign message type
     // keeps its opt-in digest.
-    expect(wrapper.findAll('[data-test^="prefs-type-"]')).toHaveLength(14)
-    expect(wrapper.findAll('[data-test^="prefs-toggle-"]')).toHaveLength(27)
-    expect(wrapper.findAll('[data-test^="prefs-toggle-"][data-test$="-email"]')).toHaveLength(12)
+    expect(wrapper.findAll('[data-test^="prefs-type-"]')).toHaveLength(15)
+    expect(wrapper.findAll('[data-test^="prefs-toggle-"]')).toHaveLength(29)
+    expect(wrapper.findAll('[data-test^="prefs-toggle-"][data-test$="-email"]')).toHaveLength(13)
     expect(wrapper.find('[data-test="prefs-toggle-assignment.invited-in_app"]').exists()).toBe(true)
     // All four groups present — AH-058 (Q5) split `jobs_board` out of
     // `assignment`, honouring the trigger AH-056 recorded in the enum.
@@ -227,8 +227,8 @@ describe('NotificationPreferencesPage', () => {
 
     expect(notificationsApi.updatePreferences).toHaveBeenCalledTimes(1)
     const payload = vi.mocked(notificationsApi.updatePreferences).mock.calls[0]?.[0]
-    // A creator submits all 27 (type, channel) toggles — 14 in_app + 12 email + 1 digest.
-    expect(payload?.preferences).toHaveLength(27)
+    // A creator submits all 29 (type, channel) toggles — 15 in_app + 13 email + 1 digest.
+    expect(payload?.preferences).toHaveLength(29)
     expect(payload?.preferences.filter((p) => p.channel === 'digest')).toHaveLength(1)
     // The flipped in_app rides false; the opted-in digest rides true.
     expect(
@@ -406,9 +406,9 @@ describe('NotificationPreferencesPage', () => {
       await flushPromises()
 
       expect(wrapper.find('[data-test^="prefs-grid-"]').exists()).toBe(false)
-      expect(wrapper.findAll('.prefs-card')).toHaveLength(14)
+      expect(wrapper.findAll('.prefs-card')).toHaveLength(15)
       // The same data-test ids and toggle counts as the grid — only the layout moved.
-      expect(wrapper.findAll('[data-test^="prefs-toggle-"]')).toHaveLength(27)
+      expect(wrapper.findAll('[data-test^="prefs-toggle-"]')).toHaveLength(29)
       // A card carries only its own channels: the always-on caption sits in the card.
       const card = wrapper.find('[data-test="prefs-type-creator.approved"]')
       expect(card.find('[data-test="prefs-toggle-creator.approved-in_app"]').exists()).toBe(true)
@@ -431,7 +431,7 @@ describe('NotificationPreferencesPage', () => {
 
       expect(
         vi.mocked(notificationsApi.updatePreferences).mock.calls[0]?.[0].preferences,
-      ).toHaveLength(27)
+      ).toHaveLength(29)
       wrapper.unmount()
     })
   })

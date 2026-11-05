@@ -50,7 +50,7 @@ const DEFAULTS = { in_app: true, email: true, digest: false, push: true }
 /** What the API ships today: only the exceptions to the channel default. */
 const TYPE_DEFAULTS = { 'campaign.job_posted': { push: false } }
 
-/** The ten push switches the creator matrix carries (PushEligibility::TOGGLEABLE). */
+/** The eleven push switches the creator matrix carries (PushEligibility::TOGGLEABLE). */
 const PUSH_SWITCH_TYPES = [
   'assignment.invited',
   'assignment.revision_requested',
@@ -58,6 +58,7 @@ const PUSH_SWITCH_TYPES = [
   'assignment.draft_rejected',
   'assignment.completed_on_approval',
   'assignment.manually_verified',
+  'assignment.offer_edited',
   'message.received_by_creator',
   'message.relationship_received_by_creator',
   'campaign_application.accepted',
@@ -132,7 +133,7 @@ describe('push column — web (push not available)', () => {
     await flushPromises()
 
     const sent = vi.mocked(notificationsApi.updatePreferences).mock.calls[0]?.[0].preferences
-    expect(sent).toHaveLength(27)
+    expect(sent).toHaveLength(29)
     expect(sent?.filter((p) => p.channel === 'push')).toHaveLength(0)
     wrapper.unmount()
   })
@@ -155,7 +156,7 @@ describe('push column — native (push available)', () => {
     platform.pushAvailable = true
   })
 
-  it('shows exactly the ten push switches and the two always-on captions, as stacked cards', async () => {
+  it('shows exactly the eleven push switches and the two always-on captions, as stacked cards', async () => {
     vi.mocked(notificationsApi.getPreferences).mockResolvedValue(envelope())
     const wrapper = mountPage('creator')
     await flushPromises()
@@ -171,8 +172,8 @@ describe('push column — native (push available)', () => {
         'Always on',
       )
     }
-    // 27 web toggles + 10 push.
-    expect(wrapper.findAll('[data-test^="prefs-toggle-"]')).toHaveLength(37)
+    // 29 web toggles + 11 push.
+    expect(wrapper.findAll('[data-test^="prefs-toggle-"]')).toHaveLength(40)
     expect(wrapper.find('.prefs-card').exists()).toBe(true)
     wrapper.unmount()
   })
@@ -275,7 +276,7 @@ describe('push column — native (push available)', () => {
   })
 
   describe('save', () => {
-    it('sends all ten push rows in the single payload, carrying the composed value', async () => {
+    it('sends all eleven push rows in the single payload, carrying the composed value', async () => {
       vi.mocked(notificationsApi.getPreferences).mockResolvedValue(envelope())
       vi.mocked(notificationsApi.updatePreferences).mockResolvedValue(envelope())
       const wrapper = mountPage('creator')
@@ -286,7 +287,7 @@ describe('push column — native (push available)', () => {
 
       const sent = vi.mocked(notificationsApi.updatePreferences).mock.calls[0]?.[0].preferences
       const pushRows = sent?.filter((p) => p.channel === 'push') ?? []
-      expect(sent).toHaveLength(37)
+      expect(sent).toHaveLength(40)
       expect(pushRows.map((p) => p.notification_type).sort()).toEqual([...PUSH_SWITCH_TYPES].sort())
       // Untouched: job_posted rides its OFF default, everything else its ON one.
       expect(pushRows.find((p) => p.notification_type === 'campaign.job_posted')?.is_enabled).toBe(

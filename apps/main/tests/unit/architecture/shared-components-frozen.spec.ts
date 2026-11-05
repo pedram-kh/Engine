@@ -47,8 +47,9 @@ const FROZEN_COMPONENTS: ReadonlyArray<readonly [string, string]> = [
     'b7a56fd099ccdd60c1e944d87260f3ff624c431985e05e453df2c3b8c25d8338',
   ],
   [
+    // AH-118 C4: offer_edited system line — intended edit, hash re-pinned.
     'apps/main/src/modules/messaging/components/ChatPanel.vue',
-    'a6971bd47cfacd5832c9b0c9f4a847ed217d9b6e0ddc24fe3384fc38f84067a6',
+    '1d1c39816fe064483a22b68c41c432f6c4aaf50f02ddc1e650fccd8f4e800d41',
   ],
   [
     'apps/main/src/modules/messaging/components/ContactPicker.vue',
@@ -71,8 +72,9 @@ const FROZEN_COMPONENTS: ReadonlyArray<readonly [string, string]> = [
     'bba8172e5afc7fa3f5dbf61036c32cb674a03db508849f0ddfe4e3a0ae8a26f7',
   ],
   [
+    // AH-118 C5: offer_edited body money — intended edit, hash re-pinned.
     'apps/main/src/modules/notifications/components/NotificationCenter.vue',
-    'de11958b6598019dcf12e20a865443ac4010e31433c85d356f1d773d13b694a4',
+    'a8f7b2c83d55dd54e71008ae0b3f6bd86c26dcec7433ef286050ad1bd6b9303a',
   ],
   [
     'apps/main/src/modules/notifications/components/PushStateRow.vue',

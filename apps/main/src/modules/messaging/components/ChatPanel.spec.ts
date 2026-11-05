@@ -22,6 +22,7 @@ function msg(id: string, attrs: Partial<MessageResource['attributes']> = {}): Me
       body: 'hello there',
       attachments: [],
       system_event_key: null,
+      system_event_data: null,
       is_own: false,
       sender: { name: 'Agency Op' },
       created_at: '2026-01-01T00:00:00+00:00',
@@ -113,6 +114,63 @@ describe('ChatPanel', () => {
     expect(feedText).not.toContain('The contract was signed')
     wrapper.unmount()
   })
+
+  // ── AH-118: the offer-edit history line ────────────────────────────────────
+
+  function offerEdited(data: Record<string, unknown> | null): MessageResource {
+    return msg('oe1', {
+      kind: 'system',
+      sender_role: 'system',
+      body: null,
+      sender: null,
+      system_event_key: 'assignment.offer_edited',
+      system_event_data: data,
+    })
+  }
+
+  async function feedTextFor(message: MessageResource, locale = 'en'): Promise<string> {
+    const i18n = createI18n({ legacy: false, locale, messages: { [locale]: enApp } as never })
+    const vuetify = createVuetify({ components: vuetifyComponents, directives: vuetifyDirectives })
+    const wrapper = mount(ChatPanel, {
+      props: { transport: makeTransport({ list: vi.fn().mockResolvedValue(feed([message])) }) },
+      global: { plugins: [i18n, vuetify] },
+      attachTo: document.createElement('div'),
+    })
+    await flushPromises()
+    const text = wrapper.find('[data-test="chat-feed"]').text()
+    wrapper.unmount()
+    return text
+  }
+
+  it('renders "The offer changed from {from} to {to}." with both amounts formatted in the locale', async () => {
+    const text = await feedTextFor(
+      offerEdited({ previous_amount: 100_00, new_amount: 250_50, currency: 'EUR' }),
+    )
+    expect(text).toContain('The offer changed from €100.00 to €250.50.')
+  })
+
+  it('formats the amounts for a non-English reader (de: decimal comma)', async () => {
+    const text = await feedTextFor(
+      offerEdited({ previous_amount: 100_00, new_amount: 250_50, currency: 'EUR' }),
+      'de',
+    )
+    expect(text).toMatch(/100,00\s€/)
+    expect(text).toMatch(/250,50\s€/)
+  })
+
+  it.each([
+    ['an absent bag', null],
+    ['a bag with no currency', { previous_amount: 100_00, new_amount: 250_00 }],
+    ['a bag with a string amount', { previous_amount: '100', new_amount: 250_00, currency: 'EUR' }],
+    ['an empty currency', { previous_amount: 100_00, new_amount: 250_00, currency: '' }],
+  ])(
+    'falls back to the generic system line for %s, never a half-filled sentence',
+    async (_label, data) => {
+      const text = await feedTextFor(offerEdited(data as Record<string, unknown> | null))
+      expect(text).toContain('The assignment was updated.')
+      expect(text).not.toContain('The offer changed')
+    },
+  )
 
   it('hides the compose form and shows the closed notice on a terminal thread', async () => {
     const wrapper = await mountPanel(

@@ -18,6 +18,13 @@ describe('notificationVisual (AH-100d, frame 09)', () => {
     })
   })
 
+  it('gives the offer edit (AH-118) its own cash icon, not the neutral bell', () => {
+    expect(notificationVisual('assignment.offer_edited')).toEqual({
+      icon: 'mdi-cash-edit',
+      tone: 'info',
+    })
+  })
+
   it('gives a type the wire sends but the app does not know a neutral bell', () => {
     expect(notificationVisual('something.new')).toEqual({
       icon: 'mdi-bell-outline',

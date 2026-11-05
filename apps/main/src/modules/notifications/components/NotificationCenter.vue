@@ -26,7 +26,7 @@
  * the creator page, so agency users get working rows too.
  */
 
-import type { NotificationResource } from '@catalyst/api-client'
+import { formatCurrency, type NotificationResource } from '@catalyst/api-client'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -82,7 +82,17 @@ function bodyText(row: NotificationResource): string {
   // references ONLY the keys its emit site sends; extra keys are ignored and
   // missing keys never appear because no template references a key its own
   // emit site doesn't provide.
-  return t(key, { ...row.attributes.data })
+  const data: Record<string, unknown> = { ...row.attributes.data }
+  // AH-118: the offer-edit row stores minor units + a currency; the sentence
+  // wants the money in the reader's locale, so it is formatted here.
+  if (row.attributes.notification_type === 'assignment.offer_edited') {
+    const { previous_amount: previous, new_amount: next, currency } = data
+    if (typeof previous === 'number' && typeof next === 'number' && typeof currency === 'string') {
+      data.previous_amount = formatCurrency(previous, currency, locale.value)
+      data.new_amount = formatCurrency(next, currency, locale.value)
+    }
+  }
+  return t(key, data)
 }
 
 /**

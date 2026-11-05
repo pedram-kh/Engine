@@ -16,6 +16,7 @@ function msg(id: string, attrs: Partial<MessageResource['attributes']> = {}): Me
       body: 'hello',
       attachments: [],
       system_event_key: null,
+      system_event_data: null,
       is_own: false,
       sender: { name: 'Agency' },
       created_at: '2026-01-01T00:00:00+00:00',

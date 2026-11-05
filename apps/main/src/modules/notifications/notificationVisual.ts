@@ -42,6 +42,7 @@ const VISUALS: Partial<Record<NotificationType, NotificationVisual>> = {
   'assignment.draft_rejected': { icon: 'mdi-close-circle-outline', tone: 'danger' },
   'assignment.cancelled': { icon: 'mdi-close-circle-outline', tone: 'danger' },
   'assignment.countered': { icon: 'mdi-swap-horizontal', tone: 'info' },
+  'assignment.offer_edited': { icon: 'mdi-cash-edit', tone: 'info' },
   'assignment.draft_submitted': { icon: 'mdi-upload-outline', tone: 'info' },
   'assignment.revision_requested': { icon: 'mdi-pencil-outline', tone: 'info' },
   'assignment.payment_funded': { icon: 'mdi-cash', tone: 'success' },

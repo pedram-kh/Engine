@@ -264,6 +264,7 @@ describe('AH-101 preference matrix registry', () => {
     'assignment.invited',
     'assignment.completed_on_approval',
     'assignment.manually_verified',
+    'assignment.offer_edited',
     'assignment.live_verified',
     'assignment.draft_approved',
     'assignment.revision_requested',
@@ -417,14 +418,14 @@ describe('AH-102 push column registry', () => {
     )
   }
 
-  it('reads the backend lists (the spec is looking at the ruled sets: 10 toggleable, 4 always-on)', () => {
-    expect(eligibilityList('TOGGLEABLE')).toHaveLength(10)
+  it('reads the backend lists (the spec is looking at the ruled sets: 11 toggleable, 4 always-on)', () => {
+    expect(eligibilityList('TOGGLEABLE')).toHaveLength(11)
     expect(eligibilityList('ALWAYS_ON')).toHaveLength(4)
   })
 
   it('offers a push switch for exactly PushEligibility::TOGGLEABLE — no more, no fewer', () => {
     expect([...pushSwitchTypes()].sort()).toEqual([...eligibilityList('TOGGLEABLE')].sort())
-    expect(pushSwitchTypes()).toHaveLength(10)
+    expect(pushSwitchTypes()).toHaveLength(11)
   })
 
   it('shows push as an always-on caption for the ALWAYS_ON types that HAVE a matrix row, and registers the rest as toggle-less', () => {

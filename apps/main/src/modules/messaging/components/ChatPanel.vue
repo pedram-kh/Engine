@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { ApiError, extractFieldErrors, uploadToPresignedUrl } from '@catalyst/api-client'
+import {
+  ApiError,
+  extractFieldErrors,
+  formatCurrency,
+  uploadToPresignedUrl,
+} from '@catalyst/api-client'
 import type {
   MessageResource,
   SendMessageAttachment,
@@ -148,9 +153,37 @@ function senderLabel(message: MessageResource): string {
   return message.attributes.sender?.name ?? t('app.messaging.participant')
 }
 
+/**
+ * The money params of an `assignment.offer_edited` line (AH-118), formatted in
+ * the reader's locale from the structured `system_event_data` (minor units +
+ * currency). Null when the bag is absent or malformed, which falls back to the
+ * generic system line rather than printing a half-filled sentence.
+ */
+function offerEditedParams(message: MessageResource): { from: string; to: string } | null {
+  const data = message.attributes.system_event_data
+  if (data === null || data === undefined) return null
+  const { previous_amount: previous, new_amount: next, currency } = data
+  if (
+    typeof previous !== 'number' ||
+    typeof next !== 'number' ||
+    typeof currency !== 'string' ||
+    currency === ''
+  ) {
+    return null
+  }
+  return {
+    from: formatCurrency(previous, currency, locale.value),
+    to: formatCurrency(next, currency, locale.value),
+  }
+}
+
 function systemLine(message: MessageResource): string {
   const key = message.attributes.system_event_key
   const i18nKey = `app.messaging.system.${key ?? ''}`
+  if (key === 'assignment.offer_edited') {
+    const params = offerEditedParams(message)
+    return params !== null && te(i18nKey) ? t(i18nKey, params) : t('app.messaging.systemFallback')
+  }
   if (key !== null && te(i18nKey)) {
     return t(i18nKey)
   }

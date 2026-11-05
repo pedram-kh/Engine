@@ -282,6 +282,16 @@ const LIVE_TYPES: Partial<Record<NotificationType, LiveNotificationType>> = {
     destination: TO_ASSIGNMENT,
     preference: { group: 'assignment', channels: IN_APP_EMAIL_PUSH },
   },
+  // AH-118 — the agency changed the amount of the creator's offer. Creator-only,
+  // all three channels, toggleable. The row carries the amounts as minor units
+  // plus the currency; the center formats them in the reader's locale (the
+  // template's {previous_amount} / {new_amount}), never the API.
+  'assignment.offer_edited': {
+    templateKey: 'notifications.types.assignment_offer_edited',
+    recipient: 'creator',
+    destination: TO_ASSIGNMENT,
+    preference: { group: 'assignment', channels: IN_APP_EMAIL_PUSH },
+  },
   // AH-101 (⑦) — the creator's post passed AUTOMATIC verification: the silent
   // success branch, now a notice. Creator-only. The mail leg is behind
   // `post_verified_mail_enabled` (default OFF) on the backend, but the `email`

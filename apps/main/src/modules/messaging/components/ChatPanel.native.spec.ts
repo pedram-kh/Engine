@@ -36,6 +36,7 @@ function msg(id: string): MessageResource {
       body: 'hello there',
       attachments: [],
       system_event_key: null,
+      system_event_data: null,
       is_own: false,
       sender: { name: 'Agency Op' },
       created_at: '2026-01-01T00:00:00+00:00',
@@ -138,6 +139,65 @@ describe('ChatPanel attach control — web (unchanged)', () => {
 
     expect(click).toHaveBeenCalledTimes(1)
     expect(wrapper.find('[data-test="chat-attach-menu"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+})
+
+// ── AH-118: the offer-edit history line reads the same in the app and on the web ──
+
+function offerEditedMessage(): MessageResource {
+  const base = msg('oe1')
+  return {
+    ...base,
+    attributes: {
+      ...base.attributes,
+      kind: 'system',
+      sender_role: 'system',
+      body: null,
+      sender: null,
+      system_event_key: 'assignment.offer_edited',
+      system_event_data: { previous_amount: 100_00, new_amount: 250_00, currency: 'EUR' },
+    },
+  }
+}
+
+async function mountWithOfferEdit(native: boolean) {
+  platform.native = native
+  const t = transport()
+  vi.mocked(t.list).mockResolvedValue({
+    data: [offerEditedMessage()],
+    meta: {
+      thread: {
+        id: 'thread-ulid',
+        assignment_id: 'assignment-ulid',
+        last_message_at: null,
+        unread_count: 0,
+        human_send_blocked: false,
+      },
+      has_more: false,
+    },
+  })
+  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: enApp } as never })
+  const vuetify = createVuetify({ components: vuetifyComponents, directives: vuetifyDirectives })
+  const wrapper = mount(ChatPanel, {
+    props: { transport: t },
+    global: { plugins: [i18n, vuetify] },
+    attachTo: document.createElement('div'),
+  })
+  await flushPromises()
+  return wrapper
+}
+
+describe('ChatPanel offer-edit line (AH-118)', () => {
+  it.each([
+    ['native', true],
+    ['web', false],
+  ])('%s: renders the localized line with both amounts', async (_label, native) => {
+    const wrapper = await mountWithOfferEdit(native)
+
+    expect(wrapper.find('[data-test="chat-feed"]').text()).toContain(
+      'The offer changed from €100.00 to €250.00.',
+    )
     wrapper.unmount()
   })
 })

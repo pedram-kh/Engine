@@ -29,7 +29,11 @@
  *   2. application rejected   → "Not selected"      (retained)
  *   3. application accepted   → the D7 offer notice (retained)
  *   4. application pending    → "Applied"           (retained)
- *   5. never applied          → Apply
+ *   5. never applied          → Apply, or (AH-118) when the campaign restricts
+ *                               applying to its listed regions and the caller is
+ *                               outside them, a "Not available in your region" note
+ *                               in its place. Branches 1-4 keep winning over it: an
+ *                               invite never depends on the region.
  *
  * Branch 1 was inserted ABOVE the others rather than merged into them, because
  * the bug it fixes was two truths rendered as one contradiction: the agency
@@ -82,6 +86,10 @@ const dialogOpen = ref(false)
 const note = ref('')
 const submitting = ref(false)
 const snackbar = ref<{ color: string; text: string } | null>(null)
+// AH-118: learned from a 422 `job.region_not_allowed` whose `meta.reason` is
+// `country_missing`: the detail payload says THAT the job is locked, the
+// refusal says WHY.
+const countryMissing = ref(false)
 
 const ulid = computed(() => String(route.params.ulid ?? ''))
 const status = computed(() => job.value?.attributes.application_status ?? null)
@@ -91,6 +99,7 @@ const lifecycleState = computed<JobLifecycleState | null>(
   () => job.value?.attributes.assignment_state ?? null,
 )
 const canApply = computed(() => job.value !== null && status.value === null)
+const regionLocked = computed(() => job.value?.attributes.is_region_locked === true)
 // Campaign attachments from the Files library, chunk B (AH-092, S6). Same
 // shared block as the assignment-detail page — see CreatorAttachmentsBlock.
 const attachments = computed(() => job.value?.attributes.attachments ?? [])
@@ -135,6 +144,16 @@ function refusalToast(code: string): { color: string; text: string } {
   }
 }
 
+/**
+ * A stale page tried to apply to a region-locked job (AH-118): say so, and flip
+ * the page to the locked state without a reload (the reload follows anyway).
+ */
+function lockFromRefusal(error: ApiError): void {
+  countryMissing.value = error.details[0]?.meta?.reason === 'country_missing'
+  if (job.value !== null) job.value.attributes.is_region_locked = true
+  snackbar.value = { color: 'error', text: t('creator.ui.jobs.toast.regionNotAllowed') }
+}
+
 async function submitApplication(): Promise<void> {
   if (submitting.value) return
   submitting.value = true
@@ -154,6 +173,12 @@ async function submitApplication(): Promise<void> {
     if (error instanceof ApiError && error.status === 404) {
       snackbar.value = { color: 'error', text: t('creator.ui.jobs.toast.gone') }
       await load()
+    } else if (
+      error instanceof ApiError &&
+      error.status === 422 &&
+      error.code === 'job.region_not_allowed'
+    ) {
+      lockFromRefusal(error)
     } else if (error instanceof ApiError && error.status === 409) {
       snackbar.value = refusalToast(error.code)
       await load()
@@ -408,7 +433,30 @@ onMounted(() => {
           {{ t('creator.ui.jobs.detail.appliedNotice') }}
         </v-alert>
 
-        <!-- BRANCH 5 — never applied. Retained unchanged. -->
+        <!-- BRANCH 5a (AH-118) — never applied, and the campaign is limited to
+             regions the creator is not in (or has no country for). The job stays
+             visible; only the action is replaced. -->
+        <div v-else-if="regionLocked" data-testid="creator-job-region-locked">
+          <v-alert type="info" variant="tonal" density="compact" class="mb-2">
+            {{ t('creator.ui.jobs.detail.regionLocked') }}
+            <template v-if="countryMissing">
+              <br />
+              <span data-testid="creator-job-region-locked-no-country">
+                {{ t('creator.ui.jobs.detail.regionLockedNoCountry') }}
+              </span>
+            </template>
+          </v-alert>
+          <v-btn
+            variant="text"
+            size="small"
+            :to="{ name: 'creator.profile' }"
+            data-testid="creator-job-region-locked-profile"
+          >
+            {{ t('creator.ui.jobs.detail.regionLockedProfileLink') }}
+          </v-btn>
+        </div>
+
+        <!-- BRANCH 5b — never applied. Retained unchanged. -->
         <v-btn
           v-else
           color="primary"

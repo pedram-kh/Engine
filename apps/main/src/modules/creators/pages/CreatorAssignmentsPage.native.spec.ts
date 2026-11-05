@@ -218,6 +218,22 @@ describe('invitations — native card (frame 10)', () => {
   })
 })
 
+describe('an agency-edited offer amount (AH-118 C3)', () => {
+  // The edit rewrites agreed_fee_minor_units server-side; the creator pages
+  // render whatever the payload says, so the new amount must simply show up.
+  it.each([
+    ['native', true],
+    ['web', false],
+  ])('%s: the list shows the edited amount', async (_l, native) => {
+    const wrapper = await mountIt(native, [
+      makeAssignment('A', 'invited', { agreed_fee_minor_units: 25050 }),
+    ])
+
+    expect(wrapper.text()).toContain('€250.50')
+    expect(wrapper.text()).not.toContain('€25.00')
+  })
+})
+
 describe('invitations — web is unchanged', () => {
   it('keeps the one-line summary and the web labels, with none of the native card', async () => {
     const wrapper = await mountIt(false, [makeAssignment('A', 'invited')])

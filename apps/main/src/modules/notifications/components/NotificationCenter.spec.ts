@@ -482,6 +482,25 @@ describe('NotificationCenter — localized render per live type', () => {
     expect(body).toBe('Your post for Spring Launch was verified.')
   })
 
+  it('assignment.offer_edited — creator row formats both amounts from minor units (AH-118)', async () => {
+    const body = await renderBodyFor('assignment.offer_edited', {
+      campaign_name: 'Spring Launch',
+      assignment_ulid: '01ASSIGN',
+      previous_amount: 100_00,
+      new_amount: 250_50,
+      currency: 'EUR',
+    })
+    expect(body).toBe('The offer for Spring Launch changed from €100.00 to €250.50.')
+  })
+
+  it('assignment.offer_edited — a row without money data never prints raw placeholders (AH-118)', async () => {
+    const body = await renderBodyFor('assignment.offer_edited', {
+      campaign_name: 'Spring Launch',
+      assignment_ulid: '01ASSIGN',
+    })
+    expect(body).not.toMatch(/\{|\}/)
+  })
+
   it('assignment.live_verified — creator row (AH-101: the automatic-verification notice)', async () => {
     const body = await renderBodyFor('assignment.live_verified', {
       campaign_name: 'Spring Launch',

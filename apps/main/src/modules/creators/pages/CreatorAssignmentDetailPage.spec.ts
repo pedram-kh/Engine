@@ -182,6 +182,26 @@ async function mountDetail(query = '') {
   return harness
 }
 
+describe('CreatorAssignmentDetailPage — an agency-edited offer (AH-118 C3)', () => {
+  it.each([
+    ['web', false],
+    ['native', true],
+  ])('%s: shows the edited amount, keeping the unit', async (_l, native) => {
+    platform.native = native
+    vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({
+      data: makeDetail('invited', [], [], null, {
+        agreed_fee_minor_units: 25050,
+        fee_per: 'per video',
+      }),
+    })
+    const { wrapper } = await mountDetail()
+
+    expect(wrapper.text()).toContain('€250.50')
+    expect(wrapper.text()).not.toContain('€5,000.00')
+    expect(wrapper.find('[data-testid="assignment-detail-fee-per"]').text()).toContain('per video')
+  })
+})
+
 describe('CreatorAssignmentDetailPage — fail-closed state-dependent actions', () => {
   it('renders the draft submit form for a producing assignment (only)', async () => {
     vi.mocked(creatorAssignmentsApi.show).mockResolvedValue({ data: makeDetail('producing') })

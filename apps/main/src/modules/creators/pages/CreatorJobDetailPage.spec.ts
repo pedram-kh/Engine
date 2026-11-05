@@ -55,6 +55,7 @@ function detail(overrides: Record<string, unknown> = {}) {
         description: 'Three short-form videos per month.',
         listing_languages: ['en', 'pt'],
         listing_regions: ['PT', 'ES'],
+        is_region_locked: false,
         listing_examples_url: 'https://examples.test/work',
         assignment_ulid: null,
         attachments: [],
@@ -107,6 +108,7 @@ async function mountPage() {
     history: createMemoryHistory(),
     routes: [
       { path: '/creator/jobs', name: 'creator.jobs', component: { template: '<div />' } },
+      { path: '/creator/profile', name: 'creator.profile', component: { template: '<div />' } },
       {
         path: '/creator/jobs/:ulid',
         name: 'creator.job.detail',
@@ -646,5 +648,134 @@ describe('CreatorJobDetailPage — the campaign status chip (AH-107)', () => {
     const wrapper = await mountPage()
 
     expect(wrapper.find('[data-testid="creator-job-apply"]').exists()).toBe(true)
+  })
+})
+
+// ── AH-118: a region-locked job — listed, readable, not applicable ───────────
+
+describe('CreatorJobDetailPage — region-locked jobs (AH-118)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    document.body.innerHTML = ''
+    platform.native = false
+  })
+
+  afterEach(() => {
+    platform.native = false
+  })
+
+  function regionRefusal(reason: 'country_missing' | 'outside_regions'): ApiError {
+    return new ApiError({
+      status: 422,
+      code: 'job.region_not_allowed',
+      message: 'refused',
+      details: [{ code: 'job.region_not_allowed', status: '422', meta: { reason } }],
+    })
+  }
+
+  it.each([
+    ['web', false],
+    ['native', true],
+  ])(
+    '%s: replaces Apply with "Not available in your region" and a profile link',
+    async (_l, native) => {
+      platform.native = native
+      mockApi.show.mockResolvedValue(detail({ is_region_locked: true }) as never)
+      const wrapper = await mountPage()
+
+      expect(wrapper.find('[data-testid="creator-job-apply"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="creator-job-region-locked"]').text()).toContain(
+        'Not available in your region',
+      )
+      expect(wrapper.find('[data-testid="creator-job-region-locked-profile"]').text()).toBe(
+        'Open my profile',
+      )
+      // The job itself is still fully readable.
+      expect(wrapper.find('[data-testid="creator-job-detail-name"]').text()).toBe('Autumn UGC push')
+      // No way to reach the apply form: neither the dialog nor the bottom sheet.
+      const container = wrapper.findComponent({ name: native ? 'VBottomSheet' : 'VDialog' })
+      expect(container.props('modelValue')).toBe(false)
+    },
+  )
+
+  it('does not explain a missing country on load (the payload says THAT, the refusal says WHY)', async () => {
+    mockApi.show.mockResolvedValue(detail({ is_region_locked: true }) as never)
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-region-locked-no-country"]').exists()).toBe(
+      false,
+    )
+  })
+
+  it('keeps Apply when the job is not locked', async () => {
+    mockApi.show.mockResolvedValue(detail({ is_region_locked: false }) as never)
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-apply"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="creator-job-region-locked"]').exists()).toBe(false)
+  })
+
+  it.each([
+    ['an existing application', { application_status: 'pending' }, 'creator-job-applied-notice'],
+    ['a rejected application', { application_status: 'rejected' }, 'creator-job-rejected-notice'],
+    [
+      'an accepted application',
+      { application_status: 'accepted', assignment_ulid: '01ASSIGN' },
+      'creator-job-accepted-notice',
+    ],
+  ])(
+    'lets %s win over the lock: an invite never depends on the region',
+    async (_l, over, testid) => {
+      mockApi.show.mockResolvedValue(detail({ is_region_locked: true, ...over }) as never)
+      const wrapper = await mountPage()
+
+      expect(wrapper.find(`[data-testid="${testid}"]`).exists()).toBe(true)
+      expect(wrapper.find('[data-testid="creator-job-region-locked"]').exists()).toBe(false)
+    },
+  )
+
+  it('lets a live engagement win over the lock', async () => {
+    mockApi.show.mockResolvedValue(
+      detail({
+        is_region_locked: true,
+        assignment_state: 'in_progress',
+        assignment_ulid: '01A',
+      }) as never,
+    )
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-region-locked"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="creator-job-apply"]').exists()).toBe(false)
+  })
+
+  it('a stale Apply that gets 422 flips the page to the locked state and says why in a toast', async () => {
+    mockApi.show.mockResolvedValue(detail({ is_region_locked: false }) as never)
+    mockApi.apply.mockRejectedValue(regionRefusal('outside_regions'))
+    const wrapper = await mountPage()
+
+    await wrapper.find('[data-testid="creator-job-apply"]').trigger('click')
+    await wrapper.find('[data-testid="creator-job-apply-submit"]').trigger('click')
+    await flushPromises()
+
+    expect(snackbarText()).toBe('This job is only open to creators in specific regions.')
+    expect(wrapper.find('[data-testid="creator-job-region-locked"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="creator-job-apply"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="creator-job-region-locked-no-country"]').exists()).toBe(
+      false,
+    )
+  })
+
+  it('a 422 with reason country_missing also shows the profile hint', async () => {
+    mockApi.show.mockResolvedValue(detail({ is_region_locked: false }) as never)
+    mockApi.apply.mockRejectedValue(regionRefusal('country_missing'))
+    const wrapper = await mountPage()
+
+    await wrapper.find('[data-testid="creator-job-apply"]').trigger('click')
+    await wrapper.find('[data-testid="creator-job-apply-submit"]').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="creator-job-region-locked-no-country"]').text()).toBe(
+      'Add your country to your profile to apply to jobs that are limited by region.',
+    )
   })
 })
