@@ -187,3 +187,29 @@ it('does not touch the assignment status or fire the transition fan-out (no boar
     expect($assignment->fresh()?->status)->toBe(AssignmentStatus::Accepted)
         ->and(Notification::query()->where('type', '!=', NotificationType::AssignmentOfferEdited->value)->count())->toBe(0);
 });
+
+// ── unavailable creators (AH-104b-del C4) ───────────────────────────────────
+
+it('still edits but tells nothing to a creator who is unavailable to agencies', function (string $state): void {
+    ['response' => $response, 'creatorUser' => $creatorUser, 'assignment' => $assignment] = editOffer($this, before: function (User $creatorUser, array $s) use ($state): void {
+        match ($state) {
+            'erased' => $s['assignment']->creator()->firstOrFail()->forceFill(['erased_at' => now()])->save(),
+            'pending-deletion' => $creatorUser->forceFill(['deletion_requested_at' => now()])->save(),
+            default => $creatorUser->forceFill(['erasure_started_at' => now()])->save(),
+        };
+    });
+
+    $response->assertOk();
+    expect($assignment->fresh()?->agreed_fee_minor_units)->toBe(250_00)
+        ->and(AuditLog::query()->where('action', AuditAction::AssignmentOfferEdited->value)->count())->toBe(1)
+        ->and(Notification::query()->where('recipient_user_id', $creatorUser->id)->where('type', NotificationType::AssignmentOfferEdited->value)->count())->toBe(0);
+    Mail::assertNothingQueued();
+    Mail::assertNothingSent();
+})->with(['erased', 'pending-deletion', 'erasure-claimed']);
+
+it('still notifies an ordinary creator (control for the unavailable cases)', function (): void {
+    ['creatorUser' => $creatorUser] = editOffer($this);
+
+    expect(Notification::query()->where('recipient_user_id', $creatorUser->id)->where('type', NotificationType::AssignmentOfferEdited->value)->count())->toBe(1);
+    Mail::assertQueued(OfferEditedMail::class);
+});

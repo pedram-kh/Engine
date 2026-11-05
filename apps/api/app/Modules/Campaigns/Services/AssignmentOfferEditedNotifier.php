@@ -6,6 +6,7 @@ namespace App\Modules\Campaigns\Services;
 
 use App\Modules\Campaigns\Mail\OfferEditedMail;
 use App\Modules\Campaigns\Models\CampaignAssignment;
+use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
 use App\Modules\Notifications\Enums\NotificationType;
 use App\Modules\Notifications\Services\NotificationService;
@@ -25,6 +26,10 @@ use Illuminate\Support\Facades\Mail;
  * still honours the recipient's own `email` preference for the type, through the
  * same checkpoint every other assignment mail uses.
  *
+ * Silent for a creator who is erased, pending deletion or in an erasure claim
+ * ({@see Creator::isUnavailableToAgencies()}); the
+ * edit, its audit row and the history line are still written.
+ *
  * Fail-quiet on a missing creator / user, like every sibling: a notification is
  * not worth failing an edit that has already committed.
  */
@@ -41,6 +46,13 @@ final class AssignmentOfferEditedNotifier
         $recipient = $creator?->user;
 
         if ($creator === null || $campaign === null || ! $recipient instanceof User) {
+            return;
+        }
+
+        // AH-104b-del (C4): the edit itself stands (it is history on an existing
+        // assignment), but a creator scheduled for deletion, in an erasure claim
+        // or erased is told nothing: no mail, no in-app row, no push.
+        if ($creator->isUnavailableToAgencies()) {
             return;
         }
 

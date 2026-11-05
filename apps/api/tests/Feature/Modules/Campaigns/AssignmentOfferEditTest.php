@@ -273,3 +273,51 @@ it('re-checks the status against the committed row too (a creator counter in bet
     expect(fn () => app(AssignmentOfferEditor::class)->edit($stale, 250_00, $admin))
         ->toThrow(AssignmentOfferEditException::class);
 });
+
+// ── authorization ───────────────────────────────────────────────────────────
+
+it('answers own manager 200; other-agency staff, a creator and a guest never reach the edit', function (): void {
+    // House convention (see CampaignAssignmentInviteTest): `tenancy.agency` hides
+    // the agency from non-members with a 404 BEFORE the policy runs, so the
+    // "403" legs are 404 here. A 403 would confirm the agency exists.
+    ['agency' => $agency, 'campaign' => $campaign, 'assignment' => $assignment] = offerEditSetup();
+    $url = offerEditUrl($agency, $campaign, $assignment);
+    $body = ['agreed_fee_minor_units' => 250_00];
+
+    $this->actingAs(User::factory()->agencyStaff(Agency::factory()->createOne())->createOne())
+        ->patchJson($url, $body)->assertNotFound();
+    $this->actingAs(User::factory()->creator()->createOne())
+        ->patchJson($url, $body)->assertNotFound();
+    expect($assignment->fresh()?->agreed_fee_minor_units)->toBe(100_00);
+
+    $this->actingAs(User::factory()->agencyManager($agency)->createOne())
+        ->patchJson($url, $body)->assertOk();
+    expect($assignment->fresh()?->agreed_fee_minor_units)->toBe(250_00);
+
+    app('auth')->forgetGuards();
+    $this->patchJson($url, ['agreed_fee_minor_units' => 300_00])->assertUnauthorized();
+});
+
+it('grants the invite ability to the three agency roles only', function (): void {
+    ['agency' => $agency, 'campaign' => $campaign] = offerEditSetup();
+
+    foreach (['agencyAdmin', 'agencyManager', 'agencyStaff'] as $role) {
+        expect(Gate::forUser(User::factory()->{$role}($agency)->createOne())->allows('invite', $campaign))->toBeTrue();
+    }
+
+    // The policy checks the ROLE only, not the campaign's agency: tenancy
+    // (middleware + assertBelongsToAgency) is what keeps another agency's staff
+    // out, as the 404 test above proves. Pre-existing, shared by every ability.
+    expect(Gate::forUser(User::factory()->creator()->createOne())->allows('invite', $campaign))->toBeFalse();
+});
+
+it('is a 403 when the invite ability denies, and writes nothing (the endpoint really calls the Gate)', function (): void {
+    ['agency' => $agency, 'campaign' => $campaign, 'assignment' => $assignment, 'admin' => $admin] = offerEditSetup();
+
+    Gate::before(fn (User $user, string $ability): ?bool => $ability === 'invite' ? false : null);
+
+    $this->actingAs($admin)->patchJson(offerEditUrl($agency, $campaign, $assignment), ['agreed_fee_minor_units' => 250_00])
+        ->assertForbidden();
+
+    expect($assignment->fresh()?->agreed_fee_minor_units)->toBe(100_00);
+});

@@ -86,7 +86,7 @@ final class AgencyCreatorSurfaces
             'Campaigns/Models/CampaignJobNotification.php' => ['model', 'The once-only stamp model.'],
             'Campaigns/Services/AssignmentInviteGate.php' => ['via-relation', 'The blacklist predicate; called by the invite controller AFTER its availability guard.'],
             'Campaigns/Services/CampaignApplicationDecisionService.php' => ['via-relation', 'Settles an application as a side effect of an accepted invite, which is guarded.'],
-            'Campaigns/Services/AssignmentOfferEditedNotifier.php' => ['unchanged', 'AH-118: the offer-edit notice on an EXISTING assignment (C4); the edit itself is not a new live action.'],
+            'Campaigns/Services/AssignmentOfferEditedNotifier.php' => ['silent', 'AH-118: the offer edit on an EXISTING assignment still happens (audit + history), but a pending-deletion, erasure-claimed or erased creator gets no mail, in-app row or push.'],
             'Campaigns/Services/CampaignApplicationNotifier.php' => ['silent', 'Mail and notices to the creator about an application: silent for a pending or erased creator.'],
             'Campaigns/Services/CampaignInvitationService.php' => ['via-relation', 'Creates the invite; only called by the guarded invite and accept controllers.'],
             'Campaigns/Services/JobPostedFanOutService.php' => ['scoped', 'The job-posted fan-out recipients.'],
