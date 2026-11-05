@@ -203,7 +203,7 @@ final class JobPostedFanOutService
             ->withoutGlobalScope(BelongsToAgencyScope::class)
             ->where('agency_creator_relations.agency_id', $campaign->agency_id)
             ->permitsMessaging()
-            ->whereHas('creator', function (Builder $creator): void {
+            ->whereHas('creator', function (Builder $creator) use ($campaign): void {
                 /** @var Builder<Creator> $creator */
                 $creator->where('creators.application_status', ApplicationStatus::Approved->value)
                     // AH-104b-del: no job invitation to a creator who asked to
@@ -211,6 +211,19 @@ final class JobPostedFanOutService
                     ->visibleToAgencies()
                     // Nobody to mail or notify without a user row.
                     ->whereHas('user');
+
+                // AH-118 (Q9) — a region-locked creator cannot apply, so "a job
+                // was posted, apply!" is skipped for them. SQL mirror of
+                // {@see Campaign::isRegionLockedFor()}: same trim + upper-case,
+                // and a NULL/blank country matches nothing, i.e. is locked.
+                // Parity-tested against the PHP predicate.
+                if ($campaign->restrictsApplicationsToRegions()) {
+                    $regions = $campaign->normalizedListingRegions();
+                    $creator->whereRaw(
+                        'UPPER(TRIM(creators.country_code)) IN ('.implode(',', array_fill(0, count($regions), '?')).')',
+                        $regions,
+                    );
+                }
             })
             // C5 — the brand-scoped HARD blacklist, mirroring the invite gate
             // and the board predicate. Without it the fan-out would email an

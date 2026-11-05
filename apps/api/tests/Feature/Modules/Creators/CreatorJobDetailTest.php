@@ -68,6 +68,9 @@ const DETAIL_KEYS = [
     'listing_languages',
     'listing_regions',
     'listing_examples_url',
+    // AH-118 — always present, false unless the region switch is in force and
+    // the caller is outside it. Detail only (Q10); CARD_KEYS must not gain it.
+    'is_region_locked',
     // The D7 bridge (chunk 4, AH-058). Present on EVERY detail render, null
     // unless the caller's pair has an assignment — a conditional key would make
     // this keyset data-dependent and blunt the accretion guard.

@@ -42,6 +42,10 @@ use Illuminate\Support\Collection;
  *                               `application_status === 'accepted'`: the
  *                               application and the assignment are separate
  *                               rows and can disagree.
+ *   - `is_region_locked`      — AH-118: the caller may see this job but not
+ *                               apply (region switch on, creator outside the
+ *                               listed regions or with no country). Detail only
+ *                               (Q10); the card never carries it.
  *   - `attachments`           — Campaign attachments from the Files library,
  *                               chunk B (AH-092, D4). The controller loads the
  *                               relation pre-filtered through
@@ -89,6 +93,9 @@ final class CreatorJobDetailResource extends CreatorJobCardResource
                 'listing_languages' => $campaign->listing_languages,
                 'listing_regions' => $campaign->listing_regions,
                 'listing_examples_url' => $campaign->listing_examples_url,
+                // AH-118 — ALWAYS present (false while the flag or switch is off),
+                // so the exact keyset does not depend on data.
+                'is_region_locked' => (bool) $campaign->getAttribute('caller_region_locked'),
                 'assignment_ulid' => $this->callerAssignmentUlid($campaign),
                 'attachments' => CreatorCampaignAttachmentResource::collection($this->creatorVisibleAttachments($campaign))->resolve($request),
                 'brand' => $brand,

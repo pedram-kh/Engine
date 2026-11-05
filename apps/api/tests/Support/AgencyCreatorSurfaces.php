@@ -79,6 +79,7 @@ final class AgencyCreatorSurfaces
             'Campaigns/Jobs/VerifyPostedContentJob.php' => ['silent', 'AH-104c: holds back the automatic check for a pending or erased creator (the post stays pending); an ordinary creator is verified as before.'],
             'Campaigns/Listeners/RedispatchPostedContentVerification.php' => ['via-relation', 'AH-104c: when the creator cancels a deletion request, re-runs the checks held back meanwhile on assignments the creator already holds; emits nothing.'],
             'Campaigns/Listeners/SendAssignmentNotifications.php' => ['unchanged', 'Lifecycle notices of EXISTING assignments (C4); the erasure cancellation fan-out names no one.'],
+            'Campaigns/Models/Campaign.php' => ['model', 'The campaign model. AH-118: `isRegionLockedFor()` reads the APPLYING creator\'s country; creator-side, never an agency read.'],
             'Campaigns/Models/CampaignApplication.php' => ['model', 'The application model.'],
             'Campaigns/Models/CampaignAssignment.php' => ['model', 'The assignment model.'],
             'Campaigns/Models/CampaignDraft.php' => ['model', 'The draft model.'],

@@ -12,6 +12,8 @@ use App\Modules\Brands\Models\Brand;
 use App\Modules\Campaigns\Database\Factories\CampaignFactory;
 use App\Modules\Campaigns\Enums\CampaignObjective;
 use App\Modules\Campaigns\Enums\CampaignStatus;
+use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
+use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Laravel\Pennant\Feature;
 
 /**
  * A campaign — a first-class Phase 1 entity owned by an agency and a brand
@@ -234,6 +237,67 @@ final class Campaign extends Model
     public function board(): HasOne
     {
         return $this->hasOne(Board::class);
+    }
+
+    /**
+     * AH-118 — is "only creators in the listed regions can apply" IN FORCE for
+     * this campaign? All three must hold: the switch is on, the flag is on, and
+     * there is at least one region to match against. An empty list never locks
+     * anyone (the write path refuses switch-on-with-no-regions; this is the read
+     * side's belt for a row that got there some other way).
+     */
+    public function restrictsApplicationsToRegions(): bool
+    {
+        if (! $this->restrict_to_listing_regions) {
+            return false;
+        }
+
+        if (! Feature::active(CampaignRegionRestrictionEnabled::NAME)) {
+            return false;
+        }
+
+        return $this->normalizedListingRegions() !== [];
+    }
+
+    /**
+     * AH-118 — may this creator NOT apply because of where they are? The one
+     * predicate behind the apply refusal, the detail page's `is_region_locked`
+     * and (mirrored in SQL, parity-tested) the job-posted fan-out.
+     *
+     * A creator's `country_code` is `char(2)`, nullable and not normalised on
+     * write, so the comparison trims and upper-cases both sides, and a missing
+     * country is LOCKED (Q7), never "unknown, let them through".
+     */
+    public function isRegionLockedFor(Creator $creator): bool
+    {
+        if (! $this->restrictsApplicationsToRegions()) {
+            return false;
+        }
+
+        $country = is_string($creator->country_code) ? strtoupper(trim($creator->country_code)) : '';
+
+        return $country === '' || ! in_array($country, $this->normalizedListingRegions(), true);
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function normalizedListingRegions(): array
+    {
+        $regions = $this->listing_regions;
+
+        if (! is_array($regions)) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($regions as $region) {
+            if (is_string($region) && trim($region) !== '') {
+                $out[] = strtoupper(trim($region));
+            }
+        }
+
+        return array_values(array_unique($out));
     }
 
     /**

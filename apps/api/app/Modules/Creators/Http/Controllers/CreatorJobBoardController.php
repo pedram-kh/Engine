@@ -90,6 +90,9 @@ final class CreatorJobBoardController
         'campaigns.listing_languages',
         'campaigns.listing_regions',
         'campaigns.listing_examples_url',
+        // AH-118 — read by the region predicate for `is_region_locked`; never
+        // emitted itself.
+        'campaigns.restrict_to_listing_regions',
     ];
 
     public function __construct(
@@ -191,6 +194,10 @@ final class CreatorJobBoardController
         // Loaded ONLY after the visibility predicate above has already run —
         // never a substitute for it, only the shared creator-visible filter
         // layered on top.
+        // AH-118 — detail only (Q10). Computed here, where the caller is known,
+        // and handed to the resource as an attribute (the `caller_*` pattern).
+        $job->setAttribute('caller_region_locked', $job->isRegionLockedFor($creator));
+
         $job->load(['attachments' => fn ($q) => $q->creatorVisible()->with('agencyFile')]);
 
         return response()->json([
@@ -247,6 +254,23 @@ final class CreatorJobBoardController
 
         if ($existing instanceof CampaignApplication) {
             $this->refuseDuplicate($existing->status->reapplyBlockCode());
+        }
+
+        // AH-118 — after the visibility 404 and the duplicate 409 (an existing
+        // application or assignment is never touched, Q13), before the insert.
+        if ($job->isRegionLockedFor($creator)) {
+            $missing = trim((string) $creator->country_code) === '';
+
+            abort(response()->json([
+                'errors' => [[
+                    'status' => '422',
+                    'code' => 'job.region_not_allowed',
+                    'detail' => $missing
+                        ? 'This job is limited to creators in specific regions, and your profile has no country set.'
+                        : 'This job is limited to creators in specific regions, and yours is not one of them.',
+                    'meta' => ['reason' => $missing ? 'country_missing' : 'outside_regions'],
+                ]],
+            ], 422));
         }
 
         try {
