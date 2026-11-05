@@ -11,6 +11,14 @@ The recorded state of the **creator web** (and the onboarding, auth and bare-app
 - **Per target:** `domHash` and `domLen` (the `#app` outerHTML with digits normalised), `styleHash` and `elements` (17 computed properties of every element under `#app`), `themeSheetLen` and `themeSheetSha` (the Vuetify theme `<style>`), `agencyClassCount` (elements whose class contains `v-theme--agency`), and a 32 x 20 greyscale thumbnail of the screenshot.
 - **Environment:** Chromium 147.0.7727.15, macOS (darwin), `reducedMotion: reduce`, locale `en-US`, timezone `Europe/Madrid`. A different browser build or OS can move computed styles and thumbnails; re-record on the new environment from an unchanged tree before trusting a comparison.
 
+## Re-recorded on Apple silicon (2026-11-05, AH-118 W1)
+
+`baseline.json` was re-recorded on **macOS 27.0, arm64 (Apple silicon), Chromium 147.0.7727.15**, from a clean checkout of `origin/main` at `3de0b8e3` (a detached worktree with its own `pnpm install --frozen-lockfile`, no uncommitted files). The original recording, made on an Intel machine, is kept as `baseline-intel.json` for reference only.
+
+Why: on this machine the Intel file did not reproduce even on an unchanged tree. Of the 142 targets, 68 differed in `styleHash` (auth, onboarding and a few more), with the same 68 on a clean `origin/main` as on the W1 working tree. Same Chromium version, different CPU and OS build, so computed styles and font rasterisation moved.
+
+Checks on the new file: two consecutive runs of the clean checkout compare 142/142 identical; the W1 working tree compares 142/142 against it. Use `baseline.json` on Apple silicon; compare against `baseline-intel.json` only on the original Intel environment.
+
 ## How the comparison works
 
 `DOM`, `style` and `theme stylesheet` hashes are **exact**. Screenshots are **not** bit-stable in Chromium (about 8 anti-aliased pixels move between runs of the same page), so they are compared as a thumbnail with a tolerance (any cell off by more than 12 levels, or a mean above 1.0, fails). The DOM and computed-style hashes are the real guarantee; the thumbnail is a second look.
