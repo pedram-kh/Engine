@@ -39,7 +39,7 @@ const ITEM: MessageSearchItem = {
 function render(
   state: MessageSearchState,
   items: MessageSearchItem[] = [],
-  extra: { hasMore?: boolean; loadingMore?: boolean } = {},
+  extra: { hasMore?: boolean; loadingMore?: boolean; query?: string } = {},
 ) {
   return mount(MessageSearchResults, {
     props: {
@@ -47,6 +47,7 @@ function render(
       items,
       hasMore: extra.hasMore ?? false,
       loadingMore: extra.loadingMore ?? false,
+      query: extra.query,
     },
     global: {
       plugins: [
@@ -100,6 +101,36 @@ describe('MessageSearchResults', () => {
     expect(el.find('b').exists()).toBe(false)
     expect(el.find('img').exists()).toBe(false)
     expect(el.text()).toContain('<b>x</b>')
+  })
+
+  describe('matched term', () => {
+    it('wraps the typed term in a styled span and keeps the text identical', () => {
+      const w = render('results', [{ ...ITEM, snippet: '…the Brief is attached…' }], {
+        query: 'brief',
+      })
+      const matches = w.findAll('[data-test="search-term-match"]')
+      expect(matches.map((m) => m.text())).toEqual(['Brief'])
+      expect(matches[0]?.element.tagName).toBe('SPAN')
+      expect(matches[0]?.classes()).toContain('agency-msg-hit__match')
+      expect(w.get('[data-test="message-hit-snippet"]').text()).toBe('You: …the Brief is attached…')
+    })
+
+    it('marks nothing without a query', () => {
+      const w = render('results', [{ ...ITEM, snippet: '…the Brief…' }])
+      expect(w.find('[data-test="search-term-match"]').exists()).toBe(false)
+    })
+
+    it('escapes first: server markup stays characters, only the term is wrapped', () => {
+      const w = render('results', [{ ...ITEM, snippet: '<b>brief</b><img src=y onerror=x>' }], {
+        query: 'brief',
+      })
+      const el = w.get('[data-test="message-hit-snippet"]')
+      expect(el.find('b').exists()).toBe(false)
+      expect(el.find('img').exists()).toBe(false)
+      expect(el.text()).toContain('<b>brief</b><img src=y onerror=x>')
+      expect(w.findAll('[data-test="search-term-match"]').map((m) => m.text())).toEqual(['brief'])
+      expect(el.html()).not.toContain('<img')
+    })
   })
 
   it('shows an empty date for an unparseable time rather than "Invalid Date"', () => {

@@ -138,6 +138,7 @@ function setFilters(next: UnifiedInboxFilters): void {
       campaign: undefined,
       unread: undefined,
       owner: undefined,
+      direct: undefined,
       ...filtersToQuery(next),
     },
   })

@@ -54,6 +54,8 @@ export interface UnifiedInboxFilters {
   campaign: string[]
   unread: boolean
   owner: 'me' | 'all'
+  /** Only the Direct (relationship) threads; excludes a brand or campaign selection. */
+  direct: boolean
 }
 
 const props = defineProps<{
@@ -120,15 +122,27 @@ const anyFilter = computed(
     props.filters.brand.length > 0 ||
     props.filters.campaign.length > 0 ||
     props.filters.unread ||
-    props.filters.owner === 'me',
+    props.filters.owner === 'me' ||
+    props.filters.direct,
 )
 
 function patch(partial: Partial<UnifiedInboxFilters>): void {
-  emit('update:filters', { ...props.filters, ...partial })
+  const next = { ...props.filters, ...partial }
+  // Direct threads have no brand or campaign, so the two never combine: choosing one side
+  // drops the other instead of leaving an empty list the user cannot explain.
+  if (partial.direct === true) {
+    next.brand = []
+    next.campaign = []
+  } else if (partial.brand !== undefined || partial.campaign !== undefined) {
+    if ((partial.brand ?? []).length > 0 || (partial.campaign ?? []).length > 0) {
+      next.direct = false
+    }
+  }
+  emit('update:filters', next)
 }
 
 function clearFilters(): void {
-  emit('update:filters', { brand: [], campaign: [], unread: false, owner: 'all' })
+  emit('update:filters', { brand: [], campaign: [], unread: false, owner: 'all', direct: false })
 }
 
 const visibleItems = computed(() => {
@@ -272,6 +286,17 @@ function initial(item: UnifiedInboxItem): string {
         >
           <v-icon icon="mdi-account-outline" size="14" aria-hidden="true" />
           {{ t('app.messaging.inbox.ownerMine') }}
+        </button>
+        <button
+          type="button"
+          class="agency-inbox__mine"
+          :class="{ 'agency-inbox__mine--on': filters.direct }"
+          :aria-pressed="filters.direct"
+          data-test="agency-inbox-direct"
+          @click="patch({ direct: !filters.direct })"
+        >
+          <v-icon icon="mdi-message-outline" size="14" aria-hidden="true" />
+          {{ t('app.messaging.inbox.tagDirect') }}
         </button>
 
         <div class="agency-inbox__toggle" role="radiogroup" data-test="agency-inbox-toggle">
@@ -434,6 +459,7 @@ function initial(item: UnifiedInboxItem): string {
           :items="search?.items ?? []"
           :has-more="search?.hasMore ?? false"
           :loading-more="search?.loadingMore ?? false"
+          :query="query"
           @load-more="emit('searchMore')"
         />
       </MessageGate>

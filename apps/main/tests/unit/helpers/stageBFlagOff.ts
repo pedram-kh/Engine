@@ -171,7 +171,7 @@ export const unifiedInboxProps = {
   ],
   facets: { brands: [], campaigns: [] },
   unreadThreadsTotal: 2,
-  filters: { brand: [], campaign: [], unread: false, owner: 'all' },
+  filters: { brand: [], campaign: [], unread: false, owner: 'all', direct: false },
   loading: false,
   loadError: false,
   loadingMore: false,

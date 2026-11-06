@@ -144,6 +144,11 @@ test.describe('AH-119 Stage B — message search', () => {
       '[data-test^="message-hit-"]:not([data-test="message-hit-snippet"])',
     )
     await expect(hits).toHaveCount(2, { timeout: 15_000 })
+    // The typed word is marked in each snippet (a styled span; the text is unchanged).
+    await expect(results.locator('[data-test="search-term-match"]').first()).toBeVisible()
+    for (const match of await results.locator('[data-test="search-term-match"]').all()) {
+      expect((await match.innerText()).toLowerCase()).toBe(WORD.toLowerCase())
+    }
     // A creator with no finished profile reads as "Participant", exactly as the inbox row does.
     await expect(results).toContainText('in Participant')
     await expect(results).not.toContainText('Nothing to see in this one.')

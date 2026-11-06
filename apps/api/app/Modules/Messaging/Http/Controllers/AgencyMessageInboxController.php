@@ -40,6 +40,8 @@ final class AgencyMessageInboxController
             'campaign.*' => ['string', 'max:40'],
             'unread' => ['sometimes', 'boolean'],
             'owner' => ['sometimes', 'in:me,all'],
+            // AH-119 walk: only the Direct (relationship) threads.
+            'direct' => ['sometimes', 'boolean'],
             'per_page' => ['sometimes', 'integer', 'min:1'],
             'cursor' => ['sometimes', 'nullable', 'string', 'max:300'],
             // Reserved for Stage B (message search); accepted and ignored in Stage A.

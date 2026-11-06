@@ -21,6 +21,9 @@ export function messageInboxQuery(params: MessageInboxParams): string {
   if (params.unread === true) {
     query.set('unread', '1')
   }
+  if (params.direct === true) {
+    query.set('direct', '1')
+  }
   if (params.owner !== undefined) {
     query.set('owner', params.owner)
   }

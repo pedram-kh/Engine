@@ -372,6 +372,7 @@ describe('AgencyMessagesPage — unified inbox (AH-119)', () => {
         campaign: [],
         unread: true,
         owner: 'me',
+        direct: false,
         cursor: null,
         perPage: 30,
       })
@@ -410,6 +411,31 @@ describe('AgencyMessagesPage — unified inbox (AH-119)', () => {
       expect(messageInboxApi.list).toHaveBeenLastCalledWith(
         'agency-ulid',
         expect.objectContaining({ brand: ['a'], cursor: null }),
+      )
+      wrapper.unmount()
+    })
+
+    it('the Direct chip writes direct=1 to the route and reloads with direct, next to Mine', async () => {
+      const { wrapper, router } = await mountPage({ path: '/messages?owner=me' })
+      await wrapper.get('[data-test="agency-inbox-direct"]').trigger('click')
+      await vi.waitFor(() => expect(router.currentRoute.value.query.direct).toBe('1'))
+      expect(router.currentRoute.value.query.owner).toBe('me')
+      await settle()
+      expect(messageInboxApi.list).toHaveBeenLastCalledWith(
+        'agency-ulid',
+        expect.objectContaining({ direct: true, owner: 'me' }),
+      )
+      wrapper.unmount()
+    })
+
+    it('loading with ?direct=1 presses the Direct chip and asks for direct', async () => {
+      const { wrapper } = await mountPage({ path: '/messages?direct=1' })
+      expect(wrapper.get('[data-test="agency-inbox-direct"]').attributes('aria-pressed')).toBe(
+        'true',
+      )
+      expect(messageInboxApi.list).toHaveBeenCalledWith(
+        'agency-ulid',
+        expect.objectContaining({ direct: true }),
       )
       wrapper.unmount()
     })
@@ -521,6 +547,7 @@ describe('AgencyMessagesPage — unified inbox (AH-119)', () => {
         campaign: [],
         unread: true,
         owner: 'me',
+        direct: false,
         cursor: null,
         perPage: 30,
       })

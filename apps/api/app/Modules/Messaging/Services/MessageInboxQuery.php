@@ -49,7 +49,7 @@ final class MessageInboxQuery
     private const PREVIEW_LENGTH = 200;
 
     /**
-     * @param  array{brand?: list<string>, campaign?: list<string>, unread?: bool, owner?: string, per_page?: int, cursor?: string|null}  $params
+     * @param  array{brand?: list<string>, campaign?: list<string>, unread?: bool, owner?: string, direct?: bool, per_page?: int, cursor?: string|null}  $params
      * @return array{rows: list<array<string, mixed>>, meta: array<string, mixed>}
      */
     public function run(Agency $agency, User $viewer, array $params): array
@@ -58,11 +58,12 @@ final class MessageInboxQuery
         $campaignIds = $this->resolveIds(Campaign::class, $agency, $params['campaign'] ?? []);
         $unreadOnly = (bool) ($params['unread'] ?? false);
         $mine = ($params['owner'] ?? 'all') === 'me';
+        $directOnly = (bool) ($params['direct'] ?? false);
         $perPage = min(max((int) ($params['per_page'] ?? self::DEFAULT_PER_PAGE), 1), self::MAX_PER_PAGE);
 
         $union = $this->threads($agency, $viewer);
 
-        $page = $this->filtered($union, $brandIds, $campaignIds, $unreadOnly, $mine, $viewer)
+        $page = $this->filtered($union, $brandIds, $campaignIds, $unreadOnly, $mine, $viewer, $directOnly)
             ->orderByDesc('last_at')->orderByDesc('type')->orderByDesc('id');
         $this->applyCursor($page, $params['cursor'] ?? null);
 
@@ -187,10 +188,16 @@ final class MessageInboxQuery
      * @param  list<int>  $brandIds
      * @param  list<int>  $campaignIds
      */
-    private function filtered(Builder $union, array $brandIds, array $campaignIds, bool $unreadOnly, bool $mine, User $viewer): Builder
+    private function filtered(Builder $union, array $brandIds, array $campaignIds, bool $unreadOnly, bool $mine, User $viewer, bool $directOnly = false): Builder
     {
         $q = clone $union;
         $q->select('inbox.*');
+
+        if ($directOnly) {
+            // Direct = relationship threads. With a brand or campaign filter too, nothing is left
+            // (the web never sends both: choosing one clears the other).
+            $q->where('inbox.type', self::TYPE_RELATIONSHIP);
+        }
 
         if ($brandIds !== [] || $campaignIds !== []) {
             // Direct rows carry no brand or campaign: hidden under either filter.

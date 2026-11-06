@@ -15,6 +15,7 @@ import { useI18n } from 'vue-i18n'
 import type { RouteLocationRaw } from 'vue-router'
 
 import type { MessageSearchState } from '@/modules/messaging/composables/useMessageSearch'
+import { highlightSnippet } from '@/modules/messaging/utils/highlightSnippet'
 
 export interface MessageSearchItem {
   /** The message ULID: unique across the list. */
@@ -33,6 +34,8 @@ defineProps<{
   items: MessageSearchItem[]
   hasMore: boolean
   loadingMore: boolean
+  /** The text typed in the search field; its terms are marked in each snippet. */
+  query?: string
 }>()
 
 const emit = defineEmits<{ loadMore: [] }>()
@@ -99,7 +102,14 @@ function formatSent(iso: string): string {
             <span class="agency-msg-hit__snippet" data-test="message-hit-snippet"
               ><span v-if="item.senderLabel !== null" class="agency-msg-hit__sender"
                 >{{ item.senderLabel }}: </span
-              >{{ item.snippet }}</span
+              ><template v-for="(run, i) in highlightSnippet(item.snippet, query ?? '')" :key="i"
+                ><span
+                  v-if="run.match"
+                  class="agency-msg-hit__match"
+                  data-test="search-term-match"
+                  >{{ run.text }}</span
+                ><template v-else>{{ run.text }}</template></template
+              ></span
             >
           </router-link>
         </li>
@@ -201,6 +211,16 @@ function formatSent(iso: string): string {
   line-height: var(--catalyst-typography-body-sm-line-height);
   color: rgb(var(--v-theme-on-surface-variant));
   overflow-wrap: anywhere;
+}
+
+/* The matched term: weight and an underline in the brand colour, no background box. */
+.agency-msg-hit__match {
+  font-weight: 700;
+  color: rgb(var(--v-theme-on-surface));
+  text-decoration: underline;
+  text-decoration-color: rgb(var(--v-theme-primary));
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
 }
 
 .agency-msg-hit__sender {

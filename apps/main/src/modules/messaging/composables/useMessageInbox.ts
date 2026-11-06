@@ -20,6 +20,7 @@ export interface InboxFilters {
   campaign: string[]
   unread: boolean
   owner: 'me' | 'all'
+  direct: boolean
 }
 
 export const EMPTY_FACETS: MessageInboxResponse['meta']['facets'] = { brands: [], campaigns: [] }
@@ -58,6 +59,7 @@ export function useMessageInbox(agencyId: Ref<string | null>, filters: Ref<Inbox
       campaign: f.campaign,
       unread: f.unread,
       owner: f.owner,
+      direct: f.direct,
       cursor,
       perPage: INBOX_PAGE_SIZE,
     }

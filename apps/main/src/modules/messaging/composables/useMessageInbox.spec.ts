@@ -63,7 +63,7 @@ function deferred<T>() {
   return { promise, resolve, reject }
 }
 
-const NONE: InboxFilters = { brand: [], campaign: [], unread: false, owner: 'all' }
+const NONE: InboxFilters = { brand: [], campaign: [], unread: false, owner: 'all', direct: false }
 
 function mountInbox(agency: string | null = 'ag1', filters: InboxFilters = NONE) {
   const agencyId: Ref<string | null> = ref(agency)
@@ -98,6 +98,7 @@ describe('useMessageInbox', () => {
       campaign: ['k1'],
       unread: true,
       owner: 'me',
+      direct: false,
     })
     expect(api().loading.value).toBe(true)
     await flushPromises()
@@ -108,6 +109,7 @@ describe('useMessageInbox', () => {
       campaign: ['k1'],
       unread: true,
       owner: 'me',
+      direct: false,
       cursor: null,
       perPage: INBOX_PAGE_SIZE,
     })

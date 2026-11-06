@@ -25,7 +25,13 @@ import AgencyUnifiedInbox, {
   type UnifiedInboxItem,
 } from '@/modules/agency/components/AgencyUnifiedInbox.vue'
 
-const NONE: UnifiedInboxFilters = { brand: [], campaign: [], unread: false, owner: 'all' }
+const NONE: UnifiedInboxFilters = {
+  brand: [],
+  campaign: [],
+  unread: false,
+  owner: 'all',
+  direct: false,
+}
 
 const DIRECT_KEY = 'relationship_thread:t1'
 const CAMPAIGN_KEY = 'assignment_thread:t2'
@@ -291,6 +297,37 @@ describe('AgencyUnifiedInbox', () => {
     })
   })
 
+  describe('Direct chip', () => {
+    it('is not pressed when off, and pressing it asks for direct, keeping Mine and Unread', async () => {
+      const filters = { ...NONE, owner: 'me' as const, unread: true }
+      const w = await mountInbox({ filters })
+      const chip = w.get('[data-test="agency-inbox-direct"]')
+      expect(chip.attributes('aria-pressed')).toBe('false')
+      await chip.trigger('click')
+      expect(w.emitted('update:filters')).toEqual([[{ ...filters, direct: true }]])
+      w.unmount()
+    })
+
+    it('is pressed when on, and pressing it again turns it off', async () => {
+      const w = await mountInbox({ filters: { ...NONE, direct: true } })
+      const chip = w.get('[data-test="agency-inbox-direct"]')
+      expect(chip.attributes('aria-pressed')).toBe('true')
+      expect(chip.classes()).toContain('agency-inbox__mine--on')
+      await chip.trigger('click')
+      expect(w.emitted('update:filters')).toEqual([[{ ...NONE, direct: false }]])
+      w.unmount()
+    })
+
+    it('drops a brand and campaign selection when it goes on (Direct rows have neither)', async () => {
+      const w = await mountInbox({
+        filters: { ...NONE, brand: ['b1'], campaign: ['k1'], unread: true },
+      })
+      await w.get('[data-test="agency-inbox-direct"]').trigger('click')
+      expect(w.emitted('update:filters')).toEqual([[{ ...NONE, unread: true, direct: true }]])
+      w.unmount()
+    })
+  })
+
   describe('Mine chip', () => {
     it('is not pressed for "all", and pressing it asks for owner "me", keeping the other filters', async () => {
       const filters = { ...NONE, brand: ['b1'], unread: true }
@@ -355,13 +392,14 @@ describe('AgencyUnifiedInbox', () => {
       ['campaign', { campaign: ['k1'] }],
       ['unread', { unread: true }],
       ['owner', { owner: 'me' as const }],
+      ['direct', { direct: true }],
     ])('appears for the %s filter and emits the empty filters', async (_name, patch) => {
       const w = await mountInbox({ filters: { ...NONE, ...patch } })
       const clear = w.get('[data-test="agency-inbox-clear-filters"]')
       expect(clear.text()).toBe('Clear filters')
       await clear.trigger('click')
       expect(w.emitted('update:filters')).toEqual([
-        [{ brand: [], campaign: [], unread: false, owner: 'all' }],
+        [{ brand: [], campaign: [], unread: false, owner: 'all', direct: false }],
       ])
       w.unmount()
     })

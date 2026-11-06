@@ -56,6 +56,12 @@ describe('messageInboxQuery', () => {
     expect(q.get('per_page')).toBe('30')
   })
 
+  it('sends direct=1 only when direct is on', () => {
+    expect(parsed(messageInboxQuery({ direct: true })).get('direct')).toBe('1')
+    expect(parsed(messageInboxQuery({ direct: false })).has('direct')).toBe(false)
+    expect(parsed(messageInboxQuery({})).has('direct')).toBe(false)
+  })
+
   it('builds the whole query in a stable order', () => {
     const qs = messageInboxQuery({
       brand: ['a', 'b'],

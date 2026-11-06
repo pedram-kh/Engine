@@ -141,6 +141,23 @@ test.describe('AH-119 — the agency unified inbox', () => {
     await expect(page).not.toHaveURL(/owner=me/)
     await expect(assignments).toHaveCount(2, { timeout: 10_000 })
 
+    // ── Step 4b: Direct (only relationship threads; in the URL; combines with Mine) ──
+    const directList = page.waitForResponse(
+      (r) => r.url().includes('/message-inbox') && r.url().includes('direct=1'),
+    )
+    await page.locator('[data-test="agency-inbox-direct"]').click()
+    expect((await directList).status()).toBe(200)
+    await expect(page).toHaveURL(/direct=1/)
+    await expect(assignments).toHaveCount(0, { timeout: 10_000 })
+    await expect(direct).toHaveCount(1)
+    await page.locator('[data-test="agency-inbox-mine"]').click()
+    await expect(page).toHaveURL(/owner=me/)
+    await expect(page).toHaveURL(/direct=1/)
+    await page.locator('[data-test="agency-inbox-mine"]').click()
+    await page.locator('[data-test="agency-inbox-direct"]').click()
+    await expect(page).not.toHaveURL(/direct=1/)
+    await expect(assignments).toHaveCount(2, { timeout: 10_000 })
+
     // ── Step 5: open an assignment thread, send a message with a link ───────
     await assignments.first().click()
     await expect(page).toHaveURL(/\/messages\/c\/[^/]+\/[^/]+/)

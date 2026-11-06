@@ -10,9 +10,15 @@ import { NO_FILTERS, filterQueryOf, filtersFromQuery, filtersToQuery } from './i
 
 describe('inboxFilterQuery', () => {
   it('round-trips every filter through the query', () => {
-    const filters = { brand: ['a', 'b'], campaign: ['c'], unread: true, owner: 'me' as const }
+    const filters = {
+      brand: ['a', 'b'],
+      campaign: ['c'],
+      unread: true,
+      owner: 'me' as const,
+      direct: true,
+    }
     const query = filtersToQuery(filters)
-    expect(query).toEqual({ brand: 'a,b', campaign: 'c', unread: '1', owner: 'me' })
+    expect(query).toEqual({ brand: 'a,b', campaign: 'c', unread: '1', owner: 'me', direct: '1' })
     expect(filtersFromQuery(query as Record<string, string>)).toEqual(filters)
   })
 
@@ -27,6 +33,13 @@ describe('inboxFilterQuery', () => {
   it('writes only the keys that are on', () => {
     expect(filtersToQuery({ ...NO_FILTERS, unread: true })).toEqual({ unread: '1' })
     expect(filtersToQuery({ ...NO_FILTERS, brand: ['a'] })).toEqual({ brand: 'a' })
+  })
+
+  it('reads direct only from 1, and writes direct=1 only when on', () => {
+    expect(filtersFromQuery({ direct: '1' }).direct).toBe(true)
+    expect(filtersFromQuery({ direct: 'yes' }).direct).toBe(false)
+    expect(filtersToQuery({ ...NO_FILTERS, direct: true })).toEqual({ direct: '1' })
+    expect(filtersToQuery(NO_FILTERS)).not.toHaveProperty('direct')
   })
 
   it('never writes owner=all', () => {

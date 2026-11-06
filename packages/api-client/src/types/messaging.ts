@@ -409,6 +409,8 @@ export interface MessageInboxParams {
   campaign?: string[]
   unread?: boolean
   owner?: 'me' | 'all'
+  /** Only the Direct (relationship) threads. */
+  direct?: boolean
   cursor?: string | null
   perPage?: number
 }

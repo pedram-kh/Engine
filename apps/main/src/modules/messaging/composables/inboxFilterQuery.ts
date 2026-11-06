@@ -1,5 +1,5 @@
 /**
- * AH-119 — the unified inbox's filters as route query: `?brand=a,b&campaign=c&unread=1&owner=me`.
+ * AH-119 — the unified inbox's filters as route query: `?brand=a,b&campaign=c&unread=1&owner=me&direct=1`.
  * The filters live in the URL so a reload or a back navigation keeps them, and the thread routes
  * (children of the inbox) carry them along so opening a conversation does not reset the list.
  */
@@ -8,7 +8,13 @@ import type { LocationQuery, LocationQueryRaw } from 'vue-router'
 
 import type { InboxFilters } from './useMessageInbox'
 
-export const NO_FILTERS: InboxFilters = { brand: [], campaign: [], unread: false, owner: 'all' }
+export const NO_FILTERS: InboxFilters = {
+  brand: [],
+  campaign: [],
+  unread: false,
+  owner: 'all',
+  direct: false,
+}
 
 function one(value: LocationQuery[string] | undefined): string {
   const first = Array.isArray(value) ? value[0] : value
@@ -28,6 +34,7 @@ export function filtersFromQuery(query: LocationQuery): InboxFilters {
     campaign: list(query.campaign),
     unread: one(query.unread) === '1',
     owner: one(query.owner) === 'me' ? 'me' : 'all',
+    direct: one(query.direct) === '1',
   }
 }
 
@@ -45,6 +52,9 @@ export function filtersToQuery(filters: InboxFilters): LocationQueryRaw {
   }
   if (filters.owner === 'me') {
     out.owner = 'me'
+  }
+  if (filters.direct) {
+    out.direct = '1'
   }
   return out
 }
