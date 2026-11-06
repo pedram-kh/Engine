@@ -617,3 +617,7 @@ specs stay at 29 passed; dropping the `:*` prefix form fails the FTS spec on Pos
 
 See `messages-v2-review.md`. Gates green on both Pest legs; creator walk identical (142); flag armed only after the
 web deploy (P7). Stage B not started.
+
+## Stage B result (2026-11-06, built, not pushed)
+
+See `messages-v2-review.md`. Both Pest legs, full Vitest, Playwright and the creator walk green; Stage B flag stays OFF until build 4 is live.
