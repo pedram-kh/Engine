@@ -47,9 +47,9 @@ const FROZEN_COMPONENTS: ReadonlyArray<readonly [string, string]> = [
     'b7a56fd099ccdd60c1e944d87260f3ff624c431985e05e453df2c3b8c25d8338',
   ],
   [
-    // AH-118 C4: offer_edited system line — intended edit, hash re-pinned.
+    // AH-119 A6: linkify + inline images + paste, build 4 — intended edit, hash re-pinned.
     'apps/main/src/modules/messaging/components/ChatPanel.vue',
-    '1d1c39816fe064483a22b68c41c432f6c4aaf50f02ddc1e650fccd8f4e800d41',
+    '46f2d49424476561c7cf1f43b9f8a02ee4c3a8c84f98f526eb701c8875e6ec45',
   ],
   [
     'apps/main/src/modules/messaging/components/ContactPicker.vue',
@@ -60,8 +60,9 @@ const FROZEN_COMPONENTS: ReadonlyArray<readonly [string, string]> = [
     '1766bf603c46ab7ac0b8684d6d6b58e2b655904a0f7795fbfd9a68578e6cef05',
   ],
   [
+    // AH-119 A6: linkify + inline images + paste, build 4 — intended edit, hash re-pinned.
     'apps/main/src/modules/messaging/components/RelationshipThreadView.vue',
-    '057451b862d86fb6c623342c8be6bf9ba6473a455069a525fdfc59a8cf7acdc0',
+    'aeab5ad185e0d65734fc7470221d999399c043bc016cdf65afbfaff4c33bbf96',
   ],
   [
     'apps/main/src/modules/messaging/components/ReportFallback.vue',

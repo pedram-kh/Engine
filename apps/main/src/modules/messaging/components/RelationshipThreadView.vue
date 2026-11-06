@@ -16,6 +16,7 @@
 
 import { ApiError, extractFieldErrors, uploadToPresignedUrl } from '@catalyst/api-client'
 import type {
+  RelationshipFileAttachment,
   RelationshipMessageResource,
   RelationshipThreadClosedReason,
   RelationshipThreadMeta,
@@ -31,8 +32,11 @@ import { useDisplay } from 'vuetify'
 import { isNativePlatform } from '@/core/platform/isNativePlatform'
 
 import type { RelationshipChatTransport } from '../api/relationshipMessaging.api'
+import { useComposerImages } from '../composables/useComposerImages'
 import { useMessageThread } from '../composables/useMessageThread'
+import { isInlineImageMime } from '../utils/messageImages'
 import { reportHref } from '../utils/reportProblem'
+import MessageText from './MessageText.vue'
 import ReportFallback from './ReportFallback.vue'
 
 const props = defineProps<{
@@ -251,6 +255,44 @@ function removeFile(index: number): void {
   selectedFiles.value = selectedFiles.value.filter((_, i) => i !== index)
 }
 
+// AH-119 (S2) — pasted / dropped images join the same pending list the paperclip fills.
+const composeEl = ref<HTMLElement | null>(null)
+const { dragging } = useComposerImages(
+  composeEl,
+  (files) => {
+    generalError.value = null
+    selectedFiles.value = [...selectedFiles.value, ...files]
+  },
+  {
+    onRejected: (reason) => {
+      generalError.value =
+        reason === 'type'
+          ? t('app.messaging.attachmentPasteUnsupportedType')
+          : t('app.messaging.attachmentUploadError')
+    },
+  },
+)
+
+// An image attachment whose <img> failed to load falls back to the file card.
+const failedImages = ref<Set<string>>(new Set())
+function imageKey(message: RelationshipMessageResource, index: number): string {
+  return `${message.id}:${index}`
+}
+function showAsImage(
+  message: RelationshipMessageResource,
+  att: RelationshipFileAttachment,
+  index: number,
+): boolean {
+  return (
+    att.view_url !== null &&
+    isInlineImageMime(att.mime_type) &&
+    !failedImages.value.has(imageKey(message, index))
+  )
+}
+function onImageError(message: RelationshipMessageResource, index: number): void {
+  failedImages.value = new Set(failedImages.value).add(imageKey(message, index))
+}
+
 function addLink(): void {
   linkError.value = null
   const url = linkUrl.value.trim()
@@ -418,7 +460,7 @@ async function submit(): Promise<void> {
               </div>
 
               <p v-if="message.attributes.body" class="rel-bubble__body">
-                {{ message.attributes.body }}
+                <MessageText :text="message.attributes.body" />
               </p>
 
               <ul v-if="message.attributes.attachments.length > 0" class="rel-bubble__attachments">
@@ -437,8 +479,29 @@ async function submit(): Promise<void> {
                     {{ att.name ?? att.url }}
                   </a>
                   <a
+                    v-else-if="att.kind === 'file' && showAsImage(message, att, i)"
+                    :href="att.view_url ?? undefined"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="message-image-link"
+                  >
+                    <img
+                      loading="lazy"
+                      :src="att.view_url ?? undefined"
+                      :alt="att.name ?? t('app.messaging.attachment')"
+                      class="message-image"
+                      data-test="message-image"
+                      @error="onImageError(message, i)"
+                    />
+                  </a>
+                  <a
                     v-else-if="att.kind === 'file' && att.view_url"
                     :href="att.view_url"
+                    :title="
+                      failedImages.has(imageKey(message, i))
+                        ? t('app.messaging.attachmentImageUnavailable')
+                        : undefined
+                    "
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -486,10 +549,14 @@ async function submit(): Promise<void> {
 
     <form
       v-else
+      ref="composeEl"
       class="rel-thread__compose"
       data-test="relationship-compose"
       @submit.prevent="submit"
     >
+      <div v-if="dragging" class="rel-thread__drop-hint" data-test="relationship-drop-hint">
+        {{ t('app.messaging.attachmentDropHint') }}
+      </div>
       <ul
         v-if="selectedFiles.length > 0"
         class="rel-thread__pending"
@@ -873,6 +940,37 @@ async function submit(): Promise<void> {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.rel-thread__compose {
+  position: relative;
+}
+
+.rel-thread__drop-hint {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed rgb(var(--v-theme-primary));
+  border-radius: 12px;
+  background: rgba(var(--v-theme-surface), 0.92);
+  color: rgb(var(--v-theme-primary));
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+
+.message-image-link {
+  display: inline-block;
+}
+
+.message-image {
+  display: block;
+  max-width: 100%;
+  max-height: 320px;
+  border-radius: 8px;
+  object-fit: contain;
 }
 
 /* The native file input is triggered programmatically from the "+" menu. */

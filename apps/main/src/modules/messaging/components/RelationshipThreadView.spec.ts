@@ -178,10 +178,10 @@ describe('RelationshipThreadView', () => {
                 {
                   kind: 'file',
                   s3_path: 'x',
-                  mime_type: 'image/png',
-                  name: 'shot.png',
+                  mime_type: 'application/pdf',
+                  name: 'shot.pdf',
                   size_bytes: 10,
-                  view_url: 'https://files.example/shot.png',
+                  view_url: 'https://files.example/shot.pdf',
                 },
                 { kind: 'link', url: 'https://brief.example/deck', name: 'The deck' },
               ],
@@ -191,8 +191,8 @@ describe('RelationshipThreadView', () => {
       }),
     )
     const fileLink = wrapper.find('[data-test="relationship-attachment-file"] a')
-    expect(fileLink.attributes('href')).toBe('https://files.example/shot.png')
-    expect(fileLink.text()).toContain('shot.png')
+    expect(fileLink.attributes('href')).toBe('https://files.example/shot.pdf')
+    expect(fileLink.text()).toContain('shot.pdf')
     const linkLink = wrapper.find('[data-test="relationship-attachment-link"] a')
     expect(linkLink.attributes('href')).toBe('https://brief.example/deck')
     expect(linkLink.text()).toContain('The deck')
@@ -335,6 +335,251 @@ describe('RelationshipThreadView — closed conversation (AH-051 follow-up)', ()
     )
 
     expect(wrapper.find('[data-test="relationship-closed"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+})
+
+// ── AH-119 A6: linkify + inline images + paste (shared surface) ─────────────
+
+vi.mock('@catalyst/api-client', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@catalyst/api-client')>()),
+  uploadToPresignedUrl: vi.fn().mockResolvedValue(undefined),
+}))
+
+const A6_I18N_FALLBACKS: Record<string, string> = {
+  attachmentDropHint: 'Drop images to attach',
+  attachmentImageUnavailable: 'Image unavailable',
+  attachmentPasteUnsupportedType: 'Only PNG, JPEG, WebP and GIF images can be pasted.',
+}
+
+function a6Messages() {
+  const clone = JSON.parse(JSON.stringify(enApp)) as typeof enApp & {
+    app: { messaging: Record<string, string> }
+  }
+  for (const [k, v] of Object.entries(A6_I18N_FALLBACKS)) {
+    clone.app.messaging[k] ??= v
+  }
+  return clone
+}
+
+const stripScope = (html: string) => html.replace(/ data-v-[a-z0-9]+=""/g, '')
+
+async function a6Mount(
+  native: boolean,
+  messages: RelationshipMessageResource[],
+  tr: RelationshipChatTransport = makeTransport(),
+) {
+  void native
+  vi.mocked(tr.list).mockResolvedValue(feed(messages))
+  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: a6Messages() } as never })
+  const vuetify = createVuetify({ components: vuetifyComponents, directives: vuetifyDirectives })
+  const wrapper = mount(RelationshipThreadView, {
+    props: { transport: tr, title: 'Acme Agency' },
+    global: { plugins: [i18n, vuetify] },
+    attachTo: document.createElement('div'),
+  })
+  await flushPromises()
+  return { wrapper, tr }
+}
+
+function a6Paste(wrapper: { get: (s: string) => { element: Element } }, files: File[]): Event {
+  const event = new Event('paste', { bubbles: true, cancelable: true })
+  Object.defineProperty(event, 'clipboardData', { value: { files } })
+  wrapper.get('[data-test="relationship-compose"]').element.dispatchEvent(event)
+  return event
+}
+
+describe.each([['web', false]])('RelationshipThreadView AH-119 A6 (%s)', (_label, native) => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('renders a URL in the body as a safe, clickable link', async () => {
+    const { wrapper } = await a6Mount(native, [
+      msg('l1', { body: 'read https://example.com/doc. thanks' }),
+    ])
+    const a = wrapper.get('[data-test="message-link"]')
+    expect(a.attributes('href')).toBe('https://example.com/doc')
+    expect(a.attributes('rel')).toBe('noopener noreferrer')
+    expect(a.attributes('target')).toBe('_blank')
+    expect(wrapper.get('.rel-bubble__body').element.textContent).toBe(
+      'read https://example.com/doc. thanks',
+    )
+    wrapper.unmount()
+  })
+
+  it('does not link javascript: and keeps HTML as text', async () => {
+    const { wrapper } = await a6Mount(native, [
+      msg('l2', { body: 'javascript:alert(1) <img src=x onerror=alert(1)>' }),
+    ])
+    expect(wrapper.find('[data-test="message-link"]').exists()).toBe(false)
+    expect(wrapper.find('.rel-bubble__body img').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('POLARITY: a URL-free, image-free message renders the exact old body markup', async () => {
+    const { wrapper } = await a6Mount(native, [msg('p1', { body: 'hello there' })])
+    expect(stripScope(wrapper.get('.rel-bubble__body').element.outerHTML)).toBe(
+      '<p class="rel-bubble__body">hello there</p>',
+    )
+    wrapper.unmount()
+  })
+
+  it('POLARITY: a non-image file attachment renders exactly as before', async () => {
+    const { wrapper } = await a6Mount(native, [
+      msg('p2', {
+        attachments: [
+          {
+            kind: 'file',
+            s3_path: null,
+            mime_type: 'application/pdf',
+            name: 'a.pdf',
+            size_bytes: 1,
+            view_url: 'https://cdn.test/a.pdf',
+          } as const,
+        ],
+      }),
+    ])
+    expect(wrapper.find('[data-test="message-image"]').exists()).toBe(false)
+    expect(stripScope(wrapper.get('.rel-bubble__attachments').element.outerHTML)).toBe(
+      '<ul class="rel-bubble__attachments"><li data-test="relationship-attachment-file"><a href="https://cdn.test/a.pdf" target="_blank" rel="noopener noreferrer"><i class="mdi-paperclip mdi v-icon notranslate v-theme--light v-icon--size-x-small mr-1" aria-hidden="true"></i> a.pdf</a></li></ul>',
+    )
+    wrapper.unmount()
+  })
+
+  it('renders an image attachment as a lazy inline <img> inside a new-tab link', async () => {
+    const { wrapper } = await a6Mount(native, [
+      msg('i1', {
+        attachments: [
+          {
+            kind: 'file',
+            s3_path: null,
+            mime_type: 'image/png',
+            name: 'pic.png',
+            size_bytes: 1,
+            view_url: 'https://cdn.test/pic.png',
+          } as const,
+        ],
+      }),
+    ])
+    const img = wrapper.get('[data-test="message-image"]')
+    expect(img.attributes()).toMatchObject({
+      loading: 'lazy',
+      src: 'https://cdn.test/pic.png',
+      alt: 'pic.png',
+    })
+    expect(img.classes()).toContain('message-image')
+    const link = img.element.closest('a')!
+    expect(link.getAttribute('href')).toBe('https://cdn.test/pic.png')
+    expect(link.getAttribute('target')).toBe('_blank')
+    expect(link.getAttribute('rel')).toBe('noopener noreferrer')
+    wrapper.unmount()
+  })
+
+  it('falls back to the file card when the image fails to load', async () => {
+    const { wrapper } = await a6Mount(native, [
+      msg('i2', {
+        attachments: [
+          {
+            kind: 'file',
+            s3_path: null,
+            mime_type: 'image/png',
+            name: 'pic.png',
+            size_bytes: 1,
+            view_url: 'https://cdn.test/pic.png',
+          } as const,
+        ],
+      }),
+    ])
+    await wrapper.get('[data-test="message-image"]').trigger('error')
+    expect(wrapper.find('[data-test="message-image"]').exists()).toBe(false)
+    const card = wrapper.get('.rel-bubble__attachments a')
+    expect(card.attributes('href')).toBe('https://cdn.test/pic.png')
+    expect(card.attributes('title')).toBe(a6Messages().app.messaging.attachmentImageUnavailable)
+    expect(card.text()).toContain('pic.png')
+    wrapper.unmount()
+  })
+
+  it('does not inline an image with a null view_url', async () => {
+    const { wrapper } = await a6Mount(native, [
+      msg('i3', {
+        attachments: [
+          {
+            ...({
+              kind: 'file',
+              s3_path: null,
+              mime_type: 'image/png',
+              name: 'pic.png',
+              size_bytes: 1,
+              view_url: 'https://cdn.test/pic.png',
+            } as const),
+            view_url: null,
+          },
+        ],
+      }),
+    ])
+    expect(wrapper.find('[data-test="message-image"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('a pasted image joins the pending list and goes out through the existing send path', async () => {
+    const tr = makeTransport()
+    vi.mocked(tr.attachmentInit).mockResolvedValue({
+      data: { upload_url: 'https://s3.test/u', upload_id: 'up-1' },
+    } as never)
+    vi.mocked(tr.send).mockResolvedValue({ data: msg('sent', {}) } as never)
+    const { wrapper } = await a6Mount(native, [msg('m1', {})], tr)
+
+    const png = new File(['x'], 'shot.png', { type: 'image/png' })
+    const event = a6Paste(wrapper, [png])
+    await flushPromises()
+    expect(event.defaultPrevented).toBe(true)
+    expect(wrapper.get('[data-test="relationship-pending-files"]').text()).toContain('shot.png')
+
+    await wrapper.get('[data-test="relationship-compose"]').trigger('submit')
+    await flushPromises()
+    expect(tr.attachmentInit).toHaveBeenCalledWith({ mime_type: 'image/png', size_bytes: png.size })
+    expect(tr.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        attachments: [expect.objectContaining({ upload_id: 'up-1', name: 'shot.png' })],
+      }),
+    )
+    wrapper.unmount()
+  })
+
+  it('pasted images append to files already picked with the paperclip', async () => {
+    const { wrapper } = await a6Mount(native, [msg('m1', {})])
+    a6Paste(wrapper, [new File(['x'], 'one.png', { type: 'image/png' })])
+    a6Paste(wrapper, [new File(['x'], 'two.webp', { type: 'image/webp' })])
+    await flushPromises()
+    const text = wrapper.get('[data-test="relationship-pending-files"]').text()
+    expect(text).toContain('one.png')
+    expect(text).toContain('two.webp')
+    wrapper.unmount()
+  })
+
+  it('a pasted pdf is refused with the inline error and nothing is queued', async () => {
+    const { wrapper } = await a6Mount(native, [msg('m1', {})])
+    const event = a6Paste(wrapper, [new File(['x'], 'a.pdf', { type: 'application/pdf' })])
+    await flushPromises()
+    expect(event.defaultPrevented).toBe(false)
+    expect(wrapper.find('[data-test="relationship-pending-files"]').exists()).toBe(false)
+    expect(wrapper.get('[data-test="relationship-general-error"]').text()).toBe(
+      a6Messages().app.messaging.attachmentPasteUnsupportedType,
+    )
+    wrapper.unmount()
+  })
+
+  it('shows the drop hint while a file is dragged over the composer', async () => {
+    const { wrapper } = await a6Mount(native, [msg('m1', {})])
+    expect(wrapper.find('[data-test="relationship-drop-hint"]').exists()).toBe(false)
+    const enter = new Event('dragenter', { bubbles: true, cancelable: true })
+    Object.defineProperty(enter, 'dataTransfer', { value: { types: ['Files'], files: [] } })
+    wrapper.get('[data-test="relationship-compose"]').element.dispatchEvent(enter)
+    await flushPromises()
+    expect(wrapper.get('[data-test="relationship-drop-hint"]').text()).toBe(
+      a6Messages().app.messaging.attachmentDropHint,
+    )
     wrapper.unmount()
   })
 })
