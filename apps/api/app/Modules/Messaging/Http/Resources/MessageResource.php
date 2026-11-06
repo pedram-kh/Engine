@@ -34,8 +34,10 @@ final class MessageResource extends JsonResource
             'attributes' => [
                 'kind' => $this->kind->value,
                 'sender_role' => $this->sender_role->value,
-                'body' => $this->body,
-                'attachments' => $this->presentAttachments(),
+                // AH-119 B2: a deleted message is MASKED here, the one place that decides (no body, no
+                // attachments, no signed URL minted); `original_body` and `deleted_body` never leave the model.
+                'body' => $this->isDeleted() ? null : $this->body,
+                'attachments' => $this->isDeleted() ? [] : $this->presentAttachments(),
                 'system_event_key' => $this->system_event_key,
                 // AH-118 — ALWAYS present, null for lines that carry no data.
                 'system_event_data' => $this->system_event_data,
@@ -44,8 +46,15 @@ final class MessageResource extends JsonResource
                     ? ['name' => $this->sender->name]
                     : null,
                 'created_at' => $this->created_at->toIso8601String(),
+                'edited_at' => $this->isDeleted() ? null : $this->edited_at?->toIso8601String(),
+                'is_deleted' => $this->isDeleted(),
             ],
         ];
+    }
+
+    private function isDeleted(): bool
+    {
+        return $this->deleted_at !== null;
     }
 
     /**

@@ -120,7 +120,9 @@ final class MessageService
      */
     public function pageForThread(MessageThread $thread, ?int $beforeId = null, int $perPage = self::DEFAULT_PAGE_SIZE): array
     {
-        $query = Message::query()
+        // AH-119 B2: the FEED opts in to deleted rows (masked by the resource); unread, digest and search
+        // keep the SoftDeletes scope, so a deleted message never counts or matches.
+        $query = Message::query()->withTrashed()
             ->where('thread_id', $thread->id)
             ->with('sender:id,name')
             ->orderByDesc('id');

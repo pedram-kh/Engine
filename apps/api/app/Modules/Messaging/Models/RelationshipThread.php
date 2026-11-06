@@ -94,6 +94,19 @@ final class RelationshipThread extends Model
     }
 
     /**
+     * AH-119 B2 — the newest message INCLUDING a deleted one (the list previews show the "deleted"
+     * placeholder). The plain {@see self::latestMessage()} keeps the SoftDeletes scope.
+     *
+     * @return HasOne<RelationshipMessage, $this>
+     */
+    public function latestMessageWithTrashed(): HasOne
+    {
+        return $this->hasOne(RelationshipMessage::class, 'thread_id')
+            ->ofMany(['id' => 'max'], static fn ($query) => $query->withTrashed())
+            ->withTrashed();
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array

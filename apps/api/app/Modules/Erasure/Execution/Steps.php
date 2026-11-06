@@ -64,6 +64,11 @@ final class Steps
             'campaign_applications.note' => $anon,
             'messages.attachments' => fn (Selection $sel, SubjectSet $s, ConnectionInterface $db, string $now): int => self::updateEach($sel, $s, $db, fn (stdClass $row): array => ['attachments' => null]),
             'relationship_messages.attachments' => fn (Selection $sel, SubjectSet $s, ConnectionInterface $db, string $now): int => self::updateEach($sel, $s, $db, fn (stdClass $row): array => ['attachments' => null]),
+            // 4c AH-119 B4: the subject's withdrawn text (body stays, D-C)
+            'messages.original_body' => fn (Selection $sel, SubjectSet $s, ConnectionInterface $db, string $now): int => self::updateEach($sel, $s, $db, fn (stdClass $row): array => ['original_body' => null]),
+            'messages.deleted_body' => fn (Selection $sel, SubjectSet $s, ConnectionInterface $db, string $now): int => self::updateEach($sel, $s, $db, fn (stdClass $row): array => ['deleted_body' => null]),
+            'relationship_messages.original_body' => fn (Selection $sel, SubjectSet $s, ConnectionInterface $db, string $now): int => self::updateEach($sel, $s, $db, fn (stdClass $row): array => ['original_body' => null]),
+            'relationship_messages.deleted_body' => fn (Selection $sel, SubjectSet $s, ConnectionInterface $db, string $now): int => self::updateEach($sel, $s, $db, fn (stdClass $row): array => ['deleted_body' => null]),
             // 4d JSON scrubs
             'notifications.own_feed' => $delete,
             'notifications.actor' => fn (Selection $sel, SubjectSet $s, ConnectionInterface $db, string $now): int => self::updateEach($sel, $s, $db, fn (stdClass $row): array => ['data' => self::withoutKeys($row->data ?? null, ['sender_name'])]),

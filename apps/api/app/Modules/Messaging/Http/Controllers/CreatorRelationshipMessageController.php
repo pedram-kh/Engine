@@ -10,6 +10,7 @@ use App\Modules\Agencies\Models\Agency;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
 use App\Modules\Messaging\Enums\MessageSenderRole;
+use App\Modules\Messaging\Http\Controllers\Concerns\HandlesMessageRevisions;
 use App\Modules\Messaging\Http\Controllers\Concerns\HandlesRelationshipMessageAttachments;
 use App\Modules\Messaging\Http\Requests\SendRelationshipMessageRequest;
 use App\Modules\Messaging\Http\Resources\RelationshipMessageResource;
@@ -19,6 +20,8 @@ use App\Modules\Messaging\Services\RelationshipMessageAttachmentUploadService;
 use App\Modules\Messaging\Services\RelationshipMessageService;
 use App\Modules\Messaging\Support\ContactMediaUrl;
 use App\Modules\Messaging\Support\RelationshipSendState;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -44,6 +47,7 @@ use RuntimeException;
  */
 final class CreatorRelationshipMessageController
 {
+    use HandlesMessageRevisions;
     use HandlesRelationshipMessageAttachments;
 
     public function __construct(
@@ -66,8 +70,8 @@ final class CreatorRelationshipMessageController
             ->where('creator_id', $creator->id)
             // Only conversations that actually have a message (AH-012 D2) — no
             // empty ghosts, even if a transient/attachment row ever slips in.
-            ->has('messages')
-            ->with(['agency:id,ulid,name,logo_path', 'latestMessage'])
+            ->has('messages', '>=', 1, 'and', static fn (EloquentBuilder $q) => $q->withoutGlobalScope(SoftDeletingScope::class))
+            ->with(['agency:id,ulid,name,logo_path', 'latestMessageWithTrashed'])
             ->orderByDesc('last_message_at')
             ->orderByDesc('id')
             ->get();
@@ -86,7 +90,8 @@ final class CreatorRelationshipMessageController
                         'logo_url' => ContactMediaUrl::resolve($thread->agency->logo_path),
                     ],
                     'last_message_at' => $thread->last_message_at?->toIso8601String(),
-                    'last_message_preview' => $this->preview($thread->latestMessage),
+                    'last_message_preview' => $this->preview($thread->latestMessageWithTrashed),
+                    'last_message_is_deleted' => $thread->latestMessageWithTrashed?->deleted_at !== null,
                     'unread_count' => $this->messages->unreadCountForUser($thread, $viewer),
                 ],
             ])->all(),
@@ -176,6 +181,38 @@ final class CreatorRelationshipMessageController
     }
 
     /**
+     * AH-119 B2 — edit own message (flag-gated by route middleware); structural by creator_id and agency.
+     */
+    public function update(Request $request, Agency $agency, string $message): JsonResponse
+    {
+        return $this->editMessageResponse($request, $this->existingThread($request, $agency), $message);
+    }
+
+    /**
+     * AH-119 B2 — delete own message (allowed when the relationship has since closed).
+     */
+    public function destroy(Request $request, Agency $agency, string $message): JsonResponse
+    {
+        return $this->deleteMessageResponse($request, $this->existingThread($request, $agency), $message);
+    }
+
+    private function existingThread(Request $request, Agency $agency): ?RelationshipThread
+    {
+        /** @var User $viewer */
+        $viewer = $request->user();
+        $creator = $viewer->creator;
+        if ($creator === null) {
+            return null;
+        }
+
+        return RelationshipThread::query()
+            ->withoutGlobalScope(BelongsToAgencyScope::class)
+            ->where('creator_id', $creator->id)
+            ->where('agency_id', $agency->id)
+            ->first();
+    }
+
+    /**
      * Resolve (viewer, creator, thread) for a READ. An EXISTING owned thread is
      * always readable by its creator (D6). With no thread yet, opening one
      * requires the current send gate — but opening alone does NOT persist a row
@@ -222,7 +259,7 @@ final class CreatorRelationshipMessageController
             return null;
         }
 
-        return RelationshipMessage::query()
+        return RelationshipMessage::query()->withTrashed()
             ->where('thread_id', $thread->id)
             ->where('ulid', $beforeUlid)
             ->value('id');
@@ -230,7 +267,7 @@ final class CreatorRelationshipMessageController
 
     private function preview(?RelationshipMessage $message): ?string
     {
-        if ($message === null) {
+        if ($message === null || $message->deleted_at !== null) {
             return null;
         }
 

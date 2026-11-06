@@ -103,6 +103,8 @@ final class AgencyCreatorSurfaces
             'Messaging/Models/RelationshipThread.php' => ['model', 'The thread model.'],
             'Messaging/Services/MessageDigestService.php' => ['scoped', 'The digest mail recipients.'],
             'Messaging/Services/MessageInboxQuery.php' => ['flagged', 'AH-119: the unified inbox keeps the thread of an erased creator and flags it (is_erased), like the relationship-thread list.'],
+            'Messaging/Services/MessageRevisionService.php' => ['unchanged', 'AH-119: edit and delete of one\'s own message. History stays editable only while the thread is open (the gate refuses an edit toward a pending or erased creator); a delete is always allowed.'],
+            'Messaging/Services/MessageSearch.php' => ['flagged', 'AH-119: an erased creator\'s messages stay searchable and the row carries sender_is_erased.'],
             'Messaging/Services/MessageableContactsFinder.php' => ['scoped', 'The contact picker query: an unavailable creator only where a thread already exists.'],
             'Messaging/Services/RelationshipMessageNotifications.php' => ['silent', 'Agency messages to a pending or erased creator: stored, never delivered.'],
             'Messaging/Services/RelationshipMessageService.php' => ['guarded', 'No NEW conversation with a pending or erased creator; an existing thread stays writable.'],

@@ -87,6 +87,9 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         'agency_creator_relation.notes_updated',
         // AH-119 A3 — the owner reassign (ids only).
         'agency_creator_relation.owner_changed',
+        // AH-119 B2 — a sender edited or deleted their own message (ids only).
+        'message.edited',
+        'message.deleted',
         // AH-051 (D-7) — admin-initiated relation verbs (Door 1 / Door 2 /
         // disconnect). admin_connected + disconnected require a reason.
         'agency_creator_relation.admin_requested',

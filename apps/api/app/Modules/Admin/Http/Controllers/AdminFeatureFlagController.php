@@ -24,6 +24,7 @@ use App\Modules\Creators\Features\SocialVerificationEnabled;
 use App\Modules\Erasure\Features\AccountErasureExecuteEnabled;
 use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Features\AccountDeletionEnabled;
+use App\Modules\Messaging\Features\MessagesV2EditSearchEnabled;
 use App\Modules\Messaging\Features\MessagesV2InboxEnabled;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -125,6 +126,10 @@ final class AdminFeatureFlagController
         MessagesV2InboxEnabled::NAME => [
             'label' => 'Messages v2: unified inbox',
             'description' => 'Turns on the unified agency inbox (direct and campaign conversations in one list, with brand and campaign filters and Mine/All) and the relationship-owner reassign endpoint. Off: the endpoints answer 404 and the agency Messages page is the previous one. Arm after the web deploy.',
+        ],
+        MessagesV2EditSearchEnabled::NAME => [
+            'label' => 'Messages v2: edit, delete and search',
+            'description' => 'Lets a sender edit a message for 15 minutes and delete it at any time, and turns on the agency message search. Off: the edit, delete and search endpoints answer 404 and nothing is written. Arm only after TestFlight build 4 is live: an older app renders a deleted message as a blank bubble.',
         ],
         AccountErasureExecuteEnabled::NAME => [
             'label' => 'Account erasure (admin Erase button)',

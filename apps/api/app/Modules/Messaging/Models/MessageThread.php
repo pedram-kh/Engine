@@ -108,6 +108,19 @@ final class MessageThread extends Model
     }
 
     /**
+     * AH-119 B2 — the newest message INCLUDING a deleted one (the list previews show the "deleted"
+     * placeholder). The plain {@see self::latestMessage()} keeps the SoftDeletes scope.
+     *
+     * @return HasOne<Message, $this>
+     */
+    public function latestMessageWithTrashed(): HasOne
+    {
+        return $this->hasOne(Message::class, 'thread_id')
+            ->ofMany(['id' => 'max'], static fn ($query) => $query->withTrashed())
+            ->withTrashed();
+    }
+
+    /**
      * Whether a human send is currently blocked (D-13 + Q2). Reads the parent
      * assignment's status; system writes ignore this.
      */

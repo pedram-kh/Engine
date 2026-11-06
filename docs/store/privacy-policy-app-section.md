@@ -11,6 +11,7 @@ Catalyst Performance Ltd, 151 Walworth Road, London SE17 1RS, United Kingdom, is
 - **Account:** name, email address, password (stored in hashed form), two-factor authentication settings, email verification status.
 - **Profile:** profile photo, short bio, languages, accent, content categories, content companions, videos, date of birth, phone or WhatsApp number, postal address, social-media account names and follower counts, portfolio items and availability. You provide these yourself.
 - **Work:** your agency relationships, campaign applications, assignments, contracts, and the messages and attachments you exchange with agencies and brands.
+- **Edited and deleted messages:** when you edit a message within 15 minutes, or delete one, we keep the earlier text (and the text of a deleted message) so the agency's record stays complete. It is not shown in the app and is not visible to Catalyst support staff. It is removed if you delete your account. _Notice text for Pedram to review; not legally reviewed._
 - **Device and notifications:** a push-notification token for your device, your notification preferences, whether a notification was delivered, the app version, operating system and device language.
 - **Technical and security:** IP address and app or browser identifier in security logs (sign-ins, failed sign-ins and changes to your account).
 

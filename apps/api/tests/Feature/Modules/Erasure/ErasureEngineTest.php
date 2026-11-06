@@ -350,3 +350,48 @@ it('removes only the personal keys from a JSON column: the rest of the payload, 
         ->and(json_decode((string) $events[0], true))->toBe(['erased' => true])
         ->and(json_decode((string) $events[2], true))->toBe(['session' => 'unrelated-session-id-1234']);
 });
+
+// ── AH-119 B4: the withdrawn text of edited and deleted messages (Q5, Q13) ──────────────────────
+
+it('nulls the subject\'s kept originals and deleted text on both message tables, and keeps every body and the agency member\'s rows', function (): void {
+    $a = ErasureGraph::seedSubject('a');
+    $subject = SubjectSet::resolve($a->user);
+    $messageBodies = fn (): array => [
+        DB::table('messages')->orderBy('id')->pluck('body', 'id')->all(),
+        DB::table('relationship_messages')->orderBy('id')->pluck('body', 'id')->all(),
+    ];
+    $members = fn (): array => [
+        DB::table('messages')->where('sender_user_id', $a->agencyMember->id)->orderBy('id')->get()->map(fn ($r): array => (array) $r)->all(),
+        DB::table('relationship_messages')->where('sender_user_id', $a->agencyMember->id)->orderBy('id')->get()->map(fn ($r): array => (array) $r)->all(),
+    ];
+    $bodiesBefore = $messageBodies();
+    $membersBefore = $members();
+
+    // The dry-run counts what the run changes: one of each per table (a deleted row is included).
+    $dry = collect(Selections::all())->filter(fn ($s): bool => str_ends_with($s->id, '.original_body') || str_ends_with($s->id, '.deleted_body'))
+        ->mapWithKeys(fn ($s): array => [$s->id => $s->count($subject, DB::connection())])->all();
+    expect($dry)->toBe([
+        'messages.original_body' => 1, 'messages.deleted_body' => 1,
+        'relationship_messages.original_body' => 1, 'relationship_messages.deleted_body' => 1,
+    ]);
+
+    (new ErasureEngine)->run($subject);
+
+    foreach (['messages', 'relationship_messages'] as $table) {
+        expect(DB::table($table)->where('sender_user_id', $a->user->id)->whereNotNull('original_body')->count())->toBe(0)
+            ->and(DB::table($table)->where('sender_user_id', $a->user->id)->whereNotNull('deleted_body')->count())->toBe(0)
+            // The deletion itself and its bookkeeping stay: only the text goes.
+            ->and(DB::table($table)->where('sender_user_id', $a->user->id)->whereNotNull('deleted_at')->count())->toBe(1)
+            ->and(DB::table($table)->where('sender_user_id', $a->user->id)->whereNotNull('deleted_by_user_id')->count())->toBe(1)
+            ->and(DB::table($table)->where('sender_user_id', $a->user->id)->whereNotNull('edited_at')->count())->toBe(1);
+    }
+    expect($messageBodies())->toBe($bodiesBefore)
+        ->and($members())->toBe($membersBefore)
+        ->and(collect($membersBefore[0])->pluck('original_body')->filter()->map(fn ($v): bool => str_contains((string) $v, 'agency original'))->all())->toBe([true]);
+
+    // A second run finds nothing more to scrub (idempotent).
+    foreach (['messages.original_body', 'messages.deleted_body', 'relationship_messages.original_body', 'relationship_messages.deleted_body'] as $id) {
+        $selection = collect(Selections::all())->firstWhere('id', $id);
+        expect($selection?->count($subject, DB::connection()) ?? -1)->toBe(0);
+    }
+});

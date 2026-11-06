@@ -29,12 +29,13 @@ The endpoints address two specific E2E pain points:
 All routes live under `/api/v1/_test/*` and require the
 `X-Test-Helper-Token` header.
 
-| Method | Path                               | Body / Query                                                  | Returns                                 |
-| ------ | ---------------------------------- | ------------------------------------------------------------- | --------------------------------------- |
-| GET    | `/api/v1/_test/verification-token` | `?email=jane@example.com`                                     | `{ data: { token, verification_url } }` |
-| POST   | `/api/v1/_test/totp`               | `{ "user_id": 123 }` **or** `{ "email": "jane@example.com" }` | `{ data: { code: "123456" } }`          |
-| POST   | `/api/v1/_test/clock`              | `{ "at": "2026-05-09T00:00:00Z" }`                            | `{ data: { at: "..." } }`               |
-| POST   | `/api/v1/_test/clock/reset`        | (none)                                                        | `{ data: { reset: true } }`             |
+| Method | Path                                | Body / Query                                                  | Returns                                                                   |
+| ------ | ----------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| GET    | `/api/v1/_test/verification-token`  | `?email=jane@example.com`                                     | `{ data: { token, verification_url } }`                                   |
+| POST   | `/api/v1/_test/totp`                | `{ "user_id": 123 }` **or** `{ "email": "jane@example.com" }` | `{ data: { code: "123456" } }`                                            |
+| POST   | `/api/v1/_test/clock`               | `{ "at": "2026-05-09T00:00:00Z" }`                            | `{ data: { at: "..." } }`                                                 |
+| POST   | `/api/v1/_test/clock/reset`         | (none)                                                        | `{ data: { reset: true } }`                                               |
+| POST   | `/api/v1/_test/messages/{ulid}/age` | `{ "minutes": 16 }` (integer 1 to 10080)                      | `{ data: { id, table, created_at } }` (404 unknown ulid, 422 bad minutes) |
 
 The Playwright spec for 2FA enrollment (chunk 6 priority #19) calls
 `/_test/totp` with `email` because the SPA never sees the user's

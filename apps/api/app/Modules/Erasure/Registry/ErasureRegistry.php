@@ -230,14 +230,20 @@ final class ErasureRegistry
     {
         $attachments = 'Creator-authored uploads only (the creator\'s own messages); the S3 objects are deleted per object in Stage 4f, never by shared prefix.';
         $conversation = 'The agency\'s conversation record; body kept (D-C).';
+        $withdrawn = 'Text the subject withdrew by editing or deleting their own message (AH-119 B2). Kept while the account lives (never shown to anyone), nulled at erasure on the subject\'s own rows (Q5).';
+        $edit = 'AH-119 B2 edit and delete bookkeeping: a timestamp, and the id of the deleting sender (a user FK left pointing at the anonymised user, as `sender_user_id` is).';
 
         return [
-            'messages' => new TableRule(null, 'Body kept (D-C); the creator\'s attachments scrubbed (§3.4).', ['sender_user_id'], [
+            'messages' => new TableRule(null, 'Body kept (D-C); the creator\'s attachments and withdrawn text scrubbed (§3.4).', ['sender_user_id', 'deleted_by_user_id'], [
                 ...self::scrub('attachments', 'attachments of messages whose sender_user_id is the subject user: set to null', $attachments),
+                ...self::scrub('original_body,deleted_body', 'original_body and deleted_body of messages whose sender_user_id is the subject user: set to null (selections messages.original_body, messages.deleted_body)', $withdrawn),
+                ...self::keep('edited_at,deleted_by_user_id', $edit),
                 ...self::keep('id,ulid,thread_id,sender_user_id,sender_role,kind,body,system_event_key,system_event_data,created_at,updated_at,deleted_at', $conversation),
             ]),
-            'relationship_messages' => new TableRule(null, 'Body kept (D-C); the creator\'s attachments scrubbed (§3.4).', ['sender_user_id'], [
+            'relationship_messages' => new TableRule(null, 'Body kept (D-C); the creator\'s attachments and withdrawn text scrubbed (§3.4).', ['sender_user_id', 'deleted_by_user_id'], [
                 ...self::scrub('attachments', 'attachments of messages whose sender_user_id is the subject user: set to null', $attachments),
+                ...self::scrub('original_body,deleted_body', 'original_body and deleted_body of messages whose sender_user_id is the subject user: set to null (selections relationship_messages.original_body, relationship_messages.deleted_body)', $withdrawn),
+                ...self::keep('edited_at,deleted_by_user_id', $edit),
                 ...self::keep('id,ulid,thread_id,sender_user_id,sender_role,kind,body,created_at,updated_at,deleted_at', $conversation),
             ]),
             'message_threads' => new TableRule(null, 'Edge to an anchor; no creator data of its own (§3.4).', [], [

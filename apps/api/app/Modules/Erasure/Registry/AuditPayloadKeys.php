@@ -75,6 +75,7 @@ final class AuditPayloadKeys
             'Money or currency of an assignment, not a person.' => 'agreed_fee_currency,agreed_fee_minor_units,currency,previous_agreed_fee_minor_units',
             'A from/to state or column transition label.' => 'from,to',
             'A user id on each side of an owner reassign (AH-119 A3): an id, not a name.' => 'from_user,to_user',
+            'The ulids of a message and its thread (AH-119 B2 edit and delete audit rows): ids, never the text.' => 'message_ulid,thread_ulid',
             'Locale, currency or UI preference.' => 'categories,country_code,preferred_currency,preferred_language,primary_language,theme_preference,timezone',
             'Boolean marker of a completed step.' => 'payout_method_set',
             'The erasure run\'s own bookkeeping: its ledger ulid, digest and per-table counts. No person.' => 'audit_rows_scrubbed,counts,digest,files_deleted,ledger_ulid',

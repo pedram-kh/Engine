@@ -240,3 +240,19 @@ it('keeps FileKeys a plain value: sorted unique keys, class counts, a skipped co
     expect($keys->count())->toBe(2)
         ->and($keys->summary())->toBe(['avatar' => 2, 'skipped_outside_own_prefix' => 1]);
 });
+
+it('still collects and deletes the attachments of a DELETED message (Q4: hidden, kept until erasure)', function (): void {
+    [$graph, $subject, $store] = erasureFilesFixture();
+    DB::table('messages')->where('sender_user_id', $graph->user->id)->whereNotNull('attachments')
+        ->update(['deleted_at' => now(), 'deleted_by_user_id' => $graph->user->id, 'deleted_body' => 'withdrawn', 'body' => null]);
+    DB::table('relationship_messages')->where('sender_user_id', $graph->user->id)->whereNotNull('attachments')
+        ->update(['deleted_at' => now(), 'deleted_by_user_id' => $graph->user->id, 'deleted_body' => 'withdrawn', 'body' => null]);
+
+    $keys = (new FileKeyCollector($store))->collect(SubjectSet::resolve($graph->user));
+    $deleted = (new FileStep($store))->run($keys);
+
+    expect($keys->byClass['message_attachment'])->toBe(1)
+        ->and($keys->byClass['relationship_attachment'])->toBe(1)
+        ->and($deleted)->toBe(count($graph->files['delete']))
+        ->and(array_values(array_filter($graph->files['delete'], fn (string $k): bool => Storage::disk('media')->exists($k))))->toBe([]);
+});

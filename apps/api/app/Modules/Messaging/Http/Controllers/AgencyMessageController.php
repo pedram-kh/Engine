@@ -13,6 +13,7 @@ use App\Modules\Messaging\Enums\MessageKind;
 use App\Modules\Messaging\Enums\MessageSenderRole;
 use App\Modules\Messaging\Exceptions\MessageThreadClosedException;
 use App\Modules\Messaging\Http\Controllers\Concerns\HandlesMessageAttachments;
+use App\Modules\Messaging\Http\Controllers\Concerns\HandlesMessageRevisions;
 use App\Modules\Messaging\Http\Requests\SendMessageRequest;
 use App\Modules\Messaging\Http\Resources\MessageResource;
 use App\Modules\Messaging\Models\Message;
@@ -45,6 +46,7 @@ use RuntimeException;
 final class AgencyMessageController
 {
     use HandlesMessageAttachments;
+    use HandlesMessageRevisions;
 
     public function __construct(
         private readonly MessageThreadService $threads,
@@ -66,7 +68,7 @@ final class AgencyMessageController
 
         $threads = MessageThread::query()
             ->whereHas('assignment', static fn ($q) => $q->where('campaign_id', $campaign->id))
-            ->with(['assignment.creator:id,ulid,display_name,erased_at', 'latestMessage'])
+            ->with(['assignment.creator:id,ulid,display_name,erased_at', 'latestMessageWithTrashed'])
             ->orderByDesc('last_message_at')
             ->orderByDesc('id')
             ->get();
@@ -83,7 +85,8 @@ final class AgencyMessageController
                         'is_erased' => $thread->assignment?->creator?->isErased() ?? false,
                     ],
                     'last_message_at' => $thread->last_message_at?->toIso8601String(),
-                    'last_message_preview' => $this->preview($thread->latestMessage),
+                    'last_message_preview' => $this->preview($thread->latestMessageWithTrashed),
+                    'last_message_is_deleted' => $thread->latestMessageWithTrashed?->deleted_at !== null,
                     'unread_count' => $this->messages->unreadCountForUser($thread, $viewer),
                 ],
             ])->all(),
@@ -177,6 +180,31 @@ final class AgencyMessageController
         return response()->json(['meta' => ['marked' => $marked, 'unread_count' => 0]]);
     }
 
+    /**
+     * AH-119 B2 — edit own message (flag-gated by route middleware). The thread is looked up, never provisioned.
+     */
+    public function update(Request $request, Agency $agency, Campaign $campaign, CampaignAssignment $assignment, string $message): JsonResponse
+    {
+        return $this->editMessageResponse($request, $this->reviseThread($agency, $campaign, $assignment), $message);
+    }
+
+    /**
+     * AH-119 B2 — delete own message (allowed in a closed thread).
+     */
+    public function destroy(Request $request, Agency $agency, Campaign $campaign, CampaignAssignment $assignment, string $message): JsonResponse
+    {
+        return $this->deleteMessageResponse($request, $this->reviseThread($agency, $campaign, $assignment), $message);
+    }
+
+    private function reviseThread(Agency $agency, Campaign $campaign, CampaignAssignment $assignment): ?MessageThread
+    {
+        $this->assertCampaignBelongsToAgency($campaign, $agency);
+        $this->assertAssignmentBelongsToCampaign($assignment, $campaign);
+        Gate::authorize('message', $campaign);
+
+        return MessageThread::query()->where('assignment_id', $assignment->id)->first();
+    }
+
     private function resolveBeforeCursor(Request $request, MessageThread $thread): ?int
     {
         $beforeUlid = $request->query('before');
@@ -184,7 +212,7 @@ final class AgencyMessageController
             return null;
         }
 
-        return Message::query()
+        return Message::query()->withTrashed()
             ->where('thread_id', $thread->id)
             ->where('ulid', $beforeUlid)
             ->value('id');
@@ -192,8 +220,8 @@ final class AgencyMessageController
 
     private function preview(?Message $message): ?string
     {
-        if ($message === null) {
-            return null;
+        if ($message === null || $message->deleted_at !== null) {
+            return null; // a deleted last message reads as `last_message_is_deleted`, never as text
         }
 
         if ($message->kind === MessageKind::System) {

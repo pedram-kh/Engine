@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 use App\Modules\Messaging\Http\Controllers\AgencyMessageController;
 use App\Modules\Messaging\Http\Controllers\AgencyMessageInboxController;
+use App\Modules\Messaging\Http\Controllers\AgencyMessageSearchController;
 use App\Modules\Messaging\Http\Controllers\AgencyRelationshipMessageController;
 use App\Modules\Messaging\Http\Controllers\CreatorMessageController;
 use App\Modules\Messaging\Http\Controllers\CreatorRelationshipMessageController;
 use App\Modules\Messaging\Http\Controllers\MessageableContactsController;
+use App\Modules\Messaging\Http\Middleware\RequireMessagesV2EditSearch;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -128,4 +130,46 @@ Route::prefix('creators/me/relationship-threads')
         Route::post('{agency}/messages/read', [CreatorRelationshipMessageController::class, 'markRead'])->name('messages.read');
         Route::post('{agency}/messages/attachments/init', [CreatorRelationshipMessageController::class, 'attachmentInit'])->name('messages.attachments.init');
         Route::post('{agency}/messages/attachments/complete', [CreatorRelationshipMessageController::class, 'attachmentComplete'])->name('messages.attachments.complete');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| AH-119 Stage B — edit, delete and search (flag `messages_v2_edit_search_enabled`)
+|--------------------------------------------------------------------------
+|
+| The eight edit/delete routes (PATCH + DELETE on four message route sets) and the agency message
+| search. `RequireMessagesV2EditSearch` answers 404 while the flag is off, after authentication and
+| tenancy. `{message}` is a ULID resolved INSIDE the thread named by the rest of the URL (a foreign
+| ULID is 404). The creator surfaces are structural by creator_id (the BelongsToAgency bypass already
+| allowlisted in docs/security/tenancy.md §4); the agency surfaces use the standard tenancy stack.
+|
+*/
+
+Route::middleware(['auth:web', 'tenancy.agency', 'tenancy', RequireMessagesV2EditSearch::class])
+    ->prefix('agencies/{agency}')
+    ->name('agencies.messaging.')
+    ->group(function (): void {
+        Route::patch('campaigns/{campaign}/assignments/{assignment}/messages/{message}', [AgencyMessageController::class, 'update'])
+            ->name('messages.update');
+        Route::delete('campaigns/{campaign}/assignments/{assignment}/messages/{message}', [AgencyMessageController::class, 'destroy'])
+            ->name('messages.destroy');
+        Route::patch('creators/{creator}/relationship-messages/{message}', [AgencyRelationshipMessageController::class, 'update'])
+            ->name('relationship-messages.update');
+        Route::delete('creators/{creator}/relationship-messages/{message}', [AgencyRelationshipMessageController::class, 'destroy'])
+            ->name('relationship-messages.destroy');
+        Route::get('message-search', [AgencyMessageSearchController::class, 'index'])
+            ->name('messages.search');
+    });
+
+Route::middleware(['auth:web,creator_app', 'tenancy.set', 'verified', RequireMessagesV2EditSearch::class])
+    ->name('creators.me.messages-v2.')
+    ->group(function (): void {
+        Route::patch('creators/me/assignments/{assignment}/messages/{message}', [CreatorMessageController::class, 'update'])
+            ->name('assignment.update');
+        Route::delete('creators/me/assignments/{assignment}/messages/{message}', [CreatorMessageController::class, 'destroy'])
+            ->name('assignment.destroy');
+        Route::patch('creators/me/relationship-threads/{agency}/messages/{message}', [CreatorRelationshipMessageController::class, 'update'])
+            ->name('relationship.update');
+        Route::delete('creators/me/relationship-threads/{agency}/messages/{message}', [CreatorRelationshipMessageController::class, 'destroy'])
+            ->name('relationship.destroy');
     });

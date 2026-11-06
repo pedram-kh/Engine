@@ -168,6 +168,16 @@ it('keeps the headline decisions of the approved map in place', function (): voi
         ->and($t['campaign_posted_content']->columns['post_url']->disposition)->toBe(Disposition::Keep)
         ->and($t['messages']->columns['body']->disposition)->toBe(Disposition::Keep)
         ->and($t['messages']->columns['attachments']->disposition)->toBe(Disposition::ScrubJson)
+        // AH-119 B4: the withdrawn text is scrubbed on the subject's rows, the bookkeeping kept, on both tables.
+        ->and($t['messages']->columns['original_body']->disposition)->toBe(Disposition::ScrubJson)
+        ->and($t['messages']->columns['deleted_body']->disposition)->toBe(Disposition::ScrubJson)
+        ->and($t['messages']->columns['edited_at']->disposition)->toBe(Disposition::Keep)
+        ->and($t['messages']->columns['deleted_by_user_id']->disposition)->toBe(Disposition::Keep)
+        ->and($t['relationship_messages']->columns['original_body']->disposition)->toBe(Disposition::ScrubJson)
+        ->and($t['relationship_messages']->columns['deleted_body']->disposition)->toBe(Disposition::ScrubJson)
+        ->and($t['relationship_messages']->columns['deleted_by_user_id']->disposition)->toBe(Disposition::Keep)
+        ->and($t['messages']->refs)->toContain('deleted_by_user_id')
+        ->and($t['relationship_messages']->refs)->toContain('deleted_by_user_id')
         ->and($t['creator_payout_methods']->disposition)->toBe(Disposition::EraseRow)
         ->and($t['talent_pool_creators']->disposition)->toBe(Disposition::EraseRow);
 });

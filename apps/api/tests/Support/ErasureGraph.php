@@ -106,7 +106,12 @@ final class ErasureGraph
             // The graph's open assignment; its terminal twin (seeded below) is deliberately not counted.
             'campaign_assignments.cancel' => 1,
             'messages.attachments' => 1,
+            // AH-119 B4: the subject's kept originals and deleted text (one of each per table); the agency member's own are left.
+            'messages.original_body' => 1,
+            'messages.deleted_body' => 1,
             'relationship_messages.attachments' => 1,
+            'relationship_messages.original_body' => 1,
+            'relationship_messages.deleted_body' => 1,
             'notifications.own_feed' => 2,
             'notifications.actor' => 1,
             'notifications.subject' => 2,
@@ -189,11 +194,13 @@ final class ErasureGraph
         $agencyAttachment = [['s3_path' => "messages/{$thread->ulid}/{$tag}-agency.pdf", 'name' => 'brief.pdf']];
         $ownRelationshipAttachment = [['s3_path' => "relationship-messages/{$relationshipThread->ulid}/{$tag}-own.pdf", 'name' => 'file.pdf']];
         $agencyRelationshipAttachment = [['s3_path' => "relationship-messages/{$relationshipThread->ulid}/{$tag}-agency.pdf", 'name' => 'brief.pdf']];
-        $ownMessage->forceFill(['attachments' => $ownAttachment])->save();
-        Message::factory()->createOne(['thread_id' => $thread->id, 'sender_user_id' => $user->id]);
+        $ownMessage->forceFill(['attachments' => $ownAttachment, 'edited_at' => now(), 'original_body' => "before the edit {$tag}"])->save();
+        Message::factory()->createOne(['thread_id' => $thread->id, 'sender_user_id' => $user->id, 'body' => null, 'deleted_body' => "withdrawn {$tag}", 'deleted_at' => now(), 'deleted_by_user_id' => $user->id]);
+        Message::factory()->createOne(['thread_id' => $thread->id, 'sender_user_id' => $agencyMember->id, 'edited_at' => now(), 'original_body' => "agency original {$tag}", 'deleted_body' => "agency withdrawn {$tag}"]);
         Message::factory()->attachmentOnly($agencyAttachment)->createOne(['thread_id' => $thread->id, 'sender_user_id' => $agencyMember->id]);
-        $ownRelationshipMessage->forceFill(['attachments' => $ownRelationshipAttachment])->save();
-        RelationshipMessage::factory()->createOne(['thread_id' => $relationshipThread->id, 'sender_user_id' => $user->id]);
+        $ownRelationshipMessage->forceFill(['attachments' => $ownRelationshipAttachment, 'edited_at' => now(), 'original_body' => "before the edit {$tag}"])->save();
+        RelationshipMessage::factory()->createOne(['thread_id' => $relationshipThread->id, 'sender_user_id' => $user->id, 'body' => null, 'deleted_body' => "withdrawn {$tag}", 'deleted_at' => now(), 'deleted_by_user_id' => $user->id]);
+        RelationshipMessage::factory()->createOne(['thread_id' => $relationshipThread->id, 'sender_user_id' => $agencyMember->id, 'edited_at' => now(), 'original_body' => "agency original {$tag}", 'deleted_body' => "agency withdrawn {$tag}"]);
         RelationshipMessage::factory()->attachmentOnly($agencyRelationshipAttachment)->createOne(['thread_id' => $relationshipThread->id, 'sender_user_id' => $agencyMember->id]);
 
         // 4d — JSON scrubs.

@@ -208,6 +208,12 @@ enum AuditAction: string
     // the relation's audit allowlist, so the trait's auto `*.updated` row never fires for it.
     case AgencyCreatorRelationOwnerChanged = 'agency_creator_relation.owner_changed';
 
+    // AH-119 B2 — a sender edited or deleted their own message (either message table). Metadata is ids
+    // only (`message_ulid`, `thread_ulid`), NEVER the text: the message row itself holds the original
+    // and the withdrawn body, and no audit row ever copies them.
+    case MessageEdited = 'message.edited';
+    case MessageDeleted = 'message.deleted';
+
     // AH-051 (D-7) — admin-initiated relation verbs. These make an admin-driven
     // connection/termination FOREVER distinguishable from an agency-initiated
     // one (D-8 provenance — the distinct verb IS the record; invited_by_user_id

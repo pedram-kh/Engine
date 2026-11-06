@@ -162,6 +162,16 @@ final class Selections
             new Selection('relationship_messages.attachments', 'relationship_messages', Disposition::ScrubJson, '4c', 'relationship messages sent by the subject user that still carry attachments',
                 fn (SubjectSet $s, ConnectionInterface $db): Builder => $db->table('relationship_messages')->where('sender_user_id', $s->userId)->whereNotNull('attachments'),
                 static fn (stdClass $row, SubjectSet $s): bool => self::jsonHasContent($row->attachments ?? null)),
+            // AH-119 B2/B4 (Q5): the text the subject withdrew. Raw query builder, so deleted rows are included.
+            // `body` stays (D-C); only the kept originals and the deleted text go.
+            new Selection('messages.original_body', 'messages', Disposition::ScrubJson, '4c', 'campaign messages sent by the subject user that still keep the text from before an edit',
+                fn (SubjectSet $s, ConnectionInterface $db): Builder => $db->table('messages')->where('sender_user_id', $s->userId)->whereNotNull('original_body')),
+            new Selection('messages.deleted_body', 'messages', Disposition::ScrubJson, '4c', 'campaign messages sent by the subject user that still keep the text of a deletion',
+                fn (SubjectSet $s, ConnectionInterface $db): Builder => $db->table('messages')->where('sender_user_id', $s->userId)->whereNotNull('deleted_body')),
+            new Selection('relationship_messages.original_body', 'relationship_messages', Disposition::ScrubJson, '4c', 'relationship messages sent by the subject user that still keep the text from before an edit',
+                fn (SubjectSet $s, ConnectionInterface $db): Builder => $db->table('relationship_messages')->where('sender_user_id', $s->userId)->whereNotNull('original_body')),
+            new Selection('relationship_messages.deleted_body', 'relationship_messages', Disposition::ScrubJson, '4c', 'relationship messages sent by the subject user that still keep the text of a deletion',
+                fn (SubjectSet $s, ConnectionInterface $db): Builder => $db->table('relationship_messages')->where('sender_user_id', $s->userId)->whereNotNull('deleted_body')),
         ];
     }
 

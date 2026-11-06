@@ -12,6 +12,7 @@ use App\Modules\Identity\Models\User;
 use App\Modules\Messaging\Enums\MessageSenderRole;
 use App\Modules\Messaging\Exceptions\MessageThreadClosedException;
 use App\Modules\Messaging\Http\Controllers\Concerns\HandlesMessageAttachments;
+use App\Modules\Messaging\Http\Controllers\Concerns\HandlesMessageRevisions;
 use App\Modules\Messaging\Http\Requests\SendMessageRequest;
 use App\Modules\Messaging\Http\Resources\MessageResource;
 use App\Modules\Messaging\Models\Message;
@@ -43,6 +44,7 @@ use RuntimeException;
 final class CreatorMessageController
 {
     use HandlesMessageAttachments;
+    use HandlesMessageRevisions;
 
     public function __construct(
         private readonly MessageThreadService $threads,
@@ -116,6 +118,47 @@ final class CreatorMessageController
     }
 
     /**
+     * AH-119 B2 — edit own message (flag-gated by route middleware); structural by creator_id.
+     */
+    public function update(Request $request, string $assignment, string $message): JsonResponse
+    {
+        return $this->editMessageResponse($request, $this->existingThread($request, $assignment), $message);
+    }
+
+    /**
+     * AH-119 B2 — delete own message (allowed in a closed thread).
+     */
+    public function destroy(Request $request, string $assignment, string $message): JsonResponse
+    {
+        return $this->deleteMessageResponse($request, $this->existingThread($request, $assignment), $message);
+    }
+
+    /**
+     * The creator's OWN assignment's thread, never provisioned: null (404) when the assignment is not theirs
+     * or has no thread yet.
+     */
+    private function existingThread(Request $request, string $assignmentUlid): ?MessageThread
+    {
+        /** @var User $user */
+        $user = $request->user();
+        $creator = $user->creator;
+        if ($creator === null) {
+            return null;
+        }
+
+        $assignment = CampaignAssignment::query()
+            ->withoutGlobalScope(BelongsToAgencyScope::class)
+            ->where('creator_id', $creator->id)
+            ->where('ulid', $assignmentUlid)
+            ->first();
+
+        return $assignment === null ? null : MessageThread::query()
+            ->withoutGlobalScope(BelongsToAgencyScope::class)
+            ->where('assignment_id', $assignment->id)
+            ->first();
+    }
+
+    /**
      * Resolve the authenticated creator's OWN assignment (404 otherwise) and the
      * lazily-provisioned thread.
      *
@@ -158,7 +201,7 @@ final class CreatorMessageController
             return null;
         }
 
-        return Message::query()
+        return Message::query()->withTrashed()
             ->where('thread_id', $thread->id)
             ->where('ulid', $beforeUlid)
             ->value('id');

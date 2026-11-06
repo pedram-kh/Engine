@@ -9,6 +9,7 @@ use App\Modules\Creators\Features\AssignmentOfferEditEnabled;
 use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
 use App\Modules\Identity\Features\AccountDeletionEnabled;
 use App\Modules\Identity\Models\User;
+use App\Modules\Messaging\Features\MessagesV2EditSearchEnabled;
 use App\Modules\Messaging\Features\MessagesV2InboxEnabled;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -70,6 +71,9 @@ final class UserResource extends JsonResource
                     'assignment_offer_edit' => $this->isAgencySide($user) && Feature::active(AssignmentOfferEditEnabled::NAME),
                     // AH-119 — the unified inbox. UI gate only; the API enforces the flag (404).
                     'messages_v2_inbox' => $this->isAgencySide($user) && Feature::active(MessagesV2InboxEnabled::NAME),
+                    // AH-119 Stage B — edit, delete and search. Agency users AND creators (both sides use the edit
+                    // and delete routes); `false` without evaluating the flag for a platform admin. UI gate only.
+                    'messages_v2_edit_search' => ! $user->isPlatformAdmin() && Feature::active(MessagesV2EditSearchEnabled::NAME),
                 ],
             ],
             'relationships' => [

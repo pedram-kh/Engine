@@ -9,6 +9,7 @@ use App\Modules\Agencies\Models\Agency;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
 use App\Modules\Messaging\Enums\MessageSenderRole;
+use App\Modules\Messaging\Http\Controllers\Concerns\HandlesMessageRevisions;
 use App\Modules\Messaging\Http\Controllers\Concerns\HandlesRelationshipMessageAttachments;
 use App\Modules\Messaging\Http\Requests\SendRelationshipMessageRequest;
 use App\Modules\Messaging\Http\Resources\RelationshipMessageResource;
@@ -18,6 +19,8 @@ use App\Modules\Messaging\Services\RelationshipMessageAttachmentUploadService;
 use App\Modules\Messaging\Services\RelationshipMessageService;
 use App\Modules\Messaging\Support\ContactMediaUrl;
 use App\Modules\Messaging\Support\RelationshipSendState;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -43,6 +46,7 @@ use RuntimeException;
  */
 final class AgencyRelationshipMessageController
 {
+    use HandlesMessageRevisions;
     use HandlesRelationshipMessageAttachments;
 
     public function __construct(
@@ -62,8 +66,8 @@ final class AgencyRelationshipMessageController
         $threads = RelationshipThread::query()
             // Only conversations that actually have a message (AH-012 D2) — no
             // empty ghosts, even if a transient/attachment row ever slips in.
-            ->has('messages')
-            ->with(['creator:id,ulid,display_name,avatar_path,erased_at', 'latestMessage'])
+            ->has('messages', '>=', 1, 'and', static fn (EloquentBuilder $q) => $q->withoutGlobalScope(SoftDeletingScope::class))
+            ->with(['creator:id,ulid,display_name,avatar_path,erased_at', 'latestMessageWithTrashed'])
             ->orderByDesc('last_message_at')
             ->orderByDesc('id')
             ->get();
@@ -83,7 +87,8 @@ final class AgencyRelationshipMessageController
                         'avatar_url' => ContactMediaUrl::resolve($thread->creator?->avatar_path),
                     ],
                     'last_message_at' => $thread->last_message_at?->toIso8601String(),
-                    'last_message_preview' => $this->preview($thread->latestMessage),
+                    'last_message_preview' => $this->preview($thread->latestMessageWithTrashed),
+                    'last_message_is_deleted' => $thread->latestMessageWithTrashed?->deleted_at !== null,
                     'unread_count' => $this->messages->unreadCountForUser($thread, $viewer),
                 ],
             ])->all(),
@@ -168,6 +173,23 @@ final class AgencyRelationshipMessageController
     }
 
     /**
+     * AH-119 B2 — edit own message (flag-gated by route middleware). The agency scope (tenancy stack) narrows
+     * the thread lookup; `canMessageRelationship` is NOT required to delete, and edit checks it in the service.
+     */
+    public function update(Request $request, Agency $agency, Creator $creator, string $message): JsonResponse
+    {
+        return $this->editMessageResponse($request, RelationshipThread::query()->where('creator_id', $creator->id)->first(), $message);
+    }
+
+    /**
+     * AH-119 B2 — delete own message (allowed when the relationship has since closed).
+     */
+    public function destroy(Request $request, Agency $agency, Creator $creator, string $message): JsonResponse
+    {
+        return $this->deleteMessageResponse($request, RelationshipThread::query()->where('creator_id', $creator->id)->first(), $message);
+    }
+
+    /**
      * Resolve the thread for a READ. An EXISTING thread is readable by any
      * active member (D6 — history stays readable). With no thread yet, opening
      * one requires the current send gate (you cannot start a conversation with
@@ -198,7 +220,7 @@ final class AgencyRelationshipMessageController
             return null;
         }
 
-        return RelationshipMessage::query()
+        return RelationshipMessage::query()->withTrashed()
             ->where('thread_id', $thread->id)
             ->where('ulid', $beforeUlid)
             ->value('id');
@@ -206,7 +228,7 @@ final class AgencyRelationshipMessageController
 
     private function preview(?RelationshipMessage $message): ?string
     {
-        if ($message === null) {
+        if ($message === null || $message->deleted_at !== null) {
             return null;
         }
 

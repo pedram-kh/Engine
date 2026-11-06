@@ -28,7 +28,9 @@ use Illuminate\Support\Carbon;
  * The body text is NEVER stored localized for system messages — `system_event_key`
  * + the thread's assignment context render the string at display time (D-5).
  *
- * `deleted_at` is present-but-unwritten (D-14) — no delete endpoint this sprint.
+ * `deleted_at` is the delete marker (AH-119 B2): a deleted message keeps its row, `body` is nulled and moved to
+ * `deleted_body`. The SoftDeletes scope hides it from unread, digest and search; only the feed and the previews
+ * opt in with `withTrashed()` and the resource masks it.
  *
  * @property int $id
  * @property string $ulid
@@ -43,6 +45,10 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ * @property Carbon|null $edited_at AH-119 B2: set on every edit.
+ * @property string|null $original_body AH-119 B2: the text before the FIRST edit. NEVER on a resource, payload or admin surface.
+ * @property int|null $deleted_by_user_id AH-119 B2: the sender who deleted it.
+ * @property string|null $deleted_body AH-119 B2: the text withdrawn by a delete. NEVER on a resource, payload or admin surface.
  */
 final class Message extends Model
 {
@@ -107,6 +113,7 @@ final class Message extends Model
             'kind' => MessageKind::class,
             'attachments' => 'array',
             'system_event_data' => 'array',
+            'edited_at' => 'datetime',
         ];
     }
 

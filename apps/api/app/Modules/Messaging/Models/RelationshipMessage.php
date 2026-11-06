@@ -26,8 +26,7 @@ use Illuminate\Support\Carbon;
  * {@see MessageKind} (`text` / `attachment_only`) and {@see MessageSenderRole}
  * (`creator` / `agency_user`) enums are reused as the shared vocabulary.
  *
- * `deleted_at` is present-but-unwritten (the campaign D-14 pattern) — no delete
- * endpoint this chunk.
+ * `deleted_at` is the delete marker (AH-119 B2), as on the campaign table.
  *
  * @property int $id
  * @property string $ulid
@@ -40,6 +39,10 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ * @property Carbon|null $edited_at AH-119 B2: set on every edit.
+ * @property string|null $original_body AH-119 B2: the text before the FIRST edit. NEVER on a resource, payload or admin surface.
+ * @property int|null $deleted_by_user_id AH-119 B2: the sender who deleted it.
+ * @property string|null $deleted_body AH-119 B2: the text withdrawn by a delete. NEVER on a resource, payload or admin surface.
  * @property bool $read_by_counterparty Non-persisted, set by RelationshipMessageService::pageForThread (D10 read tick).
  */
 final class RelationshipMessage extends Model
@@ -95,6 +98,7 @@ final class RelationshipMessage extends Model
             'sender_role' => MessageSenderRole::class,
             'kind' => MessageKind::class,
             'attachments' => 'array',
+            'edited_at' => 'datetime',
         ];
     }
 

@@ -37,8 +37,10 @@ final class RelationshipMessageResource extends JsonResource
             'attributes' => [
                 'kind' => $this->kind->value,
                 'sender_role' => $this->sender_role->value,
-                'body' => $this->body,
-                'attachments' => $this->presentAttachments(),
+                // AH-119 B2: a deleted message is MASKED here, the one place that decides (no body, no
+                // attachments, no signed URL minted); `original_body` and `deleted_body` never leave the model.
+                'body' => $this->isDeleted() ? null : $this->body,
+                'attachments' => $this->isDeleted() ? [] : $this->presentAttachments(),
                 'is_own' => $this->sender_user_id === $viewerId,
                 'sender' => $this->relationLoaded('sender') && $this->sender !== null
                     ? ['name' => $this->sender->name]
@@ -50,8 +52,15 @@ final class RelationshipMessageResource extends JsonResource
                     ? (bool) ($this->read_by_counterparty ?? false)
                     : null,
                 'created_at' => $this->created_at->toIso8601String(),
+                'edited_at' => $this->isDeleted() ? null : $this->edited_at?->toIso8601String(),
+                'is_deleted' => $this->isDeleted(),
             ],
         ];
+    }
+
+    private function isDeleted(): bool
+    {
+        return $this->deleted_at !== null;
     }
 
     /**

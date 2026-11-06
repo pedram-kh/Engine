@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\TestHelpers\Http\Controllers\AgeMessageController;
 use App\TestHelpers\Http\Controllers\CreateAdminUserController;
 use App\TestHelpers\Http\Controllers\CreateAgencyInvitationController;
 use App\TestHelpers\Http\Controllers\CreateAgencyWithAdminController;
@@ -158,6 +159,11 @@ Route::prefix('_test')
         // feature-test set.
         Route::post('creators/listed-job', CreateListedJobController::class)
             ->name('creators.listed_job.create');
+
+        // AH-119 B2 — move one message's created_at back by N minutes so an E2E can push it past the
+        // 15-minute edit window without waiting (or pinning the whole clock). Local/testing only.
+        Route::post('messages/{ulid}/age', AgeMessageController::class)
+            ->name('messages.age');
 
         // Sprint 3 Chunk 3 — queue mode override for E2E saga specs.
         // POST sets `config('queue.default')` for subsequent requests

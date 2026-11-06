@@ -159,7 +159,8 @@ final class RelationshipMessageService
             return ['messages' => Collection::make(), 'has_more' => false];
         }
 
-        $query = RelationshipMessage::query()
+        // AH-119 B2: the FEED opts in to deleted rows (masked by the resource); unread and search keep the scope.
+        $query = RelationshipMessage::query()->withTrashed()
             ->where('thread_id', $thread->id)
             ->with(['sender:id,name', 'readReceipts:id,message_id,user_id'])
             ->orderByDesc('id');

@@ -88,6 +88,36 @@ final class MessageInboxQuery
     }
 
     /**
+     * The inbox rows (the exact shape of {@see self::run()}'s `rows`) of the given threads, for the
+     * message search. Same tenancy (`where agency_id` on every source), same unread and preview
+     * rules; a thread without a surfaceable human message simply yields no row.
+     *
+     * @param  list<int>  $relationshipThreadIds
+     * @param  list<int>  $assignmentThreadIds
+     * @return array<string, array<string, mixed>> keyed `type:thread ulid`
+     */
+    public function rowsForThreads(Agency $agency, User $viewer, array $relationshipThreadIds, array $assignmentThreadIds): array
+    {
+        if ($relationshipThreadIds === [] && $assignmentThreadIds === []) {
+            return [];
+        }
+
+        $q = clone $this->threads($agency, $viewer);
+        $q->select('inbox.*')->where(function ($w) use ($relationshipThreadIds, $assignmentThreadIds): void {
+            $w->where(fn ($x) => $x->where('inbox.type', self::TYPE_RELATIONSHIP)->whereIn('inbox.id', $relationshipThreadIds))
+                ->orWhere(fn ($x) => $x->where('inbox.type', self::TYPE_ASSIGNMENT)->whereIn('inbox.id', $assignmentThreadIds));
+        });
+
+        $rows = array_values($q->get()->all());
+        $out = [];
+        foreach ($this->present($agency, $rows) as $row) {
+            $out[$row['type'].':'.$row['id']] = $row;
+        }
+
+        return $out;
+    }
+
+    /**
      * The union of both sources as a derived table `inbox` with one uniform row shape.
      */
     private function threads(Agency $agency, User $viewer): Builder
@@ -388,12 +418,20 @@ final class MessageInboxQuery
                 continue;
             }
 
-            $latest = $model::query()->selectRaw('max(id)')->whereIn('thread_id', $threadIds)->groupBy('thread_id');
+            // AH-119 B2: the newest human message INCLUDING a deleted one, so a deleted last message
+            // reads as `preview_kind: deleted` (preview null) and never falls back to older text.
+            $latest = $model::query()->withTrashed()->selectRaw('max(id)')->whereIn('thread_id', $threadIds)->groupBy('thread_id');
             if ($type === self::TYPE_ASSIGNMENT) {
                 $latest->where('kind', '!=', MessageKind::System->value);
             }
 
-            foreach ($model::query()->whereIn('id', $latest)->get(['id', 'thread_id', 'body', 'attachments']) as $m) {
+            foreach ($model::query()->withTrashed()->whereIn('id', $latest)->get(['id', 'thread_id', 'body', 'attachments', 'deleted_at']) as $m) {
+                if ($m->deleted_at !== null) {
+                    $out[$type.':'.$m->thread_id] = ['preview' => null, 'preview_kind' => 'deleted'];
+
+                    continue;
+                }
+
                 $body = trim((string) $m->body);
                 $hasFiles = is_array($m->attachments) && $m->attachments !== [];
                 $out[$type.':'.$m->thread_id] = $body === '' && $hasFiles

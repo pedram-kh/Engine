@@ -165,3 +165,28 @@ it('registers the digest as a daily scheduled command (the app first schedule)',
         ->expectsOutputToContain('messages:send-digest')
         ->assertExitCode(0);
 });
+
+it('counts a message deleted by its sender out of the digest (AH-119 Q3)', function (): void {
+    Mail::fake();
+    ['admin' => $admin, 'creatorUser' => $creatorUser, 'thread' => $thread] = digestSetup();
+    optIntoDigest($admin, NotificationType::MessageReceivedByAgency);
+    sendAs($creatorUser, MessageSenderRole::Creator, $thread, 'keeps');
+    sendAs($creatorUser, MessageSenderRole::Creator, $thread, 'withdrawn');
+    $thread->messages()->where('body', 'withdrawn')->firstOrFail()->delete();
+
+    $this->artisan('messages:send-digest')->assertExitCode(0);
+
+    Mail::assertQueued(UnreadMessagesDigestMail::class, fn (UnreadMessagesDigestMail $mail): bool => $mail->hasTo($admin->email) && $mail->totalUnread === 1);
+});
+
+it('sends no digest when every unread message was deleted (AH-119 Q3)', function (): void {
+    Mail::fake();
+    ['admin' => $admin, 'creatorUser' => $creatorUser, 'thread' => $thread] = digestSetup();
+    optIntoDigest($admin, NotificationType::MessageReceivedByAgency);
+    sendAs($creatorUser, MessageSenderRole::Creator, $thread, 'withdrawn');
+    $thread->messages()->delete();
+
+    $this->artisan('messages:send-digest')->assertExitCode(0);
+
+    Mail::assertNothingQueued();
+});
