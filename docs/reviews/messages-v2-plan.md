@@ -122,7 +122,7 @@ the transaction aborts; `CampaignCrudTest`, `InviteEmailNotificationTest`: jsonb
   shows as a placeholder flag (B2 wires it; A2 returns `preview_kind: text|attachment|deleted` with `deleted`
   never produced until Stage B).
 - Filters: `brand[]` and `campaign[]` (ulids, each validated to belong to the agency: a foreign ulid is ignored
-  and 404 is **not** leaked), `unread=1`, `owner=me|all` (Mine = effective owner is the viewer, A3), `q` is
+  and 404 is **not** leaked), `unread=1`, `owner=me|all` (Mine = effective owner is the viewer, A3), `direct=1` (walk addition: only the relationship threads; it combines with `unread` and `owner`, and with a brand or campaign filter it yields nothing, which the web avoids by clearing one when the other is chosen), `q` is
   reserved for B3 and ignored in A.
 - Direct rows are hidden when `brand[]` or `campaign[]` is present.
 - `meta`: `unread_threads_total` (the pill, P6), `facets.brands[]` and `facets.campaigns[]` each `{id, name,
