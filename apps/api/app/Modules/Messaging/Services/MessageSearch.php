@@ -95,6 +95,8 @@ final class MessageSearch
                 'snippet' => $this->snippet($hit['body'], $terms),
                 'sent_at' => Carbon::parse($hit['created_at'], 'UTC')->toIso8601String(),
                 'sender_role' => $hit['sender_role'],
+                // Per-viewer, additive: true when the signed-in member wrote the matching message.
+                'is_own' => $hit['sender_user_id'] !== null && $hit['sender_user_id'] === $viewer->id,
                 'sender_is_erased' => $hit['sender_role'] === MessageSenderRole::Creator->value && isset($erased[$hit['sender_user_id']]),
                 ...$row['attributes'],
             ];

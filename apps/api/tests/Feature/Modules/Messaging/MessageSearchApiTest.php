@@ -140,3 +140,24 @@ it('does not run a search for an anonymous caller', function (): void {
 
     $this->getJson("/api/v1/agencies/{$w['agency']->ulid}/message-search?q=hello")->assertUnauthorized();
 });
+
+it('marks only the viewer\'s own messages with is_own, per viewer, on both thread kinds', function (): void {
+    $w = revWorld();
+    $mine = revCampaignMessage($w['thread'], $w['admin'], false, 'ownword by the admin');
+    $colleague = revDirectMessage($w['direct'], $w['staff'], false, 'ownword by a colleague');
+    $creator = revCampaignMessage($w['thread'], $w['creatorUser'], true, 'ownword by the creator');
+
+    /** @var list<array<string, mixed>> $adminData */
+    $adminData = revSearch($w, 'ownword')->assertOk()->json('data');
+    $asAdmin = collect($adminData)->keyBy('attributes.message_ulid');
+    expect(data_get($asAdmin[$mine->ulid], 'attributes.is_own'))->toBeTrue()
+        ->and(data_get($asAdmin[$colleague->ulid], 'attributes.is_own'))->toBeFalse()
+        ->and(data_get($asAdmin[$creator->ulid], 'attributes.is_own'))->toBeFalse();
+
+    // The same hits, read by the colleague: the flag follows the viewer.
+    /** @var list<array<string, mixed>> $staffData */
+    $staffData = revSearch($w, 'ownword', null, $w['staff'])->assertOk()->json('data');
+    $asStaff = collect($staffData)->keyBy('attributes.message_ulid');
+    expect(data_get($asStaff[$mine->ulid], 'attributes.is_own'))->toBeFalse()
+        ->and(data_get($asStaff[$colleague->ulid], 'attributes.is_own'))->toBeTrue();
+});

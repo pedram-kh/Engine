@@ -91,6 +91,7 @@ previous page (a malformed cursor reads as the first page; at most 330 results a
         "sent_at": "2026-11-06T09:30:00+00:00",
         "sender_role": "creator",
         "sender_is_erased": false,
+        "is_own": false,
         "creator": {
           "id": "<creator ulid>",
           "display_name": "Ana",
@@ -119,6 +120,7 @@ previous page (a malformed cursor reads as the first page; at most 330 results a
   `{id,name,color?}` / `{id,name}` as in the inbox). `message_ulid` is the unique list key (several hits can share
   a thread `id`).
 - `snippet` is plain text (no markup, no HTML); render as text. `sent_at` is the message `created_at`.
+- `is_own` is per viewer: `true` when the signed-in member wrote the matching message (any member sees only their own as true).
 - `sender_is_erased` is `true` when the matching message was sent by a creator who has since been erased; label
   them with the same anonymised creator label the inbox uses (the message text stays searchable, Q5).
 - Empty result: `{"data": [], "meta": {"next_cursor": null, "per_page": 30}}`.
