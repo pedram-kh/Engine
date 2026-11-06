@@ -157,7 +157,13 @@ it('answers a taken address and a free one identically once the limit is hit', f
         $this->postJson('/api/v1/auth/sign-up', srlPayload('taken@example.test'))->assertStatus(422);
     }
 
-    $normalise = static fn (mixed $r): string => (string) preg_replace('/"(request_id|trace_id)":"[^"]*"/', '"$1":"*"', (string) $r->getContent());
+    // The retry-after countdown ticks between the two requests (3599 vs 3600 seconds on a second
+    // boundary, seen in CI), so it is masked: the answer's SHAPE and wording are what must not differ.
+    $normalise = static fn (mixed $r): string => (string) preg_replace(
+        ['/"(request_id|trace_id)":"[^"]*"/', '/"seconds":\d+/', '/in \d+ seconds/'],
+        ['"$1":"*"', '"seconds":0', 'in N seconds'],
+        (string) $r->getContent(),
+    );
     $free = $this->postJson('/api/v1/auth/sign-up', srlPayload('free@example.test'));
     $taken = $this->postJson('/api/v1/auth/sign-up', srlPayload('taken@example.test'));
 

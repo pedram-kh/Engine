@@ -169,12 +169,6 @@ function inbox(url) {
   }
 }
 
-const IMAGE =
-  'data:image/svg+xml;utf8,' +
-  encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" width="360" height="220"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b6cff"/><stop offset="1" stop-color="#3ecf9e"/></linearGradient></defs><rect width="360" height="220" fill="url(#g)"/><text x="24" y="120" font-family="Inter,sans-serif" font-size="28" fill="#fff">Wave 1 hook frame</text></svg>',
-  )
-
 const msg = (id, at, body, own, extra = {}) => ({
   id,
   type: 'message',
