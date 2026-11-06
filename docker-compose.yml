@@ -39,11 +39,14 @@ services:
       - '127.0.0.1:${MAILHOG_SMTP_HOST_PORT:-1025}:1025'
       - '127.0.0.1:${MAILHOG_UI_HOST_PORT:-8025}:8025'
 
+  # `minio/minio` and `minio/mc` are no longer published on Docker Hub (a pull is refused), so the
+  # stack uses the frozen legacy Bitnami builds of the same MinIO server and client. Their data
+  # directory is /bitnami/minio/data (owned by the image's non-root user) and the API and console
+  # listen on 9000 and 9001, as before. Dev only.
   minio:
-    image: minio/minio:latest
+    image: bitnamilegacy/minio:latest
     container_name: catalyst-minio
     restart: unless-stopped
-    command: ['server', '/data', '--console-address', ':9001']
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
@@ -51,7 +54,7 @@ services:
       - '127.0.0.1:${MINIO_S3_HOST_PORT:-9100}:9000'
       - '127.0.0.1:${MINIO_CONSOLE_HOST_PORT:-9011}:9001'
     volumes:
-      - catalyst-minio-data:/data
+      - catalyst-minio-data:/bitnami/minio/data
     healthcheck:
       test: ['CMD-SHELL', 'curl -fsS http://127.0.0.1:9000/minio/health/live || exit 1']
       interval: 5s
@@ -61,7 +64,7 @@ services:
   # One-shot bucket bootstrap. Exits as soon as buckets exist.
   # Re-run with: docker compose up minio-init
   minio-init:
-    image: minio/mc:latest
+    image: bitnamilegacy/minio-client:latest
     container_name: catalyst-minio-init
     depends_on:
       minio:
