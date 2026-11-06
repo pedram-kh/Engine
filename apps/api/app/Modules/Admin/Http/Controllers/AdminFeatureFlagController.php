@@ -24,6 +24,7 @@ use App\Modules\Creators\Features\SocialVerificationEnabled;
 use App\Modules\Erasure\Features\AccountErasureExecuteEnabled;
 use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Features\AccountDeletionEnabled;
+use App\Modules\Messaging\Features\MessagesV2InboxEnabled;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -120,6 +121,10 @@ final class AdminFeatureFlagController
         AssignmentOfferEditEnabled::NAME => [
             'label' => 'Assignment offer edit',
             'description' => 'Lets an agency edit the offer amount of an assignment until a contract is sent or payment starts. Each edit notifies the creator (in-app, push and email) and writes a line in the conversation. Off: the endpoint answers 404 and nothing is sent.',
+        ],
+        MessagesV2InboxEnabled::NAME => [
+            'label' => 'Messages v2: unified inbox',
+            'description' => 'Turns on the unified agency inbox (direct and campaign conversations in one list, with brand and campaign filters and Mine/All) and the relationship-owner reassign endpoint. Off: the endpoints answer 404 and the agency Messages page is the previous one. Arm after the web deploy.',
         ],
         AccountErasureExecuteEnabled::NAME => [
             'label' => 'Account erasure (admin Erase button)',

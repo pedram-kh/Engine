@@ -54,7 +54,7 @@ final class CampaignController
 
         $query = Campaign::query()
             ->where('campaigns.agency_id', $agency->id)
-            ->with(['brand:id,ulid,name', 'agency:id,ulid'])
+            ->with(['brand:id,ulid,name,color', 'agency:id,ulid'])
             ->withCount('assignments');
 
         $this->applyBrandFilter($query, $request, $agency);
@@ -143,7 +143,7 @@ final class CampaignController
             after: $this->auditableSnapshot($campaign),
         );
 
-        return (new CampaignResource($campaign->load(['brand:id,ulid,name', 'agency:id,ulid'])))
+        return (new CampaignResource($campaign->load(['brand:id,ulid,name,color', 'agency:id,ulid'])))
             ->response()
             ->setStatusCode(201);
     }
@@ -157,7 +157,7 @@ final class CampaignController
         Gate::authorize('view', $campaign);
 
         return new CampaignResource(
-            $campaign->loadCount('assignments')->load(['brand:id,ulid,name', 'agency:id,ulid']),
+            $campaign->loadCount('assignments')->load(['brand:id,ulid,name,color', 'agency:id,ulid']),
         );
     }
 
@@ -282,7 +282,7 @@ final class CampaignController
         }
 
         return new CampaignResource(
-            ($campaign->fresh() ?? $campaign)->loadCount('assignments')->load(['brand:id,ulid,name', 'agency:id,ulid']),
+            ($campaign->fresh() ?? $campaign)->loadCount('assignments')->load(['brand:id,ulid,name,color', 'agency:id,ulid']),
         );
     }
 

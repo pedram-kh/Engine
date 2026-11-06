@@ -78,6 +78,7 @@ final class CampaignResource extends JsonResource
                         'id' => $brand->ulid,
                         'type' => 'brands',
                         'name' => $brand->name,
+                        'color' => $brand->color,
                     ],
                 ],
                 'agency' => [

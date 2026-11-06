@@ -6,6 +6,7 @@ namespace App\Modules\Brands\Http\Requests;
 
 use App\Core\Enums\Locale;
 use App\Modules\Agencies\Models\Agency;
+use App\Modules\Brands\Enums\BrandColor;
 use App\Modules\Brands\Models\Brand;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -60,6 +61,8 @@ final class CreateBrandRequest extends FormRequest
             'default_language' => ['sometimes', 'string', Rule::enum(Locale::class)],
             'brand_safety_rules' => ['nullable', 'array'],
             'client_portal_enabled' => ['sometimes', 'boolean'],
+            // AH-119 A4 — a palette key. Absent, the controller assigns the next key.
+            'color' => ['sometimes', 'nullable', 'string', Rule::enum(BrandColor::class)],
         ];
     }
 }

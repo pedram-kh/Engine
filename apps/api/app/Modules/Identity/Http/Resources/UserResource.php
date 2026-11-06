@@ -9,6 +9,7 @@ use App\Modules\Creators\Features\AssignmentOfferEditEnabled;
 use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
 use App\Modules\Identity\Features\AccountDeletionEnabled;
 use App\Modules\Identity\Models\User;
+use App\Modules\Messaging\Features\MessagesV2InboxEnabled;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Laravel\Pennant\Feature;
@@ -67,6 +68,8 @@ final class UserResource extends JsonResource
                     // creator or a platform admin, the `account_deletion` shape.
                     'campaign_region_restriction' => $this->isAgencySide($user) && Feature::active(CampaignRegionRestrictionEnabled::NAME),
                     'assignment_offer_edit' => $this->isAgencySide($user) && Feature::active(AssignmentOfferEditEnabled::NAME),
+                    // AH-119 — the unified inbox. UI gate only; the API enforces the flag (404).
+                    'messages_v2_inbox' => $this->isAgencySide($user) && Feature::active(MessagesV2InboxEnabled::NAME),
                 ],
             ],
             'relationships' => [

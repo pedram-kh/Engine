@@ -81,6 +81,8 @@ final class BulkInviteService
                     'invitation_expires_at' => Carbon::now()->addDays(self::INVITATION_LIFETIME_DAYS),
                     'invitation_sent_at' => Carbon::now(),
                     'invited_by_user_id' => $inviter->id,
+                    // AH-119 A3: the inviter owns the new relationship (the inbox "Mine" filter).
+                    'owner_user_id' => $inviter->id,
                 ]);
 
                 Audit::log(

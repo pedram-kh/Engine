@@ -58,6 +58,8 @@ final class BrandResource extends JsonResource
                 'status' => $brand->status->value,
                 'brand_safety_rules' => $brand->brand_safety_rules,
                 'client_portal_enabled' => $brand->client_portal_enabled,
+                // AH-119 A4 — the palette key, or null (the web derives a stable key from the ulid).
+                'color' => $brand->color,
                 'created_at' => $brand->created_at->toIso8601String(),
                 'updated_at' => $brand->updated_at->toIso8601String(),
             ],

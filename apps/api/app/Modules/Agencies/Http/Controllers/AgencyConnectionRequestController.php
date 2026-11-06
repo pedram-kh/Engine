@@ -128,6 +128,8 @@ final class AgencyConnectionRequestController
                     'creator_id' => $creator->id,
                     'relationship_status' => RelationshipStatus::PendingRequest,
                     'invited_by_user_id' => $actor->id,
+                    // AH-119 A3: the requesting member owns the new relationship.
+                    'owner_user_id' => $actor->id,
                     'invitation_sent_at' => now(),
                     'notification_sent_at' => now(),
                 ]);
@@ -138,6 +140,7 @@ final class AgencyConnectionRequestController
             // this is NOT swallowed as a no-op.
             $relation->relationship_status = RelationshipStatus::PendingRequest;
             $relation->invited_by_user_id = $actor->id;
+            $relation->owner_user_id = $actor->id;
             $relation->invitation_sent_at = now();
             $relation->notification_sent_at = now();
             $relation->save();

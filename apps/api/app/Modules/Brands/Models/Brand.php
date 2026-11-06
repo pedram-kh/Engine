@@ -101,6 +101,7 @@ final class Brand extends Model
         'industry',
         'website_url',
         'logo_path',
+        'color',
         'default_currency',
         'default_language',
         'status',

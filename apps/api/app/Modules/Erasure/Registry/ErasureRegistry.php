@@ -203,10 +203,11 @@ final class ErasureRegistry
             'contracts' => new TableRule(null, 'A signed agreement is a legal record; flagged for counsel (§3.3).', ['created_by_user_id', 'signed_by_creator_id'], [
                 ...self::keep('id,ulid,agency_id,kind,subject_type,subject_id,template_id,version,title,body_markdown,body_pdf_path,signature_provider,signature_envelope_id,status,sent_at,signed_at,signed_by_creator_id,signed_signature_data,expires_at,created_by_user_id,created_at,updated_at,deleted_at', 'Legal record; the signing evidence makes it enforceable (§3.3).'),
             ]),
-            'agency_creator_relations' => new TableRule(null, 'A live invite token for an erased user is an account-claim hazard (§3.3).', ['creator_id', 'blacklisted_by_user_id', 'invited_by_user_id'], [
+            'agency_creator_relations' => new TableRule(null, 'A live invite token for an erased user is an account-claim hazard (§3.3).', ['creator_id', 'blacklisted_by_user_id', 'invited_by_user_id', 'owner_user_id'], [
                 ...self::anon('invitation_token_hash,invitation_expires_at', AnonValue::Null, 'SignUpService resolves the user from this hash.'),
                 ...self::keep('id,ulid,agency_id,creator_id,relationship_status,is_blacklisted,blacklist_scope,blacklist_type,blacklisted_at,blacklisted_by_user_id,notification_sent_at,appeal_status,appeal_submitted_at,total_campaigns_completed,total_paid_minor_units,last_engaged_at,invitation_sent_at,invited_by_user_id,created_at,updated_at', $anchor),
                 ...self::keep('blacklist_reason,internal_rating,internal_notes', 'The agency\'s own record (D-D).'),
+                ...self::keep('owner_user_id', 'The agency member who owns the relationship (AH-119): an agency-side pointer, not creator data; nullOnDelete.'),
             ]),
             'brand_creator_blacklists' => new TableRule(null, 'An agency\'s ban is its record (D-D).', ['creator_id', 'blacklisted_by_user_id'], [
                 ...self::keep('id,ulid,brand_id,creator_id,blacklist_type,reason,blacklisted_at,blacklisted_by_user_id,notification_sent_at,created_at,updated_at,deleted_at', 'The agency\'s record (D-D).'),

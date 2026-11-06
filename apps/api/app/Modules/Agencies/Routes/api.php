@@ -7,6 +7,7 @@ use App\Modules\Agencies\Http\Controllers\AgencyCreatorAvailabilityController;
 use App\Modules\Agencies\Http\Controllers\AgencyCreatorController;
 use App\Modules\Agencies\Http\Controllers\AgencyCreatorDetailController;
 use App\Modules\Agencies\Http\Controllers\AgencyCreatorDiscoveryController;
+use App\Modules\Agencies\Http\Controllers\AgencyCreatorOwnerController;
 use App\Modules\Agencies\Http\Controllers\AgencyFileController;
 use App\Modules\Agencies\Http\Controllers\AgencySettingsController;
 use App\Modules\Agencies\Http\Controllers\CreatorBlacklistController;
@@ -124,6 +125,9 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
             ->name('agencies.creators.show');
         Route::patch('creators/{creator}', [AgencyCreatorDetailController::class, 'update'])
             ->name('agencies.creators.update');
+        // AH-119 A3 — reassign the relationship owner (admin/manager; flag-gated 404).
+        Route::patch('creators/{creator}/owner', [AgencyCreatorOwnerController::class, 'update'])
+            ->name('agencies.creators.owner.update');
 
         // ─── Creator blacklist (Sprint 7, Part A) ─────────────────────────────
         // A DEDICATED write surface (NOT the rating/notes PATCH — D-2 forbids a

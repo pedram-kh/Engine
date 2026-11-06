@@ -59,6 +59,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $invitation_expires_at
  * @property Carbon|null $invitation_sent_at
  * @property int|null $invited_by_user_id
+ * @property int|null $owner_user_id
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -97,6 +98,7 @@ final class AgencyCreatorRelation extends Model implements Auditable
         'invitation_expires_at',
         'invitation_sent_at',
         'invited_by_user_id',
+        'owner_user_id',
     ];
 
     /**
@@ -121,6 +123,25 @@ final class AgencyCreatorRelation extends Model implements Auditable
     public function invitedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'invited_by_user_id');
+    }
+
+    /**
+     * AH-119 A3 — the member who owns this relationship (explicit choice), else null.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function owner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'owner_user_id');
+    }
+
+    /**
+     * AH-119 A3 — the EFFECTIVE owner id: the explicit owner, else the inviter, else null (unowned).
+     * The inbox query reads the same `coalesce` in SQL; there is no backfill.
+     */
+    public function effectiveOwnerId(): ?int
+    {
+        return $this->owner_user_id ?? $this->invited_by_user_id;
     }
 
     /**

@@ -74,6 +74,7 @@ final class AuditPayloadKeys
             'A count, threshold, window or score.' => 'code_count,columns_removed,columns_seeded,internal_rating,pool_memberships_deleted,profile_completeness_score,remaining_count,revoked,row_count,threshold,window_hours,window_minutes',
             'Money or currency of an assignment, not a person.' => 'agreed_fee_currency,agreed_fee_minor_units,currency,previous_agreed_fee_minor_units',
             'A from/to state or column transition label.' => 'from,to',
+            'A user id on each side of an owner reassign (AH-119 A3): an id, not a name.' => 'from_user,to_user',
             'Locale, currency or UI preference.' => 'categories,country_code,preferred_currency,preferred_language,primary_language,theme_preference,timezone',
             'Boolean marker of a completed step.' => 'payout_method_set',
             'The erasure run\'s own bookkeeping: its ledger ulid, digest and per-table counts. No person.' => 'audit_rows_scrubbed,counts,digest,files_deleted,ledger_ulid',

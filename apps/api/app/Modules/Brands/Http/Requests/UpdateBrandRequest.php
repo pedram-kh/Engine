@@ -6,6 +6,7 @@ namespace App\Modules\Brands\Http\Requests;
 
 use App\Core\Enums\Locale;
 use App\Modules\Agencies\Models\Agency;
+use App\Modules\Brands\Enums\BrandColor;
 use App\Modules\Brands\Http\Controllers\BrandController;
 use App\Modules\Brands\Models\Brand;
 use Illuminate\Contracts\Validation\Validator;
@@ -76,6 +77,7 @@ final class UpdateBrandRequest extends FormRequest
             'default_language' => ['sometimes', 'string', Rule::enum(Locale::class)],
             'brand_safety_rules' => ['sometimes', 'nullable', 'array'],
             'client_portal_enabled' => ['sometimes', 'boolean'],
+            'color' => ['sometimes', 'nullable', 'string', Rule::enum(BrandColor::class)],
         ];
     }
 

@@ -7,6 +7,7 @@ namespace App\Modules\Brands\Http\Controllers;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Facades\Audit;
+use App\Modules\Brands\Enums\BrandColor;
 use App\Modules\Brands\Enums\BrandStatus;
 use App\Modules\Brands\Http\Requests\CreateBrandRequest;
 use App\Modules\Brands\Http\Requests\UpdateBrandRequest;
@@ -80,7 +81,13 @@ final class BrandController
     {
         Gate::authorize('create', Brand::class);
 
-        $brand = Brand::query()->create($request->validated());
+        $attributes = $request->validated();
+        // AH-119 A4: no colour chosen (absent or null) takes the next palette key, a stable rule.
+        if (($attributes['color'] ?? null) === null) {
+            $attributes['color'] = BrandColor::nthDefault(Brand::query()->withTrashed()->count())->value;
+        }
+
+        $brand = Brand::query()->create($attributes);
 
         Audit::log(
             action: AuditAction::BrandCreated,

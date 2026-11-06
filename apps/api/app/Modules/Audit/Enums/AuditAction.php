@@ -203,6 +203,11 @@ enum AuditAction: string
     // trait's normal allowlisted before/after diff (AgencyCreatorRelationUpdated).
     case AgencyCreatorRelationNotesUpdated = 'agency_creator_relation.notes_updated';
 
+    // AH-119 A3 — an admin or manager reassigned the member who owns a creator relationship (the
+    // inbox "Mine" filter). Ids only (`from_user`, `to_user`); owner_user_id is deliberately NOT in
+    // the relation's audit allowlist, so the trait's auto `*.updated` row never fires for it.
+    case AgencyCreatorRelationOwnerChanged = 'agency_creator_relation.owner_changed';
+
     // AH-051 (D-7) — admin-initiated relation verbs. These make an admin-driven
     // connection/termination FOREVER distinguishable from an agency-initiated
     // one (D-8 provenance — the distinct verb IS the record; invited_by_user_id

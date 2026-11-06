@@ -94,6 +94,15 @@ final class AgencyCreatorRelationPolicy
         return $this->hasAnyRole($user, [AgencyRole::AgencyAdmin, AgencyRole::AgencyManager]);
     }
 
+    /**
+     * Reassign the member who owns a relationship (AH-119 A3, ruling Q6): admin and manager only. The
+     * owner gates only the inbox "Mine" filter, nothing else, so staff may read but not reassign.
+     */
+    public function reassignOwner(User $user, AgencyCreatorRelation $relation): bool
+    {
+        return $this->hasAnyRole($user, [AgencyRole::AgencyAdmin, AgencyRole::AgencyManager]);
+    }
+
     /** @param list<AgencyRole> $roles */
     private function hasAnyRole(User $user, array $roles): bool
     {

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Messaging\Http\Controllers\AgencyMessageController;
+use App\Modules\Messaging\Http\Controllers\AgencyMessageInboxController;
 use App\Modules\Messaging\Http\Controllers\AgencyRelationshipMessageController;
 use App\Modules\Messaging\Http\Controllers\CreatorMessageController;
 use App\Modules\Messaging\Http\Controllers\CreatorRelationshipMessageController;
@@ -46,6 +47,14 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
             ->name('messages.attachments.init');
         Route::post('campaigns/{campaign}/assignments/{assignment}/messages/attachments/complete', [AgencyMessageController::class, 'attachmentComplete'])
             ->name('messages.attachments.complete');
+    });
+
+// AH-119 A2 — the unified agency inbox (flag-gated 404).
+Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
+    ->prefix('agencies/{agency}')
+    ->name('agencies.messaging.')
+    ->group(function (): void {
+        Route::get('message-inbox', [AgencyMessageInboxController::class, 'index'])->name('inbox.unified');
     });
 
 Route::prefix('creators/me/assignments/{assignment}')
