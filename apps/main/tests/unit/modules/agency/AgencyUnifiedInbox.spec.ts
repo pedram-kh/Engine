@@ -11,6 +11,9 @@
  * brand selection → the narrowing case fails; show Clear filters always → the clear case fails.
  */
 
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
+
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it } from 'vitest'
 import { createI18n } from 'vue-i18n'
@@ -380,6 +383,58 @@ describe('AgencyUnifiedInbox', () => {
     })
   })
 
+  describe('filter area layout (two rows)', () => {
+    const testIds = (el: Element) =>
+      Array.from(el.children).map((c) => c.getAttribute('data-test') ?? c.tagName)
+
+    it('row 1 is the two popovers; row 2 is Mine, Direct, All|Unread and, last, Clear (only with a filter on)', async () => {
+      const off = await mountInbox()
+      expect(testIds(off.get('[data-test="agency-inbox-filters-popovers"]').element)).toEqual([
+        'inbox-filter-brand',
+        'inbox-filter-campaign',
+      ])
+      expect(testIds(off.get('[data-test="agency-inbox-filters-chips"]').element)).toEqual([
+        'agency-inbox-mine',
+        'agency-inbox-direct',
+        'agency-inbox-toggle',
+      ])
+      off.unmount()
+
+      const on = await mountInbox({ filters: { ...NONE, unread: true } })
+      expect(testIds(on.get('[data-test="agency-inbox-filters-chips"]').element)).toEqual([
+        'agency-inbox-mine',
+        'agency-inbox-direct',
+        'agency-inbox-toggle',
+        'agency-inbox-clear-filters',
+      ])
+      on.unmount()
+    })
+
+    it('Clear is an icon button with a tooltip, not a text link', async () => {
+      const w = await mountInbox({ filters: { ...NONE, owner: 'me' as const } })
+      const clear = w.get('[data-test="agency-inbox-clear-filters"]')
+      expect(clear.find('.mdi-close').exists()).toBe(true)
+      expect(clear.attributes('aria-label')).toBe('Clear filters')
+      w.unmount()
+    })
+
+    // jsdom has no layout, so the one-line rule is pinned in the source (and measured in the
+    // Playwright walk at 460 and 1280). Break-revert: set `flex-wrap: wrap` on the row → fails.
+    it('keeps each row on one line: nowrap, chips that do not shrink, padding that tightens first', () => {
+      const source = readFileSync(
+        path.resolve(__dirname, '../../../../src/modules/agency/components/AgencyUnifiedInbox.vue'),
+        'utf8',
+      )
+      const rule = /\.agency-inbox__filters-row \{([^}]*)\}/.exec(source)?.[1] ?? ''
+      expect(rule).toMatch(/flex-wrap:\s*nowrap/)
+      expect(rule).not.toMatch(/flex-wrap:\s*wrap\b/)
+      expect(/\.agency-inbox__filters \.agency-inbox__mine \{([^}]*)\}/.exec(source)?.[1]).toMatch(
+        /flex:\s*none/,
+      )
+      expect(source).toMatch(/@container \(max-width: \d+px\)/)
+    })
+  })
+
   describe('Clear filters', () => {
     it('is absent while no filter is on', async () => {
       const w = await mountInbox()
@@ -396,7 +451,8 @@ describe('AgencyUnifiedInbox', () => {
     ])('appears for the %s filter and emits the empty filters', async (_name, patch) => {
       const w = await mountInbox({ filters: { ...NONE, ...patch } })
       const clear = w.get('[data-test="agency-inbox-clear-filters"]')
-      expect(clear.text()).toBe('Clear filters')
+      expect(clear.attributes('aria-label')).toBe('Clear filters')
+      expect(clear.text()).toBe('')
       await clear.trigger('click')
       expect(w.emitted('update:filters')).toEqual([
         [{ brand: [], campaign: [], unread: false, owner: 'all', direct: false }],

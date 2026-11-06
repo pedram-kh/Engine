@@ -252,89 +252,95 @@ function initial(item: UnifiedInboxItem): string {
       />
 
       <div class="agency-inbox__filters" data-test="agency-inbox-filters">
-        <InboxFilterPopover
-          :model-value="filters.brand"
-          :items="brandItems"
-          :all-label="t('app.messaging.inbox.allBrands')"
-          :heading="t('app.messaging.inbox.brandsHeading')"
-          :search-placeholder="t('app.messaging.inbox.searchBrands')"
-          :no-match="t('app.messaging.inbox.noBrandMatch')"
-          icon="mdi-tag-outline"
-          dots
-          test-key="brand"
-          @update:model-value="patch({ brand: $event })"
-        />
-        <InboxFilterPopover
-          :model-value="filters.campaign"
-          :items="campaignItems"
-          :all-label="t('app.messaging.inbox.allCampaigns')"
-          :heading="t('app.messaging.inbox.campaignsHeading')"
-          :search-placeholder="t('app.messaging.inbox.searchCampaigns')"
-          :no-match="t('app.messaging.inbox.noCampaignMatch')"
-          icon="mdi-layers-outline"
-          test-key="campaign"
-          @update:model-value="patch({ campaign: $event })"
-        />
-        <button
-          type="button"
-          class="agency-inbox__mine"
-          :class="{ 'agency-inbox__mine--on': filters.owner === 'me' }"
-          :aria-pressed="filters.owner === 'me'"
-          :aria-label="t('app.messaging.inbox.ownerFilterLabel')"
-          data-test="agency-inbox-mine"
-          @click="patch({ owner: filters.owner === 'me' ? 'all' : 'me' })"
-        >
-          <v-icon icon="mdi-account-outline" size="14" aria-hidden="true" />
-          {{ t('app.messaging.inbox.ownerMine') }}
-        </button>
-        <button
-          type="button"
-          class="agency-inbox__mine"
-          :class="{ 'agency-inbox__mine--on': filters.direct }"
-          :aria-pressed="filters.direct"
-          data-test="agency-inbox-direct"
-          @click="patch({ direct: !filters.direct })"
-        >
-          <v-icon icon="mdi-message-outline" size="14" aria-hidden="true" />
-          {{ t('app.messaging.inbox.tagDirect') }}
-        </button>
-
-        <div class="agency-inbox__toggle" role="radiogroup" data-test="agency-inbox-toggle">
+        <div class="agency-inbox__filters-row" data-test="agency-inbox-filters-popovers">
+          <InboxFilterPopover
+            :model-value="filters.brand"
+            :items="brandItems"
+            :all-label="t('app.messaging.inbox.allBrands')"
+            :heading="t('app.messaging.inbox.brandsHeading')"
+            :search-placeholder="t('app.messaging.inbox.searchBrands')"
+            :no-match="t('app.messaging.inbox.noBrandMatch')"
+            icon="mdi-tag-outline"
+            dots
+            test-key="brand"
+            @update:model-value="patch({ brand: $event })"
+          />
+          <InboxFilterPopover
+            :model-value="filters.campaign"
+            :items="campaignItems"
+            :all-label="t('app.messaging.inbox.allCampaigns')"
+            :heading="t('app.messaging.inbox.campaignsHeading')"
+            :search-placeholder="t('app.messaging.inbox.searchCampaigns')"
+            :no-match="t('app.messaging.inbox.noCampaignMatch')"
+            icon="mdi-layers-outline"
+            test-key="campaign"
+            @update:model-value="patch({ campaign: $event })"
+          />
+        </div>
+        <div class="agency-inbox__filters-row" data-test="agency-inbox-filters-chips">
           <button
             type="button"
-            role="radio"
-            class="agency-inbox__segment"
-            :class="{ 'agency-inbox__segment--on': !filters.unread }"
-            :aria-checked="!filters.unread"
-            data-test="agency-inbox-toggle-all"
-            @click="patch({ unread: false })"
+            class="agency-inbox__mine"
+            :class="{ 'agency-inbox__mine--on': filters.owner === 'me' }"
+            :aria-pressed="filters.owner === 'me'"
+            :aria-label="t('app.messaging.inbox.ownerFilterLabel')"
+            data-test="agency-inbox-mine"
+            @click="patch({ owner: filters.owner === 'me' ? 'all' : 'me' })"
           >
-            {{ t('app.messaging.relationship.inboxFilterAll') }}
+            <v-icon icon="mdi-account-outline" size="14" aria-hidden="true" />
+            {{ t('app.messaging.inbox.ownerMine') }}
           </button>
           <button
             type="button"
-            role="radio"
-            class="agency-inbox__segment"
-            :class="{ 'agency-inbox__segment--on': filters.unread }"
-            :aria-checked="filters.unread"
-            data-test="agency-inbox-toggle-unread"
-            @click="patch({ unread: true })"
+            class="agency-inbox__mine"
+            :class="{ 'agency-inbox__mine--on': filters.direct }"
+            :aria-pressed="filters.direct"
+            data-test="agency-inbox-direct"
+            @click="patch({ direct: !filters.direct })"
           >
-            {{ t('app.messaging.relationship.inboxFilterUnread') }}
+            <v-icon icon="mdi-message-outline" size="14" aria-hidden="true" />
+            {{ t('app.messaging.inbox.tagDirect') }}
+          </button>
+
+          <div class="agency-inbox__toggle" role="radiogroup" data-test="agency-inbox-toggle">
+            <button
+              type="button"
+              role="radio"
+              class="agency-inbox__segment"
+              :class="{ 'agency-inbox__segment--on': !filters.unread }"
+              :aria-checked="!filters.unread"
+              data-test="agency-inbox-toggle-all"
+              @click="patch({ unread: false })"
+            >
+              {{ t('app.messaging.relationship.inboxFilterAll') }}
+            </button>
+            <button
+              type="button"
+              role="radio"
+              class="agency-inbox__segment"
+              :class="{ 'agency-inbox__segment--on': filters.unread }"
+              :aria-checked="filters.unread"
+              data-test="agency-inbox-toggle-unread"
+              @click="patch({ unread: true })"
+            >
+              {{ t('app.messaging.relationship.inboxFilterUnread') }}
+            </button>
+          </div>
+          <button
+            v-if="anyFilter"
+            type="button"
+            class="agency-inbox__clear"
+            :aria-label="t('app.messaging.inbox.clearFilters')"
+            data-test="agency-inbox-clear-filters"
+            @click="clearFilters"
+          >
+            <v-icon icon="mdi-close" size="14" aria-hidden="true" />
+            <v-tooltip activator="parent" location="top">{{
+              t('app.messaging.inbox.clearFilters')
+            }}</v-tooltip>
           </button>
         </div>
       </div>
-
-      <button
-        v-if="anyFilter"
-        type="button"
-        class="agency-inbox__clear"
-        data-test="agency-inbox-clear-filters"
-        @click="clearFilters"
-      >
-        <v-icon icon="mdi-close" size="12" aria-hidden="true" />
-        {{ t('app.messaging.inbox.clearFilters') }}
-      </button>
     </header>
 
     <div class="agency-inbox__body">
@@ -769,17 +775,55 @@ function initial(item: UnifiedInboxItem): string {
   flex: none;
   color: rgb(var(--v-theme-text-tertiary));
 }
-/* Filter row: the two popover chips, the Mine chip and the All / Unread toggle. */
+/*
+ * The filter area is two rows, each on ONE line (no wrapping) at the 460 px pane and at 1280:
+ * row 1 the brand and campaign popovers, row 2 the Mine and Direct chips, the All / Unread
+ * control and, only while a filter is on, the clear icon at the right end. The popovers shrink
+ * (their labels ellipsise); the chips never do, and their padding tightens in a narrow pane
+ * before anything would wrap.
+ */
 .agency-inbox__filters {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+  container-type: inline-size;
+}
+
+.agency-inbox__filters-row {
+  display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   gap: var(--space-2, 8px);
+  min-width: 0;
+}
+
+.agency-inbox__filters-row > :deep(.inbox-chip) {
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
 .agency-inbox__filters .agency-inbox__toggle {
   align-self: auto;
-  margin-left: auto;
+  flex: none;
+}
+
+.agency-inbox__filters .agency-inbox__mine {
+  flex: none;
+  white-space: nowrap;
+}
+
+@container (max-width: 400px) {
+  .agency-inbox__filters-row {
+    gap: var(--space-1, 4px);
+  }
+
+  .agency-inbox__filters .agency-inbox__mine {
+    padding: 6px 7px;
+  }
+
+  .agency-inbox__filters .agency-inbox__segment {
+    padding: 4px 7px;
+  }
 }
 
 .agency-inbox__mine {
@@ -810,20 +854,23 @@ function initial(item: UnifiedInboxItem): string {
 }
 
 .agency-inbox__clear {
-  align-self: flex-end;
   display: inline-flex;
+  flex: none;
   align-items: center;
-  gap: var(--space-1, 4px);
-  margin-top: calc(-1 * var(--space-2, 8px));
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-left: auto;
   padding: 0;
   border: 0;
+  border-radius: var(--radius-md, 6px);
   background: transparent;
-  color: rgb(var(--v-theme-primary-text));
-  font: inherit;
-  font-size: var(--catalyst-typography-caption-size);
-  line-height: var(--catalyst-typography-caption-line-height);
-  font-weight: 500;
+  color: rgb(var(--v-theme-on-surface-variant));
   cursor: pointer;
+}
+
+.agency-inbox__clear:hover {
+  background: rgba(var(--v-theme-on-surface), 0.08);
 }
 
 .agency-inbox__more {

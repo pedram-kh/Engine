@@ -36,6 +36,7 @@ import { useComposerImages } from '../composables/useComposerImages'
 import { useMessagesEditSearchFlag } from '../composables/useMessagesEditSearchFlag'
 import { useMessageThread } from '../composables/useMessageThread'
 import { isInlineImageMime } from '../utils/messageImages'
+import MessageImage from './MessageImage.vue'
 import { reportHref } from '../utils/reportProblem'
 import MessageActions from './MessageActions.vue'
 import MessageEditField from './MessageEditField.vue'
@@ -518,22 +519,13 @@ async function submit(): Promise<void> {
                     <v-icon icon="mdi-link-variant" size="x-small" class="mr-1" />
                     {{ att.name ?? att.url }}
                   </a>
-                  <a
+                  <MessageImage
                     v-else-if="att.kind === 'file' && showAsImage(message, att, i)"
-                    :href="att.view_url ?? undefined"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="message-image-link"
-                  >
-                    <img
-                      loading="lazy"
-                      :src="att.view_url ?? undefined"
-                      :alt="att.name ?? t('app.messaging.attachment')"
-                      class="message-image"
-                      data-test="message-image"
-                      @error="onImageError(message, i)"
-                    />
-                  </a>
+                    :src="att.view_url ?? undefined"
+                    :alt="att.name ?? t('app.messaging.attachment')"
+                    :name="att.name"
+                    @error="onImageError(message, i)"
+                  />
                   <a
                     v-else-if="att.kind === 'file' && att.view_url"
                     :href="att.view_url"
@@ -1023,18 +1015,6 @@ async function submit(): Promise<void> {
   color: rgb(var(--v-theme-primary));
   font-size: 0.85rem;
   pointer-events: none;
-}
-
-.message-image-link {
-  display: inline-block;
-}
-
-.message-image {
-  display: block;
-  max-width: 100%;
-  max-height: 320px;
-  border-radius: 8px;
-  object-fit: contain;
 }
 
 /* The native file input is triggered programmatically from the "+" menu. */

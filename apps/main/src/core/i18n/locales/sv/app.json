@@ -23,6 +23,10 @@
       "composePlaceholder": "Skriv ett meddelande…",
       "send": "Skicka",
       "attachment": "Bilaga",
+      "lightbox": {
+        "close": "Stäng",
+        "download": "Ladda ned"
+      },
       "empty": "Inga meddelanden ännu. Starta konversationen.",
       "loadEarlier": "Ladda tidigare meddelanden",
       "reportProblem": "Rapportera ett problem",

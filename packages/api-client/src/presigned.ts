@@ -78,3 +78,31 @@ export async function uploadToPresignedUrl(
     })
   }
 }
+
+/**
+ * Reads a presigned GET URL (an image in the message lightbox) into a Blob, so the page can save it
+ * as a file without navigating. Same isolation as {@link uploadToPresignedUrl}: no platform cookie
+ * or CSRF header goes to the vendor (`withCredentials: false`). Throws {@link ApiError} on a non-2xx
+ * response, a refused cross-origin read (bucket CORS) or a network failure; the caller falls back.
+ */
+export async function downloadPresignedBlob(
+  url: string,
+  options: { timeoutMs?: number } = {},
+): Promise<Blob> {
+  try {
+    const response = await axios.get<Blob>(url, {
+      withCredentials: false,
+      responseType: 'blob',
+      timeout: options.timeoutMs ?? 60 * 1000,
+    })
+    return response.data
+  } catch (error) {
+    const axiosError = error as AxiosError
+    throw new ApiError({
+      status: axiosError.response?.status ?? 0,
+      code: 'presigned.download_failed',
+      message: axiosError.message,
+      cause: error,
+    })
+  }
+}

@@ -50,6 +50,7 @@ import MessageText from '@/modules/messaging/components/MessageText.vue'
 import { useComposerImages } from '@/modules/messaging/composables/useComposerImages'
 import { useMessagesEditSearchFlag } from '@/modules/messaging/composables/useMessagesEditSearchFlag'
 import { useMessageThread } from '@/modules/messaging/composables/useMessageThread'
+import MessageImage from '@/modules/messaging/components/MessageImage.vue'
 import { isInlineImageMime } from '@/modules/messaging/utils/messageImages'
 
 import { brandColorVar } from '../composables/brandColor'
@@ -714,22 +715,13 @@ async function submit(): Promise<void> {
                       :key="i"
                       :data-test="`relationship-attachment-${att.kind}`"
                     >
-                      <a
+                      <MessageImage
                         v-if="showAsImage(entry.message, att, i)"
-                        :href="att.kind === 'file' ? (att.view_url ?? undefined) : undefined"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="message-image-link"
-                      >
-                        <img
-                          loading="lazy"
-                          :src="att.kind === 'file' ? (att.view_url ?? undefined) : undefined"
-                          :alt="att.name ?? t('app.messaging.attachment')"
-                          class="message-image"
-                          data-test="message-image"
-                          @error="onImageError(entry.message, i)"
-                        />
-                      </a>
+                        :src="att.kind === 'file' ? (att.view_url ?? undefined) : undefined"
+                        :alt="att.name ?? t('app.messaging.attachment')"
+                        :name="att.name"
+                        @error="onImageError(entry.message, i)"
+                      />
                       <a
                         v-else-if="att.kind === 'link' && att.url"
                         class="agency-attach"
@@ -1363,18 +1355,6 @@ a.agency-attach:focus-visible {
   font-size: var(--catalyst-typography-caption-size);
   line-height: var(--catalyst-typography-caption-line-height);
   text-align: center;
-}
-
-.message-image-link {
-  display: inline-block;
-}
-
-.message-image {
-  display: block;
-  max-width: 100%;
-  max-height: 320px;
-  border-radius: 8px;
-  object-fit: contain;
 }
 
 .agency-thread__compose {

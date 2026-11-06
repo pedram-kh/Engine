@@ -23,6 +23,10 @@
       "composePlaceholder": "Écrivez un message…",
       "send": "Envoyer",
       "attachment": "Pièce jointe",
+      "lightbox": {
+        "close": "Fermer",
+        "download": "Télécharger"
+      },
       "empty": "Aucun message pour le moment. Lancez la conversation.",
       "loadEarlier": "Charger les messages antérieurs",
       "reportProblem": "Signaler un problème",

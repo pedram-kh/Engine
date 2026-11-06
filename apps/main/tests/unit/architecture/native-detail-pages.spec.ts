@@ -178,8 +178,6 @@ const NO_VISUAL: Record<string, string> = {
   'chat-panel__attach-menu': 'flex row of icon buttons',
   'chat-panel__file-input': 'hidden file input',
   'chat-panel__drop-hint': 'AH-119 drop-target overlay, styled by the component (theme tokens)',
-  'message-image': 'AH-119 inline image, sized and rounded by the component itself',
-  'message-image-link': 'AH-119 new-tab wrapper around the inline image',
   'chat-message': 'row wrapper; alignment is its own',
   'chat-message--system': 'alignment variant; the system line is styled',
   'chat-message__attachments': 'attachment list inside a bubble, ordinary text',

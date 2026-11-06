@@ -23,6 +23,10 @@
       "composePlaceholder": "Write a message…",
       "send": "Изпратете",
       "attachment": "Attachment",
+      "lightbox": {
+        "close": "Затваряне",
+        "download": "Изтегляне"
+      },
       "empty": "Не messages yet. Start the conversation.",
       "loadEarlier": "Load earlier messages",
       "reportProblem": "Съобщи за проблем",

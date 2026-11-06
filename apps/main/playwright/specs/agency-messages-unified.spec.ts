@@ -158,6 +158,43 @@ test.describe('AH-119 — the agency unified inbox', () => {
     await expect(page).not.toHaveURL(/direct=1/)
     await expect(assignments).toHaveCount(2, { timeout: 10_000 })
 
+    // ── Step 4c: filter area is two rows, and the chips row is ONE line (Clear shown) ──
+    await page.locator('[data-test="agency-inbox-mine"]').click()
+    await page.locator('[data-test="agency-inbox-direct"]').click()
+    await page.locator('[data-test="agency-inbox-toggle-unread"]').click()
+    await expect(page.locator('[data-test="agency-inbox-clear-filters"]')).toBeVisible()
+    // The pane is as wide as the layout makes it at 1280; 460 and 380 pin the filter area itself
+    // to those widths (a 460 px *viewport* would shrink the pane to the room beside the sidebar).
+    for (const width of [null, 460, 380]) {
+      await page.locator('[data-test="agency-inbox-filters"]').evaluate((el, w) => {
+        ;(el as HTMLElement).style.width = w === null ? '' : `${w}px`
+      }, width)
+      // The container query reacts to the resize a frame later: poll until the layout settles.
+      await expect(async () => {
+        const row = page.locator('[data-test="agency-inbox-filters-chips"]')
+        const rowBox = (await row.boundingBox())!
+        const kids = await row.locator(':scope > *').all()
+        expect(kids).toHaveLength(4)
+        for (const kid of kids) {
+          const box = (await kid.boundingBox())!
+          // Same line: every child sits inside the row's height, nothing wrapped under another.
+          expect(box.y).toBeGreaterThanOrEqual(rowBox.y - 1)
+          expect(box.y + box.height).toBeLessThanOrEqual(rowBox.y + rowBox.height + 1)
+          expect(box.x + box.width).toBeLessThanOrEqual(rowBox.x + rowBox.width + 1)
+        }
+        expect(rowBox.height).toBeLessThan(44)
+        const clearBox = (await kids[3]!.boundingBox())!
+        expect(clearBox.x).toBeGreaterThan((await kids[2]!.boundingBox())!.x)
+        const popovers = (await page
+          .locator('[data-test="agency-inbox-filters-popovers"]')
+          .boundingBox())!
+        expect(popovers.y + popovers.height).toBeLessThanOrEqual(rowBox.y + 1)
+      }).toPass({ timeout: 5_000 })
+    }
+    await page.setViewportSize({ width: 1280, height: 720 })
+    await page.locator('[data-test="agency-inbox-clear-filters"]').click()
+    await expect(assignments).toHaveCount(2, { timeout: 10_000 })
+
     // ── Step 5: open an assignment thread, send a message with a link ───────
     await assignments.first().click()
     await expect(page).toHaveURL(/\/messages\/c\/[^/]+\/[^/]+/)

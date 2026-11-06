@@ -23,6 +23,10 @@
       "composePlaceholder": "Napište zprávu…",
       "send": "Pošlji",
       "attachment": "Příloha",
+      "lightbox": {
+        "close": "Zapri",
+        "download": "Prenesi"
+      },
       "empty": "Žádné zprávy. Zahajte konverzaci.",
       "loadEarlier": "Načíst starší zprávy",
       "reportProblem": "Prijavi težavo",

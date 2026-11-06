@@ -23,6 +23,10 @@
       "composePlaceholder": "Write a message…",
       "send": "Siųsti",
       "attachment": "Attachment",
+      "lightbox": {
+        "close": "Uždaryti",
+        "download": "Atsisiųsti"
+      },
       "empty": "Ne messages yet. Start the conversation.",
       "loadEarlier": "Load earlier messages",
       "reportProblem": "Pranešti apie problemą",

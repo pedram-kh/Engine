@@ -47,9 +47,10 @@ const FROZEN_COMPONENTS: ReadonlyArray<readonly [string, string]> = [
     'b7a56fd099ccdd60c1e944d87260f3ff624c431985e05e453df2c3b8c25d8338',
   ],
   [
+    // AH-119 walk: the inline image is the shared MessageImage (thumbnail button + lightbox) instead of a new-tab link; hash re-pinned (flag-off DOM for text-only messages is unchanged).
     // AH-119 Stage B: edit / delete actions, "edited" tag and deleted placeholder behind messages_v2_edit_search — intended edit, hash re-pinned (flag off renders the pre-Stage-B DOM, pinned in stageBFlagOffPins.json).
     'apps/main/src/modules/messaging/components/ChatPanel.vue',
-    '441311a723d1880a795ea16490948b9e5d486045f6741bdd051ee974dacc6ab9',
+    '8dbe1a12239d72c93d8e825c723f7cd6cbdafbcc49a74d8e660109944be7bbd2',
   ],
   [
     'apps/main/src/modules/messaging/components/ContactPicker.vue',
@@ -62,7 +63,7 @@ const FROZEN_COMPONENTS: ReadonlyArray<readonly [string, string]> = [
   [
     // AH-119 Stage B: edit / delete actions, "edited" tag and deleted placeholder behind messages_v2_edit_search — intended edit, hash re-pinned (flag off renders the pre-Stage-B DOM, pinned in stageBFlagOffPins.json).
     'apps/main/src/modules/messaging/components/RelationshipThreadView.vue',
-    'ee3a912d36cecbe3c7807d4ab79e50b0ff61714a5c0ef99aa133fcc68f2f2711',
+    'f8233179e68b1e4ec3162c06ac8bd81fda19ab8b616615166d02b96df9493d54',
   ],
   [
     'apps/main/src/modules/messaging/components/ReportFallback.vue',

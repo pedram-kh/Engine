@@ -23,6 +23,10 @@
       "composePlaceholder": "Nachricht schreiben…",
       "send": "Senden",
       "attachment": "Anhang",
+      "lightbox": {
+        "close": "Schließen",
+        "download": "Herunterladen"
+      },
       "empty": "Noch keine Nachrichten. Beginne die Unterhaltung.",
       "loadEarlier": "Frühere Nachrichten laden",
       "reportProblem": "Problem melden",

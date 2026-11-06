@@ -339,7 +339,7 @@ describe.each([
     wrapper.unmount()
   })
 
-  it('renders an image attachment as a lazy inline <img> inside a new-tab link', async () => {
+  it('renders an image attachment as a lazy inline <img> inside a lightbox button', async () => {
     const { wrapper } = await a6Mount(native, [
       a6Msg('i1', {
         attachments: [
@@ -360,10 +360,9 @@ describe.each([
       alt: 'pic.png',
     })
     expect(img.classes()).toContain('message-image')
-    const link = img.element.closest('a')!
-    expect(link.getAttribute('href')).toBe('https://cdn.test/pic.png')
-    expect(link.getAttribute('target')).toBe('_blank')
-    expect(link.getAttribute('rel')).toBe('noopener noreferrer')
+    // A button that opens the lightbox: no link, so nothing opens in a new tab.
+    expect(img.element.closest('a')).toBeNull()
+    expect(img.element.closest('button')?.getAttribute('data-test')).toBe('message-image-open')
     wrapper.unmount()
   })
 

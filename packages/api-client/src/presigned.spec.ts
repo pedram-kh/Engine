@@ -12,7 +12,7 @@ import axios, { AxiosError } from 'axios'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ApiError } from './errors'
-import { uploadToPresignedUrl } from './presigned'
+import { downloadPresignedBlob, uploadToPresignedUrl } from './presigned'
 
 vi.mock('axios')
 
@@ -92,5 +92,31 @@ describe('uploadToPresignedUrl', () => {
       expect((error as ApiError).status).toBe(0)
       expect((error as ApiError).code).toBe('presigned.upload_failed')
     }
+  })
+})
+
+describe('downloadPresignedBlob', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('GETs the URL as a blob with withCredentials=false and returns the body', async () => {
+    const blob = new Blob(['png'], { type: 'image/png' })
+    vi.mocked(axios.get).mockResolvedValue({ status: 200, data: blob })
+
+    await expect(downloadPresignedBlob('https://vendor.s3.example/img.png')).resolves.toBe(blob)
+
+    const call = vi.mocked(axios.get).mock.calls[0]
+    expect(call?.[0]).toBe('https://vendor.s3.example/img.png')
+    expect(call?.[1]).toMatchObject({ withCredentials: false, responseType: 'blob' })
+  })
+
+  it('wraps a refused or failed read in an ApiError with the canonical code', async () => {
+    vi.mocked(axios.get).mockRejectedValue(new AxiosError('Network Error', 'ERR_NETWORK'))
+
+    await expect(downloadPresignedBlob('https://vendor.s3.example/img.png')).rejects.toMatchObject({
+      status: 0,
+      code: 'presigned.download_failed',
+    })
   })
 })

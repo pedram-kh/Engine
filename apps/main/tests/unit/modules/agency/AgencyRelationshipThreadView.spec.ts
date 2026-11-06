@@ -649,17 +649,16 @@ describe('AgencyRelationshipThreadView — AH-119 additions', () => {
       return amsg(id, { body: null, kind: 'attachment_only', attachments: [att] as never })
     }
 
-    it('renders an image/png attachment as a lazy <img> with the name as alt, inside a new-tab link', async () => {
+    it('renders an image/png attachment as a lazy <img> with the name as alt, inside a lightbox button', async () => {
       const wrapper = await mountAgencyView([imageMsg('i1')])
       const img = wrapper.get('[data-test="message-image"]')
       expect(img.element.tagName).toBe('IMG')
       expect(img.attributes('loading')).toBe('lazy')
       expect(img.attributes('alt')).toBe('shot.png')
       expect(img.attributes('src')).toBe('https://files.example/shot.png')
-      const link = img.element.closest('a') as HTMLAnchorElement
-      expect(link.getAttribute('href')).toBe('https://files.example/shot.png')
-      expect(link.getAttribute('target')).toBe('_blank')
-      expect(link.getAttribute('rel')).toBe('noopener noreferrer')
+      // A button that opens the lightbox: no link, so nothing opens in a new tab.
+      expect(img.element.closest('a')).toBeNull()
+      expect(img.element.closest('button')?.getAttribute('data-test')).toBe('message-image-open')
       expect(wrapper.find('.agency-attach').exists()).toBe(false)
       wrapper.unmount()
     })

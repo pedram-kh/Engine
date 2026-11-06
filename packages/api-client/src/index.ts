@@ -29,7 +29,7 @@ export {
   type HttpRequestOptions,
 } from './http'
 export { formatCurrency, formatDate, formatDateTime, formatFileSize } from './format'
-export { uploadToPresignedUrl } from './presigned'
+export { downloadPresignedBlob, uploadToPresignedUrl } from './presigned'
 export {
   EU_LANGUAGES,
   WORLD_LANGUAGES,
