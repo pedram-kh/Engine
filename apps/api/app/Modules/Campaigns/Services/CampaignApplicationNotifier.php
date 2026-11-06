@@ -301,7 +301,7 @@ final class CampaignApplicationNotifier
         Mail::to($recipient->email)
             // Queue-time locale, not render-time: the worker has no request
             // locale, so a mailable resolving its own would send everyone English.
-            ->locale($recipient->preferred_language ?: 'en')
+            ->locale($recipient->mailLocale())
             ->queue($mailable);
 
         return true;

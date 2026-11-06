@@ -478,7 +478,7 @@ final class AdminCreatorController
     /**
      * Queue a creator-facing lifecycle mail in the creator's preferred
      * locale (D-c3-11). Mirrors the BulkInviteService locale convention
-     * ($user->preferred_language ?: 'en'). No-op if the creator somehow
+     * ($user->mailLocale()). No-op if the creator somehow
      * has no associated user (defensive).
      */
     private function dispatchCreatorMail(Creator $creator, Mailable $mailable): void
@@ -489,7 +489,7 @@ final class AdminCreatorController
         }
 
         Mail::to($user->email)
-            ->locale($user->preferred_language ?: 'en')
+            ->locale($user->mailLocale())
             ->queue($mailable);
     }
 

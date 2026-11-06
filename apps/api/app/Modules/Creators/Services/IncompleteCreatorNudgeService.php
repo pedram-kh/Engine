@@ -121,7 +121,7 @@ final class IncompleteCreatorNudgeService
     private function dispatchVerify(User $user): void
     {
         Mail::to($user->email)
-            ->locale($user->preferred_language ?: 'en')
+            ->locale($user->mailLocale())
             ->queue(new IncompleteCreatorNudgeMail(
                 user: $user,
                 variant: IncompleteCreatorNudgeVariant::Verify,
@@ -133,7 +133,7 @@ final class IncompleteCreatorNudgeService
     private function dispatchFinish(User $user): void
     {
         Mail::to($user->email)
-            ->locale($user->preferred_language ?: 'en')
+            ->locale($user->mailLocale())
             ->queue(new IncompleteCreatorNudgeMail(
                 user: $user,
                 variant: IncompleteCreatorNudgeVariant::Finish,

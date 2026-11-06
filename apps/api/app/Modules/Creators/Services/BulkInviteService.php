@@ -93,7 +93,7 @@ final class BulkInviteService
                 $this->mail
                     ->mailer()
                     ->to($email)
-                    ->locale($user->preferred_language ?: 'en')
+                    ->locale($user->mailLocale())
                     ->queue(new ProspectCreatorInviteMail(
                         agencyName: $agency->name,
                         token: $token,

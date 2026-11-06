@@ -9,7 +9,6 @@ use App\Modules\Creators\Mail\CreatorRejectedMail;
 use App\Modules\Identity\Enums\UserType;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
@@ -83,12 +82,8 @@ it('dispatches CreatorRejectedMail carrying the reason, in the creator locale, o
 });
 
 it('falls back to en locale when the creator has no preferred_language', function (): void {
-    // AH-119 A0 (finding F1): users.preferred_language is char(2), so Postgres stores '' as '  '
-    // (truthy), and `?: 'en'` is not reached. SQLite-only until F1 is ruled (tech-debt row).
-    if (DB::connection()->getDriverName() === 'pgsql') {
-        $this->markTestSkipped('char(2) pads an empty preferred_language on Postgres (AH-119 A0 F1).');
-    }
-
+    // AH-119 A0 F1: preferred_language is char(2), which Postgres pads ('' reads back as two
+    // spaces); User::mailLocale() trims, so this holds on both legs.
     Mail::fake();
 
     $admin = makeMailAdmin();

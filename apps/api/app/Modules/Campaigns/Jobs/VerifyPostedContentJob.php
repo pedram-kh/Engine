@@ -151,7 +151,7 @@ final class VerifyPostedContentJob implements ShouldQueue
         $reason = $outcome === PostVerificationOutcome::Mismatch ? 'mismatch' : 'not_found';
 
         Mail::to($recipient->email)
-            ->locale($recipient->preferred_language ?: 'en')
+            ->locale($recipient->mailLocale())
             ->queue(new PostVerificationFailedMail(
                 recipientName: $recipient->name,
                 creatorName: $creator->display_name ?? '',

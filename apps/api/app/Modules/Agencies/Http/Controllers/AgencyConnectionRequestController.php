@@ -171,7 +171,7 @@ final class AgencyConnectionRequestController
         $this->mail
             ->mailer()
             ->to($user->email)
-            ->locale($user->preferred_language ?: 'en')
+            ->locale($user->mailLocale())
             ->queue(new ConnectionRequestMail(
                 creatorDisplayName: $creator->display_name ?? '',
                 agencyName: $agency->name,

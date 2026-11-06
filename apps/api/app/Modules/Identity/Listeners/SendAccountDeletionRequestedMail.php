@@ -35,7 +35,7 @@ final class SendAccountDeletionRequestedMail
 
         $this->mail->mailer()
             ->to($user->email)
-            ->locale($user->preferred_language ?: 'en')
+            ->locale($user->mailLocale())
             ->queue(new AccountDeletionRequestedMail(
                 recipientName: $user->name,
                 scheduledFor: $event->scheduledFor,

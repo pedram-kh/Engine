@@ -206,7 +206,7 @@ final class CampaignAssignmentResolutionController
         }
 
         Mail::to($recipient->email)
-            ->locale($recipient->preferred_language ?: 'en')
+            ->locale($recipient->mailLocale())
             ->queue(new ResubmitRequestedMail(
                 creatorName: $creator->display_name ?? $recipient->name,
                 campaignName: $campaign->name,

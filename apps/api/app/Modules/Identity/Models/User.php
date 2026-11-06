@@ -149,6 +149,18 @@ final class User extends Authenticatable implements Auditable, MustVerifyEmail
      *
      * @return list<string>
      */
+    /**
+     * The locale for mail and notifications sent to this user, `en` when none is stored.
+     * `preferred_language` is `char(2)`, which Postgres pads, so an empty value reads back as
+     * two spaces: trim before the fallback (AH-119 A0, finding F1).
+     */
+    public function mailLocale(): string
+    {
+        $locale = trim((string) $this->preferred_language);
+
+        return $locale !== '' ? $locale : 'en';
+    }
+
     public function auditableAllowlist(): array
     {
         return [

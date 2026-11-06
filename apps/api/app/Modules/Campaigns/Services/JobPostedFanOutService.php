@@ -294,7 +294,7 @@ final class JobPostedFanOutService
         }
 
         Mail::to($user->email)
-            ->locale($user->preferred_language ?: 'en')
+            ->locale($user->mailLocale())
             ->queue(new JobPostedMail(
                 user: $user,
                 campaign: $campaign,

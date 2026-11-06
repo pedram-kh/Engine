@@ -304,7 +304,7 @@ final class CampaignAssignmentContractController
         }
 
         Mail::to($recipient->email)
-            ->locale($recipient->preferred_language ?: 'en')
+            ->locale($recipient->mailLocale())
             ->queue(new ContractAttachedMail(
                 creatorName: $creator->display_name ?? $recipient->name,
                 campaignName: $campaign->name,

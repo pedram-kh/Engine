@@ -289,7 +289,7 @@ final class AdminCreatorConnectionController
             if ($creatorUser->email !== '') {
                 $this->mail->mailer()
                     ->to($creatorUser->email)
-                    ->locale($creatorUser->preferred_language ?: 'en')
+                    ->locale($creatorUser->mailLocale())
                     ->queue(new RelationDisconnectedMail(
                         recipientName: $creatorName,
                         counterpartyName: $agency->name,
@@ -321,7 +321,7 @@ final class AdminCreatorConnectionController
             if ($memberUser->email !== '') {
                 $this->mail->mailer()
                     ->to($memberUser->email)
-                    ->locale($memberUser->preferred_language ?: 'en')
+                    ->locale($memberUser->mailLocale())
                     ->queue(new RelationDisconnectedMail(
                         recipientName: $memberUser->name ?? '',
                         counterpartyName: $creatorName,
@@ -402,7 +402,7 @@ final class AdminCreatorConnectionController
         $this->mail
             ->mailer()
             ->to($user->email)
-            ->locale($user->preferred_language ?: 'en')
+            ->locale($user->mailLocale())
             ->queue(new ConnectionRequestMail(
                 creatorDisplayName: $creator->display_name ?? '',
                 agencyName: $agency->name,

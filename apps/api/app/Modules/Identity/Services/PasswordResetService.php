@@ -74,7 +74,7 @@ final class PasswordResetService
         $this->mail
             ->mailer()
             ->to($user->email)
-            ->locale($user->preferred_language ?: 'en')
+            ->locale($user->mailLocale())
             ->queue(new ResetPasswordMail(
                 user: $user,
                 resetUrl: $this->buildResetUrl($user, $token),

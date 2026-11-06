@@ -60,7 +60,7 @@ final class AssignmentOfferEditedNotifier
 
         if ($recipient->email !== '' && $this->notifications->isEmailEnabled($recipient, NotificationType::AssignmentOfferEdited)) {
             Mail::to($recipient->email)
-                ->locale($recipient->preferred_language ?: 'en')
+                ->locale($recipient->mailLocale())
                 ->queue(new OfferEditedMail(
                     creatorName: $creator->display_name ?? $recipient->name,
                     campaignName: $campaign->name,

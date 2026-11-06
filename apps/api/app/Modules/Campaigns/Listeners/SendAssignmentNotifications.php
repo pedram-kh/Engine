@@ -428,7 +428,7 @@ final class SendAssignmentNotifications
         }
 
         Mail::to($recipient->email)
-            ->locale($recipient->preferred_language ?: 'en')
+            ->locale($recipient->mailLocale())
             ->queue($mailable);
     }
 
