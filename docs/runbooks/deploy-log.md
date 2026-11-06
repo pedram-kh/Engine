@@ -74,11 +74,12 @@ happened.
 
 ---
 
-## AH-119 — Messages v2 (API + main web + admin web), both flags OFF — PENDING
+## AH-119 — Messages v2 (API + main web + admin web), both flags OFF — DEPLOYED
 
 > **One sitting with AH-116, AH-117 and AH-118, in this order: pre-checks, snapshot, migrate, API, verify every new flag OFF, main web, admin web. Then, separately and later: native build 4, the Stage A flag, and only after build 4 is live the Stage B flag.** The API goes first: the new web calls new endpoints (`message-inbox`, the edit, delete and search routes), and an old API under the new web would show controls the API ignores. **No `queue:restart` and no worker restart while an erasure is claimed** (the erasure worker program loads `Steps` and the registry, which this change edits; `account-erasure.md`; the C4 countdown is open, earliest real due date 2026-11-15).
 
-- **Status:** PENDING. Opened 2026-11-06. Pushed (`origin/main`); **not deployed. Pushing is not deploying.**
+- **Status:** DEPLOYED, 2026-11-06 (reported; details **not read**, see the deploy record below). Previously PENDING; opened 2026-11-06.
+- **Deploy record, 2026-11-06 (one sitting, stacked: AH-116 API, AH-116 web, AH-117, AH-118, AH-119): by Pedram's colleague from the Bitbucket mirror, checklist [`deploy-ah116-ah119.md`](deploy-ah116-ah119.md).** _Source: Pedram's report that the deploy is done (2026-11-06). **Nothing else was reported, so nothing else is recorded: every field below is not read until the colleague returns the filled runbook.**_ **Not read:** the snapshot name and creation time; the six `DONE` lines, the batch and the two GIN build times; the P3 grant read; the Q10 count and whether `queue:restart` ran; the `supervisorctl status` lines (including `laravel-erasure`); the CORS rules before and after; the four flag read-backs (they were meant to be OFF; **not read, so not asserted**); the `APP_KEY` fingerprints; both bundle hashes; the mirror SHA and the tree-hash check; P8 and P9. Never read as "passed".
 - **Range:** production API **`066ff29c`** (reported 2026-10-29, current state **not read**) and main SPA **`1bc398e8`** (reported), admin at the 2026-10-29 build (reported) → the pushed head of `main` (this entry's tip is the last commit of the push report; CI at that tip: run `run 42193519400 green at 6be6c910: Pest SQLite 2m23s, Pest PostgreSQL whole suite 5m59s, Playwright main 6m and admin 17s`, the result in the push report). The mirror may rewrite SHAs (unconfirmed); these are GitHub's. AH-119 commits: `ce30376d`, `a8dab767`, `045b0771`, `47172863`, `32182314`, `9d14b901`, `670c12c1`, `4be4cb85` (Stage A, pushed with CI run 42181503407 green), `28a5ad29`, `deb860a1`, `377fa0e1`, `ee102ff5`, `0d2c476b` (Stage B) and the fix and docs commits after them.
 - **AH entries carried:** AH-119. **AH-116 (API, then web), AH-117 (admin) and AH-118 are pushed and not deployed, with their own `PENDING` entries; stack them: one sitting, one snapshot, one `migrate` (AH-118 M1 and M2, then these four), one API deploy, then main web and admin web once each (the main and admin builds each carry all four AH entries).**
 - **Migrations run: four** (plus the AH-118 two in the same sitting), all additive and schema-only, none rewrites a row: **(1)** `2026_11_06_100000_add_owner_user_id_to_agency_creator_relations` (nullable FK to `users`); **(2)** `2026_11_06_100001_add_color_to_brands` (nullable string); **(3)** `2026_11_06_110000_add_edit_and_delete_columns_to_messages` (on `messages` and `relationship_messages`: `edited_at`, `original_body`, `deleted_by_user_id` FK `restrictOnDelete`, `deleted_body`; all nullable, no default); **(4)** `2026_11_06_110001_add_body_search_indexes_to_messages` (two GIN indexes, `to_tsvector('simple', coalesce(body, ''))`, **pgsql only**, inside the migration transaction, not `CONCURRENTLY`: a write-blocking lock on each table for the build, **milliseconds to seconds at about 7,100 and 3,800 rows (the 2026-10-20 read; re-read below)**). `down()` of (3) discards withdrawn text: a snapshot comes first. Pre-deploy: `php artisan migrate --pretend` read and recorded; `migrate:status` shows all six Pending.
@@ -99,11 +100,12 @@ happened.
 
 ---
 
-## AH-118 — campaign rules (API + main web + admin web), both flags OFF — PENDING
+## AH-118 — campaign rules (API + main web + admin web), both flags OFF — DEPLOYED
 
 > **One entry, one sitting, in this order: snapshot, migrate (M1, M2), API, verify both flags OFF, main web, admin web.** The API goes first: the new web calls the new endpoints, and an old API under the new web would show a region switch that the API ignores. The two flags stay OFF at deploy; Pedram flips them afterwards (below). **Native build 4 follows the web deploy.**
 
-- **Status:** PENDING. Opened 2026-11-05. Pushed (`origin/main`); **not deployed. Pushing is not deploying.**
+- **Status:** DEPLOYED, 2026-11-06 (reported; details **not read**, see the deploy record below). Previously PENDING; opened 2026-11-05.
+- **Deploy record, 2026-11-06 (one sitting, stacked: AH-116 API, AH-116 web, AH-117, AH-118, AH-119): by Pedram's colleague from the Bitbucket mirror, checklist [`deploy-ah116-ah119.md`](deploy-ah116-ah119.md).** _Source: Pedram's report that the deploy is done (2026-11-06). **Nothing else was reported, so nothing else is recorded: every field below is not read until the colleague returns the filled runbook.**_ **Not read:** the snapshot name and creation time; the six `DONE` lines, the batch and the two GIN build times; the P3 grant read; the Q10 count and whether `queue:restart` ran; the `supervisorctl status` lines (including `laravel-erasure`); the CORS rules before and after; the four flag read-backs (they were meant to be OFF; **not read, so not asserted**); the `APP_KEY` fingerprints; both bundle hashes; the mirror SHA and the tree-hash check; P8 and P9. Never read as "passed".
 - **Range:** the production API **`066ff29c`** (reported 2026-10-29, current state **not read**) and the production main SPA **`1bc398e8`** (reported), admin at the 2026-10-29 build (reported) → **`60b908fc`** (the pushed tip; the last runtime commit is `86b0a7e0`, after it only tests and docs). CI at the tip: run `41950195214` (https://github.com/pedram-kh/Engine/actions/runs/41950195214): **green, all four jobs (Frontend, Backend, E2E admin, E2E main)**. The mirror may rewrite SHAs (unconfirmed); these are GitHub's.
 - **AH entries carried:** AH-118. AH-116 and AH-117 are also pushed and not deployed, with their own `PENDING` entries; they are independent and may go before or after. The AH-116 API entry and this one both touch the API: deploy them in one sitting if they are not already out.
 - **Migrations run:** **two**, both additive and schema-only (no row is rewritten): **M1** `2026_11_05_100000_add_restrict_to_listing_regions_to_campaigns` (one boolean column, default false, on `campaigns`) and **M2** `2026_11_05_100001_add_system_event_data_to_messages` (one nullable jsonb column on `messages`). Pre-deploy: `php artisan migrate --pretend` read and recorded.
@@ -122,11 +124,12 @@ happened.
 
 ---
 
-## AH-117 — admin list navigation (admin SPA only) — PENDING
+## AH-117 — admin list navigation (admin SPA only) — DEPLOYED
 
 > **No API dependency.** The build works against the API that is live now; it reads the same list endpoints with the same parameters. It can be deployed before, after or without the AH-116 entries below. Do not combine it with them: their web build is the **main** site.
 
-- **Status:** PENDING. Opened 2026-11-04. Pushed (`origin/main`); **not deployed. Pushing is not deploying.**
+- **Status:** DEPLOYED, 2026-11-06 (reported; details **not read**, see the deploy record below). Previously PENDING; opened 2026-11-04.
+- **Deploy record, 2026-11-06 (one sitting, stacked: AH-116 API, AH-116 web, AH-117, AH-118, AH-119): by Pedram's colleague from the Bitbucket mirror, checklist [`deploy-ah116-ah119.md`](deploy-ah116-ah119.md).** _Source: Pedram's report that the deploy is done (2026-11-06). **Nothing else was reported, so nothing else is recorded: every field below is not read until the colleague returns the filled runbook.**_ **Not read:** the snapshot name and creation time; the six `DONE` lines, the batch and the two GIN build times; the P3 grant read; the Q10 count and whether `queue:restart` ran; the `supervisorctl status` lines (including `laravel-erasure`); the CORS rules before and after; the four flag read-backs (they were meant to be OFF; **not read, so not asserted**); the `APP_KEY` fingerprints; both bundle hashes; the mirror SHA and the tree-hash check; P8 and P9. Never read as "passed".
 - **Range:** the admin production tip, **reported** as the 2026-10-29 build (Pedram used the Erasure queue page in production on 2026-11-01, which exists only in builds from 2026-10-25 on); **not read by the assistant; the bundle hash (`assets/index-<hash>.js` at admin.catalyst-growth.com) and the commit it was built from are read by Pedram before the deploy and written here:** `<to fill>` → **`7a4e7bab`** (S7, AH-117's last runtime commit; the D1 docs commits on top change no build output). The mirror's SHA for the deployed commit is recorded beside GitHub's (the mirror rewrites SHAs).
 - **AH entries carried:** AH-117 (S1 `06e8f7b7`, S2 `a9350513`, S3 `95148533`, S4 `7de315f4`, S5 `5cb37a81`, S6 `5d445ba7`, S7 `7a4e7bab`). **Two other commits in the range touch `packages/`:** AH-116 W1 `d2a51a62` (`packages/api-client/src/types/campaign.ts`, +7) and W2 `d0472dce` (`packages/api-client/src/types/agency.ts`, +7), optional interface members, **types only** (erased at build; no byte comparison of the admin bundle was made). `git log <admin tip>..HEAD -- apps/admin packages` is run at deploy time against the real admin tip and pasted here, because the build tip is the thing to be sure of. No other entry rides this deploy.
 - **Migrations run:** none
@@ -142,11 +145,12 @@ happened.
 
 ---
 
-## AH-116 API — campaign status counts, pool member filters, archived brand read — PENDING
+## AH-116 API — campaign status counts, pool member filters, archived brand read — DEPLOYED
 
 > **Deploy order, fixed: this entry first, then "AH-116 web" below.** The web build tolerates an old API for the status counts (an absent `status_counts` reads as null and the page shows today's summary), but against an old API the pool page would show a selected country or language over an unfiltered list. The two entries are two sittings with separate rollbacks.
 
-- **Status:** PENDING. Opened 2026-11-02. Pushed (`origin/main`, CI green at `471fe96c`: [run 41499069553](https://github.com/pedram-kh/Engine/actions/runs/41499069553)); **not deployed. Pushing is not deploying.**
+- **Status:** DEPLOYED, 2026-11-06 (reported; details **not read**, see the deploy record below). Previously PENDING; opened 2026-11-02.
+- **Deploy record, 2026-11-06 (one sitting, stacked: AH-116 API, AH-116 web, AH-117, AH-118, AH-119): by Pedram's colleague from the Bitbucket mirror, checklist [`deploy-ah116-ah119.md`](deploy-ah116-ah119.md).** _Source: Pedram's report that the deploy is done (2026-11-06). **Nothing else was reported, so nothing else is recorded: every field below is not read until the colleague returns the filled runbook.**_ **Not read:** the snapshot name and creation time; the six `DONE` lines, the batch and the two GIN build times; the P3 grant read; the Q10 count and whether `queue:restart` ran; the `supervisorctl status` lines (including `laravel-erasure`); the CORS rules before and after; the four flag read-backs (they were meant to be OFF; **not read, so not asserted**); the `APP_KEY` fingerprints; both bundle hashes; the mirror SHA and the tree-hash check; P8 and P9. Never read as "passed".
 - **Range:** `066ff29c` (production API; production's current state **not read**) → **`471fe96c`** (A3, the last API commit). The API diff over that range is exactly A1 to A3: seven files (`CampaignController`, `TalentPoolMembershipController`, the brands route file, the `FiltersCreatorColumns` docblock, and three Pest files), +483 −2. Every other commit in the range is docs or web. The mirror's SHA for the deployed commit is recorded beside GitHub's (two pairs already differ: `a60ffbbf` = `5d2ecdbc` and `c295185` = `1bc398e8`).
 - **AH entries carried:** AH-116 (steps A1 `0fe5cd6e`, A2 `6ebc6745`, A3 `471fe96c`). No other entry rides this deploy.
 - **Migrations run:** none
@@ -162,11 +166,12 @@ happened.
 
 ---
 
-## AH-116 web — agency UX batch (main SPA only) — PENDING
+## AH-116 web — agency UX batch (main SPA only) — DEPLOYED
 
 > **Precondition: the "AH-116 API" entry above reads DEPLOYED.** Do not deploy this build before it (the pool member filters are inert against the old API, so the page would show a filter over an unfiltered list).
 
-- **Status:** PENDING. Opened 2026-11-02. Pushed (`origin/main`); **not deployed.**
+- **Status:** DEPLOYED, 2026-11-06 (reported; details **not read**, see the deploy record below). Previously PENDING; opened 2026-11-02.
+- **Deploy record, 2026-11-06 (one sitting, stacked: AH-116 API, AH-116 web, AH-117, AH-118, AH-119): by Pedram's colleague from the Bitbucket mirror, checklist [`deploy-ah116-ah119.md`](deploy-ah116-ah119.md).** _Source: Pedram's report that the deploy is done (2026-11-06). **Nothing else was reported, so nothing else is recorded: every field below is not read until the colleague returns the filled runbook.**_ **Not read:** the snapshot name and creation time; the six `DONE` lines, the batch and the two GIN build times; the P3 grant read; the Q10 count and whether `queue:restart` ran; the `supervisorctl status` lines (including `laravel-erasure`); the CORS rules before and after; the four flag read-backs (they were meant to be OFF; **not read, so not asserted**); the `APP_KEY` fingerprints; both bundle hashes; the mirror SHA and the tree-hash check; P8 and P9. Never read as "passed".
 - **Range:** `1bc398e8` (production main SPA; **current state not read**) → **`b3ba3d0d`** (AH-116's last runtime commit: the Discover age-input height fix). The commits after it are a spec (`f4f72591`), dev tools under `apps/main/tools/walk/` (`e0c47919`, `8041b5f0`, not built) and docs; none changes the build's output. The mirror's SHA for the deployed commit is recorded beside GitHub's.
 - **AH entries carried:** AH-116 (steps W3 `5b3bd02b`, W2 `d0472dce`, W1 `d2a51a62`, W4 `1910894d`, W5 `f866109c`, W6 `0d2381c1`, W7 `188336e3`, the W2 fix `b3ba3d0d`). No other entry rides this deploy.
 - **Migrations run:** none
