@@ -29,6 +29,7 @@ export function normaliseHtml(html: string): string {
     .replace(/ id="[^"]*"/g, '')
     .replace(/ for="[^"]*"/g, '')
     .replace(/ aria-describedby="[^"]*"/g, '')
+    .replace(/\d{1,2}:\d{2}\s?[AP]M/g, 'H:MM')
 }
 
 export function relMessage(id: string, own: boolean, extra: Record<string, unknown> = {}) {
@@ -231,5 +232,10 @@ export async function renderHtml(
   return html
 }
 
-/** The pre-Stage-B markup captured from the last Stage A commit. */
-export const FLAG_OFF_PINS = pins as Record<string, string>
+/**
+ * The pre-Stage-B markup captured from the last Stage A commit. Clock times are masked on both
+ * sides: the pins were captured in CET and CI runs in UTC (a rendered time is timezone-bound).
+ */
+export const FLAG_OFF_PINS: Record<string, string> = Object.fromEntries(
+  Object.entries(pins as Record<string, string>).map(([key, html]) => [key, normaliseHtml(html)]),
+)
