@@ -612,3 +612,8 @@ Evidence is recorded in the stop report for A0 and, once pushed, the CI run is c
 removing `lockForUpdate` from the offer editor fails the editor PROBE spec on Postgres while the SQLite offer-edit
 specs stay at 24 passed; removing it from the attach fails the attach PROBE and HOLDER specs while the SQLite contract
 specs stay at 29 passed; dropping the `:*` prefix form fails the FTS spec on Postgres while SQLite passes (skips it).
+
+## Stage A result (2026-11-06, built, not pushed)
+
+See `messages-v2-review.md`. Gates green on both Pest legs; creator walk identical (142); flag armed only after the
+web deploy (P7). Stage B not started.

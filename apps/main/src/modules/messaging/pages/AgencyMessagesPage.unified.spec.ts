@@ -399,6 +399,7 @@ describe('AgencyMessagesPage — unified inbox (AH-119)', () => {
       await wrapper.get('[data-test="inbox-filter-brand"]').trigger('click')
       await settle()
       inBody('inbox-filter-brand-option-a')!.click()
+      await vi.waitFor(() => expect(router.currentRoute.value.query.brand).toBe('a'))
       await settle()
 
       expect(replace).toHaveBeenCalledTimes(1)
