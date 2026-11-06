@@ -616,7 +616,7 @@
           "erasedTitle": "Det här raderar vi",
           "erased": "Ditt namn, din e-postadress, ditt telefonnummer, din adress, ditt födelsedatum, din presentation, dina foton och filer samt dina inloggningsuppgifter.",
           "keptTitle": "Det här finns kvar",
-          "kept": "Meddelanden, ansökningar, avtal och kampanjuppgifter finns kvar hos byråerna du arbetat med. Ditt namn tas bort från dem. Öppna uppdrag avbryts.",
+          "kept": "Meddelanden, ansökningar, avtal och kampanjuppgifter finns kvar hos byråerna du arbetat med. Ditt namn tas bort från dem. Öppna uppdrag avbryts. Den tidigare texten i meddelanden du har redigerat och texten i meddelanden du har raderat sparas dolda tills ditt konto raderas.",
           "graceTitle": "Om du ändrar dig",
           "grace": "Ditt konto låses och du loggas ut överallt så fort du bekräftar. För att avbryta loggar du in med e-post och lösenord inom 14 dagar och väljer att återställa det. Efter det går det inte att ångra.",
           "button": "Radera mitt konto"

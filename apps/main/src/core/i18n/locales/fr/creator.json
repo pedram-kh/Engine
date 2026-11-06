@@ -616,7 +616,7 @@
           "erasedTitle": "Ce que nous supprimons",
           "erased": "Votre nom, e-mail, numéro de téléphone, adresse, date de naissance, biographie, photos et fichiers, ainsi que vos identifiants de connexion.",
           "keptTitle": "Ce qui reste",
-          "kept": "Les messages, candidatures, contrats et dossiers de campagne restent chez les agences avec lesquelles vous avez travaillé. Votre nom y est retiré. Les missions en cours sont annulées.",
+          "kept": "Les messages, candidatures, contrats et dossiers de campagne restent chez les agences avec lesquelles vous avez travaillé. Votre nom y est retiré. Les missions en cours sont annulées. L'ancien texte des messages que vous avez modifiés et le texte de ceux que vous avez supprimés sont conservés, masqués, jusqu'à l'effacement de votre compte.",
           "graceTitle": "Si vous changez d'avis",
           "grace": "Votre compte est verrouillé et vous êtes déconnecté partout dès que vous confirmez. Pour annuler, connectez-vous avec votre e-mail et votre mot de passe dans les 14 jours et choisissez de le restaurer. Après cela, c'est irréversible.",
           "button": "Supprimer mon compte"

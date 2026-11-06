@@ -616,7 +616,7 @@
           "erasedTitle": "What we delete",
           "erased": "Your name, email, phone number, address, date of birth, bio, photos and files, and your sign-in details.",
           "keptTitle": "What stays",
-          "kept": "Messages, applications, contracts and campaign records stay with the agencies you worked with. Your name on them is removed. Open assignments are cancelled.",
+          "kept": "Messages, applications, contracts and campaign records stay with the agencies you worked with. Your name on them is removed. Open assignments are cancelled. The earlier text of messages you edited, and the text of messages you deleted, is kept hidden from view until your account is erased.",
           "graceTitle": "If you change your mind",
           "grace": "Your account is locked and you are signed out everywhere as soon as you confirm. To cancel, sign in with your email and password within 14 days and choose to restore it. After that, it cannot be undone.",
           "button": "Delete my account"

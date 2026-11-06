@@ -616,7 +616,7 @@
           "erasedTitle": "Čo mažeme",
           "erased": "Vaše meno, e-mail, telefónne číslo, adresu, dátum narodenia, medailónik, fotografie a súbory a prihlasovacie údaje.",
           "keptTitle": "Čo zostáva",
-          "kept": "Správy, prihlášky, zmluvy a záznamy kampaní zostávajú u agentúr, s ktorými ste spolupracovali. Vaše meno z nich bude odstránené. Otvorené zákazky sa zrušia.",
+          "kept": "Správy, prihlášky, zmluvy a záznamy kampaní zostávajú u agentúr, s ktorými ste spolupracovali. Vaše meno z nich bude odstránené. Otvorené zákazky sa zrušia. Pôvodné znenie správ, ktoré ste upravili, a text správ, ktoré ste odstránili, sa uchovávajú skryté, kým sa váš účet nevymaže.",
           "graceTitle": "Ak si to rozmyslíte",
           "grace": "Váš účet sa po potvrdení uzamkne a budete všade odhlásený. Ak chcete zmazanie zrušiť, prihláste sa do 14 dní e-mailom a heslom a zvoľte obnovenie. Potom už to nemožno vrátiť späť.",
           "button": "Zmazať môj účet"

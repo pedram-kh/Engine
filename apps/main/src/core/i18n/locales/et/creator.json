@@ -616,7 +616,7 @@
           "erasedTitle": "Mida me kustutame",
           "erased": "Sinu nime, e-posti, telefoninumbri, aadressi, sünniaja, tutvustuse, fotod ja failid ning sisselogimisandmed.",
           "keptTitle": "Mis jääb alles",
-          "kept": "Sõnumid, kandideerimised, lepingud ja kampaaniakirjed jäävad agentuuridele, kellega oled töötanud. Sinu nimi eemaldatakse neist. Avatud tööülesanded tühistatakse.",
+          "kept": "Sõnumid, kandideerimised, lepingud ja kampaaniakirjed jäävad agentuuridele, kellega oled töötanud. Sinu nimi eemaldatakse neist. Avatud tööülesanded tühistatakse. Muudetud sõnumite varasem tekst ja kustutatud sõnumite tekst säilitatakse peidetuna, kuni sinu konto kustutatakse.",
           "graceTitle": "Kui muudad meelt",
           "grace": "Sinu konto lukustatakse ja sind logitakse kõikjal välja kohe, kui kinnitad. Tühistamiseks logi 14 päeva jooksul sisse e-posti ja parooliga ning vali taastamine. Pärast seda ei saa seda enam tagasi võtta.",
           "button": "Kustuta minu konto"

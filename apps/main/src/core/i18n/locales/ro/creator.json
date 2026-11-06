@@ -616,7 +616,7 @@
           "erasedTitle": "Ce ștergem",
           "erased": "Numele, e-mailul, numărul de telefon, adresa, data nașterii, biografia, fotografiile și fișierele tale, plus datele de autentificare.",
           "keptTitle": "Ce rămâne",
-          "kept": "Mesajele, candidaturile, contractele și evidențele campaniilor rămân la agențiile cu care ai lucrat. Numele tău este eliminat din ele. Sarcinile deschise sunt anulate.",
+          "kept": "Mesajele, candidaturile, contractele și evidențele campaniilor rămân la agențiile cu care ai lucrat. Numele tău este eliminat din ele. Sarcinile deschise sunt anulate. Textul anterior al mesajelor pe care le-ai editat și textul mesajelor pe care le-ai șters sunt păstrate ascunse până la ștergerea contului tău.",
           "graceTitle": "Dacă te răzgândești",
           "grace": "Contul tău este blocat și ești deconectat peste tot imediat ce confirmi. Pentru a anula, autentifică-te cu e-mailul și parola în 14 zile și alege restaurarea. După aceea, nu se mai poate anula.",
           "button": "Șterge-mi contul"

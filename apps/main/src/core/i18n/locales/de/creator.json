@@ -616,7 +616,7 @@
           "erasedTitle": "Was wir löschen",
           "erased": "Dein Name, deine E-Mail-Adresse, Telefonnummer, Adresse, dein Geburtsdatum, deine Bio, Fotos und Dateien sowie deine Anmeldedaten.",
           "keptTitle": "Was bleibt",
-          "kept": "Nachrichten, Bewerbungen, Verträge und Kampagnendaten bleiben bei den Agenturen, mit denen du gearbeitet hast. Dein Name wird darin entfernt. Offene Aufträge werden storniert.",
+          "kept": "Nachrichten, Bewerbungen, Verträge und Kampagnendaten bleiben bei den Agenturen, mit denen du gearbeitet hast. Dein Name wird darin entfernt. Offene Aufträge werden storniert. Der frühere Wortlaut bearbeiteter Nachrichten und der Text gelöschter Nachrichten bleiben verborgen gespeichert, bis dein Konto gelöscht wird.",
           "graceTitle": "Falls du es dir anders überlegst",
           "grace": "Dein Konto wird gesperrt und du wirst überall abgemeldet, sobald du bestätigst. Zum Abbrechen melde dich innerhalb von 14 Tagen mit E-Mail und Passwort an und wähle die Wiederherstellung. Danach lässt es sich nicht mehr rückgängig machen.",
           "button": "Mein Konto löschen"

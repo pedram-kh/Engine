@@ -616,7 +616,7 @@
           "erasedTitle": "Cosa eliminiamo",
           "erased": "Il tuo nome, e-mail, numero di telefono, indirizzo, data di nascita, bio, foto e file, e i tuoi dati di accesso.",
           "keptTitle": "Cosa resta",
-          "kept": "Messaggi, candidature, contratti e dati delle campagne restano alle agenzie con cui hai lavorato. Il tuo nome vi viene rimosso. Gli incarichi aperti vengono annullati.",
+          "kept": "Messaggi, candidature, contratti e dati delle campagne restano alle agenzie con cui hai lavorato. Il tuo nome vi viene rimosso. Gli incarichi aperti vengono annullati. Il testo precedente dei messaggi che hai modificato e il testo di quelli che hai eliminato vengono conservati nascosti fino alla cancellazione del tuo account.",
           "graceTitle": "Se cambi idea",
           "grace": "Il tuo account viene bloccato e la tua sessione chiusa ovunque appena confermi. Per annullare, accedi con e-mail e password entro 14 giorni e scegli di ripristinarlo. Dopo, non si può più annullare.",
           "button": "Elimina il mio account"

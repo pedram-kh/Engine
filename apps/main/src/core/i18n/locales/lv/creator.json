@@ -616,7 +616,7 @@
           "erasedTitle": "Ko mēs dzēšam",
           "erased": "Jūsu vārdu, e-pastu, tālruņa numuru, adresi, dzimšanas datumu, aprakstu, fotoattēlus un failus, kā arī pieteikšanās datus.",
           "keptTitle": "Kas paliek",
-          "kept": "Ziņojumi, pieteikumi, līgumi un kampaņu ieraksti paliek aģentūrās, ar kurām strādājāt. Jūsu vārds no tiem tiek noņemts. Atvērtie uzdevumi tiek atcelti.",
+          "kept": "Ziņojumi, pieteikumi, līgumi un kampaņu ieraksti paliek aģentūrās, ar kurām strādājāt. Jūsu vārds no tiem tiek noņemts. Atvērtie uzdevumi tiek atcelti. Rediģēto ziņojumu iepriekšējais teksts un dzēsto ziņojumu teksts tiek glabāts apslēpts, līdz jūsu konts tiks dzēsts.",
           "graceTitle": "Ja pārdomāsiet",
           "grace": "Jūsu konts tiek bloķēts, un jūs tiekat izrakstīts visur, līdzko apstiprināt. Lai atceltu, 14 dienu laikā pierakstieties ar e-pastu un paroli un izvēlieties atjaunošanu. Pēc tam to vairs nevar atcelt.",
           "button": "Dzēst manu kontu"

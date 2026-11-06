@@ -616,7 +616,7 @@
           "erasedTitle": "Što brišemo",
           "erased": "Vaše ime, e-poštu, broj telefona, adresu, datum rođenja, biografiju, fotografije i datoteke te podatke za prijavu.",
           "keptTitle": "Što ostaje",
-          "kept": "Poruke, prijave, ugovori i zapisi kampanja ostaju kod agencija s kojima ste radili. Vaše ime se iz njih uklanja. Otvoreni zadaci se otkazuju.",
+          "kept": "Poruke, prijave, ugovori i zapisi kampanja ostaju kod agencija s kojima ste radili. Vaše ime se iz njih uklanja. Otvoreni zadaci se otkazuju. Prethodni tekst poruka koje ste uredili i tekst poruka koje ste izbrisali čuvaju se skriveni dok se vaš račun ne izbriše.",
           "graceTitle": "Ako se predomislite",
           "grace": "Vaš se račun zaključava i odjavljeni ste svugdje čim potvrdite. Za otkazivanje se prijavite e-poštom i lozinkom u roku od 14 dana i odaberite vraćanje. Nakon toga to se ne može poništiti.",
           "button": "Izbriši moj račun"

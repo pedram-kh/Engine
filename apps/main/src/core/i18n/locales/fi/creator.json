@@ -616,7 +616,7 @@
           "erasedTitle": "Mitä poistamme",
           "erased": "Nimesi, sähköpostiosoitteesi, puhelinnumerosi, osoitteesi, syntymäaikasi, esittelysi, kuvasi ja tiedostosi sekä kirjautumistietosi.",
           "keptTitle": "Mitä jää",
-          "kept": "Viestit, hakemukset, sopimukset ja kampanjatiedot jäävät toimistoille, joiden kanssa olet työskennellyt. Nimesi poistetaan niistä. Avoimet toimeksiannot perutaan.",
+          "kept": "Viestit, hakemukset, sopimukset ja kampanjatiedot jäävät toimistoille, joiden kanssa olet työskennellyt. Nimesi poistetaan niistä. Avoimet toimeksiannot perutaan. Muokkaamiesi viestien aiempi teksti ja poistamiesi viestien teksti säilytetään piilotettuna, kunnes tilisi poistetaan.",
           "graceTitle": "Jos muutat mielesi",
           "grace": "Tilisi lukitaan ja sinut kirjataan ulos kaikkialta heti, kun vahvistat. Peruuttaaksesi kirjaudu sisään sähköpostilla ja salasanalla 14 päivän kuluessa ja valitse palautus. Sen jälkeen sitä ei voi perua.",
           "button": "Poista tilini"

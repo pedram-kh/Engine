@@ -438,8 +438,8 @@ export interface MessageSearchResult {
     sender_role: 'creator' | 'agency_user'
     /** Q5: the sender's account is erased; label them with the anonymised creator label. */
     sender_is_erased: boolean
-    /** Not on the Stage B contract today: when the API adds it, "You" shows for the viewer's own hits. */
-    is_own?: boolean
+    /** Per viewer: the signed-in member wrote the matching message ("You" in the results). */
+    is_own: boolean
   }
 }
 

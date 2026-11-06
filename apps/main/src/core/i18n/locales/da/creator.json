@@ -616,7 +616,7 @@
           "erasedTitle": "Det sletter vi",
           "erased": "Dit navn, din e-mail, dit telefonnummer, din adresse, din fødselsdato, din bio, dine billeder og filer samt dine loginoplysninger.",
           "keptTitle": "Det bliver tilbage",
-          "kept": "Beskeder, ansøgninger, kontrakter og kampagneoplysninger bliver hos de bureauer, du har arbejdet med. Dit navn fjernes fra dem. Åbne opgaver annulleres.",
+          "kept": "Beskeder, ansøgninger, kontrakter og kampagneoplysninger bliver hos de bureauer, du har arbejdet med. Dit navn fjernes fra dem. Åbne opgaver annulleres. Den tidligere tekst i beskeder, du har redigeret, og teksten i beskeder, du har slettet, gemmes skjult, indtil din konto slettes.",
           "graceTitle": "Hvis du fortryder",
           "grace": "Din konto låses, og du bliver logget ud overalt, så snart du bekræfter. For at annullere skal du logge ind med din e-mail og adgangskode inden for 14 dage og vælge at gendanne den. Derefter kan det ikke fortrydes.",
           "button": "Slet min konto"

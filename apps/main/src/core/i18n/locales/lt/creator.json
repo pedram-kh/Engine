@@ -616,7 +616,7 @@
           "erasedTitle": "Ką ištriname",
           "erased": "Jūsų vardą, el. paštą, telefono numerį, adresą, gimimo datą, aprašymą, nuotraukas ir failus bei prisijungimo duomenis.",
           "keptTitle": "Kas lieka",
-          "kept": "Žinutės, paraiškos, sutartys ir kampanijų įrašai lieka agentūrose, su kuriomis dirbote. Jūsų vardas iš jų pašalinamas. Atviros užduotys atšaukiamos.",
+          "kept": "Žinutės, paraiškos, sutartys ir kampanijų įrašai lieka agentūrose, su kuriomis dirbote. Jūsų vardas iš jų pašalinamas. Atviros užduotys atšaukiamos. Redaguotų žinučių ankstesnis tekstas ir ištrintų žinučių tekstas saugomi paslėpti, kol jūsų paskyra bus ištrinta.",
           "graceTitle": "Jei apsigalvosite",
           "grace": "Jūsų paskyra užrakinama, o jūs atjungiami visur, vos patvirtinus. Norėdami atšaukti, per 14 dienų prisijunkite el. paštu ir slaptažodžiu ir pasirinkite atkūrimą. Po to to atšaukti nebegalima.",
           "button": "Ištrinti mano paskyrą"

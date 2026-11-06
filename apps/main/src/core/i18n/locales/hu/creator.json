@@ -616,7 +616,7 @@
           "erasedTitle": "Amit törlünk",
           "erased": "A nevedet, e-mail-címedet, telefonszámodat, címedet, születési dátumodat, bemutatkozásodat, fotóidat és fájljaidat, valamint a bejelentkezési adataidat.",
           "keptTitle": "Ami megmarad",
-          "kept": "Az üzenetek, jelentkezések, szerződések és kampányrekordok azoknál az ügynökségeknél maradnak, amelyekkel dolgoztál. A neved eltávolításra kerül belőlük. A nyitott megbízások törlődnek.",
+          "kept": "Az üzenetek, jelentkezések, szerződések és kampányrekordok azoknál az ügynökségeknél maradnak, amelyekkel dolgoztál. A neved eltávolításra kerül belőlük. A nyitott megbízások törlődnek. A szerkesztett üzeneteid korábbi szövegét és a törölt üzeneteid szövegét rejtve őrizzük, amíg a fiókod törlésre nem kerül.",
           "graceTitle": "Ha meggondolod magad",
           "grace": "A fiókod zárolódik, és a megerősítés pillanatában mindenhol kijelentkeztetünk. A visszavonáshoz jelentkezz be 14 napon belül e-mail-címeddel és jelszavaddal, és válaszd a visszaállítást. Ezután már nem vonható vissza.",
           "button": "Fiókom törlése"

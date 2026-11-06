@@ -616,7 +616,7 @@
           "erasedTitle": "Kaj izbrišemo",
           "erased": "Vaše ime, e-pošto, telefonsko številko, naslov, datum rojstva, opis, fotografije in datoteke ter podatke za prijavo.",
           "keptTitle": "Kaj ostane",
-          "kept": "Sporočila, prijave, pogodbe in zapisi kampanj ostanejo pri agencijah, s katerimi ste sodelovali. Vaše ime se iz njih odstrani. Odprte naloge se prekličejo.",
+          "kept": "Sporočila, prijave, pogodbe in zapisi kampanj ostanejo pri agencijah, s katerimi ste sodelovali. Vaše ime se iz njih odstrani. Odprte naloge se prekličejo. Prejšnje besedilo sporočil, ki ste jih uredili, in besedilo sporočil, ki ste jih izbrisali, se hrani skrito, dokler vaš račun ni izbrisan.",
           "graceTitle": "Če si premislite",
           "grace": "Vaš račun se zaklene in odjavljeni ste povsod, takoj ko potrdite. Za preklic se v 14 dneh prijavite z e-pošto in geslom ter izberite obnovitev. Po tem tega ni več mogoče razveljaviti.",
           "button": "Izbriši moj račun"
