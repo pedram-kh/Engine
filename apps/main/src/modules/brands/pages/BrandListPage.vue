@@ -301,7 +301,11 @@ async function confirmRestore(): Promise<void> {
             <v-img :src="item.attributes.logo_url" :alt="t('app.brands.logo.alt')" cover />
           </v-avatar>
           <span v-else :data-test="`brand-logo-${item.id}`">
-            <AgencyBrandMark :name="item.attributes.name" :seed="item.id" />
+            <AgencyBrandMark
+              :name="item.attributes.name"
+              :seed="item.id"
+              :color="item.attributes.color"
+            />
           </span>
           <!-- AH-116: archived rows link too (the detail page resolves an archived brand, A3). -->
           <router-link

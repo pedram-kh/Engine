@@ -149,3 +149,73 @@ describe('BrandForm — the D8 removals and relabel', () => {
     expect(wrapper.find('[data-test="brand-description"]').text()).toContain('Monthly deliverables')
   })
 })
+
+describe('BrandForm — the AH-119 colour swatches', () => {
+  const KEYS = ['violet', 'green', 'amber', 'blue', 'pink', 'teal', 'red', 'slate'] as const
+  const swatch = (wrapper: ReturnType<typeof mount>, key: string) =>
+    wrapper.get(`[data-test="brand-color-${key}"]`)
+
+  it('renders the eight palette swatches in order, each labelled from app.brands.color.*', () => {
+    const wrapper = mountForm(COMPLETE, { logoUrl: 'blob:preview' })
+
+    const swatches = wrapper.findAll('[data-test^="brand-color-"]')
+    expect(swatches.map((s) => s.attributes('data-test'))).toEqual(
+      KEYS.map((k) => `brand-color-${k}`),
+    )
+    for (const key of KEYS) {
+      expect(swatch(wrapper, key).attributes('aria-label')).toBe(enApp.app.brands.color[key])
+      expect(swatch(wrapper, key).attributes('title')).toBe(enApp.app.brands.color[key])
+      expect(swatch(wrapper, key).attributes('style')).toContain(`var(--agency-brand-${key})`)
+    }
+    expect(swatch(wrapper, 'violet').attributes('aria-label')).toBe('Violet')
+  })
+
+  it('has none selected for a brand with no colour', () => {
+    const wrapper = mountForm(COMPLETE, { logoUrl: 'blob:preview' })
+    for (const key of KEYS) {
+      expect(swatch(wrapper, key).attributes('aria-checked')).toBe('false')
+    }
+  })
+
+  it("marks the brand's own colour as the selected one", () => {
+    const wrapper = mountForm({ ...COMPLETE, color: 'teal' }, { logoUrl: 'blob:preview' })
+    expect(swatch(wrapper, 'teal').attributes('aria-checked')).toBe('true')
+    expect(swatch(wrapper, 'teal').classes()).toContain('brand-color-swatch--on')
+    expect(swatch(wrapper, 'blue').attributes('aria-checked')).toBe('false')
+  })
+
+  it('clicking a swatch emits update:modelValue with that colour key and the rest kept', async () => {
+    const wrapper = mountForm(COMPLETE, { logoUrl: 'blob:preview' })
+
+    await swatch(wrapper, 'amber').trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')).toEqual([[{ ...COMPLETE, color: 'amber' }]])
+    expect(swatch(wrapper, 'amber').attributes('aria-checked')).toBe('true')
+  })
+
+  it('clicking the selected swatch again emits colour null', async () => {
+    const wrapper = mountForm({ ...COMPLETE, color: 'blue' }, { logoUrl: 'blob:preview' })
+
+    await swatch(wrapper, 'blue').trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')).toEqual([[{ ...COMPLETE, color: null }]])
+    expect(swatch(wrapper, 'blue').attributes('aria-checked')).toBe('false')
+  })
+
+  it('picking another swatch moves the selection (blue then pink)', async () => {
+    const wrapper = mountForm({ ...COMPLETE, color: 'blue' }, { logoUrl: 'blob:preview' })
+
+    await swatch(wrapper, 'pink').trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([{ ...COMPLETE, color: 'pink' }])
+    expect(swatch(wrapper, 'blue').attributes('aria-checked')).toBe('false')
+    expect(swatch(wrapper, 'pink').attributes('aria-checked')).toBe('true')
+  })
+
+  it('does not submit the form and does not touch the floor gate', async () => {
+    const wrapper = mountForm(COMPLETE, { logoUrl: 'blob:preview' })
+    await swatch(wrapper, 'red').trigger('click')
+    expect(wrapper.emitted('submit')).toBeUndefined()
+    expect(submitButton(wrapper).disabled).toBe(false)
+  })
+})

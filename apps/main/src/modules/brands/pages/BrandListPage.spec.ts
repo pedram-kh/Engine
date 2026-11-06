@@ -38,6 +38,8 @@ vi.mock('../api/brands.api', () => ({
   },
 }))
 
+import { brandMarkTone } from '@/modules/agency/status/agencyBrandTone'
+
 import { brandsApi } from '../api/brands.api'
 
 // localStorage stub so useAgencyStore can persist its `currentAgencyId`
@@ -313,5 +315,63 @@ describe('BrandListPage — restore UI (Sprint 3 Chunk 4 sub-step 6)', () => {
     expect(errorAlert?.textContent).toContain('Failed to restore brand')
     // Dialog stays open so the user can retry.
     expect(document.querySelector('[data-test="restore-dialog-title"]')).not.toBeNull()
+  })
+})
+
+describe('BrandListPage — the AH-119 brand colour on the mark', () => {
+  let cleanup: (() => void) | null = null
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    cleanup?.()
+    cleanup = null
+  })
+
+  function markOf(harness: Awaited<ReturnType<typeof mountBrandList>>, id: string) {
+    return harness.wrapper.get(`[data-test="brand-logo-${id}"] [data-test="agency-brand-mark"]`)
+  }
+
+  it('a brand with a colour uses it on the mark (data-tone palette-<key>), not the hashed tone', async () => {
+    const brand = makeBrand({ status: 'active', color: 'teal' })
+    const harness = await mountBrandList({ brands: [brand] })
+    cleanup = harness.cleanup
+
+    const mark = markOf(harness, brand.id)
+    expect(mark.attributes('data-tone')).toBe('palette-teal')
+    expect(mark.classes()).toContain('agency-brand-mark--palette')
+    expect(mark.classes()).not.toContain(`agency-brand-mark--${brandMarkTone(brand.id)}`)
+    expect(mark.attributes('style')).toContain('var(--agency-brand-teal)')
+  })
+
+  it('a brand without a colour falls back to the hashed tone of its id', async () => {
+    const brand = makeBrand({ status: 'active', color: null })
+    const harness = await mountBrandList({ brands: [brand] })
+    cleanup = harness.cleanup
+
+    const mark = markOf(harness, brand.id)
+    expect(mark.attributes('data-tone')).toBe(brandMarkTone(brand.id))
+    expect(mark.classes()).toContain(`agency-brand-mark--${brandMarkTone(brand.id)}`)
+    expect(mark.classes()).not.toContain('agency-brand-mark--palette')
+  })
+
+  it('a brand whose API predates colour (key absent) falls back the same way', async () => {
+    const brand = makeBrand({ status: 'active' })
+    const harness = await mountBrandList({ brands: [brand] })
+    cleanup = harness.cleanup
+
+    expect(markOf(harness, brand.id).attributes('data-tone')).toBe(brandMarkTone(brand.id))
+  })
+
+  it("each row takes its own brand's colour", async () => {
+    const a = makeBrand({ status: 'active', name: 'Acme', color: 'red' })
+    const b = { ...makeBrand({ status: 'active', name: 'Bravo', color: 'green' }), id: 'brand-b' }
+    const harness = await mountBrandList({ brands: [a, b] })
+    cleanup = harness.cleanup
+
+    expect(markOf(harness, a.id).attributes('data-tone')).toBe('palette-red')
+    expect(markOf(harness, 'brand-b').attributes('data-tone')).toBe('palette-green')
   })
 })

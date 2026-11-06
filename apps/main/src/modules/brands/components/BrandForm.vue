@@ -23,6 +23,8 @@ import type { CreateBrandPayload } from '@catalyst/api-client'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { BRAND_COLOR_KEYS, brandColorVar } from '@/modules/agency/composables/brandColor'
+
 import { brandFloorMissingFields } from '../brandFloor'
 
 /**
@@ -230,6 +232,31 @@ const industryOptions = [
       @update:model-value="update('website_url', $event || undefined)"
     />
 
+    <!-- AH-119: the palette colour that marks the brand in the inbox and the lists. -->
+    <div class="mb-4" data-test="brand-color">
+      <div class="text-subtitle-2 mb-2">{{ t('app.brands.fields.color') }}</div>
+      <div
+        class="brand-color-swatches"
+        role="radiogroup"
+        :aria-label="t('app.brands.fields.color')"
+      >
+        <button
+          v-for="key in BRAND_COLOR_KEYS"
+          :key="key"
+          type="button"
+          role="radio"
+          class="brand-color-swatch"
+          :class="{ 'brand-color-swatch--on': local.color === key }"
+          :style="{ backgroundColor: brandColorVar(key) }"
+          :aria-checked="local.color === key"
+          :aria-label="t(`app.brands.color.${key}`)"
+          :title="t(`app.brands.color.${key}`)"
+          :data-test="`brand-color-${key}`"
+          @click="update('color', local.color === key ? null : key)"
+        />
+      </div>
+    </div>
+
     <!-- Logo (D7). Chosen here, uploaded by the parent. -->
     <div class="mb-4">
       <div class="text-subtitle-2 mb-2">{{ t('app.brands.fields.logo') }}</div>
@@ -311,3 +338,28 @@ const industryOptions = [
     </div>
   </form>
 </template>
+
+<style scoped>
+.brand-color-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.brand-color-swatch {
+  width: 28px;
+  height: 28px;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  outline-offset: 2px;
+}
+
+.brand-color-swatch--on {
+  border-color: rgb(var(--v-theme-on-surface));
+}
+
+.brand-color-swatch:focus-visible {
+  outline: 2px solid rgb(var(--v-theme-primary));
+}
+</style>

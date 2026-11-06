@@ -73,3 +73,67 @@ describe('AgencyBrandMark', () => {
     expect(byName.attributes('data-tone')).toBe(brandMarkTone('Cleo'))
   })
 })
+
+describe('AgencyBrandMark — the AH-119 palette colour', () => {
+  it('a colour prop sets the palette class and the CSS variable the stylesheet reads', () => {
+    const wrapper = mount(AgencyBrandMark, {
+      props: { name: 'Cleo', seed: 'abc', color: 'violet' },
+    })
+    expect(wrapper.classes()).toContain('agency-brand-mark--palette')
+    expect(wrapper.attributes('data-tone')).toBe('palette-violet')
+    expect((wrapper.element as HTMLElement).style.getPropertyValue('--mark-fill-css')).toBe(
+      'var(--agency-brand-violet)',
+    )
+  })
+
+  it('the colour wins over the seed: no hashed-tone class is left on the mark', () => {
+    const wrapper = mount(AgencyBrandMark, { props: { name: 'Cleo', seed: 'abc', color: 'amber' } })
+    expect(wrapper.classes()).not.toContain(`agency-brand-mark--${brandMarkTone('abc')}`)
+    expect(wrapper.classes().filter((c) => c.startsWith('agency-brand-mark--'))).toEqual([
+      'agency-brand-mark--palette',
+    ])
+  })
+
+  it.each(['violet', 'green', 'amber', 'blue', 'pink', 'teal', 'red', 'slate'])(
+    'takes %s from var(--agency-brand-%s)',
+    (key) => {
+      const wrapper = mount(AgencyBrandMark, { props: { name: 'Cleo', color: key } })
+      expect((wrapper.element as HTMLElement).style.getPropertyValue('--mark-fill-css')).toBe(
+        `var(--agency-brand-${key})`,
+      )
+    },
+  )
+
+  it('an unknown colour key reads as slate, still on the palette path', () => {
+    const wrapper = mount(AgencyBrandMark, { props: { name: 'Cleo', color: 'chartreuse' } })
+    expect(wrapper.classes()).toContain('agency-brand-mark--palette')
+    expect((wrapper.element as HTMLElement).style.getPropertyValue('--mark-fill-css')).toBe(
+      'var(--agency-brand-slate)',
+    )
+  })
+
+  it.each([[null], [undefined], ['']])(
+    'colour %j keeps the hashed tone and no CSS variable',
+    (color) => {
+      const wrapper = mount(AgencyBrandMark, { props: { name: 'Cleo', seed: 'abc', color } })
+      expect(wrapper.attributes('data-tone')).toBe(brandMarkTone('abc'))
+      expect(wrapper.classes()).toContain(`agency-brand-mark--${brandMarkTone('abc')}`)
+      expect(wrapper.classes()).not.toContain('agency-brand-mark--palette')
+      expect((wrapper.element as HTMLElement).style.getPropertyValue('--mark-fill-css')).toBe('')
+    },
+  )
+
+  it('still draws the letter and hides from assistive tech with a colour', () => {
+    const wrapper = mount(AgencyBrandMark, { props: { name: 'cleo', color: 'blue' } })
+    expect(wrapper.text()).toBe('C')
+    expect(wrapper.attributes('aria-hidden')).toBe('true')
+  })
+
+  it('renders nothing for a blank name even with a colour', () => {
+    expect(
+      mount(AgencyBrandMark, { props: { name: ' ', color: 'blue' } })
+        .find('span')
+        .exists(),
+    ).toBe(false)
+  })
+})

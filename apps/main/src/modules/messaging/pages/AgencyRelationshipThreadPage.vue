@@ -13,29 +13,36 @@
  */
 
 import type { AgencyRelationshipThreadRow } from '@catalyst/api-client'
+import { storeToRefs } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { type RouteLocationRaw, useRoute } from 'vue-router'
 import { useDisplay } from 'vuetify'
 
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
+import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 
+import { messageInboxApi } from '../api/messageInbox.api'
 import {
   agencyRelationshipTransport,
   relationshipMessagingApi,
 } from '../api/relationshipMessaging.api'
+import { filterQueryOf } from '../composables/inboxFilterQuery'
 import AgencyRelationshipThreadView from '@/modules/agency/components/AgencyRelationshipThreadView.vue'
+import ThreadActionsMenu from '@/modules/agency/components/ThreadActionsMenu.vue'
 import { creatorAvatarUrl, creatorIsErased, creatorLabel } from '@/core/creators/creatorLabel'
 
 const { t } = useI18n()
 const route = useRoute()
 const agencyStore = useAgencyStore()
+const authStore = useAuthStore()
+const { currentRole } = storeToRefs(agencyStore)
 const display = useDisplay()
 
 // AH-013 — the thread renders in the two-pane right column on desktop, so the
 // header back chevron is only needed on mobile (single-pane). Null hides it.
 const backTo = computed<RouteLocationRaw | null>(() =>
-  display.smAndDown.value ? { name: 'messages.inbox' } : null,
+  display.smAndDown.value ? { name: 'messages.inbox', query: filterQueryOf(route.query) } : null,
 )
 
 const creatorUlid = computed(() => String(route.params.creatorUlid ?? ''))
@@ -50,6 +57,15 @@ const profileTo = computed<RouteLocationRaw | null>(() =>
 const nameHint = computed(() => (typeof route.query.name === 'string' ? route.query.name : ''))
 
 const resolvedRow = ref<AgencyRelationshipThreadRow | null>(null)
+
+// AH-119 — the owner line and Reassign, only while the unified inbox is on. The owner is read
+// from the unified inbox (best effort: no row, no menu).
+const unifiedOn = computed(() => authStore.user?.attributes.features?.messages_v2_inbox === true)
+const owner = ref<{ id: string; name: string } | null>(null)
+const ownerKnown = ref(false)
+const canReassign = computed(
+  () => currentRole.value === 'agency_admin' || currentRole.value === 'agency_manager',
+)
 
 const transport = computed(() => {
   const agencyId = agencyStore.currentAgencyId
@@ -77,8 +93,27 @@ watch(
   [creatorUlid, () => agencyStore.currentAgencyId],
   async ([ulid, agencyId]) => {
     resolvedRow.value = null
+    owner.value = null
+    ownerKnown.value = false
     if (agencyId === null || ulid === '') {
       return
+    }
+    if (unifiedOn.value) {
+      void messageInboxApi
+        .list(agencyId, { perPage: 100 })
+        .then((res) => {
+          if (creatorUlid.value !== ulid || agencyStore.currentAgencyId !== agencyId) {
+            return
+          }
+          const hit = res.data.find(
+            (r) => r.type === 'relationship_thread' && r.attributes.creator.id === ulid,
+          )
+          if (hit !== undefined) {
+            owner.value = hit.attributes.owner
+            ownerKnown.value = true
+          }
+        })
+        .catch(() => undefined)
     }
     try {
       const res = await relationshipMessagingApi.agencyInbox(agencyId)
@@ -105,7 +140,18 @@ watch(
       :avatar-url="avatarUrl"
       :back-to="backTo"
       :profile-to="profileTo"
-    />
+    >
+      <template #actions>
+        <ThreadActionsMenu
+          v-if="unifiedOn && ownerKnown && agencyStore.currentAgencyId !== null"
+          :agency-id="agencyStore.currentAgencyId"
+          :creator-ulid="creatorUlid"
+          :owner="owner"
+          :can-reassign="canReassign"
+          @changed="owner = $event"
+        />
+      </template>
+    </AgencyRelationshipThreadView>
   </section>
 </template>
 

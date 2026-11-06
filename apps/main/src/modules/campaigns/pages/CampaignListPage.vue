@@ -563,6 +563,7 @@ async function commitListing(item: CampaignResource, value: boolean): Promise<vo
           <AgencyBrandMark
             :name="item.relationships.brand.data.name"
             :seed="item.relationships.brand.data.id"
+            :color="item.relationships.brand.data.color"
           />
           <router-link
             :to="{ name: 'brands.detail', params: { ulid: item.relationships.brand.data.id } }"

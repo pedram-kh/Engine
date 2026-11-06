@@ -31,6 +31,7 @@ vi.mock('@/modules/brands/api/brands.api', () => ({
 
 import { campaignsApi } from '../api/campaigns.api'
 import { brandsApi } from '@/modules/brands/api/brands.api'
+import { brandMarkTone } from '@/modules/agency/status/agencyBrandTone'
 
 const localStorageStore: Record<string, string> = {}
 Object.defineProperty(globalThis, 'localStorage', {
@@ -653,5 +654,52 @@ describe('CampaignListPage (Sprint 8 Chunk 1)', () => {
       await from.get('input').setValue('2026-10-01')
       expect(from.classes()).toContain('agency-filter--applied')
     })
+  })
+})
+
+describe('CampaignListPage — the AH-119 brand colour on the mark', () => {
+  let cleanup: (() => void) | null = null
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    cleanup?.()
+    cleanup = null
+  })
+
+  function withBrandColor(color: CampaignResource['relationships']['brand']['data']['color']) {
+    const campaign = makeCampaign()
+    campaign.relationships.brand.data = { ...campaign.relationships.brand.data, color }
+    return campaign
+  }
+
+  it('the embedded brand colour reaches the mark (data-tone palette-<key>)', async () => {
+    const harness = await mountList([withBrandColor('pink')])
+    cleanup = harness.cleanup
+
+    const mark = harness.wrapper.get('[data-test="agency-brand-mark"]')
+    expect(mark.attributes('data-tone')).toBe('palette-pink')
+    expect(mark.classes()).toContain('agency-brand-mark--palette')
+    expect(mark.attributes('style')).toContain('var(--agency-brand-pink)')
+  })
+
+  it('a brand with no colour keeps the hashed tone of the brand id', async () => {
+    const harness = await mountList([withBrandColor(null)])
+    cleanup = harness.cleanup
+
+    const mark = harness.wrapper.get('[data-test="agency-brand-mark"]')
+    expect(mark.attributes('data-tone')).toBe(brandMarkTone('brand-ulid'))
+    expect(mark.classes()).not.toContain('agency-brand-mark--palette')
+  })
+
+  it('an API that omits the colour key keeps the hashed tone too', async () => {
+    const harness = await mountList([makeCampaign()])
+    cleanup = harness.cleanup
+
+    expect(harness.wrapper.get('[data-test="agency-brand-mark"]').attributes('data-tone')).toBe(
+      brandMarkTone('brand-ulid'),
+    )
   })
 })

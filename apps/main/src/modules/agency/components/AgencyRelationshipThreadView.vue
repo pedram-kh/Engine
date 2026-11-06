@@ -14,15 +14,20 @@
  * at the bottom left, a file card inside a bubble, a meta line (name and time, read ticks on
  * own messages), and a composer with an attach button, the field and a send button.
  *
- * Omitted, no placeholder (plan S2.3): the Online pill, the campaign tag, "View campaign" and
- * the more menu; the frame's data does not exist (no presence, no campaign on a thread) and the
- * menu has no actions. No i18n key is added: day labels and file sizes use `Intl`, the rest
- * reuses the original's keys.
+ * Omitted, no placeholder (plan S2.3): the Online pill (no presence data). AH-119 adds, all
+ * optional so a Direct thread renders as before: the campaign tag, "View campaign" and an
+ * `actions` slot for the more menu (owner line, Reassign), system lines and inline images; and the
+ * transport is the agency thread contract, so an assignment thread uses the same view through
+ * `assignmentThreadTransport`. No i18n key is added here beyond AH-119's own.
  */
 
-import { ApiError, extractFieldErrors, uploadToPresignedUrl } from '@catalyst/api-client'
+import {
+  ApiError,
+  extractFieldErrors,
+  formatCurrency,
+  uploadToPresignedUrl,
+} from '@catalyst/api-client'
 import type {
-  RelationshipMessageResource,
   RelationshipThreadClosedReason,
   RelationshipThreadMeta,
   SendMessageAttachment,
@@ -34,11 +39,21 @@ import { useI18n } from 'vue-i18n'
 import { RouterLink, type RouteLocationRaw } from 'vue-router'
 import { useDisplay } from 'vuetify'
 
-import type { RelationshipChatTransport } from '@/modules/messaging/api/relationshipMessaging.api'
+import type {
+  AgencyThreadMessage,
+  AgencyThreadTransport,
+} from '@/modules/messaging/api/agencyThreadTransport'
+import MessageText from '@/modules/messaging/components/MessageText.vue'
+import { useComposerImages } from '@/modules/messaging/composables/useComposerImages'
 import { useMessageThread } from '@/modules/messaging/composables/useMessageThread'
+import { isInlineImageMime } from '@/modules/messaging/utils/messageImages'
+
+import { brandColorVar } from '../composables/brandColor'
+
+type RelationshipMessageResource = AgencyThreadMessage
 
 const props = defineProps<{
-  transport: RelationshipChatTransport | null
+  transport: AgencyThreadTransport | null
   /** The counterparty label shown in the thread header. */
   title: string
   avatarText?: string
@@ -54,9 +69,20 @@ const props = defineProps<{
    * leaves them plain, which is also what an erased creator gets.
    */
   profileTo?: RouteLocationRaw | null
+  /**
+   * AH-119: a campaign (assignment) conversation. The campaign tag under the name, the
+   * "View campaign" button and a closed notice of its own. All optional: a Direct thread passes
+   * none of them and renders as before.
+   */
+  campaignTag?: { text: string; color?: string | null } | null
+  viewCampaignTo?: RouteLocationRaw | null
+  /** Replaces the relationship "closed" wording (an assignment thread's is not about a relation). */
+  closedText?: string | null
+  /** Link attachments exist on Direct threads only; an assignment thread hides the link action. */
+  noLinks?: boolean
 }>()
 
-const { t, locale } = useI18n()
+const { t, te, locale } = useI18n()
 const { smAndDown } = useDisplay()
 
 // Enter-to-send is a DESKTOP affordance. On mobile the on-screen keyboard's
@@ -75,11 +101,9 @@ const {
   loadError,
   loadOlder,
   sendMessage,
-} = useMessageThread<
-  RelationshipMessageResource,
-  RelationshipThreadMeta,
-  SendRelationshipMessagePayload
->(transportRef)
+} = useMessageThread<AgencyThreadMessage, RelationshipThreadMeta, SendRelationshipMessagePayload>(
+  transportRef,
+)
 
 // Whether the CONVERSATION accepts new messages at all — distinct from the
 // `canSend` below, which is form validity (is there anything to send, are we
@@ -104,6 +128,9 @@ const CLOSED_REASON_KEY: Record<RelationshipThreadClosedReason, string> = {
 }
 
 const closedMessage = computed(() => {
+  if (props.closedText) {
+    return props.closedText
+  }
   const reason = threadMeta.value?.closed_reason ?? null
   const key =
     reason === null
@@ -302,6 +329,78 @@ function showSenderLabel(message: RelationshipMessageResource): boolean {
   return !message.attributes.is_own && message.attributes.sender_role === 'agency_user'
 }
 
+/** The money params of an `assignment.offer_edited` line, formatted for the reader's locale. */
+function offerEditedParams(message: AgencyThreadMessage): { from: string; to: string } | null {
+  const data = message.attributes.system_event_data
+  if (data === null || data === undefined) return null
+  const { previous_amount: previous, new_amount: next, currency } = data
+  if (
+    typeof previous !== 'number' ||
+    typeof next !== 'number' ||
+    typeof currency !== 'string' ||
+    currency === ''
+  ) {
+    return null
+  }
+  return {
+    from: formatCurrency(previous, currency, locale.value),
+    to: formatCurrency(next, currency, locale.value),
+  }
+}
+
+/** An assignment thread's system line, localised here (the wire carries a key, never text). */
+function systemLine(message: AgencyThreadMessage): string {
+  const key = message.attributes.system_event_key ?? null
+  const i18nKey = `app.messaging.system.${key ?? ''}`
+  if (key === 'assignment.offer_edited') {
+    const params = offerEditedParams(message)
+    return params !== null && te(i18nKey) ? t(i18nKey, params) : t('app.messaging.systemFallback')
+  }
+  if (key !== null && te(i18nKey)) {
+    return t(i18nKey)
+  }
+  return t('app.messaging.systemFallback')
+}
+
+// AH-119 — pasted / dropped images join the same pending list the paperclip fills.
+const composeEl = ref<HTMLElement | null>(null)
+const { dragging } = useComposerImages(
+  composeEl,
+  (files) => {
+    generalError.value = null
+    selectedFiles.value = [...selectedFiles.value, ...files]
+  },
+  {
+    onRejected: (reason) => {
+      generalError.value =
+        reason === 'type'
+          ? t('app.messaging.attachmentPasteUnsupportedType')
+          : t('app.messaging.attachmentUploadError')
+    },
+  },
+)
+
+// An image attachment whose <img> failed to load falls back to the file card.
+const failedImages = ref<Set<string>>(new Set())
+function imageKey(message: AgencyThreadMessage, index: number): string {
+  return `${message.id}:${index}`
+}
+function showAsImage(
+  message: AgencyThreadMessage,
+  att: AgencyThreadMessage['attributes']['attachments'][number],
+  index: number,
+): boolean {
+  return (
+    att.kind === 'file' &&
+    att.view_url !== null &&
+    isInlineImageMime(att.mime_type) &&
+    !failedImages.value.has(imageKey(message, index))
+  )
+}
+function onImageError(message: AgencyThreadMessage, index: number): void {
+  failedImages.value = new Set(failedImages.value).add(imageKey(message, index))
+}
+
 function onFilesPicked(event: Event): void {
   const target = event.target as HTMLInputElement
   selectedFiles.value = target.files !== null ? Array.from(target.files) : []
@@ -459,6 +558,25 @@ async function submit(): Promise<void> {
       <span v-else class="agency-thread__title" data-test="relationship-thread-title">{{
         title
       }}</span>
+      <span v-if="campaignTag" class="agency-thread__tag" data-test="thread-campaign-tag"
+        ><span
+          v-if="campaignTag.color !== undefined"
+          class="agency-thread__tag-dot"
+          :style="{ backgroundColor: brandColorVar(campaignTag.color) }"
+          aria-hidden="true"
+        />{{ campaignTag.text }}</span
+      >
+      <span class="agency-thread__header-spacer" />
+      <v-btn
+        v-if="viewCampaignTo"
+        :to="viewCampaignTo"
+        variant="outlined"
+        size="small"
+        data-test="thread-view-campaign"
+      >
+        {{ t('app.messaging.inbox.viewCampaign') }}
+      </v-btn>
+      <slot name="actions" />
     </header>
 
     <div ref="feedEl" class="agency-thread__feed" data-test="relationship-thread-feed">
@@ -503,6 +621,14 @@ async function submit(): Promise<void> {
             </li>
 
             <li
+              v-else-if="entry.message.attributes.kind === 'system'"
+              class="agency-thread__system"
+              :data-test="`thread-system-${entry.message.id}`"
+            >
+              {{ systemLine(entry.message) }}
+            </li>
+
+            <li
               v-else
               class="agency-bubble-row"
               :class="{ 'agency-bubble-row--own': entry.message.attributes.is_own }"
@@ -519,7 +645,7 @@ async function submit(): Promise<void> {
                   </div>
 
                   <p v-if="entry.message.attributes.body" class="agency-bubble__body">
-                    {{ entry.message.attributes.body }}
+                    <MessageText :text="entry.message.attributes.body" />
                   </p>
 
                   <ul
@@ -532,7 +658,23 @@ async function submit(): Promise<void> {
                       :data-test="`relationship-attachment-${att.kind}`"
                     >
                       <a
-                        v-if="att.kind === 'link' && att.url"
+                        v-if="showAsImage(entry.message, att, i)"
+                        :href="att.kind === 'file' ? (att.view_url ?? undefined) : undefined"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="message-image-link"
+                      >
+                        <img
+                          loading="lazy"
+                          :src="att.kind === 'file' ? (att.view_url ?? undefined) : undefined"
+                          :alt="att.name ?? t('app.messaging.attachment')"
+                          class="message-image"
+                          data-test="message-image"
+                          @error="onImageError(entry.message, i)"
+                        />
+                      </a>
+                      <a
+                        v-else-if="att.kind === 'link' && att.url"
                         class="agency-attach"
                         :href="att.url"
                         target="_blank"
@@ -637,10 +779,14 @@ async function submit(): Promise<void> {
 
     <form
       v-else
+      ref="composeEl"
       class="agency-thread__compose"
       data-test="relationship-compose"
       @submit.prevent="submit"
     >
+      <div v-if="dragging" class="agency-thread__drop-hint" data-test="thread-drop-hint">
+        {{ t('app.messaging.attachmentDropHint') }}
+      </div>
       <ul
         v-if="selectedFiles.length > 0"
         class="agency-thread__pending"
@@ -728,6 +874,7 @@ async function submit(): Promise<void> {
           @click="openFilePicker"
         />
         <v-btn
+          v-if="!noLinks"
           icon="mdi-link-variant"
           variant="tonal"
           size="small"
@@ -1088,5 +1235,83 @@ a.agency-attach:focus-visible {
 /* The native file input is opened programmatically from the attach menu. */
 .agency-thread__file-input {
   display: none;
+}
+
+/* AH-119: campaign tag, system lines, inline images, drop hint. */
+.agency-thread__header-spacer {
+  flex: 1 1 auto;
+}
+
+.agency-thread__tag {
+  position: relative;
+  isolation: isolate;
+  flex: none;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: rgb(var(--v-theme-neutral-text));
+  font-size: var(--catalyst-typography-caption-size);
+  line-height: var(--catalyst-typography-caption-line-height);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.agency-thread__tag::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-color: rgb(var(--v-theme-status-neutral));
+  opacity: 0.15;
+}
+
+.agency-thread__tag-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 6px;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+
+.agency-thread__system {
+  align-self: center;
+  list-style: none;
+  padding: 4px 12px;
+  color: rgb(var(--v-theme-text-tertiary));
+  font-size: var(--catalyst-typography-caption-size);
+  line-height: var(--catalyst-typography-caption-line-height);
+  text-align: center;
+}
+
+.message-image-link {
+  display: inline-block;
+}
+
+.message-image {
+  display: block;
+  max-width: 100%;
+  max-height: 320px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.agency-thread__compose {
+  position: relative;
+}
+
+.agency-thread__drop-hint {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed rgb(var(--v-theme-primary));
+  border-radius: var(--radius-xl, 10px);
+  background: rgb(var(--v-theme-surface) / 0.92);
+  color: rgb(var(--v-theme-primary-text));
+  font-size: var(--catalyst-typography-body-sm-size);
+  pointer-events: none;
 }
 </style>

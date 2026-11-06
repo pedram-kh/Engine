@@ -12,6 +12,7 @@
 
 import { computed } from 'vue'
 
+import { brandColorVar } from '../composables/brandColor'
 import { brandMarkTone } from '../status/agencyBrandTone'
 
 const props = defineProps<{
@@ -19,6 +20,8 @@ const props = defineProps<{
   name: string
   /** Stable id (or any stable string) that picks the colour; falls back to the name. */
   seed?: string | null
+  /** AH-119: the brand's palette key. When set it overrides the hashed tone. */
+  color?: string | null
 }>()
 
 const initial = computed(() => Array.from(props.name.trim())[0]?.toUpperCase() ?? '')
@@ -29,8 +32,9 @@ const tone = computed(() => brandMarkTone(props.seed ?? props.name))
   <span
     v-if="initial !== ''"
     class="agency-brand-mark"
-    :class="`agency-brand-mark--${tone}`"
-    :data-tone="tone"
+    :class="color ? 'agency-brand-mark--palette' : `agency-brand-mark--${tone}`"
+    :style="color ? { '--mark-fill-css': brandColorVar(color) } : undefined"
+    :data-tone="color ? `palette-${color}` : tone"
     aria-hidden="true"
     data-test="agency-brand-mark"
   >
@@ -72,6 +76,15 @@ const tone = computed(() => brandMarkTone(props.seed ?? props.name))
   line-height: 14px;
   letter-spacing: 0.4px;
   text-transform: uppercase;
+}
+
+/* A palette colour: the same colour is the tint and the letter (agency.css, both themes). */
+.agency-brand-mark--palette {
+  color: var(--mark-fill-css);
+}
+
+.agency-brand-mark--palette::before {
+  background-color: var(--mark-fill-css);
 }
 
 .agency-brand-mark--success {

@@ -92,6 +92,7 @@ describe('agency-shell routes — requireAgencyUser guard registration (Sprint 6
       // AH-091, chunk A — the agency Files library (upload/list/delete).
       'files.list',
       // AH-010b — the agency-shell relationship-messaging inbox + thread.
+      'messages.assignment-thread',
       'messages.inbox',
       'messages.thread',
       // S11.0 Ch3a — the agency-shell notification archive (full paginated feed).

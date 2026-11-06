@@ -59,6 +59,7 @@ async function loadBrand(): Promise<void> {
       description: attrs.description ?? undefined,
       industry: attrs.industry ?? undefined,
       website_url: attrs.website_url ?? undefined,
+      color: attrs.color ?? undefined,
     }
     logoUrl.value = attrs.logo_url
   } catch {

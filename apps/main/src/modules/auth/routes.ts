@@ -264,6 +264,15 @@ export const appRoutes: RouteRecordRaw[] = [
         component: () => import('@/modules/messaging/pages/AgencyRelationshipThreadPage.vue'),
         meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
       },
+      // AH-119: a campaign (assignment) conversation opened inside the unified inbox. Same shell,
+      // same guard chain; it only ever resolves while `messages_v2_inbox` is on (the inbox row
+      // that links here exists only then), and the API 404s the thread otherwise.
+      {
+        path: 'c/:campaignUlid/:assignmentUlid',
+        name: 'messages.assignment-thread',
+        component: () => import('@/modules/messaging/pages/AgencyAssignmentThreadPage.vue'),
+        meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+      },
     ],
   },
 

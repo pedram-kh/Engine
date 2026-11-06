@@ -147,6 +147,31 @@
   --catalyst-typography-overline-line-height: 14px;
 }
 
+/* AH-119 — the brand colour palette (keys from the API's `BrandColor`). Dark values are the Figma
+ * status / usp fills (frames 16:7838, 16:8144); light values are the same hues stepped darker so a
+ * dot and an avatar tile hold 3:1 on white. Read through `brandColorVar()`; agency themes only. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) {
+  --agency-brand-violet: #8b6cff;
+  --agency-brand-green: #34c77b;
+  --agency-brand-amber: #f5a524;
+  --agency-brand-blue: #4c8dff;
+  --agency-brand-pink: #f472b6;
+  --agency-brand-teal: #3ecf9e;
+  --agency-brand-red: #f0506e;
+  --agency-brand-slate: #a0a0a8;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light).v-theme--agency-light {
+  --agency-brand-violet: #6d4fe0;
+  --agency-brand-green: #1e9e5a;
+  --agency-brand-amber: #c27c0a;
+  --agency-brand-blue: #2f6fe0;
+  --agency-brand-pink: #d6428f;
+  --agency-brand-teal: #1f9d78;
+  --agency-brand-red: #d6304f;
+  --agency-brand-slate: #6b6b73;
+}
+
 /* Teleported overlays sit in `.v-overlay-container` under <body>, which computes
  * Roboto; the overlay element itself carries the agency theme class. */
 :is(.v-theme--agency-dark, .v-theme--agency-light).v-overlay {
