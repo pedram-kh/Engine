@@ -30,6 +30,16 @@
 | P6  | **Pill with filters on.**                                                                                                                                                                                                                                                                | The pill is the **unfiltered total** of threads with unread for the viewer (not filtered by brand, campaign or Mine/All); the list and the facet counts follow the filters.                                                                                                                                                                                                                                                                                           |
 | P7  | **Stage A flag timing.** You wrote "build 4, then Stage A flag ON". Stage A's inbox is agency web only and does not depend on build 4.                                                                                                                                                   | Follow your order unless you say otherwise; I note that the flag could be armed right after the web deploy without risk to the native app.                                                                                                                                                                                                                                                                                                                            |
 
+### Plan rulings (Pedram, 2026-11-06, plan cleared)
+
+P1 accepted (inbox-only exclusion of system lines; shared `unreadQuery` unchanged; a tech-debt row is written when
+A2 lands). P2: **decided after A0.1**: the whole suite as a second CI step if it runs in under 15 minutes in CI,
+otherwise a `pg` group. P3 approved (the eight keys). P4: one deploy. P5 yes. P6 yes. P7: the Stage A flag is
+armed **after the web deploy** (not after build 4); the §11 deploy order step 8 is read that way. **Mine is a
+toggle chip in the filter row beside the brand and campaign popovers** (not a segmented control), logged as a
+**Figma deviation** (the frames do not draw it). Instruction: build A0 only and stop with the Postgres suite
+timing, the four fixes, the CI step as added and the lock test result; no feature code until P2 is ruled.
+
 ## 1. Sequence, at a glance
 
 ```
