@@ -410,7 +410,7 @@ final class MessageInboxQuery
      * who was a platform admin, or who has left, reads as unowned).
      *
      * @param  list<\stdClass>  $rows
-     * @return array<int, array{id: int, name: string}>
+     * @return array<int, array{id: string, name: string}>
      */
     private function owners(Agency $agency, array $rows): array
     {
@@ -423,8 +423,8 @@ final class MessageInboxQuery
             ->whereNotNull('accepted_at')->whereNull('deleted_at')->pluck('user_id')->all();
 
         $out = [];
-        foreach (User::query()->whereIn('id', $active)->get(['id', 'name']) as $u) {
-            $out[$u->id] = ['id' => $u->id, 'name' => $u->name];
+        foreach (User::query()->whereIn('id', $active)->get(['id', 'ulid', 'name']) as $u) {
+            $out[$u->id] = ['id' => $u->ulid, 'name' => $u->name];
         }
 
         return $out;

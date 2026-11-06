@@ -41,8 +41,9 @@ final class AgencyCreatorOwnerController
 
         Gate::authorize('reassignOwner', $relation);
 
-        $validated = $request->validate(['owner_user_id' => ['required', 'integer']]);
-        $newOwnerId = (int) $validated['owner_user_id'];
+        // The wire carries the user's ULID, never the internal id.
+        $validated = $request->validate(['owner_user_id' => ['required', 'string', 'max:40']]);
+        $newOwnerId = (int) (User::query()->where('ulid', $validated['owner_user_id'])->value('id') ?? 0);
 
         $isActiveMember = AgencyMembership::query()
             ->where('agency_id', $agency->id)
@@ -85,12 +86,12 @@ final class AgencyCreatorOwnerController
         ]);
     }
 
-    /** @return array{id: int, name: string}|null */
+    /** @return array{id: string, name: string}|null */
     private function owner(Agency $agency, AgencyCreatorRelation $relation): ?array
     {
         $ownerId = $relation->effectiveOwnerId();
         $user = $ownerId === null ? null : User::query()->find($ownerId);
 
-        return $user === null ? null : ['id' => $user->id, 'name' => $user->name];
+        return $user === null ? null : ['id' => $user->ulid, 'name' => $user->name];
     }
 }

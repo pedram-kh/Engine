@@ -69,9 +69,9 @@ it('lets an admin and a manager reassign the owner to an active member, writing 
     $creator = inboxCreator();
     inboxRelation($agency, $creator, owner: $admin);
 
-    $this->actingAs($admin)->patchJson(ownerUrl($agency, $creator), ['owner_user_id' => $staff->id])
-        ->assertOk()->assertJsonPath('data.attributes.owner.id', $staff->id);
-    $this->actingAs($manager)->patchJson(ownerUrl($agency, $creator), ['owner_user_id' => $manager->id])->assertOk();
+    $this->actingAs($admin)->patchJson(ownerUrl($agency, $creator), ['owner_user_id' => $staff->ulid])
+        ->assertOk()->assertJsonPath('data.attributes.owner.id', $staff->ulid);
+    $this->actingAs($manager)->patchJson(ownerUrl($agency, $creator), ['owner_user_id' => $manager->ulid])->assertOk();
 
     $rows = AuditLog::query()->where('action', AuditAction::AgencyCreatorRelationOwnerChanged->value)->orderBy('id')->get();
     expect($rows)->toHaveCount(2)
@@ -88,7 +88,7 @@ it('is a no-op when the owner is unchanged: 200 and no audit row', function (): 
     $creator = inboxCreator();
     inboxRelation($agency, $creator, owner: $admin);
 
-    $this->actingAs($admin)->patchJson(ownerUrl($agency, $creator), ['owner_user_id' => $admin->id])->assertOk();
+    $this->actingAs($admin)->patchJson(ownerUrl($agency, $creator), ['owner_user_id' => $admin->ulid])->assertOk();
 
     expect(AuditLog::query()->where('action', AuditAction::AgencyCreatorRelationOwnerChanged->value)->count())->toBe(0);
 });
@@ -99,23 +99,23 @@ it('refuses staff and creators (403), a non-member target (422), a foreign relat
     $creator = inboxCreator();
     $relation = inboxRelation($agency, $creator, owner: $admin);
 
-    $this->actingAs($staff)->patchJson(ownerUrl($agency, $creator), ['owner_user_id' => $staff->id])->assertForbidden();
-    $this->actingAs($creator->user)->patchJson(ownerUrl($agency, $creator), ['owner_user_id' => $admin->id])->assertStatus(404);
+    $this->actingAs($staff)->patchJson(ownerUrl($agency, $creator), ['owner_user_id' => $staff->ulid])->assertForbidden();
+    $this->actingAs($creator->user)->patchJson(ownerUrl($agency, $creator), ['owner_user_id' => $admin->ulid])->assertStatus(404);
 
-    $this->actingAs($admin)->patchJson(ownerUrl($agency, $creator), ['owner_user_id' => $otherAdmin->id])
+    $this->actingAs($admin)->patchJson(ownerUrl($agency, $creator), ['owner_user_id' => $otherAdmin->ulid])
         ->assertStatus(422)->assertJsonPath('errors.0.code', 'owner.not_a_member');
-    $this->actingAs($admin)->patchJson(ownerUrl($agency, $creator), ['owner_user_id' => 999999])->assertStatus(422);
+    $this->actingAs($admin)->patchJson(ownerUrl($agency, $creator), ['owner_user_id' => 'no-such-user'])->assertStatus(422);
 
     // A creator this agency has no relation with: 404, and nothing written.
     $stranger = inboxCreator();
-    $this->actingAs($admin)->patchJson(ownerUrl($agency, $stranger), ['owner_user_id' => $admin->id])->assertNotFound();
+    $this->actingAs($admin)->patchJson(ownerUrl($agency, $stranger), ['owner_user_id' => $admin->ulid])->assertNotFound();
     // Another agency's admin cannot reach this agency's relation.
-    $this->actingAs($otherAdmin)->patchJson(ownerUrl($agency, $creator), ['owner_user_id' => $otherAdmin->id])->assertNotFound();
+    $this->actingAs($otherAdmin)->patchJson(ownerUrl($agency, $creator), ['owner_user_id' => $otherAdmin->ulid])->assertNotFound();
 
     expect($relation->fresh()?->owner_user_id)->toBe($admin->id);
 
     inboxWorld(flag: false);
-    $this->actingAs($admin)->patchJson(ownerUrl($agency, $creator), ['owner_user_id' => $admin->id])->assertNotFound();
+    $this->actingAs($admin)->patchJson(ownerUrl($agency, $creator), ['owner_user_id' => $admin->ulid])->assertNotFound();
 });
 
 it('refuses a member who was removed from the agency (soft-deleted) as the new owner', function (): void {
@@ -124,7 +124,7 @@ it('refuses a member who was removed from the agency (soft-deleted) as the new o
     inboxRelation($agency, $creator, owner: $admin);
     AgencyMembership::query()->where('user_id', $staff->id)->delete();
 
-    $this->actingAs($admin)->patchJson(ownerUrl($agency, $creator), ['owner_user_id' => $staff->id])
+    $this->actingAs($admin)->patchJson(ownerUrl($agency, $creator), ['owner_user_id' => $staff->ulid])
         ->assertStatus(422)->assertJsonPath('errors.0.code', 'owner.not_a_member');
 });
 
@@ -156,6 +156,6 @@ it('shows the owner (id and name) on the row, null when unowned', function (): v
     $unowned = inboxDirect($agency, inboxCreator());
 
     $rows = inboxList($this->actingAs($admin)->getJson(inboxUrl($agency)), 'data')->keyBy('id');
-    expect($rows[$owned['thread']->ulid]['attributes']['owner'])->toBe(['id' => $admin->id, 'name' => $admin->name])
+    expect($rows[$owned['thread']->ulid]['attributes']['owner'])->toBe(['id' => $admin->ulid, 'name' => $admin->name])
         ->and($rows[$unowned['thread']->ulid]['attributes']['owner'])->toBeNull();
 });
