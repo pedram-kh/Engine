@@ -131,7 +131,38 @@
       },
       "attachmentDropHint": "Pudota kuva liittääksesi sen",
       "attachmentImageUnavailable": "Kuva ei ole saatavilla",
-      "attachmentPasteUnsupportedType": "Tähän voi liittää vain kuvia. Käytä paperiliitintä muille tiedostoille."
+      "attachmentPasteUnsupportedType": "Tähän voi liittää vain kuvia. Käytä paperiliitintä muille tiedostoille.",
+      "actions": {
+        "menu": "Viestin toiminnot",
+        "edit": "Muokkaa",
+        "delete": "Poista",
+        "save": "Tallenna",
+        "cancel": "Peruuta",
+        "edited": "muokattu",
+        "deleted": "Viesti poistettu",
+        "deleteTitle": "Poistetaanko tämä viesti?",
+        "deleteBody": "Molemmat osapuolet näkevät tekstin ”Viesti poistettu”. Liittämäsi tiedostot säilyvät tallessa, kunnes tili poistetaan.",
+        "deleteConfirm": "Poista",
+        "editHint": "Voit muokata viestiä 15 minuutin ajan sen lähettämisestä.",
+        "editFieldLabel": "Muokkaa viestiä"
+      },
+      "errors": {
+        "editWindowClosed": "Tätä viestiä ei voi enää muokata.",
+        "editThreadClosed": "Tämä keskustelu on suljettu, joten viestejä ei voi muokata.",
+        "notEditable": "Tätä viestiä ei voi muokata.",
+        "alreadyDeleted": "Tämä viesti on jo poistettu.",
+        "ownerNotMember": "Tämä henkilö ei ole tämän toimiston jäsen.",
+        "editFailed": "Muutoksen tallentaminen epäonnistui.",
+        "deleteFailed": "Viestin poistaminen epäonnistui."
+      },
+      "search": {
+        "resultsHeading": "Viestit",
+        "noResults": "Ei hakua vastaavia viestejä",
+        "error": "Viestien haku epäonnistui.",
+        "minChars": "Kirjoita vähintään 2 merkkiä hakeaksesi viesteistä.",
+        "fromYou": "Sinä",
+        "inThreadWith": "keskustelussa: {name}"
+      }
     },
     "nav": {
       "dashboard": "Kojelauta",

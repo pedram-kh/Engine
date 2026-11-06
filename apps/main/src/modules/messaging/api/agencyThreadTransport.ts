@@ -10,6 +10,7 @@
  */
 
 import type {
+  EditMessagePayload,
   MessageAttachmentCompleteEnvelope,
   MessageAttachmentInitEnvelope,
   MessageAttachmentInitPayload,
@@ -45,6 +46,9 @@ export interface AgencyThreadTransport {
   markRead(): Promise<MessageMarkReadEnvelope>
   attachmentInit(payload: MessageAttachmentInitPayload): Promise<MessageAttachmentInitEnvelope>
   attachmentComplete(uploadId: string): Promise<MessageAttachmentCompleteEnvelope>
+  /** AH-119 Stage B (a relationship transport satisfies these as it is). */
+  edit?(messageId: string, payload: EditMessagePayload): Promise<{ data: AgencyThreadMessage }>
+  remove?(messageId: string): Promise<{ data: AgencyThreadMessage }>
 }
 
 function toThreadMessage(message: MessageResource): AgencyThreadMessage {
@@ -62,6 +66,8 @@ function toThreadMessage(message: MessageResource): AgencyThreadMessage {
       // Assignment threads carry no per-message read state.
       read_by_counterparty: a.is_own ? false : null,
       created_at: a.created_at,
+      edited_at: a.edited_at ?? null,
+      is_deleted: a.is_deleted ?? false,
       system_event_key: a.system_event_key,
       system_event_data: a.system_event_data,
     },
@@ -97,5 +103,21 @@ export function assignmentThreadTransport(chat: ChatTransport): AgencyThreadTran
     markRead: () => chat.markRead(),
     attachmentInit: (payload) => chat.attachmentInit(payload),
     attachmentComplete: (uploadId) => chat.attachmentComplete(uploadId),
+    ...(chat.edit !== undefined
+      ? {
+          edit: async (messageId: string, payload: EditMessagePayload) => {
+            const res = await chat.edit!(messageId, payload)
+            return { data: toThreadMessage(res.data) }
+          },
+        }
+      : {}),
+    ...(chat.remove !== undefined
+      ? {
+          remove: async (messageId: string) => {
+            const res = await chat.remove!(messageId)
+            return { data: toThreadMessage(res.data) }
+          },
+        }
+      : {}),
   }
 }

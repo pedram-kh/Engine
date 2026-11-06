@@ -292,6 +292,27 @@ describe('ThreadActionsMenu', () => {
       w.unmount()
     })
 
+    it('maps owner.not_a_member to its own localised line (AH-119 Stage B), not the raw server text', async () => {
+      vi.mocked(messageInboxApi.reassignOwner).mockRejectedValue(
+        new ApiError({
+          status: 422,
+          code: 'owner.not_a_member',
+          message: 'raw server text',
+        }),
+      )
+      const w = mountMenu()
+      await openDialog(w)
+      await choose(w, 'user-bo')
+      inBody('thread-reassign-confirm')!.click()
+      await flushPromises()
+
+      const text = inBody('thread-reassign-error')?.textContent ?? ''
+      expect(text).toContain('That person is not a member of this agency.')
+      expect(text).not.toContain('raw server text')
+      expect(dialogOpen(w)).toBe(true)
+      w.unmount()
+    })
+
     it('shows the generic error for a non-API failure, and a retry can succeed', async () => {
       vi.mocked(messageInboxApi.reassignOwner)
         .mockRejectedValueOnce(new Error('network'))

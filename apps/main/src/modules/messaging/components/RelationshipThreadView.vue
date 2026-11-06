@@ -33,9 +33,13 @@ import { isNativePlatform } from '@/core/platform/isNativePlatform'
 
 import type { RelationshipChatTransport } from '../api/relationshipMessaging.api'
 import { useComposerImages } from '../composables/useComposerImages'
+import { useMessagesEditSearchFlag } from '../composables/useMessagesEditSearchFlag'
 import { useMessageThread } from '../composables/useMessageThread'
 import { isInlineImageMime } from '../utils/messageImages'
 import { reportHref } from '../utils/reportProblem'
+import MessageActions from './MessageActions.vue'
+import MessageEditField from './MessageEditField.vue'
+import MessageGate from './MessageGate'
 import MessageText from './MessageText.vue'
 import ReportFallback from './ReportFallback.vue'
 
@@ -78,6 +82,8 @@ const {
   loadError,
   loadOlder,
   sendMessage,
+  editMessage,
+  deleteMessage,
 } = useMessageThread<
   RelationshipMessageResource,
   RelationshipThreadMeta,
@@ -93,6 +99,21 @@ const {
 // brief optimistic composer beats flashing a "closed" notice on every thread
 // open. The server stays authoritative either way.
 const threadOpen = computed(() => threadMeta.value?.can_send ?? true)
+
+// AH-119 Stage B — edit and delete, behind the `/me` switch. Off, none of the helpers below
+// changes what renders.
+const actionsOn = useMessagesEditSearchFlag()
+const editingId = ref<string | null>(null)
+
+function isDeleted(message: RelationshipMessageResource): boolean {
+  return actionsOn.value && message.attributes.is_deleted === true
+}
+function isEdited(message: RelationshipMessageResource): boolean {
+  return actionsOn.value && !isDeleted(message) && (message.attributes.edited_at ?? null) !== null
+}
+function canAct(message: RelationshipMessageResource): boolean {
+  return actionsOn.value && message.attributes.is_own && !isDeleted(message)
+}
 
 // Reason → copy. `relation_ended` is the case a real user hits (an admin
 // disconnect); the rest are mapped so no state can silently fall through to
@@ -450,7 +471,7 @@ async function submit(): Promise<void> {
             :class="{ 'rel-bubble-row--own': message.attributes.is_own }"
             :data-test="`relationship-message-${message.id}`"
           >
-            <div class="rel-bubble">
+            <div class="rel-bubble" :class="{ 'rel-bubble--deleted': isDeleted(message) }">
               <div
                 v-if="showSenderLabel(message)"
                 class="rel-bubble__sender"
@@ -459,11 +480,30 @@ async function submit(): Promise<void> {
                 {{ senderLabel(message) }}
               </div>
 
-              <p v-if="message.attributes.body" class="rel-bubble__body">
+              <MessageGate :when="canAct(message) && editingId === message.id">
+                <MessageEditField
+                  :initial="message.attributes.body ?? ''"
+                  :save="(body: string) => editMessage(message.id, body)"
+                  @done="editingId = null"
+                />
+              </MessageGate>
+              <MessageGate :when="isDeleted(message)">
+                <p class="rel-bubble__deleted" data-test="message-deleted">
+                  {{ t('app.messaging.actions.deleted') }}
+                </p>
+              </MessageGate>
+
+              <p
+                v-if="message.attributes.body && editingId !== message.id && !isDeleted(message)"
+                class="rel-bubble__body"
+              >
                 <MessageText :text="message.attributes.body" />
               </p>
 
-              <ul v-if="message.attributes.attachments.length > 0" class="rel-bubble__attachments">
+              <ul
+                v-if="message.attributes.attachments.length > 0 && !isDeleted(message)"
+                class="rel-bubble__attachments"
+              >
                 <li
                   v-for="(att, i) in message.attributes.attachments"
                   :key="i"
@@ -516,6 +556,11 @@ async function submit(): Promise<void> {
               </ul>
 
               <div class="rel-bubble__meta">
+                <MessageGate :when="isEdited(message)">
+                  <span class="rel-bubble__edited" data-test="message-edited">{{
+                    t('app.messaging.actions.edited')
+                  }}</span>
+                </MessageGate>
                 <span class="rel-bubble__time" data-test="relationship-message-time">{{
                   formatTime(message.attributes.created_at)
                 }}</span>
@@ -534,6 +579,14 @@ async function submit(): Promise<void> {
                   "
                   :data-test="`relationship-tick-${message.attributes.read_by_counterparty ? 'read' : 'sent'}`"
                 />
+                <MessageGate :when="canAct(message)">
+                  <MessageActions
+                    :created-at="message.attributes.created_at"
+                    :thread-open="threadOpen"
+                    :confirm-delete="() => deleteMessage(message.id)"
+                    @edit="editingId = message.id"
+                  />
+                </MessageGate>
               </div>
             </div>
           </li>
@@ -868,6 +921,17 @@ async function submit(): Promise<void> {
 .rel-bubble__tick--read {
   color: rgb(var(--v-theme-primary));
   opacity: 1;
+}
+
+.rel-bubble__edited::after {
+  content: '·';
+  margin-left: 4px;
+}
+
+.rel-bubble__deleted {
+  margin: 0;
+  font-style: italic;
+  opacity: 0.7;
 }
 
 .rel-thread__empty {

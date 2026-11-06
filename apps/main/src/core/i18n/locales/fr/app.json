@@ -131,7 +131,38 @@
       },
       "attachmentDropHint": "Déposez une image pour la joindre",
       "attachmentImageUnavailable": "Image indisponible",
-      "attachmentPasteUnsupportedType": "Seules les images peuvent être collées ici. Utilisez le trombone pour les autres fichiers."
+      "attachmentPasteUnsupportedType": "Seules les images peuvent être collées ici. Utilisez le trombone pour les autres fichiers.",
+      "actions": {
+        "menu": "Actions sur le message",
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "edited": "modifié",
+        "deleted": "Message supprimé",
+        "deleteTitle": "Supprimer ce message ?",
+        "deleteBody": "Les deux parties verront « Message supprimé ». Les fichiers que vous avez joints restent stockés jusqu’à la suppression du compte.",
+        "deleteConfirm": "Supprimer",
+        "editHint": "Vous pouvez modifier un message pendant 15 minutes après son envoi.",
+        "editFieldLabel": "Modifier le message"
+      },
+      "errors": {
+        "editWindowClosed": "Ce message ne peut plus être modifié.",
+        "editThreadClosed": "Cette conversation est fermée, les messages ne peuvent donc pas être modifiés.",
+        "notEditable": "Ce message ne peut pas être modifié.",
+        "alreadyDeleted": "Ce message a déjà été supprimé.",
+        "ownerNotMember": "Cette personne n’est pas membre de cette agence.",
+        "editFailed": "Nous n’avons pas pu enregistrer la modification.",
+        "deleteFailed": "Nous n’avons pas pu supprimer le message."
+      },
+      "search": {
+        "resultsHeading": "Messages",
+        "noResults": "Aucun message ne correspond",
+        "error": "Nous n’avons pas pu rechercher les messages.",
+        "minChars": "Saisissez au moins 2 caractères pour rechercher des messages.",
+        "fromYou": "Vous",
+        "inThreadWith": "dans la conversation avec {name}"
+      }
     },
     "nav": {
       "dashboard": "Tableau de bord",

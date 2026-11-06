@@ -131,7 +131,38 @@
       },
       "attachmentDropHint": "Spustite sliko, da jo priložite",
       "attachmentImageUnavailable": "Slika ni na voljo",
-      "attachmentPasteUnsupportedType": "Tu lahko prilepite samo slike. Za druge datoteke uporabite sponko."
+      "attachmentPasteUnsupportedType": "Tu lahko prilepite samo slike. Za druge datoteke uporabite sponko.",
+      "actions": {
+        "menu": "Dejanja sporočila",
+        "edit": "Uredi",
+        "delete": "Izbriši",
+        "save": "Shrani",
+        "cancel": "Prekliči",
+        "edited": "urejeno",
+        "deleted": "Sporočilo izbrisano",
+        "deleteTitle": "Želite izbrisati to sporočilo?",
+        "deleteBody": "Obe strani bosta videli „Sporočilo izbrisano“. Datoteke, ki ste jih priložili, ostanejo shranjene, dokler se račun ne izbriše.",
+        "deleteConfirm": "Izbriši",
+        "editHint": "Sporočilo lahko urejate 15 minut po pošiljanju.",
+        "editFieldLabel": "Uredi sporočilo"
+      },
+      "errors": {
+        "editWindowClosed": "Tega sporočila ni več mogoče urejati.",
+        "editThreadClosed": "Ta pogovor je zaprt, zato sporočil ni mogoče urejati.",
+        "notEditable": "Tega sporočila ni mogoče urejati.",
+        "alreadyDeleted": "To sporočilo je že izbrisano.",
+        "ownerNotMember": "Ta oseba ni član te agencije.",
+        "editFailed": "Spremembe nismo mogli shraniti.",
+        "deleteFailed": "Sporočila nismo mogli izbrisati."
+      },
+      "search": {
+        "resultsHeading": "Sporočila",
+        "noResults": "Ni ustreznih sporočil",
+        "error": "Sporočil nismo mogli poiskati.",
+        "minChars": "Za iskanje po sporočilih vnesite vsaj 2 znaka.",
+        "fromYou": "Vi",
+        "inThreadWith": "v pogovoru z {name}"
+      }
     },
     "nav": {
       "dashboard": "Nadzorna plošča",

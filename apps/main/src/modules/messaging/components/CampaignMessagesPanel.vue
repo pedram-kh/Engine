@@ -4,6 +4,8 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { agencyChatTransport, messagingApi, type ChatTransport } from '../api/messaging.api'
+import { useMessagesEditSearchFlag } from '../composables/useMessagesEditSearchFlag'
+import { previewOrDeleted } from '../utils/messageRevision'
 import ChatDialog from './ChatDialog.vue'
 import { creatorLabel } from '@/core/creators/creatorLabel'
 import CampaignFilesStrip from '@/modules/campaigns/components/CampaignFilesStrip.vue'
@@ -15,6 +17,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
+const editSearchOn = useMessagesEditSearchFlag()
 
 /** Badges refresh on a longer interval than the open thread's ~15s poll (D-12). */
 const ROLLUP_POLL_INTERVAL_MS = 45000
@@ -134,7 +137,14 @@ onBeforeUnmount(() => {
           {{ creatorLabel(row.attributes.creator, t, t('app.messaging.participant')) }}
         </v-list-item-title>
         <v-list-item-subtitle>
-          {{ row.attributes.last_message_preview ?? t('app.messaging.rollup.noMessages') }}
+          {{
+            previewOrDeleted(
+              row.attributes.last_message_preview,
+              row.attributes.last_message_is_deleted,
+              editSearchOn,
+              t('app.messaging.actions.deleted'),
+            ) ?? t('app.messaging.rollup.noMessages')
+          }}
         </v-list-item-subtitle>
         <template #append>
           <v-badge

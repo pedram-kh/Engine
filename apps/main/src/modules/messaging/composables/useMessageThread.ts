@@ -22,7 +22,14 @@ export const THREAD_POLL_INTERVAL_MS = 15000
 /** The minimal message shape the engine needs: an id + a created_at. */
 interface ThreadMessageLike {
   id: string
-  attributes: { created_at: string }
+  attributes: {
+    created_at: string
+    /** AH-119 Stage B: optimistic edit / delete touch these; absent on older fixtures. */
+    body?: string | null
+    attachments?: unknown[]
+    edited_at?: string | null
+    is_deleted?: boolean
+  }
 }
 
 /** The minimal thread-meta shape: unread count + last-message stamp (+ optional campaign-only block flag). */
@@ -41,6 +48,16 @@ export interface GenericChatTransport<
   list(before?: string): Promise<{ data: TMessage[]; meta: { thread: TMeta; has_more: boolean } }>
   send(payload: TSend): Promise<{ data: TMessage }>
   markRead(): Promise<unknown>
+  /** AH-119 Stage B: absent where edit and delete do not exist (the surface never calls them). */
+  edit?(messageId: string, payload: { body: string }): Promise<{ data: TMessage }>
+  remove?(messageId: string): Promise<{ data: TMessage }>
+}
+
+function revisionDiffers(a: ThreadMessageLike, b: ThreadMessageLike): boolean {
+  return (
+    (a.attributes.edited_at ?? null) !== (b.attributes.edited_at ?? null) ||
+    (a.attributes.is_deleted ?? false) !== (b.attributes.is_deleted ?? false)
+  )
 }
 
 export function useMessageThread<
@@ -55,6 +72,9 @@ export function useMessageThread<
   const loadingOlder = ref(false)
   const sending = ref(false)
   const loadError = ref(false)
+
+  // Message ids with an edit / delete in flight: a poll must not overwrite their optimistic state.
+  const inFlight = new Set<string>()
 
   let cancelled = false
   let timer: ReturnType<typeof setTimeout> | null = null
@@ -89,8 +109,20 @@ export function useMessageThread<
       } else {
         const known = new Set(messages.value.map((m) => m.id))
         const fresh = res.data.filter((m) => !known.has(m.id))
-        if (fresh.length > 0) {
-          messages.value = [...messages.value, ...fresh]
+        // AH-119 Stage B: an edit or a delete made on the other side arrives as a changed
+        // `edited_at` / `is_deleted` on a message we already hold.
+        const incoming = new Map(res.data.map((m) => [m.id, m]))
+        let changed = false
+        const merged = messages.value.map((m) => {
+          const next = incoming.get(m.id)
+          if (next === undefined || inFlight.has(m.id) || !revisionDiffers(m, next)) {
+            return m
+          }
+          changed = true
+          return next
+        })
+        if (fresh.length > 0 || changed) {
+          messages.value = [...merged, ...fresh]
         }
       }
 
@@ -167,6 +199,63 @@ export function useMessageThread<
     }
   }
 
+  function replaceMessage(id: string, next: TMessage): void {
+    messages.value = messages.value.map((m) => (m.id === id ? next : m))
+  }
+
+  /**
+   * AH-119 Stage B: optimistic edit. The bubble shows the new text at once; a refused edit puts
+   * the old message back and rethrows so the caller can show the mapped error.
+   */
+  async function editMessage(id: string, body: string): Promise<TMessage> {
+    const client = transport.value
+    const before = messages.value.find((m) => m.id === id)
+    if (client === null || client.edit === undefined || before === undefined) {
+      throw new Error('Chat transport is not ready.')
+    }
+
+    inFlight.add(id)
+    replaceMessage(id, {
+      ...before,
+      attributes: { ...before.attributes, body, edited_at: new Date().toISOString() },
+    })
+    try {
+      const res = await client.edit(id, { body })
+      replaceMessage(id, res.data)
+      return res.data
+    } catch (err) {
+      replaceMessage(id, before)
+      throw err
+    } finally {
+      inFlight.delete(id)
+    }
+  }
+
+  /** AH-119 Stage B: optimistic delete (masked at once, restored if the server refuses). */
+  async function deleteMessage(id: string): Promise<TMessage> {
+    const client = transport.value
+    const before = messages.value.find((m) => m.id === id)
+    if (client === null || client.remove === undefined || before === undefined) {
+      throw new Error('Chat transport is not ready.')
+    }
+
+    inFlight.add(id)
+    replaceMessage(id, {
+      ...before,
+      attributes: { ...before.attributes, body: null, attachments: [], is_deleted: true },
+    })
+    try {
+      const res = await client.remove(id)
+      replaceMessage(id, res.data)
+      return res.data
+    } catch (err) {
+      replaceMessage(id, before)
+      throw err
+    } finally {
+      inFlight.delete(id)
+    }
+  }
+
   async function tick(): Promise<void> {
     if (cancelled) {
       return
@@ -226,6 +315,8 @@ export function useMessageThread<
     refresh,
     loadOlder,
     sendMessage,
+    editMessage,
+    deleteMessage,
     start,
     stop,
   }

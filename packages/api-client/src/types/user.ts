@@ -135,6 +135,8 @@ export interface UserAttributes {
     assignment_offer_edit?: boolean
     /** AH-119: agency-side only; true while the unified Messages inbox is on. */
     messages_v2_inbox?: boolean
+    /** AH-119 Stage B: true while message edit, delete and search are on (creator and agency). */
+    messages_v2_edit_search?: boolean
   }
 }
 

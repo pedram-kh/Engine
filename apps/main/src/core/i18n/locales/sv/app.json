@@ -131,7 +131,38 @@
       },
       "attachmentDropHint": "Släpp en bild för att bifoga den",
       "attachmentImageUnavailable": "Bilden är inte tillgänglig",
-      "attachmentPasteUnsupportedType": "Endast bilder kan klistras in här. Använd gem-ikonen för andra filer."
+      "attachmentPasteUnsupportedType": "Endast bilder kan klistras in här. Använd gem-ikonen för andra filer.",
+      "actions": {
+        "menu": "Meddelandeåtgärder",
+        "edit": "Redigera",
+        "delete": "Radera",
+        "save": "Spara",
+        "cancel": "Avbryt",
+        "edited": "redigerat",
+        "deleted": "Meddelandet raderat",
+        "deleteTitle": "Radera det här meddelandet?",
+        "deleteBody": "Båda sidor ser ”Meddelandet raderat”. Filer du har bifogat ligger kvar tills kontot raderas.",
+        "deleteConfirm": "Radera",
+        "editHint": "Du kan redigera ett meddelande i 15 minuter efter att du skickat det.",
+        "editFieldLabel": "Redigera meddelande"
+      },
+      "errors": {
+        "editWindowClosed": "Det här meddelandet kan inte längre redigeras.",
+        "editThreadClosed": "Den här konversationen är stängd, så meddelanden kan inte redigeras.",
+        "notEditable": "Det här meddelandet kan inte redigeras.",
+        "alreadyDeleted": "Det här meddelandet har redan raderats.",
+        "ownerNotMember": "Den personen är inte medlem i den här byrån.",
+        "editFailed": "Vi kunde inte spara ändringen.",
+        "deleteFailed": "Vi kunde inte radera meddelandet."
+      },
+      "search": {
+        "resultsHeading": "Meddelanden",
+        "noResults": "Inga meddelanden matchar",
+        "error": "Vi kunde inte söka i meddelanden.",
+        "minChars": "Skriv minst 2 tecken för att söka i meddelanden.",
+        "fromYou": "Du",
+        "inThreadWith": "i konversationen med {name}"
+      }
     },
     "nav": {
       "dashboard": "Dashboard",

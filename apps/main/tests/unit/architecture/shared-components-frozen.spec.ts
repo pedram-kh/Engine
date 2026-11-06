@@ -47,9 +47,9 @@ const FROZEN_COMPONENTS: ReadonlyArray<readonly [string, string]> = [
     'b7a56fd099ccdd60c1e944d87260f3ff624c431985e05e453df2c3b8c25d8338',
   ],
   [
-    // AH-119 A6: linkify + inline images + paste, build 4 — intended edit, hash re-pinned.
+    // AH-119 Stage B: edit / delete actions, "edited" tag and deleted placeholder behind messages_v2_edit_search — intended edit, hash re-pinned (flag off renders the pre-Stage-B DOM, pinned in stageBFlagOffPins.json).
     'apps/main/src/modules/messaging/components/ChatPanel.vue',
-    '46f2d49424476561c7cf1f43b9f8a02ee4c3a8c84f98f526eb701c8875e6ec45',
+    '441311a723d1880a795ea16490948b9e5d486045f6741bdd051ee974dacc6ab9',
   ],
   [
     'apps/main/src/modules/messaging/components/ContactPicker.vue',
@@ -60,9 +60,9 @@ const FROZEN_COMPONENTS: ReadonlyArray<readonly [string, string]> = [
     '1766bf603c46ab7ac0b8684d6d6b58e2b655904a0f7795fbfd9a68578e6cef05',
   ],
   [
-    // AH-119 A6: linkify + inline images + paste, build 4 — intended edit, hash re-pinned.
+    // AH-119 Stage B: edit / delete actions, "edited" tag and deleted placeholder behind messages_v2_edit_search — intended edit, hash re-pinned (flag off renders the pre-Stage-B DOM, pinned in stageBFlagOffPins.json).
     'apps/main/src/modules/messaging/components/RelationshipThreadView.vue',
-    'aeab5ad185e0d65734fc7470221d999399c043bc016cdf65afbfaff4c33bbf96',
+    'ee3a912d36cecbe3c7807d4ab79e50b0ff61714a5c0ef99aa133fcc68f2f2711',
   ],
   [
     'apps/main/src/modules/messaging/components/ReportFallback.vue',

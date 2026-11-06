@@ -131,7 +131,38 @@
       },
       "attachmentDropHint": "Lohista pilt siia, et see lisada",
       "attachmentImageUnavailable": "Pilt pole saadaval",
-      "attachmentPasteUnsupportedType": "Siia saab kleepida ainult pilte. Muude failide jaoks kasuta kirjaklambrit."
+      "attachmentPasteUnsupportedType": "Siia saab kleepida ainult pilte. Muude failide jaoks kasuta kirjaklambrit.",
+      "actions": {
+        "menu": "Sõnumi toimingud",
+        "edit": "Muuda",
+        "delete": "Kustuta",
+        "save": "Salvesta",
+        "cancel": "Tühista",
+        "edited": "muudetud",
+        "deleted": "Sõnum kustutatud",
+        "deleteTitle": "Kas kustutada see sõnum?",
+        "deleteBody": "Mõlemad pooled näevad teadet „Sõnum kustutatud“. Sinu lisatud failid jäävad salvestatuks, kuni konto kustutatakse.",
+        "deleteConfirm": "Kustuta",
+        "editHint": "Saad sõnumit muuta 15 minutit pärast selle saatmist.",
+        "editFieldLabel": "Muuda sõnumit"
+      },
+      "errors": {
+        "editWindowClosed": "Seda sõnumit ei saa enam muuta.",
+        "editThreadClosed": "See vestlus on suletud, seega ei saa sõnumeid muuta.",
+        "notEditable": "Seda sõnumit ei saa muuta.",
+        "alreadyDeleted": "See sõnum on juba kustutatud.",
+        "ownerNotMember": "See isik ei ole selle agentuuri liige.",
+        "editFailed": "Muudatuse salvestamine ebaõnnestus.",
+        "deleteFailed": "Sõnumi kustutamine ebaõnnestus."
+      },
+      "search": {
+        "resultsHeading": "Sõnumid",
+        "noResults": "Ühtegi sõnumit ei leitud",
+        "error": "Sõnumite otsimine ebaõnnestus.",
+        "minChars": "Sõnumite otsimiseks sisesta vähemalt 2 märki.",
+        "fromYou": "Sina",
+        "inThreadWith": "vestluses kasutajaga {name}"
+      }
     },
     "nav": {
       "dashboard": "Juhtpaneel",

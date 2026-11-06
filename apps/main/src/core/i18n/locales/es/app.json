@@ -131,7 +131,38 @@
       },
       "attachmentDropHint": "Suelta una imagen para adjuntarla",
       "attachmentImageUnavailable": "Imagen no disponible",
-      "attachmentPasteUnsupportedType": "Aquí solo se pueden pegar imágenes. Usa el clip para otros archivos."
+      "attachmentPasteUnsupportedType": "Aquí solo se pueden pegar imágenes. Usa el clip para otros archivos.",
+      "actions": {
+        "menu": "Acciones del mensaje",
+        "edit": "Editar",
+        "delete": "Eliminar",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "edited": "editado",
+        "deleted": "Mensaje eliminado",
+        "deleteTitle": "¿Eliminar este mensaje?",
+        "deleteBody": "Ambas partes verán «Mensaje eliminado». Los archivos que adjuntaste se conservan hasta que se borre la cuenta.",
+        "deleteConfirm": "Eliminar",
+        "editHint": "Puedes editar un mensaje durante 15 minutos después de enviarlo.",
+        "editFieldLabel": "Editar mensaje"
+      },
+      "errors": {
+        "editWindowClosed": "Este mensaje ya no se puede editar.",
+        "editThreadClosed": "Esta conversación está cerrada, por lo que no se pueden editar los mensajes.",
+        "notEditable": "Este mensaje no se puede editar.",
+        "alreadyDeleted": "Este mensaje ya se eliminó.",
+        "ownerNotMember": "Esa persona no es miembro de esta agencia.",
+        "editFailed": "No pudimos guardar el cambio.",
+        "deleteFailed": "No pudimos eliminar el mensaje."
+      },
+      "search": {
+        "resultsHeading": "Mensajes",
+        "noResults": "Ningún mensaje coincide",
+        "error": "No pudimos buscar mensajes.",
+        "minChars": "Escribe al menos 2 caracteres para buscar mensajes.",
+        "fromYou": "Tú",
+        "inThreadWith": "en la conversación con {name}"
+      }
     },
     "nav": {
       "dashboard": "Panel",

@@ -131,7 +131,38 @@
       },
       "attachmentDropHint": "Trage o imagine pentru a o atașa",
       "attachmentImageUnavailable": "Imagine indisponibilă",
-      "attachmentPasteUnsupportedType": "Aici pot fi lipite doar imagini. Folosește agrafa pentru alte fișiere."
+      "attachmentPasteUnsupportedType": "Aici pot fi lipite doar imagini. Folosește agrafa pentru alte fișiere.",
+      "actions": {
+        "menu": "Acțiuni pentru mesaj",
+        "edit": "Editează",
+        "delete": "Șterge",
+        "save": "Salvează",
+        "cancel": "Anulează",
+        "edited": "editat",
+        "deleted": "Mesaj șters",
+        "deleteTitle": "Ștergi acest mesaj?",
+        "deleteBody": "Ambele părți vor vedea „Mesaj șters”. Fișierele atașate de tine rămân stocate până la ștergerea contului.",
+        "deleteConfirm": "Șterge",
+        "editHint": "Poți edita un mesaj timp de 15 minute după trimitere.",
+        "editFieldLabel": "Editează mesajul"
+      },
+      "errors": {
+        "editWindowClosed": "Acest mesaj nu mai poate fi editat.",
+        "editThreadClosed": "Această conversație este închisă, așa că mesajele nu pot fi editate.",
+        "notEditable": "Acest mesaj nu poate fi editat.",
+        "alreadyDeleted": "Acest mesaj a fost deja șters.",
+        "ownerNotMember": "Acea persoană nu este membră a acestei agenții.",
+        "editFailed": "Nu am putut salva modificarea.",
+        "deleteFailed": "Nu am putut șterge mesajul."
+      },
+      "search": {
+        "resultsHeading": "Mesaje",
+        "noResults": "Niciun mesaj nu se potrivește",
+        "error": "Nu am putut căuta în mesaje.",
+        "minChars": "Introdu cel puțin 2 caractere pentru a căuta în mesaje.",
+        "fromYou": "Tu",
+        "inThreadWith": "în conversația cu {name}"
+      }
     },
     "nav": {
       "dashboard": "Panou de control",

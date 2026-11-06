@@ -20,8 +20,11 @@ import { useDisplay } from 'vuetify'
 import { relationshipMessagingApi } from '../api/relationshipMessaging.api'
 import ContactPicker, { type ContactPickerItem } from '../components/ContactPicker.vue'
 import RelationshipInbox, { type RelationshipInboxItem } from '../components/RelationshipInbox.vue'
+import { useMessagesEditSearchFlag } from '../composables/useMessagesEditSearchFlag'
+import { previewOrDeleted } from '../utils/messageRevision'
 
 const { t } = useI18n()
+const editSearchOn = useMessagesEditSearchFlag()
 const route = useRoute()
 const display = useDisplay()
 
@@ -52,7 +55,12 @@ const items = computed<RelationshipInboxItem[]>(() =>
       return {
         id: agency.id as string,
         title: name,
-        preview: row.attributes.last_message_preview,
+        preview: previewOrDeleted(
+          row.attributes.last_message_preview,
+          row.attributes.last_message_is_deleted,
+          editSearchOn.value,
+          t('app.messaging.actions.deleted'),
+        ),
         lastMessageAt: row.attributes.last_message_at,
         unreadCount: row.attributes.unread_count,
         avatarText: name,

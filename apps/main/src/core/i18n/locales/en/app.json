@@ -131,7 +131,38 @@
       },
       "attachmentDropHint": "Drop an image to attach it",
       "attachmentImageUnavailable": "Image unavailable",
-      "attachmentPasteUnsupportedType": "Only images can be pasted here. Use the paperclip for other files."
+      "attachmentPasteUnsupportedType": "Only images can be pasted here. Use the paperclip for other files.",
+      "actions": {
+        "menu": "Message actions",
+        "edit": "Edit",
+        "delete": "Delete",
+        "save": "Save",
+        "cancel": "Cancel",
+        "edited": "edited",
+        "deleted": "Message deleted",
+        "deleteTitle": "Delete this message?",
+        "deleteBody": "Both sides will see \"Message deleted\". Files you attached stay stored until the account is erased.",
+        "deleteConfirm": "Delete",
+        "editHint": "You can edit a message for 15 minutes after sending it.",
+        "editFieldLabel": "Edit message"
+      },
+      "errors": {
+        "editWindowClosed": "This message can no longer be edited.",
+        "editThreadClosed": "This conversation is closed, so messages can't be edited.",
+        "notEditable": "This message can't be edited.",
+        "alreadyDeleted": "This message was already deleted.",
+        "ownerNotMember": "That person is not a member of this agency.",
+        "editFailed": "We couldn't save the change.",
+        "deleteFailed": "We couldn't delete the message."
+      },
+      "search": {
+        "resultsHeading": "Messages",
+        "noResults": "No messages match",
+        "error": "We couldn't search messages.",
+        "minChars": "Type at least 2 characters to search messages.",
+        "fromYou": "You",
+        "inThreadWith": "in {name}"
+      }
     },
     "nav": {
       "dashboard": "Dashboard",

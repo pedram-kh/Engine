@@ -24,6 +24,11 @@ vi.mock('@/core/platform/isNativePlatform', () => ({
   isNativePlatform: () => platform.native,
 }))
 
+import {
+  FLAG_OFF_PINS,
+  relTransport,
+  renderHtml,
+} from '../../../../tests/unit/helpers/stageBFlagOff'
 import type { RelationshipChatTransport } from '../api/relationshipMessaging.api'
 import RelationshipThreadView from './RelationshipThreadView.vue'
 
@@ -431,4 +436,36 @@ describe.each([
     )
     wrapper.unmount()
   })
+})
+
+// AH-119 Stage B — flag off = the DOM of today. The panel is rendered with the Stage B switch off
+// (no Pinia, the switch false, and the switch absent) in the web and the Capacitor polarity and must
+// equal the markup captured from the last pre-Stage-B commit (`stageBFlagOffPins.json`).
+//
+// Break-revert: render a `<!--v-if-->` instead of the empty gate, or add any element or class to the
+// bubble for a flag-off message → these pins fail.
+describe('RelationshipThreadView — Stage B flag off renders the pre-Stage-B markup', () => {
+  const SWITCHES: Array<[string, Record<string, boolean> | undefined]> = [
+    ['no Pinia', undefined],
+    ['switch false', { messages_v2_edit_search: false }],
+    ['switch absent', {}],
+  ]
+
+  for (const native of [false, true]) {
+    for (const [label, features] of SWITCHES) {
+      it(`${native ? 'native' : 'web'}, ${label}: identical to the pin`, async () => {
+        platform.native = native
+        const html = await renderHtml(
+          RelationshipThreadView,
+          { transport: relTransport(), title: 'X' },
+          '[data-test="relationship-thread"]',
+          features === undefined ? {} : { features },
+        )
+        expect(html).toBe(FLAG_OFF_PINS[`rel-${native ? 'native' : 'web'}`])
+        expect(html).not.toContain('message-actions')
+        expect(html).not.toContain('message-edited')
+        expect(html).not.toContain('message-deleted')
+      })
+    }
+  }
 })

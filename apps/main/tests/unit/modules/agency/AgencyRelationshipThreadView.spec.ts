@@ -18,6 +18,7 @@ import * as vuetifyComponents from 'vuetify/components'
 import * as vuetifyDirectives from 'vuetify/directives'
 
 import enApp from '@/core/i18n/locales/en/app.json'
+import { FLAG_OFF_PINS, relTransport, renderHtml } from '../../helpers/stageBFlagOff'
 import AgencyRelationshipThreadView from '@/modules/agency/components/AgencyRelationshipThreadView.vue'
 import type { AgencyThreadMessage } from '@/modules/messaging/api/agencyThreadTransport'
 import type { RelationshipChatTransport } from '@/modules/messaging/api/relationshipMessaging.api'
@@ -947,4 +948,37 @@ describe('AgencyRelationshipThreadView — AH-119 additions', () => {
       wrapper.unmount()
     })
   })
+})
+
+// AH-119 Stage B — flag off = the DOM of today, for the Direct and the campaign transport alike
+// (the markup does not depend on the transport), open and closed thread.
+describe('AgencyRelationshipThreadView — Stage B flag off renders the pre-Stage-B markup', () => {
+  const SWITCHES: Array<[string, Record<string, boolean> | undefined]> = [
+    ['no Pinia', undefined],
+    ['switch false', { messages_v2_edit_search: false }],
+    ['switch absent', {}],
+  ]
+
+  for (const [label, features] of SWITCHES) {
+    it(`open thread, ${label}: identical to the pin`, async () => {
+      const html = await renderHtml(
+        AgencyRelationshipThreadView,
+        { transport: relTransport(), title: 'X' },
+        '[data-test="relationship-thread"]',
+        features === undefined ? {} : { features },
+      )
+      expect(html).toBe(FLAG_OFF_PINS['agency'])
+      expect(html).not.toContain('message-actions')
+    })
+
+    it(`closed thread, ${label}: identical to the pin`, async () => {
+      const html = await renderHtml(
+        AgencyRelationshipThreadView,
+        { transport: relTransport(false), title: 'X' },
+        '[data-test="relationship-thread"]',
+        features === undefined ? {} : { features },
+      )
+      expect(html).toBe(FLAG_OFF_PINS['agency-closed'])
+    })
+  }
 })

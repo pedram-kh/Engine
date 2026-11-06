@@ -131,7 +131,38 @@
       },
       "attachmentDropHint": "Nometiet attēlu, lai to pievienotu",
       "attachmentImageUnavailable": "Attēls nav pieejams",
-      "attachmentPasteUnsupportedType": "Šeit var ielīmēt tikai attēlus. Citiem failiem izmantojiet saspraudi."
+      "attachmentPasteUnsupportedType": "Šeit var ielīmēt tikai attēlus. Citiem failiem izmantojiet saspraudi.",
+      "actions": {
+        "menu": "Ziņas darbības",
+        "edit": "Rediģēt",
+        "delete": "Dzēst",
+        "save": "Saglabāt",
+        "cancel": "Atcelt",
+        "edited": "rediģēta",
+        "deleted": "Ziņa izdzēsta",
+        "deleteTitle": "Vai dzēst šo ziņu?",
+        "deleteBody": "Abas puses redzēs „Ziņa izdzēsta”. Jūsu pievienotie faili paliek saglabāti, līdz konts tiek dzēsts.",
+        "deleteConfirm": "Dzēst",
+        "editHint": "Ziņu var rediģēt 15 minūtes pēc nosūtīšanas.",
+        "editFieldLabel": "Rediģēt ziņu"
+      },
+      "errors": {
+        "editWindowClosed": "Šo ziņu vairs nevar rediģēt.",
+        "editThreadClosed": "Šī saruna ir slēgta, tāpēc ziņas nevar rediģēt.",
+        "notEditable": "Šo ziņu nevar rediģēt.",
+        "alreadyDeleted": "Šī ziņa jau ir izdzēsta.",
+        "ownerNotMember": "Šī persona nav šīs aģentūras dalībnieks.",
+        "editFailed": "Mēs nevarējām saglabāt izmaiņas.",
+        "deleteFailed": "Mēs nevarējām izdzēst ziņu."
+      },
+      "search": {
+        "resultsHeading": "Ziņas",
+        "noResults": "Nav atbilstošu ziņu",
+        "error": "Mēs nevarējām meklēt ziņās.",
+        "minChars": "Ievadiet vismaz 2 rakstzīmes, lai meklētu ziņās.",
+        "fromYou": "Jūs",
+        "inThreadWith": "sarunā ar {name}"
+      }
     },
     "nav": {
       "dashboard": "Vadības panelis",

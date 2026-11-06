@@ -1172,6 +1172,29 @@ export async function setFeatureFlag(
 }
 
 /**
+ * AH-119 Stage B — move a message's `created_at` back by `minutes` so it falls outside the
+ * 15-minute edit window. `POST /api/v1/_test/messages/{ulid}/age` (local/testing only; either
+ * message table; works on a deleted row). 422 for `minutes` outside 1..10080, 404 for an
+ * unknown ULID.
+ */
+export async function ageMessage(
+  request: APIRequestContext,
+  messageUlid: string,
+  minutes: number,
+): Promise<void> {
+  const response = await request.post(
+    `http://127.0.0.1:8000/api/v1/_test/messages/${encodeURIComponent(messageUlid)}/age`,
+    { headers: defaultHeaders, data: { minutes } },
+  )
+
+  if (response.status() !== 200) {
+    throw new Error(
+      `ageMessage(${messageUlid}, ${minutes}) failed with status ${response.status()}: ${await response.text()}`,
+    )
+  }
+}
+
+/**
  * AH-118 — as the signed-in AGENCY user, edit an assignment's offer amount
  * through the real Creators-tab button and dialog, and wait for the success
  * snackbar. Assumes the agency session is already signed in.

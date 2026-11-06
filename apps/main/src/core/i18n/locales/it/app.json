@@ -131,7 +131,38 @@
       },
       "attachmentDropHint": "Trascina un’immagine per allegarla",
       "attachmentImageUnavailable": "Immagine non disponibile",
-      "attachmentPasteUnsupportedType": "Qui si possono incollare solo immagini. Usa la graffetta per gli altri file."
+      "attachmentPasteUnsupportedType": "Qui si possono incollare solo immagini. Usa la graffetta per gli altri file.",
+      "actions": {
+        "menu": "Azioni sul messaggio",
+        "edit": "Modifica",
+        "delete": "Elimina",
+        "save": "Salva",
+        "cancel": "Annulla",
+        "edited": "modificato",
+        "deleted": "Messaggio eliminato",
+        "deleteTitle": "Eliminare questo messaggio?",
+        "deleteBody": "Entrambe le parti vedranno «Messaggio eliminato». I file che hai allegato restano archiviati finché l’account non viene cancellato.",
+        "deleteConfirm": "Elimina",
+        "editHint": "Puoi modificare un messaggio per 15 minuti dopo averlo inviato.",
+        "editFieldLabel": "Modifica messaggio"
+      },
+      "errors": {
+        "editWindowClosed": "Questo messaggio non può più essere modificato.",
+        "editThreadClosed": "Questa conversazione è chiusa, quindi i messaggi non possono essere modificati.",
+        "notEditable": "Questo messaggio non può essere modificato.",
+        "alreadyDeleted": "Questo messaggio è già stato eliminato.",
+        "ownerNotMember": "Quella persona non è un membro di questa agenzia.",
+        "editFailed": "Non siamo riusciti a salvare la modifica.",
+        "deleteFailed": "Non siamo riusciti a eliminare il messaggio."
+      },
+      "search": {
+        "resultsHeading": "Messaggi",
+        "noResults": "Nessun messaggio corrisponde",
+        "error": "Non siamo riusciti a cercare i messaggi.",
+        "minChars": "Digita almeno 2 caratteri per cercare i messaggi.",
+        "fromYou": "Tu",
+        "inThreadWith": "nella conversazione con {name}"
+      }
     },
     "nav": {
       "dashboard": "Dashboard",

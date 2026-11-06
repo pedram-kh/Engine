@@ -57,11 +57,50 @@ const ATTACHMENT = [
   'attachmentPasteUnsupportedType',
 ].map((k) => `app.messaging.${k}`)
 
+// AH-119 Stage B — edit, delete and message search.
+const ACTIONS = [
+  'menu',
+  'edit',
+  'delete',
+  'save',
+  'cancel',
+  'edited',
+  'deleted',
+  'deleteTitle',
+  'deleteBody',
+  'deleteConfirm',
+  'editHint',
+  'editFieldLabel',
+].map((k) => `app.messaging.actions.${k}`)
+
+const ERRORS = [
+  'editWindowClosed',
+  'editThreadClosed',
+  'notEditable',
+  'alreadyDeleted',
+  'ownerNotMember',
+  'editFailed',
+  'deleteFailed',
+].map((k) => `app.messaging.errors.${k}`)
+
+const SEARCH = ['resultsHeading', 'noResults', 'error', 'minChars', 'fromYou', 'inThreadWith'].map(
+  (k) => `app.messaging.search.${k}`,
+)
+
 const COLOURS = ['violet', 'green', 'amber', 'blue', 'pink', 'teal', 'red', 'slate'].map(
   (k) => `app.brands.color.${k}`,
 )
 
-const KEYS = [...INBOX, ...THREAD, ...ATTACHMENT, 'app.brands.fields.color', ...COLOURS]
+const KEYS = [
+  ...INBOX,
+  ...THREAD,
+  ...ATTACHMENT,
+  ...ACTIONS,
+  ...ERRORS,
+  ...SEARCH,
+  'app.brands.fields.color',
+  ...COLOURS,
+]
 
 /**
  * (locale:key) pairs that are legitimately identical to English.
@@ -79,6 +118,8 @@ const SAME_AS_ENGLISH_BY_DESIGN = new Set<string>([
   'mt:app.messaging.inbox.brandsHeading',
   // "Mine" is the same word in Danish (possessive "mine").
   'da:app.messaging.inbox.ownerMine',
+  // "Messages" is the same word in French.
+  'fr:app.messaging.search.resultsHeading',
   // "Violet" is the same colour word in French and Romanian.
   'fr:app.brands.color.violet',
   'ro:app.brands.color.violet',
@@ -106,8 +147,8 @@ function tokens(value: string): string[] {
 }
 
 describe('messaging v2 / brand colour i18n keys', () => {
-  it('checks 42 keys across 24 locales', () => {
-    expect(KEYS).toHaveLength(42)
+  it('checks 67 keys across 24 locales', () => {
+    expect(KEYS).toHaveLength(67)
     expect(UI_LOCALES).toHaveLength(24)
   })
 

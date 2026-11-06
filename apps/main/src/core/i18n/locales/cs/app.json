@@ -131,7 +131,38 @@
       },
       "attachmentDropHint": "Přetažením obrázku jej připojíte",
       "attachmentImageUnavailable": "Obrázek není k dispozici",
-      "attachmentPasteUnsupportedType": "Sem lze vložit pouze obrázky. Pro ostatní soubory použijte sponku."
+      "attachmentPasteUnsupportedType": "Sem lze vložit pouze obrázky. Pro ostatní soubory použijte sponku.",
+      "actions": {
+        "menu": "Akce se zprávou",
+        "edit": "Upravit",
+        "delete": "Smazat",
+        "save": "Uložit",
+        "cancel": "Zrušit",
+        "edited": "upraveno",
+        "deleted": "Zpráva byla smazána",
+        "deleteTitle": "Smazat tuto zprávu?",
+        "deleteBody": "Obě strany uvidí „Zpráva byla smazána“. Soubory, které jste připojili, zůstanou uložené, dokud nebude účet vymazán.",
+        "deleteConfirm": "Smazat",
+        "editHint": "Zprávu můžete upravit do 15 minut po odeslání.",
+        "editFieldLabel": "Upravit zprávu"
+      },
+      "errors": {
+        "editWindowClosed": "Tuto zprávu už nelze upravit.",
+        "editThreadClosed": "Tato konverzace je uzavřena, proto zprávy nelze upravovat.",
+        "notEditable": "Tuto zprávu nelze upravit.",
+        "alreadyDeleted": "Tato zpráva už byla smazána.",
+        "ownerNotMember": "Tato osoba není členem této agentury.",
+        "editFailed": "Změnu se nepodařilo uložit.",
+        "deleteFailed": "Zprávu se nepodařilo smazat."
+      },
+      "search": {
+        "resultsHeading": "Zprávy",
+        "noResults": "Žádné odpovídající zprávy",
+        "error": "Zprávy se nepodařilo vyhledat.",
+        "minChars": "Pro hledání ve zprávách zadejte alespoň 2 znaky.",
+        "fromYou": "Vy",
+        "inThreadWith": "v konverzaci s {name}"
+      }
     },
     "nav": {
       "dashboard": "Řídicí panel",

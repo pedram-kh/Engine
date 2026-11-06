@@ -208,3 +208,54 @@ describe('assignmentThreadTransport delegation', () => {
     expect(c.attachmentComplete).toHaveBeenCalledWith('u1')
   })
 })
+
+describe('assignmentThreadTransport — Stage B edit and delete (AH-119)', () => {
+  it('maps edited_at and is_deleted, defaulting to null and false when the API omits them', async () => {
+    const t = assignmentThreadTransport(
+      chat({
+        list: vi.fn().mockResolvedValue({
+          data: [
+            message('m1', { edited_at: '2026-01-01T09:35:00+00:00', is_deleted: true } as never),
+            message('m2'),
+          ],
+          meta: {
+            thread: { id: 't', last_message_at: null, unread_count: 0, human_send_blocked: false },
+            has_more: false,
+          },
+        }),
+      }),
+    )
+    const res = await t.list()
+    expect(res.data[0]?.attributes.edited_at).toBe('2026-01-01T09:35:00+00:00')
+    expect(res.data[0]?.attributes.is_deleted).toBe(true)
+    expect(res.data[1]?.attributes.edited_at).toBeNull()
+    expect(res.data[1]?.attributes.is_deleted).toBe(false)
+  })
+
+  it('edit forwards the id and body and maps the result', async () => {
+    const edit = vi
+      .fn()
+      .mockResolvedValue({ data: message('m1', { body: 'fixed', edited_at: 'T' } as never) })
+    const t = assignmentThreadTransport(chat({ edit }))
+    const res = await t.edit!('m1', { body: 'fixed' })
+    expect(edit).toHaveBeenCalledWith('m1', { body: 'fixed' })
+    expect(res.data.attributes.body).toBe('fixed')
+    expect(res.data.attributes.edited_at).toBe('T')
+  })
+
+  it('remove forwards the id and maps the masked result', async () => {
+    const remove = vi
+      .fn()
+      .mockResolvedValue({ data: message('m1', { body: null, is_deleted: true } as never) })
+    const t = assignmentThreadTransport(chat({ remove }))
+    const res = await t.remove!('m1')
+    expect(remove).toHaveBeenCalledWith('m1')
+    expect(res.data.attributes.is_deleted).toBe(true)
+  })
+
+  it('offers no edit or remove when the chat transport has none', () => {
+    const t = assignmentThreadTransport(chat())
+    expect(t.edit).toBeUndefined()
+    expect(t.remove).toBeUndefined()
+  })
+})

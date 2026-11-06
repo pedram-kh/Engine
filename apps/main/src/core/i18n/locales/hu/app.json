@@ -131,7 +131,38 @@
       },
       "attachmentDropHint": "Húzz ide egy képet a csatoláshoz",
       "attachmentImageUnavailable": "A kép nem érhető el",
-      "attachmentPasteUnsupportedType": "Itt csak képeket lehet beilleszteni. Más fájlokhoz használd a gemkapcsot."
+      "attachmentPasteUnsupportedType": "Itt csak képeket lehet beilleszteni. Más fájlokhoz használd a gemkapcsot.",
+      "actions": {
+        "menu": "Üzenetműveletek",
+        "edit": "Szerkesztés",
+        "delete": "Törlés",
+        "save": "Mentés",
+        "cancel": "Mégse",
+        "edited": "szerkesztve",
+        "deleted": "Üzenet törölve",
+        "deleteTitle": "Törlöd ezt az üzenetet?",
+        "deleteBody": "Mindkét fél az „Üzenet törölve” szöveget fogja látni. A csatolt fájlok a fiók törléséig tárolva maradnak.",
+        "deleteConfirm": "Törlés",
+        "editHint": "Egy üzenetet a küldés után 15 percig szerkeszthetsz.",
+        "editFieldLabel": "Üzenet szerkesztése"
+      },
+      "errors": {
+        "editWindowClosed": "Ez az üzenet már nem szerkeszthető.",
+        "editThreadClosed": "Ez a beszélgetés lezárult, ezért az üzenetek nem szerkeszthetők.",
+        "notEditable": "Ez az üzenet nem szerkeszthető.",
+        "alreadyDeleted": "Ez az üzenet már törölve lett.",
+        "ownerNotMember": "Ez a személy nem tagja ennek az ügynökségnek.",
+        "editFailed": "Nem sikerült menteni a módosítást.",
+        "deleteFailed": "Nem sikerült törölni az üzenetet."
+      },
+      "search": {
+        "resultsHeading": "Üzenetek",
+        "noResults": "Nincs találat az üzenetek között",
+        "error": "Nem sikerült keresni az üzenetek között.",
+        "minChars": "Az üzenetek kereséséhez írj be legalább 2 karaktert.",
+        "fromYou": "Te",
+        "inThreadWith": "itt: {name}"
+      }
     },
     "nav": {
       "dashboard": "Irányítópult",

@@ -13,6 +13,7 @@
  */
 
 import type {
+  EditMessagePayload,
   MessageAttachmentCompleteEnvelope,
   MessageAttachmentInitEnvelope,
   MessageAttachmentInitPayload,
@@ -40,6 +41,10 @@ export interface ChatTransport {
   markRead(): Promise<MessageMarkReadEnvelope>
   attachmentInit(payload: MessageAttachmentInitPayload): Promise<MessageAttachmentInitEnvelope>
   attachmentComplete(uploadId: string): Promise<MessageAttachmentCompleteEnvelope>
+  /** AH-119 Stage B: PATCH …/messages/{message}. 404 while `messages_v2_edit_search_enabled` is off. */
+  edit?(messageId: string, payload: EditMessagePayload): Promise<MessageEnvelope>
+  /** AH-119 Stage B: DELETE …/messages/{message}; answers the masked message. */
+  remove?(messageId: string): Promise<MessageEnvelope>
 }
 
 function listUrl(base: string, before?: string): string {
@@ -65,6 +70,9 @@ export function agencyChatTransport(
       http.post<MessageAttachmentCompleteEnvelope>(`${base}/attachments/complete`, {
         upload_id: uploadId,
       }),
+    edit: (messageId, payload) =>
+      http.patch<MessageEnvelope>(`${base}/${encodeURIComponent(messageId)}`, payload),
+    remove: (messageId) => http.delete<MessageEnvelope>(`${base}/${encodeURIComponent(messageId)}`),
   }
 }
 
@@ -80,6 +88,9 @@ export function creatorChatTransport(assignmentUlid: string): ChatTransport {
       http.post<MessageAttachmentCompleteEnvelope>(`${base}/attachments/complete`, {
         upload_id: uploadId,
       }),
+    edit: (messageId, payload) =>
+      http.patch<MessageEnvelope>(`${base}/${encodeURIComponent(messageId)}`, payload),
+    remove: (messageId) => http.delete<MessageEnvelope>(`${base}/${encodeURIComponent(messageId)}`),
   }
 }
 

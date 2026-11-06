@@ -185,3 +185,183 @@ describe('useMessageThread', () => {
     t.stop()
   })
 })
+
+// AH-119 Stage B — optimistic edit and delete, rollback, and the poll picking up the other side's
+// edit or delete.
+describe('useMessageThread — edit and delete (AH-119 Stage B)', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  const own = (id: string, attrs: Partial<MessageResource['attributes']> = {}) =>
+    msg(id, { is_own: true, body: 'first draft', ...attrs })
+
+  function deferred<T>() {
+    let resolve!: (v: T) => void
+    let reject!: (e: unknown) => void
+    const promise = new Promise<T>((res, rej) => {
+      resolve = res
+      reject = rej
+    })
+    return { promise, resolve, reject }
+  }
+
+  it('editMessage shows the new text at once, then adopts the server message', async () => {
+    const gate = deferred<{ data: MessageResource }>()
+    const transport = makeTransport({
+      list: vi.fn().mockResolvedValue(feed([own('m1')])),
+      edit: vi.fn().mockReturnValue(gate.promise),
+    })
+    const t = useMessageThread(ref(transport))
+    await t.start()
+
+    const pending = t.editMessage('m1', 'second draft')
+    // Optimistic: visible before the server answers, flagged edited.
+    expect(t.messages.value[0]?.attributes.body).toBe('second draft')
+    expect(t.messages.value[0]?.attributes.edited_at).toBeTruthy()
+    expect(transport.edit).toHaveBeenCalledWith('m1', { body: 'second draft' })
+
+    gate.resolve({
+      data: own('m1', { body: 'second draft', edited_at: '2026-01-01T00:05:00+00:00' }),
+    })
+    await pending
+    expect(t.messages.value[0]?.attributes.edited_at).toBe('2026-01-01T00:05:00+00:00')
+    t.stop()
+  })
+
+  it('editMessage rolls back to the original message when the server refuses, and rethrows', async () => {
+    const boom = new Error('edit_window_closed')
+    const transport = makeTransport({
+      list: vi.fn().mockResolvedValue(feed([own('m1')])),
+      edit: vi.fn().mockRejectedValue(boom),
+    })
+    const t = useMessageThread(ref(transport))
+    await t.start()
+    const before = t.messages.value[0]
+
+    await expect(t.editMessage('m1', 'second draft')).rejects.toBe(boom)
+
+    expect(t.messages.value[0]).toBe(before)
+    expect(t.messages.value[0]?.attributes.body).toBe('first draft')
+    expect(t.messages.value[0]?.attributes.edited_at ?? null).toBeNull()
+    t.stop()
+  })
+
+  it('deleteMessage masks the message at once (no body, no attachments) and adopts the server copy', async () => {
+    const gate = deferred<{ data: MessageResource }>()
+    const attachment = {
+      s3_path: 'p',
+      mime_type: 'image/png',
+      name: 'a.png',
+      size_bytes: 1,
+      view_url: 'https://x/a.png',
+    }
+    const transport = makeTransport({
+      list: vi.fn().mockResolvedValue(feed([own('m1', { attachments: [attachment] })])),
+      remove: vi.fn().mockReturnValue(gate.promise),
+    })
+    const t = useMessageThread(ref(transport))
+    await t.start()
+
+    const pending = t.deleteMessage('m1')
+    expect(t.messages.value[0]?.attributes.is_deleted).toBe(true)
+    expect(t.messages.value[0]?.attributes.body).toBeNull()
+    expect(t.messages.value[0]?.attributes.attachments).toEqual([])
+    expect(transport.remove).toHaveBeenCalledWith('m1')
+
+    gate.resolve({ data: own('m1', { body: null, attachments: [], is_deleted: true }) })
+    await pending
+    expect(t.messages.value[0]?.attributes.is_deleted).toBe(true)
+    t.stop()
+  })
+
+  it('deleteMessage rolls back (body and attachments restored) when the server refuses', async () => {
+    const attachment = {
+      s3_path: 'p',
+      mime_type: 'image/png',
+      name: 'a.png',
+      size_bytes: 1,
+      view_url: 'https://x/a.png',
+    }
+    const transport = makeTransport({
+      list: vi.fn().mockResolvedValue(feed([own('m1', { attachments: [attachment] })])),
+      remove: vi.fn().mockRejectedValue(new Error('nope')),
+    })
+    const t = useMessageThread(ref(transport))
+    await t.start()
+
+    await expect(t.deleteMessage('m1')).rejects.toThrow('nope')
+
+    expect(t.messages.value[0]?.attributes.is_deleted ?? false).toBe(false)
+    expect(t.messages.value[0]?.attributes.body).toBe('first draft')
+    expect(t.messages.value[0]?.attributes.attachments).toHaveLength(1)
+    t.stop()
+  })
+
+  it('refuses when the transport has no edit / remove (a surface without Stage B)', async () => {
+    const t = useMessageThread(ref(makeTransport()))
+    await t.start()
+    await expect(t.editMessage('m1', 'x')).rejects.toThrow()
+    await expect(t.deleteMessage('m1')).rejects.toThrow()
+    t.stop()
+  })
+
+  it('the poll merges edited_at and is_deleted of messages already held', async () => {
+    const list = vi
+      .fn()
+      .mockResolvedValueOnce(feed([msg('m1', { body: 'hi' }), msg('m2', { body: 'yo' })]))
+      .mockResolvedValue(
+        feed([
+          msg('m1', { body: 'hi there', edited_at: '2026-01-01T00:03:00+00:00' }),
+          msg('m2', { body: null, attachments: [], is_deleted: true }),
+        ]),
+      )
+    const t = useMessageThread(ref(makeTransport({ list })))
+    await t.start()
+    expect(t.messages.value[0]?.attributes.body).toBe('hi')
+
+    await vi.advanceTimersByTimeAsync(THREAD_POLL_INTERVAL_MS)
+
+    expect(t.messages.value[0]?.attributes.body).toBe('hi there')
+    expect(t.messages.value[0]?.attributes.edited_at).toBe('2026-01-01T00:03:00+00:00')
+    expect(t.messages.value[1]?.attributes.is_deleted).toBe(true)
+    expect(t.messages.value[1]?.attributes.body).toBeNull()
+    t.stop()
+  })
+
+  it('a poll that lands while an edit is in flight does not undo the optimistic text', async () => {
+    const gate = deferred<{ data: MessageResource }>()
+    const list = vi
+      .fn()
+      .mockResolvedValueOnce(feed([own('m1')]))
+      .mockResolvedValue(feed([own('m1', { edited_at: '2026-01-01T00:01:00+00:00' })]))
+    const transport = makeTransport({ list, edit: vi.fn().mockReturnValue(gate.promise) })
+    const t = useMessageThread(ref(transport))
+    await t.start()
+
+    const pending = t.editMessage('m1', 'second draft')
+    await vi.advanceTimersByTimeAsync(THREAD_POLL_INTERVAL_MS)
+    expect(t.messages.value[0]?.attributes.body).toBe('second draft')
+
+    gate.resolve({
+      data: own('m1', { body: 'second draft', edited_at: '2026-01-01T00:02:00+00:00' }),
+    })
+    await pending
+    t.stop()
+  })
+
+  it('an unchanged message in the poll keeps its object identity (no needless re-render)', async () => {
+    const list = vi.fn().mockResolvedValue(feed([msg('m1')]))
+    const t = useMessageThread(ref(makeTransport({ list })))
+    await t.start()
+    const first = t.messages.value[0]
+
+    await vi.advanceTimersByTimeAsync(THREAD_POLL_INTERVAL_MS)
+
+    expect(t.messages.value[0]).toBe(first)
+    t.stop()
+  })
+})

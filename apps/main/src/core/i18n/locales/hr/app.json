@@ -131,7 +131,38 @@
       },
       "attachmentDropHint": "Ispustite sliku da biste je priložili",
       "attachmentImageUnavailable": "Slika nije dostupna",
-      "attachmentPasteUnsupportedType": "Ovdje se mogu zalijepiti samo slike. Za ostale datoteke koristite spajalicu."
+      "attachmentPasteUnsupportedType": "Ovdje se mogu zalijepiti samo slike. Za ostale datoteke koristite spajalicu.",
+      "actions": {
+        "menu": "Radnje s porukom",
+        "edit": "Uredi",
+        "delete": "Izbriši",
+        "save": "Spremi",
+        "cancel": "Odustani",
+        "edited": "uređeno",
+        "deleted": "Poruka je izbrisana",
+        "deleteTitle": "Izbrisati ovu poruku?",
+        "deleteBody": "Obje strane vidjet će „Poruka je izbrisana“. Datoteke koje ste priložili ostaju pohranjene dok se račun ne izbriše.",
+        "deleteConfirm": "Izbriši",
+        "editHint": "Poruku možete urediti 15 minuta nakon slanja.",
+        "editFieldLabel": "Uredi poruku"
+      },
+      "errors": {
+        "editWindowClosed": "Ova se poruka više ne može urediti.",
+        "editThreadClosed": "Ovaj je razgovor zatvoren pa se poruke ne mogu uređivati.",
+        "notEditable": "Ova se poruka ne može urediti.",
+        "alreadyDeleted": "Ova je poruka već izbrisana.",
+        "ownerNotMember": "Ta osoba nije član ove agencije.",
+        "editFailed": "Nismo mogli spremiti promjenu.",
+        "deleteFailed": "Nismo mogli izbrisati poruku."
+      },
+      "search": {
+        "resultsHeading": "Poruke",
+        "noResults": "Nijedna poruka ne odgovara",
+        "error": "Nismo mogli pretražiti poruke.",
+        "minChars": "Unesite najmanje 2 znaka za pretraživanje poruka.",
+        "fromYou": "Vi",
+        "inThreadWith": "u razgovoru s {name}"
+      }
     },
     "nav": {
       "dashboard": "Upravljačka ploča",

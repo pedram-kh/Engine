@@ -131,7 +131,38 @@
       },
       "attachmentDropHint": "Sleep een afbeelding hierheen om deze toe te voegen",
       "attachmentImageUnavailable": "Afbeelding niet beschikbaar",
-      "attachmentPasteUnsupportedType": "Hier kunnen alleen afbeeldingen worden geplakt. Gebruik de paperclip voor andere bestanden."
+      "attachmentPasteUnsupportedType": "Hier kunnen alleen afbeeldingen worden geplakt. Gebruik de paperclip voor andere bestanden.",
+      "actions": {
+        "menu": "Berichtacties",
+        "edit": "Bewerken",
+        "delete": "Verwijderen",
+        "save": "Opslaan",
+        "cancel": "Annuleren",
+        "edited": "bewerkt",
+        "deleted": "Bericht verwijderd",
+        "deleteTitle": "Dit bericht verwijderen?",
+        "deleteBody": "Beide kanten zien „Bericht verwijderd”. Bestanden die je hebt bijgevoegd blijven opgeslagen tot het account wordt gewist.",
+        "deleteConfirm": "Verwijderen",
+        "editHint": "Je kunt een bericht tot 15 minuten na verzending bewerken.",
+        "editFieldLabel": "Bericht bewerken"
+      },
+      "errors": {
+        "editWindowClosed": "Dit bericht kan niet meer worden bewerkt.",
+        "editThreadClosed": "Dit gesprek is gesloten, dus berichten kunnen niet worden bewerkt.",
+        "notEditable": "Dit bericht kan niet worden bewerkt.",
+        "alreadyDeleted": "Dit bericht is al verwijderd.",
+        "ownerNotMember": "Die persoon is geen lid van dit bureau.",
+        "editFailed": "We konden de wijziging niet opslaan.",
+        "deleteFailed": "We konden het bericht niet verwijderen."
+      },
+      "search": {
+        "resultsHeading": "Berichten",
+        "noResults": "Geen berichten gevonden",
+        "error": "We konden niet in berichten zoeken.",
+        "minChars": "Typ minstens 2 tekens om berichten te zoeken.",
+        "fromYou": "Jij",
+        "inThreadWith": "in gesprek met {name}"
+      }
     },
     "nav": {
       "dashboard": "Dashboard",

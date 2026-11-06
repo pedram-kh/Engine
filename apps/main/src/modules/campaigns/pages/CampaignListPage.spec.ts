@@ -31,7 +31,7 @@ vi.mock('@/modules/brands/api/brands.api', () => ({
 
 import { campaignsApi } from '../api/campaigns.api'
 import { brandsApi } from '@/modules/brands/api/brands.api'
-import { brandMarkTone } from '@/modules/agency/status/agencyBrandTone'
+import { effectiveBrandColor } from '@/modules/agency/composables/brandColor'
 
 const localStorageStore: Record<string, string> = {}
 Object.defineProperty(globalThis, 'localStorage', {
@@ -685,21 +685,50 @@ describe('CampaignListPage — the AH-119 brand colour on the mark', () => {
     expect(mark.attributes('style')).toContain('var(--agency-brand-pink)')
   })
 
-  it('a brand with no colour keeps the hashed tone of the brand id', async () => {
+  it('a brand with no colour shows the palette colour derived from its id, as the inbox does', async () => {
     const harness = await mountList([withBrandColor(null)])
     cleanup = harness.cleanup
 
+    const derived = effectiveBrandColor(null, 'brand-ulid')
     const mark = harness.wrapper.get('[data-test="agency-brand-mark"]')
-    expect(mark.attributes('data-tone')).toBe(brandMarkTone('brand-ulid'))
-    expect(mark.classes()).not.toContain('agency-brand-mark--palette')
+    expect(mark.attributes('data-tone')).toBe(`palette-${derived}`)
+    expect(mark.classes()).toContain('agency-brand-mark--palette')
+    expect(mark.attributes('style')).toContain(`var(--agency-brand-${derived})`)
   })
 
-  it('an API that omits the colour key keeps the hashed tone too', async () => {
+  it('an API that omits the colour key gets the same derived palette colour', async () => {
     const harness = await mountList([makeCampaign()])
     cleanup = harness.cleanup
 
     expect(harness.wrapper.get('[data-test="agency-brand-mark"]').attributes('data-tone')).toBe(
-      brandMarkTone('brand-ulid'),
+      `palette-${effectiveBrandColor(null, 'brand-ulid')}`,
     )
+  })
+
+  it('two campaigns of one brand share one colour; a set colour wins over the derived one', async () => {
+    const a = withBrandColor(null)
+    const b = { ...withBrandColor(null), id: 'camp-2' }
+    const c = {
+      ...withBrandColor('teal'),
+      id: 'camp-3',
+      relationships: {
+        ...withBrandColor('teal').relationships,
+        brand: {
+          data: {
+            ...withBrandColor('teal').relationships.brand.data,
+            id: 'brand-2',
+            color: 'teal' as const,
+          },
+        },
+      },
+    }
+    const harness = await mountList([a, b, c])
+    cleanup = harness.cleanup
+
+    const tones = harness.wrapper
+      .findAll('[data-test="agency-brand-mark"]')
+      .map((m) => m.attributes('data-tone'))
+    expect(tones[0]).toBe(tones[1])
+    expect(tones[2]).toBe('palette-teal')
   })
 })

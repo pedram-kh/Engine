@@ -47,6 +47,7 @@ import { CEmptyState } from '@catalyst/ui'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import AgencyBrandMark from '@/modules/agency/components/AgencyBrandMark.vue'
 import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
+import { effectiveBrandColor } from '@/modules/agency/composables/brandColor'
 import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
 import { brandsApi } from '@/modules/brands/api/brands.api'
 import { campaignsApi } from '../api/campaigns.api'
@@ -563,7 +564,12 @@ async function commitListing(item: CampaignResource, value: boolean): Promise<vo
           <AgencyBrandMark
             :name="item.relationships.brand.data.name"
             :seed="item.relationships.brand.data.id"
-            :color="item.relationships.brand.data.color"
+            :color="
+              effectiveBrandColor(
+                item.relationships.brand.data.color,
+                item.relationships.brand.data.id,
+              )
+            "
           />
           <router-link
             :to="{ name: 'brands.detail', params: { ulid: item.relationships.brand.data.id } }"

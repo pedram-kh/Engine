@@ -131,7 +131,38 @@
       },
       "attachmentDropHint": "Poġġi immaġni biex twaħħalha",
       "attachmentImageUnavailable": "Immaġni mhux disponibbli",
-      "attachmentPasteUnsupportedType": "Hawnhekk jistgħu jiġu ppejstjati biss immaġni. Uża l-paperclip għal fajls oħra."
+      "attachmentPasteUnsupportedType": "Hawnhekk jistgħu jiġu ppejstjati biss immaġni. Uża l-paperclip għal fajls oħra.",
+      "actions": {
+        "menu": "Azzjonijiet tal-messaġġ",
+        "edit": "Editja",
+        "delete": "Ħassar",
+        "save": "Issejvja",
+        "cancel": "Ikkanċella",
+        "edited": "editjat",
+        "deleted": "Messaġġ imħassar",
+        "deleteTitle": "Tħassar dan il-messaġġ?",
+        "deleteBody": "Iż-żewġ naħat se jaraw “Messaġġ imħassar”. Il-fajls li żidt jibqgħu maħżuna sakemm il-kont jitħassar.",
+        "deleteConfirm": "Ħassar",
+        "editHint": "Tista’ teditja messaġġ għal 15-il minuta wara li tibgħatu.",
+        "editFieldLabel": "Editja l-messaġġ"
+      },
+      "errors": {
+        "editWindowClosed": "Dan il-messaġġ ma jistax jiġi editjat aktar.",
+        "editThreadClosed": "Din il-konversazzjoni magħluqa, għalhekk il-messaġġi ma jistgħux jiġu editjati.",
+        "notEditable": "Dan il-messaġġ ma jistax jiġi editjat.",
+        "alreadyDeleted": "Dan il-messaġġ diġà tħassar.",
+        "ownerNotMember": "Dik il-persuna mhijiex membru ta’ din l-aġenzija.",
+        "editFailed": "Ma stajniex nissejvjaw il-bidla.",
+        "deleteFailed": "Ma stajniex inħassru l-messaġġ."
+      },
+      "search": {
+        "resultsHeading": "Messaġġi",
+        "noResults": "Ebda messaġġ ma jaqbel",
+        "error": "Ma stajniex infittxu l-messaġġi.",
+        "minChars": "Ikteb mill-inqas 2 karattri biex tfittex fil-messaġġi.",
+        "fromYou": "Int",
+        "inThreadWith": "fil-konversazzjoni ma’ {name}"
+      }
     },
     "nav": {
       "dashboard": "Dashboard",

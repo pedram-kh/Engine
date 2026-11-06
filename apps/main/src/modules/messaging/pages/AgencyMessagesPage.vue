@@ -34,6 +34,10 @@ import AgencyUnifiedInbox, {
 import { creatorAvatarUrl, creatorLabel } from '@/core/creators/creatorLabel'
 import { filtersFromQuery, filtersToQuery } from '../composables/inboxFilterQuery'
 import { useMessageInbox, type InboxFilters } from '../composables/useMessageInbox'
+import { useMessageSearch } from '../composables/useMessageSearch'
+import { useMessagesEditSearchFlag } from '../composables/useMessagesEditSearchFlag'
+import { previewOrDeleted } from '../utils/messageRevision'
+import type { MessageSearchItem } from '@/modules/agency/components/MessageSearchResults.vue'
 
 const { t } = useI18n()
 const agencyStore = useAgencyStore()
@@ -60,6 +64,71 @@ const unifiedOn = computed(() => authStore.user?.attributes.features?.messages_v
 const filters = computed<InboxFilters>(() => filtersFromQuery(route.query))
 const inboxAgencyId = computed(() => (unifiedOn.value ? agencyStore.currentAgencyId : null))
 const inbox = useMessageInbox(inboxAgencyId, filters)
+
+// AH-119 Stage B — message search in the unified inbox. Off, the search field is the client-side
+// filter it was. The thread rows reuse the inbox's own link shape.
+const editSearchOn = useMessagesEditSearchFlag()
+const searchOn = computed(() => unifiedOn.value && editSearchOn.value)
+const searchTerm = ref('')
+const messageSearch = useMessageSearch(inboxAgencyId, searchTerm, searchOn)
+
+const searchItems = computed<MessageSearchItem[]>(() => {
+  const filterQuery = filtersToQuery(filters.value)
+  return messageSearch.results.value.flatMap((hit): MessageSearchItem[] => {
+    const a = hit.attributes
+    const name = creatorLabel(a.creator, t, t('app.messaging.participant'))
+    const base = {
+      key: a.message_ulid,
+      threadTitle: name,
+      snippet: a.snippet,
+      sentAt: a.sent_at,
+      senderLabel: a.is_own
+        ? t('app.messaging.search.fromYou')
+        : a.sender_role === 'creator'
+          ? name
+          : null,
+    }
+    if (hit.type === 'relationship_thread') {
+      if (a.creator.id === null) {
+        return []
+      }
+      return [
+        {
+          ...base,
+          to: {
+            name: 'messages.thread',
+            params: { creatorUlid: a.creator.id },
+            query: { ...filterQuery, name },
+          },
+        },
+      ]
+    }
+    if (a.campaign === null || a.assignment_id === null) {
+      return []
+    }
+    return [
+      {
+        ...base,
+        to: {
+          name: 'messages.assignment-thread',
+          params: { campaignUlid: a.campaign.id, assignmentUlid: a.assignment_id },
+          query: { ...filterQuery, name },
+        },
+      },
+    ]
+  })
+})
+
+const searchProp = computed(() =>
+  searchOn.value
+    ? {
+        state: messageSearch.state.value,
+        items: searchItems.value,
+        hasMore: messageSearch.hasMore.value,
+        loadingMore: messageSearch.loadingMore.value,
+      }
+    : null,
+)
 
 function setFilters(next: UnifiedInboxFilters): void {
   void router.replace({
@@ -94,6 +163,7 @@ const unifiedItems = computed<UnifiedInboxItem[]>(() => {
       title: name,
       preview: a.preview,
       previewIsAttachment: a.preview_kind === 'attachment',
+      previewIsDeleted: a.preview_kind === 'deleted',
       lastMessageAt: a.last_message_at,
       unreadCount: a.unread_count,
       avatarText: name,
@@ -177,7 +247,12 @@ const items = computed<AgencyInboxItem[]>(() =>
       return {
         id: creator.id as string,
         title: name,
-        preview: row.attributes.last_message_preview,
+        preview: previewOrDeleted(
+          row.attributes.last_message_preview,
+          row.attributes.last_message_is_deleted,
+          editSearchOn.value,
+          t('app.messaging.actions.deleted'),
+        ),
         lastMessageAt: row.attributes.last_message_at,
         unreadCount: row.attributes.unread_count,
         avatarText: name,
@@ -355,8 +430,11 @@ onBeforeUnmount(() => {
         :loading-more="inbox.loadingMore.value"
         :has-more="inbox.hasMore.value"
         :active-key="activeKey"
+        :search="searchProp"
         @start="openPicker"
         @load-more="inbox.loadMore"
+        @search="searchTerm = $event"
+        @search-more="messageSearch.loadMore"
         @update:filters="setFilters"
       />
       <AgencyRelationshipInbox

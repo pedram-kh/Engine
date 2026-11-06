@@ -43,8 +43,12 @@ import type {
   AgencyThreadMessage,
   AgencyThreadTransport,
 } from '@/modules/messaging/api/agencyThreadTransport'
+import MessageActions from '@/modules/messaging/components/MessageActions.vue'
+import MessageEditField from '@/modules/messaging/components/MessageEditField.vue'
+import MessageGate from '@/modules/messaging/components/MessageGate'
 import MessageText from '@/modules/messaging/components/MessageText.vue'
 import { useComposerImages } from '@/modules/messaging/composables/useComposerImages'
+import { useMessagesEditSearchFlag } from '@/modules/messaging/composables/useMessagesEditSearchFlag'
 import { useMessageThread } from '@/modules/messaging/composables/useMessageThread'
 import { isInlineImageMime } from '@/modules/messaging/utils/messageImages'
 
@@ -101,6 +105,8 @@ const {
   loadError,
   loadOlder,
   sendMessage,
+  editMessage,
+  deleteMessage,
 } = useMessageThread<AgencyThreadMessage, RelationshipThreadMeta, SendRelationshipMessagePayload>(
   transportRef,
 )
@@ -114,6 +120,32 @@ const {
 // brief optimistic composer beats flashing a "closed" notice on every thread
 // open. The server stays authoritative either way.
 const threadOpen = computed(() => threadMeta.value?.can_send ?? true)
+
+// AH-119 Stage B — edit and delete, behind the `/me` switch. Off, none of the helpers below
+// changes what renders. The transport must offer them too (both agency transports do).
+const messageActionsOn = useMessagesEditSearchFlag()
+const actionsOn = computed(
+  () =>
+    messageActionsOn.value &&
+    props.transport?.edit !== undefined &&
+    props.transport.remove !== undefined,
+)
+const editingId = ref<string | null>(null)
+
+function isDeleted(message: RelationshipMessageResource): boolean {
+  return actionsOn.value && message.attributes.is_deleted === true
+}
+function isEdited(message: RelationshipMessageResource): boolean {
+  return actionsOn.value && !isDeleted(message) && (message.attributes.edited_at ?? null) !== null
+}
+function canAct(message: RelationshipMessageResource): boolean {
+  return (
+    actionsOn.value &&
+    message.attributes.is_own &&
+    message.attributes.kind !== 'system' &&
+    !isDeleted(message)
+  )
+}
 
 // Reason → copy. `relation_ended` is the case a real user hits (an admin
 // disconnect); the rest are mapped so no state can silently fall through to
@@ -635,7 +667,10 @@ async function submit(): Promise<void> {
               :data-test="`relationship-message-${entry.message.id}`"
             >
               <div class="agency-bubble-col">
-                <div class="agency-bubble">
+                <div
+                  class="agency-bubble"
+                  :class="{ 'agency-bubble--deleted': isDeleted(entry.message) }"
+                >
                   <div
                     v-if="showSenderLabel(entry.message)"
                     class="agency-bubble__sender"
@@ -644,12 +679,34 @@ async function submit(): Promise<void> {
                     {{ senderLabel(entry.message) }}
                   </div>
 
-                  <p v-if="entry.message.attributes.body" class="agency-bubble__body">
+                  <MessageGate :when="canAct(entry.message) && editingId === entry.message.id">
+                    <MessageEditField
+                      :initial="entry.message.attributes.body ?? ''"
+                      :save="(body: string) => editMessage(entry.message.id, body)"
+                      @done="editingId = null"
+                    />
+                  </MessageGate>
+                  <MessageGate :when="isDeleted(entry.message)">
+                    <p class="agency-bubble__deleted" data-test="message-deleted">
+                      {{ t('app.messaging.actions.deleted') }}
+                    </p>
+                  </MessageGate>
+
+                  <p
+                    v-if="
+                      entry.message.attributes.body &&
+                      editingId !== entry.message.id &&
+                      !isDeleted(entry.message)
+                    "
+                    class="agency-bubble__body"
+                  >
                     <MessageText :text="entry.message.attributes.body" />
                   </p>
 
                   <ul
-                    v-if="entry.message.attributes.attachments.length > 0"
+                    v-if="
+                      entry.message.attributes.attachments.length > 0 && !isDeleted(entry.message)
+                    "
                     class="agency-bubble__attachments"
                   >
                     <li
@@ -741,6 +798,11 @@ async function submit(): Promise<void> {
                     class="agency-bubble__who"
                     >{{ entry.message.attributes.sender?.name }} ·</span
                   >
+                  <MessageGate :when="isEdited(entry.message)">
+                    <span class="agency-bubble__edited" data-test="message-edited">{{
+                      t('app.messaging.actions.edited')
+                    }}</span>
+                  </MessageGate>
                   <span class="agency-bubble__time" data-test="relationship-message-time">{{
                     formatTime(entry.message.attributes.created_at)
                   }}</span>
@@ -763,6 +825,14 @@ async function submit(): Promise<void> {
                     "
                     :data-test="`relationship-tick-${entry.message.attributes.read_by_counterparty ? 'read' : 'sent'}`"
                   />
+                  <MessageGate :when="canAct(entry.message)">
+                    <MessageActions
+                      :created-at="entry.message.attributes.created_at"
+                      :thread-open="threadOpen"
+                      :confirm-delete="() => deleteMessage(entry.message.id)"
+                      @edit="editingId = entry.message.id"
+                    />
+                  </MessageGate>
                 </div>
               </div>
             </li>
@@ -1149,6 +1219,17 @@ a.agency-attach:focus-visible {
 .agency-bubble__who,
 .agency-bubble__time {
   white-space: pre;
+}
+
+.agency-bubble__edited::after {
+  content: '·';
+  margin-left: 4px;
+}
+
+.agency-bubble__deleted {
+  margin: 0;
+  font-style: italic;
+  opacity: 0.7;
 }
 
 .agency-bubble__tick {

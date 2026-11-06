@@ -131,7 +131,38 @@
       },
       "attachmentDropHint": "Scaoil íomhá chun é a cheangal",
       "attachmentImageUnavailable": "Níl an íomhá ar fáil",
-      "attachmentPasteUnsupportedType": "Ní féidir ach íomhánna a ghreamú anseo. Úsáid an greamaire páipéir le haghaidh comhad eile."
+      "attachmentPasteUnsupportedType": "Ní féidir ach íomhánna a ghreamú anseo. Úsáid an greamaire páipéir le haghaidh comhad eile.",
+      "actions": {
+        "menu": "Gníomhartha teachtaireachta",
+        "edit": "Cuir in eagar",
+        "delete": "Scrios",
+        "save": "Sábháil",
+        "cancel": "Cealaigh",
+        "edited": "curtha in eagar",
+        "deleted": "Teachtaireacht scriosta",
+        "deleteTitle": "An scriosfar an teachtaireacht seo?",
+        "deleteBody": "Feicfidh an dá thaobh “Teachtaireacht scriosta”. Fanann na comhaid a cheangail tú stóráilte go dtí go scriostar an cuntas.",
+        "deleteConfirm": "Scrios",
+        "editHint": "Is féidir leat teachtaireacht a chur in eagar ar feadh 15 nóiméad tar éis í a sheoladh.",
+        "editFieldLabel": "Cuir teachtaireacht in eagar"
+      },
+      "errors": {
+        "editWindowClosed": "Ní féidir an teachtaireacht seo a chur in eagar a thuilleadh.",
+        "editThreadClosed": "Tá an comhrá seo dúnta, mar sin ní féidir teachtaireachtaí a chur in eagar.",
+        "notEditable": "Ní féidir an teachtaireacht seo a chur in eagar.",
+        "alreadyDeleted": "Scriosadh an teachtaireacht seo cheana.",
+        "ownerNotMember": "Níl an duine sin ina bhall den ghníomhaireacht seo.",
+        "editFailed": "Níorbh fhéidir linn an t-athrú a shábháil.",
+        "deleteFailed": "Níorbh fhéidir linn an teachtaireacht a scriosadh."
+      },
+      "search": {
+        "resultsHeading": "Teachtaireachtaí",
+        "noResults": "Níl aon teachtaireacht ag teacht leis",
+        "error": "Níorbh fhéidir linn teachtaireachtaí a chuardach.",
+        "minChars": "Clóscríobh 2 charachtar ar a laghad chun teachtaireachtaí a chuardach.",
+        "fromYou": "Tú",
+        "inThreadWith": "sa chomhrá le {name}"
+      }
     },
     "nav": {
       "dashboard": "Deais",

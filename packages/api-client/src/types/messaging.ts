@@ -41,6 +41,10 @@ export interface MessageAttributes {
   is_own: boolean
   sender: MessageSender | null
   created_at: string
+  /** AH-119 Stage B: when the sender last edited the body; null if never. Optional so older payloads still type. */
+  edited_at?: string | null
+  /** AH-119 Stage B: a deleted message arrives masked (no body, no attachments). */
+  is_deleted?: boolean
 }
 
 export interface MessageResource {
@@ -87,6 +91,8 @@ export interface MessageThreadRollupRow {
     creator: { display_name: string | null; is_erased?: boolean }
     last_message_at: string | null
     last_message_preview: string | null
+    /** AH-119 Stage B: the newest message was deleted (`last_message_preview` is then null). */
+    last_message_is_deleted?: boolean
     unread_count: number
   }
 }
@@ -172,6 +178,10 @@ export interface RelationshipMessageAttributes {
   /** D10: whether the counterparty has read this OWN message. Null on incoming. */
   read_by_counterparty: boolean | null
   created_at: string
+  /** AH-119 Stage B: when the sender last edited the body; null if never. Optional so older payloads still type. */
+  edited_at?: string | null
+  /** AH-119 Stage B: a deleted message arrives masked (no body, no attachments). */
+  is_deleted?: boolean
 }
 
 export interface RelationshipMessageResource {
@@ -250,6 +260,8 @@ export interface AgencyRelationshipThreadRow {
     }
     last_message_at: string | null
     last_message_preview: string | null
+    /** AH-119 Stage B: the newest message was deleted (`last_message_preview` is then null). */
+    last_message_is_deleted?: boolean
     unread_count: number
   }
 }
@@ -267,6 +279,8 @@ export interface CreatorRelationshipThreadRow {
     }
     last_message_at: string | null
     last_message_preview: string | null
+    /** AH-119 Stage B: the newest message was deleted (`last_message_preview` is then null). */
+    last_message_is_deleted?: boolean
     unread_count: number
   }
 }
@@ -360,7 +374,7 @@ export interface MessageInboxRow {
     assignment_id: string | null
     last_message_at: string | null
     preview: string | null
-    preview_kind: 'text' | 'attachment'
+    preview_kind: 'text' | 'attachment' | 'deleted'
     unread_count: number
     owner: { id: string; name: string } | null
   }
@@ -397,4 +411,39 @@ export interface MessageInboxParams {
   owner?: 'me' | 'all'
   cursor?: string | null
   perPage?: number
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AH-119 Stage B — edit, delete and search
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** PATCH …/messages/{message} body: the new text (1 to 5000 characters). */
+export interface EditMessagePayload {
+  body: string
+}
+
+/**
+ * One hit of `GET /agencies/{agency}/message-search`. `id` and `type` are the THREAD's (the
+ * inbox row's, so the page opens it the same way); every attribute of the inbox row is present
+ * too, plus the message that matched. `message_ulid` is the unique list key.
+ */
+export interface MessageSearchResult {
+  id: string
+  type: MessageInboxRow['type']
+  attributes: MessageInboxRow['attributes'] & {
+    message_ulid: string
+    /** Plain text (no markup), up to 160 characters around the first match. */
+    snippet: string
+    sent_at: string
+    sender_role: 'creator' | 'agency_user'
+    /** Q5: the sender's account is erased; label them with the anonymised creator label. */
+    sender_is_erased: boolean
+    /** Not on the Stage B contract today: when the API adds it, "You" shows for the viewer's own hits. */
+    is_own?: boolean
+  }
+}
+
+export interface MessageSearchResponse {
+  data: MessageSearchResult[]
+  meta: { next_cursor: string | null; per_page: number }
 }

@@ -131,7 +131,38 @@
       },
       "attachmentDropHint": "Nuleiskite paveikslėlį, kad jį pridėtumėte",
       "attachmentImageUnavailable": "Paveikslėlis nepasiekiamas",
-      "attachmentPasteUnsupportedType": "Čia galima įklijuoti tik paveikslėlius. Kitiems failams naudokite sąvaržėlę."
+      "attachmentPasteUnsupportedType": "Čia galima įklijuoti tik paveikslėlius. Kitiems failams naudokite sąvaržėlę.",
+      "actions": {
+        "menu": "Pranešimo veiksmai",
+        "edit": "Redaguoti",
+        "delete": "Ištrinti",
+        "save": "Išsaugoti",
+        "cancel": "Atšaukti",
+        "edited": "redaguota",
+        "deleted": "Pranešimas ištrintas",
+        "deleteTitle": "Ištrinti šį pranešimą?",
+        "deleteBody": "Abi pusės matys „Pranešimas ištrintas“. Jūsų pridėti failai lieka saugomi, kol paskyra bus ištrinta.",
+        "deleteConfirm": "Ištrinti",
+        "editHint": "Pranešimą galite redaguoti 15 minučių po išsiuntimo.",
+        "editFieldLabel": "Redaguoti pranešimą"
+      },
+      "errors": {
+        "editWindowClosed": "Šio pranešimo daugiau redaguoti negalima.",
+        "editThreadClosed": "Šis pokalbis uždarytas, todėl pranešimų redaguoti negalima.",
+        "notEditable": "Šio pranešimo redaguoti negalima.",
+        "alreadyDeleted": "Šis pranešimas jau ištrintas.",
+        "ownerNotMember": "Šis asmuo nėra šios agentūros narys.",
+        "editFailed": "Nepavyko išsaugoti pakeitimo.",
+        "deleteFailed": "Nepavyko ištrinti pranešimo."
+      },
+      "search": {
+        "resultsHeading": "Pranešimai",
+        "noResults": "Nėra tinkamų pranešimų",
+        "error": "Nepavyko ieškoti pranešimų.",
+        "minChars": "Įveskite bent 2 simbolius, kad ieškotumėte pranešimų.",
+        "fromYou": "Jūs",
+        "inThreadWith": "pokalbyje su {name}"
+      }
     },
     "nav": {
       "dashboard": "Valdymo skydelis",

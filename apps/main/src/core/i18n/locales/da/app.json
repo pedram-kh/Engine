@@ -131,7 +131,38 @@
       },
       "attachmentDropHint": "Slip et billede for at vedhæfte det",
       "attachmentImageUnavailable": "Billedet er ikke tilgængeligt",
-      "attachmentPasteUnsupportedType": "Kun billeder kan indsættes her. Brug papirclipsen til andre filer."
+      "attachmentPasteUnsupportedType": "Kun billeder kan indsættes her. Brug papirclipsen til andre filer.",
+      "actions": {
+        "menu": "Handlinger for besked",
+        "edit": "Rediger",
+        "delete": "Slet",
+        "save": "Gem",
+        "cancel": "Annuller",
+        "edited": "redigeret",
+        "deleted": "Besked slettet",
+        "deleteTitle": "Slet denne besked?",
+        "deleteBody": "Begge sider vil se „Besked slettet“. Filer, du har vedhæftet, forbliver gemt, indtil kontoen slettes.",
+        "deleteConfirm": "Slet",
+        "editHint": "Du kan redigere en besked i 15 minutter efter, at du har sendt den.",
+        "editFieldLabel": "Rediger besked"
+      },
+      "errors": {
+        "editWindowClosed": "Denne besked kan ikke længere redigeres.",
+        "editThreadClosed": "Denne samtale er lukket, så beskeder kan ikke redigeres.",
+        "notEditable": "Denne besked kan ikke redigeres.",
+        "alreadyDeleted": "Denne besked er allerede slettet.",
+        "ownerNotMember": "Personen er ikke medlem af dette bureau.",
+        "editFailed": "Vi kunne ikke gemme ændringen.",
+        "deleteFailed": "Vi kunne ikke slette beskeden."
+      },
+      "search": {
+        "resultsHeading": "Beskeder",
+        "noResults": "Ingen matchende beskeder",
+        "error": "Vi kunne ikke søge i beskeder.",
+        "minChars": "Skriv mindst 2 tegn for at søge i beskeder.",
+        "fromYou": "Dig",
+        "inThreadWith": "i samtale med {name}"
+      }
     },
     "nav": {
       "dashboard": "Dashboard",

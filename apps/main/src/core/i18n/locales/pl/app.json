@@ -131,7 +131,38 @@
       },
       "attachmentDropHint": "Upuść obraz, aby go dołączyć",
       "attachmentImageUnavailable": "Obraz niedostępny",
-      "attachmentPasteUnsupportedType": "Tutaj można wklejać tylko obrazy. Użyj spinacza dla innych plików."
+      "attachmentPasteUnsupportedType": "Tutaj można wklejać tylko obrazy. Użyj spinacza dla innych plików.",
+      "actions": {
+        "menu": "Działania na wiadomości",
+        "edit": "Edytuj",
+        "delete": "Usuń",
+        "save": "Zapisz",
+        "cancel": "Anuluj",
+        "edited": "edytowano",
+        "deleted": "Wiadomość usunięta",
+        "deleteTitle": "Usunąć tę wiadomość?",
+        "deleteBody": "Obie strony zobaczą „Wiadomość usunięta”. Załączone przez Ciebie pliki pozostają przechowywane do czasu usunięcia konta.",
+        "deleteConfirm": "Usuń",
+        "editHint": "Wiadomość możesz edytować przez 15 minut od wysłania.",
+        "editFieldLabel": "Edytuj wiadomość"
+      },
+      "errors": {
+        "editWindowClosed": "Tej wiadomości nie można już edytować.",
+        "editThreadClosed": "Ta rozmowa jest zamknięta, więc wiadomości nie można edytować.",
+        "notEditable": "Tej wiadomości nie można edytować.",
+        "alreadyDeleted": "Ta wiadomość została już usunięta.",
+        "ownerNotMember": "Ta osoba nie jest członkiem tej agencji.",
+        "editFailed": "Nie udało się zapisać zmiany.",
+        "deleteFailed": "Nie udało się usunąć wiadomości."
+      },
+      "search": {
+        "resultsHeading": "Wiadomości",
+        "noResults": "Brak pasujących wiadomości",
+        "error": "Nie udało się przeszukać wiadomości.",
+        "minChars": "Wpisz co najmniej 2 znaki, aby przeszukać wiadomości.",
+        "fromYou": "Ty",
+        "inThreadWith": "w rozmowie z {name}"
+      }
     },
     "nav": {
       "dashboard": "Pulpit nawigacyjny",

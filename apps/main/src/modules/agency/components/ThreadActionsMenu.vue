@@ -15,6 +15,7 @@ import { useI18n } from 'vue-i18n'
 
 import { membersApi } from '@/modules/agency-users/api/members.api'
 import { messageInboxApi } from '@/modules/messaging/api/messageInbox.api'
+import { MESSAGE_ERROR_KEYS } from '@/modules/messaging/utils/messageRevision'
 
 const props = defineProps<{
   agencyId: string
@@ -75,7 +76,15 @@ async function confirm(): Promise<void> {
     dialogOpen.value = false
     done.value = t('app.messaging.thread.reassignDone', { name: target.name })
   } catch (err) {
-    error.value = err instanceof ApiError ? err.message : t('app.messaging.thread.reassignError')
+    // AH-119 Stage B: `owner.not_a_member` has its own localised line; other API errors keep the
+    // server's message as before.
+    const mapped = err instanceof ApiError ? MESSAGE_ERROR_KEYS[err.code] : undefined
+    error.value =
+      mapped !== undefined
+        ? t(mapped)
+        : err instanceof ApiError
+          ? err.message
+          : t('app.messaging.thread.reassignError')
   } finally {
     saving.value = false
   }

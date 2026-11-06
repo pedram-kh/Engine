@@ -183,6 +183,14 @@ const NO_VISUAL: Record<string, string> = {
   'chat-message': 'row wrapper; alignment is its own',
   'chat-message--system': 'alignment variant; the system line is styled',
   'chat-message__attachments': 'attachment list inside a bubble, ordinary text',
+  'chat-message__bubble--deleted':
+    'AH-119 B5 deleted-message state of the bubble, no box change (placeholder text only)',
+  'chat-message__deleted':
+    'AH-119 B5 "Message deleted" placeholder: italic, dimmed, set by the component itself',
+  'chat-message__edited':
+    'AH-119 B5 "edited" mark beside the time, caption text set by the component itself',
+  'chat-message__time--actions':
+    'AH-119 B5 time row that carries the edited mark and the ⋯ button, a flex row owned by the component',
   'draft-round-feedback': 'pre-wrap text only; colour inherited from the round card',
   'assignment-revision-feedback': 'pre-wrap text only; colour inherited from the banner',
 }

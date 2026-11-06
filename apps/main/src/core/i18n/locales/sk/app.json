@@ -131,7 +131,38 @@
       },
       "attachmentDropHint": "Presunutím obrázka ho pripojíte",
       "attachmentImageUnavailable": "Obrázok nie je k dispozícii",
-      "attachmentPasteUnsupportedType": "Sem je možné vložiť iba obrázky. Pre ostatné súbory použite sponku."
+      "attachmentPasteUnsupportedType": "Sem je možné vložiť iba obrázky. Pre ostatné súbory použite sponku.",
+      "actions": {
+        "menu": "Akcie so správou",
+        "edit": "Upraviť",
+        "delete": "Odstrániť",
+        "save": "Uložiť",
+        "cancel": "Zrušiť",
+        "edited": "upravené",
+        "deleted": "Správa bola odstránená",
+        "deleteTitle": "Odstrániť túto správu?",
+        "deleteBody": "Obe strany uvidia „Správa bola odstránená“. Súbory, ktoré ste pripojili, zostanú uložené, kým sa účet nevymaže.",
+        "deleteConfirm": "Odstrániť",
+        "editHint": "Správu môžete upraviť do 15 minút po odoslaní.",
+        "editFieldLabel": "Upraviť správu"
+      },
+      "errors": {
+        "editWindowClosed": "Túto správu už nie je možné upraviť.",
+        "editThreadClosed": "Táto konverzácia je uzavretá, preto správy nie je možné upravovať.",
+        "notEditable": "Túto správu nie je možné upraviť.",
+        "alreadyDeleted": "Táto správa už bola odstránená.",
+        "ownerNotMember": "Táto osoba nie je členom tejto agentúry.",
+        "editFailed": "Zmenu sa nepodarilo uložiť.",
+        "deleteFailed": "Správu sa nepodarilo odstrániť."
+      },
+      "search": {
+        "resultsHeading": "Správy",
+        "noResults": "Žiadne zodpovedajúce správy",
+        "error": "Správy sa nepodarilo vyhľadať.",
+        "minChars": "Na vyhľadávanie v správach zadajte aspoň 2 znaky.",
+        "fromYou": "Vy",
+        "inThreadWith": "v konverzácii s {name}"
+      }
     },
     "nav": {
       "dashboard": "Riadiaci panel",

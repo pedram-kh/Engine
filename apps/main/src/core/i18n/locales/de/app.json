@@ -131,7 +131,38 @@
       },
       "attachmentDropHint": "Bild hier ablegen, um es anzuhängen",
       "attachmentImageUnavailable": "Bild nicht verfügbar",
-      "attachmentPasteUnsupportedType": "Hier können nur Bilder eingefügt werden. Nutze die Büroklammer für andere Dateien."
+      "attachmentPasteUnsupportedType": "Hier können nur Bilder eingefügt werden. Nutze die Büroklammer für andere Dateien.",
+      "actions": {
+        "menu": "Nachrichtenaktionen",
+        "edit": "Bearbeiten",
+        "delete": "Löschen",
+        "save": "Speichern",
+        "cancel": "Abbrechen",
+        "edited": "bearbeitet",
+        "deleted": "Nachricht gelöscht",
+        "deleteTitle": "Diese Nachricht löschen?",
+        "deleteBody": "Beide Seiten sehen „Nachricht gelöscht“. Von dir angehängte Dateien bleiben gespeichert, bis das Konto gelöscht wird.",
+        "deleteConfirm": "Löschen",
+        "editHint": "Du kannst eine Nachricht bis zu 15 Minuten nach dem Senden bearbeiten.",
+        "editFieldLabel": "Nachricht bearbeiten"
+      },
+      "errors": {
+        "editWindowClosed": "Diese Nachricht kann nicht mehr bearbeitet werden.",
+        "editThreadClosed": "Diese Unterhaltung ist geschlossen, daher können Nachrichten nicht bearbeitet werden.",
+        "notEditable": "Diese Nachricht kann nicht bearbeitet werden.",
+        "alreadyDeleted": "Diese Nachricht wurde bereits gelöscht.",
+        "ownerNotMember": "Diese Person ist kein Mitglied dieser Agentur.",
+        "editFailed": "Die Änderung konnte nicht gespeichert werden.",
+        "deleteFailed": "Die Nachricht konnte nicht gelöscht werden."
+      },
+      "search": {
+        "resultsHeading": "Nachrichten",
+        "noResults": "Keine passenden Nachrichten",
+        "error": "Die Nachrichtensuche ist fehlgeschlagen.",
+        "minChars": "Gib mindestens 2 Zeichen ein, um Nachrichten zu durchsuchen.",
+        "fromYou": "Du",
+        "inThreadWith": "in Unterhaltung mit {name}"
+      }
     },
     "nav": {
       "dashboard": "Dashboard",

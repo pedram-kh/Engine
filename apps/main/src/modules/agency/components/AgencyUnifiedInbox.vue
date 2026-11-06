@@ -14,13 +14,18 @@
  * the row badge is that thread's unread messages.
  */
 
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { RouteLocationRaw } from 'vue-router'
 import type { MessageInboxFacets } from '@catalyst/api-client'
 
 import { brandColorVar, effectiveBrandColor } from '../composables/brandColor'
+import type { MessageSearchState } from '@/modules/messaging/composables/useMessageSearch'
+
+import MessageGate from '@/modules/messaging/components/MessageGate'
+
 import InboxFilterPopover, { type InboxFilterItem } from './InboxFilterPopover.vue'
+import MessageSearchResults, { type MessageSearchItem } from './MessageSearchResults.vue'
 
 export interface UnifiedInboxItem {
   /** Unique across both thread types. */
@@ -28,6 +33,8 @@ export interface UnifiedInboxItem {
   title: string
   preview: string | null
   previewIsAttachment: boolean
+  /** AH-119 Stage B: the newest message was deleted; the row shows "Message deleted". */
+  previewIsDeleted?: boolean
   lastMessageAt: string | null
   unreadCount: number
   avatarText: string
@@ -60,17 +67,32 @@ const props = defineProps<{
   loadingMore: boolean
   hasMore: boolean
   activeKey?: string | null
+  /**
+   * AH-119 Stage B: the message-search group. Null or absent (the Stage B switch is off) leaves the
+   * search field a client-side filter of the loaded rows, as before.
+   */
+  search?: {
+    state: MessageSearchState
+    items: MessageSearchItem[]
+    hasMore: boolean
+    loadingMore: boolean
+  } | null
 }>()
 
 const emit = defineEmits<{
   start: []
   loadMore: []
+  /** The search field's text, on every change (the page debounces and calls the API). */
+  search: [term: string]
+  searchMore: []
   'update:filters': [value: UnifiedInboxFilters]
 }>()
 
 const { t, locale } = useI18n()
 
 const query = ref('')
+
+watch(query, (term) => emit('search', term))
 
 const brandItems = computed<InboxFilterItem[]>(() =>
   props.facets.brands.map((b) => ({
@@ -351,12 +373,18 @@ function initial(item: UnifiedInboxItem): string {
                   class="agency-inbox-row__clip"
                   aria-hidden="true"
                 />
-                <span class="agency-inbox-row__preview">{{
-                  item.preview ??
-                  (item.previewIsAttachment
-                    ? t('app.messaging.attachment')
-                    : t('app.messaging.rollup.noMessages'))
-                }}</span>
+                <span
+                  class="agency-inbox-row__preview"
+                  :class="{ 'agency-inbox-row__preview--deleted': item.previewIsDeleted === true }"
+                  >{{
+                    item.previewIsDeleted === true
+                      ? t('app.messaging.actions.deleted')
+                      : (item.preview ??
+                        (item.previewIsAttachment
+                          ? t('app.messaging.attachment')
+                          : t('app.messaging.rollup.noMessages')))
+                  }}</span
+                >
                 <span
                   v-if="item.unreadCount > 0"
                   class="agency-inbox-row__count"
@@ -399,6 +427,16 @@ function initial(item: UnifiedInboxItem): string {
       >
         {{ t('app.messaging.relationship.inboxNoMatch') }}
       </p>
+
+      <MessageGate :when="search != null">
+        <MessageSearchResults
+          :state="search?.state ?? 'idle'"
+          :items="search?.items ?? []"
+          :has-more="search?.hasMore ?? false"
+          :loading-more="search?.loadingMore ?? false"
+          @load-more="emit('searchMore')"
+        />
+      </MessageGate>
 
       <div v-if="hasMore && !loading && !loadError" class="agency-inbox__more">
         <v-btn
@@ -645,6 +683,10 @@ function initial(item: UnifiedInboxItem): string {
 
 .agency-inbox-row--unread .agency-inbox-row__time {
   color: rgb(var(--v-theme-primary-text));
+}
+
+.agency-inbox-row__preview--deleted {
+  font-style: italic;
 }
 
 .agency-inbox-row__preview {

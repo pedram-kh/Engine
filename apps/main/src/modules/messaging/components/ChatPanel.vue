@@ -19,9 +19,13 @@ import { isNativePlatform } from '@/core/platform/isNativePlatform'
 
 import type { ChatTransport } from '../api/messaging.api'
 import { useComposerImages } from '../composables/useComposerImages'
+import { useMessagesEditSearchFlag } from '../composables/useMessagesEditSearchFlag'
 import { useMessageThread } from '../composables/useMessageThread'
 import { isInlineImageMime } from '../utils/messageImages'
 import { reportHref } from '../utils/reportProblem'
+import MessageActions from './MessageActions.vue'
+import MessageEditField from './MessageEditField.vue'
+import MessageGate from './MessageGate'
 import MessageText from './MessageText.vue'
 import ReportFallback from './ReportFallback.vue'
 
@@ -54,7 +58,29 @@ const {
   humanSendBlocked,
   loadOlder,
   sendMessage,
+  editMessage,
+  deleteMessage,
 } = useMessageThread(transportRef)
+
+// AH-119 Stage B — edit and delete, behind the `/me` switch. Off, none of the helpers below
+// changes what renders.
+const actionsOn = useMessagesEditSearchFlag()
+const editingId = ref<string | null>(null)
+
+function isDeleted(message: MessageResource): boolean {
+  return actionsOn.value && message.attributes.is_deleted === true
+}
+function isEdited(message: MessageResource): boolean {
+  return actionsOn.value && !isDeleted(message) && (message.attributes.edited_at ?? null) !== null
+}
+function canAct(message: MessageResource): boolean {
+  return (
+    actionsOn.value &&
+    message.attributes.is_own &&
+    message.attributes.kind !== 'system' &&
+    !isDeleted(message)
+  )
+}
 
 // Date AND time — matches the relationship thread: a campaign conversation runs
 // for days, so an hour alone doesn't say which one.
@@ -348,13 +374,32 @@ async function submit(): Promise<void> {
             <div v-if="message.attributes.kind === 'system'" class="chat-message__system">
               {{ systemLine(message) }}
             </div>
-            <div v-else class="chat-message__bubble">
+            <div
+              v-else
+              class="chat-message__bubble"
+              :class="{ 'chat-message__bubble--deleted': isDeleted(message) }"
+            >
               <div class="chat-message__sender">{{ senderLabel(message) }}</div>
-              <p v-if="message.attributes.body" class="chat-message__body">
+              <MessageGate :when="canAct(message) && editingId === message.id">
+                <MessageEditField
+                  :initial="message.attributes.body ?? ''"
+                  :save="(body: string) => editMessage(message.id, body)"
+                  @done="editingId = null"
+                />
+              </MessageGate>
+              <MessageGate :when="isDeleted(message)">
+                <p class="chat-message__deleted" data-test="message-deleted">
+                  {{ t('app.messaging.actions.deleted') }}
+                </p>
+              </MessageGate>
+              <p
+                v-if="message.attributes.body && editingId !== message.id && !isDeleted(message)"
+                class="chat-message__body"
+              >
                 <MessageText :text="message.attributes.body" />
               </p>
               <ul
-                v-if="message.attributes.attachments.length > 0"
+                v-if="message.attributes.attachments.length > 0 && !isDeleted(message)"
                 class="chat-message__attachments"
               >
                 <li v-for="(att, i) in message.attributes.attachments" :key="i">
@@ -394,7 +439,29 @@ async function submit(): Promise<void> {
                   </span>
                 </li>
               </ul>
-              <div class="chat-message__time">{{ formatTime(message.attributes.created_at) }}</div>
+              <MessageGate :when="!actionsOn">
+                <div class="chat-message__time">
+                  {{ formatTime(message.attributes.created_at) }}
+                </div>
+              </MessageGate>
+              <MessageGate :when="actionsOn">
+                <div class="chat-message__time chat-message__time--actions">
+                  <span
+                    v-if="isEdited(message)"
+                    class="chat-message__edited"
+                    data-test="message-edited"
+                    >{{ t('app.messaging.actions.edited') }}</span
+                  >
+                  <span>{{ formatTime(message.attributes.created_at) }}</span>
+                  <MessageActions
+                    v-if="canAct(message)"
+                    :created-at="message.attributes.created_at"
+                    :thread-open="!humanSendBlocked"
+                    :confirm-delete="() => deleteMessage(message.id)"
+                    @edit="editingId = message.id"
+                  />
+                </div>
+              </MessageGate>
             </div>
           </li>
         </ul>
@@ -616,6 +683,24 @@ async function submit(): Promise<void> {
   margin-top: 2px;
   /* Keep the date and time on one line — a wrapped stamp reads as two stamps. */
   white-space: nowrap;
+}
+
+.chat-message__time--actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.chat-message__edited::after {
+  content: '·';
+  margin-left: 4px;
+}
+
+.chat-message__deleted {
+  margin: 0;
+  font-style: italic;
+  opacity: 0.7;
 }
 
 .chat-panel__empty {

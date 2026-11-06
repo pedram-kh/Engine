@@ -15,6 +15,7 @@
 
 import type {
   AgencyRelationshipInboxEnvelope,
+  EditMessagePayload,
   CreatorRelationshipInboxEnvelope,
   MessageAttachmentCompleteEnvelope,
   MessageAttachmentInitEnvelope,
@@ -36,6 +37,10 @@ export interface RelationshipChatTransport {
   markRead(): Promise<MessageMarkReadEnvelope>
   attachmentInit(payload: MessageAttachmentInitPayload): Promise<MessageAttachmentInitEnvelope>
   attachmentComplete(uploadId: string): Promise<MessageAttachmentCompleteEnvelope>
+  /** AH-119 Stage B: PATCH …/messages/{message}. 404 while `messages_v2_edit_search_enabled` is off. */
+  edit?(messageId: string, payload: EditMessagePayload): Promise<RelationshipMessageEnvelope>
+  /** AH-119 Stage B: DELETE …/messages/{message}; answers the masked message. */
+  remove?(messageId: string): Promise<RelationshipMessageEnvelope>
 }
 
 function listUrl(base: string, before?: string): string {
@@ -64,6 +69,10 @@ function buildTransport(base: string): RelationshipChatTransport {
       http.post<MessageAttachmentCompleteEnvelope>(`${base}/attachments/complete`, {
         upload_id: uploadId,
       }),
+    edit: (messageId, payload) =>
+      http.patch<RelationshipMessageEnvelope>(`${base}/${encodeURIComponent(messageId)}`, payload),
+    remove: (messageId) =>
+      http.delete<RelationshipMessageEnvelope>(`${base}/${encodeURIComponent(messageId)}`),
   }
 }
 
