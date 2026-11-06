@@ -17,6 +17,8 @@ it('counts threads with unread in the popovers and the pill, while the row badge
     ['agency' => $agency, 'admin' => $admin] = inboxWorld();
     $a = inboxAssignment($agency, humans: 3);                       // one thread, 3 unread messages
     inboxAssignment($agency, brand: $a['brand'], humans: 2);        // a second thread of the same brand
+    $read = inboxAssignment($agency, brand: $a['brand']);           // a third, fully read: in the brand, not in the count
+    inboxMarkRead($admin, $read['messages'][0]);
     inboxDirect($agency, inboxCreator(), humans: 4);                // a Direct thread
 
     $res = $this->actingAs($admin)->getJson(inboxUrl($agency))->assertOk();

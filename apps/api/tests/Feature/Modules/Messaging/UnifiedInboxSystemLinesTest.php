@@ -54,3 +54,11 @@ it('does not surface a thread whose only human message was deleted', function ()
 
     $this->actingAs($admin)->getJson(inboxUrl($agency))->assertOk()->assertJsonCount(0, 'data');
 });
+
+it('does not count a system-kind message even if it somehow carries a sender', function (): void {
+    ['agency' => $agency, 'admin' => $admin] = inboxWorld();
+    $asg = inboxAssignment($agency, humans: 1, system: 1);
+    $asg['messages'][1]->forceFill(['sender_user_id' => $asg['creator']->user_id])->save();
+
+    expect($this->actingAs($admin)->getJson(inboxUrl($agency))->json('data.0.attributes.unread_count'))->toBe(1);
+});
