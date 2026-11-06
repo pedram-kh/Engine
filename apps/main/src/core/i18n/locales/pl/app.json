@@ -94,7 +94,44 @@
         "inboxFilterAll": "Wszystkie",
         "inboxFilterUnread": "Nieprzeczytane",
         "inboxNoMatch": "Brak pasujących rozmów."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Bezpośrednie",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Wszystkie marki",
+        "allCampaigns": "Wszystkie kampanie",
+        "searchBrands": "Szukaj marek",
+        "searchCampaigns": "Szukaj kampanii",
+        "brandsHeading": "Marki",
+        "campaignsHeading": "Kampanie",
+        "selectedCount": "Wybrano {count} | Wybrano {count}",
+        "clearSelection": "Wyczyść",
+        "clearFilters": "Wyczyść filtry",
+        "ownerMine": "Moje",
+        "ownerAll": "Wszystkie",
+        "ownerFilterLabel": "Pokaż rozmowy, których właścicielem jest",
+        "noBrandMatch": "Brak pasujących marek",
+        "noCampaignMatch": "Brak pasujących kampanii",
+        "viewCampaign": "Zobacz kampanię",
+        "noOwner": "Brak właściciela",
+        "loadMore": "Załaduj więcej",
+        "filteredEmpty": "Żadne rozmowy nie pasują do tych filtrów."
+      },
+      "thread": {
+        "moreActions": "Więcej działań",
+        "reassignOwner": "Zmień właściciela",
+        "reassignTitle": "Zmień właściciela tej rozmowy",
+        "reassignHint": "Właściciel decyduje, kto widzi tę rozmowę w zakładce Moje.",
+        "reassignSelect": "Nowy właściciel",
+        "reassignConfirm": "Zmień",
+        "reassignCancel": "Anuluj",
+        "reassignDone": "Właściciel zmieniony na {name}.",
+        "reassignError": "Nie udało się zmienić właściciela.",
+        "ownerLabel": "Właściciel: {name}"
+      },
+      "attachmentDropHint": "Upuść obraz, aby go dołączyć",
+      "attachmentImageUnavailable": "Obraz niedostępny",
+      "attachmentPasteUnsupportedType": "Tutaj można wklejać tylko obrazy. Użyj spinacza dla innych plików."
     },
     "nav": {
       "dashboard": "Pulpit nawigacyjny",
@@ -377,7 +414,8 @@
         "descriptionHint": "Co twórca przygotowuje co miesiąc (np. 2 Reels i 3 Stories) oraz warunki wykorzystania.",
         "slugHint": "Proponowany automatycznie na podstawie nazwy. Używany w adresach URL.",
         "createdAt": "Utworzono",
-        "logo": "Logo"
+        "logo": "Logo",
+        "color": "Kolor"
       },
       "status": {
         "active": "Aktywna",
@@ -447,6 +485,16 @@
           "website_url": "adres URL strony",
           "logo_path": "logo"
         }
+      },
+      "color": {
+        "violet": "Fioletowy",
+        "green": "Zielony",
+        "amber": "Bursztynowy",
+        "blue": "Niebieski",
+        "pink": "Różowy",
+        "teal": "Morski",
+        "red": "Czerwony",
+        "slate": "Łupkowy"
       }
     },
     "campaigns": {

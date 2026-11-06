@@ -94,7 +94,44 @@
         "inboxFilterAll": "Όλα",
         "inboxFilterUnread": "Μη αναγνωσμένα",
         "inboxNoMatch": "Δεν βρέθηκαν συνομιλίες."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Άμεσα",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Όλα τα brands",
+        "allCampaigns": "Όλες οι καμπάνιες",
+        "searchBrands": "Αναζήτηση brands",
+        "searchCampaigns": "Αναζήτηση καμπανιών",
+        "brandsHeading": "Brands",
+        "campaignsHeading": "Καμπάνιες",
+        "selectedCount": "{count} επιλεγμένο | {count} επιλεγμένα",
+        "clearSelection": "Εκκαθάριση",
+        "clearFilters": "Εκκαθάριση φίλτρων",
+        "ownerMine": "Δικές μου",
+        "ownerAll": "Όλες",
+        "ownerFilterLabel": "Εμφάνιση συνομιλιών που ανήκουν σε",
+        "noBrandMatch": "Κανένα brand δεν ταιριάζει",
+        "noCampaignMatch": "Καμία καμπάνια δεν ταιριάζει",
+        "viewCampaign": "Προβολή καμπάνιας",
+        "noOwner": "Χωρίς υπεύθυνο",
+        "loadMore": "Φόρτωση περισσότερων",
+        "filteredEmpty": "Καμία συνομιλία δεν ταιριάζει με αυτά τα φίλτρα."
+      },
+      "thread": {
+        "moreActions": "Περισσότερες ενέργειες",
+        "reassignOwner": "Αλλαγή υπευθύνου",
+        "reassignTitle": "Αλλαγή υπευθύνου αυτής της συνομιλίας",
+        "reassignHint": "Ο υπεύθυνος καθορίζει ποιος βλέπει αυτή τη συνομιλία στις Δικές μου.",
+        "reassignSelect": "Νέος υπεύθυνος",
+        "reassignConfirm": "Αλλαγή",
+        "reassignCancel": "Ακύρωση",
+        "reassignDone": "Ο υπεύθυνος άλλαξε σε {name}.",
+        "reassignError": "Δεν ήταν δυνατή η αλλαγή του υπευθύνου.",
+        "ownerLabel": "Υπεύθυνος: {name}"
+      },
+      "attachmentDropHint": "Αφήστε μια εικόνα για να την επισυνάψετε",
+      "attachmentImageUnavailable": "Η εικόνα δεν είναι διαθέσιμη",
+      "attachmentPasteUnsupportedType": "Εδώ μπορούν να επικολληθούν μόνο εικόνες. Χρησιμοποιήστε τον συνδετήρα για άλλα αρχεία."
     },
     "nav": {
       "dashboard": "Πίνακας ελέγχου",
@@ -377,7 +414,8 @@
         "descriptionHint": "Τι παράγει ο δημιουργός κάθε μήνα (π.χ. 2 Reels και 3 Stories), καθώς και οι όροι χρήσης.",
         "slugHint": "Προτείνεται αυτόματα από το όνομα. Χρησιμοποιείται στα URL.",
         "createdAt": "Δημιουργήθηκε",
-        "logo": "Λογότυπο"
+        "logo": "Λογότυπο",
+        "color": "Χρώμα"
       },
       "status": {
         "active": "Ενεργό",
@@ -447,6 +485,16 @@
           "website_url": "URL ιστοτόπου",
           "logo_path": "λογότυπο"
         }
+      },
+      "color": {
+        "violet": "Βιολετί",
+        "green": "Πράσινο",
+        "amber": "Κεχριμπαρί",
+        "blue": "Μπλε",
+        "pink": "Ροζ",
+        "teal": "Τιρκουάζ",
+        "red": "Κόκκινο",
+        "slate": "Σχιστόλιθου"
       }
     },
     "campaigns": {

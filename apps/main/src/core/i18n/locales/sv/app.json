@@ -94,7 +94,44 @@
         "inboxFilterAll": "Alla",
         "inboxFilterUnread": "Olästa",
         "inboxNoMatch": "Inga konversationer matchar."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Direkt",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Alla varumärken",
+        "allCampaigns": "Alla kampanjer",
+        "searchBrands": "Sök varumärken",
+        "searchCampaigns": "Sök kampanjer",
+        "brandsHeading": "Varumärken",
+        "campaignsHeading": "Kampanjer",
+        "selectedCount": "{count} vald | {count} valda",
+        "clearSelection": "Rensa",
+        "clearFilters": "Rensa filter",
+        "ownerMine": "Mina",
+        "ownerAll": "Alla",
+        "ownerFilterLabel": "Visa konversationer som ägs av",
+        "noBrandMatch": "Inga varumärken matchar",
+        "noCampaignMatch": "Inga kampanjer matchar",
+        "viewCampaign": "Visa kampanj",
+        "noOwner": "Ingen ägare",
+        "loadMore": "Ladda fler",
+        "filteredEmpty": "Inga konversationer matchar dessa filter."
+      },
+      "thread": {
+        "moreActions": "Fler åtgärder",
+        "reassignOwner": "Byt ägare",
+        "reassignTitle": "Tilldela konversationen en ny ägare",
+        "reassignHint": "Ägaren avgör vem som ser den här konversationen under Mina.",
+        "reassignSelect": "Ny ägare",
+        "reassignConfirm": "Tilldela om",
+        "reassignCancel": "Avbryt",
+        "reassignDone": "Ägaren ändrades till {name}.",
+        "reassignError": "Vi kunde inte byta ägare.",
+        "ownerLabel": "Ägare: {name}"
+      },
+      "attachmentDropHint": "Släpp en bild för att bifoga den",
+      "attachmentImageUnavailable": "Bilden är inte tillgänglig",
+      "attachmentPasteUnsupportedType": "Endast bilder kan klistras in här. Använd gem-ikonen för andra filer."
     },
     "nav": {
       "dashboard": "Dashboard",
@@ -377,7 +414,8 @@
         "descriptionHint": "Vad creatorn producerar varje månad (t.ex. 2 Reels och 3 Stories), samt användningsvillkor.",
         "slugHint": "Föreslås automatiskt utifrån namnet. Används i URL:er.",
         "createdAt": "Skapad",
-        "logo": "Logotyp"
+        "logo": "Logotyp",
+        "color": "Färg"
       },
       "status": {
         "active": "Aktiv",
@@ -447,6 +485,16 @@
           "website_url": "webbplatsens URL",
           "logo_path": "logotyp"
         }
+      },
+      "color": {
+        "violet": "Violett",
+        "green": "Grön",
+        "amber": "Bärnsten",
+        "blue": "Blå",
+        "pink": "Rosa",
+        "teal": "Blågrön",
+        "red": "Röd",
+        "slate": "Skiffergrå"
       }
     },
     "campaigns": {

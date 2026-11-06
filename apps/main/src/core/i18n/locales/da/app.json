@@ -94,7 +94,44 @@
         "inboxFilterAll": "Alle",
         "inboxFilterUnread": "Ulæste",
         "inboxNoMatch": "Ingen samtaler matcher."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Direkte",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Alle brands",
+        "allCampaigns": "Alle kampagner",
+        "searchBrands": "Søg i brands",
+        "searchCampaigns": "Søg i kampagner",
+        "brandsHeading": "Brands",
+        "campaignsHeading": "Kampagner",
+        "selectedCount": "{count} valgt | {count} valgte",
+        "clearSelection": "Ryd",
+        "clearFilters": "Ryd filtre",
+        "ownerMine": "Mine",
+        "ownerAll": "Alle",
+        "ownerFilterLabel": "Vis samtaler ejet af",
+        "noBrandMatch": "Ingen brands matcher",
+        "noCampaignMatch": "Ingen kampagner matcher",
+        "viewCampaign": "Se kampagne",
+        "noOwner": "Ingen ejer",
+        "loadMore": "Indlæs mere",
+        "filteredEmpty": "Ingen samtaler matcher disse filtre."
+      },
+      "thread": {
+        "moreActions": "Flere handlinger",
+        "reassignOwner": "Tildel ny ejer",
+        "reassignTitle": "Tildel denne samtale til en ny ejer",
+        "reassignHint": "Ejeren bestemmer, hvem der ser denne samtale under Mine.",
+        "reassignSelect": "Ny ejer",
+        "reassignConfirm": "Tildel",
+        "reassignCancel": "Annuller",
+        "reassignDone": "Ejeren er ændret til {name}.",
+        "reassignError": "Vi kunne ikke ændre ejeren.",
+        "ownerLabel": "Ejer: {name}"
+      },
+      "attachmentDropHint": "Slip et billede for at vedhæfte det",
+      "attachmentImageUnavailable": "Billedet er ikke tilgængeligt",
+      "attachmentPasteUnsupportedType": "Kun billeder kan indsættes her. Brug papirclipsen til andre filer."
     },
     "nav": {
       "dashboard": "Dashboard",
@@ -377,7 +414,8 @@
         "descriptionHint": "Hvad creatoren producerer hver måned (fx 2 Reels og 3 Stories) samt brugsvilkår.",
         "slugHint": "Foreslås automatisk ud fra navnet. Bruges i URL'er.",
         "createdAt": "Oprettet",
-        "logo": "Logo"
+        "logo": "Logo",
+        "color": "Farve"
       },
       "status": {
         "active": "Aktiv",
@@ -447,6 +485,16 @@
           "website_url": "website-URL",
           "logo_path": "logo"
         }
+      },
+      "color": {
+        "violet": "Lilla",
+        "green": "Grøn",
+        "amber": "Rav",
+        "blue": "Blå",
+        "pink": "Lyserød",
+        "teal": "Blågrøn",
+        "red": "Rød",
+        "slate": "Skifergrå"
       }
     },
     "campaigns": {

@@ -94,7 +94,44 @@
         "inboxFilterAll": "Kollha",
         "inboxFilterUnread": "Mhux moqrija",
         "inboxNoMatch": "Ma sabet ebda konversazzjoni."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Dirett",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Il-brands kollha",
+        "allCampaigns": "Il-kampanji kollha",
+        "searchBrands": "Fittex brands",
+        "searchCampaigns": "Fittex kampanji",
+        "brandsHeading": "Brands",
+        "campaignsHeading": "Kampanji",
+        "selectedCount": "{count} magħżul | {count} magħżulin",
+        "clearSelection": "Neħħi",
+        "clearFilters": "Neħħi l-filtri",
+        "ownerMine": "Tiegħi",
+        "ownerAll": "Kollha",
+        "ownerFilterLabel": "Uri konversazzjonijiet li huma proprjetà ta’",
+        "noBrandMatch": "L-ebda brand ma jaqbel",
+        "noCampaignMatch": "L-ebda kampanja ma taqbel",
+        "viewCampaign": "Ara l-kampanja",
+        "noOwner": "L-ebda sid",
+        "loadMore": "Tagħbija ta’ aktar",
+        "filteredEmpty": "L-ebda konversazzjoni ma taqbel ma’ dawn il-filtri."
+      },
+      "thread": {
+        "moreActions": "Aktar azzjonijiet",
+        "reassignOwner": "Assenja mill-ġdid is-sid",
+        "reassignTitle": "Assenja mill-ġdid din il-konversazzjoni",
+        "reassignHint": "Is-sid jiddeċiedi min jara din il-konversazzjoni taħt Tiegħi.",
+        "reassignSelect": "Sid ġdid",
+        "reassignConfirm": "Assenja mill-ġdid",
+        "reassignCancel": "Ikkanċella",
+        "reassignDone": "Is-sid inbidel għal {name}.",
+        "reassignError": "Ma stajniex nibdlu s-sid.",
+        "ownerLabel": "Sid: {name}"
+      },
+      "attachmentDropHint": "Poġġi immaġni biex twaħħalha",
+      "attachmentImageUnavailable": "Immaġni mhux disponibbli",
+      "attachmentPasteUnsupportedType": "Hawnhekk jistgħu jiġu ppejstjati biss immaġni. Uża l-paperclip għal fajls oħra."
     },
     "nav": {
       "dashboard": "Dashboard",
@@ -377,7 +414,8 @@
         "descriptionHint": "X'jipproduċi l-kreatur kull xahar (ngħidu aħna 2 Reels u 3 Stories), flimkien mat-termini tal-użu.",
         "slugHint": "Jiġi suġġerit awtomatikament mill-isem. Jintuża fl-URLs.",
         "createdAt": "Maħluq",
-        "logo": "Logo"
+        "logo": "Logo",
+        "color": "Kulur"
       },
       "status": {
         "active": "Attiv",
@@ -447,6 +485,16 @@
           "website_url": "URL tal-websajt",
           "logo_path": "logo"
         }
+      },
+      "color": {
+        "violet": "Vjola",
+        "green": "Aħdar",
+        "amber": "Ambra",
+        "blue": "Blu",
+        "pink": "Roża",
+        "teal": "Turkiża",
+        "red": "Aħmar",
+        "slate": "Griż"
       }
     },
     "campaigns": {

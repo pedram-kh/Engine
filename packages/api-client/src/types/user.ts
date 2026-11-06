@@ -133,6 +133,8 @@ export interface UserAttributes {
     campaign_region_restriction?: boolean
     /** AH-118: agency-side only; false for a creator or a platform admin. */
     assignment_offer_edit?: boolean
+    /** AH-119: agency-side only; true while the unified Messages inbox is on. */
+    messages_v2_inbox?: boolean
   }
 }
 

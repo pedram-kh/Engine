@@ -94,7 +94,44 @@
         "inboxFilterAll": "Visi",
         "inboxFilterUnread": "Nelasītās",
         "inboxNoMatch": "Nav atbilstošu sarunu."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Tiešās",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Visi zīmoli",
+        "allCampaigns": "Visas kampaņas",
+        "searchBrands": "Meklēt zīmolus",
+        "searchCampaigns": "Meklēt kampaņas",
+        "brandsHeading": "Zīmoli",
+        "campaignsHeading": "Kampaņas",
+        "selectedCount": "Atlasīts {count} | Atlasīti {count}",
+        "clearSelection": "Notīrīt",
+        "clearFilters": "Notīrīt filtrus",
+        "ownerMine": "Mani",
+        "ownerAll": "Visi",
+        "ownerFilterLabel": "Rādīt sarunas, kuru īpašnieks ir",
+        "noBrandMatch": "Nav atbilstošu zīmolu",
+        "noCampaignMatch": "Nav atbilstošu kampaņu",
+        "viewCampaign": "Skatīt kampaņu",
+        "noOwner": "Nav īpašnieka",
+        "loadMore": "Ielādēt vairāk",
+        "filteredEmpty": "Neviena saruna neatbilst šiem filtriem."
+      },
+      "thread": {
+        "moreActions": "Citas darbības",
+        "reassignOwner": "Mainīt īpašnieku",
+        "reassignTitle": "Pārvietot šo sarunu citam īpašniekam",
+        "reassignHint": "Īpašnieks nosaka, kas redz šo sarunu sadaļā Mani.",
+        "reassignSelect": "Jaunais īpašnieks",
+        "reassignConfirm": "Pārvietot",
+        "reassignCancel": "Atcelt",
+        "reassignDone": "Īpašnieks nomainīts uz {name}.",
+        "reassignError": "Neizdevās nomainīt īpašnieku.",
+        "ownerLabel": "Īpašnieks: {name}"
+      },
+      "attachmentDropHint": "Nometiet attēlu, lai to pievienotu",
+      "attachmentImageUnavailable": "Attēls nav pieejams",
+      "attachmentPasteUnsupportedType": "Šeit var ielīmēt tikai attēlus. Citiem failiem izmantojiet saspraudi."
     },
     "nav": {
       "dashboard": "Vadības panelis",
@@ -377,7 +414,8 @@
         "descriptionHint": "Ko veidotājs izveido katru mēnesi (piem., 2 Reels un 3 Stories), kā arī lietošanas nosacījumi.",
         "slugHint": "Automātiski ieteikts no nosaukuma. Tiek izmantots URL adresēs.",
         "createdAt": "Izveidots",
-        "logo": "Logotips"
+        "logo": "Logotips",
+        "color": "Krāsa"
       },
       "status": {
         "active": "Aktīvs",
@@ -447,6 +485,16 @@
           "website_url": "vietnes URL",
           "logo_path": "logotips"
         }
+      },
+      "color": {
+        "violet": "Violeta",
+        "green": "Zaļa",
+        "amber": "Dzintara",
+        "blue": "Zila",
+        "pink": "Rozā",
+        "teal": "Zilganzaļa",
+        "red": "Sarkana",
+        "slate": "Šīfera"
       }
     },
     "campaigns": {

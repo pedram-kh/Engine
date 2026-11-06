@@ -94,7 +94,44 @@
         "inboxFilterAll": "Toate",
         "inboxFilterUnread": "Necitite",
         "inboxNoMatch": "Nicio conversație nu se potrivește."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Direct",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Toate brandurile",
+        "allCampaigns": "Toate campaniile",
+        "searchBrands": "Caută branduri",
+        "searchCampaigns": "Caută campanii",
+        "brandsHeading": "Branduri",
+        "campaignsHeading": "Campanii",
+        "selectedCount": "{count} selectat | {count} selectate",
+        "clearSelection": "Șterge",
+        "clearFilters": "Șterge filtrele",
+        "ownerMine": "Ale mele",
+        "ownerAll": "Toate",
+        "ownerFilterLabel": "Afișează conversațiile deținute de",
+        "noBrandMatch": "Niciun brand nu se potrivește",
+        "noCampaignMatch": "Nicio campanie nu se potrivește",
+        "viewCampaign": "Vezi campania",
+        "noOwner": "Fără responsabil",
+        "loadMore": "Încarcă mai multe",
+        "filteredEmpty": "Nicio conversație nu se potrivește cu aceste filtre."
+      },
+      "thread": {
+        "moreActions": "Mai multe acțiuni",
+        "reassignOwner": "Reatribuie responsabilul",
+        "reassignTitle": "Reatribuie această conversație",
+        "reassignHint": "Responsabilul decide cine vede această conversație la Ale mele.",
+        "reassignSelect": "Responsabil nou",
+        "reassignConfirm": "Reatribuie",
+        "reassignCancel": "Anulează",
+        "reassignDone": "Responsabilul a fost schimbat în {name}.",
+        "reassignError": "Nu am putut schimba responsabilul.",
+        "ownerLabel": "Responsabil: {name}"
+      },
+      "attachmentDropHint": "Trage o imagine pentru a o atașa",
+      "attachmentImageUnavailable": "Imagine indisponibilă",
+      "attachmentPasteUnsupportedType": "Aici pot fi lipite doar imagini. Folosește agrafa pentru alte fișiere."
     },
     "nav": {
       "dashboard": "Panou de control",
@@ -377,7 +414,8 @@
         "descriptionHint": "Ce produce creatorul în fiecare lună (de ex. 2 Reels și 3 Stories), plus condițiile de utilizare.",
         "slugHint": "Sugerat automat din nume. Se folosește în adresele URL.",
         "createdAt": "Creat",
-        "logo": "Logo"
+        "logo": "Logo",
+        "color": "Culoare"
       },
       "status": {
         "active": "Activ",
@@ -447,6 +485,16 @@
           "website_url": "adresa URL a site-ului",
           "logo_path": "logo"
         }
+      },
+      "color": {
+        "violet": "Violet",
+        "green": "Verde",
+        "amber": "Chihlimbar",
+        "blue": "Albastru",
+        "pink": "Roz",
+        "teal": "Turcoaz",
+        "red": "Roșu",
+        "slate": "Ardezie"
       }
     },
     "campaigns": {

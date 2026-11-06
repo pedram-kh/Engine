@@ -94,7 +94,44 @@
         "inboxFilterAll": "Todas",
         "inboxFilterUnread": "Não lidas",
         "inboxNoMatch": "Nenhuma conversa corresponde."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Direto",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Todas as marcas",
+        "allCampaigns": "Todas as campanhas",
+        "searchBrands": "Pesquisar marcas",
+        "searchCampaigns": "Pesquisar campanhas",
+        "brandsHeading": "Marcas",
+        "campaignsHeading": "Campanhas",
+        "selectedCount": "{count} selecionado | {count} selecionados",
+        "clearSelection": "Limpar",
+        "clearFilters": "Limpar filtros",
+        "ownerMine": "Minhas",
+        "ownerAll": "Todas",
+        "ownerFilterLabel": "Mostrar conversas atribuídas a",
+        "noBrandMatch": "Nenhuma marca corresponde",
+        "noCampaignMatch": "Nenhuma campanha corresponde",
+        "viewCampaign": "Ver campanha",
+        "noOwner": "Sem responsável",
+        "loadMore": "Carregar mais",
+        "filteredEmpty": "Nenhuma conversa corresponde a estes filtros."
+      },
+      "thread": {
+        "moreActions": "Mais ações",
+        "reassignOwner": "Reatribuir responsável",
+        "reassignTitle": "Reatribuir esta conversa",
+        "reassignHint": "O responsável decide quem vê esta conversa em Minhas.",
+        "reassignSelect": "Novo responsável",
+        "reassignConfirm": "Reatribuir",
+        "reassignCancel": "Cancelar",
+        "reassignDone": "Responsável alterado para {name}.",
+        "reassignError": "Não foi possível alterar o responsável.",
+        "ownerLabel": "Responsável: {name}"
+      },
+      "attachmentDropHint": "Largue uma imagem para a anexar",
+      "attachmentImageUnavailable": "Imagem indisponível",
+      "attachmentPasteUnsupportedType": "Aqui só é possível colar imagens. Use o clipe para outros ficheiros."
     },
     "nav": {
       "dashboard": "Painel",
@@ -377,7 +414,8 @@
         "descriptionHint": "O que o criador produz por mês (por ex., 2 Reels e 3 Stories), além das condições de utilização.",
         "slugHint": "Sugerido automaticamente a partir do nome. Usado nos URL.",
         "createdAt": "Criado",
-        "logo": "Logótipo"
+        "logo": "Logótipo",
+        "color": "Cor"
       },
       "status": {
         "active": "Ativo",
@@ -447,6 +485,16 @@
           "website_url": "URL do site",
           "logo_path": "logótipo"
         }
+      },
+      "color": {
+        "violet": "Violeta",
+        "green": "Verde",
+        "amber": "Âmbar",
+        "blue": "Azul",
+        "pink": "Rosa",
+        "teal": "Azul-petróleo",
+        "red": "Vermelho",
+        "slate": "Ardósia"
       }
     },
     "campaigns": {

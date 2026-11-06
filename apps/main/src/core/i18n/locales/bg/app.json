@@ -94,7 +94,44 @@
         "inboxFilterAll": "Всички",
         "inboxFilterUnread": "Непрочетени",
         "inboxNoMatch": "Няма съвпадащи разговори."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Директни",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Всички марки",
+        "allCampaigns": "Всички кампании",
+        "searchBrands": "Търсене на марки",
+        "searchCampaigns": "Търсене на кампании",
+        "brandsHeading": "Марки",
+        "campaignsHeading": "Кампании",
+        "selectedCount": "{count} избран | {count} избрани",
+        "clearSelection": "Изчисти",
+        "clearFilters": "Изчисти филтрите",
+        "ownerMine": "Мои",
+        "ownerAll": "Всички",
+        "ownerFilterLabel": "Показване на разговорите, притежавани от",
+        "noBrandMatch": "Няма съвпадащи марки",
+        "noCampaignMatch": "Няма съвпадащи кампании",
+        "viewCampaign": "Преглед на кампанията",
+        "noOwner": "Без собственик",
+        "loadMore": "Зареди още",
+        "filteredEmpty": "Няма разговори, отговарящи на тези филтри."
+      },
+      "thread": {
+        "moreActions": "Още действия",
+        "reassignOwner": "Смяна на собственика",
+        "reassignTitle": "Смяна на собственика на този разговор",
+        "reassignHint": "Собственикът определя кой вижда този разговор в „Мои“.",
+        "reassignSelect": "Нов собственик",
+        "reassignConfirm": "Смени",
+        "reassignCancel": "Отказ",
+        "reassignDone": "Собственикът е сменен на {name}.",
+        "reassignError": "Не успяхме да сменим собственика.",
+        "ownerLabel": "Собственик: {name}"
+      },
+      "attachmentDropHint": "Пуснете изображение, за да го прикачите",
+      "attachmentImageUnavailable": "Изображението не е налично",
+      "attachmentPasteUnsupportedType": "Тук могат да се поставят само изображения. Използвайте кламера за други файлове."
     },
     "nav": {
       "dashboard": "Табло за управление",
@@ -377,7 +414,8 @@
         "descriptionHint": "Какво произвежда криейтърът всеки месец (напр. 2 Reels и 3 Stories), плюс условията за използване.",
         "slugHint": "Предлага се автоматично от името. Използва се в URL адресите.",
         "createdAt": "Създадено",
-        "logo": "Лого"
+        "logo": "Лого",
+        "color": "Цвят"
       },
       "status": {
         "active": "Активен",
@@ -447,6 +485,16 @@
           "website_url": "URL на уебсайта",
           "logo_path": "лого"
         }
+      },
+      "color": {
+        "violet": "Виолетов",
+        "green": "Зелен",
+        "amber": "Кехлибарен",
+        "blue": "Син",
+        "pink": "Розов",
+        "teal": "Тюркоазен",
+        "red": "Червен",
+        "slate": "Графитен"
       }
     },
     "campaigns": {

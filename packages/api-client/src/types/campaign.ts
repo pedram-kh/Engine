@@ -6,6 +6,8 @@
  * Conventions follow `packages/api-client/src/types/agency.ts`.
  */
 
+import type { BrandColorKey } from './messaging'
+
 // ---------------------------------------------------------------------------
 // Enums (mirror App\Modules\Campaigns\Enums\*)
 // ---------------------------------------------------------------------------
@@ -139,6 +141,8 @@ export interface CampaignResource {
         id: string
         type: 'brands'
         name: string
+        /** AH-119: the brand's palette key, when set. */
+        color?: BrandColorKey | null
       }
     }
     agency: {

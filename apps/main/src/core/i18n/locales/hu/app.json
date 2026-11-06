@@ -94,7 +94,44 @@
         "inboxFilterAll": "Mind",
         "inboxFilterUnread": "Olvasatlan",
         "inboxNoMatch": "Nincs találat a beszélgetések között."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Közvetlen",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Összes márka",
+        "allCampaigns": "Összes kampány",
+        "searchBrands": "Márkák keresése",
+        "searchCampaigns": "Kampányok keresése",
+        "brandsHeading": "Márkák",
+        "campaignsHeading": "Kampányok",
+        "selectedCount": "{count} kiválasztva | {count} kiválasztva",
+        "clearSelection": "Törlés",
+        "clearFilters": "Szűrők törlése",
+        "ownerMine": "Saját",
+        "ownerAll": "Összes",
+        "ownerFilterLabel": "A következő tulajdonosú beszélgetések megjelenítése:",
+        "noBrandMatch": "Nincs egyező márka",
+        "noCampaignMatch": "Nincs egyező kampány",
+        "viewCampaign": "Kampány megtekintése",
+        "noOwner": "Nincs tulajdonos",
+        "loadMore": "Továbbiak betöltése",
+        "filteredEmpty": "Egy beszélgetés sem felel meg ezeknek a szűrőknek."
+      },
+      "thread": {
+        "moreActions": "További műveletek",
+        "reassignOwner": "Tulajdonos módosítása",
+        "reassignTitle": "A beszélgetés átadása",
+        "reassignHint": "A tulajdonos dönti el, ki látja ezt a beszélgetést a Saját alatt.",
+        "reassignSelect": "Új tulajdonos",
+        "reassignConfirm": "Átadás",
+        "reassignCancel": "Mégse",
+        "reassignDone": "A tulajdonos mostantól: {name}.",
+        "reassignError": "Nem sikerült módosítani a tulajdonost.",
+        "ownerLabel": "Tulajdonos: {name}"
+      },
+      "attachmentDropHint": "Húzz ide egy képet a csatoláshoz",
+      "attachmentImageUnavailable": "A kép nem érhető el",
+      "attachmentPasteUnsupportedType": "Itt csak képeket lehet beilleszteni. Más fájlokhoz használd a gemkapcsot."
     },
     "nav": {
       "dashboard": "Irányítópult",
@@ -377,7 +414,8 @@
         "descriptionHint": "Amit az alkotó havonta készít (pl. 2 Reels és 3 Stories), valamint a felhasználási feltételek.",
         "slugHint": "A névből automatikusan javasolt. Az URL-ekben használjuk.",
         "createdAt": "Létrehozva",
-        "logo": "Logó"
+        "logo": "Logó",
+        "color": "Szín"
       },
       "status": {
         "active": "Aktív",
@@ -447,6 +485,16 @@
           "website_url": "weboldal URL-je",
           "logo_path": "logó"
         }
+      },
+      "color": {
+        "violet": "Lila",
+        "green": "Zöld",
+        "amber": "Borostyán",
+        "blue": "Kék",
+        "pink": "Rózsaszín",
+        "teal": "Pávakék",
+        "red": "Piros",
+        "slate": "Palaszürke"
       }
     },
     "campaigns": {

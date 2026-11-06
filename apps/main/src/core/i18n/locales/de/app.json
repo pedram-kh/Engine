@@ -94,7 +94,44 @@
         "inboxFilterAll": "Alle",
         "inboxFilterUnread": "Ungelesen",
         "inboxNoMatch": "Keine Unterhaltungen gefunden."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Direkt",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Alle Marken",
+        "allCampaigns": "Alle Kampagnen",
+        "searchBrands": "Marken suchen",
+        "searchCampaigns": "Kampagnen suchen",
+        "brandsHeading": "Marken",
+        "campaignsHeading": "Kampagnen",
+        "selectedCount": "{count} ausgewählt | {count} ausgewählt",
+        "clearSelection": "Zurücksetzen",
+        "clearFilters": "Filter zurücksetzen",
+        "ownerMine": "Meine",
+        "ownerAll": "Alle",
+        "ownerFilterLabel": "Unterhaltungen anzeigen mit Verantwortlichem",
+        "noBrandMatch": "Keine passenden Marken",
+        "noCampaignMatch": "Keine passenden Kampagnen",
+        "viewCampaign": "Kampagne ansehen",
+        "noOwner": "Kein Verantwortlicher",
+        "loadMore": "Mehr laden",
+        "filteredEmpty": "Keine Unterhaltungen entsprechen diesen Filtern."
+      },
+      "thread": {
+        "moreActions": "Weitere Aktionen",
+        "reassignOwner": "Verantwortlichen ändern",
+        "reassignTitle": "Diese Unterhaltung neu zuweisen",
+        "reassignHint": "Der Verantwortliche bestimmt, wer diese Unterhaltung unter „Meine“ sieht.",
+        "reassignSelect": "Neuer Verantwortlicher",
+        "reassignConfirm": "Neu zuweisen",
+        "reassignCancel": "Abbrechen",
+        "reassignDone": "Verantwortlicher geändert auf {name}.",
+        "reassignError": "Wir konnten den Verantwortlichen nicht ändern.",
+        "ownerLabel": "Verantwortlich: {name}"
+      },
+      "attachmentDropHint": "Bild hier ablegen, um es anzuhängen",
+      "attachmentImageUnavailable": "Bild nicht verfügbar",
+      "attachmentPasteUnsupportedType": "Hier können nur Bilder eingefügt werden. Nutze die Büroklammer für andere Dateien."
     },
     "nav": {
       "dashboard": "Dashboard",
@@ -377,7 +414,8 @@
         "descriptionHint": "Was der Creator jeden Monat produziert (z. B. 2 Reels und 3 Stories), plus Nutzungsbedingungen.",
         "slugHint": "Wird automatisch aus dem Namen vorgeschlagen. Wird in URLs verwendet.",
         "createdAt": "Erstellt",
-        "logo": "Logo"
+        "logo": "Logo",
+        "color": "Farbe"
       },
       "status": {
         "active": "Aktiv",
@@ -447,6 +485,16 @@
           "website_url": "Website-URL",
           "logo_path": "Logo"
         }
+      },
+      "color": {
+        "violet": "Violett",
+        "green": "Grün",
+        "amber": "Bernstein",
+        "blue": "Blau",
+        "pink": "Rosa",
+        "teal": "Petrol",
+        "red": "Rot",
+        "slate": "Schiefergrau"
       }
     },
     "campaigns": {

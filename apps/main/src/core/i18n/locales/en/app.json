@@ -94,7 +94,44 @@
         "inboxFilterAll": "All",
         "inboxFilterUnread": "Unread",
         "inboxNoMatch": "No conversations match."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Direct",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "All brands",
+        "allCampaigns": "All campaigns",
+        "searchBrands": "Search brands",
+        "searchCampaigns": "Search campaigns",
+        "brandsHeading": "Brands",
+        "campaignsHeading": "Campaigns",
+        "selectedCount": "{count} selected | {count} selected",
+        "clearSelection": "Clear",
+        "clearFilters": "Clear filters",
+        "ownerMine": "Mine",
+        "ownerAll": "All",
+        "ownerFilterLabel": "Show conversations owned by",
+        "noBrandMatch": "No brands match",
+        "noCampaignMatch": "No campaigns match",
+        "viewCampaign": "View campaign",
+        "noOwner": "No owner",
+        "loadMore": "Load more",
+        "filteredEmpty": "No conversations match these filters."
+      },
+      "thread": {
+        "moreActions": "More actions",
+        "reassignOwner": "Reassign owner",
+        "reassignTitle": "Reassign this conversation",
+        "reassignHint": "The owner decides who sees this conversation under Mine.",
+        "reassignSelect": "New owner",
+        "reassignConfirm": "Reassign",
+        "reassignCancel": "Cancel",
+        "reassignDone": "Owner changed to {name}.",
+        "reassignError": "We couldn't change the owner.",
+        "ownerLabel": "Owner: {name}"
+      },
+      "attachmentDropHint": "Drop an image to attach it",
+      "attachmentImageUnavailable": "Image unavailable",
+      "attachmentPasteUnsupportedType": "Only images can be pasted here. Use the paperclip for other files."
     },
     "nav": {
       "dashboard": "Dashboard",
@@ -377,7 +414,8 @@
         "descriptionHint": "What the creator produces each month (e.g. 2 Reels and 3 Stories), plus usage terms.",
         "slugHint": "Auto-suggested from the name. Used in URLs.",
         "createdAt": "Created",
-        "logo": "Logo"
+        "logo": "Logo",
+        "color": "Colour"
       },
       "status": {
         "active": "Active",
@@ -447,6 +485,16 @@
           "website_url": "website URL",
           "logo_path": "logo"
         }
+      },
+      "color": {
+        "violet": "Violet",
+        "green": "Green",
+        "amber": "Amber",
+        "blue": "Blue",
+        "pink": "Pink",
+        "teal": "Teal",
+        "red": "Red",
+        "slate": "Slate"
       }
     },
     "campaigns": {

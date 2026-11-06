@@ -94,7 +94,44 @@
         "inboxFilterAll": "Kõik",
         "inboxFilterUnread": "Lugemata",
         "inboxNoMatch": "Ühtegi vestlust ei leitud."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Otse",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Kõik brändid",
+        "allCampaigns": "Kõik kampaaniad",
+        "searchBrands": "Otsi brände",
+        "searchCampaigns": "Otsi kampaaniaid",
+        "brandsHeading": "Brändid",
+        "campaignsHeading": "Kampaaniad",
+        "selectedCount": "{count} valitud | {count} valitud",
+        "clearSelection": "Tühjenda",
+        "clearFilters": "Tühjenda filtrid",
+        "ownerMine": "Minu",
+        "ownerAll": "Kõik",
+        "ownerFilterLabel": "Näita vestlusi, mille omanik on",
+        "noBrandMatch": "Ükski bränd ei sobi",
+        "noCampaignMatch": "Ükski kampaania ei sobi",
+        "viewCampaign": "Vaata kampaaniat",
+        "noOwner": "Omanikuta",
+        "loadMore": "Laadi rohkem",
+        "filteredEmpty": "Ükski vestlus ei vasta neile filtritele."
+      },
+      "thread": {
+        "moreActions": "Rohkem toiminguid",
+        "reassignOwner": "Määra omanik ümber",
+        "reassignTitle": "Määra see vestlus ümber",
+        "reassignHint": "Omanik otsustab, kes näeb seda vestlust jaotises Minu.",
+        "reassignSelect": "Uus omanik",
+        "reassignConfirm": "Määra ümber",
+        "reassignCancel": "Tühista",
+        "reassignDone": "Omanikuks määrati {name}.",
+        "reassignError": "Omaniku muutmine ebaõnnestus.",
+        "ownerLabel": "Omanik: {name}"
+      },
+      "attachmentDropHint": "Lohista pilt siia, et see lisada",
+      "attachmentImageUnavailable": "Pilt pole saadaval",
+      "attachmentPasteUnsupportedType": "Siia saab kleepida ainult pilte. Muude failide jaoks kasuta kirjaklambrit."
     },
     "nav": {
       "dashboard": "Juhtpaneel",
@@ -377,7 +414,8 @@
         "descriptionHint": "Mida looja iga kuu toodab (nt 2 Reels'i ja 3 Stories't) ning kasutustingimused.",
         "slugHint": "Pakutakse automaatselt nime järgi. Kasutatakse URL-ides.",
         "createdAt": "Loodud",
-        "logo": "Logo"
+        "logo": "Logo",
+        "color": "Värv"
       },
       "status": {
         "active": "Aktiivne",
@@ -447,6 +485,16 @@
           "website_url": "veebisaidi URL",
           "logo_path": "logo"
         }
+      },
+      "color": {
+        "violet": "Violetne",
+        "green": "Roheline",
+        "amber": "Merevaigukollane",
+        "blue": "Sinine",
+        "pink": "Roosa",
+        "teal": "Sinakasroheline",
+        "red": "Punane",
+        "slate": "Kiltkivihall"
       }
     },
     "campaigns": {

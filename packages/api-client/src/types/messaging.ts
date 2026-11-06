@@ -325,3 +325,76 @@ export interface MessageableAgencyRow {
 export interface MessageableAgenciesEnvelope {
   data: MessageableAgencyRow[]
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AH-119 — the unified agency inbox (`GET /agencies/{agency}/message-inbox`)
+//
+// One list of Direct (relationship) and campaign-assignment conversations. The
+// row id is the thread ULID; the creator id is what the Direct thread route
+// takes, the assignment id (with the campaign id) what the assignment route takes.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Mirrors `App\Modules\Brands\Enums\BrandColor`: the palette keys a brand may carry. */
+export type BrandColorKey =
+  | 'violet'
+  | 'green'
+  | 'amber'
+  | 'blue'
+  | 'pink'
+  | 'teal'
+  | 'red'
+  | 'slate'
+
+export interface MessageInboxRow {
+  id: string
+  type: 'relationship_thread' | 'assignment_thread'
+  attributes: {
+    creator: {
+      id: string | null
+      display_name: string | null
+      is_erased?: boolean
+      avatar_url: string | null
+    }
+    brand: { id: string; name: string; color: BrandColorKey | null } | null
+    campaign: { id: string; name: string } | null
+    assignment_id: string | null
+    last_message_at: string | null
+    preview: string | null
+    preview_kind: 'text' | 'attachment'
+    unread_count: number
+    owner: { id: string; name: string } | null
+  }
+}
+
+export interface MessageInboxFacets {
+  brands: Array<{
+    id: string
+    name: string
+    color: BrandColorKey | null
+    unread_threads: number
+  }>
+  campaigns: Array<{
+    id: string
+    name: string
+    brand_id: string | null
+    unread_threads: number
+  }>
+}
+
+export interface MessageInboxResponse {
+  data: MessageInboxRow[]
+  meta: {
+    unread_threads_total: number
+    facets: MessageInboxFacets
+    next_cursor: string | null
+  }
+}
+
+export interface MessageInboxParams {
+  brand?: string[]
+  campaign?: string[]
+  unread?: boolean
+  owner?: 'me' | 'all'
+  cursor?: string | null
+  perPage?: number
+}

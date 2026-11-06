@@ -94,7 +94,44 @@
         "inboxFilterAll": "Sve",
         "inboxFilterUnread": "Nepročitano",
         "inboxNoMatch": "Nema podudarnih razgovora."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Izravno",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Svi brendovi",
+        "allCampaigns": "Sve kampanje",
+        "searchBrands": "Pretraži brendove",
+        "searchCampaigns": "Pretraži kampanje",
+        "brandsHeading": "Brendovi",
+        "campaignsHeading": "Kampanje",
+        "selectedCount": "{count} odabrano | {count} odabrano",
+        "clearSelection": "Očisti",
+        "clearFilters": "Očisti filtre",
+        "ownerMine": "Moji",
+        "ownerAll": "Svi",
+        "ownerFilterLabel": "Prikaži razgovore u vlasništvu",
+        "noBrandMatch": "Nema podudarnih brendova",
+        "noCampaignMatch": "Nema podudarnih kampanja",
+        "viewCampaign": "Prikaži kampanju",
+        "noOwner": "Bez vlasnika",
+        "loadMore": "Učitaj više",
+        "filteredEmpty": "Nijedan razgovor ne odgovara ovim filtrima."
+      },
+      "thread": {
+        "moreActions": "Više radnji",
+        "reassignOwner": "Promijeni vlasnika",
+        "reassignTitle": "Promijeni vlasnika ovog razgovora",
+        "reassignHint": "Vlasnik određuje tko vidi ovaj razgovor pod Moji.",
+        "reassignSelect": "Novi vlasnik",
+        "reassignConfirm": "Promijeni",
+        "reassignCancel": "Odustani",
+        "reassignDone": "Vlasnik je promijenjen u {name}.",
+        "reassignError": "Nismo uspjeli promijeniti vlasnika.",
+        "ownerLabel": "Vlasnik: {name}"
+      },
+      "attachmentDropHint": "Ispustite sliku da biste je priložili",
+      "attachmentImageUnavailable": "Slika nije dostupna",
+      "attachmentPasteUnsupportedType": "Ovdje se mogu zalijepiti samo slike. Za ostale datoteke koristite spajalicu."
     },
     "nav": {
       "dashboard": "Upravljačka ploča",
@@ -377,7 +414,8 @@
         "descriptionHint": "Što kreator izrađuje svaki mjesec (npr. 2 Reels i 3 Stories) te uvjeti korištenja.",
         "slugHint": "Automatski se predlaže prema nazivu. Koristi se u URL-ovima.",
         "createdAt": "Stvoreno",
-        "logo": "Logotip"
+        "logo": "Logotip",
+        "color": "Boja"
       },
       "status": {
         "active": "Aktiven",
@@ -447,6 +485,16 @@
           "website_url": "URL web-mjesta",
           "logo_path": "logotip"
         }
+      },
+      "color": {
+        "violet": "Ljubičasta",
+        "green": "Zelena",
+        "amber": "Jantarna",
+        "blue": "Plava",
+        "pink": "Roza",
+        "teal": "Tirkizna",
+        "red": "Crvena",
+        "slate": "Škriljasta"
       }
     },
     "campaigns": {

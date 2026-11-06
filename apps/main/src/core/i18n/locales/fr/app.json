@@ -94,7 +94,44 @@
         "inboxFilterAll": "Toutes",
         "inboxFilterUnread": "Non lues",
         "inboxNoMatch": "Aucune conversation ne correspond."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Direct",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Toutes les marques",
+        "allCampaigns": "Toutes les campagnes",
+        "searchBrands": "Rechercher des marques",
+        "searchCampaigns": "Rechercher des campagnes",
+        "brandsHeading": "Marques",
+        "campaignsHeading": "Campagnes",
+        "selectedCount": "{count} sélectionné | {count} sélectionnés",
+        "clearSelection": "Effacer",
+        "clearFilters": "Effacer les filtres",
+        "ownerMine": "Les miennes",
+        "ownerAll": "Toutes",
+        "ownerFilterLabel": "Afficher les conversations dont le responsable est",
+        "noBrandMatch": "Aucune marque ne correspond",
+        "noCampaignMatch": "Aucune campagne ne correspond",
+        "viewCampaign": "Voir la campagne",
+        "noOwner": "Aucun responsable",
+        "loadMore": "Charger plus",
+        "filteredEmpty": "Aucune conversation ne correspond à ces filtres."
+      },
+      "thread": {
+        "moreActions": "Plus d’actions",
+        "reassignOwner": "Réattribuer le responsable",
+        "reassignTitle": "Réattribuer cette conversation",
+        "reassignHint": "Le responsable décide qui voit cette conversation sous « Les miennes ».",
+        "reassignSelect": "Nouveau responsable",
+        "reassignConfirm": "Réattribuer",
+        "reassignCancel": "Annuler",
+        "reassignDone": "Responsable changé pour {name}.",
+        "reassignError": "Nous n’avons pas pu changer le responsable.",
+        "ownerLabel": "Responsable : {name}"
+      },
+      "attachmentDropHint": "Déposez une image pour la joindre",
+      "attachmentImageUnavailable": "Image indisponible",
+      "attachmentPasteUnsupportedType": "Seules les images peuvent être collées ici. Utilisez le trombone pour les autres fichiers."
     },
     "nav": {
       "dashboard": "Tableau de bord",
@@ -377,7 +414,8 @@
         "descriptionHint": "Ce que le créateur produit chaque mois (par ex. 2 Reels et 3 Stories), ainsi que les conditions d'utilisation.",
         "slugHint": "Suggéré automatiquement à partir du nom. Utilisé dans les URL.",
         "createdAt": "Créé",
-        "logo": "Logo"
+        "logo": "Logo",
+        "color": "Couleur"
       },
       "status": {
         "active": "Active",
@@ -447,6 +485,16 @@
           "website_url": "URL du site web",
           "logo_path": "logo"
         }
+      },
+      "color": {
+        "violet": "Violet",
+        "green": "Vert",
+        "amber": "Ambre",
+        "blue": "Bleu",
+        "pink": "Rose",
+        "teal": "Sarcelle",
+        "red": "Rouge",
+        "slate": "Ardoise"
       }
     },
     "campaigns": {

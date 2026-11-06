@@ -94,7 +94,44 @@
         "inboxFilterAll": "Všetky",
         "inboxFilterUnread": "Neprečítané",
         "inboxNoMatch": "Žiadne zodpovedajúce konverzácie."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Priame",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Všetky značky",
+        "allCampaigns": "Všetky kampane",
+        "searchBrands": "Hľadať značky",
+        "searchCampaigns": "Hľadať kampane",
+        "brandsHeading": "Značky",
+        "campaignsHeading": "Kampane",
+        "selectedCount": "{count} vybraná | {count} vybraných",
+        "clearSelection": "Vymazať",
+        "clearFilters": "Vymazať filtre",
+        "ownerMine": "Moje",
+        "ownerAll": "Všetky",
+        "ownerFilterLabel": "Zobraziť konverzácie, ktoré vlastní",
+        "noBrandMatch": "Žiadne zodpovedajúce značky",
+        "noCampaignMatch": "Žiadne zodpovedajúce kampane",
+        "viewCampaign": "Zobraziť kampaň",
+        "noOwner": "Bez vlastníka",
+        "loadMore": "Načítať viac",
+        "filteredEmpty": "Týmto filtrom nezodpovedajú žiadne konverzácie."
+      },
+      "thread": {
+        "moreActions": "Ďalšie akcie",
+        "reassignOwner": "Zmeniť vlastníka",
+        "reassignTitle": "Zmeniť vlastníka tejto konverzácie",
+        "reassignHint": "Vlastník určuje, kto uvidí túto konverzáciu v časti Moje.",
+        "reassignSelect": "Nový vlastník",
+        "reassignConfirm": "Zmeniť",
+        "reassignCancel": "Zrušiť",
+        "reassignDone": "Vlastník bol zmenený na {name}.",
+        "reassignError": "Vlastníka sa nepodarilo zmeniť.",
+        "ownerLabel": "Vlastník: {name}"
+      },
+      "attachmentDropHint": "Presunutím obrázka ho pripojíte",
+      "attachmentImageUnavailable": "Obrázok nie je k dispozícii",
+      "attachmentPasteUnsupportedType": "Sem je možné vložiť iba obrázky. Pre ostatné súbory použite sponku."
     },
     "nav": {
       "dashboard": "Riadiaci panel",
@@ -377,7 +414,8 @@
         "descriptionHint": "Čo tvorca vytvorí každý mesiac (napr. 2 Reels a 3 Stories) a podmienky použitia.",
         "slugHint": "Automaticky navrhnuté podľa názvu. Používa sa v adresách URL.",
         "createdAt": "Vytvorené",
-        "logo": "Logo"
+        "logo": "Logo",
+        "color": "Farba"
       },
       "status": {
         "active": "Aktívny",
@@ -447,6 +485,16 @@
           "website_url": "URL webovej stránky",
           "logo_path": "logo"
         }
+      },
+      "color": {
+        "violet": "Fialová",
+        "green": "Zelená",
+        "amber": "Jantárová",
+        "blue": "Modrá",
+        "pink": "Ružová",
+        "teal": "Modrozelená",
+        "red": "Červená",
+        "slate": "Bridlicová"
       }
     },
     "campaigns": {

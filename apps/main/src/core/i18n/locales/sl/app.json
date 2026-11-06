@@ -94,7 +94,44 @@
         "inboxFilterAll": "Vse",
         "inboxFilterUnread": "Neprebrano",
         "inboxNoMatch": "Ni ujemajočih pogovorov."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Neposredno",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Vse blagovne znamke",
+        "allCampaigns": "Vse kampanje",
+        "searchBrands": "Iskanje blagovnih znamk",
+        "searchCampaigns": "Iskanje kampanj",
+        "brandsHeading": "Blagovne znamke",
+        "campaignsHeading": "Kampanje",
+        "selectedCount": "{count} izbran | {count} izbrani",
+        "clearSelection": "Počisti",
+        "clearFilters": "Počisti filtre",
+        "ownerMine": "Moji",
+        "ownerAll": "Vsi",
+        "ownerFilterLabel": "Prikaži pogovore v lasti",
+        "noBrandMatch": "Ni ustreznih blagovnih znamk",
+        "noCampaignMatch": "Ni ustreznih kampanj",
+        "viewCampaign": "Ogled kampanje",
+        "noOwner": "Brez lastnika",
+        "loadMore": "Naloži več",
+        "filteredEmpty": "Nobeden pogovor ne ustreza tem filtrom."
+      },
+      "thread": {
+        "moreActions": "Več dejanj",
+        "reassignOwner": "Spremeni lastnika",
+        "reassignTitle": "Spremeni lastnika tega pogovora",
+        "reassignHint": "Lastnik določi, kdo vidi ta pogovor pod Moji.",
+        "reassignSelect": "Nov lastnik",
+        "reassignConfirm": "Spremeni",
+        "reassignCancel": "Prekliči",
+        "reassignDone": "Lastnik je spremenjen v {name}.",
+        "reassignError": "Lastnika nismo mogli spremeniti.",
+        "ownerLabel": "Lastnik: {name}"
+      },
+      "attachmentDropHint": "Spustite sliko, da jo priložite",
+      "attachmentImageUnavailable": "Slika ni na voljo",
+      "attachmentPasteUnsupportedType": "Tu lahko prilepite samo slike. Za druge datoteke uporabite sponko."
     },
     "nav": {
       "dashboard": "Nadzorna plošča",
@@ -377,7 +414,8 @@
         "descriptionHint": "Kaj ustvarjalec pripravi vsak mesec (npr. 2 Reels in 3 Stories) ter pogoji uporabe.",
         "slugHint": "Samodejno predlagano iz imena. Uporablja se v naslovih URL.",
         "createdAt": "Ustvarjeno",
-        "logo": "Logotip"
+        "logo": "Logotip",
+        "color": "Barva"
       },
       "status": {
         "active": "Aktiven",
@@ -447,6 +485,16 @@
           "website_url": "URL spletnega mesta",
           "logo_path": "logotip"
         }
+      },
+      "color": {
+        "violet": "Vijolična",
+        "green": "Zelena",
+        "amber": "Jantarna",
+        "blue": "Modra",
+        "pink": "Roza",
+        "teal": "Turkizna",
+        "red": "Rdeča",
+        "slate": "Skrilasta"
       }
     },
     "campaigns": {

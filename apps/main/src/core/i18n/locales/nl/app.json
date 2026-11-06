@@ -94,7 +94,44 @@
         "inboxFilterAll": "Alles",
         "inboxFilterUnread": "Ongelezen",
         "inboxNoMatch": "Geen gesprekken gevonden."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Direct",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Alle merken",
+        "allCampaigns": "Alle campagnes",
+        "searchBrands": "Merken zoeken",
+        "searchCampaigns": "Campagnes zoeken",
+        "brandsHeading": "Merken",
+        "campaignsHeading": "Campagnes",
+        "selectedCount": "{count} geselecteerd | {count} geselecteerd",
+        "clearSelection": "Wissen",
+        "clearFilters": "Filters wissen",
+        "ownerMine": "Van mij",
+        "ownerAll": "Alle",
+        "ownerFilterLabel": "Gesprekken tonen die eigendom zijn van",
+        "noBrandMatch": "Geen merken gevonden",
+        "noCampaignMatch": "Geen campagnes gevonden",
+        "viewCampaign": "Campagne bekijken",
+        "noOwner": "Geen eigenaar",
+        "loadMore": "Meer laden",
+        "filteredEmpty": "Geen gesprekken voldoen aan deze filters."
+      },
+      "thread": {
+        "moreActions": "Meer acties",
+        "reassignOwner": "Eigenaar wijzigen",
+        "reassignTitle": "Dit gesprek opnieuw toewijzen",
+        "reassignHint": "De eigenaar bepaalt wie dit gesprek ziet onder Van mij.",
+        "reassignSelect": "Nieuwe eigenaar",
+        "reassignConfirm": "Opnieuw toewijzen",
+        "reassignCancel": "Annuleren",
+        "reassignDone": "Eigenaar gewijzigd naar {name}.",
+        "reassignError": "We konden de eigenaar niet wijzigen.",
+        "ownerLabel": "Eigenaar: {name}"
+      },
+      "attachmentDropHint": "Sleep een afbeelding hierheen om deze toe te voegen",
+      "attachmentImageUnavailable": "Afbeelding niet beschikbaar",
+      "attachmentPasteUnsupportedType": "Hier kunnen alleen afbeeldingen worden geplakt. Gebruik de paperclip voor andere bestanden."
     },
     "nav": {
       "dashboard": "Dashboard",
@@ -377,7 +414,8 @@
         "descriptionHint": "Wat de creator elke maand maakt (bijv. 2 Reels en 3 Stories), plus de gebruiksvoorwaarden.",
         "slugHint": "Automatisch voorgesteld op basis van de naam. Wordt gebruikt in URL's.",
         "createdAt": "Aangemaakt",
-        "logo": "Logo"
+        "logo": "Logo",
+        "color": "Kleur"
       },
       "status": {
         "active": "Actief",
@@ -447,6 +485,16 @@
           "website_url": "website-URL",
           "logo_path": "logo"
         }
+      },
+      "color": {
+        "violet": "Paars",
+        "green": "Groen",
+        "amber": "Oranjegeel",
+        "blue": "Blauw",
+        "pink": "Roze",
+        "teal": "Blauwgroen",
+        "red": "Rood",
+        "slate": "Leigrijs"
       }
     },
     "campaigns": {

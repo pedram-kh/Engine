@@ -94,7 +94,44 @@
         "inboxFilterAll": "Kaikki",
         "inboxFilterUnread": "Lukemattomat",
         "inboxNoMatch": "Ei hakua vastaavia keskusteluja."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Suora",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Kaikki brändit",
+        "allCampaigns": "Kaikki kampanjat",
+        "searchBrands": "Hae brändejä",
+        "searchCampaigns": "Hae kampanjoita",
+        "brandsHeading": "Brändit",
+        "campaignsHeading": "Kampanjat",
+        "selectedCount": "{count} valittu | {count} valittua",
+        "clearSelection": "Tyhjennä",
+        "clearFilters": "Tyhjennä suodattimet",
+        "ownerMine": "Omat",
+        "ownerAll": "Kaikki",
+        "ownerFilterLabel": "Näytä keskustelut, joiden omistaja on",
+        "noBrandMatch": "Ei vastaavia brändejä",
+        "noCampaignMatch": "Ei vastaavia kampanjoita",
+        "viewCampaign": "Näytä kampanja",
+        "noOwner": "Ei omistajaa",
+        "loadMore": "Lataa lisää",
+        "filteredEmpty": "Mikään keskustelu ei vastaa näitä suodattimia."
+      },
+      "thread": {
+        "moreActions": "Lisää toimintoja",
+        "reassignOwner": "Vaihda omistaja",
+        "reassignTitle": "Vaihda tämän keskustelun omistaja",
+        "reassignHint": "Omistaja päättää, kuka näkee tämän keskustelun kohdassa Omat.",
+        "reassignSelect": "Uusi omistaja",
+        "reassignConfirm": "Vaihda",
+        "reassignCancel": "Peruuta",
+        "reassignDone": "Omistajaksi vaihdettiin {name}.",
+        "reassignError": "Omistajaa ei voitu vaihtaa.",
+        "ownerLabel": "Omistaja: {name}"
+      },
+      "attachmentDropHint": "Pudota kuva liittääksesi sen",
+      "attachmentImageUnavailable": "Kuva ei ole saatavilla",
+      "attachmentPasteUnsupportedType": "Tähän voi liittää vain kuvia. Käytä paperiliitintä muille tiedostoille."
     },
     "nav": {
       "dashboard": "Kojelauta",
@@ -377,7 +414,8 @@
         "descriptionHint": "Mitä tekijä tuottaa joka kuukausi (esim. 2 Reels ja 3 Stories) sekä käyttöehdot.",
         "slugHint": "Ehdotetaan automaattisesti nimen perusteella. Käytetään URL-osoitteissa.",
         "createdAt": "Luotu",
-        "logo": "Logo"
+        "logo": "Logo",
+        "color": "Väri"
       },
       "status": {
         "active": "Aktiivinen",
@@ -447,6 +485,16 @@
           "website_url": "verkkosivun URL",
           "logo_path": "logo"
         }
+      },
+      "color": {
+        "violet": "Violetti",
+        "green": "Vihreä",
+        "amber": "Meripihka",
+        "blue": "Sininen",
+        "pink": "Pinkki",
+        "teal": "Turkoosi",
+        "red": "Punainen",
+        "slate": "Liuskekivi"
       }
     },
     "campaigns": {

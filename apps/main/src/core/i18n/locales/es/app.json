@@ -94,7 +94,44 @@
         "inboxFilterAll": "Todas",
         "inboxFilterUnread": "Sin leer",
         "inboxNoMatch": "Ninguna conversación coincide."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Directo",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Todas las marcas",
+        "allCampaigns": "Todas las campañas",
+        "searchBrands": "Buscar marcas",
+        "searchCampaigns": "Buscar campañas",
+        "brandsHeading": "Marcas",
+        "campaignsHeading": "Campañas",
+        "selectedCount": "{count} seleccionado | {count} seleccionados",
+        "clearSelection": "Borrar",
+        "clearFilters": "Borrar filtros",
+        "ownerMine": "Mías",
+        "ownerAll": "Todas",
+        "ownerFilterLabel": "Mostrar conversaciones de",
+        "noBrandMatch": "Ninguna marca coincide",
+        "noCampaignMatch": "Ninguna campaña coincide",
+        "viewCampaign": "Ver campaña",
+        "noOwner": "Sin responsable",
+        "loadMore": "Cargar más",
+        "filteredEmpty": "Ninguna conversación coincide con estos filtros."
+      },
+      "thread": {
+        "moreActions": "Más acciones",
+        "reassignOwner": "Reasignar responsable",
+        "reassignTitle": "Reasignar esta conversación",
+        "reassignHint": "El responsable decide quién ve esta conversación en Mías.",
+        "reassignSelect": "Nuevo responsable",
+        "reassignConfirm": "Reasignar",
+        "reassignCancel": "Cancelar",
+        "reassignDone": "Responsable cambiado a {name}.",
+        "reassignError": "No hemos podido cambiar el responsable.",
+        "ownerLabel": "Responsable: {name}"
+      },
+      "attachmentDropHint": "Suelta una imagen para adjuntarla",
+      "attachmentImageUnavailable": "Imagen no disponible",
+      "attachmentPasteUnsupportedType": "Aquí solo se pueden pegar imágenes. Usa el clip para otros archivos."
     },
     "nav": {
       "dashboard": "Panel",
@@ -377,7 +414,8 @@
         "descriptionHint": "Lo que el creador produce cada mes (p. ej. 2 Reels y 3 Stories), además de las condiciones de uso.",
         "slugHint": "Se sugiere automáticamente a partir del nombre. Se usa en las URL.",
         "createdAt": "Creado",
-        "logo": "Logotipo"
+        "logo": "Logotipo",
+        "color": "Color"
       },
       "status": {
         "active": "Activa",
@@ -447,6 +485,16 @@
           "website_url": "URL del sitio web",
           "logo_path": "logotipo"
         }
+      },
+      "color": {
+        "violet": "Violeta",
+        "green": "Verde",
+        "amber": "Ámbar",
+        "blue": "Azul",
+        "pink": "Rosa",
+        "teal": "Turquesa",
+        "red": "Rojo",
+        "slate": "Pizarra"
       }
     },
     "campaigns": {

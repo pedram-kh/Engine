@@ -94,7 +94,44 @@
         "inboxFilterAll": "Vše",
         "inboxFilterUnread": "Nepřečtené",
         "inboxNoMatch": "Žádné konverzace neodpovídají."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Přímé",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Všechny značky",
+        "allCampaigns": "Všechny kampaně",
+        "searchBrands": "Hledat značky",
+        "searchCampaigns": "Hledat kampaně",
+        "brandsHeading": "Značky",
+        "campaignsHeading": "Kampaně",
+        "selectedCount": "{count} vybraná | {count} vybraných",
+        "clearSelection": "Vymazat",
+        "clearFilters": "Vymazat filtry",
+        "ownerMine": "Moje",
+        "ownerAll": "Všechny",
+        "ownerFilterLabel": "Zobrazit konverzace, které vlastní",
+        "noBrandMatch": "Žádné odpovídající značky",
+        "noCampaignMatch": "Žádné odpovídající kampaně",
+        "viewCampaign": "Zobrazit kampaň",
+        "noOwner": "Bez vlastníka",
+        "loadMore": "Načíst další",
+        "filteredEmpty": "Těmto filtrům neodpovídají žádné konverzace."
+      },
+      "thread": {
+        "moreActions": "Další akce",
+        "reassignOwner": "Změnit vlastníka",
+        "reassignTitle": "Změnit vlastníka této konverzace",
+        "reassignHint": "Vlastník určuje, kdo uvidí tuto konverzaci v části Moje.",
+        "reassignSelect": "Nový vlastník",
+        "reassignConfirm": "Změnit",
+        "reassignCancel": "Zrušit",
+        "reassignDone": "Vlastník byl změněn na {name}.",
+        "reassignError": "Vlastníka se nepodařilo změnit.",
+        "ownerLabel": "Vlastník: {name}"
+      },
+      "attachmentDropHint": "Přetažením obrázku jej připojíte",
+      "attachmentImageUnavailable": "Obrázek není k dispozici",
+      "attachmentPasteUnsupportedType": "Sem lze vložit pouze obrázky. Pro ostatní soubory použijte sponku."
     },
     "nav": {
       "dashboard": "Řídicí panel",
@@ -377,7 +414,8 @@
         "descriptionHint": "Co tvůrce každý měsíc vytvoří (např. 2 Reels a 3 Stories) a podmínky užití.",
         "slugHint": "Automaticky navrženo podle názvu. Používá se v URL adresách.",
         "createdAt": "Vytvořeno",
-        "logo": "Logo"
+        "logo": "Logo",
+        "color": "Barva"
       },
       "status": {
         "active": "Aktivní",
@@ -447,6 +485,16 @@
           "website_url": "URL webu",
           "logo_path": "logo"
         }
+      },
+      "color": {
+        "violet": "Fialová",
+        "green": "Zelená",
+        "amber": "Jantarová",
+        "blue": "Modrá",
+        "pink": "Růžová",
+        "teal": "Modrozelená",
+        "red": "Červená",
+        "slate": "Břidlicová"
       }
     },
     "campaigns": {

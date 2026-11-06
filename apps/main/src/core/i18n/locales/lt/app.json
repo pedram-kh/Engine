@@ -94,7 +94,44 @@
         "inboxFilterAll": "Visi",
         "inboxFilterUnread": "Neskaityti",
         "inboxNoMatch": "Pokalbių nerasta."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Tiesioginiai",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Visi prekių ženklai",
+        "allCampaigns": "Visos kampanijos",
+        "searchBrands": "Ieškoti prekių ženklų",
+        "searchCampaigns": "Ieškoti kampanijų",
+        "brandsHeading": "Prekių ženklai",
+        "campaignsHeading": "Kampanijos",
+        "selectedCount": "Pasirinktas {count} | Pasirinkta {count}",
+        "clearSelection": "Išvalyti",
+        "clearFilters": "Išvalyti filtrus",
+        "ownerMine": "Mano",
+        "ownerAll": "Visi",
+        "ownerFilterLabel": "Rodyti pokalbius, kuriuos valdo",
+        "noBrandMatch": "Nėra tinkamų prekių ženklų",
+        "noCampaignMatch": "Nėra tinkamų kampanijų",
+        "viewCampaign": "Peržiūrėti kampaniją",
+        "noOwner": "Be savininko",
+        "loadMore": "Įkelti daugiau",
+        "filteredEmpty": "Nėra pokalbių, atitinkančių šiuos filtrus."
+      },
+      "thread": {
+        "moreActions": "Daugiau veiksmų",
+        "reassignOwner": "Pakeisti savininką",
+        "reassignTitle": "Perskirti šį pokalbį",
+        "reassignHint": "Savininkas nusprendžia, kas mato šį pokalbį skiltyje Mano.",
+        "reassignSelect": "Naujas savininkas",
+        "reassignConfirm": "Perskirti",
+        "reassignCancel": "Atšaukti",
+        "reassignDone": "Savininkas pakeistas į {name}.",
+        "reassignError": "Nepavyko pakeisti savininko.",
+        "ownerLabel": "Savininkas: {name}"
+      },
+      "attachmentDropHint": "Nuleiskite paveikslėlį, kad jį pridėtumėte",
+      "attachmentImageUnavailable": "Paveikslėlis nepasiekiamas",
+      "attachmentPasteUnsupportedType": "Čia galima įklijuoti tik paveikslėlius. Kitiems failams naudokite sąvaržėlę."
     },
     "nav": {
       "dashboard": "Valdymo skydelis",
@@ -377,7 +414,8 @@
         "descriptionHint": "Ką kūrėjas sukuria kas mėnesį (pvz., 2 „Reels“ ir 3 „Stories“) bei naudojimo sąlygos.",
         "slugHint": "Automatiškai siūloma pagal pavadinimą. Naudojama URL adresuose.",
         "createdAt": "Sukurta",
-        "logo": "Logotipas"
+        "logo": "Logotipas",
+        "color": "Spalva"
       },
       "status": {
         "active": "Aktyvus",
@@ -447,6 +485,16 @@
           "website_url": "svetainės URL",
           "logo_path": "logotipas"
         }
+      },
+      "color": {
+        "violet": "Violetinė",
+        "green": "Žalia",
+        "amber": "Gintarinė",
+        "blue": "Mėlyna",
+        "pink": "Rožinė",
+        "teal": "Žalsvai mėlyna",
+        "red": "Raudona",
+        "slate": "Skalūno"
       }
     },
     "campaigns": {

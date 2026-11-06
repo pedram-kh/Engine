@@ -94,7 +94,44 @@
         "inboxFilterAll": "Uile",
         "inboxFilterUnread": "Gan léamh",
         "inboxNoMatch": "Níl aon chomhrá ag teacht leis."
-      }
+      },
+      "inbox": {
+        "tagDirect": "Díreach",
+        "tagCampaign": "{brand} · {campaign}",
+        "allBrands": "Gach branda",
+        "allCampaigns": "Gach feachtas",
+        "searchBrands": "Cuardaigh brandaí",
+        "searchCampaigns": "Cuardaigh feachtais",
+        "brandsHeading": "Brandaí",
+        "campaignsHeading": "Feachtais",
+        "selectedCount": "{count} roghnaithe | {count} roghnaithe",
+        "clearSelection": "Glan",
+        "clearFilters": "Glan na scagairí",
+        "ownerMine": "Mo cheann féin",
+        "ownerAll": "Gach ceann",
+        "ownerFilterLabel": "Taispeáin comhráite faoi úinéireacht",
+        "noBrandMatch": "Níl aon bhranda ag teacht leis",
+        "noCampaignMatch": "Níl aon fheachtas ag teacht leis",
+        "viewCampaign": "Féach ar an bhfeachtas",
+        "noOwner": "Gan úinéir",
+        "loadMore": "Luchtaigh níos mó",
+        "filteredEmpty": "Níl aon chomhrá ag teacht leis na scagairí seo."
+      },
+      "thread": {
+        "moreActions": "Tuilleadh gníomhartha",
+        "reassignOwner": "Athshann úinéir",
+        "reassignTitle": "Athshann an comhrá seo",
+        "reassignHint": "Socraíonn an t-úinéir cé a fheiceann an comhrá seo faoi Mo cheann féin.",
+        "reassignSelect": "Úinéir nua",
+        "reassignConfirm": "Athshann",
+        "reassignCancel": "Cealaigh",
+        "reassignDone": "Athraíodh an t-úinéir go {name}.",
+        "reassignError": "Níorbh fhéidir linn an t-úinéir a athrú.",
+        "ownerLabel": "Úinéir: {name}"
+      },
+      "attachmentDropHint": "Scaoil íomhá chun é a cheangal",
+      "attachmentImageUnavailable": "Níl an íomhá ar fáil",
+      "attachmentPasteUnsupportedType": "Ní féidir ach íomhánna a ghreamú anseo. Úsáid an greamaire páipéir le haghaidh comhad eile."
     },
     "nav": {
       "dashboard": "Deais",
@@ -377,7 +414,8 @@
         "descriptionHint": "A gcruthaíonn an cruthaitheoir gach mí (m.sh. 2 Reels agus 3 Stories), chomh maith le téarmaí úsáide.",
         "slugHint": "Moltar go huathoibríoch ón ainm. Úsáidtear é i URLanna.",
         "createdAt": "Cruthaithe",
-        "logo": "Lógó"
+        "logo": "Lógó",
+        "color": "Dath"
       },
       "status": {
         "active": "Gníomhach",
@@ -447,6 +485,16 @@
           "website_url": "URL an tsuímh ghréasáin",
           "logo_path": "lógó"
         }
+      },
+      "color": {
+        "violet": "Corcra",
+        "green": "Glas",
+        "amber": "Ómra",
+        "blue": "Gorm",
+        "pink": "Bándearg",
+        "teal": "Téal",
+        "red": "Dearg",
+        "slate": "Scláta"
       }
     },
     "campaigns": {

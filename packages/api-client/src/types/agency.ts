@@ -10,6 +10,7 @@
  */
 
 import type { AvailabilityBlockType, AvailabilityKind } from './availability'
+import type { BrandColorKey } from './messaging'
 import type {
   CreatorApplicationStatus,
   CreatorPortfolioItemSummary,
@@ -73,6 +74,8 @@ export interface BrandAttributes {
   logo_path: string | null
   /** Short-lived signed GET (60 min), minted per response. Null when no logo. */
   logo_url: string | null
+  /** AH-119: the brand's palette key (null until chosen; new brands get one by default). */
+  color?: BrandColorKey | null
   default_currency: string | null
   default_language: string | null
   status: BrandStatus
@@ -133,6 +136,8 @@ export interface CreateBrandPayload {
   description: string
   industry: string
   website_url: string
+  /** AH-119: a palette key; null clears it. */
+  color?: BrandColorKey | null
   default_currency?: string
   default_language?: string
 }
