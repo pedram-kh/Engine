@@ -601,3 +601,14 @@ reads (snapshot, `migrate:status`, flags) are in §11, not here.
 - **No push without Pedram's word.**
 
 Stopping here for plan review.
+
+---
+
+## A0 result (2026-11-06, built, not pushed)
+
+Evidence is recorded in the stop report for A0 and, once pushed, the CI run is cited here. Whole suite on Postgres 16:
+196 s locally (so P2 = the whole suite in CI, well under 15 minutes). First run 17 failed / 4298 passed; after A0.2,
+1 skipped / all passed (4315+). Findings F1 and F2 are in `docs/tech-debt.md` ("AH-119 A0 findings"). Break-reverts:
+removing `lockForUpdate` from the offer editor fails the editor PROBE spec on Postgres while the SQLite offer-edit
+specs stay at 24 passed; removing it from the attach fails the attach PROBE and HOLDER specs while the SQLite contract
+specs stay at 29 passed; dropping the `:*` prefix form fails the FTS spec on Postgres while SQLite passes (skips it).

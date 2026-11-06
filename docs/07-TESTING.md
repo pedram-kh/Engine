@@ -174,6 +174,15 @@ Every scheduled command (`->command(...)` in the `withSchedule()` callback in [`
 
 - Every webhook handler has tests for: valid signature, invalid signature, idempotency (duplicate event), unknown event type, malformed payload.
 
+### 3.1a The Postgres leg (AH-119 A0)
+
+Pest runs twice in CI: the default leg on SQLite `:memory:` (`composer test`, fast, hermetic) and the whole suite again on PostgreSQL 16 (`composer test:pg`, `apps/api/phpunit.pgsql.xml`, against the backend job's `postgres` service, database `catalyst_test`). Production is Postgres, so the second leg is the one that proves `jsonb`, `char(n)`, generated columns, row locks, and the erasure registry against the real schema.
+
+- **The config.** `phpunit.pgsql.xml` is `phpunit.xml` with only the `DB_*` lines changed; `tests/Unit/PhpunitConfigParityTest.php` fails if the two drift. `DB_CONNECTION=pgsql` is forced, host, port, name and credentials default to the CI service and can be overridden by environment.
+- **Running it locally.** Use a throwaway database, never the dev one: `createdb catalyst_test`, then `DB_PORT=<port> composer test:pg`. `tests/TestCase.php` refuses to run (before any `migrate:fresh`) unless the Postgres database name ends in `_test` or `_e2e`.
+- **Writing specs that run on both.** Do not read `sqlite_master` / `PRAGMA` (use `Schema::getIndexes()`); wrap a statement you expect to fail in `DB::transaction(...)` (a savepoint: Postgres aborts the whole transaction on a failed statement, SQLite does not); compare JSON with `toEqual` (jsonb does not keep key order); a `char(n)` column is padded and refuses overlong values; cast `LIKE` on a jsonb column (`CAST(col AS TEXT)`). Code that only exists on one driver skips on the other with a stated reason.
+- **Row locks need two connections.** `Tests\PostgresCommittedTestCase` (group `pg`) commits its data and rebuilds the schema around each test; see `PostgresRowLockTest` for the probe (`FOR UPDATE NOWAIT` from a second connection while the app holds its lock) and holder (the second connection holds the row, the app waits and times out) patterns.
+
 ### 3.2 Test data (factories)
 
 - Every model has a factory.

@@ -187,7 +187,11 @@ it('CONTAINMENT: a failing insert (table gone — the stand-in for a missing GRA
 
 it('CONTAINMENT: a failing insert still invalidates a TokenInvalid token (invalidate runs first and independently)', function (): void {
     $token = UserPushToken::factory()->create();
-    Schema::drop('push_deliveries');
+    // AH-119 A0: a model event, not Schema::drop: a failed statement aborts the surrounding
+    // transaction on Postgres, so the insert is made to fail before any SQL is sent.
+    PushDelivery::creating(function (): void {
+        throw new RuntimeException('simulated insert failure');
+    });
 
     pdrRecorder()->record(pdrOutcome($token, PushOutcome::TokenInvalid, code: 'UNREGISTERED'));
 

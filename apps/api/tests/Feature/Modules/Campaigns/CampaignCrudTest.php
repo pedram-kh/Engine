@@ -462,7 +462,8 @@ it('preserves the stored brief byte-identical when the edit omits it (D-3 — th
     ])->assertOk()->assertJsonPath('data.attributes.name', 'Renamed campaign');
 
     // Byte-identical: the whole blob AND each sub-key the wipe-bug used to drop.
-    expect(reloadCampaign($campaign)->brief)->toBe($storedBrief)
+    // toEqual, not toBe: jsonb does not keep object key order (Postgres leg, AH-119 A0).
+    expect(reloadCampaign($campaign)->brief)->toEqual($storedBrief)
         ->and(reloadCampaign($campaign)->brief['dos'] ?? null)->toBe(['Tag the brand'])
         ->and(reloadCampaign($campaign)->brief['donts'] ?? null)->toBe(['No competitor mentions'])
         ->and(reloadCampaign($campaign)->brief['mentions'] ?? null)->toBe(['@brandhandle'])

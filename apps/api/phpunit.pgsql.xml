@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>app</directory>
+        </include>
+    </source>
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <!-- Deterministic test-only encryption key. NOT a secret — committed
+             intentionally so the test suite is hermetic and runs identically
+             on a fresh clone, on CI, and on every developer's machine without
+             depending on apps/api/.env. Production / staging keys come from
+             AWS Secrets Manager (see docs/SPRINT-0-MANUAL-STEPS.md). -->
+        <env name="APP_KEY" value="base64:SjJQVMrPc7nfaVPS4fIL71NxMj8lpAKwOl+o0YKwHgw="/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
+        <!-- Argon2id with the lowest safe cost so the test suite runs fast.
+             Production parameters are tuned in config/hashing.php. -->
+        <env name="HASH_DRIVER" value="argon2id"/>
+        <env name="HASH_ARGON_MEMORY" value="8192"/>
+        <env name="HASH_ARGON_TIME" value="1"/>
+        <env name="HASH_ARGON_THREADS" value="1"/>
+        <!-- ============================================================
+             TEST-PERFORMANCE-ONLY BCRYPT COST. DO NOT CARGO-CULT.
+             ============================================================
+             Bcrypt cost 4 is the absolute MINIMUM the library accepts.
+             It is set here ONLY so the chunk-5 recovery-code hashing
+             tests do not dominate the suite (~60s -> ~10s end-to-end).
+
+             Production / staging / any non-test environment uses
+             config('hashing.bcrypt.rounds'), which defaults to 12 per
+             Laravel's framework default. Cost 4 must NEVER appear in
+             .env.example, config/hashing.php, deployment manifests, or
+             any other phpunit.xml-style override file.
+
+             If you need to add a new bcrypt-related env var, leave it
+             at the framework default and only override here for the
+             same test-performance reason. -->
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="CACHE_STORE" value="array"/>
+        <!-- AH-119 A0: the PostgreSQL leg. Everything else in this file is byte-identical to
+             phpunit.xml (PhpunitConfigParityTest pins that). DB_CONNECTION is forced; the rest
+             are defaults a runner can override from the environment (CI uses the service
+             container's values, a laptop sets DB_PORT=5435 and DB_DATABASE=catalyst_test).
+             NEVER point DB_DATABASE at a database with data: RefreshDatabase wipes it. -->
+        <env name="DB_CONNECTION" value="pgsql" force="true"/>
+        <env name="DB_HOST" value="127.0.0.1"/>
+        <env name="DB_PORT" value="5432"/>
+        <env name="DB_DATABASE" value="catalyst_test"/>
+        <env name="DB_USERNAME" value="catalyst"/>
+        <env name="DB_PASSWORD" value="catalyst"/>
+        <env name="MAIL_MAILER" value="array"/>
+        <!-- Pennant's array driver keeps feature-flag state in-process,
+             avoiding the cross-test coupling on the `features` table
+             from the database driver and keeping non-RefreshDatabase
+             tests usable for binding assertions (Sprint 3 Chunk 2
+             sub-step 8 IntegrationProviderBindingsTest). -->
+        <env name="PENNANT_STORE" value="array"/>
+        <env name="PULSE_ENABLED" value="false"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="TELESCOPE_ENABLED" value="false"/>
+        <!-- Test-helpers gate. Phase-1 Pest tests cover the App\TestHelpers
+             module under both gate-open and gate-closed states; the latter
+             flips this via config()->set() at runtime so the env value
+             stays open for the rest of the suite. See
+             app/TestHelpers/README.md for the operator runbook. -->
+        <env name="TEST_HELPERS_TOKEN" value="phpunit-test-helpers-token"/>
+        <!-- ============================================================
+             S3/MinIO placeholders — the hermetic contract, completed.
+             ============================================================
+             Every `s3`-family disk in config/filesystems.php reads
+             env('AWS_DEFAULT_REGION'), and the AWS SDK refuses to build a
+             client without a region — so any request that touches a
+             presigned URL (brand logos, media, contracts, exports) throws
+             `Missing required client configuration options: region` when
+             nothing supplies one.
+
+             These are NOT secrets and NOT credentials: they are the same
+             local-MinIO placeholders as .env.example, present only so the
+             SDK can construct a client and sign a URL. No test reaches a
+             real bucket.
+
+             Why they live here rather than in CI's env: this file's whole
+             premise (see the APP_KEY note above) is that the suite runs
+             identically on a fresh clone, on CI, and on every developer's
+             machine WITHOUT depending on apps/api/.env. The AWS values were
+             the one hole in that promise, and it stayed invisible while
+             composer's `post-install-cmd` copied .env.example to .env on
+             every install — CI was reading a .env nobody had written on
+             purpose. AH-067 removed that hook (it also rotated the live
+             APP_KEY, hence the incident), which turned the latent hole into
+             a red CI. Do not "fix" a future recurrence by copying an env
+             file into CI; add the missing key here instead, so a fresh
+             clone behaves the same way. -->
+        <env name="AWS_ACCESS_KEY_ID" value="minioadmin"/>
+        <env name="AWS_SECRET_ACCESS_KEY" value="minioadmin"/>
+        <env name="AWS_DEFAULT_REGION" value="eu-central-1"/>
+        <env name="AWS_ENDPOINT_URL" value="http://localhost:9100"/>
+        <env name="AWS_BUCKET" value="catalyst-engine-media"/>
+        <env name="AWS_BUCKET_MEDIA" value="catalyst-engine-media"/>
+        <env name="AWS_BUCKET_CONTRACTS" value="catalyst-engine-contracts"/>
+        <env name="AWS_BUCKET_EXPORTS" value="catalyst-engine-exports"/>
+        <env name="AWS_BUCKET_PUBLIC" value="catalyst-engine-public"/>
+        <!-- Path-style matches .env.example and the local MinIO setup, so a
+             presigned URL has the same shape here as on a dev machine.
+             `(true)` and not `true`: PHPUnit casts a "true" attribute to a
+             real boolean and putenv() stringifies it to "1", which Laravel's
+             env() passes through as the STRING "1" and the AWS SDK rejects
+             with "Expected bool, but got string(1)". `(true)` is the literal
+             Laravel's Env::get maps to boolean true. -->
+        <env name="AWS_USE_PATH_STYLE_ENDPOINT" value="(true)"/>
+    </php>
+</phpunit>

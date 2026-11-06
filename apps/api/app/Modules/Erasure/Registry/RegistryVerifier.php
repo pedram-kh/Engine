@@ -36,6 +36,16 @@ final class RegistryVerifier
         'handle', 'agent', 'bio', 'avatar', 'tax', 'street', 'postal', 'secret',
     ];
 
+    /**
+     * Columns that exist on PostgreSQL only (a pgsql-guarded migration; the local and
+     * SQLite test schema never has them). The registry MUST classify them, because
+     * production has them, but the stale-entry check must not fail on SQLite for want
+     * of them. AH-119 A0: the Postgres leg found `creators.search_vector` unclassified.
+     *
+     * @var array<string, list<string>> table => columns
+     */
+    public const POSTGRES_ONLY_COLUMNS = ['creators' => ['search_vector']];
+
     private const FILE = 'app/Modules/Erasure/Registry/ErasureRegistry.php';
 
     /** The tables whose foreign keys the registry must declare. */
@@ -105,6 +115,9 @@ final class RegistryVerifier
                 }
                 // 3. stale column.
                 foreach (array_diff_key($rule->columns, $actual['columns']) as $col => $_) {
+                    if (in_array($col, self::POSTGRES_ONLY_COLUMNS[$table] ?? [], true)) {
+                        continue;
+                    }
                     $v[] = "Stale entry `{$table}.{$col}`: the column no longer exists; remove or rename it in ".self::FILE.'.';
                 }
                 // malformed column rules.

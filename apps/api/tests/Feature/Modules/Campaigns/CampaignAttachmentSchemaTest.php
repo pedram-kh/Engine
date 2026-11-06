@@ -75,7 +75,8 @@ it('RESTRICTs a hard delete of an attached agency_file — the FK backstop behin
     $file = AgencyFile::factory()->forAgency($campaign->agency_id)->create();
     CampaignAttachment::factory()->createOne(['campaign_id' => $campaign->id, 'agency_file_id' => $file->id]);
 
-    expect(fn () => DB::table('agency_files')->where('id', $file->id)->delete())
+    // Savepoint, so Postgres keeps the test transaction alive after the refused delete (AH-119 A0).
+    expect(fn () => DB::transaction(fn () => DB::table('agency_files')->where('id', $file->id)->delete()))
         ->toThrow(QueryException::class);
 
     // An UNattached file has no backstop to trip.

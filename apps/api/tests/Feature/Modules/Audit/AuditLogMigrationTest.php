@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
@@ -45,9 +44,9 @@ it('audit_logs is append-only: no updated_at, no deleted_at', function (): void 
 });
 
 it('audit_logs has every index from docs/03-DATA-MODEL.md §12', function (): void {
-    $indexes = collect(DB::select(
-        "SELECT name FROM sqlite_master WHERE type = 'index' AND tbl_name = 'audit_logs'",
-    ))->pluck('name')->all();
+    // Schema::getIndexes is driver-neutral (AH-119 A0: this used to read sqlite_master,
+    // which cannot run on the Postgres leg).
+    $indexes = collect(Schema::getIndexes('audit_logs'))->pluck('name')->all();
 
     foreach ([
         'idx_audit_actor',
@@ -61,9 +60,8 @@ it('audit_logs has every index from docs/03-DATA-MODEL.md §12', function (): vo
 });
 
 it('audit_logs.ulid is unique', function (): void {
-    $indexes = collect(DB::select(
-        "SELECT sql FROM sqlite_master WHERE type = 'index' AND tbl_name = 'audit_logs'",
-    ))->pluck('sql')->filter()->implode("\n");
+    $unique = collect(Schema::getIndexes('audit_logs'))
+        ->filter(fn (array $index): bool => $index['unique'] && $index['columns'] === ['ulid']);
 
-    expect($indexes)->toContain('UNIQUE');
+    expect($unique)->not->toBeEmpty('audit_logs.ulid has no unique index');
 });

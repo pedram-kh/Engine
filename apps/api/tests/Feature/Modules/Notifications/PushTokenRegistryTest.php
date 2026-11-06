@@ -57,7 +57,10 @@ function pushLiveValues(User $user): array
 it('CANARY: deleting the bearer through the model removes its push token (FK cascade is enforced)', function (): void {
     $pushToken = UserPushToken::factory()->create();
 
-    expect(DB::select('PRAGMA foreign_keys')[0]->foreign_keys ?? null)->toBe(1, 'SQLite FK enforcement must be ON');
+    // SQLite needs the pragma on; Postgres always enforces FKs (AH-119 A0).
+    if (DB::connection()->getDriverName() === 'sqlite') {
+        expect(DB::select('PRAGMA foreign_keys')[0]->foreign_keys ?? null)->toBe(1, 'SQLite FK enforcement must be ON');
+    }
 
     PersonalAccessToken::query()->findOrFail($pushToken->personal_access_token_id)->delete();
 

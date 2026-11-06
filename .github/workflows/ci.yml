@@ -106,6 +106,15 @@ jobs:
       - name: Pest (tests)
         run: composer test
 
+      # The same suite again on PostgreSQL 16 (AH-119 A0), against the postgres service above
+      # (catalyst_test is a throwaway: RefreshDatabase migrates it fresh). The SQLite leg is fast
+      # and stays the default; this leg is the only place the pgsql-only code runs: the FTS
+      # `search_vector` path, `lockForUpdate` row locks, jsonb, char(n) and the erasure registry
+      # against the real schema. phpunit.pgsql.xml differs from phpunit.xml in the DB lines
+      # only (PhpunitConfigParityTest pins that).
+      - name: Pest on PostgreSQL (whole suite)
+        run: composer test:pg
+
   frontend:
     name: Frontend (lint + typecheck + unit)
     runs-on: ubuntu-24.04

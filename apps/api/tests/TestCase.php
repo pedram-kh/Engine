@@ -43,4 +43,27 @@ abstract class TestCase extends BaseTestCase
 
         parent::tearDown();
     }
+
+    /**
+     * RefreshDatabase runs `migrate:fresh` against whatever DB_DATABASE points at, which on the
+     * Postgres leg (phpunit.pgsql.xml, composer test:pg) is a real server. Refuse before any
+     * trait (and so any wipe) runs unless the database is plainly a throwaway (AH-119 A0).
+     * (Not beforeRefreshingDatabase(): the trait's own method would override it.)
+     *
+     * @return array<class-string, class-string>
+     */
+    protected function setUpTraits()
+    {
+        $connection = config('database.default');
+        if (config("database.connections.{$connection}.driver") !== 'pgsql') {
+            return parent::setUpTraits();
+        }
+
+        $database = (string) config("database.connections.{$connection}.database");
+        if (preg_match('/_(test|e2e)$/', $database) !== 1) {
+            throw new \RuntimeException("Refusing to run migrate:fresh on Postgres database \"{$database}\": the test database must end in _test or _e2e.");
+        }
+
+        return parent::setUpTraits();
+    }
 }

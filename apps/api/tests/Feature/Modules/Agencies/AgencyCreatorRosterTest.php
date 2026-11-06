@@ -561,14 +561,11 @@ it('escapes LIKE wildcards so a literal % in q is not a wildcard', function (): 
 });
 
 it('[postgres-only] matches name/bio via to_tsquery prefix lexemes', function (): void {
-    // The Postgres FTS branch (search_vector @@ to_tsquery('simple', 'word:*'))
-    // cannot run under the SQLite :memory: test DB — there is no tsvector type
-    // or generated `search_vector` column there (the migration is pgsql-guarded,
-    // D-1). This assertion is dormant: it skips under SQLite and becomes live
-    // the day a Postgres CI job lands (docs/tech-debt.md — SQLite-in-tests).
-    // Until then the FTS path is covered by manual local-Postgres verification
-    // (recorded in the review) — the one place "green CI" is not full proof,
-    // stated honestly (D-3).
+    // The Postgres FTS branch (search_vector @@ to_tsquery('simple', 'word:*')) cannot run under
+    // the SQLite :memory: test DB: there is no tsvector type or generated `search_vector` column
+    // there (the migration is pgsql-guarded, D-1). It skips under SQLite and runs live on the
+    // Postgres CI leg (`composer test:pg`, AH-119 A0), which closes the old "manual local-Postgres
+    // verification" gap (docs/tech-debt.md, SQLite-in-tests).
     if (DB::connection()->getDriverName() !== 'pgsql') {
         $this->markTestSkipped('FTS tsquery path requires Postgres; SQLite uses the ILIKE fallback.');
     }

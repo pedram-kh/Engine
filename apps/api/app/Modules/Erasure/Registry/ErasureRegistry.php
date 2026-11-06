@@ -156,6 +156,7 @@ final class ErasureRegistry
                 ...self::keep('country_code,primary_language,secondary_languages,categories,tier,verification_level', 'Coarse, non-identifying once name, bio, avatar and handles are gone (§3.2).'),
                 ...self::keep('application_status,approved_at,submitted_at,rejected_at,kyc_status,kyc_method,kyc_verified_at,tax_profile_complete,payout_method_set,profile_completeness_score,last_active_at,click_through_accepted_at', 'Lifecycle facts and consent evidence (§3.2).'),
                 ...self::keep('rejection_reason', 'The platform\'s decision record (D-D).'),
+                ...self::keep('search_vector', 'PostgreSQL only (RegistryVerifier::POSTGRES_ONLY_COLUMNS). A STORED generated column over display_name and bio, both ANON above: Postgres recomputes it from the nulled columns in the same UPDATE, so it holds no lexeme of the person afterwards (proved on the Postgres leg by ErasureSearchVectorTest). It cannot be written, so it is never an ANON target.'),
                 ...self::keep('id,ulid,user_id,approved_by_user_id,verified_by_user_id,signed_master_contract_id,created_at,updated_at,deleted_at', 'Edges and the pseudonymous key; the RESTRICT edges stay valid (§3.2).'),
             ]),
             'creator_tax_profiles' => new TableRule(null, 'Highest-value PII on the system (§3.2, D-E): the identifying columns go, the skeleton stays.', ['creator_id', 'verified_by_user_id'], [

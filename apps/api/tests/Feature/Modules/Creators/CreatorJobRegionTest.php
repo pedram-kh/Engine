@@ -14,6 +14,7 @@ use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Laravel\Pennant\Feature;
 use Tests\Fixtures\JobsBoard\CreatorJobFixture;
 use Tests\TestCase;
@@ -67,7 +68,10 @@ it('locks a creator with a NULL country (Q7), and a blank one', function (): voi
 });
 
 it('compares a lower-case or padded stored country case-insensitively', function (): void {
-    foreach (['ie', 'Ie', ' ie '] as $country) {
+    // country_code is char(2): Postgres refuses a padded ' ie ' outright, so that spelling is
+    // SQLite-only (AH-119 A0).
+    $spellings = DB::connection()->getDriverName() === 'pgsql' ? ['ie', 'Ie'] : ['ie', 'Ie', ' ie '];
+    foreach ($spellings as $country) {
         $f = regionJob($country);
         expect($f->campaign->isRegionLockedFor(reloadedCreator($f)))->toBeFalse(sprintf('country %s', var_export($country, true)));
     }
@@ -222,7 +226,10 @@ it('keeps the fan-out SQL in step with the PHP predicate across country spelling
     Feature::activate(CampaignRegionRestrictionEnabled::NAME);
     $f = CreatorJobFixture::make(['restrict_to_listing_regions' => true]);
 
-    $countries = ['IE', 'ie', ' fr ', 'FR', 'PT', 'US', null, ''];
+    // ' fr ' cannot be stored in char(2) on Postgres (AH-119 A0).
+    $countries = DB::connection()->getDriverName() === 'pgsql'
+        ? ['IE', 'ie', 'FR', 'PT', 'US', null, '']
+        : ['IE', 'ie', ' fr ', 'FR', 'PT', 'US', null, ''];
     $byId = [];
 
     foreach ($countries as $country) {

@@ -7,6 +7,7 @@ use App\Modules\Erasure\Execution\ErasureEngine;
 use App\Modules\Erasure\Execution\Steps;
 use App\Modules\Erasure\Registry\Disposition;
 use App\Modules\Erasure\Registry\ErasureRegistry;
+use App\Modules\Erasure\Registry\RegistryVerifier;
 use App\Modules\Erasure\Selection\DryRun;
 use App\Modules\Erasure\Selection\Selections;
 use App\Modules\Erasure\Subject\SubjectSet;
@@ -208,7 +209,7 @@ it('anonymises the identity: placeholder email, marker on both rows, the tax pro
         ->and($tax->address)->toBe([])
         ->and($creator['erased_at'] !== null)->toBeTrue()
         ->and($creator['display_name'])->toBeNull()
-        ->and($creator['is_discoverable'])->toBe(0);
+        ->and((int) $creator['is_discoverable'])->toBe(0); // int cast: Postgres returns a real boolean
 });
 
 it('gives each erased person a distinct placeholder, so the unique email index never collides', function (): void {
@@ -302,7 +303,10 @@ it('keeps every KEEP column of every row it anonymises or scrubs (the other part
             continue;
         }
         foreach (ErasureRegistry::tables()[$selection->table]->columns as $column => $rule) {
-            if ($rule->disposition === Disposition::Keep) {
+            // A generated column (creators.search_vector, Postgres only) is "kept" in the sense that
+            // nothing writes it; it MUST change, because it derives from the erased columns.
+            // ErasureSearchVectorTest proves it empties (AH-119 A0 F2).
+            if ($rule->disposition === Disposition::Keep && ! in_array($column, RegistryVerifier::POSTGRES_ONLY_COLUMNS[$selection->table] ?? [], true)) {
                 $keepColumns[$selection->table][] = $column;
             }
         }

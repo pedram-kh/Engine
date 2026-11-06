@@ -68,6 +68,15 @@ function erasureQueryPlan(string $selectionId, SubjectSet $subject): string
         if ($selection->id === $selectionId) {
             $builder = $selection->builder($subject, DB::connection());
 
+            if (DB::connection()->getDriverName() === 'pgsql') {
+                // AH-119 A0: on Postgres the planner prefers a sequential scan on the empty test
+                // tables whatever the indexes are, so it is told not to (inside the test
+                // transaction only: SET LOCAL), and the plan text names the index it uses.
+                DB::statement('SET LOCAL enable_seqscan = off');
+
+                return collect(DB::select('EXPLAIN '.$builder->toSql(), $builder->getBindings()))->pluck('QUERY PLAN')->implode(' | ');
+            }
+
             return collect(DB::select('EXPLAIN QUERY PLAN '.$builder->toSql(), $builder->getBindings()))->pluck('detail')->implode(' | ');
         }
     }
@@ -398,7 +407,7 @@ it('reads in batches: the notification scrub and the audit scrub never issue an 
     $unbounded = array_values(array_filter($selects, fn (array $s): bool => ! str_contains(strtolower($s[1]), ' limit ')));
     $batches = fn (string $table): int => count(array_filter($selects, fn (array $s): bool => $s[0] === $table && str_contains(strtolower($s[1]), ' limit ')));
 
-    expect(DB::table('notifications')->where('actor_user_id', $a->user->id)->whereRaw("data LIKE '%sender_name%'")->count())->toBe(0)
+    expect(DB::table('notifications')->where('actor_user_id', $a->user->id)->whereRaw("CAST(data AS TEXT) LIKE '%sender_name%'")->count())->toBe(0)
         ->and($batches('notifications'))->toBeGreaterThanOrEqual(3)
         ->and($batches('audit_logs'))->toBeGreaterThanOrEqual(2)
         ->and(array_values(array_filter($unbounded, fn (array $s): bool => str_contains($s[1], 'where "actor_user_id"') || str_contains($s[1], '"actor_id"'))))->toBe([]);

@@ -128,7 +128,8 @@ it('fresh invite: FLAG ON queues InviteReceivedMail(outcome: fresh) and writes t
 
     $row = Notification::query()->where('type', NotificationType::AssignmentInvited->value)->firstOrFail();
     expect($row->recipient_user_id)->toBe($s['creatorUser']->id)
-        ->and($row->data)->toBe([
+        // toEqual: jsonb does not keep key order (Postgres leg, AH-119 A0).
+        ->and($row->data)->toEqual([
             'campaign_name' => 'Autumn UGC push',
             'creator_name' => 'Maria Lopez',
             'assignment_ulid' => $assignment->ulid,

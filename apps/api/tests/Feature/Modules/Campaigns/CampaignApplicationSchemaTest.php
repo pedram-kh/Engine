@@ -13,6 +13,7 @@ use App\Modules\Creators\Models\Creator;
 use Carbon\CarbonInterface;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
@@ -38,10 +39,12 @@ it('enforces one application per (campaign, creator) pair', function (): void {
         'creator_id' => $creator->id,
     ]);
 
-    expect(fn () => CampaignApplication::factory()->createOne([
+    // A savepoint (a nested DB::transaction): on Postgres a failed statement aborts the
+    // whole surrounding transaction, SQLite lets it continue (AH-119 A0).
+    expect(fn () => DB::transaction(fn () => CampaignApplication::factory()->createOne([
         'campaign_id' => $campaign->id,
         'creator_id' => $creator->id,
-    ]))->toThrow(QueryException::class);
+    ])))->toThrow(QueryException::class);
 });
 
 it('keeps the unique pair occupied by a RETAINED rejected row — the no-re-apply mechanism', function (): void {
@@ -55,10 +58,12 @@ it('keeps the unique pair occupied by a RETAINED rejected row — the no-re-appl
     // The rejected row is NOT soft-deleted and NOT removed, so a second insert
     // for the same pair cannot happen at the database level either. This is the
     // belt behind the application-layer 409 (D5).
-    expect(fn () => CampaignApplication::factory()->createOne([
+    // A savepoint (a nested DB::transaction): on Postgres a failed statement aborts the
+    // whole surrounding transaction, SQLite lets it continue (AH-119 A0).
+    expect(fn () => DB::transaction(fn () => CampaignApplication::factory()->createOne([
         'campaign_id' => $campaign->id,
         'creator_id' => $creator->id,
-    ]))->toThrow(QueryException::class);
+    ])))->toThrow(QueryException::class);
 
     expect(CampaignApplication::withoutGlobalScope(BelongsToAgencyScope::class)
         ->where('campaign_id', $campaign->id)

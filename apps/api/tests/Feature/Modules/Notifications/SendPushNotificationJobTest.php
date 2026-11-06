@@ -478,7 +478,11 @@ it('AH-102b CONTAINMENT (a)(c): Delivered + a failing insert completes the job w
 it('AH-102b CONTAINMENT: Retryable + a failing insert is still released with its backoff (control flow untouched)', function (): void {
     $token = pjLiveToken();
     $sender = pjSender([PushSendResult::retryable('UNAVAILABLE', 'busy', 503)]);
-    Schema::drop('push_deliveries');
+    // AH-119 A0: a model event, not Schema::drop: a failed statement aborts the surrounding
+    // transaction on Postgres, so the insert is made to fail before any SQL is sent.
+    PushDelivery::creating(function (): void {
+        throw new RuntimeException('simulated insert failure');
+    });
     $job = pjJob($token, 1);
 
     pjRun($job);
@@ -492,7 +496,11 @@ it('AH-102b CONTAINMENT: Retryable + a failing insert is still released with its
 it('AH-102b CONTAINMENT: TokenInvalid + a failing insert still invalidates the token and sends once', function (): void {
     $token = pjLiveToken();
     $sender = pjSender([PushSendResult::tokenInvalid('UNREGISTERED', 'gone', 404)]);
-    Schema::drop('push_deliveries');
+    // AH-119 A0: a model event, not Schema::drop: a failed statement aborts the surrounding
+    // transaction on Postgres, so the insert is made to fail before any SQL is sent.
+    PushDelivery::creating(function (): void {
+        throw new RuntimeException('simulated insert failure');
+    });
     $job = pjJob($token);
 
     pjRun($job);
