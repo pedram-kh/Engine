@@ -110,3 +110,19 @@ Each was reverted byte-identical; the tables are in the agents' reports and the 
 
 Screenshots: `docs/reviews/messages-v2-assets/checkpoint-b/` (edit menu, edit field, edited mark, past-window menu,
 delete confirm, deleted placeholder, search min-chars, results, empty; dark and light).
+
+## Pedram's walk (2026-11-06)
+
+Pedram walked the local stack (seeded by `Ah119WalkSeeder`) and **passed items 1 to 10 with all five fixes**:
+
+1. Direct chip beside Mine (`direct=1`, combinable; API + web specs, break-reverted).
+2. Matched-term highlight in search snippets (client-side, text nodes in a styled span, never HTML).
+3. Screenshot paste failed locally: local S3 was down (the `minio` images are no longer pulled); compose now uses the Bitnami legacy images.
+4. Filter area is two rows: brand and campaign popovers; then Mine, Direct, All|Unread and, only with a filter on, Clear as an icon button with a tooltip. One line at the 460 px pane and at 1280 (source rule pinned with a break-revert; measured in `agency-messages-unified.spec.ts` at the natural width, 460 and 380).
+5. Image lightbox for inline message images in both shells (`MessageImage` + `ImageLightbox`, shared next to `MessageText`): tap opens a full-screen view on a dark backdrop; close (x), download, Esc and backdrop click close; no new tab. Web downloads the file through the signed URL; the Capacitor app hands it to the system share sheet.
+
+**Correction to the brief:** there was no existing Capacitor share plugin. `@capacitor/share` 8.0.3 was added (pinned exact; `cap sync` touched the Android and iOS project files), so **native build 4 must be cut with it**. The sheet shares the signed URL, not the file bytes (a real file share needs `@capacitor/filesystem`; tech-debt row 17). The web download reads the signed URL with a GET, so the **production media bucket's CORS must allow GET from the web origins**; if it does not, the web falls back to a plain anchor (the browser opens or saves the URL by its own rules) rather than failing.
+
+Gates: Vitest main 4749 passed (the 2 `appIconAssets` failures are the known environmental ones), admin 690, api-client 230; lint and typecheck clean; Pest SQLite 4599 passed (36 skipped), Pest PostgreSQL (`catalyst_test`) 4635 passed; Playwright main 54 passed, admin 2 passed; creator walk `COMPARE OK: 142 targets identical to baseline.json`.
+Re-pins, each with its reason: `ChatPanel.vue` and `RelationshipThreadView.vue` hashes (image markup), and in `stageBFlagOffPins.json` the `agency`, `agency-closed`, `rel-web`, `rel-native` pins (image anchor became a thumbnail button) and `unified-inbox` (two rows); the diffs were checked to contain only those changes.
+Not covered: the e2e layout check passes with `flex-wrap: wrap` at these widths, so the one-line rule is held by the source-level spec (break-reverted), not by the browser check; the lightbox focus trap and focus restore are not asserted (jsdom), and no real-stack image upload is in the e2e.
