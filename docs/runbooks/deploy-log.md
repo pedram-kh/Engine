@@ -74,6 +74,31 @@ happened.
 
 ---
 
+## AH-115 — creator web adopts the native look, creator inbox v2, Notifications page (API + main web + native build 5) — PENDING
+
+> **One entry, in this order: snapshot, migrate, API, verify the flag is OFF, main web, then (separately, later) native build 5, and only after build 5 is live the flag.** The API goes before the web: the new web reads `features.messages_v2_creator_inbox` and calls the new endpoints only when it is true, but the order costs nothing and keeps the flag-off proof clean. **The agency shell does not change** (proved, `docs/reviews/creator-restyle-review.md`) and **the admin SPA is not part of this deploy.**
+
+- **Status:** PENDING (pushed to `main`; nothing deployed; no deploy-day fact has been read).
+- **Range:** production API and both SPAs as recorded in the AH-119 entry below (API `066ff29c` reported 2026-10-29, current state **not read**; the AH-116 to AH-119 stack deployed 2026-11-06, reported) → the pushed tip of `main` (the last commit of the AH-115 push; the migration is in `4803b7a3`). The range is restated by the operator at deploy time from `git log` on the box, not inferred from this line.
+- **AH entries carried:** AH-115.
+- **Migrations (one, additive):** `2026_11_09_100000_add_creator_index_to_relationship_threads` (`CREATE INDEX idx_relationship_threads_creator ON relationship_threads (creator_id)`). **PROD-DATA RISK LOW:** schema only, no data command, no backfill. The table is expected to be small (**not read**: the row count is a pre-deploy read below); a plain `CREATE INDEX` takes a short lock on writes to `relationship_threads` (it is not `CONCURRENTLY` in this migration), so run it outside a busy minute. **The snapshot is a step:** an Aurora cluster snapshot immediately before `migrate`, confirmed `available` first. **Rollback:** `php artisan migrate:rollback --step=1` drops the index only; no data is touched.
+- **Pre-deploy reads (operator):** `php artisan migrate:status` (the one migration is the only pending one beyond whatever is already pending, reported); the row count of `relationship_threads` (to know what the index build costs; the EXPLAIN in `creator-restyle-plan.md` L4.1 was on 300 seeded rows only).
+- **Infra:** no worker restart is required by this change's queued classes (none changed); the new endpoints and the flag are plain request code, so the usual FPM reload after the code update is enough. No env change, no cron change.
+- **Order and checks:**
+  1. **Snapshot**, then confirm `available`.
+  2. **Migrate** (the one migration); read back `\d relationship_threads` or `pg_indexes` for `idx_relationship_threads_creator` and that it is valid.
+  3. **API** deploy. **Verify flag OFF:** `GET /api/v1/creators/me/message-inbox` as a creator answers **404** `not_found`; the creator `/me` carries `features.messages_v2_creator_inbox: false`; the old creator inbox endpoint is unchanged.
+  4. **Main web** deploy. Rollback: redeploy the previous `dist`. The creator web now has the native look (dark; light derived), the Notifications header, and (flag off) the previous inbox with the new date rule.
+  5. **Native build 5** (by Pedram): `CURRENT_PROJECT_VERSION` is **5** in both configurations of the iOS project (already set in the repo, `dc4c524c`); archive, read the entitlements, upload, install over build 4, then the **build 5 device walk** (`docs/reviews/creator-restyle-review.md`, the last section). **Build 4 is safe with the flag on or off** (it ignores the new endpoints and keeps its own inbox).
+  6. **Flag** `messages_v2_creator_inbox_enabled` ON in the admin Feature-flags page, with a reason, **only after build 5 is live and its inbox step walked with the flag OFF**; read it back on the page, not assumed. Turn it OFF to roll the inbox back (no data written by it).
+- **One-shot commands:** none.
+- **Flags armed:** none at deploy (the new flag defaults OFF). It is armed in step 6, after build 5.
+- **Post-deploy verification:** `/up`; a creator sign-in on the web (dark and light, desktop and a phone width); the Notifications page header; the flag-off 404; then, after step 6, one conversation with an agency in each of Direct and a campaign, the search, the deep link.
+- **Operator:** to be recorded (the colleague for steps 1 to 4, Pedram for 5 and 6).
+- **Anything unexpected:** none recorded yet. **Not proved before deploy:** the index build time on the production table; the derived light theme on a device; the native Roboto fix on a device (all in the build 5 walk or the pre-deploy reads above).
+
+---
+
 ## AH-119 — Messages v2 (API + main web + admin web), both flags OFF — DEPLOYED
 
 > **One sitting with AH-116, AH-117 and AH-118, in this order: pre-checks, snapshot, migrate, API, verify every new flag OFF, main web, admin web. Then, separately and later: native build 4, the Stage A flag, and only after build 4 is live the Stage B flag.** The API goes first: the new web calls new endpoints (`message-inbox`, the edit, delete and search routes), and an old API under the new web would show controls the API ignores. **No `queue:restart` and no worker restart while an erasure is claimed** (the erasure worker program loads `Steps` and the registry, which this change edits; `account-erasure.md`; the C4 countdown is open, earliest real due date 2026-11-15).
