@@ -579,10 +579,13 @@
       "upload": {
         "avatar_prompt": "Släpp ett foto här, eller klicka för att välja",
         "avatar_prompt_native": "Tryck för att välja ett foto",
+        "avatar_prompt_web": "Välj ett foto",
         "avatar_preview_alt": "Förhandsgranskning av profilfoto",
         "size_hint": "{types} · upp till {max_mb} MB",
         "portfolio_prompt": "Släpp filer här, eller klicka för att välja",
         "portfolio_prompt_native": "Tryck för att välja filer",
+        "portfolio_prompt_web": "Välj filer",
+        "portfolio_prompt_drop_web": "Släpp filer här eller välj",
         "portfolio_size_hint": "Bilder upp till {image_mb} MB · videor upp till {video_mb} MB",
         "portfolio_slots_remaining": "{remaining} platser kvar",
         "portfolio_queue_status": "{in_flight} av {total} laddar upp (upp till {concurrency} åt gången).",

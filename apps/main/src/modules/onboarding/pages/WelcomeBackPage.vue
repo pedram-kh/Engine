@@ -92,7 +92,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
-import { isNativePlatform } from '@/core/platform/isNativePlatform'
+import { useNativeLook } from '@/composables/useNativeLook'
 
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 import { hasMountedBefore, markMounted } from '../internal/welcomeBackFlag'
@@ -124,7 +124,7 @@ const {
  * lists the steps (done / up next / to do) inside the card, in place of the
  * "You're on Step X" sentence. Web keeps its own copy and card.
  */
-const isNative = isNativePlatform()
+const isNative = useNativeLook()
 
 const firstName = computed(() => {
   const name = creator.value?.attributes.display_name?.trim() ?? ''

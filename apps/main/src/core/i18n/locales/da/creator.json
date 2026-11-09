@@ -579,10 +579,13 @@
       "upload": {
         "avatar_prompt": "Drop et billede her, eller klik for at vælge",
         "avatar_prompt_native": "Tryk for at vælge et billede",
+        "avatar_prompt_web": "Vælg et foto",
         "avatar_preview_alt": "Forhåndsvisning af profilbillede",
         "size_hint": "{types} · op til {max_mb} MB",
         "portfolio_prompt": "Drop filer her, eller klik for at vælge",
         "portfolio_prompt_native": "Tryk for at vælge filer",
+        "portfolio_prompt_web": "Vælg filer",
+        "portfolio_prompt_drop_web": "Slip filer her eller vælg",
         "portfolio_size_hint": "Billeder op til {image_mb} MB · videoer op til {video_mb} MB",
         "portfolio_slots_remaining": "{remaining} pladser tilbage",
         "portfolio_queue_status": "{in_flight} af {total} uploader (op til {concurrency} ad gangen).",

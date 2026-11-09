@@ -579,10 +579,13 @@
       "upload": {
         "avatar_prompt": "Foto hier ablegen oder klicken, um eines auszuwählen",
         "avatar_prompt_native": "Tippe, um ein Foto auszuwählen",
+        "avatar_prompt_web": "Foto auswählen",
         "avatar_preview_alt": "Profilfoto-Vorschau",
         "size_hint": "{types} · bis zu {max_mb} MB",
         "portfolio_prompt": "Dateien hier ablegen oder klicken, um sie auszuwählen",
         "portfolio_prompt_native": "Tippe, um Dateien auszuwählen",
+        "portfolio_prompt_web": "Dateien auswählen",
+        "portfolio_prompt_drop_web": "Dateien hierher ziehen oder auswählen",
         "portfolio_size_hint": "Bilder bis zu {image_mb} MB · Videos bis zu {video_mb} MB",
         "portfolio_slots_remaining": "{remaining} Plätze verbleibend",
         "portfolio_queue_status": "{in_flight} von {total} wird hochgeladen (bis zu {concurrency} gleichzeitig).",

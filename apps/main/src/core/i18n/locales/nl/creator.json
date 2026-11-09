@@ -579,10 +579,13 @@
       "upload": {
         "avatar_prompt": "Foto hier neerzetten of klikken om te kiezen",
         "avatar_prompt_native": "Tik om een foto te kiezen",
+        "avatar_prompt_web": "Kies een foto",
         "avatar_preview_alt": "Voorbeeld profielfoto",
         "size_hint": "{types} · tot {max_mb} MB",
         "portfolio_prompt": "Bestanden hier neerzetten of klikken om te kiezen",
         "portfolio_prompt_native": "Tik om bestanden te kiezen",
+        "portfolio_prompt_web": "Kies bestanden",
+        "portfolio_prompt_drop_web": "Sleep bestanden hierheen of kies",
         "portfolio_size_hint": "Afbeeldingen tot {image_mb} MB · video's tot {video_mb} MB",
         "portfolio_slots_remaining": "{remaining} plaatsen beschikbaar",
         "portfolio_queue_status": "{in_flight} van {total} wordt geüpload (maximaal {concurrency} tegelijk).",

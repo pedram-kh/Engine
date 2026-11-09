@@ -19,7 +19,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
 
-import { isNativePlatform } from '@/core/platform/isNativePlatform'
+import { useNativeLook } from '@/composables/useNativeLook'
 
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 import SocialBrandIcon from './SocialBrandIcon.vue'
@@ -36,7 +36,7 @@ const isMobile = computed(() => display.smAndDown.value)
 // card with a brand tile, the @handle, an "Added" pill and inline Edit / Remove
 // (or "@ username" + Add when not connected). The web keeps the two layouts
 // below; this is a third, native-only branch.
-const isNative = isNativePlatform()
+const isNative = useNativeLook()
 
 // Per-platform "currently editing the handle" flag. Only meaningful on the
 // mobile card path; the desktop row keeps its always-visible input.

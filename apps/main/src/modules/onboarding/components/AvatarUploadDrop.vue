@@ -22,6 +22,7 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { useNativeLook } from '@/composables/useNativeLook'
 import { isNativePlatform } from '@/core/platform/isNativePlatform'
 
 import {
@@ -34,9 +35,16 @@ import { useOnboardingStore } from '../stores/useOnboardingStore'
 
 const { t } = useI18n()
 // AH-100c — "drop here, or click" is wrong on a touch device: the app says "tap".
-const promptKey = isNativePlatform()
-  ? 'creator.ui.upload.avatar_prompt_native'
-  : 'creator.ui.upload.avatar_prompt'
+// AH-115 — the creator web look says neither: "Choose a photo". Anywhere else (agency-side
+// onboarding previews, the bare shell) the original web string stays.
+const look = useNativeLook()
+const promptKey = computed(() =>
+  isNativePlatform()
+    ? 'creator.ui.upload.avatar_prompt_native'
+    : look.value
+      ? 'creator.ui.upload.avatar_prompt_web'
+      : 'creator.ui.upload.avatar_prompt',
+)
 const store = useOnboardingStore()
 const { previewUrl, error, isUploading, upload, remove } = useAvatarUpload()
 
@@ -61,8 +69,7 @@ const displayUrl = computed(() => previewUrl.value ?? persistedAvatarUrl.value)
 // AH-100d (Figma frame 03) — once there is a photo, the app shows it as a ROW
 // (88px thumbnail, "Profile photo *", the size hint, Replace + Remove). The
 // dashed dropzone stays the EMPTY state (frame 02). Web keeps its own markup.
-const isNative = isNativePlatform()
-const nativeFilled = computed(() => isNative && displayUrl.value !== null)
+const nativeFilled = computed(() => look.value && displayUrl.value !== null)
 const photoLabel = computed(() => `${t('creator.ui.wizard.fields.avatar')} *`)
 
 function onClickReplace(): void {

@@ -13,7 +13,7 @@ import { PortfolioGallery } from '@catalyst/ui'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { isNativePlatform } from '@/core/platform/isNativePlatform'
+import { useNativeLook } from '@/composables/useNativeLook'
 
 import PortfolioUploadGrid from './PortfolioUploadGrid.vue'
 import { resolveSubmitErrorKey } from '../composables/useSubmitErrorKey'
@@ -29,9 +29,9 @@ const removeErrorKey = ref<string | null>(null)
  * each tile and a "N items" count beside the heading. Web gets neither (the
  * prop is `undefined`, so the shared gallery's markup is unchanged).
  */
-const isNative = isNativePlatform()
+const isNative = useNativeLook()
 const kindLabels = computed(() =>
-  isNative
+  isNative.value
     ? {
         image: t('creator.ui.wizard.steps.portfolio.kind_label.image'),
         video: t('creator.ui.wizard.steps.portfolio.kind_label.video'),

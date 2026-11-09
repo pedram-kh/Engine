@@ -579,10 +579,13 @@
       "upload": {
         "avatar_prompt": "Přetáhněte foto sem nebo klikněte pro výběr",
         "avatar_prompt_native": "Tapnite za izbiro fotografije",
+        "avatar_prompt_web": "Izberi fotografijo",
         "avatar_preview_alt": "Náhled profilové fotografie",
         "size_hint": "{types} · do {max_mb} MB",
         "portfolio_prompt": "Přetáhněte soubory sem nebo klikněte pro výběr",
         "portfolio_prompt_native": "Tapnite za izbiro datotek",
+        "portfolio_prompt_web": "Izberi datoteke",
+        "portfolio_prompt_drop_web": "Spusti datoteke sem ali izberi",
         "portfolio_size_hint": "Obrázky do {image_mb} MB · videa do {video_mb} MB",
         "portfolio_slots_remaining": "Zbývá {remaining} míst",
         "portfolio_queue_status": "{in_flight} z {total} se nahrává (max. {concurrency} najednou).",

@@ -579,10 +579,13 @@
       "upload": {
         "avatar_prompt": "Drop a photo here, or click to choose",
         "avatar_prompt_native": "Agħfas biex tagħżel ritratt",
+        "avatar_prompt_web": "Agħżel ritratt",
         "avatar_preview_alt": "Profil photo preview",
         "size_hint": "{types} · up to {max_mb} MB",
         "portfolio_prompt": "Drop files here, or click to choose",
         "portfolio_prompt_native": "Agħfas biex tagħżel fajls",
+        "portfolio_prompt_web": "Agħżel fajls",
+        "portfolio_prompt_drop_web": "Waqqa' l-fajls hawn jew agħżel",
         "portfolio_size_hint": "Images up to {image_mb} MB · videos up to {video_mb} MB",
         "portfolio_slots_remaining": "{remaining} slots remaining",
         "portfolio_queue_status": "{in_flight} of {total} uploading (up to {concurrency} at a time).",

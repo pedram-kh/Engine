@@ -19,8 +19,10 @@
  */
 
 import { computed, ref } from 'vue'
+import { useDisplay } from 'vuetify'
 import { useI18n } from 'vue-i18n'
 
+import { useNativeLook } from '@/composables/useNativeLook'
 import { isNativePlatform } from '@/core/platform/isNativePlatform'
 
 import {
@@ -34,9 +36,19 @@ import {
 
 const { t } = useI18n()
 // AH-100c — "drop here, or click" is wrong on a touch device: the app says "tap".
-const promptKey = isNativePlatform()
-  ? 'creator.ui.upload.portfolio_prompt_native'
-  : 'creator.ui.upload.portfolio_prompt'
+// AH-115 — the creator web look: "Drop files here or choose" where a pointer can drop (md and
+// up), "Choose files" below that. The original web string stays outside the creator shell.
+const look = useNativeLook()
+const { mdAndUp } = useDisplay()
+const promptKey = computed(() =>
+  isNativePlatform()
+    ? 'creator.ui.upload.portfolio_prompt_native'
+    : look.value
+      ? mdAndUp.value
+        ? 'creator.ui.upload.portfolio_prompt_drop_web'
+        : 'creator.ui.upload.portfolio_prompt_web'
+      : 'creator.ui.upload.portfolio_prompt',
+)
 const { items, enqueue, addLink, remove, inFlightCount, remainingSlots } = usePortfolioUpload()
 
 /**
@@ -46,7 +58,7 @@ const { items, enqueue, addLink, remove, inFlightCount, remainingSlots } = usePo
  * rows stay — they have no tile yet. Web keeps every row, unchanged.
  */
 const visibleItems = computed(() =>
-  isNativePlatform() ? items.value.filter((item) => item.status !== 'done') : items.value,
+  look.value ? items.value.filter((item) => item.status !== 'done') : items.value,
 )
 
 const isDragOver = ref(false)
