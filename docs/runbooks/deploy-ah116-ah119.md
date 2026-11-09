@@ -35,7 +35,7 @@ CI at `6d7a9c28`: [run 42277564265](https://github.com/pedram-kh/Engine/actions/
 | Scheduler                         | No change                                                                                                                                                                                                                                                                                                        |
 | Supervisor                        | No new program. `laravel-erasure` already exists; status is read in P4.4                                                                                                                                                                                                                                         |
 | One-shot command                  | **None expected** (confirmed in P5)                                                                                                                                                                                                                                                                              |
-| Media bucket                      | **CORS change** (P6): allow `GET` from the two web origins, for the web image download                                                                                                                                                                                                                           |
+| Media bucket                      | **CORS change** (P6): rule A `GET` from the two web origins (web image download) and **rule B `PUT` from `capacitor://localhost` and `https://localhost` (native photo upload; added after the build 4 walk)**                                                                                                   |
 | Flags armed in this sitting       | **None.** Four new flags, all OFF (P7)                                                                                                                                                                                                                                                                           |
 | Not in this sitting               | Native build 4 (carries `@capacitor/share`), the Stage A and Stage B flag flips, the two AH-118 flag flips, the production walks (§3)                                                                                                                                                                            |
 
@@ -382,9 +382,10 @@ Healthy: the first prints **no new command or seeder file that the five entries 
 Files listed: `______________` Commands: `______________` Ran any one-shot: no
 Result: `______________`
 
-### P6. Media bucket CORS: allow `GET` from the two web origins [CONSOLE or any shell with the AWS CLI]
+### P6. Media bucket CORS: `GET` from the two web origins, **and `PUT` from the two native origins** [CONSOLE or any shell with the AWS CLI]
 
 **Why.** The image lightbox's web "Download" reads the signed URL with a `GET` from the page (to save it as a file without opening a tab). A cross-origin read needs `Access-Control-Allow-Origin`. Without it the download **falls back to a plain link** (the browser opens or saves the URL by its own rules): nothing breaks, the Download button is just weaker. The Capacitor app does not need this (it shares the URL through the system sheet).
+**Why the native origins (found in the build 4 production walk, 2026-11-08; tech-debt row 19).** The Capacitor app uploads a photo or file with a browser `PUT` to the presigned URL from the WKWebView, whose origin is **`capacitor://localhost` on iOS and `https://localhost` on Android**. The `PUT` carries a `Content-Type`, so the browser sends a preflight first, and without a matching rule the bucket answers 403 and the app shows "An attachment failed to upload". The October deploy added these origins to the **API's** CORS (`FRONTEND_EXTRA_ORIGINS`) and never to the bucket. **This rule is needed on every environment that serves the native app**, and it covers every presigned upload from the app (messages, portfolio, offer attachments).
 **What `put-bucket-cors` does.** It **replaces the whole configuration**. Browser uploads already `PUT` to presigned URLs, so a rule for `PUT` almost certainly exists: **read it first and write back the existing rules plus the new one**; never paste the new rule alone.
 
 ```sh
@@ -393,8 +394,8 @@ aws s3api get-bucket-cors --bucket "$BUCKET" > /tmp/cors-before.json ; echo "exi
 jq -c '.CORSRules[] | {AllowedOrigins, AllowedMethods}' /tmp/cors-before.json             # origins and methods only
 ```
 
-Healthy: a list of existing rules (write them down) or `NoSuchCORSConfiguration`. **If a rule already allows `GET` from both `https://platform.catalyst-growth.com` and `https://admin.catalyst-growth.com`, you are done: record it and skip the write.**
-**The rule to add (exact):**
+Healthy: a list of existing rules (write them down) or `NoSuchCORSConfiguration`. **Two rules are needed, each skipped if an existing rule already does the job:** rule A (`GET` from both web origins) and rule B (`PUT` from both native origins). A rule "already does the job" only if it lists **all** the origins of that rule with that method; a rule with only the web origins does **not** cover B.
+**Rule A, to add (exact):**
 
 ```json
 {
@@ -406,12 +407,35 @@ Healthy: a list of existing rules (write them down) or `NoSuchCORSConfiguration`
 }
 ```
 
-`GET` with no custom request header is a simple cross-origin request, so there is no preflight and no `AllowedHeaders` entry is needed; the list is empty on purpose. No wildcard origin, no `localhost`, no `capacitor://localhost` (the app shares, it does not fetch).
-Write the merged configuration, then read it back (the first line keeps every existing rule and appends the new one; with `NoSuchCORSConfiguration` start from `{"CORSRules":[]}`):
+`GET` with no custom request header is a simple cross-origin request, so there is no preflight and no `AllowedHeaders` entry is needed; the list is empty on purpose. No wildcard origin, and no native origin on rule A (the native lightbox shares the URL, it does not fetch it).
+**Rule B, to add (exact): the native upload `PUT`:**
+
+```json
+{
+  "AllowedOrigins": ["capacitor://localhost", "https://localhost"],
+  "AllowedMethods": ["PUT"],
+  "AllowedHeaders": ["*"],
+  "ExposeHeaders": ["ETag"],
+  "MaxAgeSeconds": 3000
+}
+```
+
+`PUT` with a `Content-Type` is not a simple request, so the preflight needs `AllowedHeaders` (here `*`; the origins are the narrow part). `https://localhost` is Android's origin only; it is not a real site. Keep B as its **own** rule: never widen the web rule's origins to include the native ones.
+Write the merged configuration (this adds A and B **only if each is missing**; every existing rule is kept; with `NoSuchCORSConfiguration` start from `{"CORSRules":[]}`), then read it back (the first line keeps every existing rule and appends the new one; with `NoSuchCORSConfiguration` start from `{"CORSRules":[]}`):
 
 ```sh
-jq '.CORSRules += [{"AllowedOrigins":["https://platform.catalyst-growth.com","https://admin.catalyst-growth.com"],"AllowedMethods":["GET","HEAD"],"AllowedHeaders":[],"ExposeHeaders":[],"MaxAgeSeconds":3000}]' /tmp/cors-before.json > /tmp/cors-after.json
-jq -c '.CORSRules[] | {AllowedOrigins, AllowedMethods}' /tmp/cors-after.json                 # read it: the old rules are all still there
+jq '
+  . as $c
+  | ([ "https://platform.catalyst-growth.com","https://admin.catalyst-growth.com" ]) as $web
+  | ([ "capacitor://localhost","https://localhost" ]) as $native
+  | ($c.CORSRules // []) as $r
+  | def covered(m; os): any($r[]; (.AllowedMethods | index(m)) != null and (. as $x | os | all(. as $o | $x.AllowedOrigins | index($o) != null)));
+    $c
+  | .CORSRules = ($r
+      + (if covered("GET"; $web) then [] else [{"AllowedOrigins":$web,"AllowedMethods":["GET","HEAD"],"AllowedHeaders":[],"ExposeHeaders":[],"MaxAgeSeconds":3000}] end)
+      + (if covered("PUT"; $native) then [] else [{"AllowedOrigins":$native,"AllowedMethods":["PUT"],"AllowedHeaders":["*"],"ExposeHeaders":["ETag"],"MaxAgeSeconds":3000}] end))
+' /tmp/cors-before.json > /tmp/cors-after.json
+jq -c '.CORSRules[] | {AllowedOrigins, AllowedMethods}' /tmp/cors-after.json                 # read it: the old rules are all still there, plus A and/or B
 aws s3api put-bucket-cors --bucket "$BUCKET" --cors-configuration file:///tmp/cors-after.json
 aws s3api get-bucket-cors --bucket "$BUCKET" | jq -c '.CORSRules[] | {AllowedOrigins, AllowedMethods}'
 ```
@@ -427,6 +451,21 @@ unset SIGNED KEY
 ```
 
 Healthy: first call `HTTP/… 200` and **`access-control-allow-origin: https://platform.catalyst-growth.com`**; second call `200` and **no** `access-control-allow-origin` line. Also run the existing upload path (P8.7 does) to prove the old `PUT` rule survived.
+
+**Then the native preflight (rule B). It needs no signature, writes nothing and prints no secret.** Run it **before** the write too, to record the "before" state (expected `403` for the native origins if B was missing):
+
+```sh
+REGION=<REAL_REGION from P9.1>      # or use the host of the upload URL the API returns; the bucket's own endpoint is what matters
+for O in capacitor://localhost https://localhost https://platform.catalyst-growth.com https://evil.example; do
+  echo "== $O"; curl -s -o /dev/null -D - -X OPTIONS \
+    -H "Origin: $O" -H "Access-Control-Request-Method: PUT" -H "Access-Control-Request-Headers: content-type" \
+    "https://$BUCKET.s3.$REGION.amazonaws.com/relationship-messages/cors-probe" | grep -i -E '^(HTTP|access-control-allow-(origin|methods|headers))'
+done
+```
+
+Healthy after the write: `capacitor://localhost` and `https://localhost` each answer **`HTTP/… 200`** with **`access-control-allow-origin`** equal to the origin sent and `access-control-allow-methods` listing `PUT`; `https://platform.catalyst-growth.com` answers 200 too (the web upload rule); **`https://evil.example` answers 403** with no allow-origin line. A 403 for a native origin after the write means rule B did not land: re-read `get-bucket-cors`.
+**This is the only read-only proof of B.** A real upload from the app (a photo from the paperclip, on a build 4 install) is the end-to-end proof and is a **device step**: record it as done, or as **not read**.
+Native preflight before (capacitor / https://localhost): `______` / `______` after: `______` / `______` (evil.example 403? `______`) Rule B added or already present: `______________` Photo upload from the app re-walked: yes / no / not read
 Existing rules before: `______________` Rule added or already present: `______________` Allow-origin (platform): `______` (evil.example): none? `______` Bucket region (from P9.1): `______`
 Result: `______________`
 
@@ -496,6 +535,8 @@ Result: `______________`
 
 In a **test** thread (a named test agency, never a real conversation), paste or attach a small image and send it. Healthy: the upload completes and the image appears (it is the browser `PUT` to the signed URL that the old CORS rule serves; P6 added a rule, it must not have removed one). Delete the test message if the flag-OFF UI allows it; otherwise note the thread.
 Upload: `______` Thread used: `______________`
+**Native app (device step, not done from a browser):** on a build 4 install attach a photo with the paperclip and paste one, in a **test** thread. Healthy: both send and render as thumbnails. This is the proof of P6 rule B; until it is walked record **not read**.
+Native upload: `______`
 Result: `______________`
 
 **P8.8 Brands and campaigns render (AH-119 colour dot) [browser, agency]**
@@ -564,21 +605,22 @@ Done: yes / no
 
 **First rule: stop, record the state, change nothing else.** Then:
 
-| Symptom                                                                    | Do                                                                                                                                                                                                                                                                                                                 |
-| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **`APP_KEY` fingerprint differs** (any step)                               | **Restart nothing.** Restore the value from the recoverable copy (P0.2), `php artisan config:cache`, reload FPM. Do not run `composer install` again                                                                                                                                                               |
-| Tree hashes in P1.1 differ from the table                                  | The mirror holds other content. **Stop before migrating**; ask Pedram. Do not pull "close enough"                                                                                                                                                                                                                  |
-| A migration fails                                                          | Do not re-run blindly. Read the error and `migrate:status`. Each migration is a transaction: a failure leaves the earlier ones `Ran` and the failing one undone. Fix the cause (usually ownership or a lock wait), run `php artisan migrate --force` again                                                         |
-| The GIN build holds writes too long (requests queue, 500s on message send) | It ends when the build ends; do not kill the session mid-build. If it is clearly stuck, `pg_terminate_backend` the migration's backend as the owner: the transaction rolls back and no index is left. Re-run at a quieter minute                                                                                   |
-| 500s or errors on agency/creator pages between P1.1 and P2                 | The new code reads the new columns before they exist: **run P2 now**, do not roll the code back first (this is why P1.1 and P2 are one quiet minute)                                                                                                                                                               |
-| P3 prints `FALSE` lines                                                    | Grant as the table owner (P3), re-read. Until then message sends and campaign creation can fail with `permission denied`                                                                                                                                                                                           |
-| Code problem after migrating (API or SPA)                                  | **Roll the code back, leave the columns and indexes.** Old code ignores them. `git checkout <OLD>` on the host, rebuild and republish the SPAs, `config:cache`, reload FPM, `queue:restart` only after the Q10 check                                                                                               |
-| Roll the schema back                                                       | `php artisan migrate:rollback --step=6 --force` drops the columns and indexes. Safe while they are empty (they are at deploy: both message flags are OFF). **Never after a message was edited or deleted**: `down()` of migration 5 discards `original_body` and `deleted_body`. Restore from the snapshot instead |
-| The CORS write removed an existing rule (uploads fail in P8.7)             | Re-apply `/tmp/cors-before.json`: `aws s3api put-bucket-cors --bucket "$BUCKET" --cors-configuration file:///tmp/cors-before.json`. That is why P6 saves it first                                                                                                                                                  |
-| Web Download falls back to a plain link                                    | Not a fault: the CORS rule is missing or the browser cached the image without CORS headers (a hard reload clears it). Re-read P6                                                                                                                                                                                   |
-| A flag reads ON                                                            | Switch it OFF in the admin Feature-flags page and say so (P7)                                                                                                                                                                                                                                                      |
-| `laravel-erasure` is not `RUNNING` after P4.3                              | Read `supervisorctl status` and its log; `supervisorctl start laravel-erasure:*` once. Nothing needs it while erasure is not run; the default worker is unaffected                                                                                                                                                 |
-| **Data problem** (not just schema)                                         | **Restore from the P0.1 snapshot.** A restore creates a **new cluster**; it does not roll the live one back in place. **CONFIRM** how the app is re-pointed. Never rehearsed; everything written after the snapshot is lost. Prefer fix-forward                                                                    |
+| Symptom                                                                            | Do                                                                                                                                                                                                                                                                                                                                                                                        |
+| ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`APP_KEY` fingerprint differs** (any step)                                       | **Restart nothing.** Restore the value from the recoverable copy (P0.2), `php artisan config:cache`, reload FPM. Do not run `composer install` again                                                                                                                                                                                                                                      |
+| Tree hashes in P1.1 differ from the table                                          | The mirror holds other content. **Stop before migrating**; ask Pedram. Do not pull "close enough"                                                                                                                                                                                                                                                                                         |
+| A migration fails                                                                  | Do not re-run blindly. Read the error and `migrate:status`. Each migration is a transaction: a failure leaves the earlier ones `Ran` and the failing one undone. Fix the cause (usually ownership or a lock wait), run `php artisan migrate --force` again                                                                                                                                |
+| The GIN build holds writes too long (requests queue, 500s on message send)         | It ends when the build ends; do not kill the session mid-build. If it is clearly stuck, `pg_terminate_backend` the migration's backend as the owner: the transaction rolls back and no index is left. Re-run at a quieter minute                                                                                                                                                          |
+| 500s or errors on agency/creator pages between P1.1 and P2                         | The new code reads the new columns before they exist: **run P2 now**, do not roll the code back first (this is why P1.1 and P2 are one quiet minute)                                                                                                                                                                                                                                      |
+| P3 prints `FALSE` lines                                                            | Grant as the table owner (P3), re-read. Until then message sends and campaign creation can fail with `permission denied`                                                                                                                                                                                                                                                                  |
+| Code problem after migrating (API or SPA)                                          | **Roll the code back, leave the columns and indexes.** Old code ignores them. `git checkout <OLD>` on the host, rebuild and republish the SPAs, `config:cache`, reload FPM, `queue:restart` only after the Q10 check                                                                                                                                                                      |
+| Roll the schema back                                                               | `php artisan migrate:rollback --step=6 --force` drops the columns and indexes. Safe while they are empty (they are at deploy: both message flags are OFF). **Never after a message was edited or deleted**: `down()` of migration 5 discards `original_body` and `deleted_body`. Restore from the snapshot instead                                                                        |
+| The CORS write removed an existing rule (uploads fail in P8.7)                     | Re-apply `/tmp/cors-before.json`: `aws s3api put-bucket-cors --bucket "$BUCKET" --cors-configuration file:///tmp/cors-before.json`. That is why P6 saves it first                                                                                                                                                                                                                         |
+| The app shows "An attachment failed to upload" (photo from the paperclip or paste) | Almost always rule B missing: run the native preflight in P6 (a 403 for `capacitor://localhost` confirms it), apply rule B, re-walk on the device. Safari Web Inspector on the phone shows `Origin capacitor://localhost is not allowed`. Other causes, in order: an unsupported MIME (the API answers 422 `message.attachment_invalid`; HEIC is not on the allowlist), a file over 25 MB |
+| Web Download falls back to a plain link                                            | Not a fault: the CORS rule is missing or the browser cached the image without CORS headers (a hard reload clears it). Re-read P6                                                                                                                                                                                                                                                          |
+| A flag reads ON                                                                    | Switch it OFF in the admin Feature-flags page and say so (P7)                                                                                                                                                                                                                                                                                                                             |
+| `laravel-erasure` is not `RUNNING` after P4.3                                      | Read `supervisorctl status` and its log; `supervisorctl start laravel-erasure:*` once. Nothing needs it while erasure is not run; the default worker is unaffected                                                                                                                                                                                                                        |
+| **Data problem** (not just schema)                                                 | **Restore from the P0.1 snapshot.** A restore creates a **new cluster**; it does not roll the live one back in place. **CONFIRM** how the app is re-pointed. Never rehearsed; everything written after the snapshot is lost. Prefer fix-forward                                                                                                                                           |
 
 **Kill switches in this deploy:** the four new flags are the switches for their features, all OFF. **No kill switch exists** for the lightbox, the status counts, the pool filters, the brand colour dot or the archived-brand read: they ship live with the web build.
 
