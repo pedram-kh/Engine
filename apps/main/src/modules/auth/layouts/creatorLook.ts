@@ -31,5 +31,8 @@ export function hasCreatorLook(name: unknown): boolean {
  */
 export function useAuthCreatorTheme() {
   const route = useRoute()
-  return useCreatorTheme(computed(() => hasCreatorLook(route.name)))
+  return useCreatorTheme(
+    computed(() => hasCreatorLook(route.name)),
+    { applyPreference: false },
+  )
 }

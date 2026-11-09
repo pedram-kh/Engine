@@ -52,6 +52,7 @@ import '@/modules/creators/theme/creator.css'
 
 import { CREATOR_LOOK } from '@/composables/useNativeLook'
 import { useTheme } from '@/composables/useTheme'
+import { useThemePreference } from '@/composables/useThemePreference'
 import { isNativePlatform } from '@/core/platform/isNativePlatform'
 
 import {
@@ -79,13 +80,28 @@ export interface CreatorTheme {
   look: ComputedRef<boolean>
 }
 
-export function useCreatorTheme(enabled: Readonly<Ref<boolean>> = ref(true)): CreatorTheme {
+export interface CreatorThemeOptions {
+  /**
+   * Apply the stored light/dark preference at setup (default true). The creator and onboarding
+   * layouts do, so a creator who stored `light` is not shown the dark default at load (the
+   * preference was only ever applied by the agency layout and the toggle). `AuthLayout` does
+   * not: it also serves screens an agency user reaches, and the global theme is not its to set.
+   */
+  applyPreference?: boolean
+}
+
+export function useCreatorTheme(
+  enabled: Readonly<Ref<boolean>> = ref(true),
+  { applyPreference = true }: CreatorThemeOptions = {},
+): CreatorTheme {
   const theme = inject<ThemeHost['theme'] | null>(VUETIFY_THEME_KEY, null)
   if (theme === null) {
     throw new Error(
       'useCreatorTheme() must run inside a component of an app that installed Vuetify.',
     )
   }
+  // Web only: the app is dark-only, so a stored preference must not move it.
+  if (applyPreference && !isNativePlatform()) useThemePreference()
   const { currentTheme } = useTheme()
   // The creator look for this subtree (`useNativeLook`): on while the hook is enabled.
   provide(CREATOR_LOOK, enabled)

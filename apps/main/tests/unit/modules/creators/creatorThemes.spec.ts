@@ -16,7 +16,7 @@ import * as vuetifyComponents from 'vuetify/components'
 import * as vuetifyDirectives from 'vuetify/directives'
 import { nativeDarkTheme } from '@catalyst/design-tokens/native'
 
-import { __resetThemePreferenceForTests } from '@/composables/useThemePreference'
+import { __resetThemePreferenceForTests, STORAGE_KEY } from '@/composables/useThemePreference'
 import {
   buildCreatorThemes,
   CREATOR_DARK_THEME,
@@ -141,5 +141,22 @@ describe('useCreatorTheme', () => {
     await nextTick()
     expect(vuetify.theme.themes.value[CREATOR_DARK_THEME]).toBeUndefined()
     expect(vuetify.theme.styles.value).toBe(before)
+  })
+
+  // AH-115 L1.4: the stored-light-at-load bug. The preference used to be applied only by the
+  // agency layout and the toggle, so a creator who stored `light` always loaded dark.
+  it('applies a stored light preference at setup, so the creator layout loads light', () => {
+    window.localStorage.setItem(STORAGE_KEY, 'light')
+    __resetThemePreferenceForTests()
+    const vuetify = makeVuetify()
+    const { themeName } = mountLayout(vuetify)
+    expect(themeName()).toBe('creator-light')
+  })
+
+  it('applies a stored dark preference too', () => {
+    window.localStorage.setItem(STORAGE_KEY, 'dark')
+    __resetThemePreferenceForTests()
+    const { themeName } = mountLayout(makeVuetify())
+    expect(themeName()).toBe('creator-dark')
   })
 })

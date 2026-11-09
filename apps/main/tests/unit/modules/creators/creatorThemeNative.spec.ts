@@ -13,11 +13,14 @@ import * as vuetifyDirectives from 'vuetify/directives'
 
 vi.mock('@/core/platform/isNativePlatform', () => ({ isNativePlatform: () => true }))
 
+import { __resetThemePreferenceForTests, STORAGE_KEY } from '@/composables/useThemePreference'
 import { useCreatorTheme } from '@/modules/creators/theme/useCreatorTheme'
 import { buildVuetifyOptions } from '@/plugins/vuetify'
 
 describe('useCreatorTheme inside the native app', () => {
-  it('registers nothing and returns no theme', () => {
+  it('registers nothing, returns no theme, and ignores a stored light preference', () => {
+    window.localStorage.setItem(STORAGE_KEY, 'light')
+    __resetThemePreferenceForTests()
     const vuetify = createVuetify({
       ...buildVuetifyOptions(true),
       components: vuetifyComponents,
@@ -35,6 +38,9 @@ describe('useCreatorTheme inside the native app', () => {
     expect(theme?.value).toBeUndefined()
     expect(vuetify.theme.themes.value['creator-dark']).toBeUndefined()
     expect(vuetify.theme.styles.value).toBe(before)
+    expect(vuetify.theme.global.name.value).toBe('dark')
     wrapper.unmount()
+    window.localStorage.clear()
+    __resetThemePreferenceForTests()
   })
 })

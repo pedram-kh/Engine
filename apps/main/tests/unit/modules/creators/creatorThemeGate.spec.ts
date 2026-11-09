@@ -21,6 +21,7 @@ import {
   hasCreatorLook,
   useAuthCreatorTheme,
 } from '@/modules/auth/layouts/creatorLook'
+import { __resetThemePreferenceForTests, STORAGE_KEY } from '@/composables/useThemePreference'
 import { buildVuetifyOptions } from '@/plugins/vuetify'
 
 const NAMES = [
@@ -108,5 +109,17 @@ describe('AuthLayout theme hook across route changes', () => {
     await flushPromises()
     expect(theme()).toBeUndefined()
     expect(vuetify.theme.styles.value).toBe(untouched)
+  })
+
+  it('never applies the stored preference (the auth screens are shared with the agency)', async () => {
+    window.localStorage.setItem(STORAGE_KEY, 'light')
+    __resetThemePreferenceForTests()
+    const { router, vuetify, theme } = await setup()
+    await router.push({ name: 'auth.sign-in' })
+    await flushPromises()
+    // The global theme is still the dark default: AuthLayout did not call useThemePreference.
+    expect(vuetify.theme.global.name.value).toBe('dark')
+    expect(theme()).toBe('creator-dark')
+    window.localStorage.clear()
   })
 })

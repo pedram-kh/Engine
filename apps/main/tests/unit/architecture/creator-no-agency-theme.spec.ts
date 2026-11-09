@@ -30,7 +30,7 @@ import { buildVuetifyOptions } from '@/plugins/vuetify'
 import { registerAgencyThemes } from '@/modules/agency/theme/agencyThemes'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
-import { __resetThemePreferenceForTests } from '@/composables/useThemePreference'
+import { __resetThemePreferenceForTests, STORAGE_KEY } from '@/composables/useThemePreference'
 
 vi.mock('@/core/platform/isNativePlatform', () => ({ isNativePlatform: () => false }))
 
@@ -164,6 +164,8 @@ const ROUTES: RouteRecordRaw[] = [
 let wrapper: VueWrapper | undefined
 
 async function mountAt(path: string, theme: 'dark' | 'light') {
+  // AH-115 L1.4: the creator layouts apply the stored preference, so a light case stores it.
+  window.localStorage.setItem(STORAGE_KEY, theme)
   __resetThemePreferenceForTests()
   const pinia = createPinia()
   setActivePinia(pinia)
@@ -222,6 +224,7 @@ describe('creator, onboarding and auth trees never carry an agency theme class',
   afterEach(() => {
     wrapper?.unmount()
     wrapper = undefined
+    window.localStorage.clear()
   })
 
   const CASES: ReadonlyArray<[string, string, 'dark' | 'light']> = [
