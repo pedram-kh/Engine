@@ -25,6 +25,18 @@ At the end of L1 the 12 auth targets at 1280 (6 screens, dark and light) stopped
 - Two full runs on the same tree: **126 / 126 targets identical** (`COMPARE OK`).
 - **Break-revert (MEASURED):** with `--brand-font-primary` in `tokens.css` temporarily changed, `--only dashboard` fails on all 4 dashboard targets (8 differences: `styleHash` plus the screenshot on each); reverted, `git diff` clean.
 
+## Re-recorded on 2026-11-09 (L5), and why
+
+At L5 the committed `baseline.json` stopped matching on **12 of the 126 targets**: the six auth screens at 1280, dark and light (`agency-sign-in`, 2FA verify and enable, forgot and reset password, accept invitation), `styleHash` only (DOM, theme sheet and thumbnail the same). The cause is **not the runtime**: the same 12 fail identically on `75766ded` (the pushed L3 tip, when this walk was 126 / 126) and on the tip, with the same run hashes. The same 12 failed once before (the L1 finding above) and were then cured by a re-record, which is the signature of a machine-dependent signal the mask does not fully cover (the 1280-wide auth screens carry the locale switcher's progress bar and a fractional page height; that is a suspicion, not a measurement). Not isolated further.
+
+What was done instead, so the proof does not depend on that flake:
+
+1. **`baseline.json` is now recorded from the pre-chunk runtime** (`src` and `packages` at `9a0be3f3`, before any AH-115 code; walk tooling at the tip), on this machine today: 126 targets, 0 page errors.
+2. **The tip compares 126 / 126 identical** against it (`COMPARE OK: 126 targets identical`). That is the claim: no AH-115 file changed one agency hash.
+3. The L0 recording is kept as `baseline-recorded-l0.json` for reference. On the tip it compares identical on the other 114 targets and differs on the 12 above.
+
+Tech-debt (new row): finish the mask so a recording survives a day; until then, before trusting a failing compare, record the pre-chunk tree and compare against that.
+
 ## Run it
 
 ```
