@@ -162,9 +162,9 @@ const FROZEN_FILES: ReadonlyArray<readonly [string, string]> = [
     '5541a249e9ea0be4581a61ecb9d1fe2b4879263db371cd8c21a50a497ba74a39',
   ],
   [
-    // AH-115 L1.2: the scope is widened to `:is(.catalyst-native, .v-theme--creator-*)` so the web creator shell reads the same tokens and component rules; intended edit, re-pinned.
+    // AH-115 L1.2: the scope is widened to `:is(.catalyst-native, .v-theme--creator-*)` so the web creator shell reads the same tokens and component rules; intended edit, re-pinned. L1.5 (Q8): the Roboto fix for the `.text-*` utilities and the overlay root, a recorded native deviation.
     'packages/design-tokens/native.css',
-    'd1e4efc4c9b39471e09bc840f74124fb1356aaceab0f54e132a3de2e1a1e3336',
+    '637d03ecef416656241cab945b090c5a32d7fc0b82d67d064544c04828fc2932',
   ],
   [
     'packages/design-tokens/src/index.ts',

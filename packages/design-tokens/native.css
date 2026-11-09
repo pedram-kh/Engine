@@ -289,3 +289,29 @@
   border: 1px solid var(--native-border-default);
   border-radius: var(--native-radius-2xl);
 }
+
+/* AH-115 (L1.5, ruling Q8) — Vuetify's `.text-*` utilities carry `font-family: "Roboto"`, which
+   is not installed: every element with one of these classes fell back to the system sans while
+   its container was Inter. Fixed here, inside the shared scope, so the creator web and the app
+   agree. RECORDED DEVIATION: this also changes the native render (Inter where the system sans
+   showed through), listed in the build 5 device walk. The teleported overlay root gets the
+   same family in `creator.css` (the web's overlay carries the theme class itself). */
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light)
+  :is(
+    .text-h1,
+    .text-h2,
+    .text-h3,
+    .text-h4,
+    .text-h5,
+    .text-h6,
+    .text-subtitle-1,
+    .text-subtitle-2,
+    .text-body-1,
+    .text-body-2,
+    .text-caption,
+    .text-overline,
+    .text-button
+  ),
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-overlay {
+  font-family: var(--font-sans);
+}

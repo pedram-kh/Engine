@@ -43,6 +43,13 @@
   font: var(--native-type-body);
 }
 
+/* Teleported overlays sit in `.v-overlay-container` under <body>, which computes Roboto; the
+ * overlay element itself carries the creator theme class (the rule for `.text-*` utilities,
+ * which also covers the app, is in `native.css`: AH-115 L1.5, ruling Q8). */
+:is(.v-theme--creator-dark, .v-theme--creator-light).v-overlay {
+  font-family: var(--font-sans);
+}
+
 /* The single non-descendant form: the canvas behind and around the app. */
 :root:has(.v-application.v-theme--creator-dark) {
   background-color: #0b0b0c;
