@@ -12,6 +12,14 @@ The recorded state of the **agency shell and its 24 routes** before any AH-115 c
 - **Clock frozen** to `2026-11-09T11:00:00Z` on both sides (node fixtures through `freeze-clock.mjs`, the page through `context.clock.setFixedTime`). Without it the messages thread differed between two runs of the same tree (a bubble time changes width with its digits: MEASURED, 4 of 8 messages targets); with it, identical.
 - **Environment:** Chromium 147.0.7727.15, macOS (darwin) Apple silicon, `reducedMotion: reduce`, locale `en-US`, timezone `Europe/Madrid`. A different browser build or OS can move computed styles; re-record from an unchanged tree on a new environment before trusting a comparison.
 
+## Known non-deterministic source: indeterminate progress bars (found at the end of L1)
+
+At the end of L1 the 12 auth targets at 1280 (6 screens, dark and light) stopped matching the recorded baseline, with the **same difference on the tree that recorded it** (`adb31fd8`, no creator code), so the runtime was not the cause. The per-element computed-style dumps (before and after neutralising animations) show the only elements that move are the `.v-progress-linear__indeterminate` bars: Vuetify animates their own `width` with a keyframe, so the value is a snapshot of whatever frame the capture lands on (MEASURED: 14 of 341 elements, one property, on both 1280 and 390). Nothing else differed.
+
+- **Mask:** `walk.mjs` replaces that one property on those elements with `~` in the style hash. Every other property and every other element still counts.
+- **Re-record:** the baseline was re-recorded with the mask on the **`adb31fd8` tree** (unchanged runtime), twice (second run `COMPARE OK`, 126 / 126), then compared at the L1 tip: 126 / 126 identical. 104 of the 126 `styleHash` values moved from the first recording because the bars exist on most pages; the DOM hashes, theme sheet hashes and every other recorded field are unchanged.
+- **Effect on the AH-114 creator baseline:** its `styleHash` values will differ wherever a creator page has such a bar; that baseline is re-recorded deliberately in L5.
+
 ## Determinism (the gate for this step)
 
 - Two full runs on the same tree: **126 / 126 targets identical** (`COMPARE OK`).

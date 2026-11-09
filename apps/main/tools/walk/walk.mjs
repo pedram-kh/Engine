@@ -95,7 +95,12 @@ function probeInPage(opts) {
   }
   for (const el of els) {
     const c = getComputedStyle(el)
-    const s = el.tagName + '|' + STYLE_PROPS.map((p) => c[p]).join('|')
+    // KNOWN NON-DETERMINISTIC SOURCE (AH-115 L1): an indeterminate progress bar animates its own
+    // `width` (a keyframe snapshot taken at whatever frame the capture lands on), so that one
+    // property is masked. Nothing else is: every other property and element still counts.
+    const animated = el.matches('.v-progress-linear__indeterminate')
+    const s =
+      el.tagName + '|' + STYLE_PROPS.map((p) => (animated && p === 'width' ? '~' : c[p])).join('|')
     for (let i = 0; i < s.length; i++) styleHash = (styleHash * 31 + s.charCodeAt(i)) | 0
     elements++
   }

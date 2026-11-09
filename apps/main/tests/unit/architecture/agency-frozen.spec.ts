@@ -11,7 +11,7 @@
  * (file text, CRLF normalised to LF; recorded on `5677b378`). The set is also pinned, so
  * a new file in the agency module fails here until it is pinned on purpose. The render
  * itself is proved by the agency baseline walk (`docs/reviews/ah-115-agency-baseline/`,
- * 102 targets: DOM + computed styles + theme `<style>` bytes), which is the real
+ * the agency baseline targets: DOM + computed styles + theme `<style>` bytes), which is the real
  * guarantee; this spec is the cheap early alarm.
  *
  * Anyone who sees this fail has edited the agency shell. Outside AH-115 that can be
