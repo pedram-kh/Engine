@@ -1,0 +1,47 @@
+/*
+ * AH-115 (L0.5) — the creator app's stylesheet: what the two creator Vuetify themes have no
+ * slot for. Today that is the light derivation of the native `--native-*` tokens and the
+ * browser canvas; later layers add the creator-only rules that `native.css` does not carry.
+ *
+ * SCOPE RULE (pinned by tests/unit/architecture/creator-css-scoping.spec.ts): every selector
+ * starts with `:is(.v-theme--creator-dark, .v-theme--creator-light)`. Vuetify puts that class
+ * on the creator `<v-app>` and on every overlay it teleports (menus, dialogs, tooltips), so
+ * the scope covers teleported content and nothing the agency, admin or bare-app trees render.
+ * The prefix is also what makes a rule beat `native.css`'s own widened selectors.
+ *
+ * THE ONE EXCEPTION is the canvas rule at the bottom (the browser canvas lives outside the
+ * layout, so it is reached with `:root:has(.v-application…)`): `background-color` only, and
+ * the value must equal the theme module's `background` (the spec asserts it).
+ *
+ * LIGHT (inventory §3, ruling Q4). `native.css` defines the dark `--native-*` values on the
+ * widened scope; this block re-defines only the colour tokens for `creator-light`, derived
+ * from the agency light palette (parity pinned by `creator-light-parity.spec.ts`). Radius,
+ * type and safe-area tokens do not change with the theme and are not repeated. Brand and
+ * status FILLS stay the dark values (one brand, two canvases), as in the Vuetify theme.
+ */
+
+:is(.v-theme--creator-dark, .v-theme--creator-light).v-theme--creator-light {
+  --native-bg-canvas: #f4f4f5;
+  --native-bg-sidebar: #fafafa;
+  --native-bg-topbar: #ffffff;
+  --native-bg-surface: #ffffff;
+  --native-bg-surface-raised: #f4f4f5;
+  --native-border-default: #e4e4e7;
+  --native-border-strong: #d4d4d8;
+  --native-text-primary: #18181b;
+  --native-text-secondary: #52525b;
+  --native-text-tertiary: #6b6b74;
+  --native-accent-primary-subtle: #e4f8f1;
+  --native-shadow-overlay: 0 12px 32px rgba(24, 24, 27, 0.14);
+
+  color-scheme: light;
+}
+
+/* The single non-descendant form: the canvas behind and around the app. */
+:root:has(.v-application.v-theme--creator-dark) {
+  background-color: #0b0b0c;
+}
+
+:root:has(.v-application.v-theme--creator-light) {
+  background-color: #f4f4f5;
+}
