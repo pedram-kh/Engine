@@ -223,6 +223,20 @@ async function open(handle, route, { real = '', settle = 400 } = {}) {
     timeout: 60000,
   })
   await page.evaluate(() => document.fonts.ready)
+  // AH-115 L5: `fonts.ready` can resolve before a face is requested at all (nothing has used it yet).
+  // The locale select is auto-width and its options are written in every script (Latin-extended,
+  // Cyrillic, Greek), so its width depends on which Inter subset files have arrived (MEASURED:
+  // 67.34 px against 67.67 px, only the targets that show the select). Request every subset and
+  // weight explicitly, then wait.
+  await page.evaluate(async () => {
+    const sample = 'Aa ąžŁ Ωλ Жд ăâ ệ'
+    await Promise.all(
+      [400, 500, 600, 700].map((w) =>
+        document.fonts.load(`${w} 16px Inter`, sample).catch(() => []),
+      ),
+    )
+    await document.fonts.ready
+  })
   await page.waitForTimeout(settle)
 }
 
