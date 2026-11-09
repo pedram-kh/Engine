@@ -40,11 +40,40 @@
   color-scheme: light;
 }
 
-/* Brand-coloured text, outlined and plain buttons: the label is `primary-text` in light (the same
- * rule the agency light theme carries). */
+/* Brand-coloured text in light, on any element (links, selected list rows, tonal, outlined, text
+ * and plain buttons): the label is `primary-text`, the same colour the agency light theme uses;
+ * the mint itself fails AA on white. Filled primary surfaces (`bg-primary`) keep their own label. */
 :is(.v-theme--creator-dark, .v-theme--creator-light).v-theme--creator-light
-  .v-btn:is(.v-btn--variant-outlined, .v-btn--variant-text, .v-btn--variant-plain).text-primary {
+  .text-primary:not(.bg-primary) {
   color: rgb(var(--v-theme-primary-text)) !important;
+}
+
+/* Light: the same label colour where a shared component's own sheet draws brand-coloured text
+ * (the thread's report link, read ticks and drop hint, the selected inbox row's preview). */
+:is(.v-theme--creator-dark, .v-theme--creator-light).v-theme--creator-light
+  :is(
+    .rel-thread__report,
+    .rel-bubble__tick--read,
+    .rel-thread__drop-hint,
+    .v-list-item--active .v-list-item-subtitle
+  ) {
+  color: rgb(var(--v-theme-primary-text));
+}
+
+/* A disabled filled primary button must read as disabled in both themes: the muted raised
+ * surface and the tertiary label (the same treatment as the agency rule), not the solid mint. */
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .v-btn--disabled.v-btn--variant-flat.bg-primary {
+  background-color: var(--native-bg-surface-raised) !important;
+  color: var(--native-text-tertiary) !important;
+}
+
+/* Light: a floating field label rides the secondary text colour, at full strength (the default
+ * 0.7 on-surface blend washes out on the light field). */
+:is(.v-theme--creator-dark, .v-theme--creator-light).v-theme--creator-light
+  .v-field-label--floating {
+  color: var(--native-text-secondary);
+  opacity: 1;
 }
 
 /* The app root IS the themed element, so `native.css`'s `<scope> .v-application` (written for the
