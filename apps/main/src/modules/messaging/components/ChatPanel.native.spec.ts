@@ -10,6 +10,7 @@
 
 import type { MessageResource } from '@catalyst/api-client'
 import { flushPromises, mount } from '@vue/test-utils'
+import { ref } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createI18n } from 'vue-i18n'
 import { createVuetify } from 'vuetify'
@@ -17,6 +18,7 @@ import * as vuetifyComponents from 'vuetify/components'
 import * as vuetifyDirectives from 'vuetify/directives'
 
 import enApp from '@/core/i18n/locales/en/app.json'
+import { CREATOR_LOOK } from '@/composables/useNativeLook'
 
 const platform = vi.hoisted(() => ({ native: false }))
 vi.mock('@/core/platform/isNativePlatform', () => ({
@@ -71,13 +73,18 @@ function transport(): ChatTransport {
   }
 }
 
-async function mountPanel(native: boolean) {
-  platform.native = native
+/** AH-115: the creator web look reaches the shared component by injection, not by the platform. */
+function lookProvide(native: boolean | 'look') {
+  return native === 'look' ? { [CREATOR_LOOK as symbol]: ref(true) } : {}
+}
+
+async function mountPanel(native: boolean | 'look') {
+  platform.native = native === true
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: enApp } as never })
   const vuetify = createVuetify({ components: vuetifyComponents, directives: vuetifyDirectives })
   const wrapper = mount(ChatPanel, {
     props: { transport: transport() },
-    global: { plugins: [i18n, vuetify] },
+    global: { plugins: [i18n, vuetify], provide: lookProvide(native) },
     attachTo: document.createElement('div'),
   })
   await flushPromises()
@@ -502,4 +509,14 @@ describe('ChatPanel — Stage B flag off renders the pre-Stage-B markup', () => 
       })
     }
   }
+})
+
+describe('ChatPanel attach control — creator web look (AH-115)', () => {
+  it('draws the native paperclip when CREATOR_LOOK is provided, with no platform', async () => {
+    const wrapper = await mountPanel('look')
+
+    expect(wrapper.find('[data-test="chat-attach-file"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="chat-attach-toggle"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
 })

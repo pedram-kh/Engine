@@ -10,6 +10,7 @@
 
 import type { NotificationResource, NotificationType } from '@catalyst/api-client'
 import { flushPromises, mount } from '@vue/test-utils'
+import { ref } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createI18n } from 'vue-i18n'
 import { createMemoryHistory, createRouter } from 'vue-router'
@@ -18,6 +19,7 @@ import * as vuetifyComponents from 'vuetify/components'
 import * as vuetifyDirectives from 'vuetify/directives'
 
 import enNotifications from '@/core/i18n/locales/en/notifications.json'
+import { CREATOR_LOOK } from '@/composables/useNativeLook'
 
 const platform = vi.hoisted(() => ({ native: false }))
 vi.mock('@/core/platform/isNativePlatform', () => ({
@@ -67,8 +69,13 @@ function feed(rows: NotificationResource[], meta: { page?: number; last_page?: n
   } as never
 }
 
-async function mountPage(native: boolean, rows: NotificationResource[], last = 1) {
-  platform.native = native
+/** AH-115: the creator web look reaches the shared component by injection, not by the platform. */
+function lookProvide(native: boolean | 'look') {
+  return native === 'look' ? { [CREATOR_LOOK as symbol]: ref(true) } : {}
+}
+
+async function mountPage(native: boolean | 'look', rows: NotificationResource[], last = 1) {
+  platform.native = native === true
   vi.mocked(notificationsApi.list).mockResolvedValue(feed(rows, { last_page: last }))
   const i18n = createI18n({
     legacy: false,
@@ -82,6 +89,7 @@ async function mountPage(native: boolean, rows: NotificationResource[], last = 1
     props: { variant: 'page' },
     // AH-103: a row can navigate now, so the component injects the router.
     global: {
+      provide: lookProvide(native),
       plugins: [
         i18n,
         vuetify,
@@ -176,6 +184,16 @@ describe('notifications — web is unchanged', () => {
     expect(wrapper.find('[data-test="notification-caught-up"]').exists()).toBe(false)
     expect(wrapper.find('.notification-row').exists()).toBe(false)
     expect(wrapper.find('[data-test="notification-unread-dot"]').classes()).toContain('v-icon')
+    wrapper.unmount()
+  })
+})
+
+describe('notifications — creator web look (AH-115)', () => {
+  it('draws the native rows and the caught-up footer when CREATOR_LOOK is provided', async () => {
+    const wrapper = await mountPage('look', [row('a', 'campaign.invited', H)], 1)
+
+    expect(wrapper.find('.notification-row').exists()).toBe(true)
+    expect(wrapper.text()).toContain("You're all caught up")
     wrapper.unmount()
   })
 })

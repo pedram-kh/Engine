@@ -13,7 +13,7 @@ import type { RouteLocationRaw } from 'vue-router'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { isNativePlatform } from '@/core/platform/isNativePlatform'
+import { useNativeLook } from '@/composables/useNativeLook'
 
 export interface RelationshipInboxItem {
   /** Stable key (the thread or counterparty ULID). */
@@ -58,7 +58,7 @@ const { t, locale } = useI18n()
  * pill. The label resolves fine; the paint did not. A filled button takes the
  * app's own on-accent label colour.
  */
-const isNative = isNativePlatform()
+const isNative = useNativeLook()
 
 const dateFormatter = computed(() => new Intl.DateTimeFormat(locale.value, { dateStyle: 'short' }))
 

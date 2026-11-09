@@ -15,7 +15,7 @@ import { computed, nextTick, ref, toRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
 
-import { isNativePlatform } from '@/core/platform/isNativePlatform'
+import { useNativeLook } from '@/composables/useNativeLook'
 
 import type { ChatTransport } from '../api/messaging.api'
 import { useComposerImages } from '../composables/useComposerImages'
@@ -151,7 +151,7 @@ const attachOpen = ref(false)
 // AH-101 (U4) — in the native app the "+" would open a menu with ONE item (the
 // paperclip), which is a tap spent revealing a tap. The native composer renders
 // the paperclip itself in the "+" slot. The web keeps the "+" menu unchanged.
-const isNative = isNativePlatform()
+const isNative = useNativeLook()
 
 function onComposerKeydown(event: KeyboardEvent): void {
   if (isMobile.value) {

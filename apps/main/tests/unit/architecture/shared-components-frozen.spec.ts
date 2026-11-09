@@ -49,21 +49,24 @@ const FROZEN_COMPONENTS: ReadonlyArray<readonly [string, string]> = [
   [
     // AH-119 walk: the inline image is the shared MessageImage (thumbnail button + lightbox) instead of a new-tab link; hash re-pinned (flag-off DOM for text-only messages is unchanged).
     // AH-119 Stage B: edit / delete actions, "edited" tag and deleted placeholder behind messages_v2_edit_search — intended edit, hash re-pinned (flag off renders the pre-Stage-B DOM, pinned in stageBFlagOffPins.json).
+    // AH-115 L2: look gate reads useNativeLook() (default false outside the creator shell) instead of isNativePlatform(); flag-off DOM unchanged.
     'apps/main/src/modules/messaging/components/ChatPanel.vue',
-    '8dbe1a12239d72c93d8e825c723f7cd6cbdafbcc49a74d8e660109944be7bbd2',
+    '4f0753575e490e551b654617830fec04960ecb6781ba577f2039be18822f33e0',
   ],
   [
     'apps/main/src/modules/messaging/components/ContactPicker.vue',
     'ae49c2d76f8a77a101f8e45686e93465bf2105b7ea06a5d7dc394e8a77ce8c63',
   ],
   [
+    // AH-115 L2: look gate reads useNativeLook() (creator-only at runtime).
     'apps/main/src/modules/messaging/components/RelationshipInbox.vue',
-    '1766bf603c46ab7ac0b8684d6d6b58e2b655904a0f7795fbfd9a68578e6cef05',
+    '0712b4a82ea0b7ea2c54aca70b34e0267f1fb5ad78ef199026abe826d0f397fd',
   ],
   [
     // AH-119 Stage B: edit / delete actions, "edited" tag and deleted placeholder behind messages_v2_edit_search — intended edit, hash re-pinned (flag off renders the pre-Stage-B DOM, pinned in stageBFlagOffPins.json).
+    // AH-115 L2: look gate reads useNativeLook(); the native height rule also applies under the creator theme classes.
     'apps/main/src/modules/messaging/components/RelationshipThreadView.vue',
-    'f8233179e68b1e4ec3162c06ac8bd81fda19ab8b616615166d02b96df9493d54',
+    '92fc22e944f1b841c62142f0a35c04cbdfc434812d80dc61994bdb9cd3c55a8f',
   ],
   [
     'apps/main/src/modules/messaging/components/ReportFallback.vue',
@@ -75,8 +78,9 @@ const FROZEN_COMPONENTS: ReadonlyArray<readonly [string, string]> = [
   ],
   [
     // AH-118 C5: offer_edited body money — intended edit, hash re-pinned.
+    // AH-115 L2: look gate reads useNativeLook() (default false: the agency feed is unchanged).
     'apps/main/src/modules/notifications/components/NotificationCenter.vue',
-    'a8f7b2c83d55dd54e71008ae0b3f6bd86c26dcec7433ef286050ad1bd6b9303a',
+    'c607472f01f892f4ff8be99be61f03fd3c80767b8b71b22d66e6887ea5e18782',
   ],
   [
     'apps/main/src/modules/notifications/components/PushStateRow.vue',

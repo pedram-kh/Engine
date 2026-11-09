@@ -11,6 +11,7 @@
 
 import type { RelationshipMessageResource } from '@catalyst/api-client'
 import { flushPromises, mount } from '@vue/test-utils'
+import { ref } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createI18n } from 'vue-i18n'
 import { createVuetify } from 'vuetify'
@@ -18,6 +19,7 @@ import * as vuetifyComponents from 'vuetify/components'
 import * as vuetifyDirectives from 'vuetify/directives'
 
 import enApp from '@/core/i18n/locales/en/app.json'
+import { CREATOR_LOOK } from '@/composables/useNativeLook'
 
 const platform = vi.hoisted(() => ({ native: false }))
 vi.mock('@/core/platform/isNativePlatform', () => ({
@@ -70,13 +72,18 @@ function transport(): RelationshipChatTransport {
   } as unknown as RelationshipChatTransport
 }
 
-async function mountView(native: boolean) {
-  platform.native = native
+/** AH-115: the creator web look reaches the shared component by injection, not by the platform. */
+function lookProvide(native: boolean | 'look') {
+  return native === 'look' ? { [CREATOR_LOOK as symbol]: ref(true) } : {}
+}
+
+async function mountView(native: boolean | 'look') {
+  platform.native = native === true
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: enApp } as never })
   const vuetify = createVuetify({ components: vuetifyComponents, directives: vuetifyDirectives })
   const wrapper = mount(RelationshipThreadView, {
     props: { transport: transport(), title: 'Acme Agency' },
-    global: { plugins: [i18n, vuetify] },
+    global: { plugins: [i18n, vuetify], provide: lookProvide(native) },
     attachTo: document.createElement('div'),
   })
   await flushPromises()
@@ -467,4 +474,15 @@ describe('RelationshipThreadView — Stage B flag off renders the pre-Stage-B ma
       })
     }
   }
+})
+
+describe('RelationshipThreadView attach controls — creator web look (AH-115)', () => {
+  it('draws the inline controls when CREATOR_LOOK is provided, with no platform', async () => {
+    const wrapper = await mountView('look')
+
+    expect(wrapper.find('[data-test="relationship-attach-file"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="relationship-attach-link"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="relationship-attach-toggle"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
 })

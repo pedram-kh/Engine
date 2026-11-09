@@ -30,7 +30,7 @@ import { formatCurrency, type NotificationResource } from '@catalyst/api-client'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { isNativePlatform } from '@/core/platform/isNativePlatform'
+import { useNativeLook } from '@/composables/useNativeLook'
 
 import { notificationsApi } from '../api/notifications.api'
 import { useNotificationNavigation } from '../composables/useNotificationNavigation'
@@ -59,7 +59,7 @@ const { open: openNotification } = useNotificationNavigation()
  * a compact age and the unread dot on the right, and the page ends "You're all
  * caught up". Web keeps its own row.
  */
-const isNative = isNativePlatform()
+const isNative = useNativeLook()
 
 const DROPDOWN_PER_PAGE = 8
 const PAGE_PER_PAGE = 25

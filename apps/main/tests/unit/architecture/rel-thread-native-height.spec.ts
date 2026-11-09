@@ -36,13 +36,17 @@ function ruleBody(selector: string): string {
   return STYLE.slice(open + 1, close)
 }
 
+// AH-115 L2: the rule also applies under the creator theme classes (the creator web look).
+const NATIVE_RULE =
+  ':global(:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .rel-thread)'
+
 describe('RelationshipThreadView — native height (U3)', () => {
-  it('has a `.catalyst-native .rel-thread` rule (the native scope)', () => {
-    expect(STYLE).toContain(':global(.catalyst-native .rel-thread)')
+  it('has a `.rel-thread` rule scoped to .catalyst-native and the creator themes (AH-115)', () => {
+    expect(STYLE).toContain(NATIVE_RULE)
   })
 
   it('derives the native height from the live layout vars and the safe-area tokens', () => {
-    const body = ruleBody(':global(.catalyst-native .rel-thread)')
+    const body = ruleBody(NATIVE_RULE)
 
     for (const token of [
       '--v-layout-top',
@@ -62,7 +66,7 @@ describe('RelationshipThreadView — native height (U3)', () => {
 
   it('is declared AFTER the web mobile media block, so it wins at equal specificity', () => {
     const media = STYLE.indexOf('@media (max-width: 959px)')
-    const native = STYLE.indexOf(':global(.catalyst-native .rel-thread)')
+    const native = STYLE.indexOf(NATIVE_RULE)
 
     expect(media).toBeGreaterThan(-1)
     expect(native).toBeGreaterThan(media)

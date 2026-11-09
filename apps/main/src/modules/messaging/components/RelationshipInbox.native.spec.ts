@@ -11,6 +11,7 @@
  */
 
 import { flushPromises, mount } from '@vue/test-utils'
+import { ref } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createI18n } from 'vue-i18n'
 import { createMemoryHistory, createRouter } from 'vue-router'
@@ -19,6 +20,7 @@ import * as vuetifyComponents from 'vuetify/components'
 import * as vuetifyDirectives from 'vuetify/directives'
 
 import enApp from '@/core/i18n/locales/en/app.json'
+import { CREATOR_LOOK } from '@/composables/useNativeLook'
 import frApp from '@/core/i18n/locales/fr/app.json'
 
 const platform = vi.hoisted(() => ({ native: false }))
@@ -28,8 +30,13 @@ vi.mock('@/core/platform/isNativePlatform', () => ({
 
 import RelationshipInbox from './RelationshipInbox.vue'
 
-async function mountEmpty(native: boolean, locale: 'en' | 'fr' = 'en') {
-  platform.native = native
+/** AH-115: the creator web look reaches the shared component by injection, not by the platform. */
+function lookProvide(native: boolean | 'look') {
+  return native === 'look' ? { [CREATOR_LOOK as symbol]: ref(true) } : {}
+}
+
+async function mountEmpty(native: boolean | 'look', locale: 'en' | 'fr' = 'en') {
+  platform.native = native === true
   const i18n = createI18n({
     legacy: false,
     locale,
@@ -42,7 +49,7 @@ async function mountEmpty(native: boolean, locale: 'en' | 'fr' = 'en') {
   })
   const wrapper = mount(RelationshipInbox, {
     props: { items: [], loading: false, loadError: false },
-    global: { plugins: [i18n, vuetify, router] },
+    global: { plugins: [i18n, vuetify, router], provide: lookProvide(native) },
     attachTo: document.createElement('div'),
   })
   await flushPromises()
@@ -84,5 +91,14 @@ describe('RelationshipInbox empty state — web is unchanged', () => {
     expect(btn.text()).toBe('Start a conversation')
     expect(btn.classes()).toContain('v-btn--variant-tonal')
     expect(btn.classes()).not.toContain('v-btn--variant-flat')
+  })
+})
+
+describe('RelationshipInbox empty state — creator web look (AH-115)', () => {
+  it('draws the filled primary button when CREATOR_LOOK is provided, with no platform', async () => {
+    const btn = (await mountEmpty('look')).find('[data-test="relationship-inbox-start"]')
+
+    expect(btn.classes()).toContain('v-btn--variant-flat')
+    expect(btn.classes()).not.toContain('v-btn--variant-tonal')
   })
 })

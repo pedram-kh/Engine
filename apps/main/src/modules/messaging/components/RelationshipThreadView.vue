@@ -29,7 +29,7 @@ import { useI18n } from 'vue-i18n'
 import type { RouteLocationRaw } from 'vue-router'
 import { useDisplay } from 'vuetify'
 
-import { isNativePlatform } from '@/core/platform/isNativePlatform'
+import { useNativeLook } from '@/composables/useNativeLook'
 
 import type { RelationshipChatTransport } from '../api/relationshipMessaging.api'
 import { useComposerImages } from '../composables/useComposerImages'
@@ -203,7 +203,7 @@ const attachOpen = ref(false)
 // one tap each instead of two. (The "+" menu exists so a thumb-sized composer is
 // not crowded; on a 390pt screen two 40pt icons fit, and the assignment page
 // already renders this exact pair.) The web keeps the "+" menu unchanged.
-const isNative = isNativePlatform()
+const isNative = useNativeLook()
 const linkDialogOpen = ref(false)
 const generalError = ref<string | null>(null)
 const fieldErrors = ref<Partial<Record<ComposeField, readonly string[]>>>({})
@@ -799,10 +799,11 @@ async function submit(): Promise<void> {
    any future change to the bar or the safe-area insets instead of gaining another
    magic number. 24px is the page's own vertical content padding. Scoped to
    `.catalyst-native`, which the shell sets on <html> only inside the Capacitor
-   app: the web rules above are untouched. Declared AFTER the media block so it
+   app, and (AH-115) by the creator theme classes the creator layouts put on <v-app>: the
+   web rules above are untouched for every other tree. Declared AFTER the media block so it
    wins at equal specificity. The `min-height` floor is released for the same
    reason the mobile rule releases it. */
-:global(.catalyst-native .rel-thread) {
+:global(:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .rel-thread) {
   height: calc(
     100dvh - var(--v-layout-top, 0px) - var(--native-safe-top, 0px) - var(--v-layout-bottom, 0px) -
       var(--native-safe-bottom, 0px) - 24px
