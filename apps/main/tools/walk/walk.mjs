@@ -32,7 +32,7 @@ import { chromium } from '@playwright/test'
 import sharp from 'sharp'
 import { createServer } from 'vite'
 
-import { AGENCY_ROUTES, agencyPageFor } from './agency-routes.mjs'
+import { AGENCY_ROUTES, agencyPageFor, PROTECTED_AUTH } from './agency-routes.mjs'
 import { fixtureFor } from './l3-fixtures.mjs'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
@@ -389,7 +389,35 @@ async function runAgency(base, browser) {
       await h.context.close()
     }
   })
-  return [...direct, ...cross]
+  // The auth screens the creator restyle must NOT change (AH-115 rulings Q3 and 1): the agency
+  // sign-in and the screens an agency user can reach (2FA, forgot, reset, accept invitation).
+  // Stub pages: these routes' own pages are not what is measured, the AuthLayout around them is.
+  const authJobs = []
+  for (const [name, route] of PROTECTED_AUTH) {
+    for (const theme of ['dark', 'light']) {
+      for (const viewport of ['desktop', 'mobile']) {
+        if (ONLY && !name.includes(ONLY)) continue
+        authJobs.push({ name, route, theme, viewport })
+      }
+    }
+  }
+  const auth = await pool(authJobs, async ({ name, route, theme, viewport }) => {
+    const h = await newPage(browser, { viewport, theme, user: 'none', base, fixtures: true })
+    try {
+      await open(h, route)
+      return await measure(h, `agencyauth.${name}.${theme}.${viewport}`, {
+        kind: 'direct',
+        route,
+        name,
+        layout: 'auth',
+        theme,
+        viewport,
+      })
+    } finally {
+      await h.context.close()
+    }
+  })
+  return [...direct, ...cross, ...auth]
 }
 
 function compare(baseline, run) {

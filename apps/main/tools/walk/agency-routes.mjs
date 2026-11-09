@@ -45,3 +45,16 @@ export function agencyPageFor(slug, width) {
   if (!entry) return null
   return { ...entry, width, height: width === 390 ? 844 : 800 }
 }
+
+/**
+ * Auth routes the creator restyle leaves unchanged (AH-115 rulings): the agency sign-in
+ * (byte-identical, Q3) and the four screens an agency user can also reach.
+ */
+export const PROTECTED_AUTH = [
+  ['agency-sign-in', '/agency/sign-in'],
+  ['2fa-verify', '/auth/2fa/verify'],
+  ['2fa-enable', '/auth/2fa/enable'],
+  ['forgot-password', '/forgot-password'],
+  ['reset-password', '/auth/reset-password'],
+  ['accept-invitation', '/accept-invitation'],
+]
