@@ -94,7 +94,7 @@ const OLD_INBOX = {
   ],
 }
 
-async function mountPage(flag: boolean | 'absent') {
+async function mountPage(flag: boolean | 'absent', inbox: CreatorInboxResponse = INBOX) {
   const pinia = createPinia()
   setActivePinia(pinia)
   useAuthStore().user = {
@@ -104,7 +104,7 @@ async function mountPage(flag: boolean | 'absent') {
   } as never
 
   vi.mocked(relationshipMessagingApi.creatorInbox).mockResolvedValue(OLD_INBOX as never)
-  vi.mocked(creatorInboxApi.inbox).mockResolvedValue(INBOX)
+  vi.mocked(creatorInboxApi.inbox).mockResolvedValue(inbox)
   vi.mocked(creatorInboxApi.search).mockResolvedValue({
     data: [
       {
@@ -186,6 +186,35 @@ describe('CreatorMessagesPage — unified inbox (AH-115 L4)', () => {
       .map((r) => r.attributes('data-test'))
     expect(order).toEqual(['relationship-inbox-row-thr-asg', 'relationship-inbox-row-thr-direct'])
   })
+
+  it.each([true, false] as const)(
+    'flag %s: stamps follow the agency inbox rule (today a time, this year "Mar 14", older with the year)',
+    async (flag) => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date(2026, 10, 9, 15, 0, 0))
+      const at = (iso: string, id: string): CreatorInboxRow => ({
+        ...DIRECT,
+        id,
+        attributes: { ...DIRECT.attributes, last_message_at: iso },
+      })
+      const wrapper = await mountPage(flag, {
+        data: [
+          at(new Date(2026, 10, 9, 9, 30).toISOString(), 'a'),
+          at(new Date(2026, 2, 14, 10, 0).toISOString(), 'b'),
+          at(new Date(2025, 2, 14, 10, 0).toISOString(), 'c'),
+        ],
+        meta: { unread_threads_total: 0, next_cursor: null },
+      })
+      const times = wrapper.findAll('.rel-inbox__time').map((n) => n.text())
+      if (flag) {
+        expect(times).toEqual(['9:30 AM', 'Mar 14', 'Mar 14, 2025'])
+      } else {
+        // flag off: still the day-aware rule (consistency over scope), from the old endpoint
+        expect(times).toHaveLength(1)
+        expect(times[0]).toBe('Mar 14, 2020')
+      }
+    },
+  )
 
   it('flag on: a campaign row deep-links to its assignment chat, a direct row to the thread', async () => {
     const wrapper = await mountPage(true)

@@ -60,8 +60,9 @@ const FROZEN_COMPONENTS: ReadonlyArray<readonly [string, string]> = [
   [
     // AH-115 L2: look gate reads useNativeLook() (creator-only at runtime).
     // AH-115 L4: optional per-row tag (creator unified inbox); no tag renders the previous DOM.
+    // AH-115 L4: opt-in dayAwareStamps (agency-inbox date rule); off renders the previous date.
     'apps/main/src/modules/messaging/components/RelationshipInbox.vue',
-    '8e3ad950e11db2992c80ae0a17252009f87c6faa2604a7ecc08ad298d37d345c',
+    '3b10b665a3d0ad0a30ec0c452748e505a909ffa1fa651b0f049a4bbeeb9e133a',
   ],
   [
     // AH-119 Stage B: edit / delete actions, "edited" tag and deleted placeholder behind messages_v2_edit_search — intended edit, hash re-pinned (flag off renders the pre-Stage-B DOM, pinned in stageBFlagOffPins.json).

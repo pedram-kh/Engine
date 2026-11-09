@@ -382,6 +382,7 @@ onBeforeUnmount(() => {
           :loading="loading"
           :load-error="loadError"
           :active-id="activeRowId"
+          day-aware-stamps
           @start="openPicker"
         />
         <v-btn

@@ -44,6 +44,12 @@ const props = defineProps<{
    * single-pane callers are unaffected.
    */
   activeId?: string | null
+  /**
+   * AH-115 L4: stamp each row by the unified-inbox rule (today a time, this year "Nov 9", older
+   * "Nov 9, 2025"), the same rule as the agency inbox. Off by default: every other caller keeps
+   * the short numeric date.
+   */
+  dayAwareStamps?: boolean
 }>()
 
 /**
@@ -71,13 +77,35 @@ const listLines = computed(() => (props.items.some((i) => i.tag) ? 'three' : 'tw
 const isNative = useNativeLook()
 
 const dateFormatter = computed(() => new Intl.DateTimeFormat(locale.value, { dateStyle: 'short' }))
+const timeFormatter = computed(() => new Intl.DateTimeFormat(locale.value, { timeStyle: 'short' }))
+const dayFormatter = computed(
+  () => new Intl.DateTimeFormat(locale.value, { day: 'numeric', month: 'short' }),
+)
+const fullFormatter = computed(
+  () => new Intl.DateTimeFormat(locale.value, { day: 'numeric', month: 'short', year: 'numeric' }),
+)
 
-function formatStamp(iso: string | null): string {
+function startOfDay(date: Date): number {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime()
+}
+
+function formatStamp(iso: string | null, now: Date = new Date()): string {
   if (iso === null) {
     return ''
   }
   const date = new Date(iso)
-  return Number.isNaN(date.getTime()) ? '' : dateFormatter.value.format(date)
+  if (Number.isNaN(date.getTime())) {
+    return ''
+  }
+  if (props.dayAwareStamps !== true) {
+    return dateFormatter.value.format(date)
+  }
+  if (startOfDay(date) === startOfDay(now)) {
+    return timeFormatter.value.format(date)
+  }
+  return date.getFullYear() === now.getFullYear()
+    ? dayFormatter.value.format(date)
+    : fullFormatter.value.format(date)
 }
 </script>
 
