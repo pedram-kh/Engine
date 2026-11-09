@@ -213,13 +213,23 @@ describe('OnboardingLayout — creator app chrome (AH-100)', () => {
     expect(wrapper.html()).not.toContain('--native')
   })
 
-  it('web mobile: the mobile chrome, Save and exit not inline', async () => {
+  // AH-115 — the creator web below md adopts the app's chrome: the compact header (progress line,
+  // "Step N of 5"), form first, no stacked stepper. The hamburger stays (it carries the locale
+  // switcher, which the web has no other place for); "Save and exit" stays in its drawer.
+  it('web mobile (creator look): the native header, neither animated chrome, drawer kept', async () => {
     wrapper = await mountLayout({ mobile: true })
 
-    expect(wrapper.findComponent({ name: 'AnimatedWizardChromeMobile' }).exists()).toBe(true)
-    expect(wrapper.find('[data-test="native-wizard-header"]').exists()).toBe(false)
+    const header = wrapper.find('[data-test="native-wizard-header"]')
+    expect(header.exists()).toBe(true)
+    expect(header.find('[data-test="native-wizard-header-position"]').text()).toMatch(/2/)
+    expect(wrapper.findComponent({ name: 'AnimatedWizardChrome' }).exists()).toBe(false)
+    expect(wrapper.findComponent({ name: 'AnimatedWizardChromeMobile' }).exists()).toBe(false)
+    expect(wrapper.find('[data-test="onboarding-topbar"]').classes()).toContain(
+      'onboarding-topbar--native',
+    )
     expect(
       wrapper.find('[data-test="onboarding-topbar"] [data-test="save-and-exit-btn"]').exists(),
     ).toBe(false)
+    expect(wrapper.find('[data-test="onboarding-menu-btn"]').exists()).toBe(true)
   })
 })

@@ -70,7 +70,9 @@ const authStore = useAuthStore()
 const onboardingStore = useOnboardingStore()
 const { isNative, isMobile } = useMobileShell()
 // AH-115 — the creator Vuetify theme (web only; the app keeps its global native theme).
-const { theme: creatorTheme } = useCreatorTheme()
+const { theme: creatorTheme, look } = useCreatorTheme()
+/** AH-115 — the native chrome below md on creator web (compact header, form first); ≥ md keeps the side stepper. */
+const nativeChrome = computed(() => isNative || (look.value && isMobile.value))
 
 const {
   isBootstrapped,
@@ -138,7 +140,7 @@ const useMobileChrome = computed(
 )
 
 /** AH-100 — the creator app's frame-01 header (no motion to reduce). */
-const useNativeHeader = computed(() => isNative && creator.value !== null)
+const useNativeHeader = computed(() => nativeChrome.value && creator.value !== null)
 
 /** On a step route the active row is that step; on the Welcome Back
  *  resume screen we highlight the creator's `next_step` so the rail
@@ -225,7 +227,7 @@ async function saveAndExit(): Promise<void> {
     <v-app-bar
       elevation="1"
       class="onboarding-topbar"
-      :class="{ 'onboarding-topbar--native': isNative }"
+      :class="{ 'onboarding-topbar--native': nativeChrome }"
       data-test="onboarding-topbar"
     >
       <div class="d-flex align-center px-4" data-test="onboarding-brand">
@@ -342,7 +344,7 @@ async function saveAndExit(): Promise<void> {
       </div>
     </v-navigation-drawer>
 
-    <v-main :class="{ 'onboarding-main--native': isNative }" data-test="onboarding-main">
+    <v-main :class="{ 'onboarding-main--native': nativeChrome }" data-test="onboarding-main">
       <!-- AH-100: the creator app's header + plain body (frame 01). -->
       <div v-if="useNativeHeader" class="onboarding-native">
         <NativeWizardHeader
