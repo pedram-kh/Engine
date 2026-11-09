@@ -37,6 +37,12 @@
   color-scheme: light;
 }
 
+/* The app root IS the themed element, so `native.css`'s `<scope> .v-application` (written for the
+ * Capacitor shell, where the class sits on <html>) does not reach it. Body text is Inter 14/20. */
+:is(.v-theme--creator-dark, .v-theme--creator-light).v-application {
+  font: var(--native-type-body);
+}
+
 /* The single non-descendant form: the canvas behind and around the app. */
 :root:has(.v-application.v-theme--creator-dark) {
   background-color: #0b0b0c;

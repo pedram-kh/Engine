@@ -85,9 +85,11 @@ describe('nativeDarkTheme', () => {
 
 describe('native.css button language (AH-100d)', () => {
   it('danger outlined buttons (Remove, Decline) are the tinted-danger style: 16% fill, danger border', () => {
-    const rule = /\.catalyst-native \.v-btn--variant-outlined\.text-error\s*\{([^}]*)\}/.exec(
-      NATIVE_CSS,
-    )
+    // AH-115: the scope is the widened `:is(.catalyst-native, .v-theme--creator-*)` list.
+    const rule =
+      /\.v-theme--creator-light\s*\)\s*\.v-btn--variant-outlined\.text-error\s*\{([^}]*)\}/.exec(
+        NATIVE_CSS,
+      )
     expect(rule, 'the danger outlined rule exists').not.toBeNull()
     expect(rule?.[1]).toMatch(/background:\s*var\(--native-status-danger-subtle\)/)
     expect(rule?.[1]).toMatch(/border-color:\s*var\(--native-status-danger\)/)

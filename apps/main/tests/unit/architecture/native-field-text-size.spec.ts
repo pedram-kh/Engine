@@ -39,13 +39,24 @@ interface Rule {
   decls: Map<string, string>
 }
 
+/**
+ * AH-115 (L1.2): `native.css` is scoped by the widened
+ * `:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light)` list. These pins are
+ * about what each rule DECLARES, so the list is read as the one scope it replaced
+ * (`.catalyst-native`). Polarity edit, by name. `native-css-scoping.spec.ts` owns the scope.
+ */
+const WIDENED_SCOPE =
+  /:is\(\s*\.catalyst-native,\s*\.v-theme--creator-dark,\s*\.v-theme--creator-light\s*\)/g
+
 function strip(css: string): string {
   return css.replace(/\/\*[\s\S]*?\*\//g, '')
 }
 
 function parse(file: string): Rule[] {
   const rules: Rule[] = []
-  for (const match of strip(readFileSync(file, 'utf8')).matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+  for (const match of strip(readFileSync(file, 'utf8'))
+    .replace(WIDENED_SCOPE, '.catalyst-native')
+    .matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
     const decls = new Map<string, string>()
     for (const decl of (match[2] as string).split(';')) {
       const idx = decl.indexOf(':')

@@ -203,6 +203,7 @@ describe('creator theme isolation (agency side)', () => {
     expect(
       scan([path.join(REPO_ROOT, 'packages/design-tokens')], /\.(ts|vue|css|js|mjs)$/, [
         'packages/design-tokens/native.css',
+        'packages/design-tokens/src/native.spec.ts',
       ]),
     ).toEqual([])
   })

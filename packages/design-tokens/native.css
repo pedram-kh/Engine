@@ -3,18 +3,22 @@
  * Source of truth: Figma 1Dd0NdZ55EXh58uNyvf9Bi; TS mirror: src/native.ts
  * (`nativeCssVariables`, kept in lockstep by src/native.spec.ts).
  *
- * Loaded ONLY inside the native shell (dynamic import in the main SPA's
- * boot, after `.catalyst-native` is set on <html>). Every selector in this
- * file starts with `.catalyst-native`, pinned by
- * apps/main/tests/unit/architecture/native-css-scoping.spec.ts, so even if
- * the file were ever loaded on the web it could not restyle anything.
+ * Loaded inside the native shell (dynamic import in the main SPA's boot, after
+ * `.catalyst-native` is set on <html>) and, since AH-115, by the creator, onboarding
+ * and auth layouts on the web. Every selector in this file starts with
+ * `:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light)`,
+ * pinned by apps/main/tests/unit/architecture/native-css-scoping.spec.ts. The
+ * creator theme classes are put on a `<v-app>` (and on its teleported overlays)
+ * only by the creator-side layouts, so the file cannot restyle the agency, the
+ * admin or the bare app. `:is()` takes the specificity of its most specific
+ * argument, which is one class, exactly what `.catalyst-native` was.
  *
  * Colours that have a Vuetify slot are NOT here — they reach components
  * through the swapped `dark` theme (`nativeDarkTheme`). This file carries
  * what Vuetify has no slot for.
  */
 
-.catalyst-native {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) {
   --native-bg-canvas: #0b0b0c;
   --native-bg-sidebar: #151516;
   --native-bg-topbar: #18181a;
@@ -85,13 +89,13 @@
   color-scheme: dark;
 }
 
-.catalyst-native body {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) body {
   background: var(--native-bg-canvas);
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
 }
 
-.catalyst-native .v-application {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-application {
   font: var(--native-type-body);
 }
 
@@ -103,14 +107,14 @@
  */
 
 /* Cards are flat, bordered surfaces — never elevated (frames 02–14). */
-.catalyst-native .v-card--variant-elevated,
-.catalyst-native .v-card--variant-flat {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-card--variant-elevated,
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-card--variant-flat {
   border: 1px solid var(--native-border-default);
   border-radius: var(--native-radius-2xl);
   box-shadow: none;
 }
 
-.catalyst-native .v-card-title {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-card-title {
   font: var(--native-type-h4);
   letter-spacing: 0;
 }
@@ -118,19 +122,19 @@
 /* Inputs: canvas fill, strong 1px outline, 8px radius, 46px tall. The label
    still floats inside the field (Vuetify) — Figma draws it above; see the
    deviations list in the AH-100b review. */
-.catalyst-native .v-field {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-field {
   --v-field-border-radius: var(--native-radius-lg);
 }
 
-.catalyst-native .v-field--variant-outlined {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-field--variant-outlined {
   background: var(--native-bg-canvas);
 }
 
-.catalyst-native .v-input--density-compact {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-input--density-compact {
   --v-input-control-height: 46px;
 }
 
-.catalyst-native
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light)
   .v-field--variant-outlined:not(.v-field--focused):not(.v-field--error)
   .v-field__outline {
   --v-field-border-opacity: 1;
@@ -142,68 +146,77 @@
    fixed tab bar off-screen. Pinned by native-field-text-size.spec.ts. We do not
    set `maximum-scale=1` instead: that blocks pinch-zoom, an accessibility
    failure (WCAG 1.4.4). Labels are not focus targets and stay at body (14px). */
-.catalyst-native .v-field__input,
-.catalyst-native .v-field__input input,
-.catalyst-native .v-field__input select,
-.catalyst-native .v-field__input textarea,
-.catalyst-native input,
-.catalyst-native select,
-.catalyst-native textarea {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-field__input,
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-field__input input,
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-field__input select,
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-field__input textarea,
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) input,
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) select,
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) textarea {
   font: var(--native-type-input);
 }
 
-.catalyst-native .v-field .v-field-label {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-field .v-field-label {
   font: var(--native-type-body);
 }
 
-.catalyst-native .v-messages {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-messages {
   font: var(--native-type-caption);
   color: var(--native-text-tertiary);
 }
 
-.catalyst-native .v-counter {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-counter {
   font: var(--native-type-caption);
   color: var(--native-text-tertiary);
 }
 
 /* Choice chips: surface pill, accent-subtle + accent border when selected. */
-.catalyst-native .v-chip--variant-outlined {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-chip--variant-outlined {
   background: var(--native-bg-surface);
   border-color: var(--native-border-default);
   color: var(--native-text-secondary);
   font: var(--native-type-body-small);
 }
 
-.catalyst-native .v-chip--variant-outlined.v-chip--selected {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light)
+  .v-chip--variant-outlined.v-chip--selected {
   background: var(--native-accent-primary-subtle);
   border-color: var(--native-accent-primary);
   color: var(--native-accent-primary);
 }
 
-.catalyst-native .v-chip--variant-outlined .v-chip__underlay,
-.catalyst-native .v-chip--variant-outlined .v-chip__overlay {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light)
+  .v-chip--variant-outlined
+  .v-chip__underlay,
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light)
+  .v-chip--variant-outlined
+  .v-chip__overlay {
   display: none;
 }
 
 /* Checkbox: 20px, 4px radius, mint fill when checked. */
-.catalyst-native .v-selection-control .v-icon {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light)
+  .v-selection-control
+  .v-icon {
   font-size: 20px;
 }
 
-.catalyst-native .v-checkbox .v-label,
-.catalyst-native .v-selection-control .v-label {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-checkbox .v-label,
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light)
+  .v-selection-control
+  .v-label {
   font: var(--native-type-body);
   opacity: 1;
   color: var(--native-text-primary);
 }
 
 /* Buttons: Figma's Button/Default 500 and Button/Primary 600. */
-.catalyst-native .v-btn {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-btn {
   font: var(--native-type-button);
   letter-spacing: 0;
 }
 
-.catalyst-native .v-btn.bg-primary {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-btn.bg-primary {
   font: var(--native-type-button-primary);
   color: var(--native-text-on-accent);
 }
@@ -216,26 +229,29 @@
    `!important` class (measured: 0px). So the rule has to be `!important` too,
    and it out-ranks `.rounded-0` on specificity. Icon-only buttons take
    Vuetify's own circle back. Pinned by native-button-radius.spec.ts. */
-.catalyst-native .v-btn:not(.v-btn--icon) {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-btn:not(.v-btn--icon) {
   border-radius: var(--native-radius-lg) !important;
 }
 
-.catalyst-native .v-btn.v-btn--icon {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-btn.v-btn--icon {
   border-radius: var(--native-radius-full) !important;
 }
 
 /* Tonal buttons are Figma's "Soft": accent-subtle fill, mint label. */
-.catalyst-native .v-btn--variant-tonal {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-btn--variant-tonal {
   background: var(--native-accent-primary-subtle);
   color: var(--native-accent-primary);
 }
 
-.catalyst-native .v-btn--variant-tonal .v-btn__underlay {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light)
+  .v-btn--variant-tonal
+  .v-btn__underlay {
   background: transparent;
 }
 
 /* Outlined buttons are Figma's "Secondary": surface fill, strong border. */
-.catalyst-native .v-btn--variant-outlined:not([class*='text-']) {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light)
+  .v-btn--variant-outlined:not([class*='text-']) {
   background: var(--native-bg-surface);
   border-color: var(--native-border-strong);
   color: var(--native-text-primary);
@@ -243,24 +259,27 @@
 
 /* Danger outlined buttons (Remove, Decline) are Figma's tinted danger: danger
    fill at 16%, danger border, danger label (frames 04, 10, 13). */
-.catalyst-native .v-btn--variant-outlined.text-error {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light)
+  .v-btn--variant-outlined.text-error {
   background: var(--native-status-danger-subtle);
   border-color: var(--native-status-danger);
 }
 
 /* Alerts read as Figma's tinted banners (info / success / warning / danger). */
-.catalyst-native .v-alert--variant-tonal {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .v-alert--variant-tonal {
   border-radius: var(--native-radius-xl);
 }
 
-.catalyst-native .v-alert--variant-tonal.text-info,
-.catalyst-native .v-alert--variant-tonal.v-alert--color-info {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light)
+  .v-alert--variant-tonal.text-info,
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light)
+  .v-alert--variant-tonal.v-alert--color-info {
   background: var(--native-status-info-subtle);
   border: 1px solid var(--native-status-info);
 }
 
 /* A run of fields grouped by `NativeCard` (the web renders no wrapper). */
-.catalyst-native .native-card {
+:is(.catalyst-native, .v-theme--creator-dark, .v-theme--creator-light) .native-card {
   display: flex;
   flex-direction: column;
   gap: 20px;

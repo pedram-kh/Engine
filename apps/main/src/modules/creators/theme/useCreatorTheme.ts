@@ -22,6 +22,11 @@
  * renders `nativeDarkTheme` as its global `dark` theme (`buildVuetifyOptions(true)`), and
  * its render is meant to stay exactly as it was.
  *
+ * Importing the hook also loads the two stylesheets that give the creator themes their look:
+ * `native.css` (the Figma token layer, scoped to the creator theme classes since L1.2) and
+ * `creator.css` (the light remap and the canvas). Both are inert unless a creator theme class
+ * is on the page.
+ *
  * The instance is the one the app installed (injected), not the `@/plugins/vuetify`
  * singleton, so a test app with its own Vuetify gets its own registration. `useTheme` stays
  * the single import boundary for Vuetify's theme composable (`use-theme-is-sot.spec.ts`).
@@ -37,6 +42,9 @@ import {
   type ComputedRef,
   type Ref,
 } from 'vue'
+
+import '@catalyst/design-tokens/native.css'
+import '@/modules/creators/theme/creator.css'
 
 import { useTheme } from '@/composables/useTheme'
 import { isNativePlatform } from '@/core/platform/isNativePlatform'
