@@ -94,6 +94,7 @@
           "close": "Schließen"
         },
         "inboxSearch": "Creator oder Nachrichten suchen",
+        "creatorInboxSearch": "Nachrichten durchsuchen",
         "inboxUnreadPill": "{count} ungelesen | {count} ungelesen",
         "inboxFilterAll": "Alle",
         "inboxFilterUnread": "Ungelesen",

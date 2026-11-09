@@ -94,6 +94,7 @@
           "close": "Cerrar"
         },
         "inboxSearch": "Buscar creadores o mensajes",
+        "creatorInboxSearch": "Buscar mensajes",
         "inboxUnreadPill": "{count} sin leer | {count} sin leer",
         "inboxFilterAll": "Todas",
         "inboxFilterUnread": "Sin leer",

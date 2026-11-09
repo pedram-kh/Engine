@@ -94,6 +94,7 @@
           "close": "Затвори"
         },
         "inboxSearch": "Търсене на създатели или съобщения",
+        "creatorInboxSearch": "Търсене в съобщенията",
         "inboxUnreadPill": "{count} непрочетен | {count} непрочетени",
         "inboxFilterAll": "Всички",
         "inboxFilterUnread": "Непрочетени",

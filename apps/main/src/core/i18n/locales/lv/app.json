@@ -94,6 +94,7 @@
           "close": "Aizvērt"
         },
         "inboxSearch": "Meklēt veidotājus vai ziņojumus",
+        "creatorInboxSearch": "Meklēt ziņās",
         "inboxUnreadPill": "{count} nelasīta | {count} nelasītas",
         "inboxFilterAll": "Visi",
         "inboxFilterUnread": "Nelasītās",

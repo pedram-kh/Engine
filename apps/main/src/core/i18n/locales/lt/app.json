@@ -94,6 +94,7 @@
           "close": "Uždaryti"
         },
         "inboxSearch": "Ieškoti kūrėjų ar žinučių",
+        "creatorInboxSearch": "Ieškoti žinučių",
         "inboxUnreadPill": "{count} neskaityta | {count} neskaitytos",
         "inboxFilterAll": "Visi",
         "inboxFilterUnread": "Neskaityti",

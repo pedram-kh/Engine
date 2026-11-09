@@ -25,9 +25,16 @@ export interface RelationshipInboxItem {
   avatarText: string
   avatarUrl?: string | null
   to: RouteLocationRaw
+  /**
+   * AH-115 L4: the conversation's tag on the creator's unified inbox ("Direct", or "Brand · Campaign").
+   * Absent for every other caller, which renders no tag.
+   */
+  tag?: string | null
+  /** The tag is the Direct one (rendered neutral, not as a campaign chip). */
+  tagDirect?: boolean
 }
 
-defineProps<{
+const props = defineProps<{
   items: RelationshipInboxItem[]
   loading: boolean
   loadError: boolean
@@ -50,6 +57,9 @@ const emit = defineEmits<{
 }>()
 
 const { t, locale } = useI18n()
+
+// A tagged row has a third line; the two-line row height would clip it.
+const listLines = computed(() => (props.items.some((i) => i.tag) ? 'three' : 'two'))
 
 /**
  * AH-100d: inside the creator app the CTA is the filled primary button. The
@@ -96,7 +106,7 @@ function formatStamp(iso: string | null): string {
       </v-btn>
     </div>
 
-    <v-list v-else lines="two" data-test="relationship-inbox-list">
+    <v-list v-else :lines="listLines" data-test="relationship-inbox-list">
       <v-list-item
         v-for="item in items"
         :key="item.id"
@@ -118,6 +128,14 @@ function formatStamp(iso: string | null): string {
         <v-list-item-subtitle>
           {{ item.preview ?? t('app.messaging.rollup.noMessages') }}
         </v-list-item-subtitle>
+        <div
+          v-if="item.tag"
+          class="rel-inbox__tag"
+          :class="{ 'rel-inbox__tag--direct': item.tagDirect === true }"
+          :data-test="`relationship-inbox-tag-${item.id}`"
+        >
+          {{ item.tag }}
+        </div>
 
         <template #append>
           <div class="rel-inbox__meta">
@@ -156,6 +174,26 @@ function formatStamp(iso: string | null): string {
   flex-direction: column;
   align-items: flex-end;
   gap: 2px;
+}
+
+.rel-inbox__tag {
+  display: inline-block;
+  max-width: 100%;
+  margin-top: 4px;
+  padding: 1px 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(var(--v-theme-primary), 0.14);
+  color: rgb(var(--v-theme-primary));
+  font-size: 0.7rem;
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rel-inbox__tag--direct {
+  background: rgba(var(--v-theme-on-surface), 0.08);
+  color: rgba(var(--v-theme-on-surface), 0.7);
 }
 
 .rel-inbox__time {

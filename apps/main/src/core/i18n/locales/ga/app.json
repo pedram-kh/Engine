@@ -94,6 +94,7 @@
           "close": "Dún"
         },
         "inboxSearch": "Cuardaigh cruthaitheoirí nó teachtaireachtaí",
+        "creatorInboxSearch": "Cuardaigh teachtaireachtaí",
         "inboxUnreadPill": "{count} gan léamh | {count} gan léamh",
         "inboxFilterAll": "Uile",
         "inboxFilterUnread": "Gan léamh",

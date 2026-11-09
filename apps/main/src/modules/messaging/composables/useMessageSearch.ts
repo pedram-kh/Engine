@@ -17,12 +17,28 @@ export const MESSAGE_SEARCH_DEBOUNCE_MS = 300
 
 export type MessageSearchState = 'idle' | 'minChars' | 'loading' | 'results' | 'empty' | 'error'
 
-export function useMessageSearch(
+/**
+ * One search call. The default is the agency's (`key` = the agency id); the creator inbox (AH-115 L4)
+ * passes its own, with a constant `key`, and gets the same debounce, minimum, stale-drop and paging.
+ */
+export type MessageSearchFetcher<T extends MessageSearchHit = MessageSearchResult> = (
+  key: string,
+  q: string,
+  cursor?: string | null,
+) => Promise<{ data: T[]; meta: { next_cursor: string | null } }>
+
+/** What the hook needs of a hit: its unique message ULID (the list key). */
+export interface MessageSearchHit {
+  attributes: { message_ulid: string }
+}
+
+export function useMessageSearch<T extends MessageSearchHit = MessageSearchResult>(
   agencyId: Ref<string | null>,
   term: Ref<string>,
   enabled: Ref<boolean>,
+  fetcher: MessageSearchFetcher<T> = messageSearchApi.search as unknown as MessageSearchFetcher<T>,
 ) {
-  const results = ref<MessageSearchResult[]>([])
+  const results = ref<T[]>([]) as Ref<T[]>
   const nextCursor = ref<string | null>(null)
   const loading = ref(false)
   const loadingMore = ref(false)
@@ -74,7 +90,7 @@ export function useMessageSearch(
     loading.value = true
     failed.value = false
     try {
-      const res = await messageSearchApi.search(agency, q)
+      const res = await fetcher(agency, q)
       if (mine !== generation) {
         return
       }
@@ -103,7 +119,7 @@ export function useMessageSearch(
     const mine = generation
     loadingMore.value = true
     try {
-      const res = await messageSearchApi.search(agency, trimmed.value, cursor)
+      const res = await fetcher(agency, trimmed.value, cursor)
       if (mine !== generation) {
         return
       }

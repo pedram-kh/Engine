@@ -94,6 +94,7 @@
           "close": "Luk"
         },
         "inboxSearch": "Søg efter skabere eller beskeder",
+        "creatorInboxSearch": "Søg i beskeder",
         "inboxUnreadPill": "{count} ulæst | {count} ulæste",
         "inboxFilterAll": "Alle",
         "inboxFilterUnread": "Ulæste",

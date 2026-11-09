@@ -59,8 +59,9 @@ const FROZEN_COMPONENTS: ReadonlyArray<readonly [string, string]> = [
   ],
   [
     // AH-115 L2: look gate reads useNativeLook() (creator-only at runtime).
+    // AH-115 L4: optional per-row tag (creator unified inbox); no tag renders the previous DOM.
     'apps/main/src/modules/messaging/components/RelationshipInbox.vue',
-    '0712b4a82ea0b7ea2c54aca70b34e0267f1fb5ad78ef199026abe826d0f397fd',
+    '8e3ad950e11db2992c80ae0a17252009f87c6faa2604a7ecc08ad298d37d345c',
   ],
   [
     // AH-119 Stage B: edit / delete actions, "edited" tag and deleted placeholder behind messages_v2_edit_search — intended edit, hash re-pinned (flag off renders the pre-Stage-B DOM, pinned in stageBFlagOffPins.json).
@@ -79,8 +80,9 @@ const FROZEN_COMPONENTS: ReadonlyArray<readonly [string, string]> = [
   [
     // AH-118 C5: offer_edited body money — intended edit, hash re-pinned.
     // AH-115 L2: look gate reads useNativeLook() (default false: the agency feed is unchanged).
+    // AH-115 L4: optional hide-title prop (the creator page draws its own header); default renders the previous DOM.
     'apps/main/src/modules/notifications/components/NotificationCenter.vue',
-    'c607472f01f892f4ff8be99be61f03fd3c80767b8b71b22d66e6887ea5e18782',
+    '99f1815261473c6f478fc10b68846bcac4bd3f955cfbeeca3f97322310b44b5e',
   ],
   [
     'apps/main/src/modules/notifications/components/PushStateRow.vue',

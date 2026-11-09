@@ -94,6 +94,7 @@
           "close": "Zavřít"
         },
         "inboxSearch": "Hledat tvůrce nebo zprávy",
+        "creatorInboxSearch": "Hledat ve zprávách",
         "inboxUnreadPill": "{count} nepřečtená | {count} nepřečtených",
         "inboxFilterAll": "Vše",
         "inboxFilterUnread": "Nepřečtené",

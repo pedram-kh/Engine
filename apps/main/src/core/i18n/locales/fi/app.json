@@ -94,6 +94,7 @@
           "close": "Sulje"
         },
         "inboxSearch": "Hae tekijöitä tai viestejä",
+        "creatorInboxSearch": "Hae viesteistä",
         "inboxUnreadPill": "{count} lukematon | {count} lukematonta",
         "inboxFilterAll": "Kaikki",
         "inboxFilterUnread": "Lukemattomat",

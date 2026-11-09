@@ -94,6 +94,7 @@
           "close": "Zamknij"
         },
         "inboxSearch": "Szukaj twórców lub wiadomości",
+        "creatorInboxSearch": "Szukaj w wiadomościach",
         "inboxUnreadPill": "{count} nieprzeczytana | {count} nieprzeczytane",
         "inboxFilterAll": "Wszystkie",
         "inboxFilterUnread": "Nieprzeczytane",

@@ -94,6 +94,7 @@
           "close": "Stäng"
         },
         "inboxSearch": "Sök skapare eller meddelanden",
+        "creatorInboxSearch": "Sök i meddelanden",
         "inboxUnreadPill": "{count} oläst | {count} olästa",
         "inboxFilterAll": "Alla",
         "inboxFilterUnread": "Olästa",

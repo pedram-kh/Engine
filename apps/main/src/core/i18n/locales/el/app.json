@@ -94,6 +94,7 @@
           "close": "Κλείσιμο"
         },
         "inboxSearch": "Αναζήτηση δημιουργών ή μηνυμάτων",
+        "creatorInboxSearch": "Αναζήτηση μηνυμάτων",
         "inboxUnreadPill": "{count} μη αναγνωσμένη | {count} μη αναγνωσμένες",
         "inboxFilterAll": "Όλα",
         "inboxFilterUnread": "Μη αναγνωσμένα",

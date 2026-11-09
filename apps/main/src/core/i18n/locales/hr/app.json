@@ -94,6 +94,7 @@
           "close": "Zatvori"
         },
         "inboxSearch": "Pretraži kreatore ili poruke",
+        "creatorInboxSearch": "Pretraži poruke",
         "inboxUnreadPill": "{count} nepročitana | {count} nepročitanih",
         "inboxFilterAll": "Sve",
         "inboxFilterUnread": "Nepročitano",

@@ -94,6 +94,7 @@
           "close": "Sluiten"
         },
         "inboxSearch": "Zoek makers of berichten",
+        "creatorInboxSearch": "Berichten zoeken",
         "inboxUnreadPill": "{count} ongelezen | {count} ongelezen",
         "inboxFilterAll": "Alles",
         "inboxFilterUnread": "Ongelezen",

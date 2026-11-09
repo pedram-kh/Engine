@@ -449,3 +449,52 @@ export interface MessageSearchResponse {
   data: MessageSearchResult[]
   meta: { next_cursor: string | null; per_page: number }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AH-115 L4 — the creator unified inbox and search (flag `messages_v2_creator_inbox_enabled`)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * One thread of `GET /creators/me/message-inbox`. `id` is the THREAD's ULID. A relationship thread
+ * is tagged "Direct" (no brand or campaign); an assignment thread carries its brand and campaign
+ * ("Brand · Campaign") and the assignment ULID the row links to.
+ */
+export interface CreatorInboxRow {
+  id: string
+  type: 'relationship_thread' | 'assignment_thread'
+  attributes: {
+    agency: { id: string | null; name: string | null; logo_url: string | null }
+    brand: { id: string; name: string } | null
+    campaign: { id: string; name: string } | null
+    assignment_id: string | null
+    last_message_at: string | null
+    preview: string | null
+    preview_kind: 'text' | 'attachment' | 'deleted'
+    unread_count: number
+  }
+}
+
+export interface CreatorInboxResponse {
+  data: CreatorInboxRow[]
+  meta: { unread_threads_total: number; next_cursor: string | null }
+}
+
+/** One hit of `GET /creators/me/message-search`: the inbox row plus the message that matched. */
+export interface CreatorInboxSearchResult {
+  id: string
+  type: CreatorInboxRow['type']
+  attributes: CreatorInboxRow['attributes'] & {
+    message_ulid: string
+    /** Plain text (no markup), up to 160 characters around the first match. */
+    snippet: string
+    sent_at: string
+    sender_role: 'creator' | 'agency_user' | 'brand_user' | 'admin' | 'system'
+    /** The signed-in creator wrote the matching message ("You" in the results). */
+    is_own: boolean
+  }
+}
+
+export interface CreatorInboxSearchResponse {
+  data: CreatorInboxSearchResult[]
+  meta: { next_cursor: string | null; per_page: number }
+}

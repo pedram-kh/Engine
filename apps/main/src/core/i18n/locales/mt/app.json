@@ -94,6 +94,7 @@
           "close": "Agħlaq"
         },
         "inboxSearch": "Fittex kreaturi jew messaġġi",
+        "creatorInboxSearch": "Fittex fil-messaġġi",
         "inboxUnreadPill": "{count} mhux moqrija | {count} mhux moqrijin",
         "inboxFilterAll": "Kollha",
         "inboxFilterUnread": "Mhux moqrija",

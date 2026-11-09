@@ -94,6 +94,7 @@
           "close": "Zapri"
         },
         "inboxSearch": "Išči ustvarjalce ali sporočila",
+        "creatorInboxSearch": "Išči po sporočilih",
         "inboxUnreadPill": "{count} neprebrano | {count} neprebranih",
         "inboxFilterAll": "Vse",
         "inboxFilterUnread": "Neprebrano",

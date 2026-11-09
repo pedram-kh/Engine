@@ -94,6 +94,7 @@
           "close": "Închide"
         },
         "inboxSearch": "Caută creatori sau mesaje",
+        "creatorInboxSearch": "Caută în mesaje",
         "inboxUnreadPill": "{count} necitită | {count} necitite",
         "inboxFilterAll": "Toate",
         "inboxFilterUnread": "Necitite",

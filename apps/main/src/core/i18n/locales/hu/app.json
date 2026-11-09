@@ -94,6 +94,7 @@
           "close": "Bezárás"
         },
         "inboxSearch": "Alkotók vagy üzenetek keresése",
+        "creatorInboxSearch": "Üzenetek keresése",
         "inboxUnreadPill": "{count} olvasatlan | {count} olvasatlan",
         "inboxFilterAll": "Mind",
         "inboxFilterUnread": "Olvasatlan",

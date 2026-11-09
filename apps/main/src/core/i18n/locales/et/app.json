@@ -94,6 +94,7 @@
           "close": "Sulge"
         },
         "inboxSearch": "Otsi sisuloojaid või sõnumeid",
+        "creatorInboxSearch": "Otsi sõnumeid",
         "inboxUnreadPill": "{count} lugemata | {count} lugemata",
         "inboxFilterAll": "Kõik",
         "inboxFilterUnread": "Lugemata",

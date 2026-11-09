@@ -11,15 +11,27 @@
  * MOBILE it stays single-pane (one pane at a time, based on the selection).
  */
 
-import type { CreatorRelationshipThreadRow, MessageableAgencyRow } from '@catalyst/api-client'
+import type {
+  CreatorInboxRow,
+  CreatorInboxSearchResult,
+  CreatorRelationshipThreadRow,
+  MessageableAgencyRow,
+} from '@catalyst/api-client'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute } from 'vue-router'
+import { useRoute, type RouteLocationRaw } from 'vue-router'
 import { useDisplay } from 'vuetify'
 
+import CreatorMessageSearchResults, {
+  type MessageSearchItem,
+} from '../components/CreatorMessageSearchResults.vue'
+import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
+
+import { creatorInboxApi } from '../api/creatorInbox.api'
 import { relationshipMessagingApi } from '../api/relationshipMessaging.api'
 import ContactPicker, { type ContactPickerItem } from '../components/ContactPicker.vue'
 import RelationshipInbox, { type RelationshipInboxItem } from '../components/RelationshipInbox.vue'
+import { useMessageSearch } from '../composables/useMessageSearch'
 import { useMessagesEditSearchFlag } from '../composables/useMessagesEditSearchFlag'
 import { previewOrDeleted } from '../utils/messageRevision'
 
@@ -34,12 +46,36 @@ const activeAgencyUlid = computed(() =>
   typeof route.params.agencyUlid === 'string' ? route.params.agencyUlid : '',
 )
 const hasSelection = computed(() => activeAgencyUlid.value !== '')
+// The open conversation's row: v1 rows are keyed by agency; the unified rows by thread, and only a
+// direct thread is ever open beside the list.
+const activeRowId = computed(() => {
+  if (!unifiedOn.value) {
+    return activeAgencyUlid.value
+  }
+  const open = v2Rows.value.find(
+    (r) => r.type === 'relationship_thread' && r.attributes.agency.id === activeAgencyUlid.value,
+  )
+  return open?.id ?? ''
+})
 const showList = computed(() => isDesktop.value || !hasSelection.value)
 const showDetail = computed(() => isDesktop.value || hasSelection.value)
 
 const INBOX_POLL_INTERVAL_MS = 45000
 
+const authStore = useAuthStore()
+
+// AH-115 L4 — the unified inbox (direct and campaign conversations in one list, tagged, with search)
+// replaces the agency-only list while `messages_v2_creator_inbox` is on (a `/me` switch; the API 404s
+// the endpoints otherwise). Off, nothing below changes: the list is today's.
+const unifiedOn = computed(
+  () => authStore.user?.attributes.features?.messages_v2_creator_inbox === true,
+)
+
 const rows = ref<CreatorRelationshipThreadRow[]>([])
+const v2Rows = ref<CreatorInboxRow[]>([])
+const v2Cursor = ref<string | null>(null)
+const v2LoadingMore = ref(false)
+const searchTerm = ref('')
 const loading = ref(false)
 const loadError = ref(false)
 
@@ -47,6 +83,87 @@ let cancelled = false
 let timer: ReturnType<typeof setTimeout> | null = null
 
 const items = computed<RelationshipInboxItem[]>(() =>
+  unifiedOn.value ? v2Items.value : v1Items.value,
+)
+
+function v2Preview(row: CreatorInboxRow): string | null {
+  const a = row.attributes
+  if (a.preview_kind === 'deleted') {
+    return t('app.messaging.actions.deleted')
+  }
+  if (a.preview_kind === 'attachment') {
+    return t('app.messaging.attachment')
+  }
+  return a.preview
+}
+
+function v2Tag(row: CreatorInboxRow): string {
+  const a = row.attributes
+  if (row.type === 'relationship_thread') {
+    return t('app.messaging.inbox.tagDirect')
+  }
+  if (a.brand !== null && a.campaign !== null) {
+    return t('app.messaging.inbox.tagCampaign', { brand: a.brand.name, campaign: a.campaign.name })
+  }
+  return a.campaign?.name ?? a.brand?.name ?? ''
+}
+
+function v2To(row: CreatorInboxRow, name: string): RouteLocationRaw | null {
+  const a = row.attributes
+  if (row.type === 'relationship_thread') {
+    return a.agency.id === null
+      ? null
+      : { name: 'creator.messages.thread', params: { agencyUlid: a.agency.id }, query: { name } }
+  }
+  // Q6: an assignment row opens the assignment's own chat.
+  return a.assignment_id === null
+    ? null
+    : {
+        name: 'creator.assignment.detail',
+        params: { ulid: a.assignment_id },
+        query: { focus: 'messages' },
+      }
+}
+
+const v2Items = computed<RelationshipInboxItem[]>(() =>
+  v2Rows.value.flatMap((row): RelationshipInboxItem[] => {
+    const a = row.attributes
+    const name = a.agency.name ?? t('app.messaging.participant')
+    const to = v2To(row, name)
+    if (to === null) {
+      return []
+    }
+    return [
+      {
+        id: row.id,
+        title: name,
+        preview: v2Preview(row),
+        lastMessageAt: a.last_message_at,
+        unreadCount: a.unread_count,
+        avatarText: name,
+        avatarUrl: a.agency.logo_url,
+        to,
+        tag: v2Tag(row),
+        tagDirect: row.type === 'relationship_thread',
+      },
+    ]
+  }),
+)
+
+// The search field also narrows the loaded rows (name, preview, tag), as the agency field does.
+const visibleItems = computed<RelationshipInboxItem[]>(() => {
+  const needle = searchTerm.value.trim().toLowerCase()
+  if (!unifiedOn.value || needle === '') {
+    return items.value
+  }
+  return items.value.filter((item) =>
+    [item.title, item.preview, item.tag].some((part) =>
+      (part ?? '').toLowerCase().includes(needle),
+    ),
+  )
+})
+
+const v1Items = computed<RelationshipInboxItem[]>(() =>
   rows.value
     .filter((row) => row.attributes.agency.id !== null)
     .map((row) => {
@@ -75,20 +192,54 @@ const items = computed<RelationshipInboxItem[]>(() =>
 )
 
 async function load(initial = false): Promise<void> {
-  loading.value = initial && rows.value.length === 0
+  const unified = unifiedOn.value
+  loading.value = initial && (unified ? v2Rows.value.length === 0 : rows.value.length === 0)
   try {
-    const res = await relationshipMessagingApi.creatorInbox()
-    if (cancelled) {
-      return
+    if (unified) {
+      const res = await creatorInboxApi.inbox()
+      if (cancelled) {
+        return
+      }
+      if (v2Cursor.value === null || v2Rows.value.length === 0) {
+        v2Rows.value = [...res.data]
+        v2Cursor.value = res.meta.next_cursor
+      } else {
+        // Later pages are loaded: refresh the first page in place and keep the rest.
+        const fresh = new Set(res.data.map((r) => r.id))
+        v2Rows.value = [...res.data, ...v2Rows.value.filter((r) => !fresh.has(r.id))]
+      }
+    } else {
+      const res = await relationshipMessagingApi.creatorInbox()
+      if (cancelled) {
+        return
+      }
+      rows.value = [...res.data]
     }
-    rows.value = [...res.data]
     loadError.value = false
   } catch {
-    if (rows.value.length === 0) {
+    if ((unified ? v2Rows.value : rows.value).length === 0) {
       loadError.value = true
     }
   } finally {
     loading.value = false
+  }
+}
+
+async function loadMore(): Promise<void> {
+  const cursor = v2Cursor.value
+  if (cursor === null || v2LoadingMore.value) {
+    return
+  }
+  v2LoadingMore.value = true
+  try {
+    const res = await creatorInboxApi.inbox(cursor)
+    const known = new Set(v2Rows.value.map((r) => r.id))
+    v2Rows.value = [...v2Rows.value, ...res.data.filter((r) => !known.has(r.id))]
+    v2Cursor.value = res.meta.next_cursor
+  } catch {
+    // Transient: the cursor stays so the user can ask again.
+  } finally {
+    v2LoadingMore.value = false
   }
 }
 
@@ -108,6 +259,36 @@ async function tick(): Promise<void> {
   }
   schedule()
 }
+
+// ── Message search (AH-115 L4) ───────────────────────────────────────────────
+const searchKey = ref<string | null>('creator')
+const messageSearch = useMessageSearch<CreatorInboxSearchResult>(
+  searchKey,
+  searchTerm,
+  unifiedOn,
+  (_key, q, cursor) => creatorInboxApi.search(q, cursor),
+)
+
+const searchItems = computed<MessageSearchItem[]>(() =>
+  messageSearch.results.value.flatMap((hit): MessageSearchItem[] => {
+    const a = hit.attributes
+    const name = a.agency.name ?? t('app.messaging.participant')
+    const to = v2To({ id: hit.id, type: hit.type, attributes: a }, name)
+    if (to === null) {
+      return []
+    }
+    return [
+      {
+        key: a.message_ulid,
+        threadTitle: name,
+        senderLabel: a.is_own ? t('app.messaging.search.fromYou') : name,
+        snippet: a.snippet,
+        sentAt: a.sent_at,
+        to,
+      },
+    ]
+  }),
+)
 
 // ── New-conversation contact picker (AH-012) ─────────────────────────────────
 const pickerOpen = ref(false)
@@ -182,13 +363,46 @@ onBeforeUnmount(() => {
         </v-btn>
       </header>
 
+      <v-text-field
+        v-if="unifiedOn"
+        v-model="searchTerm"
+        :placeholder="t('app.messaging.relationship.creatorInboxSearch')"
+        :aria-label="t('app.messaging.relationship.creatorInboxSearch')"
+        prepend-inner-icon="mdi-magnify"
+        density="compact"
+        variant="outlined"
+        hide-details
+        class="msg-shell__search"
+        data-test="creator-inbox-search"
+      />
+
       <div class="msg-shell__list-body">
         <RelationshipInbox
-          :items="items"
+          :items="visibleItems"
           :loading="loading"
           :load-error="loadError"
-          :active-id="activeAgencyUlid"
+          :active-id="activeRowId"
           @start="openPicker"
+        />
+        <v-btn
+          v-if="unifiedOn && v2Cursor !== null && searchTerm.trim() === ''"
+          variant="text"
+          size="small"
+          class="msg-shell__more"
+          :loading="v2LoadingMore"
+          data-test="creator-inbox-load-more"
+          @click="loadMore"
+        >
+          {{ t('app.messaging.inbox.loadMore') }}
+        </v-btn>
+        <CreatorMessageSearchResults
+          v-if="unifiedOn"
+          :state="messageSearch.state.value"
+          :items="searchItems"
+          :has-more="messageSearch.hasMore.value"
+          :loading-more="messageSearch.loadingMore.value"
+          :query="searchTerm"
+          @load-more="messageSearch.loadMore"
         />
       </div>
     </div>
@@ -240,6 +454,15 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 12px;
+}
+
+.msg-shell__search {
+  margin-bottom: 8px;
+}
+
+.msg-shell__more {
+  align-self: center;
+  margin: 4px auto;
 }
 
 .msg-shell__list-body {
