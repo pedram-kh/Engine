@@ -12,8 +12,8 @@
  * must hold no creator theme once the creator layout has unmounted (its themes are
  * unregistered with it, as the agency's are).
  *
- * The worst case (both creator themes sitting in the Vuetify instance, as after a creator
- * visit) is added with the theme module in L0.4.
+ * The direct cases run with both creator themes sitting in the Vuetify instance (the worst
+ * case, as after a creator visit); the body must still carry no creator marker.
  */
 
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
@@ -29,10 +29,11 @@ import enApp from '@/core/i18n/locales/en/app.json'
 import enAuth from '@/core/i18n/locales/en/auth.json'
 import enCreator from '@/core/i18n/locales/en/creator.json'
 import enNotifications from '@/core/i18n/locales/en/notifications.json'
+import { registerCreatorThemes } from '@/modules/creators/theme/creatorThemes'
 import { buildVuetifyOptions } from '@/plugins/vuetify'
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
-import { __resetThemePreferenceForTests } from '@/composables/useThemePreference'
+import { __resetThemePreferenceForTests, STORAGE_KEY } from '@/composables/useThemePreference'
 
 vi.mock('@/core/platform/isNativePlatform', () => ({ isNativePlatform: () => false }))
 
@@ -128,7 +129,12 @@ const CREATOR_MARKER =
 
 let wrapper: VueWrapper | undefined
 
-async function mountAt(path: string, theme: 'dark' | 'light') {
+async function mountAt(
+  path: string,
+  theme: 'dark' | 'light',
+  { worstCase = false }: { worstCase?: boolean } = {},
+) {
+  window.localStorage.setItem(STORAGE_KEY, theme)
   __resetThemePreferenceForTests()
   const pinia = createPinia()
   setActivePinia(pinia)
@@ -168,6 +174,8 @@ async function mountAt(path: string, theme: 'dark' | 'light') {
     components: vuetifyComponents,
     directives: vuetifyDirectives,
   })
+  // Worst case: both creator themes sit in the instance (a session that visited a creator page).
+  if (worstCase) registerCreatorThemes(vuetify)
   vuetify.theme.change(theme)
 
   wrapper = mount(App, {
@@ -193,6 +201,7 @@ describe('the agency tree never carries a creator class', () => {
   afterEach(() => {
     wrapper?.unmount()
     wrapper = undefined
+    window.localStorage.clear()
   })
 
   const CASES: ReadonlyArray<[string, 'dark' | 'light']> = AGENCY_NAMES.flatMap((name) => [
@@ -201,13 +210,14 @@ describe('the agency tree never carries a creator class', () => {
   ])
 
   it.each(CASES)('%s (%s)', async (path, theme) => {
-    await mountAt(path, theme)
+    const { vuetify } = await mountAt(path, theme, { worstCase: true })
 
+    // The creator themes ARE in the instance (worst case) and the agency still renders its own.
+    expect(vuetify.theme.themes.value['creator-dark']).toBeDefined()
     expect(document.querySelector('[data-test="agency-layout"]')).not.toBeNull()
+    expect(document.querySelector(`.v-theme--agency-${theme}`)).not.toBeNull()
+    // <body> only: the theme stylesheet in <head> legitimately holds the registered rules.
     expectNoCreatorMarker()
-    expect(document.getElementById('vuetify-theme-stylesheet')?.innerHTML ?? '').not.toMatch(
-      /creator-(dark|light)/,
-    )
   })
 
   describe('after a creator page has rendered in the same session', () => {
