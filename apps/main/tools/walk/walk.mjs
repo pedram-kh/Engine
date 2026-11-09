@@ -13,10 +13,15 @@
  *   creator   every non-agency route (creator, onboarding, auth, app), dark and
  *             light, 1280 and 390 wide, plus agency-to-creator crossover pairs
  *   shell     the agency shell on the probe page, dark and light (screenshots)
+ *   agency    AH-115 L0.1: the 24 agency routes as REAL pages over the mock API
+ *             (l3-fixtures), dark and light, 1280 and 390 wide, plus creator-to-agency
+ *             crossover pairs (the "creator theme leaves nothing behind" check)
  *
  * Dev tool only. It starts its own Vite dev server on a private port, uses the
  * real app code and NO API (every /api and /sanctum request answers 503).
  */
+
+import { FROZEN_NOW } from './freeze-clock.mjs'
 
 import { createHash } from 'node:crypto'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
@@ -26,6 +31,9 @@ import { fileURLToPath } from 'node:url'
 import { chromium } from '@playwright/test'
 import sharp from 'sharp'
 import { createServer } from 'vite'
+
+import { AGENCY_ROUTES, agencyPageFor } from './agency-routes.mjs'
+import { fixtureFor } from './l3-fixtures.mjs'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 const APP_ROOT = path.resolve(HERE, '../..')
@@ -161,7 +169,7 @@ function thumbDiff(a, b) {
   return { cell: max, mean: sum / n }
 }
 
-async function newPage(browser, { viewport, theme, user, base }) {
+async function newPage(browser, { viewport, theme, user, base, fixtures = false }) {
   const context = await browser.newContext({
     viewport: VIEWPORTS[viewport],
     deviceScaleFactor: 1,
@@ -180,21 +188,37 @@ async function newPage(browser, { viewport, theme, user, base }) {
   // Only the real API prefixes: a bare /api/ regex also matches source paths such as /src/modules/auth/api/.
   await context.route(
     (url) => /^\/(api|sanctum)\//.test(url.pathname),
-    (route) => route.fulfill({ status: 503, contentType: 'application/json', body: '{}' }),
+    (route) => {
+      if (fixtures) {
+        const url = new URL(route.request().url())
+        const body = fixtureFor(url, route.request().method())
+        if (body) {
+          return route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify(body),
+          })
+        }
+      }
+      return route.fulfill({ status: 503, contentType: 'application/json', body: '{}' })
+    },
   )
+  // The agency set freezes the page clock too (clock-text widths such as a bubble time).
+  if (fixtures) await context.clock.setFixedTime(new Date(FROZEN_NOW))
   const page = await context.newPage()
   return { context, page, base, theme, user }
 }
 
-async function open(handle, route) {
+async function open(handle, route, { real = '', settle = 400 } = {}) {
   const { page, base, theme, user } = handle
   const qs = new URLSearchParams({ to: route, user, theme })
+  if (real) qs.set('real', real)
   await page.goto(`${base}/tools/walk/index.html?${qs}`, { waitUntil: 'domcontentloaded' })
   await page.waitForFunction(() => window.__walk && window.__walk.ready === true, null, {
     timeout: 60000,
   })
   await page.evaluate(() => document.fonts.ready)
-  await page.waitForTimeout(400)
+  await page.waitForTimeout(settle)
 }
 
 async function measure(handle, id, meta, opts = {}) {
@@ -304,6 +328,70 @@ async function runShell(base, browser) {
   return out
 }
 
+/** AH-115 L0.1: every agency route as the real page over the mock API, plus creator-to-agency crossovers. */
+async function runAgency(base, browser) {
+  const jobs = []
+  for (const [route, slug] of AGENCY_ROUTES) {
+    for (const theme of ['dark', 'light']) {
+      for (const viewport of ['desktop', 'mobile']) {
+        if (ONLY && !slug.includes(ONLY)) continue
+        const page = agencyPageFor(slug, viewport === 'mobile' ? 390 : 1280)
+        if (!page) throw new Error(`no REAL_PAGES entry for agency route ${route} (${slug})`)
+        jobs.push({ route, slug, theme, viewport, page })
+      }
+    }
+  }
+  const direct = await pool(jobs, async ({ slug, theme, viewport, page }) => {
+    const h = await newPage(browser, { viewport, theme, user: 'agency', base, fixtures: true })
+    try {
+      await open(h, page.to, { real: page.names, settle: 1200 })
+      return await measure(h, `agency.${slug}.${theme}.${viewport}`, {
+        kind: 'direct',
+        route: page.to,
+        name: slug,
+        layout: 'agency',
+        theme,
+        viewport,
+      })
+    } finally {
+      await h.context.close()
+    }
+  })
+  // Crossover: a creator page first (its layout registers whatever it registers), then a
+  // client-side push to the agency route. The agency render must equal the direct one.
+  const crossSlugs = ONLY ? [] : ['dashboard', 'campaigns', 'messages']
+  const crossJobs = []
+  for (const theme of ['dark', 'light']) {
+    for (const slug of crossSlugs) crossJobs.push({ slug, theme })
+  }
+  const cross = await pool(crossJobs, async ({ slug, theme }) => {
+    const page = agencyPageFor(slug, 1280)
+    const h = await newPage(browser, {
+      viewport: 'desktop',
+      theme,
+      user: 'agency',
+      base,
+      fixtures: true,
+    })
+    try {
+      await open(h, '/creator/dashboard', { real: page.names })
+      await h.page.evaluate((p) => window.__walk.push(p), page.to)
+      await h.page.waitForTimeout(1600)
+      return await measure(h, `crossover.agency.${slug}.${theme}.desktop`, {
+        kind: 'crossover',
+        route: page.to,
+        name: slug,
+        layout: 'agency',
+        theme,
+        viewport: 'desktop',
+      })
+    } finally {
+      await h.context.close()
+    }
+  })
+  return [...direct, ...cross]
+}
+
 function compare(baseline, run) {
   const byId = new Map(baseline.targets.map((t) => [t.id, t]))
   const problems = []
@@ -364,7 +452,12 @@ try {
   }
   await new Promise((r) => setTimeout(r, 4000))
 
-  const targets = SET === 'shell' ? await runShell(base, browser) : await runCreator(base, browser)
+  const targets =
+    SET === 'shell'
+      ? await runShell(base, browser)
+      : SET === 'agency'
+        ? await runAgency(base, browser)
+        : await runCreator(base, browser)
   const version = browser.version()
   const result = {
     meta: {
