@@ -101,14 +101,14 @@ export const creatorsRoutes: RouteRecordRaw[] = [
   },
   {
     // S11.0 Ch3a (D-2) — the creator-shell full paginated notification feed.
-    // Parallel to the agency `/notifications` route; renders the SAME
-    // shell-agnostic NotificationsPage. Distinct path (the `/creator/*` prefix)
+    // Parallel to the agency `/notifications` route; renders the creator fork
+    // CreatorNotificationsPage (AH-115 L4.4; the agency keeps NotificationsPage). Distinct path (the `/creator/*` prefix)
     // keeps it on the creator layout — App.vue dispatches purely off
     // meta.layout, so a single shared path would 302 creators via
     // requireAgencyUser (the `/dashboard` vs `/creator/dashboard` precedent).
     path: '/creator/notifications',
     name: 'creator.notifications',
-    component: () => import('@/modules/notifications/pages/NotificationsPage.vue'),
+    component: () => import('@/modules/notifications/pages/CreatorNotificationsPage.vue'),
     meta: {
       layout: 'creator',
       guards: ['requireAuth'],

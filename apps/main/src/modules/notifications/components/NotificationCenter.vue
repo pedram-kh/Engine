@@ -44,10 +44,13 @@ const props = withDefaults(
     poll?: NotificationPollHandle | null
     /** Route NAME for the dropdown's "view all" link (dropdown variant only). */
     viewAllRoute?: string | null
+    /** AH-115 L4: the host page draws its own title (the creator page header); the card keeps "mark all". */
+    hideTitle?: boolean
   }>(),
   {
     poll: null,
     viewAllRoute: null,
+    hideTitle: false,
   },
 )
 
@@ -217,11 +220,12 @@ defineExpose({ reload, load })
   >
     <!-- Header: title + mark-all -->
     <div class="d-flex align-center justify-space-between px-4 py-2">
-      <span class="text-subtitle-2 font-weight-medium">
+      <span v-if="!hideTitle" class="text-subtitle-2 font-weight-medium">
         {{
           variant === 'dropdown' ? t('notifications.center.title') : t('notifications.page.title')
         }}
       </span>
+      <span v-else />
       <v-btn
         v-if="hasRows"
         variant="text"
