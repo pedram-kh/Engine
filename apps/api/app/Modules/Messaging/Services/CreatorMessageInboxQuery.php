@@ -100,8 +100,11 @@ final class CreatorMessageInboxQuery
 
     private function threads(Creator $creator, User $viewer): Builder
     {
+        // Both unread aggregates are scoped to THIS creator's threads: unscoped they would count every
+        // message in the table on each request (EXPLAIN: a full scan of the message table).
         $relationshipUnread = DB::table('relationship_messages as m')
             ->selectRaw('m.thread_id, count(*) as unread')
+            ->whereIn('m.thread_id', DB::table('relationship_threads')->select('id')->where('creator_id', $creator->id))
             ->whereNull('m.deleted_at')
             ->where('m.sender_user_id', '!=', $viewer->id)
             ->whereNotExists(function ($q) use ($viewer): void {
@@ -125,6 +128,9 @@ final class CreatorMessageInboxQuery
 
         $assignmentUnread = DB::table('messages as m')
             ->selectRaw('m.thread_id, count(*) as unread')
+            ->whereIn('m.thread_id', DB::table('message_threads as mt')
+                ->join('campaign_assignments as ma', 'ma.id', '=', 'mt.assignment_id')
+                ->where('ma.creator_id', $creator->id)->select('mt.id'))
             ->whereNull('m.deleted_at')
             ->where('m.kind', '!=', MessageKind::System->value)
             ->where('m.sender_user_id', '!=', $viewer->id)
