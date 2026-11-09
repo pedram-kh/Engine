@@ -108,7 +108,7 @@ describe('useCreatorTheme', () => {
     let themeName: { value: string | undefined } | undefined
     const Layout = defineComponent({
       setup() {
-        themeName = useCreatorTheme()
+        themeName = useCreatorTheme().theme
         return () => h('div', { class: 'layout' })
       },
     })

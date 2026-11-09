@@ -497,7 +497,10 @@ describe('CreatorDashboardLayout — creator app shell (AH-100)', () => {
     expect(mounted.wrapper.find('[data-test="creator-nav"]').exists()).toBe(false)
   })
 
-  it('native: the Figma modifiers are bound; web: none of them are', async () => {
+  // AH-115 L1.3 (polarity edit, by name): the creator web wears the native look, so the web
+  // binds the same Figma modifiers. What stays platform-only is pinned in the tests below
+  // (theme toggle, the Settings / Security / Privacy rows in More).
+  it('native and web alike: the Figma modifiers are bound', async () => {
     const native = await mountLayout({ native: true, applicationStatus: 'approved' })
     for (const modifier of [
       'creator-layout--native',
@@ -511,7 +514,14 @@ describe('CreatorDashboardLayout — creator app shell (AH-100)', () => {
 
     const web = await mountLayout({ mobile: true, applicationStatus: 'approved' })
     cleanup = web.cleanup
-    expect(web.wrapper.html()).not.toContain('--native')
+    for (const modifier of [
+      'creator-layout--native',
+      'creator-topbar--native',
+      'creator-main--native',
+      'creator-bottom-nav--native',
+    ]) {
+      expect(web.wrapper.find(`.${modifier}`).exists(), `web ${modifier}`).toBe(true)
+    }
   })
 
   it('native: no theme toggle; web: the toggle stays', async () => {
@@ -541,23 +551,27 @@ describe('CreatorDashboardLayout — creator app shell (AH-100)', () => {
     expect(settings.attributes('href')).toBe('/creator/notifications/preferences')
   })
 
-  it('web mobile: More keeps its pre-AH-100 items — no Settings, no subtitles', async () => {
+  // AH-115 L1.3 (polarity edit, by name): the web More sheet now carries the subtitles, as the
+  // app's does. The Settings row stays app-only: the web reaches notification preferences
+  // from the avatar menu, which is on every web width.
+  it('web mobile: More carries the subtitles, but no Settings row (the avatar menu has it)', async () => {
     const mounted = await mountLayout({ mobile: true, applicationStatus: 'approved' })
     cleanup = mounted.cleanup
     const w = mounted.wrapper
 
     expect(w.find('[data-test="creator-bottom-nav-more-settings"]').exists()).toBe(false)
-    expect(
-      w.find('[data-test="creator-bottom-nav-more-list"] .v-list-item-subtitle').exists(),
-    ).toBe(false)
+    expect(w.find('[data-test="creator-bottom-nav-more-profile"]').text()).toContain(
+      'Photo, bio and socials',
+    )
+    expect(w.find('[data-test="notification-settings-link"]').exists()).toBe(true)
   })
 })
 
 /**
  * AH-100d — the French tab bar collided: "Tableau de bord" and "Offres de
- * mission" overlap or clip in a fifth of a 390px phone. The app's bar reads its
- * own short labels (`availability.creatorNav.tab.*`); the web's bottom bar and
- * topbar keep the full ones, so a browser's labels are unchanged.
+ * mission" overlap or clip in a fifth of a 390px phone. The bottom bar reads its own
+ * short labels (`availability.creatorNav.tab.*`); the topbar keeps the full ones. Since
+ * AH-115 the web's bottom bar is the same bar and reads the short labels too.
  */
 describe('CreatorDashboardLayout — tab bar labels (AH-100d)', () => {
   let cleanup: (() => void) | null = null
@@ -580,17 +594,22 @@ describe('CreatorDashboardLayout — tab bar labels (AH-100d)', () => {
     expect(labels(m.wrapper)).toEqual(['Accueil', 'Offres', 'Invitations', 'Messages', 'Plus'])
   })
 
-  it('the web bottom bar keeps the full French labels', async () => {
+  // AH-115 L1.3 (polarity edit, by name): the web bottom bar reads the same short labels as the
+  // app's (it is the same bar now); the desktop topbar keeps the full ones.
+  it('the web bottom bar reads the short French labels, like the app', async () => {
     const m = await mountLayout({ mobile: true, locale: 'fr', applicationStatus: 'approved' })
     cleanup = m.cleanup
 
-    expect(labels(m.wrapper)).toEqual([
-      'Tableau de bord',
-      'Offres de mission',
-      'Invitations',
-      'Messages',
-      'Plus',
-    ])
+    expect(labels(m.wrapper)).toEqual(['Accueil', 'Offres', 'Invitations', 'Messages', 'Plus'])
+  })
+
+  it('the desktop topbar keeps the full French labels', async () => {
+    const m = await mountLayout({ locale: 'fr', applicationStatus: 'approved' })
+    cleanup = m.cleanup
+
+    const nav = m.wrapper.find('[data-test="creator-nav"]').text()
+    expect(nav).toContain('Tableau de bord')
+    expect(nav).toContain('Offres de mission')
   })
 })
 

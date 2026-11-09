@@ -70,7 +70,7 @@ const authStore = useAuthStore()
 const onboardingStore = useOnboardingStore()
 const { isNative, isMobile } = useMobileShell()
 // AH-115 — the creator Vuetify theme (web only; the app keeps its global native theme).
-const creatorTheme = useCreatorTheme()
+const { theme: creatorTheme } = useCreatorTheme()
 
 const {
   isBootstrapped,

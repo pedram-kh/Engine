@@ -27,7 +27,7 @@ describe('useCreatorTheme inside the native app', () => {
     let theme: { value: string | undefined } | undefined
     const Layout = defineComponent({
       setup() {
-        theme = useCreatorTheme()
+        theme = useCreatorTheme().theme
         return () => h('div')
       },
     })

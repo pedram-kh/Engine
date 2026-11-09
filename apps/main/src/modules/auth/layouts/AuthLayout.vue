@@ -40,7 +40,7 @@ const isHero = computed(() => route.name === 'auth.sign-in' || route.name === 'a
 const showTail = computed(() => showsMarketingTail(isHero.value))
 // AH-101 U2 / AH-104d: the creator app's sign-in, sign-up and verify-pending are sheets.
 const isNativeSheet = computed(() => usesNativeSheet(isSheetRoute(route.name)))
-const creatorTheme = useAuthCreatorTheme()
+const { theme: creatorTheme } = useAuthCreatorTheme()
 </script>
 
 <template>

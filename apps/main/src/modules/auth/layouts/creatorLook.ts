@@ -27,7 +27,7 @@ export function hasCreatorLook(name: unknown): boolean {
 
 /**
  * `AuthLayout`'s theme hook: the creator theme while the current route has the creator look,
- * `undefined` (the global theme, untouched) on every other auth screen.
+ * `theme: undefined` (the global theme, untouched) on every other auth screen.
  */
 export function useAuthCreatorTheme() {
   const route = useRoute()

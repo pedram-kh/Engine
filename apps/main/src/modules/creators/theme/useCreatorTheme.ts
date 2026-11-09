@@ -22,6 +22,9 @@
  * renders `nativeDarkTheme` as its global `dark` theme (`buildVuetifyOptions(true)`), and
  * its render is meant to stay exactly as it was.
  *
+ * The hook also provides `CREATOR_LOOK` (`useNativeLook`), so components below the layout
+ * can ask "does this subtree render the native look?" without asking "is this a phone?".
+ *
  * Importing the hook also loads the two stylesheets that give the creator themes their look:
  * `native.css` (the Figma token layer, scoped to the creator theme classes since L1.2) and
  * `creator.css` (the light remap and the canvas). Both are inert unless a creator theme class
@@ -36,6 +39,7 @@ import {
   computed,
   inject,
   onBeforeUnmount,
+  provide,
   ref,
   unref,
   watch,
@@ -46,6 +50,7 @@ import {
 import '@catalyst/design-tokens/native.css'
 import '@/modules/creators/theme/creator.css'
 
+import { CREATOR_LOOK } from '@/composables/useNativeLook'
 import { useTheme } from '@/composables/useTheme'
 import { isNativePlatform } from '@/core/platform/isNativePlatform'
 
@@ -63,9 +68,18 @@ const VUETIFY_THEME_KEY = Symbol.for('vuetify:theme')
 /** Holders per theme registry; the themes go when the last one lets go. */
 const holders = new WeakMap<object, number>()
 
-export function useCreatorTheme(
-  enabled: Readonly<Ref<boolean>> = ref(true),
-): ComputedRef<CreatorThemeName | undefined> {
+export interface CreatorTheme {
+  /** The theme for `<v-app :theme>`; `undefined` keeps the global theme. */
+  theme: ComputedRef<CreatorThemeName | undefined>
+  /**
+   * Does this layout render the native look? `useNativeLook()` answers that for everything
+   * BELOW the layout (a component cannot inject what it provides itself), so the layout
+   * reads it here.
+   */
+  look: ComputedRef<boolean>
+}
+
+export function useCreatorTheme(enabled: Readonly<Ref<boolean>> = ref(true)): CreatorTheme {
   const theme = inject<ThemeHost['theme'] | null>(VUETIFY_THEME_KEY, null)
   if (theme === null) {
     throw new Error(
@@ -73,6 +87,8 @@ export function useCreatorTheme(
     )
   }
   const { currentTheme } = useTheme()
+  // The creator look for this subtree (`useNativeLook`): on while the hook is enabled.
+  provide(CREATOR_LOOK, enabled)
   const native = isNativePlatform()
   const registry = unref(theme.themes)
 
@@ -96,7 +112,10 @@ export function useCreatorTheme(
   }
   onBeforeUnmount(release)
 
-  return computed(() =>
-    native || !enabled.value ? undefined : creatorThemeFor(currentTheme.value),
-  )
+  return {
+    theme: computed(() =>
+      native || !enabled.value ? undefined : creatorThemeFor(currentTheme.value),
+    ),
+    look: computed(() => native || enabled.value),
+  }
 }

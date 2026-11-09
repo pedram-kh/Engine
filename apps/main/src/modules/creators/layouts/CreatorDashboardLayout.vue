@@ -54,7 +54,8 @@ const { isNative, isMobile } = useMobileShell()
 const { visible: showBack, goBack } = useShellBack()
 const { currentTheme } = useTheme()
 // AH-115 — the creator Vuetify theme (web only; the app keeps its global native theme).
-const creatorTheme = useCreatorTheme()
+// The creator web wears the native look; `isNative` stays for what is the platform.
+const { theme: creatorTheme, look } = useCreatorTheme()
 const { user, isLoggingOut } = storeToRefs(authStore)
 const { applicationStatus } = storeToRefs(onboardingStore)
 const localeOptions = buildLocaleOptions()
@@ -124,7 +125,7 @@ const wideContent = computed(() => route.meta.wide === true)
 /** AH-100 — the app's More-menu subtitle for an item, when one is authored. */
 function moreSubtitle(key: string): string | undefined {
   const subtitleKey = `availability.creatorNav.subtitles.${key}`
-  return isNative && te(subtitleKey) ? t(subtitleKey) : undefined
+  return look.value && te(subtitleKey) ? t(subtitleKey) : undefined
 }
 
 /**
@@ -232,16 +233,12 @@ onMounted(() => {
 <template>
   <v-app
     :theme="creatorTheme"
-    :class="{ 'creator-layout--native': isNative }"
+    :class="{ 'creator-layout--native': look }"
     data-test="creator-layout"
   >
     <ImpersonationBanner />
 
-    <v-app-bar
-      elevation="1"
-      :class="{ 'creator-topbar--native': isNative }"
-      data-test="creator-topbar"
-    >
+    <v-app-bar elevation="1" :class="{ 'creator-topbar--native': look }" data-test="creator-topbar">
       <!-- AH-106 — the shell's back arrow, on every page that is not a tab and
            does not draw its own back control (see `useShellBack`). -->
       <v-btn
@@ -309,10 +306,10 @@ onMounted(() => {
       >
         <template #activator="{ props: menuProps }">
           <v-btn v-bind="menuProps" variant="text" class="text-none" data-test="user-menu-btn">
-            <v-avatar size="32" :color="isNative ? 'primary-container' : 'primary'" class="mr-2">
+            <v-avatar size="32" :color="look ? 'primary-container' : 'primary'" class="mr-2">
               <span
                 class="text-caption font-weight-bold"
-                :class="isNative ? 'text-primary' : 'text-white'"
+                :class="look ? 'text-primary' : 'text-white'"
               >
                 {{ (user?.attributes.name ?? '?')[0]?.toUpperCase() }}
               </span>
@@ -387,9 +384,9 @@ onMounted(() => {
       </v-menu>
     </v-app-bar>
 
-    <v-main :class="{ 'creator-main--native': isNative }" data-test="creator-main">
+    <v-main :class="{ 'creator-main--native': look }" data-test="creator-main">
       <v-container
-        :class="wideContent ? 'pa-2 pa-md-6' : isNative ? 'px-4 py-6' : 'pa-6'"
+        :class="wideContent ? 'pa-2 pa-md-6' : look ? 'px-4 py-6' : 'pa-6'"
         :fluid="wideContent"
         :style="wideContent ? undefined : 'max-width: 960px'"
       >
@@ -406,7 +403,7 @@ onMounted(() => {
       grow
       color="primary"
       class="creator-bottom-nav"
-      :class="{ 'creator-bottom-nav--native': isNative }"
+      :class="{ 'creator-bottom-nav--native': look }"
       data-test="creator-bottom-nav"
     >
       <v-btn
@@ -416,14 +413,14 @@ onMounted(() => {
         :aria-label="navAriaLabel(item.key)"
         :data-test="`creator-bottom-nav-${item.key}`"
       >
-        <span v-if="isNative" class="creator-bottom-nav__line" aria-hidden="true" />
+        <span v-if="look" class="creator-bottom-nav__line" aria-hidden="true" />
         <NavBadgeIcon
           :icon="item.icon"
           :count="navBadgeCount(item.key)"
           :data-test="`creator-${item.key}-unread-badge-bottom`"
         />
         <span class="creator-bottom-nav__label">
-          {{ t(`availability.creatorNav.${isNative ? 'tab.' : ''}${item.key}`) }}
+          {{ t(`availability.creatorNav.${look ? 'tab.' : ''}${item.key}`) }}
         </span>
       </v-btn>
 
@@ -431,28 +428,26 @@ onMounted(() => {
         v-if="mobileOverflowItems.length > 0"
         v-model="moreMenuOpen"
         location="top end"
-        :scrim="isNative"
+        :scrim="look"
         data-test="creator-bottom-nav-more-wrapper"
       >
         <template #activator="{ props: moreProps }">
           <v-btn
             v-bind="moreProps"
-            :class="{ 'creator-bottom-nav__more--open': isNative && moreMenuOpen }"
+            :class="{ 'creator-bottom-nav__more--open': look && moreMenuOpen }"
             data-test="creator-bottom-nav-more"
           >
-            <span v-if="isNative" class="creator-bottom-nav__line" aria-hidden="true" />
+            <span v-if="look" class="creator-bottom-nav__line" aria-hidden="true" />
             <v-icon icon="mdi-dots-horizontal" />
             <span class="creator-bottom-nav__label">
-              {{
-                t(isNative ? 'availability.creatorNav.tab.more' : 'availability.creatorNav.more')
-              }}
+              {{ t(look ? 'availability.creatorNav.tab.more' : 'availability.creatorNav.more') }}
             </span>
           </v-btn>
         </template>
 
         <v-list
           density="compact"
-          :class="{ 'creator-more-menu--native': isNative }"
+          :class="{ 'creator-more-menu--native': look }"
           data-test="creator-bottom-nav-more-list"
         >
           <v-list-item

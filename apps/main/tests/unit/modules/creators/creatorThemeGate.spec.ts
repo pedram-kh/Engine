@@ -73,7 +73,7 @@ describe('AuthLayout theme hook across route changes', () => {
     let theme: { value: string | undefined } | undefined
     const Layout = defineComponent({
       setup() {
-        theme = useAuthCreatorTheme()
+        theme = useAuthCreatorTheme().theme
         return () => h(RouterView)
       },
     })
