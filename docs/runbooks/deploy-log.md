@@ -125,6 +125,8 @@ happened.
 - **Anything unexpected:** to be recorded after the deploy.
 - **Rollback:** redeploy the previous API and both SPA builds. The two columns are additive and unread by old code, so they stay; with both flags OFF no behaviour depends on them. `queue:restart` again after an API rollback. Snapshot restore only if data was damaged (none is written by the migrations).
 
+- **Build 4 walk, 2026-11-09 (reported by Pedram; not read):** the build 4 production walk covering N1 to N10 is **10 of 10**: step 3 (photo upload from the app) passed after the colleague applied the native-origin CORS rule on 2026-11-09 (tech-debt row 19 CLOSED). The 2026-11-08 "except step 3" note in the AH-119 entry is superseded.
+
 ---
 
 ## AH-117 — admin list navigation (admin SPA only) — DEPLOYED
