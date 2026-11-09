@@ -38,7 +38,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
-import { isNativePlatform } from '@/core/platform/isNativePlatform'
+import { useNativeLook } from '@/composables/useNativeLook'
 
 import PushSoftAskSheet from '@/modules/notifications/components/PushSoftAskSheet.vue'
 
@@ -66,8 +66,8 @@ const displayName = computed(() => store.creator?.attributes.display_name ?? '')
 // AH-100c — inside the Capacitor app the APPROVED dashboard draws Figma frame 07
 // (welcome header, banner, strength card, invitation card). Every other state,
 // and the whole web dashboard, keeps the markup below it unchanged.
-const isNative = isNativePlatform()
-const nativeApproved = computed(() => isNative && status.value === 'approved')
+const isNative = useNativeLook()
+const nativeApproved = computed(() => isNative.value && status.value === 'approved')
 /** The first wizard step the creator has not completed — the strength card's row. */
 const nextIncompleteStep = computed(
   () =>
@@ -208,7 +208,7 @@ async function declineRequest(item: ConnectionRequestListItem): Promise<void> {
 // the page unmounts. The web page does not poll (a named follow-up; AH-102's push
 // is the proactive version).
 useApplicationStatusPoll({
-  active: computed(() => isNative && status.value === 'pending'),
+  active: computed(() => isNative.value && status.value === 'pending'),
   refresh: () => store.refresh(),
 })
 

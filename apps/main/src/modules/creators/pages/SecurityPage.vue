@@ -14,12 +14,12 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { isNativePlatform } from '@/core/platform/isNativePlatform'
+import { useNativeLook } from '@/composables/useNativeLook'
 
 import DeleteAccountDialog from '../components/DeleteAccountDialog.vue'
 
 const { t } = useI18n()
-const isNative = isNativePlatform()
+const isNative = useNativeLook()
 const dialogOpen = ref(false)
 </script>
 

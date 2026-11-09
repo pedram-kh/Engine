@@ -53,7 +53,7 @@ import { useRoute } from 'vue-router'
 import { VBottomSheet } from 'vuetify/components/VBottomSheet'
 import { VDialog } from 'vuetify/components/VDialog'
 
-import { isNativePlatform } from '@/core/platform/isNativePlatform'
+import { useNativeLook } from '@/composables/useNativeLook'
 
 import CampaignStatusChip from '../components/CampaignStatusChip.vue'
 import { creatorJobsApi } from '../jobs.api'
@@ -62,7 +62,7 @@ import RichBrief from '@/components/RichBrief.vue'
 
 const { t } = useI18n()
 const route = useRoute()
-const isNative = isNativePlatform()
+const isNative = useNativeLook()
 
 const NOTE_MAX_LENGTH = 1000
 

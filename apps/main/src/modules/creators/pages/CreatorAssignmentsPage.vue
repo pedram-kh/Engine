@@ -24,7 +24,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import RichBrief from '@/components/RichBrief.vue'
-import { isNativePlatform } from '@/core/platform/isNativePlatform'
+import { useNativeLook } from '@/composables/useNativeLook'
 
 import CampaignStatusChip from '../components/CampaignStatusChip.vue'
 import { creatorAssignmentsApi } from '../assignments.api'
@@ -38,7 +38,7 @@ const actioningId = ref<string | null>(null)
 const snackbar = ref<{ color: string; text: string } | null>(null)
 
 /** Native (AH-100d, Figma frame 10): the card is built from the offer payload. */
-const isNative = isNativePlatform()
+const isNative = useNativeLook()
 
 const isEmpty = computed(() => loadedOnce.value && assignments.value.length === 0)
 

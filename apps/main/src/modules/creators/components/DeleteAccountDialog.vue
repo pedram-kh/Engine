@@ -28,7 +28,7 @@ import { VBottomSheet } from 'vuetify/components/VBottomSheet'
 import { VDialog } from 'vuetify/components/VDialog'
 
 import { SUPPORT_EMAIL } from '@/core/config/support'
-import { isNativePlatform } from '@/core/platform/isNativePlatform'
+import { useNativeLook } from '@/composables/useNativeLook'
 import { resolveErrorMessage } from '@/modules/auth/composables/useErrorMessage'
 import { useMfaCodeInput } from '@/modules/auth/composables/useMfaCodeInput'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
@@ -41,7 +41,7 @@ const emit = defineEmits<{ (e: 'update:modelValue', value: boolean): void }>()
 const { t, te, locale } = useI18n()
 const router = useRouter()
 const store = useAuthStore()
-const isNative = isNativePlatform()
+const isNative = useNativeLook()
 
 const acknowledged = ref(false)
 const password = ref('')

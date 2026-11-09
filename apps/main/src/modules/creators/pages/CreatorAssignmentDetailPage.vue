@@ -42,7 +42,7 @@ import { useRoute } from 'vue-router'
 import { VBottomSheet } from 'vuetify/components/VBottomSheet'
 import { VDialog } from 'vuetify/components/VDialog'
 
-import { isNativePlatform } from '@/core/platform/isNativePlatform'
+import { useNativeLook } from '@/composables/useNativeLook'
 
 import CampaignStatusBanner from '../components/CampaignStatusBanner.vue'
 import CampaignStatusChip from '../components/CampaignStatusChip.vue'
@@ -73,7 +73,7 @@ const PLATFORMS = ['instagram', 'tiktok', 'youtube'] as const
 
 const { t, locale } = useI18n()
 const route = useRoute()
-const isNative = isNativePlatform()
+const isNative = useNativeLook()
 
 const ulid = computed(() => String(route.params.ulid ?? ''))
 
