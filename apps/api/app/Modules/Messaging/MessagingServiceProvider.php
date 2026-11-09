@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Messaging;
 
+use App\Modules\Messaging\Features\MessagesV2CreatorInboxEnabled;
 use App\Modules\Messaging\Features\MessagesV2EditSearchEnabled;
 use App\Modules\Messaging\Features\MessagesV2InboxEnabled;
 use Illuminate\Contracts\Foundation\CachesRoutes;
@@ -21,6 +22,7 @@ final class MessagingServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Feature::define(MessagesV2InboxEnabled::NAME, MessagesV2InboxEnabled::default());
+        Feature::define(MessagesV2CreatorInboxEnabled::NAME, MessagesV2CreatorInboxEnabled::default());
         Feature::define(MessagesV2EditSearchEnabled::NAME, MessagesV2EditSearchEnabled::default());
         $this->registerRoutes();
     }

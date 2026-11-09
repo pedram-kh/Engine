@@ -7,6 +7,7 @@ use App\Modules\Messaging\Http\Controllers\AgencyMessageInboxController;
 use App\Modules\Messaging\Http\Controllers\AgencyMessageSearchController;
 use App\Modules\Messaging\Http\Controllers\AgencyRelationshipMessageController;
 use App\Modules\Messaging\Http\Controllers\CreatorMessageController;
+use App\Modules\Messaging\Http\Controllers\CreatorMessageInboxController;
 use App\Modules\Messaging\Http\Controllers\CreatorRelationshipMessageController;
 use App\Modules\Messaging\Http\Controllers\MessageableContactsController;
 use App\Modules\Messaging\Http\Middleware\RequireMessagesV2EditSearch;
@@ -118,6 +119,16 @@ Route::prefix('creators/me')
     ->group(function (): void {
         Route::get('messageable-agencies', [MessageableContactsController::class, 'agencies'])
             ->name('messageable-agencies');
+    });
+
+// AH-115 L4 — the creator's unified inbox and its search (flag `messages_v2_creator_inbox_enabled`,
+// 404 while off, checked in the controller). Scoped by the signed-in creator, never a path parameter.
+Route::prefix('creators/me')
+    ->name('creators.me.inbox-v2.')
+    ->middleware(['auth:web,creator_app', 'tenancy.set', 'verified'])
+    ->group(function (): void {
+        Route::get('message-inbox', [CreatorMessageInboxController::class, 'index'])->name('index');
+        Route::get('message-search', [CreatorMessageInboxController::class, 'search'])->name('search');
     });
 
 Route::prefix('creators/me/relationship-threads')

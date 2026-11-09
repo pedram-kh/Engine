@@ -7,6 +7,7 @@ namespace App\TestHelpers\Http\Controllers;
 use App\Modules\Creators\Features\AssignmentOfferEditEnabled;
 use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
 use App\Modules\Identity\Features\AccountDeletionEnabled;
+use App\Modules\Messaging\Features\MessagesV2CreatorInboxEnabled;
 use App\Modules\Messaging\Features\MessagesV2EditSearchEnabled;
 use App\Modules\Messaging\Features\MessagesV2InboxEnabled;
 use Illuminate\Http\JsonResponse;
@@ -54,6 +55,8 @@ final class SetFeatureFlagController
         // AH-119 — OFF at deploy; the E2E leg drives each state.
         MessagesV2InboxEnabled::NAME,
         MessagesV2EditSearchEnabled::NAME,
+        // AH-115 L4 — OFF at deploy; the creator-inbox E2E leg drives each state.
+        MessagesV2CreatorInboxEnabled::NAME,
     ];
 
     public function store(Request $request, string $name): JsonResponse

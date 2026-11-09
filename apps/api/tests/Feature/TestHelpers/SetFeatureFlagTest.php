@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Modules\Creators\Features\AssignmentOfferEditEnabled;
 use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
 use App\Modules\Identity\Features\AccountDeletionEnabled;
+use App\Modules\Messaging\Features\MessagesV2CreatorInboxEnabled;
 use App\Modules\Messaging\Features\MessagesV2EditSearchEnabled;
 use App\Modules\Messaging\Features\MessagesV2InboxEnabled;
 use App\TestHelpers\Http\Controllers\SetFeatureFlagController;
@@ -83,6 +84,7 @@ it('allows exactly the flags the E2E legs need (a new entry is a reviewed change
         AssignmentOfferEditEnabled::NAME,
         MessagesV2InboxEnabled::NAME,
         MessagesV2EditSearchEnabled::NAME,
+        MessagesV2CreatorInboxEnabled::NAME,
     ]);
 });
 
