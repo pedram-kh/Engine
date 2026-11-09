@@ -1,8 +1,8 @@
 # AH-115 creator baseline (L5.1)
 
-The creator web (and the onboarding, auth and bare-app shells) **after** the AH-115 restyle, re-recorded deliberately from `baseline.json` of [`ah-114-creator-baseline`](../ah-114-creator-baseline/README.md). Same tool, same 142 targets, same harness (`apps/main/tools/walk/walk.mjs --set creator`); recorded on macOS 27.2, Apple silicon, Chromium 147.0.7727.15, from the tree at `4803b7a3` plus the L5 specs (no runtime change after it).
+The creator web (and the onboarding, auth and bare-app shells) **after** the AH-115 restyle, re-recorded deliberately from `baseline.json` of [`ah-114-creator-baseline`](../ah-114-creator-baseline/README.md). Same tool, same 142 targets, same harness (`apps/main/tools/walk/walk.mjs --set creator`); recorded on macOS 27.2, Apple silicon, Chromium 147.0.7727.15, from the tree at `dc4c524c` (no runtime change after it) with the L5 walk harness (font loading made explicit, below).
 
-Compare with: `node tools/walk/walk.mjs --set creator --compare ../../docs/reviews/ah-115-creator-baseline/baseline.json` from `apps/main`. Gate on this recording: two consecutive runs, **142 / 142 identical** (`COMPARE OK`).
+Compare with: `node tools/walk/walk.mjs --set creator --compare ../../docs/reviews/ah-115-creator-baseline/baseline.json` from `apps/main`. Gate on this recording: four consecutive compares, **142 / 142 identical** (`COMPARE OK`), recorded once at `--concurrency 1` and compared at the default.
 
 ## Why it moved (the whole diff, 142 of 142 targets, by family)
 
@@ -21,6 +21,10 @@ Three more things to know when reading a diff against the old file:
 - **The progress-bar mask.** During L1 the walk started masking one property (`width`) on `.v-progress-linear__indeterminate` elements in the style hash. Vuetify animates that width with a keyframe, so the recorded value was whatever frame the capture landed on. The AH-114 file was recorded without the mask, so the `styleHash` of every page with such a bar differs from it for that reason alone. Nothing else is masked.
 - **Fonts.** The Roboto fix (Inter on `.text-*` utilities and overlays inside the creator scope) moves `fontFamily` on the creator, onboarding and auth-creator targets.
 - **Theme sheet.** 94 targets register a creator theme, so the Vuetify `<style>` bytes grow (18 863 to 33 627 chars on the auth sign-in pair); the 48 targets that do not register one are byte-identical.
+
+## A second harness fix: fonts (found at L5)
+
+A first L5 recording flipped between two states on the 52 targets that show the locale select (auth at 1280, onboarding at 390): the select's width depended on which Inter subset files (Latin-extended, Cyrillic, Greek) had arrived at capture time (67.34 px against 67.67 px). `open()` in `walk.mjs` now requests every weight with a multi-script sample and awaits `fonts.ready`; after it, the file reproduces on four consecutive compares. The same fix re-recorded the agency baseline (its README). Any compare recorded before it can show those targets moving for that reason alone.
 
 ## What this file does NOT prove
 

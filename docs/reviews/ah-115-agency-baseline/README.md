@@ -25,17 +25,14 @@ At the end of L1 the 12 auth targets at 1280 (6 screens, dark and light) stopped
 - Two full runs on the same tree: **126 / 126 targets identical** (`COMPARE OK`).
 - **Break-revert (MEASURED):** with `--brand-font-primary` in `tokens.css` temporarily changed, `--only dashboard` fails on all 4 dashboard targets (8 differences: `styleHash` plus the screenshot on each); reverted, `git diff` clean.
 
-## Re-recorded on 2026-11-09 (L5), and why
+## Re-recorded on 2026-11-09 (L5): the second non-deterministic source was a font race
 
-At L5 the committed `baseline.json` stopped matching on **12 of the 126 targets**: the six auth screens at 1280, dark and light (`agency-sign-in`, 2FA verify and enable, forgot and reset password, accept invitation), `styleHash` only (DOM, theme sheet and thumbnail the same). The cause is **not the runtime**: the same 12 fail identically on `75766ded` (the pushed L3 tip, when this walk was 126 / 126) and on the tip, with the same run hashes. The same 12 failed once before (the L1 finding above) and were then cured by a re-record, which is the signature of a machine-dependent signal the mask does not fully cover (the 1280-wide auth screens carry the locale switcher's progress bar and a fractional page height; that is a suspicion, not a measurement). Not isolated further.
+At L5 the L0 recording stopped matching on **12 of the 126 targets** (the six auth screens at 1280, dark and light, `styleHash` only), with the same failure on `75766ded` (the pushed L3 tip, 126 / 126 when it was pushed) and on the tip, so it was not this chunk. The per-element dump of two runs of one unchanged tree found the difference: the locale select's `v-input__control`, `v-field` and `v-field__overlay` measure **67.34 px in one run and 67.67 px in another** (the same elements, 44 of 341 changed, only the targets that show the select). The select is auto-width and its options are written in every script, so its width depends on which **Inter subset files (Latin-extended, Cyrillic, Greek) have arrived** when the capture lands. `document.fonts.ready` can resolve before those faces are even requested. The creator walk showed the same bimodal state on the onboarding targets at 390 (which also show the select).
 
-What was done instead, so the proof does not depend on that flake:
-
-1. **`baseline.json` is now recorded from the pre-chunk runtime** (`src` and `packages` at `9a0be3f3`, before any AH-115 code; walk tooling at the tip), on this machine today: 126 targets, 0 page errors.
-2. **The tip compares 126 / 126 identical** against it (`COMPARE OK: 126 targets identical`). That is the claim: no AH-115 file changed one agency hash.
-3. The L0 recording is kept as `baseline-recorded-l0.json` for reference. On the tip it compares identical on the other 114 targets and differs on the 12 above.
-
-Tech-debt (new row): finish the mask so a recording survives a day; until then, before trusting a failing compare, record the pre-chunk tree and compare against that.
+- **Fix (walk tool only):** `open()` now requests every weight (400 to 700) with a sample string covering those scripts, then awaits `fonts.ready`, before the capture. The runtime is untouched.
+- **Re-record:** the L0 file recorded the incomplete-font state, so it cannot match a deterministic harness. `baseline.json` is now recorded with the fixed harness from the **pre-chunk runtime** (`src` and `packages` at `9a0be3f3`, before any AH-115 code): 126 targets, 0 page errors. The L0 recording stays as `baseline-recorded-l0.json` for reference only.
+- **Proof, MEASURED:** the tip compares **126 / 126 identical** against that pre-chunk recording, twice in a row (`COMPARE OK`). Before the harness fix, the tip also compared 126 / 126 against a pre-chunk recording made in one sitting (same font state on both sides), and against the L0 file with the font state of the day it was recorded.
+- The creator baseline had the same race and was recorded with the fixed harness (its README).
 
 ## Run it
 
