@@ -237,10 +237,11 @@ describe('creator, onboarding and auth trees never carry an agency theme class',
     const { vuetify } = await mountAt(path, theme)
 
     // The agency themes ARE in the instance (worst case), and the creator route
-    // still renders its own global theme.
+    // renders its own theme. AH-115 (L1.1): that is now the creator theme, registered by the
+    // layout, not the global base theme (polarity edit, by name).
     expect(vuetify.theme.themes.value['agency-dark']).toBeDefined()
     expect(document.querySelector('.v-application')).not.toBeNull()
-    expect(document.querySelector(`.v-application.v-theme--${theme}`)).not.toBeNull()
+    expect(document.querySelector(`.v-application.v-theme--creator-${theme}`)).not.toBeNull()
 
     // <body> only: the theme stylesheet in <head> legitimately holds the agency rules.
     expect(document.body.outerHTML).not.toMatch(/v-theme--agency/)

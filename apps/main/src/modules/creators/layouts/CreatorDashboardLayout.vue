@@ -41,6 +41,7 @@ import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
 import { useMobileShell } from '@/composables/useMobileShell'
 import { useShellBack } from '@/composables/useShellBack'
 import { useTheme } from '@/composables/useTheme'
+import { useCreatorTheme } from '@/modules/creators/theme/useCreatorTheme'
 import catalystLogo from '@/modules/auth/assets/catalyst-logo.svg'
 
 const { t, te, locale } = useI18n()
@@ -52,6 +53,8 @@ const onboardingStore = useOnboardingStore()
 const { isNative, isMobile } = useMobileShell()
 const { visible: showBack, goBack } = useShellBack()
 const { currentTheme } = useTheme()
+// AH-115 — the creator Vuetify theme (web only; the app keeps its global native theme).
+const creatorTheme = useCreatorTheme()
 const { user, isLoggingOut } = storeToRefs(authStore)
 const { applicationStatus } = storeToRefs(onboardingStore)
 const localeOptions = buildLocaleOptions()
@@ -227,7 +230,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <v-app :class="{ 'creator-layout--native': isNative }" data-test="creator-layout">
+  <v-app
+    :theme="creatorTheme"
+    :class="{ 'creator-layout--native': isNative }"
+    data-test="creator-layout"
+  >
     <ImpersonationBanner />
 
     <v-app-bar

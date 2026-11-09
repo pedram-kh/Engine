@@ -11,7 +11,8 @@
  *      import closure contains no file under `modules/creators/theme/`. A shared
  *      component an agency page renders may know `useNativeLook()` (it lives in
  *      `src/composables/`, outside the theme directory) but never the creator theme itself.
- *   2. IMPORTERS: only the creator-side layouts (creators, onboarding, auth) and the
+ *   2. IMPORTERS: only the creator-side layouts (creators, onboarding, auth, and auth's
+ *      `creatorLook.ts` route gate) and the
  *      creator theme directory itself may import the creator theme directory.
  *   3. OUTSIDE `apps/main`: `apps/admin` and `packages/ui` never mention the creator theme;
  *      in `packages/design-tokens` only `native.css` may (its widened selector list).
@@ -37,6 +38,8 @@ const ALLOWED_THEME_IMPORTERS: readonly string[] = [
   path.join(SRC, 'modules/creators/layouts/CreatorDashboardLayout.vue'),
   path.join(SRC, 'modules/onboarding/layouts/OnboardingLayout.vue'),
   path.join(SRC, 'modules/auth/layouts/AuthLayout.vue'),
+  // AuthLayout's route-gated theme hook (the look applies by route name, AH-115 ruling 1).
+  path.join(SRC, 'modules/auth/layouts/creatorLook.ts'),
 ]
 
 const RESOLVE_SUFFIXES = ['', '.ts', '.vue', '.js', '.css', '/index.ts', '/index.vue']

@@ -47,6 +47,7 @@ import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { buildLocaleOptions } from '@/modules/auth/layouts/localeOptions'
 import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
 import catalystLogo from '@/modules/auth/assets/catalyst-logo.svg'
+import { useCreatorTheme } from '@/modules/creators/theme/useCreatorTheme'
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 import OnboardingProgress from '../components/OnboardingProgress.vue'
 import AnimatedWizardChrome, { type WizardChromeStep } from '../components/AnimatedWizardChrome.vue'
@@ -68,6 +69,8 @@ const router = useRouter()
 const authStore = useAuthStore()
 const onboardingStore = useOnboardingStore()
 const { isNative, isMobile } = useMobileShell()
+// AH-115 — the creator Vuetify theme (web only; the app keeps its global native theme).
+const creatorTheme = useCreatorTheme()
 
 const {
   isBootstrapped,
@@ -216,7 +219,7 @@ async function saveAndExit(): Promise<void> {
 </script>
 
 <template>
-  <v-app data-test="onboarding-layout">
+  <v-app :theme="creatorTheme" data-test="onboarding-layout">
     <ImpersonationBanner />
 
     <v-app-bar

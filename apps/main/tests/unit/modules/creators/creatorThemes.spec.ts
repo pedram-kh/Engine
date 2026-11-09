@@ -105,7 +105,7 @@ describe('useCreatorTheme', () => {
   })
 
   function mountLayout(vuetify: ReturnType<typeof makeVuetify>) {
-    let themeName: { value: string } | undefined
+    let themeName: { value: string | undefined } | undefined
     const Layout = defineComponent({
       setup() {
         themeName = useCreatorTheme()

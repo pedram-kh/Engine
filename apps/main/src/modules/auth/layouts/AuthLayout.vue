@@ -23,6 +23,7 @@ import BrandLogoWall from '@/modules/auth/components/BrandLogoWall.vue'
 import CreatorGuideCta from '@/modules/auth/components/CreatorGuideCta.vue'
 import catalystLogo from '@/modules/auth/assets/catalyst-logo.svg'
 import { useLocaleSwitch } from '@/core/i18n/useLocaleSwitch'
+import { useAuthCreatorTheme } from './creatorLook'
 import { buildLocaleOptions } from './localeOptions'
 import { showsMarketingTail } from './marketingTail'
 import { isSheetRoute, usesNativeSheet } from './nativeSheet'
@@ -39,10 +40,11 @@ const isHero = computed(() => route.name === 'auth.sign-in' || route.name === 'a
 const showTail = computed(() => showsMarketingTail(isHero.value))
 // AH-101 U2 / AH-104d: the creator app's sign-in, sign-up and verify-pending are sheets.
 const isNativeSheet = computed(() => usesNativeSheet(isSheetRoute(route.name)))
+const creatorTheme = useAuthCreatorTheme()
 </script>
 
 <template>
-  <v-app>
+  <v-app :theme="creatorTheme">
     <ImpersonationBanner />
 
     <v-main>
