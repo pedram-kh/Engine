@@ -12,13 +12,13 @@
 
 import { useI18n } from 'vue-i18n'
 
-import { isNativePlatform } from '@/core/platform/isNativePlatform'
+import { useNativeLook } from '@/composables/useNativeLook'
 
 import AvailabilityCalendar from '../components/AvailabilityCalendar.vue'
 import AvailabilityCalendarNative from '../components/AvailabilityCalendarNative.vue'
 
 const { t } = useI18n()
-const isNative = isNativePlatform()
+const isNative = useNativeLook()
 </script>
 
 <template>

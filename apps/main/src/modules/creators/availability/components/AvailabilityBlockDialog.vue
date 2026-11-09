@@ -37,7 +37,7 @@ import { useI18n } from 'vue-i18n'
 import { VBottomSheet } from 'vuetify/components/VBottomSheet'
 import { VDialog } from 'vuetify/components/VDialog'
 
-import { isNativePlatform } from '@/core/platform/isNativePlatform'
+import { useNativeLook } from '@/composables/useNativeLook'
 
 import { availabilityApi } from '../availability.api'
 import { addDays, eachDayKey, todayKey, utcIsoToZoned, zonedToUtcIso } from '../datetime'
@@ -64,7 +64,7 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 /** AH-100 — the creator app opens this form as a bottom sheet. */
-const isNative = isNativePlatform()
+const isNative = useNativeLook()
 
 type AvailabilityField =
   | 'starts_at'
