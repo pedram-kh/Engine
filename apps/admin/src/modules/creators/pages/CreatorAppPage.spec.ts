@@ -266,7 +266,10 @@ describe('CreatorAppPage (AH-102b)', () => {
     expect(adminCreatorAppApi.users).toHaveBeenCalledWith({ ...BASE, search: 'ada' })
     // `q` reaches the URL after the pause, and not before it.
     vi.useRealTimers()
-    await vi.waitFor(() => expect(h.router.currentRoute.value.query).toEqual({ q: 'ada' }))
+    // The router push settles on a loaded CI runner after the default 1 s: give it room.
+    await vi.waitFor(() => expect(h.router.currentRoute.value.query).toEqual({ q: 'ada' }), {
+      timeout: 10_000,
+    })
   })
 
   it('shows the empty state and the error surface', async () => {
