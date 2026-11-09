@@ -27,6 +27,8 @@ function arg(name, fallback) {
 const OUT = path.resolve(arg('out', '../../playwright-report/ah-115-l3'))
 const PORT = Number(arg('port', '5197'))
 const ONLY = arg('only', null)
+// --probe '<js expression>': log its value after the page settles (diagnosis aid)
+const PROBE = arg('probe', null)
 
 // [name, user, route, real route names, creator status]
 const CASES = [
@@ -44,6 +46,8 @@ const CASES = [
   ['profile', 'creator', '/creator/profile', 'creator.profile', 'approved'],
   ['job-detail', 'creator', `/creator/jobs/${JOB}`, 'creator.job.detail', 'approved'],
   ['sign-in', 'none', '/sign-in', 'auth.sign-in', 'approved'],
+  ['sign-up', 'none', '/sign-up', 'auth.sign-up', 'approved'],
+  ['verify-pending', 'creator', '/verify-email/pending', 'auth.verify-email.pending', 'incomplete'],
 ].filter(([name]) => !ONLY || name.includes(ONLY))
 
 const SIZES = { 1280: { width: 1280, height: 800 }, 390: { width: 390, height: 844 } }
@@ -106,6 +110,7 @@ async function shot(theme, width, [name, user, to, real, status]) {
     path: path.join(OUT, `${theme}-${width}-${name}.png`),
     animations: 'disabled',
   })
+  if (PROBE) console.log(`[${name}] probe:`, JSON.stringify(await page.evaluate(PROBE), null, 1))
   await context.close()
 }
 

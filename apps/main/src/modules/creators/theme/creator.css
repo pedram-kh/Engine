@@ -68,12 +68,27 @@
   color: var(--native-text-tertiary) !important;
 }
 
-/* Light: a floating field label rides the secondary text colour, at full strength (the default
- * 0.7 on-surface blend washes out on the light field). */
-:is(.v-theme--creator-dark, .v-theme--creator-light).v-theme--creator-light
-  .v-field-label--floating {
+/* A floating field label rides the secondary text colour at full strength, in both themes (the
+ * default on-surface blend washes out on the field, and on the dark card it read as clipped). */
+:is(.v-theme--creator-dark, .v-theme--creator-light) .v-field-label--floating {
   color: var(--native-text-secondary);
   opacity: 1;
+}
+
+/* Outlined fields carry no canvas fill on the creator web. Vuetify floats the label half above the
+ * field box, so a fill that stops at the box edge cuts the label in two (the dark canvas fill
+ * against the lighter card). The native app keeps its fill (no floating-label straddle there:
+ * native.css still styles it); the web field is the strong outline alone. */
+:is(.v-theme--creator-dark, .v-theme--creator-light) .v-field--variant-outlined {
+  background: transparent;
+}
+
+/* Links in the auth card (sign-in, sign-up, verify, forgot): the accent LABEL colour, in both
+ * themes, instead of the browser's default blue. `--native-accent-primary` is the mint in dark and
+ * the AA `primary-text` green in light (above); the dark theme has no `primary-text` slot of its
+ * own. Buttons keep their own colours. */
+:is(.v-theme--creator-dark, .v-theme--creator-light) .auth-layout__card a:not(.v-btn) {
+  color: var(--native-accent-primary);
 }
 
 /* The app root IS the themed element, so `native.css`'s `<scope> .v-application` (written for the
