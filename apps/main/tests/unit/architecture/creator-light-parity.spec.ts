@@ -74,6 +74,7 @@ describe('creator-light parity', () => {
       ['text-secondary', 'on-surface-variant'],
       ['text-tertiary', 'text-tertiary'],
       ['accent-primary-subtle', 'primary-container'],
+      ['accent-primary', 'primary-text'],
     ])('--native-%s equals the %s colour', (token, colour) => {
       expect(remap[token]).toBe(creator[colour]?.toLowerCase())
     })
@@ -91,6 +92,7 @@ describe('creator-light parity', () => {
         'text-secondary',
         'text-tertiary',
         'accent-primary-subtle',
+        'accent-primary',
         'shadow-overlay',
       ])
       expect(Object.keys(remap).filter((token) => !allowed.has(token))).toEqual([])

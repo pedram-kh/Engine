@@ -31,10 +31,20 @@
   --native-text-primary: #18181b;
   --native-text-secondary: #52525b;
   --native-text-tertiary: #6b6b74;
+  /* The mint fails AA as a label on white: accent LABELS, rings and the active tab take the
+   * theme's `primary-text`; fills stay the mint. */
+  --native-accent-primary: #0b7a5a;
   --native-accent-primary-subtle: #e4f8f1;
   --native-shadow-overlay: 0 12px 32px rgba(24, 24, 27, 0.14);
 
   color-scheme: light;
+}
+
+/* Brand-coloured text, outlined and plain buttons: the label is `primary-text` in light (the same
+ * rule the agency light theme carries). */
+:is(.v-theme--creator-dark, .v-theme--creator-light).v-theme--creator-light
+  .v-btn:is(.v-btn--variant-outlined, .v-btn--variant-text, .v-btn--variant-plain).text-primary {
+  color: rgb(var(--v-theme-primary-text)) !important;
 }
 
 /* The app root IS the themed element, so `native.css`'s `<scope> .v-application` (written for the
