@@ -58,6 +58,7 @@ For one of those unchanged screens (`auth.forgot-password`, dark, 1280 and 390) 
 7. **Outlined fields lose their fill** in the creator scope (transparent), because the canvas fill straddled the floating label; the agency shell has its own field rules and is unaffected.
 8. **Notifications on the native app** keeps the bare card (the native shell has its own header); the page header is for the web.
 9. **Unread aggregates scoped** in the creator inbox query (not requested, found by the EXPLAIN): both aggregates read only the creator's own threads.
+10. **Bell popover (build 4 walk finding).** `NotificationBell.vue` (creator bell; agency has its own) is gated by `useNativeLook()`: with the look, below md the bell navigates to the Notifications page (no popover; the native app is always below md in practice, so this changes the app: recorded, in the build 5 walk); at md and above the popover stays with creator classes (`creator.css`, header, rows as on the page, "View all" footer) and one scroll container (card `overflow: hidden`, list `overflow-y: auto`, no overflow on the centre). Without the look the DOM is unchanged. Pinned by `NotificationBell.look.spec.ts` and `creator-notification-popover.spec.ts`; break-reverted (card overflow, list overflow). MEASURED: the agency walk is 126 / 126 identical between the tree without and with this change, recorded and compared in the same sitting. The earlier font-race fix was not fully deterministic: against the committed baseline the agency auth screens at 1280 flipped back to the other font state after the bell change, so the same-sitting pair is the proof for this change.
 
 ## Playwright (MEASURED)
 
@@ -85,5 +86,7 @@ Install build 5 over build 4 (the session must survive), then on a device:
 7. **Chat thread:** safe area at the bottom, keyboard open and close, no jump.
 8. **Photo upload** (paperclip and paste), re-checked: the native-origin CORS rule is live (REPORTED 2026-11-09), and build 5 must not regress it.
 9. **Share limits (known):** the lightbox share still hands over the signed URL, not the bytes (tech-debt rows 17 and 23).
+
+10. **Bell (build 4 walk finding):** tapping the top-bar bell opens the Notifications page directly (no popover) on the app and on creator web below md. Check the unread badge still shows on the bell.
 
 Deploy order, with the snapshot and the migration, is in the PENDING entry of the deploy log.
