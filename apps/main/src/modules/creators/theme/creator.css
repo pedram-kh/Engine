@@ -104,6 +104,181 @@
   font-family: var(--font-sans);
 }
 
+/* The notification popover (md and up): the page's look in a card, ONE scroll container (the
+ * list). Vuetify gives a menu's card `overflow: auto`, which made the card and the list two
+ * scrollers; here the card clips, the header and the "View all" footer stay put, the list scrolls.
+ * Below md the bell navigates to the page and this popover is not rendered. */
+:is(.v-theme--creator-dark, .v-theme--creator-light) .notification-dropdown-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--native-bg-surface);
+  border: 1px solid var(--native-border-default);
+  border-radius: var(--native-radius-2xl);
+}
+
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .notification-dropdown-card
+  .notification-center--dropdown {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  max-height: min(70vh, 560px);
+}
+
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .notification-dropdown-card
+  .notification-center--dropdown
+  > .d-flex
+  > span {
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .notification-dropdown-card
+  [data-test='notification-mark-all'] {
+  color: var(--native-text-secondary);
+}
+
+:is(.v-theme--creator-dark, .v-theme--creator-light) .notification-dropdown-card .v-divider {
+  border-color: var(--native-border-default);
+  opacity: 1;
+}
+
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .notification-dropdown-card
+  [data-test='notification-list'] {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 6px;
+  overflow-y: auto;
+  background: transparent;
+}
+
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .notification-dropdown-card
+  [data-test='notification-list']
+  .v-list-item {
+  padding: 12px;
+  border-radius: var(--native-radius-lg);
+}
+
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .notification-dropdown-card
+  [data-test='notification-list']
+  .notification-row--unread {
+  background: var(--native-accent-primary-subtle);
+}
+
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .notification-dropdown-card
+  [data-test='notification-body'] {
+  font: var(--native-type-body-strong);
+  color: var(--native-text-primary);
+}
+
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .notification-dropdown-card
+  [data-test='notification-detail'],
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .notification-dropdown-card
+  [data-test='notification-round'] {
+  font: var(--native-type-caption);
+  color: var(--native-text-secondary);
+  opacity: 1;
+}
+
+:is(.v-theme--creator-dark, .v-theme--creator-light) .notification-dropdown-card .notification-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .notification-dropdown-card
+  .notification-row__icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: var(--native-text-secondary);
+  background: var(--native-bg-surface-raised);
+  border-radius: var(--native-radius-full);
+}
+
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .notification-dropdown-card
+  .notification-row__icon--accent {
+  color: var(--native-accent-primary);
+  background: var(--native-accent-primary-subtle);
+}
+
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .notification-dropdown-card
+  .notification-row__icon--success {
+  color: var(--native-status-success);
+  background: var(--native-status-success-subtle);
+}
+
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .notification-dropdown-card
+  .notification-row__icon--info {
+  color: var(--native-status-info);
+  background: var(--native-status-info-subtle);
+}
+
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .notification-dropdown-card
+  .notification-row__icon--danger {
+  color: var(--native-status-danger);
+  background: var(--native-status-danger-subtle);
+}
+
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .notification-dropdown-card
+  .notification-row__text {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .notification-dropdown-card
+  .notification-row__aside {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+  min-height: 32px;
+}
+
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .notification-dropdown-card
+  .notification-row__time {
+  font: var(--native-type-caption);
+  color: var(--native-text-tertiary);
+}
+
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .notification-dropdown-card
+  .notification-row__dot {
+  width: 8px;
+  height: 8px;
+  background: var(--native-accent-primary);
+  border-radius: var(--native-radius-full);
+}
+
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .notification-dropdown-card
+  [data-test='notification-view-all'] {
+  font: var(--native-type-body-strong);
+  color: var(--native-accent-primary);
+}
+
 /* The single non-descendant form: the canvas behind and around the app. */
 :root:has(.v-application.v-theme--creator-dark) {
   background-color: #0b0b0c;

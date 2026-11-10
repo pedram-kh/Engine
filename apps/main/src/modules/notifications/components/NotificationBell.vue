@@ -17,16 +17,19 @@
  * refetch pushes `meta.unread_count` back as a reconcile point.
  */
 
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { useDisplay } from 'vuetify'
+
+import { useNativeLook } from '@/composables/useNativeLook'
 
 import { formatBadgeCount } from '../formatBadgeCount'
 import { injectNotificationPoll } from '../composables/notificationPollContext'
 import { useNotificationPoll } from '../composables/useNotificationPoll'
 import NotificationCenter from './NotificationCenter.vue'
 
-defineProps<{
+const props = defineProps<{
   /** Route NAME of this shell's full notifications page (agency vs creator). */
   viewAllRoute: string
 }>()
@@ -44,6 +47,19 @@ if (sharedPoll === null) {
 
 const menuOpen = ref(false)
 const route = useRoute()
+const router = useRouter()
+
+// AH-115 (build 4 walk): in the creator look the bell is a link below `md` (the native app and the
+// creator web on a phone): the popover was cramped, unstyled and a second scroller. `useNativeLook()`
+// is true only inside the creator layouts and on the native app, so any other mount keeps the popover
+// byte for byte.
+const look = useNativeLook()
+const display = useDisplay()
+const goesToPage = computed(() => look.value && !display.mdAndUp.value)
+
+function openPage(): void {
+  void router.push({ name: props.viewAllRoute })
+}
 const centerRef = ref<InstanceType<typeof NotificationCenter> | null>(null)
 
 // AH-101 (U1) — close on navigation. The menu is `:close-on-content-click="false"`
@@ -70,11 +86,29 @@ watch(menuOpen, (open) => {
 </script>
 
 <template>
+  <v-badge
+    v-if="goesToPage"
+    :content="formatBadgeCount(poll.unreadCount.value)"
+    :model-value="poll.unreadCount.value > 0"
+    color="error"
+    data-test="notification-badge"
+  >
+    <v-btn
+      icon="mdi-bell-outline"
+      variant="text"
+      :aria-label="t('notifications.center.unreadBadgeLabel', { count: poll.unreadCount.value })"
+      data-test="notification-bell-btn"
+      @click="openPage"
+    />
+  </v-badge>
+
   <v-menu
+    v-else
     v-model="menuOpen"
     offset-y
     :close-on-content-click="false"
     location="bottom end"
+    :content-class="look ? 'notification-dropdown-menu' : undefined"
     data-test="notification-menu-trigger-wrapper"
   >
     <template #activator="{ props: menuProps }">
@@ -96,7 +130,10 @@ watch(menuOpen, (open) => {
       </v-badge>
     </template>
 
-    <v-card data-test="notification-dropdown-card">
+    <v-card
+      :class="look ? 'notification-dropdown-card' : undefined"
+      data-test="notification-dropdown-card"
+    >
       <NotificationCenter
         ref="centerRef"
         variant="dropdown"

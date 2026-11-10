@@ -75,8 +75,10 @@ const FROZEN_COMPONENTS: ReadonlyArray<readonly [string, string]> = [
     'b205c540fa690d04cdefb9efbef09ef65da014ab6c9d80934cceca68e8243733',
   ],
   [
+    // AH-115 (build 4 walk): creator look below md navigates to the page instead of a popover; above md
+    // the popover gets creator-look classes. Without the look (any other mount) the DOM is unchanged.
     'apps/main/src/modules/notifications/components/NotificationBell.vue',
-    'bba8172e5afc7fa3f5dbf61036c32cb674a03db508849f0ddfe4e3a0ae8a26f7',
+    '9dcd21903f5f8988f1390ac1e219c84c4e7c85f5aed6e68211b1208b78d7d82e',
   ],
   [
     // AH-118 C5: offer_edited body money — intended edit, hash re-pinned.
