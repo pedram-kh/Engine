@@ -46,6 +46,8 @@ const CASES = [
   ],
   ['inbox-flag-off', '/creator/messages', 'creator.messages,creator.messages.thread', '', null],
   ['notifications', '/creator/notifications', 'creator.notifications', '', null],
+  // the bell: at 1280 the popover opens; at 390 it navigates to the page
+  ['bell', '/creator/dashboard', 'creator.dashboard,creator.notifications', '', '@bell'],
 ].filter(([name]) => !ONLY || name.includes(ONLY))
 
 const SIZES = { 1280: { width: 1280, height: 800 }, 390: { width: 390, height: 844 } }
@@ -96,7 +98,10 @@ async function shot(theme, width, [name, to, real, features, term]) {
   })
   await page.evaluate(() => document.fonts.ready)
   await page.waitForTimeout(1200)
-  if (term) {
+  if (term === '@bell') {
+    await page.click('[data-test="notification-bell-btn"]')
+    await page.waitForTimeout(1200)
+  } else if (term) {
     await page.fill('[data-test="creator-inbox-search"] input', term)
     await page.waitForSelector('[data-test="message-search-list"]', { timeout: 10000 })
     await page.waitForTimeout(400)
