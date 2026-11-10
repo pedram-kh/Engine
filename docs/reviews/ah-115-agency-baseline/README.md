@@ -34,6 +34,13 @@ At L5 the L0 recording stopped matching on **12 of the 126 targets** (the six au
 - **Proof, MEASURED:** the tip compares **126 / 126 identical** against that pre-chunk recording, twice in a row (`COMPARE OK`). Before the harness fix, the tip also compared 126 / 126 against a pre-chunk recording made in one sitting (same font state on both sides), and against the L0 file with the font state of the day it was recorded.
 - The creator baseline had the same race and was recorded with the fixed harness (its README).
 
+## Re-recorded on 2026-11-10: text-metric sizes masked (the font race is no longer fought)
+
+After the L5 harness fix the race came back (the agency auth screens at 1280 flipped to the other font state against the committed file, 12 targets, `styleHash` only), so preloading fonts cannot be the gate. **`walk.mjs` now masks `width` and `height` (the measured box) of the locale switcher (`[data-test$="locale-switcher"]`) and of every element inside it** in the style hash, the same way the progress-bar `width` is masked. Colours, fonts, paddings, display and every other property of those elements, and every other element, still count. The preload stays (it narrows the race for the thumbnails). If a diff ever shows another element sized by text metrics, add it to the mask with its measured values here; none showed one.
+
+- **Re-record:** from the pre-chunk runtime (`src` and `packages` at `9a0be3f3`) with the masked harness: 126 targets, 0 page errors.
+- **Proof, MEASURED:** the tip compares 126 / 126 identical to the new `baseline.json` three times in a row, and the recording itself compared 126 / 126 three times in a row; also 126 / 126 with the font preload switched off (no weights requested).
+
 ## Run it
 
 ```

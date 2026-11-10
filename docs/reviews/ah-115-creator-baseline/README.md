@@ -29,3 +29,7 @@ A first L5 recording flipped between two states on the 52 targets that show the 
 ## What this file does NOT prove
 
 The agency shell is proved by [`ah-115-agency-baseline`](../ah-115-agency-baseline/README.md), not by this file. Native renders are not in the walk (it runs on web). The 32 "page errors" in a creator run are the harness's 503 answers on onboarding pages (no fixture API), the same as in AH-114.
+
+## Re-recorded on 2026-11-10 (walk determinism)
+
+`walk.mjs` now masks `width` and `height` of the locale switcher and its descendants in the style hash (see the agency baseline README, same section): the font-subset race could not be removed, so the size it moves is no longer measured. Re-recorded from the tip (`9940997c`, with the masked harness) at `--concurrency 1`: 142 targets, 32 with page errors, the same 32 as the previous recording (onboarding targets, unfixtured API, HTTP 503; not new). **MEASURED: three consecutive compares of the recording 142 / 142 identical, and three of the committed file at the default concurrency.**
