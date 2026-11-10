@@ -99,8 +99,17 @@ function probeInPage(opts) {
     // `width` (a keyframe snapshot taken at whatever frame the capture lands on), so that one
     // property is masked. Nothing else is: every other property and element still counts.
     const animated = el.matches('.v-progress-linear__indeterminate')
+    // KNOWN NON-DETERMINISTIC SOURCE (AH-115 L5): the locale switcher is an auto-width select whose
+    // size follows the text metrics of whichever Inter subset files have arrived (67.34 px against
+    // 67.67 px). Its measured width and height, and those of everything inside it, are masked.
+    // Colours, fonts, paddings, display and every other property of those elements still count.
+    const metric = !!el.closest('[data-test$="locale-switcher"]')
     const s =
-      el.tagName + '|' + STYLE_PROPS.map((p) => (animated && p === 'width' ? '~' : c[p])).join('|')
+      el.tagName +
+      '|' +
+      STYLE_PROPS.map((p) =>
+        (animated && p === 'width') || (metric && (p === 'width' || p === 'height')) ? '~' : c[p],
+      ).join('|')
     for (let i = 0; i < s.length; i++) styleHash = (styleHash * 31 + s.charCodeAt(i)) | 0
     elements++
   }
