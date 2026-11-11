@@ -235,7 +235,17 @@ final class Ah115WalkSeeder extends Seeder
             [NotificationType::MessageRelationshipReceivedByCreator, 'South', 7, false],
             [NotificationType::AssignmentDraftApproved, 'North', 26, true],
         ] as [$type, $key, $hoursAgo, $read]) {
-            [$admin, $agency, $campaign, $assignment, , $direct] = collect($notes)->first(fn (array $n): bool => $n[4] === $key);
+            $found = null;
+            foreach ($notes as $n) {
+                if ($n[4] === $key) {
+                    $found = $n;
+                    break;
+                }
+            }
+            if ($found === null) {
+                continue;
+            }
+            [$admin, $agency, $campaign, $assignment, , $direct] = $found;
             $isDirect = $type === NotificationType::MessageRelationshipReceivedByCreator;
             $subject = $isDirect ? $direct : $assignment;
             // The data keys are exactly what the real senders write (SendMessageNotifications,
