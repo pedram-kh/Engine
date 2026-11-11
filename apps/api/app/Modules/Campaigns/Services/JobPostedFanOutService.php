@@ -93,6 +93,7 @@ final class JobPostedFanOutService
     public function __construct(
         private readonly NotificationService $notifications,
         private readonly Repository $config,
+        private readonly BrandExclusivity $exclusivity,
     ) {}
 
     /**
@@ -224,6 +225,14 @@ final class JobPostedFanOutService
                         $regions,
                     );
                 }
+
+                // AH-120 — a creator blocked from this campaign's brand cannot
+                // apply either, so "a job was posted, apply!" is skipped for them
+                // (Q3 is moot here: both legs only ever remove recipients). SQL
+                // mirror of {@see BrandExclusivity::isBlocked()}, built from the
+                // SAME query as the PHP predicate; parity-tested. A no-op while
+                // the flag is off.
+                $this->exclusivity->excludeBlockedCreators($creator, $campaign);
             })
             // C5 — the brand-scoped HARD blacklist, mirroring the invite gate
             // and the board predicate. Without it the fan-out would email an
