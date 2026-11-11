@@ -1,5 +1,31 @@
 # AH-120 plan — brand exclusivity between campaigns
 
+> **PLAN CLEARED with rulings (2026-11-11).** The API checkpoint (A1 to A7) is built and accepted
+> (tip `d221ad4f`). Rulings folded in below; where a section later in this file disagrees with
+> this block, this block wins:
+>
+> - **R1 (confirmed):** a cancelled campaign always ends its block; a completed campaign ends it
+>   only when no end date is set; an explicit end date wins (§0).
+> - **R2:** the conflicts read stays a `POST` (creator ids in the body). It is documented as
+>   read-only in the route comment and in `docs/security/tenancy.md` ("AH-120: the
+>   exclusivity-conflicts read"). Built in A6.
+> - **R3:** the campaign **list** payload omits the blocked brands; `exclusive_brand_ids` (and the
+>   display list `exclusive_brands`) come back on show, create and update only. The list keeps
+>   `exclusivity_ends_on`. Open point 3 is closed this way.
+> - **R4:** the locked job detail is step 14 of the build-5 device walk in
+>   `creator-restyle-review.md` (added).
+> - **R5:** the 18 i18n keys in §3 are approved.
+> - **Deploy:** AH-115 and AH-120 deploy together in one sitting. When AH-120 closes, write
+>   `docs/runbooks/deploy-ah115-ah120.md` (supersedes `deploy-ah115.md`, which is then marked
+>   "superseded, not used"): both migration sets; both flags OFF at deploy
+>   (`messages_v2_creator_inbox_enabled`, `campaign_brand_exclusivity_enabled`); main site only
+>   unless AH-120 touches admin; build 5 from the final tip; then the flag flips. §7 below is
+>   superseded by that runbook.
+>
+> **Deviations recorded during the API build (accepted):** `exclusive_brands` on show/create/update;
+> `brand_ulid` on the listed-job test helper; the `tenancy.md` section; the conflicts endpoint
+> accepts up to 100 creator ids (not 25).
+
 > Mode A, step 3 (plan-pause). **NO code until the plan is cleared.** Inventory and rulings:
 > [`brand-exclusivity-inventory.md`](brand-exclusivity-inventory.md) (Q1 to Q12 are binding).
 > Written against `origin/main` `65f1a671` (docs on top of `c8257afe`). Production: API
