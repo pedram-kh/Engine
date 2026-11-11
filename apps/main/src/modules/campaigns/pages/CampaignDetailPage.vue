@@ -20,6 +20,7 @@ import {
   extractFieldErrors,
   type CampaignAssignmentResource,
   type CampaignResource,
+  type BrandOptionResource,
   type CampaignStatus,
   type CreateCampaignPayload,
   type UpdateCampaignPayload,
@@ -37,6 +38,7 @@ import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
 import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
+import { brandsApi } from '@/modules/brands/api/brands.api'
 import { campaignsApi } from '../api/campaigns.api'
 import CampaignForm from '../components/CampaignForm.vue'
 import { campaignTabFromQuery, DEFAULT_CAMPAIGN_TAB } from '../campaignTabs'
@@ -70,6 +72,25 @@ const authStore = useAuthStore()
 const regionRestrictionEnabled = computed(
   () => authStore.user?.attributes.features?.campaign_region_restriction === true,
 )
+// AH-120: brand exclusivity (agency side). UI gate only; the API enforces it.
+const brandExclusivityEnabled = computed(
+  () => authStore.user?.attributes.features?.campaign_brand_exclusivity === true,
+)
+/** The agency's active brands, for the Settings multi-select (only fetched while the flag is on). */
+const exclusivityBrandOptions = ref<{ id: string; name: string }[]>([])
+async function loadExclusivityBrands(): Promise<void> {
+  const agencyId = agencyStore.currentAgencyId
+  if (agencyId === null || !brandExclusivityEnabled.value) return
+  try {
+    const res = await brandsApi.listOptions(agencyId, 'active')
+    exclusivityBrandOptions.value = res.data.map((b: BrandOptionResource) => ({
+      id: b.id,
+      name: b.attributes.name,
+    }))
+  } catch {
+    exclusivityBrandOptions.value = []
+  }
+}
 const offerEditEnabled = computed(
   () => authStore.user?.attributes.features?.assignment_offer_edit === true,
 )
@@ -409,6 +430,15 @@ function seedEditForm(c: CampaignResource): void {
     ...(regionRestrictionEnabled.value
       ? { restrict_to_listing_regions: c.attributes.restrict_to_listing_regions }
       : {}),
+    // AH-120: seeded only while the flag is on, for the same reason as the region switch:
+    // with it off the fields are left out of every save, so a stored list can never turn
+    // an ordinary settings save into a 422 `campaign.brand_exclusivity_disabled`.
+    ...(brandExclusivityEnabled.value
+      ? {
+          exclusive_brand_ids: c.attributes.exclusive_brand_ids ?? [],
+          exclusivity_ends_on: c.attributes.exclusivity_ends_on,
+        }
+      : {}),
     listing_examples_url: c.attributes.listing_examples_url ?? undefined,
   }
   editStatus.value = c.attributes.status
@@ -468,6 +498,7 @@ async function loadPendingApplications(): Promise<void> {
 }
 
 onMounted(() => {
+  void loadExclusivityBrands()
   void loadCampaign()
   void loadPendingApplications()
   void loadCampaignFiles()
@@ -537,6 +568,9 @@ async function onSaveSettings(): Promise<void> {
           creator_posts_content: campaign.value.attributes.creator_posts_content,
         }
       }
+    } else if (err instanceof ApiError && err.code === 'campaign.brand_exclusivity_disabled') {
+      // AH-120: the flag was switched off under an open form.
+      saveError.value = t('app.campaigns.errors.brandExclusivityDisabled')
     } else if (err instanceof ApiError) {
       const grouped = extractFieldErrors<string>(err)
       fieldErrors.value = grouped
@@ -634,6 +668,13 @@ const showAside = computed(() => showGlance.value || campaignFiles.value.length 
 const regionNames = computed<string[]>(() =>
   (campaign.value?.attributes.listing_regions ?? []).map(
     (code) => COUNTRY_OPTIONS.find((c) => c.code === code)?.label ?? code,
+  ),
+)
+
+/** AH-120: the blocked brands' names for Overview; an archived one stays listed, marked. */
+const exclusiveBrandsShown = computed<string[]>(() =>
+  (campaign.value?.attributes.exclusive_brands ?? []).map((b) =>
+    b.is_archived ? `${b.name} (${t('app.brands.status.archived')})` : b.name,
   ),
 )
 
@@ -879,6 +920,32 @@ const requirementRows = computed<RequirementRow[]>(() => {
                         tone="warning"
                         :label="t('app.campaigns.fields.regionsRestricted')"
                         data-test="overview-regions-restricted"
+                      />
+                    </dd>
+                  </div>
+                  <!-- AH-120: who this campaign keeps from applying to which brands. -->
+                  <div
+                    v-if="brandExclusivityEnabled && exclusiveBrandsShown.length > 0"
+                    class="agency-field"
+                    style="grid-column: 1 / -1"
+                    data-test="overview-exclusive-brands-field"
+                  >
+                    <dt class="agency-field__label">
+                      {{ t('app.campaigns.fields.exclusiveBrandsOverview') }}
+                    </dt>
+                    <dd class="agency-field__value" style="flex-wrap: wrap; gap: 8px">
+                      <span data-test="overview-exclusive-brands">{{
+                        exclusiveBrandsShown.join(', ')
+                      }}</span>
+                      <AgencyStatusPill
+                        v-if="campaign.attributes.exclusivity_ends_on"
+                        tone="neutral"
+                        :label="
+                          t('app.campaigns.fields.exclusivityEndsOnOverview', {
+                            date: formatDay(campaign.attributes.exclusivity_ends_on),
+                          })
+                        "
+                        data-test="overview-exclusivity-ends-on"
                       />
                     </dd>
                   </div>
@@ -1452,13 +1519,17 @@ const requirementRows = computed<RequirementRow[]>(() => {
             <CampaignForm
               v-if="editForm"
               v-model="editForm"
-              :brands="[]"
+              :brands="exclusivityBrandOptions"
               hide-brand
+              :own-brand-id="campaign?.relationships.brand.data.id ?? null"
+              :listed-exclusive-brands="campaign?.attributes.exclusive_brands ?? []"
+              :stored-exclusivity-ends-on="campaign?.attributes.exclusivity_ends_on ?? null"
               :submitting="saving"
               :submit-label="t('app.campaigns.actions.saveSettings')"
               :error="saveError"
               :field-errors="fieldErrors"
               :region-restriction-enabled="regionRestrictionEnabled"
+              :brand-exclusivity-enabled="brandExclusivityEnabled"
               @submit="onSaveSettings"
             />
             <v-snackbar

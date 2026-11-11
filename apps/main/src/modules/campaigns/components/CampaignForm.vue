@@ -31,7 +31,7 @@
  * extractFieldErrors pattern); the parent owns the network layer.
  */
 
-import type { CreateCampaignPayload } from '@catalyst/api-client'
+import type { CreateCampaignPayload, ExclusiveBrand } from '@catalyst/api-client'
 import { COUNTRY_OPTIONS, euLanguageOptions } from '@catalyst/api-client'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -63,11 +63,31 @@ const props = withDefaults(
      * rather than offered.
      */
     regionRestrictionEnabled?: boolean
+    /**
+     * AH-120: the `campaign_brand_exclusivity` feature switch (from `/me`). The brand
+     * multi-select and the end date render only while it is on; the server refuses a
+     * non-empty list or a date while the flag is off, so the controls are hidden rather
+     * than offered.
+     */
+    brandExclusivityEnabled?: boolean
+    /** AH-120 (Settings edit): the campaign's own brand, which can never be blocked. */
+    ownBrandId?: string | null
+    /**
+     * AH-120 (Settings edit): the stored list. An archived brand on it stays blocked: it is
+     * shown with the Archived pill and can be removed, never added again.
+     */
+    listedExclusiveBrands?: ExclusiveBrand[]
+    /** AH-120 (Settings edit): the stored end date, so an unchanged past date is not an error. */
+    storedExclusivityEndsOn?: string | null
   }>(),
   {
     fieldErrors: () => ({}),
     hideBrand: false,
     regionRestrictionEnabled: false,
+    brandExclusivityEnabled: false,
+    ownBrandId: null,
+    listedExclusiveBrands: () => [],
+    storedExclusivityEndsOn: null,
   },
 )
 
@@ -142,6 +162,73 @@ const restrictRegionsErrors = computed(() =>
     ? [t('app.campaigns.errors.restrictNeedsRegions')]
     : [],
 )
+// ── AH-120: brand exclusivity ────────────────────────────────────────────────────────────
+const MAX_EXCLUSIVE_BRANDS = 50
+
+/** The brand that can never be blocked: the payload's brand on create, the stored one on edit. */
+const ownBrandForExclusivity = computed(() =>
+  props.hideBrand ? props.ownBrandId : (local.value.brand_id ?? null),
+)
+const selectedExclusiveIds = computed(() => local.value.exclusive_brand_ids ?? [])
+
+const exclusiveBrandItems = computed(() => {
+  const own = ownBrandForExclusivity.value
+  const selected = new Set(selectedExclusiveIds.value)
+  const items: { title: string; value: string; props?: { disabled: boolean } }[] = props.brands
+    .filter((b) => b.id !== own)
+    .map((b) => ({ title: b.name, value: b.id }))
+  const known = new Set(items.map((i) => i.value))
+  for (const b of props.listedExclusiveBrands) {
+    if (b.id === own || known.has(b.id)) continue
+    // An archived brand already on the list stays visible and removable; it cannot be added.
+    items.push({
+      title: b.is_archived ? `${b.name} (${t('app.brands.status.archived')})` : b.name,
+      value: b.id,
+      ...(b.is_archived ? { props: { disabled: !selected.has(b.id) } } : {}),
+    })
+  }
+  return items
+})
+
+const exclusiveBrandsErrors = computed(() => {
+  const server = Object.entries(props.fieldErrors ?? {})
+    .filter(([key]) => key === 'exclusive_brand_ids' || key.startsWith('exclusive_brand_ids.'))
+    .flatMap(([, messages]) => [...(messages ?? [])])
+  const over =
+    selectedExclusiveIds.value.length > MAX_EXCLUSIVE_BRANDS
+      ? [t('app.campaigns.fields.exclusiveBrandsLimit', { max: MAX_EXCLUSIVE_BRANDS })]
+      : []
+  return [...over, ...server]
+})
+
+function onBrandChange(value: string | null): void {
+  // Choosing the brand that is already on the blocked list would be a 422: drop it.
+  const kept = (local.value.exclusive_brand_ids ?? []).filter((id) => id !== value)
+  local.value = { ...local.value, brand_id: value ?? '' }
+  if (
+    props.brandExclusivityEnabled &&
+    kept.length !== (local.value.exclusive_brand_ids ?? []).length
+  ) {
+    local.value = { ...local.value, exclusive_brand_ids: kept }
+  }
+  emitUpdate()
+}
+
+/** UTC calendar date, the same clock the server uses. */
+const todayUtc = new Date().toISOString().slice(0, 10)
+const exclusivityDateErrors = computed(() => {
+  const value = local.value.exclusivity_ends_on
+  const past =
+    typeof value === 'string' &&
+    value !== '' &&
+    value !== props.storedExclusivityEndsOn &&
+    value < todayUtc
+  return [
+    ...(past ? [t('app.campaigns.errors.exclusivityDateInPast')] : []),
+    ...fieldErrorList('exclusivity_ends_on'),
+  ]
+})
+
 const listingExamplesUrlErrors = computed(() => fieldErrorList('listing_examples_url'))
 
 // A campaign's production languages follow the operating markets, so the
@@ -183,7 +270,7 @@ const descriptionTextareaHandle = computed<TextareaHandle | null>(
       item-value="value"
       required
       data-test="campaign-brand"
-      @update:model-value="update('brand_id', $event)"
+      @update:model-value="onBrandChange($event)"
     />
 
     <v-text-field
@@ -342,6 +429,39 @@ const descriptionTextareaHandle = computed<TextareaHandle | null>(
       data-test="campaign-restrict-to-regions"
       @update:model-value="update('restrict_to_listing_regions', $event === true)"
     />
+
+    <!-- AH-120: brand exclusivity. Flag-gated; with it off the DOM is the one it was. -->
+    <template v-if="brandExclusivityEnabled">
+      <v-autocomplete
+        :model-value="selectedExclusiveIds"
+        :label="t('app.campaigns.fields.exclusiveBrands')"
+        :hint="`${t('app.campaigns.fields.exclusiveBrandsHint')} ${t('app.campaigns.fields.exclusiveBrandsLimit', { max: MAX_EXCLUSIVE_BRANDS })}`"
+        :placeholder="t('app.campaigns.fields.exclusiveBrandsPlaceholder')"
+        :error-messages="exclusiveBrandsErrors"
+        :items="exclusiveBrandItems"
+        item-title="title"
+        item-value="value"
+        multiple
+        chips
+        closable-chips
+        persistent-hint
+        class="mt-3"
+        data-test="campaign-exclusive-brands"
+        @update:model-value="update('exclusive_brand_ids', $event)"
+      />
+      <v-text-field
+        :model-value="local.exclusivity_ends_on ?? ''"
+        :label="t('app.campaigns.fields.exclusivityEndsOn')"
+        :hint="t('app.campaigns.fields.exclusivityEndsOnHint')"
+        :error-messages="exclusivityDateErrors"
+        :min="todayUtc"
+        persistent-hint
+        type="date"
+        class="mb-3"
+        data-test="campaign-exclusivity-ends-on"
+        @update:model-value="update('exclusivity_ends_on', $event || null)"
+      />
+    </template>
 
     <v-text-field
       :model-value="local.listing_examples_url ?? ''"

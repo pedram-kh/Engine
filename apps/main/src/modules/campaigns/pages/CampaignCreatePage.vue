@@ -25,6 +25,11 @@ const regionRestrictionEnabled = computed(
   () => authStore.user?.attributes.features?.campaign_region_restriction === true,
 )
 
+// AH-120: the brand multi-select and end date render only while the flag is on.
+const brandExclusivityEnabled = computed(
+  () => authStore.user?.attributes.features?.campaign_brand_exclusivity === true,
+)
+
 function emptyForm(): CreateCampaignPayload {
   // `objective` is omitted — the server defaults it to `ugc` (D-1).
   return {
@@ -78,7 +83,9 @@ async function onSubmit(): Promise<void> {
     const res = await campaignsApi.create(agencyId, form.value)
     await router.push({ name: 'campaigns.detail', params: { ulid: res.data.id } })
   } catch (err) {
-    if (err instanceof ApiError) {
+    if (err instanceof ApiError && err.code === 'campaign.brand_exclusivity_disabled') {
+      error.value = t('app.campaigns.errors.brandExclusivityDisabled')
+    } else if (err instanceof ApiError) {
       const grouped = extractFieldErrors<string>(err)
       fieldErrors.value = grouped
       if (Object.keys(grouped).length === 0) {
@@ -123,6 +130,7 @@ async function onSubmit(): Promise<void> {
         :error="error"
         :field-errors="fieldErrors"
         :region-restriction-enabled="regionRestrictionEnabled"
+        :brand-exclusivity-enabled="brandExclusivityEnabled"
         @submit="onSubmit"
       />
     </section>

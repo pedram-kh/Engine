@@ -54,6 +54,18 @@ vi.mock('../api/campaigns.api', () => ({
 
 import { campaignsApi } from '../api/campaigns.api'
 
+// AH-120: the Settings multi-select reads the agency's brands while the flag is on.
+vi.mock('@/modules/brands/api/brands.api', () => ({
+  brandsApi: {
+    listOptions: vi.fn().mockResolvedValue({
+      data: [
+        { id: 'zava-ulid', type: 'brands', attributes: { name: 'Zava' } },
+        { id: 'yahoo-ulid', type: 'brands', attributes: { name: 'Yahoo' } },
+      ],
+    }),
+  },
+}))
+
 // Sprint 12 Chunk 2: the Board tab now mounts the live BoardView (no longer
 // coming-soon). Mock the board API so no transport runs when the tab opens.
 vi.mock('@/modules/boards/api/board.api', () => ({
@@ -203,7 +215,11 @@ async function mountDetail(
     /** AH-116: the campaign's attached files (default: none). */
     files?: CampaignAttachmentResource[]
     /** AH-118: the `/me` feature switches (default: both off). */
-    features?: { campaign_region_restriction?: boolean; assignment_offer_edit?: boolean }
+    features?: {
+      campaign_region_restriction?: boolean
+      assignment_offer_edit?: boolean
+      campaign_brand_exclusivity?: boolean
+    }
     /** AH-116: the files read fails. */
     filesError?: boolean
   } = {},
@@ -1540,6 +1556,111 @@ describe('CampaignDetailPage — AH-118 offer edit and the region switch', () =>
       CAMPAIGN_ULID,
       expect.objectContaining({ restrict_to_listing_regions: true }),
     )
+  })
+
+  // ── AH-120: brand exclusivity ────────────────────────────────────────────────────────────
+  const EXCL_ON = { campaign_brand_exclusivity: true }
+  const BLOCKS_ZAVA = {
+    exclusive_brand_ids: ['zava-ulid'],
+    exclusive_brands: [{ id: 'zava-ulid', name: 'Zava', is_archived: false }],
+    exclusivity_ends_on: '2099-03-31',
+  }
+
+  it('never sends the exclusivity fields on a Settings save while the flag is off', async () => {
+    const harness = await mountDetail('agency_admin', [], { campaign: BLOCKS_ZAVA })
+    cleanup = harness.cleanup
+    ;(harness.wrapper.vm as unknown as { tab: string }).tab = 'settings'
+    await flushPromises()
+    vi.mocked(campaignsApi.update).mockResolvedValue({ data: makeCampaign() })
+
+    expect(harness.wrapper.find('[data-test="campaign-exclusive-brands"]').exists()).toBe(false)
+    await harness.wrapper.find('[data-test="campaign-form"]').trigger('submit')
+    await flushPromises()
+
+    const payload = vi.mocked(campaignsApi.update).mock.calls[0]?.[2] as Record<string, unknown>
+    expect('exclusive_brand_ids' in payload).toBe(false)
+    expect('exclusivity_ends_on' in payload).toBe(false)
+  })
+
+  it('seeds and sends the stored list and date on a Settings save while the flag is on', async () => {
+    const harness = await mountDetail('agency_admin', [], {
+      campaign: BLOCKS_ZAVA,
+      features: EXCL_ON,
+    })
+    cleanup = harness.cleanup
+    ;(harness.wrapper.vm as unknown as { tab: string }).tab = 'settings'
+    await flushPromises()
+    vi.mocked(campaignsApi.update).mockResolvedValue({ data: makeCampaign() })
+
+    expect(harness.wrapper.find('[data-test="campaign-exclusive-brands"]').exists()).toBe(true)
+    await harness.wrapper.find('[data-test="campaign-form"]').trigger('submit')
+    await flushPromises()
+
+    expect(campaignsApi.update).toHaveBeenCalledWith(
+      'agency-ulid',
+      CAMPAIGN_ULID,
+      expect.objectContaining({
+        exclusive_brand_ids: ['zava-ulid'],
+        exclusivity_ends_on: '2099-03-31',
+      }),
+    )
+  })
+
+  it('shows the localized message when the server says the flag is off under an open form', async () => {
+    const harness = await mountDetail('agency_admin', [], {
+      campaign: BLOCKS_ZAVA,
+      features: EXCL_ON,
+    })
+    cleanup = harness.cleanup
+    ;(harness.wrapper.vm as unknown as { tab: string }).tab = 'settings'
+    await flushPromises()
+    vi.mocked(campaignsApi.update).mockRejectedValue(
+      new ApiError({
+        status: 422,
+        code: 'campaign.brand_exclusivity_disabled',
+        message: 'Blocking creators is not available yet.',
+        details: [],
+        requestId: 'r1',
+      } as never),
+    )
+
+    await harness.wrapper.find('[data-test="campaign-form"]').trigger('submit')
+    await flushPromises()
+
+    expect(harness.wrapper.find('[data-test="campaign-form-error"]').text()).toBe(
+      'Brand exclusivity is not available yet.',
+    )
+  })
+
+  it('Overview: lists the blocked brands and the end date while the flag is on', async () => {
+    const harness = await mountDetail('agency_admin', [], {
+      campaign: {
+        ...BLOCKS_ZAVA,
+        exclusive_brands: [
+          { id: 'zava-ulid', name: 'Zava', is_archived: false },
+          { id: 'old-ulid', name: 'Old Co', is_archived: true },
+        ],
+      },
+      features: EXCL_ON,
+    })
+    cleanup = harness.cleanup
+
+    expect(harness.wrapper.find('[data-test="overview-exclusive-brands"]').text()).toBe(
+      'Zava, Old Co (Archived)',
+    )
+    expect(harness.wrapper.find('[data-test="overview-exclusivity-ends-on"]').text()).toContain(
+      'Ends on',
+    )
+  })
+
+  it('Overview: no exclusivity row while the flag is off, or when nothing is blocked', async () => {
+    const off = await mountDetail('agency_admin', [], { campaign: BLOCKS_ZAVA })
+    expect(off.wrapper.find('[data-test="overview-exclusive-brands-field"]').exists()).toBe(false)
+    off.cleanup()
+
+    const none = await mountDetail('agency_admin', [], { features: EXCL_ON })
+    cleanup = none.cleanup
+    expect(none.wrapper.find('[data-test="overview-exclusive-brands-field"]').exists()).toBe(false)
   })
 
   // ── W1: the restriction on Overview ──────────────────────────────────────────────────────

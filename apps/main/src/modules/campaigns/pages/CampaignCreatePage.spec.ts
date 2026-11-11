@@ -10,6 +10,7 @@
  * can be deleted silently and every new campaign quietly expects posting again.
  */
 
+import { ApiError } from '@catalyst/api-client'
 import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createI18n } from 'vue-i18n'
@@ -33,7 +34,7 @@ vi.mock('@/core/stores/useAgencyStore', () => ({
 
 // AH-118: the page reads `/me` features through the auth store; the real store
 // pulls in the agency store this spec replaces, so it is replaced here too.
-const features: { campaign_region_restriction?: boolean } = {}
+const features: { campaign_region_restriction?: boolean; campaign_brand_exclusivity?: boolean } = {}
 vi.mock('@/modules/auth/stores/useAuthStore', () => ({
   useAuthStore: () => ({ user: { attributes: { features } } }),
 }))
@@ -48,8 +49,11 @@ import { campaignsApi } from '../api/campaigns.api'
 import CampaignForm from '../components/CampaignForm.vue'
 import CampaignCreatePage from './CampaignCreatePage.vue'
 
-async function mountPage(flags: { campaign_region_restriction?: boolean } = {}) {
+async function mountPage(
+  flags: { campaign_region_restriction?: boolean; campaign_brand_exclusivity?: boolean } = {},
+) {
   delete features.campaign_region_restriction
+  delete features.campaign_brand_exclusivity
   Object.assign(features, flags)
 
   const i18n = createI18n({
@@ -175,5 +179,63 @@ describe('CampaignCreatePage — the region switch (AH-118)', () => {
     expect((toggle.element as HTMLInputElement).checked).toBe(false)
     // Nothing to restrict to yet: disabled until a region is chosen.
     expect((toggle.element as HTMLInputElement).disabled).toBe(true)
+  })
+})
+
+describe('CampaignCreatePage — brand exclusivity (AH-120)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.mocked(brandsApi.listOptions).mockResolvedValue({
+      data: [
+        { id: 'acme-ulid', type: 'brands', attributes: { name: 'Acme' } },
+        { id: 'zava-ulid', type: 'brands', attributes: { name: 'Zava' } },
+      ],
+    } as never)
+    vi.mocked(campaignsApi.create).mockResolvedValue({ data: { id: 'new-ulid' } } as never)
+  })
+
+  it('shows no exclusivity control while the flag is off, and sends neither field', async () => {
+    const wrapper = await mountPage()
+    expect(wrapper.find('[data-test="campaign-exclusive-brands"]').exists()).toBe(false)
+    expect(wrapper.find('[data-test="campaign-exclusivity-ends-on"]').exists()).toBe(false)
+
+    await wrapper.find('[data-test="campaign-name"] input').setValue('Autumn UGC')
+    await wrapper.find('[data-test="campaign-form"]').trigger('submit')
+    await flushPromises()
+
+    const payload = vi.mocked(campaignsApi.create).mock.calls[0]?.[1] as unknown as Record<
+      string,
+      unknown
+    >
+    expect('exclusive_brand_ids' in payload).toBe(false)
+    expect('exclusivity_ends_on' in payload).toBe(false)
+  })
+
+  it('shows both controls while the flag is on', async () => {
+    const wrapper = await mountPage({ campaign_brand_exclusivity: true })
+
+    expect(wrapper.find('[data-test="campaign-exclusive-brands"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="campaign-exclusivity-ends-on"]').exists()).toBe(true)
+  })
+
+  it('shows the localized message when the server says the flag is off', async () => {
+    vi.mocked(campaignsApi.create).mockRejectedValue(
+      new ApiError({
+        status: 422,
+        code: 'campaign.brand_exclusivity_disabled',
+        message: 'Blocking creators is not available yet.',
+        details: [],
+        requestId: 'r1',
+      } as never),
+    )
+    const wrapper = await mountPage({ campaign_brand_exclusivity: true })
+
+    await wrapper.find('[data-test="campaign-name"] input').setValue('Autumn UGC')
+    await wrapper.find('[data-test="campaign-form"]').trigger('submit')
+    await flushPromises()
+
+    expect(wrapper.find('[data-test="campaign-form-error"]').text()).toBe(
+      'Brand exclusivity is not available yet.',
+    )
   })
 })

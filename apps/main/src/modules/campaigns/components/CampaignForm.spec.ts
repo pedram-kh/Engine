@@ -190,3 +190,155 @@ describe('CampaignForm — the region switch (AH-118)', () => {
     expect(wrapper.text()).toContain('Choose at least one region to restrict applications.')
   })
 })
+
+describe('CampaignForm — brand exclusivity (AH-120)', () => {
+  const LIST = '[data-test="campaign-exclusive-brands"]'
+  const DATE = '[data-test="campaign-exclusivity-ends-on"]'
+  const BRANDS = [
+    { id: 'brand-ulid', name: 'Acme' },
+    { id: 'zava-ulid', name: 'Zava' },
+    { id: 'yahoo-ulid', name: 'Yahoo' },
+  ]
+
+  function autocompleteItems(wrapper: ReturnType<typeof mountForm>) {
+    return wrapper.findComponent(vuetifyComponents.VAutocomplete).props('items') as {
+      title: string
+      value: string
+      props?: { disabled: boolean }
+    }[]
+  }
+
+  it('renders neither control while the flag is off (the DOM it always was)', () => {
+    const wrapper = mountForm(basePayload(), { brands: BRANDS })
+
+    expect(wrapper.find(LIST).exists()).toBe(false)
+    expect(wrapper.find(DATE).exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('Exclusivity ends on')
+  })
+
+  it('renders the multi-select and the end date while the flag is on, with the hint and the cap', () => {
+    const wrapper = mountForm(basePayload(), { brands: BRANDS, brandExclusivityEnabled: true })
+
+    expect(wrapper.find(LIST).exists()).toBe(true)
+    expect(wrapper.find(DATE).exists()).toBe(true)
+    expect(wrapper.text()).toContain('Block creators selected here from applying to')
+    expect(wrapper.text()).toContain('Invitations are not affected.')
+    expect(wrapper.text()).toContain('Up to 50 brands')
+  })
+
+  it("offers every brand except the campaign's own (create: the chosen brand)", () => {
+    const wrapper = mountForm(basePayload({ brand_id: 'brand-ulid' }), {
+      brands: BRANDS,
+      brandExclusivityEnabled: true,
+    })
+
+    expect(autocompleteItems(wrapper).map((i) => i.value)).toEqual(['zava-ulid', 'yahoo-ulid'])
+  })
+
+  it('offers every brand except the stored one on the Settings edit (hide-brand)', () => {
+    const wrapper = mountForm(basePayload({ brand_id: 'zava-ulid' }), {
+      brands: BRANDS,
+      hideBrand: true,
+      ownBrandId: 'zava-ulid',
+      brandExclusivityEnabled: true,
+    })
+
+    expect(autocompleteItems(wrapper).map((i) => i.value)).toEqual(['brand-ulid', 'yahoo-ulid'])
+  })
+
+  it('keeps an archived brand that is already listed (marked, removable), and never offers it otherwise', () => {
+    const archived = { id: 'old-ulid', name: 'Old Co', is_archived: true }
+
+    const listed = mountForm(basePayload({ exclusive_brand_ids: ['old-ulid'] }), {
+      brands: BRANDS,
+      brandExclusivityEnabled: true,
+      listedExclusiveBrands: [archived],
+    })
+    const row = autocompleteItems(listed).find((i) => i.value === 'old-ulid')
+    expect(row?.title).toBe('Old Co (Archived)')
+    expect(row?.props?.disabled).toBe(false)
+
+    // Removed from the selection: still shown, but can no longer be picked again.
+    const removed = mountForm(basePayload({ exclusive_brand_ids: [] }), {
+      brands: BRANDS,
+      brandExclusivityEnabled: true,
+      listedExclusiveBrands: [archived],
+    })
+    expect(autocompleteItems(removed).find((i) => i.value === 'old-ulid')?.props?.disabled).toBe(
+      true,
+    )
+  })
+
+  it('emits exclusive_brand_ids on change', async () => {
+    const wrapper = mountForm(basePayload(), { brands: BRANDS, brandExclusivityEnabled: true })
+
+    wrapper
+      .findComponent(vuetifyComponents.VAutocomplete)
+      .vm.$emit('update:modelValue', ['zava-ulid'])
+    await flushPromises()
+
+    const emitted = wrapper.emitted('update:modelValue')?.at(-1)?.[0] as CreateCampaignPayload
+    expect(emitted.exclusive_brand_ids).toEqual(['zava-ulid'])
+  })
+
+  it("drops the blocked brand that the campaign's own brand just became (create)", async () => {
+    const wrapper = mountForm(basePayload({ exclusive_brand_ids: ['zava-ulid', 'yahoo-ulid'] }), {
+      brands: BRANDS,
+      brandExclusivityEnabled: true,
+    })
+
+    wrapper.findComponent(vuetifyComponents.VSelect).vm.$emit('update:modelValue', 'zava-ulid')
+    await flushPromises()
+
+    const emitted = wrapper.emitted('update:modelValue')?.at(-1)?.[0] as CreateCampaignPayload
+    expect(emitted.brand_id).toBe('zava-ulid')
+    expect(emitted.exclusive_brand_ids).toEqual(['yahoo-ulid'])
+  })
+
+  it('emits null when the end date is cleared', async () => {
+    const wrapper = mountForm(basePayload({ exclusivity_ends_on: '2099-01-31' }), {
+      brands: BRANDS,
+      brandExclusivityEnabled: true,
+    })
+
+    const date = wrapper
+      .findAllComponents(vuetifyComponents.VTextField)
+      .find((c) => c.attributes('data-test') === 'campaign-exclusivity-ends-on')
+    date?.vm.$emit('update:modelValue', '')
+    await flushPromises()
+
+    const emitted = wrapper.emitted('update:modelValue')?.at(-1)?.[0] as CreateCampaignPayload
+    expect(emitted.exclusivity_ends_on).toBeNull()
+  })
+
+  it('says so before the round trip when a CHANGED date is in the past, but not for an unchanged one', () => {
+    const changed = mountForm(basePayload({ exclusivity_ends_on: '2000-01-01' }), {
+      brands: BRANDS,
+      brandExclusivityEnabled: true,
+    })
+    expect(changed.text()).toContain('Choose today or a later date.')
+
+    const unchanged = mountForm(basePayload({ exclusivity_ends_on: '2000-01-01' }), {
+      brands: BRANDS,
+      brandExclusivityEnabled: true,
+      storedExclusivityEndsOn: '2000-01-01',
+    })
+    expect(unchanged.text()).not.toContain('Choose today or a later date.')
+
+    const future = mountForm(basePayload({ exclusivity_ends_on: '2099-01-01' }), {
+      brands: BRANDS,
+      brandExclusivityEnabled: true,
+    })
+    expect(future.text()).not.toContain('Choose today or a later date.')
+  })
+
+  it("shows the server's per-brand refusal on the list", () => {
+    const wrapper = mountForm(basePayload({ exclusive_brand_ids: ['zava-ulid'] }), {
+      brands: BRANDS,
+      brandExclusivityEnabled: true,
+      fieldErrors: { 'exclusive_brand_ids.0': ['Choose a brand from this agency.'] },
+    })
+
+    expect(wrapper.text()).toContain('Choose a brand from this agency.')
+  })
+})
