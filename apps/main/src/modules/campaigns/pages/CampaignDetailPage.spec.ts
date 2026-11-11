@@ -49,6 +49,18 @@ vi.mock('../api/campaigns.api', () => ({
     proceedWithoutContract: vi.fn(),
     // AH-116: the Overview files strip reads the campaign's attachments.
     listAttachments: vi.fn(),
+    // AH-120: the invite dialog's advisory conflicts read.
+    exclusivityConflicts: vi.fn(),
+  },
+}))
+
+// The invite dialog loads the roster when it opens; no transport in this spec.
+vi.mock('@/modules/roster/api/roster.api', () => ({
+  rosterApi: {
+    list: vi.fn().mockResolvedValue({
+      data: [],
+      meta: { total: 0, page: 1, per_page: 100, last_page: 1 },
+    }),
   },
 }))
 
@@ -1661,6 +1673,43 @@ describe('CampaignDetailPage — AH-118 offer edit and the region switch', () =>
     const none = await mountDetail('agency_admin', [], { features: EXCL_ON })
     cleanup = none.cleanup
     expect(none.wrapper.find('[data-test="overview-exclusive-brands-field"]').exists()).toBe(false)
+  })
+
+  it('passes exclusivityEnabled to the invite dialog: flag on, a selection triggers the conflicts read', async () => {
+    vi.mocked(campaignsApi.exclusivityConflicts).mockResolvedValue({ data: [] })
+    const harness = await mountDetail('agency_admin', [], { features: EXCL_ON })
+    cleanup = harness.cleanup
+
+    await harness.wrapper.find('[data-test="campaign-detail-invite"]').trigger('click')
+    await flushPromises()
+    const dialog = harness.wrapper.findComponent(InviteCreatorsDialog)
+    expect(dialog.props('exclusivityEnabled')).toBe(true)
+    ;(dialog.vm as unknown as { toggleSelect: (id: string, row: unknown) => void }).toggleSelect(
+      '01CREATORA',
+      { attributes: { is_blacklisted: false } },
+    )
+    await flushPromises()
+
+    expect(campaignsApi.exclusivityConflicts).toHaveBeenCalledWith('agency-ulid', CAMPAIGN_ULID, {
+      creator_ids: ['01CREATORA'],
+    })
+  })
+
+  it('passes exclusivityEnabled=false to the invite dialog while the flag is off: no read, ever', async () => {
+    const harness = await mountDetail('agency_admin', [])
+    cleanup = harness.cleanup
+
+    await harness.wrapper.find('[data-test="campaign-detail-invite"]').trigger('click')
+    await flushPromises()
+    const dialog = harness.wrapper.findComponent(InviteCreatorsDialog)
+    expect(dialog.props('exclusivityEnabled')).toBe(false)
+    ;(dialog.vm as unknown as { toggleSelect: (id: string, row: unknown) => void }).toggleSelect(
+      '01CREATORA',
+      { attributes: { is_blacklisted: false } },
+    )
+    await flushPromises()
+
+    expect(campaignsApi.exclusivityConflicts).not.toHaveBeenCalled()
   })
 
   // ── W1: the restriction on Overview ──────────────────────────────────────────────────────

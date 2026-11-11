@@ -770,7 +770,7 @@
           "proceed": "Tabhair cuireadh anyway"
         },
         "exclusivity": {
-          "warning": "Tá {count} cruthaitheoir roghnaithe ar fheachtas a chuireann cosc ar an mbranda seo. Is féidir leat cuireadh a thabhairt dóibh fós.",
+          "warning": "Tá {count} cruthaitheoir roghnaithe ar fheachtas a chuireann cosc ar an mbranda seo. Is féidir leat cuireadh a thabhairt dó fós. | Tá {count} cruthaitheoir roghnaithe ar fheachtas a chuireann cosc ar an mbranda seo. Is féidir leat cuireadh a thabhairt dóibh fós.",
           "creatorLine": "{name}: {campaign}"
         }
       },

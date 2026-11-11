@@ -770,7 +770,7 @@
           "proceed": "Kutsu anyway"
         },
         "exclusivity": {
-          "warning": "{count} valitud loojat on kampaanias, mis blokeerib selle brändi. Saad neid siiski kutsuda.",
+          "warning": "{count} valitud looja on kampaanias, mis blokeerib selle brändi. Saad teda siiski kutsuda. | {count} valitud loojat on kampaanias, mis blokeerib selle brändi. Saad neid siiski kutsuda.",
           "creatorLine": "{name}: {campaign}"
         }
       },

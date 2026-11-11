@@ -770,7 +770,7 @@
           "proceed": "Bjud in ändå"
         },
         "exclusivity": {
-          "warning": "{count} valda skapare ingår i en kampanj som blockerar det här varumärket. Du kan fortfarande bjuda in dem.",
+          "warning": "{count} vald skapare ingår i en kampanj som blockerar det här varumärket. Du kan fortfarande bjuda in dem. | {count} valda skapare ingår i en kampanj som blockerar det här varumärket. Du kan fortfarande bjuda in dem.",
           "creatorLine": "{name}: {campaign}"
         }
       },

@@ -770,7 +770,7 @@
           "proceed": "Invite anyway"
         },
         "exclusivity": {
-          "warning": "{count} selected creator(s) are on a campaign that blocks this brand. You can still invite them.",
+          "warning": "{count} selected creator is on a campaign that blocks this brand. You can still invite them. | {count} selected creators are on a campaign that blocks this brand. You can still invite them.",
           "creatorLine": "{name}: {campaign}"
         }
       },

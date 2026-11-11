@@ -770,7 +770,7 @@
           "proceed": "Invitar de todos modos"
         },
         "exclusivity": {
-          "warning": "{count} creadores seleccionados están en una campaña que bloquea esta marca. Aún puedes invitarlos.",
+          "warning": "{count} creador seleccionado está en una campaña que bloquea esta marca. Aún puedes invitarlo. | {count} creadores seleccionados están en una campaña que bloquea esta marca. Aún puedes invitarlos.",
           "creatorLine": "{name}: {campaign}"
         }
       },

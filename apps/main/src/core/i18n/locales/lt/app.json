@@ -770,7 +770,7 @@
           "proceed": "Pakviesti anyway"
         },
         "exclusivity": {
-          "warning": "{count} pasirinktų kūrėjų yra kampanijoje, kuri blokuoja šį prekių ženklą. Vis tiek gali juos pakviesti.",
+          "warning": "{count} pasirinktas kūrėjas yra kampanijoje, kuri blokuoja šį prekių ženklą. Vis tiek gali jį pakviesti. | {count} pasirinktų kūrėjų yra kampanijoje, kuri blokuoja šį prekių ženklą. Vis tiek gali juos pakviesti.",
           "creatorLine": "{name}: {campaign}"
         }
       },

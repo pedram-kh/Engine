@@ -770,7 +770,7 @@
           "proceed": "Kutsu anyway"
         },
         "exclusivity": {
-          "warning": "{count} valittua tekijää on kampanjassa, joka estää tämän brändin. Voit silti kutsua heidät.",
+          "warning": "{count} valittu tekijä on kampanjassa, joka estää tämän brändin. Voit silti kutsua hänet. | {count} valittua tekijää on kampanjassa, joka estää tämän brändin. Voit silti kutsua heidät.",
           "creatorLine": "{name}: {campaign}"
         }
       },

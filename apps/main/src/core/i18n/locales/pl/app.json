@@ -770,7 +770,7 @@
           "proceed": "Zaproś mimo to"
         },
         "exclusivity": {
-          "warning": "Liczba wybranych twórców w kampanii blokującej tę markę: {count}. Nadal możesz ich zaprosić.",
+          "warning": "{count} wybrany twórca jest w kampanii blokującej tę markę. Nadal możesz go zaprosić. | Liczba wybranych twórców w kampanii blokującej tę markę: {count}. Nadal możesz ich zaprosić.",
           "creatorLine": "{name}: {campaign}"
         }
       },

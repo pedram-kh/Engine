@@ -770,7 +770,7 @@
           "proceed": "Uzaicināt anyway"
         },
         "exclusivity": {
-          "warning": "{count} izvēlēti veidotāji ir kampaņā, kas bloķē šo zīmolu. Tu joprojām vari viņus uzaicināt.",
+          "warning": "Izvēlēto veidotāju kampaņā, kas bloķē šo zīmolu: {count}. Uzaicināšana joprojām ir iespējama. | Izvēlēto veidotāju kampaņā, kas bloķē šo zīmolu: {count}. Uzaicināšana joprojām ir iespējama.",
           "creatorLine": "{name}: {campaign}"
         }
       },

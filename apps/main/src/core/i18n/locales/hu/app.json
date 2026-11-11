@@ -770,7 +770,7 @@
           "proceed": "Meghívás anyway"
         },
         "exclusivity": {
-          "warning": "{count} kiválasztott alkotó olyan kampányban van, amely tiltja ezt a márkát. Meghívhatod őket így is.",
+          "warning": "{count} kiválasztott alkotó olyan kampányban van, amely tiltja ezt a márkát. Meghívhatod őt így is. | {count} kiválasztott alkotó olyan kampányban van, amely tiltja ezt a márkát. Meghívhatod őket így is.",
           "creatorLine": "{name}: {campaign}"
         }
       },

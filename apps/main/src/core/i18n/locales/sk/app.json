@@ -770,7 +770,7 @@
           "proceed": "Přesto pozvat"
         },
         "exclusivity": {
-          "warning": "Počet vybraných tvorcov v kampani, ktorá blokuje túto značku: {count}. Stále ich môžeš pozvať.",
+          "warning": "{count} vybraný tvorca je v kampani, ktorá blokuje túto značku. Stále ho môžeš pozvať. | Počet vybraných tvorcov v kampani, ktorá blokuje túto značku: {count}. Stále ich môžeš pozvať.",
           "creatorLine": "{name}: {campaign}"
         }
       },

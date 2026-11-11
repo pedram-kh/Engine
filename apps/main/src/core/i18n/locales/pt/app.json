@@ -770,7 +770,7 @@
           "proceed": "Convidar mesmo assim"
         },
         "exclusivity": {
-          "warning": "{count} criadores selecionados estão numa campanha que bloqueia esta marca. Ainda os podes convidar.",
+          "warning": "{count} criador selecionado está numa campanha que bloqueia esta marca. Ainda o podes convidar. | {count} criadores selecionados estão numa campanha que bloqueia esta marca. Ainda os podes convidar.",
           "creatorLine": "{name}: {campaign}"
         }
       },

@@ -770,7 +770,7 @@
           "proceed": "Invitér alligevel"
         },
         "exclusivity": {
-          "warning": "{count} valgte skabere er på en kampagne, der blokerer dette brand. Du kan stadig invitere dem.",
+          "warning": "{count} valgt skaber er på en kampagne, der blokerer dette brand. Du kan stadig invitere dem. | {count} valgte skabere er på en kampagne, der blokerer dette brand. Du kan stadig invitere dem.",
           "creatorLine": "{name}: {campaign}"
         }
       },

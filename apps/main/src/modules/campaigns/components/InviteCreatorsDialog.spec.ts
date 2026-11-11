@@ -370,9 +370,27 @@ describe('InviteCreatorsDialog — brand exclusivity warning (AH-120)', () => {
       creator_ids: ['01CREATORA', '01CREATORB'],
     })
     const warning = document.querySelector('[data-test="invite-creators-exclusivity"]')
-    expect(warning?.textContent).toContain('1 selected creator(s)')
+    expect(warning?.textContent).toContain('1 selected creator is on a campaign')
+    expect(warning?.textContent).not.toContain('(s)')
     expect(warning?.textContent).toContain('Ada Lovelace: Zava Summer')
     expect(warning?.textContent).not.toContain('Bo Burnham')
+  })
+
+  it('pluralises: two blocked creators read "2 selected creators are on a campaign"', async () => {
+    vi.mocked(campaignsApi.exclusivityConflicts).mockResolvedValue({
+      data: {
+        '01CREATORA': { blocking_campaign: { id: 'c1', name: 'Zava Summer' } },
+        '01CREATORB': { blocking_campaign: { id: 'c1', name: 'Zava Summer' } },
+      },
+    })
+    wrapper = mountDialog(ROWS, { exclusivityEnabled: true })
+    await flushPromises()
+    await pick('01CREATORA')
+    await pick('01CREATORB')
+
+    const text = document.querySelector('[data-test="invite-creators-exclusivity"]')?.textContent
+    expect(text).toContain('2 selected creators are on a campaign')
+    expect(text).not.toContain('(s)')
   })
 
   it('never blocks: the invite button stays enabled while the warning shows', async () => {

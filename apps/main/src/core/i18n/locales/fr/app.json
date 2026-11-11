@@ -770,7 +770,7 @@
           "proceed": "Inviter quand même"
         },
         "exclusivity": {
-          "warning": "{count} créateurs sélectionnés sont sur une campagne qui bloque cette marque. Tu peux quand même les inviter.",
+          "warning": "{count} créateur sélectionné est sur une campagne qui bloque cette marque. Tu peux quand même l'inviter. | {count} créateurs sélectionnés sont sur une campagne qui bloque cette marque. Tu peux quand même les inviter.",
           "creatorLine": "{name}: {campaign}"
         }
       },

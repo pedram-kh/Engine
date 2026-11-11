@@ -770,7 +770,7 @@
           "proceed": "Trotzdem einladen"
         },
         "exclusivity": {
-          "warning": "{count} ausgewählte Creator sind in einer Kampagne, die diese Marke blockiert. Du kannst sie trotzdem einladen.",
+          "warning": "{count} ausgewählter Creator ist in einer Kampagne, die diese Marke blockiert. Eine Einladung ist trotzdem möglich. | {count} ausgewählte Creator sind in einer Kampagne, die diese Marke blockiert. Du kannst sie trotzdem einladen.",
           "creatorLine": "{name}: {campaign}"
         }
       },

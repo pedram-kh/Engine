@@ -770,7 +770,7 @@
           "proceed": "Přesto pozvat"
         },
         "exclusivity": {
-          "warning": "Izbranih ustvarjalcev v kampanji, ki blokira to blagovno znamko: {count}. Še vedno jih lahko povabiš.",
+          "warning": "{count} izbrani ustvarjalec je v kampanji, ki blokira to blagovno znamko. Še vedno ga lahko povabiš. | Izbranih ustvarjalcev v kampanji, ki blokira to blagovno znamko: {count}. Še vedno jih lahko povabiš.",
           "creatorLine": "{name}: {campaign}"
         }
       },

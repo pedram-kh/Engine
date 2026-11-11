@@ -770,7 +770,7 @@
           "proceed": "Invitați anyway"
         },
         "exclusivity": {
-          "warning": "{count} creatori selectați sunt într-o campanie care blochează acest brand. Îi poți totuși invita.",
+          "warning": "{count} creator selectat este într-o campanie care blochează acest brand. Îl poți totuși invita. | Creatori selectați într-o campanie care blochează acest brand: {count}. Îi poți totuși invita.",
           "creatorLine": "{name}: {campaign}"
         }
       },

@@ -770,7 +770,7 @@
           "proceed": "Stedina anyway"
         },
         "exclusivity": {
-          "warning": "{count} creators magħżula huma f'kampanja li timblokka dan il-brand. Xorta tista' tistedinhom.",
+          "warning": "{count} creator magħżul huwa f'kampanja li timblokka dan il-brand. Xorta tista' tistiednu. | {count} creators magħżula huma f'kampanja li timblokka dan il-brand. Xorta tista' tistedinhom.",
           "creatorLine": "{name}: {campaign}"
         }
       },

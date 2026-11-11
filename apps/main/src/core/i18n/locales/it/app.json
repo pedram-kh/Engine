@@ -770,7 +770,7 @@
           "proceed": "Invita comunque"
         },
         "exclusivity": {
-          "warning": "{count} creator selezionati sono in una campagna che blocca questo brand. Puoi comunque invitarli.",
+          "warning": "{count} creator selezionato è in una campagna che blocca questo brand. Puoi comunque invitarlo. | {count} creator selezionati sono in una campagna che blocca questo brand. Puoi comunque invitarli.",
           "creatorLine": "{name}: {campaign}"
         }
       },
