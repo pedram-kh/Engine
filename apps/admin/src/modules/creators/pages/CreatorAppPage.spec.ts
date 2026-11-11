@@ -264,12 +264,17 @@ describe('CreatorAppPage (AH-102b)', () => {
 
     expect(adminCreatorAppApi.users).toHaveBeenCalledTimes(1)
     expect(adminCreatorAppApi.users).toHaveBeenCalledWith({ ...BASE, search: 'ada' })
-    // `q` reaches the URL after the pause, and not before it.
-    vi.useRealTimers()
-    // The router push settles on a loaded CI runner after the default 1 s: give it room.
-    await vi.waitFor(() => expect(h.router.currentRoute.value.query).toEqual({ q: 'ada' }), {
-      timeout: 10_000,
-    })
+    // `q` reaches the URL after the pause, and not before it. Deterministic, no real-time wait:
+    // the fake clock STAYS installed. (The old version restored real timers here, which drops
+    // every timer the router push had already queued on the fake clock, so the URL write could
+    // never land: it passed only when an earlier test had warmed the route, and failed alone.)
+    // Advancing the fake clock in small steps lets those timers fire; the loop is bounded and
+    // the assertion below is the verdict.
+    for (let i = 0; i < 20 && h.router.currentRoute.value.query.q !== 'ada'; i += 1) {
+      await vi.advanceTimersByTimeAsync(50)
+      await flushPromises()
+    }
+    expect(h.router.currentRoute.value.query).toEqual({ q: 'ada' })
   })
 
   it('shows the empty state and the error surface', async () => {
