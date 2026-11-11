@@ -42,12 +42,14 @@ it('lists a brand once per campaign and reads it back, archived brands included'
     expect($campaign->exclusiveBrands()->pluck('brands.id')->all())->toBe([$brand->id]);
 
     // The unique pair is the guard, not the code that writes it.
-    expect(fn () => DB::table('campaign_exclusive_brands')->insert([
+    // (A nested transaction is a savepoint: on Postgres a failed statement would
+    // otherwise abort the test's own transaction and every later query with it.)
+    expect(fn () => DB::transaction(fn () => DB::table('campaign_exclusive_brands')->insert([
         'campaign_id' => $campaign->id,
         'brand_id' => $brand->id,
         'created_at' => now(),
         'updated_at' => now(),
-    ]))->toThrow(QueryException::class);
+    ])))->toThrow(QueryException::class);
 
     // An archived brand stays on the list: the block does not lift on archive.
     $brand->delete();
@@ -60,7 +62,7 @@ it('removes the list with its campaign and refuses to hard-delete a listed brand
     $campaign->exclusiveBrands()->attach($brand->id);
 
     // Cascade from the campaign side (forceDelete: soft-delete keeps the row).
-    expect(fn () => $brand->forceDelete())->toThrow(QueryException::class);
+    expect(fn () => DB::transaction(fn () => $brand->forceDelete()))->toThrow(QueryException::class);
 
     $campaign->forceDelete();
     expect(DB::table('campaign_exclusive_brands')->count())->toBe(0);
