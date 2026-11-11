@@ -385,7 +385,7 @@ final class Campaign extends Model
             'listing_languages' => 'array',
             'listing_regions' => 'array',
             'restrict_to_listing_regions' => 'boolean',
-            'exclusivity_ends_on' => 'date',
+            'exclusivity_ends_on' => 'date:Y-m-d',
             'listed_at' => 'datetime',
         ];
     }
