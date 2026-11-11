@@ -40,7 +40,7 @@ final class CreatorMessageInboxQuery
     private const PREVIEW_LENGTH = 200;
 
     /**
-     * @param  array{per_page?: int, cursor?: string|null}  $params
+     * @param  array{per_page?: int, cursor?: string|null, unread?: bool, direct?: bool}  $params
      * @return array{rows: list<array<string, mixed>>, meta: array<string, mixed>}
      */
     public function run(Creator $creator, User $viewer, array $params): array
@@ -49,7 +49,18 @@ final class CreatorMessageInboxQuery
 
         $union = $this->threads($creator, $viewer);
 
-        $page = (clone $union)->select('inbox.*')
+        // The two creator filters: `direct` keeps only the relationship (Direct) threads, `unread`
+        // only threads with an unread human message. They combine (AND). The unread pill in `meta`
+        // is the unfiltered total, as on the agency side.
+        $filtered = clone $union;
+        if ((bool) ($params['direct'] ?? false)) {
+            $filtered->where('inbox.type', MessageInboxQuery::TYPE_RELATIONSHIP);
+        }
+        if ((bool) ($params['unread'] ?? false)) {
+            $filtered->where('inbox.unread', '>', 0);
+        }
+
+        $page = (clone $filtered)->select('inbox.*')
             ->orderByDesc('last_at')->orderByDesc('type')->orderByDesc('id');
         $this->applyCursor($page, $params['cursor'] ?? null);
 

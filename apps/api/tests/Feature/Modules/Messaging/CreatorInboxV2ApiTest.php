@@ -131,6 +131,46 @@ it('counts unread messages for the viewer only and ignores system lines', functi
     expect($this->actingAs($creator->user)->getJson(CREATOR_INBOX_URL)->json('meta.unread_threads_total'))->toBe(2);
 });
 
+it('filters by direct and by unread, alone and together, and leaves the unread total unfiltered', function (): void {
+    creatorInboxFlag();
+    ['agency' => $agency, 'admin' => $admin] = inboxWorld(flag: false);
+    $creator = inboxCreator('Ada');
+
+    // direct, unread (agency spoke last); assignment, unread; assignment, read (the creator's own line).
+    $direct = inboxDirect($agency, $creator, humans: 1, at: now()->subHours(3));
+    $direct['messages'][0]->forceFill(['sender_user_id' => $admin->id, 'sender_role' => 'agency_user'])->save();
+    $unreadAsg = inboxAssignment($agency, creator: $creator, humans: 1, at: now()->subHours(2));
+    Message::query()->whereKey($unreadAsg['messages'][0]->id)->update(['sender_user_id' => $admin->id, 'sender_role' => 'agency_user']);
+    $readAsg = inboxAssignment($agency, creator: $creator, humans: 1, at: now()->subHour());
+
+    $ids = fn (string $q) => inboxList($this->actingAs($creator->user)->getJson(CREATOR_INBOX_URL.$q)->assertOk())->pluck('id')->all();
+
+    expect($ids(''))->toHaveCount(3)
+        ->and($ids('?direct=1'))->toBe([$direct['thread']->ulid])
+        ->and($ids('?unread=1'))->toBe([$unreadAsg['thread']->ulid, $direct['thread']->ulid])
+        ->and($ids('?unread=1&direct=1'))->toBe([$direct['thread']->ulid])
+        ->and($ids('?unread=0&direct=0'))->toHaveCount(3)
+        ->and($ids('?unread=1'))->not->toContain($readAsg['thread']->ulid);
+
+    // The pill is the unfiltered total, whatever the filters.
+    expect($this->actingAs($creator->user)->getJson(CREATOR_INBOX_URL.'?direct=1&unread=1')->json('meta.unread_threads_total'))->toBe(2);
+
+    $this->actingAs($creator->user)->getJson(CREATOR_INBOX_URL.'?unread=maybe')->assertUnprocessable();
+});
+
+it('keeps another creator\'s threads out of every filter combination', function (): void {
+    creatorInboxFlag();
+    ['agency' => $agency, 'admin' => $admin] = inboxWorld(flag: false);
+    $mine = inboxCreator('Mine');
+    $other = inboxCreator('Other');
+    $theirs = inboxDirect($agency, $other, humans: 1);
+    $theirs['messages'][0]->forceFill(['sender_user_id' => $admin->id, 'sender_role' => 'agency_user'])->save();
+
+    foreach (['', '?direct=1', '?unread=1', '?direct=1&unread=1'] as $q) {
+        expect(inboxList($this->actingAs($mine->user)->getJson(CREATOR_INBOX_URL.$q)->assertOk())->all())->toBe([]);
+    }
+});
+
 it('does not surface a thread that has only system lines', function (): void {
     creatorInboxFlag();
     ['agency' => $agency] = inboxWorld(flag: false);

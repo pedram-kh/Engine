@@ -37,6 +37,9 @@ final class CreatorMessageInboxController
         $params = $request->validate([
             'per_page' => ['sometimes', 'integer', 'min:1'],
             'cursor' => ['sometimes', 'nullable', 'string', 'max:300'],
+            // AH-115 (walk): the creator's two filters. Additive; absent means "no filter".
+            'unread' => ['sometimes', 'boolean'],
+            'direct' => ['sometimes', 'boolean'],
         ]);
 
         /** @var User $viewer */
