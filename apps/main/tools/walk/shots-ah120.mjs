@@ -76,8 +76,6 @@ const rosterRow = (id, name) => ({
 const ok = (body) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) })
 const missed = []
 
-let brandIds = []
-
 function handle(url, method) {
   const p = url.pathname
   const base = `/api/v1/agencies/${AGENCY}`
@@ -94,7 +92,6 @@ function handle(url, method) {
     }
   }
   const res = fixtureFor(url, method)
-  if (p === `${base}/brands` && res) brandIds = res.data.map((b) => b.id)
   if (method === 'GET' && p === `${base}/campaigns/${DETAIL_ID}` && res) {
     // Two blocked brands (one archived) and an end date, as the show endpoint returns them.
     res.data.attributes.exclusive_brand_ids = ['b-yahoo', 'b-old']
