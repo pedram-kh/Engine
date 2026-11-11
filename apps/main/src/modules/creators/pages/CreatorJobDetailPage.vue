@@ -35,6 +35,12 @@
  *                               in its place. Branches 1-4 keep winning over it: an
  *                               invite never depends on the region.
  *
+ * AH-120 adds one more never-applied outcome, ABOVE the region note: when the creator is
+ * selected on another campaign that blocks this brand, the footer says only "Not available
+ * to you". The wording is deliberately generic and there is no link anywhere: the page never
+ * names the blocking campaign or its brand. Branches 1-4 keep winning, so an invite or an
+ * application that already exists is never hidden by it.
+ *
  * Branch 1 was inserted ABOVE the others rather than merged into them, because
  * the bug it fixes was two truths rendered as one contradiction: the agency
  * rejected an application and later invited the same creator anyway, and the page
@@ -95,6 +101,9 @@ const lifecycleState = computed<JobLifecycleState | null>(
   () => job.value?.attributes.assignment_state ?? null,
 )
 const canApply = computed(() => job.value !== null && status.value === null)
+// AH-120: true when another campaign the creator is selected on blocks this brand. The payload
+// carries no campaign or brand name, by design; a stale-page 422 flips the same field.
+const brandLocked = computed(() => job.value?.attributes.is_brand_locked === true)
 const regionLocked = computed(() => job.value?.attributes.is_region_locked === true)
 // AH-118: the payload names WHY on load (`region_lock_reason`); a stale-page 422
 // writes the same field from its `meta.reason`, so both paths read one place.
@@ -158,6 +167,15 @@ function lockFromRefusal(error: ApiError): void {
   snackbar.value = { color: 'error', text: t('creator.ui.jobs.toast.regionNotAllowed') }
 }
 
+/** A stale page tried to apply to a brand-locked job (AH-120): flip to the locked state. */
+function lockBrandFromRefusal(): void {
+  if (job.value !== null) {
+    job.value.attributes.is_brand_locked = true
+    job.value.attributes.brand_lock_reason = 'brand_exclusive'
+  }
+  snackbar.value = { color: 'error', text: t('creator.ui.jobs.toast.brandNotAvailable') }
+}
+
 async function submitApplication(): Promise<void> {
   if (submitting.value) return
   submitting.value = true
@@ -177,6 +195,12 @@ async function submitApplication(): Promise<void> {
     if (error instanceof ApiError && error.status === 404) {
       snackbar.value = { color: 'error', text: t('creator.ui.jobs.toast.gone') }
       await load()
+    } else if (
+      error instanceof ApiError &&
+      error.status === 422 &&
+      error.code === 'job.brand_exclusive'
+    ) {
+      lockBrandFromRefusal()
     } else if (
       error instanceof ApiError &&
       error.status === 422 &&
@@ -435,6 +459,18 @@ onMounted(() => {
           data-testid="creator-job-applied-notice"
         >
           {{ t('creator.ui.jobs.detail.appliedNotice') }}
+        </v-alert>
+
+        <!-- BRANCH 5-brand (AH-120) — never applied, and a campaign the creator is selected on
+             blocks this brand. Generic on purpose: no campaign, no brand, no link, no Apply. -->
+        <v-alert
+          v-else-if="brandLocked"
+          type="info"
+          variant="tonal"
+          density="compact"
+          data-testid="creator-job-brand-locked"
+        >
+          {{ t('creator.ui.jobs.detail.brandLocked') }}
         </v-alert>
 
         <!-- BRANCH 5a (AH-118) — never applied, and the campaign is limited to

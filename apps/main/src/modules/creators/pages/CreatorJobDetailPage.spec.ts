@@ -57,6 +57,8 @@ function detail(overrides: Record<string, unknown> = {}) {
         listing_regions: ['PT', 'ES'],
         is_region_locked: false,
         region_lock_reason: null,
+        is_brand_locked: false,
+        brand_lock_reason: null,
         listing_examples_url: 'https://examples.test/work',
         assignment_ulid: null,
         attachments: [],
@@ -792,5 +794,99 @@ describe('CreatorJobDetailPage — region-locked jobs (AH-118)', () => {
     expect(wrapper.find('[data-testid="creator-job-region-locked-no-country"]').text()).toBe(
       'Add your country to your profile to apply to jobs that are limited by region.',
     )
+  })
+})
+
+describe('CreatorJobDetailPage — brand exclusivity (AH-120)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    document.body.innerHTML = ''
+    platform.native = false
+  })
+
+  afterEach(() => {
+    platform.native = false
+  })
+
+  const LOCKED = { is_brand_locked: true, brand_lock_reason: 'brand_exclusive' }
+
+  it.each([
+    ['web', false],
+    ['native', true],
+  ])(
+    '%s: replaces Apply with the generic "Not available to you", and links nowhere',
+    async (_l, native) => {
+      platform.native = native
+      mockApi.show.mockResolvedValue(detail(LOCKED) as never)
+      const wrapper = await mountPage()
+
+      expect(wrapper.find('[data-testid="creator-job-apply"]').exists()).toBe(false)
+      const note = wrapper.find('[data-testid="creator-job-brand-locked"]')
+      expect(note.text()).toBe('Not available to you')
+      // No profile link or any other way out of the notice; it names nothing.
+      expect(note.find('a').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="creator-job-region-locked-profile"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="creator-job-detail-name"]').text()).toBe('Autumn UGC push')
+      const container = wrapper.findComponent({ name: native ? 'VBottomSheet' : 'VDialog' })
+      expect(container.props('modelValue')).toBe(false)
+    },
+  )
+
+  it('keeps Apply when the job is not brand-locked', async () => {
+    mockApi.show.mockResolvedValue(detail() as never)
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-apply"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="creator-job-brand-locked"]').exists()).toBe(false)
+  })
+
+  it.each([
+    ['an existing application', { application_status: 'pending' }, 'creator-job-applied-notice'],
+    ['a rejected application', { application_status: 'rejected' }, 'creator-job-rejected-notice'],
+    [
+      'an accepted application',
+      { application_status: 'accepted', assignment_ulid: '01ASSIGN' },
+      'creator-job-accepted-notice',
+    ],
+  ])('lets %s win over the lock', async (_l, over, testid) => {
+    mockApi.show.mockResolvedValue(detail({ ...LOCKED, ...over }) as never)
+    const wrapper = await mountPage()
+
+    expect(wrapper.find(`[data-testid="${testid}"]`).exists()).toBe(true)
+    expect(wrapper.find('[data-testid="creator-job-brand-locked"]').exists()).toBe(false)
+  })
+
+  it('lets a live engagement win over the lock', async () => {
+    mockApi.show.mockResolvedValue(
+      detail({ ...LOCKED, assignment_state: 'in_progress', assignment_ulid: '01A' }) as never,
+    )
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-brand-locked"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="creator-job-apply"]').exists()).toBe(false)
+  })
+
+  it('shows the brand lock, not the region note, when both apply', async () => {
+    mockApi.show.mockResolvedValue(detail({ ...LOCKED, is_region_locked: true }) as never)
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="creator-job-brand-locked"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="creator-job-region-locked"]').exists()).toBe(false)
+  })
+
+  it('a stale Apply that gets 422 job.brand_exclusive flips the page to locked, with a toast', async () => {
+    mockApi.show.mockResolvedValue(detail() as never)
+    mockApi.apply.mockRejectedValue(
+      new ApiError({ status: 422, code: 'job.brand_exclusive', message: 'refused' }),
+    )
+    const wrapper = await mountPage()
+
+    await wrapper.find('[data-testid="creator-job-apply"]').trigger('click')
+    await wrapper.find('[data-testid="creator-job-apply-submit"]').trigger('click')
+    await flushPromises()
+
+    expect(snackbarText()).toBe("This job isn't available to you.")
+    expect(wrapper.find('[data-testid="creator-job-brand-locked"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="creator-job-apply"]').exists()).toBe(false)
   })
 })
