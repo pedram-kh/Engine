@@ -98,6 +98,10 @@ const { rows, loading, loadError, page, lastPage, filter, actionError, hasRows, 
 // offered one). The set is read once, and only when there is a pending row to put a button on.
 const messageable = useMessageableCreatorIds(() => props.agencyId)
 
+function hasConflict(row: CampaignApplicationListItemResource): boolean {
+  return isPending(row) && row.attributes.has_exclusivity_conflict === true
+}
+
 function canMessage(row: CampaignApplicationListItemResource): boolean {
   const creator = row.attributes.creator
   return creator !== null && !creatorIsErased(creator) && messageable.canMessage(creator.id)
@@ -281,6 +285,25 @@ defineExpose({
               :status="row.attributes.status"
               :data-test="`applications-status-${row.id}`"
             />
+            <!-- AH-120: a pending applicant already selected on a campaign that blocks this
+                 brand. A warning only: Accept stays enabled (agency invites are never blocked). -->
+            <v-chip
+              v-if="hasConflict(row)"
+              size="small"
+              color="warning"
+              variant="tonal"
+              prepend-icon="mdi-alert-outline"
+              :data-test="`applications-conflict-${row.id}`"
+            >
+              {{ t('app.campaigns.applications.exclusivityConflict') }}
+              <v-tooltip activator="parent" location="top">
+                {{
+                  t('app.campaigns.applications.exclusivityConflictTooltip', {
+                    campaign: row.attributes.exclusivity_conflict?.name ?? '',
+                  })
+                }}
+              </v-tooltip>
+            </v-chip>
           </v-list-item-title>
 
           <v-list-item-subtitle>

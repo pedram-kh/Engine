@@ -33,6 +33,7 @@ vi.mock('@/modules/roster/api/roster.api', () => ({
 vi.mock('../api/campaigns.api', () => ({
   campaignsApi: {
     invite: vi.fn(),
+    exclusivityConflicts: vi.fn(),
     createAttachmentUpload: vi.fn(),
   },
 }))
@@ -76,7 +77,7 @@ function listResponse(rows: RosterCreatorListItem[]): RosterListResponse {
   } as RosterListResponse
 }
 
-function mountDialog(rows: RosterCreatorListItem[]) {
+function mountDialog(rows: RosterCreatorListItem[], extra: Record<string, unknown> = {}) {
   vi.mocked(rosterApi.list).mockResolvedValue(listResponse(rows))
 
   const i18n = createI18n({
@@ -98,6 +99,7 @@ function mountDialog(rows: RosterCreatorListItem[]) {
       agencyId: 'agency-ulid',
       campaignId: CAMPAIGN,
       campaignCurrency: 'GBP',
+      ...extra,
     },
     global: { plugins: [i18n, vuetify] },
     attachTo: document.createElement('div'),
@@ -331,5 +333,83 @@ describe('InviteCreatorsDialog (campaign invite picker)', () => {
       `Invited 1. Skipped 0 (blacklisted), 0 with conflicts. ${enCreator.creator.unavailable}`,
     )
     expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe(false)
+  })
+})
+
+describe('InviteCreatorsDialog — brand exclusivity warning (AH-120)', () => {
+  let wrapper: ReturnType<typeof mount> | null = null
+  const ROWS = [
+    rosterRow({ creator_id: '01CREATORA', display_name: 'Ada Lovelace' }),
+    rosterRow({ creator_id: '01CREATORB', display_name: 'Bo Burnham' }),
+  ]
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.mocked(campaignsApi.exclusivityConflicts).mockResolvedValue({
+      data: { '01CREATORA': { blocking_campaign: { id: 'c1', name: 'Zava Summer' } } },
+    })
+  })
+
+  afterEach(() => {
+    wrapper?.unmount()
+    wrapper = null
+  })
+
+  async function pick(id: string): Promise<void> {
+    document.querySelector<HTMLElement>(`[data-test="invite-creators-checkbox-${id}"]`)?.click()
+    await flushPromises()
+  }
+
+  it('asks once the selection changes, then warns inline naming creator and campaign', async () => {
+    wrapper = mountDialog(ROWS, { exclusivityEnabled: true })
+    await flushPromises()
+    await pick('01CREATORA')
+    await pick('01CREATORB')
+
+    expect(campaignsApi.exclusivityConflicts).toHaveBeenLastCalledWith('agency-ulid', CAMPAIGN, {
+      creator_ids: ['01CREATORA', '01CREATORB'],
+    })
+    const warning = document.querySelector('[data-test="invite-creators-exclusivity"]')
+    expect(warning?.textContent).toContain('1 selected creator(s)')
+    expect(warning?.textContent).toContain('Ada Lovelace: Zava Summer')
+    expect(warning?.textContent).not.toContain('Bo Burnham')
+  })
+
+  it('never blocks: the invite button stays enabled while the warning shows', async () => {
+    wrapper = mountDialog(ROWS, { exclusivityEnabled: true })
+    await flushPromises()
+    await pick('01CREATORA')
+
+    expect(document.querySelector('[data-test="invite-creators-exclusivity"]') !== null).toBe(true)
+    // A valid offer is all the submit needs: the warning adds no condition of its own.
+    ;(wrapper.vm as unknown as { offerValid: boolean }).offerValid = true
+    await flushPromises()
+    const submit = document.querySelector<HTMLButtonElement>('[data-test="invite-creators-submit"]')
+    expect(submit?.disabled).toBe(false)
+    expect(vi.mocked(campaignsApi.invite)).not.toHaveBeenCalled()
+  })
+
+  it('never calls the read while the flag is off', async () => {
+    wrapper = mountDialog(ROWS)
+    await flushPromises()
+    await pick('01CREATORA')
+
+    expect(campaignsApi.exclusivityConflicts).not.toHaveBeenCalled()
+    expect(document.querySelector('[data-test="invite-creators-exclusivity"]') !== null).toBe(false)
+  })
+
+  it('stays silent when the read fails, and clears the warning when the selection empties', async () => {
+    wrapper = mountDialog(ROWS, { exclusivityEnabled: true })
+    await flushPromises()
+    await pick('01CREATORA')
+    expect(document.querySelector('[data-test="invite-creators-exclusivity"]') !== null).toBe(true)
+
+    await pick('01CREATORA') // deselect
+    expect(document.querySelector('[data-test="invite-creators-exclusivity"]') !== null).toBe(false)
+
+    vi.mocked(campaignsApi.exclusivityConflicts).mockRejectedValue(new Error('boom'))
+    await pick('01CREATORB')
+    expect(document.querySelector('[data-test="invite-creators-exclusivity"]') !== null).toBe(false)
+    expect(document.querySelector('[data-test="invite-creators-error"]') !== null).toBe(false)
   })
 })

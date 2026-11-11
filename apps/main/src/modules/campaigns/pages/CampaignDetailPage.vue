@@ -1258,6 +1258,7 @@ const requirementRows = computed<RequirementRow[]>(() => {
             :agency-id="agencyStore.currentAgencyId"
             :campaign-id="ulid"
             :campaign-currency="campaign?.attributes.budget_currency ?? null"
+            :exclusivity-enabled="brandExclusivityEnabled"
             @invited="onInvited"
           />
 

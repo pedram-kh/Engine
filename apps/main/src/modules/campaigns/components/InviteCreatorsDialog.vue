@@ -49,6 +49,8 @@ const props = defineProps<{
   agencyId: string
   campaignId: string
   campaignCurrency: string | null
+  /** AH-120: the `campaign_brand_exclusivity` flag. Off, the dialog never asks. */
+  exclusivityEnabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -93,6 +95,44 @@ const offer = ref<BuiltOffer>(null)
 // The availability-warning modal state (TIER 2).
 const conflictPrompt = ref(false)
 const conflictedIds = ref<string[]>([])
+
+// AH-120 — a non-blocking heads-up about selected creators who are on a campaign that blocks this
+// brand. READ-ONLY and advisory: it never gates the submit, and a failed read is silent (the
+// server decides at invite time, and an agency invite is never blocked by exclusivity).
+const exclusivityHits = ref<Record<string, string>>({})
+let exclusivitySeq = 0
+
+watch(
+  () => [...selected.value].sort().join(','),
+  async (key) => {
+    const seq = ++exclusivitySeq
+    if (!props.exclusivityEnabled || key === '') {
+      exclusivityHits.value = {}
+      return
+    }
+    try {
+      const res = await campaignsApi.exclusivityConflicts(props.agencyId, props.campaignId, {
+        creator_ids: key.split(','),
+      })
+      if (seq !== exclusivitySeq) return
+      const next: Record<string, string> = {}
+      for (const [id, hit] of Object.entries(res.data)) next[id] = hit.blocking_campaign.name
+      exclusivityHits.value = next
+    } catch {
+      if (seq === exclusivitySeq) exclusivityHits.value = {}
+    }
+  },
+)
+
+const exclusivityLines = computed(() =>
+  Object.entries(exclusivityHits.value).map(([creatorId, campaign]) => {
+    const row = roster.value.find((r) => r.attributes.creator_id === creatorId)
+    const name = row
+      ? creatorLabel(row.attributes, t, t('app.campaigns.invite.unnamed'))
+      : t('app.campaigns.invite.unnamed')
+    return t('app.campaigns.invite.exclusivity.creatorLine', { name, campaign })
+  }),
+)
 
 const searchTerm = computed(() => (search.value ?? '').trim())
 
@@ -147,6 +187,7 @@ async function load(): Promise<void> {
   offerFields.value?.reset()
   offer.value = null
   conflictedIds.value = []
+  exclusivityHits.value = {}
   await fetchRoster('')
   loading.value = false
 }
@@ -332,6 +373,22 @@ function finish(
       </v-card-title>
 
       <v-card-text>
+        <v-alert
+          v-if="exclusivityLines.length > 0"
+          type="warning"
+          variant="tonal"
+          density="compact"
+          class="mb-3"
+          data-test="invite-creators-exclusivity"
+        >
+          <div>
+            {{ t('app.campaigns.invite.exclusivity.warning', { count: exclusivityLines.length }) }}
+          </div>
+          <ul class="ps-4 mt-1">
+            <li v-for="line in exclusivityLines" :key="line">{{ line }}</li>
+          </ul>
+        </v-alert>
+
         <v-alert
           v-if="error"
           type="error"

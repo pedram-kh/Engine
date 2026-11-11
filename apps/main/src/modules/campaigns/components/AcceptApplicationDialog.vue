@@ -59,6 +59,14 @@ const creatorName = computed(() =>
   creatorLabel(props.application?.attributes.creator, t, t('app.campaigns.invite.unnamed')),
 )
 const note = computed(() => props.application?.attributes.note ?? null)
+// AH-120: a heads-up, never a block — the offer below sends exactly as before.
+const exclusivityWarning = computed(() => {
+  const attrs = props.application?.attributes
+  if (!attrs?.has_exclusivity_conflict || !attrs.exclusivity_conflict) return null
+  return t('app.campaigns.applications.accept.exclusivityWarning', {
+    campaign: attrs.exclusivity_conflict.name,
+  })
+})
 const canSubmit = computed(() => offerValid.value && !submitting.value)
 
 watch(
@@ -169,6 +177,17 @@ function proceedWithConflict(): void {
           data-test="accept-application-note"
         >
           {{ note }}
+        </v-alert>
+
+        <v-alert
+          v-if="exclusivityWarning"
+          type="warning"
+          variant="tonal"
+          density="compact"
+          class="mb-3"
+          data-test="accept-application-exclusivity"
+        >
+          {{ exclusivityWarning }}
         </v-alert>
 
         <v-alert

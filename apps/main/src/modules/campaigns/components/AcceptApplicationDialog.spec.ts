@@ -67,7 +67,7 @@ function refusal(code: string): ApiError {
   })
 }
 
-async function mountDialog() {
+async function mountDialog(app: CampaignApplicationListItemResource = application) {
   const i18n = createI18n({
     legacy: false,
     locale: 'en',
@@ -83,7 +83,7 @@ async function mountDialog() {
       modelValue: true,
       agencyId: 'agency-ulid',
       campaignId: 'campaign-ulid',
-      application,
+      application: app,
       campaignCurrency: 'EUR',
     },
     global: { plugins: [i18n, vuetify] },
@@ -300,6 +300,35 @@ describe('AcceptApplicationDialog', () => {
     expect(
       document.querySelector('[data-test="accept-application-refusal"]')?.textContent,
     ).toContain(enApp.app.campaigns.applications.refusal.generic)
+    wrapper.unmount()
+  })
+})
+
+describe('AcceptApplicationDialog — brand exclusivity warning (AH-120)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('warns, naming the blocking campaign, and does not disable the submit', async () => {
+    const wrapper = await mountDialog({
+      ...application,
+      attributes: {
+        ...application.attributes,
+        has_exclusivity_conflict: true,
+        exclusivity_conflict: { id: 'camp-zava', name: 'Zava Summer' },
+      },
+    })
+
+    const warning = document.querySelector('[data-test="accept-application-exclusivity"]')
+    expect(warning?.textContent).toContain('Zava Summer')
+    expect(warning?.textContent).toContain('You can still accept')
+    wrapper.unmount()
+  })
+
+  it('shows no warning without a conflict', async () => {
+    const wrapper = await mountDialog()
+
+    expect(document.querySelector('[data-test="accept-application-exclusivity"]')).toBeNull()
     wrapper.unmount()
   })
 })

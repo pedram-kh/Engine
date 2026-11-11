@@ -530,3 +530,64 @@ describe('ApplicationsTab', () => {
     wrapper.unmount()
   })
 })
+
+describe('ApplicationsTab — brand exclusivity conflict (AH-120)', () => {
+  const CONFLICTED = '01APPCONFLICTEDXXXXXXXXXXX'
+  const PLAIN = '01APPPLAINXXXXXXXXXXXXXXX'
+
+  function withConflict(row: CampaignApplicationListItemResource) {
+    row.attributes.has_exclusivity_conflict = true
+    row.attributes.exclusivity_conflict = { id: 'camp-zava', name: 'Zava Summer' }
+    return row
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.mocked(relationshipMessagingApi.messageableCreators).mockResolvedValue(
+      messageablePage([]) as never,
+    )
+  })
+
+  it('badges a pending row that has a conflict, naming the blocking campaign, and keeps Accept enabled', async () => {
+    vi.mocked(campaignsApi.listApplications).mockResolvedValue(
+      listResponse([withConflict(makeRow(CONFLICTED)), makeRow(PLAIN)], 2) as never,
+    )
+    const wrapper = await mountTab()
+
+    const chip = wrapper.find(`[data-test="applications-conflict-${CONFLICTED}"]`)
+    expect(chip.exists()).toBe(true)
+    expect(chip.text()).toContain('Conflict')
+
+    // The tooltip names the blocking campaign (rendered on hover, teleported to the body).
+    await chip.trigger('mouseenter')
+    await new Promise((r) => setTimeout(r, 400))
+    await flushPromises()
+    expect(document.body.textContent).toContain('Selected for Zava Summer')
+    expect(wrapper.find(`[data-test="applications-conflict-${PLAIN}"]`).exists()).toBe(false)
+
+    const accept = wrapper.find(`[data-test="applications-accept-${CONFLICTED}"]`)
+    expect(accept.exists()).toBe(true)
+    expect(accept.attributes('disabled')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('never badges an answered row, even if the payload carries the flag', async () => {
+    vi.mocked(campaignsApi.listApplications).mockResolvedValue(
+      listResponse([withConflict(makeRow(ANSWERED_ID, 'rejected'))], 0) as never,
+    )
+    const wrapper = await mountTab()
+
+    expect(wrapper.find(`[data-test="applications-conflict-${ANSWERED_ID}"]`).exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('shows no badge when the payload has no conflict fields (flag off)', async () => {
+    vi.mocked(campaignsApi.listApplications).mockResolvedValue(
+      listResponse([makeRow(PLAIN)], 1) as never,
+    )
+    const wrapper = await mountTab()
+
+    expect(wrapper.find('[data-test^="applications-conflict-"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+})
