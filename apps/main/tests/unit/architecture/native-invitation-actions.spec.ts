@@ -26,8 +26,32 @@ interface Rule {
   decls: Map<string, string>
 }
 
-function parse(file: string): Rule[] {
-  const css = readFileSync(file, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+/**
+ * The PHONE rules: everything outside the `@media (min-width: 960px)` block (md and up, AH-115 local
+ * walk), which turns the row into a right-aligned flex line on desktop; that block is read on its own
+ * below. The phone structure pinned here is untouched by it (below md the block does not apply).
+ */
+const DESKTOP_START = '@media (min-width: 960px) {'
+
+function stripDesktop(css: string): string {
+  const start = css.indexOf(DESKTOP_START)
+  if (start === -1) return css
+  let depth = 0
+  for (let i = start; i < css.length; i++) {
+    if (css[i] === '{') depth++
+    if (css[i] === '}' && --depth === 0) return css.slice(0, start) + css.slice(i + 1)
+  }
+  return css
+}
+
+function parse(file: string, desktop = false): Rule[] {
+  const raw = readFileSync(file, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+  const start = raw.indexOf(DESKTOP_START)
+  const css = desktop
+    ? start === -1
+      ? ''
+      : raw.slice(start + DESKTOP_START.length)
+    : stripDesktop(raw)
   const rules: Rule[] = []
   for (const match of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
     const decls = new Map<string, string>()
@@ -44,6 +68,22 @@ function parse(file: string): Rule[] {
 
 const RULES = parse(SHEET)
 const forActions = RULES.filter((r) => r.selector.includes('.assignment__actions'))
+
+describe('invitation actions on desktop (md and up)', () => {
+  const desktop = parse(SHEET, true).filter((r) => r.selector.includes('.assignment__actions'))
+
+  it('are one right-aligned flex line with Accept last, and only inside the md media block', () => {
+    const row = desktop.find(
+      (r) => r.selector === '.creator-main--native :deep(.assignment__actions)',
+    )
+    expect(row?.decls.get('display')).toBe('flex')
+    expect(row?.decls.get('justify-content')).toBe('flex-end')
+    const accept = desktop.find((r) => r.selector.includes('creator-assignment-accept-'))
+    expect(accept?.decls.get('order')).toBe('1')
+    // the phone rules above still say grid: the override lives only in the block
+    expect(forActions.some((r) => r.decls.get('display') === 'flex')).toBe(false)
+  })
+})
 
 describe('native invitation actions (frame 10)', () => {
   it('the actions row is a two-column grid', () => {

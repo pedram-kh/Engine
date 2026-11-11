@@ -83,6 +83,23 @@
   background: transparent;
 }
 
+/* The phone / WhatsApp country-code picker (Contact details). Its items are keyed by dial code, and
+ * dozens of countries share one (+1), so the autocomplete treats every one of them as selected and
+ * renders a flag-and-code chip for each: on the creator web they ran out of the 125 px field over the
+ * number beside it. One selection is shown (the first, which is the one the form wrote), nothing may
+ * paint outside the field box, and the hidden search input stays usable. */
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .profile-basics-form__dial-code
+  .v-autocomplete__selection:nth-child(n + 2) {
+  display: none;
+}
+
+:is(.v-theme--creator-dark, .v-theme--creator-light)
+  .profile-basics-form__dial-code
+  .v-field__input {
+  overflow: hidden;
+}
+
 /* Links in the auth card (sign-in, sign-up, verify, forgot): the accent LABEL colour, in both
  * themes, instead of the browser's default blue. `--native-accent-primary` is the mint in dark and
  * the AA `primary-text` green in light (above); the dark theme has no `primary-text` slot of its

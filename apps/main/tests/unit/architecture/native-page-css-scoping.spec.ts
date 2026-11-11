@@ -58,7 +58,19 @@ describe.each(SHEETS)('$file', ({ file, root }) => {
   })
 
   it('contains no at-rules (a bare @media would escape the root)', () => {
-    expect(css.replace(/\/\*[\s\S]*?\*\//g, '')).not.toMatch(/@[a-z-]+/)
+    // AH-115 (local walk): the one allowed at-rule is `@media (min-width: 960px)` (md and up) in
+    // `creatorNative.css`. It used to be forbidden because the sheet only ever rendered inside the
+    // Capacitor app; the creator web now carries `.creator-main--native` too and needs a desktop
+    // layout for the invitation and job cards. It stays safe because every selector INSIDE the
+    // block is still rooted at the class (the next test reads those too, `selectors()` sees
+    // through the block), and no other at-rule is allowed anywhere.
+    const allowed = file.endsWith('modules/creators/layouts/creatorNative.css')
+      ? ['@media (min-width: 960px)']
+      : []
+    const found = [...css.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/@[a-z-]+[^{]*/g)].map((m) =>
+      m[0].trim(),
+    )
+    expect(found.filter((rule) => !allowed.includes(rule))).toEqual([])
   })
 
   it('uses no literal colours', () => {

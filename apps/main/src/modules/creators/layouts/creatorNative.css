@@ -228,6 +228,10 @@
   background: var(--native-bg-surface);
   border: 1px solid var(--native-border-default);
   border-radius: var(--native-radius-2xl);
+  /* The page's own desktop row rule centres its children (`align-items: center`) and only
+     switches to `stretch` below 600 px, so from 600 px up the card's contents sat in a centred
+     column inside a wide card. The card is a stretched column at every width. */
+  align-items: stretch;
 }
 
 .creator-main--native :deep(.assignment__name),
@@ -388,6 +392,33 @@
   order: -1;
   min-height: 44px;
   font: var(--native-type-button-primary);
+}
+
+/* AH-115 (local walk): from `md` (960 px) up the invitation and job cards are a desktop list, not
+   the phone column stretched wide: two cards per row, content left-aligned, the actions on one
+   line aligned right with Accept last (the primary action at the end of the row). Below `md`
+   nothing here applies. */
+@media (min-width: 960px) {
+  .creator-main--native :deep(.assignments),
+  .creator-main--native :deep(.jobs) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .creator-main--native :deep(.assignment__actions) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: auto;
+  }
+
+  .creator-main--native
+    :deep(.assignment__actions > .v-btn[data-testid^='creator-assignment-accept-']) {
+    order: 1;
+    min-height: 36px;
+  }
 }
 
 /* Empty states (frames 11 and 14): a ringed icon, a title, a sentence. */
