@@ -90,6 +90,8 @@ Install build 5 over build 4 (the session must survive), then on a device:
 
 10. **Bell (build 4 walk finding):** tapping the top-bar bell opens the Notifications page directly (no popover) on the app and on creator web below md. Check the unread badge still shows on the bell.
 
-11. **Build 5 additions:** inbox All | Unread and Direct chip (filters apply, URL keeps them, filtered-empty message); country-code picker shows one flag and code in onboarding and profile (Contact details); inbox search field keeps its height with an empty list; a notification tap opens its target (Direct message opens that agency thread).
+11. **Inbox filters (build 5, new):** open Messages with the flag ON. Tap **Unread**: only threads with unread messages stay; tap **Direct**: only Direct threads (with Unread: Direct and unread); **All** and Direct off bring the full list back. Leave the screen and return: check the filter state you expect. With a filter on and no match, the message "No conversations match these filters." shows. Search field keeps its height with an empty list.
+12. **Country-code picker (build 5, new; not verified on a device):** onboarding Contact details and Profile (phone and WhatsApp): open the picker, each row shows one flag and one code with no overlap; pick a code shared by several countries (+1) and check the field shows a single flag and code; dark and light.
+13. **Notification tap (build 5):** a Direct-message notification opens that agency's thread; an assignment notification opens the assignment.
 
 Deploy order, with the snapshot and the migration, is in the PENDING entry of the deploy log.

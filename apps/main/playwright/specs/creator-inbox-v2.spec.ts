@@ -130,6 +130,84 @@ test.describe('AH-115 L4 — the creator unified inbox', () => {
     await expect(page).toHaveURL(new RegExp(`/creator/assignments/${seeded.assignmentUlid}`))
   })
 
+  test('ON: the All | Unread control and the Direct chip filter the list and live in the URL', async ({
+    page,
+  }) => {
+    test.setTimeout(300_000)
+    const request = page.context().request
+    const creatorEmail = uniqueEmail('creator-inbox-filters')
+    await setFeatureFlag(request, FLAG, true)
+    const admin = await seedAgencyAdmin(request)
+    await signUpUser(request, creatorEmail, PASSWORD, 'Filter Creator')
+    await verifyEmailViaApi(request, creatorEmail)
+    const alpha = await seedContractedAssignment(request, admin.agencyUlid, creatorEmail, {
+      campaignName: 'Filter Alpha',
+      brandName: 'Filter Brand One',
+    })
+    const beta = await seedContractedAssignment(request, admin.agencyUlid, creatorEmail, {
+      campaignName: 'Filter Beta',
+      brandName: 'Filter Brand Two',
+    })
+
+    // The creator speaks in Beta only: that thread has nothing unread for the creator.
+    await signIn(page, creatorEmail, PASSWORD)
+    const own = await request.post(
+      `${API}/creators/me/assignments/${beta.assignmentUlid}/messages`,
+      {
+        headers: await xsrfHeaders(page),
+        data: { body: 'Hello from the creator.' },
+      },
+    )
+    expect(own.status(), await own.text()).toBe(201)
+    await signOutViaApi(request)
+
+    // The agency answers in Alpha and opens a Direct thread: both unread for the creator.
+    await signIn(page, admin.email, admin.password)
+    for (const url of [
+      `${API}/agencies/${admin.agencyUlid}/creators/${alpha.creatorUlid}/relationship-messages`,
+      `${API}/agencies/${admin.agencyUlid}/campaigns/${alpha.campaignUlid}/assignments/${alpha.assignmentUlid}/messages`,
+    ]) {
+      const sent = await request.post(url, {
+        headers: await xsrfHeaders(page),
+        data: { body: 'Hello from the agency.' },
+      })
+      expect(sent.status(), `${url}: ${await sent.text()}`).toBe(201)
+    }
+    await signOutViaApi(request)
+
+    await signIn(page, creatorEmail, PASSWORD)
+    await page.setViewportSize({ width: 1280, height: 800 })
+    await page.goto('/creator/messages')
+    const rows = page.locator('[data-test^="relationship-inbox-row-"]')
+    await expect(rows).toHaveCount(3, { timeout: 15_000 })
+
+    // Unread: Direct and Alpha stay, Beta (the creator's own message) goes.
+    await page.locator('[data-test="creator-inbox-toggle-unread"]').click()
+    await expect(page).toHaveURL(/unread=1/)
+    await expect(page).not.toHaveURL(/direct=1/)
+    await expect(rows).toHaveCount(2, { timeout: 15_000 })
+
+    // Direct on top of Unread: the Direct row alone.
+    await page.locator('[data-test="creator-inbox-direct"]').click()
+    await expect(page).toHaveURL(/direct=1/)
+    await expect(rows).toHaveCount(1, { timeout: 15_000 })
+    await expect(page.locator('[data-test^="relationship-inbox-tag-"]')).toHaveText('Direct')
+
+    // The state survives a reload.
+    await page.reload()
+    await expect(page).toHaveURL(/unread=1/)
+    await expect(page).toHaveURL(/direct=1/)
+    await expect(rows).toHaveCount(1, { timeout: 15_000 })
+
+    // All + Direct: still the Direct row; Direct off + All: everything again.
+    await page.locator('[data-test="creator-inbox-toggle-all"]').click()
+    await expect(page).not.toHaveURL(/unread=1/)
+    await expect(rows).toHaveCount(1, { timeout: 15_000 })
+    await page.locator('[data-test="creator-inbox-direct"]').click()
+    await expect(page).not.toHaveURL(/direct=1/)
+    await expect(rows).toHaveCount(3, { timeout: 15_000 })
+  })
+
   test('OFF: the previous list, no tag, no search field, and the new endpoint answers 404', async ({
     page,
   }) => {
