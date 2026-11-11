@@ -308,6 +308,52 @@ it('writes nothing of an edit when any part of its payload is refused', function
         ->and(DB::table('campaign_exclusive_brands')->count())->toBe(0);
 });
 
+// ── atomicity: the pivot sync fails AFTER the campaign row was written ─────
+
+/** Throw on the first insert into the pivot: the campaign UPDATE/INSERT has already run by then. */
+function failPivotInserts(): void
+{
+    DB::listen(static function ($query): void {
+        if (str_contains($query->sql, 'insert into "campaign_exclusive_brands"')) {
+            throw new RuntimeException('injected pivot failure');
+        }
+    });
+}
+
+it('rolls the campaign row and the pivot back together when the pivot sync fails on edit', function (): void {
+    Feature::activate(CampaignBrandExclusivityEnabled::NAME);
+    ['agency' => $agency, 'admin' => $admin, 'own' => $own, 'zava' => $zava, 'yahoo' => $yahoo] = exclusivityAgency();
+    $campaign = Campaign::factory()->forAgency($agency->id)->blocking([$zava], '2027-01-31')->createOne(['brand_id' => $own->id, 'name' => 'Before']);
+
+    failPivotInserts();
+    $this->withoutExceptionHandling();
+
+    expect(fn () => $this->actingAs($admin)->patchJson(exclusivityUrl($agency, $campaign), [
+        'name' => 'After',
+        'exclusive_brand_ids' => [$yahoo->ulid],
+        'exclusivity_ends_on' => '2027-06-30',
+    ]))->toThrow(RuntimeException::class, 'injected pivot failure');
+
+    $fresh = $campaign->fresh();
+    expect($fresh?->name)->toBe('Before')
+        ->and($fresh?->exclusivity_ends_on?->toDateString())->toBe('2027-01-31')
+        ->and($campaign->exclusiveBrands()->pluck('brands.id')->all())->toBe([$zava->id]);
+});
+
+it('rolls the new campaign back when the pivot sync fails on create', function (): void {
+    Feature::activate(CampaignBrandExclusivityEnabled::NAME);
+    ['agency' => $agency, 'admin' => $admin, 'own' => $own, 'zava' => $zava] = exclusivityAgency();
+
+    failPivotInserts();
+    $this->withoutExceptionHandling();
+
+    expect(fn () => $this->actingAs($admin)->postJson(exclusivityUrl($agency), exclusivityCreatePayload($own, ['exclusive_brand_ids' => [$zava->ulid]])))
+        ->toThrow(RuntimeException::class, 'injected pivot failure');
+
+    expect(Campaign::query()->where('agency_id', $agency->id)->count())->toBe(0)
+        ->and(DB::table('campaign_exclusive_brands')->count())->toBe(0);
+});
+
 // ── audit ───────────────────────────────────────────────────────────────────
 
 it('audits who changed the exclusivity: the snapshot carries the brand ids and the date, no names', function (): void {
