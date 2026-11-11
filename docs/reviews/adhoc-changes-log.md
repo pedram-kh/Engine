@@ -5461,5 +5461,12 @@ portfolio/images/complete`, which dispatches the worker. Uniform **500 MB** ceil
 
 ---
 
+### AH-115 creator web walk findings (2026-11-11)
+
+- **What:** notifications seed data fixed (no code change); creator inbox All | Unread + Direct filters (web and native, additive API params, Pest); search field height with empty list; creator-scope country-code picker overlap; desktop (960px and up) two-column cards on Invitations, Assignments, Job Posts.
+- **Gates:** see `creator-restyle-review.md` deviation 11. Agency walk 126/126; creator walk re-recorded deliberately (see its README).
+
+---
+
 _Maintained alongside the work: when an ad-hoc change lands, its entry moves here in the
 same pass — the log and the build move together, never as an afterthought._

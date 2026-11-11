@@ -141,6 +141,23 @@ Every batch close-out demands **evidence, not assertion**:
   in the flaky 10** — real MT baseline at merge time (the AH-028/AH-046/047
   ruling; "match the surrounding English" is rejected — surroundings are debt).
 
+### 4.1 Local-run rules (standing; a full-board run froze the machine)
+
+A run with ~16 Vitest workers plus Playwright/Chrome and Docker forced a
+reboot. From now on, for every agent and developer, on a local machine:
+
+1. **Clean slate first.** Before any test run: `pkill -f vitest; pkill -f playwright`
+   (also any walk, `pkill -f walk.mjs`). No leftovers.
+2. **One suite at a time.** Never run two suites at once: no Vitest while
+   Playwright, Pest or a walk is running. Start the next only after the
+   previous has exited.
+3. **Cap Vitest at 4 workers:** `VITEST_MAX_WORKERS=4 npx vitest run ...`
+   (read in `apps/main/vitest.config.ts`; unset in CI, so CI is unchanged). The
+   bare `--maxWorkers=4` flag errors on Vitest 2.x (min/max conflict); use the variable.
+4. **Pest full suite serial** (as in § 4). **Playwright `--workers=2`** locally.
+5. **No background-then-another.** If a run is backgrounded, wait for its
+   exit before starting anything else.
+
 ---
 
 ## 5. Production-data safety (we are live)

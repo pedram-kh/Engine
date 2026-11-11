@@ -33,3 +33,7 @@ The agency shell is proved by [`ah-115-agency-baseline`](../ah-115-agency-baseli
 ## Re-recorded on 2026-11-10 (walk determinism)
 
 `walk.mjs` now masks `width` and `height` of the locale switcher and its descendants in the style hash (see the agency baseline README, same section): the font-subset race could not be removed, so the size it moves is no longer measured. Re-recorded from the tip (`9940997c`, with the masked harness) at `--concurrency 1`: 142 targets, 32 with page errors, the same 32 as the previous recording (onboarding targets, unfixtured API, HTTP 503; not new). **MEASURED: three consecutive compares of the recording 142 / 142 identical, and three of the committed file at the default concurrency.**
+
+## Re-recorded on 2026-11-11 (walk findings 2-5)
+
+Reason: deliberate runtime changes on creator routes: inbox filter bar and search-field height (messages), the country-code picker rules (onboarding and profile), the 960px-and-up card grid (invitations, assignments, jobs) in `creatorNative.css`. Recorded at `--concurrency 1`: 142 targets, 32 with page errors (the same onboarding 503s). **MEASURED: three consecutive compares at the default concurrency, 142 / 142 identical.** The agency shell was compared against its untouched baseline on the same tree: 126 / 126 identical.
