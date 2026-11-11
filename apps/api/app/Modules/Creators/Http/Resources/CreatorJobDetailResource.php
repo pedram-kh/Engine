@@ -46,6 +46,10 @@ use Illuminate\Support\Collection;
  *                               apply (region switch on, creator outside the
  *                               listed regions or with no country). Detail only
  *                               (Q10); the card never carries it.
+ *   - `is_brand_locked`       — AH-120: the caller may see this job but not
+ *                               apply (brand exclusivity). Detail only (Q6);
+ *                               `brand_lock_reason` is `brand_exclusive` | null and
+ *                               never names the blocking brand or campaign.
  *   - `attachments`           — Campaign attachments from the Files library,
  *                               chunk B (AH-092, D4). The controller loads the
  *                               relation pre-filtered through
@@ -98,6 +102,11 @@ final class CreatorJobDetailResource extends CreatorJobCardResource
                 'is_region_locked' => (bool) $campaign->getAttribute('caller_region_locked'),
                 // AH-118 — why: `country_missing` | `outside_regions` | null. Always present.
                 'region_lock_reason' => $this->regionLockReason($campaign),
+                // AH-120 — ALWAYS present (false while the flag is off or nothing
+                // blocks), so the exact keyset does not depend on data. Detail only
+                // (Q6). The reason is generic: it never names the brand or campaign.
+                'is_brand_locked' => (bool) $campaign->getAttribute('caller_brand_locked'),
+                'brand_lock_reason' => $campaign->getAttribute('caller_brand_locked') === true ? 'brand_exclusive' : null,
                 'assignment_ulid' => $this->callerAssignmentUlid($campaign),
                 'attachments' => CreatorCampaignAttachmentResource::collection($this->creatorVisibleAttachments($campaign))->resolve($request),
                 'brand' => $brand,

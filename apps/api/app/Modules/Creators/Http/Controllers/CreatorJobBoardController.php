@@ -11,6 +11,7 @@ use App\Modules\Campaigns\Enums\CampaignApplicationStatus;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignApplication;
 use App\Modules\Campaigns\Models\CampaignAssignment;
+use App\Modules\Campaigns\Services\BrandExclusivity;
 use App\Modules\Campaigns\Services\CampaignApplicationNotifier;
 use App\Modules\Campaigns\Services\JobsBoardVisibility;
 use App\Modules\Creators\Http\Requests\ApplyToJobRequest;
@@ -166,7 +167,7 @@ final class CreatorJobBoardController
      * and one indistinguishable code for every reason is the §5.4
      * non-fingerprinting rule.
      */
-    public function show(Request $request, string $campaign): JsonResponse
+    public function show(Request $request, string $campaign, BrandExclusivity $exclusivity): JsonResponse
     {
         $creator = $this->requireCreator($request);
 
@@ -198,6 +199,9 @@ final class CreatorJobBoardController
         // and handed to the resource as an attribute (the `caller_*` pattern).
         $job->setAttribute('caller_region_locked', $job->isRegionLockedFor($creator));
         $job->setAttribute('caller_region_lock_reason', $job->regionLockReasonFor($creator));
+        // AH-120 — detail only (Q6). The same single predicate `apply` enforces;
+        // the reason is generic and never names the blocking brand or campaign.
+        $job->setAttribute('caller_brand_locked', $exclusivity->isBlocked($job, $creator));
 
         $job->load(['attachments' => fn ($q) => $q->creatorVisible()->with('agencyFile')]);
 
@@ -238,6 +242,7 @@ final class CreatorJobBoardController
         ApplyToJobRequest $request,
         string $campaign,
         CampaignApplicationNotifier $notifier,
+        BrandExclusivity $exclusivity,
     ): JsonResponse {
         $creator = $this->requireCreator($request);
 
@@ -255,6 +260,20 @@ final class CreatorJobBoardController
 
         if ($existing instanceof CampaignApplication) {
             $this->refuseDuplicate($existing->status->reapplyBlockCode());
+        }
+
+        // AH-120 — brand exclusivity, after the duplicate 409 and BEFORE the
+        // region check (Q3). The detail is generic: it never names the brand or
+        // the campaign that blocks (the creator-side leak rule).
+        if ($exclusivity->isBlocked($job, $creator)) {
+            abort(response()->json([
+                'errors' => [[
+                    'status' => '422',
+                    'code' => 'job.brand_exclusive',
+                    'detail' => 'This job is not available to you.',
+                    'meta' => ['reason' => 'brand_exclusive'],
+                ]],
+            ], 422));
         }
 
         // AH-118 — after the visibility 404 and the duplicate 409 (an existing

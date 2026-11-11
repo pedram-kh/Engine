@@ -73,6 +73,10 @@ const DETAIL_KEYS = [
     'is_region_locked',
     // AH-118 — why (`country_missing` | `outside_regions` | null). Always present.
     'region_lock_reason',
+    // AH-120 — always present, false/null unless brand exclusivity blocks the
+    // caller. Detail only (Q6); CARD_KEYS must not gain them.
+    'is_brand_locked',
+    'brand_lock_reason',
     // The D7 bridge (chunk 4, AH-058). Present on EVERY detail render, null
     // unless the caller's pair has an assignment — a conditional key would make
     // this keyset data-dependent and blunt the accretion guard.
