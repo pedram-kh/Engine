@@ -2,7 +2,9 @@
 
 **Status: DRAFTED 2026-11-11, nothing run.** For Pedram's colleague (who runs the box), in the shape of [`deploy-ah116-ah119.md`](deploy-ah116-ah119.md). **This runbook replaces [`deploy-ah115.md`](deploy-ah115.md)**, which is marked "superseded, not used": AH-115 and AH-120 deploy together, in one sitting.
 Written from the repo at **`905d9aa8`** (the runtime tip; this runbook is a docs-only commit on top of it) and the AH-115 and AH-120 `PENDING` entries in [`deploy-log.md`](deploy-log.md). Procedure behind it: [`production-queue-worker.md`](production-queue-worker.md) §2a, §4, §7, §8.
-CI at `905d9aa8`: [run 43093612585](https://github.com/pedram-kh/Engine/actions/runs/43093612585): Frontend green; Backend steps green, E2E not finished when drafted. **Re-read the run before the sitting and replace this line with the final result.**.
+CI at `bafc6c97` (docs-only on top of `905d9aa8`; identical `apps` and `packages` trees): [run 43110640162](https://github.com/pedram-kh/Engine/actions/runs/43110640162), **all four jobs green on attempt 2** (Backend 15m50s, Frontend 7m02s, E2E admin 1m16s, E2E main 8m14s). Attempt 1 failed Frontend on one admin spec timing out (`CreatorAppPage` search-debounce, [tech-debt](../tech-debt.md) row 30) and skipped the E2E jobs; the failed jobs were re-run, no new push. **Not yet in this run: the spec fix commit `d6d65088` (test-only, `apps/admin`).**
+
+> **RESTAMP BEFORE THE SITTING (after the final push):** the spec fix changes the `apps` tree, so the deploy tip is the final pushed tip, not `905d9aa8`, and the `apps` hash in P1.1 is **`e34ca182f2a84184e6720c0d66fdee2848e86e61`** (`packages` and `pnpm-lock` unchanged). Replace `905d9aa8` with the final tip in this file, and cite the final push's CI run here.
 
 **How to use it.** Run P0 to P9 in order. Every step has its exact command, what a healthy result looks like, and a blank `Result:` line to fill. Each step says where it runs: **HOST** (`~/catalyst-engine`), **APP** (inside `docker compose exec app sh`, at `/app`), **BUILD** (the machine that builds the SPA) or **LAPTOP** / **CONSOLE** (Pedram). Anything the repo does not document is marked **CONFIRM**.
 **No secret is printed by any command here**: fingerprints, counts, names and hostnames only. Never run a bare `docker compose config`, never `cat` or `echo` an env file, never paste shell history, never paste a signed URL. **Never print `.env` files.**
@@ -156,7 +158,7 @@ Result: `______________`
 Before this step the colleague confirms **the Bitbucket mirror holds the tip** (a separate human step after the push). The mirror's SHAs differ from GitHub's, so **prove the code by tree hashes**. The GitHub values for `905d9aa8` (read 2026-11-11):
 
 ```
-apps      c9fcdfbf3d327688133da8d06ef1f5ebcd29260f
+apps      e34ca182f2a84184e6720c0d66fdee2848e86e61   (with the spec fix d6d65088; was c9fcdfbf… at 905d9aa8)
 packages  5b7f1c590269895e183d0132359d552af639ea9a
 pnpm-lock 94d23dc9e4b3279dac336f26d7b54b9447f705b7
 ```
