@@ -568,7 +568,15 @@
         "jobBoard": "Bolsa de trabajo",
         "restrictToRegions": "Solo pueden aplicar los creadores de las regiones indicadas",
         "restrictToRegionsHint": "Los creadores de fuera de estas regiones siguen viendo la oferta, pero no pueden aplicar. Las invitaciones no se ven afectadas.",
-        "regionsRestricted": "Restringido"
+        "regionsRestricted": "Restringido",
+        "exclusiveBrands": "Impedir que los creadores seleccionados aquí se postulen a",
+        "exclusiveBrandsHint": "Los creadores seleccionados para esta campaña no pueden postularse a campañas de estas marcas. Las invitaciones no se ven afectadas.",
+        "exclusiveBrandsPlaceholder": "Elige marcas",
+        "exclusiveBrandsLimit": "Hasta {max} marcas",
+        "exclusivityEndsOn": "La exclusividad termina el",
+        "exclusivityEndsOnHint": "Déjalo vacío para que termine cuando el trabajo del creador en esta campaña esté completo.",
+        "exclusiveBrandsOverview": "Bloquea postulaciones a",
+        "exclusivityEndsOnOverview": "Termina el {date}"
       },
       "insertLink": {
         "buttonLabel": "Insertar enlace",
@@ -663,6 +671,8 @@
         },
         "loadFailed": "No hemos podido cargar las candidaturas. Inténtalo de nuevo.",
         "appliedAt": "Se postuló el {date}",
+        "exclusivityConflict": "Conflicto",
+        "exclusivityConflictTooltip": "Seleccionado para {campaign}, que bloquea las postulaciones a esta marca. Aún puedes aceptar.",
         "acceptedToast": "Oferta enviada a {name}.",
         "rejectedToast": "La candidatura de {name} se ha cerrado.",
         "accept": {
@@ -671,7 +681,8 @@
           "body": "Al aceptar se envía una invitación estándar con tu oferta. El creador todavía puede aceptarla o rechazarla.",
           "submit": "Enviar oferta",
           "cancel": "Cancelar",
-          "conflictBody": "{name} no está disponible durante la ventana de la campaña. ¿Enviar la oferta de todos modos?"
+          "conflictBody": "{name} no está disponible durante la ventana de la campaña. ¿Enviar la oferta de todos modos?",
+          "exclusivityWarning": "Este creador está seleccionado para {campaign}, que bloquea las postulaciones a esta marca. Aún puedes aceptar."
         },
         "reject": {
           "action": "Rechazar",
@@ -757,6 +768,10 @@
           "body": "{count} creador(es) seleccionado(s) no está(n) disponible(s) durante la ventana de la campaña. ¿Invitarlos de todos modos?",
           "cancel": "Omitirlos",
           "proceed": "Invitar de todos modos"
+        },
+        "exclusivity": {
+          "warning": "{count} creadores seleccionados están en una campaña que bloquea esta marca. Aún puedes invitarlos.",
+          "creatorLine": "{name}: {campaign}"
         }
       },
       "board": {
@@ -979,7 +994,10 @@
       "errors": {
         "loadFailed": "No se han podido cargar las campañas.",
         "saveFailed": "No se ha podido guardar la campaña.",
-        "restrictNeedsRegions": "Elige al menos una región para limitar las solicitudes."
+        "restrictNeedsRegions": "Elige al menos una región para limitar las solicitudes.",
+        "exclusivityDateInPast": "Elige hoy o una fecha posterior.",
+        "exclusivityOwnBrand": "Una campaña no puede bloquear su propia marca.",
+        "brandExclusivityDisabled": "La exclusividad de marca aún no está disponible."
       },
       "listing": {
         "sectionTitle": "Anuncio en el tablón de trabajos",

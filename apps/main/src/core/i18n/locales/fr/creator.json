@@ -557,7 +557,8 @@
           "viewAssignment": "Voir la mission",
           "regionLocked": "Non disponible dans votre région",
           "regionLockedNoCountry": "Ajoutez votre pays à votre profil pour postuler aux offres limitées par région.",
-          "regionLockedProfileLink": "Ouvrir mon profil"
+          "regionLockedProfileLink": "Ouvrir mon profil",
+          "brandLocked": "Non disponible pour toi"
         },
         "applyDialog": {
           "title": "Postuler à cette offre",
@@ -573,7 +574,8 @@
           "applicationRejected": "Vous n'avez pas été retenu pour cette offre, il n'est donc plus possible d'y postuler.",
           "gone": "Cette offre n'est plus disponible.",
           "error": "Une erreur s'est produite. Veuillez réessayer.",
-          "regionNotAllowed": "Cette offre est réservée aux créateurs de certaines régions."
+          "regionNotAllowed": "Cette offre est réservée aux créateurs de certaines régions.",
+          "brandNotAvailable": "Cette mission n'est pas disponible pour toi."
         }
       },
       "upload": {

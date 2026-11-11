@@ -568,7 +568,15 @@
         "jobBoard": "Tööpakkumised",
         "restrictToRegions": "Kandideerida saavad ainult loetletud piirkondade sisuloojad",
         "restrictToRegionsHint": "Nendest piirkondadest väljaspool olevad sisuloojad näevad tööd endiselt, kuid ei saa kandideerida. Kutseid see ei mõjuta.",
-        "regionsRestricted": "Piiratud"
+        "regionsRestricted": "Piiratud",
+        "exclusiveBrands": "Blokeeri siin valitud loojatel kandideerimine",
+        "exclusiveBrandsHint": "Sellele kampaaniale valitud loojad ei saa kandideerida nende brändide kampaaniatele. Kutseid see ei mõjuta.",
+        "exclusiveBrandsPlaceholder": "Vali brändid",
+        "exclusiveBrandsLimit": "Kuni {max} brändi",
+        "exclusivityEndsOn": "Ainuõigus lõpeb",
+        "exclusivityEndsOnHint": "Jäta tühjaks, et see lõpeks, kui looja töö selles kampaanias on lõppenud.",
+        "exclusiveBrandsOverview": "Blokeerib kandideerimise",
+        "exclusivityEndsOnOverview": "Lõpeb {date}"
       },
       "insertLink": {
         "buttonLabel": "Lisa link",
@@ -663,6 +671,8 @@
         },
         "loadFailed": "Kandideerimisi ei õnnestunud laadida. Palun proovi uuesti.",
         "appliedAt": "Kandideeris {date}",
+        "exclusivityConflict": "Konflikt",
+        "exclusivityConflictTooltip": "Valitud kampaaniasse {campaign}, mis blokeerib kandideerimise sellele brändile. Saad siiski vastu võtta.",
         "acceptedToast": "Pakkumine saadeti loojale {name}.",
         "rejectedToast": "{name} kandideerimine on suletud.",
         "accept": {
@@ -671,7 +681,8 @@
           "body": "Vastuvõtmine saadab tavapärase kutse koos sinu pakkumisega. Looja saab selle ikka vastu võtta või tagasi lükata.",
           "submit": "Saada pakkumine",
           "cancel": "Tühista",
-          "conflictBody": "{name} ei ole kampaania perioodil saadaval. Kas saadame pakkumise siiski?"
+          "conflictBody": "{name} ei ole kampaania perioodil saadaval. Kas saadame pakkumise siiski?",
+          "exclusivityWarning": "See looja on valitud kampaaniasse {campaign}, mis blokeerib kandideerimise sellele brändile. Saad siiski vastu võtta."
         },
         "reject": {
           "action": "Lükka tagasi",
@@ -757,6 +768,10 @@
           "body": "{count} selected creator(s) are unavailable during the campaign window. Kutsu them anyway?",
           "cancel": "Skip them",
           "proceed": "Kutsu anyway"
+        },
+        "exclusivity": {
+          "warning": "{count} valitud loojat on kampaanias, mis blokeerib selle brändi. Saad neid siiski kutsuda.",
+          "creatorLine": "{name}: {campaign}"
         }
       },
       "board": {
@@ -979,7 +994,10 @@
       "errors": {
         "loadFailed": "Failed to load campaigns.",
         "saveFailed": "Failed to save campaign.",
-        "restrictNeedsRegions": "Vali vähemalt üks piirkond, et kandideerimist piirata."
+        "restrictNeedsRegions": "Vali vähemalt üks piirkond, et kandideerimist piirata.",
+        "exclusivityDateInPast": "Vali tänane või hilisem kuupäev.",
+        "exclusivityOwnBrand": "Kampaania ei saa blokeerida oma brändi.",
+        "brandExclusivityDisabled": "Brändi ainuõigus pole veel saadaval."
       },
       "listing": {
         "sectionTitle": "Kuulutus tööde tahvlil",

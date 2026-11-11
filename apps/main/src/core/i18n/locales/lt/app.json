@@ -568,7 +568,15 @@
         "jobBoard": "Darbo skelbimai",
         "restrictToRegions": "Kandidatuoti gali tik nurodytų regionų kūrėjai",
         "restrictToRegionsHint": "Kūrėjai ne iš šių regionų darbą vis tiek mato, bet kandidatuoti negali. Kvietimų tai neliečia.",
-        "regionsRestricted": "Apribota"
+        "regionsRestricted": "Apribota",
+        "exclusiveBrands": "Neleisti čia pasirinktiems kūrėjams teikti paraiškų į",
+        "exclusiveBrandsHint": "Šiai kampanijai pasirinkti kūrėjai negali teikti paraiškų į šių prekių ženklų kampanijas. Kvietimai nepaveikiami.",
+        "exclusiveBrandsPlaceholder": "Pasirink prekių ženklus",
+        "exclusiveBrandsLimit": "Iki {max} prekių ženklų",
+        "exclusivityEndsOn": "Išskirtinumas baigiasi",
+        "exclusivityEndsOnHint": "Palik tuščią, kad baigtųsi, kai kūrėjo darbas šioje kampanijoje bus baigtas.",
+        "exclusiveBrandsOverview": "Blokuoja paraiškas į",
+        "exclusivityEndsOnOverview": "Baigiasi {date}"
       },
       "insertLink": {
         "buttonLabel": "Įterpti nuorodą",
@@ -663,6 +671,8 @@
         },
         "loadFailed": "Nepavyko įkelti paraiškų. Bandyk dar kartą.",
         "appliedAt": "Pateikta {date}",
+        "exclusivityConflict": "Konfliktas",
+        "exclusivityConflictTooltip": "Pasirinktas kampanijai {campaign}, kuri blokuoja paraiškas į šį prekių ženklą. Vis tiek gali priimti.",
         "acceptedToast": "Pasiūlymas išsiųstas {name}.",
         "rejectedToast": "{name} paraiška uždaryta.",
         "accept": {
@@ -671,7 +681,8 @@
           "body": "Priėmus išsiunčiamas standartinis pakvietimas su tavo pasiūlymu. Kūrėjas vis dar gali jį priimti arba atmesti.",
           "submit": "Siųsti pasiūlymą",
           "cancel": "Atšaukti",
-          "conflictBody": "{name} kampanijos laikotarpiu nepasiekiamas. Vis tiek siųsti pasiūlymą?"
+          "conflictBody": "{name} kampanijos laikotarpiu nepasiekiamas. Vis tiek siųsti pasiūlymą?",
+          "exclusivityWarning": "Šis kūrėjas pasirinktas kampanijai {campaign}, kuri blokuoja paraiškas į šį prekių ženklą. Vis tiek gali priimti."
         },
         "reject": {
           "action": "Atmesti",
@@ -757,6 +768,10 @@
           "body": "{count} selected creator(s) are unavailable during the campaign window. Pakviesti them anyway?",
           "cancel": "Skip them",
           "proceed": "Pakviesti anyway"
+        },
+        "exclusivity": {
+          "warning": "{count} pasirinktų kūrėjų yra kampanijoje, kuri blokuoja šį prekių ženklą. Vis tiek gali juos pakviesti.",
+          "creatorLine": "{name}: {campaign}"
         }
       },
       "board": {
@@ -979,7 +994,10 @@
       "errors": {
         "loadFailed": "Failed to load campaigns.",
         "saveFailed": "Failed to save campaign.",
-        "restrictNeedsRegions": "Pasirink bent vieną regioną, kad apribotum kandidatūras."
+        "restrictNeedsRegions": "Pasirink bent vieną regioną, kad apribotum kandidatūras.",
+        "exclusivityDateInPast": "Pasirink šiandienos ar vėlesnę datą.",
+        "exclusivityOwnBrand": "Kampanija negali blokuoti savo prekių ženklo.",
+        "brandExclusivityDisabled": "Prekių ženklo išskirtinumas dar nepasiekiamas."
       },
       "listing": {
         "sectionTitle": "Skelbimas darbų lentoje",

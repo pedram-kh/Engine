@@ -568,7 +568,15 @@
         "jobBoard": "Oglasi za rad",
         "restrictToRegions": "Prijaviti se mogu samo kreatori iz navedenih regija",
         "restrictToRegionsHint": "Kreatori izvan tih regija i dalje vide posao, ali se ne mogu prijaviti. Pozivi nisu zahvaćeni.",
-        "regionsRestricted": "Ograničeno"
+        "regionsRestricted": "Ograničeno",
+        "exclusiveBrands": "Blokiraj ovdje odabrane kreatore da se prijave na",
+        "exclusiveBrandsHint": "Kreatori odabrani za ovu kampanju ne mogu se prijaviti na kampanje ovih brendova. Pozivnice to ne pogađa.",
+        "exclusiveBrandsPlaceholder": "Odaberi brendove",
+        "exclusiveBrandsLimit": "Do {max} brendova",
+        "exclusivityEndsOn": "Ekskluzivnost završava",
+        "exclusivityEndsOnHint": "Ostavi prazno da završi kada rad kreatora na ovoj kampanji bude gotov.",
+        "exclusiveBrandsOverview": "Blokira prijave na",
+        "exclusivityEndsOnOverview": "Završava {date}"
       },
       "insertLink": {
         "buttonLabel": "Umetni poveznicu",
@@ -663,6 +671,8 @@
         },
         "loadFailed": "Nismo mogli učitati prijave. Pokušaj ponovno.",
         "appliedAt": "Prijavljeno {date}",
+        "exclusivityConflict": "Sukob",
+        "exclusivityConflictTooltip": "Odabran za {campaign}, koja blokira prijave na ovaj brend. I dalje možeš prihvatiti.",
         "acceptedToast": "Ponuda poslana kreatoru {name}.",
         "rejectedToast": "Prijava kreatora {name} je zatvorena.",
         "accept": {
@@ -671,7 +681,8 @@
           "body": "Prihvaćanjem se šalje standardni poziv s tvojom ponudom. Kreator je još može prihvatiti ili odbiti.",
           "submit": "Pošalji ponudu",
           "cancel": "Otkažite",
-          "conflictBody": "{name} nije dostupan tijekom trajanja kampanje. Želiš li ipak poslati ponudu?"
+          "conflictBody": "{name} nije dostupan tijekom trajanja kampanje. Želiš li ipak poslati ponudu?",
+          "exclusivityWarning": "Ovaj je kreator odabran za {campaign}, koja blokira prijave na ovaj brend. I dalje možeš prihvatiti."
         },
         "reject": {
           "action": "Odbij",
@@ -757,6 +768,10 @@
           "body": "{count} vybraných tvůrců není dostupných v okně kampanje. Přesto je pozvat?",
           "cancel": "Přeskočit je",
           "proceed": "Přesto pozvat"
+        },
+        "exclusivity": {
+          "warning": "Odabranih kreatora u kampanji koja blokira ovaj brend: {count}. I dalje ih možeš pozvati.",
+          "creatorLine": "{name}: {campaign}"
         }
       },
       "board": {
@@ -979,7 +994,10 @@
       "errors": {
         "loadFailed": "Ni uspelo učitajti kampanje.",
         "saveFailed": "Ni uspelo spremiti kampanja.",
-        "restrictNeedsRegions": "Odaberi barem jednu regiju kako bi ograničio prijave."
+        "restrictNeedsRegions": "Odaberi barem jednu regiju kako bi ograničio prijave.",
+        "exclusivityDateInPast": "Odaberi današnji ili kasniji datum.",
+        "exclusivityOwnBrand": "Kampanja ne može blokirati vlastiti brend.",
+        "brandExclusivityDisabled": "Ekskluzivnost brenda još nije dostupna."
       },
       "listing": {
         "sectionTitle": "Oglas na ploči poslova",

@@ -568,7 +568,15 @@
         "jobBoard": "Vacaturebord",
         "restrictToRegions": "Alleen creators in de genoemde regio's kunnen reageren",
         "restrictToRegionsHint": "Creators buiten deze regio's zien de opdracht nog wel, maar kunnen niet reageren. Uitnodigingen worden niet beïnvloed.",
-        "regionsRestricted": "Beperkt"
+        "regionsRestricted": "Beperkt",
+        "exclusiveBrands": "Hier geselecteerde creators blokkeren om te solliciteren op",
+        "exclusiveBrandsHint": "Creators die voor deze campagne zijn geselecteerd, kunnen niet solliciteren op campagnes van deze merken. Uitnodigingen worden niet beïnvloed.",
+        "exclusiveBrandsPlaceholder": "Kies merken",
+        "exclusiveBrandsLimit": "Maximaal {max} merken",
+        "exclusivityEndsOn": "Exclusiviteit eindigt op",
+        "exclusivityEndsOnHint": "Laat leeg om te eindigen wanneer het werk van de creator aan deze campagne is afgerond.",
+        "exclusiveBrandsOverview": "Blokkeert sollicitaties op",
+        "exclusivityEndsOnOverview": "Eindigt op {date}"
       },
       "insertLink": {
         "buttonLabel": "Link invoegen",
@@ -663,6 +671,8 @@
         },
         "loadFailed": "Aanmeldingen konden niet worden geladen. Probeer het opnieuw.",
         "appliedAt": "Aangemeld op {date}",
+        "exclusivityConflict": "Conflict",
+        "exclusivityConflictTooltip": "Geselecteerd voor {campaign}, die sollicitaties op dit merk blokkeert. Je kunt nog steeds accepteren.",
         "acceptedToast": "Aanbod verstuurd naar {name}.",
         "rejectedToast": "De aanmelding van {name} is gesloten.",
         "accept": {
@@ -671,7 +681,8 @@
           "body": "Bij accepteren wordt een gewone uitnodiging met jouw aanbod verstuurd. De creator kan die nog steeds accepteren of afwijzen.",
           "submit": "Aanbod versturen",
           "cancel": "Annuleren",
-          "conflictBody": "{name} is niet beschikbaar tijdens de campagneperiode. Aanbod toch versturen?"
+          "conflictBody": "{name} is niet beschikbaar tijdens de campagneperiode. Aanbod toch versturen?",
+          "exclusivityWarning": "Deze creator is geselecteerd voor {campaign}, die sollicitaties op dit merk blokkeert. Je kunt nog steeds accepteren."
         },
         "reject": {
           "action": "Afwijzen",
@@ -757,6 +768,10 @@
           "body": "{count} geselecteerde creator(s) is/zijn niet beschikbaar tijdens de campagneperiode. Toch uitnodigen?",
           "cancel": "Overslaan",
           "proceed": "Toch uitnodigen"
+        },
+        "exclusivity": {
+          "warning": "{count} geselecteerde creators zitten in een campagne die dit merk blokkeert. Je kunt ze nog steeds uitnodigen.",
+          "creatorLine": "{name}: {campaign}"
         }
       },
       "board": {
@@ -979,7 +994,10 @@
       "errors": {
         "loadFailed": "Campagnes konden niet worden geladen.",
         "saveFailed": "Campagne kon niet worden opgeslagen.",
-        "restrictNeedsRegions": "Kies minstens één regio om reacties te beperken."
+        "restrictNeedsRegions": "Kies minstens één regio om reacties te beperken.",
+        "exclusivityDateInPast": "Kies vandaag of een latere datum.",
+        "exclusivityOwnBrand": "Een campagne kan haar eigen merk niet blokkeren.",
+        "brandExclusivityDisabled": "Merkexclusiviteit is nog niet beschikbaar."
       },
       "listing": {
         "sectionTitle": "Vermelding op het opdrachtenbord",

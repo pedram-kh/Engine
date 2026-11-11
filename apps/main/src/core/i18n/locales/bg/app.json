@@ -568,7 +568,15 @@
         "jobBoard": "Работни обяви",
         "restrictToRegions": "Само създатели от посочените региони могат да кандидатстват",
         "restrictToRegionsHint": "Създателите извън тези региони все още виждат обявата, но не могат да кандидатстват. Поканите не се засягат.",
-        "regionsRestricted": "Ограничено"
+        "regionsRestricted": "Ограничено",
+        "exclusiveBrands": "Блокирай избраните тук създатели да кандидатстват за",
+        "exclusiveBrandsHint": "Създателите, избрани за тази кампания, не могат да кандидатстват за кампании на тези марки. Поканите не се засягат.",
+        "exclusiveBrandsPlaceholder": "Избери марки",
+        "exclusiveBrandsLimit": "До {max} марки",
+        "exclusivityEndsOn": "Ексклузивността приключва на",
+        "exclusivityEndsOnHint": "Остави празно, за да приключи, когато работата на създателя по тази кампания е завършена.",
+        "exclusiveBrandsOverview": "Блокира кандидатстването за",
+        "exclusivityEndsOnOverview": "Приключва на {date}"
       },
       "insertLink": {
         "buttonLabel": "Вмъкване на връзка",
@@ -663,6 +671,8 @@
         },
         "loadFailed": "Не успяхме да заредим кандидатурите. Опитай отново.",
         "appliedAt": "Кандидатствал(а) на {date}",
+        "exclusivityConflict": "Конфликт",
+        "exclusivityConflictTooltip": "Избран за {campaign}, която блокира кандидатстването за тази марка. Все още можеш да приемеш.",
         "acceptedToast": "Офертата е изпратена на {name}.",
         "rejectedToast": "Кандидатурата на {name} е затворена.",
         "accept": {
@@ -671,7 +681,8 @@
           "body": "Приемането изпраща стандартна покана с твоята оферта. Криейтърът все още може да я приеме или откаже.",
           "submit": "Изпрати оферта",
           "cancel": "Отменете",
-          "conflictBody": "{name} е зает(а) през периода на кампанията. Да изпратим ли офертата въпреки това?"
+          "conflictBody": "{name} е зает(а) през периода на кампанията. Да изпратим ли офертата въпреки това?",
+          "exclusivityWarning": "Този създател е избран за {campaign}, която блокира кандидатстването за тази марка. Все още можеш да приемеш."
         },
         "reject": {
           "action": "Отказ",
@@ -757,6 +768,10 @@
           "body": "{count} selected creator(s) are unavailable during the campaign window. Поканете them anyway?",
           "cancel": "Skip them",
           "proceed": "Поканете anyway"
+        },
+        "exclusivity": {
+          "warning": "{count} избрани създатели са в кампания, която блокира тази марка. Все още можеш да ги поканиш.",
+          "creatorLine": "{name}: {campaign}"
         }
       },
       "board": {
@@ -979,7 +994,10 @@
       "errors": {
         "loadFailed": "Failed to load campaigns.",
         "saveFailed": "Failed to save campaign.",
-        "restrictNeedsRegions": "Избери поне един регион, за да ограничиш кандидатурите."
+        "restrictNeedsRegions": "Избери поне един регион, за да ограничиш кандидатурите.",
+        "exclusivityDateInPast": "Избери днешна или по-късна дата.",
+        "exclusivityOwnBrand": "Кампания не може да блокира собствената си марка.",
+        "brandExclusivityDisabled": "Ексклузивността на марка още не е налична."
       },
       "listing": {
         "sectionTitle": "Обява в борсата за задачи",

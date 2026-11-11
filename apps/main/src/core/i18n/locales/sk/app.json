@@ -568,7 +568,15 @@
         "jobBoard": "Pracovné nabídky",
         "restrictToRegions": "Prihlásiť sa môžu len tvorcovia z uvedených regiónov",
         "restrictToRegionsHint": "Tvorcovia mimo týchto regiónov ponuku stále vidia, ale nemôžu sa prihlásiť. Pozvánok sa to netýka.",
-        "regionsRestricted": "Obmedzené"
+        "regionsRestricted": "Obmedzené",
+        "exclusiveBrands": "Zablokovať tu vybraným tvorcom prihlásenie sa na",
+        "exclusiveBrandsHint": "Tvorcovia vybraní pre túto kampaň sa nemôžu prihlásiť do kampaní týchto značiek. Pozvánky to neovplyvní.",
+        "exclusiveBrandsPlaceholder": "Vyber značky",
+        "exclusiveBrandsLimit": "Až {max} značiek",
+        "exclusivityEndsOn": "Exkluzivita končí dňa",
+        "exclusivityEndsOnHint": "Nechaj prázdne, aby skončila, keď je práca tvorcu na tejto kampani dokončená.",
+        "exclusiveBrandsOverview": "Blokuje prihlášky na",
+        "exclusivityEndsOnOverview": "Končí dňa {date}"
       },
       "insertLink": {
         "buttonLabel": "Vložiť odkaz",
@@ -663,6 +671,8 @@
         },
         "loadFailed": "Nepodarilo sa nám načítať prihlášky. Skús to znova.",
         "appliedAt": "Prihlásené {date}",
+        "exclusivityConflict": "Konflikt",
+        "exclusivityConflictTooltip": "Vybraný pre {campaign}, ktorá blokuje prihlášky na túto značku. Stále ho môžeš prijať.",
         "acceptedToast": "Ponuka bola odoslaná tvorcovi {name}.",
         "rejectedToast": "Prihláška od {name} bola uzavretá.",
         "accept": {
@@ -671,7 +681,8 @@
           "body": "Prijatím sa odošle štandardná pozvánka s tvojou ponukou. Tvorca ju stále môže prijať alebo odmietnuť.",
           "submit": "Odoslať ponuku",
           "cancel": "Zrušiť",
-          "conflictBody": "{name} nie je počas obdobia kampane dostupný. Odoslať ponuku aj tak?"
+          "conflictBody": "{name} nie je počas obdobia kampane dostupný. Odoslať ponuku aj tak?",
+          "exclusivityWarning": "Tento tvorca je vybraný pre {campaign}, ktorá blokuje prihlášky na túto značku. Stále ho môžeš prijať."
         },
         "reject": {
           "action": "Odmietnuť",
@@ -757,6 +768,10 @@
           "body": "{count} vybraných tvůrců není dostupných v okně kampaně. Přesto je pozvat?",
           "cancel": "Přeskočit je",
           "proceed": "Přesto pozvat"
+        },
+        "exclusivity": {
+          "warning": "Počet vybraných tvorcov v kampani, ktorá blokuje túto značku: {count}. Stále ich môžeš pozvať.",
+          "creatorLine": "{name}: {campaign}"
         }
       },
       "board": {
@@ -979,7 +994,10 @@
       "errors": {
         "loadFailed": "Nepodařilo sa načíst kampaně.",
         "saveFailed": "Nepodařilo sa uložiť kampaň.",
-        "restrictNeedsRegions": "Vyber aspoň jeden región, aby si obmedzil prihlášky."
+        "restrictNeedsRegions": "Vyber aspoň jeden región, aby si obmedzil prihlášky.",
+        "exclusivityDateInPast": "Vyber dnešný alebo neskorší dátum.",
+        "exclusivityOwnBrand": "Kampaň nemôže blokovať vlastnú značku.",
+        "brandExclusivityDisabled": "Exkluzivita značky zatiaľ nie je k dispozícii."
       },
       "listing": {
         "sectionTitle": "Inzerát na nástenke zákaziek",

@@ -568,7 +568,15 @@
         "jobBoard": "Offerte di lavoro",
         "restrictToRegions": "Solo i creator delle regioni indicate possono candidarsi",
         "restrictToRegionsHint": "I creator al di fuori di queste regioni vedono comunque l'offerta ma non possono candidarsi. Gli inviti non sono interessati.",
-        "regionsRestricted": "Limitato"
+        "regionsRestricted": "Limitato",
+        "exclusiveBrands": "Impedisci ai creator selezionati qui di candidarsi a",
+        "exclusiveBrandsHint": "I creator selezionati per questa campagna non possono candidarsi alle campagne di questi brand. Gli inviti non sono interessati.",
+        "exclusiveBrandsPlaceholder": "Scegli i brand",
+        "exclusiveBrandsLimit": "Fino a {max} brand",
+        "exclusivityEndsOn": "L'esclusiva termina il",
+        "exclusivityEndsOnHint": "Lascia vuoto per farla terminare quando il lavoro del creator su questa campagna è concluso.",
+        "exclusiveBrandsOverview": "Blocca le candidature a",
+        "exclusivityEndsOnOverview": "Termina il {date}"
       },
       "insertLink": {
         "buttonLabel": "Inserisci link",
@@ -663,6 +671,8 @@
         },
         "loadFailed": "Impossibile caricare le candidature. Riprova.",
         "appliedAt": "Candidatura del {date}",
+        "exclusivityConflict": "Conflitto",
+        "exclusivityConflictTooltip": "Selezionato per {campaign}, che blocca le candidature a questo brand. Puoi comunque accettare.",
         "acceptedToast": "Offerta inviata a {name}.",
         "rejectedToast": "La candidatura di {name} è stata chiusa.",
         "accept": {
@@ -671,7 +681,8 @@
           "body": "Accettando invii un invito standard con la tua offerta. Il creator può ancora accettarla o rifiutarla.",
           "submit": "Invia offerta",
           "cancel": "Annulla",
-          "conflictBody": "{name} non è disponibile durante il periodo della campagna. Inviare l'offerta comunque?"
+          "conflictBody": "{name} non è disponibile durante il periodo della campagna. Inviare l'offerta comunque?",
+          "exclusivityWarning": "Questo creator è selezionato per {campaign}, che blocca le candidature a questo brand. Puoi comunque accettare."
         },
         "reject": {
           "action": "Rifiuta",
@@ -757,6 +768,10 @@
           "body": "{count} creator selezionato/i non sono disponibili durante il periodo della campagna. Invitarli comunque?",
           "cancel": "Saltali",
           "proceed": "Invita comunque"
+        },
+        "exclusivity": {
+          "warning": "{count} creator selezionati sono in una campagna che blocca questo brand. Puoi comunque invitarli.",
+          "creatorLine": "{name}: {campaign}"
         }
       },
       "board": {
@@ -979,7 +994,10 @@
       "errors": {
         "loadFailed": "Caricamento campagne fallito.",
         "saveFailed": "Salvataggio campagna fallito.",
-        "restrictNeedsRegions": "Scegli almeno una regione per limitare le candidature."
+        "restrictNeedsRegions": "Scegli almeno una regione per limitare le candidature.",
+        "exclusivityDateInPast": "Scegli oggi o una data successiva.",
+        "exclusivityOwnBrand": "Una campagna non può bloccare il proprio brand.",
+        "brandExclusivityDisabled": "L'esclusiva di brand non è ancora disponibile."
       },
       "listing": {
         "sectionTitle": "Annuncio nella bacheca lavori",

@@ -557,7 +557,8 @@
           "viewAssignment": "Ver atribuição",
           "regionLocked": "Não disponível na tua região",
           "regionLockedNoCountry": "Adiciona o teu país ao perfil para te candidatares a ofertas limitadas por região.",
-          "regionLockedProfileLink": "Abrir o meu perfil"
+          "regionLockedProfileLink": "Abrir o meu perfil",
+          "brandLocked": "Não disponível para ti"
         },
         "applyDialog": {
           "title": "Candidatar-me a esta oferta",
@@ -573,7 +574,8 @@
           "applicationRejected": "Não foste selecionado para esta oferta, por isso não é possível candidatar-te de novo.",
           "gone": "Esta oferta já não está disponível.",
           "error": "Algo correu mal. Tenta novamente.",
-          "regionNotAllowed": "Esta oferta está aberta apenas a criadores de regiões específicas."
+          "regionNotAllowed": "Esta oferta está aberta apenas a criadores de regiões específicas.",
+          "brandNotAvailable": "Este trabalho não está disponível para ti."
         }
       },
       "upload": {

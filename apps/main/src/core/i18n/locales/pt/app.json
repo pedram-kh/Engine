@@ -568,7 +568,15 @@
         "jobBoard": "Ofertas de trabalho",
         "restrictToRegions": "Só criadores das regiões indicadas podem candidatar-se",
         "restrictToRegionsHint": "Os criadores fora destas regiões continuam a ver a oferta, mas não se podem candidatar. Os convites não são afetados.",
-        "regionsRestricted": "Restrito"
+        "regionsRestricted": "Restrito",
+        "exclusiveBrands": "Impedir que os criadores selecionados aqui se candidatem a",
+        "exclusiveBrandsHint": "Os criadores selecionados para esta campanha não se podem candidatar a campanhas destas marcas. Os convites não são afetados.",
+        "exclusiveBrandsPlaceholder": "Escolhe marcas",
+        "exclusiveBrandsLimit": "Até {max} marcas",
+        "exclusivityEndsOn": "A exclusividade termina em",
+        "exclusivityEndsOnHint": "Deixa em branco para terminar quando o trabalho do criador nesta campanha estiver concluído.",
+        "exclusiveBrandsOverview": "Bloqueia candidaturas a",
+        "exclusivityEndsOnOverview": "Termina em {date}"
       },
       "insertLink": {
         "buttonLabel": "Inserir link",
@@ -663,6 +671,8 @@
         },
         "loadFailed": "Não foi possível carregar as candidaturas. Tente novamente.",
         "appliedAt": "Candidatou-se a {date}",
+        "exclusivityConflict": "Conflito",
+        "exclusivityConflictTooltip": "Selecionado para {campaign}, que bloqueia candidaturas a esta marca. Ainda podes aceitar.",
         "acceptedToast": "Proposta enviada a {name}.",
         "rejectedToast": "A candidatura de {name} foi encerrada.",
         "accept": {
@@ -671,7 +681,8 @@
           "body": "Ao aceitar, é enviado um convite normal com a tua proposta. O criador pode ainda aceitá-la ou recusá-la.",
           "submit": "Enviar proposta",
           "cancel": "Cancelar",
-          "conflictBody": "{name} não está disponível durante o período da campanha. Enviar a proposta mesmo assim?"
+          "conflictBody": "{name} não está disponível durante o período da campanha. Enviar a proposta mesmo assim?",
+          "exclusivityWarning": "Este criador está selecionado para {campaign}, que bloqueia candidaturas a esta marca. Ainda podes aceitar."
         },
         "reject": {
           "action": "Recusar",
@@ -757,6 +768,10 @@
           "body": "{count} criador(es) selecionado(s) estão indisponíveis durante o período da campanha. Convidar mesmo assim?",
           "cancel": "Ignorá-los",
           "proceed": "Convidar mesmo assim"
+        },
+        "exclusivity": {
+          "warning": "{count} criadores selecionados estão numa campanha que bloqueia esta marca. Ainda os podes convidar.",
+          "creatorLine": "{name}: {campaign}"
         }
       },
       "board": {
@@ -979,7 +994,10 @@
       "errors": {
         "loadFailed": "Falha ao carregar campanhas.",
         "saveFailed": "Falha ao salvar campanha.",
-        "restrictNeedsRegions": "Escolhe pelo menos uma região para limitar as candidaturas."
+        "restrictNeedsRegions": "Escolhe pelo menos uma região para limitar as candidaturas.",
+        "exclusivityDateInPast": "Escolhe hoje ou uma data posterior.",
+        "exclusivityOwnBrand": "Uma campanha não pode bloquear a sua própria marca.",
+        "brandExclusivityDisabled": "A exclusividade de marca ainda não está disponível."
       },
       "listing": {
         "sectionTitle": "Anúncio no quadro de trabalhos",

@@ -557,7 +557,8 @@
           "viewAssignment": "Visa uppdrag",
           "regionLocked": "Inte tillgängligt i din region",
           "regionLockedNoCountry": "Lägg till ditt land i din profil för att söka jobb som är begränsade till vissa regioner.",
-          "regionLockedProfileLink": "Öppna min profil"
+          "regionLockedProfileLink": "Öppna min profil",
+          "brandLocked": "Inte tillgängligt för dig"
         },
         "applyDialog": {
           "title": "Sök det här jobbet",
@@ -573,7 +574,8 @@
           "applicationRejected": "Du blev inte vald till det här jobbet, så det går inte att söka igen.",
           "gone": "Det här jobbet är inte längre tillgängligt.",
           "error": "Något gick fel. Försök igen.",
-          "regionNotAllowed": "Det här jobbet är bara öppet för creators i vissa regioner."
+          "regionNotAllowed": "Det här jobbet är bara öppet för creators i vissa regioner.",
+          "brandNotAvailable": "Det här jobbet är inte tillgängligt för dig."
         }
       },
       "upload": {

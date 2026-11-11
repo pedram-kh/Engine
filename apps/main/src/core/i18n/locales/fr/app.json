@@ -568,7 +568,15 @@
         "jobBoard": "Offres d'emploi",
         "restrictToRegions": "Seuls les créateurs des régions indiquées peuvent postuler",
         "restrictToRegionsHint": "Les créateurs hors de ces régions voient toujours l'offre mais ne peuvent pas postuler. Les invitations ne sont pas concernées.",
-        "regionsRestricted": "Restreint"
+        "regionsRestricted": "Restreint",
+        "exclusiveBrands": "Empêcher les créateurs sélectionnés ici de postuler pour",
+        "exclusiveBrandsHint": "Les créateurs sélectionnés pour cette campagne ne peuvent pas postuler aux campagnes de ces marques. Les invitations ne sont pas concernées.",
+        "exclusiveBrandsPlaceholder": "Choisis des marques",
+        "exclusiveBrandsLimit": "Jusqu'à {max} marques",
+        "exclusivityEndsOn": "L'exclusivité se termine le",
+        "exclusivityEndsOnHint": "Laisse vide pour qu'elle se termine quand le travail du créateur sur cette campagne est terminé.",
+        "exclusiveBrandsOverview": "Bloque les candidatures à",
+        "exclusivityEndsOnOverview": "Se termine le {date}"
       },
       "insertLink": {
         "buttonLabel": "Insérer un lien",
@@ -663,6 +671,8 @@
         },
         "loadFailed": "Nous n'avons pas pu charger les candidatures. Veuillez réessayer.",
         "appliedAt": "Candidature envoyée le {date}",
+        "exclusivityConflict": "Conflit",
+        "exclusivityConflictTooltip": "Sélectionné pour {campaign}, qui bloque les candidatures à cette marque. Tu peux quand même accepter.",
         "acceptedToast": "Offre envoyée à {name}.",
         "rejectedToast": "La candidature de {name} a été clôturée.",
         "accept": {
@@ -671,7 +681,8 @@
           "body": "L'acceptation envoie une invitation standard avec votre offre. Le créateur peut toujours l'accepter ou la refuser.",
           "submit": "Envoyer l'offre",
           "cancel": "Annuler",
-          "conflictBody": "{name} n'est pas disponible pendant la période de la campagne. Envoyer l'offre quand même ?"
+          "conflictBody": "{name} n'est pas disponible pendant la période de la campagne. Envoyer l'offre quand même ?",
+          "exclusivityWarning": "Ce créateur est sélectionné pour {campaign}, qui bloque les candidatures à cette marque. Tu peux quand même accepter."
         },
         "reject": {
           "action": "Refuser",
@@ -757,6 +768,10 @@
           "body": "{count} créateur(s) sélectionné(s) ne sont pas disponibles pendant la période de la campagne. Les inviter quand même ?",
           "cancel": "Les ignorer",
           "proceed": "Inviter quand même"
+        },
+        "exclusivity": {
+          "warning": "{count} créateurs sélectionnés sont sur une campagne qui bloque cette marque. Tu peux quand même les inviter.",
+          "creatorLine": "{name}: {campaign}"
         }
       },
       "board": {
@@ -979,7 +994,10 @@
       "errors": {
         "loadFailed": "Échec du chargement des campagnes.",
         "saveFailed": "Échec de l'enregistrement de la campagne.",
-        "restrictNeedsRegions": "Choisissez au moins une région pour limiter les candidatures."
+        "restrictNeedsRegions": "Choisissez au moins une région pour limiter les candidatures.",
+        "exclusivityDateInPast": "Choisis aujourd'hui ou une date ultérieure.",
+        "exclusivityOwnBrand": "Une campagne ne peut pas bloquer sa propre marque.",
+        "brandExclusivityDisabled": "L'exclusivité de marque n'est pas encore disponible."
       },
       "listing": {
         "sectionTitle": "Annonce sur le tableau des missions",

@@ -557,7 +557,8 @@
           "viewAssignment": "Opdracht bekijken",
           "regionLocked": "Niet beschikbaar in jouw regio",
           "regionLockedNoCountry": "Voeg je land toe aan je profiel om te reageren op opdrachten die per regio beperkt zijn.",
-          "regionLockedProfileLink": "Mijn profiel openen"
+          "regionLockedProfileLink": "Mijn profiel openen",
+          "brandLocked": "Niet beschikbaar voor jou"
         },
         "applyDialog": {
           "title": "Solliciteren op deze opdracht",
@@ -573,7 +574,8 @@
           "applicationRejected": "Je bent niet gekozen voor deze opdracht, dus opnieuw solliciteren kan niet.",
           "gone": "Deze opdracht is niet meer beschikbaar.",
           "error": "Er is iets misgegaan. Probeer het opnieuw.",
-          "regionNotAllowed": "Deze opdracht staat alleen open voor creators in bepaalde regio's."
+          "regionNotAllowed": "Deze opdracht staat alleen open voor creators in bepaalde regio's.",
+          "brandNotAvailable": "Deze opdracht is niet beschikbaar voor jou."
         }
       },
       "upload": {

@@ -568,7 +568,15 @@
         "jobBoard": "Bord tax-xogħol",
         "restrictToRegions": "Il-kreaturi biss fir-reġjuni elenkati jistgħu japplikaw",
         "restrictToRegionsHint": "Il-kreaturi barra minn dawn ir-reġjuni xorta jaraw ix-xogħol imma ma jistgħux japplikaw. L-istediniet ma jaffettwawx.",
-        "regionsRestricted": "Ristrett"
+        "regionsRestricted": "Ristrett",
+        "exclusiveBrands": "Imblokka lill-creators magħżula hawn milli japplikaw għal",
+        "exclusiveBrandsHint": "Il-creators magħżula għal din il-kampanja ma jistgħux japplikaw għall-kampanji ta' dawn il-brands. L-istediniet mhumiex affettwati.",
+        "exclusiveBrandsPlaceholder": "Agħżel brands",
+        "exclusiveBrandsLimit": "Sa {max} brands",
+        "exclusivityEndsOn": "L-esklussività tintemm fi",
+        "exclusivityEndsOnHint": "Ħalli vojt biex tintemm meta x-xogħol tal-creator fuq din il-kampanja jkun komplut.",
+        "exclusiveBrandsOverview": "Timblokka applikazzjonijiet għal",
+        "exclusivityEndsOnOverview": "Tintemm fi {date}"
       },
       "insertLink": {
         "buttonLabel": "Daħħal link",
@@ -663,6 +671,8 @@
         },
         "loadFailed": "Ma stajniex intellgħu l-applikazzjonijiet. Erġa' pprova.",
         "appliedAt": "Applika {date}",
+        "exclusivityConflict": "Konflitt",
+        "exclusivityConflictTooltip": "Magħżul għal {campaign}, li timblokka applikazzjonijiet għal dan il-brand. Xorta tista' taċċetta.",
         "acceptedToast": "L-offerta ntbagħtet lil {name}.",
         "rejectedToast": "L-applikazzjoni ta' {name} ingħalqet.",
         "accept": {
@@ -671,7 +681,8 @@
           "body": "L-aċċettazzjoni tibgħat stedina standard bl-offerta tiegħek. Il-kreatur xorta jista' jaċċettaha jew jirrifjutaha.",
           "submit": "Ibgħat l-offerta",
           "cancel": "Ikkanċella",
-          "conflictBody": "{name} mhux disponibbli matul il-perjodu tal-kampanja. Tibgħat l-offerta xorta?"
+          "conflictBody": "{name} mhux disponibbli matul il-perjodu tal-kampanja. Tibgħat l-offerta xorta?",
+          "exclusivityWarning": "Dan il-creator huwa magħżul għal {campaign}, li timblokka applikazzjonijiet għal dan il-brand. Xorta tista' taċċetta."
         },
         "reject": {
           "action": "Irrifjuta",
@@ -757,6 +768,10 @@
           "body": "{count} selected creator(s) are unavailable during the campaign window. Stedina them anyway?",
           "cancel": "Skip them",
           "proceed": "Stedina anyway"
+        },
+        "exclusivity": {
+          "warning": "{count} creators magħżula huma f'kampanja li timblokka dan il-brand. Xorta tista' tistedinhom.",
+          "creatorLine": "{name}: {campaign}"
         }
       },
       "board": {
@@ -979,7 +994,10 @@
       "errors": {
         "loadFailed": "Failed to load campaigns.",
         "saveFailed": "Failed to save campaign.",
-        "restrictNeedsRegions": "Agħżel mill-inqas reġjun wieħed biex tillimita l-applikazzjonijiet."
+        "restrictNeedsRegions": "Agħżel mill-inqas reġjun wieħed biex tillimita l-applikazzjonijiet.",
+        "exclusivityDateInPast": "Agħżel illum jew data aktar tard.",
+        "exclusivityOwnBrand": "Kampanja ma tistax timblokka l-brand tagħha stess.",
+        "brandExclusivityDisabled": "L-esklussività tal-brand għadha mhijiex disponibbli."
       },
       "listing": {
         "sectionTitle": "Avviż fuq il-bord tax-xogħlijiet",

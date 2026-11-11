@@ -557,7 +557,8 @@
           "viewAssignment": "Zobraziť zadanie",
           "regionLocked": "Vo tvojom regióne nie je dostupné",
           "regionLockedNoCountry": "Pridaj do profilu svoju krajinu, aby si sa mohol prihlásiť na ponuky obmedzené podľa regiónu.",
-          "regionLockedProfileLink": "Otvoriť môj profil"
+          "regionLockedProfileLink": "Otvoriť môj profil",
+          "brandLocked": "Pre teba nedostupné"
         },
         "applyDialog": {
           "title": "Prihlásiť sa na túto ponuku",
@@ -573,7 +574,8 @@
           "applicationRejected": "Na túto ponuku ťa nevybrali, preto sa nedá prihlásiť znova.",
           "gone": "Táto ponuka už nie je dostupná.",
           "error": "Niečo sa pokazilo. Skús to znova.",
-          "regionNotAllowed": "Táto ponuka je otvorená len tvorcom z určitých regiónov."
+          "regionNotAllowed": "Táto ponuka je otvorená len tvorcom z určitých regiónov.",
+          "brandNotAvailable": "Táto zákazka pre teba nie je dostupná."
         }
       },
       "upload": {

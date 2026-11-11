@@ -568,7 +568,15 @@
         "jobBoard": "Työpaikat",
         "restrictToRegions": "Vain mainittujen alueiden sisällöntuottajat voivat hakea",
         "restrictToRegionsHint": "Näiden alueiden ulkopuoliset sisällöntuottajat näkevät työn mutta eivät voi hakea. Kutsut eivät muutu.",
-        "regionsRestricted": "Rajoitettu"
+        "regionsRestricted": "Rajoitettu",
+        "exclusiveBrands": "Estä tässä valittuja tekijöitä hakemasta kohteeseen",
+        "exclusiveBrandsHint": "Tähän kampanjaan valitut tekijät eivät voi hakea näiden brändien kampanjoihin. Kutsut eivät vaikuta.",
+        "exclusiveBrandsPlaceholder": "Valitse brändit",
+        "exclusiveBrandsLimit": "Enintään {max} brändiä",
+        "exclusivityEndsOn": "Yksinoikeus päättyy",
+        "exclusivityEndsOnHint": "Jätä tyhjäksi, jolloin se päättyy, kun tekijän työ tässä kampanjassa on valmis.",
+        "exclusiveBrandsOverview": "Estää hakemukset kohteeseen",
+        "exclusivityEndsOnOverview": "Päättyy {date}"
       },
       "insertLink": {
         "buttonLabel": "Lisää linkki",
@@ -663,6 +671,8 @@
         },
         "loadFailed": "Hakemuksia ei voitu ladata. Yritä uudelleen.",
         "appliedAt": "Haki {date}",
+        "exclusivityConflict": "Ristiriita",
+        "exclusivityConflictTooltip": "Valittu kampanjaan {campaign}, joka estää hakemukset tähän brändiin. Voit silti hyväksyä.",
         "acceptedToast": "Tarjous lähetettiin tekijälle {name}.",
         "rejectedToast": "Hakemus tekijältä {name} on suljettu.",
         "accept": {
@@ -671,7 +681,8 @@
           "body": "Hyväksyminen lähettää tavallisen kutsun tarjouksesi kanssa. Tekijä voi edelleen hyväksyä sen tai hylätä sen.",
           "submit": "Lähetä tarjous",
           "cancel": "Peruuta",
-          "conflictBody": "{name} ei ole käytettävissä kampanjan aikana. Lähetetäänkö tarjous silti?"
+          "conflictBody": "{name} ei ole käytettävissä kampanjan aikana. Lähetetäänkö tarjous silti?",
+          "exclusivityWarning": "Tämä tekijä on valittu kampanjaan {campaign}, joka estää hakemukset tähän brändiin. Voit silti hyväksyä."
         },
         "reject": {
           "action": "Hylkää",
@@ -757,6 +768,10 @@
           "body": "{count} selected creator(s) are unavailable during the campaign window. Kutsu them anyway?",
           "cancel": "Skip them",
           "proceed": "Kutsu anyway"
+        },
+        "exclusivity": {
+          "warning": "{count} valittua tekijää on kampanjassa, joka estää tämän brändin. Voit silti kutsua heidät.",
+          "creatorLine": "{name}: {campaign}"
         }
       },
       "board": {
@@ -979,7 +994,10 @@
       "errors": {
         "loadFailed": "Failed to load campaigns.",
         "saveFailed": "Failed to save campaign.",
-        "restrictNeedsRegions": "Valitse vähintään yksi alue rajataksesi hakemukset."
+        "restrictNeedsRegions": "Valitse vähintään yksi alue rajataksesi hakemukset.",
+        "exclusivityDateInPast": "Valitse tämä päivä tai myöhempi päivä.",
+        "exclusivityOwnBrand": "Kampanja ei voi estää omaa brändiään.",
+        "brandExclusivityDisabled": "Brändin yksinoikeus ei ole vielä käytettävissä."
       },
       "listing": {
         "sectionTitle": "Ilmoitus työtaulussa",

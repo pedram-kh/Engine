@@ -557,7 +557,8 @@
           "viewAssignment": "View assignment",
           "regionLocked": "Not available in your region",
           "regionLockedNoCountry": "Add your country to your profile to apply to jobs that are limited by region.",
-          "regionLockedProfileLink": "Open my profile"
+          "regionLockedProfileLink": "Open my profile",
+          "brandLocked": "Not available to you"
         },
         "applyDialog": {
           "title": "Apply to this job",
@@ -573,7 +574,8 @@
           "applicationRejected": "You weren't selected for this job, so it can't be applied to again.",
           "gone": "This job is no longer available.",
           "error": "Something went wrong. Please try again.",
-          "regionNotAllowed": "This job is only open to creators in specific regions."
+          "regionNotAllowed": "This job is only open to creators in specific regions.",
+          "brandNotAvailable": "This job isn't available to you."
         }
       },
       "upload": {

@@ -557,7 +557,8 @@
           "viewAssignment": "Megbízás megtekintése",
           "regionLocked": "A te régiódban nem elérhető",
           "regionLockedNoCountry": "Add meg az országodat a profilodban, hogy jelentkezhess a régióhoz kötött munkákra.",
-          "regionLockedProfileLink": "Profilom megnyitása"
+          "regionLockedProfileLink": "Profilom megnyitása",
+          "brandLocked": "Nem elérhető számodra"
         },
         "applyDialog": {
           "title": "Jelentkezés erre a munkára",
@@ -573,7 +574,8 @@
           "applicationRejected": "Nem téged választottak erre a munkára, ezért újra nem lehet jelentkezni.",
           "gone": "Ez a munka már nem elérhető.",
           "error": "Valami hiba történt. Próbáld újra.",
-          "regionNotAllowed": "Ez a munka csak bizonyos régiók alkotói számára nyitott."
+          "regionNotAllowed": "Ez a munka csak bizonyos régiók alkotói számára nyitott.",
+          "brandNotAvailable": "Ez a munka nem elérhető számodra."
         }
       },
       "upload": {

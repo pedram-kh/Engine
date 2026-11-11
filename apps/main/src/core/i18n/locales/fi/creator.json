@@ -557,7 +557,8 @@
           "viewAssignment": "Näytä toimeksianto",
           "regionLocked": "Ei saatavilla alueellasi",
           "regionLockedNoCountry": "Lisää maasi profiiliisi, jotta voit hakea alueen mukaan rajattuihin töihin.",
-          "regionLockedProfileLink": "Avaa profiilini"
+          "regionLockedProfileLink": "Avaa profiilini",
+          "brandLocked": "Ei saatavilla sinulle"
         },
         "applyDialog": {
           "title": "Hae tätä työtä",
@@ -573,7 +574,8 @@
           "applicationRejected": "Sinua ei valittu tähän työhön, joten sitä ei voi hakea uudelleen.",
           "gone": "Tämä työ ei ole enää saatavilla.",
           "error": "Jokin meni pieleen. Yritä uudelleen.",
-          "regionNotAllowed": "Tämä työ on avoin vain tietyillä alueilla oleville sisällöntuottajille."
+          "regionNotAllowed": "Tämä työ on avoin vain tietyillä alueilla oleville sisällöntuottajille.",
+          "brandNotAvailable": "Tämä työ ei ole sinun saatavillasi."
         }
       },
       "upload": {

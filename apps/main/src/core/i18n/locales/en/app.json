@@ -568,7 +568,15 @@
         "jobBoard": "Job board",
         "restrictToRegions": "Only creators in the listed regions can apply",
         "restrictToRegionsHint": "Creators outside these regions can still see the job but cannot apply. Invitations are not affected.",
-        "regionsRestricted": "Restricted"
+        "regionsRestricted": "Restricted",
+        "exclusiveBrands": "Block creators selected here from applying to",
+        "exclusiveBrandsHint": "Creators selected for this campaign can't apply to campaigns of these brands. Invitations are not affected.",
+        "exclusiveBrandsPlaceholder": "Choose brands",
+        "exclusiveBrandsLimit": "Up to {max} brands",
+        "exclusivityEndsOn": "Exclusivity ends on",
+        "exclusivityEndsOnHint": "Leave empty to end when the creator's work on this campaign is complete.",
+        "exclusiveBrandsOverview": "Blocks applications to",
+        "exclusivityEndsOnOverview": "Ends on {date}"
       },
       "insertLink": {
         "buttonLabel": "Insert link",
@@ -663,6 +671,8 @@
         },
         "loadFailed": "We couldn't load applications. Please try again.",
         "appliedAt": "Applied {date}",
+        "exclusivityConflict": "Conflict",
+        "exclusivityConflictTooltip": "Selected for {campaign}, which blocks applications to this brand. You can still accept.",
         "acceptedToast": "Offer sent to {name}.",
         "rejectedToast": "{name}'s application was closed.",
         "accept": {
@@ -671,7 +681,8 @@
           "body": "Accepting sends a standard invitation with your offer. The creator still accepts or declines it.",
           "submit": "Send offer",
           "cancel": "Cancel",
-          "conflictBody": "{name} is unavailable during the campaign window. Send the offer anyway?"
+          "conflictBody": "{name} is unavailable during the campaign window. Send the offer anyway?",
+          "exclusivityWarning": "This creator is selected for {campaign}, which blocks applications to this brand. You can still accept."
         },
         "reject": {
           "action": "Reject",
@@ -757,6 +768,10 @@
           "body": "{count} selected creator(s) are unavailable during the campaign window. Invite them anyway?",
           "cancel": "Skip them",
           "proceed": "Invite anyway"
+        },
+        "exclusivity": {
+          "warning": "{count} selected creator(s) are on a campaign that blocks this brand. You can still invite them.",
+          "creatorLine": "{name}: {campaign}"
         }
       },
       "board": {
@@ -979,7 +994,10 @@
       "errors": {
         "loadFailed": "Failed to load campaigns.",
         "saveFailed": "Failed to save campaign.",
-        "restrictNeedsRegions": "Choose at least one region to restrict applications."
+        "restrictNeedsRegions": "Choose at least one region to restrict applications.",
+        "exclusivityDateInPast": "Choose today or a later date.",
+        "exclusivityOwnBrand": "A campaign cannot block its own brand.",
+        "brandExclusivityDisabled": "Brand exclusivity is not available yet."
       },
       "listing": {
         "sectionTitle": "Jobs board listing",

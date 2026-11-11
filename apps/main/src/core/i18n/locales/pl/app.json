@@ -568,7 +568,15 @@
         "jobBoard": "Oferty pracy",
         "restrictToRegions": "Aplikować mogą tylko twórcy z wymienionych regionów",
         "restrictToRegionsHint": "Twórcy spoza tych regionów nadal widzą zlecenie, ale nie mogą aplikować. Zaproszenia nie są objęte ograniczeniem.",
-        "regionsRestricted": "Ograniczone"
+        "regionsRestricted": "Ograniczone",
+        "exclusiveBrands": "Zablokuj wybranym tutaj twórcom aplikowanie do",
+        "exclusiveBrandsHint": "Twórcy wybrani do tej kampanii nie mogą aplikować do kampanii tych marek. Zaproszenia nie są objęte blokadą.",
+        "exclusiveBrandsPlaceholder": "Wybierz marki",
+        "exclusiveBrandsLimit": "Do {max} marek",
+        "exclusivityEndsOn": "Wyłączność kończy się",
+        "exclusivityEndsOnHint": "Zostaw puste, aby zakończyła się, gdy praca twórcy przy tej kampanii zostanie ukończona.",
+        "exclusiveBrandsOverview": "Blokuje aplikowanie do",
+        "exclusivityEndsOnOverview": "Kończy się {date}"
       },
       "insertLink": {
         "buttonLabel": "Wstaw link",
@@ -663,6 +671,8 @@
         },
         "loadFailed": "Nie mogliśmy załadować zgłoszeń. Spróbuj ponownie.",
         "appliedAt": "Zgłoszenie z {date}",
+        "exclusivityConflict": "Konflikt",
+        "exclusivityConflictTooltip": "Wybrany do kampanii {campaign}, która blokuje aplikowanie do tej marki. Nadal możesz zaakceptować.",
         "acceptedToast": "Oferta wysłana do {name}.",
         "rejectedToast": "Zgłoszenie {name} zostało zamknięte.",
         "accept": {
@@ -671,7 +681,8 @@
           "body": "Akceptacja wysyła standardowe zaproszenie z Twoją ofertą. Twórca nadal może ją przyjąć lub odrzucić.",
           "submit": "Wyślij ofertę",
           "cancel": "Anuluj",
-          "conflictBody": "{name} jest niedostępny w okresie kampanii. Wysłać ofertę mimo to?"
+          "conflictBody": "{name} jest niedostępny w okresie kampanii. Wysłać ofertę mimo to?",
+          "exclusivityWarning": "Ten twórca jest wybrany do kampanii {campaign}, która blokuje aplikowanie do tej marki. Nadal możesz zaakceptować."
         },
         "reject": {
           "action": "Odrzuć",
@@ -757,6 +768,10 @@
           "body": "{count} wybrany/ch twórca/ów jest niedostępny/ch podczas okna kampanii. Zaprosić ich mimo to?",
           "cancel": "Pomiń ich",
           "proceed": "Zaproś mimo to"
+        },
+        "exclusivity": {
+          "warning": "Liczba wybranych twórców w kampanii blokującej tę markę: {count}. Nadal możesz ich zaprosić.",
+          "creatorLine": "{name}: {campaign}"
         }
       },
       "board": {
@@ -979,7 +994,10 @@
       "errors": {
         "loadFailed": "Nie udało się załadować kampanii.",
         "saveFailed": "Nie udało się zapisać kampanii.",
-        "restrictNeedsRegions": "Wybierz co najmniej jeden region, aby ograniczyć zgłoszenia."
+        "restrictNeedsRegions": "Wybierz co najmniej jeden region, aby ograniczyć zgłoszenia.",
+        "exclusivityDateInPast": "Wybierz dzisiejszą lub późniejszą datę.",
+        "exclusivityOwnBrand": "Kampania nie może blokować własnej marki.",
+        "brandExclusivityDisabled": "Wyłączność marki nie jest jeszcze dostępna."
       },
       "listing": {
         "sectionTitle": "Ogłoszenie na tablicy zleceń",

@@ -568,7 +568,15 @@
         "jobBoard": "Álláshirdetések",
         "restrictToRegions": "Csak a felsorolt régiók alkotói jelentkezhetnek",
         "restrictToRegionsHint": "Az ezeken a régiókon kívüli alkotók továbbra is látják a munkát, de nem jelentkezhetnek. A meghívókat ez nem érinti.",
-        "regionsRestricted": "Korlátozott"
+        "regionsRestricted": "Korlátozott",
+        "exclusiveBrands": "Az itt kiválasztott alkotók jelentkezésének tiltása ide:",
+        "exclusiveBrandsHint": "Az ehhez a kampányhoz kiválasztott alkotók nem jelentkezhetnek ezeknek a márkáknak a kampányaira. A meghívásokat ez nem érinti.",
+        "exclusiveBrandsPlaceholder": "Válassz márkákat",
+        "exclusiveBrandsLimit": "Legfeljebb {max} márka",
+        "exclusivityEndsOn": "A kizárólagosság vége:",
+        "exclusivityEndsOnHint": "Hagyd üresen, hogy akkor érjen véget, amikor az alkotó munkája ezen a kampányon befejeződik.",
+        "exclusiveBrandsOverview": "Tiltja a jelentkezést ide:",
+        "exclusivityEndsOnOverview": "Vége: {date}"
       },
       "insertLink": {
         "buttonLabel": "Link beszúrása",
@@ -663,6 +671,8 @@
         },
         "loadFailed": "Nem sikerült betölteni a jelentkezéseket. Próbáld újra.",
         "appliedAt": "Jelentkezett: {date}",
+        "exclusivityConflict": "Ütközés",
+        "exclusivityConflictTooltip": "Kiválasztva ide: {campaign}, amely tiltja a jelentkezést erre a márkára. Elfogadhatod így is.",
         "acceptedToast": "Ajánlat elküldve {name} részére.",
         "rejectedToast": "{name} jelentkezését lezártuk.",
         "accept": {
@@ -671,7 +681,8 @@
           "body": "Az elfogadás egy szokásos meghívót küld az ajánlatoddal. Az alkotó továbbra is elfogadhatja vagy elutasíthatja.",
           "submit": "Ajánlat küldése",
           "cancel": "Mégse",
-          "conflictBody": "{name} nem elérhető a kampány időszakában. Elküldjük mégis az ajánlatot?"
+          "conflictBody": "{name} nem elérhető a kampány időszakában. Elküldjük mégis az ajánlatot?",
+          "exclusivityWarning": "Ez az alkotó ki van választva ide: {campaign}, amely tiltja a jelentkezést erre a márkára. Elfogadhatod így is."
         },
         "reject": {
           "action": "Elutasítás",
@@ -757,6 +768,10 @@
           "body": "{count} selected creator(s) are unavailable during the campaign window. Meghívás them anyway?",
           "cancel": "Skip them",
           "proceed": "Meghívás anyway"
+        },
+        "exclusivity": {
+          "warning": "{count} kiválasztott alkotó olyan kampányban van, amely tiltja ezt a márkát. Meghívhatod őket így is.",
+          "creatorLine": "{name}: {campaign}"
         }
       },
       "board": {
@@ -979,7 +994,10 @@
       "errors": {
         "loadFailed": "Failed to load campaigns.",
         "saveFailed": "Failed to save campaign.",
-        "restrictNeedsRegions": "Válassz legalább egy régiót a jelentkezések korlátozásához."
+        "restrictNeedsRegions": "Válassz legalább egy régiót a jelentkezések korlátozásához.",
+        "exclusivityDateInPast": "Válaszd a mai vagy egy későbbi dátumot.",
+        "exclusivityOwnBrand": "Egy kampány nem tilthatja a saját márkáját.",
+        "brandExclusivityDisabled": "A márka kizárólagossága még nem érhető el."
       },
       "listing": {
         "sectionTitle": "Hirdetés a munkatáblán",

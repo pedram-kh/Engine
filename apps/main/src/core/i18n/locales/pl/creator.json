@@ -557,7 +557,8 @@
           "viewAssignment": "Zobacz zlecenie",
           "regionLocked": "Niedostępne w twoim regionie",
           "regionLockedNoCountry": "Dodaj swój kraj do profilu, aby aplikować na zlecenia ograniczone regionalnie.",
-          "regionLockedProfileLink": "Otwórz mój profil"
+          "regionLockedProfileLink": "Otwórz mój profil",
+          "brandLocked": "Niedostępne dla ciebie"
         },
         "applyDialog": {
           "title": "Aplikuj na to zlecenie",
@@ -573,7 +574,8 @@
           "applicationRejected": "Nie zostałeś wybrany na to zlecenie, więc nie można zgłosić się ponownie.",
           "gone": "To zlecenie nie jest już dostępne.",
           "error": "Coś poszło nie tak. Spróbuj ponownie.",
-          "regionNotAllowed": "To zlecenie jest otwarte tylko dla twórców z określonych regionów."
+          "regionNotAllowed": "To zlecenie jest otwarte tylko dla twórców z określonych regionów.",
+          "brandNotAvailable": "Ta praca nie jest dla ciebie dostępna."
         }
       },
       "upload": {

@@ -568,7 +568,15 @@
         "jobBoard": "Jobbörse",
         "restrictToRegions": "Nur Creator in den aufgeführten Regionen können sich bewerben",
         "restrictToRegionsHint": "Creator außerhalb dieser Regionen sehen den Job weiterhin, können sich aber nicht bewerben. Einladungen sind nicht betroffen.",
-        "regionsRestricted": "Eingeschränkt"
+        "regionsRestricted": "Eingeschränkt",
+        "exclusiveBrands": "Hier ausgewählten Creators Bewerbungen blockieren für",
+        "exclusiveBrandsHint": "Für diese Kampagne ausgewählte Creator können sich nicht auf Kampagnen dieser Marken bewerben. Einladungen sind nicht betroffen.",
+        "exclusiveBrandsPlaceholder": "Marken wählen",
+        "exclusiveBrandsLimit": "Bis zu {max} Marken",
+        "exclusivityEndsOn": "Exklusivität endet am",
+        "exclusivityEndsOnHint": "Leer lassen, damit sie endet, wenn die Arbeit des Creators an dieser Kampagne abgeschlossen ist.",
+        "exclusiveBrandsOverview": "Blockiert Bewerbungen auf",
+        "exclusivityEndsOnOverview": "Endet am {date}"
       },
       "insertLink": {
         "buttonLabel": "Link einfügen",
@@ -663,6 +671,8 @@
         },
         "loadFailed": "Bewerbungen konnten nicht geladen werden. Bitte versuche es erneut.",
         "appliedAt": "Beworben am {date}",
+        "exclusivityConflict": "Konflikt",
+        "exclusivityConflictTooltip": "Für {campaign} ausgewählt, die Bewerbungen auf diese Marke blockiert. Du kannst trotzdem annehmen.",
         "acceptedToast": "Angebot an {name} gesendet.",
         "rejectedToast": "Die Bewerbung von {name} wurde geschlossen.",
         "accept": {
@@ -671,7 +681,8 @@
           "body": "Beim Annehmen wird eine normale Einladung mit deinem Angebot gesendet. Der Creator kann sie weiterhin annehmen oder ablehnen.",
           "submit": "Angebot senden",
           "cancel": "Abbrechen",
-          "conflictBody": "{name} ist während des Kampagnenzeitraums nicht verfügbar. Angebot trotzdem senden?"
+          "conflictBody": "{name} ist während des Kampagnenzeitraums nicht verfügbar. Angebot trotzdem senden?",
+          "exclusivityWarning": "Dieser Creator ist für {campaign} ausgewählt, die Bewerbungen auf diese Marke blockiert. Du kannst trotzdem annehmen."
         },
         "reject": {
           "action": "Ablehnen",
@@ -757,6 +768,10 @@
           "body": "{count} ausgewählte(r) Creator ist/sind während des Kampagnenzeitraums nicht verfügbar. Trotzdem einladen?",
           "cancel": "Überspringen",
           "proceed": "Trotzdem einladen"
+        },
+        "exclusivity": {
+          "warning": "{count} ausgewählte Creator sind in einer Kampagne, die diese Marke blockiert. Du kannst sie trotzdem einladen.",
+          "creatorLine": "{name}: {campaign}"
         }
       },
       "board": {
@@ -979,7 +994,10 @@
       "errors": {
         "loadFailed": "Kampagnen konnten nicht geladen werden.",
         "saveFailed": "Kampagne konnte nicht gespeichert werden.",
-        "restrictNeedsRegions": "Wähle mindestens eine Region, um Bewerbungen einzuschränken."
+        "restrictNeedsRegions": "Wähle mindestens eine Region, um Bewerbungen einzuschränken.",
+        "exclusivityDateInPast": "Wähle heute oder ein späteres Datum.",
+        "exclusivityOwnBrand": "Eine Kampagne kann ihre eigene Marke nicht blockieren.",
+        "brandExclusivityDisabled": "Markenexklusivität ist noch nicht verfügbar."
       },
       "listing": {
         "sectionTitle": "Jobboard-Eintrag",

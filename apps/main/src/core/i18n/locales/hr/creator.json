@@ -557,7 +557,8 @@
           "viewAssignment": "Prikaži zadatak",
           "regionLocked": "Nije dostupno u tvojoj regiji",
           "regionLockedNoCountry": "Dodaj svoju zemlju u profil kako bi se mogao prijaviti na poslove ograničene po regijama.",
-          "regionLockedProfileLink": "Otvori moj profil"
+          "regionLockedProfileLink": "Otvori moj profil",
+          "brandLocked": "Nije dostupno tebi"
         },
         "applyDialog": {
           "title": "Prijavi se na ovaj posao",
@@ -573,7 +574,8 @@
           "applicationRejected": "Nisi odabran za ovaj posao pa se nije moguće ponovno prijaviti.",
           "gone": "Ovaj posao više nije dostupan.",
           "error": "Nešto je pošlo po zlu. Pokušaj ponovno.",
-          "regionNotAllowed": "Ovaj je posao otvoren samo kreatorima iz određenih regija."
+          "regionNotAllowed": "Ovaj je posao otvoren samo kreatorima iz određenih regija.",
+          "brandNotAvailable": "Ovaj posao nije dostupan tebi."
         }
       },
       "upload": {

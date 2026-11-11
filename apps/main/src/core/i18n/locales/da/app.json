@@ -568,7 +568,15 @@
         "jobBoard": "Jobopslag",
         "restrictToRegions": "Kun creators i de angivne regioner kan søge",
         "restrictToRegionsHint": "Creators uden for disse regioner kan stadig se jobbet, men kan ikke søge. Invitationer påvirkes ikke.",
-        "regionsRestricted": "Begrænset"
+        "regionsRestricted": "Begrænset",
+        "exclusiveBrands": "Bloker skabere, der er valgt her, fra at ansøge om",
+        "exclusiveBrandsHint": "Skabere, der er valgt til denne kampagne, kan ikke ansøge om kampagner for disse brands. Invitationer påvirkes ikke.",
+        "exclusiveBrandsPlaceholder": "Vælg brands",
+        "exclusiveBrandsLimit": "Op til {max} brands",
+        "exclusivityEndsOn": "Eksklusivitet slutter den",
+        "exclusivityEndsOnHint": "Lad feltet stå tomt, så slutter den, når skaberens arbejde på kampagnen er afsluttet.",
+        "exclusiveBrandsOverview": "Blokerer ansøgninger til",
+        "exclusivityEndsOnOverview": "Slutter den {date}"
       },
       "insertLink": {
         "buttonLabel": "Indsæt link",
@@ -663,6 +671,8 @@
         },
         "loadFailed": "Ansøgningerne kunne ikke indlæses. Prøv igen.",
         "appliedAt": "Ansøgt {date}",
+        "exclusivityConflict": "Konflikt",
+        "exclusivityConflictTooltip": "Valgt til {campaign}, som blokerer ansøgninger til dette brand. Du kan stadig acceptere.",
         "acceptedToast": "Tilbud sendt til {name}.",
         "rejectedToast": "Ansøgningen fra {name} er lukket.",
         "accept": {
@@ -671,7 +681,8 @@
           "body": "Når du accepterer, sendes en almindelig invitation med dit tilbud. Creatoren kan stadig acceptere eller afvise.",
           "submit": "Send tilbud",
           "cancel": "Annuller",
-          "conflictBody": "{name} er ikke tilgængelig i kampagneperioden. Send tilbuddet alligevel?"
+          "conflictBody": "{name} er ikke tilgængelig i kampagneperioden. Send tilbuddet alligevel?",
+          "exclusivityWarning": "Denne skaber er valgt til {campaign}, som blokerer ansøgninger til dette brand. Du kan stadig acceptere."
         },
         "reject": {
           "action": "Afvis",
@@ -757,6 +768,10 @@
           "body": "{count} valgt(e) creator(er) er ikke tilgængelig(e) i kampagneperioden. Invitér dem alligevel?",
           "cancel": "Spring over",
           "proceed": "Invitér alligevel"
+        },
+        "exclusivity": {
+          "warning": "{count} valgte skabere er på en kampagne, der blokerer dette brand. Du kan stadig invitere dem.",
+          "creatorLine": "{name}: {campaign}"
         }
       },
       "board": {
@@ -979,7 +994,10 @@
       "errors": {
         "loadFailed": "Kampagner kunne ikke indlæses.",
         "saveFailed": "Kampagne kunne ikke gemmes.",
-        "restrictNeedsRegions": "Vælg mindst én region for at begrænse ansøgninger."
+        "restrictNeedsRegions": "Vælg mindst én region for at begrænse ansøgninger.",
+        "exclusivityDateInPast": "Vælg i dag eller en senere dato.",
+        "exclusivityOwnBrand": "En kampagne kan ikke blokere sit eget brand.",
+        "brandExclusivityDisabled": "Brandeksklusivitet er ikke tilgængelig endnu."
       },
       "listing": {
         "sectionTitle": "Opslag på opgavetavlen",

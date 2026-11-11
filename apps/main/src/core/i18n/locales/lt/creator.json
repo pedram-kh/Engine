@@ -557,7 +557,8 @@
           "viewAssignment": "Peržiūrėti užduotį",
           "regionLocked": "Tavo regione neprieinama",
           "regionLockedNoCountry": "Pridėk savo šalį į profilį, kad galėtum kandidatuoti į darbus, ribojamus pagal regioną.",
-          "regionLockedProfileLink": "Atidaryti mano profilį"
+          "regionLockedProfileLink": "Atidaryti mano profilį",
+          "brandLocked": "Tau nepasiekiama"
         },
         "applyDialog": {
           "title": "Kandidatuoti į šį darbą",
@@ -573,7 +574,8 @@
           "applicationRejected": "Į šį darbą nebuvai pasirinktas, todėl kandidatuoti iš naujo negalima.",
           "gone": "Šis darbas nebepasiekiamas.",
           "error": "Kažkas nepavyko. Bandyk dar kartą.",
-          "regionNotAllowed": "Šis darbas atviras tik tam tikrų regionų kūrėjams."
+          "regionNotAllowed": "Šis darbas atviras tik tam tikrų regionų kūrėjams.",
+          "brandNotAvailable": "Šis darbas tau nepasiekiamas."
         }
       },
       "upload": {

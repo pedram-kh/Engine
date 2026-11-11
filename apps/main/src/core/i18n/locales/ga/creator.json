@@ -557,7 +557,8 @@
           "viewAssignment": "Féach ar an sannadh",
           "regionLocked": "Níl sé ar fáil i do réigiún",
           "regionLockedNoCountry": "Cuir do thír le do phróifíl chun cur isteach ar phoist atá teoranta de réir réigiúin.",
-          "regionLockedProfileLink": "Oscail mo phróifíl"
+          "regionLockedProfileLink": "Oscail mo phróifíl",
+          "brandLocked": "Níl sé ar fáil duit"
         },
         "applyDialog": {
           "title": "Cuir isteach ar an bpost seo",
@@ -573,7 +574,8 @@
           "applicationRejected": "Níor roghnaíodh thú don phost seo, mar sin ní féidir cur isteach air arís.",
           "gone": "Níl an post seo ar fáil a thuilleadh.",
           "error": "Chuaigh rud éigin mícheart. Bain triail eile as.",
-          "regionNotAllowed": "Níl an post seo oscailte ach do chruthaitheoirí i réigiúin áirithe."
+          "regionNotAllowed": "Níl an post seo oscailte ach do chruthaitheoirí i réigiúin áirithe.",
+          "brandNotAvailable": "Níl an post seo ar fáil duit."
         }
       },
       "upload": {

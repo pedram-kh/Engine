@@ -557,7 +557,8 @@
           "viewAssignment": "Se opgaven",
           "regionLocked": "Ikke tilgængeligt i din region",
           "regionLockedNoCountry": "Tilføj dit land til din profil for at søge job, der er begrænset til bestemte regioner.",
-          "regionLockedProfileLink": "Åbn min profil"
+          "regionLockedProfileLink": "Åbn min profil",
+          "brandLocked": "Ikke tilgængelig for dig"
         },
         "applyDialog": {
           "title": "Søg dette job",
@@ -573,7 +574,8 @@
           "applicationRejected": "Du blev ikke valgt til dette job, så du kan ikke søge igen.",
           "gone": "Dette job er ikke længere tilgængeligt.",
           "error": "Noget gik galt. Prøv igen.",
-          "regionNotAllowed": "Dette job er kun åbent for creators i bestemte regioner."
+          "regionNotAllowed": "Dette job er kun åbent for creators i bestemte regioner.",
+          "brandNotAvailable": "Dette job er ikke tilgængeligt for dig."
         }
       },
       "upload": {

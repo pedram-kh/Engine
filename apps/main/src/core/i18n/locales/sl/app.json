@@ -568,7 +568,15 @@
         "jobBoard": "Oglasi za delo",
         "restrictToRegions": "Prijavijo se lahko samo ustvarjalci iz navedenih regij",
         "restrictToRegionsHint": "Ustvarjalci zunaj teh regij delo še vedno vidijo, vendar se ne morejo prijaviti. Povabila niso prizadeta.",
-        "regionsRestricted": "Omejeno"
+        "regionsRestricted": "Omejeno",
+        "exclusiveBrands": "Tukaj izbranim ustvarjalcem prepreči prijavo na",
+        "exclusiveBrandsHint": "Ustvarjalci, izbrani za to kampanjo, se ne morejo prijaviti na kampanje teh blagovnih znamk. Povabil to ne zadeva.",
+        "exclusiveBrandsPlaceholder": "Izberi blagovne znamke",
+        "exclusiveBrandsLimit": "Do {max} blagovnih znamk",
+        "exclusivityEndsOn": "Ekskluzivnost se konča",
+        "exclusivityEndsOnHint": "Pusti prazno, da se konča, ko je delo ustvarjalca pri tej kampanji dokončano.",
+        "exclusiveBrandsOverview": "Preprečuje prijave na",
+        "exclusivityEndsOnOverview": "Konča se {date}"
       },
       "insertLink": {
         "buttonLabel": "Vstavi povezavo",
@@ -663,6 +671,8 @@
         },
         "loadFailed": "Prijav nam ni uspelo naložiti. Poskusi znova.",
         "appliedAt": "Prijava {date}",
+        "exclusivityConflict": "Konflikt",
+        "exclusivityConflictTooltip": "Izbran za {campaign}, ki preprečuje prijave na to blagovno znamko. Še vedno lahko sprejmeš.",
         "acceptedToast": "Ponudba je bila poslana {name}.",
         "rejectedToast": "Prijava {name} je zaprta.",
         "accept": {
@@ -671,7 +681,8 @@
           "body": "S sprejemom se pošlje običajno vabilo s tvojo ponudbo. Ustvarjalec jo lahko še vedno sprejme ali zavrne.",
           "submit": "Pošlji ponudbo",
           "cancel": "Prekliči",
-          "conflictBody": "{name} v času kampanje ni na voljo. Želiš ponudbo vseeno poslati?"
+          "conflictBody": "{name} v času kampanje ni na voljo. Želiš ponudbo vseeno poslati?",
+          "exclusivityWarning": "Ta ustvarjalec je izbran za {campaign}, ki preprečuje prijave na to blagovno znamko. Še vedno lahko sprejmeš."
         },
         "reject": {
           "action": "Zavrni",
@@ -757,6 +768,10 @@
           "body": "{count} vybraných tvůrců není dostupných v okně kampanje. Přesto je pozvat?",
           "cancel": "Přeskočit je",
           "proceed": "Přesto pozvat"
+        },
+        "exclusivity": {
+          "warning": "Izbranih ustvarjalcev v kampanji, ki blokira to blagovno znamko: {count}. Še vedno jih lahko povabiš.",
+          "creatorLine": "{name}: {campaign}"
         }
       },
       "board": {
@@ -979,7 +994,10 @@
       "errors": {
         "loadFailed": "Ni uspelo naložiti kampanje.",
         "saveFailed": "Ni uspelo shraniti kampanja.",
-        "restrictNeedsRegions": "Izberi vsaj eno regijo, da omejiš prijave."
+        "restrictNeedsRegions": "Izberi vsaj eno regijo, da omejiš prijave.",
+        "exclusivityDateInPast": "Izberi današnji ali poznejši datum.",
+        "exclusivityOwnBrand": "Kampanja ne more blokirati lastne blagovne znamke.",
+        "brandExclusivityDisabled": "Ekskluzivnost blagovne znamke še ni na voljo."
       },
       "listing": {
         "sectionTitle": "Objava na oglasni deski del",

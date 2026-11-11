@@ -568,7 +568,15 @@
         "jobBoard": "Nabídky práce",
         "restrictToRegions": "Přihlásit se mohou jen tvůrci z uvedených regionů",
         "restrictToRegionsHint": "Tvůrci mimo tyto regiony nabídku stále vidí, ale nemohou se přihlásit. Pozvánky se to netýká.",
-        "regionsRestricted": "Omezeno"
+        "regionsRestricted": "Omezeno",
+        "exclusiveBrands": "Zablokovat tvůrcům vybraným zde podání přihlášky k",
+        "exclusiveBrandsHint": "Tvůrci vybraní pro tuto kampaň se nemohou přihlásit do kampaní těchto značek. Pozvánky to neovlivní.",
+        "exclusiveBrandsPlaceholder": "Vyber značky",
+        "exclusiveBrandsLimit": "Až {max} značek",
+        "exclusivityEndsOn": "Exkluzivita končí dne",
+        "exclusivityEndsOnHint": "Nech prázdné, aby skončila, když je práce tvůrce na této kampani dokončena.",
+        "exclusiveBrandsOverview": "Blokuje přihlášky k",
+        "exclusivityEndsOnOverview": "Končí dne {date}"
       },
       "insertLink": {
         "buttonLabel": "Vložit odkaz",
@@ -663,6 +671,8 @@
         },
         "loadFailed": "Nepodařilo se nám načíst přihlášky. Zkuste to znovu.",
         "appliedAt": "Přihlášeno {date}",
+        "exclusivityConflict": "Konflikt",
+        "exclusivityConflictTooltip": "Vybrán pro {campaign}, která blokuje přihlášky k této značce. Stále ho můžeš přijmout.",
         "acceptedToast": "Nabídka byla odeslána tvůrci {name}.",
         "rejectedToast": "Přihláška od {name} byla uzavřena.",
         "accept": {
@@ -671,7 +681,8 @@
           "body": "Přijetím odešleš standardní pozvánku se svou nabídkou. Tvůrce ji stále může přijmout nebo odmítnout.",
           "submit": "Odeslat nabídku",
           "cancel": "Zrušit",
-          "conflictBody": "{name} není v období kampaně dostupný. Odeslat nabídku i tak?"
+          "conflictBody": "{name} není v období kampaně dostupný. Odeslat nabídku i tak?",
+          "exclusivityWarning": "Tento tvůrce je vybrán pro {campaign}, která blokuje přihlášky k této značce. Stále ho můžeš přijmout."
         },
         "reject": {
           "action": "Odmítnout",
@@ -757,6 +768,10 @@
           "body": "{count} vybraných tvůrců není dostupných v okně kampaně. Přesto je pozvat?",
           "cancel": "Přeskočit je",
           "proceed": "Přesto pozvat"
+        },
+        "exclusivity": {
+          "warning": "Počet vybraných tvůrců v kampani, která blokuje tuto značku: {count}. Stále je můžeš pozvat.",
+          "creatorLine": "{name}: {campaign}"
         }
       },
       "board": {
@@ -979,7 +994,10 @@
       "errors": {
         "loadFailed": "Nepodařilo se načíst kampaně.",
         "saveFailed": "Nepodařilo se uložit kampaň.",
-        "restrictNeedsRegions": "Vyber alespoň jeden region, abys omezil přihlášky."
+        "restrictNeedsRegions": "Vyber alespoň jeden region, abys omezil přihlášky.",
+        "exclusivityDateInPast": "Vyber dnešní nebo pozdější datum.",
+        "exclusivityOwnBrand": "Kampaň nemůže blokovat vlastní značku.",
+        "brandExclusivityDisabled": "Exkluzivita značky zatím není k dispozici."
       },
       "listing": {
         "sectionTitle": "Nabídka na nástěnce zakázek",

@@ -557,7 +557,8 @@
           "viewAssignment": "Ara l-inkarigu",
           "regionLocked": "Mhux disponibbli fir-reġjun tiegħek",
           "regionLockedNoCountry": "Żid il-pajjiż tiegħek mal-profil tiegħek biex tapplika għal impjiegi limitati skont ir-reġjun.",
-          "regionLockedProfileLink": "Iftaħ il-profil tiegħi"
+          "regionLockedProfileLink": "Iftaħ il-profil tiegħi",
+          "brandLocked": "Mhux disponibbli għalik"
         },
         "applyDialog": {
           "title": "Applika għal dan ix-xogħol",
@@ -573,7 +574,8 @@
           "applicationRejected": "Ma ġejtx magħżul għal dan ix-xogħol, għalhekk ma tistax terġa' tapplika.",
           "gone": "Dan ix-xogħol m'għadux disponibbli.",
           "error": "Xi ħaġa marret ħażin. Erġa' pprova.",
-          "regionNotAllowed": "Dan ix-xogħol huwa miftuħ biss għal kreaturi f'reġjuni speċifiċi."
+          "regionNotAllowed": "Dan ix-xogħol huwa miftuħ biss għal kreaturi f'reġjuni speċifiċi.",
+          "brandNotAvailable": "Dan ix-xogħol mhuwiex disponibbli għalik."
         }
       },
       "upload": {

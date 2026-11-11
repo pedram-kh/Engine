@@ -568,7 +568,15 @@
         "jobBoard": "Clár post",
         "restrictToRegions": "Ní féidir ach le cruthaitheoirí sna réigiúin liostaithe cur isteach",
         "restrictToRegionsHint": "Is féidir le cruthaitheoirí lasmuigh de na réigiúin seo an post a fheiceáil fós ach ní féidir leo cur isteach. Ní chuirtear isteach ar chuirí.",
-        "regionsRestricted": "Srianta"
+        "regionsRestricted": "Srianta",
+        "exclusiveBrands": "Cuir cosc ar chruthaitheoirí a roghnaítear anseo iarratas a dhéanamh ar",
+        "exclusiveBrandsHint": "Ní féidir le cruthaitheoirí a roghnaítear don fheachtas seo iarratas a dhéanamh ar fheachtais na mbrandaí seo. Ní dhéanann sé difear do chuireadh.",
+        "exclusiveBrandsPlaceholder": "Roghnaigh brandaí",
+        "exclusiveBrandsLimit": "Suas le {max} brandaí",
+        "exclusivityEndsOn": "Críochnaíonn an eisiachtacht ar",
+        "exclusivityEndsOnHint": "Fág folamh chun go gcríochnóidh sé nuair a bheidh obair an chruthaitheora ar an bhfeachtas seo críochnaithe.",
+        "exclusiveBrandsOverview": "Cuireann cosc ar iarratais ar",
+        "exclusivityEndsOnOverview": "Críochnaíonn ar {date}"
       },
       "insertLink": {
         "buttonLabel": "Ionsáigh nasc",
@@ -663,6 +671,8 @@
         },
         "loadFailed": "Níorbh fhéidir na hiarratais a lódáil. Bain triail eile as.",
         "appliedAt": "Iarratas déanta {date}",
+        "exclusivityConflict": "Coimhlint",
+        "exclusivityConflictTooltip": "Roghnaithe do {campaign}, a chuireann cosc ar iarratais ar an mbranda seo. Is féidir leat glacadh leis fós.",
         "acceptedToast": "Tairiscint seolta chuig {name}.",
         "rejectedToast": "Dúnadh iarratas {name}.",
         "accept": {
@@ -671,7 +681,8 @@
           "body": "Seolann glacadh cuireadh caighdeánach le do thairiscint. Is féidir leis an gcruthaitheoir glacadh leis nó é a dhiúltú fós.",
           "submit": "Seol an tairiscint",
           "cancel": "Cealaigh",
-          "conflictBody": "Níl {name} ar fáil le linn tréimhse an fheachtais. An bhfuil fonn ort an tairiscint a sheoladh mar sin féin?"
+          "conflictBody": "Níl {name} ar fáil le linn tréimhse an fheachtais. An bhfuil fonn ort an tairiscint a sheoladh mar sin féin?",
+          "exclusivityWarning": "Tá an cruthaitheoir seo roghnaithe do {campaign}, a chuireann cosc ar iarratais ar an mbranda seo. Is féidir leat glacadh leis fós."
         },
         "reject": {
           "action": "Diúltaigh",
@@ -757,6 +768,10 @@
           "body": "{count} selected creator(s) are unavailable during the campaign window. Tabhair cuireadh them anyway?",
           "cancel": "Skip them",
           "proceed": "Tabhair cuireadh anyway"
+        },
+        "exclusivity": {
+          "warning": "Tá {count} cruthaitheoir roghnaithe ar fheachtas a chuireann cosc ar an mbranda seo. Is féidir leat cuireadh a thabhairt dóibh fós.",
+          "creatorLine": "{name}: {campaign}"
         }
       },
       "board": {
@@ -979,7 +994,10 @@
       "errors": {
         "loadFailed": "Failed to load campaigns.",
         "saveFailed": "Failed to save campaign.",
-        "restrictNeedsRegions": "Roghnaigh réigiún amháin ar a laghad chun iarratais a theorannú."
+        "restrictNeedsRegions": "Roghnaigh réigiún amháin ar a laghad chun iarratais a theorannú.",
+        "exclusivityDateInPast": "Roghnaigh inniu nó dáta níos déanaí.",
+        "exclusivityOwnBrand": "Ní féidir le feachtas a bhranda féin a bhacadh.",
+        "brandExclusivityDisabled": "Níl eisiachtacht brandaí ar fáil go fóill."
       },
       "listing": {
         "sectionTitle": "Fógra ar an gclár post",

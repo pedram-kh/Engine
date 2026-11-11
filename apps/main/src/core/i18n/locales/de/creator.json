@@ -557,7 +557,8 @@
           "viewAssignment": "Auftrag ansehen",
           "regionLocked": "In deiner Region nicht verfügbar",
           "regionLockedNoCountry": "Trage dein Land in deinem Profil ein, um dich auf Jobs zu bewerben, die auf Regionen beschränkt sind.",
-          "regionLockedProfileLink": "Mein Profil öffnen"
+          "regionLockedProfileLink": "Mein Profil öffnen",
+          "brandLocked": "Für dich nicht verfügbar"
         },
         "applyDialog": {
           "title": "Auf diesen Job bewerben",
@@ -573,7 +574,8 @@
           "applicationRejected": "Du wurdest für diesen Job nicht ausgewählt, daher ist keine erneute Bewerbung möglich.",
           "gone": "Dieser Job ist nicht mehr verfügbar.",
           "error": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
-          "regionNotAllowed": "Dieser Job steht nur Creators in bestimmten Regionen offen."
+          "regionNotAllowed": "Dieser Job steht nur Creators in bestimmten Regionen offen.",
+          "brandNotAvailable": "Dieser Job ist für dich nicht verfügbar."
         }
       },
       "upload": {

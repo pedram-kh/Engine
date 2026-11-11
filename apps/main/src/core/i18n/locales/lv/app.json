@@ -568,7 +568,15 @@
         "jobBoard": "Darba piedāvājumi",
         "restrictToRegions": "Pieteikties var tikai norādīto reģionu satura veidotāji",
         "restrictToRegionsHint": "Satura veidotāji ārpus šiem reģioniem darbu joprojām redz, bet nevar pieteikties. Uzaicinājumus tas neietekmē.",
-        "regionsRestricted": "Ierobežots"
+        "regionsRestricted": "Ierobežots",
+        "exclusiveBrands": "Liegt šeit izvēlētajiem veidotājiem pieteikties",
+        "exclusiveBrandsHint": "Šai kampaņai izvēlētie veidotāji nevar pieteikties šo zīmolu kampaņām. Uzaicinājumus tas neietekmē.",
+        "exclusiveBrandsPlaceholder": "Izvēlies zīmolus",
+        "exclusiveBrandsLimit": "Līdz {max} zīmoliem",
+        "exclusivityEndsOn": "Ekskluzivitāte beidzas",
+        "exclusivityEndsOnHint": "Atstāj tukšu, lai tā beigtos, kad veidotāja darbs šajā kampaņā ir pabeigts.",
+        "exclusiveBrandsOverview": "Bloķē pieteikumus",
+        "exclusivityEndsOnOverview": "Beidzas {date}"
       },
       "insertLink": {
         "buttonLabel": "Ievietot saiti",
@@ -663,6 +671,8 @@
         },
         "loadFailed": "Neizdevās ielādēt pieteikumus. Lūdzu, mēģini vēlreiz.",
         "appliedAt": "Pieteicās {date}",
+        "exclusivityConflict": "Konflikts",
+        "exclusivityConflictTooltip": "Izvēlēts kampaņai {campaign}, kas bloķē pieteikumus šim zīmolam. Tu joprojām vari pieņemt.",
         "acceptedToast": "Piedāvājums nosūtīts {name}.",
         "rejectedToast": "{name} pieteikums ir slēgts.",
         "accept": {
@@ -671,7 +681,8 @@
           "body": "Apstiprinot tiek nosūtīts parasts uzaicinājums ar tavu piedāvājumu. Autors to joprojām var pieņemt vai atteikt.",
           "submit": "Nosūtīt piedāvājumu",
           "cancel": "Atcelt",
-          "conflictBody": "{name} kampaņas laikā nav pieejams. Vai tomēr nosūtīt piedāvājumu?"
+          "conflictBody": "{name} kampaņas laikā nav pieejams. Vai tomēr nosūtīt piedāvājumu?",
+          "exclusivityWarning": "Šis veidotājs ir izvēlēts kampaņai {campaign}, kas bloķē pieteikumus šim zīmolam. Tu joprojām vari pieņemt."
         },
         "reject": {
           "action": "Atteikt",
@@ -757,6 +768,10 @@
           "body": "{count} selected creator(s) are unavailable during the campaign window. Uzaicināt them anyway?",
           "cancel": "Skip them",
           "proceed": "Uzaicināt anyway"
+        },
+        "exclusivity": {
+          "warning": "{count} izvēlēti veidotāji ir kampaņā, kas bloķē šo zīmolu. Tu joprojām vari viņus uzaicināt.",
+          "creatorLine": "{name}: {campaign}"
         }
       },
       "board": {
@@ -979,7 +994,10 @@
       "errors": {
         "loadFailed": "Failed to load campaigns.",
         "saveFailed": "Failed to save campaign.",
-        "restrictNeedsRegions": "Izvēlies vismaz vienu reģionu, lai ierobežotu pieteikumus."
+        "restrictNeedsRegions": "Izvēlies vismaz vienu reģionu, lai ierobežotu pieteikumus.",
+        "exclusivityDateInPast": "Izvēlies šodienu vai vēlāku datumu.",
+        "exclusivityOwnBrand": "Kampaņa nevar bloķēt savu zīmolu.",
+        "brandExclusivityDisabled": "Zīmola ekskluzivitāte vēl nav pieejama."
       },
       "listing": {
         "sectionTitle": "Sludinājums darbu tāfelē",
