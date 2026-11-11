@@ -316,6 +316,7 @@ final class ErasureRegistry
             'brands' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7).', [], [], null, [
                 'name' => $agencyOrg,
             ]),
+            'campaign_exclusive_brands' => new TableRule(Disposition::NotApplicable, 'Agency-authored pivot of campaign to brand (AH-120); holds no creator data and points at no creator or user (§3.7).', []),
             'campaigns' => new TableRule(Disposition::NotApplicable, 'Agency-authored; the creator link is a pivot covered above (§3.7).', ['created_by_user_id'], [], null, [
                 'name' => 'A campaign title.',
             ]),

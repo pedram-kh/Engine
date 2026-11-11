@@ -9,6 +9,7 @@ use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Facades\Audit;
 use App\Modules\Creators\Features\ApplicationNotificationsEnabled;
 use App\Modules\Creators\Features\AssignmentOfferEditEnabled;
+use App\Modules\Creators\Features\CampaignBrandExclusivityEnabled;
 use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
@@ -119,6 +120,10 @@ final class AdminFeatureFlagController
         CampaignRegionRestrictionEnabled::NAME => [
             'label' => 'Campaign region restriction',
             'description' => 'Lets an agency limit who can apply to a listed campaign to the creators in its listed regions. Off: the switch cannot be turned on, nobody is region-locked and fan-out is unchanged. Creators outside the regions still see the job when it is on; invitations are never affected.',
+        ],
+        CampaignBrandExclusivityEnabled::NAME => [
+            'label' => 'Campaign brand exclusivity',
+            'description' => 'Lets an agency stop the creators selected for a campaign from applying to campaigns of chosen brands. Off: the setting cannot be saved, nobody is blocked and the job-posted email is unchanged. A blocked creator still sees the job, with Apply replaced by "Not available to you"; agency invites are never blocked and existing applications are left alone. Arm after the web deploy.',
         ],
         AssignmentOfferEditEnabled::NAME => [
             'label' => 'Assignment offer edit',

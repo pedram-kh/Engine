@@ -6,6 +6,7 @@ namespace App\Modules\Identity\Http\Resources;
 
 use App\Modules\Agencies\Models\AgencyMembership;
 use App\Modules\Creators\Features\AssignmentOfferEditEnabled;
+use App\Modules\Creators\Features\CampaignBrandExclusivityEnabled;
 use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
 use App\Modules\Identity\Features\AccountDeletionEnabled;
 use App\Modules\Identity\Models\User;
@@ -69,6 +70,8 @@ final class UserResource extends JsonResource
                     // each flag itself); `false` without evaluating the flag for a
                     // creator or a platform admin, the `account_deletion` shape.
                     'campaign_region_restriction' => $this->isAgencySide($user) && Feature::active(CampaignRegionRestrictionEnabled::NAME),
+                    // AH-120 — brand exclusivity. Agency-side UI gate; the API enforces the flag itself.
+                    'campaign_brand_exclusivity' => $this->isAgencySide($user) && Feature::active(CampaignBrandExclusivityEnabled::NAME),
                     'assignment_offer_edit' => $this->isAgencySide($user) && Feature::active(AssignmentOfferEditEnabled::NAME),
                     // AH-119 — the unified inbox. UI gate only; the API enforces the flag (404).
                     'messages_v2_inbox' => $this->isAgencySide($user) && Feature::active(MessagesV2InboxEnabled::NAME),

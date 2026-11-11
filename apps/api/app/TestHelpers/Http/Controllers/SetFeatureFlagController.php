@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\TestHelpers\Http\Controllers;
 
 use App\Modules\Creators\Features\AssignmentOfferEditEnabled;
+use App\Modules\Creators\Features\CampaignBrandExclusivityEnabled;
 use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
 use App\Modules\Identity\Features\AccountDeletionEnabled;
 use App\Modules\Messaging\Features\MessagesV2CreatorInboxEnabled;
@@ -57,6 +58,8 @@ final class SetFeatureFlagController
         MessagesV2EditSearchEnabled::NAME,
         // AH-115 L4 — OFF at deploy; the creator-inbox E2E leg drives each state.
         MessagesV2CreatorInboxEnabled::NAME,
+        // AH-120 — OFF at deploy; the brand-exclusivity E2E leg drives each state.
+        CampaignBrandExclusivityEnabled::NAME,
     ];
 
     public function store(Request $request, string $name): JsonResponse

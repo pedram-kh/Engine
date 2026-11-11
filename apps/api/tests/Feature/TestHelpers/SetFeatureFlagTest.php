@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Creators\Features\AssignmentOfferEditEnabled;
+use App\Modules\Creators\Features\CampaignBrandExclusivityEnabled;
 use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
 use App\Modules\Identity\Features\AccountDeletionEnabled;
 use App\Modules\Messaging\Features\MessagesV2CreatorInboxEnabled;
@@ -85,6 +86,7 @@ it('allows exactly the flags the E2E legs need (a new entry is a reviewed change
         MessagesV2InboxEnabled::NAME,
         MessagesV2EditSearchEnabled::NAME,
         MessagesV2CreatorInboxEnabled::NAME,
+        CampaignBrandExclusivityEnabled::NAME,
     ]);
 });
 

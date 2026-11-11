@@ -6,6 +6,7 @@ namespace App\Modules\Creators;
 
 use App\Modules\Creators\Features\ApplicationNotificationsEnabled;
 use App\Modules\Creators\Features\AssignmentOfferEditEnabled;
+use App\Modules\Creators\Features\CampaignBrandExclusivityEnabled;
 use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
 use App\Modules\Creators\Features\ContractSigningEnabled;
 use App\Modules\Creators\Features\CreatorPayoutMethodEnabled;
@@ -272,6 +273,7 @@ final class CreatorsServiceProvider extends ServiceProvider
         Feature::define(PushNotificationsEnabled::NAME, PushNotificationsEnabled::default());
         Feature::define(CampaignRegionRestrictionEnabled::NAME, CampaignRegionRestrictionEnabled::default());
         Feature::define(AssignmentOfferEditEnabled::NAME, AssignmentOfferEditEnabled::default());
+        Feature::define(CampaignBrandExclusivityEnabled::NAME, CampaignBrandExclusivityEnabled::default());
     }
 
     private function registerRoutes(): void

@@ -6,6 +6,7 @@ namespace App\Modules\Campaigns\Database\Factories;
 
 use App\Modules\Agencies\Database\Factories\AgencyFactory;
 use App\Modules\Brands\Database\Factories\BrandFactory;
+use App\Modules\Brands\Models\Brand;
 use App\Modules\Campaigns\Enums\CampaignObjective;
 use App\Modules\Campaigns\Enums\CampaignStatus;
 use App\Modules\Campaigns\Models\Campaign;
@@ -111,6 +112,21 @@ final class CampaignFactory extends Factory
         return $this->state(fn (array $attributes): array => [
             'restrict_to_listing_regions' => true,
         ]);
+    }
+
+    /**
+     * AH-120 — the campaign blocks its selected creators from applying to the
+     * given brands' campaigns (the pivot rows are written after create).
+     *
+     * @param  list<Brand>  $brands
+     */
+    public function blocking(array $brands, ?string $endsOn = null): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'exclusivity_ends_on' => $endsOn,
+        ])->afterCreating(function (Campaign $campaign) use ($brands): void {
+            $campaign->exclusiveBrands()->sync(array_map(static fn (Brand $brand): int => $brand->id, $brands));
+        });
     }
 
     /**

@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -63,6 +64,7 @@ use Laravel\Pennant\Feature;
  * @property list<string>|null $listing_languages
  * @property list<string>|null $listing_regions
  * @property bool $restrict_to_listing_regions
+ * @property Carbon|null $exclusivity_ends_on
  * @property string|null $listing_examples_url
  * @property Carbon|null $listed_at
  * @property Carbon $created_at
@@ -135,6 +137,8 @@ final class Campaign extends Model
         'listing_languages',
         'listing_regions',
         'restrict_to_listing_regions',
+        // AH-120 — a plain date; the blocked-brand list is the pivot, synced by the controller.
+        'exclusivity_ends_on',
         'listing_examples_url',
         // AH-056 D4 — DISPLAY metadata, written only on the false→true listing
         // flip in CampaignController::update(). Fillable for factory/test
@@ -178,6 +182,20 @@ final class Campaign extends Model
     public function assignments(): HasMany
     {
         return $this->hasMany(CampaignAssignment::class);
+    }
+
+    /**
+     * AH-120 — the brands whose campaigns the creators selected for THIS
+     * campaign may not apply to. Includes archived brands: an archived brand
+     * stays blocked.
+     *
+     * @return BelongsToMany<Brand, $this>
+     */
+    public function exclusiveBrands(): BelongsToMany
+    {
+        return $this->belongsToMany(Brand::class, 'campaign_exclusive_brands')
+            ->withTimestamps()
+            ->withTrashed();
     }
 
     /**
@@ -367,6 +385,7 @@ final class Campaign extends Model
             'listing_languages' => 'array',
             'listing_regions' => 'array',
             'restrict_to_listing_regions' => 'boolean',
+            'exclusivity_ends_on' => 'date',
             'listed_at' => 'datetime',
         ];
     }

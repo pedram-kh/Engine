@@ -105,6 +105,86 @@ enum AssignmentStatus: string
     }
 
     /**
+     * AH-120 (brand exclusivity) — is this a state in which the creator counts
+     * as SELECTED for the campaign? Accepted and every later active state; the
+     * invitation stage (invited, countered) does not, and the three ways an
+     * engagement ends without being completed (declined, rejected, cancelled)
+     * end the block immediately.
+     *
+     * The classification lives here, once, and the exclusivity predicate reads
+     * it (PHP and SQL both): a status added later must be placed in exactly one
+     * of {@see countsAsSelected()}, {@see isPreSelection()} or
+     * {@see endsExclusivityImmediately()}. A spec asserts every case sits in
+     * exactly one.
+     */
+    public function countsAsSelected(): bool
+    {
+        return match ($this) {
+            self::Accepted,
+            self::Contracted,
+            self::Producing,
+            self::DraftSubmitted,
+            self::RevisionRequested,
+            self::Approved,
+            self::Posted,
+            self::LiveVerified,
+            self::ManuallyVerified,
+            self::PaymentHeld,
+            self::PaymentReleased,
+            self::CompletedOnApproval => true,
+            self::Invited,
+            self::Countered,
+            self::Declined,
+            self::Rejected,
+            self::Cancelled => false,
+        };
+    }
+
+    /**
+     * AH-120 — an offer that has not been accepted yet: never blocks.
+     */
+    public function isPreSelection(): bool
+    {
+        return match ($this) {
+            self::Invited,
+            self::Countered => true,
+            default => false,
+        };
+    }
+
+    /**
+     * AH-120 — declined, rejected or cancelled: the creator is not (or no
+     * longer) selected, and any block they carried ends at once.
+     */
+    public function endsExclusivityImmediately(): bool
+    {
+        return match ($this) {
+            self::Declined,
+            self::Rejected,
+            self::Cancelled => true,
+            default => false,
+        };
+    }
+
+    /**
+     * AH-120 — the engagement's work is finished (verified, held for payment,
+     * paid, or approved on a hand-off campaign). With NO exclusivity end date,
+     * the block ends here (Q1). `payment_held` follows `live_verified` and is
+     * classed with it. A subset of {@see countsAsSelected()}.
+     */
+    public function isCompletedForExclusivity(): bool
+    {
+        return match ($this) {
+            self::LiveVerified,
+            self::ManuallyVerified,
+            self::PaymentHeld,
+            self::PaymentReleased,
+            self::CompletedOnApproval => true,
+            default => false,
+        };
+    }
+
+    /**
      * True when a payment may be released for an assignment in this state
      * (verification-resolution chunk, D-3). The S10 release-gate
      * (docs/20-PHASE-1-SPEC.md §6.8 "Release payment" + the auto-release
