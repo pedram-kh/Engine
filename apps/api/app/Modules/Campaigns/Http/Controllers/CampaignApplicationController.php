@@ -17,6 +17,7 @@ use App\Modules\Campaigns\Models\CampaignApplication;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Campaigns\Services\AssignmentInviteGate;
 use App\Modules\Campaigns\Services\AssignmentOfferAttachmentUploadService;
+use App\Modules\Campaigns\Services\BrandExclusivity;
 use App\Modules\Campaigns\Services\CampaignApplicationDecisionService;
 use App\Modules\Campaigns\Services\CampaignApplicationNotifier;
 use App\Modules\Campaigns\Services\CampaignAssignmentStateMachine;
@@ -72,7 +73,7 @@ final class CampaignApplicationController
      * information design: the rows that need a decision are the rows an agency
      * opened the tab for, and an answered application is history.
      */
-    public function index(Request $request, Agency $agency, Campaign $campaign): JsonResponse
+    public function index(Request $request, Agency $agency, Campaign $campaign, BrandExclusivity $exclusivity): JsonResponse
     {
         $this->assertBelongsToAgency($campaign, $agency);
         Gate::authorize('view', $campaign);
@@ -100,6 +101,19 @@ final class CampaignApplicationController
             ->orderByDesc('campaign_applications.id')
             ->paginate($perPage)
             ->withQueryString();
+
+        // AH-120 (Q9) — the conflict badge, on PENDING rows only: a pending
+        // applicant who is now blocked from this brand. ONE query for the page.
+        // Existing applications are left alone (ruling 6); this only informs.
+        $pending = array_values(array_filter(
+            $paginator->items(),
+            static fn (CampaignApplication $a): bool => $a->status === CampaignApplicationStatus::Pending,
+        ));
+        $conflicts = $exclusivity->conflictsFor($campaign, array_map(static fn (CampaignApplication $a): int => $a->creator_id, $pending));
+
+        foreach ($pending as $application) {
+            $application->setAttribute('exclusivity_conflict', $conflicts[$application->creator_id] ?? null);
+        }
 
         return response()->json([
             'data' => CampaignApplicationListItemResource::collection($paginator->items())->resolve($request),

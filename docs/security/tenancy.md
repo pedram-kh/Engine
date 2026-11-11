@@ -304,6 +304,15 @@ a `Category` column and recategorize all rows; tracked in `docs/tech-debt.md`.
 - **The owner of a thread** still decides who sees it in the inbox; search rows are the inbox rows of the same viewer.
 - Nothing in `Modules/Admin` reads `original_body` or `deleted_body` (`AdminNeverReadsWithdrawnTextTest`).
 
+### AH-120: the exclusivity-conflicts read
+
+- **`POST /agencies/{agency}/campaigns/{campaign}/exclusivity-conflicts` is READ-ONLY.** It is a `POST` only because the creator list travels in the body. It writes nothing,
+  audits nothing and notifies nobody, so it is exempt from the "every POST audits" expectation, and it is **not** on the cross-tenant allowlist: it is a path-scoped agency route behind
+  `tenancy.agency` + `tenancy`, gated by the `invite` ability, with `assertBelongsToAgency` on the campaign.
+- **The query uses the raw query builder**, so no global scope applies: `BrandExclusivity::conflictsFor()` filters `z.agency_id = ?` explicitly, and the campaign name that comes back is always
+  one of the caller's own campaigns. `ExclusivityConflictsEndpointTest` pins it, including a pivot row that links another agency's campaign.
+- **Creators never see it.** The creator surfaces get a generic `job.brand_exclusive` / `brand_exclusive` and never the blocking brand or campaign (`CreatorJobBrandExclusiveTest`, leak spec).
+
 ## 5. Cross-tenant access from non-HTTP code
 
 Queue jobs, scheduled commands, and admin scripts run **without** an

@@ -88,7 +88,10 @@ it('emits an EXACT keyset per row — roster-level identity, the note, the two t
         // added here without a decision reddens this test rather than quietly
         // widening what an agency reads about an applicant.
         ->and(array_keys($attributes))->toBe([
-            'status', 'note', 'applied_at', 'responded_at', 'creator',
+            'status', 'note', 'applied_at', 'responded_at',
+            // AH-120 (Q9) — always present, false/null unless a pending applicant is blocked.
+            'has_exclusivity_conflict', 'exclusivity_conflict',
+            'creator',
         ])
         ->and(array_keys($attributes['creator']))->toBe(['id', 'display_name', 'is_erased', 'avatar_url'])
         ->and($attributes['status'])->toBe('pending')

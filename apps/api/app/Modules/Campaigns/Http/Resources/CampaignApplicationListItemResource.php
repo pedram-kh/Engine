@@ -56,6 +56,7 @@ final class CampaignApplicationListItemResource extends JsonResource
         $application = $this->resource;
 
         $creator = $application->relationLoaded('creator') ? $application->creator : null;
+        $conflict = $application->getAttribute('exclusivity_conflict');
 
         return [
             'id' => $application->ulid,
@@ -67,6 +68,15 @@ final class CampaignApplicationListItemResource extends JsonResource
                 // Null while pending; the stamp of the agency's (or the
                 // campaign-closure's) answer once terminal.
                 'responded_at' => $application->responded_at?->toIso8601String(),
+                // AH-120 (Q9) — ALWAYS present so the keyset is data-independent:
+                // true only on a pending row whose creator is blocked from this
+                // brand, naming the blocking campaign to the AGENCY (its own data;
+                // never a creator surface).
+                'has_exclusivity_conflict' => is_array($conflict),
+                'exclusivity_conflict' => is_array($conflict) ? [
+                    'id' => $conflict['campaign_ulid'],
+                    'name' => $conflict['campaign_name'],
+                ] : null,
                 'creator' => $creator instanceof Creator ? [
                     'id' => $creator->ulid,
                     'display_name' => $creator->display_name,

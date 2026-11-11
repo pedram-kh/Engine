@@ -103,6 +103,11 @@ final class BrandExclusivity
         }
 
         $rows = $this->blockingAssignments(DB::query())
+            // Raw query builder: no tenancy scope applies, so the agency is
+            // asserted here. A list can only hold its own agency's brands, so this
+            // is already true by construction; it is stated rather than assumed,
+            // because the campaign NAME crosses to the agency.
+            ->where('z.agency_id', $campaign->agency_id)
             ->whereIn('a.creator_id', $creatorIds)
             ->where('x.brand_id', $campaign->brand_id)
             ->orderBy('z.id')

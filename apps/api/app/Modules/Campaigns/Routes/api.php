@@ -10,6 +10,7 @@ use App\Modules\Campaigns\Http\Controllers\CampaignAssignmentReviewController;
 use App\Modules\Campaigns\Http\Controllers\CampaignAttachmentController;
 use App\Modules\Campaigns\Http\Controllers\CampaignController;
 use App\Modules\Campaigns\Http\Controllers\CampaignDraftController;
+use App\Modules\Campaigns\Http\Controllers\CampaignExclusivityConflictController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -68,6 +69,15 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         // campaign ability are the boundary, exactly as for drafts above.
         Route::get('campaigns/{campaign}/applications', [CampaignApplicationController::class, 'index'])
             ->name('campaigns.applications.index');
+
+        // AH-120 — which of these creators are blocked from this campaign's
+        // brand (the invite dialog's non-blocking warning). ⚠ READ-ONLY despite
+        // the POST: the creator list rides in the body (it can exceed a sane URL)
+        // and nothing is written, audited or notified. It is a normal tenanted
+        // agency route (tenancy.agency + tenancy), `invite`-gated; see
+        // docs/security/tenancy.md ("AH-120: the exclusivity-conflicts read").
+        Route::post('campaigns/{campaign}/exclusivity-conflicts', [CampaignExclusivityConflictController::class, 'index'])
+            ->name('campaigns.exclusivity-conflicts.index');
 
         // Accept (the offer form → a standard invitation) + reject. Both under
         // the `invite` execute ability (Q4); the list above is view-gated.
