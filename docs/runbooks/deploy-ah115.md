@@ -1,6 +1,8 @@
 # Deploy runbook: AH-115 (creator web restyle, creator inbox v2), one sitting
 
-**Status: DRAFTED 2026-11-11, nothing run.** For Pedram's colleague (who runs the box), in the shape of [`deploy-ah116-ah119.md`](deploy-ah116-ah119.md).
+**Status: SUPERSEDED, NOT USED.** AH-115 and AH-120 deploy together: use [`deploy-ah115-ah120.md`](deploy-ah115-ah120.md). Do not run this file; it plans one migration and **no worker restart**, both of which are wrong once AH-120 ships (two migrations; `queue:restart` needed, with Q10 first). Kept for history only.
+
+~~Was: DRAFTED 2026-11-11, nothing run.~~ For Pedram's colleague (who runs the box), in the shape of [`deploy-ah116-ah119.md`](deploy-ah116-ah119.md).
 Written from the repo at **`c8257afe`** (the runtime tip; this runbook is a docs-only commit on top of it) and the AH-115 `PENDING` entry in [`deploy-log.md`](deploy-log.md). Procedure behind it: [`production-queue-worker.md`](production-queue-worker.md) §2a, §4, §7, §8.
 CI at `c8257afe`: [run 42946965785](https://github.com/pedram-kh/Engine/actions/runs/42946965785), green on the first attempt (Backend 959s, Frontend 321s, E2E main 494s, E2E admin 70s).
 

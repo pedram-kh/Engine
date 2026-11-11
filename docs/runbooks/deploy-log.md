@@ -74,11 +74,32 @@ happened.
 
 ---
 
+## AH-115 + AH-120 — creator web restyle and inbox v2, brand exclusivity (API + main web + native build 5), both flags OFF — PENDING
+
+> **One sitting for both, in this order: snapshot, migrate (two), API, Q10, `queue:restart`, verify both flags OFF, main web, then (separately, later) native build 5, and only afterwards the two flag flips.** Runbook: [`deploy-ah115-ah120.md`](deploy-ah115-ah120.md) (P0 to P9). **It replaces [`deploy-ah115.md`](deploy-ah115.md), superseded, not used.** The AH-115 entry below stays as the record of that arc's scope; where it says "no `queue:restart` is needed" **this entry overrides it**.
+
+- **Status:** PENDING (pushed to `main`; nothing deployed; no deploy-day fact has been read). The runbook commit is **not pushed** yet (Pedram's word).
+- **Range:** production API and both SPAs as recorded in the AH-119 entry below (API `066ff29c` reported 2026-10-29; the AH-116 to AH-119 stack deployed 2026-11-06, reported; current state **not read**) → runtime tip **`905d9aa8`** on GitHub (85 commits after `6d7a9c28`). The operator restates the range from `git log` on the box and proves the code by the tree hashes in the runbook's P1.1 (the mirror rewrites SHAs).
+- **AH entries carried:** AH-115, AH-120.
+- **Migrations (two, additive):** `2026_11_09_100000_add_creator_index_to_relationship_threads` (plain btree index) and `2026_11_12_100000_add_brand_exclusivity_to_campaigns` (`campaigns.exclusivity_ends_on` nullable date, metadata-only; new table `campaign_exclusive_brands`, created empty). **PROD-DATA RISK LOW:** no existing row is read or rewritten, no backfill. **Rollback:** `migrate:rollback --step=2` drops all three objects; safe while the flag has never been ON, discards saved exclusivity lists after that (snapshot first).
+- **Flags: both OFF at deploy.** `messages_v2_creator_inbox_enabled` and `campaign_brand_exclusivity_enabled`. Flag OFF, AH-120 is byte-identical: agency walk 126 / 126, creator walk 146 / 146 (four additive AH-120 targets), a set write is refused 422, nobody is blocked, `is_brand_locked` false, fan-out unchanged.
+- **Infra:** **`queue:restart` IS needed** (AH-120 changed `JobPostedFanOutService`, used by `SendJobPostedNotificationsJob`, and `ErasureRegistry` / `AuditPayloadKeys`, loaded by `laravel-erasure`). **Q10 (`0 0`) is asked immediately before it (P4.3); if not `0 0`, defer the restart** (the new code is dormant with both flags OFF) **and treat it as a prerequisite for the exclusivity flip.** FPM reload required; no env change, no cron change, composer.lock and pnpm-lock.yaml unchanged; **main site only** (admin unchanged).
+- **P3 GRANT:** the new table and its sequence need the app role's privileges: read at P3, fix as the table owner if a `FALSE` prints; blocks the exclusivity flip, not the deploy.
+- **Order after deploy (Pedram):** build 5 and its walk (steps 1 to 14); then the inbox flag (after build 5 live and its inbox step walked OFF); the exclusivity flag only after the worker restart has happened and the grant read was clean. Each flip with a reason, read back on the admin page.
+- **One-shot commands:** none. **Seeders:** the `Ah115Walk*` and `Ah120Walk*` seeders are dev only and never run on production.
+- **CI at `905d9aa8`:** [run 43093612585](https://github.com/pedram-kh/Engine/actions/runs/43093612585), unfinished when written (Frontend green, Backend steps green, E2E queued): to be updated with the final result.
+- **Local walk:** Pedram walked the web build locally (2026-11-11, the AH-120 seeded setup) and it **passed**.
+- **Known, not caused by this deploy (tech-debt rows 25 to 29):** the agency shell has no mobile layout; Playwright `--workers=2` flakes (serial plus CI is the gate); `appIconAssets` fails on one Mac only; plural forms capped at English's two; the job-detail brand-logo gap when a logo object is missing.
+- **Operator:** to be recorded (the colleague for steps 1 to 4, Pedram for build 5 and the flips).
+- **Anything unexpected:** none recorded yet. **Not proved before deploy:** the index build time and production size of `relationship_threads`; the app role's privileges on the new table; the derived light theme and the brand-locked state on a device (build 5 walk).
+
+---
+
 ## AH-115 — creator web adopts the native look, creator inbox v2, Notifications page (API + main web + native build 5) — PENDING
 
 > **One entry, in this order: snapshot, migrate, API, verify the flag is OFF, main web, then (separately, later) native build 5, and only after build 5 is live the flag.** The API goes before the web: the new web reads `features.messages_v2_creator_inbox` and calls the new endpoints only when it is true, but the order costs nothing and keeps the flag-off proof clean. **The agency shell does not change** (proved, `docs/reviews/creator-restyle-review.md`) and **the admin SPA is not part of this deploy.**
 
-- **Status:** PENDING (pushed to `main`; nothing deployed; no deploy-day fact has been read).
+- **Status:** PENDING, **deploys together with AH-120 under [`deploy-ah115-ah120.md`](deploy-ah115-ah120.md)** (the entry above); [`deploy-ah115.md`](deploy-ah115.md) is superseded, not used (pushed to `main`; nothing deployed; no deploy-day fact has been read).
 - **Range:** production API and both SPAs as recorded in the AH-119 entry below (API `066ff29c` reported 2026-10-29, current state **not read**; the AH-116 to AH-119 stack deployed 2026-11-06, reported) → the pushed tip of `main` (the last commit of the AH-115 push; the migration is in `4803b7a3`). The range is restated by the operator at deploy time from `git log` on the box, not inferred from this line.
 - **AH entries carried:** AH-115.
 - **Migrations (one, additive):** `2026_11_09_100000_add_creator_index_to_relationship_threads` (`CREATE INDEX idx_relationship_threads_creator ON relationship_threads (creator_id)`). **PROD-DATA RISK LOW:** schema only, no data command, no backfill. The table is expected to be small (**not read**: the row count is a pre-deploy read below); a plain `CREATE INDEX` takes a short lock on writes to `relationship_threads` (it is not `CONCURRENTLY` in this migration), so run it outside a busy minute. **The snapshot is a step:** an Aurora cluster snapshot immediately before `migrate`, confirmed `available` first. **Rollback:** `php artisan migrate:rollback --step=1` drops the index only; no data is touched.
