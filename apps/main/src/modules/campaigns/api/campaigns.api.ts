@@ -31,6 +31,8 @@ import type {
   ContractMediaInitPayload,
   ContractMediaInitResponse,
   CreateCampaignPayload,
+  ExclusivityConflictsPayload,
+  ExclusivityConflictsResponse,
   InviteAssignmentPayload,
   ManuallyVerifyPayload,
   OfferAttachmentCompletePayload,
@@ -131,6 +133,21 @@ export const campaignsApi = {
     const qs = query.toString()
     return http.get<CampaignApplicationListResponse>(
       `${campaignsBase(agencyId)}/${campaignId}/applications${qs === '' ? '' : `?${qs}`}`,
+    )
+  },
+
+  /**
+   * AH-120 — which of these creators are blocked from this campaign's brand (the invite
+   * dialog's non-blocking warning). READ-ONLY despite the POST: the ids ride in the body.
+   */
+  exclusivityConflicts(
+    agencyId: string,
+    campaignId: string,
+    payload: ExclusivityConflictsPayload,
+  ): Promise<ExclusivityConflictsResponse> {
+    return http.post<ExclusivityConflictsResponse>(
+      `${campaignsBase(agencyId)}/${campaignId}/exclusivity-conflicts`,
+      payload,
     )
   },
 

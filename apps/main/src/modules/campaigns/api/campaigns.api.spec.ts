@@ -273,3 +273,20 @@ describe('campaignsApi applications (Jobs Board chunk 4)', () => {
     )
   })
 })
+
+describe('campaignsApi exclusivity (AH-120)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockHttp.post.mockResolvedValue({ data: [] })
+  })
+
+  it('POSTs the creator ids to the read-only conflicts route', async () => {
+    await campaignsApi.exclusivityConflicts('agency-ulid', 'campaign-ulid', {
+      creator_ids: ['c1', 'c2'],
+    })
+    expect(mockHttp.post).toHaveBeenCalledWith(
+      '/agencies/agency-ulid/campaigns/campaign-ulid/exclusivity-conflicts',
+      { creator_ids: ['c1', 'c2'] },
+    )
+  })
+})

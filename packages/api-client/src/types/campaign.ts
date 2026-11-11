@@ -122,6 +122,19 @@ export interface CampaignAttributes {
    * the server only enforces it while `campaign_region_restriction_enabled`.
    */
   restrict_to_listing_regions: boolean
+  /**
+   * AH-120: the last day (UTC, `Y-m-d`, inclusive) creators selected on this
+   * campaign cannot apply to the listed brands. Null: the block ends when the
+   * creator's work completes. Always present.
+   */
+  exclusivity_ends_on: string | null
+  /**
+   * AH-120: ULIDs of the brands this campaign blocks. Present on show, create
+   * and update ONLY; the campaign LIST omits it (never a wrong empty array).
+   */
+  exclusive_brand_ids?: string[]
+  /** AH-120: the same brands for display, same presence rule. An archived brand stays blocked. */
+  exclusive_brands?: ExclusiveBrand[]
   listing_examples_url: string | null
   published_at: string | null
   completed_at: string | null
@@ -235,7 +248,23 @@ export interface CreateCampaignPayload {
    * must be non-empty (422 on `listing_regions`).
    */
   restrict_to_listing_regions?: boolean
+  /**
+   * AH-120. Setting a non-empty list or a date while `campaign_brand_exclusivity_enabled`
+   * is OFF is a 422 `campaign.brand_exclusivity_disabled`; clearing is always allowed and an
+   * omitted field is untouched. Max 50 brands of this agency, never the campaign's own brand;
+   * an archived brand cannot be added (one already listed stays).
+   */
+  exclusive_brand_ids?: string[]
+  /** AH-120. `Y-m-d`, today or later (UTC) when it changes; null clears. */
+  exclusivity_ends_on?: string | null
   listing_examples_url?: string | null
+}
+
+/** AH-120: a blocked brand as the campaign detail shows it. */
+export interface ExclusiveBrand {
+  id: string
+  name: string
+  is_archived: boolean
 }
 
 /**
@@ -1104,6 +1133,15 @@ export interface CreatorJobDetailResource {
      * Optional for an older backend that does not send it.
      */
     region_lock_reason?: 'country_missing' | 'outside_regions' | null
+    /**
+     * AH-120: true when a campaign this creator is selected on blocks this job's
+     * brand. Always present; false while the exclusivity flag is OFF. The page
+     * shows a generic "Not available to you": it never names the brand or the
+     * campaign.
+     */
+    is_brand_locked?: boolean
+    /** AH-120: `brand_exclusive` while locked, else null. */
+    brand_lock_reason?: 'brand_exclusive' | null
     /** External link; rendered with rel="noopener". */
     listing_examples_url: string | null
     /**
@@ -1184,6 +1222,13 @@ export interface CampaignApplicationListItemResource {
     applied_at: string
     /** Null while pending; stamped when the application was answered. */
     responded_at: string | null
+    /**
+     * AH-120 (Q9): true only on a PENDING row whose creator is now blocked from
+     * this campaign's brand. Always present. Informs the agency; blocks nothing.
+     */
+    has_exclusivity_conflict?: boolean
+    /** AH-120: the blocking campaign, named to the agency. Null unless flagged. */
+    exclusivity_conflict?: { id: string; name: string } | null
     creator: {
       id: string
       display_name: string | null
@@ -1267,3 +1312,14 @@ export type ApplicationActionBlockCode =
   | 'application.already_engaged'
   | 'application.creator_not_approved'
   | 'assignment.blacklisted'
+
+/** POST `…/campaigns/{campaign}/exclusivity-conflicts` (AH-120) — READ-ONLY despite the POST. */
+export interface ExclusivityConflictsPayload {
+  /** Creator ULIDs, max 100. */
+  creator_ids: string[]
+}
+
+/** Blocked creators only, keyed by creator ULID. `[]` while the flag is OFF or nothing blocks. */
+export interface ExclusivityConflictsResponse {
+  data: Record<string, { blocking_campaign: { id: string; name: string } }> | []
+}

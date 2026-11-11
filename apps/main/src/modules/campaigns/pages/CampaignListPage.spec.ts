@@ -73,6 +73,7 @@ function makeCampaign(overrides: Partial<CampaignResource['attributes']> = {}): 
       listing_languages: null,
       listing_regions: null,
       restrict_to_listing_regions: false,
+      exclusivity_ends_on: null,
       listing_examples_url: null,
       published_at: null,
       completed_at: null,
