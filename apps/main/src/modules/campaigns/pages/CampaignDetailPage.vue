@@ -678,6 +678,14 @@ const exclusiveBrandsShown = computed<string[]>(() =>
   ),
 )
 
+/**
+ * AH-120: the Overview row renders through a one-or-zero list instead of a `v-if`, so the
+ * flag-off DOM has no `<!--v-if-->` anchor (the agency walk pins it).
+ */
+const exclusivityOverviewRows = computed(() =>
+  brandExclusivityEnabled.value && exclusiveBrandsShown.value.length > 0 ? [1] : [],
+)
+
 const restrictOn = computed(() => campaign.value?.attributes.restrict_to_listing_regions === true)
 
 /**
@@ -923,9 +931,9 @@ const requirementRows = computed<RequirementRow[]>(() => {
                       />
                     </dd>
                   </div>
-                  <!-- AH-120: who this campaign keeps from applying to which brands. -->
                   <div
-                    v-if="brandExclusivityEnabled && exclusiveBrandsShown.length > 0"
+                    v-for="shown in exclusivityOverviewRows"
+                    :key="shown"
                     class="agency-field"
                     style="grid-column: 1 / -1"
                     data-test="overview-exclusive-brands-field"

@@ -171,6 +171,11 @@ const ownBrandForExclusivity = computed(() =>
 )
 const selectedExclusiveIds = computed(() => local.value.exclusive_brand_ids ?? [])
 
+// AH-120: the two exclusivity controls render through a one-or-zero list rather than a `v-if`,
+// because a false `v-if` leaves a `<!--v-if-->` anchor in the DOM and the flag-off DOM has to be
+// the one it always was (pinned by the agency walk). An empty `v-for` leaves nothing at all.
+const exclusivityControls = computed(() => (props.brandExclusivityEnabled ? [1] : []))
+
 const exclusiveBrandItems = computed(() => {
   const own = ownBrandForExclusivity.value
   const selected = new Set(selectedExclusiveIds.value)
@@ -430,8 +435,7 @@ const descriptionTextareaHandle = computed<TextareaHandle | null>(
       @update:model-value="update('restrict_to_listing_regions', $event === true)"
     />
 
-    <!-- AH-120: brand exclusivity. Flag-gated; with it off the DOM is the one it was. -->
-    <template v-if="brandExclusivityEnabled">
+    <template v-for="shown in exclusivityControls" :key="shown">
       <v-autocomplete
         :model-value="selectedExclusiveIds"
         :label="t('app.campaigns.fields.exclusiveBrands')"
