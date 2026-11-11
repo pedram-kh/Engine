@@ -195,7 +195,8 @@ final class Campaign extends Model
     {
         return $this->belongsToMany(Brand::class, 'campaign_exclusive_brands')
             ->withTimestamps()
-            ->withTrashed();
+            ->withTrashed()
+            ->orderBy('campaign_exclusive_brands.id');
     }
 
     /**

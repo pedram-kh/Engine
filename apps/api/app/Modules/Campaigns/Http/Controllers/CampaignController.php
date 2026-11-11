@@ -20,13 +20,16 @@ use App\Modules\Campaigns\Http\Resources\CampaignResource;
 use App\Modules\Campaigns\Jobs\AutoRejectPendingApplicationsJob;
 use App\Modules\Campaigns\Jobs\SendJobPostedNotificationsJob;
 use App\Modules\Campaigns\Models\Campaign;
+use App\Modules\Creators\Features\CampaignBrandExclusivityEnabled;
 use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
 use App\Modules\Identity\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Pennant\Feature;
 
@@ -89,6 +92,10 @@ final class CampaignController
             return $refused;
         }
 
+        if ($refused = $this->refuseDisabledBrandExclusivity($request)) {
+            return $refused;
+        }
+
         /** @var User $actor */
         $actor = $request->user();
         $validated = $request->validated();
@@ -98,44 +105,54 @@ final class CampaignController
             ->where('agency_id', $agency->id)
             ->firstOrFail();
 
-        $campaign = Campaign::query()->create([
-            'agency_id' => $agency->id,
-            'brand_id' => $brand->id,
-            'created_by_user_id' => $actor->id,
-            'name' => $validated['name'],
-            'description' => $validated['description'] ?? null,
-            'objective' => $validated['objective'],
-            'status' => CampaignStatus::Draft,
-            'budget_minor_units' => $validated['budget_minor_units'],
-            'budget_currency' => strtoupper((string) $validated['budget_currency']),
-            'starts_at' => $validated['starts_at'] ?? null,
-            'ends_at' => $validated['ends_at'] ?? null,
-            'posting_window_starts_at' => $validated['posting_window_starts_at'] ?? null,
-            'posting_window_ends_at' => $validated['posting_window_ends_at'] ?? null,
-            'brief' => $validated['brief'] ?? null,
-            'target_creator_count' => $validated['target_creator_count'] ?? null,
-            'requires_per_campaign_contract' => $validated['requires_per_campaign_contract'] ?? false,
+        // AH-120 — create and the blocked-brand list land together or not at all.
+        $campaign = DB::transaction(function () use ($agency, $brand, $actor, $validated): Campaign {
+            $campaign = Campaign::query()->create([
+                'agency_id' => $agency->id,
+                'brand_id' => $brand->id,
+                'created_by_user_id' => $actor->id,
+                'name' => $validated['name'],
+                'description' => $validated['description'] ?? null,
+                'objective' => $validated['objective'],
+                'status' => CampaignStatus::Draft,
+                'budget_minor_units' => $validated['budget_minor_units'],
+                'budget_currency' => strtoupper((string) $validated['budget_currency']),
+                'starts_at' => $validated['starts_at'] ?? null,
+                'ends_at' => $validated['ends_at'] ?? null,
+                'posting_window_starts_at' => $validated['posting_window_starts_at'] ?? null,
+                'posting_window_ends_at' => $validated['posting_window_ends_at'] ?? null,
+                'brief' => $validated['brief'] ?? null,
+                'target_creator_count' => $validated['target_creator_count'] ?? null,
+                'requires_per_campaign_contract' => $validated['requires_per_campaign_contract'] ?? false,
 
-            // AH-069 D1 — this array is a WHITELIST, not `$fillable`, so a field
-            // missing from here validates, returns 201 and never persists (the
-            // AH-054 catch). The `?? true` fallback IS the Q1 safety floor: a
-            // caller that does not name the field gets today's behaviour
-            // (posting expected), matching the column default. The create form
-            // always names it.
-            'creator_posts_content' => $validated['creator_posts_content'] ?? true,
+                // AH-069 D1 — this array is a WHITELIST, not `$fillable`, so a field
+                // missing from here validates, returns 201 and never persists (the
+                // AH-054 catch). The `?? true` fallback IS the Q1 safety floor: a
+                // caller that does not name the field gets today's behaviour
+                // (posting expected), matching the column default. The create form
+                // always names it.
+                'creator_posts_content' => $validated['creator_posts_content'] ?? true,
 
-            // Jobs-board listing copy (AH-054, D2). `listed_on_jobs_board` is
-            // absent by design — create never lists (D4); the column default
-            // (false) carries it.
-            'listing_duration' => $validated['listing_duration'] ?? null,
-            'listing_fee' => $validated['listing_fee'] ?? null,
-            'listing_languages' => $validated['listing_languages'] ?? null,
-            'listing_regions' => $validated['listing_regions'] ?? null,
-            // AH-118 — whitelist, not `$fillable` (the AH-054 catch). Absent means
-            // unrestricted, which is the column default.
-            'restrict_to_listing_regions' => $validated['restrict_to_listing_regions'] ?? false,
-            'listing_examples_url' => $validated['listing_examples_url'] ?? null,
-        ]);
+                // Jobs-board listing copy (AH-054, D2). `listed_on_jobs_board` is
+                // absent by design — create never lists (D4); the column default
+                // (false) carries it.
+                'listing_duration' => $validated['listing_duration'] ?? null,
+                'listing_fee' => $validated['listing_fee'] ?? null,
+                'listing_languages' => $validated['listing_languages'] ?? null,
+                'listing_regions' => $validated['listing_regions'] ?? null,
+                // AH-118 — whitelist, not `$fillable` (the AH-054 catch). Absent means
+                // unrestricted, which is the column default.
+                'restrict_to_listing_regions' => $validated['restrict_to_listing_regions'] ?? false,
+                'listing_examples_url' => $validated['listing_examples_url'] ?? null,
+                // AH-120 — whitelist, not `$fillable` (the AH-054 catch). The list
+                // itself is the pivot, synced below.
+                'exclusivity_ends_on' => $validated['exclusivity_ends_on'] ?? null,
+            ]);
+
+            $campaign->exclusiveBrands()->sync($this->resolveExclusiveBrandIds($agency, $validated['exclusive_brand_ids'] ?? []));
+
+            return $campaign;
+        });
 
         Audit::log(
             action: AuditAction::CampaignCreated,
@@ -143,7 +160,7 @@ final class CampaignController
             after: $this->auditableSnapshot($campaign),
         );
 
-        return (new CampaignResource($campaign->load(['brand:id,ulid,name,color', 'agency:id,ulid'])))
+        return (new CampaignResource($campaign->load(['brand:id,ulid,name,color', 'agency:id,ulid', 'exclusiveBrands'])))
             ->response()
             ->setStatusCode(201);
     }
@@ -157,7 +174,7 @@ final class CampaignController
         Gate::authorize('view', $campaign);
 
         return new CampaignResource(
-            $campaign->loadCount('assignments')->load(['brand:id,ulid,name,color', 'agency:id,ulid']),
+            $campaign->loadCount('assignments')->load(['brand:id,ulid,name,color', 'agency:id,ulid', 'exclusiveBrands']),
         );
     }
 
@@ -179,9 +196,19 @@ final class CampaignController
             return $refused;
         }
 
+        if ($refused = $this->refuseDisabledBrandExclusivity($request)) {
+            return $refused;
+        }
+
         $before = $this->auditableSnapshot($campaign);
 
         $updates = $request->validated();
+
+        // AH-120 — the list is the pivot, never a column: take it out BEFORE
+        // `fill` (a stray key is silently dropped by `$fillable`, which would
+        // read as success), and sync it with the save.
+        $syncBrands = array_key_exists('exclusive_brand_ids', $updates);
+        $brandUlids = Arr::pull($updates, 'exclusive_brand_ids', []);
         if (isset($updates['budget_currency'])) {
             $updates['budget_currency'] = strtoupper((string) $updates['budget_currency']);
         }
@@ -254,7 +281,13 @@ final class CampaignController
             $updates['listed_at'] = now();
         }
 
-        $campaign->fill($updates)->save();
+        DB::transaction(function () use ($campaign, $updates, $syncBrands, $brandUlids, $agency): void {
+            $campaign->fill($updates)->save();
+
+            if ($syncBrands) {
+                $campaign->exclusiveBrands()->sync($this->resolveExclusiveBrandIds($agency, $brandUlids));
+            }
+        });
 
         Audit::log(
             action: AuditAction::CampaignUpdated,
@@ -282,7 +315,7 @@ final class CampaignController
         }
 
         return new CampaignResource(
-            ($campaign->fresh() ?? $campaign)->loadCount('assignments')->load(['brand:id,ulid,name,color', 'agency:id,ulid']),
+            ($campaign->fresh() ?? $campaign)->loadCount('assignments')->load(['brand:id,ulid,name,color', 'agency:id,ulid', 'exclusiveBrands']),
         );
     }
 
@@ -479,7 +512,63 @@ final class CampaignController
             'listed_on_jobs_board' => $campaign->listed_on_jobs_board,
             // AH-118 — who restricted applications to the listed regions, and when.
             'restrict_to_listing_regions' => $campaign->restrict_to_listing_regions,
+            // AH-120 — who changed the exclusivity, and when: the blocked brands
+            // (internal ids, sorted) and the end date. Ids and a date, no names.
+            'exclusive_brand_ids' => $campaign->exclusiveBrands()->pluck('brands.id')->map(static fn (mixed $id): int => (int) $id)->sort()->values()->all(),
+            'exclusivity_ends_on' => $campaign->exclusivity_ends_on?->toDateString(),
         ];
+    }
+
+    /**
+     * AH-120 — while `campaign_brand_exclusivity_enabled` is OFF a write that
+     * SETS a blocked-brand list or an end date is a 422 with a domain code (not
+     * a silent ignore: the agency would believe a block was in force that
+     * nothing enforces). Clearing (an empty list, a null date) is always
+     * allowed, and an omitted field is untouched.
+     */
+    private function refuseDisabledBrandExclusivity(Request $request): ?JsonResponse
+    {
+        $setsList = $request->has('exclusive_brand_ids') && ! empty($request->input('exclusive_brand_ids'));
+        $setsDate = $request->has('exclusivity_ends_on') && $request->input('exclusivity_ends_on') !== null && $request->input('exclusivity_ends_on') !== '';
+
+        if (! $setsList && ! $setsDate) {
+            return null;
+        }
+
+        if (Feature::active(CampaignBrandExclusivityEnabled::NAME)) {
+            return null;
+        }
+
+        return ErrorResponse::single(
+            $request,
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+            'campaign.brand_exclusivity_disabled',
+            'Blocking creators from applying to other brands is not available yet.',
+            source: ['pointer' => '/data/attributes/'.($setsList ? 'exclusive_brand_ids' : 'exclusivity_ends_on')],
+        );
+    }
+
+    /**
+     * Brand ULIDs (already proven to be this agency's by the request) to the
+     * internal ids the pivot stores. Archived brands resolve: an archived brand
+     * already on the list stays on it.
+     *
+     * @param  array<int, mixed>  $ulids
+     * @return list<int>
+     */
+    private function resolveExclusiveBrandIds(Agency $agency, array $ulids): array
+    {
+        if ($ulids === []) {
+            return [];
+        }
+
+        $ids = Brand::query()->withTrashed()
+            ->where('agency_id', $agency->id)
+            ->whereIn('ulid', array_values($ulids))
+            ->pluck('id')
+            ->all();
+
+        return array_values(array_map(static fn (mixed $id): int => (int) $id, $ids));
     }
 
     /**

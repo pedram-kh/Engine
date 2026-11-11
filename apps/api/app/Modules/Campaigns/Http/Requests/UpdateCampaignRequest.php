@@ -6,6 +6,7 @@ namespace App\Modules\Campaigns\Http\Requests;
 
 use App\Modules\Campaigns\Enums\CampaignObjective;
 use App\Modules\Campaigns\Enums\CampaignStatus;
+use App\Modules\Campaigns\Http\Requests\Concerns\ValidatesBrandExclusivity;
 use App\Modules\Campaigns\Http\Requests\Concerns\ValidatesJobsBoardListing;
 use App\Modules\Campaigns\Models\Campaign;
 use Illuminate\Contracts\Validation\Validator;
@@ -39,6 +40,7 @@ use Illuminate\Validation\Rules\Enum;
  */
 final class UpdateCampaignRequest extends FormRequest
 {
+    use ValidatesBrandExclusivity;
     use ValidatesJobsBoardListing;
 
     /**
@@ -48,6 +50,7 @@ final class UpdateCampaignRequest extends FormRequest
     {
         return [
             ...$this->listingFieldRules(),
+            ...$this->brandExclusivityRules(),
 
             'name' => ['sometimes', 'string', 'max:255'],
             // AH-082 D3 — raised 5000 -> 10000, mirrored from CreateCampaignRequest
@@ -98,6 +101,7 @@ final class UpdateCampaignRequest extends FormRequest
             // AH-118 — before the listed-state early return below: a restricted
             // campaign needs regions whether or not it is on the board.
             $this->validateRegionRestriction($validator, $campaign);
+            $this->validateBrandExclusivity($validator, $campaign);
 
             $resultingListed = $this->has('listed_on_jobs_board')
                 ? $this->boolean('listed_on_jobs_board')

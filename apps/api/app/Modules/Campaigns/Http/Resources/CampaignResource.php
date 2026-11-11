@@ -66,6 +66,22 @@ final class CampaignResource extends JsonResource
                 // AH-118 — the STORED switch (it is inert while the flag is off).
                 'restrict_to_listing_regions' => $campaign->restrict_to_listing_regions,
                 'listing_examples_url' => $campaign->listing_examples_url,
+                // AH-120 — the STORED end date (inert while the flag is off). A
+                // plain `Y-m-d`: it is a calendar date in UTC, not an instant.
+                'exclusivity_ends_on' => $campaign->exclusivity_ends_on?->toDateString(),
+                // AH-120 — the blocked brands, on show / create / update ONLY
+                // (the list never loads the pivot, so the keys are absent there
+                // rather than wrongly empty). `ids` round-trips on a write;
+                // `brands` is for display, and flags an archived brand, which
+                // stays blocked. Agency-side only, never a creator surface.
+                ...($campaign->relationLoaded('exclusiveBrands') ? [
+                    'exclusive_brand_ids' => $campaign->exclusiveBrands->pluck('ulid')->values()->all(),
+                    'exclusive_brands' => $campaign->exclusiveBrands->map(static fn (Brand $b): array => [
+                        'id' => $b->ulid,
+                        'name' => $b->name,
+                        'is_archived' => $b->trashed(),
+                    ])->values()->all(),
+                ] : []),
                 'published_at' => $campaign->published_at?->toIso8601String(),
                 'completed_at' => $campaign->completed_at?->toIso8601String(),
                 'assignment_count' => $campaign->assignments_count ?? null,

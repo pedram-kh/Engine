@@ -6,6 +6,7 @@ namespace App\Modules\Campaigns\Http\Requests;
 
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Campaigns\Enums\CampaignObjective;
+use App\Modules\Campaigns\Http\Requests\Concerns\ValidatesBrandExclusivity;
 use App\Modules\Campaigns\Http\Requests\Concerns\ValidatesJobsBoardListing;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -34,6 +35,7 @@ use Illuminate\Validation\Rules\Enum;
  */
 final class CreateCampaignRequest extends FormRequest
 {
+    use ValidatesBrandExclusivity;
     use ValidatesJobsBoardListing;
 
     /**
@@ -46,6 +48,7 @@ final class CreateCampaignRequest extends FormRequest
 
         return [
             ...$this->listingFieldRules(),
+            ...$this->brandExclusivityRules(),
 
             'brand_id' => [
                 'required',
@@ -95,6 +98,7 @@ final class CreateCampaignRequest extends FormRequest
     {
         $validator->after(function (Validator $validator): void {
             $this->validateRegionRestriction($validator, null);
+            $this->validateBrandExclusivity($validator, null);
         });
     }
 
