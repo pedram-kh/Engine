@@ -58,6 +58,7 @@ it('seeds an UNLISTED campaign on the given agency, with the listing floor compl
         ->assertJsonPath('data.agency_ulid', $agency->ulid)
         ->assertJsonPath('data.campaign_name', 'Winter UGC push')
         ->assertJsonPath('data.brand_name', 'Northwind Coffee')
+        ->assertJsonStructure(['data' => ['brand_ulid']])
         ->assertJsonPath('data.creator_ulid', $creator->ulid);
 
     /** @var Campaign $campaign */

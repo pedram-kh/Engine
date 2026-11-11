@@ -70,7 +70,7 @@ use Illuminate\Validation\ValidationException;
  *   - `brand_name`     — string|null, optional.
  *
  * Response (201):
- *   { "data": { "agency_ulid", "campaign_ulid", "campaign_name", "brand_name",
+ *   { "data": { "agency_ulid", "campaign_ulid", "campaign_name", "brand_name", "brand_ulid",
  *               "creator_ulid", "creator_display_name" } }
  */
 final class CreateListableCampaignController
@@ -164,6 +164,8 @@ final class CreateListableCampaignController
                 'campaign_ulid' => $campaign->ulid,
                 'campaign_name' => $campaign->name,
                 'brand_name' => $brand->name,
+                // AH-120 — so a later helper call can name this brand as blocked.
+                'brand_ulid' => $brand->ulid,
                 'creator_ulid' => $creator->ulid,
                 'creator_display_name' => $creator->display_name,
             ],

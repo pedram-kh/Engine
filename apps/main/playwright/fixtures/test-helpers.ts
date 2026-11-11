@@ -835,6 +835,8 @@ export interface SeedListableCampaignResult {
   campaignUlid: string
   campaignName: string
   brandName: string
+  /** AH-120 — so a later seed can name this brand as blocked. */
+  brandUlid: string
   creatorUlid: string
   creatorDisplayName: string
 }
@@ -886,6 +888,7 @@ export async function seedListableCampaign(
       campaign_ulid: string
       campaign_name: string
       brand_name: string
+      brand_ulid: string
       creator_ulid: string
       creator_display_name: string
     }
@@ -896,6 +899,7 @@ export async function seedListableCampaign(
     campaignUlid: body.data.campaign_ulid,
     campaignName: body.data.campaign_name,
     brandName: body.data.brand_name,
+    brandUlid: body.data.brand_ulid,
     creatorUlid: body.data.creator_ulid,
     creatorDisplayName: body.data.creator_display_name,
   }
@@ -963,6 +967,8 @@ export interface SeedListedJobResult {
   campaignUlid: string
   campaignName: string
   brandName: string
+  /** AH-120 — the job's brand, so a later seed can name it as blocked. */
+  brandUlid: string
   agencyUlid: string
   creatorUlid: string
 }
@@ -1038,6 +1044,7 @@ export async function seedListedJob(
       campaign_ulid: string
       campaign_name: string
       brand_name: string
+      brand_ulid: string
       agency_ulid: string
       creator_ulid: string
     }
@@ -1046,6 +1053,7 @@ export async function seedListedJob(
     campaignUlid: body.data.campaign_ulid,
     campaignName: body.data.campaign_name,
     brandName: body.data.brand_name,
+    brandUlid: body.data.brand_ulid,
     agencyUlid: body.data.agency_ulid,
     creatorUlid: body.data.creator_ulid,
   }
@@ -1091,6 +1099,10 @@ export async function seedContractedAssignment(
     restrictToListingRegions?: boolean
     listingRegions?: string[]
     creatorCountry?: string
+    /** AH-120 — ULIDs of this agency's brands the new campaign blocks. */
+    exclusiveBrandIds?: string[]
+    /** AH-120 — Y-m-d; written as given, past dates included (that is how a block is lifted). */
+    exclusivityEndsOn?: string | null
   } = {},
 ): Promise<SeedContractedAssignmentResult> {
   const response = await request.post(
@@ -1106,6 +1118,8 @@ export async function seedContractedAssignment(
         restrict_to_listing_regions: options.restrictToListingRegions,
         listing_regions: options.listingRegions,
         creator_country: options.creatorCountry,
+        exclusive_brand_ids: options.exclusiveBrandIds,
+        exclusivity_ends_on: options.exclusivityEndsOn,
       },
     },
   )
