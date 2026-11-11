@@ -287,15 +287,11 @@ defineExpose({
             />
             <!-- AH-120: a pending applicant already selected on a campaign that blocks this
                  brand. A warning only: Accept stays enabled (agency invites are never blocked). -->
-            <v-chip
-              v-if="hasConflict(row)"
-              size="small"
-              color="warning"
-              variant="tonal"
-              prepend-icon="mdi-alert-outline"
-              :data-test="`applications-conflict-${row.id}`"
-            >
-              {{ t('app.campaigns.applications.exclusivityConflict') }}
+            <span v-if="hasConflict(row)" :data-test="`applications-conflict-${row.id}`">
+              <AgencyStatusPill
+                tone="warning"
+                :label="t('app.campaigns.applications.exclusivityConflict')"
+              />
               <v-tooltip activator="parent" location="top">
                 {{
                   t('app.campaigns.applications.exclusivityConflictTooltip', {
@@ -303,7 +299,7 @@ defineExpose({
                   })
                 }}
               </v-tooltip>
-            </v-chip>
+            </span>
           </v-list-item-title>
 
           <v-list-item-subtitle>
