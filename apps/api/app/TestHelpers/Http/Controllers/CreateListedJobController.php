@@ -68,7 +68,7 @@ use Illuminate\Validation\ValidationException;
  *                           gap, not this leg's).
  *
  * Response (201):
- *   { "data": { "campaign_ulid", "campaign_name", "brand_name", "agency_ulid", "creator_ulid" } }
+ *   { "data": { "campaign_ulid", "campaign_name", "brand_name", "brand_ulid", "agency_ulid", "creator_ulid" } }
  */
 final class CreateListedJobController
 {
@@ -185,6 +185,8 @@ final class CreateListedJobController
                 'campaign_ulid' => $campaign->ulid,
                 'campaign_name' => $campaign->name,
                 'brand_name' => $brand->name,
+                // AH-120 — so a later helper call can name this brand as blocked.
+                'brand_ulid' => $brand->ulid,
                 'agency_ulid' => $agency->ulid,
                 'creator_ulid' => $creator->ulid,
             ],

@@ -61,6 +61,11 @@ use Illuminate\Validation\ValidationException;
  *   - `status`         — `invited` | `contracted` (default), optional (AH-118).
  *   - `contract_sent`  — bool, optional (AH-118). Adds a `sent` contract (lock reason `contract_pending`).
  *   - `restrict_to_listing_regions`, `listing_regions`, `creator_country` — optional (AH-118).
+ *   - `exclusive_brand_ids` — string[], optional (AH-120). ULIDs of THIS agency's brands the new
+ *                             campaign blocks (the `contracted` creator is selected on it, so
+ *                             they are blocked from those brands). Written directly, bypassing
+ *                             the flag: arming it is the spec's own step.
+ *   - `exclusivity_ends_on` — Y-m-d|null, optional (AH-120). Written as given, past dates included.
  *
  * Response (201):
  *   { "data": { "agency_ulid", "campaign_ulid", "campaign_name", "brand_name",
@@ -83,11 +88,28 @@ final class CreateContractedAssignmentController
                 'listing_regions' => ['sometimes', 'array', 'max:10'],
                 'listing_regions.*' => ['string', 'size:2'],
                 'creator_country' => ['nullable', 'string', 'size:2'],
+                // AH-120 — the blocked-brand list and end date of the campaign this creates.
+                'exclusive_brand_ids' => ['sometimes', 'array', 'max:50'],
+                'exclusive_brand_ids.*' => ['string', 'distinct'],
+                'exclusivity_ends_on' => ['sometimes', 'nullable', 'date_format:Y-m-d'],
             ]);
         } catch (ValidationException $e) {
             return new JsonResponse([
                 'error' => 'validation failed',
                 'errors' => $e->errors(),
+            ], 422);
+        }
+
+        /** @var array<int, string> $exclusiveUlids */
+        $exclusiveUlids = $validated['exclusive_brand_ids'] ?? [];
+        $exclusiveBrandIds = $exclusiveUlids === []
+            ? []
+            : Brand::query()->where('agency_id', $agency->id)->whereIn('ulid', $exclusiveUlids)->pluck('id')->all();
+
+        if (count($exclusiveBrandIds) !== count($exclusiveUlids)) {
+            return new JsonResponse([
+                'error' => 'validation failed',
+                'errors' => ['exclusive_brand_ids' => ['Every brand must belong to this agency.']],
             ], 422);
         }
 
@@ -143,7 +165,12 @@ final class CreateContractedAssignmentController
             'restrict_to_listing_regions' => (bool) ($validated['restrict_to_listing_regions'] ?? false),
 
             'ends_at' => null,
+            'exclusivity_ends_on' => $validated['exclusivity_ends_on'] ?? null,
         ]);
+
+        if ($exclusiveBrandIds !== []) {
+            $campaign->exclusiveBrands()->sync($exclusiveBrandIds);
+        }
 
         $invited = ($validated['status'] ?? 'contracted') === 'invited';
 
