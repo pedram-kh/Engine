@@ -13,6 +13,18 @@ export default mergeConfig(
       // must be excluded from the Vitest scan.
       exclude: ['tests/e2e/**', 'playwright/**', 'node_modules/**', 'ios/**', 'android/**'],
       globals: true,
+      // Local-run cap (docs/WORKING-PROCESS.md § 4.1): set VITEST_MAX_WORKERS=4
+      // on a laptop. Unset in CI, so CI keeps Vitest's default.
+      // (Vitest 2.x: --maxWorkers on the CLI conflicts with the default minimum
+      // in the forks pool, so the cap is set through poolOptions here.)
+      ...(process.env.VITEST_MAX_WORKERS
+        ? {
+            poolOptions: {
+              forks: { minForks: 1, maxForks: Number(process.env.VITEST_MAX_WORKERS) },
+              threads: { minThreads: 1, maxThreads: Number(process.env.VITEST_MAX_WORKERS) },
+            },
+          }
+        : {}),
       root: fileURLToPath(new URL('./', import.meta.url)),
       setupFiles: ['./tests/unit/setup.ts'],
       server: {

@@ -12,8 +12,21 @@ import { http } from '@/core/api'
 import { messageSearchQuery } from './messageSearch.api'
 
 export const creatorInboxApi = {
-  inbox(cursor?: string | null): Promise<CreatorInboxResponse> {
+  /**
+   * `filters` are the creator's two inbox filters (AH-115 walk): `unread` (threads with unread only) and
+   * `direct` (Direct threads only). Each is sent only when on, so a clean inbox has a clean request.
+   */
+  inbox(
+    cursor?: string | null,
+    filters?: { unread?: boolean; direct?: boolean },
+  ): Promise<CreatorInboxResponse> {
     const query = new URLSearchParams()
+    if (filters?.unread === true) {
+      query.set('unread', '1')
+    }
+    if (filters?.direct === true) {
+      query.set('direct', '1')
+    }
     if (cursor !== undefined && cursor !== null && cursor !== '') {
       query.set('cursor', cursor)
     }

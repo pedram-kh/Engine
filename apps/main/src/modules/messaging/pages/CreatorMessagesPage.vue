@@ -17,9 +17,9 @@ import type {
   CreatorRelationshipThreadRow,
   MessageableAgencyRow,
 } from '@catalyst/api-client'
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute, type RouteLocationRaw } from 'vue-router'
+import { useRoute, useRouter, type LocationQueryRaw, type RouteLocationRaw } from 'vue-router'
 import { useDisplay } from 'vuetify'
 
 import CreatorMessageSearchResults, {
@@ -31,6 +31,7 @@ import { creatorInboxApi } from '../api/creatorInbox.api'
 import { relationshipMessagingApi } from '../api/relationshipMessaging.api'
 import ContactPicker, { type ContactPickerItem } from '../components/ContactPicker.vue'
 import RelationshipInbox, { type RelationshipInboxItem } from '../components/RelationshipInbox.vue'
+import { filtersFromQuery } from '../composables/inboxFilterQuery'
 import { useMessageSearch } from '../composables/useMessageSearch'
 import { useMessagesEditSearchFlag } from '../composables/useMessagesEditSearchFlag'
 import { previewOrDeleted } from '../utils/messageRevision'
@@ -38,6 +39,7 @@ import { previewOrDeleted } from '../utils/messageRevision'
 const { t } = useI18n()
 const editSearchOn = useMessagesEditSearchFlag()
 const route = useRoute()
+const router = useRouter()
 const display = useDisplay()
 
 // AH-013 — two-pane only at ≥ md; below that, one pane at a time (mobile).
@@ -70,6 +72,32 @@ const authStore = useAuthStore()
 const unifiedOn = computed(
   () => authStore.user?.attributes.features?.messages_v2_creator_inbox === true,
 )
+
+// AH-115 (walk): two filters, kept in the URL (`?unread=1&direct=1`) like the agency inbox's, so a reload
+// or a back navigation keeps them. No brand, campaign or Mine on the creator side. They apply only to the
+// unified list; the previous list ignores them.
+const filters = computed(() => {
+  const parsed = filtersFromQuery(route.query)
+  return { unread: parsed.unread, direct: parsed.direct }
+})
+const anyFilter = computed(() => unifiedOn.value && (filters.value.unread || filters.value.direct))
+const filterQuery = computed<LocationQueryRaw>(() => ({
+  ...(filters.value.unread ? { unread: '1' } : {}),
+  ...(filters.value.direct ? { direct: '1' } : {}),
+}))
+
+function setFilters(next: { unread: boolean; direct: boolean }): void {
+  const query: LocationQueryRaw = { ...route.query }
+  delete query.unread
+  delete query.direct
+  void router.replace({
+    query: {
+      ...query,
+      ...(next.unread ? { unread: '1' } : {}),
+      ...(next.direct ? { direct: '1' } : {}),
+    },
+  })
+}
 
 const rows = ref<CreatorRelationshipThreadRow[]>([])
 const v2Rows = ref<CreatorInboxRow[]>([])
@@ -113,7 +141,11 @@ function v2To(row: CreatorInboxRow, name: string): RouteLocationRaw | null {
   if (row.type === 'relationship_thread') {
     return a.agency.id === null
       ? null
-      : { name: 'creator.messages.thread', params: { agencyUlid: a.agency.id }, query: { name } }
+      : {
+          name: 'creator.messages.thread',
+          params: { agencyUlid: a.agency.id },
+          query: { name, ...filterQuery.value },
+        }
   }
   // Q6: an assignment row opens the assignment's own chat.
   return a.assignment_id === null
@@ -196,7 +228,7 @@ async function load(initial = false): Promise<void> {
   loading.value = initial && (unified ? v2Rows.value.length === 0 : rows.value.length === 0)
   try {
     if (unified) {
-      const res = await creatorInboxApi.inbox()
+      const res = await creatorInboxApi.inbox(null, filters.value)
       if (cancelled) {
         return
       }
@@ -232,7 +264,7 @@ async function loadMore(): Promise<void> {
   }
   v2LoadingMore.value = true
   try {
-    const res = await creatorInboxApi.inbox(cursor)
+    const res = await creatorInboxApi.inbox(cursor, filters.value)
     const known = new Set(v2Rows.value.map((r) => r.id))
     v2Rows.value = [...v2Rows.value, ...res.data.filter((r) => !known.has(r.id))]
     v2Cursor.value = res.meta.next_cursor
@@ -327,6 +359,19 @@ async function openPicker(): Promise<void> {
   }
 }
 
+// A filter change starts the list over: the old rows and cursor belong to the old filter.
+watch(
+  () => [filters.value.unread, filters.value.direct],
+  () => {
+    if (!unifiedOn.value) {
+      return
+    }
+    v2Rows.value = []
+    v2Cursor.value = null
+    void load(true)
+  },
+)
+
 onMounted(() => {
   cancelled = false
   void load(true)
@@ -376,8 +421,54 @@ onBeforeUnmount(() => {
         data-test="creator-inbox-search"
       />
 
+      <div v-if="unifiedOn" class="msg-shell__filters" data-test="creator-inbox-filters">
+        <button
+          type="button"
+          class="msg-shell__chip"
+          :class="{ 'msg-shell__chip--on': filters.direct }"
+          :aria-pressed="filters.direct"
+          data-test="creator-inbox-direct"
+          @click="setFilters({ ...filters, direct: !filters.direct })"
+        >
+          <v-icon icon="mdi-message-outline" size="14" aria-hidden="true" />
+          {{ t('app.messaging.inbox.tagDirect') }}
+        </button>
+        <div class="msg-shell__toggle" role="radiogroup" data-test="creator-inbox-toggle">
+          <button
+            type="button"
+            role="radio"
+            class="msg-shell__segment"
+            :class="{ 'msg-shell__segment--on': !filters.unread }"
+            :aria-checked="!filters.unread"
+            data-test="creator-inbox-toggle-all"
+            @click="setFilters({ ...filters, unread: false })"
+          >
+            {{ t('app.messaging.relationship.inboxFilterAll') }}
+          </button>
+          <button
+            type="button"
+            role="radio"
+            class="msg-shell__segment"
+            :class="{ 'msg-shell__segment--on': filters.unread }"
+            :aria-checked="filters.unread"
+            data-test="creator-inbox-toggle-unread"
+            @click="setFilters({ ...filters, unread: true })"
+          >
+            {{ t('app.messaging.relationship.inboxFilterUnread') }}
+          </button>
+        </div>
+      </div>
+
       <div class="msg-shell__list-body">
+        <p
+          v-if="anyFilter && !loading && !loadError && visibleItems.length === 0"
+          class="msg-shell__no-match"
+          data-test="creator-inbox-filtered-empty"
+        >
+          {{ t('app.messaging.inbox.filteredEmpty') }}
+        </p>
         <RelationshipInbox
+          v-else
           :items="visibleItems"
           :loading="loading"
           :load-error="loadError"
@@ -458,7 +549,82 @@ onBeforeUnmount(() => {
 }
 
 .msg-shell__search {
+  /* `.v-input` is `flex: 1 1 auto`: in this column it took the spare height when the list was empty
+     and the field stretched to fill the pane. The field is one row tall, always. */
+  flex: 0 0 auto;
   margin-bottom: 8px;
+}
+
+/* The two filters: a Direct chip and an All / Unread segmented control, on one line. */
+.msg-shell__filters {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.msg-shell__chip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 10px;
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.2);
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(var(--v-theme-on-surface), 0.7);
+  font: inherit;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.msg-shell__chip--on {
+  border-color: rgb(var(--v-theme-primary));
+  background-color: rgba(var(--v-theme-primary), 0.16);
+  color: rgb(var(--v-theme-primary));
+}
+
+.msg-shell__toggle {
+  display: inline-flex;
+  flex: none;
+  padding: 3px;
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.2);
+  border-radius: 8px;
+}
+
+.msg-shell__segment {
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(var(--v-theme-on-surface), 0.6);
+  font: inherit;
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.msg-shell__segment--on {
+  background-color: rgba(var(--v-theme-on-surface), 0.12);
+  color: rgb(var(--v-theme-on-surface));
+}
+
+.msg-shell__chip:focus-visible,
+.msg-shell__segment:focus-visible {
+  outline: 2px solid rgb(var(--v-theme-primary));
+  outline-offset: 1px;
+}
+
+.msg-shell__no-match {
+  margin: 24px 0;
+  text-align: center;
+  opacity: 0.6;
 }
 
 .msg-shell__more {
