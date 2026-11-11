@@ -264,6 +264,16 @@ try {
     await page.waitForSelector('[data-test="invite-creators-exclusivity"]')
     await page.waitForTimeout(500)
     await shot(page, `4-invite-dialog-warning-${label}.png`)
+    // The Invite button is disabled in that shot only because the fee is empty: with a fee
+    // typed, the warning still shows and the button is enabled.
+    const submit = page.locator('[data-test="invite-creators-submit"]')
+    const before = await submit.isDisabled()
+    await page.locator('[data-test="invite-creators-fee"] input').first().fill('250')
+    await page.waitForTimeout(400)
+    console.log(
+      `invite submit @${label}: disabled with empty fee=${before}; with fee=${await submit.isDisabled()}; warning still shown=${await page.locator('[data-test="invite-creators-exclusivity"]').isVisible()}`,
+    )
+    await shot(page, `4b-invite-dialog-warning-fee-filled-${label}.png`)
     await page.context().close()
 
     // 5. Creator job detail, "Not available to you".

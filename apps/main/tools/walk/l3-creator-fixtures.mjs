@@ -8,6 +8,8 @@ import { creatorFixtureFor } from './l2-fixtures.mjs'
 
 export const ASSIGNMENT = '01HASSIGNMENT0000000001'
 export const JOB = '01HJOB0000000000000000001'
+/** AH-120: a job the caller is brand-locked out of ("Not available to you"). Additive walk target. */
+export const JOB_BRAND_LOCKED = '01HJOB0000000000000000002'
 
 const iso = (days, hours = 0) =>
   new Date(Date.now() + days * 86_400_000 + hours * 3_600_000).toISOString()
@@ -188,6 +190,34 @@ export function l3CreatorFixtures({ status = 'approved' } = {}) {
           block('01HBLOCK00000000000000002', 9, 'personal', null),
         ],
         meta: { window: { from: iso(-30), to: iso(60) } },
+      }
+    }
+    if (method === 'GET' && p === `${api}/jobs/${JOB_BRAND_LOCKED}`) {
+      return {
+        data: {
+          id: JOB_BRAND_LOCKED,
+          type: 'creator_job',
+          attributes: {
+            name: 'Yahoo Spring creators',
+            listing_fee: '€300 per video',
+            listing_duration: '4 weeks',
+            applicant_count: 3,
+            listed_at: iso(-2),
+            application_status: null,
+            assignment_state: null,
+            description: 'Three short-form videos per month, filmed at home with natural light.',
+            listing_languages: ['en', 'pt'],
+            listing_regions: ['PT', 'ES'],
+            is_region_locked: false,
+            region_lock_reason: null,
+            is_brand_locked: true,
+            brand_lock_reason: 'brand_exclusive',
+            listing_examples_url: null,
+            assignment_ulid: null,
+            attachments: [],
+            brand: { name: 'Yahoo', logo_url: null, website_url: null },
+          },
+        },
       }
     }
     if (method === 'GET' && p === `${api}/jobs/${JOB}`) {

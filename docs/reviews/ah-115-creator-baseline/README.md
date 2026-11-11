@@ -41,3 +41,7 @@ Reason: deliberate runtime changes on creator routes: inbox filter bar and searc
 ## Re-recorded on 2026-11-11 (desktop cards: one column)
 
 Reason: after the walk, the invitation, assignment and job lists at 960px and up went from a two-column grid to one column (cards full width of the content column), in `creatorNative.css`. Recorded at `--concurrency 1`: 142 targets, 32 with page errors (the same onboarding 503s). **MEASURED: three consecutive compares at the default concurrency, 142 / 142 identical.** Agency walk on the same tree: 126 / 126 identical.
+
+## AH-120 addition: 4 targets (146 in total)
+
+`creator.job.detail.brand-locked` at dark and light, 1280 and 390, appended 2026-11-11. The job detail for a job the creator is brand-locked out of ("Not available to you"), rendered as the real page over the creator mock API (`JOB_BRAND_LOCKED` in `l3-creator-fixtures.mjs`; every other creator target renders over a stub that answers 503, so none of them can show a job). **Additive only:** the 142 targets are byte-identical in the file (the commit adds 136 lines and removes none) and compare identical. Recorded twice (identical), then compared in full twice: `COMPARE OK: 146 targets identical`.

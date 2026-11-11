@@ -33,6 +33,7 @@ import sharp from 'sharp'
 import { createServer } from 'vite'
 
 import { AGENCY_ROUTES, agencyPageFor, PROTECTED_AUTH } from './agency-routes.mjs'
+import { JOB_BRAND_LOCKED, l3CreatorFixtures } from './l3-creator-fixtures.mjs'
 import { fixtureFor } from './l3-fixtures.mjs'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
@@ -183,7 +184,10 @@ function thumbDiff(a, b) {
   return { cell: max, mean: sum / n }
 }
 
-async function newPage(browser, { viewport, theme, user, base, fixtures = false }) {
+async function newPage(
+  browser,
+  { viewport, theme, user, base, fixtures = false, fixtureFn = null },
+) {
   const context = await browser.newContext({
     viewport: VIEWPORTS[viewport],
     deviceScaleFactor: 1,
@@ -203,9 +207,9 @@ async function newPage(browser, { viewport, theme, user, base, fixtures = false 
   await context.route(
     (url) => /^\/(api|sanctum)\//.test(url.pathname),
     (route) => {
-      if (fixtures) {
+      if (fixtures || fixtureFn) {
         const url = new URL(route.request().url())
-        const body = fixtureFor(url, route.request().method())
+        const body = (fixtureFn ?? fixtureFor)(url, route.request().method())
         if (body) {
           return route.fulfill({
             status: 200,
@@ -335,7 +339,45 @@ async function runCreator(base, browser) {
       await h.context.close()
     }
   })
-  return [...direct, ...cross]
+  return [...direct, ...cross, ...(await runBrandLockedJob(base, browser))]
+}
+
+/**
+ * AH-120 (additive): the creator job detail for a brand-locked job, as the REAL page over the
+ * creator mock API (every other creator target renders over a 503-everything stub, so none of
+ * them can show a job). Four new ids; the 142 targets above are untouched.
+ */
+async function runBrandLockedJob(base, browser) {
+  const name = 'creator.job.detail.brand-locked'
+  if (ONLY && !name.includes(ONLY)) return []
+  const path = `/creator/jobs/${JOB_BRAND_LOCKED}`
+  const jobs = []
+  for (const theme of ['dark', 'light']) {
+    for (const viewport of ['desktop', 'mobile']) jobs.push({ theme, viewport })
+  }
+  return pool(jobs, async ({ theme, viewport }) => {
+    const h = await newPage(browser, {
+      viewport,
+      theme,
+      user: 'creator',
+      base,
+      fixtureFn: l3CreatorFixtures({ status: 'approved' }),
+    })
+    try {
+      await open(h, path, { real: 'creator.job.detail' })
+      await h.page.waitForSelector('[data-testid="creator-job-brand-locked"]', { timeout: 15000 })
+      return await measure(h, `${name}.${theme}.${viewport}`, {
+        kind: 'direct',
+        route: path,
+        name,
+        layout: 'creator',
+        theme,
+        viewport,
+      })
+    } finally {
+      await h.context.close()
+    }
+  })
 }
 
 async function runShell(base, browser) {
