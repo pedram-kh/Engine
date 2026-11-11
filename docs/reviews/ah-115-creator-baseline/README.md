@@ -37,3 +37,7 @@ The agency shell is proved by [`ah-115-agency-baseline`](../ah-115-agency-baseli
 ## Re-recorded on 2026-11-11 (walk findings 2-5)
 
 Reason: deliberate runtime changes on creator routes: inbox filter bar and search-field height (messages), the country-code picker rules (onboarding and profile), the 960px-and-up card grid (invitations, assignments, jobs) in `creatorNative.css`. Recorded at `--concurrency 1`: 142 targets, 32 with page errors (the same onboarding 503s). **MEASURED: three consecutive compares at the default concurrency, 142 / 142 identical.** The agency shell was compared against its untouched baseline on the same tree: 126 / 126 identical.
+
+## Re-recorded on 2026-11-11 (desktop cards: one column)
+
+Reason: after the walk, the invitation, assignment and job lists at 960px and up went from a two-column grid to one column (cards full width of the content column), in `creatorNative.css`. Recorded at `--concurrency 1`: 142 targets, 32 with page errors (the same onboarding 503s). **MEASURED: three consecutive compares at the default concurrency, 142 / 142 identical.** Agency walk on the same tree: 126 / 126 identical.

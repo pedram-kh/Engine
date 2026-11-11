@@ -3,11 +3,11 @@
  *
  * Before: the cards were the phone column stretched wide (the page's desktop row rule centred the
  * card's children from 600 px up). In `creatorNative.css`: the card is a stretched column at every
- * width; from 960 px the lists are two columns and the invitation actions sit on one right-aligned
+ * width; from 960 px the lists stay ONE column (cards full width) and the invitation actions sit on one right-aligned
  * line with Accept last. Below 960 nothing of the desktop block applies.
  *
- * Break-revert: drop `align-items: stretch` from the card, the grid from the media block, or the
- * right alignment → this fails.
+ * Break-revert: drop `align-items: stretch` from the card, add a grid to the lists in the media block,
+ * or drop the right alignment → this fails.
  */
 
 import { readFileSync } from 'node:fs'
@@ -38,10 +38,11 @@ describe('invitation and job cards on desktop', () => {
     expect(mediaStart).toBeGreaterThan(-1)
   })
 
-  it('lists are two columns from md', () => {
-    expect(desktop).toMatch(/:deep\(\.assignments\)/)
-    expect(desktop).toMatch(/:deep\(\.jobs\)/)
-    expect(desktop).toMatch(/grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/)
+  it('lists stay one column from md: no grid on .assignments or .jobs in the md block', () => {
+    expect(desktop).not.toMatch(/:deep\(\.assignments\)/)
+    expect(desktop).not.toMatch(/:deep\(\.jobs\)/)
+    expect(desktop).not.toMatch(/grid-template-columns/)
+    expect(desktop).not.toMatch(/display:\s*grid/)
   })
 
   it('the actions are one right-aligned line with Accept last', () => {
