@@ -73,6 +73,8 @@ final class AgencyCreatorSurfaces
             'Campaigns/Http/Controllers/CampaignAssignmentResolutionController.php' => ['guarded', 'AH-104c: a NEW live verification (manual verify) of a pending or erased creator is refused; the other resolutions on an EXISTING assignment stay open (C4).'],
             'Campaigns/Http/Controllers/CampaignAssignmentReviewController.php' => ['flagged', 'The review payload of an existing assignment.'],
             'Campaigns/Http/Controllers/CampaignController.php' => ['flagged', 'The posting-due list names the creator.'],
+            'Campaigns/Http/Controllers/CampaignExclusivityConflictController.php' => ['unchanged', 'AH-120: a read-only warning that echoes back the creator ULIDs the caller supplied, with the name of the agency\'s own blocking campaign; it emits no creator field and acts on nothing, so a pending or erased creator discloses nothing.'],
+            'Campaigns/Services/BrandExclusivity.php' => ['model', 'AH-120: the exclusivity predicate over assignment rows by creator id; it reads no creator field and emits nothing.'],
             'Campaigns/Http/Controllers/CampaignDraftController.php' => ['via-relation', 'Emits the creator through CampaignDraftListItemResource (is_erased).'],
             'Campaigns/Http/Resources/CampaignApplicationListItemResource.php' => ['resource', 'The applications list.'],
             'Campaigns/Http/Resources/CampaignAssignmentResource.php' => ['resource', 'The assignment.'],
