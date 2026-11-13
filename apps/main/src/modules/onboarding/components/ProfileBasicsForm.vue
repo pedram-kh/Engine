@@ -48,7 +48,12 @@ import NativeCard from '@/components/NativeCard'
 import AvatarUploadDrop from './AvatarUploadDrop.vue'
 import { renderBio } from '../composables/useBioRenderer'
 import { COUNTRY_OPTIONS, labelForCountryCode } from '../data/countries'
-import { DIAL_CODE_OPTIONS, dialCodeForCountry, splitPhoneValue } from '../data/dialCodes'
+import {
+  DIAL_CODE_OPTIONS,
+  dialCodeForCountry,
+  isoForDialCode,
+  splitPhoneValue,
+} from '../data/dialCodes'
 import { useOnboardingStore } from '../stores/useOnboardingStore'
 
 /** Readiness signal the host uses to build its own gate. */
@@ -111,9 +116,13 @@ const dateOfBirth = ref('')
 // AH-005 — optional contact details. All optional; partial entry is fine.
 // phone / whatsapp are split into a dial-code part and a local-number part;
 // they are joined back to a single string on save (e.g. "+34 612 345 678").
-const phoneDial = ref('')
+// AH-122 — the pickers select by ISO country code (unique); many countries share a dial code, so
+// binding the dial code selected all of them. The dial code is derived from the chosen country.
+const phoneDialIso = ref('')
+const phoneDial = computed(() => dialCodeForCountry(phoneDialIso.value))
 const phoneLocal = ref('')
-const whatsappDial = ref('')
+const whatsappDialIso = ref('')
+const whatsappDial = computed(() => dialCodeForCountry(whatsappDialIso.value))
 const whatsappLocal = ref('')
 const addressStreet = ref('')
 const addressPostalCode = ref('')
@@ -326,6 +335,13 @@ watch([hasAvatar, hasCategory, floorMet], () => emit('readiness', currentReadine
 // component (and any host-driven hydration) has settled on mount.
 onMounted(() => emit('readiness', currentReadiness()))
 
+// AH-122 — a stored dial code maps to the creator's country when that country has the same dial
+// code, else to the first registry entry with it. No stored dial code: the creator's country.
+function hydrateDialIso(storedDial: string, country: string | null): string {
+  if (storedDial !== '') return isoForDialCode(storedDial, country)
+  return country !== null && dialCodeForCountry(country) !== '' ? country.toUpperCase() : ''
+}
+
 function hydrate(): void {
   const attrs = store.creator?.attributes
   if (attrs === undefined) return
@@ -340,10 +356,10 @@ function hydrate(): void {
   // into dial code + local number. Falls back to the country-derived dial
   // code when no known prefix is found (covers legacy free-text entries).
   const pSplit = splitPhoneValue(attrs.phone ?? null)
-  phoneDial.value = pSplit.dialCode || dialCodeForCountry(attrs.country_code ?? null)
+  phoneDialIso.value = hydrateDialIso(pSplit.dialCode, attrs.country_code ?? null)
   phoneLocal.value = pSplit.local
   const wSplit = splitPhoneValue(attrs.whatsapp ?? null)
-  whatsappDial.value = wSplit.dialCode || dialCodeForCountry(attrs.country_code ?? null)
+  whatsappDialIso.value = hydrateDialIso(wSplit.dialCode, attrs.country_code ?? null)
   whatsappLocal.value = wSplit.local
   addressStreet.value = attrs.address_street ?? ''
   addressPostalCode.value = attrs.address_postal_code ?? ''
@@ -416,8 +432,9 @@ watch(countryCode, (newCode, oldCode) => {
   const newDial = dialCodeForCountry(newCode)
   if (!newDial) return
   const oldDial = dialCodeForCountry(oldCode ?? null)
-  if (!phoneLocal.value || phoneDial.value === oldDial) phoneDial.value = newDial
-  if (!whatsappLocal.value || whatsappDial.value === oldDial) whatsappDial.value = newDial
+  const iso = newCode?.toUpperCase() ?? ''
+  if (!phoneLocal.value || phoneDial.value === oldDial) phoneDialIso.value = iso
+  if (!whatsappLocal.value || whatsappDial.value === oldDial) whatsappDialIso.value = iso
 })
 
 defineExpose({ save, hydrate, isPristine })
@@ -540,10 +557,10 @@ defineExpose({ save, hydrate, isPristine })
 
       <div class="profile-basics-form__tel-row">
         <v-autocomplete
-          v-model="phoneDial"
+          v-model="phoneDialIso"
           :items="DIAL_CODE_OPTIONS"
           item-title="label"
-          item-value="dialCode"
+          item-value="code"
           hide-details
           class="profile-basics-form__dial-code"
           data-testid="profile-phone-dial"
@@ -567,10 +584,10 @@ defineExpose({ save, hydrate, isPristine })
 
       <div class="profile-basics-form__tel-row">
         <v-autocomplete
-          v-model="whatsappDial"
+          v-model="whatsappDialIso"
           :items="DIAL_CODE_OPTIONS"
           item-title="label"
-          item-value="dialCode"
+          item-value="code"
           hide-details
           class="profile-basics-form__dial-code"
           data-testid="profile-whatsapp-dial"

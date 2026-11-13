@@ -1,13 +1,12 @@
 /**
- * AH-115 (local walk) — the Contact details country-code picker on the creator web.
+ * The Contact details country-code picker on the creator web: its field input must be clipped to
+ * the field box so nothing paints outside it over the number beside it. The rule stays under the
+ * creator theme scope (the scoping spec covers that), so the agency and the admin are untouched.
  *
- * Its items are keyed by dial code and dozens of countries share "+1", so the autocomplete treats
- * all of them as selected and paints a flag-and-code chip for each; on the creator web they ran
- * out of the 125 px field over the number beside it. In `creator.css` only the first selection may
- * show and nothing may paint outside the field box. Both rules stay under the creator theme scope
- * (the scoping spec covers that), so the agency and the admin are untouched.
+ * AH-122: the picker now selects by ISO country code, so only one chip ever renders and the old
+ * rule hiding every chip after the first (and its assertion here) was removed.
  *
- * Break-revert: delete either rule → this fails.
+ * Break-revert: delete the rule → this fails.
  */
 
 import { readFileSync } from 'node:fs'
@@ -28,11 +27,6 @@ function rule(selectorEnd: string): string {
 }
 
 describe('creator country-code picker', () => {
-  it('shows one selection, not one per country that shares the dial code', () => {
-    const body = rule('.profile-basics-form__dial-code .v-autocomplete__selection:nth-child(n + 2)')
-    expect(body).toMatch(/display:\s*none/)
-  })
-
   it('clips the field input to the field box', () => {
     const body = rule('.profile-basics-form__dial-code .v-field__input')
     expect(body).toMatch(/overflow:\s*hidden/)

@@ -317,6 +317,20 @@ export function dialCodeForCountry(isoCode: string | null): string {
 }
 
 /**
+ * AH-122 — the ISO country to show for a stored dial code. Many countries share a code ("+1" has
+ * about 25), so the pickers select by ISO code (unique) and this decides which one a stored dial
+ * code maps to: the creator's own country when its dial code matches, otherwise the first entry
+ * in DIAL_CODE_OPTIONS with that dial code. Returns '' when the dial code is unknown or empty.
+ */
+export function isoForDialCode(dialCode: string, countryCode: string | null): string {
+  if (dialCode === '') return ''
+  if (countryCode !== null && dialCodeForCountry(countryCode) === dialCode) {
+    return countryCode.toUpperCase()
+  }
+  return DIAL_CODE_OPTIONS.find((d) => d.dialCode === dialCode)?.code ?? ''
+}
+
+/**
  * Split a stored phone string (e.g. "+34 612 345 678") into its dial
  * code and local-number parts. Tries to match the longest known dial
  * code that is a prefix of the value.
