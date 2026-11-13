@@ -74,6 +74,23 @@ happened.
 
 ---
 
+## AH-122 — dial-code picker selects by country, not by shared code (main web only) — PENDING
+
+> **Main web only.** No API deploy, no migration, no feature flag, no `queue:restart`. Reaches the phone in **native build 6** (with AH-121), not before.
+
+- **Status:** PENDING (commit `911e0b75` is on local `main`; deployed state: nothing).
+- **What:** the creator onboarding country-code picker bound `item-value="dialCode"`, so a dial code shared by several countries (+1) showed several rows as selected. It now selects by country. Found in the build 5 device walk, step 12, 2026-11-13 (reported); tracked as AH-122 in `../reviews/adhoc-changes-log.md`.
+- **Touched (`911e0b75`, from `git show --stat`):** `apps/main/src/modules/onboarding/components/ProfileBasicsForm.vue`, `onboarding/data/dialCodes.ts`, `creators/theme/creator.css`, and three specs (`ProfileBasicsForm.dialPicker.spec.ts`, `dialCodes.spec.ts`, `unit/architecture/creator-dial-picker.spec.ts`). Frontend only.
+- **Range:** the web build must contain `911e0b75`; the SPA runtime tip it was built from: **not read** (no build or deploy has happened).
+- **AH entries carried:** AH-122.
+- **Migrations run:** none. **Pre-deploy reads:** none. **Snapshot:** not needed (no API or schema change). **Infra:** none (no worker restart, cron or env change). **One-shot commands:** none. **Flags armed:** none.
+- **Verified so far:** unit specs and break-reverts (counts: **not read** here; see the commit's specs); Pedram's local look on creator web, 2026-11-13: Canada and Bahamas each show one flag and one selected row (reported).
+- **Not verified:** on a device (build 6 does not exist yet); on production.
+- **Post-deploy check (after the web deploy):** on creator web, open the onboarding country-code picker, choose Canada, then Bahamas: each shows one flag and exactly one selected row.
+- **Operator / anything unexpected:** not yet deployed.
+
+---
+
 ## AH-115 + AH-120 — creator web restyle and inbox v2, brand exclusivity (API + main web + native build 5) — DEPLOYED 2026-11-12 (P0 to P9; build 5 uploaded and walked on a device 2026-11-13, AH-122 and two walk steps OPEN), both flags flipped ON out of order
 
 > **One sitting for both, in this order: snapshot, migrate (two), API, Q10, `queue:restart`, verify both flags OFF, main web, then (separately, later) native build 5, and only afterwards the two flag flips.** Runbook: [`deploy-ah115-ah120.md`](deploy-ah115-ah120.md) (P0 to P9). **It replaces [`deploy-ah115.md`](deploy-ah115.md), superseded, not used.** The AH-115 entry below stays as the record of that arc's scope; where it says "no `queue:restart` is needed" **this entry overrides it**.
@@ -110,7 +127,9 @@ happened.
 
 ---
 
-## AH-115 — creator web adopts the native look, creator inbox v2, Notifications page (API + main web + native build 5) — PENDING
+## AH-115 — creator web adopts the native look, creator inbox v2, Notifications page (API + main web + native build 5) — PENDING — SUPERSEDED by the AH-115 + AH-120 entry above (DEPLOYED 2026-11-12); kept as history, not an open deploy
+
+> **SUPERSEDED.** This standalone entry was never used. AH-115 deployed together with AH-120 on 2026-11-12; the record is the AH-115 + AH-120 entry above. The text below is the original plan, unchanged.
 
 > **One entry, in this order: snapshot, migrate, API, verify the flag is OFF, main web, then (separately, later) native build 5, and only after build 5 is live the flag.** The API goes before the web: the new web reads `features.messages_v2_creator_inbox` and calls the new endpoints only when it is true, but the order costs nothing and keeps the flag-off proof clean. **The agency shell does not change** (proved, `docs/reviews/creator-restyle-review.md`) and **the admin SPA is not part of this deploy.**
 
