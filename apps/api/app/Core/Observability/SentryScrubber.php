@@ -51,6 +51,18 @@ final class SentryScrubber
     /** Metadata / array keys that hold a URL and get query + fragment stripped. */
     private const URL_KEYS = ['url', 'from', 'to', 'referrer', 'referer', 'description', 'uri'];
 
+    /**
+     * Sentry's own identifiers: the opaque-token rule must not touch them. Exempt only
+     * when the value has exactly the shape of the id (32 or 16 lower-case hex), so a
+     * token planted under one of these keys is still redacted.
+     */
+    private const SENTRY_ID_SHAPES = [
+        'event_id' => '/^[0-9a-f]{32}$/',
+        'trace_id' => '/^[0-9a-f]{32}$/',
+        'span_id' => '/^[0-9a-f]{16}$/',
+        'parent_span_id' => '/^[0-9a-f]{16}$/',
+    ];
+
     /** Metadata keys that exist only to carry a query string or fragment. */
     private const QUERY_KEYS = ['http.query', 'http.fragment', 'query', 'query_string', 'fragment'];
 
@@ -171,6 +183,11 @@ final class SentryScrubber
         }
 
         if (! is_string($value)) {
+            return $value;
+        }
+
+        $shape = self::SENTRY_ID_SHAPES[strtolower($key)] ?? null;
+        if ($shape !== null && preg_match($shape, $value) === 1) {
             return $value;
         }
 

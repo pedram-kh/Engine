@@ -217,3 +217,26 @@ it('the DSN comes from SENTRY_LARAVEL_DSN alone: empty means empty, and the gene
     // Positive control: the variable is the one that is read.
     expect($show(['SENTRY_LARAVEL_DSN' => 'https://k@h.invalid/1']))->toContain('https://k@h.invalid/1');
 });
+
+it('keeps Sentry\'s own ids valid (32-hex event and trace ids, 16-hex span id) while a planted 40-character token is redacted', function (): void {
+    $sentry = SentryRecording::install();
+    $planted = 'Zk3Jq9Wm2Lp8Xc5Vb7Nn4Hg6Fd1Sa0Qw3Er5Ty7U'; // 40 characters
+
+    expect(strlen($planted))->toBe(40);
+
+    SentryRecording::hub()->configureScope(function ($scope) use ($planted): void {
+        $scope->setExtra('planted', $planted);
+        $scope->setTag('planted_tag', $planted);
+    });
+    SentryRecording::hub()->captureException(new RuntimeException('boom'));
+    $sentry->flush();
+
+    $lines = explode("\n", $sentry->bodies[0]);
+    $header = json_decode($lines[0], true, 512, JSON_THROW_ON_ERROR);
+    $event = json_decode($lines[2], true, 512, JSON_THROW_ON_ERROR);
+
+    expect($header['event_id'])->toMatch('/^[0-9a-f]{32}$/');
+    expect($event['contexts']['trace']['trace_id'])->toMatch('/^[0-9a-f]{32}$/');
+    expect($event['contexts']['trace']['span_id'])->toMatch('/^[0-9a-f]{16}$/');
+    expect($sentry->bodies[0])->not->toContain($planted);
+});
