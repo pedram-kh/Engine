@@ -92,6 +92,38 @@ describe('init options', () => {
   })
 })
 
+describe('integrations are an allow-list', () => {
+  const EXPECTED = [
+    'InboundFilters',
+    'FunctionToString',
+    'ConversationId',
+    'BrowserApiErrors',
+    'Breadcrumbs',
+    'GlobalHandlers',
+    'LinkedErrors',
+    'Dedupe',
+    'HttpContext',
+    'Vue',
+  ]
+
+  it('pins the allowed integration list literally, so adding one is a visible diff here', () => {
+    const match = /ALLOWED_INTEGRATIONS = \[([\s\S]*?)\] as const/.exec(CLIENT)
+    const listed = [...(match?.[1] ?? '').matchAll(/'([A-Za-z]+)'/g)].map((m) => m[1])
+    expect(listed).toEqual(EXPECTED)
+  })
+
+  it('filters the SDK defaults through the list, and never re-adds CultureContext or BrowserSession', () => {
+    expect(CLIENT).toMatch(/defaults\.filter\(/)
+    expect(CLIENT).toMatch(
+      /ALLOWED_INTEGRATIONS as readonly string\[\]\)\.includes\(integration\.name\)/,
+    )
+    const wiring = CLIENT.slice(CLIENT.indexOf('Sentry.init('))
+    expect(wiring).not.toMatch(
+      /cultureContextIntegration|browserSessionIntegration|defaultIntegrations/,
+    )
+  })
+})
+
 describe('main.ts', () => {
   it('calls initSentry after Pinia and before the router is installed', () => {
     const main = code(read('src/main.ts'))

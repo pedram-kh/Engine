@@ -13,7 +13,7 @@ vi.mock('@sentry/vue', async (importOriginal) => {
   return { ...actual, init: vi.fn(actual.init) }
 })
 
-import { startSentry } from '@/core/observability/sentryClient'
+import { ALLOWED_INTEGRATIONS, startSentry } from '@/core/observability/sentryClient'
 
 import { FAKE_DSN, startRecordingSentry, ULID, type Harness } from '../../helpers/sentryRecorder'
 
@@ -190,5 +190,34 @@ describe('options', () => {
     expect(names).not.toContain('Feedback')
     expect(names).toContain('Vue')
     expect(names).toContain('GlobalHandlers')
+  })
+
+  it('runs exactly the allowed integrations: no CultureContext, no BrowserSession', () => {
+    harness = startRecordingSentry()
+    const names = (Sentry.getClient()?.getOptions().integrations ?? []).map((i) => i.name)
+    expect([...names].sort()).toEqual([...ALLOWED_INTEGRATIONS].sort())
+    expect(names).not.toContain('CultureContext')
+    expect(names).not.toContain('BrowserSession')
+  })
+
+  it('an event carries no culture context (timezone, locale, calendar) and lists no BrowserSession', async () => {
+    harness = startRecordingSentry()
+    Sentry.captureException(new Error('boom'))
+    await harness.settled()
+    const event = harness.recorded.events[0]
+    expect(event?.contexts?.culture).toBeUndefined()
+    expect(event?.sdk?.integrations).not.toContain('CultureContext')
+    expect(event?.sdk?.integrations).not.toContain('BrowserSession')
+    expect(JSON.stringify(event)).not.toMatch(/timezone|calendar/i)
+  })
+
+  it('sends no session envelope: only event items reach the transport', async () => {
+    harness = startRecordingSentry()
+    Sentry.captureException(new Error('one'))
+    Sentry.captureException(new Error('two'))
+    await harness.settled(2)
+    await Sentry.flush(1000)
+    expect(harness.recorded.itemTypes.length).toBeGreaterThan(0)
+    expect(harness.recorded.itemTypes.every((type) => type === 'event')).toBe(true)
   })
 })

@@ -17,6 +17,8 @@ export const ULID = '01HZX3K9Q5M7R2T8V4W6Y0A1B2'
 export interface Recorded {
   readonly events: Array<Record<string, any>>
   readonly headers: Array<Record<string, any>>
+  /** The type of every envelope item the transport was handed (`event`, `session`, ...). */
+  readonly itemTypes: string[]
 }
 
 export interface Harness {
@@ -30,7 +32,7 @@ export interface Harness {
 }
 
 export function startRecordingSentry(overrides: Record<string, unknown> = {}): Harness {
-  const recorded: Recorded = { events: [], headers: [] }
+  const recorded: Recorded = { events: [], headers: [], itemTypes: [] }
   const user = ref<SentryUserState>({ id: null, type: null })
   const app = createApp({ render: () => null })
   const router = createRouter({
@@ -49,6 +51,7 @@ export function startRecordingSentry(overrides: Record<string, unknown> = {}): H
         send: async (envelope: any) => {
           recorded.headers.push(envelope[0])
           for (const item of envelope[1]) {
+            recorded.itemTypes.push(item[0].type)
             if (item[0].type === 'event') {
               recorded.events.push(item[1])
             }

@@ -57,6 +57,26 @@ describe('URLs lose query and fragment', () => {
     }
   })
 
+  it('strips the main SPA /impersonation/claim#token= URL everywhere it can appear', () => {
+    const url = 'http://127.0.0.1:5173/impersonation/claim#token=TESTTOKEN123'
+    const out = scrub({
+      request: { url },
+      transaction: '/impersonation/claim#token=TESTTOKEN123',
+      message: `claim failed at ${url}`,
+      breadcrumbs: [
+        {
+          category: 'navigation',
+          data: { from: '/', to: '/impersonation/claim#token=TESTTOKEN123' },
+        },
+      ],
+    })
+    expect(out.request.url).toBe('http://127.0.0.1:5173/impersonation/claim')
+    expect(out.transaction).toBe('/impersonation/claim')
+    expect(out.message).toBe('claim failed at http://127.0.0.1:5173/impersonation/claim')
+    expect(out.breadcrumbs[0].data).toEqual({ from: '/', to: '/impersonation/claim' })
+    expect(JSON.stringify(out)).not.toContain('TESTTOKEN123')
+  })
+
   it('strips them from URLs embedded in free text too', () => {
     const out = scrub({
       message:

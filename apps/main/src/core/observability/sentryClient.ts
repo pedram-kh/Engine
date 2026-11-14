@@ -39,6 +39,26 @@ export interface SentryStartOptions {
   readonly overrides?: Partial<BrowserOptions>
 }
 
+/**
+ * The ONLY integrations a client may run. The SDK's defaults are filtered through this
+ * list, so a default added by a future SDK version is dropped, not silently enabled.
+ * Left out on purpose: `CultureContext` (timezone is coarse location, the same reason
+ * the org rule removes geo) and `BrowserSession` (session tracking is ruled off).
+ * Pinned by `sentry-source-inspection.spec.ts` and by a runtime check.
+ */
+export const ALLOWED_INTEGRATIONS = [
+  'InboundFilters',
+  'FunctionToString',
+  'ConversationId',
+  'BrowserApiErrors',
+  'Breadcrumbs',
+  'GlobalHandlers',
+  'LinkedErrors',
+  'Dedupe',
+  'HttpContext',
+  'Vue',
+] as const
+
 /** `user_type` tag values (B1/B2): a role class, never personal data. */
 const USER_TYPE_TAG: Record<SentryUserType, string | undefined> = {
   creator: 'creator',
@@ -79,7 +99,13 @@ export function startSentry(options: SentryStartOptions): boolean {
     environment: options.environment,
     sendDefaultPii: false,
     attachProps: false,
-    integrations: [
+    integrations: (defaults) => [
+      ...defaults.filter(
+        (integration) =>
+          (ALLOWED_INTEGRATIONS as readonly string[]).includes(integration.name) &&
+          integration.name !== 'Breadcrumbs' &&
+          integration.name !== 'GlobalHandlers',
+      ),
       Sentry.breadcrumbsIntegration({
         console: false,
         dom: false,
