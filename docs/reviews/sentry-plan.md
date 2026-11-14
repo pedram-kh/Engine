@@ -29,7 +29,7 @@ This revision applies Pedram's approval of the first draft. Section A is unchang
 | Q7  | Scrubber **mirrored in each SPA** with a **parity architecture test**.                                                                                                                                             |
 | Q8  | Erasure namespace: **class and frames, no message.**                                                                                                                                                               |
 | Q9  | Purpose: **App Functionality.** Bump **Android `versionCode` together with iOS.**                                                                                                                                  |
-| Q10 | The **DPA is accepted before the first real DSN is set anywhere.** **Not yet accepted.**                                                                                                                           |
+| Q10 | The **DPA is accepted before the first real DSN is set anywhere.** **Accepted by Pedram (reported, 2026-11-13); gate 0 closed.**                                                                                   |
 | Q11 | **Sentry Crons deferred to its own AH.** A tech-debt row records the weak `/up`.                                                                                                                                   |
 
 ### R2. Changes to the plan (Pedram's list, with where each lands)
@@ -269,7 +269,7 @@ Chunk order (each independently green; this plan, once approved, becomes the kic
 
 **Order: gates, then API, then web (with AH-122), then the phone (build 6).** Two gates before any real DSN exists anywhere:
 
-- **Gate 0, the DPA (Q10):** accepted in the Sentry org by Pedram. **Not yet accepted.** Until it is, no DSN is set on the box, in Netlify or on the Mac.
+- **Gate 0, the DPA (Q10):** accepted in the Sentry org by Pedram (**reported**, 2026-11-13). **Closed.** (The catalyst-app DSN was used locally for the C0 spike only, then removed from the local file, reported 2026-11-14.)
 - **Gate 1, the repo docs (C4):** the docs in B6 are merged. The **public web notice** is a separate, later gate: **text sent to Jordan, publication not read**; it does **not** block the API and web DSNs; it **does** block App Store submission of build 6.
 
 | #   | What                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Who                                                                                  | Notes                                                                                                                                |
@@ -294,22 +294,64 @@ Chunk order (each independently green; this plan, once approved, becomes the kic
 
 **Still open or to be recorded (none blocks writing C0):**
 
-1. **DPA acceptance (Q10): not yet accepted.** Blocks every real DSN (gate 0). Owner: Pedram.
+1. ~~DPA acceptance (Q10)~~ **Closed: accepted, reported 2026-11-13.**
 2. **Retention figure:** the pricing page says 30 days on the free plan (reported); the org settings value is **not read**. The notice and `account-erasure.md` §7 wait for the read figure. Owner: Pedram.
 3. **Trial:** 14 days, no paid plan chosen. What the free plan keeps (uptime monitor, retention) after the trial is not read. Owner: Pedram.
 4. **Org settings not read back:** Enhanced Privacy, Allow Shared Issues, Global Sensitive Fields; and each project's IP-address setting. Owner: Pedram.
 5. **Public web notice:** text sent to Jordan; publication **not read**. Blocks App Store submission of build 6, not the API and web DSNs.
-6. **Xcode:** 26.0 per the toolchain record; **re-confirm before C0** (`xcodebuild -version` is part of the spike).
+6. ~~Xcode~~ **Read in C0: 27.2** at `/Applications/Xcode.app` (the active developer dir is CommandLineTools, so builds need `DEVELOPER_DIR`). The toolchain record's 26.0 is out of date.
 7. **Which free external monitor service** for the two web origins. Owner: Pedram.
 8. **The `impersonated` tag** (B2): a small addition of mine; keep or drop.
 9. **Whether `/` on each web origin returns 200 or a redirect:** not read; checked when the monitors are created.
+
+## D. C0 spike results (2026-11-14, scratch branch `spike/ah-121-c0`, never pushed, now deleted)
+
+PROD-DATA RISK: NONE (no production data touched). The catalyst-app DSN was used locally only and removed afterwards (reported by Pedram).
+
+### D1. Stage 1 (no real DSN), each step pass / fail / not read
+
+| Step                                                                                  | Result                                                                                                                                                                                                  |
+| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm install` `@sentry/capacitor 4.5.0` + `@sentry/vue 10.76.2`                      | pass                                                                                                                                                                                                    |
+| `vue-tsc` + `vite build --mode native-development`                                    | pass after two type fixes: the Vue app goes in `siblingOptions.vueOptions` and needs `attachProps` and `attachErrorHandler`; 4.5.0's options type has **no** `attachScreenshot` / `attachViewHierarchy` |
+| `cap sync ios`                                                                        | pass                                                                                                                                                                                                    |
+| SPM resolve                                                                           | pass; `sentry-apple-binaries` 9.28.0                                                                                                                                                                    |
+| iOS Simulator build, install, launch                                                  | pass                                                                                                                                                                                                    |
+| SDK initialises (native `initNativeSdk`, `setUser`, `setTag` reached)                 | pass                                                                                                                                                                                                    |
+| JS event reaches `beforeSend` with user keys `["id"]`, no `?` or `#` in `request.url` | pass, **with a fake localhost DSN**: without any DSN `beforeSend` never runs                                                                                                                            |
+| Unsigned generic-iOS Release archive                                                  | pass, 21 s, no strain                                                                                                                                                                                   |
+| Android                                                                               | **not read** (no JDK, no Android SDK on this Mac)                                                                                                                                                       |
+
+- **Package.swift diff:** one `.package(name: "SentryCapacitor", path: ...)` and one `.product(name: "SentryCapacitor", ...)` line; nothing else changed. **Package.resolved diff:** one new pin, `sentry-apple-binaries` 9.28.0, revision `71ed5066fa7b5b1f54ac72c6bc8666cbf80d54dd`. **Symlink entry for the plugin: not needed.**
+- **`PrivacyInfo.xcprivacy` in the archive:** `Frameworks/Sentry.framework` (Sentry embeds as a dynamic framework), `Capacitor.framework`, `Cordova.framework`, the Firebase and GoogleUtilities, GoogleDataTransport, nanopb and FBLPromises bundles. `SentryCapacitor` ships none of its own.
+- **Plan facts learned:** (a) the plugin initialises the native SDK first and creates the JS client afterwards, so an error captured synchronously after `init` is **dropped**; the real integration must tolerate or await that. (b) The plugin path in `Package.swift` contains a pnpm peer-set hash (`...typescrip_80108a8e3fed2064556ea5fdf00f3e43`) that can change on any dependency change; `cap sync` must be re-run and the diff reviewed after every install. (c) The plugin's postinstall (`check-siblings.js`) is ignored by pnpm's build-script approval. (d) `dataCollection` is JS-only; natively only `userInfo` is bridged as `sendDefaultPii`.
+
+### D2. Stage 2 (real DSN, simulator), checked from the raw JSON Pedram exported
+
+- **JS event 1:** user block `id` only; no email, username, ip_address, token, cookie or request block. **`user.geo` was present** (ES, Madrid), derived by Sentry at ingest. **PASS on the ruling, geo finding below.**
+- **Geo rule:** Pedram set an organisation-level Advanced Data Scrubbing rule, Remove / Anything / `$user.geo.**` (**set by Pedram, reported**, 2026-11-14); it covers all four projects. Sentry derives geo from the IP even with "Prevent Storing of IP Addresses" on (Sentry docs; getsentry/sentry#92201), so the rule is the only control found. An organisation rule overrides project rules.
+- **JS event 2 (`028d2eac…`): PASS.** `user.geo` values null; `_meta` shows removal by the organisation rule. Geo is closed for all four projects; **re-check once per project when its DSN first goes live.**
+- **Native crash (`7f738fda…`, EXC_BAD_ACCESS, mechanism mach, sdk `sentry.cocoa.capacitor` 9.28.0): ARRIVED.** No email, username, ip_address, token, cookie or request block. Its `geo` predates the rule.
+- Not findings: `/Users/pedram` paths in image paths (simulator only); missing dSYMs (expected in the spike).
+
+### D3. Findings, to fix in the real integration (none fixed in the spike)
+
+1. **Native crash user id is an install id, not the ulid.** `user.id` on the crash was an install UUID (`5E415BF1-…`) although the `user_type` tag synced. Cause **not read** (either the native user scope is not persisted for crash reports, or the SDK's install-id fallback). Find why; native crashes must carry the **ulid only, or no user**, never an install id. **Proof: a native crash test in C3.**
+2. **Native integrations list contains SessionReplay, NetworkTracking, AutoSessionTracking and Crash.** The rulings say replay off and no session tracking. Disable each explicitly in the native options; **proof: the integrations list on a test event excludes them, and no session envelopes are sent.**
+3. **Breadcrumbs.** A console breadcrumb (category `console`, with arguments) was recorded, and the navigation breadcrumb carried a query string (`to: "/sign-in?redirect=/"`). Console breadcrumbs off on the native path too; the breadcrumb scrubber applies to breadcrumbs synced to native. **The SPA scrubber must strip query and fragment from breadcrumb `data.from` and `data.to` as well as from URLs; add the exact case `/sign-in?redirect=/` to the scrubber tests, with break-revert (B7).**
+4. **Device hash in the event (`app.device` / `device_app_hash`).** The store label's Device ID row (`docs/store/app-privacy-answers.md:26`) lists only the Firebase push token and installation id. **Add the Sentry device hash to that row** (purpose App Functionality) before submission. What the hash is derived from: **not read**.
+5. **Geo:** keep the organisation rule; add the per-project first-live re-check as a gate in B9.
+
+### D4. Cleanup (reported by the assistant, read from git and the file system)
+
+DSN-bearing build outputs deleted and the pre-spike copies restored; branch deleted with `-D`; `main` untouched (clean status, empty diff, HEAD `29de43834fb02aa59c6bbc22fdfd3f024cc7204d` before this docs commit); `pnpm install --frozen-lockfile` re-run. Orphaned `@sentry/*` folders remain in the ignored `node_modules/.pnpm` store (not linked, harmless). The local env file's DSN line was removed by Pedram; the assistant did not read the file's contents.
 
 ## Not verified (so nobody reads these as checked)
 
 - Everything labelled **(memory)**: SDK defaults (breadcrumbs, request body, IP and install-id behaviour, empty-DSN behaviour), Sentry EU host names, Sentry's uptime feature and what the free plan keeps, Apple's category and purpose wording, the Sentry manifest contents.
 - Everything labelled **(registry)** was read from npm, Packagist and unpkg on 2026-11-13 and can move: `@sentry/capacitor 4.5.0` (peers and Swift package as quoted), `@sentry/vue 11.12.0` latest, `sentry/sentry-laravel 4.30.0`.
 - Everything labelled **reported** (R3) came from Pedram or the colleague; the assistant read nothing from Sentry, Netlify, the box or a device. Production `LOG_*`, `config:cache` state, the supervisor files and the Netlify build log: **not read**.
-- No package was installed, no build run, no `cap sync`, no test run. The Capacitor 8 and SPM claims rest on the registry's `Package.swift` and are **proved only by the C0 spike**.
+- C0 (section D) proved on **iOS only**: install, build, `cap sync`, SPM resolve, simulator launch, archive, a JS event and a native crash. **Not read:** Android, a physical device, a signed archive, TestFlight or App Store processing, dSYM upload, source-map upload, and the plan's API and SPA chunks (nothing of those was built).
 - Engineering input, not legal advice. In particular the erased-user statement in B6 is an **engineering view, not legal advice**.
 
 _Provenance: drafted by Cursor (read-only inventory and plan), 2026-11-13; revision 2 applies Pedram's approval and rulings of the same day. Not yet reviewed by Claude._
