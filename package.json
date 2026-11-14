@@ -52,6 +52,7 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
+      "@sentry/cli",
       "esbuild",
       "sharp",
       "vue-demi"

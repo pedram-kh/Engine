@@ -4,6 +4,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import { resolveBootLocale } from './composables/useLocalePreference'
 import { sessionExpiredLocation } from './core/api'
+import { initSentry } from './core/observability/initSentry'
 import { router } from './core/router'
 import { i18n, setLocale } from './core/i18n'
 import { startAppResumeRefresh } from './core/platform/appResume'
@@ -29,6 +30,10 @@ import '@catalyst/design-tokens/tokens.css'
 const app = createApp(App)
 
 app.use(createPinia())
+
+// AH-121 C2: Sentry (errors only). A no-op without VITE_SENTRY_DSN_MAIN: no init, nothing sent.
+// After Pinia (the user comes from the auth store), before the router is installed.
+initSentry(app, router)
 
 // AH-103d: creator app only (a no-op on the web) — decide, before the router's first
 // navigation can read the token, whether this is a reinstall (iOS keeps the Keychain

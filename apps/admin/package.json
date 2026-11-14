@@ -6,7 +6,7 @@
   "description": "Catalyst Engine — admin SPA (super-admin only)",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
+    "build": "vue-tsc --noEmit && vite build && node scripts/check-no-sourcemaps.mjs",
     "preview": "vite preview --port 5174",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -22,6 +22,7 @@
     "@catalyst/design-tokens": "workspace:*",
     "@catalyst/ui": "workspace:*",
     "@mdi/font": "^7.4.47",
+    "@sentry/vue": "10.76.2",
     "pinia": "^2.3.0",
     "vue": "^3.5.13",
     "vue-i18n": "^10.0.5",
@@ -30,6 +31,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.49.1",
+    "@sentry/vite-plugin": "5.4.1",
     "@types/node": "^22.10.5",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vitest/coverage-v8": "^2.1.9",

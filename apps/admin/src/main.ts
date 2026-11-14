@@ -3,6 +3,7 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import { resolveBootLocale } from './composables/useLocalePreference'
+import { initSentry } from './core/observability/initSentry'
 import { router } from './core/router'
 import { i18n, setLocale } from './core/i18n'
 import { vuetify } from './plugins/vuetify'
@@ -16,6 +17,10 @@ import '@catalyst/design-tokens/tokens.css'
 const app = createApp(App)
 
 app.use(createPinia())
+
+// AH-121 C2: Sentry (errors only). A no-op without VITE_SENTRY_DSN_ADMIN: no init, nothing sent.
+// After Pinia (the user comes from the auth store), before the router is installed.
+initSentry(app, router)
 app.use(router)
 app.use(i18n)
 app.use(vuetify)

@@ -4,6 +4,8 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
 
+import { defaultGit, resolveRelease, sentryBuildSettings } from './tools/sentryBuild'
+
 /**
  * The admin Vite dev server's `/api` + `/sanctum` proxy target. Defaults
  * to the canonical Laravel dev server port (8000) so `pnpm dev` works
@@ -74,8 +76,26 @@ const vuetifyComponents = [
   'VSkeletonLoader',
 ].map((name) => `vuetify/components/${name}`)
 
+// AH-121 C2: release name from tree hashes (or SENTRY_RELEASE), and hidden source
+// maps + upload only when SENTRY_AUTH_TOKEN is present. See tools/sentryBuild.ts.
+const sentryRelease = resolveRelease(
+  'admin',
+  process.env,
+  defaultGit(fileURLToPath(new URL('.', import.meta.url))),
+)
+if (sentryRelease.warning !== null && process.env.VITEST === undefined) {
+  console.warn(sentryRelease.warning)
+}
+const sentryBuild = sentryBuildSettings(
+  sentryRelease.release,
+  process.env,
+  fileURLToPath(new URL('./dist/**/*.map', import.meta.url)),
+)
+
 export default defineConfig({
-  plugins: [vue(), vuetify({ autoImport: true })],
+  plugins: [vue(), vuetify({ autoImport: true }), ...sentryBuild.plugins],
+  define: { __SENTRY_RELEASE__: JSON.stringify(sentryRelease.release) },
+  build: { sourcemap: sentryBuild.sourcemap },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
