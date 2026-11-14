@@ -32,11 +32,7 @@ Local development never reads from Secrets Manager. Dev `.env` files use mock or
 
 ### Observability
 
-| Secret path                        | Contents |
-| ---------------------------------- | -------- |
-| `catalyst/${env}/api/sentry`       | `dsn`    |
-| `catalyst/${env}/spa-main/sentry`  | `dsn`    |
-| `catalyst/${env}/spa-admin/sentry` | `dsn`    |
+**Not used for Sentry (corrected 2026-11-15, AH-121 C4).** The three `sentry` secret paths this section used to list are not where the DSNs are read from. Whether those secrets exist: **not read**. As built, the API DSN is in the box's `.env`, the two web DSNs are in the Netlify site env (colleague-owned), and the phone DSN is in the gitignored `apps/main/.env.native-production` on Pedram's Mac. See [`infra/sentry/README.md`](../sentry/README.md). Whether this Secrets Manager structure exists at all is **not read** (`docs/services.md` says "Confirm").
 
 ### Infrastructure runtime
 
@@ -54,13 +50,13 @@ ECS task definitions inject secrets as environment variables via the task's `sec
 
 ### From SPAs (main / admin)
 
-SPAs do not read from Secrets Manager directly. Build-time values (`VITE_SENTRY_DSN_*`) are injected into the GitHub Actions runner from Secrets Manager and passed to `vite build` as env vars. These values are baked into the static bundle.
+SPAs do not read from Secrets Manager directly. Build-time values are baked into the static bundle. (The Sentry DSNs, `VITE_SENTRY_DSN_*`, are set in the Netlify site env, not injected from Secrets Manager: see `infra/sentry/README.md`.)
 
 ## Rotation
 
 - Postgres credentials: rotated automatically by RDS (30-day cycle).
 - Stripe / OAuth / KYC / e-sign keys: rotated manually on a 90-day cadence (on-call playbook in Phase 2).
-- Sentry DSNs: not rotated; revoked and replaced on incident.
+- Sentry DSNs: not rotated; revoked and replaced on incident (not in Secrets Manager, see above). The instant switch is disabling the project's client key in Sentry.
 
 ## Auditing
 

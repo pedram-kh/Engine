@@ -61,6 +61,7 @@ Baseline (C3, plugin 4.5.0 + sentry-cocoa 9.28.0 + the patch):
 - `sdk.integrations`: `SessionReplay`, `Crash` (replay listed but inert: rates 0, `onErrorSampleRate == 0` skips the start; `_dsc.replay_id` null). `features`: `experimentalViewRenderer`, `dataSwizzling`.
 - Breadcrumbs: 7, all origin `capacitor` (5 `xhr`, 2 `navigation`), no query strings. None of `ui.lifecycle`, `device.event`, `http`; no `firebase` or `fcmtoken` string anywhere.
 - `user`: `{id: <ulid>}` only; `user_type` tag; no email, no name, no IP; `release` `<bundle id>@<version>+<build>`, `dist` = build.
+- `contexts.device.locale` is present (`en_US@rg=eszzzz`: language plus region) and **is declared** in the privacy texts as "the device's language and region setting". **No `timezone` field** in either native export (`5878a46c…` and `92a8a649…`, searched by Claude, reported 2026-11-15; two events, one build). A `timezone` appearing after an upgrade is a finding: the texts claim none.
 - Signed out: `user.id` `signed-out`, never a UUID.
 
 ## Not covered here

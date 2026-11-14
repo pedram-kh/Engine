@@ -89,7 +89,7 @@ Required with every processor:
 - KYC vendor (Persona / Veriff / Onfido — TBD)
 - E-sign vendor (DocuSign / Dropbox Sign — TBD)
 - Email provider
-- Sentry (error tracking)
+- Sentry (error tracking): **accepted by Pedram, reported 2026-11-13**; the registry row is in `docs/compliance/dpa-registry.md` (legal review: not recorded there)
 - AWS (infrastructure provider — DPA via AWS GDPR DPA)
 - Product analytics tool
 
@@ -412,7 +412,7 @@ The Laravel `APP_KEY` is the encryption master. It is stored in AWS Secrets Mana
 - Secrets rotate on a schedule (annually minimum; immediately if compromised).
 - Pre-commit hook (`gitleaks` or similar) scans for accidentally committed secrets.
 - CI pipeline fails on detected secrets.
-- Sentry, CloudWatch, etc. configured to redact known secret patterns.
+- Sentry is configured to redact (AH-121, built and trial-checked 2026-11-14, `docs/reviews/sentry-plan.md`): a scrubber on every surface removes emails, bearer and Sanctum-shaped tokens, secret-named query and form pairs, query strings and fragments, request bodies, cookies and auth headers; database exceptions send class and SQLSTATE only; the erasure namespace sends class and frames, no message; the user block holds the ulid only. The org also has Require Data Scrubber, Require Default Scrubbers and Prevent Storing of IP Addresses on, and an organisation rule removing `$user.geo` (all reported by Pedram). CloudWatch held no copy as of the 2026-10-20 production read-back (`account-erasure.md` §7). Org settings read back: Enhanced Privacy, Allow Shared Issues, Global Sensitive Fields: **not read**.
 
 ---
 
@@ -709,7 +709,7 @@ Application logs MUST NOT contain:
 - OAuth access/refresh tokens
 - Email body contents (subject and addresses ok)
 
-Laravel's logger and Sentry SDK are configured to redact known sensitive patterns. Cursor never adds `Log::info($creditCard)` or similar; reviews catch this.
+Laravel's logger is configured to redact known sensitive patterns, and the Sentry SDK is configured with a scrubber that does so on every surface (see §5.4; built in AH-121, proven on trial events, not yet on production traffic). Cursor never adds `Log::info($creditCard)` or similar; reviews catch this.
 
 When debugging requires logging sensitive data, use a temporary local debugger, not production logs.
 

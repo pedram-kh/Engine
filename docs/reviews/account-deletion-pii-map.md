@@ -305,3 +305,15 @@ Not a plan. Only the invariants the plan must then satisfy: (1) a **registry** o
 Pest spec that reads the schema, so a future migration that adds a table or a PII-shaped column fails CI until classified (the same shape as the payment-state
 spec you asked for); (2) the dry-run prints, per table and per predicate, what would change; (3) the command is idempotent and refuses without a subject set; (4) agency-facing
 resources emit an `is_erased` flag and never an English label.
+
+---
+
+## Post-close addendum (2026-11-15, AH-121 C4): Sentry / error tracking, §6 row and §8
+
+This review is closed; §6 and §8 above are left as written. **The §6 row "Sentry / error tracking: Identity sent not traced: Not verified" is superseded.** What is now known, from the AH-121 build and trials (`docs/reviews/sentry-plan.md` B6, D2, D7, D8):
+
+- **What is sent:** an event keyed to `users.ulid` (the only user field) with a `user_type` tag (`creator`, `agency`, `admin`), device model, OS and app version, and error text with personal details removed. No email, name, IP, cookie or token; no session tracking or replay. Signed-out events carry no user id (the phone sends the fixed string `signed-out`).
+- **Needed at erasure: nothing is built, by design.** The ulid is the pseudonymous key that survives erasure (§3, the `users` anchor row), every identifying column is anonymised, so after erasure the reference identifies nobody we hold. `ErasureRegistry` gains no external-party step. **Engineering view, not legal advice;** counsel decides whether an erased account's reference in a processor's logs needs more.
+- **Residue:** error text that slipped past the scrubber, kept until Sentry's retention ends: **30 days on the free plan per the pricing page (reported); the org setting was not read.** Remedy if found: Sentry's per-issue "delete and discard", noted in the incident log.
+- **Still not verified here:** production events (nothing real has been sent from production: no production DSN is set as of this entry); the org retention setting; Enhanced Privacy and Global Sensitive Fields read-back.
+- The operational text is in `docs/runbooks/account-erasure.md` §7.

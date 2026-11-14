@@ -31,7 +31,7 @@ See [`docs/SPRINT-0-MANUAL-STEPS.md`](../../docs/SPRINT-0-MANUAL-STEPS.md) Batch
 - All resources tagged with `Environment`, `Project = catalyst-engine`, `ManagedBy = terraform`, `Owner` (team email), and `CostCenter`.
 - Resource names prefixed with `catalyst-${var.environment}` (e.g., `catalyst-staging-rds-postgres`).
 - Secrets are **never** stored in `*.tf` or `*.tfvars`. They live in AWS Secrets Manager — see [`infra/aws-secrets-manager/README.md`](../aws-secrets-manager/README.md). Terraform reads them via `data "aws_secretsmanager_secret_version"` when needed.
-- Sentry DSNs and similar non-secret operational values live in SSM Parameter Store with the path layout in [`infra/sentry/README.md`](../sentry/README.md).
+- Sentry DSNs are **not** in SSM Parameter Store or Terraform: the API DSN is in the box's `.env`, the web DSNs in the Netlify site env, the phone DSN in a gitignored file on Pedram's Mac (corrected 2026-11-15, AH-121 C4; see [`infra/sentry/README.md`](../sentry/README.md)). Other non-secret operational values may live in SSM Parameter Store.
 
 ## Style
 

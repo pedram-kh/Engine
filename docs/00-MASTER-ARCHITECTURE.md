@@ -282,7 +282,7 @@ In Phase 1 with a solo developer, "account structure" can start as production + 
 ### Application logs
 
 - **Structured JSON logs** to CloudWatch.
-- **Sentry** for errors and exceptions, separate DSN for backend / main SPA / admin SPA.
+- **Sentry** (EU region) for errors and exceptions only, **four projects with four DSNs**: API, main SPA, admin SPA and the phone app. Errors only; no tracing, profiling or session replay. User context is the account ulid and a user-type tag, nothing else about the person; every surface runs a scrubber. Releases are named by tree hash (the mirror rewrites SHAs). Alerts go to email only. See `06-INTEGRATIONS.md` §7 and `docs/reviews/sentry-plan.md`. **Not live in production until the AH-121 deploy.**
 - **Log retention:** 90 days hot, 1 year cold (S3), 7 years compliance archive (Glacier Deep Archive).
 
 ### Metrics & alerting
@@ -390,7 +390,7 @@ Detailed in `06-INTEGRATIONS.md`. Phase 1 integrations:
 | Contracts             | DocuSign or HelloSign            | E-signature for universal master contract    |
 | Social APIs           | Meta Graph, TikTok, YouTube Data | Profile verification, metrics, post tracking |
 | Email                 | Postmark or AWS SES              | Transactional email                          |
-| Error monitoring      | Sentry                           | Backend + both SPAs                          |
+| Error monitoring      | Sentry (EU), errors only         | Backend, both SPAs and the phone app         |
 | Product analytics     | TBD (Amplitude / PostHog)        | Funnel and retention                         |
 
 Each integration is wrapped in a service class. Direct vendor SDK usage is forbidden outside the service class. This makes vendor swaps possible and tests mockable.

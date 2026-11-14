@@ -429,21 +429,27 @@ A reasonable approach: AWS SES for bulk transactional (notifications, digests), 
 ### 7.1 Capabilities needed
 
 - Backend exception tracking (Laravel)
-- Frontend error tracking (both Vue SPAs)
+- Frontend error tracking (both Vue SPAs) and the phone app (iOS and Android, through Capacitor)
 - Source maps for stack traces
-- Performance monitoring (transaction tracing)
-- User context attached to errors (with PII redacted)
+- ~~Performance monitoring (transaction tracing)~~ **Off by ruling (AH-121): errors only.** No tracing, profiling, metrics, logs or session replay
+- User context attached to errors: the account ulid only (see 7.2)
 - Release tracking
 - EU data residency
 
+> **Rewritten 2026-11-15 (AH-121 C4) to what was built.** The original text said a project per environment per surface, user "ULID + role", and a release per commit SHA. Those were overridden by Pedram's rulings Q1, Q6 and Q3 (`docs/reviews/sentry-plan.md` R1). Retention and org settings: see "Not read" at the end of 7.2.
+
 ### 7.2 Configuration
 
-- **Project per environment per surface:** `catalyst-engine-api-prod`, `catalyst-engine-main-prod`, `catalyst-engine-admin-prod`. Same for staging.
-- **EU data region** explicitly chosen at Sentry org setup.
-- **PII redaction filters** configured: passwords, tokens, secrets, full credit cards, government IDs, KYC documents.
-- **User context** attached to events: user ULID + role (no email or name).
-- **Release tracking** via CI: every deploy registers a Sentry release with the commit SHA.
-- **Source maps uploaded** during build; not served publicly.
+- **Four projects, one per surface, with the `environment` tag; no staging project** (ruling Q6; overrides the earlier "project per environment"): `catalyst-api` (Laravel), `catalyst-main` (Vue), `catalyst-admin` (Vue), `catalyst-app` (Capacitor, the phone). Organisation slug `catalyst-engine`. **Errors only.**
+- **EU data region** chosen at org setup (reported). Org settings on (reported): Require Data Scrubber, Require Default Scrubbers, Prevent Storing of IP Addresses; plus an organisation Advanced Data Scrubbing rule removing `$user.geo.**` (set by Pedram; Sentry derives geo from the IP even with IP storing off).
+- **Scrubber on every surface** (the PHP scrubber in `apps/api`, mirrored in each SPA with a parity test): emails, tokens, secret-named pairs, query strings and fragments, request bodies, cookies and auth headers removed; `QueryException` sends class and SQLSTATE only; the erasure namespace sends class and frames, no message. Over-redacts on purpose.
+- **User context:** the user's **ulid as `user.id`, plus a `user_type` tag** (`creator`, `agency`, `admin`; none for `brand_user`). Never email, name, IP or token; the scrubber rebuilds the user block as `{id}`. Phone: a signed-out user is the fixed string `signed-out`, never the SDK's install id.
+- **Release tracking by content, not commit SHA** (the Bitbucket mirror rewrites SHAs): `catalyst-api@<tree12>`, `catalyst-main@<12 hex>`, `catalyst-admin@<12 hex>` from tree hashes; the phone is `com.catalystgrowth.platform@<version>+<build>` with `dist` = build. The API's `SENTRY_RELEASE` is written at deploy; the SPAs derive theirs at build time (`SENTRY_RELEASE` is only an override).
+- **Source maps:** built hidden **only when `SENTRY_AUTH_TOKEN` is present**, uploaded to the release and **deleted after upload**; the build fails if any `.map` is left in `dist` (and in the native `public` folders). **The upload with a real token has not been run** (`sentry-plan.md` D6).
+- **Where each DSN lives (not Secrets Manager, as built):** API in the box's `.env` (`SENTRY_LARAVEL_DSN`), set by the colleague; the two web DSNs (`VITE_SENTRY_DSN_MAIN`, `VITE_SENTRY_DSN_ADMIN`) and `SENTRY_AUTH_TOKEN` in the Netlify site env, set by the colleague; the phone DSN (`VITE_SENTRY_DSN_APP`) in the gitignored `apps/main/.env.native-production` on Pedram's Mac. An empty DSN sends nothing on every surface. Pedram supplies values privately, never in chat or the repo.
+- **Alerts:** email to Pedram only, rules created after a week of volume. No Slack, no PagerDuty (not built). Uptime: Sentry's one included monitor on the API `/up`; the two web origins on one free external monitor service (not chosen yet).
+- **Session replay, session tracking, tracing, profiling, user feedback and the logs product are all off**, pinned by source-inspection tests. The phone's native SDK needed a patch of `@sentry/capacitor` to switch its defaults off (`docs/runbooks/native-sentry.md`).
+- **Not read:** the retention figure in the org settings (the pricing page says 30 days on the free plan, reported; the 14-day trial has no paid plan chosen); Enhanced Privacy, Allow Shared Issues and Global Sensitive Fields; what the free plan keeps after the trial; Android; production traffic (no production DSN is set as of 2026-11-15). Privacy texts: `docs/store/`; DPA: `docs/compliance/dpa-registry.md`.
 
 Sentry is the standard. Only swap if pricing becomes prohibitive (Phase 4+ scale).
 
@@ -574,16 +580,16 @@ Phase 1 doesn't need to define these contracts in detail — but `app/Core/Searc
 
 A living document in `docs/integrations/vendor-decisions.md` (created during Phase 1) tracks:
 
-| Capability        | Status   | Vendor                      | Decided    | Notes |
-| ----------------- | -------- | --------------------------- | ---------- | ----- |
-| Payments          | Selected | Stripe Connect              | YYYY-MM-DD |       |
-| KYC               | Open     | TBD (likely Veriff)         |            |       |
-| E-sign            | Open     | TBD (likely Dropbox Sign)   |            |       |
-| Email             | Open     | TBD (likely SES + Postmark) |            |       |
-| Error monitoring  | Selected | Sentry (EU)                 | YYYY-MM-DD |       |
-| Product analytics | Open     | TBD (likely PostHog EU)     |            |       |
-| Cookie consent    | Open     | Self-built or Iubenda       |            |       |
-| Tax validation    | Built-in | VIES + HMRC                 | YYYY-MM-DD |       |
+| Capability        | Status   | Vendor                      | Decided    | Notes                                                                                                  |
+| ----------------- | -------- | --------------------------- | ---------- | ------------------------------------------------------------------------------------------------------ |
+| Payments          | Selected | Stripe Connect              | YYYY-MM-DD |                                                                                                        |
+| KYC               | Open     | TBD (likely Veriff)         |            |                                                                                                        |
+| E-sign            | Open     | TBD (likely Dropbox Sign)   |            |                                                                                                        |
+| Email             | Open     | TBD (likely SES + Postmark) |            |                                                                                                        |
+| Error monitoring  | Selected | Sentry (EU)                 | 2026-11-13 | Org and four projects created; DPA accepted (reported). Not live in production until the AH-121 deploy |
+| Product analytics | Open     | TBD (likely PostHog EU)     |            |                                                                                                        |
+| Cookie consent    | Open     | Self-built or Iubenda       |            |                                                                                                        |
+| Tax validation    | Built-in | VIES + HMRC                 | YYYY-MM-DD |                                                                                                        |
 
 When a vendor is chosen, this table is updated, the adapter is implemented, and tests are added.
 

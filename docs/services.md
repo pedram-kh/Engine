@@ -51,11 +51,11 @@ running. The spec's risk table puts all of them in Sprint 0.
 Real-vendor work to **staging** depends on these. If any weren't done in Sprint 0, they gate the
 moment you switch a flag from `mock` to a real driver.
 
-| Item                                                    | Spec source         | State   | Blocks                                                                                                                   |
-| ------------------------------------------------------- | ------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------ |
-| **Sentry projects** (×3: api / main / admin, EU region) | Sprint 0 acceptance | Confirm | Error monitoring on staging/prod; not core-flow blocking                                                                 |
-| **AWS Secrets Manager** structure                       | Sprint 0 acceptance | Confirm | _Every_ real vendor credential lives here (`06-INTEGRATIONS` §1.2). Hard prerequisite for any real adapter beyond local. |
-| **AWS environments** (eu-central-1 staging + prod)      | Sprint 0 acceptance | Confirm | Anywhere a real vendor is exercised outside your laptop                                                                  |
+| Item                                                          | Spec source         | State                                                                     | Blocks                                                                                                                                                             |
+| ------------------------------------------------------------- | ------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Sentry projects** (×4: api / main / admin / app, EU region) | Sprint 0 acceptance | **Created 2026-11-13 (reported by Pedram); no DSN set in production yet** | Error monitoring; not core-flow blocking. Org `catalyst-engine`, 14-day trial, errors only; DPA accepted (reported). Deploy: `docs/runbooks/deploy-ah121-ah122.md` |
+| **AWS Secrets Manager** structure                             | Sprint 0 acceptance | Confirm                                                                   | _Every_ real vendor credential lives here (`06-INTEGRATIONS` §1.2). Hard prerequisite for any real adapter beyond local.                                           |
+| **AWS environments** (eu-central-1 staging + prod)            | Sprint 0 acceptance | Confirm                                                                   | Anywhere a real vendor is exercised outside your laptop                                                                                                            |
 
 ---
 
@@ -181,21 +181,21 @@ Locked Sprint 4 = full scope, dependency-ordered. Service touchpoints per chunk:
 (Mirrors `06-INTEGRATIONS.md` §12 — keep this updated as decisions land; this table is the
 living `vendor-decisions.md` the spec asks for.)
 
-| Capability        | Status       | Vendor                             | Sandbox/keys           | Lead-time action                                      |
-| ----------------- | ------------ | ---------------------------------- | ---------------------- | ----------------------------------------------------- |
-| Payments          | Decided      | Stripe Connect (Express)           | ❌ test keys pending   | Connect application — **start now**                   |
-| KYC               | **Open**     | TBD (lean Veriff)                  | ❌                     | Select, then sandbox                                  |
-| E-sign            | **Open**     | TBD (lean Dropbox Sign)            | ❌                     | Select, then sandbox                                  |
-| Email             | **Open**     | TBD (lean SES + Postmark)          | ❌                     | Select + verify domain (Sprint 4 relevant)            |
-| Social — Meta     | Platform set | Meta Graph / IG Graph              | ❌                     | **App review — start now**                            |
-| Social — TikTok   | Platform set | TikTok Login Kit                   | ❌                     | **App review — start now**                            |
-| Social — YouTube  | Platform set | Google OAuth                       | ❌                     | Consent-screen verification                           |
-| Error monitoring  | Decided      | Sentry (EU)                        | Confirm projects exist | Sprint-0 item — confirm                               |
-| Product analytics | Open         | TBD (lean PostHog EU)              | ❌                     | Defer                                                 |
-| Cookie consent    | Decided      | Self-built (Iubenda fallback)      | n/a                    | Pre-launch                                            |
-| Tax validation    | Built-in     | VIES + HMRC                        | n/a (free)             | Confirm live calls wired                              |
-| Secrets / cloud   | Foundation   | AWS Secrets Manager + eu-central-1 | Confirm                | Sprint-0 item — confirm                               |
-| Push              | Decided      | Firebase Cloud Messaging (v1)      | ❌ project not created | Firebase project + owning Google account — **Pedram** |
+| Capability        | Status       | Vendor                             | Sandbox/keys                              | Lead-time action                                      |
+| ----------------- | ------------ | ---------------------------------- | ----------------------------------------- | ----------------------------------------------------- |
+| Payments          | Decided      | Stripe Connect (Express)           | ❌ test keys pending                      | Connect application — **start now**                   |
+| KYC               | **Open**     | TBD (lean Veriff)                  | ❌                                        | Select, then sandbox                                  |
+| E-sign            | **Open**     | TBD (lean Dropbox Sign)            | ❌                                        | Select, then sandbox                                  |
+| Email             | **Open**     | TBD (lean SES + Postmark)          | ❌                                        | Select + verify domain (Sprint 4 relevant)            |
+| Social — Meta     | Platform set | Meta Graph / IG Graph              | ❌                                        | **App review — start now**                            |
+| Social — TikTok   | Platform set | TikTok Login Kit                   | ❌                                        | **App review — start now**                            |
+| Social — YouTube  | Platform set | Google OAuth                       | ❌                                        | Consent-screen verification                           |
+| Error monitoring  | Decided      | Sentry (EU)                        | Four projects exist (reported 2026-11-13) | Built in AH-121; live after its deploy                |
+| Product analytics | Open         | TBD (lean PostHog EU)              | ❌                                        | Defer                                                 |
+| Cookie consent    | Decided      | Self-built (Iubenda fallback)      | n/a                                       | Pre-launch                                            |
+| Tax validation    | Built-in     | VIES + HMRC                        | n/a (free)                                | Confirm live calls wired                              |
+| Secrets / cloud   | Foundation   | AWS Secrets Manager + eu-central-1 | Confirm                                   | Sprint-0 item — confirm                               |
+| Push              | Decided      | Firebase Cloud Messaging (v1)      | ❌ project not created                    | Firebase project + owning Google account — **Pedram** |
 
 ---
 

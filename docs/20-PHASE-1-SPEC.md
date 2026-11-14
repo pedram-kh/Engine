@@ -112,7 +112,7 @@ This is the recommended sequence. Each sprint is roughly 1–2 weeks for a solo 
 - Docker Compose for local dev (Postgres, Redis, Mailhog)
 - GitHub Actions CI pipeline (lint, typecheck, test on PR)
 - Terraform skeleton for AWS (eu-central-1 staging + production accounts)
-- Sentry projects created for all 3 surfaces
+- Sentry projects created for all surfaces: **four** as built (api, main, admin, app; org `catalyst-engine`, EU), created 2026-11-13 (reported) and wired in AH-121
 - AWS Secrets Manager structure defined
 - `CURSOR-INSTRUCTIONS.md` and architecture docs in repo
 

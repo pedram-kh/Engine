@@ -14,6 +14,7 @@ Catalyst Performance Ltd, 151 Walworth Road, London SE17 1RS, United Kingdom, is
 - **Edited and deleted messages:** when you edit a message within 15 minutes, or delete one, we keep the earlier text (and the text of a deleted message) so the agency's record stays complete. It is not shown in the app and is not visible to Catalyst support staff. It is removed if you delete your account. _Notice text for Pedram to review; not legally reviewed._
 - **Device and notifications:** a push-notification token for your device, your notification preferences, whether a notification was delivered, the app version, operating system and device language.
 - **Technical and security:** IP address and app or browser identifier in security logs (sign-ins, failed sign-ins and changes to your account).
+- **Error reports:** when the app or our service hits an error, a report is sent to our error-monitoring provider. It contains the technical error message (with personal details such as email addresses removed), the place in the code where it happened, your device model, operating system and app version, the device's language and region setting, and, on a crash, a device identifier that is a hash. It also holds an account reference (a pseudonymous account id, with no name, email address or IP address) and whether the account is a creator. It does not contain your name, email address, IP address, location, time zone, cookies or sign-in tokens. We do not use it for session tracking or session replay.
 
 We do not collect precise location, contacts, health data or advertising identifiers. The app does not track you across other companies’ apps or websites, and we do not sell personal data.
 
@@ -29,6 +30,7 @@ We do not collect precise location, contacts, health data or advertising identif
 - Amazon Web Services: hosting and file storage, in Ireland (EU).
 - Google Firebase Cloud Messaging and Apple Push Notification service: delivery of push notifications. They receive your device token and the notification text.
 - Postmark: transactional email.
+- Sentry (Functional Software, Inc.): error reports, stored in the EU region.
 
 Each provider acts under a data-processing agreement. Where a provider processes data outside the UK or EU, transfers rely on the UK International Data Transfer Agreement, the EU Standard Contractual Clauses or an adequacy decision.
 
@@ -37,6 +39,7 @@ Each provider acts under a data-processing agreement. Where a provider processes
 - Account and profile data: while your account is active.
 - Backups: up to 7 days after erasure.
 - Server logs: up to 14 days.
+- Error reports: 30 days.
 - Security logs: retained, with personal details removed when your account is erased.
 - Records we are legally required to keep: for the legally required period.
 
@@ -57,3 +60,37 @@ The Catalyst Creators app is intended for people aged 18 or over.
 We will post changes to this section here and, for significant changes, notify you in the app.
 
 Last updated: [date of publication]
+
+---
+
+_Everything below this line is notes for Pedram, not notice text._
+
+## Notes on the AH-121 additions (2026-11-15)
+
+**Engineering view, not legal advice.** Text for Pedram to review; not legally reviewed.
+
+- **What changed:** three edits above: the **Error reports** bullet (under "What we collect"), the **Sentry** line (under "Who processes it for us"), the **Error reports: 30 days** line (under "How long we keep it"). `Last updated` stays a placeholder until publication.
+- **The 30 days is Sentry's pricing page for the free plan, as reported; the figure in the org settings was not read, and the 14-day trial has no paid plan chosen.** Before this is published, read the figure in the org settings and change the number here and in the web block below if it differs. **Do not publish the number as read.**
+- **The legal basis line.** "Why we use it" already lists keeping the service secure (legitimate interest); error reports serve that and the working of the service. Whether that wording is enough for diagnostics is for counsel.
+- **The erased-user case (engineering view, not legal advice).** At erasure the account row stays with its ulid and every identifying column is erased (`account-erasure.md` §7). After that the ulid in an error report identifies nobody we can name. Nothing is built to delete events at erasure (plan B6); the residue is error text that slipped past the scrubber, bounded by the retention above. Counsel decides whether that needs more.
+- **"A device identifier that is a hash"** is on native crashes only (`app.device`, `device_app_hash`). What it is derived from: **not read.**
+- **Time zone and language (evidence, 2026-11-15):** Claude searched both native exports (`5878a46c…`, `92a8a649…`): **no `timezone` field**; `contexts.device.locale` **is present** (`en_US@rg=eszzzz`: language plus region). So "no time zone" is claimed for the phone **on that evidence** (two events, one build), and "the device's language and region setting" is listed as held. The web events carry neither (`CultureContext` removed, D7).
+
+## Text block for the public web privacy notice (`${SITE}/legal/privacy`)
+
+**sent to Jordan: not yet; publication: not read.**
+Blocks App Store submission of build 6; does **not** block the API and web DSNs (sentry-plan.md B9). The public notice is Catalyst's, not this repo's. **Engineering view, not legal advice; not legally reviewed.** Paste-ready, English:
+
+> ### Error reports
+>
+> When something goes wrong in the Catalyst service (the website, the admin site, our servers or the Catalyst Creators app), we receive an automatic error report so we can find and fix the problem. We use Sentry (Functional Software, Inc.) for this, with data stored in the EU region.
+>
+> A report contains: the technical error message, with personal details such as email addresses and sign-in tokens removed; the page address without anything after the question mark or hash; the place in the code where the error happened; your device or browser model, operating system and app or site version; for the Catalyst Creators app, the device's language and region setting; and, for crashes in that app, a device identifier that is a hash. When you are signed in it also contains an account reference (a pseudonymous account id, from which we can find your account but which contains no name, email address or IP address) and whether the account is a creator, an agency or an administrator.
+>
+> A report does not contain your name, email address, IP address, location, time zone, cookies, sign-in tokens or the content of your messages and files. We do not record your sessions, we do not replay what you do on screen, and we do not use error reports for advertising or tracking.
+>
+> We use error reports to keep the service working and secure (legitimate interest). We keep them for 30 days. When your account is erased, your personal details are removed from our records; error reports held for the remaining days refer only to the account reference.
+>
+> Sentry acts for us under a data-processing agreement. Where data is processed outside the UK or EU, transfers rely on the UK International Data Transfer Agreement, the EU Standard Contractual Clauses or an adequacy decision.
+
+**Check before sending:** (1) the 30 days (see above); (2) the last sentence of the fourth paragraph (the erased-account one) was written for erased accounts: counsel's call; (3) the transfer sentence copies the app section's wording; whether Sentry's DPA names the same mechanisms was **not read**.
