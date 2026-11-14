@@ -62,6 +62,8 @@
         <env name="DB_USERNAME" value="catalyst"/>
         <env name="DB_PASSWORD" value="catalyst"/>
         <env name="MAIL_MAILER" value="array"/>
+        <!-- AH-121: tests never send to Sentry, whatever a local .env holds. -->
+        <env name="SENTRY_LARAVEL_DSN" value="" force="true"/>
         <!-- Pennant's array driver keeps feature-flag state in-process,
              avoiding the cross-test coupling on the `features` table
              from the database driver and keeping non-RefreshDatabase

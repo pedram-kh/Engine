@@ -21,6 +21,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Sentry\Laravel\Integration;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
@@ -115,6 +116,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // Module-specific middleware is registered by each module's ServiceProvider.
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        // AH-121: report unhandled exceptions to Sentry (a no-op while SENTRY_LARAVEL_DSN
+        // is empty). Every event passes App\Core\Observability\SentryScrubber first.
+        Integration::handles($exceptions);
+
         // Normalize FormRequest validation failures to the canonical JSON:API
         // error envelope (docs/04-API-DESIGN.md §8). Without this, Laravel's
         // default validation renderer returns `{message, errors:{field:[]}}`,

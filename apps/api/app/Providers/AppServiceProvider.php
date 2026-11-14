@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Core\Impersonation\ImpersonationContext;
+use App\Core\Observability\SentryUserContext;
 use App\Core\Storage\BracketSafeFilesystem;
 use App\Core\Tenancy\TenancyContext;
 use Illuminate\Support\ServiceProvider;
@@ -42,6 +43,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // AH-121: the Sentry user is the authenticated user's ulid, never anything else.
+        SentryUserContext::register($this->app->make('events'));
     }
 }
