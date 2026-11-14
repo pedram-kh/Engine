@@ -17,6 +17,8 @@ In Phase 1 the platform ships **two browser SPAs** that talk to the **same Larav
 | `admin` | 5174      | `http://127.0.0.1:5174` |
 | `api`   | 8000      | `http://127.0.0.1:8000` |
 
+**Always browse the SPAs at `http://127.0.0.1:<port>`, never `http://localhost:<port>`.** Sign-in from `http://localhost:5174` fails locally with "Something went wrong" (seen 2026-11-14, AH-121 admin trial); `127.0.0.1` works. `localhost` is not one of the origins and hosts the cookie and CORS settings below are written for (`FRONTEND_*_URL`, `SANCTUM_STATEFUL_DOMAINS` list `127.0.0.1:<port>` entries). Cause not diagnosed further; local dev only.
+
 In production the two SPAs live on `app.catalystengine.com` and `admin.catalystengine.com`. **Hosts isolate cookies in production**; Phase 1 local dev needs explicit help because **browsers do NOT isolate cookies by port** — both Vite dev servers share the `127.0.0.1` origin from the cookie jar's perspective.
 
 ---
