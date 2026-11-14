@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@sentry/capacitor@4.5.0':
+    hash: 8f2b4702f2420bbda497e103779e7eebd512244caaa8aad78f4a1101272d37db
+    path: patches/@sentry__capacitor@4.5.0.patch
+
 importers:
 
   .:
@@ -150,6 +155,9 @@ importers:
       '@mdi/font':
         specifier: ^7.4.47
         version: 7.4.47
+      '@sentry/capacitor':
+        specifier: 4.5.0
+        version: 4.5.0(patch_hash=8f2b4702f2420bbda497e103779e7eebd512244caaa8aad78f4a1101272d37db)(@capacitor/core@8.5.2)(@sentry/vue@10.76.2(pinia@2.3.1(typescript@5.6.3)(vue@3.5.33(typescript@5.6.3)))(vue@3.5.33(typescript@5.6.3)))
       '@sentry/vue':
         specifier: 10.76.2
         version: 10.76.2(pinia@2.3.1(typescript@5.6.3)(vue@3.5.33(typescript@5.6.3)))(vue@3.5.33(typescript@5.6.3))
@@ -1200,6 +1208,21 @@ packages:
       webpack:
         optional: true
 
+  '@sentry/capacitor@4.5.0':
+    resolution: {integrity: sha512-f/rH3ImHnYfNC6Y76C3pzKTWtkCLpVw+oEAGWzADfRJd3eSmnFnDP0NCfyMzyIi+hfI+BpFnaHgC3KdUxD0Mcw==}
+    peerDependencies:
+      '@capacitor/core': '>=6.0.0'
+      '@sentry/angular': 10.76.2
+      '@sentry/react': 10.76.2
+      '@sentry/vue': 10.76.2
+    peerDependenciesMeta:
+      '@sentry/angular':
+        optional: true
+      '@sentry/react':
+        optional: true
+      '@sentry/vue':
+        optional: true
+
   '@sentry/cli-darwin@2.58.6':
     resolution: {integrity: sha512-udAVvcyfNa0R+95GvPz/+43/N3TC0TYKdkQ7D7jhPSzbcMc7l2fxRNN5yB3UpCA5fWFnW4toeaqwDBhb/Wh3LA==}
     engines: {node: '>=10'}
@@ -1274,6 +1297,10 @@ packages:
 
   '@sentry/replay@10.76.2':
     resolution: {integrity: sha512-xMNFEZ7KuEvfj9j1cKmcH+p6u5t3NZs1vcrj+sBW5+S9C327ASOAvcR23ZoM0UhTXr9j7j+Dozs/NYHW2EYjpw==}
+    engines: {node: '>=18'}
+
+  '@sentry/types@10.76.2':
+    resolution: {integrity: sha512-UliOKWPE5t+T3E1cAbCzQyGoThfx930CoILEnkQfeyqvIk39ykYv+l9XWh47OxG5W5R/2cDKhIPX3o0qmnk1Yg==}
     engines: {node: '>=18'}
 
   '@sentry/vite-plugin@5.4.1':
@@ -4679,6 +4706,15 @@ snapshots:
       - encoding
       - supports-color
 
+  '@sentry/capacitor@4.5.0(patch_hash=8f2b4702f2420bbda497e103779e7eebd512244caaa8aad78f4a1101272d37db)(@capacitor/core@8.5.2)(@sentry/vue@10.76.2(pinia@2.3.1(typescript@5.6.3)(vue@3.5.33(typescript@5.6.3)))(vue@3.5.33(typescript@5.6.3)))':
+    dependencies:
+      '@capacitor/core': 8.5.2
+      '@sentry/browser': 10.76.2
+      '@sentry/core': 10.76.2
+      '@sentry/types': 10.76.2
+    optionalDependencies:
+      '@sentry/vue': 10.76.2(pinia@2.3.1(typescript@5.6.3)(vue@3.5.33(typescript@5.6.3)))(vue@3.5.33(typescript@5.6.3))
+
   '@sentry/cli-darwin@2.58.6':
     optional: true
 
@@ -4745,6 +4781,10 @@ snapshots:
   '@sentry/replay@10.76.2':
     dependencies:
       '@sentry/browser-utils': 10.76.2
+      '@sentry/core': 10.76.2
+
+  '@sentry/types@10.76.2':
+    dependencies:
       '@sentry/core': 10.76.2
 
   '@sentry/vite-plugin@5.4.1(rollup@4.60.3)':

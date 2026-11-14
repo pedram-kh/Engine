@@ -135,6 +135,15 @@
         "revision" : "f4a19a3c313dc2616c70bb49d29a799fb16be837",
         "version" : "2.4.1"
       }
+    },
+    {
+      "identity" : "sentry-apple-binaries",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/getsentry/sentry-apple-binaries",
+      "state" : {
+        "revision" : "71ed5066fa7b5b1f54ac72c6bc8666cbf80d54dd",
+        "version" : "9.28.0"
+      }
     }
   ],
   "version" : 3

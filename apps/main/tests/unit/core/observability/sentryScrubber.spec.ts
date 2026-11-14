@@ -161,6 +161,10 @@ describe('user block', () => {
   it('drops a user whose id is not a ulid (an email or numeric id cannot slip through)', () => {
     expect(scrub({ user: { id: 'jane@example.com' } }).user).toBeUndefined()
     expect(scrub({ user: { id: '42' } }).user).toBeUndefined()
+    // AH-121 C3: the native SDK's per-install UUID (the native crash fallback) and the
+    // signed-out marker must never reach a JS event as a user either.
+    expect(scrub({ user: { id: '07F50A93-A2CB-4F21-A821-8EF22EF2DFAF' } }).user).toBeUndefined()
+    expect(scrub({ user: { id: 'signed-out' } }).user).toBeUndefined()
   })
 
   it('through the real client: a stray Sentry.setUser({ email }) is stripped to the id', async () => {

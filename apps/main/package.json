@@ -19,6 +19,7 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install --with-deps chromium",
+    "sync:native": "cap sync && node scripts/check-no-sourcemaps.mjs ios/App/App/public android/app/src/main/assets/public && node scripts/check-native-plugins.mjs",
     "lint": "eslint . --ext .ts,.vue",
     "lint:fix": "eslint . --ext .ts,.vue --fix",
     "typecheck": "vue-tsc --noEmit"
@@ -35,6 +36,7 @@
     "@catalyst/design-tokens": "workspace:*",
     "@catalyst/ui": "workspace:*",
     "@mdi/font": "^7.4.47",
+    "@sentry/capacitor": "4.5.0",
     "@sentry/vue": "10.76.2",
     "dompurify": "^3.4.3",
     "luxon": "3.7.2",

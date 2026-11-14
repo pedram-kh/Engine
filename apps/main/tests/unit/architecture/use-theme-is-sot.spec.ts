@@ -93,6 +93,11 @@ const ALLOWLISTED_RELATIVE_PATHS: ReadonlySet<string> = new Set([
   // Mirrors useLocalePreference: it IS the persistence layer and owns the
   // primitives for its keys. Carries a matching note in docs/tech-debt.md.
   'composables/usePushPreference.ts',
+  // AH-121 C3: the Sentry test-event path (test builds only, absent from a normal build)
+  // keeps its once-per-install marker in WebView localStorage, which is cleared on
+  // uninstall (so a fresh install can fire again). Non-theme; carries a matching note
+  // in docs/tech-debt.md.
+  'core/observability/sentryTestEvent.ts',
   // AH-103d: installMarker is the persistence layer for the creator app's
   // "this install has run before" marker (`catalyst.install.marker`) — non-theme,
   // non-secret, WebView `localStorage`, deleted with the app on iOS (which keeps the

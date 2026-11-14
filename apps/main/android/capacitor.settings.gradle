@@ -13,3 +13,6 @@ project(':capacitor-app').projectDir = new File('../../../node_modules/.pnpm/@ca
 
 include ':capacitor-share'
 project(':capacitor-share').projectDir = new File('../../../node_modules/.pnpm/@capacitor+share@8.0.3_@capacitor+core@8.5.2/node_modules/@capacitor/share/android')
+
+include ':sentry-capacitor'
+project(':sentry-capacitor').projectDir = new File('../../../node_modules/.pnpm/@sentry+capacitor@4.5.0_patch_hash=8f2b4702f2420bbda497e103779e7eebd512244caaa8aad78f4a_50967f9fcc2c6946d83fdf51d1a50929/node_modules/@sentry/capacitor/android')

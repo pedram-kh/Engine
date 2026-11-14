@@ -56,6 +56,9 @@
       "esbuild",
       "sharp",
       "vue-demi"
-    ]
+    ],
+    "patchedDependencies": {
+      "@sentry/capacitor@4.5.0": "patches/@sentry__capacitor@4.5.0.patch"
+    }
   }
 }

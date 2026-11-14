@@ -7,6 +7,10 @@ interface ImportMetaEnv {
   readonly VITE_API_BASE_URL: string
   readonly VITE_APP_NAME: string
   readonly VITE_SENTRY_DSN_MAIN?: string
+  /** AH-121 C3: the catalyst-app DSN, read only inside the Capacitor shell. */
+  readonly VITE_SENTRY_DSN_APP?: string
+  /** AH-121 C3: test builds only (`1`, `crash`, `early`); never set for a submitted build. */
+  readonly VITE_SENTRY_TEST_EVENT?: string
   readonly VITE_SUPPORT_EMAIL?: string
 }
 

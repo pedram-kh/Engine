@@ -85,8 +85,10 @@ describe('init options', () => {
         /setUser\(/.test(code(readFileSync(file, 'utf8'))) &&
         /Sentry|@sentry/.test(readFileSync(file, 'utf8')),
     )
+    // C3 (main only): `sentryNative.ts` adds the signed-out marker (`applyNativeUser`).
     expect(callers.map((f) => path.relative(ROOT, f))).toEqual([
       'src/core/observability/sentryClient.ts',
+      'src/core/observability/sentryNative.ts',
     ])
     expect(CLIENT).toMatch(/Sentry\.setUser\(\{ id: state\.id \}\)/)
   })

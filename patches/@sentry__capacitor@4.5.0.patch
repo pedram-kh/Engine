@@ -1,0 +1,31 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+deleted file mode 100644
+index 8d6ce4b294eb70214a582e9fa88a608909f52182..0000000000000000000000000000000000000000
+diff --git a/ios/Sources/SentryCapacitorPlugin/SentryCapacitorPlugin.swift b/ios/Sources/SentryCapacitorPlugin/SentryCapacitorPlugin.swift
+index 9649d044046d5eedad08fbd3733505f1b5e1c83f..47be99fae52b34ac5a220ff9d3fc573010b08c91 100644
+--- a/ios/Sources/SentryCapacitorPlugin/SentryCapacitorPlugin.swift
++++ b/ios/Sources/SentryCapacitorPlugin/SentryCapacitorPlugin.swift
+@@ -194,6 +194,23 @@ public class SentryCapacitorPlugin: CAPPlugin, CAPBridgedPlugin {
+             options.sendDefaultPii = sendDefaultPii
+         }
+ 
++        // AH-121 C3 (Catalyst patch, patches/@sentry__capacitor@4.5.0.patch): this plugin does not
++        // pass these options through from JS (its FilterNativeOptions allow-list drops them, and
++        // createOptions does not read them), so sentry-cocoa's defaults stayed ON: native HTTP
++        // breadcrumbs (URLs, sizes), lifecycle/device breadcrumbs and session tracking, none of
++        // which pass the JS scrubber. They are set off here, after everything above, so nothing
++        // can switch them back on. Session replay stays at its default rates of 0 (inert).
++        // On an upgrade, compare sdk.integrations and the breadcrumb categories of one native
++        // crash (docs/runbooks/native-sentry.md).
++        options.enableAutoSessionTracking = false
++        options.enableNetworkBreadcrumbs = false
++        options.enableNetworkTracking = false
++        options.enableCaptureFailedRequests = false
++        options.enableAutoBreadcrumbTracking = false
++        options.enableMetrics = false
++        options.sessionReplay.sessionSampleRate = 0
++        options.sessionReplay.onErrorSampleRate = 0
++
+         return options
+     }
+ 
