@@ -102,6 +102,7 @@ happened.
   - **Geo re-check:** nulled by the organisation rule on `catalyst-api`, `catalyst-main` and `catalyst-admin`. `catalyst-app`: later, build 6.
   - **The colleague's first frontend test sent nothing:** an error typed in the console does not reach `window.onerror`, and Sentry is not a console global; the `setTimeout` form works. Added to the runbook, P8.3.
 - **Still open:** build 6 and its device walk; the public privacy notice (text **not yet sent** to Jordan; publication not read); the uptime monitor and alert rules; P6.3; the admin signed-in event; the tree-hash question (row 39); the breadcrumb fix (committed locally, **not pushed, not deployed**).
+- **Follow-up, breadcrumb fix `77797fcd` (2026-11-15): pushed, NOT deployed.** Clears the scope's breadcrumbs when the user id changes or becomes null (main, admin and native); frontend only. **The web needs one more Netlify deploy of both sites** (no API change, so no API deploy, no `queue:restart`; no env change). **The phone gets it in build 6.** Until then the main signed-in event can still carry a previous account's breadcrumbs in the same tab. The runbook is restamped to this tip (`apps` tree `7087ba8e…`; `apps/api` unchanged, so the API release name stands).
 - **Operator / anything unexpected:** the colleague. Unexpected: the tree check failed (above); the release name differs from the runbook's; the first console test sent nothing (explained above); the breadcrumb carry-over in event `43eedc28…`.
 
 ---
