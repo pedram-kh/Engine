@@ -16,10 +16,21 @@ import {
 
 const REPO = path.resolve(__dirname, '../../../..')
 let tree = ''
+const bases: string[] = []
+
+/**
+ * The committed entries climb out of the tree with relative paths (five `../` for Swift, three
+ * for Gradle). The copy therefore lives well below its own base, so those paths land inside the
+ * base on any machine instead of depending on how deep the OS temp folder or the repo is, and
+ * nothing is ever created outside it.
+ */
+const NEST = ['a', 'b', 'c', 'd', 'e', 'tree']
 
 /** A copy of the four files the check reads, plus the plugin folders they point at. */
 function copyTree(): string {
-  const root = mkdtempSync(path.join(tmpdir(), 'native-plugins-'))
+  const base = mkdtempSync(path.join(tmpdir(), 'native-plugins-'))
+  bases.push(base)
+  const root = path.join(base, ...NEST)
   for (const file of [
     'package.json',
     'ios/App/CapApp-SPM/Package.swift',
@@ -58,8 +69,8 @@ beforeEach(() => {
   tree = ''
 })
 afterEach(() => {
-  if (tree !== '') {
-    rmSync(tree, { recursive: true, force: true })
+  for (const base of bases.splice(0)) {
+    rmSync(base, { recursive: true, force: true })
   }
 })
 
