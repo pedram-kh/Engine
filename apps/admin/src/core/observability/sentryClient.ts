@@ -74,8 +74,29 @@ const CHUNK_LOAD_PATTERN =
 /** Every deploy produces some stale-chunk failures: send a few per page load, not a flood. */
 const CHUNK_LOAD_MAX_PER_PAGE = 3
 
+/**
+ * The account the scope last belonged to. `undefined` until the first user is applied; `null`
+ * is signed out. Module state on purpose: the SDK scope is process-global too.
+ */
+let lastAccountId: string | null | undefined
+
+/**
+ * Breadcrumbs must not cross an account change: an agency user's navigation and API paths must
+ * not ride on the next creator's event in the same tab. Clear them when the user id changes or
+ * becomes null. On the phone the scope sync forwards the clear to the native layer.
+ */
+export function clearBreadcrumbsOnAccountChange(id: string | null): void {
+  if (lastAccountId !== undefined && lastAccountId !== id) {
+    Sentry.getGlobalScope().clearBreadcrumbs()
+    Sentry.getIsolationScope().clearBreadcrumbs()
+    Sentry.getCurrentScope().clearBreadcrumbs()
+  }
+  lastAccountId = id
+}
+
 /** Set or clear the Sentry user. The scrubber enforces `{ id }` only on every event too. */
 export function applySentryUser(state: SentryUserState): void {
+  clearBreadcrumbsOnAccountChange(state.id)
   if (state.id === null) {
     Sentry.setUser(null)
     Sentry.setTag('user_type', undefined)
@@ -92,6 +113,7 @@ export function startSentry(options: SentryStartOptions): boolean {
     return false
   }
 
+  lastAccountId = undefined
   Sentry.init({
     app: options.app,
     dsn,

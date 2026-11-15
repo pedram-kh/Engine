@@ -32,8 +32,14 @@ const capacitor = vi.hoisted(() => ({
 }))
 vi.mock('@sentry/capacitor', () => capacitor)
 
+const scopeClears = vi.hoisted(() => ({ count: 0 }))
+const scope = { clearBreadcrumbs: () => (scopeClears.count += 1) }
+
 vi.mock('@sentry/vue', () => ({
   init: vi.fn(),
+  getGlobalScope: () => scope,
+  getIsolationScope: () => scope,
+  getCurrentScope: () => scope,
   setUser: (user: unknown) => calls.log.push(`setUser:${JSON.stringify(user)}`),
   setTag: (key: string, value: unknown) => calls.log.push(`setTag:${key}=${String(value)}`),
   breadcrumbsIntegration: (options: unknown) => ({ name: 'Breadcrumbs', options }),
@@ -260,5 +266,18 @@ describe('applyNativeUser', () => {
   it('signed in is { id } only', () => {
     applyNativeUser({ id: ULID, type: 'creator' })
     expect(calls.log[0]).toBe(`setUser:${JSON.stringify({ id: ULID })}`)
+  })
+
+  it('clears breadcrumbs when the account changes or signs out, not when the id is unchanged', () => {
+    applyNativeUser({ id: ULID, type: 'agency_user' })
+    scopeClears.count = 0
+    applyNativeUser({ id: ULID, type: 'agency_user' })
+    expect(scopeClears.count).toBe(0)
+    applyNativeUser({ id: null, type: null })
+    expect(scopeClears.count).toBe(3) // global, isolation and current scope
+    applyNativeUser({ id: null, type: null })
+    expect(scopeClears.count).toBe(3)
+    applyNativeUser({ id: ULID, type: 'creator' })
+    expect(scopeClears.count).toBe(6) // signed out -> signed in is a change too
   })
 })

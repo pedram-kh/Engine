@@ -26,7 +26,12 @@ import { watch, type App } from 'vue'
 import type { Router } from 'vue-router'
 
 import { drainEarlyErrors } from './earlyErrors'
-import { ALLOWED_INTEGRATIONS, applySentryUser, type SentryUserState } from './sentryClient'
+import {
+  ALLOWED_INTEGRATIONS,
+  applySentryUser,
+  clearBreadcrumbsOnAccountChange,
+  type SentryUserState,
+} from './sentryClient'
 import { scrubBreadcrumb, scrubEvent } from './sentryScrubber'
 
 /**
@@ -51,6 +56,7 @@ export const SIGNED_OUT_USER_ID = 'signed-out'
 /** Signed in: `{ id: ulid }` and the `user_type` tag. Signed out: the fixed string. */
 export function applyNativeUser(state: SentryUserState): void {
   if (state.id === null) {
+    clearBreadcrumbsOnAccountChange(null)
     SentryCapacitor.setUser({ id: SIGNED_OUT_USER_ID })
     SentryCapacitor.setTag('user_type', undefined)
     return

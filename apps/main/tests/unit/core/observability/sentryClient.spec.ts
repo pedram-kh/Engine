@@ -221,3 +221,55 @@ describe('options', () => {
     expect(harness.recorded.itemTypes.every((type) => type === 'event')).toBe(true)
   })
 })
+
+const ULID_B = '01HZX3K9Q5M7R2T8V4W6Y0A1B3'
+
+describe('breadcrumbs across an account change', () => {
+  const crumb = (message: string) =>
+    Sentry.addBreadcrumb({
+      category: 'navigation',
+      message,
+      data: { from: '/', to: `/${message}` },
+    })
+
+  it("an event after sign-out and a new sign-in holds none of the previous account's breadcrumbs", async () => {
+    harness = startRecordingSentry()
+    harness.user.value = { id: ULID, type: 'agency_user' }
+    await nextTick()
+    crumb('crumb-of-user-a')
+    Sentry.captureException(new Error('control: user A'))
+
+    harness.user.value = { id: null, type: null }
+    await nextTick()
+    harness.user.value = { id: ULID_B, type: 'creator' }
+    await nextTick()
+    crumb('crumb-of-user-b')
+    Sentry.captureException(new Error('user B'))
+    await harness.settled(2)
+
+    const [a, b] = harness.recorded.events
+    // Control: the breadcrumb really is recorded while A is signed in.
+    expect(JSON.stringify(a?.breadcrumbs ?? [])).toContain('crumb-of-user-a')
+    expect(JSON.stringify(b?.breadcrumbs ?? [])).not.toContain('crumb-of-user-a')
+    expect(JSON.stringify(b?.breadcrumbs ?? [])).toContain('crumb-of-user-b')
+    expect(b?.user).toEqual({ id: ULID_B })
+  })
+
+  it('sign-out alone clears them, and an unchanged id keeps them', async () => {
+    harness = startRecordingSentry()
+    harness.user.value = { id: ULID, type: 'creator' }
+    await nextTick()
+    crumb('same-account')
+    harness.user.value = { id: ULID, type: 'creator' }
+    await nextTick()
+    Sentry.captureException(new Error('same id'))
+    harness.user.value = { id: null, type: null }
+    await nextTick()
+    Sentry.captureException(new Error('signed out'))
+    await harness.settled(2)
+
+    const [same, out] = harness.recorded.events
+    expect(JSON.stringify(same?.breadcrumbs ?? [])).toContain('same-account')
+    expect(JSON.stringify(out?.breadcrumbs ?? [])).not.toContain('same-account')
+  })
+})
