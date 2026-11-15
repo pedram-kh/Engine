@@ -90,6 +90,9 @@ final class SentryScrubber
             $event->setContext((string) $name, self::scrubArray($context));
         }
 
+        // The OS kernel version string repeats the machine hostname; os name and version stay.
+        $event->getOsContext()?->setKernelVersion(null);
+
         $transaction = $event->getTransaction();
         if ($transaction !== null) {
             $event->setTransaction(self::scrubString($transaction));

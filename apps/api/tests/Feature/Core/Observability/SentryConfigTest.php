@@ -240,3 +240,9 @@ it('keeps Sentry\'s own ids valid (32-hex event and trace ids, 16-hex span id) w
     expect($event['contexts']['trace']['span_id'])->toMatch('/^[0-9a-f]{16}$/');
     expect($sentry->bodies[0])->not->toContain($planted);
 });
+
+it('config/sentry.php fixes server_name so the machine hostname is never sent', function (): void {
+    $c = require base_path('config/sentry.php');
+
+    expect($c['server_name'])->toBe('catalyst-api');
+});

@@ -33,8 +33,12 @@ return [
 
     'release' => env('SENTRY_RELEASE'),
 
-    // Empty means "use APP_ENV".
+    // Empty means "use APP_ENV", and a process-level APP_ENV beats the .env file. Production
+    // sets SENTRY_ENVIRONMENT=production explicitly so the tag is never ambiguous.
     'environment' => env('SENTRY_ENVIRONMENT'),
+
+    // Fixed name: the SDK would send the machine hostname (the box, or a developer's Mac).
+    'server_name' => 'catalyst-api',
 
     'sample_rate' => 1.0,
 

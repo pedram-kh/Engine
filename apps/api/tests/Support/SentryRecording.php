@@ -69,6 +69,19 @@ final class SentryRecording implements HttpClientInterface
     }
 
     /**
+     * The whole decoded event body of the n-th recorded event.
+     *
+     * @return array<string, mixed>
+     */
+    public function raw(int $index = 0): array
+    {
+        $lines = explode("\n", $this->bodies[$index]);
+
+        /** @var array<string, mixed> */
+        return json_decode($lines[2], true, 512, JSON_THROW_ON_ERROR);
+    }
+
+    /**
      * The `user` object of the n-th recorded event (null when the key is absent
      * or every field of it is null), and its tags.
      *

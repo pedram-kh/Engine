@@ -164,3 +164,31 @@ it('an exception inside a job run by a real queue worker sends one event with no
     expect($sentry->bodies)->toHaveCount(1);
     expect($sentry->event()['user'])->toBeNull();
 });
+
+it('an event carries the fixed server_name, an empty kernel version, and the os name and version', function (): void {
+    $sentry = SentryRecording::install();
+
+    $this->getJson('/api/v1/_sentry-test/boom')->assertStatus(500);
+    $sentry->flush();
+
+    $raw = $sentry->raw();
+    expect($raw['server_name'])->toBe('catalyst-api')
+        ->and($raw['contexts']['os']['kernel_version'] ?? null)->toBeNull()
+        ->and($raw['contexts']['os']['name'] ?? null)->toBeString()
+        ->and($raw['contexts']['os']['version'] ?? null)->toBeString()
+        ->and(json_encode($raw))->not->toContain((string) gethostname());
+});
+
+it('the environment tag is SENTRY_ENVIRONMENT when set, otherwise APP_ENV', function (): void {
+    $sentry = SentryRecording::install();
+    $this->getJson('/api/v1/_sentry-test/boom')->assertStatus(500);
+    $sentry->flush();
+    expect($sentry->raw()['environment'])->toBe(app()->environment());
+
+    SentryRecording::reset();
+    config()->set('sentry.environment', 'production');
+    $sentry = SentryRecording::install();
+    $this->getJson('/api/v1/_sentry-test/boom')->assertStatus(500);
+    $sentry->flush();
+    expect($sentry->raw()['environment'])->toBe('production');
+});

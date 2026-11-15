@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Core\Observability\SentryScrubber;
 use Illuminate\Database\QueryException;
 use Sentry\Breadcrumb;
+use Sentry\Context\OsContext;
 use Sentry\Event;
 use Sentry\EventHint;
 use Sentry\ExceptionDataBag;
@@ -290,4 +291,16 @@ it('scrubs a combined payload so that no planted secret survives anywhere in the
     foreach ([SCRUB_EMAIL, SCRUB_BEARER, 'eyJhbGciOiJIUzI1NiJ9', SCRUB_SANCTUM, 'aB3dE5gH7jK9mN1pQ3rS5tU7vW9xY1zA3bC5dE7f', SCRUB_OPAQUE, 'planted'] as $secret) {
         expect($json)->not->toContain($secret);
     }
+});
+
+it('drops the OS kernel version (it repeats the hostname) and keeps the os name and version', function (): void {
+    $event = scrubEventWith(function (Event $e): void {
+        $e->setOsContext(new OsContext('Darwin', '25.1.0', 'build-1', 'Darwin Pedrams-Mac-Mini.local 25.1.0 arm64', 'arm64'));
+    });
+    $json = scrubPayload($event);
+
+    scrubAbsent($json, 'Pedrams-Mac-Mini');
+    expect($event->getOsContext()?->getKernelVersion())->toBeNull()
+        ->and($event->getOsContext()?->getName())->toBe('Darwin')
+        ->and($event->getOsContext()?->getVersion())->toBe('25.1.0');
 });
