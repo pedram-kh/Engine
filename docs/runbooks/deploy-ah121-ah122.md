@@ -120,7 +120,7 @@ Result: `______________`
 
 **P1.1 Pull the mirror's copy of the tip [HOST]**
 
-The Bitbucket mirror must hold the tip first (a separate human step after the push). The mirror's SHAs differ from GitHub's, so **prove the code by tree hashes**. GitHub values at `3c4a6133` (the `apps` hash moved twice since `21ef79bf`: the CI test fix touched `apps/main`, and the API trial fix (`3c4a6133`: fixed `server_name`, no OS kernel version) touched `apps/api`, so **the API release name is now `catalyst-api@48eab25ab42d`**, not `a4aa908faafe`; read 2026-11-15 on the development checkout; **restamp if the tip moves**):
+**Deploy of 2026-11-15: this proof FAILED on the box** (`apps/api` tree `bd78dc68…` on the box against `48eab25a…` on GitHub, no matching GitHub commit in the last 400; cause not read; see the deploy log and tech-debt row 39). Treat a mismatch as a stop until the cause is read, not as "the mirror explains it" (a mirror changes commit SHAs, not tree hashes). The Bitbucket mirror must hold the tip first (a separate human step after the push). The mirror's SHAs differ from GitHub's, so **prove the code by tree hashes**. GitHub values at `3c4a6133` (the `apps` hash moved twice since `21ef79bf`: the CI test fix touched `apps/main`, and the API trial fix (`3c4a6133`: fixed `server_name`, no OS kernel version) touched `apps/api`, so **the API release name is now `catalyst-api@48eab25ab42d`**, not `a4aa908faafe`; read 2026-11-15 on the development checkout; **restamp if the tip moves**):
 
 ```
 apps              df01ce41524b78e2e506fb1b31d1d28be2b0f445
@@ -365,7 +365,7 @@ Sign in with your own accounts (no password goes in this file): **a creator** an
 
 **P8.3 One test event per SPA, and the raw-JSON checklist [BROWSER, then PEDRAM reads]**
 
-On each site, **signed in as a test account whose email, first name, last name and display name Pedram knows**, raise one handled error from the console through the app's SDK (**CONFIRM** the exact one-liner at the sitting; for example open `/reset-password?token=TESTTOKEN123&email=qa-ah121@example.invalid` once in that tab first, then throw, so the URL rules are exercised). Wait about a minute, then **PEDRAM exports the raw JSON of each event** (the rendered view is not the proof; the Sentry integration the assistant uses cannot show `sdk.integrations` or breadcrumbs). **Pass only if all hold (one list, used for P6.2, P6.3 and each SPA event):**
+On each site, **signed in as a test account whose email, first name, last name and display name Pedram knows**, raise one error from the console. **An error typed or thrown directly in the console does not reach `window.onerror`, and Sentry is not a console global, so a bare `throw` or a `Sentry.captureException(...)` sends nothing (the first production attempt, 2026-11-15). Use the timer form: `setTimeout(() => { throw new Error('AH-121 production test event') }, 0)`; it is an uncaught error and goes through the SDK's global handler** ( for example open `/reset-password?token=TESTTOKEN123&email=qa-ah121@example.invalid` once in that tab first, then throw, so the URL rules are exercised). Wait about a minute, then **PEDRAM exports the raw JSON of each event** (the rendered view is not the proof; the Sentry integration the assistant uses cannot show `sdk.integrations` or breadcrumbs). **Pass only if all hold (one list, used for P6.2, P6.3 and each SPA event):**
 
 1. The test account's **email, first name, last name and display name** appear **nowhere** in the JSON (search each), nor `qa-ah121`, nor `TESTTOKEN123`.
 2. No **`Authorization`, `Cookie`, `Bearer`, `signature`, `X-Amz-`, `password`** string and **no token value**. (The literal `[token]` is the scrubber's redaction marker, not a token.)
@@ -375,7 +375,8 @@ On each site, **signed in as a test account whose email, first name, last name a
 6. **No `contexts.culture`** and no time zone, locale or calendar value (web). (Phone events: no `timezone`; `contexts.device.locale` is expected and declared.)
 7. `sdk.integrations` matches the allow-list: **no `BrowserSession`, `Replay`, `CultureContext`, `BrowserTracing`** (sentry-plan.md D7).
 8. `release` is the expected name (API `catalyst-api@48eab25ab42d`; SPAs `catalyst-<surface>@<12 hex>`, **no `-dirty`**) and `environment` is `production`.
-9. No request body, no cookies, no headers beyond `Accept`, `Host` and `User-Agent` (API and web). **API: `server_name` is `catalyst-api` and `contexts.os.kernel_version` is null or absent.**
+9. **No breadcrumbs from another account's session** in the same tab: sign in as one account, navigate, sign out, sign in as another, raise the error: the event must hold none of the first account's navigation or API paths (the breadcrumb clearing on an account change; production event `43eedc28…` showed the carry-over before that fix).
+10. No request body, no cookies, no headers beyond `Accept`, `Host` and `User-Agent` (API and web). **API: `server_name` is `catalyst-api` and `contexts.os.kernel_version` is null or absent.**
 
 Record per event: id, surface, pass / fail per item, and the release name read.
 Main event id: `______________` Admin event id: `______________` API event ids (P6): `______________` Release names read: `______________` All nine items pass: yes / no

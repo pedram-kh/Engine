@@ -438,6 +438,10 @@ Local API, the real app with trial routes added at runtime from a front controll
 - **Accepted as is:** the `User-Agent` header is sent (browser context; the privacy texts say "device or browser model"); the `modules` list (composer package versions) is sent.
 - **Release:** the code change moved `apps/api`'s tree, so the API release is now `catalyst-api@48eab25ab42d`. The trial events carry `catalyst-api@a4aa908faafe`, the release before the fix.
 
+### D11. Production deploy record, 2026-11-15 (evening CET)
+
+The colleague deployed AH-121 and AH-122 (box HEAD, mirror, `4ff906eb…` = GitHub `35385695`); Pedram verified; Claude read the raw JSON. The full record, with "not read" marked, is in `docs/runbooks/deploy-log.md` (AH-121 entry). In short: production events for the API (`09e6b9b4…`), main and admin signed-out and main signed-in all PASS on the privacy rules, all environment `production`; source maps uploaded and resolving by debug id on both sites; geo nulled on three projects. **Findings:** (1) the tree-hash proof failed on the box and is unexplained (tech-debt row 39); the API release on the box is the mirror's commit SHA, not the tree-hash name; (2) the signed-in main event `43eedc28…` carried breadcrumbs from a previous account's session in the same tab: **the SPA scrubbers' breadcrumb handling did not account for an account change**, fixed in a code commit (breadcrumbs are cleared when the user id changes or becomes null, main, admin and native); (3) a console-typed error sends nothing (runbook P8.3 corrected).
+
 ## Not verified (so nobody reads these as checked)
 
 - Everything labelled **(memory)**: SDK defaults (breadcrumbs, request body, IP and install-id behaviour, empty-DSN behaviour), Sentry EU host names, Sentry's uptime feature and what the free plan keeps, Apple's category and purpose wording, the Sentry manifest contents.
