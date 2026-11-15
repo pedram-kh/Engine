@@ -1,7 +1,7 @@
 # Deploy runbook: AH-121 + AH-122 (Sentry error reporting on the API and both web sites; the country-code picker fix), one sitting
 
 **Status: DRAFTED 2026-11-15. NOT RUN. Nothing here has been run against production, and nothing has been pushed.** For Pedram's colleague (who runs the box and the Netlify sites), in the shape of [`deploy-ah115-ah120.md`](deploy-ah115-ah120.md). The record of what actually happened goes in [`deploy-log.md`](deploy-log.md) (the AH-121 entry; AH-122 rides the same web deploy); deploy state is recorded there only.
-Written from the repo at the code tip **`695d3cb1`** (the docs commits after it, this runbook's included, change no file under `apps/`, `packages/` or `pnpm-lock.yaml`). **CI at the pushed tip: not read** (nothing is pushed; fill the run URL here at push time: `______________`). **Restamp the tip, the tree hashes and the CI run in P1.1 if anything lands on `main` before this is run.** Plan, rulings and evidence: [`../reviews/sentry-plan.md`](../reviews/sentry-plan.md) (R, B, D). Procedure behind it: [`production-queue-worker.md`](production-queue-worker.md) §2a, §4, §8.
+Written from the repo at the code tip **`3c4a6133`** (the docs commits after it, this runbook's included, change no file under `apps/`, `packages/` or `pnpm-lock.yaml`). **CI at the pushed tip: not read** (nothing is pushed; fill the run URL here at push time: `______________`). **Restamp the tip, the tree hashes and the CI run in P1.1 if anything lands on `main` before this is run.** Plan, rulings and evidence: [`../reviews/sentry-plan.md`](../reviews/sentry-plan.md) (R, B, D). Procedure behind it: [`production-queue-worker.md`](production-queue-worker.md) §2a, §4, §8.
 
 **How to use it.** Run P0 to P9 in order. Every step has its exact command, what a healthy result looks like, and a blank `Result:` line to fill. Each step says where it runs: **HOST** (`~/catalyst-engine`), **APP** (inside `docker compose exec app sh`, at `/app`), **NETLIFY** (the colleague's site settings), **BROWSER**, or **PEDRAM**. Anything the repo does not document is marked **CONFIRM**.
 **No secret is printed by any command here, and a DSN is a secret for this purpose.** Never `cat` or `echo` an env file, never print the DSN or the token, never paste either into chat, a ticket, a screenshot or a terminal log. Fingerprints, counts, `set` / `empty` and names only. Pedram gives the values to the colleague **privately**; the DSN is typed into the env file with an editor, never with `echo`. **Never print `.env` files.**
@@ -17,8 +17,8 @@ Written from the repo at the code tip **`695d3cb1`** (the docs commits after it,
 | Item                              | Value                                                                                                                                                                                                                                                                                                                                                                               |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Last deployed (from `deploy-log`) | The AH-115 + AH-120 sitting of 2026-11-12, deploy tip **`28df3f27`** (reported; **current state not read**)                                                                                                                                                                                                                                                                         |
-| Deploy tip                        | **`695d3cb1`** (GitHub). 21 commits after `28df3f27`: the Sentry plan, C1 (API), C2 (SPAs), C3 (native; **inert on the web and the API**), the malformed-DSN test, the CI test fix `695d3cb1` (test only), docs, and **AH-122** (`911e0b75`, main web only)                                                                                                                         |
-| Migrations                        | **None.** `git diff --name-only 28df3f27 695d3cb1 -- apps/api/database` is empty (checked at drafting). **Q10 applies anyway** (P4.3): the workers must load the new vendor classes                                                                                                                                                                                                 |
+| Deploy tip                        | **`3c4a6133`** (GitHub). 21 commits after `28df3f27`: the Sentry plan, C1 (API), C2 (SPAs), C3 (native; **inert on the web and the API**), the malformed-DSN test, the CI test fix `3c4a6133` (test only), docs, and **AH-122** (`911e0b75`, main web only)                                                                                                                         |
+| Migrations                        | **None.** `git diff --name-only 28df3f27 3c4a6133 -- apps/api/database` is empty (checked at drafting). **Q10 applies anyway** (P4.3): the workers must load the new vendor classes                                                                                                                                                                                                 |
 | PHP dependencies                  | **CHANGED.** `apps/api/composer.lock` blob is now **`2fb4ae4761b4ff2511c9f1bbc3cd21d177428194`** (was `58ae398d21002237ef63f37bf0b5ead5fd417253`). Five packages added (`sentry/sentry-laravel` 4.30.0, `sentry/sentry` 4.37.0, `nyholm/psr7` 1.8.2, `symfony/options-resolver`, `symfony/psr-http-message-bridge`). **Safe form only (P1.2): never plain `composer install`**      |
 | JS dependencies                   | **CHANGED.** `pnpm-lock.yaml` blob **`5c469f97d0d3568587be59f5d944876dc1a80736`** (was `94d23dc9e4b3279dac336f26d7b54b9447f705b7`): `@sentry/vue` 10.76.2, `@sentry/vite-plugin` 5.4.1 (both SPAs), `@sentry/capacitor` 4.5.0 (main; native only, a dynamic import, not in the web entry chunk). `@sentry/cli` is allowed to run its install script (root `package.json`)           |
 | SPA rebuilds                      | **Both.** Main (Sentry + AH-122) and **admin (Sentry; the AH-115/AH-120 deploy published main only)**                                                                                                                                                                                                                                                                               |
@@ -69,7 +69,7 @@ Result: `______________`
 **P0.2 No snapshot: confirm there is nothing for one to protect [any checkout]**
 
 ```sh
-git diff --name-only 28df3f27 695d3cb1 -- apps/api/database apps/api/app/Console | head -5     # expected: no output (no migration, seeder or command)
+git diff --name-only 28df3f27 3c4a6133 -- apps/api/database apps/api/app/Console | head -5     # expected: no output (no migration, seeder or command)
 ```
 
 Healthy: no output. Anything listed means this runbook is stale: **stop** and ask Pedram (a migration brings back P0.1 snapshot, P2 and P3 of the previous runbook).
@@ -120,11 +120,11 @@ Result: `______________`
 
 **P1.1 Pull the mirror's copy of the tip [HOST]**
 
-The Bitbucket mirror must hold the tip first (a separate human step after the push). The mirror's SHAs differ from GitHub's, so **prove the code by tree hashes**. GitHub values at `695d3cb1` (the `apps` hash changed from `6db05e75…` at `21ef79bf`, because the CI test fix touched `apps/main`; `apps/api` did not change, so the API release name is unchanged; read 2026-11-15 on the development checkout; **restamp if the tip moves**):
+The Bitbucket mirror must hold the tip first (a separate human step after the push). The mirror's SHAs differ from GitHub's, so **prove the code by tree hashes**. GitHub values at `3c4a6133` (the `apps` hash moved twice since `21ef79bf`: the CI test fix touched `apps/main`, and the API trial fix (`3c4a6133`: fixed `server_name`, no OS kernel version) touched `apps/api`, so **the API release name is now `catalyst-api@48eab25ab42d`**, not `a4aa908faafe`; read 2026-11-15 on the development checkout; **restamp if the tip moves**):
 
 ```
-apps              501dda0b717d10f11925877a3edb49607590852a
-apps/api          a4aa908faafe340ff9f01d95fb49c3d7a12bc8d3
+apps              df01ce41524b78e2e506fb1b31d1d28be2b0f445
+apps/api          48eab25ab42d0b9dd4c44ae5394b01044c4ba6bb
 packages          5b7f1c590269895e183d0132359d552af639ea9a
 pnpm-lock         5c469f97d0d3568587be59f5d944876dc1a80736
 composer.lock     2fb4ae4761b4ff2511c9f1bbc3cd21d177428194      (apps/api/composer.lock)
@@ -135,14 +135,14 @@ cd ~/catalyst-engine
 OLD=$(git rev-parse HEAD); echo "OLD=$OLD"
 git remote -v | head -2                                    # CONFIRM the remote is the Bitbucket mirror
 git fetch origin
-git log origin/main -5 --format='%h %s'                    # the top commits' SUBJECTS must include "test(sentry): native plugin check copy no longer depends on temp or repo depth" and, further down, "test(sentry): malformed API dsn cannot break requests, errors or artisan (AH-121)"
+git log origin/main -5 --format='%h %s'                    # the top commits' SUBJECTS must include "fix(sentry): fixed api server_name and no os kernel version in events" and "test(sentry): native plugin check copy no longer depends on temp or repo depth" and, further down, "test(sentry): malformed API dsn cannot break requests, errors or artisan (AH-121)"
 git merge --ff-only origin/main
 git rev-parse HEAD
 git rev-parse HEAD:apps HEAD:apps/api HEAD:packages HEAD:pnpm-lock.yaml HEAD:apps/api/composer.lock      # must equal the five values above (HEAD may be a docs-only descendant: docs/ is not in these)
 ```
 
 Healthy: a fast-forward; the five hashes **equal** the table. A difference means the mirror holds other content or another tip: **stop**. Then **[APP]** the `APP_KEY` fingerprint is **identical to P0.3**.
-**Release names, for the record (they derive from these hashes):** API `catalyst-api@` + the first 12 hex of `apps/api`'s tree = **`catalyst-api@a4aa908faafe`**. The two SPA names are `catalyst-main@<12 hex>` and `catalyst-admin@<12 hex>`, computed by the build as the first 12 hex of `sha1(<apps/<surface> tree> + <packages tree>)`; **read them from the first test event, do not predict them** (`-dirty` appended means the Netlify checkout was modified: a finding).
+**Release names, for the record (they derive from these hashes):** API `catalyst-api@` + the first 12 hex of `apps/api`'s tree = **`catalyst-api@48eab25ab42d`**. The two SPA names are `catalyst-main@<12 hex>` and `catalyst-admin@<12 hex>`, computed by the build as the first 12 hex of `sha1(<apps/<surface> tree> + <packages tree>)`; **read them from the first test event, do not predict them** (`-dirty` appended means the Netlify checkout was modified: a finding).
 Mirror HEAD (SHA, subject): `______________` Trees equal: yes / no Fingerprint after: `______________` Same as P0.3: yes / no
 Result: `______________`
 
@@ -202,7 +202,7 @@ Result: `______________`
 | ------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------- | --------------------------------------------------------------- |
 | API     | `SENTRY_LARAVEL_DSN`                                              | the `catalyst-api` project's DSN                                             | the box `.env`                                                    | **Colleague** types it; **Pedram supplies the value privately** |
 | API     | `SENTRY_ENVIRONMENT`                                              | `production`                                                                 | the box `.env`                                                    | **Colleague**                                                   |
-| API     | `SENTRY_RELEASE`                                                  | `catalyst-api@a4aa908faafe` (the tree hash of `apps/api`; P1.1)              | the box `.env`                                                    | **Colleague** (written by the commands below)                   |
+| API     | `SENTRY_RELEASE`                                                  | `catalyst-api@48eab25ab42d` (the tree hash of `apps/api`; P1.1)              | the box `.env`                                                    | **Colleague** (written by the commands below)                   |
 | Main    | `VITE_SENTRY_DSN_MAIN`                                            | the `catalyst-main` project's DSN                                            | the main Netlify site env                                         | **Colleague**; Pedram supplies privately                        |
 | Main    | `SENTRY_AUTH_TOKEN`                                               | the org token limited to release and source-map upload                       | the main Netlify site env                                         | **Colleague**; Pedram supplies privately                        |
 | Main    | `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_URL`                      | `catalyst-engine`, `catalyst-main`, the EU region URL (**CONFIRM** the host) | the main Netlify site env                                         | **Colleague** (names; values were not read at drafting)         |
@@ -215,9 +215,9 @@ Result: `______________`
 Write the API release, **without printing the file**, from the HOST value of P1.1:
 
 ```sh
-REL="catalyst-api@$(git rev-parse --short=12 HEAD:apps/api)"; echo "$REL"        # HOST; expected: catalyst-api@a4aa908faafe
+REL="catalyst-api@$(git rev-parse --short=12 HEAD:apps/api)"; echo "$REL"        # HOST; expected: catalyst-api@48eab25ab42d
 # APP is a different shell: set REL there to the printed value, then write the line without printing .env (use the real path if it is not /app/.env)
-REL=catalyst-api@a4aa908faafe    # APP; the value HOST printed above
+REL=catalyst-api@48eab25ab42d    # APP; the value HOST printed above
 grep -q '^SENTRY_RELEASE=' .env && sed -i "s|^SENTRY_RELEASE=.*|SENTRY_RELEASE=$REL|" .env || echo "SENTRY_RELEASE=$REL" >> .env
 grep -c '^SENTRY_RELEASE=' .env                                                    # expected: 1
 grep -c '^SENTRY_ENVIRONMENT=production$' .env                                     # expected: 1 (add the line with an editor if 0)
@@ -251,7 +251,7 @@ ls bootstrap/cache/                                                             
 php artisan tinker --execute="echo config('sentry.dsn') ? 'dsn set' : 'dsn empty', ' ', config('sentry.environment'), ' ', config('sentry.release'), PHP_EOL;"
 ```
 
-Healthy: `config:cache` succeeds; the fingerprint is unchanged; the last line prints `dsn set production catalyst-api@a4aa908faafe` (the DSN itself is **not** printed). **If a route cache exists**, run `php artisan route:cache` (this release adds no route, but keep the box's usual procedure).
+Healthy: `config:cache` succeeds; the fingerprint is unchanged; the last line prints `dsn set production catalyst-api@48eab25ab42d` (the DSN itself is **not** printed). **If a route cache exists**, run `php artisan route:cache` (this release adds no route, but keep the box's usual procedure).
 Output: `______________` Route cache present: yes / no
 Result: `______________`
 
@@ -334,9 +334,12 @@ php artisan tinker --execute="try { DB::select('select * from ah121_no_such_tabl
 ```
 
 Healthy: it prints `Illuminate\Database\QueryException`. **Wait about a minute (ingestion lag), then PEDRAM opens both events in `catalyst-api` and reads the raw JSON with the checklist in P8.3.** For P6.3 add: the strings `qa-ah121`, `example.invalid`, `ah121_no_such_table` and `select` appear **nowhere**; the exception value is the class and the SQLSTATE only.
+**P6.4 Before anything else, read `environment` [PEDRAM]:** open the **first** production event in `catalyst-api` and read `environment` **before** any other check. It must be exactly **`production`** (it comes from `SENTRY_ENVIRONMENT=production` in the box `.env`, P3.1). If it reads anything else (for example `testing` or `local`), **stop: turn the API off (§4)** and fix the env line first. Why this is explicit: with `SENTRY_ENVIRONMENT` empty the tag falls back to `APP_ENV`, and a **process-level `APP_ENV` beats the `.env` file** (the local trial read `testing` because the shell that started it had `APP_ENV=testing` exported). Also read `server_name` = **`catalyst-api`** (never a hostname) and `contexts.os`: `name` and `version` present, **`kernel_version` null or absent**.
 Both commands ran: yes / no Event ids: `______________` / `______________` Checklist (P8.3) passed: yes / no
 **If any check fails: turn the API off first (§4), then fix.**
 Result: `______________`
+
+**Local baseline (API trial, 2026-11-15, real Sentry, EU, `catalyst-api` project; code at `695d3cb1`, i.e. before the `server_name` and kernel-version fix; Pedram's Mac, so `environment` read `testing` and `server_name` was the hostname: both fixed or explained above).** Raw JSON checked by Claude, PASS on the privacy rules: **a** `aad69970405d4118b0c1f6560988f914` (route exception, signed-in creator: user `{id: <ulid>}`, `user_type` creator); **b** `42f07fd9c2a04cb18472aa8228d2c359` (guest: no user); **c** `1736c7d278b144ddb897c273e7a87289` (QueryException: both exception values are `<Class> (SQLSTATE 42P01)`, the planted name and phone appear nowhere); **d** `afce9dd7135741e99a5e1f4078e25f78` (queued job on a real worker: no user, `sapi` cli, no job payload). 404 and 422: nothing arrived. All four: no cookies, Authorization, `ip_address` or body; headers `Accept`, `Host`, `User-Agent` only; geo nulled; release `catalyst-api@a4aa908faafe`. Accepted as is: the `User-Agent` header is sent (browser context; the privacy texts say "device or browser model"); the `modules` list (composer package versions) is sent, harmless.
 
 ### P7. Publish the web sites [NETLIFY]
 
@@ -371,8 +374,8 @@ On each site, **signed in as a test account whose email, first name, last name a
 5. `request.url` (and every breadcrumb URL) has **no `?` and no `#`**.
 6. **No `contexts.culture`** and no time zone, locale or calendar value (web). (Phone events: no `timezone`; `contexts.device.locale` is expected and declared.)
 7. `sdk.integrations` matches the allow-list: **no `BrowserSession`, `Replay`, `CultureContext`, `BrowserTracing`** (sentry-plan.md D7).
-8. `release` is the expected name (API `catalyst-api@a4aa908faafe`; SPAs `catalyst-<surface>@<12 hex>`, **no `-dirty`**) and `environment` is `production`.
-9. No request body, no cookies, no headers (API and web).
+8. `release` is the expected name (API `catalyst-api@48eab25ab42d`; SPAs `catalyst-<surface>@<12 hex>`, **no `-dirty`**) and `environment` is `production`.
+9. No request body, no cookies, no headers beyond `Accept`, `Host` and `User-Agent` (API and web). **API: `server_name` is `catalyst-api` and `contexts.os.kernel_version` is null or absent.**
 
 Record per event: id, surface, pass / fail per item, and the release name read.
 Main event id: `______________` Admin event id: `______________` API event ids (P6): `______________` Release names read: `______________` All nine items pass: yes / no
@@ -436,4 +439,4 @@ Done: yes / no
 
 ---
 
-_Provenance: drafted by Cursor on 2026-11-15 from `docs/reviews/sentry-plan.md` (B9, D5, D6, D7, D8), the shape of [`deploy-ah115-ah120.md`](deploy-ah115-ah120.md), [`deploy-log.md`](deploy-log.md) (the AH-115 + AH-120 and AH-122 entries), `git diff 28df3f27 695d3cb1` (lock files, `apps/api`, `apps/api/database`, `apps/admin`, `apps/main`, `packages`), the tree hashes quoted in P1.1, and the read-only source of `sentry/sentry-laravel` (`TestCommand.php`) and `sentry/sentry` (`Dsn.php`) in `apps/api/vendor`. The scrubber, the user hook, the empty-DSN switch, the SPA clients and the native app were exercised locally and against the real Sentry projects from a development machine (D2, D7, D8); **no command has been run against production, and no production DSN is set.** **Still CONFIRM, because the repo cannot say:** the box's Composer version, the env file path, the PHP-FPM program name, whether the box caches routes, how the Netlify sites build from the mirror (including whether pnpm runs `@sentry/cli`'s install script there and what the Sentry plugin does when an upload fails), the EU region URL for `SENTRY_URL`, the Netlify deploy-permalink form, the exact console one-liner for a test error per SPA, the retention figure in the Sentry org, and the Sentry settings listed in P0.1. Engineering view, not legal advice, wherever the privacy texts are touched._
+_Provenance: drafted by Cursor on 2026-11-15 from `docs/reviews/sentry-plan.md` (B9, D5, D6, D7, D8), the shape of [`deploy-ah115-ah120.md`](deploy-ah115-ah120.md), [`deploy-log.md`](deploy-log.md) (the AH-115 + AH-120 and AH-122 entries), `git diff 28df3f27 3c4a6133` (lock files, `apps/api`, `apps/api/database`, `apps/admin`, `apps/main`, `packages`), the tree hashes quoted in P1.1, and the read-only source of `sentry/sentry-laravel` (`TestCommand.php`) and `sentry/sentry` (`Dsn.php`) in `apps/api/vendor`. The scrubber, the user hook, the empty-DSN switch, the SPA clients and the native app were exercised locally and against the real Sentry projects from a development machine (D2, D7, D8); **no command has been run against production, and no production DSN is set.** **Still CONFIRM, because the repo cannot say:** the box's Composer version, the env file path, the PHP-FPM program name, whether the box caches routes, how the Netlify sites build from the mirror (including whether pnpm runs `@sentry/cli`'s install script there and what the Sentry plugin does when an upload fails), the EU region URL for `SENTRY_URL`, the Netlify deploy-permalink form, the exact console one-liner for a test error per SPA, the retention figure in the Sentry org, and the Sentry settings listed in P0.1. Engineering view, not legal advice, wherever the privacy texts are touched._
