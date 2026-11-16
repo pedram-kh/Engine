@@ -377,6 +377,8 @@ it('summary: the window boundary is exact — 1s inside counts, 1s outside does 
 ]);
 
 it('summary: the footer reports table depth and the oldest row independent of the window', function (): void {
+    // One instant: two now() calls on either side of midnight would give two different dates.
+    $this->freezeTime();
     $creator = pdCreator();
     pdRow($creator, ['created_at' => now()->subDays(60)->startOfSecond()]);
     pdRow($creator);

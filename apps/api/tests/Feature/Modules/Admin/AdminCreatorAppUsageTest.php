@@ -249,6 +249,8 @@ it('NEGATIVE: a non-creator-app token (name) does not count as a sign-in', funct
 })->with(['admin token' => 'admin-cli', 'lookalike' => 'my-creator-app:ios', 'no prefix' => 'ios']);
 
 it('counts live sign-ins and reports platforms from the name suffix; last_seen is the max over LIVE tokens only', function (): void {
+    // One instant for the stored values and the expected value (a second boundary between two now() calls made this flaky).
+    $this->freezeTime();
     config(['sanctum.expiration' => 600]);
     $creator = cauCreator();
     cauSignIn($creator, 'creator-app:ios', lastUsed: now()->subHours(5)->startOfSecond());
