@@ -24,7 +24,8 @@ use Illuminate\Support\Facades\DB;
  *   - a linked campaign must belong to this agency AND this brand, must not be soft-deleted and must not be
  *     Cancelled; every "no" is the SAME `wave.campaign_not_available`, so a response never reveals whether a
  *     foreign, deleted or cancelled campaign exists;
- *   - one wave per campaign: the partial unique index is the guard, the pre-check a courtesy;
+ *   - one wave per campaign: the partial unique index is the only guard; its violation is mapped to
+ *     `wave.campaign_already_linked` (there is no pre-check);
  *   - an existing link can be neither changed nor removed (PL-1.2); a link can be SET while the wave has none.
  */
 final class WaveService
@@ -130,8 +131,9 @@ final class WaveService
 
     /**
      * Resolve the campaign a wave may link to, or null for "no link". Throws `campaign_not_available` for anything
-     * that is not this agency's, this brand's, live and not cancelled; `campaign_already_linked` when a live wave
-     * already holds it (the unique index remains the real guard against a race).
+     * that is not this agency's, this brand's, live and not cancelled. "Already has a wave" is NOT checked here: the
+     * partial unique index plus the exception mapping in create() and update() are the single path to
+     * `wave.campaign_already_linked`.
      */
     private function linkableCampaign(Agency $agency, Brand $brand, ?string $campaignUlid): ?Campaign
     {
@@ -148,10 +150,6 @@ final class WaveService
 
         if ($campaign === null) {
             throw WaveRuleViolation::campaignNotAvailable();
-        }
-
-        if (Wave::query()->where('campaign_id', $campaign->id)->exists()) {
-            throw WaveRuleViolation::campaignAlreadyLinked();
         }
 
         return $campaign;
