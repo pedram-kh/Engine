@@ -28,6 +28,7 @@ use App\Modules\Identity\Features\AccountDeletionEnabled;
 use App\Modules\Messaging\Features\MessagesV2CreatorInboxEnabled;
 use App\Modules\Messaging\Features\MessagesV2EditSearchEnabled;
 use App\Modules\Messaging\Features\MessagesV2InboxEnabled;
+use App\Modules\Waves\Features\WavesEnabled;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -140,6 +141,10 @@ final class AdminFeatureFlagController
         MessagesV2CreatorInboxEnabled::NAME => [
             'label' => 'Messages v2: creator inbox',
             'description' => 'Turns on the creator unified inbox (direct and campaign conversations in one list, with the Brand · Campaign tag) and the creator message search. Off: the two endpoints answer 404 and the creator Messages page is the previous list of agency conversations. Arm after the web deploy and the native build 5 walk.',
+        ],
+        WavesEnabled::NAME => [
+            'label' => 'Waves and client files',
+            'description' => 'Turns on the Client files and Waves panels on the Brand page, the New wave dialog, the wave page and the endpoints behind them. Off: those panels are not shown and the endpoints answer 404; nothing else on the Brand page changes. Arm after the web deploy.',
         ],
         AccountErasureExecuteEnabled::NAME => [
             'label' => 'Account erasure (admin Erase button)',

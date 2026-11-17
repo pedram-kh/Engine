@@ -17,6 +17,7 @@ use App\Modules\Notifications\NotificationsServiceProvider;
 use App\Modules\Payments\PaymentsServiceProvider;
 use App\Modules\TalentPools\TalentPoolsServiceProvider;
 use App\Modules\TrackedJobs\TrackedJobsServiceProvider;
+use App\Modules\Waves\WavesServiceProvider;
 use App\Providers\AppServiceProvider;
 use App\Providers\HorizonServiceProvider;
 use App\TestHelpers\TestHelpersServiceProvider;
@@ -42,6 +43,7 @@ return [
     PaymentsServiceProvider::class,
     TalentPoolsServiceProvider::class,
     TrackedJobsServiceProvider::class,
+    WavesServiceProvider::class,
 
     // E2E / Playwright support. The provider is itself a no-op outside
     // of `local` and `testing` environments and when `TEST_HELPERS_TOKEN`
