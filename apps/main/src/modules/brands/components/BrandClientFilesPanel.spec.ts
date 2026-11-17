@@ -1,7 +1,7 @@
 /** PL-1.1 W5 — BrandClientFilesPanel and BrandFileUploadDialog. */
 import { ApiError } from '@catalyst/api-client'
 import { flushPromises } from '@vue/test-utils'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('../api/brandFiles.api', () => ({
   brandFilesApi: {
@@ -58,6 +58,11 @@ beforeEach(() => {
   vi.mocked(brandFilesApi.completeUpload).mockResolvedValue({
     data: makeFile('01NEWFILEULIDXXXXXXXXXXXX', { original_filename: 'new.pdf' }),
   })
+})
+
+// A failed test must not leave its teleported dialog behind for the next one.
+afterEach(() => {
+  document.body.innerHTML = ''
 })
 
 describe('BrandClientFilesPanel (PL-1.1 W5)', () => {

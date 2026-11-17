@@ -1,7 +1,7 @@
 /** PL-1.1 W3 — NewWaveDialog: validation, campaign list, payloads, 422 mapping, success. */
 import { ApiError } from '@catalyst/api-client'
 import { flushPromises } from '@vue/test-utils'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { VSelect } from 'vuetify/components'
 
 vi.mock('../api/waves.api', () => ({
@@ -77,6 +77,11 @@ beforeEach(() => {
     ],
   })
   vi.mocked(wavesApi.create).mockResolvedValue({ data: makeWave() })
+})
+
+// A failed test must not leave its teleported dialog behind for the next one.
+afterEach(() => {
+  document.body.innerHTML = ''
 })
 
 describe('NewWaveDialog (PL-1.1 W3)', () => {

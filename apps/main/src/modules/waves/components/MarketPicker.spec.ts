@@ -1,6 +1,6 @@
 /** PL-1.1 W4 — MarketPicker: add, remove, no duplicates, order kept, code badge. */
 import { flushPromises } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
 import { mountWithApp } from '../waveTestKit'
 import MarketPicker from './MarketPicker.vue'
@@ -11,6 +11,11 @@ async function open(wrapper: Awaited<ReturnType<typeof mountWithApp>>): Promise<
   await wrapper.get('[data-test="market-add"]').trigger('click')
   await flushPromises()
 }
+
+// A failed test must not leave its teleported dialog behind for the next one.
+afterEach(() => {
+  document.body.innerHTML = ''
+})
 
 describe('MarketPicker (PL-1.1 W4)', () => {
   it('shows a code badge and the country name for each picked market, in the order given', async () => {
