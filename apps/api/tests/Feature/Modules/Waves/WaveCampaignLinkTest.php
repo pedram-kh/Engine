@@ -76,7 +76,7 @@ it('B5: a second wave for a linked campaign gives 422 wave.campaign_already_link
         ->assertUnprocessable()->assertJsonPath('errors.0.code', 'wave.campaign_already_linked');
 });
 
-it('B5: the race: when the pre-check passes but the index fires, the answer is the 422, not a 500', function (): void {
+it('B5: the race: when a competing row lands first the index fires and the answer is the 422, not a 500', function (): void {
     $w = WaveFixtures::world();
     WaveFixtures::armed();
     $campaign = WaveFixtures::campaign($w['agency'], $w['brand']);
@@ -101,7 +101,7 @@ it('B5: the race: when the pre-check passes but the index fires, the answer is t
         ->assertUnprocessable()->assertJsonPath('errors.0.code', 'wave.campaign_already_linked');
 
     // The hook ran inside the request's own transaction, so the whole attempt (winner row included) rolled back.
-    // What is pinned: the pre-check was bypassed and the unique violation became the 422, not a 500.
+    // What is pinned: the unique violation became the 422, not a 500 (there is no pre-check any more).
     expect($armed)->toBeFalse()
         ->and(Wave::query()->where('name', 'Wave 7')->count())->toBe(0);
 });
