@@ -129,6 +129,22 @@ Pedram, 2026-11-17. These **supersede any earlier note that "a wave is a kind of
    - A creator who declines stays in Invited with the Declined label. The card does not move to Dropped. Dropped is for creators the team removes or rejects.
 10. **R10.** Where a screen has no design, build from the existing design system and name that in the plan and the report.
 
+### PL-1.2 rulings (Pedram, 2026-11-17)
+
+Recorded with the PL-1.2 plan (`pl-1-2-plan.md`). They sharpen R3, R4 and R9; **P2 amends PL-1.1** (see the note at the end).
+
+- **P1.** A campaign has a type: normal, or for a wave. In a for-a-wave campaign the creator does not post content (R3).
+- **P2.** Only for-a-wave campaigns can be linked to a wave. The campaign dropdown and the server rule refuse a normal campaign, with the same 422 `wave.campaign_not_available` and the same body.
+- **P3.** The New wave dialog gains "Create a campaign for this wave now": the user gives a campaign name; the wave and a for-a-wave campaign are created together, linked, in one transaction. The rest of the campaign is filled in later on the campaign page.
+- **P4.** The link is shown on both sides: the wave page shows its campaign, the campaign page shows its wave.
+- **P5.** Changing or removing the link is allowed only while no creator of the campaign is Selected or further. After that the link is locked.
+- **P6.** Board for a for-a-wave campaign, columns in order: Applied, Invited, Selected, Filming, Submitted / in review, In edits, Client review, Approved, Dropped. All nine exist from the start. One card per creator. Invited cards carry a label: Invited, Accepted or Declined; Accepted and Declined cards stay in Invited; Declined never moves to Dropped by itself; Dropped is for creators the team removes or rejects. The card has a place for the per-script tracker, empty until scripts exist (PL-3), with no dead UI. Filming to Approved: the strategist moves cards by hand in this chunk; later sprints automate each move. No Paid or Payment due columns.
+- **P7.** Existing campaigns keep their type (normal) and their boards exactly as they are.
+- **P8.** A model-level guard on `Campaign` refuses a change of `brand_id` (deferred from PL-1.1). This chunk may edit the Campaigns module.
+- **P9.** Deleting a wave stays out.
+
+**Amendment to PL-1.1 (by P2 and P5):** PL-1.1 let a wave link to any campaign of the brand and locked the link once set. Under P2 the link accepts only a for-a-wave campaign; under P5 the lock starts at the first Selected creator, not at the first link. PL-1.1's tests, seeder and dialog change in PL-1.2 (list in `pl-1-2-plan.md` §6). PL-1.1 as built and walked is not edited retroactively.
+
 ### PL-1 chunks (three)
 
 - **PL-1.1 Brand and new wave.** The wave object (brand, name, go-live date, markets, optional campaign link), the Brand page (details, client files, waves table) and the New wave dialog. Frames 01 and 09. **Status (2026-11-17): built and walked (Pedram, local, 14 of 14 steps, including the first real-storage upload). Not merged, not deployed.** Review: `pl-1-1-review.md`.
