@@ -5,7 +5,7 @@
  *
  * Staff see the list; New wave is for an admin or manager on an active brand. A row opens the wave page.
  */
-import { formatDateTime, labelForCountryCode } from '@catalyst/api-client'
+import { formatDateTime } from '@catalyst/api-client'
 import type { WaveResource } from '@catalyst/api-client'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -52,7 +52,7 @@ async function load(): Promise<void> {
 function marketsLabel(w: WaveResource): { shown: string[]; more: number } {
   const all = w.attributes.markets
   return {
-    shown: all.slice(0, MAX_VISIBLE_MARKETS).map((c) => labelForCountryCode(c)),
+    shown: all.slice(0, MAX_VISIBLE_MARKETS),
     more: Math.max(0, all.length - MAX_VISIBLE_MARKETS),
   }
 }

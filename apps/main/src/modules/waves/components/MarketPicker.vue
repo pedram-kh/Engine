@@ -58,6 +58,7 @@ function remove(code: string): void {
         :data-test="`market-chip-${code}`"
         @click:close="remove(code)"
       >
+        <strong class="mr-1" :data-test="`market-code-${code}`">{{ code }}</strong>
         {{ labelForCountryCode(code) }}
       </v-chip>
 
