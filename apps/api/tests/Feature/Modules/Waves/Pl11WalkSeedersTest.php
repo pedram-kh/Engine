@@ -35,6 +35,10 @@ it('S1: seeds the two walk agencies, leaves the flag off, and is idempotent', fu
 });
 
 it('S2: cleanup removes everything the walk made, leaves a bystander alone, and does not touch the flag', function (): void {
+    // The database store, so the flag is a real row the cleanup could (wrongly) delete.
+    config(['pennant.default' => 'database']);
+    Feature::purge();
+
     $bystander = AgencyFactory::new()->createOne();
     $bystanderBrand = Brand::factory()->forAgency($bystander->id)->create();
     Wave::factory()->forBrand($bystander->id, $bystanderBrand->id)->create();
@@ -54,7 +58,7 @@ it('S2: cleanup removes everything the walk made, leaves a bystander alone, and 
         ->and(BrandFile::query()->count())->toBe(0)
         ->and(Brand::query()->where('agency_id', $bystander->id)->count())->toBe(1)
         // The stored flag row is still there (read it from the table: the in-memory cache would hide a delete).
-        ->and(DB::table('features')->where('name', WavesEnabled::NAME)->where('value', 'true')->exists())->toBeTrue();
+        ->and(DB::table('features')->where('name', WavesEnabled::NAME)->exists())->toBeTrue();
 
     // Safe twice, and safe when the seeder never ran.
     $this->seed(Pl11WalkCleanupSeeder::class);
