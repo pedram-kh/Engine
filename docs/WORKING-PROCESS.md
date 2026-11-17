@@ -4,7 +4,7 @@
 > non-negotiables. If this file and `PROJECT-WORKFLOW.md` §5 disagree, the repo
 > wins — but flag the divergence and reconcile it.
 >
-> **Last updated:** 2026-07-16 (post-AH-048).
+> **Last updated:** 2026-07-16 (post-AH-048); §8 two-branch flow added 2026-11-17.
 
 ---
 
@@ -259,10 +259,21 @@ violation Pedram can call out.
   files to the Claude Project (delete stale, upload current). The repo always
   wins over stale KB copies — divergences get flagged, not papered over.
 - **Push discipline:** nothing pushes until Claude clears it and Pedram says
-  go. After push: confirm `origin/main = HEAD`
-  (`git rev-list --left-right --count origin/main...HEAD` → `0 0`).
+  go. After push: confirm the remote branch equals HEAD
+  (`git rev-list --left-right --count origin/<branch>...HEAD` → `0 0`, with
+  `<branch>` = `main` or `pl`).
+- **Two branches (`PROJECT-WORKFLOW.md` §12).** `main` is production: fixes to
+  the live product and AH work go there. `pl` holds the Production Line
+  sprints (PL-1 to PL-9); chunks are `PL-<sprint>.<n>`. Check `git branch
+--show-current` before every commit and every push; the HEAD SHA you state at
+  the start of a thread is the SHA of the branch you are on, with the branch
+  named. `main` is merged into `pl` at least weekly; `pl` goes into `main` only
+  at a sprint boundary, on Pedram's word, with every new flag OFF. The
+  per-chunk, sprint-end and staging rules are in
+  `reviews/production-line-sprints.md`.
 - **A push is not complete until CI is green at the pushed tip, cited
-  (`PROJECT-WORKFLOW.md` §5.41).** The local gate board is pre-push evidence;
+  (`PROJECT-WORKFLOW.md` §5.41),** on whichever branch was pushed (CI runs on
+  `main` and `pl`). The local gate board is pre-push evidence;
   CI is the post-push confirmation that the same claim holds off the
   developer's own machine — and it is not redundant with the local run: two
   chunks (AH-068, AH-069) shipped with a green local board while CI had been

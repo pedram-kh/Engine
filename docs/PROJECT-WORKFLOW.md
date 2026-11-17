@@ -106,7 +106,7 @@ The merged review file:
 # Drop the file into docs/reviews/, then:
 git add docs/reviews/sprint-{N}-chunk-{M}-review.md
 git commit -m "docs(reviews): close sprint {N} chunk {M} review (final merged version)"
-git push
+git push origin <branch>   # `main` for work on the live product, `pl` for Production Line chunks (§12)
 ```
 
 Then move to the next chunk's kickoff.
@@ -497,7 +497,7 @@ We are live in production with real users, and live data is the platform's most 
 
 **Established:** AH-070, 2026-08-17
 
-A push is not complete until the CI run **at the pushed tip** is green and its run URL is cited in the close-out. The local gate board (§4 of `WORKING-PROCESS.md`) remains the **pre-push** evidence — it is what tells the implementing agent the chunk is ready to push at all. CI is the **post-push confirmation** — a separate, independently-provisioned environment proving the same claim holds somewhere other than the machine that made it. **A red CI at the tip reopens the chunk**, regardless of what the local board said, and regardless of whether the failure looks unrelated to the diff — an unrelated-looking CI failure is exactly what this standard exists to catch, not a reason to wave it through.
+A push is not complete until the CI run **at the pushed tip** is green and its run URL is cited in the close-out. This applies to **both** branches (`main` and `pl`, §12): CI runs on every push to either, and the tip being checked is the tip of the branch that was pushed. The local gate board (§4 of `WORKING-PROCESS.md`) remains the **pre-push** evidence — it is what tells the implementing agent the chunk is ready to push at all. CI is the **post-push confirmation** — a separate, independently-provisioned environment proving the same claim holds somewhere other than the machine that made it. **A red CI at the tip reopens the chunk**, regardless of what the local board said, and regardless of whether the failure looks unrelated to the diff — an unrelated-looking CI failure is exactly what this standard exists to catch, not a reason to wave it through.
 
 **Why this needed saying.** Two chunks — AH-068 and AH-069 — each shipped with a green local gate board while `origin/main`'s CI had been red since 2026-08-11 (AH-070). Both boards were honest; both were also **laptop-local**, run on a machine that supplied an AWS region CI did not, and neither chunk checked the CI result for the tip it was pushing before calling the push clean. The gap was not a testing gap — it was a **ritual** gap: nothing in the close-out step ever pointed either agent at GitHub.
 
@@ -608,5 +608,19 @@ This document is the **process** record. It's not the technical record. For tech
 - Tenancy contract → `security/tenancy.md`
 - Feature flags → `feature-flags.md`
 - Per-chunk decisions → `reviews/sprint-{N}-chunk-{M}-review.md`
+- Production Line sprints, chunks and branch rulings → `reviews/production-line-sprints.md`
 
 This document is the glue between all of those.
+
+---
+
+## 12. Branches: `main` and `pl`
+
+Since 2026-11-17 there are two long-lived branches. The full rulings are in `docs/reviews/production-line-sprints.md`; the short form:
+
+- **`main` is production.** Fixes and ad-hoc work on the live product (AH numbers) go on `main`, as before, with every rule in this document unchanged.
+- **`pl` holds the Production Line work** (sprints PL-1 to PL-9: Strategy & scripts, Video editing, Client portal). Chunks are named `PL-<sprint>.<n>`.
+- **`main` is merged into `pl` at least weekly**, so live fixes never drift away from the new work.
+- **`pl` is merged into `main` only at a sprint boundary, on Pedram's word,** after one or more complete sprints, with every new feature flag OFF.
+- **CI runs on every push to `main` and to `pl`, all four jobs.** The CI-green rule (§5.41) applies to both.
+- **"Every push is to `main`" no longer holds.** Wherever a process document says "push", read "push to the branch the work belongs to". Nothing pushes without Pedram's word on either branch.
