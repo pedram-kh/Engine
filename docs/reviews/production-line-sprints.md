@@ -12,19 +12,19 @@
 
 Sizes and chunk counts are estimates. Each sprint's plan fixes them before any code.
 
-| Sprint | Name                  | Size | Chunks | Scope                                                                                                                                                                                               | Frames                         |
-| ------ | --------------------- | ---- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| PL-1   | Brand and wave        | M    | 4      | Campaign kind (wave) and markets; wave board columns; Brand page and brand files; New wave and Wave tracker (Statics and Stills tracked only)                                                       | Strategy 01, 01b, 09           |
-| PL-2   | Strategy              | L    | 5      | USPs; personas; messaging matrix (by hand); concepts; versions, gate 1 and approval recorded on the client's behalf                                                                                 | Strategy 02 to 05              |
-| PL-3   | Creators and scripts  | L    | 5      | Shortlist model; creator picker; script model; script editor (hooks, lines, shots); two languages and versions                                                                                      | Strategy 06 to 08              |
-| PL-4   | Portal access         | XL   | 6      | Client sign-in backend; tenancy, audit and rate limits; client deletion path; portal shell and joining pages; questionnaire; Home, Files and Team                                                   | Portal P01 to P05, P07 to P09  |
-| PL-5   | Client approvals      | L    | 5      | Approval records and notifications; comments; USPs, personas and matrix screens; concepts, creators and scripts screens; portal wave tracker                                                        | Strategy 10, 11; Portal P06    |
-| PL-6   | Hand-off and footage  | XL   | 7      | Gate 2 and automatic brief; deadlines and reminders; large resumable upload; thumbnails and video details; "My scripts" with clip slots; phone upload plugin and app build; footage review per clip | Strategy 12a to 12j, 13        |
-| PL-7   | Video editing         | L    | 6      | Editor role and guards; editor shell; jobs, brief and open pool; upload final ads; monthly deliverables and batch; revision round                                                                   | Video 01 to 03, 05 to 07       |
-| PL-8   | Ad review and library | XL   | 6      | Streaming player; timed comments; drawing; V1 to V2 loop; downloads and export; Ads library                                                                                                         | Video 12, 14 to 17; Portal P10 |
-| PL-9   | AI                    | L    | 5      | Provider, cost limit and run log; USP drafts and matrix; concept and script drafts; translation; subtitle check                                                                                     | Strategy 04b; Video 04         |
+| Sprint | Name                  | Size | Chunks | Scope                                                                                                                                                                                                                                                                                                                 | Frames                         |
+| ------ | --------------------- | ---- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| PL-1   | Brand and wave        | M    | 3      | Wave object (brand, name, go-live date, markets, optional campaign link); Brand page, client files and waves table; New wave dialog; campaign for a wave, link on both sides and the new board; Wave project tracker (Statics and Stills tracked only). Chunks PL-1.1 to PL-1.3, see the design rulings of 2026-11-17 | Strategy 01, 01b, 09           |
+| PL-2   | Strategy              | L    | 5      | USPs; personas; messaging matrix (by hand); concepts; versions, gate 1 and approval recorded on the client's behalf                                                                                                                                                                                                   | Strategy 02 to 05              |
+| PL-3   | Creators and scripts  | L    | 5      | Shortlist model; creator picker; script model; script editor (hooks, lines, shots); two languages and versions                                                                                                                                                                                                        | Strategy 06 to 08              |
+| PL-4   | Portal access         | XL   | 6      | Client sign-in backend; tenancy, audit and rate limits; client deletion path; portal shell and joining pages; questionnaire; Home, Files and Team                                                                                                                                                                     | Portal P01 to P05, P07 to P09  |
+| PL-5   | Client approvals      | L    | 5      | Approval records and notifications; comments; USPs, personas and matrix screens; concepts, creators and scripts screens; portal wave tracker                                                                                                                                                                          | Strategy 10, 11; Portal P06    |
+| PL-6   | Hand-off and footage  | XL   | 7      | Gate 2 and automatic brief; deadlines and reminders; large resumable upload; thumbnails and video details; "My scripts" with clip slots; phone upload plugin and app build; footage review per clip                                                                                                                   | Strategy 12a to 12j, 13        |
+| PL-7   | Video editing         | L    | 6      | Editor role and guards; editor shell; jobs, brief and open pool; upload final ads; monthly deliverables and batch; revision round                                                                                                                                                                                     | Video 01 to 03, 05 to 07       |
+| PL-8   | Ad review and library | XL   | 6      | Streaming player; timed comments; drawing; V1 to V2 loop; downloads and export; Ads library                                                                                                                                                                                                                           | Video 12, 14 to 17; Portal P10 |
+| PL-9   | AI                    | L    | 5      | Provider, cost limit and run log; USP drafts and matrix; concept and script drafts; translation; subtitle check                                                                                                                                                                                                       | Strategy 04b; Video 04         |
 
-Total: 49 chunks.
+Total: 48 chunks (PL-1 is 3 chunks since 2026-11-17).
 
 **Flags.** Each sprint ships behind its own flag (strategy, portal, editing, AI), default OFF.
 
@@ -38,7 +38,7 @@ Total: 49 chunks.
 
 **Earlier decisions carried in**
 
-- A wave is a campaign with a new kind, and the normal assignment is created only at hand-off.
+- ~~A wave is a campaign with a new kind~~ **superseded 2026-11-17**: a wave is its own object linked to a campaign (R1 below). The normal assignment is still created only at hand-off.
 - The strategist picks the month when sending a batch.
 - Every step works by hand before AI is added.
 
@@ -104,3 +104,38 @@ Recorded, not edited now (Pedram, 2026-11-17).
 - **`docs/runbooks/local-dev.md` (the environments table, ~L53):** the staging row. Rewrite when staging exists.
 - **Runbooks** (`deploy-ah*.md`) hard-code `origin/main` in the pull and fast-forward steps. The next runbook should name the branch; deploys stay `main` only.
 - **Deploy-log template:** says production is the only environment. Staging needs its own log or an `Environment:` field; pushes to `pl` are never recorded as deploys.
+
+---
+
+## 6. Design rulings 2026-11-17
+
+Pedram, 2026-11-17. These **supersede any earlier note that "a wave is a kind of campaign"** (design review §9 ruling 4, inventory §A5 and §N, and the sprint table of 2026-11-13). Record only; no code.
+
+1. **R1. A wave is its own object.** It links one-to-one to a campaign of the same brand. A campaign has at most one wave; a wave has at most one campaign.
+2. **R2. Split of work.** The campaign does recruiting: job post, applications, invites, offer, contract, chat, board. The wave owns strategy, scripts, the project tracker and client approvals.
+3. **R3.** A campaign can be created "for a wave". In such a campaign the creator does not post content.
+4. **R4.** The New wave dialog offers an existing unlinked campaign of that brand, or "create a campaign for this wave now". The link is optional when the wave is created. It is **required by the creators step**. **Hand-off is blocked without it.**
+5. **R5.** The wave's creator picker shows only creators who applied to the linked campaign's job post or were invited to that campaign.
+6. **R6.** Creator status in the wave is derived from the campaign: Shortlisted, Contacted (invited), Confirmed (accepted), Declined.
+7. **R7.** Hand-off sends approved scripts to a creator who has already accepted.
+8. **R8. OPEN.** New need: a "release creator" action. Sprint not decided (PL-3 or PL-5).
+9. **R9. Board for a campaign linked to a wave.** Columns, in order: **Applied, Invited, Selected, Filming, Submitted / in review, In edits, Client review, Approved, Dropped.** All columns exist from the start.
+   - Invited cards show a status: Invited, Accepted or Declined. An Accepted card stays in Invited until the strategist selects the creator.
+   - One card per creator. The card carries a per-script tracker.
+   - The card's column follows the slowest script.
+   - Paid and Payment due are left off until payments exist.
+   - Existing campaigns keep their current columns.
+   - **OPEN:** whether a Declined card moves to Dropped. Not ruled. **Do not build either way until Pedram rules.**
+10. **R10.** Where a screen has no design, build from the existing design system and name that in the plan and the report.
+
+### PL-1 chunks (three)
+
+- **PL-1.1 Brand and new wave.** The wave object (brand, name, go-live date, markets, optional campaign link), the Brand page (details, client files, waves table) and the New wave dialog. Frames 01 and 09.
+- **PL-1.2 Campaign for a wave.** The create option, the link shown on both sides, the new board. Design: Pedram's board screenshot.
+- **PL-1.3 Wave project tracker.** Streams, steps table, owners and dates. Frame 01b, read from Figma in pieces.
+
+### Open items from these rulings
+
+- R8: the "release creator" action; PL-3 or PL-5 not decided.
+- R9: whether a Declined card moves to Dropped.
+- Docs that still say a wave is a campaign kind, to reconcile when the PL-1 plan is written: `production-line-inventory.md` §A5 and §N, `new-sections-design-review.md` §9 ruling 4. Closed review files stay verbatim (`WORKING-PROCESS.md` §8); the correction belongs in a dated addendum.
