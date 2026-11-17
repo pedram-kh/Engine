@@ -84,6 +84,8 @@ Routes: agency `MOD/Campaigns/Routes/api.php:33-153`; board `MOD/Boards/Routes/a
 
 ### A5. What would break or need a branch for `kind = "wave"` (current assumptions only)
 
+> **Addendum 2026-11-17.** The wave rulings of 2026-11-17 (`production-line-sprints.md` §6, R1 to R10) supersede "a wave is a campaign". A wave is its own object, linked one-to-one to a campaign of the same brand. No `kind` column is added to campaigns. The list below is kept verbatim as a record of what a `kind` would have touched; it is no longer the plan.
+
 1. No `kind` exists in migration, fillable/casts (`Campaign.php:111-148,366-392`), `CreateCampaignRequest`, the `store()` whitelist (`CampaignController.php:110-150`; comment `:128-130`: a missing field "validates, returns 201 and never persists"), `CampaignResource` (`:36-90`), the audit snapshot (`:495-519`), `CampaignFactory`, or `packages/api-client/src/types/campaign.ts`.
 2. Brand is mandatory in six places (A3, Brand row).
 3. Jobs board and fan-out have no kind filter: `Campaign.php:356-361`, `JobsBoardVisibility.php:88-131`, `JobPostedFanOutService.php:267`, `CreatorJobBoardController.php:118,174,249`, `CreatorJobCardResource`, `CreatorJobDetailResource`.
@@ -656,6 +658,8 @@ Paths under `MOD/TalentPools/` unless marked; migrations under `API/database/mig
 ---
 
 ## N. SIZING (the only opinion section)
+
+> **Addendum 2026-11-17.** The wave rulings of 2026-11-17 (`production-line-sprints.md` §6) supersede "a wave is a campaign" wherever it appears in this section (N1 "a `kind`, or a parent link", N2 item 3, N3 "backfilling a `kind`" and "per-kind board columns"). A wave is its own object linked one-to-one to a campaign; only campaigns linked to a wave get the new board columns (R9). The sizing text below is kept verbatim.
 
 ### N1. Per section
 

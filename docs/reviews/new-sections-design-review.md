@@ -468,6 +468,8 @@ These are not decisions. They are the heavy parts to size before planning.
 | 10  | Portal on phones                          | **Not needed for the first release.**                                                                                                                                                     |
 | 11  | Share link and portal                     | **One client portal only.** The share-link sign-in screens (Video 08 to 11, 13) are not built; a share link opens a page inside the portal.                                               |
 
+**Addendum 2026-11-17, ruling 4.** The wave rulings of 2026-11-17 (`production-line-sprints.md` §6, R1 to R10) supersede "a wave is a campaign". A wave is its own object, linked one-to-one to a campaign of the same brand. The ruling 4 row above is kept verbatim.
+
 **Note on 5, where the monthly batch appears.** Video editing frames 01, 02, 05, 06, 07 and 12, and portal frames P05 and P10. Frame 05 is titled "Bolt Food — October deliverables" with the line "Wave 7 · SK + RO · 18 ads from 6 creators". Job rows read "Bolt Food · Wave 7 · Oct deliverables" and "Glovo · Wave 2 · Nov deliverables". Every example pairs one month with one wave. No screen shows a month holding two waves or a wave spanning two months.
 
 **Note on 6, where Statics and Stills appear.** Only on Strategy frame 01b, the wave project tracker: two of the six wave tabs ("Statics" with a Figma tag, "Stills"), two of the three stream cards, and their rows in the steps table. They link out to Figma and to a shoot folder. No screen exists for the tabs themselves.

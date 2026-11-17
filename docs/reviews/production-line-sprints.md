@@ -125,7 +125,7 @@ Pedram, 2026-11-17. These **supersede any earlier note that "a wave is a kind of
    - The card's column follows the slowest script.
    - Paid and Payment due are left off until payments exist.
    - Existing campaigns keep their current columns.
-   - **OPEN:** whether a Declined card moves to Dropped. Not ruled. **Do not build either way until Pedram rules.**
+   - A creator who declines stays in Invited with the Declined label. The card does not move to Dropped. Dropped is for creators the team removes or rejects.
 10. **R10.** Where a screen has no design, build from the existing design system and name that in the plan and the report.
 
 ### PL-1 chunks (three)
@@ -137,5 +137,4 @@ Pedram, 2026-11-17. These **supersede any earlier note that "a wave is a kind of
 ### Open items from these rulings
 
 - R8: the "release creator" action; PL-3 or PL-5 not decided.
-- R9: whether a Declined card moves to Dropped.
-- Docs that still say a wave is a campaign kind, to reconcile when the PL-1 plan is written: `production-line-inventory.md` §A5 and §N, `new-sections-design-review.md` §9 ruling 4. Closed review files stay verbatim (`WORKING-PROCESS.md` §8); the correction belongs in a dated addendum.
+- Docs that still say a wave is a campaign kind. Dated addenda of 2026-11-17 now sit in `production-line-inventory.md` §A5 and §N, and in `new-sections-design-review.md` §9 ruling 4. Closed review files stay verbatim (`WORKING-PROCESS.md` §8); the correction is a dated addendum.
