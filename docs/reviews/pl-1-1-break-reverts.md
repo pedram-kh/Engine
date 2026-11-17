@@ -55,3 +55,14 @@ Correction after Stage 1 review: the service "already linked" pre-check was remo
 | step4       | B10 deleted audit removed                                                                        | destroy                                         | B10 (1 red)                                                                                                                                          | restored yes       |
 | post-review | create exception mapping removed                                                                 | WaveService::create                             | B5 second wave for a linked campaign, B5 race (2 red)                                                                                                | restored yes       |
 | post-review | update (set-link) exception mapping removed                                                      | WaveService::update                             | B14 set-link obeys every create rule (1 red)                                                                                                         | restored yes       |
+
+## Audit payload fix (after CI run 447)
+
+Mutations ran on the committed tree at `61c84195`; `git checkout` restored each file and `git status` was clean after each.
+
+| Step      | Gate / what was broken                                                | Where                               | Tests that went red                                              |
+| --------- | --------------------------------------------------------------------- | ----------------------------------- | ---------------------------------------------------------------- |
+| audit-fix | E1 `original_filename` key left undecided                             | AuditPayloadKeys::notPersonalKeys   | AuditPayloadKeysGuardTest, has decided every literal key (1 red) |
+| audit-fix | E2 wave `after` payload back to `toArray()` (not statically readable) | WaveService::create                 | AuditPayloadKeysGuardTest, has decided every literal key (1 red) |
+| audit-fix | E3 file `after` payload gains `storage_key`                           | BrandFileController::completeUpload | BrandFileApiTest B10 key-set pin (1 red)                         |
+| audit-fix | E4 wave update `before` payload drops `campaign_id`                   | WaveService::update                 | WaveApiTest B10 key-set pin (1 red)                              |
