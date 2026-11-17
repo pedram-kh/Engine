@@ -1413,6 +1413,102 @@
       "showing": "Se afișează {shown} din {total}",
       "previous": "Anterior",
       "next": "Următor"
+    },
+    "waves": {
+      "status": {
+        "draft": "Ciornă"
+      },
+      "panel": {
+        "title": "Valuri",
+        "subtitle": "Fiecare val este o rundă de planificare pentru acest brand.",
+        "newWave": "Val nou",
+        "count": "{count} val | {count} valuri"
+      },
+      "table": {
+        "wave": "Val",
+        "markets": "Piețe",
+        "progress": "Progres",
+        "updated": "Actualizat",
+        "goLive": "Lansare {date}",
+        "notStarted": "Neînceput"
+      },
+      "empty": {
+        "heading": "Încă nu există valuri",
+        "body": "Creați primul val pentru acest brand."
+      },
+      "errors": {
+        "loadFailed": "Valurile nu au putut fi încărcate.",
+        "campaignNotAvailable": "Campania aceea nu poate fi legată de un val al acestui brand.",
+        "campaignAlreadyLinked": "Campania aceea are deja un val.",
+        "campaignLinkLocked": "Acest val este deja legat de o campanie. Legătura nu poate fi schimbată.",
+        "brandArchived": "Acest brand este arhivat. Restaurați-l pentru a-i modifica valurile.",
+        "saveFailed": "Valul nu a putut fi salvat. Încercați din nou."
+      },
+      "dialog": {
+        "createTitle": "Val nou",
+        "editTitle": "Editați valul",
+        "name": "Numele valului",
+        "goLive": "Data lansării",
+        "markets": "Piețe",
+        "addMarket": "Adăugați o piață",
+        "searchMarket": "Căutați țări",
+        "noMarketMatch": "Nicio țară nu se potrivește",
+        "removeMarket": "Eliminați {market}",
+        "campaign": "Campanie (opțional)",
+        "noCampaign": "Fără campanie",
+        "campaignHint": "Puteți lega o campanie mai târziu.",
+        "campaignLocked": "O campanie legată nu poate fi schimbată aici.",
+        "create": "Creați valul",
+        "save": "Salvați modificările"
+      },
+      "validation": {
+        "nameRequired": "Introduceți un nume pentru val.",
+        "goLiveRequired": "Alegeți o dată de lansare.",
+        "marketsRequired": "Adăugați cel puțin o piață.",
+        "marketsMax": "Adăugați cel mult 20 de piețe."
+      },
+      "detail": {
+        "title": "Val",
+        "brand": "Brand",
+        "campaign": "Campanie legată",
+        "noCampaign": "Nicio campanie legată",
+        "createdBy": "Creat de",
+        "notFound": "Acest val nu a fost găsit."
+      }
+    },
+    "brandFiles": {
+      "title": "Fișierele clientului",
+      "subtitle": "Briefuri, cercetări și ghiduri partajate de client.",
+      "upload": "Încărcați fișiere",
+      "type": "Tip",
+      "types": {
+        "brief": "Brief",
+        "research": "Cercetare",
+        "guidelines": "Ghiduri",
+        "assets": "Materiale",
+        "other": "Altele"
+      },
+      "dropZone": "Trageți fișierele aici pentru a le încărca. PDF, Office, text, imagini sau ZIP, până la 100 MB fiecare.",
+      "empty": "Încă nu există fișiere ale clientului.",
+      "actions": "Acțiuni pentru fișier",
+      "uploadDialog": {
+        "title": "Încărcați fișierele clientului",
+        "body": "PDF, Word, Excel, text, CSV, imagini sau ZIP, până la 100 MB fiecare.",
+        "typeLabel": "Tipul fișierului",
+        "choose": "Alegeți fișiere",
+        "done": "Gata",
+        "uploading": "Se încarcă {name}…",
+        "success": "{name} a fost încărcat."
+      },
+      "errors": {
+        "tooLarge": "{name} depășește 100 MB.",
+        "unsupported": "{name} nu este un tip de fișier acceptat.",
+        "uploadFailed": "{name} nu a putut fi încărcat. Încercați din nou.",
+        "loadFailed": "Fișierele clientului nu au putut fi încărcate.",
+        "deleteFailed": "Fișierul nu a putut fi șters. Încercați din nou.",
+        "downloadFailed": "Descărcarea nu a putut fi pornită.",
+        "brandArchived": "Acest brand este arhivat. Restaurați-l pentru a-i modifica fișierele."
+      }
     }
   },
   "validation": {

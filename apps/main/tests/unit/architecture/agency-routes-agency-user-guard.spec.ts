@@ -106,6 +106,8 @@ describe('agency-shell routes — requireAgencyUser guard registration (Sprint 6
       'roster.detail',
       'roster.list',
       'settings',
+      // PL-1.1 — a wave of a brand.
+      'waves.detail',
     ])
   })
 

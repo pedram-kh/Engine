@@ -1413,6 +1413,102 @@
       "showing": "{shown} sur {total} affichés",
       "previous": "Précédent",
       "next": "Suivant"
+    },
+    "waves": {
+      "status": {
+        "draft": "Brouillon"
+      },
+      "panel": {
+        "title": "Vagues",
+        "subtitle": "Chaque vague est un tour de planification pour cette marque.",
+        "newWave": "Nouvelle vague",
+        "count": "{count} vague | {count} vagues"
+      },
+      "table": {
+        "wave": "Vague",
+        "markets": "Marchés",
+        "progress": "Progression",
+        "updated": "Mise à jour",
+        "goLive": "Mise en ligne {date}",
+        "notStarted": "Non commencée"
+      },
+      "empty": {
+        "heading": "Aucune vague pour l'instant",
+        "body": "Créez la première vague de cette marque."
+      },
+      "errors": {
+        "loadFailed": "Impossible de charger les vagues.",
+        "campaignNotAvailable": "Cette campagne ne peut pas être liée à une vague de cette marque.",
+        "campaignAlreadyLinked": "Cette campagne a déjà une vague.",
+        "campaignLinkLocked": "Cette vague est déjà liée à une campagne. Le lien ne peut pas être modifié.",
+        "brandArchived": "Cette marque est archivée. Restaurez-la pour modifier ses vagues.",
+        "saveFailed": "Impossible d'enregistrer la vague. Réessayez."
+      },
+      "dialog": {
+        "createTitle": "Nouvelle vague",
+        "editTitle": "Modifier la vague",
+        "name": "Nom de la vague",
+        "goLive": "Date de mise en ligne",
+        "markets": "Marchés",
+        "addMarket": "Ajouter un marché",
+        "searchMarket": "Rechercher des pays",
+        "noMarketMatch": "Aucun pays ne correspond",
+        "removeMarket": "Retirer {market}",
+        "campaign": "Campagne (facultatif)",
+        "noCampaign": "Aucune campagne",
+        "campaignHint": "Vous pourrez lier une campagne plus tard.",
+        "campaignLocked": "Une campagne liée ne peut pas être modifiée ici.",
+        "create": "Créer la vague",
+        "save": "Enregistrer les modifications"
+      },
+      "validation": {
+        "nameRequired": "Saisissez un nom de vague.",
+        "goLiveRequired": "Choisissez une date de mise en ligne.",
+        "marketsRequired": "Ajoutez au moins un marché.",
+        "marketsMax": "Ajoutez 20 marchés au maximum."
+      },
+      "detail": {
+        "title": "Vague",
+        "brand": "Marque",
+        "campaign": "Campagne liée",
+        "noCampaign": "Aucune campagne liée",
+        "createdBy": "Créée par",
+        "notFound": "Cette vague est introuvable."
+      }
+    },
+    "brandFiles": {
+      "title": "Fichiers du client",
+      "subtitle": "Briefs, études et directives partagés par le client.",
+      "upload": "Téléverser des fichiers",
+      "type": "Type",
+      "types": {
+        "brief": "Cahier des charges",
+        "research": "Étude",
+        "guidelines": "Directives",
+        "assets": "Ressources",
+        "other": "Autre"
+      },
+      "dropZone": "Glissez des fichiers ici pour les téléverser. PDF, Office, texte, images ou ZIP, 100 Mo maximum chacun.",
+      "empty": "Aucun fichier du client pour l'instant.",
+      "actions": "Actions sur le fichier",
+      "uploadDialog": {
+        "title": "Téléverser des fichiers du client",
+        "body": "PDF, Word, Excel, texte, CSV, images ou ZIP, 100 Mo maximum chacun.",
+        "typeLabel": "Nature du fichier",
+        "choose": "Choisir des fichiers",
+        "done": "Terminé",
+        "uploading": "Téléversement de {name}…",
+        "success": "{name} a été téléversé."
+      },
+      "errors": {
+        "tooLarge": "{name} dépasse 100 Mo.",
+        "unsupported": "{name} n'est pas un type de fichier pris en charge.",
+        "uploadFailed": "Impossible de téléverser {name}. Réessayez.",
+        "loadFailed": "Impossible de charger les fichiers du client.",
+        "deleteFailed": "Impossible de supprimer le fichier. Réessayez.",
+        "downloadFailed": "Impossible de démarrer le téléchargement.",
+        "brandArchived": "Cette marque est archivée. Restaurez-la pour modifier ses fichiers."
+      }
     }
   },
   "validation": {

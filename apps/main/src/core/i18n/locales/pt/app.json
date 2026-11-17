@@ -1413,6 +1413,102 @@
       "showing": "A mostrar {shown} de {total}",
       "previous": "Anterior",
       "next": "Seguinte"
+    },
+    "waves": {
+      "status": {
+        "draft": "Rascunho"
+      },
+      "panel": {
+        "title": "Ondas",
+        "subtitle": "Cada onda é uma ronda de planeamento para esta marca.",
+        "newWave": "Nova onda",
+        "count": "{count} onda | {count} ondas"
+      },
+      "table": {
+        "wave": "Onda",
+        "markets": "Mercados",
+        "progress": "Progresso",
+        "updated": "Atualizada",
+        "goLive": "Lançamento {date}",
+        "notStarted": "Não iniciada"
+      },
+      "empty": {
+        "heading": "Ainda não há ondas",
+        "body": "Crie a primeira onda desta marca."
+      },
+      "errors": {
+        "loadFailed": "Não foi possível carregar as ondas.",
+        "campaignNotAvailable": "Essa campanha não pode ser associada a uma onda desta marca.",
+        "campaignAlreadyLinked": "Essa campanha já tem uma onda.",
+        "campaignLinkLocked": "Esta onda já está associada a uma campanha. A associação não pode ser alterada.",
+        "brandArchived": "Esta marca está arquivada. Restaure-a para alterar as suas ondas.",
+        "saveFailed": "Não foi possível guardar a onda. Tente novamente."
+      },
+      "dialog": {
+        "createTitle": "Nova onda",
+        "editTitle": "Editar onda",
+        "name": "Nome da onda",
+        "goLive": "Data de lançamento",
+        "markets": "Mercados",
+        "addMarket": "Adicionar mercado",
+        "searchMarket": "Pesquisar países",
+        "noMarketMatch": "Nenhum país corresponde",
+        "removeMarket": "Remover {market}",
+        "campaign": "Campanha (opcional)",
+        "noCampaign": "Sem campanha",
+        "campaignHint": "Pode associar uma campanha mais tarde.",
+        "campaignLocked": "Uma campanha associada não pode ser alterada aqui.",
+        "create": "Criar onda",
+        "save": "Guardar alterações"
+      },
+      "validation": {
+        "nameRequired": "Introduza um nome para a onda.",
+        "goLiveRequired": "Escolha uma data de lançamento.",
+        "marketsRequired": "Adicione pelo menos um mercado.",
+        "marketsMax": "Adicione no máximo 20 mercados."
+      },
+      "detail": {
+        "title": "Onda",
+        "brand": "Marca",
+        "campaign": "Campanha associada",
+        "noCampaign": "Sem campanha associada",
+        "createdBy": "Criada por",
+        "notFound": "Esta onda não foi encontrada."
+      }
+    },
+    "brandFiles": {
+      "title": "Ficheiros do cliente",
+      "subtitle": "Briefings, pesquisas e diretrizes partilhados pelo cliente.",
+      "upload": "Carregar ficheiros",
+      "type": "Tipo",
+      "types": {
+        "brief": "Briefing",
+        "research": "Pesquisa",
+        "guidelines": "Diretrizes",
+        "assets": "Materiais",
+        "other": "Outro"
+      },
+      "dropZone": "Arraste ficheiros para aqui para os carregar. PDF, Office, texto, imagens ou ZIP, até 100 MB cada.",
+      "empty": "Ainda não há ficheiros do cliente.",
+      "actions": "Ações do ficheiro",
+      "uploadDialog": {
+        "title": "Carregar ficheiros do cliente",
+        "body": "PDF, Word, Excel, texto, CSV, imagens ou ZIP, até 100 MB cada.",
+        "typeLabel": "Tipo de ficheiro",
+        "choose": "Escolher ficheiros",
+        "done": "Concluído",
+        "uploading": "A carregar {name}…",
+        "success": "{name} foi carregado."
+      },
+      "errors": {
+        "tooLarge": "{name} excede os 100 MB.",
+        "unsupported": "{name} não é um tipo de ficheiro suportado.",
+        "uploadFailed": "Não foi possível carregar {name}. Tente novamente.",
+        "loadFailed": "Não foi possível carregar os ficheiros do cliente.",
+        "deleteFailed": "Não foi possível eliminar o ficheiro. Tente novamente.",
+        "downloadFailed": "Não foi possível iniciar a transferência.",
+        "brandArchived": "Esta marca está arquivada. Restaure-a para alterar os seus ficheiros."
+      }
     }
   },
   "validation": {

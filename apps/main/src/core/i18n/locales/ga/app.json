@@ -1413,6 +1413,102 @@
       "showing": "Ag taispeáint {shown} as {total}",
       "previous": "Roimhe seo",
       "next": "Ar aghaidh"
+    },
+    "waves": {
+      "status": {
+        "draft": "Dréacht"
+      },
+      "panel": {
+        "title": "Tonnta",
+        "subtitle": "Is babhta pleanála amháin é gach tonn don bhranda seo.",
+        "newWave": "Tonn nua",
+        "count": "{count} tonn | {count} tonn"
+      },
+      "table": {
+        "wave": "Tonn",
+        "markets": "Margaí",
+        "progress": "Dul chun cinn",
+        "updated": "Nuashonraithe",
+        "goLive": "Dul beo {date}",
+        "notStarted": "Gan tosú"
+      },
+      "empty": {
+        "heading": "Níl aon tonn ann fós",
+        "body": "Cruthaigh an chéad tonn don bhranda seo."
+      },
+      "errors": {
+        "loadFailed": "Níorbh fhéidir na tonnta a luchtú.",
+        "campaignNotAvailable": "Ní féidir an feachtas sin a nascadh le tonn den bhranda seo.",
+        "campaignAlreadyLinked": "Tá tonn ag an bhfeachtas sin cheana.",
+        "campaignLinkLocked": "Tá an tonn seo nasctha le feachtas cheana. Ní féidir an nasc a athrú.",
+        "brandArchived": "Tá an branda seo cartlannaithe. Athchóirigh é chun a thonnta a athrú.",
+        "saveFailed": "Níorbh fhéidir an tonn a shábháil. Bain triail eile as."
+      },
+      "dialog": {
+        "createTitle": "Tonn nua",
+        "editTitle": "Cuir tonn in eagar",
+        "name": "Ainm an toinn",
+        "goLive": "Dáta dul beo",
+        "markets": "Margaí",
+        "addMarket": "Cuir margadh leis",
+        "searchMarket": "Cuardaigh tíortha",
+        "noMarketMatch": "Níl aon tír ag teacht leis",
+        "removeMarket": "Bain {market}",
+        "campaign": "Feachtas (roghnach)",
+        "noCampaign": "Gan feachtas",
+        "campaignHint": "Is féidir leat feachtas a nascadh níos déanaí.",
+        "campaignLocked": "Ní féidir feachtas nasctha a athrú anseo.",
+        "create": "Cruthaigh tonn",
+        "save": "Sábháil na hathruithe"
+      },
+      "validation": {
+        "nameRequired": "Cuir isteach ainm toinn.",
+        "goLiveRequired": "Roghnaigh dáta dul beo.",
+        "marketsRequired": "Cuir margadh amháin ar a laghad leis.",
+        "marketsMax": "Cuir 20 margadh ar a mhéad leis."
+      },
+      "detail": {
+        "title": "Tonn",
+        "brand": "Branda",
+        "campaign": "Feachtas nasctha",
+        "noCampaign": "Gan feachtas nasctha",
+        "createdBy": "Cruthaithe ag",
+        "notFound": "Níor aimsíodh an tonn seo."
+      }
+    },
+    "brandFiles": {
+      "title": "Comhaid chliaint",
+      "subtitle": "Achoimrí, taighde agus treoirlínte a roinn an cliant.",
+      "upload": "Uaslódáil comhaid",
+      "type": "Cineál",
+      "types": {
+        "brief": "Achoimre",
+        "research": "Taighde",
+        "guidelines": "Treoirlínte",
+        "assets": "Sócmhainní",
+        "other": "Eile"
+      },
+      "dropZone": "Tarraing comhaid anseo chun iad a uaslódáil. PDF, Office, téacs, íomhánna nó ZIP, suas le 100 MB an ceann.",
+      "empty": "Níl aon chomhad cliaint ann fós.",
+      "actions": "Gníomhartha comhaid",
+      "uploadDialog": {
+        "title": "Uaslódáil comhaid chliaint",
+        "body": "PDF, Word, Excel, téacs, CSV, íomhánna nó ZIP, suas le 100 MB an ceann.",
+        "typeLabel": "Cineál comhaid",
+        "choose": "Roghnaigh comhaid",
+        "done": "Déanta",
+        "uploading": "{name} á uaslódáil…",
+        "success": "Uaslódáladh {name}."
+      },
+      "errors": {
+        "tooLarge": "Tá {name} níos mó ná 100 MB.",
+        "unsupported": "Ní cineál comhaid tacaithe é {name}.",
+        "uploadFailed": "Níorbh fhéidir {name} a uaslódáil. Bain triail eile as.",
+        "loadFailed": "Níorbh fhéidir na comhaid chliaint a luchtú.",
+        "deleteFailed": "Níorbh fhéidir an comhad a scriosadh. Bain triail eile as.",
+        "downloadFailed": "Níorbh fhéidir an íoslódáil a thosú.",
+        "brandArchived": "Tá an branda seo cartlannaithe. Athchóirigh é chun a chomhaid a athrú."
+      }
     }
   },
   "validation": {

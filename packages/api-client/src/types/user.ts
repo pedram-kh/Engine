@@ -141,6 +141,8 @@ export interface UserAttributes {
     messages_v2_edit_search?: boolean
     /** AH-115 L4: creator-side only; true while the creator unified inbox is on. */
     messages_v2_creator_inbox?: boolean
+    /** PL-1: agency-side only; true while brand client files and waves are on. */
+    waves?: boolean
   }
 }
 

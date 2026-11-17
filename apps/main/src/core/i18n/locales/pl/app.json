@@ -1413,6 +1413,102 @@
       "showing": "Wyświetlono {shown} z {total}",
       "previous": "Poprzednia",
       "next": "Następna"
+    },
+    "waves": {
+      "status": {
+        "draft": "Szkic"
+      },
+      "panel": {
+        "title": "Fale",
+        "subtitle": "Każda fala to jedna runda planowania dla tej marki.",
+        "newWave": "Nowa fala",
+        "count": "{count} fala | {count} fal"
+      },
+      "table": {
+        "wave": "Fala",
+        "markets": "Rynki",
+        "progress": "Postęp",
+        "updated": "Zaktualizowano",
+        "goLive": "Start {date}",
+        "notStarted": "Nie rozpoczęto"
+      },
+      "empty": {
+        "heading": "Brak fal",
+        "body": "Utwórz pierwszą falę dla tej marki."
+      },
+      "errors": {
+        "loadFailed": "Nie udało się wczytać fal.",
+        "campaignNotAvailable": "Tej kampanii nie można powiązać z falą tej marki.",
+        "campaignAlreadyLinked": "Ta kampania ma już falę.",
+        "campaignLinkLocked": "Ta fala jest już powiązana z kampanią. Powiązania nie można zmienić.",
+        "brandArchived": "Ta marka jest zarchiwizowana. Przywróć ją, aby zmieniać jej fale.",
+        "saveFailed": "Nie udało się zapisać fali. Spróbuj ponownie."
+      },
+      "dialog": {
+        "createTitle": "Nowa fala",
+        "editTitle": "Edytuj falę",
+        "name": "Nazwa fali",
+        "goLive": "Data startu",
+        "markets": "Rynki",
+        "addMarket": "Dodaj rynek",
+        "searchMarket": "Szukaj krajów",
+        "noMarketMatch": "Żaden kraj nie pasuje",
+        "removeMarket": "Usuń {market}",
+        "campaign": "Kampania (opcjonalnie)",
+        "noCampaign": "Bez kampanii",
+        "campaignHint": "Kampanię możesz powiązać później.",
+        "campaignLocked": "Powiązanej kampanii nie można tu zmienić.",
+        "create": "Utwórz falę",
+        "save": "Zapisz zmiany"
+      },
+      "validation": {
+        "nameRequired": "Wpisz nazwę fali.",
+        "goLiveRequired": "Wybierz datę startu.",
+        "marketsRequired": "Dodaj co najmniej jeden rynek.",
+        "marketsMax": "Dodaj najwyżej 20 rynków."
+      },
+      "detail": {
+        "title": "Fala",
+        "brand": "Marka",
+        "campaign": "Powiązana kampania",
+        "noCampaign": "Brak powiązanej kampanii",
+        "createdBy": "Utworzył(a)",
+        "notFound": "Nie znaleziono tej fali."
+      }
+    },
+    "brandFiles": {
+      "title": "Pliki klienta",
+      "subtitle": "Briefy, badania i wytyczne udostępnione przez klienta.",
+      "upload": "Prześlij pliki",
+      "type": "Typ",
+      "types": {
+        "brief": "Brief",
+        "research": "Badanie",
+        "guidelines": "Wytyczne",
+        "assets": "Materiały",
+        "other": "Inne"
+      },
+      "dropZone": "Przeciągnij pliki tutaj, aby je przesłać. PDF, Office, tekst, obrazy lub ZIP, do 100 MB każdy.",
+      "empty": "Brak plików klienta.",
+      "actions": "Akcje na pliku",
+      "uploadDialog": {
+        "title": "Prześlij pliki klienta",
+        "body": "PDF, Word, Excel, tekst, CSV, obrazy lub ZIP, do 100 MB każdy.",
+        "typeLabel": "Rodzaj pliku",
+        "choose": "Wybierz pliki",
+        "done": "Gotowe",
+        "uploading": "Przesyłanie pliku {name}…",
+        "success": "Przesłano plik {name}."
+      },
+      "errors": {
+        "tooLarge": "Plik {name} jest większy niż 100 MB.",
+        "unsupported": "Plik {name} ma nieobsługiwany typ.",
+        "uploadFailed": "Nie udało się przesłać pliku {name}. Spróbuj ponownie.",
+        "loadFailed": "Nie udało się wczytać plików klienta.",
+        "deleteFailed": "Nie udało się usunąć pliku. Spróbuj ponownie.",
+        "downloadFailed": "Nie udało się rozpocząć pobierania.",
+        "brandArchived": "Ta marka jest zarchiwizowana. Przywróć ją, aby zmieniać jej pliki."
+      }
     }
   },
   "validation": {

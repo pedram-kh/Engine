@@ -35,6 +35,7 @@ import type {
   DraftReviewStatus,
   PostedContentVerificationStatus,
   RosterRelationshipStatus,
+  WaveStatus,
 } from '@catalyst/api-client'
 
 export type AgencyStatusTone = 'success' | 'info' | 'warning' | 'danger' | 'neutral' | 'ai'
@@ -123,6 +124,9 @@ export const AGENCY_STATUS_TONES = {
     active: 'success',
     archived: 'neutral',
   }),
+  wave: entries<WaveStatus>('app.waves.status', {
+    draft: 'neutral',
+  }),
   invitation: entries<AgencyInvitationStatus>('app.agencyUsers.invitations.status', {
     pending: 'warning',
     accepted: 'success',
@@ -152,6 +156,7 @@ export const AGENCY_STATUS_SOURCES: Readonly<
   roster: { type: 'RosterRelationshipStatus', file: 'types/agency.ts' },
   discovery: { type: 'DiscoveryConnectionState', file: 'types/agency.ts' },
   brand: { type: 'BrandStatus', file: 'types/agency.ts' },
+  wave: { type: 'WaveStatus', file: 'types/wave.ts' },
   invitation: { type: 'AgencyInvitationStatus', file: 'types/agency.ts' },
   membership: { type: 'AgencyMembershipStatus', file: 'types/agency.ts' },
 }

@@ -113,7 +113,7 @@ const FROZEN_AGENCY_FILES: ReadonlyArray<readonly [string, string]> = [
   ],
   [
     'apps/main/src/modules/agency/status/agencyStatusTones.ts',
-    'abeeb6768a8d51b4f50143ad2aac168b512218e6a63cba431250b6c26c5ee121',
+    '7b7f68e86406432c532d788c3c4d3bbcfd3666df0f2284ae06dd9fbd2bf87c55',
   ],
   [
     'apps/main/src/modules/agency/status/draftRoundTone.ts',
@@ -121,7 +121,7 @@ const FROZEN_AGENCY_FILES: ReadonlyArray<readonly [string, string]> = [
   ],
   [
     'apps/main/src/modules/agency/theme/agency.css',
-    '0d9bdc6837bdefb0f520426c972af27ed6022940fd38d83e7cdccab837fcc88c',
+    '0a5e9b0c04d81558a05ee04da257e567760c0fa5b142659dbb56f54aefb9cd30',
   ],
   [
     'apps/main/src/modules/agency/theme/agencyThemes.ts',

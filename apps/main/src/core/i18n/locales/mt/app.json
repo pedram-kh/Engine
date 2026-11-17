@@ -1413,6 +1413,102 @@
       "showing": "Qed turi {shown} minn {total}",
       "previous": "Preċedenti",
       "next": "Li jmiss"
+    },
+    "waves": {
+      "status": {
+        "draft": "Abbozz"
+      },
+      "panel": {
+        "title": "Mewġ",
+        "subtitle": "Kull mewġa hija rawnd ta' ppjanar wieħed għal dan il-marka.",
+        "newWave": "Mewġa ġdida",
+        "count": "{count} mewġa | {count} mewġ"
+      },
+      "table": {
+        "wave": "Mewġa",
+        "markets": "Swieq",
+        "progress": "Avanzament",
+        "updated": "Aġġornat",
+        "goLive": "Tnedija {date}",
+        "notStarted": "Ma bdietx"
+      },
+      "empty": {
+        "heading": "Għad m'hemm l-ebda mewġ",
+        "body": "Oħloq l-ewwel mewġa għal din il-marka."
+      },
+      "errors": {
+        "loadFailed": "Il-mewġ ma setax jitgħabba.",
+        "campaignNotAvailable": "Dik il-kampanja ma tistax tiġi marbuta ma' mewġa ta' din il-marka.",
+        "campaignAlreadyLinked": "Dik il-kampanja diġà għandha mewġa.",
+        "campaignLinkLocked": "Din il-mewġa diġà hija marbuta ma' kampanja. Il-ħolqa ma tistax tinbidel.",
+        "brandArchived": "Din il-marka hija arkivjata. Irkuprah biex tbiddel il-mewġ tagħha.",
+        "saveFailed": "Il-mewġa ma setgħetx tiġi ssejvjata. Erġa' pprova."
+      },
+      "dialog": {
+        "createTitle": "Mewġa ġdida",
+        "editTitle": "Editja l-mewġa",
+        "name": "Isem il-mewġa",
+        "goLive": "Data tat-tnedija",
+        "markets": "Swieq",
+        "addMarket": "Żid suq",
+        "searchMarket": "Fittex pajjiżi",
+        "noMarketMatch": "L-ebda pajjiż ma jaqbel",
+        "removeMarket": "Neħħi {market}",
+        "campaign": "Kampanja (mhux obbligatorja)",
+        "noCampaign": "Ebda kampanja",
+        "campaignHint": "Tista' torbot kampanja iktar tard.",
+        "campaignLocked": "Kampanja marbuta ma tistax tinbidel hawnhekk.",
+        "create": "Oħloq mewġa",
+        "save": "Issejvja l-bidliet"
+      },
+      "validation": {
+        "nameRequired": "Daħħal isem għall-mewġa.",
+        "goLiveRequired": "Agħżel data tat-tnedija.",
+        "marketsRequired": "Żid mill-inqas suq wieħed.",
+        "marketsMax": "Żid massimu ta' 20 suq."
+      },
+      "detail": {
+        "title": "Mewġa",
+        "brand": "Marka",
+        "campaign": "Kampanja marbuta",
+        "noCampaign": "Ebda kampanja marbuta",
+        "createdBy": "Maħluq minn",
+        "notFound": "Din il-mewġa ma nstabitx."
+      }
+    },
+    "brandFiles": {
+      "title": "Fajls tal-klijent",
+      "subtitle": "Briefs, riċerka u linji gwida maqsuma mill-klijent.",
+      "upload": "Ittrasferixxi fajls",
+      "type": "Tip",
+      "types": {
+        "brief": "Brief tal-proġett",
+        "research": "Riċerka",
+        "guidelines": "Linji gwida",
+        "assets": "Materjal",
+        "other": "Oħrajn"
+      },
+      "dropZone": "Iġbed il-fajls hawn biex tittrasferixxi. PDF, Office, test, stampi jew ZIP, sa 100 MB kull wieħed.",
+      "empty": "Għad m'hemm l-ebda fajl tal-klijent.",
+      "actions": "Azzjonijiet tal-fajl",
+      "uploadDialog": {
+        "title": "Ittrasferixxi fajls tal-klijent",
+        "body": "PDF, Word, Excel, test, CSV, stampi jew ZIP, sa 100 MB kull wieħed.",
+        "typeLabel": "Tip ta' fajl",
+        "choose": "Agħżel fajls",
+        "done": "Lest",
+        "uploading": "Qed jiġi ttrasferit {name}…",
+        "success": "{name} ġie ttrasferit."
+      },
+      "errors": {
+        "tooLarge": "{name} huwa akbar minn 100 MB.",
+        "unsupported": "{name} mhuwiex tip ta' fajl appoġġjat.",
+        "uploadFailed": "{name} ma setax jiġi ttrasferit. Erġa' pprova.",
+        "loadFailed": "Il-fajls tal-klijent ma setgħux jitgħabbew.",
+        "deleteFailed": "Il-fajl ma setax jitħassar. Erġa' pprova.",
+        "downloadFailed": "It-tniżżil ma setax jibda.",
+        "brandArchived": "Din il-marka hija arkivjata. Irkuprah biex tbiddel il-fajls tagħha."
+      }
     }
   },
   "validation": {

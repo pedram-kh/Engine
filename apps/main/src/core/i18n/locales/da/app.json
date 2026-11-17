@@ -1413,6 +1413,102 @@
       "showing": "Viser {shown} af {total}",
       "previous": "Forrige",
       "next": "Næste"
+    },
+    "waves": {
+      "status": {
+        "draft": "Kladde"
+      },
+      "panel": {
+        "title": "Bølger",
+        "subtitle": "Hver bølge er en planlægningsrunde for dette brand.",
+        "newWave": "Ny bølge",
+        "count": "{count} bølge | {count} bølger"
+      },
+      "table": {
+        "wave": "Bølge",
+        "markets": "Markeder",
+        "progress": "Fremdrift",
+        "updated": "Opdateret",
+        "goLive": "Lancering {date}",
+        "notStarted": "Ikke startet"
+      },
+      "empty": {
+        "heading": "Ingen bølger endnu",
+        "body": "Opret den første bølge for dette brand."
+      },
+      "errors": {
+        "loadFailed": "Bølgerne kunne ikke indlæses.",
+        "campaignNotAvailable": "Den kampagne kan ikke knyttes til en bølge for dette brand.",
+        "campaignAlreadyLinked": "Den kampagne har allerede en bølge.",
+        "campaignLinkLocked": "Denne bølge er allerede knyttet til en kampagne. Forbindelsen kan ikke ændres.",
+        "brandArchived": "Dette brand er arkiveret. Gendan det for at ændre dets bølger.",
+        "saveFailed": "Bølgen kunne ikke gemmes. Prøv igen."
+      },
+      "dialog": {
+        "createTitle": "Ny bølge",
+        "editTitle": "Rediger bølge",
+        "name": "Bølgens navn",
+        "goLive": "Lanceringsdato",
+        "markets": "Markeder",
+        "addMarket": "Tilføj marked",
+        "searchMarket": "Søg efter lande",
+        "noMarketMatch": "Intet land passer",
+        "removeMarket": "Fjern {market}",
+        "campaign": "Kampagne (valgfri)",
+        "noCampaign": "Ingen kampagne",
+        "campaignHint": "Du kan knytte en kampagne til senere.",
+        "campaignLocked": "En tilknyttet kampagne kan ikke ændres her.",
+        "create": "Opret bølge",
+        "save": "Gem ændringer"
+      },
+      "validation": {
+        "nameRequired": "Angiv et navn til bølgen.",
+        "goLiveRequired": "Vælg en lanceringsdato.",
+        "marketsRequired": "Tilføj mindst ét marked.",
+        "marketsMax": "Tilføj højst 20 markeder."
+      },
+      "detail": {
+        "title": "Bølge",
+        "brand": "Mærke",
+        "campaign": "Tilknyttet kampagne",
+        "noCampaign": "Ingen kampagne tilknyttet",
+        "createdBy": "Oprettet af",
+        "notFound": "Denne bølge blev ikke fundet."
+      }
+    },
+    "brandFiles": {
+      "title": "Kundens filer",
+      "subtitle": "Briefinger, research og retningslinjer delt af kunden.",
+      "upload": "Upload filer",
+      "type": "Filtype",
+      "types": {
+        "brief": "Briefing",
+        "research": "Undersøgelse",
+        "guidelines": "Retningslinjer",
+        "assets": "Materialer",
+        "other": "Andet"
+      },
+      "dropZone": "Træk filer hertil for at uploade. PDF, Office, tekst, billeder eller ZIP, op til 100 MB hver.",
+      "empty": "Ingen kundefiler endnu.",
+      "actions": "Filhandlinger",
+      "uploadDialog": {
+        "title": "Upload kundefiler",
+        "body": "PDF, Word, Excel, tekst, CSV, billeder eller ZIP, op til 100 MB hver.",
+        "typeLabel": "Filens art",
+        "choose": "Vælg filer",
+        "done": "Færdig",
+        "uploading": "Uploader {name}…",
+        "success": "{name} er uploadet."
+      },
+      "errors": {
+        "tooLarge": "{name} er større end 100 MB.",
+        "unsupported": "{name} er ikke en understøttet filtype.",
+        "uploadFailed": "{name} kunne ikke uploades. Prøv igen.",
+        "loadFailed": "Kundens filer kunne ikke indlæses.",
+        "deleteFailed": "Filen kunne ikke slettes. Prøv igen.",
+        "downloadFailed": "Download kunne ikke startes.",
+        "brandArchived": "Dette brand er arkiveret. Gendan det for at ændre dets filer."
+      }
     }
   },
   "validation": {

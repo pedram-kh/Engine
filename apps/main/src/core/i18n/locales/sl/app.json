@@ -1413,6 +1413,102 @@
       "showing": "Prikazano {shown} od {total}",
       "previous": "Prejšnja",
       "next": "Naslednja"
+    },
+    "waves": {
+      "status": {
+        "draft": "Osnutek"
+      },
+      "panel": {
+        "title": "Valovi",
+        "subtitle": "Vsak val je en krog načrtovanja za to znamko.",
+        "newWave": "Nov val",
+        "count": "{count} val | {count} valov"
+      },
+      "table": {
+        "wave": "Val",
+        "markets": "Trgi",
+        "progress": "Napredek",
+        "updated": "Posodobljeno",
+        "goLive": "Zagon {date}",
+        "notStarted": "Ni se začelo"
+      },
+      "empty": {
+        "heading": "Še ni valov",
+        "body": "Ustvarite prvi val za to znamko."
+      },
+      "errors": {
+        "loadFailed": "Valov ni bilo mogoče naložiti.",
+        "campaignNotAvailable": "Te kampanje ni mogoče povezati z valom te znamke.",
+        "campaignAlreadyLinked": "Ta kampanja že ima val.",
+        "campaignLinkLocked": "Ta val je že povezan s kampanjo. Povezave ni mogoče spremeniti.",
+        "brandArchived": "Ta znamka je arhivirana. Obnovite jo, da boste lahko spreminjali njene valove.",
+        "saveFailed": "Vala ni bilo mogoče shraniti. Poskusite znova."
+      },
+      "dialog": {
+        "createTitle": "Nov val",
+        "editTitle": "Uredi val",
+        "name": "Ime vala",
+        "goLive": "Datum zagona",
+        "markets": "Trgi",
+        "addMarket": "Dodaj trg",
+        "searchMarket": "Iskanje držav",
+        "noMarketMatch": "Nobena država se ne ujema",
+        "removeMarket": "Odstrani {market}",
+        "campaign": "Kampanja (neobvezno)",
+        "noCampaign": "Brez kampanje",
+        "campaignHint": "Kampanjo lahko povežete pozneje.",
+        "campaignLocked": "Povezane kampanje tukaj ni mogoče spremeniti.",
+        "create": "Ustvari val",
+        "save": "Shrani spremembe"
+      },
+      "validation": {
+        "nameRequired": "Vnesite ime vala.",
+        "goLiveRequired": "Izberite datum zagona.",
+        "marketsRequired": "Dodajte vsaj en trg.",
+        "marketsMax": "Dodajte največ 20 trgov."
+      },
+      "detail": {
+        "title": "Val",
+        "brand": "Znamka",
+        "campaign": "Povezana kampanja",
+        "noCampaign": "Ni povezane kampanje",
+        "createdBy": "Ustvaril(a)",
+        "notFound": "Tega vala ni bilo mogoče najti."
+      }
+    },
+    "brandFiles": {
+      "title": "Datoteke stranke",
+      "subtitle": "Povzetki, raziskave in smernice, ki jih je delila stranka.",
+      "upload": "Naloži datoteke",
+      "type": "Vrsta",
+      "types": {
+        "brief": "Povzetek",
+        "research": "Raziskava",
+        "guidelines": "Smernice",
+        "assets": "Gradivo",
+        "other": "Drugo"
+      },
+      "dropZone": "Povlecite datoteke sem za nalaganje. PDF, Office, besedilo, slike ali ZIP, vsaka do 100 MB.",
+      "empty": "Datotek stranke še ni.",
+      "actions": "Dejanja z datoteko",
+      "uploadDialog": {
+        "title": "Naloži datoteke stranke",
+        "body": "PDF, Word, Excel, besedilo, CSV, slike ali ZIP, vsaka do 100 MB.",
+        "typeLabel": "Vrsta datoteke",
+        "choose": "Izberi datoteke",
+        "done": "Končano",
+        "uploading": "Nalaganje datoteke {name}…",
+        "success": "Datoteka {name} je naložena."
+      },
+      "errors": {
+        "tooLarge": "Datoteka {name} je večja od 100 MB.",
+        "unsupported": "Datoteka {name} ni podprte vrste.",
+        "uploadFailed": "Datoteke {name} ni bilo mogoče naložiti. Poskusite znova.",
+        "loadFailed": "Datotek stranke ni bilo mogoče naložiti.",
+        "deleteFailed": "Datoteke ni bilo mogoče izbrisati. Poskusite znova.",
+        "downloadFailed": "Prenosa ni bilo mogoče začeti.",
+        "brandArchived": "Ta znamka je arhivirana. Obnovite jo, da boste lahko spreminjali njene datoteke."
+      }
     }
   },
   "validation": {

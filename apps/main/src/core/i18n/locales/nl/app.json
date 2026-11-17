@@ -1413,6 +1413,102 @@
       "showing": "{shown} van {total} weergegeven",
       "previous": "Vorige",
       "next": "Volgende"
+    },
+    "waves": {
+      "status": {
+        "draft": "Concept"
+      },
+      "panel": {
+        "title": "Golven",
+        "subtitle": "Elke golf is één planningsronde voor dit merk.",
+        "newWave": "Nieuwe golf",
+        "count": "{count} golf | {count} golven"
+      },
+      "table": {
+        "wave": "Golf",
+        "markets": "Markten",
+        "progress": "Voortgang",
+        "updated": "Bijgewerkt",
+        "goLive": "Livegang {date}",
+        "notStarted": "Niet gestart"
+      },
+      "empty": {
+        "heading": "Nog geen golven",
+        "body": "Maak de eerste golf voor dit merk."
+      },
+      "errors": {
+        "loadFailed": "De golven konden niet worden geladen.",
+        "campaignNotAvailable": "Die campagne kan niet worden gekoppeld aan een golf van dit merk.",
+        "campaignAlreadyLinked": "Die campagne heeft al een golf.",
+        "campaignLinkLocked": "Deze golf is al gekoppeld aan een campagne. De koppeling kan niet worden gewijzigd.",
+        "brandArchived": "Dit merk is gearchiveerd. Herstel het om de golven te wijzigen.",
+        "saveFailed": "De golf kon niet worden opgeslagen. Probeer het opnieuw."
+      },
+      "dialog": {
+        "createTitle": "Nieuwe golf",
+        "editTitle": "Golf bewerken",
+        "name": "Naam van de golf",
+        "goLive": "Datum van livegang",
+        "markets": "Markten",
+        "addMarket": "Markt toevoegen",
+        "searchMarket": "Landen zoeken",
+        "noMarketMatch": "Geen land gevonden",
+        "removeMarket": "{market} verwijderen",
+        "campaign": "Campagne (optioneel)",
+        "noCampaign": "Geen campagne",
+        "campaignHint": "Je kunt later een campagne koppelen.",
+        "campaignLocked": "Een gekoppelde campagne kan hier niet worden gewijzigd.",
+        "create": "Golf maken",
+        "save": "Wijzigingen opslaan"
+      },
+      "validation": {
+        "nameRequired": "Voer een naam voor de golf in.",
+        "goLiveRequired": "Kies een datum van livegang.",
+        "marketsRequired": "Voeg ten minste één markt toe.",
+        "marketsMax": "Voeg maximaal 20 markten toe."
+      },
+      "detail": {
+        "title": "Golf",
+        "brand": "Merk",
+        "campaign": "Gekoppelde campagne",
+        "noCampaign": "Geen campagne gekoppeld",
+        "createdBy": "Gemaakt door",
+        "notFound": "Deze golf is niet gevonden."
+      }
+    },
+    "brandFiles": {
+      "title": "Klantbestanden",
+      "subtitle": "Briefings, onderzoek en richtlijnen gedeeld door de klant.",
+      "upload": "Bestanden uploaden",
+      "type": "Soort",
+      "types": {
+        "brief": "Briefing",
+        "research": "Onderzoek",
+        "guidelines": "Richtlijnen",
+        "assets": "Materiaal",
+        "other": "Overig"
+      },
+      "dropZone": "Sleep bestanden hierheen om te uploaden. PDF, Office, tekst, afbeeldingen of ZIP, elk maximaal 100 MB.",
+      "empty": "Nog geen klantbestanden.",
+      "actions": "Bestandsacties",
+      "uploadDialog": {
+        "title": "Klantbestanden uploaden",
+        "body": "PDF, Word, Excel, tekst, CSV, afbeeldingen of ZIP, elk maximaal 100 MB.",
+        "typeLabel": "Bestandstype",
+        "choose": "Bestanden kiezen",
+        "done": "Klaar",
+        "uploading": "{name} wordt geüpload…",
+        "success": "{name} is geüpload."
+      },
+      "errors": {
+        "tooLarge": "{name} is groter dan 100 MB.",
+        "unsupported": "{name} is geen ondersteund bestandstype.",
+        "uploadFailed": "{name} kon niet worden geüpload. Probeer het opnieuw.",
+        "loadFailed": "De klantbestanden konden niet worden geladen.",
+        "deleteFailed": "Het bestand kon niet worden verwijderd. Probeer het opnieuw.",
+        "downloadFailed": "De download kon niet worden gestart.",
+        "brandArchived": "Dit merk is gearchiveerd. Herstel het om de bestanden te wijzigen."
+      }
     }
   },
   "validation": {

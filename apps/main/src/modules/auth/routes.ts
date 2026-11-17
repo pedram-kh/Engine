@@ -321,6 +321,13 @@ export const appRoutes: RouteRecordRaw[] = [
     component: () => import('@/modules/brands/pages/BrandEditPage.vue'),
     meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
+  // PL-1.1 — a wave of a brand. The page redirects to the brand while `features.waves` is off.
+  {
+    path: '/brands/:ulid/waves/:waveUlid',
+    name: 'waves.detail',
+    component: () => import('@/modules/waves/pages/WaveDetailPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
 
   // ── Campaigns ──────────────────────────────────────────────────────────────
   // Sprint 8 Chunk 1. Any agency member may view (list/detail); create + the

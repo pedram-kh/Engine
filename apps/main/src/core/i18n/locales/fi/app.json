@@ -1413,6 +1413,102 @@
       "showing": "Näytetään {shown} / {total}",
       "previous": "Edellinen",
       "next": "Seuraava"
+    },
+    "waves": {
+      "status": {
+        "draft": "Luonnos"
+      },
+      "panel": {
+        "title": "Aallot",
+        "subtitle": "Jokainen aalto on yksi suunnittelukierros tälle brändille.",
+        "newWave": "Uusi aalto",
+        "count": "{count} aalto | {count} aaltoa"
+      },
+      "table": {
+        "wave": "Aalto",
+        "markets": "Markkinat",
+        "progress": "Eteneminen",
+        "updated": "Päivitetty",
+        "goLive": "Julkaisu {date}",
+        "notStarted": "Ei aloitettu"
+      },
+      "empty": {
+        "heading": "Ei vielä aaltoja",
+        "body": "Luo tämän brändin ensimmäinen aalto."
+      },
+      "errors": {
+        "loadFailed": "Aaltojen lataaminen epäonnistui.",
+        "campaignNotAvailable": "Tuota kampanjaa ei voi liittää tämän brändin aaltoon.",
+        "campaignAlreadyLinked": "Tuolla kampanjalla on jo aalto.",
+        "campaignLinkLocked": "Tämä aalto on jo liitetty kampanjaan. Liitosta ei voi muuttaa.",
+        "brandArchived": "Tämä brändi on arkistoitu. Palauta se muuttaaksesi sen aaltoja.",
+        "saveFailed": "Aallon tallentaminen epäonnistui. Yritä uudelleen."
+      },
+      "dialog": {
+        "createTitle": "Uusi aalto",
+        "editTitle": "Muokkaa aaltoa",
+        "name": "Aallon nimi",
+        "goLive": "Julkaisupäivä",
+        "markets": "Markkinat",
+        "addMarket": "Lisää markkina",
+        "searchMarket": "Hae maita",
+        "noMarketMatch": "Mikään maa ei täsmää",
+        "removeMarket": "Poista {market}",
+        "campaign": "Kampanja (valinnainen)",
+        "noCampaign": "Ei kampanjaa",
+        "campaignHint": "Voit liittää kampanjan myöhemmin.",
+        "campaignLocked": "Liitettyä kampanjaa ei voi muuttaa täällä.",
+        "create": "Luo aalto",
+        "save": "Tallenna muutokset"
+      },
+      "validation": {
+        "nameRequired": "Anna aallolle nimi.",
+        "goLiveRequired": "Valitse julkaisupäivä.",
+        "marketsRequired": "Lisää vähintään yksi markkina.",
+        "marketsMax": "Lisää enintään 20 markkinaa."
+      },
+      "detail": {
+        "title": "Aalto",
+        "brand": "Brändi",
+        "campaign": "Liitetty kampanja",
+        "noCampaign": "Ei liitettyä kampanjaa",
+        "createdBy": "Luonut",
+        "notFound": "Tätä aaltoa ei löytynyt."
+      }
+    },
+    "brandFiles": {
+      "title": "Asiakkaan tiedostot",
+      "subtitle": "Asiakkaan jakamat briefit, selvitykset ja ohjeet.",
+      "upload": "Lähetä tiedostoja",
+      "type": "Tyyppi",
+      "types": {
+        "brief": "Briefi",
+        "research": "Selvitys",
+        "guidelines": "Ohjeet",
+        "assets": "Aineistot",
+        "other": "Muu"
+      },
+      "dropZone": "Vedä tiedostot tähän lähettääksesi. PDF, Office, teksti, kuvat tai ZIP, enintään 100 Mt kukin.",
+      "empty": "Ei vielä asiakkaan tiedostoja.",
+      "actions": "Tiedoston toiminnot",
+      "uploadDialog": {
+        "title": "Lähetä asiakkaan tiedostoja",
+        "body": "PDF, Word, Excel, teksti, CSV, kuvat tai ZIP, enintään 100 Mt kukin.",
+        "typeLabel": "Tiedostotyyppi",
+        "choose": "Valitse tiedostot",
+        "done": "Valmis",
+        "uploading": "Lähetetään {name}…",
+        "success": "{name} lähetetty."
+      },
+      "errors": {
+        "tooLarge": "{name} on suurempi kuin 100 Mt.",
+        "unsupported": "{name} ei ole tuettu tiedostotyyppi.",
+        "uploadFailed": "Tiedoston {name} lähettäminen epäonnistui. Yritä uudelleen.",
+        "loadFailed": "Asiakkaan tiedostojen lataaminen epäonnistui.",
+        "deleteFailed": "Tiedoston poistaminen epäonnistui. Yritä uudelleen.",
+        "downloadFailed": "Latausta ei voitu aloittaa.",
+        "brandArchived": "Tämä brändi on arkistoitu. Palauta se muuttaaksesi sen tiedostoja."
+      }
     }
   },
   "validation": {

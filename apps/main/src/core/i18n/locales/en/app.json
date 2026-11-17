@@ -1413,6 +1413,102 @@
       "showing": "Showing {shown} of {total}",
       "previous": "Previous",
       "next": "Next"
+    },
+    "waves": {
+      "status": {
+        "draft": "Draft"
+      },
+      "panel": {
+        "title": "Waves",
+        "subtitle": "Each wave is one planning round for this brand.",
+        "newWave": "New wave",
+        "count": "{count} wave | {count} waves"
+      },
+      "table": {
+        "wave": "Wave",
+        "markets": "Markets",
+        "progress": "Progress",
+        "updated": "Updated",
+        "goLive": "Go-live {date}",
+        "notStarted": "Not started"
+      },
+      "empty": {
+        "heading": "No waves yet",
+        "body": "Create the first wave for this brand."
+      },
+      "errors": {
+        "loadFailed": "Failed to load waves.",
+        "campaignNotAvailable": "That campaign cannot be linked to a wave of this brand.",
+        "campaignAlreadyLinked": "That campaign already has a wave.",
+        "campaignLinkLocked": "This wave is already linked to a campaign. The link cannot be changed.",
+        "brandArchived": "This brand is archived. Restore it to change its waves.",
+        "saveFailed": "The wave could not be saved. Try again."
+      },
+      "dialog": {
+        "createTitle": "New wave",
+        "editTitle": "Edit wave",
+        "name": "Wave name",
+        "goLive": "Go-live date",
+        "markets": "Markets",
+        "addMarket": "Add market",
+        "searchMarket": "Search countries",
+        "noMarketMatch": "No country matches",
+        "removeMarket": "Remove {market}",
+        "campaign": "Campaign (optional)",
+        "noCampaign": "No campaign",
+        "campaignHint": "You can link a campaign later.",
+        "campaignLocked": "A linked campaign cannot be changed here.",
+        "create": "Create wave",
+        "save": "Save changes"
+      },
+      "validation": {
+        "nameRequired": "Enter a wave name.",
+        "goLiveRequired": "Choose a go-live date.",
+        "marketsRequired": "Add at least one market.",
+        "marketsMax": "Add at most 20 markets."
+      },
+      "detail": {
+        "title": "Wave",
+        "brand": "Brand",
+        "campaign": "Linked campaign",
+        "noCampaign": "No campaign linked",
+        "createdBy": "Created by",
+        "notFound": "This wave was not found."
+      }
+    },
+    "brandFiles": {
+      "title": "Client files",
+      "subtitle": "Briefs, research and guidelines shared by the client.",
+      "upload": "Upload files",
+      "type": "Type",
+      "types": {
+        "brief": "Brief",
+        "research": "Research",
+        "guidelines": "Guidelines",
+        "assets": "Assets",
+        "other": "Other"
+      },
+      "dropZone": "Drag files here to upload. PDF, Office, text, images or ZIP, up to 100 MB each.",
+      "empty": "No client files yet.",
+      "actions": "File actions",
+      "uploadDialog": {
+        "title": "Upload client files",
+        "body": "PDF, Word, Excel, text, CSV, images or ZIP, up to 100 MB each.",
+        "typeLabel": "File type",
+        "choose": "Choose files",
+        "done": "Done",
+        "uploading": "Uploading {name}…",
+        "success": "Uploaded {name}."
+      },
+      "errors": {
+        "tooLarge": "{name} is larger than 100 MB.",
+        "unsupported": "{name} is not a supported file type.",
+        "uploadFailed": "{name} could not be uploaded. Try again.",
+        "loadFailed": "Failed to load client files.",
+        "deleteFailed": "Failed to delete the file. Try again.",
+        "downloadFailed": "The download could not be started.",
+        "brandArchived": "This brand is archived. Restore it to change its files."
+      }
     }
   },
   "validation": {

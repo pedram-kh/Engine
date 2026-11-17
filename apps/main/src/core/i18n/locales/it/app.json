@@ -1413,6 +1413,102 @@
       "showing": "Mostrati {shown} di {total}",
       "previous": "Precedente",
       "next": "Successivo"
+    },
+    "waves": {
+      "status": {
+        "draft": "Bozza"
+      },
+      "panel": {
+        "title": "Ondate",
+        "subtitle": "Ogni ondata è un ciclo di pianificazione per questo marchio.",
+        "newWave": "Nuova ondata",
+        "count": "{count} ondata | {count} ondate"
+      },
+      "table": {
+        "wave": "Ondata",
+        "markets": "Mercati",
+        "progress": "Avanzamento",
+        "updated": "Aggiornata",
+        "goLive": "Go-live il {date}",
+        "notStarted": "Non iniziata"
+      },
+      "empty": {
+        "heading": "Ancora nessuna ondata",
+        "body": "Crea la prima ondata per questo marchio."
+      },
+      "errors": {
+        "loadFailed": "Impossibile caricare le ondate.",
+        "campaignNotAvailable": "Quella campagna non può essere collegata a un'ondata di questo marchio.",
+        "campaignAlreadyLinked": "Quella campagna ha già un'ondata.",
+        "campaignLinkLocked": "Questa ondata è già collegata a una campagna. Il collegamento non può essere modificato.",
+        "brandArchived": "Questo marchio è archiviato. Ripristinalo per modificarne le ondate.",
+        "saveFailed": "Impossibile salvare l'ondata. Riprova."
+      },
+      "dialog": {
+        "createTitle": "Nuova ondata",
+        "editTitle": "Modifica ondata",
+        "name": "Nome dell'ondata",
+        "goLive": "Data di go-live",
+        "markets": "Mercati",
+        "addMarket": "Aggiungi mercato",
+        "searchMarket": "Cerca paesi",
+        "noMarketMatch": "Nessun paese corrisponde",
+        "removeMarket": "Rimuovi {market}",
+        "campaign": "Campagna (facoltativa)",
+        "noCampaign": "Nessuna campagna",
+        "campaignHint": "Puoi collegare una campagna in seguito.",
+        "campaignLocked": "Una campagna collegata non può essere modificata qui.",
+        "create": "Crea ondata",
+        "save": "Salva modifiche"
+      },
+      "validation": {
+        "nameRequired": "Inserisci un nome per l'ondata.",
+        "goLiveRequired": "Scegli una data di go-live.",
+        "marketsRequired": "Aggiungi almeno un mercato.",
+        "marketsMax": "Aggiungi al massimo 20 mercati."
+      },
+      "detail": {
+        "title": "Ondata",
+        "brand": "Marchio",
+        "campaign": "Campagna collegata",
+        "noCampaign": "Nessuna campagna collegata",
+        "createdBy": "Creata da",
+        "notFound": "Questa ondata non è stata trovata."
+      }
+    },
+    "brandFiles": {
+      "title": "File del cliente",
+      "subtitle": "Brief, ricerche e linee guida condivisi dal cliente.",
+      "upload": "Carica file",
+      "type": "Tipo",
+      "types": {
+        "brief": "Brief",
+        "research": "Ricerca",
+        "guidelines": "Linee guida",
+        "assets": "Materiali",
+        "other": "Altro"
+      },
+      "dropZone": "Trascina qui i file da caricare. PDF, Office, testo, immagini o ZIP, fino a 100 MB ciascuno.",
+      "empty": "Ancora nessun file del cliente.",
+      "actions": "Azioni sul file",
+      "uploadDialog": {
+        "title": "Carica file del cliente",
+        "body": "PDF, Word, Excel, testo, CSV, immagini o ZIP, fino a 100 MB ciascuno.",
+        "typeLabel": "Tipo di file",
+        "choose": "Scegli file",
+        "done": "Fatto",
+        "uploading": "Caricamento di {name}…",
+        "success": "{name} è stato caricato."
+      },
+      "errors": {
+        "tooLarge": "{name} supera i 100 MB.",
+        "unsupported": "{name} non è un tipo di file supportato.",
+        "uploadFailed": "Impossibile caricare {name}. Riprova.",
+        "loadFailed": "Impossibile caricare i file del cliente.",
+        "deleteFailed": "Impossibile eliminare il file. Riprova.",
+        "downloadFailed": "Impossibile avviare il download.",
+        "brandArchived": "Questo marchio è archiviato. Ripristinalo per modificarne i file."
+      }
     }
   },
   "validation": {

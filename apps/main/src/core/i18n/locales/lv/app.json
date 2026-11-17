@@ -1413,6 +1413,102 @@
       "showing": "Rāda {shown} no {total}",
       "previous": "Iepriekšējā",
       "next": "Nākamā"
+    },
+    "waves": {
+      "status": {
+        "draft": "Melnraksts"
+      },
+      "panel": {
+        "title": "Vilņi",
+        "subtitle": "Katrs vilnis ir viens šīs preču zīmes plānošanas posms.",
+        "newWave": "Jauns vilnis",
+        "count": "{count} vilnis | {count} vilņi"
+      },
+      "table": {
+        "wave": "Vilnis",
+        "markets": "Tirgi",
+        "progress": "Norise",
+        "updated": "Atjaunināts",
+        "goLive": "Palaišana {date}",
+        "notStarted": "Nav sākts"
+      },
+      "empty": {
+        "heading": "Vilņu vēl nav",
+        "body": "Izveidojiet šīs preču zīmes pirmo vilni."
+      },
+      "errors": {
+        "loadFailed": "Neizdevās ielādēt vilņus.",
+        "campaignNotAvailable": "Šo kampaņu nevar saistīt ar šīs preču zīmes vilni.",
+        "campaignAlreadyLinked": "Šai kampaņai jau ir vilnis.",
+        "campaignLinkLocked": "Šis vilnis jau ir saistīts ar kampaņu. Saiti nevar mainīt.",
+        "brandArchived": "Šī preču zīme ir arhivēta. Atjaunojiet to, lai mainītu tās vilņus.",
+        "saveFailed": "Neizdevās saglabāt vilni. Mēģiniet vēlreiz."
+      },
+      "dialog": {
+        "createTitle": "Jauns vilnis",
+        "editTitle": "Rediģēt vilni",
+        "name": "Viļņa nosaukums",
+        "goLive": "Palaišanas datums",
+        "markets": "Tirgi",
+        "addMarket": "Pievienot tirgu",
+        "searchMarket": "Meklēt valstis",
+        "noMarketMatch": "Neviena valsts neatbilst",
+        "removeMarket": "Noņemt {market}",
+        "campaign": "Kampaņa (pēc izvēles)",
+        "noCampaign": "Bez kampaņas",
+        "campaignHint": "Kampaņu varat piesaistīt vēlāk.",
+        "campaignLocked": "Piesaistītu kampaņu šeit nevar mainīt.",
+        "create": "Izveidot vilni",
+        "save": "Saglabāt izmaiņas"
+      },
+      "validation": {
+        "nameRequired": "Ievadiet viļņa nosaukumu.",
+        "goLiveRequired": "Izvēlieties palaišanas datumu.",
+        "marketsRequired": "Pievienojiet vismaz vienu tirgu.",
+        "marketsMax": "Pievienojiet ne vairāk kā 20 tirgu."
+      },
+      "detail": {
+        "title": "Vilnis",
+        "brand": "Preču zīme",
+        "campaign": "Piesaistītā kampaņa",
+        "noCampaign": "Kampaņa nav piesaistīta",
+        "createdBy": "Izveidoja",
+        "notFound": "Šis vilnis nav atrasts."
+      }
+    },
+    "brandFiles": {
+      "title": "Klienta faili",
+      "subtitle": "Klienta kopīgotie īsie apraksti, pētījumi un vadlīnijas.",
+      "upload": "Augšupielādēt failus",
+      "type": "Veids",
+      "types": {
+        "brief": "Īsais apraksts",
+        "research": "Pētījums",
+        "guidelines": "Vadlīnijas",
+        "assets": "Materiāli",
+        "other": "Cits"
+      },
+      "dropZone": "Velciet failus šeit, lai tos augšupielādētu. PDF, Office, teksts, attēli vai ZIP, katrs līdz 100 MB.",
+      "empty": "Klienta failu vēl nav.",
+      "actions": "Darbības ar failu",
+      "uploadDialog": {
+        "title": "Augšupielādēt klienta failus",
+        "body": "PDF, Word, Excel, teksts, CSV, attēli vai ZIP, katrs līdz 100 MB.",
+        "typeLabel": "Faila veids",
+        "choose": "Izvēlēties failus",
+        "done": "Gatavs",
+        "uploading": "Augšupielādē {name}…",
+        "success": "{name} augšupielādēts."
+      },
+      "errors": {
+        "tooLarge": "{name} ir lielāks par 100 MB.",
+        "unsupported": "{name} nav atbalstīts faila veids.",
+        "uploadFailed": "Neizdevās augšupielādēt {name}. Mēģiniet vēlreiz.",
+        "loadFailed": "Neizdevās ielādēt klienta failus.",
+        "deleteFailed": "Neizdevās izdzēst failu. Mēģiniet vēlreiz.",
+        "downloadFailed": "Neizdevās sākt lejupielādi.",
+        "brandArchived": "Šī preču zīme ir arhivēta. Atjaunojiet to, lai mainītu tās failus."
+      }
     }
   },
   "validation": {

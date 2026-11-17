@@ -1413,6 +1413,102 @@
       "showing": "{shown} megjelenítve, összesen {total}",
       "previous": "Előző",
       "next": "Következő"
+    },
+    "waves": {
+      "status": {
+        "draft": "Piszkozat"
+      },
+      "panel": {
+        "title": "Hullámok",
+        "subtitle": "Minden hullám egy tervezési kör ennél a márkánál.",
+        "newWave": "Új hullám",
+        "count": "{count} hullám | {count} hullám"
+      },
+      "table": {
+        "wave": "Hullám",
+        "markets": "Piacok",
+        "progress": "Előrehaladás",
+        "updated": "Frissítve",
+        "goLive": "Indulás {date}",
+        "notStarted": "Nem kezdődött el"
+      },
+      "empty": {
+        "heading": "Még nincsenek hullámok",
+        "body": "Hozza létre a márka első hullámát."
+      },
+      "errors": {
+        "loadFailed": "A hullámok betöltése nem sikerült.",
+        "campaignNotAvailable": "Ez a kampány nem kapcsolható a márka egyik hullámához.",
+        "campaignAlreadyLinked": "Ennek a kampánynak már van hullámja.",
+        "campaignLinkLocked": "Ez a hullám már kampányhoz van kapcsolva. A kapcsolat nem módosítható.",
+        "brandArchived": "Ez a márka archivált. Állítsa vissza, hogy módosíthassa a hullámait.",
+        "saveFailed": "A hullámot nem sikerült menteni. Próbálja újra."
+      },
+      "dialog": {
+        "createTitle": "Új hullám",
+        "editTitle": "Hullám szerkesztése",
+        "name": "A hullám neve",
+        "goLive": "Indulás dátuma",
+        "markets": "Piacok",
+        "addMarket": "Piac hozzáadása",
+        "searchMarket": "Országok keresése",
+        "noMarketMatch": "Nincs egyező ország",
+        "removeMarket": "{market} eltávolítása",
+        "campaign": "Kampány (nem kötelező)",
+        "noCampaign": "Nincs kampány",
+        "campaignHint": "Kampányt később is kapcsolhat.",
+        "campaignLocked": "A kapcsolt kampány itt nem módosítható.",
+        "create": "Hullám létrehozása",
+        "save": "Módosítások mentése"
+      },
+      "validation": {
+        "nameRequired": "Adja meg a hullám nevét.",
+        "goLiveRequired": "Válasszon indulási dátumot.",
+        "marketsRequired": "Adjon hozzá legalább egy piacot.",
+        "marketsMax": "Legfeljebb 20 piacot adhat hozzá."
+      },
+      "detail": {
+        "title": "Hullám",
+        "brand": "Márka",
+        "campaign": "Kapcsolt kampány",
+        "noCampaign": "Nincs kapcsolt kampány",
+        "createdBy": "Létrehozta",
+        "notFound": "Ez a hullám nem található."
+      }
+    },
+    "brandFiles": {
+      "title": "Ügyfélfájlok",
+      "subtitle": "Az ügyfél által megosztott brifek, kutatások és irányelvek.",
+      "upload": "Fájlok feltöltése",
+      "type": "Típus",
+      "types": {
+        "brief": "Brief",
+        "research": "Kutatás",
+        "guidelines": "Irányelvek",
+        "assets": "Anyagok",
+        "other": "Egyéb"
+      },
+      "dropZone": "Húzza ide a feltöltendő fájlokat. PDF, Office, szöveg, képek vagy ZIP, egyenként legfeljebb 100 MB.",
+      "empty": "Még nincsenek ügyfélfájlok.",
+      "actions": "Fájlműveletek",
+      "uploadDialog": {
+        "title": "Ügyfélfájlok feltöltése",
+        "body": "PDF, Word, Excel, szöveg, CSV, képek vagy ZIP, egyenként legfeljebb 100 MB.",
+        "typeLabel": "Fájl fajtája",
+        "choose": "Fájlok kiválasztása",
+        "done": "Kész",
+        "uploading": "{name} feltöltése…",
+        "success": "A(z) {name} feltöltve."
+      },
+      "errors": {
+        "tooLarge": "A(z) {name} nagyobb 100 MB-nál.",
+        "unsupported": "A(z) {name} nem támogatott fájltípus.",
+        "uploadFailed": "A(z) {name} feltöltése nem sikerült. Próbálja újra.",
+        "loadFailed": "Az ügyfélfájlok betöltése nem sikerült.",
+        "deleteFailed": "A fájl törlése nem sikerült. Próbálja újra.",
+        "downloadFailed": "A letöltést nem sikerült elindítani.",
+        "brandArchived": "Ez a márka archivált. Állítsa vissza, hogy módosíthassa a fájljait."
+      }
     }
   },
   "validation": {

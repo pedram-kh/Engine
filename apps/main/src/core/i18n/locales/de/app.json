@@ -1413,6 +1413,102 @@
       "showing": "{shown} von {total} angezeigt",
       "previous": "Zurück",
       "next": "Weiter"
+    },
+    "waves": {
+      "status": {
+        "draft": "Entwurf"
+      },
+      "panel": {
+        "title": "Wellen",
+        "subtitle": "Jede Welle ist eine Planungsrunde für diese Marke.",
+        "newWave": "Neue Welle",
+        "count": "{count} Welle | {count} Wellen"
+      },
+      "table": {
+        "wave": "Welle",
+        "markets": "Märkte",
+        "progress": "Fortschritt",
+        "updated": "Aktualisiert",
+        "goLive": "Live ab {date}",
+        "notStarted": "Nicht begonnen"
+      },
+      "empty": {
+        "heading": "Noch keine Wellen",
+        "body": "Erstellen Sie die erste Welle für diese Marke."
+      },
+      "errors": {
+        "loadFailed": "Die Wellen konnten nicht geladen werden.",
+        "campaignNotAvailable": "Diese Kampagne kann nicht mit einer Welle dieser Marke verknüpft werden.",
+        "campaignAlreadyLinked": "Diese Kampagne hat bereits eine Welle.",
+        "campaignLinkLocked": "Diese Welle ist bereits mit einer Kampagne verknüpft. Die Verknüpfung kann nicht geändert werden.",
+        "brandArchived": "Diese Marke ist archiviert. Stellen Sie sie wieder her, um ihre Wellen zu ändern.",
+        "saveFailed": "Die Welle konnte nicht gespeichert werden. Versuchen Sie es erneut."
+      },
+      "dialog": {
+        "createTitle": "Neue Welle",
+        "editTitle": "Welle bearbeiten",
+        "name": "Name der Welle",
+        "goLive": "Go-live-Datum",
+        "markets": "Märkte",
+        "addMarket": "Markt hinzufügen",
+        "searchMarket": "Länder suchen",
+        "noMarketMatch": "Kein Land gefunden",
+        "removeMarket": "{market} entfernen",
+        "campaign": "Kampagne (optional)",
+        "noCampaign": "Keine Kampagne",
+        "campaignHint": "Sie können später eine Kampagne verknüpfen.",
+        "campaignLocked": "Eine verknüpfte Kampagne kann hier nicht geändert werden.",
+        "create": "Welle erstellen",
+        "save": "Änderungen speichern"
+      },
+      "validation": {
+        "nameRequired": "Geben Sie einen Namen für die Welle ein.",
+        "goLiveRequired": "Wählen Sie ein Go-live-Datum.",
+        "marketsRequired": "Fügen Sie mindestens einen Markt hinzu.",
+        "marketsMax": "Fügen Sie höchstens 20 Märkte hinzu."
+      },
+      "detail": {
+        "title": "Welle",
+        "brand": "Marke",
+        "campaign": "Verknüpfte Kampagne",
+        "noCampaign": "Keine Kampagne verknüpft",
+        "createdBy": "Erstellt von",
+        "notFound": "Diese Welle wurde nicht gefunden."
+      }
+    },
+    "brandFiles": {
+      "title": "Kundendateien",
+      "subtitle": "Briefings, Recherchen und Richtlinien, die der Kunde geteilt hat.",
+      "upload": "Dateien hochladen",
+      "type": "Typ",
+      "types": {
+        "brief": "Briefing",
+        "research": "Recherche",
+        "guidelines": "Richtlinien",
+        "assets": "Materialien",
+        "other": "Sonstiges"
+      },
+      "dropZone": "Dateien zum Hochladen hierher ziehen. PDF, Office, Text, Bilder oder ZIP, je bis 100 MB.",
+      "empty": "Noch keine Kundendateien.",
+      "actions": "Dateiaktionen",
+      "uploadDialog": {
+        "title": "Kundendateien hochladen",
+        "body": "PDF, Word, Excel, Text, CSV, Bilder oder ZIP, je bis 100 MB.",
+        "typeLabel": "Dateityp",
+        "choose": "Dateien auswählen",
+        "done": "Fertig",
+        "uploading": "{name} wird hochgeladen…",
+        "success": "{name} wurde hochgeladen."
+      },
+      "errors": {
+        "tooLarge": "{name} ist größer als 100 MB.",
+        "unsupported": "{name} ist kein unterstützter Dateityp.",
+        "uploadFailed": "{name} konnte nicht hochgeladen werden. Versuchen Sie es erneut.",
+        "loadFailed": "Die Kundendateien konnten nicht geladen werden.",
+        "deleteFailed": "Die Datei konnte nicht gelöscht werden. Versuchen Sie es erneut.",
+        "downloadFailed": "Der Download konnte nicht gestartet werden.",
+        "brandArchived": "Diese Marke ist archiviert. Stellen Sie sie wieder her, um ihre Dateien zu ändern."
+      }
     }
   },
   "validation": {

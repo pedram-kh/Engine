@@ -1413,6 +1413,102 @@
       "showing": "Näidatud {shown} / {total}",
       "previous": "Eelmine",
       "next": "Järgmine"
+    },
+    "waves": {
+      "status": {
+        "draft": "Kavand"
+      },
+      "panel": {
+        "title": "Lained",
+        "subtitle": "Iga laine on selle brändi üks planeerimisring.",
+        "newWave": "Uus laine",
+        "count": "{count} laine | {count} lainet"
+      },
+      "table": {
+        "wave": "Laine",
+        "markets": "Turud",
+        "progress": "Edenemine",
+        "updated": "Uuendatud",
+        "goLive": "Avalikustamine {date}",
+        "notStarted": "Alustamata"
+      },
+      "empty": {
+        "heading": "Laineid veel pole",
+        "body": "Looge selle brändi esimene laine."
+      },
+      "errors": {
+        "loadFailed": "Lainete laadimine ebaõnnestus.",
+        "campaignNotAvailable": "Seda kampaaniat ei saa selle brändi lainega siduda.",
+        "campaignAlreadyLinked": "Sellel kampaanial on juba laine.",
+        "campaignLinkLocked": "See laine on juba kampaaniaga seotud. Seost ei saa muuta.",
+        "brandArchived": "See bränd on arhiveeritud. Taastage see, et selle laineid muuta.",
+        "saveFailed": "Lainet ei õnnestunud salvestada. Proovige uuesti."
+      },
+      "dialog": {
+        "createTitle": "Uus laine",
+        "editTitle": "Muuda lainet",
+        "name": "Laine nimi",
+        "goLive": "Avalikustamise kuupäev",
+        "markets": "Turud",
+        "addMarket": "Lisa turg",
+        "searchMarket": "Otsi riike",
+        "noMarketMatch": "Ükski riik ei sobi",
+        "removeMarket": "Eemalda {market}",
+        "campaign": "Kampaania (valikuline)",
+        "noCampaign": "Kampaaniat pole",
+        "campaignHint": "Kampaania saab siduda ka hiljem.",
+        "campaignLocked": "Seotud kampaaniat ei saa siin muuta.",
+        "create": "Loo laine",
+        "save": "Salvesta muudatused"
+      },
+      "validation": {
+        "nameRequired": "Sisestage laine nimi.",
+        "goLiveRequired": "Valige avalikustamise kuupäev.",
+        "marketsRequired": "Lisage vähemalt üks turg.",
+        "marketsMax": "Lisage kuni 20 turgu."
+      },
+      "detail": {
+        "title": "Laine",
+        "brand": "Bränd",
+        "campaign": "Seotud kampaania",
+        "noCampaign": "Kampaaniat pole seotud",
+        "createdBy": "Autor",
+        "notFound": "Seda lainet ei leitud."
+      }
+    },
+    "brandFiles": {
+      "title": "Kliendi failid",
+      "subtitle": "Kliendi jagatud briifid, uuringud ja juhised.",
+      "upload": "Laadi failid üles",
+      "type": "Tüüp",
+      "types": {
+        "brief": "Briif",
+        "research": "Uuring",
+        "guidelines": "Juhised",
+        "assets": "Materjalid",
+        "other": "Muu"
+      },
+      "dropZone": "Lohistage failid siia üleslaadimiseks. PDF, Office, tekst, pildid või ZIP, igaüks kuni 100 MB.",
+      "empty": "Kliendi faile veel pole.",
+      "actions": "Faili toimingud",
+      "uploadDialog": {
+        "title": "Laadi kliendi failid üles",
+        "body": "PDF, Word, Excel, tekst, CSV, pildid või ZIP, igaüks kuni 100 MB.",
+        "typeLabel": "Faili liik",
+        "choose": "Vali failid",
+        "done": "Valmis",
+        "uploading": "Faili {name} üleslaadimine…",
+        "success": "Fail {name} on üles laaditud."
+      },
+      "errors": {
+        "tooLarge": "Fail {name} on suurem kui 100 MB.",
+        "unsupported": "Fail {name} ei ole toetatud failitüüp.",
+        "uploadFailed": "Faili {name} ei õnnestunud üles laadida. Proovige uuesti.",
+        "loadFailed": "Kliendi failide laadimine ebaõnnestus.",
+        "deleteFailed": "Faili kustutamine ebaõnnestus. Proovige uuesti.",
+        "downloadFailed": "Allalaadimist ei õnnestunud alustada.",
+        "brandArchived": "See bränd on arhiveeritud. Taastage see, et selle faile muuta."
+      }
     }
   },
   "validation": {

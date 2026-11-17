@@ -1185,6 +1185,107 @@
   width: 360px;
 }
 
+/* PL-1.1: with `waves_enabled` on, the brand page is two columns, the details card on the left
+ * and the Client files and Waves panels on the right (they wrap under the card on a narrow
+ * window). Off, none of this applies and the page is the one-column page it always was. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-detail--with-side {
+  flex-wrap: wrap;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .agency-detail--with-side
+  > .agency-detail__main {
+  flex: none;
+  width: 360px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light)
+  .agency-detail--with-side
+  > .agency-detail__main
+  .agency-fields {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-detail__side {
+  display: flex;
+  flex: 1 1 520px;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+/* Panel head and the plain rows used by the Client files and Waves panels. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-panel__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-panel__subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 19px;
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-panel__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-panel__table th {
+  padding: 8px 12px 8px 0;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 14px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: rgb(var(--v-theme-text-tertiary));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-panel__table td {
+  padding: 12px 12px 12px 0;
+  border-top: 1px solid rgb(var(--v-theme-border-color));
+  font-size: 14px;
+  line-height: 20px;
+  vertical-align: middle;
+  color: rgb(var(--v-theme-on-surface));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .agency-panel__empty {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+
+/* Wave progress: six segments, all empty in PL-1.1. */
+:is(.v-theme--agency-dark, .v-theme--agency-light) .wave-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .wave-progress__bar {
+  display: inline-flex;
+  gap: 3px;
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .wave-progress__segment {
+  width: 14px;
+  height: 6px;
+  border-radius: 3px;
+  background-color: rgb(var(--v-theme-border-color));
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light) .wave-progress__label {
+  font-size: 12px;
+  line-height: 16px;
+  color: rgb(var(--v-theme-text-tertiary));
+}
+
 /* Card: surface, default border, radius 12, padding 24, 20 between its blocks. */
 :is(.v-theme--agency-dark, .v-theme--agency-light) .agency-card {
   display: flex;

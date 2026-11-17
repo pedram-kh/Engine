@@ -1413,6 +1413,102 @@
       "showing": "Rodoma {shown} iš {total}",
       "previous": "Ankstesnis",
       "next": "Kitas"
+    },
+    "waves": {
+      "status": {
+        "draft": "Juodraštis"
+      },
+      "panel": {
+        "title": "Bangos",
+        "subtitle": "Kiekviena banga yra vienas šio prekių ženklo planavimo etapas.",
+        "newWave": "Nauja banga",
+        "count": "{count} banga | {count} bangos"
+      },
+      "table": {
+        "wave": "Banga",
+        "markets": "Rinkos",
+        "progress": "Eiga",
+        "updated": "Atnaujinta",
+        "goLive": "Paleidimas {date}",
+        "notStarted": "Nepradėta"
+      },
+      "empty": {
+        "heading": "Bangų dar nėra",
+        "body": "Sukurkite pirmąją šio prekių ženklo bangą."
+      },
+      "errors": {
+        "loadFailed": "Nepavyko įkelti bangų.",
+        "campaignNotAvailable": "Šios kampanijos negalima susieti su šio prekių ženklo banga.",
+        "campaignAlreadyLinked": "Ši kampanija jau turi bangą.",
+        "campaignLinkLocked": "Ši banga jau susieta su kampanija. Ryšio pakeisti negalima.",
+        "brandArchived": "Šis prekių ženklas suarchyvuotas. Atkurkite jį, kad galėtumėte keisti jo bangas.",
+        "saveFailed": "Nepavyko išsaugoti bangos. Bandykite dar kartą."
+      },
+      "dialog": {
+        "createTitle": "Nauja banga",
+        "editTitle": "Redaguoti bangą",
+        "name": "Bangos pavadinimas",
+        "goLive": "Paleidimo data",
+        "markets": "Rinkos",
+        "addMarket": "Pridėti rinką",
+        "searchMarket": "Ieškoti šalių",
+        "noMarketMatch": "Nėra tinkamos šalies",
+        "removeMarket": "Pašalinti {market}",
+        "campaign": "Kampanija (neprivaloma)",
+        "noCampaign": "Be kampanijos",
+        "campaignHint": "Kampaniją galite susieti vėliau.",
+        "campaignLocked": "Susietos kampanijos čia pakeisti negalima.",
+        "create": "Sukurti bangą",
+        "save": "Išsaugoti pakeitimus"
+      },
+      "validation": {
+        "nameRequired": "Įveskite bangos pavadinimą.",
+        "goLiveRequired": "Pasirinkite paleidimo datą.",
+        "marketsRequired": "Pridėkite bent vieną rinką.",
+        "marketsMax": "Pridėkite ne daugiau kaip 20 rinkų."
+      },
+      "detail": {
+        "title": "Banga",
+        "brand": "Prekių ženklas",
+        "campaign": "Susieta kampanija",
+        "noCampaign": "Kampanija nesusieta",
+        "createdBy": "Sukūrė",
+        "notFound": "Šios bangos nerasta."
+      }
+    },
+    "brandFiles": {
+      "title": "Kliento failai",
+      "subtitle": "Kliento pateikti trumpieji aprašai, tyrimai ir gairės.",
+      "upload": "Įkelti failus",
+      "type": "Tipas",
+      "types": {
+        "brief": "Trumpasis aprašas",
+        "research": "Tyrimas",
+        "guidelines": "Gairės",
+        "assets": "Medžiaga",
+        "other": "Kita"
+      },
+      "dropZone": "Vilkite failus čia, kad juos įkeltumėte. PDF, Office, tekstas, vaizdai arba ZIP, kiekvienas iki 100 MB.",
+      "empty": "Kliento failų dar nėra.",
+      "actions": "Veiksmai su failu",
+      "uploadDialog": {
+        "title": "Įkelti kliento failus",
+        "body": "PDF, Word, Excel, tekstas, CSV, vaizdai arba ZIP, kiekvienas iki 100 MB.",
+        "typeLabel": "Failo rūšis",
+        "choose": "Pasirinkti failus",
+        "done": "Baigta",
+        "uploading": "Įkeliamas {name}…",
+        "success": "{name} įkeltas."
+      },
+      "errors": {
+        "tooLarge": "{name} didesnis nei 100 MB.",
+        "unsupported": "{name} nėra palaikomo tipo failas.",
+        "uploadFailed": "Nepavyko įkelti {name}. Bandykite dar kartą.",
+        "loadFailed": "Nepavyko įkelti kliento failų.",
+        "deleteFailed": "Nepavyko ištrinti failo. Bandykite dar kartą.",
+        "downloadFailed": "Nepavyko pradėti atsisiuntimo.",
+        "brandArchived": "Šis prekių ženklas suarchyvuotas. Atkurkite jį, kad galėtumėte keisti jo failus."
+      }
     }
   },
   "validation": {

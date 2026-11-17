@@ -1413,6 +1413,102 @@
       "showing": "Visar {shown} av {total}",
       "previous": "Föregående",
       "next": "Nästa"
+    },
+    "waves": {
+      "status": {
+        "draft": "Utkast"
+      },
+      "panel": {
+        "title": "Vågor",
+        "subtitle": "Varje våg är en planeringsomgång för det här varumärket.",
+        "newWave": "Ny våg",
+        "count": "{count} våg | {count} vågor"
+      },
+      "table": {
+        "wave": "Våg",
+        "markets": "Marknader",
+        "progress": "Framsteg",
+        "updated": "Uppdaterad",
+        "goLive": "Lansering {date}",
+        "notStarted": "Inte påbörjad"
+      },
+      "empty": {
+        "heading": "Inga vågor ännu",
+        "body": "Skapa den första vågen för det här varumärket."
+      },
+      "errors": {
+        "loadFailed": "Vågorna kunde inte läsas in.",
+        "campaignNotAvailable": "Den kampanjen kan inte kopplas till en våg för det här varumärket.",
+        "campaignAlreadyLinked": "Den kampanjen har redan en våg.",
+        "campaignLinkLocked": "Den här vågen är redan kopplad till en kampanj. Kopplingen kan inte ändras.",
+        "brandArchived": "Det här varumärket är arkiverat. Återställ det för att ändra dess vågor.",
+        "saveFailed": "Vågen kunde inte sparas. Försök igen."
+      },
+      "dialog": {
+        "createTitle": "Ny våg",
+        "editTitle": "Redigera våg",
+        "name": "Vågens namn",
+        "goLive": "Lanseringsdatum",
+        "markets": "Marknader",
+        "addMarket": "Lägg till marknad",
+        "searchMarket": "Sök länder",
+        "noMarketMatch": "Inget land matchar",
+        "removeMarket": "Ta bort {market}",
+        "campaign": "Kampanj (valfritt)",
+        "noCampaign": "Ingen kampanj",
+        "campaignHint": "Du kan koppla en kampanj senare.",
+        "campaignLocked": "En kopplad kampanj kan inte ändras här.",
+        "create": "Skapa våg",
+        "save": "Spara ändringar"
+      },
+      "validation": {
+        "nameRequired": "Ange ett namn på vågen.",
+        "goLiveRequired": "Välj ett lanseringsdatum.",
+        "marketsRequired": "Lägg till minst en marknad.",
+        "marketsMax": "Lägg till högst 20 marknader."
+      },
+      "detail": {
+        "title": "Våg",
+        "brand": "Varumärke",
+        "campaign": "Kopplad kampanj",
+        "noCampaign": "Ingen kampanj kopplad",
+        "createdBy": "Skapad av",
+        "notFound": "Den här vågen hittades inte."
+      }
+    },
+    "brandFiles": {
+      "title": "Kundens filer",
+      "subtitle": "Briefer, research och riktlinjer som kunden har delat.",
+      "upload": "Ladda upp filer",
+      "type": "Typ",
+      "types": {
+        "brief": "Brief",
+        "research": "Undersökning",
+        "guidelines": "Riktlinjer",
+        "assets": "Material",
+        "other": "Övrigt"
+      },
+      "dropZone": "Dra filer hit för att ladda upp. PDF, Office, text, bilder eller ZIP, upp till 100 MB vardera.",
+      "empty": "Inga kundfiler ännu.",
+      "actions": "Filåtgärder",
+      "uploadDialog": {
+        "title": "Ladda upp kundfiler",
+        "body": "PDF, Word, Excel, text, CSV, bilder eller ZIP, upp till 100 MB vardera.",
+        "typeLabel": "Filtyp",
+        "choose": "Välj filer",
+        "done": "Klart",
+        "uploading": "Laddar upp {name}…",
+        "success": "{name} har laddats upp."
+      },
+      "errors": {
+        "tooLarge": "{name} är större än 100 MB.",
+        "unsupported": "{name} är inte en filtyp som stöds.",
+        "uploadFailed": "{name} kunde inte laddas upp. Försök igen.",
+        "loadFailed": "Kundfilerna kunde inte läsas in.",
+        "deleteFailed": "Filen kunde inte tas bort. Försök igen.",
+        "downloadFailed": "Nedladdningen kunde inte startas.",
+        "brandArchived": "Det här varumärket är arkiverat. Återställ det för att ändra dess filer."
+      }
     }
   },
   "validation": {

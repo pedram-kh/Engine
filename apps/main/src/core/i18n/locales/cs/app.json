@@ -1413,6 +1413,102 @@
       "showing": "Zobrazeno {shown} z {total}",
       "previous": "Předchozí",
       "next": "Další"
+    },
+    "waves": {
+      "status": {
+        "draft": "Koncept"
+      },
+      "panel": {
+        "title": "Vlny",
+        "subtitle": "Každá vlna je jedno plánovací kolo pro tuto značku.",
+        "newWave": "Nová vlna",
+        "count": "{count} vlna | {count} vln"
+      },
+      "table": {
+        "wave": "Vlna",
+        "markets": "Trhy",
+        "progress": "Průběh",
+        "updated": "Aktualizováno",
+        "goLive": "Spuštění {date}",
+        "notStarted": "Nezahájeno"
+      },
+      "empty": {
+        "heading": "Zatím žádné vlny",
+        "body": "Vytvořte první vlnu pro tuto značku."
+      },
+      "errors": {
+        "loadFailed": "Vlny se nepodařilo načíst.",
+        "campaignNotAvailable": "Tuto kampaň nelze propojit s vlnou této značky.",
+        "campaignAlreadyLinked": "Tato kampaň už vlnu má.",
+        "campaignLinkLocked": "Tato vlna je již propojena s kampaní. Propojení nelze změnit.",
+        "brandArchived": "Tato značka je archivovaná. Obnovte ji, abyste mohli měnit její vlny.",
+        "saveFailed": "Vlnu se nepodařilo uložit. Zkuste to znovu."
+      },
+      "dialog": {
+        "createTitle": "Nová vlna",
+        "editTitle": "Upravit vlnu",
+        "name": "Název vlny",
+        "goLive": "Datum spuštění",
+        "markets": "Trhy",
+        "addMarket": "Přidat trh",
+        "searchMarket": "Hledat země",
+        "noMarketMatch": "Žádná země neodpovídá",
+        "removeMarket": "Odebrat {market}",
+        "campaign": "Kampaň (volitelné)",
+        "noCampaign": "Bez kampaně",
+        "campaignHint": "Kampaň můžete propojit později.",
+        "campaignLocked": "Propojenou kampaň zde nelze změnit.",
+        "create": "Vytvořit vlnu",
+        "save": "Uložit změny"
+      },
+      "validation": {
+        "nameRequired": "Zadejte název vlny.",
+        "goLiveRequired": "Vyberte datum spuštění.",
+        "marketsRequired": "Přidejte alespoň jeden trh.",
+        "marketsMax": "Přidejte nejvýše 20 trhů."
+      },
+      "detail": {
+        "title": "Vlna",
+        "brand": "Značka",
+        "campaign": "Propojená kampaň",
+        "noCampaign": "Žádná propojená kampaň",
+        "createdBy": "Vytvořil(a)",
+        "notFound": "Tato vlna nebyla nalezena."
+      }
+    },
+    "brandFiles": {
+      "title": "Soubory klienta",
+      "subtitle": "Zadání, průzkumy a pokyny sdílené klientem.",
+      "upload": "Nahrát soubory",
+      "type": "Typ",
+      "types": {
+        "brief": "Zadání",
+        "research": "Průzkum",
+        "guidelines": "Pokyny",
+        "assets": "Podklady",
+        "other": "Jiné"
+      },
+      "dropZone": "Přetáhněte sem soubory k nahrání. PDF, Office, text, obrázky nebo ZIP, každý do 100 MB.",
+      "empty": "Zatím žádné soubory klienta.",
+      "actions": "Akce se souborem",
+      "uploadDialog": {
+        "title": "Nahrát soubory klienta",
+        "body": "PDF, Word, Excel, text, CSV, obrázky nebo ZIP, každý do 100 MB.",
+        "typeLabel": "Typ souboru",
+        "choose": "Vybrat soubory",
+        "done": "Hotovo",
+        "uploading": "Nahrávání {name}…",
+        "success": "Soubor {name} byl nahrán."
+      },
+      "errors": {
+        "tooLarge": "Soubor {name} je větší než 100 MB.",
+        "unsupported": "Soubor {name} není podporovaného typu.",
+        "uploadFailed": "Soubor {name} se nepodařilo nahrát. Zkuste to znovu.",
+        "loadFailed": "Soubory klienta se nepodařilo načíst.",
+        "deleteFailed": "Soubor se nepodařilo smazat. Zkuste to znovu.",
+        "downloadFailed": "Stahování se nepodařilo spustit.",
+        "brandArchived": "Tato značka je archivovaná. Obnovte ji, abyste mohli měnit její soubory."
+      }
     }
   },
   "validation": {

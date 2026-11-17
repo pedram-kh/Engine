@@ -1,19 +1,32 @@
 <script setup lang="ts">
 import { formatDateTime } from '@catalyst/api-client'
 import type { BrandResource } from '@catalyst/api-client'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useAgencyStore } from '@/core/stores/useAgencyStore'
 import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
 import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
+import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { brandsApi } from '../api/brands.api'
+import BrandClientFilesPanel from '../components/BrandClientFilesPanel.vue'
+import BrandWavesPanel from '../components/BrandWavesPanel.vue'
 
 const { t, locale } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const agencyStore = useAgencyStore()
+const authStore = useAuthStore()
+
+// PL-1.1: with `waves_enabled` off none of the two-column layout or the panels is drawn, and the DOM is
+// the page it was before.
+const wavesOn = computed(() => authStore.user?.attributes.features?.waves === true)
+const canWriteWaves = computed(
+  () =>
+    (agencyStore.currentRole === 'agency_admin' || agencyStore.currentRole === 'agency_manager') &&
+    brand.value?.attributes.status === 'active',
+)
 
 const brand = ref<BrandResource | null>(null)
 const loading = ref(true)
@@ -119,7 +132,7 @@ onMounted(loadBrand)
     </v-alert>
 
     <!-- Brand details -->
-    <div v-else-if="brand" class="agency-detail">
+    <div v-else-if="brand" class="agency-detail" :class="{ 'agency-detail--with-side': wavesOn }">
       <div class="agency-detail__main">
         <!--
           The create flow uploads the logo AFTER the brand row exists (D7), so a
@@ -188,6 +201,24 @@ onMounted(loadBrand)
             </div>
           </template>
         </section>
+      </div>
+
+      <div
+        v-if="wavesOn && agencyStore.currentAgencyId"
+        class="agency-detail__side"
+        data-test="brand-detail-side"
+      >
+        <BrandClientFilesPanel
+          :agency-id="agencyStore.currentAgencyId"
+          :brand-id="ulid"
+          :can-write="canWriteWaves"
+        />
+        <BrandWavesPanel
+          :agency-id="agencyStore.currentAgencyId"
+          :brand-id="ulid"
+          :brand-name="brand.attributes.name"
+          :can-write="canWriteWaves"
+        />
       </div>
     </div>
 
