@@ -26,7 +26,7 @@ Sizes and chunk counts are estimates. Each sprint's plan fixes them before any c
 
 Total: 48 chunks (PL-1 is 3 chunks since 2026-11-17).
 
-**Flags.** Each sprint ships behind its own flag (strategy, portal, editing, AI), default OFF.
+**Flags.** Each sprint ships behind its own flag (strategy, portal, editing, AI), default OFF. **Standing rule (2026-11-17):** a flag belongs to one sprint and is never reused by a later one, so a deploy never switches new work on. PL-1 uses `waves_enabled`; PL-2 and every later sprint get their own flag, named when that sprint is planned.
 
 **Missing designs that block a sprint**
 
@@ -63,6 +63,7 @@ Total: 48 chunks (PL-1 is 3 chunks since 2026-11-17).
 ## 3. What follows from the rulings
 
 - **CI** runs on pushes to `main` and `pl`, and on pull requests into either, all four jobs (Backend, Frontend, E2E main, E2E admin). Commitlint runs on pull requests into either.
+- **One flag per sprint, never reused (2026-11-17).** Each Production Line sprint ships behind its own flag, default OFF, and a later sprint never reuses an earlier sprint's flag. PL-1 is `waves_enabled`. A new flag must be listed in `AdminFeatureFlagController::FLAGS` (a test fails otherwise) and in `docs/feature-flags.md`.
 - **No push without Pedram's word**, on either branch.
 - **Deploys** still come only from `main` (via the mirror and the colleague). A push to `pl` deploys nothing; staging is the only environment that may run `pl`, and only once it exists.
 - **Production-data standard (§5.40) applies on `pl` unchanged:** schema-only migrations, data changes as separate dry-run-able commands, a "Production posture" section in every chunk review, and the alarm line before code. A migration on `pl` reaches production only when `pl` is merged into `main` and deployed, so the sprint-boundary merge carries the snapshot and one-shot-command obligations of every migration in the merged sprints.

@@ -1,6 +1,6 @@
 # PL-1.1 inventory: Brand and new wave
 
-**Date:** 2026-11-17. **Branch:** `pl` (tip `2df50875` when this was written; `origin/pl` was `a186696c`, so the tip is one local commit ahead). **Status:** read-only inventory. No code, no migration, no push.
+**Date:** 2026-11-17 (addendum the same day, see the end of §0 and §2). **Branch:** `pl`. **Status:** read-only inventory. No code, no migration.
 **Scope:** the code and the two Figma frames that PL-1.1 touches. Rulings R1 to R10 (`production-line-sprints.md` §6) are binding. The wave rulings of 2026-11-17 supersede "a wave is a campaign".
 **Companion:** `pl-1-1-plan.md`.
 
@@ -19,8 +19,7 @@ Paths: `API` = `apps/api`, `MOD` = `apps/api/app/Modules`, `SPA` = `apps/main/sr
 
 **What was not read**
 
-- `get_design_context` was **not called** for either frame (it returns reference code and tokens, which an inventory does not need). Colours, spacing and type values are **not read** from Figma; the plan builds from the existing agency design system (R10).
-- The node tree of 13:4000 was **not read** (`get_metadata` not called for it). Layer names and the hidden or disabled states of the dialog are **not read**.
+- **Addendum 2026-11-17:** the first version of this file listed `get_design_context` and the node tree of 13:4000 as not read. Both were read afterwards (node tree of 13:4000; design context of 13:2 and 13:4000), and the plan records the result (plan, "G1"). The frames match what the plan assumed. Colours in the frame are hard-coded values; the build uses agency theme tokens (R10), and whether they are equal is **not read**.
 - Every other frame on the page (01b, 02 to 08, 10 to 13) is **not read**. Frame 01b is PL-1.3.
 
 **Frame 01 contents (read)**
@@ -97,7 +96,7 @@ Modal "New wave", subtitle = the brand name ("Bolt Food"), a close button. Field
 - **Does anything block a one-to-one link from a wave?** No. A wave carries the link (`waves.campaign_id`), so `campaigns` needs **no column, no index and no migration**. Facts that matter:
   - Nothing in the campaign code reads a wave; "wave" appears only in a comment about an incident (`CreatorJobCardResource.php:119`) and a filter comment (`AgencyRelationshipInbox.vue:20`).
   - Campaigns are soft-deleted in schema (`SoftDeletes`) but **no code path deletes a campaign** (searched `campaign->delete(`, no match; no `destroy` route in `MOD/Campaigns/Routes/api.php`). A wave's link to a soft-deleted campaign is therefore theoretical today.
-  - **A campaign's brand cannot be changed through the API:** `UpdateCampaignRequest`'s docblock says "`brand_id` / `agency_id` are NOT editable" (`MOD/Campaigns/Http/Requests/UpdateCampaignRequest.php:19`). There is no database-level guard, so the same-brand rule holds after the link is made only because the API has no way to move a campaign. The plan pins this with a test (plan §6) so a later change cannot break it silently.
+  - **A campaign's brand cannot be changed after creation (addendum 2026-11-17, read in full).** The only writers of a campaign row are `CampaignController::store` (`:110`, sets `brand_id` once) and `update` (`:285`, `$campaign->fill($updates)->save()` with `$updates = $request->validated()`). `UpdateCampaignRequest::rules()` has no `brand_id` key (docblock `:19`: "`brand_id` / `agency_id` are NOT editable"). There is one PATCH route (`MOD/Campaigns/Routes/api.php:42`) and no PUT. No console command, admin controller, test helper, seeder or brand merge writes a campaign's brand (the walk cleanup seeders only delete). **The protection is one layer thick:** `brand_id` is in `Campaign::$fillable` (`Campaign.php:113`), so only the request whitelist keeps it out. There is no database-level guard. The plan adds two pin tests (plan "G2", B6 and B6b).
   - Campaign statuses are not a graph (inventory A5.5); any status may be linked. Whether a `cancelled` or `completed` campaign should be offered is a question for Pedram (plan §11).
 - **Existing erasure and board coupling.** Every campaign gets one board (lazy provisioning, `BoardService.php:43-65`). PL-1.1 does not touch it.
 
@@ -138,7 +137,7 @@ Modal "New wave", subtitle = the brand name ("Bolt Food"), a close button. Field
 - **Admin Feature-flags page.** `MOD/Admin/Http/Controllers/AdminFeatureFlagController.php` holds a map `NAME => ['label', 'description']` (`:120-145` read); the page is `ADM/modules/feature-flags/pages/FeatureFlagsPage.vue`. The map is `private const FLAGS` (`:67`); the list is built from it (`:155`) and a toggle for a name not in it is refused (`:175`), so **a flag that is not added to this map cannot be switched on from the admin page**. (`tests/Feature/Modules/Admin/AdminFeatureFlagTest.php` was not opened.) Toggling needs a reason and writes a `feature_flag.toggled` audit row (`docs/feature-flags.md`).
 - **Registry doc.** `docs/feature-flags.md` has one row per flag (Gates, Default, Off-state behaviour, Manual steps).
 - **Local seeding.** Walk seeders call `Feature::activate(Flag::NAME)` (`API/database/seeders/Ah115WalkSeeder.php:85`); their cleanup seeders deactivate it.
-- **Sprint-table flag family.** The sprint table says each sprint ships behind "its own flag (strategy, portal, editing, AI)". No such flag exists yet (searched `strategy` in `MOD/*/Features`).
+- **Sprint-table flag family.** The sprint table says each sprint ships behind "its own flag (strategy, portal, editing, AI)". No such flag exists yet (searched `strategy` in `MOD/*/Features`). **Ruled 2026-11-17 (Q1):** PL-1 uses `waves_enabled`, for PL-1 only; each later sprint gets its own flag, never a reused one.
 
 ---
 
@@ -194,7 +193,7 @@ Modal "New wave", subtitle = the brand name ("Bolt Food"), a close button. Field
 - **Targets that touch the Brand page: 16.** The routes `/brands` (`brands`), `/brands/new` (`brand-create`), `/brands/:ulid` (`brand-detail`) and `/brands/:ulid/edit` (`brand-edit`) from `tools/walk/agency-routes.mjs:21-24`, each in 2 themes and 2 widths. Of these only `brand-detail` (4 targets) renders the page PL-1.1 changes; fixtures are `brand-detail-1280` and `brand-detail-1600` in `tools/walk/l4-fixtures.mjs:337,343` (the fixtures were **not opened**). The other 12 reach shared code only through the same shell.
 - **Crossover targets** go creator route to `dashboard`, `campaigns` and `messages`; none is a brand page.
 - **Adding routes does not change the walk.** `walk.mjs` iterates the fixed `AGENCY_ROUTES` list (`:404`), so a new wave route does not add a target. A new route must still be added to the `requireAgencyUser` arch spec (`tests/unit/architecture/agency-routes-agency-user-guard.spec.ts`, which parses `routes.ts` and pins the expected agency routes; its expected set was **not read in full**).
-- **With the flag OFF the 126 must be identical** (the mock `/me` carries no `features.strategy`, so the flag reads false). The creator baseline (146) is not touched: no creator code changes. Per ruling 4 the baselines run at sprint end, and earlier when a shared screen changes; the Brand detail page is a shared agency screen, so run the agency 126 at the end of this chunk.
+- **With the flag OFF the 126 must be identical** (the mock `/me` carries no `features.waves`, so the flag reads false). The creator baseline (146) is not touched: no creator code changes. Per ruling 4 the baselines run at sprint end, and earlier when a shared screen changes; the Brand detail page is a shared agency screen, so run the agency 126 at the end of this chunk.
 - **Playwright surfaces.** `apps/main/playwright/specs/brands.spec.ts` and `permissions.spec.ts` (and `playwright/helpers/selectors.ts`) traverse the brand pages (found by file name match; contents **not read**). They are the E2E exposure of this chunk, with the flag OFF.
 - **Flag-ON screens have no baseline.** Pedram's local walk and the plan's tests cover them; a wave target set is a PL-1 sprint-end decision.
 
@@ -203,7 +202,6 @@ Modal "New wave", subtitle = the brand name ("Bolt Food"), a close button. Field
 ## 10. Not read, in one list
 
 - Figma: `get_design_context` for 13:2 and 13:4000; the node tree of 13:4000; colours, spacing and type values; every other frame (01b, 02 to 13) and the page's prototype links.
-- The body of `CampaignController::update` (the request docblock was read, not the controller's whitelist).
 - `tests/Feature/Modules/Admin/AdminFeatureFlagTest.php`, `Sprint3AuditActionsTest.php`, `NotificationTypeEnumTest.php`, the cross-tenant cases of `AgencyFileApiTest.php`, `BrandCrudTest.php` in full.
 - `tools/walk/l4-fixtures.mjs` brand-detail fixtures, the `requireAgencyUser` arch spec's expected set.
 - The admin SPA's locale handling for flag descriptions; the error-code harvest spec for new API codes.
