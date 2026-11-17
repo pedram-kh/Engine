@@ -322,6 +322,10 @@ final class ErasureRegistry
             ]),
             'campaign_attachments' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7).', ['attached_by_user_id']),
             'agency_files' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7).', ['uploaded_by_user_id']),
+            'waves' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); a wave holds no creator data.', ['created_by_user_id'], [], null, [
+                'name' => 'A wave title.',
+            ]),
+            'brand_files' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); client files on a brand.', ['uploaded_by_user_id']),
             'talent_pools' => new TableRule(Disposition::NotApplicable, 'Agency-authored; membership is talent_pool_creators (§3.7).', ['created_by_user_id'], [], null, [
                 'name' => 'A pool title.',
             ]),
