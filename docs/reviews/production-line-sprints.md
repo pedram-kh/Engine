@@ -131,7 +131,7 @@ Pedram, 2026-11-17. These **supersede any earlier note that "a wave is a kind of
 
 ### PL-1 chunks (three)
 
-- **PL-1.1 Brand and new wave.** The wave object (brand, name, go-live date, markets, optional campaign link), the Brand page (details, client files, waves table) and the New wave dialog. Frames 01 and 09.
+- **PL-1.1 Brand and new wave.** The wave object (brand, name, go-live date, markets, optional campaign link), the Brand page (details, client files, waves table) and the New wave dialog. Frames 01 and 09. **Status (2026-11-17): built and walked (Pedram, local, 14 of 14 steps, including the first real-storage upload). Not merged, not deployed.** Review: `pl-1-1-review.md`.
 - **PL-1.2 Campaign for a wave.** The create option, the link shown on both sides, the new board. Design: Pedram's board screenshot.
 - **PL-1.3 Wave project tracker.** Streams, steps table, owners and dates. Frame 01b, read from Figma in pieces.
 

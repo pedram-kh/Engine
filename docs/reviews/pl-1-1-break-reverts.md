@@ -107,3 +107,15 @@ Mutations ran against the committed tree; `git checkout` restored each file and 
 | S2   | Cleanup leaves the waves behind             | Pl11WalkCleanupSeeder          | Pl11WalkSeedersTest S2 (1 red, via the brand foreign key)                                                                                                      |
 | S3   | Cleanup environment guard removed           | Pl11WalkCleanupSeeder          | Pl11WalkSeedersTest S3 (1 red)                                                                                                                                 |
 | S3   | Seeder environment guard removed            | Pl11WalkSeeder                 | Pl11WalkSeedersTest S3 (1 red)                                                                                                                                 |
+
+## Walk review fixes (after the walk, 2026-11-17)
+
+Mutations ran on committed files; each was restored with `git checkout` and the tree was clean after each.
+
+| Step | What was broken                                                                                 | Where                                 | Tests that went red                                                                                      |
+| ---- | ----------------------------------------------------------------------------------------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| F1   | The unique-violation catch on the file row replaced by a catch that never fires (back to a 500) | `BrandFileController::completeUpload` | `F1: confirming the same upload_id twice` (1 red)                                                        |
+| F2   | The locked re-read removed (the service works on the caller's stale wave)                       | `WaveService::update`                 | both `F2` tests (2 red)                                                                                  |
+| F2   | `lockForUpdate()` removed, re-read kept                                                         | `WaveService::update`                 | **NOT red (81 passed).** SQLite ignores row locks, so the test cannot see the lock. See the review file. |
+| F3   | The name rule loosened to `nullable` (blank names accepted and stored empty)                    | `WaveController::rules`               | `F3`, `B8`, `B10` (3 red)                                                                                |
+| FO   | The side column back on `v-if` (leaves a comment node with the flag off)                        | `BrandDetailPage.vue`                 | `flag false` and `flag absent: no panel...` (2 red)                                                      |
