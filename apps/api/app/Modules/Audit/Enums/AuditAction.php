@@ -516,6 +516,13 @@ enum AuditAction: string
     case AgencyFileUploaded = 'agency_file.uploaded';
     case AgencyFileDeleted = 'agency_file.deleted';
 
+    // PL-1.1 — brand client files and waves. Ordinary content management: no reason required, no notification tie.
+    // `wave.updated` is written only when something changed; the brand_file rows only after the object-first work succeeded.
+    case WaveCreated = 'wave.created';
+    case WaveUpdated = 'wave.updated';
+    case BrandFileUploaded = 'brand_file.uploaded';
+    case BrandFileDeleted = 'brand_file.deleted';
+
     // Campaign attachments from the Files library, chunk B (AH-092). A
     // linkage action on the campaign, not a library action on the file — the
     // file's own audit trail (above) is unaffected by any of these. No

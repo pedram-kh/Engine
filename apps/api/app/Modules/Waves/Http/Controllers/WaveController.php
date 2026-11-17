@@ -1,0 +1,202 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Modules\Waves\Http\Controllers;
+
+use App\Core\Errors\ErrorResponse;
+use App\Modules\Agencies\Models\Agency;
+use App\Modules\Brands\Models\Brand;
+use App\Modules\Campaigns\Enums\CampaignStatus;
+use App\Modules\Campaigns\Models\Campaign;
+use App\Modules\Identity\Models\User;
+use App\Modules\Waves\Features\WavesEnabled;
+use App\Modules\Waves\Http\Resources\WaveResource;
+use App\Modules\Waves\Models\Wave;
+use App\Modules\Waves\Services\WaveRuleViolation;
+use App\Modules\Waves\Services\WaveService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
+use Laravel\Pennant\Feature;
+
+/**
+ * Waves of a brand (PL-1.1):
+ *
+ *   GET   brands/{brand}/waves                   index
+ *   POST  brands/{brand}/waves                   create (201)
+ *   GET   brands/{brand}/waves/campaign-options  the New wave dialog's campaign list
+ *   GET   brands/{brand}/waves/{wave}            show
+ *   PATCH brands/{brand}/waves/{wave}            edit: name, go-live date, markets, and the link only while empty
+ *
+ * Order in every action: the `waves_enabled` flag (404 `not_found`, before the policy and before the body is
+ * read), the brand and wave ownership check (404, never 403), the policy, then validation and the service.
+ * `{brand}` resolves archived brands (an archived brand's page is read-only, not missing); `{wave}` is looked up
+ * here, by ulid, so a soft-deleted wave is a 404.
+ */
+final class WaveController
+{
+    public function __construct(private readonly WaveService $waves) {}
+
+    public function index(Request $request, Agency $agency, Brand $brand): JsonResponse
+    {
+        if ($off = $this->flagOff($request)) {
+            return $off;
+        }
+        $this->assertBrand($brand, $agency);
+        Gate::authorize('viewAny', Wave::class);
+
+        $perPage = max(1, min((int) $request->integer('per_page', 25), 100));
+
+        $paginator = Wave::query()
+            ->where('agency_id', $agency->id)
+            ->where('brand_id', $brand->id)
+            ->with(['brand', 'campaign', 'createdBy'])
+            ->orderByDesc('updated_at')
+            ->orderByDesc('id')
+            ->paginate($perPage)
+            ->withQueryString();
+
+        return response()->json([
+            'data' => WaveResource::collection($paginator->items()),
+            'meta' => [
+                'total' => $paginator->total(),
+                'page' => $paginator->currentPage(),
+                'per_page' => $paginator->perPage(),
+                'last_page' => $paginator->lastPage(),
+            ],
+        ]);
+    }
+
+    public function store(Request $request, Agency $agency, Brand $brand): JsonResponse
+    {
+        if ($off = $this->flagOff($request)) {
+            return $off;
+        }
+        $this->assertBrand($brand, $agency);
+        Gate::authorize('create', Wave::class);
+
+        /** @var array{name: string, go_live_on: string, markets: list<string>, campaign_id?: string|null} $data */
+        $data = Validator::make($request->all(), $this->rules(creating: true))->validate();
+
+        /** @var User $actor */
+        $actor = $request->user();
+
+        try {
+            $wave = $this->waves->create($agency, $brand, $actor, $data);
+        } catch (WaveRuleViolation $e) {
+            return ErrorResponse::single($request, Response::HTTP_UNPROCESSABLE_ENTITY, $e->errorCode, $e->getMessage());
+        }
+
+        return (new WaveResource($wave->load(['brand', 'campaign', 'createdBy'])))
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
+    }
+
+    public function campaignOptions(Request $request, Agency $agency, Brand $brand): JsonResponse
+    {
+        if ($off = $this->flagOff($request)) {
+            return $off;
+        }
+        $this->assertBrand($brand, $agency);
+        Gate::authorize('viewAny', Wave::class);
+
+        $campaigns = Campaign::query()
+            ->where('agency_id', $agency->id)
+            ->where('brand_id', $brand->id)
+            ->where('status', '!=', CampaignStatus::Cancelled->value)
+            ->whereNotIn('id', Wave::query()->whereNotNull('campaign_id')->select('campaign_id'))
+            ->orderBy('name')
+            ->limit(200)
+            ->get();
+
+        return response()->json([
+            'data' => $campaigns->map(static fn (Campaign $c): array => [
+                'id' => $c->ulid,
+                'type' => 'campaign_options',
+                'attributes' => ['name' => $c->name, 'status' => $c->status->value],
+            ])->values(),
+        ]);
+    }
+
+    public function show(Request $request, Agency $agency, Brand $brand, string $wave): JsonResponse
+    {
+        if ($off = $this->flagOff($request)) {
+            return $off;
+        }
+        $this->assertBrand($brand, $agency);
+        $model = $this->findWave($wave, $agency, $brand);
+        Gate::authorize('view', $model);
+
+        return (new WaveResource($model))->response();
+    }
+
+    public function update(Request $request, Agency $agency, Brand $brand, string $wave): JsonResponse
+    {
+        if ($off = $this->flagOff($request)) {
+            return $off;
+        }
+        $this->assertBrand($brand, $agency);
+        $model = $this->findWave($wave, $agency, $brand);
+        Gate::authorize('update', $model);
+
+        /** @var array<string, mixed> $data */
+        $data = Validator::make($request->all(), $this->rules(creating: false))->validate();
+
+        try {
+            $updated = $this->waves->update($agency, $brand, $model, $data);
+        } catch (WaveRuleViolation $e) {
+            return ErrorResponse::single($request, Response::HTTP_UNPROCESSABLE_ENTITY, $e->errorCode, $e->getMessage());
+        }
+
+        return (new WaveResource($updated->load(['brand', 'campaign', 'createdBy'])))->response();
+    }
+
+    /**
+     * @return array<string, list<string>>
+     */
+    private function rules(bool $creating): array
+    {
+        $presence = $creating ? 'required' : 'sometimes';
+
+        return [
+            'name' => [$presence, 'string', 'min:1', 'max:160'],
+            'go_live_on' => [$presence, 'date_format:Y-m-d'],
+            'markets' => [$presence, 'array', 'min:1', 'max:20'],
+            'markets.*' => ['string', 'size:2', 'distinct', 'regex:/^[A-Z]{2}$/'],
+            'campaign_id' => ['sometimes', 'nullable', 'string', 'size:26'],
+        ];
+    }
+
+    private function flagOff(Request $request): ?JsonResponse
+    {
+        if (Feature::active(WavesEnabled::NAME)) {
+            return null;
+        }
+
+        return ErrorResponse::single($request, Response::HTTP_NOT_FOUND, 'not_found', 'Not found.');
+    }
+
+    /**
+     * Route-model binding resolves `{brand}` before tenancy context exists, so ownership is asserted here.
+     * 404, not 403: non-fingerprinting (docs/05-SECURITY-COMPLIANCE.md §7).
+     */
+    private function assertBrand(Brand $brand, Agency $agency): void
+    {
+        if ($brand->agency_id !== $agency->id) {
+            abort(Response::HTTP_NOT_FOUND);
+        }
+    }
+
+    private function findWave(string $ulid, Agency $agency, Brand $brand): Wave
+    {
+        return Wave::query()
+            ->where('ulid', $ulid)
+            ->where('agency_id', $agency->id)
+            ->where('brand_id', $brand->id)
+            ->with(['brand', 'campaign', 'createdBy'])
+            ->firstOrFail();
+    }
+}

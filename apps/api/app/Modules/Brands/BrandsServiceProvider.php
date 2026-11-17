@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Modules\Brands;
 
 use App\Modules\Brands\Models\Brand;
+use App\Modules\Brands\Models\BrandFile;
+use App\Modules\Brands\Policies\BrandFilePolicy;
 use App\Modules\Brands\Policies\BrandPolicy;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Support\Facades\Gate;
@@ -24,6 +26,7 @@ final class BrandsServiceProvider extends ServiceProvider
     private function registerPolicies(): void
     {
         Gate::policy(Brand::class, BrandPolicy::class);
+        Gate::policy(BrandFile::class, BrandFilePolicy::class);
     }
 
     private function registerRoutes(): void
