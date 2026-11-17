@@ -136,7 +136,9 @@ final class BrandFileController
         $actor = $request->user();
 
         try {
-            $file = BrandFile::query()->create([
+            // In a transaction so PostgreSQL rolls the failed INSERT back to a savepoint: without it a unique
+            // violation leaves any surrounding transaction aborted (the test's, or a caller's).
+            $file = DB::transaction(static fn (): BrandFile => BrandFile::query()->create([
                 'agency_id' => $agency->id,
                 'brand_id' => $brand->id,
                 'original_filename' => (string) $data['original_filename'],
@@ -145,7 +147,7 @@ final class BrandFileController
                 'size_bytes' => $verified['size_bytes'],
                 'file_type' => (string) $data['file_type'],
                 'uploaded_by_user_id' => $actor->id,
-            ]);
+            ]));
         } catch (UniqueConstraintViolationException) {
             // The same upload_id confirmed twice: the storage_key unique index refuses the second row. No row, no
             // audit row, and the object is left alone (it belongs to the first row).
