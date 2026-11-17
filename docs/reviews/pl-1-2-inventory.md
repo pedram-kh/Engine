@@ -79,8 +79,8 @@ So P6's label is **derived, not stored**: invited or countered → Invited, acce
 
 - `api/Campaigns/Enums/AssignmentStatus.php::countsAsSelected()` is **true from Accepted** (Accepted, Contracted, Producing, DraftSubmitted, … PaymentReleased, CompletedOnApproval). `isPreSelection()` is Invited and Countered. The only consumers are `Services/BrandExclusivity.php` and the enum itself. This is the AH-120 "selected on a blocking campaign" idea.
 - **P6 contradicts it by design:** an Accepted creator stays in Invited until the strategist moves the card to Selected. So "Selected" in PL-1.2 is a **board position**, not an assignment status.
-- **There is nothing stored today that says "the strategist selected this creator".** The lock must read the board: a card currently in, or a movement ever recorded into, a column from Selected onward.
-- **Problem:** columns have no stable identity (names are editable). The plan adds a nullable `board_columns.stage_key` set only on for-a-wave boards, and fixes the wave board's columns (no rename, delete, reorder). `board_card_movements` gives the "ever" history for free.
+- **There is nothing stored today that says "the strategist selected this creator".** The lock must read the board. **Ruled (Q3, 2026-11-17): current card positions only**, not movement history: locked while at least one card is in Selected, Filming, Submitted / in review, In edits, Client review or Approved.
+- **Problem:** columns have no stable identity (names are editable). The plan adds a nullable `board_columns.stage_key` set only on for-a-wave boards, and fixes the wave board's columns (no rename, delete, reorder). `board_card_movements` is **not** read by the lock (Q3).
 - The **assignment is not touched** by the move to Selected in this chunk (no hand-off, no contract; R7 says hand-off is a later sprint).
 
 ## 4. Campaign creation today
@@ -140,13 +140,22 @@ From `docs/reviews/ah-115-agency-baseline/baseline.json` (126 targets) and `ah-1
 - **Creator (146): 0 targets** touch campaign create, the campaign page or the board. 8 targets read campaign data through the assignment and job screens (`creator.assignment.detail` and `creator.job.detail`, dark and light, both widths). They must stay identical because **no creator resource changes**.
 - **Consequence:** the 12 direct targets above are the flag-off proof for this chunk (`--set agency --only campaign`). The new board and the new form option are **not** covered by any baseline and are checked by Vitest and Pedram's walk.
 
+## 8. Gaps closed (2026-11-17)
+
+**G1: zero budget and publishing.** `CreateCampaignRequest` and `UpdateCampaignRequest` accept `budget_minor_units` with `min:0`; currency must be 3 letters. There is **no publish action**: `status` is a free `sometimes` enum field on update (Draft, Active, Paused, Completed, Cancelled) and `published_at` is only set by the factory. The jobs-board listing floor (`ValidatesJobsBoardListing::LISTING_FLOOR_FIELDS`: description, listing duration, fee, languages, regions) **does not include budget**. The budget amount is read nowhere else: offers and counters check only that the fee currency equals `budget_currency`, and the offer is explicitly not constrained to the amount. **So a zero-budget campaign can be saved as draft, set Active and listed, with no refusal.** The plan adds a guard for for-a-wave campaigns only (`campaign.wave_budget_required`, plan §3.1, gate WB1). Normal campaigns are unchanged.
+
+**G2: board code.** `BoardAutomationService` moves a card only for an event with an enabled automation and a target; a wave board has two (invited, cancelled). `OverdueScanService` posting scan is limited to `creator_posts_content = true` (a wave campaign is false); the draft scan can still flag the assignment but fires an event with no automation on a wave board, so **no card is moved**. `BoardResetService::reset` deletes every column and re-seeds the default seven, which **would destroy a wave board**; the plan refuses it twice (controller and service). The existing board already has columns side by side, a name and count chip per column, drag between columns with optimistic move and revert, a horizontal scroller and click-to-open detail. Missing: the nine-column data, a slimmer card face (no fee, due date), the invite label, a specific refusal message and hidden structure controls. Plan §4.4 and §4.5.
+
+**G3: what the creator sees.** `apply` (`CreatorJobBoardController::apply`) creates a pending `CampaignApplication` and returns status, note and created_at. `CreatorJobCardResource` and `CreatorJobDetailResource` emit an explicit key list (name, status, listing fee and duration, applicant count, brand, description, languages, regions, attachments, locks) from an explicit column select (`CARD_COLUMNS`): **no budget, no campaign type, no wave**. A for-a-wave campaign therefore shows the creator nothing about waves. **About posting:** the list and detail say nothing, but the creator's assignment draft response (`CreatorAssignmentDraftController`, meta `creator_posts_content`) is false for a wave campaign, so the creator's assignment page hides the "post" form after approval and the server answers `assignment.posting_not_required`. That is existing AH-069 behaviour, not wave-specific. The description is agency free text and could say anything. Gate CR1.
+
+**G4: PL-1.1 tests and seeder.** Read line by line; exact changes are in plan §6 ("PL-1.1 tests that change"). Three backend test files, the fixtures and the factory, the Pl11 seeder, and three web files change; seven others were read and are unchanged.
+
 ## Not read (stated, not guessed)
 
-- **Pedram's board screenshot: not read.** It is not attached to the message I received (no image reached me). Column colours, card face and label wording come from the ruling text only. Please re-attach it before the build.
-- Aurora PostgreSQL major version in production: **not read** (infra not in the repo that I read). The migration analysis assumes 11 or later.
+- **Aurora PostgreSQL major version in production: not read** (infra not in the repo that I read). **Q11 (ruled): a must-confirm before `pl` is merged to `main`; it does not block the build.**
 - `apps/main/capacitor.config.ts` was read for `webDir` only; the native projects (`ios/`, `android/`) and the store-build process: **not read**.
-- The creator apply endpoint and `CreatorJobCardResource`: found, **not read** in full.
 - `apps/admin` campaign usage beyond a file list: **not read**.
-- `BoardCardDrawer.vue`, `BoardView.vue`, `useBoardStore.ts`, `BoardAutomationService.php`, `BoardResetService.php` bodies: skimmed by headers and grep only; **not read in full**.
-- Publish rules for a campaign with budget 0: **not read** (relevant to Q8).
-- Tests: no test file was read in full; counts of affected tests come from grep and are estimates.
+- `BoardCardDrawer.vue` (786 lines): its tabs and sections were listed from its `data-test` names, **not read line by line**.
+- Whether any invite gate checks campaign status: **not read**.
+- The draft-overdue notification listeners: **not read**.
+- `BrandFileApiTest.php`: searched for campaign use (none), **not read line by line**.

@@ -143,12 +143,16 @@ Recorded with the PL-1.2 plan (`pl-1-2-plan.md`). They sharpen R3, R4 and R9; **
 - **P8.** A model-level guard on `Campaign` refuses a change of `brand_id` (deferred from PL-1.1). This chunk may edit the Campaigns module.
 - **P9.** Deleting a wave stays out.
 
-**Amendment to PL-1.1 (by P2 and P5):** PL-1.1 let a wave link to any campaign of the brand and locked the link once set. Under P2 the link accepts only a for-a-wave campaign; under P5 the lock starts at the first Selected creator, not at the first link. PL-1.1's tests, seeder and dialog change in PL-1.2 (list in `pl-1-2-plan.md` §6). PL-1.1 as built and walked is not edited retroactively.
+**Plan rulings Q1 to Q12 (Pedram, 2026-11-17)** are recorded in `pl-1-2-plan.md` §11. Three matter beyond PL-1.2: **Q3** the P5 lock reads where cards are now, not history (locked while a card sits in Selected, Filming, Submitted / in review, In edits, Client review or Approved); **Q4** only an Accepted creator's card can enter a working column, any card can be moved to Dropped, moves back are free; **Q10** the board is built from the design system with no screenshot, like a ClickUp board, and the card face carries only the creator name, the invite label and the reserved script-tracker place.
+
+**MUST CONFIRM BEFORE `pl` IS MERGED TO `main` (Q11):** the production Aurora PostgreSQL major version (Pedram asks a colleague). PL-1.2's `ADD COLUMN … DEFAULT` on `campaigns` is a no-rewrite change from PostgreSQL 11. It does **not** block the build; it blocks the merge.
+
+**Amendment to PL-1.1 (by P2 and P5):** PL-1.1 let a wave link to any campaign of the brand and locked the link once set. Under P2 the link accepts only a for-a-wave campaign; under P5 and Q3 the link is locked only while a card sits in a working column (Selected or later), not once a link is set. PL-1.1's tests, seeder and dialog change in PL-1.2 (list in `pl-1-2-plan.md` §6). PL-1.1 as built and walked is not edited retroactively.
 
 ### PL-1 chunks (three)
 
 - **PL-1.1 Brand and new wave.** The wave object (brand, name, go-live date, markets, optional campaign link), the Brand page (details, client files, waves table) and the New wave dialog. Frames 01 and 09. **Status (2026-11-17): built and walked (Pedram, local, 14 of 14 steps, including the first real-storage upload). Not merged, not deployed.** Review: `pl-1-1-review.md`.
-- **PL-1.2 Campaign for a wave.** The create option, the link shown on both sides, the new board. Design: Pedram's board screenshot.
+- **PL-1.2 Campaign for a wave.** The create option, the link shown on both sides, the new board. Design: none (built from the design system and existing board components, Q10).
 - **PL-1.3 Wave project tracker.** Streams, steps table, owners and dates. Frame 01b, read from Figma in pieces.
 
 ### Open items from these rulings
