@@ -12,6 +12,7 @@ use App\Modules\Waves\Models\Wave;
 use Database\Seeders\Pl11WalkCleanupSeeder;
 use Database\Seeders\Pl11WalkSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Laravel\Pennant\Feature;
 use Tests\TestCase;
 
@@ -52,7 +53,8 @@ it('S2: cleanup removes everything the walk made, leaves a bystander alone, and 
         ->and(Wave::query()->count())->toBe(1)
         ->and(BrandFile::query()->count())->toBe(0)
         ->and(Brand::query()->where('agency_id', $bystander->id)->count())->toBe(1)
-        ->and(Feature::active(WavesEnabled::NAME))->toBeTrue();
+        // The stored flag row is still there (read it from the table: the in-memory cache would hide a delete).
+        ->and(DB::table('features')->where('name', WavesEnabled::NAME)->where('value', 'true')->exists())->toBeTrue();
 
     // Safe twice, and safe when the seeder never ran.
     $this->seed(Pl11WalkCleanupSeeder::class);
