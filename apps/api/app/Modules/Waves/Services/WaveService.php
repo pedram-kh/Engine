@@ -59,7 +59,14 @@ final class WaveService
         Audit::log(
             action: AuditAction::WaveCreated,
             subject: $wave,
-            after: $wave->toArray(),
+            // Literal keys on purpose: AuditPayloadKeysGuardTest reads them statically and Erasure decides each.
+            after: [
+                'name' => $wave->name,
+                'go_live_on' => $wave->go_live_on->toDateString(),
+                'markets' => $wave->markets,
+                'campaign_id' => $campaign?->ulid,
+                'status' => $wave->status->value,
+            ],
         );
 
         return $wave;
@@ -72,7 +79,12 @@ final class WaveService
     {
         $this->assertBrandWritable($brand);
 
-        $before = $wave->toArray();
+        $beforeName = $wave->name;
+        $beforeGoLiveOn = $wave->go_live_on->toDateString();
+        $beforeMarkets = $wave->markets;
+        $beforeCampaignUlid = $wave->campaign_id === null
+            ? null
+            : Campaign::query()->withTrashed()->whereKey($wave->campaign_id)->value('ulid');
         $newCampaign = null;
 
         if (array_key_exists('campaign_id', $data)) {
@@ -115,8 +127,21 @@ final class WaveService
         Audit::log(
             action: AuditAction::WaveUpdated,
             subject: $wave,
-            before: $before,
-            after: $wave->fresh()?->toArray() ?? [],
+            // Literal keys on purpose (see create()).
+            before: [
+                'name' => $beforeName,
+                'go_live_on' => $beforeGoLiveOn,
+                'markets' => $beforeMarkets,
+                'campaign_id' => $beforeCampaignUlid,
+                'status' => $wave->status->value,
+            ],
+            after: [
+                'name' => $wave->name,
+                'go_live_on' => $wave->go_live_on->toDateString(),
+                'markets' => $wave->markets,
+                'campaign_id' => $newCampaign === null ? $beforeCampaignUlid : $newCampaign->ulid,
+                'status' => $wave->status->value,
+            ],
         );
 
         return $wave;

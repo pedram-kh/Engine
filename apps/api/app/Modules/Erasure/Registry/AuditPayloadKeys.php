@@ -78,6 +78,8 @@ final class AuditPayloadKeys
             'The ulids of a message and its thread (AH-119 B2 edit and delete audit rows): ids, never the text.' => 'message_ulid,thread_ulid',
             'Locale, currency or UI preference.' => 'categories,country_code,preferred_currency,preferred_language,primary_language,theme_preference,timezone',
             'Boolean marker of a completed step.' => 'payout_method_set',
+            'PL-1.1 wave attributes (name, go-live date, markets): an agency\'s planning data about a brand, no creator is a field of it. `name` is also decided under scrubKeys() for user snapshots; that decision stands.' => 'go_live_on,markets',
+            'PL-1.1 client-file attributes (filename, type, MIME, size): an agency-owned file about a brand. The filename is typed by the uploading agency user; it is not creator data.' => 'file_type,mime_type,original_filename,size_bytes',
             'The erasure run\'s own bookkeeping: its ledger ulid, digest and per-table counts. No person.' => 'audit_rows_scrubbed,counts,digest,files_deleted,ledger_ulid',
         ];
 

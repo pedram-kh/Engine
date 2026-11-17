@@ -148,7 +148,14 @@ final class BrandFileController
         Audit::log(
             action: AuditAction::BrandFileUploaded,
             subject: $file,
-            after: $file->toArray(),
+            // Literal keys on purpose: AuditPayloadKeysGuardTest reads them statically and Erasure decides each.
+            // No storage_key, no internal id.
+            after: [
+                'original_filename' => $file->original_filename,
+                'file_type' => $file->file_type->value,
+                'mime_type' => $file->mime_type,
+                'size_bytes' => $file->size_bytes,
+            ],
         );
 
         return (new BrandFileResource($file->load('uploadedBy')))->response()->setStatusCode(Response::HTTP_CREATED);
@@ -179,8 +186,6 @@ final class BrandFileController
             return $archived;
         }
 
-        $before = $model->toArray();
-
         try {
             $this->uploads->delete($agency, $brand, $model);
         } catch (StorageDeleteFailedException|RuntimeException $e) {
@@ -194,7 +199,12 @@ final class BrandFileController
         Audit::log(
             action: AuditAction::BrandFileDeleted,
             subject: $model,
-            before: $before,
+            before: [
+                'original_filename' => $model->original_filename,
+                'file_type' => $model->file_type->value,
+                'mime_type' => $model->mime_type,
+                'size_bytes' => $model->size_bytes,
+            ],
         );
 
         return response()->json(null, Response::HTTP_NO_CONTENT);

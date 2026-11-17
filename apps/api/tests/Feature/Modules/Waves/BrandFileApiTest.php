@@ -369,6 +369,11 @@ it('B10: audits brand_file.uploaded and brand_file.deleted with actor and agency
         ->and($up->agency_id)->toBe($w['agency']->id)
         ->and($del->actor_id)->toBe($w['admin']->id);
 
+    // The payloads carry the decided literal keys and nothing else: no storage_key, no internal id.
+    $keys = ['file_type', 'mime_type', 'original_filename', 'size_bytes'];
+    expect(array_keys($up->after ?? []))->toEqualCanonicalizing($keys)
+        ->and(array_keys($del->before ?? []))->toEqualCanonicalizing($keys);
+
     $this->actingAs($w['staff'], 'web')->postJson(bfUrl($w['agency'], $w['brand'], 'uploads/init'), ['mime_type' => 'application/pdf', 'declared_bytes' => 10, 'file_type' => 'brief'])->assertForbidden();
     expect(AuditLog::query()->where('action', 'brand_file.uploaded')->count())->toBe(1);
 });

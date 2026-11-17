@@ -201,6 +201,13 @@ it('B10: audits wave.created and wave.updated with actor, agency and subject, an
         ->and($created->subject_type)->not->toBeNull()
         ->and($updated->actor_id)->toBe($w['admin']->id);
 
+    // The payloads carry the decided literal keys and nothing else: no internal id, no creator data.
+    $keys = ['go_live_on', 'campaign_id', 'markets', 'name', 'status'];
+    expect(array_keys($created->after ?? []))->toEqualCanonicalizing($keys)
+        ->and(array_keys($updated->before ?? []))->toEqualCanonicalizing($keys)
+        ->and(array_keys($updated->after ?? []))->toEqualCanonicalizing($keys)
+        ->and($updated->before['name'] ?? null)->not->toBe($updated->after['name'] ?? null);
+
     // A refused request audits nothing.
     $this->actingAs($w['admin'], 'web')->postJson(WaveFixtures::wavesUrl($w['agency'], $w['brand']), WaveFixtures::body(['name' => '']))->assertUnprocessable();
     expect(AuditLog::query()->where('action', 'wave.created')->count())->toBe(1);

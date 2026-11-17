@@ -157,6 +157,15 @@ reboot. From now on, for every agent and developer, on a local machine:
 4. **Pest full suite serial** (as in § 4). **Playwright `--workers=2`** locally.
 5. **No background-then-another.** If a run is backgrounded, wait for its
    exit before starting anything else.
+6. **Erasure folder before a push.** Any chunk that adds an audit call
+   (`Audit::log`, an `Audited` model), a table or a column runs the whole
+   Erasure test folder locally before the push:
+   `php -d memory_limit=1G vendor/bin/pest tests/Feature/Modules/Erasure`.
+   It holds `AuditPayloadKeysGuardTest` (every audit payload key is decided, and
+   payloads are literal arrays) and the registry schema tests (every table and
+   column is classified). A new audit payload is written as a literal array with
+   literal keys; a variable or `toArray()` is a last resort and needs a
+   tech-debt row. PL-1.1 reached CI red by skipping this step.
 
 ---
 
