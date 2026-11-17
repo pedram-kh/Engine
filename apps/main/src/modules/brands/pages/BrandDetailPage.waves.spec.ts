@@ -87,6 +87,12 @@ describe('BrandDetailPage behind features.waves (PL-1.1 W1)', () => {
       expect(w.find('[data-test="brand-detail-side"]').exists()).toBe(false)
       expect(w.find('[data-test="brand-waves-panel"]').exists()).toBe(false)
       expect(w.find('[data-test="brand-files-panel"]').exists()).toBe(false)
+      // The agency walk's DOM hash saw a `<!--v-if-->` placeholder here once: with the flag off the page's own
+      // children carry no comment node at all.
+      const comments = Array.from(w.get('.agency-detail').element.childNodes).filter(
+        (n) => n.nodeType === Node.COMMENT_NODE,
+      )
+      expect(comments).toHaveLength(0)
       expect(wavesApi.list).not.toHaveBeenCalled()
       expect(brandFilesApi.list).not.toHaveBeenCalled()
       w.unmount()

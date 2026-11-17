@@ -22,6 +22,10 @@ const authStore = useAuthStore()
 // PL-1.1: with `waves_enabled` off none of the two-column layout or the panels is drawn, and the DOM is
 // the page it was before.
 const wavesOn = computed(() => authStore.user?.attributes.features?.waves === true)
+// A one-item `v-for`, not a `v-if`, on purpose: a false `v-if` leaves a comment node in the DOM, and with
+// `waves_enabled` off the page must be identical to the one before PL-1.1 (the agency walk's DOM hash saw it).
+// An empty `v-for` leaves nothing.
+const sideColumns = computed(() => (wavesOn.value && agencyStore.currentAgencyId ? ['side'] : []))
 const canWriteWaves = computed(
   () =>
     (agencyStore.currentRole === 'agency_admin' || agencyStore.currentRole === 'agency_manager') &&
@@ -204,17 +208,18 @@ onMounted(loadBrand)
       </div>
 
       <div
-        v-if="wavesOn && agencyStore.currentAgencyId"
+        v-for="side in sideColumns"
+        :key="side"
         class="agency-detail__side"
         data-test="brand-detail-side"
       >
         <BrandClientFilesPanel
-          :agency-id="agencyStore.currentAgencyId"
+          :agency-id="agencyStore.currentAgencyId ?? ''"
           :brand-id="ulid"
           :can-write="canWriteWaves"
         />
         <BrandWavesPanel
-          :agency-id="agencyStore.currentAgencyId"
+          :agency-id="agencyStore.currentAgencyId ?? ''"
           :brand-id="ulid"
           :brand-name="brand.attributes.name"
           :can-write="canWriteWaves"
