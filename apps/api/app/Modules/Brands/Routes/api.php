@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Brands\Http\Controllers\BrandController;
+use App\Modules\Brands\Http\Controllers\BrandFileController;
 use App\Modules\Brands\Http\Controllers\BrandLogoController;
 use Illuminate\Support\Facades\Route;
 
@@ -51,4 +52,14 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
             ->name('brands.logo.store');
         Route::delete('brands/{brand}/logo', [BrandLogoController::class, 'destroy'])
             ->name('brands.logo.destroy');
+
+        // PL-1.1 — client files on a brand. Same stack, behind the `waves_enabled` flag (404 while off). The
+        // controller re-asserts brand ownership (binding runs before tenancy) and looks `{file}` up by ulid,
+        // scoped to agency and brand. `{brand}` resolves archived brands (read-only page). The two presigned
+        // routes are listed in docs/security/tenancy.md §4 ("NOT a scope bypass"). Literal `uploads/*` first.
+        Route::get('brands/{brand}/files', [BrandFileController::class, 'index'])->withTrashed()->name('brand-files.index');
+        Route::post('brands/{brand}/files/uploads/init', [BrandFileController::class, 'initUpload'])->withTrashed()->name('brand-files.init');
+        Route::post('brands/{brand}/files/uploads/complete', [BrandFileController::class, 'completeUpload'])->withTrashed()->name('brand-files.complete');
+        Route::get('brands/{brand}/files/{file}', [BrandFileController::class, 'show'])->withTrashed()->name('brand-files.show');
+        Route::delete('brands/{brand}/files/{file}', [BrandFileController::class, 'destroy'])->withTrashed()->name('brand-files.destroy');
     });
