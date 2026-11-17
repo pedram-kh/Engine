@@ -7,6 +7,8 @@ use App\Modules\Brands\Models\Brand;
 use App\Modules\Campaigns\Http\Requests\UpdateCampaignRequest;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Waves\Models\Wave;
+use App\Modules\Waves\Services\WaveRuleViolation;
+use App\Modules\Waves\Services\WaveService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -271,4 +273,52 @@ it('B15: a campaign cancelled AFTER it was linked keeps its link', function (): 
         ->patchJson(WaveFixtures::wavesUrl($w['agency'], $w['brand'], $wave->ulid), ['campaign_id' => $campaign->ulid, 'name' => 'Still linked'])
         ->assertOk();
     expect($wave->fresh()?->campaign_id)->toBe($campaign->id);
+});
+
+it('F2: a second edit holding a STALE wave re-reads the locked row: a different campaign is locked, the same campaign is a no-op', function (): void {
+    $w = WaveFixtures::world();
+    WaveFixtures::armed();
+    $first = WaveFixtures::campaign($w['agency'], $w['brand'], 'draft', 'First');
+    $second = WaveFixtures::campaign($w['agency'], $w['brand'], 'draft', 'Second');
+    $wave = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->create();
+
+    // Both "requests" loaded the wave while it had no link.
+    $staleForB = Wave::query()->findOrFail($wave->id);
+    $staleForA = Wave::query()->findOrFail($wave->id);
+    expect($staleForB->campaign_id)->toBeNull();
+
+    $service = app(WaveService::class);
+    $service->update($w['agency'], $w['brand'], $staleForA, ['campaign_id' => $first->ulid]);
+    $auditsAfterFirst = AuditLog::query()->where('action', 'wave.updated')->count();
+
+    // The loser asks for a different campaign: it must NOT overwrite the winner.
+    $caught = null;
+    try {
+        $service->update($w['agency'], $w['brand'], $staleForB, ['campaign_id' => $second->ulid]);
+    } catch (WaveRuleViolation $e) {
+        $caught = $e->errorCode;
+    }
+    expect($caught)->toBe('wave.campaign_link_locked')
+        ->and(Wave::query()->findOrFail($wave->id)->campaign_id)->toBe($first->id);
+
+    // The loser asks for the SAME campaign the winner set: a no-op, no audit row, and the returned wave carries the link.
+    $returned = $service->update($w['agency'], $w['brand'], Wave::query()->findOrFail($wave->id), ['campaign_id' => $first->ulid]);
+    expect($returned->campaign_id)->toBe($first->id)
+        ->and(AuditLog::query()->where('action', 'wave.updated')->count())->toBe($auditsAfterFirst);
+});
+
+it('F2: the stale loser asking for the winner\'s campaign with a rename applies the rename on the fresh row and audits the true before', function (): void {
+    $w = WaveFixtures::world();
+    WaveFixtures::armed();
+    $first = WaveFixtures::campaign($w['agency'], $w['brand'], 'draft', 'First');
+    $wave = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->create(['name' => 'Original']);
+    $stale = Wave::query()->findOrFail($wave->id);
+    Wave::query()->whereKey($wave->id)->update(['campaign_id' => $first->id]);
+
+    app(WaveService::class)->update($w['agency'], $w['brand'], $stale, ['campaign_id' => $first->ulid, 'name' => 'Renamed']);
+
+    $audit = AuditLog::query()->where('action', 'wave.updated')->firstOrFail();
+    expect(Wave::query()->findOrFail($wave->id)->name)->toBe('Renamed')
+        ->and($audit->before['campaign_id'] ?? null)->toBe($first->ulid)
+        ->and($audit->after['campaign_id'] ?? null)->toBe($first->ulid);
 });

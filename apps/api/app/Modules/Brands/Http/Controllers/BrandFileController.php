@@ -17,6 +17,7 @@ use App\Modules\Brands\Models\BrandFile;
 use App\Modules\Brands\Services\BrandFileUploadService;
 use App\Modules\Identity\Models\User;
 use App\Modules\Waves\Features\WavesEnabled;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -134,16 +135,22 @@ final class BrandFileController
         /** @var User $actor */
         $actor = $request->user();
 
-        $file = BrandFile::query()->create([
-            'agency_id' => $agency->id,
-            'brand_id' => $brand->id,
-            'original_filename' => (string) $data['original_filename'],
-            'storage_key' => $verified['storage_key'],
-            'mime_type' => $verified['mime_type'],
-            'size_bytes' => $verified['size_bytes'],
-            'file_type' => (string) $data['file_type'],
-            'uploaded_by_user_id' => $actor->id,
-        ]);
+        try {
+            $file = BrandFile::query()->create([
+                'agency_id' => $agency->id,
+                'brand_id' => $brand->id,
+                'original_filename' => (string) $data['original_filename'],
+                'storage_key' => $verified['storage_key'],
+                'mime_type' => $verified['mime_type'],
+                'size_bytes' => $verified['size_bytes'],
+                'file_type' => (string) $data['file_type'],
+                'uploaded_by_user_id' => $actor->id,
+            ]);
+        } catch (UniqueConstraintViolationException) {
+            // The same upload_id confirmed twice: the storage_key unique index refuses the second row. No row, no
+            // audit row, and the object is left alone (it belongs to the first row).
+            return ErrorResponse::single($request, Response::HTTP_UNPROCESSABLE_ENTITY, 'brand_file.complete_failed', 'This upload was already completed.');
+        }
 
         Audit::log(
             action: AuditAction::BrandFileUploaded,

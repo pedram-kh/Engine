@@ -79,49 +79,62 @@ final class WaveService
     {
         $this->assertBrandWritable($brand);
 
-        $beforeName = $wave->name;
-        $beforeGoLiveOn = $wave->go_live_on->toDateString();
-        $beforeMarkets = $wave->markets;
-        $beforeCampaignUlid = $wave->campaign_id === null
-            ? null
-            : Campaign::query()->withTrashed()->whereKey($wave->campaign_id)->value('ulid');
-        $newCampaign = null;
-
-        if (array_key_exists('campaign_id', $data)) {
-            $requested = $data['campaign_id'];
-            if ($wave->campaign_id !== null) {
-                $currentUlid = Campaign::query()->withTrashed()->whereKey($wave->campaign_id)->value('ulid');
-                if ($requested !== $currentUlid) {
-                    throw WaveRuleViolation::campaignLinkLocked();
-                }
-            } elseif ($requested !== null) {
-                $newCampaign = $this->linkableCampaign($agency, $brand, $requested);
-            }
-        }
-
-        if (array_key_exists('name', $data)) {
-            $wave->name = trim((string) $data['name']);
-        }
-        if (array_key_exists('go_live_on', $data)) {
-            $wave->go_live_on = $data['go_live_on'];
-        }
-        if (array_key_exists('markets', $data)) {
-            $wave->markets = array_values((array) $data['markets']);
-        }
-        if ($newCampaign !== null) {
-            $wave->campaign_id = $newCampaign->id;
-        }
-
-        if (! $wave->isDirty()) {
-            return $wave;
-        }
-
         try {
-            DB::transaction(function () use ($wave): void {
-                $wave->save();
+            // The whole read-decide-write runs inside one transaction on a ROW-LOCKED copy of the wave, so two
+            // concurrent edits are serialised: the second one re-reads the first one's link and re-applies the rule
+            // against it (PL-1.1 review fix F2). The caller's $wave may be stale by the time the lock is granted.
+            [$wave, $before, $newCampaign, $changed] = DB::transaction(function () use ($agency, $brand, $wave, $data): array {
+                $locked = Wave::query()->whereKey($wave->id)->lockForUpdate()->firstOrFail();
+
+                $beforeCampaignUlid = $locked->campaign_id === null
+                    ? null
+                    : Campaign::query()->withTrashed()->whereKey($locked->campaign_id)->value('ulid');
+                $before = [
+                    'name' => $locked->name,
+                    'go_live_on' => $locked->go_live_on->toDateString(),
+                    'markets' => $locked->markets,
+                    'campaign_id' => $beforeCampaignUlid,
+                    'status' => $locked->status->value,
+                ];
+                $newCampaign = null;
+
+                if (array_key_exists('campaign_id', $data)) {
+                    $requested = $data['campaign_id'];
+                    if ($locked->campaign_id !== null) {
+                        if ($requested !== $beforeCampaignUlid) {
+                            throw WaveRuleViolation::campaignLinkLocked();
+                        }
+                    } elseif ($requested !== null) {
+                        $newCampaign = $this->linkableCampaign($agency, $brand, $requested);
+                    }
+                }
+
+                if (array_key_exists('name', $data)) {
+                    $locked->name = trim((string) $data['name']);
+                }
+                if (array_key_exists('go_live_on', $data)) {
+                    $locked->go_live_on = $data['go_live_on'];
+                }
+                if (array_key_exists('markets', $data)) {
+                    $locked->markets = array_values((array) $data['markets']);
+                }
+                if ($newCampaign !== null) {
+                    $locked->campaign_id = $newCampaign->id;
+                }
+
+                $changed = $locked->isDirty();
+                if ($changed) {
+                    $locked->save();
+                }
+
+                return [$locked, $before, $newCampaign, $changed];
             });
         } catch (UniqueConstraintViolationException) {
             throw WaveRuleViolation::campaignAlreadyLinked();
+        }
+
+        if (! $changed) {
+            return $wave;
         }
 
         Audit::log(
@@ -129,17 +142,17 @@ final class WaveService
             subject: $wave,
             // Literal keys on purpose (see create()).
             before: [
-                'name' => $beforeName,
-                'go_live_on' => $beforeGoLiveOn,
-                'markets' => $beforeMarkets,
-                'campaign_id' => $beforeCampaignUlid,
-                'status' => $wave->status->value,
+                'name' => $before['name'],
+                'go_live_on' => $before['go_live_on'],
+                'markets' => $before['markets'],
+                'campaign_id' => $before['campaign_id'],
+                'status' => $before['status'],
             ],
             after: [
                 'name' => $wave->name,
                 'go_live_on' => $wave->go_live_on->toDateString(),
                 'markets' => $wave->markets,
-                'campaign_id' => $newCampaign === null ? $beforeCampaignUlid : $newCampaign->ulid,
+                'campaign_id' => $newCampaign === null ? $before['campaign_id'] : $newCampaign->ulid,
                 'status' => $wave->status->value,
             ],
         );

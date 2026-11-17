@@ -391,3 +391,22 @@ it('B12: the resource shape carries ulids only: no storage_key, no internal ids'
         ->and($json['relationships']['uploaded_by']['data']['id'])->toBe($w['admin']->ulid)
         ->and(json_encode($json))->not->toContain($file->storage_key);
 });
+
+it('F1: confirming the same upload_id twice is 422 brand_file.complete_failed: one row, one audit row, the object kept', function (): void {
+    $w = WaveFixtures::world();
+    WaveFixtures::armed();
+    $post = fn (string $url, array $body): TestResponse => $this->actingAs($w['admin'], 'web')->postJson($url, $body);
+
+    $init = $post(bfUrl($w['agency'], $w['brand'], 'uploads/init'), ['mime_type' => 'application/pdf', 'declared_bytes' => 64, 'file_type' => 'brief'])
+        ->assertOk()->json('data');
+    Storage::disk('media')->put($init['upload_id'], str_repeat('a', 64));
+    $body = ['upload_id' => $init['upload_id'], 'original_filename' => 'brief.pdf', 'file_type' => 'brief'];
+
+    $post(bfUrl($w['agency'], $w['brand'], 'uploads/complete'), $body)->assertCreated();
+    $post(bfUrl($w['agency'], $w['brand'], 'uploads/complete'), $body)
+        ->assertUnprocessable()->assertJsonPath('errors.0.code', 'brand_file.complete_failed');
+
+    expect(BrandFile::query()->count())->toBe(1)
+        ->and(AuditLog::query()->where('action', 'brand_file.uploaded')->count())->toBe(1)
+        ->and(Storage::disk('media')->exists($init['upload_id']))->toBeTrue();
+});

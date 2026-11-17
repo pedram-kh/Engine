@@ -230,3 +230,22 @@ it('B12: the resource shape carries ulids only: no internal id, no agency_id; da
         ->and($json['relationships']['brand']['data']['id'])->toBe($w['brand']->ulid)
         ->and(json_encode($json))->not->toContain('"agency_id"');
 });
+
+it('F3: a wave name of only spaces is 422 on create and on edit, and nothing is written', function (): void {
+    $w = WaveFixtures::world();
+    WaveFixtures::armed();
+    $actor = $this->actingAs($w['admin'], 'web');
+
+    foreach (['   ', "\t \n", ''] as $blank) {
+        $actor->postJson(WaveFixtures::wavesUrl($w['agency'], $w['brand']), WaveFixtures::body(['name' => $blank]))
+            ->assertUnprocessable()->assertJsonPath('errors.0.source.pointer', '/data/attributes/name');
+    }
+    expect(Wave::query()->count())->toBe(0);
+
+    $wave = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->create(['name' => 'Keep me']);
+    foreach (['   ', "\t \n", ''] as $blank) {
+        $actor->patchJson(WaveFixtures::wavesUrl($w['agency'], $w['brand'], $wave->ulid), ['name' => $blank])->assertUnprocessable();
+    }
+    expect(Wave::query()->findOrFail($wave->id)->name)->toBe('Keep me')
+        ->and(AuditLog::query()->where('action', 'wave.updated')->count())->toBe(0);
+});
