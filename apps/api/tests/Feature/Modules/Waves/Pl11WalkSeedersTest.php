@@ -60,7 +60,7 @@ it('S2: cleanup removes everything the walk made, leaves a bystander alone, and 
 });
 
 it('S3: both seeders refuse to run outside local and testing', function (): void {
-    $this->app['env'] = 'production';
+    app()->instance('env', 'production');
 
     expect(fn () => app(Pl11WalkSeeder::class)->run())->toThrow(RuntimeException::class)
         ->and(fn () => app(Pl11WalkCleanupSeeder::class)->run())->toThrow(RuntimeException::class);

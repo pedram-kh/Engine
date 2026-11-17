@@ -135,7 +135,7 @@ final class Pl11WalkSeeder extends Seeder
             $agency = Agency::query()->where('slug', $slug)->first();
             $brand = $agency === null ? null : Brand::query()->where('agency_id', $agency->id)->where('name', $name)->first();
             if ($agency !== null && $brand !== null) {
-                $this->command?->line("{$name}: brand {$brand->ulid} (agency {$agency->ulid})");
+                $this->command->line("{$name}: brand {$brand->ulid} (agency {$agency->ulid})");
             }
         }
     }
