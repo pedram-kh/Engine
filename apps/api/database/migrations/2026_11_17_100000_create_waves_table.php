@@ -31,6 +31,12 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Addendum 2026-11-18: the foreign keys take a brief ShareRowExclusiveLock on each referenced live table, so
+        // give up after 5 s instead of queueing behind a long transaction (PostgreSQL only).
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement("SET LOCAL lock_timeout = '5s'");
+        }
+
         Schema::create('waves', function (Blueprint $table): void {
             $table->id();
             $table->ulid('ulid')->unique();

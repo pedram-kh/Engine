@@ -91,6 +91,15 @@ Each is named here, as the standing rule requires: the **upload dialog** (`Brand
 
 **PROD-DATA RISK: NONE.**
 
+> **Addendum 2026-11-18 (correction, PL-1.3 review; same correction as `pl-1-1-plan.md` §8).** "No existing table is altered" is true, but "no existing
+> table is touched" is not. Creating a table with foreign keys takes a brief ShareRowExclusiveLock on every
+> referenced live table while the keys are added: writes to those tables wait, reads do not. No row is read or
+> written, and no data changes. `create_waves_table` locks `agencies`, `brands`, `campaigns` and `users`;
+> `create_brand_files_table` locks `agencies`, `brands` and `users`. Measured on a synthetic PostgreSQL database
+> with live-table rows: 29.19 ms and 9.84 ms. Neither migration set `lock_timeout`; both now run
+> `SET LOCAL lock_timeout = '5s'` on PostgreSQL (nothing was deployed, `pl` unmerged). The full list is in
+> `production-line-sprints.md` (PL-1 migrations at the sprint-boundary merge).
+
 - The flag `waves_enabled` is OFF by default and nothing in this chunk turns it on. With it OFF: every wave and file endpoint answers 404 `not_found`, `/me` `features.waves` is false, the brand page renders exactly as before (W1 and the unmodified `BrandDetailPage.spec.ts`), and the wave route redirects to the brand.
 - The migrations are schema-only: two new tables, `waves` and `brand_files`, empty on deploy. No existing table or column is altered, no backfill, no data change. Migrations were run on the local and test databases only.
 - The Campaigns module is not edited (an empty diff of `app/Modules/Campaigns` over the range from `5968f4f8`).

@@ -69,6 +69,15 @@ Read in full: `CampaignController::update` (`MOD/Campaigns/Http/Controllers/Camp
 
 **PROD-DATA RISK: NONE.**
 
+> **Addendum 2026-11-18 (correction, PL-1.3 review).** "No existing table is altered" is true, but "no existing
+> table is touched" is not. Creating a table with foreign keys takes a brief ShareRowExclusiveLock on every
+> referenced live table while the keys are added: writes to those tables wait, reads do not. No row is read or
+> written, and no data changes. `create_waves_table` locks `agencies`, `brands`, `campaigns` and `users`;
+> `create_brand_files_table` locks `agencies`, `brands` and `users`. Measured on a synthetic PostgreSQL database
+> with live-table rows: 29.19 ms and 9.84 ms. Neither migration set `lock_timeout`; both now run
+> `SET LOCAL lock_timeout = '5s'` on PostgreSQL (nothing was deployed, `pl` unmerged). The full list is in
+> `production-line-sprints.md` (PL-1 migrations at the sprint-boundary merge).
+
 - Two **new, empty tables** (`waves`, `brand_files`). No existing table is altered, no index is added to an existing table, no column is added to `brands` or `campaigns`.
 - No migration writes data. No backfill, no seed of business data, no default flip. No data command is needed.
 - The feature writes rows and S3 objects only when someone uses it, and only with the flag ON. Flag OFF: every new endpoint answers 404 and nothing is written.

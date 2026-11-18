@@ -179,6 +179,15 @@ reboot. From now on, for every agent and developer, on a local machine:
    dev database**, and unset the `DB_*` variables afterwards so the next SQLite
    run does not point at a dropped database. PL-1.1 reached CI red a second
    time (run 449) because an unique-violation test was only run on SQLite.
+8. **Audit, Erasure and Tenancy folders, on SQLite and PostgreSQL, before every
+   push (added 2026-11-18).** Every chunk, not only chunks that add an audit
+   call, runs `tests/Feature/Modules/Audit`, `tests/Feature/Modules/Erasure`
+   and `tests/Feature/Tenancy` locally on SQLite **and** on PostgreSQL before a
+   push. These three folders hold the registrations a new table, column, audit
+   verb or payload key must appear in (`AuditActionEnumTest` catalogue,
+   `AuditPayloadKeysGuardTest`, the erasure registry, the tenancy allowlist).
+   Missing one of them has reached CI red three times: Erasure payload keys in
+   PL-1.1 and PL-1.2, the audit catalogue in PL-1.3.
 
 ### 4.2 Stacking, width and overlay defects (lesson, PL-1.2 walk, 2026-11-18)
 

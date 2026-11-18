@@ -67,6 +67,25 @@ Total: 48 chunks (PL-1 is 3 chunks since 2026-11-17).
 - **No push without Pedram's word**, on either branch.
 - **Deploys** still come only from `main` (via the mirror and the colleague). A push to `pl` deploys nothing; staging is the only environment that may run `pl`, and only once it exists.
 - **Production-data standard (§5.40) applies on `pl` unchanged:** schema-only migrations, data changes as separate dry-run-able commands, a "Production posture" section in every chunk review, and the alarm line before code. A migration on `pl` reaches production only when `pl` is merged into `main` and deployed, so the sprint-boundary merge carries the snapshot and one-shot-command obligations of every migration in the merged sprints.
+- **PL-1 migrations at the sprint-boundary merge (added 2026-11-18).** Six migrations, in order. All are
+  schema-only and move no row. Locks measured on a synthetic PostgreSQL database with rows in the live tables
+  (the Ms are the transaction time of `up()`); each sets `SET LOCAL lock_timeout = '5s'` on PostgreSQL.
+  Creating a table with foreign keys takes a ShareRowExclusiveLock on each referenced table: writes wait, reads
+  do not. `ADD COLUMN` takes an AccessExclusiveLock: reads and writes wait, for well under 3 ms here.
+
+  | Migration                                             | Lock on a live table                                            | Time     |
+  | ----------------------------------------------------- | --------------------------------------------------------------- | -------- |
+  | `2026_11_17_100000_create_waves_table`                | ShareRowExclusive on `agencies`, `brands`, `campaigns`, `users` | 29.19 ms |
+  | `2026_11_17_100001_create_brand_files_table`          | ShareRowExclusive on `agencies`, `brands`, `users`              | 9.84 ms  |
+  | `2026_11_18_100000_add_campaign_type_to_campaigns`    | AccessExclusive on `campaigns` (default, no rewrite)            | 2.30 ms  |
+  | `2026_11_18_100001_add_stage_key_to_board_columns`    | AccessExclusive on `board_columns`                              | 2.02 ms  |
+  | `2026_11_19_100000_create_wave_steps_table`           | ShareRowExclusive on `agencies`, `users`, `waves`               | 11.67 ms |
+  | `2026_11_19_100001_add_steps_provisioned_at_to_waves` | AccessExclusive on `waves`                                      | 2.04 ms  |
+
+  Run them at a quiet moment, after a fresh snapshot. If a `lock_timeout` fires, the migration aborts cleanly
+  (each runs in one transaction, so nothing is half-applied): wait for the blocking transaction to finish and
+  re-run `php artisan migrate`. Never raise the timeout to push through.
+
 - **Merging `main` into `pl`** is routine; each merge is a normal commit on `pl`, CI must be green at its tip, and conflicts in the tenancy allowlist, `AuditAction` and its test list, and the i18n files are expected hot spots.
 - **Client-approval records** carry the approver's name and, when recorded by the strategist for the client, the strategist's name and a note. This touches the erasure registry and audit design (inventory §N3); it needs a disposition per table before the first portal chunk is planned.
 
