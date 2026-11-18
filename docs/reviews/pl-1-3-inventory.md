@@ -12,6 +12,8 @@
 - **T5.** No notifications or reminders to owners. No calendar or timeline view unless frame 01b has one; if it has, report it and leave it out.
 - **T6.** Screens with no design (edit a step, add, remove, empty, loading, error) are built from the existing design system and named.
 
+**Addendum 2026-11-18 (evening):** Pedram ruled on the plan (`pl-1-3-plan.md` §11). Frame 01's six segments are the six strategy steps, fed by six tracker steps (§1 below, now settled); the eight unnamed steps (§0.3) are named by that ruling. The findings below are left as written.
+
 ## 0. The designs (Figma MCP, file `lYy90qzKk029vjoVCPExs2`, page "STRATEGY & SCRIPT WRITING")
 
 Frame 01b is 1600 × 1725 px, desktop only. No narrow or mobile variant exists in the file I read.

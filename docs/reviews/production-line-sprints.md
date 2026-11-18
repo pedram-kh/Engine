@@ -160,7 +160,19 @@ Recorded with the PL-1.3 plan (`pl-1-3-plan.md`). Binding with R1 to R10 and P1 
 - **T5.** No notifications or reminders to owners. No calendar or timeline view unless frame 01b has one; if it has, report it and leave it out pending a ruling. (Frame 01b has none; it has a day-grouped "Due this week" list, left out.)
 - **T6.** Screens with no design (edit a step, add, remove, empty, loading, error) are built from the existing design system and named in the plan.
 
-**Status (2026-11-18): PL-1.3 inventory and plan written, not built.** Open questions Q1 to Q12 are in `pl-1-3-plan.md` §11; the build waits for Q1, Q2, Q3 and Q9.
+**Plan rulings Q1 to Q12 and the stream ruling (Pedram, 2026-11-18)**, full table in `pl-1-3-plan.md` §11:
+
+- **Q1.** The Brand page's six Progress segments are the six strategy steps ("6-segment progress", developer brief), fed by six tracker steps, **not** by a ratio of all steps.
+- **Q2.** UGC video has 13 steps; steps 2 to 7 are the six strategy steps under their own names (USPs, Personas, Messaging matrix, Concepts, Creators, Scripts; keys `ugc.usps` … `ugc.scripts`). Stills step 2 is "Shoot prep". Default names are stored in English. Segment n is filled when the nth strategy step is done; the label is the first strategy step not done, "Complete" when all six are done, "Not started" when none has started. The six can be renamed but not removed and not moved to another stream; every other step can be removed.
+- **Q3.** Delayed is derived from the due date only.
+- **Q4.** Owner is an agency team member or the label "Client" (a word on the step: no account, no access, no notification); the picker lists the members plus "Client"; client-owned steps in the frame default to "Client"; PL-4 may replace the label with a real person.
+- **Q5, Q6, Q7.** Left out: "Open in", stream footer links, the right column, header buttons, other tabs, "What needs fixing", "Due this week".
+- **Q8.** Rename a step or move it to another stream: admin and manager. **Q9.** The details card stays above the tracker. **Q10.** No reordering. **Q11.** Last write wins per field; 404 for a removed step. **Q12.** "Today" is the requesting user's day.
+- **New.** Remove a whole stream in one action (admin and manager), with a confirm. The UGC video stream cannot be removed (the Brand page bar depends on it). A removed stream returns only through an explicit Add stream action, never through the first-open marker.
+
+**Source note.** The developer brief ("Strategy & Script Writing Developer Brief v2", relayed by Pedram, not read by Cursor) describes the six-step workspace and the 6-segment progress. It does not mention the project tracker, streams, Statics or Stills; those come from Figma frame 01b only.
+
+**Status (2026-11-18): PL-1.3 inventory and plan written and ruled, not built.** No open questions remain.
 
 ### PL-1 chunks (three)
 
@@ -170,6 +182,10 @@ Recorded with the PL-1.3 plan (`pl-1-3-plan.md`). Binding with R1 to R10 and P1 
 
 ### Open items from these rulings
 
+- **PL-2 rulings (Pedram, 2026-11-18; not built in PL-1.3, the data model does not block them):**
+  - **F1.** From PL-2 the six strategy rows are set automatically by the real strategy screens. The strategist can still set one by hand. When the hand-set status goes beyond what the real screen says (for example marked done while concepts are not all approved), the system warns that the step is incomplete, lets the user confirm, and shows the row as set by hand, so a wave is never stuck on one step. PL-1.3 stores `status_source` (`system` or `manual`) on each step row for this.
+  - **F2.** Steps 2 to 6 of the strategy workspace are per market. PL-2 must rule how several markets roll up into one tracker row.
+  - **F3.** A wave opens on the first incomplete strategy step (developer brief). PL-2 must rule how the tracker and the six-step workspace share the wave page.
 - **PL-3 (2026-11-18):** the origin of a wave-board card (application or invite) is derived from accepted application rows, not stored. The one misread case, an applicant later invited separately, has no path today. The creator picker reads the same data, so PL-3 must decide whether the origin is stored once a second path to a card exists.
 - **PL-6 (Q15, 2026-11-18):** the creator's "Submit your draft" form still appears on a for_wave campaign (left as is in PL-1, Q9). PL-6 replaces it with the footage hand-in. `waves_enabled` must not be turned on in production for real creators before that is decided.
 - R8: the "release creator" action; PL-3 or PL-5 not decided.
