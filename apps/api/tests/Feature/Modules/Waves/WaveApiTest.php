@@ -39,8 +39,10 @@ it('B1: route table: every route in the waves route file is covered by the flag 
         ->map(static fn ($r): string => implode('|', $r->methods()).' '.$r->uri())
         ->values()->all();
 
-    // The gate test above exercises exactly these five. A sixth route fails here until it is added there.
-    expect($routes)->toHaveCount(5);
+    // The gate test above exercises the five PL-1.1 routes; the six PL-1.3 tracker routes (tracker, step add, update,
+    // remove, stream remove and add) are exercised by F1 in WaveTrackerAccessTest. A twelfth route fails here until it
+    // is added to one of the two.
+    expect($routes)->toHaveCount(11);
 });
 
 it('creates a wave, lists it, shows it', function (): void {

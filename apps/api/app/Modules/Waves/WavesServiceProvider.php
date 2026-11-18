@@ -6,7 +6,9 @@ namespace App\Modules\Waves;
 
 use App\Modules\Waves\Features\WavesEnabled;
 use App\Modules\Waves\Models\Wave;
+use App\Modules\Waves\Models\WaveStep;
 use App\Modules\Waves\Policies\WavePolicy;
+use App\Modules\Waves\Policies\WaveStepPolicy;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +23,7 @@ final class WavesServiceProvider extends ServiceProvider
     {
         Feature::define(WavesEnabled::NAME, WavesEnabled::default());
         Gate::policy(Wave::class, WavePolicy::class);
+        Gate::policy(WaveStep::class, WaveStepPolicy::class);
         $this->registerRoutes();
     }
 
