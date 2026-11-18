@@ -17,6 +17,65 @@ Related files: `pl-1-2-plan.md` (plan, rulings Q1 to Q14, corrections C1 to C4),
 - **Walk seeders:** `Pl12WalkSeeder` and `Pl12WalkCleanupSeeder` with a Pest test; the cleanup does not touch the flag.
 - **Process:** `WORKING-PROCESS.md` section 4.1 item 7 (PostgreSQL before a push).
 
+## Walk result (Pedram, 2026-11-18, local, steps 1 to 16)
+
+All sixteen steps passed after the D1 and D2 fixes, except one defect in step 10 (D3 below).
+
+### D1. Menus under the New wave dialog
+
+- **Real cause:** a menu left open when the dialog closed stayed mounted across a fast close and reopen. Vuetify gives an overlay a z-index of the top of its stack plus 10, so the reopened dialog restacked at 2420, above the stale menu at 2410. The menu then painted behind the dialog.
+- **The first explanation was wrong.** It blamed `position: absolute` against `position: fixed` and tried a z-index only. That did not fix it for Pedram, and a reproduction in his Chrome showed the stacking numbers above. The fix that holds: the dialog card is keyed per open, and menus are closed on open and on close (`73959b10`), with a fallback z-index (`MENU_ABOVE_DIALOG_Z = 2500`).
+- **Gate:** `wave-dialog-menus.spec.ts`, run through `playwright.config.ts` (serial). 2 passed. It had never run through the config before this turn: its first run failed on a wrong import (`SEL` does not exist; the selectors are `dt` and `testIds`) and it did not neutralise the auth throttle. Both were fixed. Break-revert: removing the per-open key makes the reopen test fail (expected 0, received 1); restored, 2 passed.
+
+### D2. Type pill and market list
+
+The type pill stretched to the name column, and the market list sat under the dialog. The pill is sized with an inline style (a scoped style block on the campaign list changed the flag-off DOM by 1856 characters, so none is used). The market list opens beside the chip.
+
+### D3. Invited column labels (step 10)
+
+**Defect.** Pia and Eva had accepted, but their cards read "Contracted". Accepting moves the assignment on to contracted, and `invite_state` only recognised `accepted`.
+
+**What accepting an application does.** It creates an `invited` assignment with an offer. The creator still answers it. There is a waiting state: the card is in Invited, assignment status `invited`, until the creator accepts.
+
+**Where the origin is stored.** Nowhere. It is derived: an accepted `campaign_applications` row for the same campaign and creator means the creator came from an application. `WaveInviteOrigin` reads those rows once per board load (and once per card move). Nothing was added to the database.
+
+**Is it reliable for existing rows?** Yes for rows made through the application flow, because the accepted application row is the record of it. One case is misread: a creator who applied, was accepted, and was later also invited by the agency in a separate step on the same campaign would show as application. No second invite path exists for a creator who already has an assignment, so no such row is expected; it is stated, not proven on production data (nothing was run there).
+
+**Labels in the Invited column** (every status that `countsAsSelected()` counts as accepted):
+
+| Origin                | Status             | Label                |
+| --------------------- | ------------------ | -------------------- |
+| invited by the agency | invited, no answer | Invited              |
+| invited by the agency | accepted or later  | Accepted invite      |
+| invited by the agency | declined           | Declined             |
+| application           | invited, no answer | **Offer sent**       |
+| application           | accepted or later  | Application accepted |
+| application           | declined           | Declined             |
+
+**FOR PEDRAM: "Offer sent" is my proposal.** It is the waiting state of an accepted applicant (the agency accepted the application, the creator has not answered the offer). Change the word if you prefer another; it is one key, `app.campaigns.board.inviteLabel.offerSent`, in 24 locales.
+
+**Working columns (Selected onward)** keep the assignment status label (Contracted, Filming and so on); no origin is sent there. The Accepted rule (Q4) is unchanged: both accepted labels may move to Selected. Test D3c pins both.
+
+**Browser check on the walk data** (real Chrome, 127.0.0.1:5173): Daniel Kovac = Declined, Eva Marin = Accepted invite, Pia Horvat in Filming = Contracted (unchanged). I accepted Maya's application in the UI and her card read Offer sent; after her accept (a request from her browser session, not a click) it read Application accepted. Plain "Invited" with an invite origin was not on that board; unit and API tests cover it.
+
+**Tests:** D3a (every `AssignmentStatus`), D3b (origin matrix, move response), D3c (working columns); Vitest: six label cases and the working-column case. Break-reverts are in `pl-1-2-break-reverts.md`.
+
+### Q15 (ruled, Pedram, 2026-11-18)
+
+The creator's "Submit your draft" form still appears on a for_wave campaign. Left as it is in PL-1 (Q9). PL-6 replaces it with the footage hand-in. Added to the PL-6 open items: `waves_enabled` must not be turned on in production for real creators before that is decided.
+
+### Test-helper routes are not in production
+
+`SetFeatureFlagController` is reached through `apps/api/app/TestHelpers/Routes/api.php` lines 83 and 85. `TestHelpersServiceProvider::boot()` (lines 53 to 63) returns before registering routes unless `gateOpen()` (lines 76 to 85) is true, and `gateOpen()` needs the environment to be `local` or `testing` and a non-empty token. The provider is registered in `bootstrap/providers.php` line 51. Real boots: `APP_ENV=production` lists 301 routes, none containing `_test`; `APP_ENV=local` lists 322, with `api/v1/_test/feature-flag/{name}` for POST and DELETE. The test "has no \_test routes at all when the app boots in production" in `SetFeatureFlagTest.php` spawns those boots. Break-revert: adding `production` to `gateOpen()` turned it red.
+
+### Local gates after the walk (2026-11-18)
+
+- Pest on SQLite: Waves 104 passed 1 skipped; Boards 87; Brands 93; Campaigns 816 passed 4 skipped; Erasure 336 passed 1 skipped; TestHelpers 141. All exit 0. (One process for all folders ran out of the 128 MB default memory, so folders ran one at a time with `memory_limit=1G`.)
+- Pest on PostgreSQL (`phpunit.pgsql.xml`, local throwaway database): Waves 105; Boards 87; Brands 93; Campaigns 820; Erasure 337; TestHelpers 141. All passed.
+- Vitest (boards, waves, brands, campaigns, i18n): 50 files, 632 tests passed. vue-tsc `apps/main` and `apps/admin`: clean (one type error in my own spec was found and fixed). ESLint `apps/main` src and playwright: 0 errors, 2 existing warnings. Prettier on changed spec files: clean. Pint: passed. Larastan: no errors. Locale verifier: 24 of 24 pass.
+- Flag-off walk: campaign 12 targets and brand 16 targets identical to baseline.
+- **Not run:** the full Playwright suite (only `wave-dialog-menus.spec.ts`); CI is the arbiter for the rest.
+
 ## Weaker gates, accepted (Pedram, 2026-11-18)
 
 Recorded in plain words, as the review asked:
@@ -86,6 +145,6 @@ No design frame exists for these; each was built from the design system and the 
 
 ## Not read and not run
 
-- **Not run:** Playwright (E2E campaign and board specs). They need the full API and a migrated database and run in CI; Pedram's walk covers the same ground by hand. The other 110 targets of the agency walk. ESLint for `packages/api-client` (no ESLint binary in that package; the app lint does not include it). Two real concurrent requests against PostgreSQL (the lock tests assert the `for update` SQL; they do not race two clients).
+- **Not run:** the Playwright specs other than `wave-dialog-menus.spec.ts` (they run in CI; Pedram's walk covers the same ground by hand). The other 110 targets of the agency walk. ESLint for `packages/api-client` (no ESLint binary in that package; the app lint does not include it). Two real concurrent requests against PostgreSQL (the lock tests assert the `for update` SQL; they do not race two clients).
 - **Not read:** `CampaignListPage.vue` beyond the name cell and the status column; the creator-side walk files; the Pl11 walk spec details.
 - **Not verified:** the Aurora engine version (Q11); any deployed storage or environment.

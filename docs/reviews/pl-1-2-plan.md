@@ -117,7 +117,7 @@ NULL on every existing column. Set only on a for-a-wave board's eight columns. I
 
 ### 1.5 The invite label (P6)
 
-Derived on the wave board's card resource, not stored: `invite_state` = `invited` for assignment status invited or countered, `accepted` for accepted, `declined` for declined, absent for anything later or on a normal board. Declined never moves by itself (no automation). Re-invite (Declined to Invited) already exists.
+Derived on the wave board's card resource, not stored. In the Invited column (`stage_key` invited), `invite_state` is `invited` for assignment status invited or countered, `declined` for declined, and `accepted` for every status that counts as selected (an accepted creator's assignment moves on to contracted). `invite_origin` (`invite` or `application`) is sent with it, derived from an accepted application row for the same campaign and creator. The card label says how the creator got there: Invited, Accepted invite, Declined, Offer sent (an accepted applicant who has not yet answered), Application accepted. In the working columns the card keeps the assignment status label and no origin is sent. Declined never moves by itself (no automation). Re-invite (Declined to Invited) already exists. (Amended 2026-11-18 after the walk, D3.)
 
 ### 1.6 Where the per-script tracker is reserved, with no dead UI (P6)
 
@@ -436,10 +436,11 @@ All in all 24 locales (`apps/main/src/core/i18n/locales/<xx>/app.json`, `app.wav
 
 **Raised by the gaps (both ruled 2026-11-17):**
 
-| #       | Question                                     | Recommendation                                                                                                                                     |
-| ------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| **Q13** | Card detail drawer on a wave board.          | **RULED 2026-11-17: stays as it is.** Fee, offer, deliverables and due dates stay; only what AH-069 hides for a non-posting campaign stays hidden. | §4.4 item 6 |
-| **Q14** | Draft-overdue scan on a for-a-wave campaign. | **RULED 2026-11-17: left as it is.**                                                                                                               | §4.5        |
+| #       | Question                                                         | Recommendation                                                                                                                                                                                               |
+| ------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| **Q13** | Card detail drawer on a wave board.                              | **RULED 2026-11-17: stays as it is.** Fee, offer, deliverables and due dates stay; only what AH-069 hides for a non-posting campaign stays hidden.                                                           | §4.4 item 6 |
+| **Q14** | Draft-overdue scan on a for-a-wave campaign.                     | **RULED 2026-11-17: left as it is.**                                                                                                                                                                         | §4.5        |
+| **Q15** | The creator's "Submit your draft" form on a for-a-wave campaign. | **RULED 2026-11-18: left as it is in PL-1 (Q9).** PL-6 replaces it with the footage hand-in. `waves_enabled` must not be turned on in production for real creators before that is decided (PL-6 open items). | §4.5        |
 
 ---
 

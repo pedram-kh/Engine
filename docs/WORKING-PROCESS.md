@@ -180,6 +180,10 @@ reboot. From now on, for every agent and developer, on a local machine:
    run does not point at a dropped database. PL-1.1 reached CI red a second
    time (run 449) because an unique-violation test was only run on SQLite.
 
+### 4.2 Stacking, width and overlay defects (lesson, PL-1.2 walk, 2026-11-18)
+
+Stacking, width and overlay defects are invisible to unit tests: a menu behind a dialog, a pill stretched to its column and a list outside the window all passed Vitest and Pest. Any new dialog, menu or board is opened in a real browser, including a quick close and reopen, before a walk is offered to Pedram.
+
 ---
 
 ## 5. Production-data safety (we are live)
