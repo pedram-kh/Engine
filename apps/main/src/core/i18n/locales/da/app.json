@@ -1575,7 +1575,8 @@
           "done": "Udført"
         },
         "steps": {
-          "title": "Leveringstrin"
+          "title": "Leveringstrin",
+          "overdue": "{days} dag | {days} dage"
         },
         "group": {
           "done": "{done} af {total} udført"
@@ -1645,6 +1646,7 @@
           "strategyLocked": "Et strategitrin kan omdøbes, men ikke fjernes eller flyttes.",
           "dates_invalid": "Fristen kan ikke ligge før startdatoen.",
           "streamNotRemovable": "UGC-videosporet kan ikke fjernes: Fremdriften på brandsiden afhænger af det.",
+          "streamDefaultsExist": "Alle standardtrin i dette spor er allerede i bølgen, i et andet spor. Flyt dem tilbage, eller tilføj et trin.",
           "brandArchived": "Dette brand er arkiveret. Gendan det for at ændre dets bølger."
         }
       }

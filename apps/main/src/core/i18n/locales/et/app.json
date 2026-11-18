@@ -1575,7 +1575,8 @@
           "done": "Tehtud"
         },
         "steps": {
-          "title": "Üleandmise sammud"
+          "title": "Üleandmise sammud",
+          "overdue": "{days} päev | {days} päeva"
         },
         "group": {
           "done": "{done} / {total} tehtud"
@@ -1645,6 +1646,7 @@
           "strategyLocked": "Strateegiasammu saab ümber nimetada, aga mitte eemaldada ega teise kanalisse tõsta.",
           "dates_invalid": "Tähtaeg ei tohi olla enne alguskuupäeva.",
           "streamNotRemovable": "UGC-videokanalit ei saa eemaldada: brändi lehe edenemine sõltub sellest.",
+          "streamDefaultsExist": "Selle voo kõik vaikesammud on juba lainel, teises voos. Liiguta need tagasi või lisa samm.",
           "brandArchived": "See bränd on arhiveeritud. Taasta see, et selle laineid muuta."
         }
       }

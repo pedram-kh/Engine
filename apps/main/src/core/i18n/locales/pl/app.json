@@ -1575,7 +1575,8 @@
           "done": "Zrobione"
         },
         "steps": {
-          "title": "Kroki dostawy"
+          "title": "Kroki dostawy",
+          "overdue": "{days} dzień | {days} dni"
         },
         "group": {
           "done": "{done} z {total} zrobionych"
@@ -1645,6 +1646,7 @@
           "strategyLocked": "Krok strategii można zmienić nazwę, ale nie można go usunąć ani przenieść.",
           "dates_invalid": "Termin nie może być wcześniejszy niż data rozpoczęcia.",
           "streamNotRemovable": "Ścieżki wideo UGC nie można usunąć: zależy od niej postęp na stronie marki.",
+          "streamDefaultsExist": "Wszystkie domyślne kroki tego strumienia są już w fali, w innym strumieniu. Przenieś je z powrotem lub dodaj krok.",
           "brandArchived": "Ta marka jest zarchiwizowana. Przywróć ją, aby zmieniać jej fale."
         }
       }

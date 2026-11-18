@@ -199,6 +199,8 @@ const KEYS = [
   'app.waves.tracker.errors.strategyLocked',
   'app.waves.tracker.errors.dates_invalid',
   'app.waves.tracker.errors.streamNotRemovable',
+  'app.waves.tracker.errors.streamDefaultsExist',
+  'app.waves.tracker.steps.overdue',
   'app.waves.tracker.errors.brandArchived',
 ] as const
 
@@ -295,8 +297,8 @@ function tokens(value: string): string[] {
 }
 
 describe('PL-1.1 wave and client-file i18n keys', () => {
-  it('checks 184 keys across 24 locales', () => {
-    expect(KEYS).toHaveLength(184)
+  it('checks 186 keys across 24 locales', () => {
+    expect(KEYS).toHaveLength(186)
     expect(UI_LOCALES).toHaveLength(24)
   })
 

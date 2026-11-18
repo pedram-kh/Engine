@@ -283,9 +283,16 @@ final class WaveStepService
                     return false;
                 }
 
+                // A default step moved to another stream by hand keeps its key (unique per wave), so it is left where
+                // it is and only the default keys that are not on the wave are inserted.
+                $existing = WaveStep::query()->where('wave_id', $locked->id)->pluck('step_key')->all();
+
                 $now = now();
                 $rows = [];
                 foreach (WaveStepDefaults::forStream($stream) as $d) {
+                    if (in_array($d['key'], $existing, true)) {
+                        continue;
+                    }
                     $rows[] = [
                         'ulid' => (string) Str::ulid(),
                         'agency_id' => $locked->agency_id,
@@ -302,6 +309,10 @@ final class WaveStepService
                         'updated_at' => $now,
                     ];
                 }
+                if ($rows === []) {
+                    throw WaveRuleViolation::streamDefaultsExist();
+                }
+
                 WaveStep::query()->insert($rows);
 
                 Audit::log(

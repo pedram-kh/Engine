@@ -61,4 +61,9 @@ final class WaveRuleViolation extends RuntimeException
     {
         return new self('stream.not_removable', 'The UGC video stream cannot be removed: the Brand page progress bar depends on it.');
     }
+
+    public static function streamDefaultsExist(): self
+    {
+        return new self('stream.defaults_exist', 'Every default step of this stream is already on the wave, moved to another stream. Move them back or add a step instead.');
+    }
 }

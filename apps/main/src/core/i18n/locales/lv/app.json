@@ -1575,7 +1575,8 @@
           "done": "Izpildīts"
         },
         "steps": {
-          "title": "Piegādes soļi"
+          "title": "Piegādes soļi",
+          "overdue": "{days} diena | {days} dienas"
         },
         "group": {
           "done": "{done} no {total} izpildīti"
@@ -1645,6 +1646,7 @@
           "strategyLocked": "Stratēģijas soli var pārdēvēt, bet nevar noņemt vai pārvietot.",
           "dates_invalid": "Termiņš nevar būt pirms sākuma datuma.",
           "streamNotRemovable": "UGC video kanālu nevar noņemt: no tā ir atkarīgs progress zīmola lapā.",
+          "streamDefaultsExist": "Visi šīs plūsmas noklusējuma soļi jau ir vilnī, citā plūsmā. Pārvietojiet tos atpakaļ vai pievienojiet soli.",
           "brandArchived": "Šis zīmols ir arhivēts. Atjaunojiet to, lai mainītu tā viļņus."
         }
       }

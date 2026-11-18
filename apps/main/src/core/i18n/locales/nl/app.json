@@ -1575,7 +1575,8 @@
           "done": "Klaar"
         },
         "steps": {
-          "title": "Opleverstappen"
+          "title": "Opleverstappen",
+          "overdue": "{days} dag | {days} dagen"
         },
         "group": {
           "done": "{done} van {total} klaar"
@@ -1645,6 +1646,7 @@
           "strategyLocked": "Een strategiestap kan worden hernoemd, maar niet verwijderd of verplaatst.",
           "dates_invalid": "De deadline mag niet voor de startdatum liggen.",
           "streamNotRemovable": "De UGC-videostroom kan niet worden verwijderd: de voortgang op de merkpagina hangt ervan af.",
+          "streamDefaultsExist": "Alle standaardstappen van deze stroom staan al in de wave, in een andere stroom. Verplaats ze terug of voeg een stap toe.",
           "brandArchived": "Dit merk is gearchiveerd. Herstel het om de waves te wijzigen."
         }
       }

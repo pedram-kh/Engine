@@ -1,6 +1,6 @@
 # PL-1.3 review: Wave project tracker
 
-**Branch:** `pl`. **Plan:** `pl-1-3-plan.md` (corrections C1 to C3 in §13). **Status:** Stage 1 (backend) pushed, CI green on `e5074996`. Stage 2 (web, strings, seeders, close-out) built and committed locally, **not pushed** until Pedram has walked it.
+**Branch:** `pl`. **Plan:** `pl-1-3-plan.md` (corrections C1 to C3 in §13). **Status:** Stage 1 (backend) pushed, CI green on `e5074996`. Stage 2 (web, strings, seeders, close-out) built and **walked by Pedram (2026-11-19, local, steps 1 to 16, all passed)**, then two fixes (D1, D2). Not merged, not deployed.
 
 ## Stage 1: migration rehearsal (local, synthetic rows only)
 
@@ -102,7 +102,7 @@ Run locally on this tree:
 - Vitest: waves, brands, architecture and i18n folders, 90 files, 1,100 tests, green. `vue-tsc --noEmit` clean. ESLint clean on the touched web files and the new Playwright spec.
 - Playwright `wave-tracker.spec.ts` at 1440 and 390, serial: 2 passed.
 - Pint (passed) and Larastan (no errors).
-- Pest on SQLite **and** PostgreSQL: Waves 166, Audit 50, Erasure 337, Tenancy 9 (all passed on both); Brands 93 (SQLite). Running the folders in one Pest command stops with a Pest fatal (a helper function declared twice across files); each folder run alone is green. Not changed by this work.
+- Pest on SQLite **and** PostgreSQL: Waves 166, Audit 50, Erasure 337, Tenancy 9 (all passed on both); Brands 93 (SQLite). Running the folders in one Pest command at PHP's default 128M stops with an out-of-memory fatal in `ErasureClaimGuardTest` (not a duplicate declaration; corrected in the 2026-11-19 section below); each folder alone is green.
 - Agency walk: 126 / 126 (C3).
 
 ## Stage 2: not read, not run
@@ -137,3 +137,35 @@ Clean up afterwards:
 ```
 php artisan db:seed --class='Database\Seeders\Pl13WalkCleanupSeeder'
 ```
+
+## Walk result and the two fixes (2026-11-19)
+
+Pedram walked steps 1 to 16 locally: all passed. Two small fixes came out of it.
+
+**D1. Delayed row wording.** A delayed step showed the red "Delayed" pill and then "Delayed · 3 days", so the word appeared twice. The text beside the pill is now the duration only ("3 days", "1 day") from a new key, `app.waves.tracker.steps.overdue`, in all 24 locales (derived from each locale's own delayed wording by dropping the word before the middle dot, plural forms kept). The stream card keeps "Delayed · 3 days". Gates: `WaveStepsPanel.spec.ts` W3 (the word appears once in the row, no "Delayed ·"); `waveKeys.spec.ts` (186 keys) and the locale-parity plural gate. Break-reverts D1 and D1b.
+
+**D2. Add stream when a default step of that stream is elsewhere.** A default Statics step moved by hand to Stills keeps its key; after Remove stream (Statics), Add stream hit the unique `(wave_id, step_key)` index, returned "nothing written", and the user saw nothing. Now Add stream (under the wave row lock) reads the step keys already on the wave, inserts only the default steps of that stream whose keys are not there, and leaves the moved step where it is. If every default key is already on the wave, the API answers 422 `stream.defaults_exist` and the page shows "Every default step of this stream is already on the wave, in another stream. Move them back, or add a step." (`app.waves.tracker.errors.streamDefaultsExist`, 24 locales). A stream that already has steps is still a quiet no-op (ST2 unchanged). Tests `D2a` (one moved: four inserted, moved step stays, 24 steps, one audit row) and `D2b` (all five moved: 422, nothing written, no audit row) and web test D2 on the message. Break-reverts D2a and D2b on SQLite **and** PostgreSQL; D2c on the web message.
+
+**The Pest fatal: not a duplicate declaration.** Reproduced it with Waves, Audit, Erasure, Tenancy and Brands in one command: `Allowed memory size of 134217728 bytes exhausted` at `ErasureClaimGuardTest.php:28`, where a helper reads every file under `app/` into an array. It is PHP's default 128M, not a function declared twice. The test is from AH-104c (2026-10-22), not PL-1 code, so it is a tech-debt row (`docs/tech-debt.md` item 42). With `php -d memory_limit=1G` the five folders run together: 653 passed, 4 skipped. My earlier note in this file ("a helper function declared twice") was a wrong guess and is withdrawn.
+
+### Real browser, D1 and D2 (local, walk data, 1440 and 390)
+
+- **D1:** Wave 8 delayed row "Internal review": pill "Delayed" then "1 day" at both widths (looked at the 390 screenshot); the Statics stream card still reads "Delayed · 1 day".
+- **D2 (1440):** moved "Design v1" to Stills with the edit dialog, Remove stream Statics, Add stream Statics: Statics came back with four steps (Static brief, Internal review, Client feedback round, Final export), "Design v1" stayed in Stills, no error. **D2 message (390):** shown with the server answer simulated (a 422 `stream.defaults_exist` injected in the browser); the real 422 is covered by test D2b. Not done in the browser: the all-five-moved case against the real API.
+
+### Gates for this round (all on this tree, local)
+
+| Gate                                                                                                             | Result                                                   |
+| ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| Pest, Waves + Brands + Audit + Erasure + Tenancy in one run, SQLite (`php -d memory_limit=1G`)                   | 653 passed, 4 skipped                                    |
+| Same folders, PostgreSQL (`phpunit.pgsql.xml`, throwaway `pl13_test`)                                            | 657 passed (**Brands on PostgreSQL: now run, included**) |
+| Pint, Larastan                                                                                                   | passed, no errors                                        |
+| Vitest: waves, brands, i18n, architecture                                                                        | 90 files, 1,101 tests passed                             |
+| `vue-tsc --noEmit`, ESLint (waves, i18n, the Playwright spec)                                                    | clean                                                    |
+| `wave-tracker.spec.ts` at 1440 and 390, serial                                                                   | 2 passed                                                 |
+| Agency walk (flag off by construction, includes the 12 campaign and 16 brand targets and the comment-node check) | COMPARE OK, 126 / 126 identical                          |
+| Full Pest, full Vitest, full creator baseline, CI                                                                | not run (CI after the push; see the PUSH report)         |
+
+### Clean-up
+
+`waves_enabled` is **ON** (global value `true` in the local `catalyst` database) before and after this round; it was ON when the walk environment started and I did not change it. `Pl13WalkCleanupSeeder` run: no `pl13-walk` users and no "PL-1.3 Walk" agency remain. `pnpm dev` stopped (API, main, admin, queue). Temporary scripts removed. Two unrelated processes of another project (ports 8010 and a Vite under `Gullio`) were left alone.

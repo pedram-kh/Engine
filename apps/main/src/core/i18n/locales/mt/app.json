@@ -1575,7 +1575,8 @@
           "done": "Magħmul"
         },
         "steps": {
-          "title": "Passi tal-konsenja"
+          "title": "Passi tal-konsenja",
+          "overdue": "jum {days} | {days} jiem"
         },
         "group": {
           "done": "{done} minn {total} magħmula"
@@ -1645,6 +1646,7 @@
           "strategyLocked": "Pass ta’ strateġija jista’ jiġi rinominat, imma mhux imneħħi jew imċaqlaq.",
           "dates_invalid": "L-iskadenza ma tistax tkun qabel id-data tal-bidu.",
           "streamNotRemovable": "Il-fluss tal-vidjo UGC ma jistax jitneħħa: il-progress fil-paġna tal-marka jiddependi minnu.",
+          "streamDefaultsExist": "Il-passi default kollha ta’ dan il-fluss diġà jinsabu fil-mewġa, f’fluss ieħor. Erġa’ qiegħedhom lura jew żid pass.",
           "brandArchived": "Din il-marka hija arkivjata. Irrestawraha biex tbiddel il-mewġ tagħha."
         }
       }

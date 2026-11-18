@@ -1575,7 +1575,8 @@
           "done": "Déanta"
         },
         "steps": {
-          "title": "Céimeanna seachadta"
+          "title": "Céimeanna seachadta",
+          "overdue": "{days} lá | {days} lá"
         },
         "group": {
           "done": "{done} as {total} déanta"
@@ -1645,6 +1646,7 @@
           "strategyLocked": "Is féidir céim straitéise a athainmniú, ach ní féidir í a bhaint ná a aistriú.",
           "dates_invalid": "Ní féidir leis an dáta dlite a bheith roimh an dáta tosaigh.",
           "streamNotRemovable": "Ní féidir sruth físeán UGC a bhaint: braitheann dul chun cinn leathanach an bhrandála air.",
+          "streamDefaultsExist": "Tá gach céim réamhshocraithe den sruth seo sa tonn cheana féin, i sruth eile. Bog ar ais iad nó cuir céim leis.",
           "brandArchived": "Tá an brandáil seo cartlannaithe. Athchóirigh í chun a tonnta a athrú."
         }
       }

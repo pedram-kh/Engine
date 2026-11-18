@@ -1575,7 +1575,8 @@
           "done": "Done"
         },
         "steps": {
-          "title": "Deliverable steps"
+          "title": "Deliverable steps",
+          "overdue": "{days} day | {days} days"
         },
         "group": {
           "done": "{done} of {total} done"
@@ -1645,6 +1646,7 @@
           "strategyLocked": "A strategy step can be renamed, but not removed or moved.",
           "dates_invalid": "The due date cannot be before the start date.",
           "streamNotRemovable": "The UGC video stream cannot be removed: the Brand page progress depends on it.",
+          "streamDefaultsExist": "Every default step of this stream is already on the wave, in another stream. Move them back, or add a step.",
           "brandArchived": "This brand is archived. Restore it to change its waves."
         }
       }

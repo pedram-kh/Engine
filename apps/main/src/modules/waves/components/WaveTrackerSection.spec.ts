@@ -183,6 +183,22 @@ describe('WaveTrackerSection (PL-1.3)', () => {
     w.unmount()
   })
 
+  it('D2: Add stream says so when every default step is already on the wave', async () => {
+    api.tracker.mockResolvedValue({
+      data: makeTracker(steps().filter((s) => s.attributes.stream !== 'statics')),
+    })
+    api.addStream.mockRejectedValue(
+      new ApiError({ status: 422, code: 'stream.defaults_exist', message: 'x' } as never),
+    )
+    const w = await mountSection()
+    await w.get('[data-test="stream-add"]').trigger('click')
+    await flushPromises()
+    body('[data-test="stream-add-statics"]')?.click()
+    await flushPromises()
+    expect(w.get('[data-test="stream-error"]').text()).toContain('already on the wave')
+    w.unmount()
+  })
+
   it('Remove step asks first and then removes', async () => {
     api.removeStep.mockResolvedValue(undefined as never)
     const w = await mountSection()

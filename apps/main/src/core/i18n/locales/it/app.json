@@ -1575,7 +1575,8 @@
           "done": "Fatto"
         },
         "steps": {
-          "title": "Passaggi di consegna"
+          "title": "Passaggi di consegna",
+          "overdue": "{days} giorno | {days} giorni"
         },
         "group": {
           "done": "{done} di {total} fatti"
@@ -1645,6 +1646,7 @@
           "strategyLocked": "Un passaggio di strategia può essere rinominato, ma non rimosso né spostato.",
           "dates_invalid": "La scadenza non può precedere la data di inizio.",
           "streamNotRemovable": "Il flusso video UGC non può essere rimosso: da esso dipende l’avanzamento nella pagina del brand.",
+          "streamDefaultsExist": "Tutti i passaggi predefiniti di questo flusso sono già nell’ondata, in un altro flusso. Rimettili qui o aggiungi un passaggio.",
           "brandArchived": "Questo brand è archiviato. Ripristinalo per modificarne le ondate."
         }
       }

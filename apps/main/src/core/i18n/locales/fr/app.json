@@ -1575,7 +1575,8 @@
           "done": "Terminée"
         },
         "steps": {
-          "title": "Étapes de livraison"
+          "title": "Étapes de livraison",
+          "overdue": "{days} jour | {days} jours"
         },
         "group": {
           "done": "{done} sur {total} terminées"
@@ -1645,6 +1646,7 @@
           "strategyLocked": "Une étape de stratégie peut être renommée, mais ni supprimée ni déplacée.",
           "dates_invalid": "La date d’échéance ne peut pas précéder la date de début.",
           "streamNotRemovable": "Le flux vidéo UGC ne peut pas être supprimé : la progression de la page de la marque en dépend.",
+          "streamDefaultsExist": "Toutes les étapes par défaut de ce flux sont déjà dans la vague, dans un autre flux. Remettez-les ici ou ajoutez une étape.",
           "brandArchived": "Cette marque est archivée. Restaurez-la pour modifier ses vagues."
         }
       }

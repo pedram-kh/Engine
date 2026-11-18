@@ -215,6 +215,7 @@ function errorMessage(err: unknown): string {
     const keys: Record<string, string> = {
       'step.strategy_locked': 'strategyLocked',
       'stream.not_removable': 'streamNotRemovable',
+      'stream.defaults_exist': 'streamDefaultsExist',
       'wave.brand_archived': 'brandArchived',
     }
     const key = keys[err.code]

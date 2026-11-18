@@ -1575,7 +1575,8 @@
           "done": "Gata"
         },
         "steps": {
-          "title": "Pași de livrare"
+          "title": "Pași de livrare",
+          "overdue": "{days} zi | {days} zile"
         },
         "group": {
           "done": "{done} din {total} gata"
@@ -1645,6 +1646,7 @@
           "strategyLocked": "Un pas de strategie poate fi redenumit, dar nu eliminat sau mutat.",
           "dates_invalid": "Termenul nu poate fi înaintea datei de început.",
           "streamNotRemovable": "Fluxul video UGC nu poate fi eliminat: progresul de pe pagina mărcii depinde de el.",
+          "streamDefaultsExist": "Toți pașii impliciți ai acestui flux sunt deja în val, într-un alt flux. Mută-i înapoi sau adaugă un pas.",
           "brandArchived": "Această marcă este arhivată. Restaureaz-o pentru a-i modifica valurile."
         }
       }

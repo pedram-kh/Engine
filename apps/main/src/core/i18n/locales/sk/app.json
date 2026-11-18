@@ -1575,7 +1575,8 @@
           "done": "Hotovo"
         },
         "steps": {
-          "title": "Kroky odovzdania"
+          "title": "Kroky odovzdania",
+          "overdue": "{days} deň | {days} dní"
         },
         "group": {
           "done": "{done} z {total} hotovo"
@@ -1645,6 +1646,7 @@
           "strategyLocked": "Strategický krok možno premenovať, ale nie odstrániť ani presunúť.",
           "dates_invalid": "Termín nemôže byť pred dátumom začiatku.",
           "streamNotRemovable": "Vetvu UGC videa nemožno odstrániť: závisí od nej postup na stránke značky.",
+          "streamDefaultsExist": "Všetky predvolené kroky tohto prúdu už sú vo vlne, v inom prúde. Presuňte ich späť alebo pridajte krok.",
           "brandArchived": "Táto značka je archivovaná. Obnovte ju, aby ste mohli meniť jej vlny."
         }
       }

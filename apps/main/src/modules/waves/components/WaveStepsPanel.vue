@@ -276,7 +276,7 @@ function canRemove(step: WaveStepResource): boolean {
             >
               {{
                 t(
-                  'app.waves.tracker.streamStatus.delayed',
+                  'app.waves.tracker.steps.overdue',
                   { days: step.attributes.days_overdue },
                   step.attributes.days_overdue,
                 )

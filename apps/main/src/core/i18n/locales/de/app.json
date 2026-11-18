@@ -1575,7 +1575,8 @@
           "done": "Erledigt"
         },
         "steps": {
-          "title": "Lieferschritte"
+          "title": "Lieferschritte",
+          "overdue": "{days} Tag | {days} Tage"
         },
         "group": {
           "done": "{done} von {total} erledigt"
@@ -1645,6 +1646,7 @@
           "strategyLocked": "Ein Strategieschritt kann umbenannt, aber nicht entfernt oder verschoben werden.",
           "dates_invalid": "Das Fälligkeitsdatum darf nicht vor dem Startdatum liegen.",
           "streamNotRemovable": "Der UGC-Video-Strang kann nicht entfernt werden: Der Fortschritt auf der Markenseite hängt davon ab.",
+          "streamDefaultsExist": "Alle Standardschritte dieses Streams sind bereits in der Welle, in einem anderen Stream. Verschiebe sie zurück oder füge einen Schritt hinzu.",
           "brandArchived": "Diese Marke ist archiviert. Stelle sie wieder her, um ihre Wellen zu ändern."
         }
       }

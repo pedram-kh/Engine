@@ -1575,7 +1575,8 @@
           "done": "Atlikta"
         },
         "steps": {
-          "title": "Pristatymo žingsniai"
+          "title": "Pristatymo žingsniai",
+          "overdue": "{days} diena | {days} dienos"
         },
         "group": {
           "done": "{done} iš {total} atlikta"
@@ -1645,6 +1646,7 @@
           "strategyLocked": "Strategijos žingsnį galima pervadinti, bet ne pašalinti ar perkelti.",
           "dates_invalid": "Termino data negali būti ankstesnė už pradžios datą.",
           "streamNotRemovable": "UGC vaizdo kanalo pašalinti negalima: nuo jo priklauso pažanga prekės ženklo puslapyje.",
+          "streamDefaultsExist": "Visi šio srauto numatytieji žingsniai jau yra bangoje, kitame sraute. Perkelkite juos atgal arba pridėkite žingsnį.",
           "brandArchived": "Šis prekės ženklas suarchyvuotas. Atkurkite jį, kad pakeistumėte jo bangas."
         }
       }

@@ -191,13 +191,13 @@ Recorded with the PL-1.3 plan (`pl-1-3-plan.md`). Binding with R1 to R10 and P1 
 
 **Source note.** The developer brief ("Strategy & Script Writing Developer Brief v2", relayed by Pedram, not read by Cursor) describes the six-step workspace and the 6-segment progress. It does not mention the project tracker, streams, Statics or Stills; those come from Figma frame 01b only.
 
-**Status (2026-11-18): PL-1.3 inventory and plan written and ruled, not built.** No open questions remain.
+**Status (2026-11-19): PL-1.3 built and walked (Pedram, local, steps 1 to 16, then two fixes D1 and D2); not merged, not deployed.** PL-1 has all three chunks built and walked. **The sprint close-out (full local suite, full agency and creator baselines) has NOT been run.** No open questions remain.
 
 ### PL-1 chunks (three)
 
 - **PL-1.1 Brand and new wave.** The wave object (brand, name, go-live date, markets, optional campaign link), the Brand page (details, client files, waves table) and the New wave dialog. Frames 01 and 09. **Status (2026-11-17): built and walked (Pedram, local, 14 of 14 steps, including the first real-storage upload). Not merged, not deployed.** Review: `pl-1-1-review.md`.
 - **PL-1.2 Campaign for a wave.** The create option, the link shown on both sides, the new board. Design: none (built from the design system and existing board components, Q10). **Status (2026-11-18): built and walked (Pedram, local, steps 1 to 16, after three fixes D1 to D3); not merged, not deployed.** No deploy-log entry.
-- **PL-1.3 Wave project tracker.** Streams, steps table, owners and dates. Frame 01b, read from Figma in pieces. **Status (2026-11-18): inventory and plan written (`pl-1-3-inventory.md`, `pl-1-3-plan.md`), not built.**
+- **PL-1.3 Wave project tracker.** Streams, steps table, owners and dates. Frame 01b, read from Figma in pieces. **Status (2026-11-19): built and walked (Pedram, local, steps 1 to 16, after two fixes D1 and D2); not merged, not deployed.** No deploy-log entry. Review: `pl-1-3-review.md`.
 
 ### Open items from these rulings
 

@@ -1575,7 +1575,8 @@
           "done": "Kész"
         },
         "steps": {
-          "title": "Átadási lépések"
+          "title": "Átadási lépések",
+          "overdue": "{days} nap | {days} nap"
         },
         "group": {
           "done": "{done} / {total} kész"
@@ -1645,6 +1646,7 @@
           "strategyLocked": "A stratégiai lépés átnevezhető, de nem távolítható el és nem helyezhető át.",
           "dates_invalid": "A határidő nem lehet a kezdő dátum előtt.",
           "streamNotRemovable": "Az UGC videócsatorna nem távolítható el: a márkaoldal haladása ettől függ.",
+          "streamDefaultsExist": "Ennek a folyamnak minden alapértelmezett lépése már a hullámban van, egy másik folyamatban. Mozgasd vissza őket, vagy adj hozzá egy lépést.",
           "brandArchived": "Ez a márka archivált. Állítsd vissza, hogy módosíthasd a hullámait."
         }
       }

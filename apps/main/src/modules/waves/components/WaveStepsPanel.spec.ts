@@ -129,7 +129,11 @@ describe('WaveStepsPanel (PL-1.3)', () => {
 
   it('W3: a delayed step says how long, a client step says Client', async () => {
     const w = await mountPanel()
-    expect(w.get('[data-test="step-row-grade"]').text()).toContain('Delayed · 2 days')
+    const row = w.get('[data-test="step-row-grade"]').text()
+    // D1: the pill says Delayed; the text beside it is the duration only.
+    expect(row).toContain('2 days')
+    expect(row.match(/Delayed/g)).toHaveLength(1)
+    expect(row).not.toContain('Delayed ·')
     expect(w.get('[data-test="step-owner-grade"]').text()).toBe('Client')
     w.unmount()
   })

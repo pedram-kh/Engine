@@ -1575,7 +1575,8 @@
           "done": "Klart"
         },
         "steps": {
-          "title": "Leveranssteg"
+          "title": "Leveranssteg",
+          "overdue": "{days} dag | {days} dagar"
         },
         "group": {
           "done": "{done} av {total} klara"
@@ -1645,6 +1646,7 @@
           "strategyLocked": "Ett strategisteg kan byta namn, men inte tas bort eller flyttas.",
           "dates_invalid": "Förfallodatumet kan inte ligga före startdatumet.",
           "streamNotRemovable": "UGC-videospåret kan inte tas bort: förloppet på varumärkessidan beror på det.",
+          "streamDefaultsExist": "Alla standardsteg i det här spåret finns redan i vågen, i ett annat spår. Flytta tillbaka dem eller lägg till ett steg.",
           "brandArchived": "Det här varumärket är arkiverat. Återställ det för att ändra dess vågor."
         }
       }

@@ -1575,7 +1575,8 @@
           "done": "Gotovo"
         },
         "steps": {
-          "title": "Koraci isporuke"
+          "title": "Koraci isporuke",
+          "overdue": "{days} dan | {days} dana"
         },
         "group": {
           "done": "{done} od {total} gotovo"
@@ -1645,6 +1646,7 @@
           "strategyLocked": "Strateški korak može se preimenovati, ali ne i ukloniti ni premjestiti.",
           "dates_invalid": "Rok ne može biti prije datuma početka.",
           "streamNotRemovable": "Tok UGC videa nije moguće ukloniti: o njemu ovisi napredak na stranici branda.",
+          "streamDefaultsExist": "Svi zadani koraci ovog toka već su u valu, u drugom toku. Premjestite ih natrag ili dodajte korak.",
           "brandArchived": "Ovaj brand je arhiviran. Vratite ga da biste mijenjali njegove valove."
         }
       }

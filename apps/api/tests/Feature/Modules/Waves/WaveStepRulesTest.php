@@ -232,6 +232,38 @@ it('ST2: Add stream does not touch a stream that has steps, custom steps removed
         ->and(WaveStep::query()->where('wave_id', $w['wave']->id)->where('stream', 'statics')->count())->toBe(5);
 });
 
+it('D2a: Add stream inserts the default keys that are not on the wave and leaves a moved default step where it is', function (): void {
+    $w = T::world();
+    $statics = T::url($w['agency'], $w['brand'], $w['wave'], 'streams/statics');
+    $moved = T::step($w['wave'], WaveStepKey::STATICS_DESIGN_V1);
+    T::call($w['admin'], 'PATCH', T::url($w['agency'], $w['brand'], $w['wave'], 'steps/'.$moved->ulid), ['stream' => 'stills'])->assertOk();
+    T::call($w['admin'], 'DELETE', $statics)->assertOk();
+
+    $res = T::call($w['admin'], 'POST', $statics)->assertOk();
+
+    $keys = WaveStep::query()->where('wave_id', $w['wave']->id)->where('stream', 'statics')->orderBy('position')->pluck('step_key')->all();
+    expect($keys)->toBe(['statics.brief_references', 'statics.internal_review', 'statics.client_feedback', 'statics.final_export'])
+        ->and(T::step($w['wave'], WaveStepKey::STATICS_DESIGN_V1)->stream->value)->toBe('stills')
+        ->and(count($res->json('data.attributes.steps')))->toBe(24)
+        ->and(AuditLog::query()->where('action', AuditAction::WaveStreamAdded->value)->count())->toBe(1);
+});
+
+it('D2b: Add stream says so when every default key of the stream is already on the wave', function (): void {
+    $w = T::world();
+    foreach ([WaveStepKey::STATICS_BRIEF_REFERENCES, WaveStepKey::STATICS_DESIGN_V1, WaveStepKey::STATICS_INTERNAL_REVIEW, WaveStepKey::STATICS_CLIENT_FEEDBACK, WaveStepKey::STATICS_FINAL_EXPORT] as $key) {
+        $step = T::step($w['wave'], $key);
+        T::call($w['admin'], 'PATCH', T::url($w['agency'], $w['brand'], $w['wave'], 'steps/'.$step->ulid), ['stream' => 'stills'])->assertOk();
+    }
+    expect(WaveStep::query()->where('wave_id', $w['wave']->id)->where('stream', 'statics')->count())->toBe(0);
+
+    T::call($w['admin'], 'POST', T::url($w['agency'], $w['brand'], $w['wave'], 'streams/statics'))
+        ->assertStatus(422)
+        ->assertJsonPath('errors.0.code', 'stream.defaults_exist');
+
+    expect(WaveStep::query()->where('wave_id', $w['wave']->id)->count())->toBe(24)
+        ->and(AuditLog::query()->where('action', AuditAction::WaveStreamAdded->value)->count())->toBe(0);
+});
+
 it('SRC1: a status change through the API sets status_source manual; provisioning sets system; an unchanged status keeps it', function (): void {
     $w = T::world();
     expect(WaveStep::query()->where('wave_id', $w['wave']->id)->where('status_source', 'system')->count())->toBe(24);
