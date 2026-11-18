@@ -36,6 +36,7 @@ Each gate is broken on purpose, the test is shown red, the break is reverted, th
 | L4-link       | Sub-step 3 (PostgreSQL run) | remove FOR UPDATE on the campaign-side link                          | WaveLinkRulesTest L4 (asserts `for update` in the SQL)                                                 | 1 failed (4 assertions)            | 1 passed (6 assertions)   |
 | L4-move       | Sub-step 3 (PostgreSQL run) | skip the wave-row lock on a card move into or out of the working set | WaveLinkRulesTest L4 (asserts `for update` in the SQL)                                                 | 1 failed (6 assertions)            | 1 passed (6 assertions)   |
 | E1-audit-keys | Sub-step 3                  | remove one decided audit key (`objective`)                           | AuditPayloadKeysGuardTest                                                                              | 1 failed, 5 passed                 | 6 passed                  |
+| G1-type       | Post-review addition        | remove the model-level campaign_type immutability check              | CampaignTypeTest G1 (type)                                                                             | 1 failed                           | 1 passed                  |
 
 ## E1 (Erasure decisions)
 

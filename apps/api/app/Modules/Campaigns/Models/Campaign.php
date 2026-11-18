@@ -14,6 +14,7 @@ use App\Modules\Campaigns\Enums\CampaignObjective;
 use App\Modules\Campaigns\Enums\CampaignStatus;
 use App\Modules\Campaigns\Enums\CampaignType;
 use App\Modules\Campaigns\Exceptions\CampaignBrandChangeException;
+use App\Modules\Campaigns\Exceptions\CampaignTypeChangeException;
 use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
@@ -427,6 +428,9 @@ final class Campaign extends Model
         self::updating(static function (Campaign $campaign): void {
             if ($campaign->isDirty('brand_id') && $campaign->getOriginal('brand_id') !== null) {
                 throw new CampaignBrandChangeException;
+            }
+            if ($campaign->isDirty('campaign_type') && $campaign->getOriginal('campaign_type') !== null) {
+                throw new CampaignTypeChangeException;
             }
         });
     }

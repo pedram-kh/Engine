@@ -6,6 +6,7 @@ use App\Modules\Agencies\Models\Agency;
 use App\Modules\Brands\Models\Brand;
 use App\Modules\Campaigns\Enums\CampaignType;
 use App\Modules\Campaigns\Exceptions\CampaignBrandChangeException;
+use App\Modules\Campaigns\Exceptions\CampaignTypeChangeException;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -153,6 +154,23 @@ it('G1 (P8): changing the brand of a saved campaign throws; creating and saving 
     // Assigning the same value is not a change.
     $campaign->brand_id = $f['brand']->id;
     $campaign->save();
+});
+
+it('G1 (type): changing the type of a saved campaign throws in the model, both ways; the same value and other fields do not', function (): void {
+    $f = typeFixture();
+
+    $normal = Campaign::factory()->createOne(['agency_id' => $f['agency']->id, 'brand_id' => $f['brand']->id]);
+    expect(fn () => $normal->update(['campaign_type' => CampaignType::ForWave]))->toThrow(CampaignTypeChangeException::class)
+        ->and($normal->fresh()?->campaign_type)->toBe(CampaignType::Normal);
+
+    $wave = Campaign::factory()->forWave()->createOne(['agency_id' => $f['agency']->id, 'brand_id' => $f['brand']->id]);
+    expect(fn () => $wave->update(['campaign_type' => 'normal']))->toThrow(CampaignTypeChangeException::class)
+        ->and($wave->fresh()?->campaign_type)->toBe(CampaignType::ForWave);
+
+    $wave->campaign_type = CampaignType::ForWave;
+    $wave->name = 'Renamed';
+    $wave->save();
+    expect($wave->fresh()?->name)->toBe('Renamed');
 });
 
 it('WB1: a for-a-wave campaign with budget 0 cannot go active or be listed; draft is fine; with a budget both work', function (): void {
