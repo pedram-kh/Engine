@@ -70,7 +70,31 @@ export interface CampaignBrief {
 // Campaign resource
 // ---------------------------------------------------------------------------
 
+/**
+ * PL-1.2 — what kind of campaign this is. Set on create, never changed. `for_wave` belongs to a wave and uses the
+ * nine-column wave board; every campaign that existed before PL-1.2 is `normal`.
+ */
+export type CampaignType = 'normal' | 'for_wave'
+
+/** PL-1.2 (P4): a campaign's wave, present on show, create and update only while `features.waves` is on. */
+export interface CampaignWaveRelationship {
+  data: {
+    id: string
+    type: 'waves'
+    attributes: {
+      name: string
+      /** A plain `Y-m-d` date. */
+      go_live_on: string
+      status: string
+      /** True while a card of this campaign sits in a working column: the link cannot change. */
+      link_locked: boolean
+    }
+  }
+}
+
 export interface CampaignAttributes {
+  /** PL-1.2. Always present. Absent only in payloads that predate it, which read as `normal`. */
+  campaign_type?: CampaignType
   name: string
   description: string | null
   objective: CampaignObjective
@@ -164,6 +188,8 @@ export interface CampaignResource {
         type: 'agencies'
       }
     }
+    /** PL-1.2: absent with `waves_enabled` OFF; `null` = loaded, no wave. */
+    wave?: CampaignWaveRelationship | null
   }
 }
 
@@ -205,6 +231,11 @@ export interface CampaignListParams {
 }
 
 export interface CreateCampaignPayload {
+  /**
+   * PL-1.2. Create only, and only with `waves_enabled` ON (otherwise 422 `campaign.wave_type_disabled`). Omit for a
+   * normal campaign. `for_wave` forces `creator_posts_content: false`.
+   */
+  campaign_type?: CampaignType
   /** Brand ULID — must belong to the path agency. */
   brand_id: string
   name: string

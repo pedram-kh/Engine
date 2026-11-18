@@ -16,7 +16,7 @@ import { ApiError } from './errors'
  *     failure. Network failures land as `ApiError` with `status: 0`
  *     and `code: 'network.error'`.
  *
- * `post`, `patch`, and `delete` additionally:
+ * `post`, `put`, `patch`, and `delete` additionally:
  *   - Issue `GET csrfCookieUrl` first to ensure the CSRF cookie is
  *     fresh before the state-changing call. This is the documented
  *     Sanctum SPA flow (`docs/04-API-DESIGN.md §4`).
@@ -31,6 +31,7 @@ import { ApiError } from './errors'
 export interface HttpClient {
   get<T = unknown>(path: string, options?: HttpRequestOptions): Promise<T>
   post<T = unknown>(path: string, body?: unknown, options?: HttpRequestOptions): Promise<T>
+  put<T = unknown>(path: string, body?: unknown, options?: HttpRequestOptions): Promise<T>
   patch<T = unknown>(path: string, body?: unknown, options?: HttpRequestOptions): Promise<T>
   delete<T = unknown>(path: string, body?: unknown, options?: HttpRequestOptions): Promise<T>
 }
@@ -115,7 +116,7 @@ export type HttpAuthMode =
 const DEFAULT_CSRF_COOKIE_URL = '/sanctum/csrf-cookie'
 const DEFAULT_XSRF_COOKIE_NAME = 'XSRF-TOKEN'
 const DEFAULT_XSRF_HEADER_NAME = 'X-XSRF-TOKEN'
-const STATE_CHANGING_METHODS = new Set(['POST', 'PATCH', 'DELETE'])
+const STATE_CHANGING_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE'])
 
 export function createHttpClient(options: CreateHttpClientOptions): HttpClient {
   const csrfCookieUrl = options.csrfCookieUrl ?? DEFAULT_CSRF_COOKIE_URL
@@ -241,6 +242,14 @@ export function createHttpClient(options: CreateHttpClientOptions): HttpClient {
     post<T = unknown>(path: string, body?: unknown, opts?: HttpRequestOptions): Promise<T> {
       return request<T>({
         method: 'POST',
+        url: path,
+        data: body ?? {},
+        ...(opts?.headers ? { headers: opts.headers } : {}),
+      })
+    },
+    put<T = unknown>(path: string, body?: unknown, opts?: HttpRequestOptions): Promise<T> {
+      return request<T>({
+        method: 'PUT',
         url: path,
         data: body ?? {},
         ...(opts?.headers ? { headers: opts.headers } : {}),

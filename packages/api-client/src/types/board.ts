@@ -24,6 +24,20 @@ export type BoardAutomationActionType = 'move_to_column' | 'none'
 /** Mirror of `MovementTrigger` — `event` (automation) or `user` (manual). */
 export type BoardMovementTrigger = 'event' | 'user'
 
+/** PL-1.2 — the stage keys of a wave board's data columns, in order. */
+export type BoardWaveStage =
+  | 'invited'
+  | 'selected'
+  | 'filming'
+  | 'submitted'
+  | 'in_edits'
+  | 'client_review'
+  | 'approved'
+  | 'dropped'
+
+/** PL-1.2 — the label on an Invited-column card of a wave board. */
+export type BoardInviteState = 'invited' | 'accepted' | 'declined'
+
 // ---------------------------------------------------------------------------
 // Column
 // ---------------------------------------------------------------------------
@@ -35,6 +49,8 @@ export interface BoardColumnAttributes {
   color_token: string
   is_terminal_success: boolean
   is_terminal_failure: boolean
+  /** PL-1.2: set only on a for-a-wave board's eight data columns; absent on every normal board. */
+  stage_key?: BoardWaveStage
   /** withCount('cards') on the board GET / reorder responses; null otherwise. */
   card_count: number | null
   created_at: string
@@ -86,6 +102,8 @@ export interface BoardCardAssignmentData {
 export interface BoardCardResource {
   id: string
   type: 'board_cards'
+  /** PL-1.2: present only on a wave board's cards while the assignment is at the invite stage. */
+  invite_state?: BoardInviteState
   attributes: {
     /** Present per §10 but INERT in P1 (intra-column ordering is P2). */
     position: number

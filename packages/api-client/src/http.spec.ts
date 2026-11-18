@@ -133,6 +133,17 @@ describe('createHttpClient', () => {
       expect(h.mock.history.patch).toHaveLength(1)
     })
 
+    it('issues GET /sanctum/csrf-cookie before PUT and sends the body', async () => {
+      h.mock.onGet(CSRF_URL).reply(204)
+      h.mock.onPut(`${BASE_URL}/campaigns/1/wave`).reply(200, { data: {} })
+
+      await h.http.put('/campaigns/1/wave', { wave_id: 'W1' })
+
+      expect(h.mock.history.get[0]?.url).toBe(CSRF_URL)
+      expect(h.mock.history.put).toHaveLength(1)
+      expect(h.mock.history.put[0]?.data).toBe('{"wave_id":"W1"}')
+    })
+
     it('issues GET /sanctum/csrf-cookie before DELETE', async () => {
       h.mock.onGet(CSRF_URL).reply(204)
       h.mock.onDelete(`${BASE_URL}/me/sessions/1`).reply(204)
