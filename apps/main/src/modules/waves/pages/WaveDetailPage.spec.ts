@@ -9,7 +9,11 @@ vi.mock('../api/waves.api', () => ({
     update: vi.fn(),
     show: vi.fn(),
     campaignOptions: vi.fn(),
+    tracker: vi.fn(() => new Promise(() => {})),
   },
+}))
+vi.mock('@/modules/agency-users/api/members.api', () => ({
+  membersApi: { list: vi.fn(() => Promise.resolve({ data: [] })) },
 }))
 
 import { wavesApi } from '../api/waves.api'

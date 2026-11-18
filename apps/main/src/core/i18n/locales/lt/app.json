@@ -1522,6 +1522,131 @@
         "createdBy": "Sukūrė",
         "notFound": "Šios bangos nerasta.",
         "linkLocked": "Užrakinta: šioje kampanijoje kūrėjas yra pasirinktas arba toliau."
+      },
+      "tracker": {
+        "progress": {
+          "complete": "Baigta"
+        },
+        "health": {
+          "onTrack": "Pagal planą",
+          "atRisk": "Rizika · {count} kanalas vėluoja | Rizika · {count} kanalai vėluoja"
+        },
+        "streams": {
+          "ugc_video": "UGC vaizdo įrašai",
+          "statics": "Statiniai",
+          "stills": "Nuotraukos"
+        },
+        "streamStatus": {
+          "on_track": "Pagal planą",
+          "delayed": "Vėluoja · {days} diena | Vėluoja · {days} dienos",
+          "complete": "Baigta"
+        },
+        "card": {
+          "steps": "{done} iš {total} žingsnių",
+          "nextStep": "Kitas žingsnis",
+          "finalDelivery": "Galutinis pristatymas",
+          "noDate": "Nėra datos",
+          "allDone": "Visi žingsniai atlikti",
+          "noSteps": "Nėra žingsnių"
+        },
+        "filter": {
+          "all": "Visi",
+          "ugc": "UGC",
+          "statics": "Statiniai",
+          "stills": "Nuotraukos",
+          "mine": "Mano"
+        },
+        "col": {
+          "step": "Žingsnis",
+          "owner": "Atsakingas",
+          "due": "Terminas",
+          "status": "Būsena"
+        },
+        "status": {
+          "up_next": "Toliau",
+          "in_progress": "Vykdoma",
+          "due_today": "Terminas šiandien",
+          "delayed": "Vėluoja",
+          "done": "Atlikta"
+        },
+        "stepStatus": {
+          "not_started": "Nepradėta",
+          "in_progress": "Vykdoma",
+          "done": "Atlikta"
+        },
+        "steps": {
+          "title": "Pristatymo žingsniai"
+        },
+        "group": {
+          "done": "{done} iš {total} atlikta"
+        },
+        "completed": {
+          "count": "{count} baigtas žingsnis | {count} baigti žingsniai",
+          "show": "Rodyti",
+          "hide": "Slėpti"
+        },
+        "due": {
+          "today": "Šiandien",
+          "tomorrow": "Rytoj"
+        },
+        "owner": {
+          "unassigned": "Nepriskirta",
+          "former": "Buvęs narys",
+          "client": "Klientas"
+        },
+        "actions": {
+          "addStep": "Pridėti žingsnį prie kanalo",
+          "addStream": "Pridėti kanalą",
+          "edit": "Redaguoti",
+          "remove": "Pašalinti",
+          "removeStream": "Pašalinti kanalą",
+          "streamMenu": "Veiksmai: {stream}",
+          "markDone": "Pažymėti „{name}“ kaip atliktą",
+          "reopen": "Pažymėti „{name}“ kaip neatliktą",
+          "rowMenu": "Veiksmai: „{name}“"
+        },
+        "dialog": {
+          "addTitle": "Pridėti žingsnį",
+          "editTitle": "Redaguoti žingsnį",
+          "name": "Žingsnio pavadinimas",
+          "stream": "Kanalas",
+          "owner": "Atsakingas",
+          "status": "Būsena",
+          "startsOn": "Pradžios data",
+          "dueOn": "Termino data",
+          "add": "Pridėti žingsnį",
+          "save": "Išsaugoti pakeitimus",
+          "cancel": "Atšaukti"
+        },
+        "remove": {
+          "title": "Pašalinti žingsnį",
+          "body": "Pašalinti „{name}“ iš šios bangos? To anuliuoti negalima.",
+          "confirm": "Pašalinti"
+        },
+        "removeStream": {
+          "title": "Pašalinti kanalą",
+          "body": "Pašalinti {stream} ir jo {count} žingsnį iš šios bangos? To anuliuoti negalima. | Pašalinti {stream} ir jo {count} žingsnius iš šios bangos? To anuliuoti negalima.",
+          "confirm": "Pašalinti kanalą"
+        },
+        "empty": {
+          "filtered": "Nė vienas žingsnis neatitinka šio filtro."
+        },
+        "removedByOther": "Šį žingsnį pašalino kitas asmuo. Sąrašas įkeltas iš naujo.",
+        "validation": {
+          "nameRequired": "Įveskite žingsnio pavadinimą."
+        },
+        "errors": {
+          "loadFailed": "Nepavyko įkelti sekimo.",
+          "retry": "Bandyti dar kartą",
+          "saveFailed": "Nepavyko išsaugoti pakeitimo. Bandykite dar kartą.",
+          "forbidden": "Jūsų vaidmuo negali atlikti šio pakeitimo.",
+          "ownerNotMember": "Atsakingas turi būti aktyvus šios agentūros narys arba Klientas.",
+          "ownerConflict": "Žingsnio atsakingas yra narys arba klientas, ne abu.",
+          "strategyLocked": "Strategijos žingsnį galima pervadinti, bet ne pašalinti ar perkelti.",
+          "dates_invalid": "Termino data negali būti ankstesnė už pradžios datą.",
+          "streamNotRemovable": "UGC vaizdo kanalo pašalinti negalima: nuo jo priklauso pažanga prekės ženklo puslapyje.",
+          "brandArchived": "Šis prekės ženklas suarchyvuotas. Atkurkite jį, kad pakeistumėte jo bangas."
+        }
       }
     },
     "brandFiles": {

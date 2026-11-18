@@ -1522,6 +1522,131 @@
         "createdBy": "Gemaakt door",
         "notFound": "Deze golf is niet gevonden.",
         "linkLocked": "Vergrendeld: er is een creator geselecteerd of verder in deze campagne."
+      },
+      "tracker": {
+        "progress": {
+          "complete": "Voltooid"
+        },
+        "health": {
+          "onTrack": "Op schema",
+          "atRisk": "Risico · {count} stroom vertraagd | Risico · {count} stromen vertraagd"
+        },
+        "streams": {
+          "ugc_video": "UGC-video",
+          "statics": "Statics",
+          "stills": "Stills"
+        },
+        "streamStatus": {
+          "on_track": "Op schema",
+          "delayed": "Vertraagd · {days} dag | Vertraagd · {days} dagen",
+          "complete": "Voltooid"
+        },
+        "card": {
+          "steps": "{done} van {total} stappen",
+          "nextStep": "Volgende stap",
+          "finalDelivery": "Eindoplevering",
+          "noDate": "Geen datum",
+          "allDone": "Alle stappen klaar",
+          "noSteps": "Geen stappen"
+        },
+        "filter": {
+          "all": "Alles",
+          "ugc": "UGC",
+          "statics": "Statics",
+          "stills": "Stills",
+          "mine": "Van mij"
+        },
+        "col": {
+          "step": "Stap",
+          "owner": "Eigenaar",
+          "due": "Deadline",
+          "status": "Status"
+        },
+        "status": {
+          "up_next": "Straks",
+          "in_progress": "Bezig",
+          "due_today": "Vandaag klaar",
+          "delayed": "Vertraagd",
+          "done": "Klaar"
+        },
+        "stepStatus": {
+          "not_started": "Niet gestart",
+          "in_progress": "Bezig",
+          "done": "Klaar"
+        },
+        "steps": {
+          "title": "Opleverstappen"
+        },
+        "group": {
+          "done": "{done} van {total} klaar"
+        },
+        "completed": {
+          "count": "{count} voltooide stap | {count} voltooide stappen",
+          "show": "Tonen",
+          "hide": "Verbergen"
+        },
+        "due": {
+          "today": "Vandaag",
+          "tomorrow": "Morgen"
+        },
+        "owner": {
+          "unassigned": "Niet toegewezen",
+          "former": "Voormalig lid",
+          "client": "Klant"
+        },
+        "actions": {
+          "addStep": "Stap aan een stroom toevoegen",
+          "addStream": "Stroom toevoegen",
+          "edit": "Bewerken",
+          "remove": "Verwijderen",
+          "removeStream": "Stroom verwijderen",
+          "streamMenu": "Acties voor {stream}",
+          "markDone": "“{name}” als klaar markeren",
+          "reopen": "“{name}” als niet klaar markeren",
+          "rowMenu": "Acties voor “{name}”"
+        },
+        "dialog": {
+          "addTitle": "Stap toevoegen",
+          "editTitle": "Stap bewerken",
+          "name": "Stapnaam",
+          "stream": "Stroom",
+          "owner": "Eigenaar",
+          "status": "Status",
+          "startsOn": "Startdatum",
+          "dueOn": "Deadline",
+          "add": "Stap toevoegen",
+          "save": "Wijzigingen opslaan",
+          "cancel": "Annuleren"
+        },
+        "remove": {
+          "title": "Stap verwijderen",
+          "body": "“{name}” uit deze wave verwijderen? Dit kan niet ongedaan worden gemaakt.",
+          "confirm": "Verwijderen"
+        },
+        "removeStream": {
+          "title": "Stroom verwijderen",
+          "body": "{stream} en de {count} stap daarvan uit deze wave verwijderen? Dit kan niet ongedaan worden gemaakt. | {stream} en de {count} stappen daarvan uit deze wave verwijderen? Dit kan niet ongedaan worden gemaakt.",
+          "confirm": "Stroom verwijderen"
+        },
+        "empty": {
+          "filtered": "Geen stappen voor dit filter."
+        },
+        "removedByOther": "Deze stap is door iemand anders verwijderd. De lijst is opnieuw geladen.",
+        "validation": {
+          "nameRequired": "Voer een stapnaam in."
+        },
+        "errors": {
+          "loadFailed": "De tracker kon niet worden geladen.",
+          "retry": "Opnieuw proberen",
+          "saveFailed": "De wijziging kon niet worden opgeslagen. Probeer het opnieuw.",
+          "forbidden": "Jouw rol mag deze wijziging niet doorvoeren.",
+          "ownerNotMember": "De eigenaar moet een actief lid van dit bureau zijn, of Klant.",
+          "ownerConflict": "Een stap heeft een lid of de klant als eigenaar, niet beide.",
+          "strategyLocked": "Een strategiestap kan worden hernoemd, maar niet verwijderd of verplaatst.",
+          "dates_invalid": "De deadline mag niet voor de startdatum liggen.",
+          "streamNotRemovable": "De UGC-videostroom kan niet worden verwijderd: de voortgang op de merkpagina hangt ervan af.",
+          "brandArchived": "Dit merk is gearchiveerd. Herstel het om de waves te wijzigen."
+        }
       }
     },
     "brandFiles": {

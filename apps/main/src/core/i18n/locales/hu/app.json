@@ -1522,6 +1522,131 @@
         "createdBy": "Létrehozta",
         "notFound": "Ez a hullám nem található.",
         "linkLocked": "Zárolva: egy alkotó ki van választva vagy továbbhaladt ebben a kampányban."
+      },
+      "tracker": {
+        "progress": {
+          "complete": "Kész"
+        },
+        "health": {
+          "onTrack": "Terv szerint",
+          "atRisk": "Veszélyben · {count} csatorna késik | Veszélyben · {count} csatorna késik"
+        },
+        "streams": {
+          "ugc_video": "UGC videó",
+          "statics": "Statikus",
+          "stills": "Állóképek"
+        },
+        "streamStatus": {
+          "on_track": "Terv szerint",
+          "delayed": "Késik · {days} nap | Késik · {days} nap",
+          "complete": "Kész"
+        },
+        "card": {
+          "steps": "{done} / {total} lépés",
+          "nextStep": "Következő lépés",
+          "finalDelivery": "Végső átadás",
+          "noDate": "Nincs dátum",
+          "allDone": "Minden lépés kész",
+          "noSteps": "Nincs lépés"
+        },
+        "filter": {
+          "all": "Mind",
+          "ugc": "UGC",
+          "statics": "Statikus",
+          "stills": "Állóképek",
+          "mine": "Saját"
+        },
+        "col": {
+          "step": "Lépés",
+          "owner": "Felelős",
+          "due": "Határidő",
+          "status": "Állapot"
+        },
+        "status": {
+          "up_next": "Következő",
+          "in_progress": "Folyamatban",
+          "due_today": "Ma esedékes",
+          "delayed": "Késik",
+          "done": "Kész"
+        },
+        "stepStatus": {
+          "not_started": "Nincs elkezdve",
+          "in_progress": "Folyamatban",
+          "done": "Kész"
+        },
+        "steps": {
+          "title": "Átadási lépések"
+        },
+        "group": {
+          "done": "{done} / {total} kész"
+        },
+        "completed": {
+          "count": "{count} befejezett lépés | {count} befejezett lépés",
+          "show": "Megjelenítés",
+          "hide": "Elrejtés"
+        },
+        "due": {
+          "today": "Ma",
+          "tomorrow": "Holnap"
+        },
+        "owner": {
+          "unassigned": "Nincs kijelölve",
+          "former": "Volt tag",
+          "client": "Ügyfél"
+        },
+        "actions": {
+          "addStep": "Lépés hozzáadása egy csatornához",
+          "addStream": "Csatorna hozzáadása",
+          "edit": "Szerkesztés",
+          "remove": "Eltávolítás",
+          "removeStream": "Csatorna eltávolítása",
+          "streamMenu": "Műveletek: {stream}",
+          "markDone": "„{name}” megjelölése késznek",
+          "reopen": "„{name}” megjelölése nem késznek",
+          "rowMenu": "Műveletek: „{name}”"
+        },
+        "dialog": {
+          "addTitle": "Lépés hozzáadása",
+          "editTitle": "Lépés szerkesztése",
+          "name": "Lépés neve",
+          "stream": "Csatorna",
+          "owner": "Felelős",
+          "status": "Állapot",
+          "startsOn": "Kezdő dátum",
+          "dueOn": "Határidő",
+          "add": "Lépés hozzáadása",
+          "save": "Módosítások mentése",
+          "cancel": "Mégse"
+        },
+        "remove": {
+          "title": "Lépés eltávolítása",
+          "body": "Eltávolítod a(z) „{name}” lépést ebből a hullámból? Ez nem vonható vissza.",
+          "confirm": "Eltávolítás"
+        },
+        "removeStream": {
+          "title": "Csatorna eltávolítása",
+          "body": "Eltávolítod a(z) {stream} csatornát és a hozzá tartozó {count} lépést ebből a hullámból? Ez nem vonható vissza. | Eltávolítod a(z) {stream} csatornát és a hozzá tartozó {count} lépést ebből a hullámból? Ez nem vonható vissza.",
+          "confirm": "Csatorna eltávolítása"
+        },
+        "empty": {
+          "filtered": "Egy lépés sem felel meg a szűrőnek."
+        },
+        "removedByOther": "Ezt a lépést valaki más eltávolította. A lista újratöltődött.",
+        "validation": {
+          "nameRequired": "Add meg a lépés nevét."
+        },
+        "errors": {
+          "loadFailed": "A követőt nem sikerült betölteni.",
+          "retry": "Újra",
+          "saveFailed": "A módosítást nem sikerült menteni. Próbáld újra.",
+          "forbidden": "A szerepköröd nem engedi ezt a módosítást.",
+          "ownerNotMember": "A felelős az ügynökség aktív tagja vagy Ügyfél lehet.",
+          "ownerConflict": "Egy lépésnek tag vagy az ügyfél a felelőse, nem mindkettő.",
+          "strategyLocked": "A stratégiai lépés átnevezhető, de nem távolítható el és nem helyezhető át.",
+          "dates_invalid": "A határidő nem lehet a kezdő dátum előtt.",
+          "streamNotRemovable": "Az UGC videócsatorna nem távolítható el: a márkaoldal haladása ettől függ.",
+          "brandArchived": "Ez a márka archivált. Állítsd vissza, hogy módosíthasd a hullámait."
+        }
       }
     },
     "brandFiles": {

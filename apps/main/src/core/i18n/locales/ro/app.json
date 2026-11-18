@@ -1522,6 +1522,131 @@
         "createdBy": "Creat de",
         "notFound": "Acest val nu a fost găsit.",
         "linkLocked": "Blocat: în această campanie un creator este selectat sau mai departe."
+      },
+      "tracker": {
+        "progress": {
+          "complete": "Finalizat"
+        },
+        "health": {
+          "onTrack": "La zi",
+          "atRisk": "Risc · {count} flux întârzie | Risc · {count} fluxuri întârzie"
+        },
+        "streams": {
+          "ugc_video": "Video UGC",
+          "statics": "Statice",
+          "stills": "Fotografii"
+        },
+        "streamStatus": {
+          "on_track": "La zi",
+          "delayed": "Întârziat · {days} zi | Întârziat · {days} zile",
+          "complete": "Finalizat"
+        },
+        "card": {
+          "steps": "{done} din {total} pași",
+          "nextStep": "Pasul următor",
+          "finalDelivery": "Livrare finală",
+          "noDate": "Fără dată",
+          "allDone": "Toți pașii sunt gata",
+          "noSteps": "Niciun pas"
+        },
+        "filter": {
+          "all": "Toate",
+          "ugc": "UGC",
+          "statics": "Statice",
+          "stills": "Fotografii",
+          "mine": "Ale mele"
+        },
+        "col": {
+          "step": "Pas",
+          "owner": "Responsabil",
+          "due": "Termen",
+          "status": "Stare"
+        },
+        "status": {
+          "up_next": "Urmează",
+          "in_progress": "În lucru",
+          "due_today": "Termen azi",
+          "delayed": "Întârziat",
+          "done": "Gata"
+        },
+        "stepStatus": {
+          "not_started": "Neînceput",
+          "in_progress": "În lucru",
+          "done": "Gata"
+        },
+        "steps": {
+          "title": "Pași de livrare"
+        },
+        "group": {
+          "done": "{done} din {total} gata"
+        },
+        "completed": {
+          "count": "{count} pas finalizat | {count} pași finalizați",
+          "show": "Arată",
+          "hide": "Ascunde"
+        },
+        "due": {
+          "today": "Azi",
+          "tomorrow": "Mâine"
+        },
+        "owner": {
+          "unassigned": "Neatribuit",
+          "former": "Fost membru",
+          "client": "Client"
+        },
+        "actions": {
+          "addStep": "Adaugă un pas într-un flux",
+          "addStream": "Adaugă flux",
+          "edit": "Editează",
+          "remove": "Elimină",
+          "removeStream": "Elimină fluxul",
+          "streamMenu": "Acțiuni pentru {stream}",
+          "markDone": "Marchează „{name}” ca gata",
+          "reopen": "Marchează „{name}” ca nefinalizat",
+          "rowMenu": "Acțiuni pentru „{name}”"
+        },
+        "dialog": {
+          "addTitle": "Adaugă pas",
+          "editTitle": "Editează pasul",
+          "name": "Numele pasului",
+          "stream": "Flux",
+          "owner": "Responsabil",
+          "status": "Stare",
+          "startsOn": "Data de început",
+          "dueOn": "Termen",
+          "add": "Adaugă pas",
+          "save": "Salvează modificările",
+          "cancel": "Anulează"
+        },
+        "remove": {
+          "title": "Elimină pasul",
+          "body": "Elimini „{name}” din acest val? Acțiunea nu poate fi anulată.",
+          "confirm": "Elimină"
+        },
+        "removeStream": {
+          "title": "Elimină fluxul",
+          "body": "Elimini {stream} și cei {count} pas din acest val? Acțiunea nu poate fi anulată. | Elimini {stream} și cei {count} pași din acest val? Acțiunea nu poate fi anulată.",
+          "confirm": "Elimină fluxul"
+        },
+        "empty": {
+          "filtered": "Niciun pas nu corespunde acestui filtru."
+        },
+        "removedByOther": "Acest pas a fost eliminat de altcineva. Lista a fost reîncărcată.",
+        "validation": {
+          "nameRequired": "Introdu un nume pentru pas."
+        },
+        "errors": {
+          "loadFailed": "Monitorizarea nu a putut fi încărcată.",
+          "retry": "Încearcă din nou",
+          "saveFailed": "Modificarea nu a putut fi salvată. Încearcă din nou.",
+          "forbidden": "Rolul tău nu permite această modificare.",
+          "ownerNotMember": "Responsabilul trebuie să fie un membru activ al acestei agenții sau Client.",
+          "ownerConflict": "Un pas are ca responsabil un membru sau clientul, nu ambele.",
+          "strategyLocked": "Un pas de strategie poate fi redenumit, dar nu eliminat sau mutat.",
+          "dates_invalid": "Termenul nu poate fi înaintea datei de început.",
+          "streamNotRemovable": "Fluxul video UGC nu poate fi eliminat: progresul de pe pagina mărcii depinde de el.",
+          "brandArchived": "Această marcă este arhivată. Restaureaz-o pentru a-i modifica valurile."
+        }
       }
     },
     "brandFiles": {

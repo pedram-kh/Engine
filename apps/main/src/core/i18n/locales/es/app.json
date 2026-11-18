@@ -1522,6 +1522,131 @@
         "createdBy": "Creada por",
         "notFound": "No se encontró esta oleada.",
         "linkLocked": "Bloqueado: hay un creador seleccionado o más avanzado en esta campaña."
+      },
+      "tracker": {
+        "progress": {
+          "complete": "Completado"
+        },
+        "health": {
+          "onTrack": "En plazo",
+          "atRisk": "En riesgo · {count} flujo retrasado | En riesgo · {count} flujos retrasados"
+        },
+        "streams": {
+          "ugc_video": "Vídeo UGC",
+          "statics": "Estáticos",
+          "stills": "Fotos"
+        },
+        "streamStatus": {
+          "on_track": "En plazo",
+          "delayed": "Retrasado · {days} día | Retrasado · {days} días",
+          "complete": "Completado"
+        },
+        "card": {
+          "steps": "{done} de {total} pasos",
+          "nextStep": "Siguiente paso",
+          "finalDelivery": "Entrega final",
+          "noDate": "Sin fecha",
+          "allDone": "Todos los pasos hechos",
+          "noSteps": "Sin pasos"
+        },
+        "filter": {
+          "all": "Todos",
+          "ugc": "UGC",
+          "statics": "Estáticos",
+          "stills": "Fotos",
+          "mine": "Míos"
+        },
+        "col": {
+          "step": "Paso",
+          "owner": "Responsable",
+          "due": "Vence",
+          "status": "Estado"
+        },
+        "status": {
+          "up_next": "Siguiente",
+          "in_progress": "En curso",
+          "due_today": "Vence hoy",
+          "delayed": "Retrasado",
+          "done": "Hecho"
+        },
+        "stepStatus": {
+          "not_started": "Sin empezar",
+          "in_progress": "En curso",
+          "done": "Hecho"
+        },
+        "steps": {
+          "title": "Pasos de entrega"
+        },
+        "group": {
+          "done": "{done} de {total} hechos"
+        },
+        "completed": {
+          "count": "{count} paso completado | {count} pasos completados",
+          "show": "Mostrar",
+          "hide": "Ocultar"
+        },
+        "due": {
+          "today": "Hoy",
+          "tomorrow": "Mañana"
+        },
+        "owner": {
+          "unassigned": "Sin asignar",
+          "former": "Antiguo miembro",
+          "client": "Cliente"
+        },
+        "actions": {
+          "addStep": "Añadir paso a un flujo",
+          "addStream": "Añadir flujo",
+          "edit": "Editar",
+          "remove": "Quitar",
+          "removeStream": "Quitar flujo",
+          "streamMenu": "Acciones de {stream}",
+          "markDone": "Marcar «{name}» como hecho",
+          "reopen": "Marcar «{name}» como no hecho",
+          "rowMenu": "Acciones de «{name}»"
+        },
+        "dialog": {
+          "addTitle": "Añadir paso",
+          "editTitle": "Editar paso",
+          "name": "Nombre del paso",
+          "stream": "Flujo",
+          "owner": "Responsable",
+          "status": "Estado",
+          "startsOn": "Fecha de inicio",
+          "dueOn": "Fecha de vencimiento",
+          "add": "Añadir paso",
+          "save": "Guardar cambios",
+          "cancel": "Cancelar"
+        },
+        "remove": {
+          "title": "Quitar paso",
+          "body": "¿Quitar «{name}» de esta oleada? No se puede deshacer.",
+          "confirm": "Quitar"
+        },
+        "removeStream": {
+          "title": "Quitar flujo",
+          "body": "¿Quitar {stream} y su {count} paso de esta oleada? No se puede deshacer. | ¿Quitar {stream} y sus {count} pasos de esta oleada? No se puede deshacer.",
+          "confirm": "Quitar flujo"
+        },
+        "empty": {
+          "filtered": "Ningún paso coincide con este filtro."
+        },
+        "removedByOther": "Otra persona quitó este paso. Se recargó la lista.",
+        "validation": {
+          "nameRequired": "Introduce un nombre de paso."
+        },
+        "errors": {
+          "loadFailed": "No se pudo cargar el seguimiento.",
+          "retry": "Reintentar",
+          "saveFailed": "No se pudo guardar el cambio. Inténtalo de nuevo.",
+          "forbidden": "Tu rol no puede hacer este cambio.",
+          "ownerNotMember": "El responsable debe ser un miembro activo de esta agencia, o Cliente.",
+          "ownerConflict": "Un paso tiene un miembro o el cliente como responsable, no ambos.",
+          "strategyLocked": "Un paso de estrategia se puede renombrar, pero no quitar ni mover.",
+          "dates_invalid": "La fecha de vencimiento no puede ser anterior a la de inicio.",
+          "streamNotRemovable": "El flujo de vídeo UGC no se puede quitar: el progreso de la página de la marca depende de él.",
+          "brandArchived": "Esta marca está archivada. Restáurala para cambiar sus oleadas."
+        }
       }
     },
     "brandFiles": {

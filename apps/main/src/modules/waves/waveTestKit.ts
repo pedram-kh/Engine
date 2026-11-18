@@ -2,7 +2,15 @@
  * Shared fixtures for the PL-1.1 specs: a wave, a brand file, and a mount helper that wires Pinia, the
  * router, i18n (English) and Vuetify the way the existing page specs do.
  */
-import type { BrandFileResource, WaveResource } from '@catalyst/api-client'
+import type {
+  BrandFileResource,
+  WaveProgress,
+  WaveResource,
+  WaveStepResource,
+  WaveStream,
+  WaveStreamSummary,
+  WaveTrackerResource,
+} from '@catalyst/api-client'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import type { Component } from 'vue'
@@ -129,4 +137,96 @@ export async function mountWithApp(
     global: { plugins: [pinia, router, i18n, vuetify] },
     attachTo: document.createElement('div'),
   })
+}
+
+export const TODAY = '2026-11-18'
+
+let stepCounter = 0
+
+export function makeStep(
+  over: Partial<WaveStepResource['attributes']> = {},
+  id?: string,
+): WaveStepResource {
+  stepCounter += 1
+  return {
+    id: id ?? `01STEP${String(stepCounter).padStart(20, '0')}`,
+    type: 'wave_steps',
+    attributes: {
+      stream: 'ugc_video',
+      key: null,
+      is_strategy: false,
+      name: `Step ${stepCounter}`,
+      position: stepCounter * 10,
+      status: 'not_started',
+      status_source: 'system',
+      display_status: 'up_next',
+      days_overdue: 0,
+      starts_on: null,
+      due_on: null,
+      completed_on: null,
+      owner: null,
+      owner_client: false,
+      owner_is_former: false,
+      ...over,
+    },
+  }
+}
+
+export const NO_PROGRESS: WaveProgress = {
+  segments: ['empty', 'empty', 'empty', 'empty', 'empty', 'empty'],
+  label_kind: 'not_started',
+  step_name: null,
+}
+
+/** A tracker whose stream summaries are derived from the steps the way the server does (done, total, status). */
+export function makeTracker(
+  steps: WaveStepResource[],
+  over: Partial<WaveTrackerResource['attributes']> = {},
+): WaveTrackerResource {
+  const order: WaveStream[] = ['ugc_video', 'statics', 'stills']
+  const colours: Record<WaveStream, string> = {
+    ugc_video: '#3ecf9e',
+    statics: '#8b6cff',
+    stills: '#f472b6',
+  }
+  const streams: WaveStreamSummary[] = []
+  for (const stream of order) {
+    const mine = steps.filter((s) => s.attributes.stream === stream)
+    if (mine.length === 0) continue
+    const open = mine.filter((s) => s.attributes.status !== 'done')
+    const delayed = Math.max(0, ...open.map((s) => s.attributes.days_overdue))
+    const next = open[0]
+    streams.push({
+      stream,
+      colour: colours[stream],
+      status: open.length === 0 ? 'complete' : delayed > 0 ? 'delayed' : 'on_track',
+      days_delayed: delayed,
+      done: mine.length - open.length,
+      total: mine.length,
+      next_step:
+        next === undefined
+          ? null
+          : { id: next.id, name: next.attributes.name, due_on: next.attributes.due_on },
+      final_delivery: mine[mine.length - 1]?.attributes.due_on ?? null,
+      owners: [],
+      has_client: mine.some((s) => s.attributes.owner_client),
+    })
+  }
+  const delayedStreams = streams.filter((s) => s.status === 'delayed').length
+  return {
+    id: WAVE_ULID,
+    type: 'wave_trackers',
+    attributes: {
+      today: TODAY,
+      streams,
+      absent_streams: order.filter((o) => !streams.some((s) => s.stream === o)),
+      steps,
+      health: {
+        status: delayedStreams > 0 ? 'at_risk' : 'on_track',
+        delayed_streams: delayedStreams,
+      },
+      progress: NO_PROGRESS,
+      ...over,
+    },
+  }
 }

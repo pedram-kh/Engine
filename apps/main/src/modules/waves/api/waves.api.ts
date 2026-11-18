@@ -12,6 +12,11 @@ import type {
   WaveEnvelope,
   WaveListParams,
   WaveListResponse,
+  WaveStepCreatePayload,
+  WaveStepEnvelope,
+  WaveStepUpdatePayload,
+  WaveStream,
+  WaveTrackerEnvelope,
 } from '@catalyst/api-client'
 import { http } from '@/core/api'
 
@@ -48,5 +53,58 @@ export const wavesApi = {
     payload: UpdateWavePayload,
   ): Promise<WaveEnvelope> {
     return http.patch<WaveEnvelope>(`${base(agencyId, brandId)}/${waveId}`, payload)
+  },
+
+  /** PL-1.3 — the tracker. The first call on a wave provisions its default steps. */
+  tracker(agencyId: string, brandId: string, waveId: string): Promise<WaveTrackerEnvelope> {
+    return http.get<WaveTrackerEnvelope>(`${base(agencyId, brandId)}/${waveId}/tracker`)
+  },
+
+  addStep(
+    agencyId: string,
+    brandId: string,
+    waveId: string,
+    payload: WaveStepCreatePayload,
+  ): Promise<WaveStepEnvelope> {
+    return http.post<WaveStepEnvelope>(`${base(agencyId, brandId)}/${waveId}/steps`, payload)
+  },
+
+  updateStep(
+    agencyId: string,
+    brandId: string,
+    waveId: string,
+    stepId: string,
+    payload: WaveStepUpdatePayload,
+  ): Promise<WaveStepEnvelope> {
+    return http.patch<WaveStepEnvelope>(
+      `${base(agencyId, brandId)}/${waveId}/steps/${stepId}`,
+      payload,
+    )
+  },
+
+  removeStep(agencyId: string, brandId: string, waveId: string, stepId: string): Promise<void> {
+    return http.delete<void>(`${base(agencyId, brandId)}/${waveId}/steps/${stepId}`)
+  },
+
+  /** Returns the whole tracker. */
+  removeStream(
+    agencyId: string,
+    brandId: string,
+    waveId: string,
+    stream: WaveStream,
+  ): Promise<WaveTrackerEnvelope> {
+    return http.delete<WaveTrackerEnvelope>(
+      `${base(agencyId, brandId)}/${waveId}/streams/${stream}`,
+    )
+  },
+
+  /** Adds a removed stream back with its default steps. Returns the whole tracker. */
+  addStream(
+    agencyId: string,
+    brandId: string,
+    waveId: string,
+    stream: WaveStream,
+  ): Promise<WaveTrackerEnvelope> {
+    return http.post<WaveTrackerEnvelope>(`${base(agencyId, brandId)}/${waveId}/streams/${stream}`)
   },
 }

@@ -1522,6 +1522,131 @@
         "createdBy": "Utworzył(a)",
         "notFound": "Nie znaleziono tej fali.",
         "linkLocked": "Zablokowane: w tej kampanii twórca jest wybrany lub dalej."
+      },
+      "tracker": {
+        "progress": {
+          "complete": "Ukończone"
+        },
+        "health": {
+          "onTrack": "Zgodnie z planem",
+          "atRisk": "Zagrożone · {count} ścieżka opóźniona | Zagrożone · {count} ścieżki opóźnione"
+        },
+        "streams": {
+          "ugc_video": "Wideo UGC",
+          "statics": "Statyki",
+          "stills": "Zdjęcia"
+        },
+        "streamStatus": {
+          "on_track": "Zgodnie z planem",
+          "delayed": "Opóźnione · {days} dzień | Opóźnione · {days} dni",
+          "complete": "Ukończone"
+        },
+        "card": {
+          "steps": "{done} z {total} kroków",
+          "nextStep": "Następny krok",
+          "finalDelivery": "Dostawa końcowa",
+          "noDate": "Brak daty",
+          "allDone": "Wszystkie kroki wykonane",
+          "noSteps": "Brak kroków"
+        },
+        "filter": {
+          "all": "Wszystkie",
+          "ugc": "UGC",
+          "statics": "Statyki",
+          "stills": "Zdjęcia",
+          "mine": "Moje"
+        },
+        "col": {
+          "step": "Krok",
+          "owner": "Odpowiedzialny",
+          "due": "Termin",
+          "status": "Status"
+        },
+        "status": {
+          "up_next": "Następny",
+          "in_progress": "W toku",
+          "due_today": "Termin dziś",
+          "delayed": "Opóźnione",
+          "done": "Zrobione"
+        },
+        "stepStatus": {
+          "not_started": "Nierozpoczęte",
+          "in_progress": "W toku",
+          "done": "Zrobione"
+        },
+        "steps": {
+          "title": "Kroki dostawy"
+        },
+        "group": {
+          "done": "{done} z {total} zrobionych"
+        },
+        "completed": {
+          "count": "{count} ukończony krok | {count} ukończone kroki",
+          "show": "Pokaż",
+          "hide": "Ukryj"
+        },
+        "due": {
+          "today": "Dziś",
+          "tomorrow": "Jutro"
+        },
+        "owner": {
+          "unassigned": "Nieprzypisane",
+          "former": "Były członek",
+          "client": "Klient"
+        },
+        "actions": {
+          "addStep": "Dodaj krok do ścieżki",
+          "addStream": "Dodaj ścieżkę",
+          "edit": "Edytuj",
+          "remove": "Usuń",
+          "removeStream": "Usuń ścieżkę",
+          "streamMenu": "Akcje dla: {stream}",
+          "markDone": "Oznacz „{name}” jako zrobiony",
+          "reopen": "Oznacz „{name}” jako niezrobiony",
+          "rowMenu": "Akcje dla: „{name}”"
+        },
+        "dialog": {
+          "addTitle": "Dodaj krok",
+          "editTitle": "Edytuj krok",
+          "name": "Nazwa kroku",
+          "stream": "Ścieżka",
+          "owner": "Odpowiedzialny",
+          "status": "Status",
+          "startsOn": "Data rozpoczęcia",
+          "dueOn": "Termin",
+          "add": "Dodaj krok",
+          "save": "Zapisz zmiany",
+          "cancel": "Anuluj"
+        },
+        "remove": {
+          "title": "Usuń krok",
+          "body": "Usunąć „{name}” z tej fali? Tej operacji nie można cofnąć.",
+          "confirm": "Usuń"
+        },
+        "removeStream": {
+          "title": "Usuń ścieżkę",
+          "body": "Usunąć {stream} i jej {count} krok z tej fali? Tej operacji nie można cofnąć. | Usunąć {stream} i jej {count} kroki z tej fali? Tej operacji nie można cofnąć.",
+          "confirm": "Usuń ścieżkę"
+        },
+        "empty": {
+          "filtered": "Żaden krok nie pasuje do tego filtra."
+        },
+        "removedByOther": "Ten krok został usunięty przez kogoś innego. Lista została wczytana ponownie.",
+        "validation": {
+          "nameRequired": "Wpisz nazwę kroku."
+        },
+        "errors": {
+          "loadFailed": "Nie udało się wczytać trackera.",
+          "retry": "Spróbuj ponownie",
+          "saveFailed": "Nie udało się zapisać zmiany. Spróbuj ponownie.",
+          "forbidden": "Twoja rola nie pozwala na tę zmianę.",
+          "ownerNotMember": "Odpowiedzialny musi być aktywnym członkiem tej agencji albo Klientem.",
+          "ownerConflict": "Krok ma jako odpowiedzialnego członka albo klienta, nie obu naraz.",
+          "strategyLocked": "Krok strategii można zmienić nazwę, ale nie można go usunąć ani przenieść.",
+          "dates_invalid": "Termin nie może być wcześniejszy niż data rozpoczęcia.",
+          "streamNotRemovable": "Ścieżki wideo UGC nie można usunąć: zależy od niej postęp na stronie marki.",
+          "brandArchived": "Ta marka jest zarchiwizowana. Przywróć ją, aby zmieniać jej fale."
+        }
       }
     },
     "brandFiles": {

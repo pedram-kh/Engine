@@ -1522,6 +1522,131 @@
         "createdBy": "Maħluq minn",
         "notFound": "Din il-mewġa ma nstabitx.",
         "linkLocked": "Imsakkar: ħallieq huwa magħżul jew aktar 'il quddiem f'din il-kampanja."
+      },
+      "tracker": {
+        "progress": {
+          "complete": "Tlesta"
+        },
+        "health": {
+          "onTrack": "Fuq l-pjan",
+          "atRisk": "Friskju · {count} fluss qed jieħu tard | Friskju · {count} flussi qed jieħdu tard"
+        },
+        "streams": {
+          "ugc_video": "Vidjo UGC",
+          "statics": "Statiċi",
+          "stills": "Stills"
+        },
+        "streamStatus": {
+          "on_track": "Fuq l-pjan",
+          "delayed": "Tard · jum {days} | Tard · {days} jiem",
+          "complete": "Tlesta"
+        },
+        "card": {
+          "steps": "{done} minn {total} passi",
+          "nextStep": "Il-pass li jmiss",
+          "finalDelivery": "Konsenja finali",
+          "noDate": "Ebda data",
+          "allDone": "Il-passi kollha lesti",
+          "noSteps": "Ebda passi"
+        },
+        "filter": {
+          "all": "Kollha",
+          "ugc": "UGC",
+          "statics": "Statiċi",
+          "stills": "Stills",
+          "mine": "Tiegħi"
+        },
+        "col": {
+          "step": "Pass",
+          "owner": "Responsabbli",
+          "due": "Skadenza",
+          "status": "Stat"
+        },
+        "status": {
+          "up_next": "Jmiss",
+          "in_progress": "Għaddej",
+          "due_today": "Tiskadi llum",
+          "delayed": "Tard",
+          "done": "Magħmul"
+        },
+        "stepStatus": {
+          "not_started": "Mhux mibdi",
+          "in_progress": "Għaddej",
+          "done": "Magħmul"
+        },
+        "steps": {
+          "title": "Passi tal-konsenja"
+        },
+        "group": {
+          "done": "{done} minn {total} magħmula"
+        },
+        "completed": {
+          "count": "{count} pass lest | {count} passi lesti",
+          "show": "Uri",
+          "hide": "Aħbi"
+        },
+        "due": {
+          "today": "Illum",
+          "tomorrow": "Għada"
+        },
+        "owner": {
+          "unassigned": "Mhux assenjat",
+          "former": "Eks membru",
+          "client": "Klijent"
+        },
+        "actions": {
+          "addStep": "Żid pass ma’ fluss",
+          "addStream": "Żid fluss",
+          "edit": "Editja",
+          "remove": "Neħħi",
+          "removeStream": "Neħħi l-fluss",
+          "streamMenu": "Azzjonijiet għal {stream}",
+          "markDone": "Immarka “{name}” bħala magħmul",
+          "reopen": "Immarka “{name}” bħala mhux magħmul",
+          "rowMenu": "Azzjonijiet għal “{name}”"
+        },
+        "dialog": {
+          "addTitle": "Żid pass",
+          "editTitle": "Editja l-pass",
+          "name": "Isem il-pass",
+          "stream": "Fluss",
+          "owner": "Responsabbli",
+          "status": "Stat",
+          "startsOn": "Data tal-bidu",
+          "dueOn": "Skadenza",
+          "add": "Żid pass",
+          "save": "Issejvja t-tibdiliet",
+          "cancel": "Ikkanċella"
+        },
+        "remove": {
+          "title": "Neħħi l-pass",
+          "body": "Tneħħi “{name}” minn din il-mewġa? Din ma tistax titreġġa’ lura.",
+          "confirm": "Neħħi"
+        },
+        "removeStream": {
+          "title": "Neħħi l-fluss",
+          "body": "Tneħħi {stream} u l-pass tiegħu ({count}) minn din il-mewġa? Din ma tistax titreġġa’ lura. | Tneħħi {stream} u l-{count} passi tiegħu minn din il-mewġa? Din ma tistax titreġġa’ lura.",
+          "confirm": "Neħħi l-fluss"
+        },
+        "empty": {
+          "filtered": "L-ebda pass ma jaqbel ma’ dan il-filtru."
+        },
+        "removedByOther": "Dan il-pass tneħħa minn xi ħadd ieħor. Il-lista ġiet imdaħħla mill-ġdid.",
+        "validation": {
+          "nameRequired": "Ikteb isem għall-pass."
+        },
+        "errors": {
+          "loadFailed": "It-tracker ma setax jitgħabba.",
+          "retry": "Erġa’ pprova",
+          "saveFailed": "It-tibdil ma setax jiġi ssejvjat. Erġa’ pprova.",
+          "forbidden": "Ir-rwol tiegħek ma jippermettilekx tagħmel dan it-tibdil.",
+          "ownerNotMember": "Ir-responsabbli jrid ikun membru attiv ta’ din l-aġenzija jew Klijent.",
+          "ownerConflict": "Pass għandu membru jew il-klijent bħala responsabbli, mhux it-tnejn.",
+          "strategyLocked": "Pass ta’ strateġija jista’ jiġi rinominat, imma mhux imneħħi jew imċaqlaq.",
+          "dates_invalid": "L-iskadenza ma tistax tkun qabel id-data tal-bidu.",
+          "streamNotRemovable": "Il-fluss tal-vidjo UGC ma jistax jitneħħa: il-progress fil-paġna tal-marka jiddependi minnu.",
+          "brandArchived": "Din il-marka hija arkivjata. Irrestawraha biex tbiddel il-mewġ tagħha."
+        }
       }
     },
     "brandFiles": {

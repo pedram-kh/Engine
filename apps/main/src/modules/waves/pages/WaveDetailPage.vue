@@ -8,7 +8,7 @@
  * the not-found state, since the server answers 404 for both.
  */
 import { formatDateTime, labelForCountryCode } from '@catalyst/api-client'
-import type { WaveResource } from '@catalyst/api-client'
+import type { WaveResource, WaveTrackerResource } from '@catalyst/api-client'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -20,6 +20,7 @@ import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { wavesApi } from '../api/waves.api'
 import NewWaveDialog from '../components/NewWaveDialog.vue'
 import WaveProgressSegments from '../components/WaveProgressSegments.vue'
+import WaveTrackerSection from '../components/WaveTrackerSection.vue'
 
 const { t, locale } = useI18n()
 const route = useRoute()
@@ -39,6 +40,12 @@ const wave = ref<WaveResource | null>(null)
 const loading = ref(true)
 const failed = ref(false)
 const editOpen = ref(false)
+const tracker = ref<WaveTrackerResource | null>(null)
+
+const health = computed(() => tracker.value?.attributes.health ?? null)
+const progress = computed(
+  () => tracker.value?.attributes.progress ?? wave.value?.attributes.progress ?? null,
+)
 
 async function load(): Promise<void> {
   const agencyId = agencyStore.currentAgencyId
@@ -64,7 +71,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="agency-page agency-page--snug" data-test="wave-detail-page">
+  <div class="agency-page agency-page--snug wave-detail" data-test="wave-detail-page">
     <AgencyPageHeader
       :title="wave?.attributes.name ?? t('app.waves.detail.title')"
       title-test="wave-detail-heading"
@@ -81,6 +88,20 @@ onMounted(async () => {
       </template>
       <template v-if="wave" #title-suffix>
         <AgencyStatusPill kind="wave" :status="wave.attributes.status" data-test="wave-status" />
+        <AgencyStatusPill
+          v-if="health"
+          :tone="health.status === 'at_risk' ? 'danger' : 'success'"
+          :label="
+            health.status === 'at_risk'
+              ? t(
+                  'app.waves.tracker.health.atRisk',
+                  { count: health.delayed_streams },
+                  health.delayed_streams,
+                )
+              : t('app.waves.tracker.health.onTrack')
+          "
+          data-test="wave-health"
+        />
       </template>
       <template v-if="wave && canManage" #actions>
         <v-btn variant="outlined" data-test="wave-edit-btn" @click="editOpen = true">
@@ -116,7 +137,7 @@ onMounted(async () => {
         </div>
         <div class="agency-field" data-test="wave-field-progress">
           <dt class="agency-field__label">{{ t('app.waves.table.progress') }}</dt>
-          <dd class="agency-field__value"><WaveProgressSegments /></dd>
+          <dd class="agency-field__value"><WaveProgressSegments :progress="progress" /></dd>
         </div>
       </dl>
 
@@ -172,6 +193,16 @@ onMounted(async () => {
       </dl>
     </section>
 
+    <WaveTrackerSection
+      v-if="wave && agencyStore.currentAgencyId"
+      :agency-id="agencyStore.currentAgencyId"
+      :brand-id="brandUlid"
+      :wave-id="waveUlid"
+      :can-manage="canManage"
+      :me-ulid="authStore.user?.id ?? null"
+      @tracker="(value: WaveTrackerResource | null) => (tracker = value)"
+    />
+
     <NewWaveDialog
       v-if="wave && agencyStore.currentAgencyId"
       v-model="editOpen"
@@ -183,3 +214,25 @@ onMounted(async () => {
     />
   </div>
 </template>
+
+<style scoped>
+/*
+ * No design exists below 1280 px (plan 4.3), and the frozen agency theme has no narrow rule for these two blocks. On
+ * a phone the title, its two pills and Edit cannot share one line, and three field columns leave the Progress column
+ * running out of the card. Both are fixed here, in this page's own style, so the frozen theme is untouched.
+ */
+@media (max-width: 767px) {
+  .wave-detail :deep(.agency-page-header) {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .wave-detail :deep(.agency-page-header__heading) {
+    flex-wrap: wrap;
+  }
+
+  .wave-detail :deep(.agency-fields) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+</style>

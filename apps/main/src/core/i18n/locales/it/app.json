@@ -1522,6 +1522,131 @@
         "createdBy": "Creata da",
         "notFound": "Questa ondata non è stata trovata.",
         "linkLocked": "Bloccato: un creator è selezionato o oltre in questa campagna."
+      },
+      "tracker": {
+        "progress": {
+          "complete": "Completato"
+        },
+        "health": {
+          "onTrack": "In linea",
+          "atRisk": "A rischio · {count} flusso in ritardo | A rischio · {count} flussi in ritardo"
+        },
+        "streams": {
+          "ugc_video": "Video UGC",
+          "statics": "Statici",
+          "stills": "Foto"
+        },
+        "streamStatus": {
+          "on_track": "In linea",
+          "delayed": "In ritardo · {days} giorno | In ritardo · {days} giorni",
+          "complete": "Completato"
+        },
+        "card": {
+          "steps": "{done} di {total} passaggi",
+          "nextStep": "Prossimo passaggio",
+          "finalDelivery": "Consegna finale",
+          "noDate": "Nessuna data",
+          "allDone": "Tutti i passaggi completati",
+          "noSteps": "Nessun passaggio"
+        },
+        "filter": {
+          "all": "Tutti",
+          "ugc": "UGC",
+          "statics": "Statici",
+          "stills": "Foto",
+          "mine": "Miei"
+        },
+        "col": {
+          "step": "Passaggio",
+          "owner": "Responsabile",
+          "due": "Scadenza",
+          "status": "Stato"
+        },
+        "status": {
+          "up_next": "Prossimo",
+          "in_progress": "In corso",
+          "due_today": "Scade oggi",
+          "delayed": "In ritardo",
+          "done": "Fatto"
+        },
+        "stepStatus": {
+          "not_started": "Non iniziato",
+          "in_progress": "In corso",
+          "done": "Fatto"
+        },
+        "steps": {
+          "title": "Passaggi di consegna"
+        },
+        "group": {
+          "done": "{done} di {total} fatti"
+        },
+        "completed": {
+          "count": "{count} passaggio completato | {count} passaggi completati",
+          "show": "Mostra",
+          "hide": "Nascondi"
+        },
+        "due": {
+          "today": "Oggi",
+          "tomorrow": "Domani"
+        },
+        "owner": {
+          "unassigned": "Non assegnato",
+          "former": "Ex membro",
+          "client": "Cliente"
+        },
+        "actions": {
+          "addStep": "Aggiungi un passaggio a un flusso",
+          "addStream": "Aggiungi flusso",
+          "edit": "Modifica",
+          "remove": "Rimuovi",
+          "removeStream": "Rimuovi flusso",
+          "streamMenu": "Azioni per {stream}",
+          "markDone": "Segna «{name}» come fatto",
+          "reopen": "Segna «{name}» come non fatto",
+          "rowMenu": "Azioni per «{name}»"
+        },
+        "dialog": {
+          "addTitle": "Aggiungi passaggio",
+          "editTitle": "Modifica passaggio",
+          "name": "Nome del passaggio",
+          "stream": "Flusso",
+          "owner": "Responsabile",
+          "status": "Stato",
+          "startsOn": "Data di inizio",
+          "dueOn": "Data di scadenza",
+          "add": "Aggiungi passaggio",
+          "save": "Salva modifiche",
+          "cancel": "Annulla"
+        },
+        "remove": {
+          "title": "Rimuovi passaggio",
+          "body": "Rimuovere «{name}» da questa ondata? L’azione non si può annullare.",
+          "confirm": "Rimuovi"
+        },
+        "removeStream": {
+          "title": "Rimuovi flusso",
+          "body": "Rimuovere {stream} e il suo {count} passaggio da questa ondata? L’azione non si può annullare. | Rimuovere {stream} e i suoi {count} passaggi da questa ondata? L’azione non si può annullare.",
+          "confirm": "Rimuovi flusso"
+        },
+        "empty": {
+          "filtered": "Nessun passaggio corrisponde a questo filtro."
+        },
+        "removedByOther": "Questo passaggio è stato rimosso da un’altra persona. L’elenco è stato ricaricato.",
+        "validation": {
+          "nameRequired": "Inserisci un nome per il passaggio."
+        },
+        "errors": {
+          "loadFailed": "Impossibile caricare il tracker.",
+          "retry": "Riprova",
+          "saveFailed": "Impossibile salvare la modifica. Riprova.",
+          "forbidden": "Il tuo ruolo non può effettuare questa modifica.",
+          "ownerNotMember": "Il responsabile deve essere un membro attivo di questa agenzia, oppure Cliente.",
+          "ownerConflict": "Un passaggio ha un membro o il cliente come responsabile, non entrambi.",
+          "strategyLocked": "Un passaggio di strategia può essere rinominato, ma non rimosso né spostato.",
+          "dates_invalid": "La scadenza non può precedere la data di inizio.",
+          "streamNotRemovable": "Il flusso video UGC non può essere rimosso: da esso dipende l’avanzamento nella pagina del brand.",
+          "brandArchived": "Questo brand è archiviato. Ripristinalo per modificarne le ondate."
+        }
       }
     },
     "brandFiles": {

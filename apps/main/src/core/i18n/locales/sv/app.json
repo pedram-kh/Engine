@@ -1522,6 +1522,131 @@
         "createdBy": "Skapad av",
         "notFound": "Den här vågen hittades inte.",
         "linkLocked": "Låst: en skapare är vald eller längre fram i den här kampanjen."
+      },
+      "tracker": {
+        "progress": {
+          "complete": "Klart"
+        },
+        "health": {
+          "onTrack": "I tid",
+          "atRisk": "Risk · {count} spår försenat | Risk · {count} spår försenade"
+        },
+        "streams": {
+          "ugc_video": "UGC-video",
+          "statics": "Statiska",
+          "stills": "Stillbilder"
+        },
+        "streamStatus": {
+          "on_track": "I tid",
+          "delayed": "Försenat · {days} dag | Försenat · {days} dagar",
+          "complete": "Klart"
+        },
+        "card": {
+          "steps": "{done} av {total} steg",
+          "nextStep": "Nästa steg",
+          "finalDelivery": "Slutleverans",
+          "noDate": "Inget datum",
+          "allDone": "Alla steg klara",
+          "noSteps": "Inga steg"
+        },
+        "filter": {
+          "all": "Alla",
+          "ugc": "UGC",
+          "statics": "Statiska",
+          "stills": "Stillbilder",
+          "mine": "Mina"
+        },
+        "col": {
+          "step": "Steg",
+          "owner": "Ansvarig",
+          "due": "Förfaller",
+          "status": "Status"
+        },
+        "status": {
+          "up_next": "Nästa",
+          "in_progress": "Pågår",
+          "due_today": "Förfaller i dag",
+          "delayed": "Försenat",
+          "done": "Klart"
+        },
+        "stepStatus": {
+          "not_started": "Ej påbörjat",
+          "in_progress": "Pågår",
+          "done": "Klart"
+        },
+        "steps": {
+          "title": "Leveranssteg"
+        },
+        "group": {
+          "done": "{done} av {total} klara"
+        },
+        "completed": {
+          "count": "{count} klart steg | {count} klara steg",
+          "show": "Visa",
+          "hide": "Dölj"
+        },
+        "due": {
+          "today": "I dag",
+          "tomorrow": "I morgon"
+        },
+        "owner": {
+          "unassigned": "Ej tilldelad",
+          "former": "Tidigare medlem",
+          "client": "Kund"
+        },
+        "actions": {
+          "addStep": "Lägg till steg i ett spår",
+          "addStream": "Lägg till spår",
+          "edit": "Redigera",
+          "remove": "Ta bort",
+          "removeStream": "Ta bort spår",
+          "streamMenu": "Åtgärder för {stream}",
+          "markDone": "Markera “{name}” som klart",
+          "reopen": "Markera “{name}” som ej klart",
+          "rowMenu": "Åtgärder för “{name}”"
+        },
+        "dialog": {
+          "addTitle": "Lägg till steg",
+          "editTitle": "Redigera steg",
+          "name": "Stegets namn",
+          "stream": "Spår",
+          "owner": "Ansvarig",
+          "status": "Status",
+          "startsOn": "Startdatum",
+          "dueOn": "Förfallodatum",
+          "add": "Lägg till steg",
+          "save": "Spara ändringar",
+          "cancel": "Avbryt"
+        },
+        "remove": {
+          "title": "Ta bort steg",
+          "body": "Ta bort “{name}” från den här vågen? Det går inte att ångra.",
+          "confirm": "Ta bort"
+        },
+        "removeStream": {
+          "title": "Ta bort spår",
+          "body": "Ta bort {stream} och dess {count} steg från den här vågen? Det går inte att ångra. | Ta bort {stream} och dess {count} steg från den här vågen? Det går inte att ångra.",
+          "confirm": "Ta bort spår"
+        },
+        "empty": {
+          "filtered": "Inga steg matchar filtret."
+        },
+        "removedByOther": "Det här steget togs bort av någon annan. Listan har lästs in igen.",
+        "validation": {
+          "nameRequired": "Ange ett namn på steget."
+        },
+        "errors": {
+          "loadFailed": "Spåraren kunde inte läsas in.",
+          "retry": "Försök igen",
+          "saveFailed": "Ändringen kunde inte sparas. Försök igen.",
+          "forbidden": "Din roll får inte göra den här ändringen.",
+          "ownerNotMember": "Den ansvariga måste vara en aktiv medlem i byrån, eller Kund.",
+          "ownerConflict": "Ett steg har antingen en medlem eller kunden som ansvarig, inte båda.",
+          "strategyLocked": "Ett strategisteg kan byta namn, men inte tas bort eller flyttas.",
+          "dates_invalid": "Förfallodatumet kan inte ligga före startdatumet.",
+          "streamNotRemovable": "UGC-videospåret kan inte tas bort: förloppet på varumärkessidan beror på det.",
+          "brandArchived": "Det här varumärket är arkiverat. Återställ det för att ändra dess vågor."
+        }
       }
     },
     "brandFiles": {

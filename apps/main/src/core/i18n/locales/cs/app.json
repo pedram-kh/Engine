@@ -1522,6 +1522,131 @@
         "createdBy": "Vytvořil(a)",
         "notFound": "Tato vlna nebyla nalezena.",
         "linkLocked": "Uzamčeno: tvůrce je na této kampani vybrán nebo dál."
+      },
+      "tracker": {
+        "progress": {
+          "complete": "Dokončeno"
+        },
+        "health": {
+          "onTrack": "V plánu",
+          "atRisk": "Ohroženo · {count} větev se zpožďuje | Ohroženo · {count} větve se zpožďují"
+        },
+        "streams": {
+          "ugc_video": "UGC video",
+          "statics": "Statické",
+          "stills": "Fotky"
+        },
+        "streamStatus": {
+          "on_track": "V plánu",
+          "delayed": "Zpoždění · {days} den | Zpoždění · {days} dnů",
+          "complete": "Dokončeno"
+        },
+        "card": {
+          "steps": "{done} z {total} kroků",
+          "nextStep": "Další krok",
+          "finalDelivery": "Konečné předání",
+          "noDate": "Bez data",
+          "allDone": "Všechny kroky hotovy",
+          "noSteps": "Žádné kroky"
+        },
+        "filter": {
+          "all": "Vše",
+          "ugc": "UGC",
+          "statics": "Statické",
+          "stills": "Fotky",
+          "mine": "Moje"
+        },
+        "col": {
+          "step": "Krok",
+          "owner": "Odpovědná osoba",
+          "due": "Termín",
+          "status": "Stav"
+        },
+        "status": {
+          "up_next": "Další",
+          "in_progress": "Probíhá",
+          "due_today": "Termín dnes",
+          "delayed": "Zpožděno",
+          "done": "Hotovo"
+        },
+        "stepStatus": {
+          "not_started": "Nezahájeno",
+          "in_progress": "Probíhá",
+          "done": "Hotovo"
+        },
+        "steps": {
+          "title": "Kroky předání"
+        },
+        "group": {
+          "done": "{done} z {total} hotovo"
+        },
+        "completed": {
+          "count": "{count} dokončený krok | {count} dokončené kroky",
+          "show": "Zobrazit",
+          "hide": "Skrýt"
+        },
+        "due": {
+          "today": "Dnes",
+          "tomorrow": "Zítra"
+        },
+        "owner": {
+          "unassigned": "Nepřiřazeno",
+          "former": "Bývalý člen",
+          "client": "Klient"
+        },
+        "actions": {
+          "addStep": "Přidat krok do větve",
+          "addStream": "Přidat větev",
+          "edit": "Upravit",
+          "remove": "Odebrat",
+          "removeStream": "Odebrat větev",
+          "streamMenu": "Akce pro {stream}",
+          "markDone": "Označit „{name}“ jako hotový",
+          "reopen": "Označit „{name}“ jako nehotový",
+          "rowMenu": "Akce pro „{name}“"
+        },
+        "dialog": {
+          "addTitle": "Přidat krok",
+          "editTitle": "Upravit krok",
+          "name": "Název kroku",
+          "stream": "Větev",
+          "owner": "Odpovědná osoba",
+          "status": "Stav",
+          "startsOn": "Datum zahájení",
+          "dueOn": "Termín",
+          "add": "Přidat krok",
+          "save": "Uložit změny",
+          "cancel": "Zrušit"
+        },
+        "remove": {
+          "title": "Odebrat krok",
+          "body": "Odebrat „{name}“ z této vlny? Nelze vrátit zpět.",
+          "confirm": "Odebrat"
+        },
+        "removeStream": {
+          "title": "Odebrat větev",
+          "body": "Odebrat {stream} a její {count} krok z této vlny? Nelze vrátit zpět. | Odebrat {stream} a její {count} kroky z této vlny? Nelze vrátit zpět.",
+          "confirm": "Odebrat větev"
+        },
+        "empty": {
+          "filtered": "Tomuto filtru neodpovídá žádný krok."
+        },
+        "removedByOther": "Tento krok odebral někdo jiný. Seznam byl znovu načten.",
+        "validation": {
+          "nameRequired": "Zadejte název kroku."
+        },
+        "errors": {
+          "loadFailed": "Sledování se nepodařilo načíst.",
+          "retry": "Zkusit znovu",
+          "saveFailed": "Změnu se nepodařilo uložit. Zkuste to znovu.",
+          "forbidden": "Vaše role tuto změnu nedovoluje.",
+          "ownerNotMember": "Odpovědnou osobou musí být aktivní člen této agentury nebo Klient.",
+          "ownerConflict": "Krok má odpovědného člena nebo klienta, ne oba.",
+          "strategyLocked": "Strategický krok lze přejmenovat, ale ne odebrat ani přesunout.",
+          "dates_invalid": "Termín nemůže být před datem zahájení.",
+          "streamNotRemovable": "Větev UGC videa nelze odebrat: závisí na ní postup na stránce značky.",
+          "brandArchived": "Tato značka je archivována. Obnovte ji, abyste mohli měnit její vlny."
+        }
       }
     },
     "brandFiles": {

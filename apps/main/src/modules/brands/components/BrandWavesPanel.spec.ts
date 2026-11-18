@@ -60,6 +60,30 @@ describe('BrandWavesPanel (PL-1.1 W2)', () => {
     w.unmount()
   })
 
+  it('PL-1.3 W6: the row bar is the server object (segments and the first step not done)', async () => {
+    list([
+      makeWave({
+        progress: {
+          segments: ['done', 'in_progress', 'empty', 'empty', 'empty', 'empty'],
+          label_kind: 'step',
+          step_name: 'Personas',
+        },
+      }),
+    ])
+    const w = await mountWithApp(BrandWavesPanel, props(true), { route })
+    await flushPromises()
+    const row = w.get(`[data-test="wave-row-${WAVE_ULID}"]`)
+    expect(row.findAll('.wave-progress__segment').map((s) => s.attributes('data-state'))).toEqual([
+      'done',
+      'in_progress',
+      'empty',
+      'empty',
+      'empty',
+      'empty',
+    ])
+    expect(row.get('[data-test="wave-progress-label"]').text()).toBe('Personas')
+  })
+
   it('shows the loading state, then the empty state', async () => {
     let resolve: (v: never) => void = () => undefined
     vi.mocked(wavesApi.list).mockReturnValue(new Promise((r) => (resolve = r as never)))

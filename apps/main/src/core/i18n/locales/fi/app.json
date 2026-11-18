@@ -1522,6 +1522,131 @@
         "createdBy": "Luonut",
         "notFound": "Tätä aaltoa ei löytynyt.",
         "linkLocked": "Lukittu: tekijä on valittu tai pidemmällä tässä kampanjassa."
+      },
+      "tracker": {
+        "progress": {
+          "complete": "Valmis"
+        },
+        "health": {
+          "onTrack": "Aikataulussa",
+          "atRisk": "Riskissä · {count} kanava myöhässä | Riskissä · {count} kanavaa myöhässä"
+        },
+        "streams": {
+          "ugc_video": "UGC-video",
+          "statics": "Staattiset",
+          "stills": "Still-kuvat"
+        },
+        "streamStatus": {
+          "on_track": "Aikataulussa",
+          "delayed": "Myöhässä · {days} päivä | Myöhässä · {days} päivää",
+          "complete": "Valmis"
+        },
+        "card": {
+          "steps": "{done} / {total} vaihetta",
+          "nextStep": "Seuraava vaihe",
+          "finalDelivery": "Lopullinen toimitus",
+          "noDate": "Ei päivää",
+          "allDone": "Kaikki vaiheet valmiit",
+          "noSteps": "Ei vaiheita"
+        },
+        "filter": {
+          "all": "Kaikki",
+          "ugc": "UGC",
+          "statics": "Staattiset",
+          "stills": "Still-kuvat",
+          "mine": "Omat"
+        },
+        "col": {
+          "step": "Vaihe",
+          "owner": "Vastuuhenkilö",
+          "due": "Määräaika",
+          "status": "Tila"
+        },
+        "status": {
+          "up_next": "Seuraavaksi",
+          "in_progress": "Käynnissä",
+          "due_today": "Erääntyy tänään",
+          "delayed": "Myöhässä",
+          "done": "Valmis"
+        },
+        "stepStatus": {
+          "not_started": "Ei aloitettu",
+          "in_progress": "Käynnissä",
+          "done": "Valmis"
+        },
+        "steps": {
+          "title": "Toimitusvaiheet"
+        },
+        "group": {
+          "done": "{done} / {total} valmiina"
+        },
+        "completed": {
+          "count": "{count} valmis vaihe | {count} valmista vaihetta",
+          "show": "Näytä",
+          "hide": "Piilota"
+        },
+        "due": {
+          "today": "Tänään",
+          "tomorrow": "Huomenna"
+        },
+        "owner": {
+          "unassigned": "Ei vastuuhenkilöä",
+          "former": "Entinen jäsen",
+          "client": "Asiakas"
+        },
+        "actions": {
+          "addStep": "Lisää vaihe kanavaan",
+          "addStream": "Lisää kanava",
+          "edit": "Muokkaa",
+          "remove": "Poista",
+          "removeStream": "Poista kanava",
+          "streamMenu": "Toiminnot: {stream}",
+          "markDone": "Merkitse ”{name}” valmiiksi",
+          "reopen": "Merkitse ”{name}” keskeneräiseksi",
+          "rowMenu": "Toiminnot: ”{name}”"
+        },
+        "dialog": {
+          "addTitle": "Lisää vaihe",
+          "editTitle": "Muokkaa vaihetta",
+          "name": "Vaiheen nimi",
+          "stream": "Kanava",
+          "owner": "Vastuuhenkilö",
+          "status": "Tila",
+          "startsOn": "Alkamispäivä",
+          "dueOn": "Määräaika",
+          "add": "Lisää vaihe",
+          "save": "Tallenna muutokset",
+          "cancel": "Peruuta"
+        },
+        "remove": {
+          "title": "Poista vaihe",
+          "body": "Poistetaanko ”{name}” tästä aallosta? Tätä ei voi perua.",
+          "confirm": "Poista"
+        },
+        "removeStream": {
+          "title": "Poista kanava",
+          "body": "Poistetaanko {stream} ja sen {count} vaihe tästä aallosta? Tätä ei voi perua. | Poistetaanko {stream} ja sen {count} vaihetta tästä aallosta? Tätä ei voi perua.",
+          "confirm": "Poista kanava"
+        },
+        "empty": {
+          "filtered": "Mikään vaihe ei vastaa suodatinta."
+        },
+        "removedByOther": "Joku muu poisti tämän vaiheen. Luettelo ladattiin uudelleen.",
+        "validation": {
+          "nameRequired": "Anna vaiheen nimi."
+        },
+        "errors": {
+          "loadFailed": "Seurantaa ei voitu ladata.",
+          "retry": "Yritä uudelleen",
+          "saveFailed": "Muutosta ei voitu tallentaa. Yritä uudelleen.",
+          "forbidden": "Roolisi ei salli tätä muutosta.",
+          "ownerNotMember": "Vastuuhenkilön on oltava tämän toimiston aktiivinen jäsen tai Asiakas.",
+          "ownerConflict": "Vaiheella on vastuuhenkilönä joko jäsen tai asiakas, ei molempia.",
+          "strategyLocked": "Strategiavaiheen voi nimetä uudelleen, mutta ei poistaa tai siirtää.",
+          "dates_invalid": "Määräaika ei voi olla ennen alkamispäivää.",
+          "streamNotRemovable": "UGC-videokanavaa ei voi poistaa: brändisivun eteneminen riippuu siitä.",
+          "brandArchived": "Tämä brändi on arkistoitu. Palauta se muokataksesi sen aaltoja."
+        }
       }
     },
     "brandFiles": {

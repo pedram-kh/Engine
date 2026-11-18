@@ -1522,6 +1522,131 @@
         "createdBy": "Oprettet af",
         "notFound": "Denne bølge blev ikke fundet.",
         "linkLocked": "Låst: en creator er valgt eller videre på denne kampagne."
+      },
+      "tracker": {
+        "progress": {
+          "complete": "Fuldført"
+        },
+        "health": {
+          "onTrack": "På sporet",
+          "atRisk": "I fare · {count} spor forsinket | I fare · {count} spor forsinket"
+        },
+        "streams": {
+          "ugc_video": "UGC-video",
+          "statics": "Statiske",
+          "stills": "Stills"
+        },
+        "streamStatus": {
+          "on_track": "På sporet",
+          "delayed": "Forsinket · {days} dag | Forsinket · {days} dage",
+          "complete": "Fuldført"
+        },
+        "card": {
+          "steps": "{done} af {total} trin",
+          "nextStep": "Næste trin",
+          "finalDelivery": "Endelig levering",
+          "noDate": "Ingen dato",
+          "allDone": "Alle trin udført",
+          "noSteps": "Ingen trin"
+        },
+        "filter": {
+          "all": "Alle",
+          "ugc": "UGC",
+          "statics": "Statiske",
+          "stills": "Stills",
+          "mine": "Mine"
+        },
+        "col": {
+          "step": "Trin",
+          "owner": "Ansvarlig",
+          "due": "Frist",
+          "status": "Status"
+        },
+        "status": {
+          "up_next": "Næste",
+          "in_progress": "I gang",
+          "due_today": "Forfalder i dag",
+          "delayed": "Forsinket",
+          "done": "Udført"
+        },
+        "stepStatus": {
+          "not_started": "Ikke startet",
+          "in_progress": "I gang",
+          "done": "Udført"
+        },
+        "steps": {
+          "title": "Leveringstrin"
+        },
+        "group": {
+          "done": "{done} af {total} udført"
+        },
+        "completed": {
+          "count": "{count} fuldført trin | {count} fuldførte trin",
+          "show": "Vis",
+          "hide": "Skjul"
+        },
+        "due": {
+          "today": "I dag",
+          "tomorrow": "I morgen"
+        },
+        "owner": {
+          "unassigned": "Ikke tildelt",
+          "former": "Tidligere medlem",
+          "client": "Kunde"
+        },
+        "actions": {
+          "addStep": "Tilføj trin til et spor",
+          "addStream": "Tilføj spor",
+          "edit": "Rediger",
+          "remove": "Fjern",
+          "removeStream": "Fjern spor",
+          "streamMenu": "Handlinger for {stream}",
+          "markDone": "Markér “{name}” som udført",
+          "reopen": "Markér “{name}” som ikke udført",
+          "rowMenu": "Handlinger for “{name}”"
+        },
+        "dialog": {
+          "addTitle": "Tilføj trin",
+          "editTitle": "Rediger trin",
+          "name": "Trinnets navn",
+          "stream": "Spor",
+          "owner": "Ansvarlig",
+          "status": "Status",
+          "startsOn": "Startdato",
+          "dueOn": "Frist",
+          "add": "Tilføj trin",
+          "save": "Gem ændringer",
+          "cancel": "Annuller"
+        },
+        "remove": {
+          "title": "Fjern trin",
+          "body": "Fjern “{name}” fra denne bølge? Det kan ikke fortrydes.",
+          "confirm": "Fjern"
+        },
+        "removeStream": {
+          "title": "Fjern spor",
+          "body": "Fjern {stream} og dets {count} trin fra denne bølge? Det kan ikke fortrydes. | Fjern {stream} og dets {count} trin fra denne bølge? Det kan ikke fortrydes.",
+          "confirm": "Fjern spor"
+        },
+        "empty": {
+          "filtered": "Ingen trin passer til dette filter."
+        },
+        "removedByOther": "Dette trin blev fjernet af en anden. Listen er indlæst igen.",
+        "validation": {
+          "nameRequired": "Skriv et navn til trinnet."
+        },
+        "errors": {
+          "loadFailed": "Trackeren kunne ikke indlæses.",
+          "retry": "Prøv igen",
+          "saveFailed": "Ændringen kunne ikke gemmes. Prøv igen.",
+          "forbidden": "Din rolle kan ikke foretage denne ændring.",
+          "ownerNotMember": "Den ansvarlige skal være et aktivt medlem af dette bureau eller Kunde.",
+          "ownerConflict": "Et trin har et medlem eller kunden som ansvarlig, ikke begge.",
+          "strategyLocked": "Et strategitrin kan omdøbes, men ikke fjernes eller flyttes.",
+          "dates_invalid": "Fristen kan ikke ligge før startdatoen.",
+          "streamNotRemovable": "UGC-videosporet kan ikke fjernes: Fremdriften på brandsiden afhænger af det.",
+          "brandArchived": "Dette brand er arkiveret. Gendan det for at ændre dets bølger."
+        }
       }
     },
     "brandFiles": {

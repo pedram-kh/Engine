@@ -36,6 +36,7 @@ import type {
   PostedContentVerificationStatus,
   RosterRelationshipStatus,
   WaveStatus,
+  WaveStepDisplayStatus,
 } from '@catalyst/api-client'
 
 export type AgencyStatusTone = 'success' | 'info' | 'warning' | 'danger' | 'neutral' | 'ai'
@@ -127,6 +128,14 @@ export const AGENCY_STATUS_TONES = {
   wave: entries<WaveStatus>('app.waves.status', {
     draft: 'neutral',
   }),
+  // PL-1.3: the five words a tracker step can show (derived on the server from status and due date).
+  wave_step: entries<WaveStepDisplayStatus>('app.waves.tracker.status', {
+    up_next: 'neutral',
+    in_progress: 'info',
+    due_today: 'warning',
+    delayed: 'danger',
+    done: 'success',
+  }),
   invitation: entries<AgencyInvitationStatus>('app.agencyUsers.invitations.status', {
     pending: 'warning',
     accepted: 'success',
@@ -157,6 +166,7 @@ export const AGENCY_STATUS_SOURCES: Readonly<
   discovery: { type: 'DiscoveryConnectionState', file: 'types/agency.ts' },
   brand: { type: 'BrandStatus', file: 'types/agency.ts' },
   wave: { type: 'WaveStatus', file: 'types/wave.ts' },
+  wave_step: { type: 'WaveStepDisplayStatus', file: 'types/wave.ts' },
   invitation: { type: 'AgencyInvitationStatus', file: 'types/agency.ts' },
   membership: { type: 'AgencyMembershipStatus', file: 'types/agency.ts' },
 }

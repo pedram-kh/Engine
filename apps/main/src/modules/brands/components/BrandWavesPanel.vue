@@ -136,7 +136,7 @@ defineExpose({ load })
                 +{{ marketsLabel(w).more }}
               </span>
             </td>
-            <td><WaveProgressSegments /></td>
+            <td><WaveProgressSegments :progress="w.attributes.progress" /></td>
             <td><AgencyStatusPill kind="wave" :status="w.attributes.status" /></td>
             <td>{{ formatDateTime(w.attributes.updated_at, locale, { dateStyle: 'medium' }) }}</td>
           </tr>

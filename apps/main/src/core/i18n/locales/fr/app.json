@@ -1522,6 +1522,131 @@
         "createdBy": "Créée par",
         "notFound": "Cette vague est introuvable.",
         "linkLocked": "Verrouillé : un créateur est sélectionné ou plus avancé sur cette campagne."
+      },
+      "tracker": {
+        "progress": {
+          "complete": "Terminé"
+        },
+        "health": {
+          "onTrack": "Dans les temps",
+          "atRisk": "À risque · {count} flux en retard | À risque · {count} flux en retard"
+        },
+        "streams": {
+          "ugc_video": "Vidéo UGC",
+          "statics": "Visuels statiques",
+          "stills": "Photos"
+        },
+        "streamStatus": {
+          "on_track": "Dans les temps",
+          "delayed": "En retard · {days} jour | En retard · {days} jours",
+          "complete": "Terminé"
+        },
+        "card": {
+          "steps": "{done} sur {total} étapes",
+          "nextStep": "Prochaine étape",
+          "finalDelivery": "Livraison finale",
+          "noDate": "Pas de date",
+          "allDone": "Toutes les étapes terminées",
+          "noSteps": "Aucune étape"
+        },
+        "filter": {
+          "all": "Toutes",
+          "ugc": "UGC",
+          "statics": "Visuels statiques",
+          "stills": "Photos",
+          "mine": "Les miennes"
+        },
+        "col": {
+          "step": "Étape",
+          "owner": "Responsable",
+          "due": "Échéance",
+          "status": "Statut"
+        },
+        "status": {
+          "up_next": "À venir",
+          "in_progress": "En cours",
+          "due_today": "Échéance aujourd’hui",
+          "delayed": "En retard",
+          "done": "Terminée"
+        },
+        "stepStatus": {
+          "not_started": "Non commencée",
+          "in_progress": "En cours",
+          "done": "Terminée"
+        },
+        "steps": {
+          "title": "Étapes de livraison"
+        },
+        "group": {
+          "done": "{done} sur {total} terminées"
+        },
+        "completed": {
+          "count": "{count} étape terminée | {count} étapes terminées",
+          "show": "Afficher",
+          "hide": "Masquer"
+        },
+        "due": {
+          "today": "Aujourd’hui",
+          "tomorrow": "Demain"
+        },
+        "owner": {
+          "unassigned": "Non assignée",
+          "former": "Ancien membre",
+          "client": "Client"
+        },
+        "actions": {
+          "addStep": "Ajouter une étape à un flux",
+          "addStream": "Ajouter un flux",
+          "edit": "Modifier",
+          "remove": "Supprimer",
+          "removeStream": "Supprimer le flux",
+          "streamMenu": "Actions pour {stream}",
+          "markDone": "Marquer « {name} » comme terminée",
+          "reopen": "Marquer « {name} » comme non terminée",
+          "rowMenu": "Actions pour « {name} »"
+        },
+        "dialog": {
+          "addTitle": "Ajouter une étape",
+          "editTitle": "Modifier l’étape",
+          "name": "Nom de l’étape",
+          "stream": "Flux",
+          "owner": "Responsable",
+          "status": "Statut",
+          "startsOn": "Date de début",
+          "dueOn": "Date d’échéance",
+          "add": "Ajouter l’étape",
+          "save": "Enregistrer les modifications",
+          "cancel": "Annuler"
+        },
+        "remove": {
+          "title": "Supprimer l’étape",
+          "body": "Supprimer « {name} » de cette vague ? Cette action est irréversible.",
+          "confirm": "Supprimer"
+        },
+        "removeStream": {
+          "title": "Supprimer le flux",
+          "body": "Supprimer {stream} et son étape ({count}) de cette vague ? Cette action est irréversible. | Supprimer {stream} et ses {count} étapes de cette vague ? Cette action est irréversible.",
+          "confirm": "Supprimer le flux"
+        },
+        "empty": {
+          "filtered": "Aucune étape ne correspond à ce filtre."
+        },
+        "removedByOther": "Cette étape a été supprimée par quelqu’un d’autre. La liste a été rechargée.",
+        "validation": {
+          "nameRequired": "Saisissez un nom d’étape."
+        },
+        "errors": {
+          "loadFailed": "Le suivi n’a pas pu être chargé.",
+          "retry": "Réessayer",
+          "saveFailed": "La modification n’a pas pu être enregistrée. Réessayez.",
+          "forbidden": "Votre rôle ne permet pas cette modification.",
+          "ownerNotMember": "Le responsable doit être un membre actif de cette agence, ou Client.",
+          "ownerConflict": "Une étape a un membre ou le client comme responsable, pas les deux.",
+          "strategyLocked": "Une étape de stratégie peut être renommée, mais ni supprimée ni déplacée.",
+          "dates_invalid": "La date d’échéance ne peut pas précéder la date de début.",
+          "streamNotRemovable": "Le flux vidéo UGC ne peut pas être supprimé : la progression de la page de la marque en dépend.",
+          "brandArchived": "Cette marque est archivée. Restaurez-la pour modifier ses vagues."
+        }
       }
     },
     "brandFiles": {

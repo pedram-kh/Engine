@@ -112,8 +112,9 @@ const FROZEN_AGENCY_FILES: ReadonlyArray<readonly [string, string]> = [
     '83ff22649ee19121d9fe230b2c1c24ff9d5cc3566d110591fe17c94425173aea',
   ],
   [
+    // Re-pinned in PL-1.3: gains the `wave_step` kind (the five words a tracker step shows). No other change.
     'apps/main/src/modules/agency/status/agencyStatusTones.ts',
-    '7b7f68e86406432c532d788c3c4d3bbcfd3666df0f2284ae06dd9fbd2bf87c55',
+    'bd519081814a45fa04d938eef49dc1e186c93d011b1fe9fc27ea9d5a857abaff',
   ],
   [
     'apps/main/src/modules/agency/status/draftRoundTone.ts',

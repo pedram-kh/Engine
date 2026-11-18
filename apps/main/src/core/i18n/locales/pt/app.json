@@ -1522,6 +1522,131 @@
         "createdBy": "Criada por",
         "notFound": "Esta onda não foi encontrada.",
         "linkLocked": "Bloqueado: há um criador selecionado ou mais avançado nesta campanha."
+      },
+      "tracker": {
+        "progress": {
+          "complete": "Concluído"
+        },
+        "health": {
+          "onTrack": "Em dia",
+          "atRisk": "Em risco · {count} fluxo atrasado | Em risco · {count} fluxos atrasados"
+        },
+        "streams": {
+          "ugc_video": "Vídeo UGC",
+          "statics": "Estáticos",
+          "stills": "Fotos"
+        },
+        "streamStatus": {
+          "on_track": "Em dia",
+          "delayed": "Atrasado · {days} dia | Atrasado · {days} dias",
+          "complete": "Concluído"
+        },
+        "card": {
+          "steps": "{done} de {total} passos",
+          "nextStep": "Próximo passo",
+          "finalDelivery": "Entrega final",
+          "noDate": "Sem data",
+          "allDone": "Todos os passos concluídos",
+          "noSteps": "Sem passos"
+        },
+        "filter": {
+          "all": "Todos",
+          "ugc": "UGC",
+          "statics": "Estáticos",
+          "stills": "Fotos",
+          "mine": "Meus"
+        },
+        "col": {
+          "step": "Passo",
+          "owner": "Responsável",
+          "due": "Prazo",
+          "status": "Estado"
+        },
+        "status": {
+          "up_next": "A seguir",
+          "in_progress": "Em curso",
+          "due_today": "Prazo hoje",
+          "delayed": "Atrasado",
+          "done": "Feito"
+        },
+        "stepStatus": {
+          "not_started": "Não iniciado",
+          "in_progress": "Em curso",
+          "done": "Feito"
+        },
+        "steps": {
+          "title": "Passos de entrega"
+        },
+        "group": {
+          "done": "{done} de {total} feitos"
+        },
+        "completed": {
+          "count": "{count} passo concluído | {count} passos concluídos",
+          "show": "Mostrar",
+          "hide": "Ocultar"
+        },
+        "due": {
+          "today": "Hoje",
+          "tomorrow": "Amanhã"
+        },
+        "owner": {
+          "unassigned": "Sem responsável",
+          "former": "Antigo membro",
+          "client": "Cliente"
+        },
+        "actions": {
+          "addStep": "Adicionar passo a um fluxo",
+          "addStream": "Adicionar fluxo",
+          "edit": "Editar",
+          "remove": "Remover",
+          "removeStream": "Remover fluxo",
+          "streamMenu": "Ações de {stream}",
+          "markDone": "Marcar «{name}» como feito",
+          "reopen": "Marcar «{name}» como não feito",
+          "rowMenu": "Ações de «{name}»"
+        },
+        "dialog": {
+          "addTitle": "Adicionar passo",
+          "editTitle": "Editar passo",
+          "name": "Nome do passo",
+          "stream": "Fluxo",
+          "owner": "Responsável",
+          "status": "Estado",
+          "startsOn": "Data de início",
+          "dueOn": "Data limite",
+          "add": "Adicionar passo",
+          "save": "Guardar alterações",
+          "cancel": "Cancelar"
+        },
+        "remove": {
+          "title": "Remover passo",
+          "body": "Remover «{name}» desta vaga? Não é possível anular.",
+          "confirm": "Remover"
+        },
+        "removeStream": {
+          "title": "Remover fluxo",
+          "body": "Remover {stream} e o seu {count} passo desta vaga? Não é possível anular. | Remover {stream} e os seus {count} passos desta vaga? Não é possível anular.",
+          "confirm": "Remover fluxo"
+        },
+        "empty": {
+          "filtered": "Nenhum passo corresponde a este filtro."
+        },
+        "removedByOther": "Este passo foi removido por outra pessoa. A lista foi recarregada.",
+        "validation": {
+          "nameRequired": "Introduza um nome para o passo."
+        },
+        "errors": {
+          "loadFailed": "Não foi possível carregar o acompanhamento.",
+          "retry": "Tentar novamente",
+          "saveFailed": "Não foi possível guardar a alteração. Tente novamente.",
+          "forbidden": "A sua função não permite esta alteração.",
+          "ownerNotMember": "O responsável tem de ser um membro ativo desta agência, ou Cliente.",
+          "ownerConflict": "Um passo tem um membro ou o cliente como responsável, não ambos.",
+          "strategyLocked": "Um passo de estratégia pode ser renomeado, mas não removido nem movido.",
+          "dates_invalid": "A data limite não pode ser anterior à data de início.",
+          "streamNotRemovable": "O fluxo de vídeo UGC não pode ser removido: o progresso na página da marca depende dele.",
+          "brandArchived": "Esta marca está arquivada. Restaure-a para alterar as suas vagas."
+        }
       }
     },
     "brandFiles": {

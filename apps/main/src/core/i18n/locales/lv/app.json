@@ -1522,6 +1522,131 @@
         "createdBy": "Izveidoja",
         "notFound": "Šis vilnis nav atrasts.",
         "linkLocked": "Bloķēts: šajā kampaņā autors ir izvēlēts vai tālāk."
+      },
+      "tracker": {
+        "progress": {
+          "complete": "Pabeigts"
+        },
+        "health": {
+          "onTrack": "Pēc plāna",
+          "atRisk": "Risks · {count} kanāls kavējas | Risks · {count} kanāli kavējas"
+        },
+        "streams": {
+          "ugc_video": "UGC video",
+          "statics": "Statiskie",
+          "stills": "Foto"
+        },
+        "streamStatus": {
+          "on_track": "Pēc plāna",
+          "delayed": "Kavējas · {days} diena | Kavējas · {days} dienas",
+          "complete": "Pabeigts"
+        },
+        "card": {
+          "steps": "{done} no {total} soļiem",
+          "nextStep": "Nākamais solis",
+          "finalDelivery": "Gala piegāde",
+          "noDate": "Nav datuma",
+          "allDone": "Visi soļi izpildīti",
+          "noSteps": "Nav soļu"
+        },
+        "filter": {
+          "all": "Visi",
+          "ugc": "UGC",
+          "statics": "Statiskie",
+          "stills": "Foto",
+          "mine": "Mani"
+        },
+        "col": {
+          "step": "Solis",
+          "owner": "Atbildīgais",
+          "due": "Termiņš",
+          "status": "Statuss"
+        },
+        "status": {
+          "up_next": "Nākamais",
+          "in_progress": "Procesā",
+          "due_today": "Termiņš šodien",
+          "delayed": "Kavējas",
+          "done": "Izpildīts"
+        },
+        "stepStatus": {
+          "not_started": "Nav sākts",
+          "in_progress": "Procesā",
+          "done": "Izpildīts"
+        },
+        "steps": {
+          "title": "Piegādes soļi"
+        },
+        "group": {
+          "done": "{done} no {total} izpildīti"
+        },
+        "completed": {
+          "count": "{count} pabeigts solis | {count} pabeigti soļi",
+          "show": "Rādīt",
+          "hide": "Slēpt"
+        },
+        "due": {
+          "today": "Šodien",
+          "tomorrow": "Rīt"
+        },
+        "owner": {
+          "unassigned": "Nav piešķirts",
+          "former": "Bijušais dalībnieks",
+          "client": "Klients"
+        },
+        "actions": {
+          "addStep": "Pievienot soli kanālam",
+          "addStream": "Pievienot kanālu",
+          "edit": "Rediģēt",
+          "remove": "Noņemt",
+          "removeStream": "Noņemt kanālu",
+          "streamMenu": "Darbības: {stream}",
+          "markDone": "Atzīmēt “{name}” kā izpildītu",
+          "reopen": "Atzīmēt “{name}” kā neizpildītu",
+          "rowMenu": "Darbības: “{name}”"
+        },
+        "dialog": {
+          "addTitle": "Pievienot soli",
+          "editTitle": "Rediģēt soli",
+          "name": "Soļa nosaukums",
+          "stream": "Kanāls",
+          "owner": "Atbildīgais",
+          "status": "Statuss",
+          "startsOn": "Sākuma datums",
+          "dueOn": "Termiņš",
+          "add": "Pievienot soli",
+          "save": "Saglabāt izmaiņas",
+          "cancel": "Atcelt"
+        },
+        "remove": {
+          "title": "Noņemt soli",
+          "body": "Vai noņemt “{name}” no šī viļņa? To nevar atsaukt.",
+          "confirm": "Noņemt"
+        },
+        "removeStream": {
+          "title": "Noņemt kanālu",
+          "body": "Vai noņemt {stream} un tā {count} soli no šī viļņa? To nevar atsaukt. | Vai noņemt {stream} un tā {count} soļus no šī viļņa? To nevar atsaukt.",
+          "confirm": "Noņemt kanālu"
+        },
+        "empty": {
+          "filtered": "Neviens solis neatbilst šim filtram."
+        },
+        "removedByOther": "Šo soli noņēma kāds cits. Saraksts tika pārlādēts.",
+        "validation": {
+          "nameRequired": "Ievadiet soļa nosaukumu."
+        },
+        "errors": {
+          "loadFailed": "Izsekotāju neizdevās ielādēt.",
+          "retry": "Mēģināt vēlreiz",
+          "saveFailed": "Izmaiņas neizdevās saglabāt. Mēģiniet vēlreiz.",
+          "forbidden": "Jūsu loma neļauj veikt šo izmaiņu.",
+          "ownerNotMember": "Atbildīgajam jābūt šīs aģentūras aktīvam dalībniekam vai Klientam.",
+          "ownerConflict": "Solim ir atbildīgais dalībnieks vai klients, nevis abi.",
+          "strategyLocked": "Stratēģijas soli var pārdēvēt, bet nevar noņemt vai pārvietot.",
+          "dates_invalid": "Termiņš nevar būt pirms sākuma datuma.",
+          "streamNotRemovable": "UGC video kanālu nevar noņemt: no tā ir atkarīgs progress zīmola lapā.",
+          "brandArchived": "Šis zīmols ir arhivēts. Atjaunojiet to, lai mainītu tā viļņus."
+        }
       }
     },
     "brandFiles": {

@@ -1522,6 +1522,131 @@
         "createdBy": "Autor",
         "notFound": "Seda lainet ei leitud.",
         "linkLocked": "Lukus: selles kampaanias on loovisik valitud või kaugemal."
+      },
+      "tracker": {
+        "progress": {
+          "complete": "Valmis"
+        },
+        "health": {
+          "onTrack": "Graafikus",
+          "atRisk": "Ohus · {count} kanal hilineb | Ohus · {count} kanalit hilineb"
+        },
+        "streams": {
+          "ugc_video": "UGC-video",
+          "statics": "Staatilised",
+          "stills": "Fotod"
+        },
+        "streamStatus": {
+          "on_track": "Graafikus",
+          "delayed": "Hilineb · {days} päev | Hilineb · {days} päeva",
+          "complete": "Valmis"
+        },
+        "card": {
+          "steps": "{done} / {total} sammu",
+          "nextStep": "Järgmine samm",
+          "finalDelivery": "Lõplik üleandmine",
+          "noDate": "Kuupäev puudub",
+          "allDone": "Kõik sammud tehtud",
+          "noSteps": "Samme pole"
+        },
+        "filter": {
+          "all": "Kõik",
+          "ugc": "UGC",
+          "statics": "Staatilised",
+          "stills": "Fotod",
+          "mine": "Minu omad"
+        },
+        "col": {
+          "step": "Samm",
+          "owner": "Vastutaja",
+          "due": "Tähtaeg",
+          "status": "Olek"
+        },
+        "status": {
+          "up_next": "Järgmine",
+          "in_progress": "Pooleli",
+          "due_today": "Tähtaeg täna",
+          "delayed": "Hilineb",
+          "done": "Tehtud"
+        },
+        "stepStatus": {
+          "not_started": "Alustamata",
+          "in_progress": "Pooleli",
+          "done": "Tehtud"
+        },
+        "steps": {
+          "title": "Üleandmise sammud"
+        },
+        "group": {
+          "done": "{done} / {total} tehtud"
+        },
+        "completed": {
+          "count": "{count} lõpetatud samm | {count} lõpetatud sammu",
+          "show": "Näita",
+          "hide": "Peida"
+        },
+        "due": {
+          "today": "Täna",
+          "tomorrow": "Homme"
+        },
+        "owner": {
+          "unassigned": "Määramata",
+          "former": "Endine liige",
+          "client": "Klient"
+        },
+        "actions": {
+          "addStep": "Lisa samm kanalisse",
+          "addStream": "Lisa kanal",
+          "edit": "Muuda",
+          "remove": "Eemalda",
+          "removeStream": "Eemalda kanal",
+          "streamMenu": "Toimingud: {stream}",
+          "markDone": "Märgi „{name}“ tehtuks",
+          "reopen": "Märgi „{name}“ mittetehtuks",
+          "rowMenu": "Toimingud: „{name}“"
+        },
+        "dialog": {
+          "addTitle": "Lisa samm",
+          "editTitle": "Muuda sammu",
+          "name": "Sammu nimi",
+          "stream": "Kanal",
+          "owner": "Vastutaja",
+          "status": "Olek",
+          "startsOn": "Alguskuupäev",
+          "dueOn": "Tähtaeg",
+          "add": "Lisa samm",
+          "save": "Salvesta muudatused",
+          "cancel": "Tühista"
+        },
+        "remove": {
+          "title": "Eemalda samm",
+          "body": "Kas eemaldada „{name}“ sellest lainest? Seda ei saa tagasi võtta.",
+          "confirm": "Eemalda"
+        },
+        "removeStream": {
+          "title": "Eemalda kanal",
+          "body": "Kas eemaldada {stream} ja selle {count} samm sellest lainest? Seda ei saa tagasi võtta. | Kas eemaldada {stream} ja selle {count} sammu sellest lainest? Seda ei saa tagasi võtta.",
+          "confirm": "Eemalda kanal"
+        },
+        "empty": {
+          "filtered": "Ükski samm ei vasta sellele filtrile."
+        },
+        "removedByOther": "Keegi teine eemaldas selle sammu. Loend laaditi uuesti.",
+        "validation": {
+          "nameRequired": "Sisesta sammu nimi."
+        },
+        "errors": {
+          "loadFailed": "Jälgijat ei õnnestunud laadida.",
+          "retry": "Proovi uuesti",
+          "saveFailed": "Muudatust ei õnnestunud salvestada. Proovi uuesti.",
+          "forbidden": "Sinu roll ei luba seda muudatust.",
+          "ownerNotMember": "Vastutaja peab olema selle agentuuri aktiivne liige või Klient.",
+          "ownerConflict": "Sammul on vastutajaks kas liige või klient, mitte mõlemad.",
+          "strategyLocked": "Strateegiasammu saab ümber nimetada, aga mitte eemaldada ega teise kanalisse tõsta.",
+          "dates_invalid": "Tähtaeg ei tohi olla enne alguskuupäeva.",
+          "streamNotRemovable": "UGC-videokanalit ei saa eemaldada: brändi lehe edenemine sõltub sellest.",
+          "brandArchived": "See bränd on arhiveeritud. Taasta see, et selle laineid muuta."
+        }
       }
     },
     "brandFiles": {

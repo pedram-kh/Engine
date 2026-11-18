@@ -1522,6 +1522,131 @@
         "createdBy": "Cruthaithe ag",
         "notFound": "Níor aimsíodh an tonn seo.",
         "linkLocked": "Faoi ghlas: roghnaíodh cruthaitheoir nó tá sé níos faide ar aghaidh san fheachtas seo."
+      },
+      "tracker": {
+        "progress": {
+          "complete": "Críochnaithe"
+        },
+        "health": {
+          "onTrack": "Ar bhóthar",
+          "atRisk": "I mbaol · {count} sruth déanach | I mbaol · {count} shruth déanacha"
+        },
+        "streams": {
+          "ugc_video": "Físeán UGC",
+          "statics": "Statacha",
+          "stills": "Grianghraif"
+        },
+        "streamStatus": {
+          "on_track": "Ar bhóthar",
+          "delayed": "Déanach · {days} lá | Déanach · {days} lá",
+          "complete": "Críochnaithe"
+        },
+        "card": {
+          "steps": "{done} as {total} céim",
+          "nextStep": "An chéad chéim eile",
+          "finalDelivery": "Seachadadh deiridh",
+          "noDate": "Gan dáta",
+          "allDone": "Gach céim déanta",
+          "noSteps": "Gan céimeanna"
+        },
+        "filter": {
+          "all": "Gach",
+          "ugc": "UGC",
+          "statics": "Statacha",
+          "stills": "Grianghraif",
+          "mine": "Mo cheann féin"
+        },
+        "col": {
+          "step": "Céim",
+          "owner": "Úinéir",
+          "due": "Dáta dlite",
+          "status": "Stádas"
+        },
+        "status": {
+          "up_next": "Ar fáil",
+          "in_progress": "Ar siúl",
+          "due_today": "Dlite inniu",
+          "delayed": "Déanach",
+          "done": "Déanta"
+        },
+        "stepStatus": {
+          "not_started": "Gan tosú",
+          "in_progress": "Ar siúl",
+          "done": "Déanta"
+        },
+        "steps": {
+          "title": "Céimeanna seachadta"
+        },
+        "group": {
+          "done": "{done} as {total} déanta"
+        },
+        "completed": {
+          "count": "{count} chéim chríochnaithe | {count} céim chríochnaithe",
+          "show": "Taispeáin",
+          "hide": "Folaigh"
+        },
+        "due": {
+          "today": "Inniu",
+          "tomorrow": "Amárach"
+        },
+        "owner": {
+          "unassigned": "Gan sannadh",
+          "former": "Iarchomhalta",
+          "client": "Cliant"
+        },
+        "actions": {
+          "addStep": "Cuir céim le sruth",
+          "addStream": "Cuir sruth leis",
+          "edit": "Cuir in eagar",
+          "remove": "Bain",
+          "removeStream": "Bain an sruth",
+          "streamMenu": "Gníomhartha do {stream}",
+          "markDone": "Marcáil “{name}” mar dhéanta",
+          "reopen": "Marcáil “{name}” mar gan déanamh",
+          "rowMenu": "Gníomhartha do “{name}”"
+        },
+        "dialog": {
+          "addTitle": "Cuir céim leis",
+          "editTitle": "Cuir an chéim in eagar",
+          "name": "Ainm na céime",
+          "stream": "Sruth",
+          "owner": "Úinéir",
+          "status": "Stádas",
+          "startsOn": "Dáta tosaigh",
+          "dueOn": "Dáta dlite",
+          "add": "Cuir céim leis",
+          "save": "Sábháil na hathruithe",
+          "cancel": "Cealaigh"
+        },
+        "remove": {
+          "title": "Bain an chéim",
+          "body": "An mbainfidh tú “{name}” den tonn seo? Ní féidir é seo a chealú.",
+          "confirm": "Bain"
+        },
+        "removeStream": {
+          "title": "Bain an sruth",
+          "body": "An mbainfidh tú {stream} agus a {count} chéim den tonn seo? Ní féidir é seo a chealú. | An mbainfidh tú {stream} agus a {count} céim den tonn seo? Ní féidir é seo a chealú.",
+          "confirm": "Bain an sruth"
+        },
+        "empty": {
+          "filtered": "Ní oireann aon chéim don scagaire seo."
+        },
+        "removedByOther": "Bhain duine éigin eile an chéim seo. Athlódáladh an liosta.",
+        "validation": {
+          "nameRequired": "Cuir isteach ainm na céime."
+        },
+        "errors": {
+          "loadFailed": "Níorbh fhéidir an rianaitheoir a luchtú.",
+          "retry": "Bain triail eile as",
+          "saveFailed": "Níorbh fhéidir an t-athrú a shábháil. Bain triail eile as.",
+          "forbidden": "Ní cheadaíonn do ról an t-athrú seo.",
+          "ownerNotMember": "Ní mór don úinéir a bheith ina chomhalta gníomhach den ghníomhaireacht seo, nó Cliant.",
+          "ownerConflict": "Tá comhalta nó an cliant mar úinéir ar chéim, ní an dá cheann.",
+          "strategyLocked": "Is féidir céim straitéise a athainmniú, ach ní féidir í a bhaint ná a aistriú.",
+          "dates_invalid": "Ní féidir leis an dáta dlite a bheith roimh an dáta tosaigh.",
+          "streamNotRemovable": "Ní féidir sruth físeán UGC a bhaint: braitheann dul chun cinn leathanach an bhrandála air.",
+          "brandArchived": "Tá an brandáil seo cartlannaithe. Athchóirigh í chun a tonnta a athrú."
+        }
       }
     },
     "brandFiles": {

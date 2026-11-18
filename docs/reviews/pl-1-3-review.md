@@ -1,6 +1,6 @@
 # PL-1.3 review: Wave project tracker
 
-**Branch:** `pl`. **Plan:** `pl-1-3-plan.md` (corrections C1 to C3 in §13). **Status:** Stage 1 (backend) built; Stage 2 (web, strings, seeders, close-out) not started. This file is completed in Stage 2.
+**Branch:** `pl`. **Plan:** `pl-1-3-plan.md` (corrections C1 to C3 in §13). **Status:** Stage 1 (backend) pushed, CI green on `e5074996`. Stage 2 (web, strings, seeders, close-out) built and committed locally, **not pushed** until Pedram has walked it.
 
 ## Stage 1: migration rehearsal (local, synthetic rows only)
 
@@ -38,3 +38,102 @@ See `pl-1-3-plan.md` §13. The precedent fits, so nothing stopped: AH-119 A3 wri
 ## Stage 1: not read, not run
 
 Not read: the developer brief; frame 01b parts listed in the plan. Not run: the full Pest suite, the full Vitest suite, Playwright, the walk, CI (until the push). No real two-client race on PostgreSQL was run; the lock tests assert the `for update` SQL, the unique indexes refuse duplicates, and sequential requests are tested.
+
+## Stage 2: what was built
+
+- **Wave page:** health pill in the title, six stream-aware sections: stream cards (one segment per step, status pill, next step, final delivery, owners incl. Client), the steps table with filters All / UGC / Statics / Stills / Mine, the check (optimistic, reverts with an inline row error), edit, add, remove, Remove stream (not on UGC) and Add stream. After every write the tracker is silently reloaded; a 404 shows "This step was removed by someone else" and reloads.
+- **Brand page:** the Waves panel draws the bar from the server `progress` object (six segments, `label_kind` step / complete / not started). The client holds no copy of the progress rule.
+- **Roles:** staff may check, change owner and dates; their request never carries `name` or `stream` (the server answers 403 to the whole request otherwise). Admin and manager also add, rename, move, remove, Remove stream, Add stream. A strategy step has no Remove and cannot change stream.
+- **Strings:** 81 keys under `app.waves.tracker.*` in all 24 locales (default step names stay English in the database). `waveKeys.spec.ts` now checks 184 keys; 51 loanwords (UGC, Status, Client, Statics, Stills, "Mine" in Danish, "UGC video") are listed in `SAME_AS_ENGLISH_BY_DESIGN`.
+- **Frozen file:** `agencyStatusTones.ts` gained the `wave_step` kind (up next neutral, in progress info, due today warning, delayed danger, done success). `agency-frozen.spec.ts` is re-pinned to `bd519081814a45fa04d938eef49dc1e186c93d011b1fe9fc27ea9d5a857abaff` in the same commit. **Reason:** the five tracker step words need their tones through the one status registry, as every other status in the app has. `agency.css` is untouched; the new styles are scoped.
+- **api-client:** tracker, step, stream and progress types in `packages/api-client/src/types/wave.ts`; six calls in `waves.api.ts`.
+- **Seeders:** `Pl13WalkSeeder` and `Pl13WalkCleanupSeeder` (synthetic rows, `*.local` addresses, refuse to run outside local/testing); `Pl13WalkSeedersTest`.
+
+## Stage 2: screens with no design, built from the design system
+
+The brief had no frames for these. Each is made of existing parts (`agency-card`, `AgencyStatusPill`, `v-dialog` and `v-menu` with the PL-1.2 dialog pattern, `v-chip`, `v-btn`, `v-alert`, `v-snackbar`):
+
+1. Stream card row (the design shows the card; its segments, owner chips and Delayed border were derived).
+2. The steps table, its filter chips and the "N completed steps" fold line.
+3. Add / Edit step dialog.
+4. Remove step and Remove stream confirmation dialogs.
+5. Row menu, group menu and the footer Add step / Add stream menu.
+6. The narrow (under 768 px) stacked row.
+7. The "step was removed by someone else" snackbar and the inline row error.
+8. The health pill in the wave title.
+
+## Stage 2: C2 report (real browser, real data, what was looked at)
+
+Setup: throwaway PostgreSQL database `pl13_walk` (dropped afterwards) seeded by `Pl13WalkSeeder`, API on 127.0.0.1:8000, Vite on 127.0.0.1:5173, flag turned on in that database only through the test helper. Chromium through Playwright, signed in as the seeded admin. Screenshots were viewed, not just measured.
+
+| Looked at                                                                                                                          | 1440 x 900                       | 390 x 844                        |
+| ---------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | -------------------------------- |
+| Brand page with four waves (bars: Draft Wave 8 with Personas in progress, Wave 6 not started, Wave 5 Complete, Wave 4 not started) | looked, correct                  | looked, correct                  |
+| Wave 8: header, health pill "At risk, 1 stream delayed", details card, three stream cards, 24-step table                           | looked                           | looked at four scroll positions  |
+| Row menu (Edit)                                                                                                                    | opened, looked                   | opened, looked                   |
+| Edit step dialog, Owner menu open above the dialog (Unassigned, Client, four active members; the former member is absent)          | opened, looked                   | opened, looked                   |
+| Stream group menu, Remove stream confirmation (names the stream and its 5 steps), Cancel                                           | opened, looked                   | opened, looked                   |
+| Add step dialog                                                                                                                    | opened, looked                   | opened                           |
+| Quick close and reopen (0, 60 and 150 ms) of the edit dialog and the confirmation                                                  | in `wave-tracker.spec.ts`, green | in `wave-tracker.spec.ts`, green |
+| Sideways scroll                                                                                                                    | none (measured 0)                | none (measured 0)                |
+
+**Found and fixed during the pass:** (1) the folded line read "USPs to USPs (Nov 16 to Nov 16)" for a single completed step; it now shows the name once and the date once. (2) At 390 the page overflowed by 29 px (details card columns and the header); scoped narrow rules fixed it. (3) At 390 the frozen layout opens the 280 px agency drawer, which pushed the page 196 px sideways; this is the existing shell, not the tracker, and was left alone. The Playwright spec closes the drawer first. (4) The filter chip row at 390 scrolls sideways inside itself ("Mine" sits at the edge); left as is.
+
+**Not looked at in a browser:** manager, staff and designer sign-ins (covered by `WaveStepsPanel.spec.ts` W4 and the API tests, not by eye), Wave 6 first open of the tracker, Agency B isolation (covered by `WaveTrackerAccessTest` TN1; not by eye), the other 23 locales on screen, light theme. Pedram's walk covers these (commands below).
+
+## Stage 2: C3 result (flag off, frozen file)
+
+`node tools/walk/walk.mjs --set agency --compare ../../docs/reviews/ah-115-agency-baseline/baseline.json` on the working tree: **COMPARE OK, 126 targets identical, 0 page errors.** That includes the 12 campaign and 16 brand targets. The walk's mock API has no `features.waves`, so the flag is off by construction, and its DOM hash is of `outerHTML`, so a stray `<!--v-if-->` would have shown. The new brand-row bar sits inside the existing wave rows, which exist only with the flag on. The wave page is not a walk route.
+
+## Stage 2: differences from the plan
+
+1. The empty-stream group line is unreachable: a stream with no steps is absent from the tracker (Remove stream deletes all of its steps), so the group never renders empty. The empty line exists only for Mine.
+2. Stream-card segments are one per step (as the plan said), so a five-step stream draws five, not a fixed six.
+3. The "N completed" line shows the name once when first and last are the same step, and the date once when both dates match.
+4. Narrow layout fixes (above) were not in the plan.
+5. The unit gate for the optimistic check (W5) is a component spec, not a browser test.
+
+## Stage 2: gates, break-reverts and results
+
+Every web gate W1 to W8, the per-open dialog key (E2E) and the i18n gate (W7) were broken and reverted; rows are in `pl-1-3-break-reverts.md`. All went red when broken and green when reverted.
+
+Run locally on this tree:
+
+- Vitest: waves, brands, architecture and i18n folders, 90 files, 1,100 tests, green. `vue-tsc --noEmit` clean. ESLint clean on the touched web files and the new Playwright spec.
+- Playwright `wave-tracker.spec.ts` at 1440 and 390, serial: 2 passed.
+- Pint (passed) and Larastan (no errors).
+- Pest on SQLite **and** PostgreSQL: Waves 166, Audit 50, Erasure 337, Tenancy 9 (all passed on both); Brands 93 (SQLite). Running the folders in one Pest command stops with a Pest fatal (a helper function declared twice across files); each folder run alone is green. Not changed by this work.
+- Agency walk: 126 / 126 (C3).
+
+## Stage 2: not read, not run
+
+Not run: the full Pest and full Vitest suites, CI for Stage 2 (nothing is pushed), the other 23 locales or the light theme in a browser, staging, any production data. Not read: the developer brief.
+
+## Stage 2: how to walk it locally
+
+```
+cd apps/api
+php artisan migrate
+php artisan db:seed --class='Database\Seeders\Pl13WalkSeeder'      # prints the ulids and logins
+php artisan serve --host=127.0.0.1 --port=8000
+cd ../main && pnpm dev --host 127.0.0.1                          # http://127.0.0.1:5173
+```
+
+Turn `waves_enabled` on by hand in the admin app (the seeder does not). Password for every login: `password-12chars`.
+
+| Login                      | Role                                                 |
+| -------------------------- | ---------------------------------------------------- |
+| `admin@pl13-walk.local`    | agency admin (Agency A)                              |
+| `manager@pl13-walk.local`  | manager                                              |
+| `staff@pl13-walk.local`    | staff                                                |
+| `designer@pl13-walk.local` | staff, owns Personas on Wave 8                       |
+| `former@pl13-walk.local`   | removed member (owns a UGC step)                     |
+| `admin@pl13-walk-b.local`  | admin of Agency B (isolation: must not see Agency A) |
+
+Brand Bolt Food: Wave 4 (Statics removed, 19 steps), Wave 5 (strategy steps done, reads Complete), Wave 6 (never opened: first open creates the 24 steps), Wave 8 (mixed: done, in progress, 3 days delayed, due today, former and Client owners). Create Wave 7 in the walk. Agency B has brand Glovo with "Glovo Wave 1".
+
+Clean up afterwards:
+
+```
+php artisan db:seed --class='Database\Seeders\Pl13WalkCleanupSeeder'
+```

@@ -1522,6 +1522,131 @@
         "createdBy": "Vytvoril(a)",
         "notFound": "Táto vlna sa nenašla.",
         "linkLocked": "Zamknuté: v tejto kampani je tvorca vybraný alebo ďalej."
+      },
+      "tracker": {
+        "progress": {
+          "complete": "Dokončené"
+        },
+        "health": {
+          "onTrack": "V pláne",
+          "atRisk": "Ohrozené · {count} vetva mešká | Ohrozené · {count} vetvy meškajú"
+        },
+        "streams": {
+          "ugc_video": "UGC video",
+          "statics": "Statické",
+          "stills": "Fotky"
+        },
+        "streamStatus": {
+          "on_track": "V pláne",
+          "delayed": "Meškanie · {days} deň | Meškanie · {days} dní",
+          "complete": "Dokončené"
+        },
+        "card": {
+          "steps": "{done} z {total} krokov",
+          "nextStep": "Ďalší krok",
+          "finalDelivery": "Konečné odovzdanie",
+          "noDate": "Bez dátumu",
+          "allDone": "Všetky kroky hotové",
+          "noSteps": "Žiadne kroky"
+        },
+        "filter": {
+          "all": "Všetko",
+          "ugc": "UGC",
+          "statics": "Statické",
+          "stills": "Fotky",
+          "mine": "Moje"
+        },
+        "col": {
+          "step": "Krok",
+          "owner": "Zodpovedná osoba",
+          "due": "Termín",
+          "status": "Stav"
+        },
+        "status": {
+          "up_next": "Ďalší",
+          "in_progress": "Prebieha",
+          "due_today": "Termín dnes",
+          "delayed": "Mešká",
+          "done": "Hotovo"
+        },
+        "stepStatus": {
+          "not_started": "Nezačaté",
+          "in_progress": "Prebieha",
+          "done": "Hotovo"
+        },
+        "steps": {
+          "title": "Kroky odovzdania"
+        },
+        "group": {
+          "done": "{done} z {total} hotovo"
+        },
+        "completed": {
+          "count": "{count} dokončený krok | {count} dokončené kroky",
+          "show": "Zobraziť",
+          "hide": "Skryť"
+        },
+        "due": {
+          "today": "Dnes",
+          "tomorrow": "Zajtra"
+        },
+        "owner": {
+          "unassigned": "Nepriradené",
+          "former": "Bývalý člen",
+          "client": "Klient"
+        },
+        "actions": {
+          "addStep": "Pridať krok do vetvy",
+          "addStream": "Pridať vetvu",
+          "edit": "Upraviť",
+          "remove": "Odstrániť",
+          "removeStream": "Odstrániť vetvu",
+          "streamMenu": "Akcie pre {stream}",
+          "markDone": "Označiť „{name}“ ako hotový",
+          "reopen": "Označiť „{name}“ ako nehotový",
+          "rowMenu": "Akcie pre „{name}“"
+        },
+        "dialog": {
+          "addTitle": "Pridať krok",
+          "editTitle": "Upraviť krok",
+          "name": "Názov kroku",
+          "stream": "Vetva",
+          "owner": "Zodpovedná osoba",
+          "status": "Stav",
+          "startsOn": "Dátum začiatku",
+          "dueOn": "Termín",
+          "add": "Pridať krok",
+          "save": "Uložiť zmeny",
+          "cancel": "Zrušiť"
+        },
+        "remove": {
+          "title": "Odstrániť krok",
+          "body": "Odstrániť „{name}“ z tejto vlny? Nedá sa vrátiť späť.",
+          "confirm": "Odstrániť"
+        },
+        "removeStream": {
+          "title": "Odstrániť vetvu",
+          "body": "Odstrániť {stream} a jej {count} krok z tejto vlny? Nedá sa vrátiť späť. | Odstrániť {stream} a jej {count} kroky z tejto vlny? Nedá sa vrátiť späť.",
+          "confirm": "Odstrániť vetvu"
+        },
+        "empty": {
+          "filtered": "Tomuto filtru nezodpovedá žiadny krok."
+        },
+        "removedByOther": "Tento krok odstránil niekto iný. Zoznam sa znova načítal.",
+        "validation": {
+          "nameRequired": "Zadajte názov kroku."
+        },
+        "errors": {
+          "loadFailed": "Sledovanie sa nepodarilo načítať.",
+          "retry": "Skúsiť znova",
+          "saveFailed": "Zmenu sa nepodarilo uložiť. Skúste to znova.",
+          "forbidden": "Vaša rola túto zmenu nepovoľuje.",
+          "ownerNotMember": "Zodpovednou osobou musí byť aktívny člen tejto agentúry alebo Klient.",
+          "ownerConflict": "Krok má zodpovedného člena alebo klienta, nie oboch.",
+          "strategyLocked": "Strategický krok možno premenovať, ale nie odstrániť ani presunúť.",
+          "dates_invalid": "Termín nemôže byť pred dátumom začiatku.",
+          "streamNotRemovable": "Vetvu UGC videa nemožno odstrániť: závisí od nej postup na stránke značky.",
+          "brandArchived": "Táto značka je archivovaná. Obnovte ju, aby ste mohli meniť jej vlny."
+        }
       }
     },
     "brandFiles": {

@@ -1522,6 +1522,131 @@
         "createdBy": "Created by",
         "notFound": "This wave was not found.",
         "linkLocked": "Locked: a creator is Selected or further on this campaign."
+      },
+      "tracker": {
+        "progress": {
+          "complete": "Complete"
+        },
+        "health": {
+          "onTrack": "On track",
+          "atRisk": "At risk · {count} stream delayed | At risk · {count} streams delayed"
+        },
+        "streams": {
+          "ugc_video": "UGC video",
+          "statics": "Statics",
+          "stills": "Stills"
+        },
+        "streamStatus": {
+          "on_track": "On track",
+          "delayed": "Delayed · {days} day | Delayed · {days} days",
+          "complete": "Complete"
+        },
+        "card": {
+          "steps": "{done} of {total} steps",
+          "nextStep": "Next step",
+          "finalDelivery": "Final delivery",
+          "noDate": "No date",
+          "allDone": "All steps done",
+          "noSteps": "No steps"
+        },
+        "filter": {
+          "all": "All",
+          "ugc": "UGC",
+          "statics": "Statics",
+          "stills": "Stills",
+          "mine": "Mine"
+        },
+        "col": {
+          "step": "Step",
+          "owner": "Owner",
+          "due": "Due",
+          "status": "Status"
+        },
+        "status": {
+          "up_next": "Up next",
+          "in_progress": "In progress",
+          "due_today": "Due today",
+          "delayed": "Delayed",
+          "done": "Done"
+        },
+        "stepStatus": {
+          "not_started": "Not started",
+          "in_progress": "In progress",
+          "done": "Done"
+        },
+        "steps": {
+          "title": "Deliverable steps"
+        },
+        "group": {
+          "done": "{done} of {total} done"
+        },
+        "completed": {
+          "count": "{count} completed step | {count} completed steps",
+          "show": "Show",
+          "hide": "Hide"
+        },
+        "due": {
+          "today": "Today",
+          "tomorrow": "Tomorrow"
+        },
+        "owner": {
+          "unassigned": "Unassigned",
+          "former": "Former member",
+          "client": "Client"
+        },
+        "actions": {
+          "addStep": "Add step to a stream",
+          "addStream": "Add stream",
+          "edit": "Edit",
+          "remove": "Remove",
+          "removeStream": "Remove stream",
+          "streamMenu": "Actions for {stream}",
+          "markDone": "Mark “{name}” as done",
+          "reopen": "Mark “{name}” as not done",
+          "rowMenu": "Actions for “{name}”"
+        },
+        "dialog": {
+          "addTitle": "Add step",
+          "editTitle": "Edit step",
+          "name": "Step name",
+          "stream": "Stream",
+          "owner": "Owner",
+          "status": "Status",
+          "startsOn": "Start date",
+          "dueOn": "Due date",
+          "add": "Add step",
+          "save": "Save changes",
+          "cancel": "Cancel"
+        },
+        "remove": {
+          "title": "Remove step",
+          "body": "Remove “{name}” from this wave? This cannot be undone.",
+          "confirm": "Remove"
+        },
+        "removeStream": {
+          "title": "Remove stream",
+          "body": "Remove {stream} and its {count} step from this wave? This cannot be undone. | Remove {stream} and its {count} steps from this wave? This cannot be undone.",
+          "confirm": "Remove stream"
+        },
+        "empty": {
+          "filtered": "No steps match this filter."
+        },
+        "removedByOther": "This step was removed by someone else. The list was reloaded.",
+        "validation": {
+          "nameRequired": "Enter a step name."
+        },
+        "errors": {
+          "loadFailed": "The tracker could not be loaded.",
+          "retry": "Retry",
+          "saveFailed": "The change could not be saved. Try again.",
+          "forbidden": "Your role cannot make this change.",
+          "ownerNotMember": "The owner must be an active member of this agency, or Client.",
+          "ownerConflict": "A step has a member or the Client as owner, not both.",
+          "strategyLocked": "A strategy step can be renamed, but not removed or moved.",
+          "dates_invalid": "The due date cannot be before the start date.",
+          "streamNotRemovable": "The UGC video stream cannot be removed: the Brand page progress depends on it.",
+          "brandArchived": "This brand is archived. Restore it to change its waves."
+        }
       }
     },
     "brandFiles": {

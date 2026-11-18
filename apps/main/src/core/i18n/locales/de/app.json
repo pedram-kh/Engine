@@ -1522,6 +1522,131 @@
         "createdBy": "Erstellt von",
         "notFound": "Diese Welle wurde nicht gefunden.",
         "linkLocked": "Gesperrt: Ein Creator ist bei dieser Kampagne ausgewählt oder weiter."
+      },
+      "tracker": {
+        "progress": {
+          "complete": "Abgeschlossen"
+        },
+        "health": {
+          "onTrack": "Im Plan",
+          "atRisk": "Gefährdet · {count} Strang verzögert | Gefährdet · {count} Stränge verzögert"
+        },
+        "streams": {
+          "ugc_video": "UGC-Video",
+          "statics": "Statische Motive",
+          "stills": "Fotos"
+        },
+        "streamStatus": {
+          "on_track": "Im Plan",
+          "delayed": "Verzögert · {days} Tag | Verzögert · {days} Tage",
+          "complete": "Abgeschlossen"
+        },
+        "card": {
+          "steps": "{done} von {total} Schritten",
+          "nextStep": "Nächster Schritt",
+          "finalDelivery": "Endabgabe",
+          "noDate": "Kein Datum",
+          "allDone": "Alle Schritte erledigt",
+          "noSteps": "Keine Schritte"
+        },
+        "filter": {
+          "all": "Alle",
+          "ugc": "UGC",
+          "statics": "Statische Motive",
+          "stills": "Fotos",
+          "mine": "Meine"
+        },
+        "col": {
+          "step": "Schritt",
+          "owner": "Verantwortlich",
+          "due": "Fällig",
+          "status": "Status"
+        },
+        "status": {
+          "up_next": "Als Nächstes",
+          "in_progress": "In Arbeit",
+          "due_today": "Heute fällig",
+          "delayed": "Verzögert",
+          "done": "Erledigt"
+        },
+        "stepStatus": {
+          "not_started": "Nicht begonnen",
+          "in_progress": "In Arbeit",
+          "done": "Erledigt"
+        },
+        "steps": {
+          "title": "Lieferschritte"
+        },
+        "group": {
+          "done": "{done} von {total} erledigt"
+        },
+        "completed": {
+          "count": "{count} erledigter Schritt | {count} erledigte Schritte",
+          "show": "Anzeigen",
+          "hide": "Ausblenden"
+        },
+        "due": {
+          "today": "Heute",
+          "tomorrow": "Morgen"
+        },
+        "owner": {
+          "unassigned": "Nicht zugewiesen",
+          "former": "Ehemaliges Mitglied",
+          "client": "Kunde"
+        },
+        "actions": {
+          "addStep": "Schritt zu einem Strang hinzufügen",
+          "addStream": "Strang hinzufügen",
+          "edit": "Bearbeiten",
+          "remove": "Entfernen",
+          "removeStream": "Strang entfernen",
+          "streamMenu": "Aktionen für {stream}",
+          "markDone": "„{name}“ als erledigt markieren",
+          "reopen": "„{name}“ als nicht erledigt markieren",
+          "rowMenu": "Aktionen für „{name}“"
+        },
+        "dialog": {
+          "addTitle": "Schritt hinzufügen",
+          "editTitle": "Schritt bearbeiten",
+          "name": "Schrittname",
+          "stream": "Strang",
+          "owner": "Verantwortlich",
+          "status": "Status",
+          "startsOn": "Startdatum",
+          "dueOn": "Fälligkeitsdatum",
+          "add": "Schritt hinzufügen",
+          "save": "Änderungen speichern",
+          "cancel": "Abbrechen"
+        },
+        "remove": {
+          "title": "Schritt entfernen",
+          "body": "„{name}“ aus dieser Welle entfernen? Das lässt sich nicht rückgängig machen.",
+          "confirm": "Entfernen"
+        },
+        "removeStream": {
+          "title": "Strang entfernen",
+          "body": "{stream} und seinen {count} Schritt aus dieser Welle entfernen? Das lässt sich nicht rückgängig machen. | {stream} und seine {count} Schritte aus dieser Welle entfernen? Das lässt sich nicht rückgängig machen.",
+          "confirm": "Strang entfernen"
+        },
+        "empty": {
+          "filtered": "Kein Schritt passt zu diesem Filter."
+        },
+        "removedByOther": "Dieser Schritt wurde von jemand anderem entfernt. Die Liste wurde neu geladen.",
+        "validation": {
+          "nameRequired": "Gib einen Schrittnamen ein."
+        },
+        "errors": {
+          "loadFailed": "Der Tracker konnte nicht geladen werden.",
+          "retry": "Erneut versuchen",
+          "saveFailed": "Die Änderung konnte nicht gespeichert werden. Versuche es erneut.",
+          "forbidden": "Deine Rolle darf diese Änderung nicht vornehmen.",
+          "ownerNotMember": "Die verantwortliche Person muss ein aktives Mitglied dieser Agentur sein oder „Kunde“.",
+          "ownerConflict": "Ein Schritt hat ein Mitglied oder den Kunden als Verantwortlichen, nicht beides.",
+          "strategyLocked": "Ein Strategieschritt kann umbenannt, aber nicht entfernt oder verschoben werden.",
+          "dates_invalid": "Das Fälligkeitsdatum darf nicht vor dem Startdatum liegen.",
+          "streamNotRemovable": "Der UGC-Video-Strang kann nicht entfernt werden: Der Fortschritt auf der Markenseite hängt davon ab.",
+          "brandArchived": "Diese Marke ist archiviert. Stelle sie wieder her, um ihre Wellen zu ändern."
+        }
       }
     },
     "brandFiles": {

@@ -1522,6 +1522,131 @@
         "createdBy": "Ustvaril(a)",
         "notFound": "Tega vala ni bilo mogoče najti.",
         "linkLocked": "Zaklenjeno: v tej kampanji je ustvarjalec izbran ali dlje."
+      },
+      "tracker": {
+        "progress": {
+          "complete": "Dokončano"
+        },
+        "health": {
+          "onTrack": "Po načrtu",
+          "atRisk": "Ogroženo · {count} tok zamuja | Ogroženo · {count} toki zamujajo"
+        },
+        "streams": {
+          "ugc_video": "UGC video",
+          "statics": "Statične",
+          "stills": "Fotografije"
+        },
+        "streamStatus": {
+          "on_track": "Po načrtu",
+          "delayed": "Zamuja · {days} dan | Zamuja · {days} dni",
+          "complete": "Dokončano"
+        },
+        "card": {
+          "steps": "{done} od {total} korakov",
+          "nextStep": "Naslednji korak",
+          "finalDelivery": "Končna oddaja",
+          "noDate": "Brez datuma",
+          "allDone": "Vsi koraki opravljeni",
+          "noSteps": "Ni korakov"
+        },
+        "filter": {
+          "all": "Vse",
+          "ugc": "UGC",
+          "statics": "Statične",
+          "stills": "Fotografije",
+          "mine": "Moje"
+        },
+        "col": {
+          "step": "Korak",
+          "owner": "Odgovorna oseba",
+          "due": "Rok",
+          "status": "Stanje"
+        },
+        "status": {
+          "up_next": "Naslednji",
+          "in_progress": "V teku",
+          "due_today": "Rok danes",
+          "delayed": "Zamuja",
+          "done": "Opravljeno"
+        },
+        "stepStatus": {
+          "not_started": "Ni začeto",
+          "in_progress": "V teku",
+          "done": "Opravljeno"
+        },
+        "steps": {
+          "title": "Koraki oddaje"
+        },
+        "group": {
+          "done": "{done} od {total} opravljenih"
+        },
+        "completed": {
+          "count": "{count} dokončan korak | {count} dokončani koraki",
+          "show": "Pokaži",
+          "hide": "Skrij"
+        },
+        "due": {
+          "today": "Danes",
+          "tomorrow": "Jutri"
+        },
+        "owner": {
+          "unassigned": "Nedodeljeno",
+          "former": "Nekdanji član",
+          "client": "Naročnik"
+        },
+        "actions": {
+          "addStep": "Dodaj korak v tok",
+          "addStream": "Dodaj tok",
+          "edit": "Uredi",
+          "remove": "Odstrani",
+          "removeStream": "Odstrani tok",
+          "streamMenu": "Dejanja za {stream}",
+          "markDone": "Označi »{name}« kot opravljeno",
+          "reopen": "Označi »{name}« kot neopravljeno",
+          "rowMenu": "Dejanja za »{name}«"
+        },
+        "dialog": {
+          "addTitle": "Dodaj korak",
+          "editTitle": "Uredi korak",
+          "name": "Ime koraka",
+          "stream": "Tok",
+          "owner": "Odgovorna oseba",
+          "status": "Stanje",
+          "startsOn": "Datum začetka",
+          "dueOn": "Rok",
+          "add": "Dodaj korak",
+          "save": "Shrani spremembe",
+          "cancel": "Prekliči"
+        },
+        "remove": {
+          "title": "Odstrani korak",
+          "body": "Odstranim »{name}« iz tega vala? Tega ni mogoče razveljaviti.",
+          "confirm": "Odstrani"
+        },
+        "removeStream": {
+          "title": "Odstrani tok",
+          "body": "Odstranim {stream} in njegov {count} korak iz tega vala? Tega ni mogoče razveljaviti. | Odstranim {stream} in njegove {count} korake iz tega vala? Tega ni mogoče razveljaviti.",
+          "confirm": "Odstrani tok"
+        },
+        "empty": {
+          "filtered": "Nobeden korak ne ustreza temu filtru."
+        },
+        "removedByOther": "Ta korak je odstranil nekdo drug. Seznam je bil znova naložen.",
+        "validation": {
+          "nameRequired": "Vnesite ime koraka."
+        },
+        "errors": {
+          "loadFailed": "Sledilnika ni bilo mogoče naložiti.",
+          "retry": "Poskusi znova",
+          "saveFailed": "Spremembe ni bilo mogoče shraniti. Poskusite znova.",
+          "forbidden": "Vaša vloga te spremembe ne dovoljuje.",
+          "ownerNotMember": "Odgovorna oseba mora biti aktiven član te agencije ali Naročnik.",
+          "ownerConflict": "Korak ima za odgovorno osebo člana ali naročnika, ne obeh.",
+          "strategyLocked": "Strateški korak je mogoče preimenovati, ne pa odstraniti ali premakniti.",
+          "dates_invalid": "Rok ne sme biti pred datumom začetka.",
+          "streamNotRemovable": "Toka UGC videa ni mogoče odstraniti: od njega je odvisen napredek na strani blagovne znamke.",
+          "brandArchived": "Ta blagovna znamka je arhivirana. Obnovite jo, da boste lahko spreminjali njene vale."
+        }
       }
     },
     "brandFiles": {
