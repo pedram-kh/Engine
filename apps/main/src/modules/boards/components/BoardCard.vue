@@ -27,6 +27,12 @@ import { creatorAvatarUrl, creatorInitial, creatorLabel } from '@/core/creators/
 
 const props = defineProps<{
   card: BoardCardResource
+  /**
+   * PL-1.2: the slim face of a wave board — the creator's name and where they stand (Invited / Accepted / Declined).
+   * No fee and no due date: the fee is the creator's own, the due date is not a wave concern. Never set on a normal
+   * board, whose face is unchanged.
+   */
+  slim?: boolean
 }>()
 
 const { t, locale } = useI18n()
@@ -64,6 +70,21 @@ const feeLabel = computed(() => {
 const showDeclinedHistory = computed(
   () => assignment.value?.previously_declined === true && assignment.value.status !== 'declined',
 )
+
+// PL-1.2 — Invited / Accepted / Declined on a wave board's invite stage. `undefined` keeps the chip exactly as it was.
+const inviteColor = computed(() => {
+  switch (props.card.invite_state) {
+    case 'accepted':
+      return 'success'
+    case 'declined':
+      return 'error'
+    default:
+      return undefined
+  }
+})
+// The `scripts` slot is PL-1.3's seam: empty today, drawn on a wave board only, and it renders no element of its own.
+// (An HTML comment in the template would show up in the dev DOM of every board, so the note lives here.)
+const slimItems = computed<number[]>(() => (props.slim === true ? [1] : []))
 
 interface DueInfo {
   label: string
@@ -117,7 +138,7 @@ const dueInfo = computed<DueInfo | null>(() => {
             {{ displayName }}
           </div>
           <span
-            v-if="dueInfo"
+            v-if="dueInfo && !slim"
             class="text-caption flex-shrink-0"
             :class="dueInfo.overdue ? 'text-error' : 'text-medium-emphasis'"
             :data-test="`board-card-due-${card.id}`"
@@ -143,19 +164,22 @@ const dueInfo = computed<DueInfo | null>(() => {
             v-if="statusLabel"
             size="x-small"
             variant="tonal"
+            :color="inviteColor"
             :data-test="`board-card-status-${card.id}`"
           >
             {{ statusLabel }}
           </v-chip>
           <v-spacer />
           <span
-            v-if="feeLabel"
+            v-if="feeLabel && !slim"
             class="text-caption text-medium-emphasis flex-shrink-0"
             :data-test="`board-card-fee-${card.id}`"
           >
             {{ feeLabel }}
           </span>
         </div>
+
+        <slot v-for="n in slimItems" :key="n" name="scripts" :card="card" />
       </template>
       <div
         v-else

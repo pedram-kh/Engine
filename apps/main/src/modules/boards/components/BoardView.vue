@@ -74,7 +74,11 @@ const drawerCard = ref<BoardCardResource | null>(null)
 async function onMove(payload: { cardId: string; toColumnId: string }): Promise<void> {
   const ok = await store.moveCard(payload.cardId, payload.toColumnId)
   if (!ok) {
-    toast.value = t('app.campaigns.board.moveFailed')
+    // PL-1.2 (Q4): a creator who has not accepted cannot enter a working column of a wave board.
+    toast.value =
+      store.lastMoveError === 'board.selection_requires_acceptance'
+        ? t('app.campaigns.board.wave.moveRefused')
+        : t('app.campaigns.board.moveFailed')
   }
 }
 
@@ -127,7 +131,7 @@ onBeforeUnmount(() => {
     <div class="board-view__toolbar d-flex align-center mb-4">
       <v-spacer />
       <v-btn
-        v-if="canConfigure"
+        v-if="canConfigure && !store.isWaveBoard"
         variant="text"
         prepend-icon="mdi-cog-outline"
         data-test="board-automations-open"
@@ -154,7 +158,8 @@ onBeforeUnmount(() => {
       class="board-view__columns"
       :columns="store.sortedColumns"
       :cards-by-column="store.cardsByColumn"
-      :can-edit-columns="canConfigure"
+      :can-edit-columns="canConfigure && !store.isWaveBoard"
+      :wave-board="store.isWaveBoard"
       :agency-id="agencyId"
       :campaign-id="campaignId"
       :can-act="props.canAct ?? false"

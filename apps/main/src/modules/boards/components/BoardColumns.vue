@@ -35,6 +35,8 @@ const props = defineProps<{
   /** The execute tier (invite) — gates accept/reject on the application cards. */
   canAct: boolean
   campaignCurrency: string | null
+  /** PL-1.2: this is a for-a-wave board — Applied is named for what it is. */
+  waveBoard?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -82,6 +84,7 @@ defineExpose({ onColumnChange, localColumns })
       :campaign-id="campaignId"
       :can-act="canAct"
       :campaign-currency="campaignCurrency"
+      :wave-board="waveBoard ?? false"
     />
 
     <draggable

@@ -13,6 +13,7 @@
 
 import type { BoardCardResource, BoardColumnResource } from '@catalyst/api-client'
 import draggable from 'vuedraggable'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { boardColorHex } from '../support/boardTokens'
@@ -31,7 +32,16 @@ const emit = defineEmits<{
   delete: [column: BoardColumnResource]
 }>()
 
-const { t } = useI18n()
+const { t, te } = useI18n()
+
+// PL-1.2: a wave board's data columns are named by their stage key, in the viewer's language; every other column
+// shows its stored name, exactly as before.
+const displayName = computed(() => {
+  const key = props.column.attributes.stage_key
+  const i18nKey = `app.campaigns.board.wave.stage.${key}`
+  return key !== undefined && te(i18nKey) ? t(i18nKey) : props.column.attributes.name
+})
+const slimCards = computed(() => props.column.attributes.stage_key !== undefined)
 
 interface CardChangeEvent {
   added?: { element: BoardCardResource; newIndex: number }
@@ -74,7 +84,7 @@ defineExpose({ onCardChange })
         class="text-subtitle-2 text-no-wrap text-truncate"
         :data-test="`board-column-name-${column.id}`"
       >
-        {{ column.attributes.name }}
+        {{ displayName }}
       </span>
       <v-chip size="x-small" variant="tonal" :data-test="`board-column-count-${column.id}`">
         {{ cards.length }}
@@ -129,7 +139,7 @@ defineExpose({ onCardChange })
     >
       <template #item="{ element }">
         <div @click="emit('open-card', element)">
-          <BoardCard :card="element" />
+          <BoardCard :card="element" :slim="slimCards" />
         </div>
       </template>
     </draggable>

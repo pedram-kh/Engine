@@ -17,14 +17,15 @@
  *     mid-move can never snap the pending card back to its origin.
  */
 
-import type {
-  BoardAutomationResource,
-  BoardCardResource,
-  BoardColumnResource,
-  BoardResource,
-  CreateBoardColumnPayload,
-  UpdateBoardAutomationPayload,
-  UpdateBoardColumnPayload,
+import {
+  ApiError,
+  type BoardAutomationResource,
+  type BoardCardResource,
+  type BoardColumnResource,
+  type BoardResource,
+  type CreateBoardColumnPayload,
+  type UpdateBoardAutomationPayload,
+  type UpdateBoardColumnPayload,
 } from '@catalyst/api-client'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
@@ -65,9 +66,17 @@ export const useBoardStore = defineStore('board', () => {
   const loading = ref(false)
   const loadError = ref(false)
 
+  /** PL-1.2: the API code of the last refused move (e.g. `board.selection_requires_acceptance`), else null. */
+  const lastMoveError = ref<string | null>(null)
+
   // ---------------------------------------------------------------
   // Getters
   // ---------------------------------------------------------------
+  /** PL-1.2: a for-a-wave board is recognised by its stage keys; no normal board's column has one. */
+  const isWaveBoard = computed(() =>
+    columns.value.some((c) => c.attributes.stage_key !== undefined),
+  )
+
   const sortedColumns = computed(() =>
     [...columns.value].sort((a, b) => a.attributes.position - b.attributes.position),
   )
@@ -210,13 +219,16 @@ export const useBoardStore = defineStore('board', () => {
     const originColumnId = cardColumnId(card)
     if (originColumnId === targetColumnUlid) return true // already there — no-op
 
+    lastMoveError.value = null
+
     setCardColumn(cardUlid, targetColumnUlid) // optimistic
     markInFlight(cardUlid)
     try {
       const res = await boardApi.moveCard(a, c, cardUlid, { target_column_id: targetColumnUlid })
       applyServerCard(res.data) // server is authoritative on success
       return true
-    } catch {
+    } catch (err) {
+      lastMoveError.value = err instanceof ApiError ? err.code : null
       setCardColumn(cardUlid, originColumnId) // revert to origin (D-3)
       return false
     } finally {
@@ -323,6 +335,7 @@ export const useBoardStore = defineStore('board', () => {
     inFlightMoves.value = new Set()
     loading.value = false
     loadError.value = false
+    lastMoveError.value = null
   }
 
   return {
@@ -336,7 +349,9 @@ export const useBoardStore = defineStore('board', () => {
     inFlightMoves,
     loading,
     loadError,
+    lastMoveError,
     // getters
+    isWaveBoard,
     sortedColumns,
     cardsByColumn,
     cardCountByColumn,

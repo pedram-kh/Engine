@@ -64,6 +64,8 @@ const props = defineProps<{
   /** The execute tier (invite) — the same ability that gates the tab's actions. */
   canAct: boolean
   campaignCurrency: string | null
+  /** PL-1.2: on a wave board the column reads "Applied". */
+  waveBoard?: boolean
 }>()
 
 const { t, locale } = useI18n()
@@ -180,7 +182,11 @@ onMounted(() => {
     <div class="applications-column__header d-flex align-center ga-2 mb-2">
       <v-icon icon="mdi-account-arrow-right-outline" size="small" />
       <span class="text-subtitle-2 text-no-wrap text-truncate" data-test="board-applications-name">
-        {{ t('app.campaigns.board.applications.title') }}
+        {{
+          waveBoard
+            ? t('app.campaigns.board.applications.titleWave')
+            : t('app.campaigns.board.applications.title')
+        }}
       </span>
       <v-chip size="x-small" variant="tonal" data-test="board-applications-count">
         {{ pendingTotal }}
