@@ -149,11 +149,24 @@ Recorded with the PL-1.2 plan (`pl-1-2-plan.md`). They sharpen R3, R4 and R9; **
 
 **Amendment to PL-1.1 (by P2 and P5):** PL-1.1 let a wave link to any campaign of the brand and locked the link once set. Under P2 the link accepts only a for-a-wave campaign; under P5 and Q3 the link is locked only while a card sits in a working column (Selected or later), not once a link is set. PL-1.1's tests, seeder and dialog change in PL-1.2 (list in `pl-1-2-plan.md` §6). PL-1.1 as built and walked is not edited retroactively.
 
+### PL-1.3 rulings (Pedram, 2026-11-18)
+
+Recorded with the PL-1.3 plan (`pl-1-3-plan.md`). Binding with R1 to R10 and P1 to P9.
+
+- **T1.** A new wave starts with a ready-made list of steps: the standard production-line steps of frame 01b. The strategist can edit, add and remove steps. Waves that already exist get the same list on first open, not by a data-writing migration.
+- **T2.** Owners are agency team members only. No client owners (PL-4).
+- **T3.** Admin and manager add and remove steps. Admin, manager and staff update a step's status, owner and dates.
+- **T4.** Everything is updated by hand in PL-1.3. Later sprints tick steps automatically; a step is found by a stable key, never by its name.
+- **T5.** No notifications or reminders to owners. No calendar or timeline view unless frame 01b has one; if it has, report it and leave it out pending a ruling. (Frame 01b has none; it has a day-grouped "Due this week" list, left out.)
+- **T6.** Screens with no design (edit a step, add, remove, empty, loading, error) are built from the existing design system and named in the plan.
+
+**Status (2026-11-18): PL-1.3 inventory and plan written, not built.** Open questions Q1 to Q12 are in `pl-1-3-plan.md` §11; the build waits for Q1, Q2, Q3 and Q9.
+
 ### PL-1 chunks (three)
 
 - **PL-1.1 Brand and new wave.** The wave object (brand, name, go-live date, markets, optional campaign link), the Brand page (details, client files, waves table) and the New wave dialog. Frames 01 and 09. **Status (2026-11-17): built and walked (Pedram, local, 14 of 14 steps, including the first real-storage upload). Not merged, not deployed.** Review: `pl-1-1-review.md`.
 - **PL-1.2 Campaign for a wave.** The create option, the link shown on both sides, the new board. Design: none (built from the design system and existing board components, Q10). **Status (2026-11-18): built and walked (Pedram, local, steps 1 to 16, after three fixes D1 to D3); not merged, not deployed.** No deploy-log entry.
-- **PL-1.3 Wave project tracker.** Streams, steps table, owners and dates. Frame 01b, read from Figma in pieces.
+- **PL-1.3 Wave project tracker.** Streams, steps table, owners and dates. Frame 01b, read from Figma in pieces. **Status (2026-11-18): inventory and plan written (`pl-1-3-inventory.md`, `pl-1-3-plan.md`), not built.**
 
 ### Open items from these rulings
 
