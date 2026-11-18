@@ -166,6 +166,19 @@ reboot. From now on, for every agent and developer, on a local machine:
    column is classified). A new audit payload is written as a literal array with
    literal keys; a variable or `toArray()` is a last resort and needs a
    tech-debt row. PL-1.1 reached CI red by skipping this step.
+7. **PostgreSQL before a push, when the chunk relies on the database.** Local
+   Pest runs on SQLite, which ignores row locks and reports unique violations
+   differently from the production database (PostgreSQL aborts the surrounding
+   transaction, SQLite does not). A test that depends on a unique index, a row
+   lock (`FOR UPDATE`) or a transaction is also run locally on PostgreSQL before
+   the push: create a **throwaway** database in the local container
+   (`CREATE DATABASE pl12_test`), run the Waves, Campaigns, Boards and Erasure
+   folders (or the folders of the chunk) with `DB_CONNECTION=pgsql` and that
+   database name, then drop it. A lock test asserts that the SQL contains
+   `for update` (it cannot go red on SQLite; mark it to skip there). **Never the
+   dev database**, and unset the `DB_*` variables afterwards so the next SQLite
+   run does not point at a dropped database. PL-1.1 reached CI red a second
+   time (run 449) because an unique-violation test was only run on SQLite.
 
 ---
 
