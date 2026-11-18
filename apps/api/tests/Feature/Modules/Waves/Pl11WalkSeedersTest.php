@@ -26,6 +26,8 @@ it('S1: seeds the two walk agencies, leaves the flag off, and is idempotent', fu
     expect(Brand::query()->where('agency_id', $a->id)->count())->toBe(3)
         ->and(Wave::query()->where('agency_id', $a->id)->pluck('name')->sort()->values()->all())->toBe(['Wave 5', 'Wave 6'])
         ->and(Wave::query()->where('brand_id', $bolt->id)->whereNotNull('campaign_id')->count())->toBe(1)
+        // PL-1.2 (P2): a linked wave's campaign is a for-a-wave campaign, the only kind that may be linked.
+        ->and(Wave::query()->whereNotNull('campaign_id')->get()->every(static fn (Wave $w): bool => $w->campaign?->isForWave() === true))->toBeTrue()
         ->and(User::query()->where('email', 'like', '%'.Pl11WalkSeeder::DOMAIN)->count())->toBe(4)
         ->and(Feature::active(WavesEnabled::NAME))->toBeFalse();
 

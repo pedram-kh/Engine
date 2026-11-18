@@ -6,8 +6,11 @@ namespace App\Modules\Campaigns\Http\Resources;
 
 use App\Modules\Brands\Models\Brand;
 use App\Modules\Campaigns\Models\Campaign;
+use App\Modules\Waves\Features\WavesEnabled;
+use App\Modules\Waves\Services\WaveCampaignLink;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Laravel\Pennant\Feature;
 
 /**
  * JSON representation of a Campaign (docs/04-API-DESIGN.md §4 envelope).
@@ -106,6 +109,22 @@ final class CampaignResource extends JsonResource
                         'type' => 'agencies',
                     ],
                 ],
+                // PL-1.2 (P4) — the campaign's wave, on show / create / update with `waves_enabled` ON ONLY (the key
+                // is absent otherwise, so nothing differs with the flag OFF). `null` = loaded and no wave.
+                ...($campaign->relationLoaded('wave') && Feature::active(WavesEnabled::NAME) ? [
+                    'wave' => $campaign->wave === null ? null : [
+                        'data' => [
+                            'id' => $campaign->wave->ulid,
+                            'type' => 'waves',
+                            'attributes' => [
+                                'name' => $campaign->wave->name,
+                                'go_live_on' => $campaign->wave->go_live_on->format('Y-m-d'),
+                                'status' => $campaign->wave->status->value,
+                                'link_locked' => app(WaveCampaignLink::class)->isLocked($campaign->id),
+                            ],
+                        ],
+                    ],
+                ] : []),
             ],
         ];
     }

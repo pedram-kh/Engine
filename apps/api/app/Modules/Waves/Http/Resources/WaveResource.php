@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Waves\Http\Resources;
 
 use App\Modules\Waves\Models\Wave;
+use App\Modules\Waves\Services\WaveCampaignLink;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -35,6 +36,9 @@ final class WaveResource extends JsonResource
                 'go_live_on' => $wave->go_live_on->format('Y-m-d'),
                 'markets' => array_values($wave->markets),
                 'status' => $wave->status->value,
+                // PL-1.2 (P5, Q3) — true while a card of the linked campaign sits in a working column, so the page can
+                // explain a disabled control. The server is the authority; this is only the explanation.
+                'link_locked' => $campaign !== null && app(WaveCampaignLink::class)->isLocked($campaign->id),
                 'created_at' => $wave->created_at->toIso8601String(),
                 'updated_at' => $wave->updated_at->toIso8601String(),
             ],
@@ -50,7 +54,7 @@ final class WaveResource extends JsonResource
                     'data' => [
                         'id' => $campaign->ulid,
                         'type' => 'campaigns',
-                        'attributes' => ['name' => $campaign->name, 'status' => $campaign->status->value],
+                        'attributes' => ['name' => $campaign->name, 'status' => $campaign->status->value, 'campaign_type' => $campaign->campaign_type->value],
                     ],
                 ],
                 'created_by' => [

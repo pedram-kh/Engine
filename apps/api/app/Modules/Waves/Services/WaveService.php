@@ -7,9 +7,12 @@ namespace App\Modules\Waves\Services;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Facades\Audit;
+use App\Modules\Boards\Services\BoardService;
 use App\Modules\Brands\Enums\BrandStatus;
 use App\Modules\Brands\Models\Brand;
+use App\Modules\Campaigns\Enums\CampaignObjective;
 use App\Modules\Campaigns\Enums\CampaignStatus;
+use App\Modules\Campaigns\Enums\CampaignType;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Identity\Models\User;
 use App\Modules\Waves\Enums\WaveStatus;
@@ -18,18 +21,23 @@ use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Wave writes (PL-1.1). The rules live here, not in the controller:
+ * Wave writes (PL-1.1, amended by PL-1.2). The rules live here, not in the controller:
  *
  *   - an archived brand is read-only (create AND edit);
- *   - a linked campaign must belong to this agency AND this brand, must not be soft-deleted and must not be
+ *   - a linked campaign must be a FOR-A-WAVE campaign (P2) of this agency AND this brand, not soft-deleted and not
  *     Cancelled; every "no" is the SAME `wave.campaign_not_available`, so a response never reveals whether a
- *     foreign, deleted or cancelled campaign exists;
+ *     foreign, deleted, cancelled or normal campaign exists;
  *   - one wave per campaign: the partial unique index is the only guard; its violation is mapped to
  *     `wave.campaign_already_linked` (there is no pre-check);
- *   - an existing link can be neither changed nor removed (PL-1.2); a link can be SET while the wave has none.
+ *   - the link can be set, changed or removed while the campaign's link is not locked (P5, Q3: locked while a card
+ *     sits in a working column); then `wave.campaign_link_locked`. The wave row is locked FOR UPDATE first, and a
+ *     card move that can change the lock takes the same lock, so the two cannot interleave;
+ *   - the wave side and the campaign side go through the SAME methods here: one rule path.
  */
 final class WaveService
 {
+    public function __construct(private readonly WaveCampaignLink $links) {}
+
     /**
      * @param  array{name: string, go_live_on: string, markets: list<string>, campaign_id?: string|null}  $data
      */
@@ -40,34 +48,64 @@ final class WaveService
         $campaign = $this->linkableCampaign($agency, $brand, $data['campaign_id'] ?? null);
 
         try {
-            $wave = DB::transaction(function () use ($agency, $brand, $actor, $data, $campaign): Wave {
-                return Wave::query()->create([
-                    'agency_id' => $agency->id,
-                    'brand_id' => $brand->id,
-                    'campaign_id' => $campaign?->id,
-                    'name' => trim($data['name']),
-                    'go_live_on' => $data['go_live_on'],
-                    'markets' => array_values($data['markets']),
-                    'status' => WaveStatus::Draft,
-                    'created_by_user_id' => $actor->id,
-                ]);
-            });
+            $wave = DB::transaction(fn (): Wave => $this->insertWave($agency, $brand, $actor, $data, $campaign));
         } catch (UniqueConstraintViolationException) {
             throw WaveRuleViolation::campaignAlreadyLinked();
         }
 
+        $this->logCreated($wave, $campaign?->ulid);
+
+        return $wave;
+    }
+
+    /**
+     * PL-1.2 (P3) — "Create a campaign for this wave now". ONE transaction: the for-a-wave campaign (draft, posting
+     * off, objective ugc, budget 0 in the agency's default currency: the rest is filled in later), its nine-column
+     * board, and the wave linked to it. Any failure rolls back all three. Audit rows are written after commit.
+     *
+     * @param  array{name: string, go_live_on: string, markets: list<string>, new_campaign: array{name: string}}  $data
+     */
+    public function createWithNewCampaign(Agency $agency, Brand $brand, User $actor, array $data): Wave
+    {
+        $this->assertBrandWritable($brand);
+
+        [$wave, $campaign] = DB::transaction(function () use ($agency, $brand, $actor, $data): array {
+            $campaign = Campaign::query()->create([
+                'agency_id' => $agency->id,
+                'brand_id' => $brand->id,
+                'created_by_user_id' => $actor->id,
+                'name' => trim($data['new_campaign']['name']),
+                'objective' => CampaignObjective::Ugc,
+                'status' => CampaignStatus::Draft,
+                'budget_minor_units' => 0,
+                'budget_currency' => strtoupper($agency->default_currency),
+                'creator_posts_content' => false,
+                'campaign_type' => CampaignType::ForWave,
+            ]);
+
+            app(BoardService::class)->ensureBoard($campaign);
+
+            return [$this->insertWave($agency, $brand, $actor, $data, $campaign), $campaign];
+        });
+
         Audit::log(
-            action: AuditAction::WaveCreated,
-            subject: $wave,
-            // Literal keys on purpose: AuditPayloadKeysGuardTest reads them statically and Erasure decides each.
+            action: AuditAction::CampaignCreated,
+            subject: $campaign,
+            // Literal keys on purpose (AuditPayloadKeysGuardTest reads them statically).
             after: [
-                'name' => $wave->name,
-                'go_live_on' => $wave->go_live_on->toDateString(),
-                'markets' => $wave->markets,
-                'campaign_id' => $campaign?->ulid,
-                'status' => $wave->status->value,
+                'name' => $campaign->name,
+                'objective' => $campaign->objective->value,
+                'status' => $campaign->status->value,
+                'budget_minor_units' => $campaign->budget_minor_units,
+                'budget_currency' => $campaign->budget_currency,
+                'brand_id' => $campaign->brand_id,
+                'agency_id' => $campaign->agency_id,
+                'creator_posts_content' => $campaign->creator_posts_content,
+                'campaign_type' => $campaign->campaign_type->value,
+                'listed_on_jobs_board' => $campaign->listed_on_jobs_board,
             ],
         );
+        $this->logCreated($wave, $campaign->ulid);
 
         return $wave;
     }
@@ -83,30 +121,14 @@ final class WaveService
             // The whole read-decide-write runs inside one transaction on a ROW-LOCKED copy of the wave, so two
             // concurrent edits are serialised: the second one re-reads the first one's link and re-applies the rule
             // against it (PL-1.1 review fix F2). The caller's $wave may be stale by the time the lock is granted.
-            [$wave, $before, $newCampaign, $changed] = DB::transaction(function () use ($agency, $brand, $wave, $data): array {
+            [$wave, $before, $afterCampaignUlid, $changed] = DB::transaction(function () use ($agency, $brand, $wave, $data): array {
                 $locked = Wave::query()->whereKey($wave->id)->lockForUpdate()->firstOrFail();
 
-                $beforeCampaignUlid = $locked->campaign_id === null
-                    ? null
-                    : Campaign::query()->withTrashed()->whereKey($locked->campaign_id)->value('ulid');
-                $before = [
-                    'name' => $locked->name,
-                    'go_live_on' => $locked->go_live_on->toDateString(),
-                    'markets' => $locked->markets,
-                    'campaign_id' => $beforeCampaignUlid,
-                    'status' => $locked->status->value,
-                ];
-                $newCampaign = null;
+                $before = $this->snapshot($locked);
+                $afterCampaignUlid = $before['campaign_id'];
 
                 if (array_key_exists('campaign_id', $data)) {
-                    $requested = $data['campaign_id'];
-                    if ($locked->campaign_id !== null) {
-                        if ($requested !== $beforeCampaignUlid) {
-                            throw WaveRuleViolation::campaignLinkLocked();
-                        }
-                    } elseif ($requested !== null) {
-                        $newCampaign = $this->linkableCampaign($agency, $brand, $requested);
-                    }
+                    $afterCampaignUlid = $this->applyCampaign($locked, $data['campaign_id'], $agency, $brand, $before['campaign_id']);
                 }
 
                 if (array_key_exists('name', $data)) {
@@ -118,16 +140,13 @@ final class WaveService
                 if (array_key_exists('markets', $data)) {
                     $locked->markets = array_values((array) $data['markets']);
                 }
-                if ($newCampaign !== null) {
-                    $locked->campaign_id = $newCampaign->id;
-                }
 
                 $changed = $locked->isDirty();
                 if ($changed) {
                     $locked->save();
                 }
 
-                return [$locked, $before, $newCampaign, $changed];
+                return [$locked, $before, $afterCampaignUlid, $changed];
             });
         } catch (UniqueConstraintViolationException) {
             throw WaveRuleViolation::campaignAlreadyLinked();
@@ -137,10 +156,182 @@ final class WaveService
             return $wave;
         }
 
+        $this->logUpdated($wave, $before, $afterCampaignUlid);
+
+        return $wave;
+    }
+
+    /**
+     * PL-1.2 (P4) — link this campaign to a wave of its brand from the CAMPAIGN side. If the campaign is already
+     * linked to another wave, that link is changed (the old wave is freed) under the same lock rule. Returns the
+     * linked wave. Every refusal is the wave side's own: not available, already linked, locked, brand archived.
+     */
+    public function linkFromCampaign(Agency $agency, Campaign $campaign, string $waveUlid): Wave
+    {
+        $brand = Brand::query()->withTrashed()->findOrFail($campaign->brand_id);
+        $this->assertBrandWritable($brand);
+
+        $audits = [];
+
+        try {
+            $target = DB::transaction(function () use ($agency, $brand, $campaign, $waveUlid, &$audits): Wave {
+                $targetId = Wave::query()
+                    ->where('ulid', $waveUlid)->where('agency_id', $agency->id)->where('brand_id', $brand->id)
+                    ->value('id');
+                $currentId = Wave::query()->where('campaign_id', $campaign->id)->value('id');
+
+                if ($targetId === null) {
+                    throw WaveRuleViolation::campaignNotAvailable();
+                }
+
+                // Both rows, locked in id order so two campaign-side calls cannot deadlock each other.
+                $ids = array_values(array_unique(array_filter([(int) $targetId, $currentId === null ? null : (int) $currentId])));
+                sort($ids);
+                $rows = Wave::query()->whereIn('id', $ids)->orderBy('id')->lockForUpdate()->get()->keyBy('id');
+
+                $target = $rows[(int) $targetId];
+                $current = $currentId === null ? null : $rows[(int) $currentId];
+
+                if ($current !== null && $current->id === $target->id) {
+                    return $target;
+                }
+
+                if ($current !== null) {
+                    $audits[] = $this->detach($current, $agency, $brand);
+                }
+
+                $before = $this->snapshot($target);
+                $after = $this->applyCampaign($target, $campaign->ulid, $agency, $brand, $before['campaign_id']);
+                $target->save();
+                $audits[] = [$target, $before, $after];
+
+                return $target;
+            });
+        } catch (UniqueConstraintViolationException) {
+            throw WaveRuleViolation::campaignAlreadyLinked();
+        }
+
+        foreach ($audits as [$wave, $before, $afterCampaignUlid]) {
+            $this->logUpdated($wave, $before, $afterCampaignUlid);
+        }
+
+        return $target;
+    }
+
+    /**
+     * PL-1.2 (P4, P5) — remove this campaign's link from the campaign side. A campaign with no wave is a no-op.
+     */
+    public function unlinkFromCampaign(Agency $agency, Campaign $campaign): void
+    {
+        $brand = Brand::query()->withTrashed()->findOrFail($campaign->brand_id);
+        $this->assertBrandWritable($brand);
+
+        $audit = DB::transaction(function () use ($agency, $brand, $campaign): ?array {
+            $current = Wave::query()->where('campaign_id', $campaign->id)->lockForUpdate()->first();
+
+            return $current === null ? null : $this->detach($current, $agency, $brand);
+        });
+
+        if ($audit !== null) {
+            $this->logUpdated($audit[0], $audit[1], $audit[2]);
+        }
+    }
+
+    /**
+     * Remove the link of an already-locked wave row (the lock rule applies) and save it.
+     *
+     * @return array{0: Wave, 1: array<string, mixed>, 2: string|null}
+     */
+    private function detach(Wave $locked, Agency $agency, Brand $brand): array
+    {
+        $before = $this->snapshot($locked);
+        $after = $this->applyCampaign($locked, null, $agency, $brand, $before['campaign_id']);
+        $locked->save();
+
+        return [$locked, $before, $after];
+    }
+
+    /**
+     * The one link rule, on a ROW-LOCKED wave. Sets `campaign_id` on the model (the caller saves) and returns the
+     * campaign ulid the wave ends up with. Asking for what it already has is a no-op. Changing or removing an
+     * existing link is refused while the campaign's link is locked (a card in a working column, read NOW).
+     *
+     * @return string|null the campaign ulid after the change
+     */
+    private function applyCampaign(Wave $locked, ?string $requestedUlid, Agency $agency, Brand $brand, ?string $beforeUlid): ?string
+    {
+        if ($requestedUlid === $beforeUlid) {
+            return $beforeUlid;
+        }
+
+        if ($locked->campaign_id !== null && $this->links->isLocked($locked->campaign_id)) {
+            throw WaveRuleViolation::campaignLinkLocked();
+        }
+
+        $new = $this->linkableCampaign($agency, $brand, $requestedUlid);
+        $locked->campaign_id = $new?->id;
+
+        return $new?->ulid;
+    }
+
+    /**
+     * @return array{name: string, go_live_on: string, markets: list<string>, campaign_id: string|null, status: string}
+     */
+    private function snapshot(Wave $wave): array
+    {
+        return [
+            'name' => $wave->name,
+            'go_live_on' => $wave->go_live_on->toDateString(),
+            'markets' => $wave->markets,
+            'campaign_id' => $wave->campaign_id === null
+                ? null
+                : Campaign::query()->withTrashed()->whereKey($wave->campaign_id)->value('ulid'),
+            'status' => $wave->status->value,
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    private function insertWave(Agency $agency, Brand $brand, User $actor, array $data, ?Campaign $campaign): Wave
+    {
+        return Wave::query()->create([
+            'agency_id' => $agency->id,
+            'brand_id' => $brand->id,
+            'campaign_id' => $campaign?->id,
+            'name' => trim((string) $data['name']),
+            'go_live_on' => $data['go_live_on'],
+            'markets' => array_values((array) $data['markets']),
+            'status' => WaveStatus::Draft,
+            'created_by_user_id' => $actor->id,
+        ]);
+    }
+
+    private function logCreated(Wave $wave, ?string $campaignUlid): void
+    {
+        Audit::log(
+            action: AuditAction::WaveCreated,
+            subject: $wave,
+            // Literal keys on purpose: AuditPayloadKeysGuardTest reads them statically and Erasure decides each.
+            after: [
+                'name' => $wave->name,
+                'go_live_on' => $wave->go_live_on->toDateString(),
+                'markets' => $wave->markets,
+                'campaign_id' => $campaignUlid,
+                'status' => $wave->status->value,
+            ],
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $before
+     */
+    private function logUpdated(Wave $wave, array $before, ?string $afterCampaignUlid): void
+    {
         Audit::log(
             action: AuditAction::WaveUpdated,
             subject: $wave,
-            // Literal keys on purpose (see create()).
+            // Literal keys on purpose (see logCreated()).
             before: [
                 'name' => $before['name'],
                 'go_live_on' => $before['go_live_on'],
@@ -152,12 +343,10 @@ final class WaveService
                 'name' => $wave->name,
                 'go_live_on' => $wave->go_live_on->toDateString(),
                 'markets' => $wave->markets,
-                'campaign_id' => $newCampaign === null ? $before['campaign_id'] : $newCampaign->ulid,
+                'campaign_id' => $afterCampaignUlid,
                 'status' => $wave->status->value,
             ],
         );
-
-        return $wave;
     }
 
     private function assertBrandWritable(Brand $brand): void
@@ -169,8 +358,8 @@ final class WaveService
 
     /**
      * Resolve the campaign a wave may link to, or null for "no link". Throws `campaign_not_available` for anything
-     * that is not this agency's, this brand's, live and not cancelled. "Already has a wave" is NOT checked here: the
-     * partial unique index plus the exception mapping in create() and update() are the single path to
+     * that is not this agency's, this brand's, FOR-A-WAVE (P2), live and not cancelled. "Already has a wave" is NOT
+     * checked here: the partial unique index plus the exception mapping is the single path to
      * `wave.campaign_already_linked`.
      */
     private function linkableCampaign(Agency $agency, Brand $brand, ?string $campaignUlid): ?Campaign
@@ -183,6 +372,7 @@ final class WaveService
             ->where('ulid', $campaignUlid)
             ->where('agency_id', $agency->id)
             ->where('brand_id', $brand->id)
+            ->where('campaign_type', CampaignType::ForWave->value)
             ->where('status', '!=', CampaignStatus::Cancelled->value)
             ->first();
 

@@ -33,6 +33,6 @@ final class WaveRuleViolation extends RuntimeException
 
     public static function campaignLinkLocked(): self
     {
-        return new self('wave.campaign_link_locked', 'A wave that is linked to a campaign cannot change or remove the link.');
+        return new self('wave.campaign_link_locked', 'The link cannot change while a creator of the campaign is Selected or further.');
     }
 }

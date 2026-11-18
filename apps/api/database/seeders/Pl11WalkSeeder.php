@@ -20,7 +20,8 @@ use RuntimeException;
  *
  * Agency A "PL-1.1 Walk Agency A": an admin, a manager and a staff user; brands Bolt Food and Glovo
  * (active) and Old Co (archived); campaigns Bolt Autumn Reels (draft), Bolt Winter Launch (active),
- * Bolt Old Promo (cancelled), Bolt Summer (completed, linked to Wave 5) and Glovo Spring; waves
+ * Bolt Old Promo (cancelled), Bolt Summer (completed, linked to Wave 5) and Glovo Spring (PL-1.2, P2: the
+ * Autumn Reels, Winter Launch and Summer are FOR-A-WAVE campaigns, the only kind a wave can link to; the others are normal); waves
  * Wave 5 (SK, linked to Bolt Summer) and Wave 6 (SK RO CZ, no campaign).
  *
  * Agency B "PL-1.1 Walk Agency B": an admin, brand Zeta Foods, campaign Zeta Q4, wave Zeta Wave 1.
@@ -92,10 +93,10 @@ final class Pl11WalkSeeder extends Seeder
 
         $base = ['agency_id' => $agency->id, 'created_by_user_id' => $admin->id];
 
-        Campaign::factory()->create($base + ['brand_id' => $bolt->id, 'name' => 'Bolt Autumn Reels']);
-        Campaign::factory()->active()->create($base + ['brand_id' => $bolt->id, 'name' => 'Bolt Winter Launch']);
+        Campaign::factory()->forWave()->create($base + ['brand_id' => $bolt->id, 'name' => 'Bolt Autumn Reels']);
+        Campaign::factory()->forWave()->active()->create($base + ['brand_id' => $bolt->id, 'name' => 'Bolt Winter Launch']);
         Campaign::factory()->create($base + ['brand_id' => $bolt->id, 'name' => 'Bolt Old Promo', 'status' => CampaignStatus::Cancelled]);
-        $summer = Campaign::factory()->create($base + ['brand_id' => $bolt->id, 'name' => 'Bolt Summer', 'status' => CampaignStatus::Completed]);
+        $summer = Campaign::factory()->forWave()->create($base + ['brand_id' => $bolt->id, 'name' => 'Bolt Summer', 'status' => CampaignStatus::Completed]);
         Campaign::factory()->create($base + ['brand_id' => $glovo->id, 'name' => 'Glovo Spring']);
 
         Wave::factory()->forBrand($agency->id, $bolt->id)->linkedTo($summer->id)->create([

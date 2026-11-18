@@ -7,6 +7,7 @@ use App\Modules\Brands\Models\Brand;
 use App\Modules\Campaigns\Http\Requests\UpdateCampaignRequest;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Waves\Models\Wave;
+use App\Modules\Waves\Services\WaveCampaignLink;
 use App\Modules\Waves\Services\WaveRuleViolation;
 use App\Modules\Waves\Services\WaveService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -36,7 +37,7 @@ function wvErrorBody(TestResponse $response): array
     return ['status' => $error['status'], 'code' => $error['code'], 'title' => $error['title']];
 }
 
-it('B4: refuses a campaign of another brand, another agency, a deleted one and an unknown ulid with an identical 422', function (): void {
+it('B4 / L1: refuses a campaign of another brand, another agency, a deleted one, an unknown ulid and a NORMAL campaign with an identical 422', function (): void {
     $w = WaveFixtures::world();
     WaveFixtures::armed();
     $sameAgencyOtherBrand = WaveFixtures::campaign($w['agency'], Brand::factory()->forAgency($w['agency']->id)->createOne());
@@ -44,9 +45,11 @@ it('B4: refuses a campaign of another brand, another agency, a deleted one and a
     $deleted = WaveFixtures::campaign($w['agency'], $w['brand']);
     $deleted->delete();
     $unknown = '01ARZ3NDEKTSV4RRFFQ69G5FAV';
+    // PL-1.2 (P2): a NORMAL campaign of this very brand and agency is refused with the same body (L1).
+    $normal = WaveFixtures::campaign($w['agency'], $w['brand']);
 
     $bodies = [];
-    foreach ([$sameAgencyOtherBrand->ulid, $otherAgency->ulid, $deleted->ulid, $unknown] as $ulid) {
+    foreach ([$sameAgencyOtherBrand->ulid, $otherAgency->ulid, $deleted->ulid, $unknown, $normal->ulid] as $ulid) {
         $res = $this->actingAs($w['admin'], 'web')
             ->postJson(WaveFixtures::wavesUrl($w['agency'], $w['brand']), WaveFixtures::body(['campaign_id' => $ulid]))
             ->assertUnprocessable()->assertJsonPath('errors.0.code', 'wave.campaign_not_available');
@@ -60,7 +63,7 @@ it('B4: refuses a campaign of another brand, another agency, a deleted one and a
 it('B4: links an own-brand unlinked campaign', function (): void {
     $w = WaveFixtures::world();
     WaveFixtures::armed();
-    $campaign = WaveFixtures::campaign($w['agency'], $w['brand']);
+    $campaign = WaveFixtures::waveCampaign($w['agency'], $w['brand']);
 
     $this->actingAs($w['admin'], 'web')
         ->postJson(WaveFixtures::wavesUrl($w['agency'], $w['brand']), WaveFixtures::body(['campaign_id' => $campaign->ulid]))
@@ -70,7 +73,7 @@ it('B4: links an own-brand unlinked campaign', function (): void {
 it('B5: a second wave for a linked campaign gives 422 wave.campaign_already_linked', function (): void {
     $w = WaveFixtures::world();
     WaveFixtures::armed();
-    $campaign = WaveFixtures::campaign($w['agency'], $w['brand']);
+    $campaign = WaveFixtures::waveCampaign($w['agency'], $w['brand']);
     Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->linkedTo($campaign->id)->create();
 
     $this->actingAs($w['admin'], 'web')
@@ -81,7 +84,7 @@ it('B5: a second wave for a linked campaign gives 422 wave.campaign_already_link
 it('B5: the race: when a competing row lands first the index fires and the answer is the 422, not a 500', function (): void {
     $w = WaveFixtures::world();
     WaveFixtures::armed();
-    $campaign = WaveFixtures::campaign($w['agency'], $w['brand']);
+    $campaign = WaveFixtures::waveCampaign($w['agency'], $w['brand']);
 
     // Another request wins the race between our pre-check and our insert: a one-shot creating hook inserts the
     // competing row (raw, so no model event runs) after the pre-check has already passed.
@@ -111,16 +114,17 @@ it('B5: the race: when a competing row lands first the index fires and the answe
 it('B6: campaign-options returns only this brand\'s live, non-cancelled campaigns with no wave, with their status', function (): void {
     $w = WaveFixtures::world();
     WaveFixtures::armed();
-    $draft = WaveFixtures::campaign($w['agency'], $w['brand'], 'draft', 'A draft');
-    $active = WaveFixtures::campaign($w['agency'], $w['brand'], 'active', 'B active');
-    $paused = WaveFixtures::campaign($w['agency'], $w['brand'], 'paused', 'C paused');
-    $completed = WaveFixtures::campaign($w['agency'], $w['brand'], 'completed', 'D completed');
-    $linked = WaveFixtures::campaign($w['agency'], $w['brand'], 'active', 'E linked');
-    WaveFixtures::campaign($w['agency'], $w['brand'], 'cancelled', 'F cancelled');
-    $gone = WaveFixtures::campaign($w['agency'], $w['brand'], 'active', 'G deleted');
+    $draft = WaveFixtures::waveCampaign($w['agency'], $w['brand'], 'draft', 'A draft');
+    $active = WaveFixtures::waveCampaign($w['agency'], $w['brand'], 'active', 'B active');
+    $paused = WaveFixtures::waveCampaign($w['agency'], $w['brand'], 'paused', 'C paused');
+    $completed = WaveFixtures::waveCampaign($w['agency'], $w['brand'], 'completed', 'D completed');
+    $linked = WaveFixtures::waveCampaign($w['agency'], $w['brand'], 'active', 'E linked');
+    WaveFixtures::campaign($w['agency'], $w['brand'], 'active', 'J normal (never offered: P2)');
+    WaveFixtures::waveCampaign($w['agency'], $w['brand'], 'cancelled', 'F cancelled');
+    $gone = WaveFixtures::waveCampaign($w['agency'], $w['brand'], 'active', 'G deleted');
     $gone->delete();
-    WaveFixtures::campaign($w['agency'], Brand::factory()->forAgency($w['agency']->id)->createOne(), 'active', 'H other brand');
-    WaveFixtures::campaign($w['otherAgency'], $w['otherBrand'], 'active', 'I other agency');
+    WaveFixtures::waveCampaign($w['agency'], Brand::factory()->forAgency($w['agency']->id)->createOne(), 'active', 'H other brand');
+    WaveFixtures::waveCampaign($w['otherAgency'], $w['otherBrand'], 'active', 'I other agency');
     $wave = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->linkedTo($linked->id)->create();
 
     $res = $this->actingAs($w['admin'], 'web')->getJson(WaveFixtures::wavesUrl($w['agency'], $w['brand'], 'campaign-options'))->assertOk();
@@ -164,7 +168,7 @@ it('B6b pin 2 (G2): PATCHing a linked campaign with a brand_id leaves the campai
 it('B14: sets a link on a wave that has none, audits wave.updated, and shows the campaign', function (): void {
     $w = WaveFixtures::world();
     WaveFixtures::armed();
-    $campaign = WaveFixtures::campaign($w['agency'], $w['brand']);
+    $campaign = WaveFixtures::waveCampaign($w['agency'], $w['brand']);
     $wave = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->create();
 
     $this->actingAs($w['admin'], 'web')
@@ -175,13 +179,41 @@ it('B14: sets a link on a wave that has none, audits wave.updated, and shows the
         ->and(AuditLog::query()->where('action', 'wave.updated')->count())->toBe(1);
 });
 
-it('B14: refuses to change or remove an existing link with 422 wave.campaign_link_locked', function (): void {
+it('L3a: with no card in a working column an existing link can be changed and removed, and each change audits wave.updated', function (): void {
     $w = WaveFixtures::world();
     WaveFixtures::armed();
-    $linked = WaveFixtures::campaign($w['agency'], $w['brand']);
-    $other = WaveFixtures::campaign($w['agency'], $w['brand']);
+    $linked = WaveFixtures::waveCampaign($w['agency'], $w['brand']);
+    $other = WaveFixtures::waveCampaign($w['agency'], $w['brand']);
     $wave = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->linkedTo($linked->id)->create();
     $url = WaveFixtures::wavesUrl($w['agency'], $w['brand'], $wave->ulid);
+
+    // A card in Applied-side territory (Invited) and one in Dropped never lock.
+    WaveFixtures::cardIn($linked, 'invited');
+    WaveFixtures::cardIn($linked, 'dropped');
+
+    $this->actingAs($w['admin'], 'web')->patchJson($url, ['campaign_id' => $other->ulid])->assertOk()
+        ->assertJsonPath('data.relationships.campaign.data.id', $other->ulid);
+    expect($wave->fresh()?->campaign_id)->toBe($other->id);
+
+    $this->actingAs($w['admin'], 'web')->patchJson($url, ['campaign_id' => null, 'name' => 'Unlinked'])->assertOk();
+    expect($wave->fresh()?->campaign_id)->toBeNull()
+        ->and($wave->fresh()?->name)->toBe('Unlinked');
+
+    $audits = AuditLog::query()->where('action', 'wave.updated')->orderBy('id')->get();
+    expect($audits)->toHaveCount(2)
+        ->and($audits[0]->before['campaign_id'])->toBe($linked->ulid)
+        ->and($audits[0]->after['campaign_id'])->toBe($other->ulid)
+        ->and($audits[1]->after['campaign_id'])->toBeNull();
+});
+
+it('L3a: a card currently in ANY working column locks the link: change and remove are 422 wave.campaign_link_locked and nothing changes', function (string $stage): void {
+    $w = WaveFixtures::world();
+    WaveFixtures::armed();
+    $linked = WaveFixtures::waveCampaign($w['agency'], $w['brand']);
+    $other = WaveFixtures::waveCampaign($w['agency'], $w['brand']);
+    $wave = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->linkedTo($linked->id)->create();
+    $url = WaveFixtures::wavesUrl($w['agency'], $w['brand'], $wave->ulid);
+    WaveFixtures::cardIn($linked, $stage);
 
     $this->actingAs($w['admin'], 'web')->patchJson($url, ['campaign_id' => $other->ulid])
         ->assertUnprocessable()->assertJsonPath('errors.0.code', 'wave.campaign_link_locked');
@@ -191,12 +223,53 @@ it('B14: refuses to change or remove an existing link with 422 wave.campaign_lin
     expect($wave->fresh()?->campaign_id)->toBe($linked->id)
         ->and($wave->fresh()?->name)->toBe($wave->name)
         ->and(AuditLog::query()->where('action', 'wave.updated')->count())->toBe(0);
+})->with(['selected', 'filming', 'submitted', 'in_edits', 'client_review', 'approved']);
+
+it('L3b: the lock releases when the card leaves the working set, even though it was there once (positions, not history)', function (): void {
+    $w = WaveFixtures::world();
+    WaveFixtures::armed();
+    $linked = WaveFixtures::waveCampaign($w['agency'], $w['brand']);
+    $wave = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->linkedTo($linked->id)->create();
+    $url = WaveFixtures::wavesUrl($w['agency'], $w['brand'], $wave->ulid);
+    $card = WaveFixtures::cardIn($linked, 'selected');
+    $board = $card->board;
+    $link = app(WaveCampaignLink::class);
+
+    expect($link->isLocked($linked->id))->toBeTrue();
+    $this->actingAs($w['admin'], 'web')->patchJson($url, ['campaign_id' => null])->assertUnprocessable();
+
+    // Moved back to Invited (by the real route): unlocked, though the card WAS selected.
+    $this->actingAs($w['admin'], 'web')
+        ->postJson("/api/v1/agencies/{$w['agency']->ulid}/campaigns/{$linked->ulid}/board/cards/{$card->ulid}/move", [
+            'target_column_id' => $board->columns()->where('stage_key', 'invited')->firstOrFail()->ulid,
+        ])->assertOk();
+    expect($link->isLocked($linked->id))->toBeFalse();
+    $this->actingAs($w['admin'], 'web')->patchJson($url, ['campaign_id' => null])->assertOk();
+    expect($wave->fresh()?->campaign_id)->toBeNull();
+});
+
+it('L3b: moved to Dropped it unlocks too; L3c: the answer flips with every move in and out, and a campaign with no board is unlocked', function (): void {
+    $w = WaveFixtures::world();
+    $linked = WaveFixtures::waveCampaign($w['agency'], $w['brand']);
+    $link = app(WaveCampaignLink::class);
+
+    expect($link->isLocked($linked->id))->toBeFalse();   // no board yet
+
+    $card = WaveFixtures::cardIn($linked, 'invited');
+    $columns = $card->board->columns()->pluck('id', 'stage_key');
+    $answers = [];
+    foreach (['selected', 'dropped', 'filming', 'invited', 'approved', 'dropped'] as $stage) {
+        $card->update(['column_id' => $columns[$stage]]);
+        $answers[$stage.'#'.count($answers)] = $link->isLocked($linked->id);
+    }
+
+    expect(array_values($answers))->toBe([true, false, true, false, true, false]);
 });
 
 it('B14: the wave\'s own campaign id is a no-op: 200 and no audit row; null on an unlinked wave is a no-op too', function (): void {
     $w = WaveFixtures::world();
     WaveFixtures::armed();
-    $linked = WaveFixtures::campaign($w['agency'], $w['brand']);
+    $linked = WaveFixtures::waveCampaign($w['agency'], $w['brand']);
     $withLink = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->linkedTo($linked->id)->create();
     $without = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->create();
 
@@ -215,11 +288,11 @@ it('B14: set-link obeys every create rule', function (): void {
     $wave = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->create();
     $url = WaveFixtures::wavesUrl($w['agency'], $w['brand'], $wave->ulid);
 
-    $otherBrandCampaign = WaveFixtures::campaign($w['agency'], Brand::factory()->forAgency($w['agency']->id)->createOne());
-    $otherAgencyCampaign = WaveFixtures::campaign($w['otherAgency'], $w['otherBrand']);
-    $deleted = WaveFixtures::campaign($w['agency'], $w['brand']);
+    $otherBrandCampaign = WaveFixtures::waveCampaign($w['agency'], Brand::factory()->forAgency($w['agency']->id)->createOne());
+    $otherAgencyCampaign = WaveFixtures::waveCampaign($w['otherAgency'], $w['otherBrand']);
+    $deleted = WaveFixtures::waveCampaign($w['agency'], $w['brand']);
     $deleted->delete();
-    $taken = WaveFixtures::campaign($w['agency'], $w['brand']);
+    $taken = WaveFixtures::waveCampaign($w['agency'], $w['brand']);
     Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->linkedTo($taken->id)->create();
 
     $bodies = [];
@@ -239,7 +312,7 @@ it('B14: set-link obeys every create rule', function (): void {
 it('B15: a Cancelled campaign is refused by the server on create and on set-link, with the same body as any other refusal', function (): void {
     $w = WaveFixtures::world();
     WaveFixtures::armed();
-    $cancelled = WaveFixtures::campaign($w['agency'], $w['brand'], 'cancelled');
+    $cancelled = WaveFixtures::waveCampaign($w['agency'], $w['brand'], 'cancelled');
     $foreign = WaveFixtures::campaign($w['otherAgency'], $w['otherBrand']);
     $wave = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->create();
 
@@ -262,7 +335,7 @@ it('B15: a Cancelled campaign is refused by the server on create and on set-link
 it('B15: a campaign cancelled AFTER it was linked keeps its link', function (): void {
     $w = WaveFixtures::world();
     WaveFixtures::armed();
-    $campaign = WaveFixtures::campaign($w['agency'], $w['brand'], 'active');
+    $campaign = WaveFixtures::waveCampaign($w['agency'], $w['brand'], 'active');
     $wave = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->linkedTo($campaign->id)->create();
 
     $campaign->update(['status' => 'cancelled']);
@@ -275,11 +348,11 @@ it('B15: a campaign cancelled AFTER it was linked keeps its link', function (): 
     expect($wave->fresh()?->campaign_id)->toBe($campaign->id);
 });
 
-it('F2: a second edit holding a STALE wave re-reads the locked row: a different campaign is locked, the same campaign is a no-op', function (): void {
+it('F2: a second edit holding a STALE wave re-reads the locked row: unlocked, a different campaign is applied on the fresh row; locked, it is refused; the same campaign is a no-op', function (): void {
     $w = WaveFixtures::world();
     WaveFixtures::armed();
-    $first = WaveFixtures::campaign($w['agency'], $w['brand'], 'draft', 'First');
-    $second = WaveFixtures::campaign($w['agency'], $w['brand'], 'draft', 'Second');
+    $first = WaveFixtures::waveCampaign($w['agency'], $w['brand'], 'draft', 'First');
+    $second = WaveFixtures::waveCampaign($w['agency'], $w['brand'], 'draft', 'Second');
     $wave = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->create();
 
     // Both "requests" loaded the wave while it had no link.
@@ -289,9 +362,9 @@ it('F2: a second edit holding a STALE wave re-reads the locked row: a different 
 
     $service = app(WaveService::class);
     $service->update($w['agency'], $w['brand'], $staleForA, ['campaign_id' => $first->ulid]);
-    $auditsAfterFirst = AuditLog::query()->where('action', 'wave.updated')->count();
 
-    // The loser asks for a different campaign: it must NOT overwrite the winner.
+    // (b) a card is Selected on the winner's campaign: the loser's different-campaign request is refused.
+    $card = WaveFixtures::cardIn($first, 'selected');
     $caught = null;
     try {
         $service->update($w['agency'], $w['brand'], $staleForB, ['campaign_id' => $second->ulid]);
@@ -301,16 +374,27 @@ it('F2: a second edit holding a STALE wave re-reads the locked row: a different 
     expect($caught)->toBe('wave.campaign_link_locked')
         ->and(Wave::query()->findOrFail($wave->id)->campaign_id)->toBe($first->id);
 
-    // The loser asks for the SAME campaign the winner set: a no-op, no audit row, and the returned wave carries the link.
-    $returned = $service->update($w['agency'], $w['brand'], Wave::query()->findOrFail($wave->id), ['campaign_id' => $first->ulid]);
-    expect($returned->campaign_id)->toBe($first->id)
-        ->and(AuditLog::query()->where('action', 'wave.updated')->count())->toBe($auditsAfterFirst);
+    // (a) the card leaves the working set: the same stale model's change is now applied on the FRESH row, and the
+    // audit's "before" is the winner's campaign, not the stale null.
+    $card->update(['column_id' => $card->board->columns()->where('stage_key', 'invited')->firstOrFail()->id]);
+    $auditsBefore = AuditLog::query()->where('action', 'wave.updated')->count();
+    $returned = $service->update($w['agency'], $w['brand'], $staleForB, ['campaign_id' => $second->ulid]);
+    $audit = AuditLog::query()->where('action', 'wave.updated')->orderByDesc('id')->firstOrFail();
+    expect($returned->campaign_id)->toBe($second->id)
+        ->and($audit->before['campaign_id'])->toBe($first->ulid)
+        ->and($audit->after['campaign_id'])->toBe($second->ulid);
+
+    // The same campaign the row already has: a no-op, no audit row.
+    $count = AuditLog::query()->where('action', 'wave.updated')->count();
+    $service->update($w['agency'], $w['brand'], Wave::query()->findOrFail($wave->id), ['campaign_id' => $second->ulid]);
+    expect(AuditLog::query()->where('action', 'wave.updated')->count())->toBe($count)
+        ->and($count)->toBe($auditsBefore + 1);
 });
 
 it('F2: the stale loser asking for the winner\'s campaign with a rename applies the rename on the fresh row and audits the true before', function (): void {
     $w = WaveFixtures::world();
     WaveFixtures::armed();
-    $first = WaveFixtures::campaign($w['agency'], $w['brand'], 'draft', 'First');
+    $first = WaveFixtures::waveCampaign($w['agency'], $w['brand'], 'draft', 'First');
     $wave = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->create(['name' => 'Original']);
     $stale = Wave::query()->findOrFail($wave->id);
     Wave::query()->whereKey($wave->id)->update(['campaign_id' => $first->id]);

@@ -8,6 +8,7 @@ use App\Core\Errors\ErrorResponse;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Brands\Models\Brand;
 use App\Modules\Campaigns\Enums\CampaignStatus;
+use App\Modules\Campaigns\Enums\CampaignType;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Identity\Models\User;
 use App\Modules\Waves\Features\WavesEnabled;
@@ -20,6 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Laravel\Pennant\Feature;
 
 /**
@@ -29,7 +31,7 @@ use Laravel\Pennant\Feature;
  *   POST  brands/{brand}/waves                   create (201)
  *   GET   brands/{brand}/waves/campaign-options  the New wave dialog's campaign list
  *   GET   brands/{brand}/waves/{wave}            show
- *   PATCH brands/{brand}/waves/{wave}            edit: name, go-live date, markets, and the link only while empty
+ *   PATCH brands/{brand}/waves/{wave}            edit: name, go-live date, markets, and the link while unlocked (PL-1.2)
  *
  * Order in every action: the `waves_enabled` flag (404 `not_found`, before the policy and before the body is
  * read), the brand and wave ownership check (404, never 403), the policy, then validation and the service.
@@ -78,14 +80,23 @@ final class WaveController
         $this->assertBrand($brand, $agency);
         Gate::authorize('create', Wave::class);
 
-        /** @var array{name: string, go_live_on: string, markets: list<string>, campaign_id?: string|null} $data */
-        $data = Validator::make($request->all(), $this->rules(creating: true))->validate();
+        /** @var array<string, mixed> $data */
+        $data = Validator::make($request->all(), $this->rules(creating: true, request: $request))->validate();
+
+        // PL-1.2 (P3) — "create a campaign for this wave now" also creates a campaign: the actor needs that ability
+        // too (admin and manager hold both, so there is no new role gap).
+        $withNewCampaign = is_array($data['new_campaign'] ?? null);
+        if ($withNewCampaign) {
+            Gate::authorize('create', Campaign::class);
+        }
 
         /** @var User $actor */
         $actor = $request->user();
 
         try {
-            $wave = $this->waves->create($agency, $brand, $actor, $data);
+            $wave = $withNewCampaign
+                ? $this->waves->createWithNewCampaign($agency, $brand, $actor, $data)
+                : $this->waves->create($agency, $brand, $actor, $data);
         } catch (WaveRuleViolation $e) {
             return ErrorResponse::single($request, Response::HTTP_UNPROCESSABLE_ENTITY, $e->errorCode, $e->getMessage());
         }
@@ -106,6 +117,7 @@ final class WaveController
         $campaigns = Campaign::query()
             ->where('agency_id', $agency->id)
             ->where('brand_id', $brand->id)
+            ->where('campaign_type', CampaignType::ForWave->value)
             ->where('status', '!=', CampaignStatus::Cancelled->value)
             ->whereNotIn('id', Wave::query()->whereNotNull('campaign_id')->select('campaign_id'))
             ->orderBy('name')
@@ -157,16 +169,22 @@ final class WaveController
     /**
      * @return array<string, list<string>>
      */
-    private function rules(bool $creating): array
+    private function rules(bool $creating, ?Request $request = null): array
     {
         $presence = $creating ? 'required' : 'sometimes';
 
         return [
+            // PL-1.2 (P3) — mutually exclusive with a campaign_id that names a campaign. `campaign_id: null` ("no
+            // campaign") alongside it is tolerated.
+            ...($creating ? [
+                'new_campaign' => ['sometimes', 'array'],
+                'new_campaign.name' => ['required_with:new_campaign', 'string', 'min:1', 'max:255'],
+            ] : []),
             'name' => [$presence, 'string', 'min:1', 'max:160'],
             'go_live_on' => [$presence, 'date_format:Y-m-d'],
             'markets' => [$presence, 'array', 'min:1', 'max:20'],
             'markets.*' => ['string', 'size:2', 'distinct', 'regex:/^[A-Z]{2}$/'],
-            'campaign_id' => ['sometimes', 'nullable', 'string', 'size:26'],
+            'campaign_id' => ['sometimes', 'nullable', 'string', 'size:26', Rule::prohibitedIf(static fn (): bool => $request !== null && is_array($request->input('new_campaign')))],
         ];
     }
 

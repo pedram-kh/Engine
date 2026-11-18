@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace Tests\Support;
 
 use App\Modules\Agencies\Models\Agency;
+use App\Modules\Boards\Models\BoardCard;
+use App\Modules\Boards\Services\BoardService;
 use App\Modules\Brands\Models\Brand;
+use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Campaigns\Models\Campaign;
+use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Identity\Models\User;
 use App\Modules\Waves\Features\WavesEnabled;
 use Laravel\Pennant\Feature;
@@ -43,6 +47,7 @@ final class WaveFixtures
         Feature::activate(WavesEnabled::NAME);
     }
 
+    /** A NORMAL campaign (the default type; PL-1.2 P2: it can no longer be linked to a wave). */
     public static function campaign(Agency $agency, Brand $brand, string $status = 'draft', string $name = ''): Campaign
     {
         return Campaign::factory()->createOne(array_filter([
@@ -51,6 +56,34 @@ final class WaveFixtures
             'status' => $status,
             'name' => $name !== '' ? $name : null,
         ]));
+    }
+
+    /** PL-1.2 — a FOR-A-WAVE campaign: the only kind a wave can link to. */
+    public static function waveCampaign(Agency $agency, Brand $brand, string $status = 'draft', string $name = ''): Campaign
+    {
+        return Campaign::factory()->forWave()->createOne(array_filter([
+            'agency_id' => $agency->id,
+            'brand_id' => $brand->id,
+            'status' => $status,
+            'name' => $name !== '' ? $name : null,
+        ]));
+    }
+
+    /**
+     * PL-1.2 (Q3) — put a card of an Accepted creator in the named stage column of the campaign's wave board
+     * (provisioning the board if needed). Raw column write: the lock reads positions, not how a card got there.
+     */
+    public static function cardIn(Campaign $campaign, string $stage): BoardCard
+    {
+        $board = app(BoardService::class)->ensureBoard($campaign);
+        $assignment = CampaignAssignment::factory()->create([
+            'agency_id' => $campaign->agency_id, 'campaign_id' => $campaign->id, 'status' => AssignmentStatus::Accepted,
+        ]);
+        app(BoardService::class)->forCampaign($campaign);
+        $card = BoardCard::query()->where('assignment_id', $assignment->id)->firstOrFail();
+        $card->update(['column_id' => $board->columns()->where('stage_key', $stage)->firstOrFail()->id]);
+
+        return $card;
     }
 
     public static function wavesUrl(Agency $agency, Brand $brand, string $suffix = ''): string

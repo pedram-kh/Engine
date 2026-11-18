@@ -64,7 +64,7 @@ it('creates a wave, lists it, shows it', function (): void {
 it('B8: every accepted create field persists and is returned', function (): void {
     $w = WaveFixtures::world();
     WaveFixtures::armed();
-    $campaign = WaveFixtures::campaign($w['agency'], $w['brand']);
+    $campaign = WaveFixtures::waveCampaign($w['agency'], $w['brand']);
 
     $res = $this->actingAs($w['admin'], 'web')
         ->postJson(WaveFixtures::wavesUrl($w['agency'], $w['brand']), WaveFixtures::body([
@@ -216,7 +216,7 @@ it('B10: audits wave.created and wave.updated with actor, agency and subject, an
 it('B12: the resource shape carries ulids only: no internal id, no agency_id; dates as Y-m-d and ISO', function (): void {
     $w = WaveFixtures::world();
     WaveFixtures::armed();
-    $campaign = WaveFixtures::campaign($w['agency'], $w['brand'], 'active', 'Bolt Summer');
+    $campaign = WaveFixtures::waveCampaign($w['agency'], $w['brand'], 'active', 'Bolt Summer');
     $wave = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->linkedTo($campaign->id)->create(['go_live_on' => '2026-11-07']);
 
     $json = $this->actingAs($w['admin'], 'web')
