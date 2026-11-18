@@ -38,6 +38,9 @@ export type BoardWaveStage =
 /** PL-1.2 — the label on an Invited-column card of a wave board. */
 export type BoardInviteState = 'invited' | 'accepted' | 'declined'
 
+/** PL-1.2 (D3): how the creator reached the Invited column: the agency invited them, or accepted their application. */
+export type BoardInviteOrigin = 'invite' | 'application'
+
 // ---------------------------------------------------------------------------
 // Column
 // ---------------------------------------------------------------------------
@@ -104,6 +107,8 @@ export interface BoardCardResource {
   type: 'board_cards'
   /** PL-1.2: present only on a wave board's cards while the assignment is at the invite stage. */
   invite_state?: BoardInviteState
+  /** Present with `invite_state`. */
+  invite_origin?: BoardInviteOrigin
   attributes: {
     /** Present per §10 but INERT in P1 (intra-column ordering is P2). */
     position: number

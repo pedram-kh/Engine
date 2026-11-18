@@ -6,6 +6,7 @@ namespace App\Modules\Boards\Http\Resources;
 
 use App\Modules\Agencies\Http\Resources\CreatorDiscoveryResource;
 use App\Modules\Boards\Models\BoardCard;
+use App\Modules\Boards\Services\WaveInviteOrigin;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Creators\Concerns\EmitsErasedState;
 use Illuminate\Filesystem\AwsS3V3Adapter;
@@ -58,7 +59,12 @@ final class BoardCardResource extends JsonResource
             // PL-1.2 — the label on a wave board's cards: present ONLY when the card's column is a wave column
             // (it carries a stage key) and the assignment is still at the invite stage. Absent on a normal board and
             // for any later status, so a normal board's JSON is byte-for-byte what it was.
-            ...($this->inviteState($card) === null ? [] : ['invite_state' => $this->inviteState($card)]),
+            ...($this->inviteState($card) === null ? [] : [
+                'invite_state' => $this->inviteState($card),
+                // Only on the Invited column: it is what turns the label into "how they got here". The working
+                // columns keep the assignment status label and the colour they always had.
+                ...($this->inInvitedColumn($card) ? ['invite_origin' => $this->inviteOrigin($request, $card)] : []),
+            ]),
             'relationships' => [
                 'column' => [
                     'data' => ['id' => $card->column?->ulid, 'type' => 'board_columns'],
@@ -98,7 +104,12 @@ final class BoardCardResource extends JsonResource
      * which throws on temporaryUrl). Mirrors {@see CreatorDiscoveryResource}.
      */
     /**
-     * `invited` (invited or countered), `accepted`, `declined`; null for anything later or off a wave board.
+     * `invited` (invited or countered), `accepted`, `declined`; null for anything else, and for a card that is not on
+     * a wave column.
+     *
+     * In the Invited column `accepted` is every status that counts as selected ({@see AssignmentStatus::countsAsSelected()}):
+     * acceptance moves the assignment on to contracted, so reading the one status Accepted missed it (walk, D3). In the
+     * working columns the rule is what it was in PL-1.2 sub-step 4: only Accepted itself, so those cards are unchanged.
      */
     private function inviteState(BoardCard $card): ?string
     {
@@ -106,12 +117,37 @@ final class BoardCardResource extends JsonResource
             return null;
         }
 
-        return match ($card->assignment?->status) {
-            AssignmentStatus::Invited, AssignmentStatus::Countered => 'invited',
-            AssignmentStatus::Accepted => 'accepted',
-            AssignmentStatus::Declined => 'declined',
+        $status = $card->assignment?->status;
+        $accepted = $this->inInvitedColumn($card)
+            ? $status?->countsAsSelected() === true
+            : $status === AssignmentStatus::Accepted;
+
+        return match (true) {
+            $status === null => null,
+            $status === AssignmentStatus::Invited, $status === AssignmentStatus::Countered => 'invited',
+            $status === AssignmentStatus::Declined => 'declined',
+            $accepted => 'accepted',
             default => null,
         };
+    }
+
+    private function inInvitedColumn(BoardCard $card): bool
+    {
+        return $card->column?->stage_key === 'invited';
+    }
+
+    /**
+     * How the creator got to the Invited column: `application` when the agency accepted their application,
+     * `invite` otherwise (see {@see WaveInviteOrigin}).
+     */
+    private function inviteOrigin(Request $request, BoardCard $card): string
+    {
+        $applied = $request->attributes->get(WaveInviteOrigin::ATTRIBUTE);
+        $creatorId = $card->assignment?->creator_id;
+
+        return is_array($applied) && $creatorId !== null && in_array($creatorId, $applied, true)
+            ? 'application'
+            : 'invite';
     }
 
     private function signedViewUrl(?string $path): ?string

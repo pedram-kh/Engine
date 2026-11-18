@@ -7,6 +7,7 @@ namespace App\Modules\Boards\Http\Resources;
 use App\Modules\Boards\Models\Board;
 use App\Modules\Boards\Models\BoardAutomation;
 use App\Modules\Boards\Models\BoardColumn;
+use App\Modules\Boards\Services\WaveInviteOrigin;
 use App\Modules\Boards\Support\BoardDefaults;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -71,8 +72,21 @@ final class BoardResource extends JsonResource
             ],
             'columns' => BoardColumnResource::collection($columns)->resolve($request),
             'automations' => BoardAutomationResource::collection($automations)->resolve($request),
-            'cards' => BoardCardResource::collection($board->cards)->resolve($request),
+            'cards' => $this->cards($board, $request),
         ];
+    }
+
+    /**
+     * @return array<int, mixed>
+     */
+    private function cards(Board $board, Request $request): array
+    {
+        // PL-1.2 (D3): only a wave board's cards carry an invite label, so only a wave board reads the origin.
+        if ($board->columns->contains(static fn (BoardColumn $c): bool => $c->stage_key !== null)) {
+            WaveInviteOrigin::remember($request, $board);
+        }
+
+        return BoardCardResource::collection($board->cards)->resolve($request);
     }
 
     /**

@@ -14,7 +14,9 @@ use App\Modules\Boards\Services\BoardResetService;
 use App\Modules\Boards\Services\BoardService;
 use App\Modules\Boards\Services\OverdueScanService;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
+use App\Modules\Campaigns\Enums\CampaignApplicationStatus;
 use App\Modules\Campaigns\Models\Campaign;
+use App\Modules\Campaigns\Models\CampaignApplication;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -211,7 +213,8 @@ it('B4: invite_state is invited / accepted / declined on Invited cards, absent f
         'invited2' => wbCard($w, AssignmentStatus::Countered),
         'accepted' => wbCard($w, AssignmentStatus::Accepted),
         'declined' => wbCard($w, AssignmentStatus::Declined),
-        'later' => wbCard($w, AssignmentStatus::Contracted),
+        'rejected' => wbCard($w, AssignmentStatus::Rejected),
+        'later' => wbCard($w, AssignmentStatus::Cancelled),
     ];
 
     $json = $this->actingAs($w['admin'])->getJson(wbUrl($w))->assertOk()->json();
@@ -222,11 +225,93 @@ it('B4: invite_state is invited / accepted / declined on Invited cards, absent f
         ->and($state('invited2'))->toBe('invited')
         ->and($state('accepted'))->toBe('accepted')
         ->and($state('declined'))->toBe('declined')
+        ->and($state('rejected'))->toBe('ABSENT')
         ->and($state('later'))->toBe('ABSENT')
         ->and(array_map(static fn (array $c): mixed => $c['attributes']['stage_key'] ?? null, $json['data']['columns']))->toBe(WB_STAGES);
 
     // Declined never moves by itself.
     expect($cards['declined']->fresh()?->column_id)->toBe(wbStage($w['board'], 'invited')->id);
+});
+
+it('D3a: every status that counts as selected gives the accepted state, whatever its column, and nothing else does', function (): void {
+    $w = wbBoard();
+    $cards = [];
+    foreach (AssignmentStatus::cases() as $status) {
+        $cards[$status->value] = wbCard($w, $status);
+    }
+
+    $json = $this->actingAs($w['admin'])->getJson(wbUrl($w))->assertOk()->json();
+    $byId = array_column($json['data']['cards'], null, 'id');
+
+    foreach (AssignmentStatus::cases() as $status) {
+        $expected = match (true) {
+            $status === AssignmentStatus::Invited, $status === AssignmentStatus::Countered => 'invited',
+            $status === AssignmentStatus::Declined => 'declined',
+            $status->countsAsSelected() => 'accepted',
+            default => 'ABSENT',
+        };
+
+        expect($byId[$cards[$status->value]->ulid]['invite_state'] ?? 'ABSENT')->toBe($expected, "status {$status->value}");
+    }
+
+    // The walk's case: acceptance moved the assignment on to contracted.
+    expect($byId[$cards['contracted']->ulid]['invite_state'])->toBe('accepted');
+});
+
+it('D3c: the working columns keep what they showed: the status label, no origin, and the colour only for Accepted', function (): void {
+    $w = wbBoard();
+    $accepted = wbCard($w, AssignmentStatus::Accepted);
+    $contracted = wbCard($w, AssignmentStatus::Contracted);
+    $selected = wbStage($w['board'], 'selected');
+    foreach ([$accepted, $contracted] as $card) {
+        $this->actingAs($w['admin'])->postJson(wbUrl($w, "cards/{$card->ulid}/move"), wbMoveBody($selected))->assertOk();
+    }
+
+    $json = $this->actingAs($w['admin'])->getJson(wbUrl($w))->assertOk()->json();
+    $byId = array_column($json['data']['cards'], null, 'id');
+
+    expect($byId[$accepted->ulid]['invite_state'])->toBe('accepted')
+        ->and(array_key_exists('invite_origin', $byId[$accepted->ulid]))->toBeFalse()
+        ->and(array_key_exists('invite_state', $byId[$contracted->ulid]))->toBeFalse()
+        ->and(array_key_exists('invite_origin', $byId[$contracted->ulid]))->toBeFalse();
+});
+
+it('D3b: the origin is application when an application was accepted for that creator, invite otherwise', function (): void {
+    $w = wbBoard();
+    $applied = wbCard($w, AssignmentStatus::Invited);
+    $appliedAccepted = wbCard($w, AssignmentStatus::Contracted);
+    $invited = wbCard($w, AssignmentStatus::Invited);
+    $invitedAccepted = wbCard($w, AssignmentStatus::Accepted);
+    $pending = wbCard($w, AssignmentStatus::Invited);
+    $rejected = wbCard($w, AssignmentStatus::Invited);
+
+    $apply = function (BoardCard $card, CampaignApplicationStatus $status) use ($w): void {
+        CampaignApplication::factory()->create([
+            'agency_id' => $w['agency']->id, 'campaign_id' => $w['campaign']->id,
+            'creator_id' => $card->assignment?->creator_id, 'status' => $status,
+        ]);
+    };
+    $apply($applied, CampaignApplicationStatus::Accepted);
+    $apply($appliedAccepted, CampaignApplicationStatus::Accepted);
+    $apply($pending, CampaignApplicationStatus::Pending);
+    $apply($rejected, CampaignApplicationStatus::Rejected);
+    // An accepted application on ANOTHER campaign says nothing about this one.
+    CampaignApplication::factory()->create(['status' => CampaignApplicationStatus::Accepted, 'creator_id' => $invited->assignment?->creator_id]);
+
+    $json = $this->actingAs($w['admin'])->getJson(wbUrl($w))->assertOk()->json();
+    $byId = array_column($json['data']['cards'], null, 'id');
+    $pair = fn (BoardCard $c): string => ($byId[$c->ulid]['invite_state'] ?? '-').'/'.($byId[$c->ulid]['invite_origin'] ?? '-');
+
+    expect($pair($applied))->toBe('invited/application')
+        ->and($pair($appliedAccepted))->toBe('accepted/application')
+        ->and($pair($invited))->toBe('invited/invite')
+        ->and($pair($invitedAccepted))->toBe('accepted/invite')
+        ->and($pair($pending))->toBe('invited/invite')
+        ->and($pair($rejected))->toBe('invited/invite');
+
+    // The move response is the same card face, origin included.
+    $moved = $this->actingAs($w['admin'])->postJson(wbUrl($w, "cards/{$appliedAccepted->ulid}/move"), wbMoveBody(wbStage($w['board'], 'invited')))->assertOk()->json('data');
+    expect($moved['invite_state'])->toBe('accepted')->and($moved['invite_origin'])->toBe('application');
 });
 
 it('B5: an invite creates the card in Invited, a cancel lands it in Dropped, and no other event moves a card', function (): void {

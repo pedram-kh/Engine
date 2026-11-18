@@ -16,6 +16,7 @@ use App\Modules\Boards\Models\BoardCard;
 use App\Modules\Boards\Models\BoardColumn;
 use App\Modules\Boards\Services\BoardCardMoveService;
 use App\Modules\Boards\Services\BoardService;
+use App\Modules\Boards\Services\WaveInviteOrigin;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -60,6 +61,9 @@ final class BoardCardController
         } catch (BoardRuleViolation $e) {
             return ErrorResponse::single($request, Response::HTTP_UNPROCESSABLE_ENTITY, $e->errorCode, $e->getMessage());
         }
+
+        // The resource reads the application request; a FormRequest is a copy of it, so write to the original.
+        WaveInviteOrigin::remember(request(), $board);
 
         return new BoardCardResource(
             $card->fresh([
