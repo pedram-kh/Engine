@@ -236,7 +236,7 @@ A PATCH that mixes allowed and forbidden fields from a staff user is refused as 
 
 ### 3.5 Audit
 
-New actions: `WaveStepsProvisioned`, `WaveStepAdded`, `WaveStepUpdated`, `WaveStepRemoved`, `WaveStreamRemoved`, `WaveStreamAdded`. Payload keys are **literals** (for `AuditPayloadKeysGuardTest`): `stream`, `step_key`, `name`, `status`, `owner_id` (the user's ulid, an id only), `owner_client`, `status_source`, `starts_on`, `due_on`, `completed_on`; each key gets an Erasure decision in `AuditPayloadKeys::notPersonalKeys()` in the same commit (PL-1.2 found five undecided keys that way). One audit row per request, with `before` and `after` for an update.
+New actions: `WaveStepsProvisioned`, `WaveStepAdded`, `WaveStepUpdated`, `WaveStepRemoved`, `WaveStreamRemoved`, `WaveStreamAdded`. Payload keys are **literals** (for `AuditPayloadKeysGuardTest`): `stream`, `step_key`, `name`, `status`, `from_user` and `to_user` (a user id on each side of an owner change, the AH-119 A3 precedent; see §13 C1), `owner_client`, `status_source`, `starts_on`, `due_on`, `completed_on`; each key gets an Erasure decision in `AuditPayloadKeys::notPersonalKeys()` in the same commit (PL-1.2 found five undecided keys that way). One audit row per request, with `before` and `after` for an update.
 
 ### 3.6 Erasure and tenancy
 
@@ -469,3 +469,21 @@ Commits: feature commit and docs commit as a pair (`WORKING-PROCESS.md` §2). **
 **Read:** Figma frame 01b (tree, header, stream cards, the whole steps panel through `get_design_context`), frame 01 (tree and table header); the Waves module (routes, model, policy, controller `index`, `store`, `campaignOptions`, flag class, create migration, audit calls); the Agencies members controller and the AH-119 owner controller; `CurrentAgencyRole`; the Erasure registry entries for waves, agency tables and `owner_user_id`; `BoardService::ensureBoard`; `WaveDetailPage.vue`, `WaveProgressSegments.vue`; the PL-1.1 notes on frame 01; `production-line-sprints.md` §6; the Playwright config.
 
 **Not read:** the developer brief itself (only Pedram's relay of it); frame 01b's right column, tooltip and wave tabs through `get_design_context`; every undrawn state; any narrow design (none exists in what I read); `WaveController::show` and `update` bodies, `WaveResource`, `WaveService::update`, `BrandWavesPanel.vue` beyond the progress cell, `WaveDetailPage.spec.ts`; the code that soft-deletes a membership, if any; any agency-level time zone; `RegistryVerifier` internals (only that it checks tables and user references); the production database and deploy runbooks (nothing was run against any deployed environment). **Not verified:** that two concurrent first-open requests behave as §3.1 describes on PostgreSQL (the build proves it with the lock SQL and the unique index, not with a real two-client race).
+
+---
+
+## 13. Corrections at build (Pedram, 2026-11-18, recorded before any code)
+
+**C1. The audit key for a user reference.** The plan's `owner_id` is dropped; it is not classified "not personal" by default. What the code does today (read, not assumed):
+
+- **How audit payloads carry a user.** AH-119 A3 (`AgencyCreatorOwnerController`, creator owner reassign) writes `metadata: ['from_user' => $previous, 'to_user' => $newOwnerId]`: **user ids on each side, never a name or an e-mail**, and the `AuditAction` comment says "ids only". Other call sites use `user_id`, `approved_by_user_id`, `invited_by_user_id`, `blacklisted_by_user_id`, `verified_by_user_id`, `impersonated_user_id`.
+- **How `AuditPayloadKeys` decides them.** `from_user` and `to_user` are in `notPersonalKeys()` under "A user id on each side of an owner reassign (AH-119 A3): an id, not a name"; the other user-id keys are in the group "An id, ulid or foreign key: points at a row that is anonymised in place, which is the point of pseudonymising". `scrubKeys()` holds only `email`, `name`, `last_name`, `last_login_ip`, `suspended_reason`, `display_name`, `provider_account_id`, `before`, `after` and `welcome_message`: the keys that carry a person's own data.
+- **How the erasure of a user treats them.** The users row is anonymised **in place** and never deleted, so a user id in an audit row still points at a valid, pseudonymised row; `AuditRowScrub` removes the scrub keys on the rows the subject owns and keeps every id and ulid.
+- **Decision (precedent fits exactly, so no stop).** An owner change in a step's audit row uses **`from_user` and `to_user`**, the existing decided keys, carrying the **integer user id** exactly as AH-119 A3 does. No new key is added for a user. A step's `owner_user_id` is **not** put in any `Audited` allowlist (there is none; audit rows are written by hand with literal keys). `owner_client` is a boolean flag, not personal. The step `name` key is the already decided `name` (a step title typed by an agency user, the PL-1.1 wave `name` decision stands).
+- **New keys needing a decision in `notPersonalKeys()`:** `stream`, `step_key`, `owner_client`, `status_source`, `starts_on`, `due_on`, `completed_on` (an agency's planning data, no person is a field of it), each in a group with its reason. `status`, `from_user`, `to_user` and `name` are already decided.
+
+**C2. Real browser before the walk (`WORKING-PROCESS.md` §4.2).** Before a walk is offered, the tracker and the Brand page bar are opened in a real browser at a desktop width and a narrow one, with real walk data, and the review file reports what was looked at. Every dialog and menu in the tracker (edit step, add step, remove step, remove stream, add stream, owner menu, row menu) is opened, closed and reopened quickly (the PL-1.2 D1 failure).
+
+**C3. Frozen file.** `agencyStatusTones.ts` is frozen and is re-pinned in the same commit that touches it (reason stated). With the flag OFF the 12 campaign and 16 brand walk targets must stay identical to `ah-115-agency-baseline/baseline.json`, **including the comment-node check**.
+
+**Break-revert record.** Every gate is recorded in `docs/reviews/pl-1-3-break-reverts.md` as it is built, in the repo.
