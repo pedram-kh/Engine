@@ -319,6 +319,7 @@ final class ErasureRegistry
             'campaign_exclusive_brands' => new TableRule(Disposition::NotApplicable, 'Agency-authored pivot of campaign to brand (AH-120); holds no creator data and points at no creator or user (§3.7).', []),
             'campaigns' => new TableRule(Disposition::NotApplicable, 'Agency-authored; the creator link is a pivot covered above (§3.7).', ['created_by_user_id'], [], null, [
                 'name' => 'A campaign title.',
+                'campaign_type' => 'A fixed enum value (normal or for_wave), not personal data.',
             ]),
             'campaign_attachments' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7).', ['attached_by_user_id']),
             'agency_files' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7).', ['uploaded_by_user_id']),
@@ -333,6 +334,7 @@ final class ErasureRegistry
             'board_columns' => new TableRule(Disposition::NotApplicable, 'Structure only (§3.7).', [], [], null, [
                 'name' => 'A column title.',
                 'color_token' => 'A design-system colour name, not an auth token.',
+                'stage_key' => 'A fixed stage identifier on a wave board (selected, filming, ...), not personal data.',
             ]),
             'board_automations' => new TableRule(Disposition::NotApplicable, 'Structure only (§3.7).'),
             'admin_automation_rules' => new TableRule(Disposition::NotApplicable, 'Admin configuration (§3.7).', [], [], null, [

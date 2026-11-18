@@ -6,6 +6,7 @@ namespace App\Modules\Campaigns\Http\Requests;
 
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Campaigns\Enums\CampaignObjective;
+use App\Modules\Campaigns\Enums\CampaignType;
 use App\Modules\Campaigns\Http\Requests\Concerns\ValidatesBrandExclusivity;
 use App\Modules\Campaigns\Http\Requests\Concerns\ValidatesJobsBoardListing;
 use Illuminate\Contracts\Validation\Validator;
@@ -80,6 +81,8 @@ final class CreateCampaignRequest extends FormRequest
             // back to the column default (`true`, posting expected), which is
             // the Q1 safety floor.
             'creator_posts_content' => ['sometimes', 'boolean'],
+            // PL-1.2 — normal (default) or for_wave. The flag check is the controller's (422 campaign.wave_type_disabled).
+            'campaign_type' => ['sometimes', new Enum(CampaignType::class)],
 
             // Structured brief blob → jsonb. Sub-fields are validated loosely.
             'brief' => ['nullable', 'array'],

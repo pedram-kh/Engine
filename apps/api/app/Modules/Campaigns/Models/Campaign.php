@@ -12,9 +12,12 @@ use App\Modules\Brands\Models\Brand;
 use App\Modules\Campaigns\Database\Factories\CampaignFactory;
 use App\Modules\Campaigns\Enums\CampaignObjective;
 use App\Modules\Campaigns\Enums\CampaignStatus;
+use App\Modules\Campaigns\Enums\CampaignType;
+use App\Modules\Campaigns\Exceptions\CampaignBrandChangeException;
 use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
+use App\Modules\Waves\Models\Wave;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -58,6 +61,7 @@ use Laravel\Pennant\Feature;
  * @property Carbon|null $marketplace_close_at
  * @property bool $requires_per_campaign_contract
  * @property bool $creator_posts_content
+ * @property CampaignType $campaign_type
  * @property bool $listed_on_jobs_board
  * @property string|null $listing_duration
  * @property string|null $listing_fee
@@ -93,6 +97,8 @@ final class Campaign extends Model
 
     protected $attributes = [
         'status' => 'draft',
+        // PL-1.2 — mirrors the column's DB default: every campaign is normal unless made for a wave.
+        'campaign_type' => 'normal',
         'is_marketplace_visible' => false,
         'requires_per_campaign_contract' => false,
         // AH-069 D1 (Q1, the safety floor) — mirrors the column's DB default.
@@ -131,6 +137,8 @@ final class Campaign extends Model
         'marketplace_close_at',
         'requires_per_campaign_contract',
         'creator_posts_content',
+        // PL-1.2 — set on create only; the immutability is enforced by CampaignController::update.
+        'campaign_type',
         'listed_on_jobs_board',
         'listing_duration',
         'listing_fee',
@@ -360,6 +368,21 @@ final class Campaign extends Model
             ->whereIn('status', self::LISTABLE_STATUSES);
     }
 
+    public function isForWave(): bool
+    {
+        return $this->campaign_type === CampaignType::ForWave;
+    }
+
+    /**
+     * PL-1.2 — the wave this campaign is linked to (one live wave per campaign, held by the partial unique index).
+     *
+     * @return HasOne<Wave, $this>
+     */
+    public function wave(): HasOne
+    {
+        return $this->hasOne(Wave::class);
+    }
+
     /**
      * @return array<string, string>
      */
@@ -382,6 +405,7 @@ final class Campaign extends Model
             'marketplace_close_at' => 'datetime',
             'requires_per_campaign_contract' => 'boolean',
             'creator_posts_content' => 'boolean',
+            'campaign_type' => CampaignType::class,
             'listed_on_jobs_board' => 'boolean',
             'listing_languages' => 'array',
             'listing_regions' => 'array',
@@ -389,6 +413,22 @@ final class Campaign extends Model
             'exclusivity_ends_on' => 'date:Y-m-d',
             'listed_at' => 'datetime',
         ];
+    }
+
+    /**
+     * PL-1.2 (P8) — a saved campaign never changes brand. A wave is tied to its brand, and a campaign moved to
+     * another brand would silently break the link. Creating is unaffected.
+     *
+     * LIMIT, stated: a query-builder `update()` bypasses model events and the database has no trigger; no such
+     * call exists in app, database or tests. Keep it that way.
+     */
+    protected static function booted(): void
+    {
+        self::updating(static function (Campaign $campaign): void {
+            if ($campaign->isDirty('brand_id') && $campaign->getOriginal('brand_id') !== null) {
+                throw new CampaignBrandChangeException;
+            }
+        });
     }
 
     protected static function newFactory(): CampaignFactory

@@ -52,6 +52,9 @@ final class CampaignResource extends JsonResource
                 // deliverable and the assignment continues through
                 // posted → verified. `false` means approval IS completion.
                 'creator_posts_content' => $campaign->creator_posts_content,
+                // PL-1.2 — ALWAYS present (the data exists whether or not the flag is on); the web ignores it with the
+                // flag OFF. Agency-side only: never added to a creator resource.
+                'campaign_type' => $campaign->campaign_type->value,
                 'is_marketplace_visible' => $campaign->is_marketplace_visible,
 
                 // Jobs board (AH-054). `listed_on_jobs_board` is the agency's

@@ -11,9 +11,11 @@ use App\Modules\Audit\Facades\Audit;
 use App\Modules\Boards\Http\Resources\BoardResource;
 use App\Modules\Boards\Models\Board;
 use App\Modules\Boards\Models\BoardCard;
+use App\Modules\Boards\Services\BoardService;
 use App\Modules\Boards\Support\BoardDefaults;
 use App\Modules\Brands\Models\Brand;
 use App\Modules\Campaigns\Enums\CampaignStatus;
+use App\Modules\Campaigns\Enums\CampaignType;
 use App\Modules\Campaigns\Http\Requests\CreateCampaignRequest;
 use App\Modules\Campaigns\Http\Requests\UpdateCampaignRequest;
 use App\Modules\Campaigns\Http\Resources\CampaignResource;
@@ -23,6 +25,7 @@ use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Creators\Features\CampaignBrandExclusivityEnabled;
 use App\Modules\Creators\Features\CampaignRegionRestrictionEnabled;
 use App\Modules\Identity\Models\User;
+use App\Modules\Waves\Features\WavesEnabled;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -96,9 +99,14 @@ final class CampaignController
             return $refused;
         }
 
+        if ($refused = $this->refuseDisabledWaveType($request)) {
+            return $refused;
+        }
+
         /** @var User $actor */
         $actor = $request->user();
         $validated = $request->validated();
+        $type = CampaignType::tryFrom((string) ($validated['campaign_type'] ?? '')) ?? CampaignType::Normal;
 
         $brand = Brand::query()
             ->where('ulid', $validated['brand_id'])
@@ -106,7 +114,7 @@ final class CampaignController
             ->firstOrFail();
 
         // AH-120 — create and the blocked-brand list land together or not at all.
-        $campaign = DB::transaction(function () use ($agency, $brand, $actor, $validated): Campaign {
+        $campaign = DB::transaction(function () use ($agency, $brand, $actor, $validated, $type): Campaign {
             $campaign = Campaign::query()->create([
                 'agency_id' => $agency->id,
                 'brand_id' => $brand->id,
@@ -131,7 +139,10 @@ final class CampaignController
                 // caller that does not name the field gets today's behaviour
                 // (posting expected), matching the column default. The create form
                 // always names it.
-                'creator_posts_content' => $validated['creator_posts_content'] ?? true,
+                'creator_posts_content' => $type === CampaignType::ForWave ? false : ($validated['creator_posts_content'] ?? true),
+
+                // PL-1.2 — whitelist, not `$fillable` (the AH-054 catch). Set on create only; immutable after.
+                'campaign_type' => $type,
 
                 // Jobs-board listing copy (AH-054, D2). `listed_on_jobs_board` is
                 // absent by design — create never lists (D4); the column default
@@ -151,6 +162,12 @@ final class CampaignController
 
             $campaign->exclusiveBrands()->sync($this->resolveExclusiveBrandIds($agency, $validated['exclusive_brand_ids'] ?? []));
 
+            // PL-1.2 — a for-a-wave campaign gets its nine-column board at creation, in the same transaction, so
+            // every column exists from the start. (A normal campaign's board stays lazy, as before.)
+            if ($type === CampaignType::ForWave) {
+                app(BoardService::class)->ensureBoard($campaign);
+            }
+
             return $campaign;
         });
 
@@ -160,7 +177,7 @@ final class CampaignController
             after: $this->auditableSnapshot($campaign),
         );
 
-        return (new CampaignResource($campaign->load(['brand:id,ulid,name,color', 'agency:id,ulid', 'exclusiveBrands'])))
+        return (new CampaignResource($campaign->load(['brand:id,ulid,name,color', 'agency:id,ulid', 'exclusiveBrands', 'wave'])))
             ->response()
             ->setStatusCode(201);
     }
@@ -174,7 +191,7 @@ final class CampaignController
         Gate::authorize('view', $campaign);
 
         return new CampaignResource(
-            $campaign->loadCount('assignments')->load(['brand:id,ulid,name,color', 'agency:id,ulid', 'exclusiveBrands']),
+            $campaign->loadCount('assignments')->load(['brand:id,ulid,name,color', 'agency:id,ulid', 'exclusiveBrands', 'wave']),
         );
     }
 
@@ -200,9 +217,17 @@ final class CampaignController
             return $refused;
         }
 
+        if ($refused = $this->refuseWaveCampaignRules($request, $campaign)) {
+            return $refused;
+        }
+
         $before = $this->auditableSnapshot($campaign);
 
         $updates = $request->validated();
+
+        // PL-1.2 — the type is never written by an update (a different value was refused above; the same value
+        // is a no-op).
+        unset($updates['campaign_type']);
 
         // AH-120 — the list is the pivot, never a column: take it out BEFORE
         // `fill` (a stray key is silently dropped by `$fillable`, which would
@@ -315,7 +340,7 @@ final class CampaignController
         }
 
         return new CampaignResource(
-            ($campaign->fresh() ?? $campaign)->loadCount('assignments')->load(['brand:id,ulid,name,color', 'agency:id,ulid', 'exclusiveBrands']),
+            ($campaign->fresh() ?? $campaign)->loadCount('assignments')->load(['brand:id,ulid,name,color', 'agency:id,ulid', 'exclusiveBrands', 'wave']),
         );
     }
 
@@ -509,6 +534,8 @@ final class CampaignController
             // ends the assignment, so "who turned it off, and when" is a
             // question the trail must be able to answer.
             'creator_posts_content' => $campaign->creator_posts_content,
+            // PL-1.2 — the type, so "made for a wave" is in the trail.
+            'campaign_type' => $campaign->campaign_type->value,
             'listed_on_jobs_board' => $campaign->listed_on_jobs_board,
             // AH-118 — who restricted applications to the listed regions, and when.
             'restrict_to_listing_regions' => $campaign->restrict_to_listing_regions,
@@ -594,6 +621,85 @@ final class CampaignController
             'Limiting applications to the listed regions is not available yet.',
             source: ['pointer' => '/data/attributes/restrict_to_listing_regions'],
         );
+    }
+
+    /**
+     * PL-1.2 — a for-a-wave campaign cannot be created while `waves_enabled` is OFF. The endpoint exists today, so
+     * it validates and refuses (422), it does not 404.
+     */
+    private function refuseDisabledWaveType(Request $request): ?JsonResponse
+    {
+        if ($request->input('campaign_type') !== CampaignType::ForWave->value) {
+            return null;
+        }
+
+        if (Feature::active(WavesEnabled::NAME)) {
+            return null;
+        }
+
+        return ErrorResponse::single(
+            $request,
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+            'campaign.wave_type_disabled',
+            'Campaigns for a wave are not available yet.',
+            source: ['pointer' => '/data/attributes/campaign_type'],
+        );
+    }
+
+    /**
+     * PL-1.2 — the three rules that only a PATCH of an existing campaign can break:
+     *
+     *   - the type is immutable (a normal campaign with a board and cards cannot become a wave board);
+     *   - a for-a-wave campaign never asks the creator to post;
+     *   - G1 (zero-budget guard): a for-a-wave campaign cannot be Active or listed on the jobs board with a budget
+     *     of 0. Read off the RESULTING state, the way the listing checks are. Normal campaigns are untouched (P7).
+     */
+    private function refuseWaveCampaignRules(Request $request, Campaign $campaign): ?JsonResponse
+    {
+        $named = $request->input('campaign_type');
+        if (is_string($named) && $named !== $campaign->campaign_type->value) {
+            return ErrorResponse::single(
+                $request,
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                'campaign.type_immutable',
+                'A campaign cannot change type after it is created.',
+                source: ['pointer' => '/data/attributes/campaign_type'],
+            );
+        }
+
+        if (! $campaign->isForWave()) {
+            return null;
+        }
+
+        if ($request->has('creator_posts_content') && $request->boolean('creator_posts_content')) {
+            return ErrorResponse::single(
+                $request,
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                'campaign.wave_posting_not_allowed',
+                'Creators do not post content on a campaign for a wave.',
+                source: ['pointer' => '/data/attributes/creator_posts_content'],
+            );
+        }
+
+        $resultingStatus = is_string($request->input('status')) ? $request->input('status') : $campaign->status->value;
+        $resultingListed = $request->has('listed_on_jobs_board')
+            ? $request->boolean('listed_on_jobs_board')
+            : $campaign->listed_on_jobs_board;
+        $resultingBudget = $request->has('budget_minor_units')
+            ? (int) $request->input('budget_minor_units')
+            : (int) $campaign->budget_minor_units;
+
+        if (($resultingStatus === CampaignStatus::Active->value || $resultingListed) && $resultingBudget <= 0) {
+            return ErrorResponse::single(
+                $request,
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                'campaign.wave_budget_required',
+                'Enter a budget before this campaign for a wave goes active or is listed on the jobs board.',
+                source: ['pointer' => '/data/attributes/budget_minor_units'],
+            );
+        }
+
+        return null;
     }
 
     /**

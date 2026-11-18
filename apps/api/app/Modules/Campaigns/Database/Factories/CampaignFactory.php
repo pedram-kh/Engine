@@ -9,6 +9,7 @@ use App\Modules\Brands\Database\Factories\BrandFactory;
 use App\Modules\Brands\Models\Brand;
 use App\Modules\Campaigns\Enums\CampaignObjective;
 use App\Modules\Campaigns\Enums\CampaignStatus;
+use App\Modules\Campaigns\Enums\CampaignType;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Identity\Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -137,6 +138,17 @@ final class CampaignFactory extends Factory
     public function handsOffAtApproval(): static
     {
         return $this->state(fn (array $attributes): array => [
+            'creator_posts_content' => false,
+        ]);
+    }
+
+    /**
+     * PL-1.2 — a campaign made for a wave: the creator does not post, and the board is the wave board.
+     */
+    public function forWave(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'campaign_type' => CampaignType::ForWave,
             'creator_posts_content' => false,
         ]);
     }

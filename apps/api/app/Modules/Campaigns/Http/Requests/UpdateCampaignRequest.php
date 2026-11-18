@@ -6,6 +6,7 @@ namespace App\Modules\Campaigns\Http\Requests;
 
 use App\Modules\Campaigns\Enums\CampaignObjective;
 use App\Modules\Campaigns\Enums\CampaignStatus;
+use App\Modules\Campaigns\Enums\CampaignType;
 use App\Modules\Campaigns\Http\Requests\Concerns\ValidatesBrandExclusivity;
 use App\Modules\Campaigns\Http\Requests\Concerns\ValidatesJobsBoardListing;
 use App\Modules\Campaigns\Models\Campaign;
@@ -58,6 +59,9 @@ final class UpdateCampaignRequest extends FormRequest
             'description' => ['sometimes', 'nullable', 'string', 'max:10000'],
             'objective' => ['sometimes', new Enum(CampaignObjective::class)],
             'status' => ['sometimes', new Enum(CampaignStatus::class)],
+            // PL-1.2 — accepted so a PATCH naming a DIFFERENT type is a clear 422 (campaign.type_immutable) from the
+            // controller, not a silent drop. The same value is a no-op.
+            'campaign_type' => ['sometimes', new Enum(CampaignType::class)],
 
             'budget_minor_units' => ['sometimes', 'integer', 'min:0'],
             'budget_currency' => ['sometimes', 'string', 'size:3'],
