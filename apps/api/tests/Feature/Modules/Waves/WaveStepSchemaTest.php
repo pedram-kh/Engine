@@ -22,9 +22,12 @@ uses(TestCase::class, RefreshDatabase::class);
  * On PostgreSQL a failed statement aborts the surrounding transaction (RefreshDatabase wraps each test in one), so a
  * statement expected to fail runs inside a nested transaction: a savepoint, rolled back on the exception.
  */
+/**
+ * @param  Closure(): mixed  $fn
+ */
 function inSavepoint(Closure $fn): Closure
 {
-    return fn () => DB::transaction($fn);
+    return fn (): mixed => DB::transaction($fn);
 }
 
 /*

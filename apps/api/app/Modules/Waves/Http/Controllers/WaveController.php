@@ -16,6 +16,7 @@ use App\Modules\Waves\Http\Resources\WaveResource;
 use App\Modules\Waves\Models\Wave;
 use App\Modules\Waves\Services\WaveRuleViolation;
 use App\Modules\Waves\Services\WaveService;
+use App\Modules\Waves\Steps\WaveTrackerCalculator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -60,6 +61,12 @@ final class WaveController
             ->orderByDesc('id')
             ->paginate($perPage)
             ->withQueryString();
+
+        // PL-1.3 (Q1): the progress of every wave on the page, ONE grouped query and no write.
+        $progress = WaveTrackerCalculator::progressForWaves(array_values(array_map(static fn (Wave $w): int => $w->id, $paginator->items())));
+        foreach ($paginator->items() as $item) {
+            $item->setRelation('progressData', $progress[$item->id]);
+        }
 
         return response()->json([
             'data' => WaveResource::collection($paginator->items()),

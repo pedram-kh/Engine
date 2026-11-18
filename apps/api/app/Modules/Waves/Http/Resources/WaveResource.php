@@ -6,6 +6,7 @@ namespace App\Modules\Waves\Http\Resources;
 
 use App\Modules\Waves\Models\Wave;
 use App\Modules\Waves\Services\WaveCampaignLink;
+use App\Modules\Waves\Steps\WaveTrackerCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -28,6 +29,12 @@ final class WaveResource extends JsonResource
 
         $campaign = $wave->campaign;
 
+        // PL-1.3 (Q1) — the six strategy steps as six segments. The list sets it for the whole page with one grouped
+        // query; any other caller gets one query here. It never writes: an unprovisioned wave reads "not started".
+        $progress = $wave->relationLoaded('progressData')
+            ? $wave->getRelation('progressData')
+            : WaveTrackerCalculator::progressForWaves([$wave->id])[$wave->id];
+
         return [
             'id' => $wave->ulid,
             'type' => 'waves',
@@ -38,6 +45,7 @@ final class WaveResource extends JsonResource
                 'status' => $wave->status->value,
                 // PL-1.2 (P5, Q3) — true while a card of the linked campaign sits in a working column, so the page can
                 // explain a disabled control. The server is the authority; this is only the explanation.
+                'progress' => $progress,
                 'link_locked' => $campaign !== null && app(WaveCampaignLink::class)->isLocked($campaign->id),
                 'created_at' => $wave->created_at->toIso8601String(),
                 'updated_at' => $wave->updated_at->toIso8601String(),
