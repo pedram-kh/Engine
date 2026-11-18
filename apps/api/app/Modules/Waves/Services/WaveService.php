@@ -36,7 +36,10 @@ use Illuminate\Support\Facades\DB;
  */
 final class WaveService
 {
-    public function __construct(private readonly WaveCampaignLink $links) {}
+    public function __construct(
+        private readonly WaveCampaignLink $links,
+        private readonly WaveStepProvisioner $provisioner,
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data  name, go_live_on, markets, campaign_id (already validated)
@@ -295,7 +298,7 @@ final class WaveService
      */
     private function insertWave(Agency $agency, Brand $brand, User $actor, array $data, ?Campaign $campaign): Wave
     {
-        return Wave::query()->create([
+        $wave = Wave::query()->create([
             'agency_id' => $agency->id,
             'brand_id' => $brand->id,
             'campaign_id' => $campaign?->id,
@@ -305,6 +308,12 @@ final class WaveService
             'status' => WaveStatus::Draft,
             'created_by_user_id' => $actor->id,
         ]);
+
+        // PL-1.3 (T1) — a new wave starts with its ready-made steps, in the SAME transaction as the wave: a failure
+        // rolls back both. Callers run this inside DB::transaction.
+        $this->provisioner->ensure($wave);
+
+        return $wave;
     }
 
     private function logCreated(Wave $wave, ?string $campaignUlid): void
