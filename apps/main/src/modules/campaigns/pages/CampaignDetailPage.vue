@@ -41,6 +41,7 @@ import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
 import { brandsApi } from '@/modules/brands/api/brands.api'
 import { campaignsApi } from '../api/campaigns.api'
 import CampaignForm from '../components/CampaignForm.vue'
+import CampaignWaveCard from '../components/CampaignWaveCard.vue'
 import { campaignTabFromQuery, DEFAULT_CAMPAIGN_TAB } from '../campaignTabs'
 import { LISTING_FLOOR_FIELDS, missingListingFloorFields } from '../listingFloor'
 import InviteCreatorsDialog from '../components/InviteCreatorsDialog.vue'
@@ -99,6 +100,14 @@ const { currentRole } = storeToRefs(agencyStore)
 const canEdit = computed(
   () => currentRole.value === 'agency_admin' || currentRole.value === 'agency_manager',
 )
+
+// ── PL-1.2: campaign type and the wave card ─────────────────────────────────────────────────
+// Both draw through a zero-or-one-item list, never a `v-if`: with `waves_enabled` off (and for every normal
+// campaign) a `v-if` would leave a `<!--v-if-->` anchor and the campaign walk targets would differ from baseline.
+const wavesEnabled = computed(() => authStore.user?.attributes.features?.waves === true)
+const isForWave = computed(() => campaign.value?.attributes.campaign_type === 'for_wave')
+const waveTypePillRows = computed<number[]>(() => (isForWave.value ? [1] : []))
+const waveCardRows = computed<number[]>(() => (wavesEnabled.value && isForWave.value ? [1] : []))
 
 // The execute ability (D-6) — inviting is broader than editing: admin +
 // manager + STAFF can invite creators to a campaign.
@@ -568,6 +577,9 @@ async function onSaveSettings(): Promise<void> {
           creator_posts_content: campaign.value.attributes.creator_posts_content,
         }
       }
+    } else if (err instanceof ApiError && err.code === 'campaign.wave_budget_required') {
+      // PL-1.2: a campaign for a wave needs a budget before it goes active or is listed.
+      saveError.value = t('app.campaigns.errors.waveBudgetRequired')
     } else if (err instanceof ApiError && err.code === 'campaign.brand_exclusivity_disabled') {
       // AH-120: the flag was switched off under an open form.
       saveError.value = t('app.campaigns.errors.brandExclusivityDisabled')
@@ -799,6 +811,13 @@ const requirementRows = computed<RequirementRow[]>(() => {
           :status="campaign.attributes.status"
           data-test="campaign-detail-status"
         />
+        <AgencyStatusPill
+          v-for="n in waveTypePillRows"
+          :key="n"
+          tone="neutral"
+          :label="t('app.campaigns.type.forWave')"
+          data-test="campaign-detail-type"
+        />
       </template>
       <template v-if="campaign && canInvite" #actions>
         <v-btn
@@ -973,6 +992,15 @@ const requirementRows = computed<RequirementRow[]>(() => {
                   </div>
                 </template>
               </section>
+
+              <CampaignWaveCard
+                v-for="n in waveCardRows"
+                :key="n"
+                :agency-id="agencyStore.currentAgencyId ?? ''"
+                :campaign="campaign"
+                :can-manage="canEdit"
+                @changed="loadCampaign"
+              />
 
               <!-- The three campaign settings, read-only here: they are edited in Settings
                    (and the job board one from the list). -->
@@ -1530,6 +1558,7 @@ const requirementRows = computed<RequirementRow[]>(() => {
               v-model="editForm"
               :brands="exclusivityBrandOptions"
               hide-brand
+              :for-wave="isForWave"
               :own-brand-id="campaign?.relationships.brand.data.id ?? null"
               :listed-exclusive-brands="campaign?.attributes.exclusive_brands ?? []"
               :stored-exclusivity-ends-on="campaign?.attributes.exclusivity_ends_on ?? null"

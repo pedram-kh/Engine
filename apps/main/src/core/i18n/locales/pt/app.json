@@ -782,7 +782,8 @@
         "automationsButton": "Automações",
         "applications": {
           "title": "Candidaturas",
-          "empty": "Não há candidaturas pendentes"
+          "empty": "Não há candidaturas pendentes",
+          "titleWave": "Candidatos"
         },
         "card": {
           "unnamed": "Criador sem nome",
@@ -855,6 +856,19 @@
             "auto": "Automação",
             "from": "de",
             "to": "para"
+          }
+        },
+        "wave": {
+          "moveRefused": "Só um criador que aceitou pode ser movido para esta coluna.",
+          "stage": {
+            "invited": "Convidados",
+            "selected": "Selecionados",
+            "filming": "Filmagem",
+            "submitted": "Enviado / em revisão",
+            "in_edits": "Em edição",
+            "client_review": "Revisão do cliente",
+            "approved": "Aprovados",
+            "dropped": "Descartados"
           }
         }
       },
@@ -997,7 +1011,9 @@
         "restrictNeedsRegions": "Escolhe pelo menos uma região para limitar as candidaturas.",
         "exclusivityDateInPast": "Escolhe hoje ou uma data posterior.",
         "exclusivityOwnBrand": "Uma campanha não pode bloquear a sua própria marca.",
-        "brandExclusivityDisabled": "A exclusividade de marca ainda não está disponível."
+        "brandExclusivityDisabled": "A exclusividade de marca ainda não está disponível.",
+        "waveBudgetRequired": "Introduza um orçamento antes de esta campanha para uma onda ficar ativa ou ser listada no quadro de vagas.",
+        "waveTypeDisabled": "As campanhas para uma onda ainda não estão disponíveis."
       },
       "listing": {
         "sectionTitle": "Anúncio no quadro de trabalhos",
@@ -1090,6 +1106,23 @@
           "payment": "O pagamento já começou."
         },
         "error": "Não foi possível alterar a oferta. Tenta novamente."
+      },
+      "type": {
+        "label": "Tipo de campanha",
+        "normal": "Campanha normal",
+        "normalHelp": "Uma campanha comum com o seu próprio quadro de sete colunas.",
+        "forWave": "Para uma onda",
+        "forWaveHelp": "Pertence a uma onda e usa o quadro da onda com nove colunas."
+      },
+      "waveCard": {
+        "none": "Nenhuma onda ligada",
+        "link": "Ligar uma onda",
+        "change": "Alterar",
+        "unlink": "Desligar",
+        "locked": "Bloqueado: há um criador selecionado ou mais avançado, por isso a onda não pode ser alterada nem removida.",
+        "pick": "Escolha uma onda",
+        "noOptions": "Esta marca não tem nenhuma onda sem campanha.",
+        "failed": "Não foi possível guardar a ligação à onda. Tente novamente."
       }
     },
     "pools": {
@@ -1440,9 +1473,10 @@
         "loadFailed": "Não foi possível carregar as ondas.",
         "campaignNotAvailable": "Essa campanha não pode ser associada a uma onda desta marca.",
         "campaignAlreadyLinked": "Essa campanha já tem uma onda.",
-        "campaignLinkLocked": "Esta onda já está associada a uma campanha. A associação não pode ser alterada.",
+        "campaignLinkLocked": "Há um criador selecionado ou mais avançado nesta campanha, por isso a ligação não pode ser alterada.",
         "brandArchived": "Esta marca está arquivada. Restaure-a para alterar as suas ondas.",
-        "saveFailed": "Não foi possível guardar a onda. Tente novamente."
+        "saveFailed": "Não foi possível guardar a onda. Tente novamente.",
+        "waveNotAvailable": "Essa onda não pode ser ligada a esta campanha."
       },
       "dialog": {
         "createTitle": "Nova onda",
@@ -1457,15 +1491,23 @@
         "campaign": "Campanha (opcional)",
         "noCampaign": "Sem campanha",
         "campaignHint": "Pode associar uma campanha mais tarde.",
-        "campaignLocked": "Uma campanha associada não pode ser alterada aqui.",
+        "campaignLocked": "Há um criador selecionado ou mais avançado, por isso a campanha não pode ser alterada nem removida.",
         "create": "Criar onda",
-        "save": "Guardar alterações"
+        "save": "Guardar alterações",
+        "choice": {
+          "none": "Ainda sem campanha",
+          "existing": "Uma campanha existente para uma onda",
+          "new": "Criar agora uma campanha para esta onda"
+        },
+        "newCampaignName": "Nome da campanha",
+        "newCampaignHint": "É criada como rascunho sem orçamento. Defina o orçamento na página da campanha antes de poder entrar em produção."
       },
       "validation": {
         "nameRequired": "Introduza um nome para a onda.",
         "goLiveRequired": "Escolha uma data de lançamento.",
         "marketsRequired": "Adicione pelo menos um mercado.",
-        "marketsMax": "Adicione no máximo 20 mercados."
+        "marketsMax": "Adicione no máximo 20 mercados.",
+        "newCampaignNameRequired": "Introduza um nome para a campanha."
       },
       "detail": {
         "title": "Onda",
@@ -1473,7 +1515,8 @@
         "campaign": "Campanha associada",
         "noCampaign": "Sem campanha associada",
         "createdBy": "Criada por",
-        "notFound": "Esta onda não foi encontrada."
+        "notFound": "Esta onda não foi encontrada.",
+        "linkLocked": "Bloqueado: há um criador selecionado ou mais avançado nesta campanha."
       }
     },
     "brandFiles": {

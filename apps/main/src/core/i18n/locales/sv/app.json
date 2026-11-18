@@ -782,7 +782,8 @@
         "automationsButton": "Automatiseringar",
         "applications": {
           "title": "Ansökningar",
-          "empty": "Inga väntande ansökningar"
+          "empty": "Inga väntande ansökningar",
+          "titleWave": "Ansökt"
         },
         "card": {
           "unnamed": "Ej namngiven creator",
@@ -855,6 +856,19 @@
             "auto": "Automatisering",
             "from": "från",
             "to": "till"
+          }
+        },
+        "wave": {
+          "moveRefused": "Bara en skapare som har tackat ja kan flyttas till den här kolumnen.",
+          "stage": {
+            "invited": "Inbjudna",
+            "selected": "Valda",
+            "filming": "Inspelning",
+            "submitted": "Inskickat / granskas",
+            "in_edits": "Redigering",
+            "client_review": "Kundgranskning",
+            "approved": "Godkända",
+            "dropped": "Avfallna"
           }
         }
       },
@@ -997,7 +1011,9 @@
         "restrictNeedsRegions": "Välj minst en region för att begränsa ansökningar.",
         "exclusivityDateInPast": "Välj dagens datum eller ett senare datum.",
         "exclusivityOwnBrand": "En kampanj kan inte blockera sitt eget varumärke.",
-        "brandExclusivityDisabled": "Varumärkesexklusivitet är inte tillgänglig ännu."
+        "brandExclusivityDisabled": "Varumärkesexklusivitet är inte tillgänglig ännu.",
+        "waveBudgetRequired": "Ange en budget innan den här kampanjen för en våg blir aktiv eller listas på jobbtavlan.",
+        "waveTypeDisabled": "Kampanjer för en våg är inte tillgängliga ännu."
       },
       "listing": {
         "sectionTitle": "Annons på uppdragstavlan",
@@ -1090,6 +1106,23 @@
           "payment": "Betalningen har påbörjats."
         },
         "error": "Erbjudandet kunde inte ändras. Försök igen."
+      },
+      "type": {
+        "label": "Kampanjtyp",
+        "normal": "Vanlig kampanj",
+        "normalHelp": "En vanlig kampanj med en egen tavla med sju kolumner.",
+        "forWave": "För en våg",
+        "forWaveHelp": "Tillhör en våg och använder vågtavlan med nio kolumner."
+      },
+      "waveCard": {
+        "none": "Ingen våg kopplad",
+        "link": "Koppla en våg",
+        "change": "Ändra",
+        "unlink": "Koppla bort",
+        "locked": "Låst: en skapare är vald eller längre fram, så vågen kan inte ändras eller tas bort.",
+        "pick": "Välj en våg",
+        "noOptions": "Det här varumärket har ingen våg utan kampanj.",
+        "failed": "Vågkopplingen kunde inte sparas. Försök igen."
       }
     },
     "pools": {
@@ -1440,9 +1473,10 @@
         "loadFailed": "Vågorna kunde inte läsas in.",
         "campaignNotAvailable": "Den kampanjen kan inte kopplas till en våg för det här varumärket.",
         "campaignAlreadyLinked": "Den kampanjen har redan en våg.",
-        "campaignLinkLocked": "Den här vågen är redan kopplad till en kampanj. Kopplingen kan inte ändras.",
+        "campaignLinkLocked": "En skapare är vald eller längre fram i den här kampanjen, så länken kan inte ändras.",
         "brandArchived": "Det här varumärket är arkiverat. Återställ det för att ändra dess vågor.",
-        "saveFailed": "Vågen kunde inte sparas. Försök igen."
+        "saveFailed": "Vågen kunde inte sparas. Försök igen.",
+        "waveNotAvailable": "Den vågen kan inte kopplas till den här kampanjen."
       },
       "dialog": {
         "createTitle": "Ny våg",
@@ -1457,15 +1491,23 @@
         "campaign": "Kampanj (valfritt)",
         "noCampaign": "Ingen kampanj",
         "campaignHint": "Du kan koppla en kampanj senare.",
-        "campaignLocked": "En kopplad kampanj kan inte ändras här.",
+        "campaignLocked": "En skapare är vald eller längre fram, så kampanjen kan inte ändras eller tas bort.",
         "create": "Skapa våg",
-        "save": "Spara ändringar"
+        "save": "Spara ändringar",
+        "choice": {
+          "none": "Ingen kampanj än",
+          "existing": "En befintlig kampanj för en våg",
+          "new": "Skapa en kampanj för den här vågen nu"
+        },
+        "newCampaignName": "Kampanjnamn",
+        "newCampaignHint": "Skapas som utkast utan budget. Ange budgeten på kampanjsidan innan den kan gå live."
       },
       "validation": {
         "nameRequired": "Ange ett namn på vågen.",
         "goLiveRequired": "Välj ett lanseringsdatum.",
         "marketsRequired": "Lägg till minst en marknad.",
-        "marketsMax": "Lägg till högst 20 marknader."
+        "marketsMax": "Lägg till högst 20 marknader.",
+        "newCampaignNameRequired": "Ange ett kampanjnamn."
       },
       "detail": {
         "title": "Våg",
@@ -1473,7 +1515,8 @@
         "campaign": "Kopplad kampanj",
         "noCampaign": "Ingen kampanj kopplad",
         "createdBy": "Skapad av",
-        "notFound": "Den här vågen hittades inte."
+        "notFound": "Den här vågen hittades inte.",
+        "linkLocked": "Låst: en skapare är vald eller längre fram i den här kampanjen."
       }
     },
     "brandFiles": {

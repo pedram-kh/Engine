@@ -782,7 +782,8 @@
         "automationsButton": "Automations",
         "applications": {
           "title": "Applications",
-          "empty": "No applications waiting"
+          "empty": "No applications waiting",
+          "titleWave": "Applied"
         },
         "card": {
           "unnamed": "Unnamed creator",
@@ -855,6 +856,19 @@
             "auto": "Automation",
             "from": "from",
             "to": "to"
+          }
+        },
+        "wave": {
+          "moveRefused": "Only a creator who has accepted can be moved into this column.",
+          "stage": {
+            "invited": "Invited",
+            "selected": "Selected",
+            "filming": "Filming",
+            "submitted": "Submitted / in review",
+            "in_edits": "In edits",
+            "client_review": "Client review",
+            "approved": "Approved",
+            "dropped": "Dropped"
           }
         }
       },
@@ -997,7 +1011,9 @@
         "restrictNeedsRegions": "Choose at least one region to restrict applications.",
         "exclusivityDateInPast": "Choose today or a later date.",
         "exclusivityOwnBrand": "A campaign cannot block its own brand.",
-        "brandExclusivityDisabled": "Brand exclusivity is not available yet."
+        "brandExclusivityDisabled": "Brand exclusivity is not available yet.",
+        "waveBudgetRequired": "Enter a budget before this campaign for a wave goes active or is listed on the jobs board.",
+        "waveTypeDisabled": "Campaigns for a wave are not available yet."
       },
       "listing": {
         "sectionTitle": "Jobs board listing",
@@ -1090,6 +1106,23 @@
           "payment": "Payment has started."
         },
         "error": "The offer could not be changed. Please try again."
+      },
+      "type": {
+        "label": "Campaign type",
+        "normal": "Normal campaign",
+        "normalHelp": "A regular campaign with its own seven-column board.",
+        "forWave": "For a wave",
+        "forWaveHelp": "Belongs to a wave and uses the wave board with nine columns."
+      },
+      "waveCard": {
+        "none": "No wave linked",
+        "link": "Link a wave",
+        "change": "Change",
+        "unlink": "Unlink",
+        "locked": "Locked: a creator is Selected or further, so the wave cannot be changed or removed.",
+        "pick": "Choose a wave",
+        "noOptions": "This brand has no wave without a campaign.",
+        "failed": "The wave link could not be saved. Try again."
       }
     },
     "pools": {
@@ -1440,9 +1473,10 @@
         "loadFailed": "Failed to load waves.",
         "campaignNotAvailable": "That campaign cannot be linked to a wave of this brand.",
         "campaignAlreadyLinked": "That campaign already has a wave.",
-        "campaignLinkLocked": "This wave is already linked to a campaign. The link cannot be changed.",
+        "campaignLinkLocked": "A creator is Selected or further on this campaign, so the link cannot be changed.",
         "brandArchived": "This brand is archived. Restore it to change its waves.",
-        "saveFailed": "The wave could not be saved. Try again."
+        "saveFailed": "The wave could not be saved. Try again.",
+        "waveNotAvailable": "That wave cannot be linked to this campaign."
       },
       "dialog": {
         "createTitle": "New wave",
@@ -1457,15 +1491,23 @@
         "campaign": "Campaign (optional)",
         "noCampaign": "No campaign",
         "campaignHint": "You can link a campaign later.",
-        "campaignLocked": "A linked campaign cannot be changed here.",
+        "campaignLocked": "A creator is Selected or further, so the campaign cannot be changed or removed.",
         "create": "Create wave",
-        "save": "Save changes"
+        "save": "Save changes",
+        "choice": {
+          "none": "No campaign yet",
+          "existing": "An existing campaign for a wave",
+          "new": "Create a campaign for this wave now"
+        },
+        "newCampaignName": "Campaign name",
+        "newCampaignHint": "Created as a draft with no budget. Set the budget on the campaign page before it can go live."
       },
       "validation": {
         "nameRequired": "Enter a wave name.",
         "goLiveRequired": "Choose a go-live date.",
         "marketsRequired": "Add at least one market.",
-        "marketsMax": "Add at most 20 markets."
+        "marketsMax": "Add at most 20 markets.",
+        "newCampaignNameRequired": "Enter a campaign name."
       },
       "detail": {
         "title": "Wave",
@@ -1473,7 +1515,8 @@
         "campaign": "Linked campaign",
         "noCampaign": "No campaign linked",
         "createdBy": "Created by",
-        "notFound": "This wave was not found."
+        "notFound": "This wave was not found.",
+        "linkLocked": "Locked: a creator is Selected or further on this campaign."
       }
     },
     "brandFiles": {

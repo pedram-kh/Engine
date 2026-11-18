@@ -79,6 +79,13 @@ const props = withDefaults(
     listedExclusiveBrands?: ExclusiveBrand[]
     /** AH-120 (Settings edit): the stored end date, so an unchanged past date is not an error. */
     storedExclusivityEndsOn?: string | null
+    /**
+     * PL-1.2: offer the campaign type (create only, `features.waves` on). The server refuses `for_wave` with the
+     * flag off, and the type never changes after create, so this is never offered on the Settings edit.
+     */
+    showTypeChoice?: boolean
+    /** PL-1.2 (Settings edit): the saved campaign is for a wave, so "creators post" is not offered. */
+    forWave?: boolean
   }>(),
   {
     fieldErrors: () => ({}),
@@ -88,6 +95,8 @@ const props = withDefaults(
     ownBrandId: null,
     listedExclusiveBrands: () => [],
     storedExclusivityEndsOn: null,
+    showTypeChoice: false,
+    forWave: false,
   },
 )
 
@@ -97,6 +106,25 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+
+// PL-1.2 — both controls render through a zero-or-one-item list, NOT `v-if`: with `waves_enabled` off a `v-if` would
+// leave a `<!--v-if-->` anchor in the form and the campaign walk targets would differ from the flag-off baseline.
+const typeChoiceItems = computed<number[]>(() => (props.showTypeChoice ? [1] : []))
+const campaignType = computed<'normal' | 'for_wave'>(() => local.value.campaign_type ?? 'normal')
+const postingSwitchItems = computed<number[]>(() =>
+  props.forWave || campaignType.value === 'for_wave' ? [] : [1],
+)
+
+function onTypeChange(value: unknown): void {
+  const next = value === 'for_wave' ? 'for_wave' : 'normal'
+  local.value = {
+    ...local.value,
+    campaign_type: next,
+    // A campaign for a wave never expects the creator to post: the server forces it false.
+    ...(next === 'for_wave' ? { creator_posts_content: false } : {}),
+  }
+  emitUpdate()
+}
 
 const local = ref<CreateCampaignPayload>({ ...props.modelValue })
 
@@ -265,6 +293,37 @@ const descriptionTextareaHandle = computed<TextareaHandle | null>(
 
 <template>
   <form novalidate data-test="campaign-form" @submit.prevent="onSubmit">
+    <v-radio-group
+      v-for="n in typeChoiceItems"
+      :key="n"
+      :model-value="campaignType"
+      :label="t('app.campaigns.type.label')"
+      density="compact"
+      data-test="campaign-type"
+      @update:model-value="onTypeChange"
+    >
+      <v-radio value="normal" color="primary" data-test="campaign-type-normal">
+        <template #label>
+          <span>
+            {{ t('app.campaigns.type.normal') }}
+            <span class="d-block text-caption text-medium-emphasis">{{
+              t('app.campaigns.type.normalHelp')
+            }}</span>
+          </span>
+        </template>
+      </v-radio>
+      <v-radio value="for_wave" color="primary" data-test="campaign-type-for-wave">
+        <template #label>
+          <span>
+            {{ t('app.campaigns.type.forWave') }}
+            <span class="d-block text-caption text-medium-emphasis">{{
+              t('app.campaigns.type.forWaveHelp')
+            }}</span>
+          </span>
+        </template>
+      </v-radio>
+    </v-radio-group>
+
     <v-select
       v-if="!hideBrand"
       :model-value="local.brand_id || null"
@@ -497,6 +556,8 @@ const descriptionTextareaHandle = computed<TextareaHandle | null>(
       campaign that expects posting.
     -->
     <v-switch
+      v-for="n in postingSwitchItems"
+      :key="n"
       :model-value="local.creator_posts_content ?? true"
       :label="t('app.campaigns.fields.creatorPostsContent')"
       :hint="t('app.campaigns.fields.creatorPostsContentHint')"

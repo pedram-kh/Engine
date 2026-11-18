@@ -782,7 +782,8 @@
         "automationsButton": "Automations",
         "applications": {
           "title": "Candidaturi",
-          "empty": "Nicio candidatură în așteptare"
+          "empty": "Nicio candidatură în așteptare",
+          "titleWave": "Candidați"
         },
         "card": {
           "unnamed": "Unnamed creator",
@@ -855,6 +856,19 @@
             "auto": "Automation",
             "from": "from",
             "to": "to"
+          }
+        },
+        "wave": {
+          "moveRefused": "Doar un creator care a acceptat poate fi mutat în această coloană.",
+          "stage": {
+            "invited": "Invitați",
+            "selected": "Selectați",
+            "filming": "Filmare",
+            "submitted": "Trimis / în revizuire",
+            "in_edits": "În editare",
+            "client_review": "Revizuire client",
+            "approved": "Aprobați",
+            "dropped": "Eliminați"
           }
         }
       },
@@ -997,7 +1011,9 @@
         "restrictNeedsRegions": "Alege cel puțin o regiune pentru a restricționa aplicările.",
         "exclusivityDateInPast": "Alege azi sau o dată ulterioară.",
         "exclusivityOwnBrand": "O campanie nu își poate bloca propriul brand.",
-        "brandExclusivityDisabled": "Exclusivitatea de brand nu este încă disponibilă."
+        "brandExclusivityDisabled": "Exclusivitatea de brand nu este încă disponibilă.",
+        "waveBudgetRequired": "Introduceți un buget înainte ca această campanie pentru un val să devină activă sau să fie listată pe tabla de joburi.",
+        "waveTypeDisabled": "Campaniile pentru un val nu sunt încă disponibile."
       },
       "listing": {
         "sectionTitle": "Anunț în panoul de joburi",
@@ -1090,6 +1106,23 @@
           "payment": "Plata a început."
         },
         "error": "Oferta nu a putut fi modificată. Încearcă din nou."
+      },
+      "type": {
+        "label": "Tipul campaniei",
+        "normal": "Campanie obișnuită",
+        "normalHelp": "O campanie obișnuită, cu propria tablă cu șapte coloane.",
+        "forWave": "Pentru un val",
+        "forWaveHelp": "Aparține unui val și folosește tabla valului, cu nouă coloane."
+      },
+      "waveCard": {
+        "none": "Niciun val legat",
+        "link": "Leagă un val",
+        "change": "Schimbă",
+        "unlink": "Dezleagă",
+        "locked": "Blocat: un creator este selectat sau mai departe, deci valul nu poate fi schimbat sau eliminat.",
+        "pick": "Alegeți un val",
+        "noOptions": "Acest brand nu are niciun val fără campanie.",
+        "failed": "Legătura cu valul nu a putut fi salvată. Încercați din nou."
       }
     },
     "pools": {
@@ -1440,9 +1473,10 @@
         "loadFailed": "Valurile nu au putut fi încărcate.",
         "campaignNotAvailable": "Campania aceea nu poate fi legată de un val al acestui brand.",
         "campaignAlreadyLinked": "Campania aceea are deja un val.",
-        "campaignLinkLocked": "Acest val este deja legat de o campanie. Legătura nu poate fi schimbată.",
+        "campaignLinkLocked": "În această campanie un creator este selectat sau mai departe, deci legătura nu poate fi schimbată.",
         "brandArchived": "Acest brand este arhivat. Restaurați-l pentru a-i modifica valurile.",
-        "saveFailed": "Valul nu a putut fi salvat. Încercați din nou."
+        "saveFailed": "Valul nu a putut fi salvat. Încercați din nou.",
+        "waveNotAvailable": "Acel val nu poate fi legat de această campanie."
       },
       "dialog": {
         "createTitle": "Val nou",
@@ -1457,15 +1491,23 @@
         "campaign": "Campanie (opțional)",
         "noCampaign": "Fără campanie",
         "campaignHint": "Puteți lega o campanie mai târziu.",
-        "campaignLocked": "O campanie legată nu poate fi schimbată aici.",
+        "campaignLocked": "Un creator este selectat sau mai departe, deci campania nu poate fi schimbată sau eliminată.",
         "create": "Creați valul",
-        "save": "Salvați modificările"
+        "save": "Salvați modificările",
+        "choice": {
+          "none": "Încă nicio campanie",
+          "existing": "O campanie existentă pentru un val",
+          "new": "Creează acum o campanie pentru acest val"
+        },
+        "newCampaignName": "Numele campaniei",
+        "newCampaignHint": "Se creează ca ciornă, fără buget. Setați bugetul pe pagina campaniei înainte de lansare."
       },
       "validation": {
         "nameRequired": "Introduceți un nume pentru val.",
         "goLiveRequired": "Alegeți o dată de lansare.",
         "marketsRequired": "Adăugați cel puțin o piață.",
-        "marketsMax": "Adăugați cel mult 20 de piețe."
+        "marketsMax": "Adăugați cel mult 20 de piețe.",
+        "newCampaignNameRequired": "Introduceți un nume de campanie."
       },
       "detail": {
         "title": "Val",
@@ -1473,7 +1515,8 @@
         "campaign": "Campanie legată",
         "noCampaign": "Nicio campanie legată",
         "createdBy": "Creat de",
-        "notFound": "Acest val nu a fost găsit."
+        "notFound": "Acest val nu a fost găsit.",
+        "linkLocked": "Blocat: în această campanie un creator este selectat sau mai departe."
       }
     },
     "brandFiles": {

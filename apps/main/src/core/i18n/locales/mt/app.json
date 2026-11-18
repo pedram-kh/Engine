@@ -782,7 +782,8 @@
         "automationsButton": "Automations",
         "applications": {
           "title": "Applikazzjonijiet",
-          "empty": "L-ebda applikazzjoni pendenti"
+          "empty": "L-ebda applikazzjoni pendenti",
+          "titleWave": "Applikanti"
         },
         "card": {
           "unnamed": "Unnamed creator",
@@ -855,6 +856,19 @@
             "auto": "Automation",
             "from": "from",
             "to": "to"
+          }
+        },
+        "wave": {
+          "moveRefused": "Biss ħallieq li aċċetta jista' jiġi mċaqlaq f'din il-kolonna.",
+          "stage": {
+            "invited": "Mistiedna",
+            "selected": "Magħżula",
+            "filming": "Filmar",
+            "submitted": "Mibgħuta / qed tiġi riveduta",
+            "in_edits": "Fl-editjar",
+            "client_review": "Reviżjoni tal-klijent",
+            "approved": "Approvati",
+            "dropped": "Waqgħu"
           }
         }
       },
@@ -997,7 +1011,9 @@
         "restrictNeedsRegions": "Agħżel mill-inqas reġjun wieħed biex tillimita l-applikazzjonijiet.",
         "exclusivityDateInPast": "Agħżel illum jew data aktar tard.",
         "exclusivityOwnBrand": "Kampanja ma tistax timblokka l-brand tagħha stess.",
-        "brandExclusivityDisabled": "L-esklussività tal-brand għadha mhijiex disponibbli."
+        "brandExclusivityDisabled": "L-esklussività tal-brand għadha mhijiex disponibbli.",
+        "waveBudgetRequired": "Daħħal baġit qabel ma din il-kampanja għal mewġa ssir attiva jew tiġi elenkata fuq il-bord tax-xogħlijiet.",
+        "waveTypeDisabled": "Il-kampanji għal mewġa għadhom mhux disponibbli."
       },
       "listing": {
         "sectionTitle": "Avviż fuq il-bord tax-xogħlijiet",
@@ -1090,6 +1106,23 @@
           "payment": "Il-ħlas beda."
         },
         "error": "L-offerta ma setgħetx tinbidel. Erġa' pprova."
+      },
+      "type": {
+        "label": "Tip ta' kampanja",
+        "normal": "Kampanja normali",
+        "normalHelp": "Kampanja regolari bil-bord tagħha ta' seba' kolonni.",
+        "forWave": "Għal mewġa",
+        "forWaveHelp": "Tappartjeni għal mewġa u tuża l-bord tal-mewġa b'disa' kolonni."
+      },
+      "waveCard": {
+        "none": "Ebda mewġa marbuta",
+        "link": "Orbot mewġa",
+        "change": "Biddel",
+        "unlink": "Neħħi r-rabta",
+        "locked": "Imsakkar: ħallieq huwa magħżul jew aktar 'il quddiem, għalhekk il-mewġa ma tistax tinbidel jew titneħħa.",
+        "pick": "Agħżel mewġa",
+        "noOptions": "Dan il-brand m'għandu l-ebda mewġa mingħajr kampanja.",
+        "failed": "Ir-rabta tal-mewġa ma setgħetx tinħażen. Erġa' pprova."
       }
     },
     "pools": {
@@ -1440,9 +1473,10 @@
         "loadFailed": "Il-mewġ ma setax jitgħabba.",
         "campaignNotAvailable": "Dik il-kampanja ma tistax tiġi marbuta ma' mewġa ta' din il-marka.",
         "campaignAlreadyLinked": "Dik il-kampanja diġà għandha mewġa.",
-        "campaignLinkLocked": "Din il-mewġa diġà hija marbuta ma' kampanja. Il-ħolqa ma tistax tinbidel.",
+        "campaignLinkLocked": "Il-ħallieq huwa magħżul jew aktar 'il quddiem f'din il-kampanja, għalhekk ir-rabta ma tistax tinbidel.",
         "brandArchived": "Din il-marka hija arkivjata. Irkuprah biex tbiddel il-mewġ tagħha.",
-        "saveFailed": "Il-mewġa ma setgħetx tiġi ssejvjata. Erġa' pprova."
+        "saveFailed": "Il-mewġa ma setgħetx tiġi ssejvjata. Erġa' pprova.",
+        "waveNotAvailable": "Dik il-mewġa ma tistax tiġi marbuta ma' din il-kampanja."
       },
       "dialog": {
         "createTitle": "Mewġa ġdida",
@@ -1457,15 +1491,23 @@
         "campaign": "Kampanja (mhux obbligatorja)",
         "noCampaign": "Ebda kampanja",
         "campaignHint": "Tista' torbot kampanja iktar tard.",
-        "campaignLocked": "Kampanja marbuta ma tistax tinbidel hawnhekk.",
+        "campaignLocked": "Ħallieq huwa magħżul jew aktar 'il quddiem, għalhekk il-kampanja ma tistax tinbidel jew titneħħa.",
         "create": "Oħloq mewġa",
-        "save": "Issejvja l-bidliet"
+        "save": "Issejvja l-bidliet",
+        "choice": {
+          "none": "Għad m'hemm l-ebda kampanja",
+          "existing": "Kampanja eżistenti għal mewġa",
+          "new": "Oħloq kampanja għal din il-mewġa issa"
+        },
+        "newCampaignName": "Isem il-kampanja",
+        "newCampaignHint": "Tinħoloq bħala abbozz mingħajr baġit. Issettja l-baġit fil-paġna tal-kampanja qabel ma tkun tista' tmur live."
       },
       "validation": {
         "nameRequired": "Daħħal isem għall-mewġa.",
         "goLiveRequired": "Agħżel data tat-tnedija.",
         "marketsRequired": "Żid mill-inqas suq wieħed.",
-        "marketsMax": "Żid massimu ta' 20 suq."
+        "marketsMax": "Żid massimu ta' 20 suq.",
+        "newCampaignNameRequired": "Daħħal isem għall-kampanja."
       },
       "detail": {
         "title": "Mewġa",
@@ -1473,7 +1515,8 @@
         "campaign": "Kampanja marbuta",
         "noCampaign": "Ebda kampanja marbuta",
         "createdBy": "Maħluq minn",
-        "notFound": "Din il-mewġa ma nstabitx."
+        "notFound": "Din il-mewġa ma nstabitx.",
+        "linkLocked": "Imsakkar: ħallieq huwa magħżul jew aktar 'il quddiem f'din il-kampanja."
       }
     },
     "brandFiles": {

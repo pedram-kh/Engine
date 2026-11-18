@@ -782,7 +782,8 @@
         "automationsButton": "Automatizaciones",
         "applications": {
           "title": "Candidaturas",
-          "empty": "No hay candidaturas pendientes"
+          "empty": "No hay candidaturas pendientes",
+          "titleWave": "Candidatos"
         },
         "card": {
           "unnamed": "Creador sin nombre",
@@ -855,6 +856,19 @@
             "auto": "Automatización",
             "from": "de",
             "to": "a"
+          }
+        },
+        "wave": {
+          "moveRefused": "Solo un creador que haya aceptado puede pasar a esta columna.",
+          "stage": {
+            "invited": "Invitados",
+            "selected": "Seleccionados",
+            "filming": "Rodaje",
+            "submitted": "Entregado / en revisión",
+            "in_edits": "En edición",
+            "client_review": "Revisión del cliente",
+            "approved": "Aprobados",
+            "dropped": "Descartados"
           }
         }
       },
@@ -997,7 +1011,9 @@
         "restrictNeedsRegions": "Elige al menos una región para limitar las solicitudes.",
         "exclusivityDateInPast": "Elige hoy o una fecha posterior.",
         "exclusivityOwnBrand": "Una campaña no puede bloquear su propia marca.",
-        "brandExclusivityDisabled": "La exclusividad de marca aún no está disponible."
+        "brandExclusivityDisabled": "La exclusividad de marca aún no está disponible.",
+        "waveBudgetRequired": "Introduce un presupuesto antes de que esta campaña para una oleada se active o se publique en el tablero de empleos.",
+        "waveTypeDisabled": "Las campañas para una oleada aún no están disponibles."
       },
       "listing": {
         "sectionTitle": "Anuncio en el tablón de trabajos",
@@ -1090,6 +1106,23 @@
           "payment": "El pago ya ha comenzado."
         },
         "error": "No se pudo cambiar la oferta. Inténtalo de nuevo."
+      },
+      "type": {
+        "label": "Tipo de campaña",
+        "normal": "Campaña normal",
+        "normalHelp": "Una campaña habitual con su propio tablero de siete columnas.",
+        "forWave": "Para una oleada",
+        "forWaveHelp": "Pertenece a una oleada y usa el tablero de oleada con nueve columnas."
+      },
+      "waveCard": {
+        "none": "Sin oleada vinculada",
+        "link": "Vincular una oleada",
+        "change": "Cambiar",
+        "unlink": "Desvincular",
+        "locked": "Bloqueado: hay un creador seleccionado o más avanzado, así que la oleada no se puede cambiar ni quitar.",
+        "pick": "Elige una oleada",
+        "noOptions": "Esta marca no tiene ninguna oleada sin campaña.",
+        "failed": "No se pudo guardar el vínculo con la oleada. Inténtalo de nuevo."
       }
     },
     "pools": {
@@ -1440,9 +1473,10 @@
         "loadFailed": "No se pudieron cargar las oleadas.",
         "campaignNotAvailable": "Esa campaña no se puede vincular a una oleada de esta marca.",
         "campaignAlreadyLinked": "Esa campaña ya tiene una oleada.",
-        "campaignLinkLocked": "Esta oleada ya está vinculada a una campaña. El vínculo no se puede cambiar.",
+        "campaignLinkLocked": "Hay un creador seleccionado o más avanzado en esta campaña, así que el vínculo no se puede cambiar.",
         "brandArchived": "Esta marca está archivada. Restáurala para cambiar sus oleadas.",
-        "saveFailed": "No se pudo guardar la oleada. Inténtalo de nuevo."
+        "saveFailed": "No se pudo guardar la oleada. Inténtalo de nuevo.",
+        "waveNotAvailable": "Esa oleada no se puede vincular a esta campaña."
       },
       "dialog": {
         "createTitle": "Nueva oleada",
@@ -1457,15 +1491,23 @@
         "campaign": "Campaña (opcional)",
         "noCampaign": "Sin campaña",
         "campaignHint": "Puedes vincular una campaña más tarde.",
-        "campaignLocked": "Una campaña vinculada no se puede cambiar aquí.",
+        "campaignLocked": "Hay un creador seleccionado o más avanzado, así que la campaña no se puede cambiar ni quitar.",
         "create": "Crear oleada",
-        "save": "Guardar cambios"
+        "save": "Guardar cambios",
+        "choice": {
+          "none": "Aún sin campaña",
+          "existing": "Una campaña existente para una oleada",
+          "new": "Crear ahora una campaña para esta oleada"
+        },
+        "newCampaignName": "Nombre de la campaña",
+        "newCampaignHint": "Se crea como borrador sin presupuesto. Define el presupuesto en la página de la campaña antes de que pueda publicarse."
       },
       "validation": {
         "nameRequired": "Introduce un nombre para la oleada.",
         "goLiveRequired": "Elige una fecha de lanzamiento.",
         "marketsRequired": "Añade al menos un mercado.",
-        "marketsMax": "Añade como máximo 20 mercados."
+        "marketsMax": "Añade como máximo 20 mercados.",
+        "newCampaignNameRequired": "Introduce un nombre de campaña."
       },
       "detail": {
         "title": "Oleada",
@@ -1473,7 +1515,8 @@
         "campaign": "Campaña vinculada",
         "noCampaign": "Sin campaña vinculada",
         "createdBy": "Creada por",
-        "notFound": "No se encontró esta oleada."
+        "notFound": "No se encontró esta oleada.",
+        "linkLocked": "Bloqueado: hay un creador seleccionado o más avanzado en esta campaña."
       }
     },
     "brandFiles": {

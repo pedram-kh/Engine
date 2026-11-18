@@ -782,7 +782,8 @@
         "automationsButton": "Automazioni",
         "applications": {
           "title": "Candidature",
-          "empty": "Nessuna candidatura in attesa"
+          "empty": "Nessuna candidatura in attesa",
+          "titleWave": "Candidati"
         },
         "card": {
           "unnamed": "Creator senza nome",
@@ -855,6 +856,19 @@
             "auto": "Automazione",
             "from": "da",
             "to": "a"
+          }
+        },
+        "wave": {
+          "moveRefused": "Solo un creator che ha accettato può essere spostato in questa colonna.",
+          "stage": {
+            "invited": "Invitati",
+            "selected": "Selezionati",
+            "filming": "Riprese",
+            "submitted": "Inviato / in revisione",
+            "in_edits": "In montaggio",
+            "client_review": "Revisione cliente",
+            "approved": "Approvati",
+            "dropped": "Scartati"
           }
         }
       },
@@ -997,7 +1011,9 @@
         "restrictNeedsRegions": "Scegli almeno una regione per limitare le candidature.",
         "exclusivityDateInPast": "Scegli oggi o una data successiva.",
         "exclusivityOwnBrand": "Una campagna non può bloccare il proprio brand.",
-        "brandExclusivityDisabled": "L'esclusiva di brand non è ancora disponibile."
+        "brandExclusivityDisabled": "L'esclusiva di brand non è ancora disponibile.",
+        "waveBudgetRequired": "Inserisci un budget prima che questa campagna per un'ondata diventi attiva o venga pubblicata nella bacheca lavori.",
+        "waveTypeDisabled": "Le campagne per un'ondata non sono ancora disponibili."
       },
       "listing": {
         "sectionTitle": "Annuncio nella bacheca lavori",
@@ -1090,6 +1106,23 @@
           "payment": "Il pagamento è iniziato."
         },
         "error": "Non è stato possibile modificare l'offerta. Riprova."
+      },
+      "type": {
+        "label": "Tipo di campagna",
+        "normal": "Campagna normale",
+        "normalHelp": "Una campagna ordinaria con la propria bacheca a sette colonne.",
+        "forWave": "Per un'ondata",
+        "forWaveHelp": "Appartiene a un'ondata e usa la bacheca dell'ondata a nove colonne."
+      },
+      "waveCard": {
+        "none": "Nessuna ondata collegata",
+        "link": "Collega un'ondata",
+        "change": "Cambia",
+        "unlink": "Scollega",
+        "locked": "Bloccato: un creator è selezionato o oltre, quindi l'ondata non può essere modificata né rimossa.",
+        "pick": "Scegli un'ondata",
+        "noOptions": "Questo brand non ha nessuna ondata senza campagna.",
+        "failed": "Non è stato possibile salvare il collegamento all'ondata. Riprova."
       }
     },
     "pools": {
@@ -1440,9 +1473,10 @@
         "loadFailed": "Impossibile caricare le ondate.",
         "campaignNotAvailable": "Quella campagna non può essere collegata a un'ondata di questo marchio.",
         "campaignAlreadyLinked": "Quella campagna ha già un'ondata.",
-        "campaignLinkLocked": "Questa ondata è già collegata a una campagna. Il collegamento non può essere modificato.",
+        "campaignLinkLocked": "Un creator è selezionato o oltre in questa campagna, quindi il collegamento non può essere modificato.",
         "brandArchived": "Questo marchio è archiviato. Ripristinalo per modificarne le ondate.",
-        "saveFailed": "Impossibile salvare l'ondata. Riprova."
+        "saveFailed": "Impossibile salvare l'ondata. Riprova.",
+        "waveNotAvailable": "Quell'ondata non può essere collegata a questa campagna."
       },
       "dialog": {
         "createTitle": "Nuova ondata",
@@ -1457,15 +1491,23 @@
         "campaign": "Campagna (facoltativa)",
         "noCampaign": "Nessuna campagna",
         "campaignHint": "Puoi collegare una campagna in seguito.",
-        "campaignLocked": "Una campagna collegata non può essere modificata qui.",
+        "campaignLocked": "Un creator è selezionato o oltre, quindi la campagna non può essere modificata né rimossa.",
         "create": "Crea ondata",
-        "save": "Salva modifiche"
+        "save": "Salva modifiche",
+        "choice": {
+          "none": "Ancora nessuna campagna",
+          "existing": "Una campagna esistente per un'ondata",
+          "new": "Crea ora una campagna per questa ondata"
+        },
+        "newCampaignName": "Nome campagna",
+        "newCampaignHint": "Viene creata come bozza senza budget. Imposta il budget nella pagina della campagna prima di pubblicarla."
       },
       "validation": {
         "nameRequired": "Inserisci un nome per l'ondata.",
         "goLiveRequired": "Scegli una data di go-live.",
         "marketsRequired": "Aggiungi almeno un mercato.",
-        "marketsMax": "Aggiungi al massimo 20 mercati."
+        "marketsMax": "Aggiungi al massimo 20 mercati.",
+        "newCampaignNameRequired": "Inserisci un nome per la campagna."
       },
       "detail": {
         "title": "Ondata",
@@ -1473,7 +1515,8 @@
         "campaign": "Campagna collegata",
         "noCampaign": "Nessuna campagna collegata",
         "createdBy": "Creata da",
-        "notFound": "Questa ondata non è stata trovata."
+        "notFound": "Questa ondata non è stata trovata.",
+        "linkLocked": "Bloccato: un creator è selezionato o oltre in questa campagna."
       }
     },
     "brandFiles": {

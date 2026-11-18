@@ -782,7 +782,8 @@
         "automationsButton": "Automatiseringen",
         "applications": {
           "title": "Aanmeldingen",
-          "empty": "Geen openstaande aanmeldingen"
+          "empty": "Geen openstaande aanmeldingen",
+          "titleWave": "Aangemeld"
         },
         "card": {
           "unnamed": "Naamloze creator",
@@ -855,6 +856,19 @@
             "auto": "Automatisering",
             "from": "van",
             "to": "naar"
+          }
+        },
+        "wave": {
+          "moveRefused": "Alleen een creator die heeft geaccepteerd kan naar deze kolom worden verplaatst.",
+          "stage": {
+            "invited": "Uitgenodigd",
+            "selected": "Geselecteerd",
+            "filming": "Filmen",
+            "submitted": "Ingediend / in beoordeling",
+            "in_edits": "In bewerking",
+            "client_review": "Klantbeoordeling",
+            "approved": "Goedgekeurd",
+            "dropped": "Afgevallen"
           }
         }
       },
@@ -997,7 +1011,9 @@
         "restrictNeedsRegions": "Kies minstens één regio om reacties te beperken.",
         "exclusivityDateInPast": "Kies vandaag of een latere datum.",
         "exclusivityOwnBrand": "Een campagne kan haar eigen merk niet blokkeren.",
-        "brandExclusivityDisabled": "Merkexclusiviteit is nog niet beschikbaar."
+        "brandExclusivityDisabled": "Merkexclusiviteit is nog niet beschikbaar.",
+        "waveBudgetRequired": "Voer een budget in voordat deze campagne voor een golf actief wordt of op het opdrachtenbord komt.",
+        "waveTypeDisabled": "Campagnes voor een golf zijn nog niet beschikbaar."
       },
       "listing": {
         "sectionTitle": "Vermelding op het opdrachtenbord",
@@ -1090,6 +1106,23 @@
           "payment": "De betaling is gestart."
         },
         "error": "Het aanbod kon niet worden gewijzigd. Probeer het opnieuw."
+      },
+      "type": {
+        "label": "Campagnetype",
+        "normal": "Gewone campagne",
+        "normalHelp": "Een gewone campagne met een eigen bord van zeven kolommen.",
+        "forWave": "Voor een golf",
+        "forWaveHelp": "Hoort bij een golf en gebruikt het golfbord met negen kolommen."
+      },
+      "waveCard": {
+        "none": "Geen golf gekoppeld",
+        "link": "Golf koppelen",
+        "change": "Wijzigen",
+        "unlink": "Ontkoppelen",
+        "locked": "Vergrendeld: er is een creator geselecteerd of verder, dus de golf kan niet worden gewijzigd of verwijderd.",
+        "pick": "Kies een golf",
+        "noOptions": "Dit merk heeft geen golf zonder campagne.",
+        "failed": "De golfkoppeling kon niet worden opgeslagen. Probeer het opnieuw."
       }
     },
     "pools": {
@@ -1440,9 +1473,10 @@
         "loadFailed": "De golven konden niet worden geladen.",
         "campaignNotAvailable": "Die campagne kan niet worden gekoppeld aan een golf van dit merk.",
         "campaignAlreadyLinked": "Die campagne heeft al een golf.",
-        "campaignLinkLocked": "Deze golf is al gekoppeld aan een campagne. De koppeling kan niet worden gewijzigd.",
+        "campaignLinkLocked": "Er is een creator geselecteerd of verder in deze campagne, dus de koppeling kan niet worden gewijzigd.",
         "brandArchived": "Dit merk is gearchiveerd. Herstel het om de golven te wijzigen.",
-        "saveFailed": "De golf kon niet worden opgeslagen. Probeer het opnieuw."
+        "saveFailed": "De golf kon niet worden opgeslagen. Probeer het opnieuw.",
+        "waveNotAvailable": "Die golf kan niet aan deze campagne worden gekoppeld."
       },
       "dialog": {
         "createTitle": "Nieuwe golf",
@@ -1457,15 +1491,23 @@
         "campaign": "Campagne (optioneel)",
         "noCampaign": "Geen campagne",
         "campaignHint": "Je kunt later een campagne koppelen.",
-        "campaignLocked": "Een gekoppelde campagne kan hier niet worden gewijzigd.",
+        "campaignLocked": "Er is een creator geselecteerd of verder, dus de campagne kan niet worden gewijzigd of verwijderd.",
         "create": "Golf maken",
-        "save": "Wijzigingen opslaan"
+        "save": "Wijzigingen opslaan",
+        "choice": {
+          "none": "Nog geen campagne",
+          "existing": "Een bestaande campagne voor een golf",
+          "new": "Nu een campagne voor deze golf maken"
+        },
+        "newCampaignName": "Campagnenaam",
+        "newCampaignHint": "Wordt aangemaakt als concept zonder budget. Stel het budget in op de campagnepagina voordat het live kan."
       },
       "validation": {
         "nameRequired": "Voer een naam voor de golf in.",
         "goLiveRequired": "Kies een datum van livegang.",
         "marketsRequired": "Voeg ten minste één markt toe.",
-        "marketsMax": "Voeg maximaal 20 markten toe."
+        "marketsMax": "Voeg maximaal 20 markten toe.",
+        "newCampaignNameRequired": "Voer een campagnenaam in."
       },
       "detail": {
         "title": "Golf",
@@ -1473,7 +1515,8 @@
         "campaign": "Gekoppelde campagne",
         "noCampaign": "Geen campagne gekoppeld",
         "createdBy": "Gemaakt door",
-        "notFound": "Deze golf is niet gevonden."
+        "notFound": "Deze golf is niet gevonden.",
+        "linkLocked": "Vergrendeld: er is een creator geselecteerd of verder in deze campagne."
       }
     },
     "brandFiles": {

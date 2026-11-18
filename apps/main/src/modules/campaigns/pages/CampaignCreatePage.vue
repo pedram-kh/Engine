@@ -47,6 +47,9 @@ function emptyForm(): CreateCampaignPayload {
   }
 }
 
+// PL-1.2: the campaign type is offered only while `features.waves` is on.
+const wavesEnabled = computed(() => authStore.user?.attributes.features?.waves === true)
+
 const form = ref<CreateCampaignPayload>(emptyForm())
 const brands = ref<{ id: string; name: string }[]>([])
 const submitting = ref(false)
@@ -85,6 +88,8 @@ async function onSubmit(): Promise<void> {
   } catch (err) {
     if (err instanceof ApiError && err.code === 'campaign.brand_exclusivity_disabled') {
       error.value = t('app.campaigns.errors.brandExclusivityDisabled')
+    } else if (err instanceof ApiError && err.code === 'campaign.wave_type_disabled') {
+      error.value = t('app.campaigns.errors.waveTypeDisabled')
     } else if (err instanceof ApiError) {
       const grouped = extractFieldErrors<string>(err)
       fieldErrors.value = grouped
@@ -131,6 +136,7 @@ async function onSubmit(): Promise<void> {
         :field-errors="fieldErrors"
         :region-restriction-enabled="regionRestrictionEnabled"
         :brand-exclusivity-enabled="brandExclusivityEnabled"
+        :show-type-choice="wavesEnabled"
         @submit="onSubmit"
       />
     </section>

@@ -1,5 +1,5 @@
 /**
- * PL-1.1 — i18n keys for waves and brand client files: presence, placeholder integrity and the
+ * PL-1.1 and PL-1.2 — i18n keys for waves, brand client files, and campaigns for a wave: presence, placeholder integrity and the
  * "not an English copy" gate across all 24 UI locales (the "flaky ten" bg, el, et, fi, ga, hu, lt,
  * lv, mt, ro included). Same shape as `messagesV2Keys.spec.ts`.
  */
@@ -60,6 +60,39 @@ const KEYS = [
   'app.waves.detail.noCampaign',
   'app.waves.detail.createdBy',
   'app.waves.detail.notFound',
+  'app.campaigns.board.applications.titleWave',
+  'app.campaigns.board.wave.moveRefused',
+  'app.campaigns.board.wave.stage.approved',
+  'app.campaigns.board.wave.stage.client_review',
+  'app.campaigns.board.wave.stage.dropped',
+  'app.campaigns.board.wave.stage.filming',
+  'app.campaigns.board.wave.stage.in_edits',
+  'app.campaigns.board.wave.stage.invited',
+  'app.campaigns.board.wave.stage.selected',
+  'app.campaigns.board.wave.stage.submitted',
+  'app.campaigns.errors.waveBudgetRequired',
+  'app.campaigns.errors.waveTypeDisabled',
+  'app.campaigns.type.forWave',
+  'app.campaigns.type.forWaveHelp',
+  'app.campaigns.type.label',
+  'app.campaigns.type.normal',
+  'app.campaigns.type.normalHelp',
+  'app.campaigns.waveCard.change',
+  'app.campaigns.waveCard.failed',
+  'app.campaigns.waveCard.link',
+  'app.campaigns.waveCard.locked',
+  'app.campaigns.waveCard.noOptions',
+  'app.campaigns.waveCard.none',
+  'app.campaigns.waveCard.pick',
+  'app.campaigns.waveCard.unlink',
+  'app.waves.detail.linkLocked',
+  'app.waves.dialog.choice.existing',
+  'app.waves.dialog.choice.new',
+  'app.waves.dialog.choice.none',
+  'app.waves.dialog.newCampaignHint',
+  'app.waves.dialog.newCampaignName',
+  'app.waves.errors.waveNotAvailable',
+  'app.waves.validation.newCampaignNameRequired',
   'app.brandFiles.title',
   'app.brandFiles.subtitle',
   'app.brandFiles.upload',
@@ -129,8 +162,8 @@ function tokens(value: string): string[] {
 }
 
 describe('PL-1.1 wave and client-file i18n keys', () => {
-  it('checks 70 keys across 24 locales', () => {
-    expect(KEYS).toHaveLength(70)
+  it('checks 103 keys across 24 locales', () => {
+    expect(KEYS).toHaveLength(103)
     expect(UI_LOCALES).toHaveLength(24)
   })
 

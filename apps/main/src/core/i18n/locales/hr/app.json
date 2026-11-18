@@ -782,7 +782,8 @@
         "automationsButton": "Automatizace",
         "applications": {
           "title": "Prijave",
-          "empty": "Nema prijava na čekanju"
+          "empty": "Nema prijava na čekanju",
+          "titleWave": "Prijavljeni"
         },
         "card": {
           "unnamed": "Nepojmenovaný ustvarjalca",
@@ -855,6 +856,19 @@
             "auto": "Automatizace",
             "from": "z",
             "to": "do"
+          }
+        },
+        "wave": {
+          "moveRefused": "U ovaj se stupac može premjestiti samo kreator koji je prihvatio.",
+          "stage": {
+            "invited": "Pozvani",
+            "selected": "Odabrani",
+            "filming": "Snimanje",
+            "submitted": "Predano / u pregledu",
+            "in_edits": "U montaži",
+            "client_review": "Pregled klijenta",
+            "approved": "Odobreno",
+            "dropped": "Odustali"
           }
         }
       },
@@ -997,7 +1011,9 @@
         "restrictNeedsRegions": "Odaberi barem jednu regiju kako bi ograničio prijave.",
         "exclusivityDateInPast": "Odaberi današnji ili kasniji datum.",
         "exclusivityOwnBrand": "Kampanja ne može blokirati vlastiti brend.",
-        "brandExclusivityDisabled": "Ekskluzivnost brenda još nije dostupna."
+        "brandExclusivityDisabled": "Ekskluzivnost brenda još nije dostupna.",
+        "waveBudgetRequired": "Unesite proračun prije nego ova kampanja za val postane aktivna ili se objavi na ploči poslova.",
+        "waveTypeDisabled": "Kampanje za val još nisu dostupne."
       },
       "listing": {
         "sectionTitle": "Oglas na ploči poslova",
@@ -1090,6 +1106,23 @@
           "payment": "Plaćanje je započelo."
         },
         "error": "Ponudu nije bilo moguće promijeniti. Pokušaj ponovno."
+      },
+      "type": {
+        "label": "Vrsta kampanje",
+        "normal": "Uobičajena kampanja",
+        "normalHelp": "Uobičajena kampanja s vlastitom pločom od sedam stupaca.",
+        "forWave": "Za val",
+        "forWaveHelp": "Pripada valu i koristi ploču vala s devet stupaca."
+      },
+      "waveCard": {
+        "none": "Nema povezanog vala",
+        "link": "Poveži val",
+        "change": "Promijeni",
+        "unlink": "Prekini vezu",
+        "locked": "Zaključano: kreator je odabran ili dalje, pa se val ne može promijeniti ni ukloniti.",
+        "pick": "Odaberite val",
+        "noOptions": "Ovaj brend nema val bez kampanje.",
+        "failed": "Veza s valom nije spremljena. Pokušajte ponovno."
       }
     },
     "pools": {
@@ -1440,9 +1473,10 @@
         "loadFailed": "Valove nije moguće učitati.",
         "campaignNotAvailable": "Ta se kampanja ne može povezati s valom ovog brenda.",
         "campaignAlreadyLinked": "Ta kampanja već ima val.",
-        "campaignLinkLocked": "Ovaj val već je povezan s kampanjom. Poveznica se ne može promijeniti.",
+        "campaignLinkLocked": "Kreator je odabran ili dalje u ovoj kampanji, pa se veza ne može promijeniti.",
         "brandArchived": "Ovaj brend je arhiviran. Vratite ga da biste mijenjali njegove valove.",
-        "saveFailed": "Val nije moguće spremiti. Pokušajte ponovno."
+        "saveFailed": "Val nije moguće spremiti. Pokušajte ponovno.",
+        "waveNotAvailable": "Taj val ne može se povezati s ovom kampanjom."
       },
       "dialog": {
         "createTitle": "Novi val",
@@ -1457,15 +1491,23 @@
         "campaign": "Kampanja (neobavezno)",
         "noCampaign": "Bez kampanje",
         "campaignHint": "Kampanju možete povezati kasnije.",
-        "campaignLocked": "Povezanu kampanju ovdje nije moguće promijeniti.",
+        "campaignLocked": "Kreator je odabran ili dalje, pa se kampanja ne može promijeniti ni ukloniti.",
         "create": "Izradi val",
-        "save": "Spremi promjene"
+        "save": "Spremi promjene",
+        "choice": {
+          "none": "Još nema kampanje",
+          "existing": "Postojeća kampanja za val",
+          "new": "Stvori kampanju za ovaj val sada"
+        },
+        "newCampaignName": "Naziv kampanje",
+        "newCampaignHint": "Stvara se kao nacrt bez proračuna. Postavite proračun na stranici kampanje prije objave."
       },
       "validation": {
         "nameRequired": "Unesite naziv vala.",
         "goLiveRequired": "Odaberite datum pokretanja.",
         "marketsRequired": "Dodajte barem jedno tržište.",
-        "marketsMax": "Dodajte najviše 20 tržišta."
+        "marketsMax": "Dodajte najviše 20 tržišta.",
+        "newCampaignNameRequired": "Unesite naziv kampanje."
       },
       "detail": {
         "title": "Val",
@@ -1473,7 +1515,8 @@
         "campaign": "Povezana kampanja",
         "noCampaign": "Nema povezane kampanje",
         "createdBy": "Izradio/la",
-        "notFound": "Ovaj val nije pronađen."
+        "notFound": "Ovaj val nije pronađen.",
+        "linkLocked": "Zaključano: kreator je odabran ili dalje u ovoj kampanji."
       }
     },
     "brandFiles": {

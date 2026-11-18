@@ -782,7 +782,8 @@
         "automationsButton": "Automations",
         "applications": {
           "title": "Pieteikumi",
-          "empty": "Nav gaidošu pieteikumu"
+          "empty": "Nav gaidošu pieteikumu",
+          "titleWave": "Pieteikušies"
         },
         "card": {
           "unnamed": "Unnamed creator",
@@ -855,6 +856,19 @@
             "auto": "Automation",
             "from": "from",
             "to": "to"
+          }
+        },
+        "wave": {
+          "moveRefused": "Šajā kolonnā var pārvietot tikai autoru, kurš ir piekritis.",
+          "stage": {
+            "invited": "Uzaicināti",
+            "selected": "Izvēlēti",
+            "filming": "Filmēšana",
+            "submitted": "Iesniegts / pārskatā",
+            "in_edits": "Rediģēšanā",
+            "client_review": "Klienta pārskats",
+            "approved": "Apstiprināti",
+            "dropped": "Izkritušie"
           }
         }
       },
@@ -997,7 +1011,9 @@
         "restrictNeedsRegions": "Izvēlies vismaz vienu reģionu, lai ierobežotu pieteikumus.",
         "exclusivityDateInPast": "Izvēlies šodienu vai vēlāku datumu.",
         "exclusivityOwnBrand": "Kampaņa nevar bloķēt savu zīmolu.",
-        "brandExclusivityDisabled": "Zīmola ekskluzivitāte vēl nav pieejama."
+        "brandExclusivityDisabled": "Zīmola ekskluzivitāte vēl nav pieejama.",
+        "waveBudgetRequired": "Ievadiet budžetu, pirms šī vilnim paredzētā kampaņa kļūst aktīva vai tiek publicēta darbu dēlī.",
+        "waveTypeDisabled": "Vilnim paredzētās kampaņas vēl nav pieejamas."
       },
       "listing": {
         "sectionTitle": "Sludinājums darbu tāfelē",
@@ -1090,6 +1106,23 @@
           "payment": "Maksājums ir sākts."
         },
         "error": "Piedāvājumu neizdevās mainīt. Mēģini vēlreiz."
+      },
+      "type": {
+        "label": "Kampaņas veids",
+        "normal": "Parasta kampaņa",
+        "normalHelp": "Parasta kampaņa ar savu septiņu kolonnu dēli.",
+        "forWave": "Vilnim",
+        "forWaveHelp": "Pieder vilnim un izmanto viļņa dēli ar deviņām kolonnām."
+      },
+      "waveCard": {
+        "none": "Nav piesaistīta viļņa",
+        "link": "Piesaistīt vilni",
+        "change": "Mainīt",
+        "unlink": "Atsaistīt",
+        "locked": "Bloķēts: autors ir izvēlēts vai tālāk, tāpēc vilni mainīt vai noņemt nevar.",
+        "pick": "Izvēlieties vilni",
+        "noOptions": "Šim zīmolam nav viļņa bez kampaņas.",
+        "failed": "Viļņa saiti neizdevās saglabāt. Mēģiniet vēlreiz."
       }
     },
     "pools": {
@@ -1440,9 +1473,10 @@
         "loadFailed": "Neizdevās ielādēt vilņus.",
         "campaignNotAvailable": "Šo kampaņu nevar saistīt ar šīs preču zīmes vilni.",
         "campaignAlreadyLinked": "Šai kampaņai jau ir vilnis.",
-        "campaignLinkLocked": "Šis vilnis jau ir saistīts ar kampaņu. Saiti nevar mainīt.",
+        "campaignLinkLocked": "Šajā kampaņā autors ir izvēlēts vai tālāk, tāpēc saiti mainīt nevar.",
         "brandArchived": "Šī preču zīme ir arhivēta. Atjaunojiet to, lai mainītu tās vilņus.",
-        "saveFailed": "Neizdevās saglabāt vilni. Mēģiniet vēlreiz."
+        "saveFailed": "Neizdevās saglabāt vilni. Mēģiniet vēlreiz.",
+        "waveNotAvailable": "Šo vilni nevar saistīt ar šo kampaņu."
       },
       "dialog": {
         "createTitle": "Jauns vilnis",
@@ -1457,15 +1491,23 @@
         "campaign": "Kampaņa (pēc izvēles)",
         "noCampaign": "Bez kampaņas",
         "campaignHint": "Kampaņu varat piesaistīt vēlāk.",
-        "campaignLocked": "Piesaistītu kampaņu šeit nevar mainīt.",
+        "campaignLocked": "Autors ir izvēlēts vai tālāk, tāpēc kampaņu mainīt vai noņemt nevar.",
         "create": "Izveidot vilni",
-        "save": "Saglabāt izmaiņas"
+        "save": "Saglabāt izmaiņas",
+        "choice": {
+          "none": "Kampaņas vēl nav",
+          "existing": "Esoša kampaņa vilnim",
+          "new": "Izveidot kampaņu šim vilnim tagad"
+        },
+        "newCampaignName": "Kampaņas nosaukums",
+        "newCampaignHint": "Tiek izveidota kā melnraksts bez budžeta. Iestatiet budžetu kampaņas lapā pirms palaišanas."
       },
       "validation": {
         "nameRequired": "Ievadiet viļņa nosaukumu.",
         "goLiveRequired": "Izvēlieties palaišanas datumu.",
         "marketsRequired": "Pievienojiet vismaz vienu tirgu.",
-        "marketsMax": "Pievienojiet ne vairāk kā 20 tirgu."
+        "marketsMax": "Pievienojiet ne vairāk kā 20 tirgu.",
+        "newCampaignNameRequired": "Ievadiet kampaņas nosaukumu."
       },
       "detail": {
         "title": "Vilnis",
@@ -1473,7 +1515,8 @@
         "campaign": "Piesaistītā kampaņa",
         "noCampaign": "Kampaņa nav piesaistīta",
         "createdBy": "Izveidoja",
-        "notFound": "Šis vilnis nav atrasts."
+        "notFound": "Šis vilnis nav atrasts.",
+        "linkLocked": "Bloķēts: šajā kampaņā autors ir izvēlēts vai tālāk."
       }
     },
     "brandFiles": {

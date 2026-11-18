@@ -782,7 +782,8 @@
         "automationsButton": "Automations",
         "applications": {
           "title": "Jelentkezések",
-          "empty": "Nincs függőben lévő jelentkezés"
+          "empty": "Nincs függőben lévő jelentkezés",
+          "titleWave": "Jelentkezők"
         },
         "card": {
           "unnamed": "Unnamed creator",
@@ -855,6 +856,19 @@
             "auto": "Automation",
             "from": "from",
             "to": "to"
+          }
+        },
+        "wave": {
+          "moveRefused": "Csak az elfogadó alkotó helyezhető át ebbe az oszlopba.",
+          "stage": {
+            "invited": "Meghívva",
+            "selected": "Kiválasztva",
+            "filming": "Forgatás",
+            "submitted": "Beadva / ellenőrzés alatt",
+            "in_edits": "Szerkesztés alatt",
+            "client_review": "Ügyfél általi ellenőrzés",
+            "approved": "Jóváhagyva",
+            "dropped": "Kiesett"
           }
         }
       },
@@ -997,7 +1011,9 @@
         "restrictNeedsRegions": "Válassz legalább egy régiót a jelentkezések korlátozásához.",
         "exclusivityDateInPast": "Válaszd a mai vagy egy későbbi dátumot.",
         "exclusivityOwnBrand": "Egy kampány nem tilthatja a saját márkáját.",
-        "brandExclusivityDisabled": "A márka kizárólagossága még nem érhető el."
+        "brandExclusivityDisabled": "A márka kizárólagossága még nem érhető el.",
+        "waveBudgetRequired": "Adjon meg költségvetést, mielőtt ez a hullámhoz tartozó kampány aktívvá válik vagy felkerül az állástáblára.",
+        "waveTypeDisabled": "A hullámhoz tartozó kampányok még nem érhetők el."
       },
       "listing": {
         "sectionTitle": "Hirdetés a munkatáblán",
@@ -1090,6 +1106,23 @@
           "payment": "A fizetés megkezdődött."
         },
         "error": "Az ajánlatot nem sikerült módosítani. Próbáld újra."
+      },
+      "type": {
+        "label": "Kampány típusa",
+        "normal": "Normál kampány",
+        "normalHelp": "Hagyományos kampány saját, hétoszlopos táblával.",
+        "forWave": "Hullámhoz",
+        "forWaveHelp": "Egy hullámhoz tartozik, és a kilencoszlopos hullámtáblát használja."
+      },
+      "waveCard": {
+        "none": "Nincs hozzákapcsolt hullám",
+        "link": "Hullám hozzákapcsolása",
+        "change": "Módosítás",
+        "unlink": "Leválasztás",
+        "locked": "Zárolva: egy alkotó ki van választva vagy továbbhaladt, ezért a hullám nem módosítható és nem távolítható el.",
+        "pick": "Válasszon hullámot",
+        "noOptions": "Ennek a márkának nincs kampány nélküli hulláma.",
+        "failed": "A hullámkapcsolatot nem sikerült menteni. Próbálja újra."
       }
     },
     "pools": {
@@ -1440,9 +1473,10 @@
         "loadFailed": "A hullámok betöltése nem sikerült.",
         "campaignNotAvailable": "Ez a kampány nem kapcsolható a márka egyik hullámához.",
         "campaignAlreadyLinked": "Ennek a kampánynak már van hullámja.",
-        "campaignLinkLocked": "Ez a hullám már kampányhoz van kapcsolva. A kapcsolat nem módosítható.",
+        "campaignLinkLocked": "Egy alkotó ki van választva vagy már továbbhaladt ebben a kampányban, ezért a kapcsolat nem módosítható.",
         "brandArchived": "Ez a márka archivált. Állítsa vissza, hogy módosíthassa a hullámait.",
-        "saveFailed": "A hullámot nem sikerült menteni. Próbálja újra."
+        "saveFailed": "A hullámot nem sikerült menteni. Próbálja újra.",
+        "waveNotAvailable": "Ez a hullám nem kapcsolható ehhez a kampányhoz."
       },
       "dialog": {
         "createTitle": "Új hullám",
@@ -1457,15 +1491,23 @@
         "campaign": "Kampány (nem kötelező)",
         "noCampaign": "Nincs kampány",
         "campaignHint": "Kampányt később is kapcsolhat.",
-        "campaignLocked": "A kapcsolt kampány itt nem módosítható.",
+        "campaignLocked": "Egy alkotó ki van választva vagy már továbbhaladt, ezért a kampány nem módosítható és nem távolítható el.",
         "create": "Hullám létrehozása",
-        "save": "Módosítások mentése"
+        "save": "Módosítások mentése",
+        "choice": {
+          "none": "Még nincs kampány",
+          "existing": "Meglévő kampány egy hullámhoz",
+          "new": "Kampány létrehozása ehhez a hullámhoz most"
+        },
+        "newCampaignName": "Kampány neve",
+        "newCampaignHint": "Vázlatként jön létre, költségvetés nélkül. Az indulás előtt állítsa be a költségvetést a kampány oldalán."
       },
       "validation": {
         "nameRequired": "Adja meg a hullám nevét.",
         "goLiveRequired": "Válasszon indulási dátumot.",
         "marketsRequired": "Adjon hozzá legalább egy piacot.",
-        "marketsMax": "Legfeljebb 20 piacot adhat hozzá."
+        "marketsMax": "Legfeljebb 20 piacot adhat hozzá.",
+        "newCampaignNameRequired": "Adja meg a kampány nevét."
       },
       "detail": {
         "title": "Hullám",
@@ -1473,7 +1515,8 @@
         "campaign": "Kapcsolt kampány",
         "noCampaign": "Nincs kapcsolt kampány",
         "createdBy": "Létrehozta",
-        "notFound": "Ez a hullám nem található."
+        "notFound": "Ez a hullám nem található.",
+        "linkLocked": "Zárolva: egy alkotó ki van választva vagy továbbhaladt ebben a kampányban."
       }
     },
     "brandFiles": {

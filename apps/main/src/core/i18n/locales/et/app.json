@@ -782,7 +782,8 @@
         "automationsButton": "Automations",
         "applications": {
           "title": "Kandideerimised",
-          "empty": "Ootel kandideerimisi ei ole"
+          "empty": "Ootel kandideerimisi ei ole",
+          "titleWave": "Kandideerinud"
         },
         "card": {
           "unnamed": "Unnamed creator",
@@ -855,6 +856,19 @@
             "auto": "Automation",
             "from": "from",
             "to": "to"
+          }
+        },
+        "wave": {
+          "moveRefused": "Sellesse veergu saab liigutada ainult nõustunud loovisiku.",
+          "stage": {
+            "invited": "Kutsutud",
+            "selected": "Valitud",
+            "filming": "Filmimine",
+            "submitted": "Esitatud / ülevaatusel",
+            "in_edits": "Redigeerimisel",
+            "client_review": "Kliendi ülevaatus",
+            "approved": "Kinnitatud",
+            "dropped": "Välja langenud"
           }
         }
       },
@@ -997,7 +1011,9 @@
         "restrictNeedsRegions": "Vali vähemalt üks piirkond, et kandideerimist piirata.",
         "exclusivityDateInPast": "Vali tänane või hilisem kuupäev.",
         "exclusivityOwnBrand": "Kampaania ei saa blokeerida oma brändi.",
-        "brandExclusivityDisabled": "Brändi ainuõigus pole veel saadaval."
+        "brandExclusivityDisabled": "Brändi ainuõigus pole veel saadaval.",
+        "waveBudgetRequired": "Sisesta eelarve enne, kui see lainele mõeldud kampaania aktiveeritakse või tööpakkumiste tahvlil avaldatakse.",
+        "waveTypeDisabled": "Lainele mõeldud kampaaniad pole veel saadaval."
       },
       "listing": {
         "sectionTitle": "Kuulutus tööde tahvlil",
@@ -1090,6 +1106,23 @@
           "payment": "Makse on alanud."
         },
         "error": "Pakkumist ei õnnestunud muuta. Proovi uuesti."
+      },
+      "type": {
+        "label": "Kampaania tüüp",
+        "normal": "Tavaline kampaania",
+        "normalHelp": "Tavaline kampaania oma seitsmeveerulise tahvliga.",
+        "forWave": "Lainele",
+        "forWaveHelp": "Kuulub lainele ja kasutab üheksa veeruga laine tahvlit."
+      },
+      "waveCard": {
+        "none": "Seotud lainet pole",
+        "link": "Seo laine",
+        "change": "Muuda",
+        "unlink": "Eemalda seos",
+        "locked": "Lukus: loovisik on valitud või kaugemal, seega ei saa lainet muuta ega eemaldada.",
+        "pick": "Vali laine",
+        "noOptions": "Sellel brändil pole kampaaniata lainet.",
+        "failed": "Laine linki ei õnnestunud salvestada. Proovi uuesti."
       }
     },
     "pools": {
@@ -1440,9 +1473,10 @@
         "loadFailed": "Lainete laadimine ebaõnnestus.",
         "campaignNotAvailable": "Seda kampaaniat ei saa selle brändi lainega siduda.",
         "campaignAlreadyLinked": "Sellel kampaanial on juba laine.",
-        "campaignLinkLocked": "See laine on juba kampaaniaga seotud. Seost ei saa muuta.",
+        "campaignLinkLocked": "Selles kampaanias on loovisik valitud või kaugemal, seega ei saa linki muuta.",
         "brandArchived": "See bränd on arhiveeritud. Taastage see, et selle laineid muuta.",
-        "saveFailed": "Lainet ei õnnestunud salvestada. Proovige uuesti."
+        "saveFailed": "Lainet ei õnnestunud salvestada. Proovige uuesti.",
+        "waveNotAvailable": "Seda lainet ei saa selle kampaaniaga siduda."
       },
       "dialog": {
         "createTitle": "Uus laine",
@@ -1457,15 +1491,23 @@
         "campaign": "Kampaania (valikuline)",
         "noCampaign": "Kampaaniat pole",
         "campaignHint": "Kampaania saab siduda ka hiljem.",
-        "campaignLocked": "Seotud kampaaniat ei saa siin muuta.",
+        "campaignLocked": "Loovisik on valitud või kaugemal, seega ei saa kampaaniat muuta ega eemaldada.",
         "create": "Loo laine",
-        "save": "Salvesta muudatused"
+        "save": "Salvesta muudatused",
+        "choice": {
+          "none": "Kampaaniat veel pole",
+          "existing": "Olemasolev kampaania lainele",
+          "new": "Loo sellele lainele kampaania kohe"
+        },
+        "newCampaignName": "Kampaania nimi",
+        "newCampaignHint": "Luuakse mustandina ilma eelarveta. Määra eelarve kampaania lehel enne avalikustamist."
       },
       "validation": {
         "nameRequired": "Sisestage laine nimi.",
         "goLiveRequired": "Valige avalikustamise kuupäev.",
         "marketsRequired": "Lisage vähemalt üks turg.",
-        "marketsMax": "Lisage kuni 20 turgu."
+        "marketsMax": "Lisage kuni 20 turgu.",
+        "newCampaignNameRequired": "Sisesta kampaania nimi."
       },
       "detail": {
         "title": "Laine",
@@ -1473,7 +1515,8 @@
         "campaign": "Seotud kampaania",
         "noCampaign": "Kampaaniat pole seotud",
         "createdBy": "Autor",
-        "notFound": "Seda lainet ei leitud."
+        "notFound": "Seda lainet ei leitud.",
+        "linkLocked": "Lukus: selles kampaanias on loovisik valitud või kaugemal."
       }
     },
     "brandFiles": {

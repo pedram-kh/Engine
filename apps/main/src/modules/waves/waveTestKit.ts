@@ -43,7 +43,7 @@ export function makeWave(
             data: {
               id: '01CAMPAIGNULIDXXXXXXXXXX',
               type: 'campaigns',
-              attributes: { name: 'Spring campaign', status: 'active' },
+              attributes: { name: 'Spring campaign', status: 'active', campaign_type: 'for_wave' },
             },
           }
         : null,

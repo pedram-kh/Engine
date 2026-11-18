@@ -41,6 +41,9 @@ vi.mock('../api/campaigns.api', () => ({
     acceptApplication: vi.fn(),
     rejectApplication: vi.fn(),
     update: vi.fn(),
+    waveOptions: vi.fn(),
+    linkWave: vi.fn(),
+    unlinkWave: vi.fn(),
     reinvite: vi.fn(),
     showAssignment: vi.fn(),
     approveDraft: vi.fn(),
@@ -231,6 +234,8 @@ async function mountDetail(
       campaign_region_restriction?: boolean
       assignment_offer_edit?: boolean
       campaign_brand_exclusivity?: boolean
+      /** PL-1.2: `waves_enabled`. */
+      waves?: boolean
     }
     /** AH-116: the files read fails. */
     filesError?: boolean
@@ -1428,6 +1433,74 @@ describe('CampaignDetailPage — agency restyle (AH-114, S3.2)', () => {
       ;(wrapper.vm as unknown as { tab: string }).tab = 'overview'
       await flushPromises()
       expect(reads()).toBe(afterMount + 1)
+    })
+  })
+
+  describe('PL-1.2 — campaign type, the wave card and the flag-off DOM (W2, W3)', () => {
+    function commentCount(root: Element): number {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_COMMENT)
+      let n = 0
+      while (walker.nextNode()) n += 1
+      return n
+    }
+    // Measured on the pre-PL-1.2 page (git HEAD a173a9b2): 95 (normal campaign, waves off, admin, Overview).
+    const BASELINE_COMMENTS = 95
+
+    it('a normal campaign with waves off draws no type pill, no wave card and no extra node', async () => {
+      const harness = await mountDetail('agency_admin', [])
+      cleanup = harness.cleanup
+      const w = harness.wrapper
+      expect(w.find('[data-test="campaign-detail-type"]').exists()).toBe(false)
+      expect(w.find('[data-test="campaign-wave-card"]').exists()).toBe(false)
+      expect(commentCount(w.element)).toBe(BASELINE_COMMENTS)
+    })
+
+    it('a for-a-wave campaign with waves on shows the type pill and the wave card', async () => {
+      const harness = await mountDetail('agency_admin', [], {
+        campaign: { campaign_type: 'for_wave' },
+        features: { waves: true },
+      })
+      cleanup = harness.cleanup
+      const w = harness.wrapper
+      expect(w.find('[data-test="campaign-detail-type"]').text()).toBe('For a wave')
+      expect(w.find('[data-test="campaign-wave-card"]').exists()).toBe(true)
+    })
+
+    it('a for-a-wave campaign with waves off keeps the pill but never the wave card', async () => {
+      const harness = await mountDetail('agency_admin', [], {
+        campaign: { campaign_type: 'for_wave' },
+        features: { waves: false },
+      })
+      cleanup = harness.cleanup
+      expect(harness.wrapper.find('[data-test="campaign-wave-card"]').exists()).toBe(false)
+    })
+
+    it('Settings of a for-a-wave campaign hides the posting switch and says why a zero budget is refused', async () => {
+      const harness = await mountDetail('agency_admin', [], {
+        campaign: { campaign_type: 'for_wave', creator_posts_content: false },
+        features: { waves: true },
+      })
+      cleanup = harness.cleanup
+      ;(harness.wrapper.vm as unknown as { tab: string }).tab = 'settings'
+      await flushPromises()
+      expect(harness.wrapper.find('[data-test="campaign-creator-posts-content"]').exists()).toBe(
+        false,
+      )
+
+      vi.mocked(campaignsApi.update).mockRejectedValue(
+        new ApiError({
+          status: 422,
+          code: 'campaign.wave_budget_required',
+          message: 'x',
+          details: [],
+          raw: null,
+        } as never),
+      )
+      await harness.wrapper.find('[data-test="campaign-form"]').trigger('submit')
+      await flushPromises()
+      expect(harness.wrapper.find('[data-test="campaign-form-error"]').text()).toContain(
+        'Enter a budget before this campaign for a wave',
+      )
     })
   })
 

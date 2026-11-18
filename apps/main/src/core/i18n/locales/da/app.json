@@ -782,7 +782,8 @@
         "automationsButton": "Automatiseringer",
         "applications": {
           "title": "Ansøgninger",
-          "empty": "Ingen ventende ansøgninger"
+          "empty": "Ingen ventende ansøgninger",
+          "titleWave": "Ansøgt"
         },
         "card": {
           "unnamed": "Unavngivet creator",
@@ -855,6 +856,19 @@
             "auto": "Automatisering",
             "from": "fra",
             "to": "til"
+          }
+        },
+        "wave": {
+          "moveRefused": "Kun en creator, der har accepteret, kan flyttes til denne kolonne.",
+          "stage": {
+            "invited": "Inviteret",
+            "selected": "Valgt",
+            "filming": "Optagelse",
+            "submitted": "Indsendt / til gennemsyn",
+            "in_edits": "Redigering",
+            "client_review": "Klientgennemgang",
+            "approved": "Godkendt",
+            "dropped": "Droppet"
           }
         }
       },
@@ -997,7 +1011,9 @@
         "restrictNeedsRegions": "Vælg mindst én region for at begrænse ansøgninger.",
         "exclusivityDateInPast": "Vælg i dag eller en senere dato.",
         "exclusivityOwnBrand": "En kampagne kan ikke blokere sit eget brand.",
-        "brandExclusivityDisabled": "Brandeksklusivitet er ikke tilgængelig endnu."
+        "brandExclusivityDisabled": "Brandeksklusivitet er ikke tilgængelig endnu.",
+        "waveBudgetRequired": "Angiv et budget, før denne kampagne til en bølge bliver aktiv eller vises på jobtavlen.",
+        "waveTypeDisabled": "Kampagner til en bølge er ikke tilgængelige endnu."
       },
       "listing": {
         "sectionTitle": "Opslag på opgavetavlen",
@@ -1090,6 +1106,23 @@
           "payment": "Betalingen er startet."
         },
         "error": "Tilbuddet kunne ikke ændres. Prøv igen."
+      },
+      "type": {
+        "label": "Kampagnetype",
+        "normal": "Almindelig kampagne",
+        "normalHelp": "En almindelig kampagne med sin egen tavle med syv kolonner.",
+        "forWave": "Til en bølge",
+        "forWaveHelp": "Hører til en bølge og bruger bølgetavlen med ni kolonner."
+      },
+      "waveCard": {
+        "none": "Ingen bølge knyttet",
+        "link": "Knyt en bølge",
+        "change": "Skift",
+        "unlink": "Fjern link",
+        "locked": "Låst: en creator er valgt eller videre, så bølgen kan ikke ændres eller fjernes.",
+        "pick": "Vælg en bølge",
+        "noOptions": "Dette brand har ingen bølge uden kampagne.",
+        "failed": "Bølgelinket kunne ikke gemmes. Prøv igen."
       }
     },
     "pools": {
@@ -1440,9 +1473,10 @@
         "loadFailed": "Bølgerne kunne ikke indlæses.",
         "campaignNotAvailable": "Den kampagne kan ikke knyttes til en bølge for dette brand.",
         "campaignAlreadyLinked": "Den kampagne har allerede en bølge.",
-        "campaignLinkLocked": "Denne bølge er allerede knyttet til en kampagne. Forbindelsen kan ikke ændres.",
+        "campaignLinkLocked": "En creator er valgt eller videre på denne kampagne, så linket kan ikke ændres.",
         "brandArchived": "Dette brand er arkiveret. Gendan det for at ændre dets bølger.",
-        "saveFailed": "Bølgen kunne ikke gemmes. Prøv igen."
+        "saveFailed": "Bølgen kunne ikke gemmes. Prøv igen.",
+        "waveNotAvailable": "Den bølge kan ikke knyttes til denne kampagne."
       },
       "dialog": {
         "createTitle": "Ny bølge",
@@ -1457,15 +1491,23 @@
         "campaign": "Kampagne (valgfri)",
         "noCampaign": "Ingen kampagne",
         "campaignHint": "Du kan knytte en kampagne til senere.",
-        "campaignLocked": "En tilknyttet kampagne kan ikke ændres her.",
+        "campaignLocked": "En creator er valgt eller videre, så kampagnen kan ikke ændres eller fjernes.",
         "create": "Opret bølge",
-        "save": "Gem ændringer"
+        "save": "Gem ændringer",
+        "choice": {
+          "none": "Ingen kampagne endnu",
+          "existing": "En eksisterende kampagne til en bølge",
+          "new": "Opret en kampagne til denne bølge nu"
+        },
+        "newCampaignName": "Kampagnenavn",
+        "newCampaignHint": "Oprettes som kladde uden budget. Angiv budgettet på kampagnesiden, før den kan gå live."
       },
       "validation": {
         "nameRequired": "Angiv et navn til bølgen.",
         "goLiveRequired": "Vælg en lanceringsdato.",
         "marketsRequired": "Tilføj mindst ét marked.",
-        "marketsMax": "Tilføj højst 20 markeder."
+        "marketsMax": "Tilføj højst 20 markeder.",
+        "newCampaignNameRequired": "Angiv et kampagnenavn."
       },
       "detail": {
         "title": "Bølge",
@@ -1473,7 +1515,8 @@
         "campaign": "Tilknyttet kampagne",
         "noCampaign": "Ingen kampagne tilknyttet",
         "createdBy": "Oprettet af",
-        "notFound": "Denne bølge blev ikke fundet."
+        "notFound": "Denne bølge blev ikke fundet.",
+        "linkLocked": "Låst: en creator er valgt eller videre på denne kampagne."
       }
     },
     "brandFiles": {

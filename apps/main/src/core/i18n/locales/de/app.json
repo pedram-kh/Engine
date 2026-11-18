@@ -782,7 +782,8 @@
         "automationsButton": "Automatisierungen",
         "applications": {
           "title": "Bewerbungen",
-          "empty": "Keine offenen Bewerbungen"
+          "empty": "Keine offenen Bewerbungen",
+          "titleWave": "Beworben"
         },
         "card": {
           "unnamed": "Unbenannter Creator",
@@ -855,6 +856,19 @@
             "auto": "Automatisierung",
             "from": "von",
             "to": "nach"
+          }
+        },
+        "wave": {
+          "moveRefused": "Nur ein Creator, der angenommen hat, kann in diese Spalte verschoben werden.",
+          "stage": {
+            "invited": "Eingeladen",
+            "selected": "Ausgewählt",
+            "filming": "Dreh",
+            "submitted": "Eingereicht / in Prüfung",
+            "in_edits": "In Bearbeitung",
+            "client_review": "Kundenprüfung",
+            "approved": "Freigegeben",
+            "dropped": "Ausgeschieden"
           }
         }
       },
@@ -997,7 +1011,9 @@
         "restrictNeedsRegions": "Wähle mindestens eine Region, um Bewerbungen einzuschränken.",
         "exclusivityDateInPast": "Wähle heute oder ein späteres Datum.",
         "exclusivityOwnBrand": "Eine Kampagne kann ihre eigene Marke nicht blockieren.",
-        "brandExclusivityDisabled": "Markenexklusivität ist noch nicht verfügbar."
+        "brandExclusivityDisabled": "Markenexklusivität ist noch nicht verfügbar.",
+        "waveBudgetRequired": "Geben Sie ein Budget an, bevor diese Kampagne für eine Welle aktiv wird oder im Jobboard erscheint.",
+        "waveTypeDisabled": "Kampagnen für eine Welle sind noch nicht verfügbar."
       },
       "listing": {
         "sectionTitle": "Jobboard-Eintrag",
@@ -1090,6 +1106,23 @@
           "payment": "Die Zahlung hat begonnen."
         },
         "error": "Das Angebot konnte nicht geändert werden. Bitte versuche es erneut."
+      },
+      "type": {
+        "label": "Kampagnentyp",
+        "normal": "Normale Kampagne",
+        "normalHelp": "Eine reguläre Kampagne mit eigenem Board mit sieben Spalten.",
+        "forWave": "Für eine Welle",
+        "forWaveHelp": "Gehört zu einer Welle und nutzt das Wellen-Board mit neun Spalten."
+      },
+      "waveCard": {
+        "none": "Keine Welle verknüpft",
+        "link": "Welle verknüpfen",
+        "change": "Ändern",
+        "unlink": "Verknüpfung lösen",
+        "locked": "Gesperrt: Ein Creator ist ausgewählt oder weiter, daher kann die Welle nicht geändert oder entfernt werden.",
+        "pick": "Welle auswählen",
+        "noOptions": "Diese Marke hat keine Welle ohne Kampagne.",
+        "failed": "Die Wellen-Verknüpfung konnte nicht gespeichert werden. Versuchen Sie es erneut."
       }
     },
     "pools": {
@@ -1440,9 +1473,10 @@
         "loadFailed": "Die Wellen konnten nicht geladen werden.",
         "campaignNotAvailable": "Diese Kampagne kann nicht mit einer Welle dieser Marke verknüpft werden.",
         "campaignAlreadyLinked": "Diese Kampagne hat bereits eine Welle.",
-        "campaignLinkLocked": "Diese Welle ist bereits mit einer Kampagne verknüpft. Die Verknüpfung kann nicht geändert werden.",
+        "campaignLinkLocked": "Ein Creator ist bei dieser Kampagne ausgewählt oder weiter, daher kann die Verknüpfung nicht geändert werden.",
         "brandArchived": "Diese Marke ist archiviert. Stellen Sie sie wieder her, um ihre Wellen zu ändern.",
-        "saveFailed": "Die Welle konnte nicht gespeichert werden. Versuchen Sie es erneut."
+        "saveFailed": "Die Welle konnte nicht gespeichert werden. Versuchen Sie es erneut.",
+        "waveNotAvailable": "Diese Welle kann nicht mit dieser Kampagne verknüpft werden."
       },
       "dialog": {
         "createTitle": "Neue Welle",
@@ -1457,15 +1491,23 @@
         "campaign": "Kampagne (optional)",
         "noCampaign": "Keine Kampagne",
         "campaignHint": "Sie können später eine Kampagne verknüpfen.",
-        "campaignLocked": "Eine verknüpfte Kampagne kann hier nicht geändert werden.",
+        "campaignLocked": "Ein Creator ist ausgewählt oder weiter, daher kann die Kampagne nicht geändert oder entfernt werden.",
         "create": "Welle erstellen",
-        "save": "Änderungen speichern"
+        "save": "Änderungen speichern",
+        "choice": {
+          "none": "Noch keine Kampagne",
+          "existing": "Eine bestehende Kampagne für eine Welle",
+          "new": "Jetzt eine Kampagne für diese Welle erstellen"
+        },
+        "newCampaignName": "Kampagnenname",
+        "newCampaignHint": "Wird als Entwurf ohne Budget angelegt. Legen Sie das Budget auf der Kampagnenseite fest, bevor sie live gehen kann."
       },
       "validation": {
         "nameRequired": "Geben Sie einen Namen für die Welle ein.",
         "goLiveRequired": "Wählen Sie ein Go-live-Datum.",
         "marketsRequired": "Fügen Sie mindestens einen Markt hinzu.",
-        "marketsMax": "Fügen Sie höchstens 20 Märkte hinzu."
+        "marketsMax": "Fügen Sie höchstens 20 Märkte hinzu.",
+        "newCampaignNameRequired": "Geben Sie einen Kampagnennamen ein."
       },
       "detail": {
         "title": "Welle",
@@ -1473,7 +1515,8 @@
         "campaign": "Verknüpfte Kampagne",
         "noCampaign": "Keine Kampagne verknüpft",
         "createdBy": "Erstellt von",
-        "notFound": "Diese Welle wurde nicht gefunden."
+        "notFound": "Diese Welle wurde nicht gefunden.",
+        "linkLocked": "Gesperrt: Ein Creator ist bei dieser Kampagne ausgewählt oder weiter."
       }
     },
     "brandFiles": {

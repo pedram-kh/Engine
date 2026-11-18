@@ -26,6 +26,7 @@ import type {
   CampaignEnvelope,
   CampaignListParams,
   CampaignListResponse,
+  CampaignWaveOptionsResponse,
   ContractMediaCompletePayload,
   ContractMediaCompleteResponse,
   ContractMediaInitPayload,
@@ -51,6 +52,7 @@ import type {
   ReviewActionResponse,
   UpdateCampaignAttachmentPayload,
   UpdateCampaignPayload,
+  WaveEnvelope,
 } from '@catalyst/api-client'
 
 import { http } from '@/core/api'
@@ -190,6 +192,27 @@ export const campaignsApi = {
       `${campaignsBase(agencyId)}/${campaignId}/attachments/${fileId}`,
       payload,
     )
+  },
+
+  /**
+   * PL-1.2 (P4) — this brand's waves that have no campaign, for the campaign page's Wave card. Behind `waves_enabled`
+   * (404 while off). `PUT` links or changes, `DELETE` unlinks; both refuse with 422 `wave.campaign_link_locked` while
+   * a creator is Selected or further.
+   */
+  waveOptions(agencyId: string, campaignId: string): Promise<CampaignWaveOptionsResponse> {
+    return http.get<CampaignWaveOptionsResponse>(
+      `${campaignsBase(agencyId)}/${campaignId}/wave-options`,
+    )
+  },
+
+  linkWave(agencyId: string, campaignId: string, waveId: string): Promise<WaveEnvelope> {
+    return http.put<WaveEnvelope>(`${campaignsBase(agencyId)}/${campaignId}/wave`, {
+      wave_id: waveId,
+    })
+  },
+
+  unlinkWave(agencyId: string, campaignId: string): Promise<void> {
+    return http.delete<void>(`${campaignsBase(agencyId)}/${campaignId}/wave`)
   },
 
   /**

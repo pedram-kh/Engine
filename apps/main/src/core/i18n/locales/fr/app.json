@@ -782,7 +782,8 @@
         "automationsButton": "Automatisations",
         "applications": {
           "title": "Candidatures",
-          "empty": "Aucune candidature en attente"
+          "empty": "Aucune candidature en attente",
+          "titleWave": "Candidats"
         },
         "card": {
           "unnamed": "Créateur sans nom",
@@ -855,6 +856,19 @@
             "auto": "Automatisation",
             "from": "de",
             "to": "vers"
+          }
+        },
+        "wave": {
+          "moveRefused": "Seul un créateur qui a accepté peut être déplacé dans cette colonne.",
+          "stage": {
+            "invited": "Invités",
+            "selected": "Sélectionnés",
+            "filming": "Tournage",
+            "submitted": "Soumis / en revue",
+            "in_edits": "En montage",
+            "client_review": "Revue client",
+            "approved": "Approuvés",
+            "dropped": "Écartés"
           }
         }
       },
@@ -997,7 +1011,9 @@
         "restrictNeedsRegions": "Choisissez au moins une région pour limiter les candidatures.",
         "exclusivityDateInPast": "Choisis aujourd'hui ou une date ultérieure.",
         "exclusivityOwnBrand": "Une campagne ne peut pas bloquer sa propre marque.",
-        "brandExclusivityDisabled": "L'exclusivité de marque n'est pas encore disponible."
+        "brandExclusivityDisabled": "L'exclusivité de marque n'est pas encore disponible.",
+        "waveBudgetRequired": "Saisissez un budget avant que cette campagne pour une vague ne passe en actif ou ne soit publiée sur le tableau des offres.",
+        "waveTypeDisabled": "Les campagnes pour une vague ne sont pas encore disponibles."
       },
       "listing": {
         "sectionTitle": "Annonce sur le tableau des missions",
@@ -1090,6 +1106,23 @@
           "payment": "Le paiement a commencé."
         },
         "error": "L'offre n'a pas pu être modifiée. Veuillez réessayer."
+      },
+      "type": {
+        "label": "Type de campagne",
+        "normal": "Campagne normale",
+        "normalHelp": "Une campagne classique avec son propre tableau de sept colonnes.",
+        "forWave": "Pour une vague",
+        "forWaveHelp": "Appartient à une vague et utilise le tableau de vague à neuf colonnes."
+      },
+      "waveCard": {
+        "none": "Aucune vague liée",
+        "link": "Lier une vague",
+        "change": "Modifier",
+        "unlink": "Délier",
+        "locked": "Verrouillé : un créateur est sélectionné ou plus avancé, la vague ne peut donc pas être modifiée ni retirée.",
+        "pick": "Choisir une vague",
+        "noOptions": "Cette marque n'a aucune vague sans campagne.",
+        "failed": "Le lien avec la vague n'a pas pu être enregistré. Réessayez."
       }
     },
     "pools": {
@@ -1440,9 +1473,10 @@
         "loadFailed": "Impossible de charger les vagues.",
         "campaignNotAvailable": "Cette campagne ne peut pas être liée à une vague de cette marque.",
         "campaignAlreadyLinked": "Cette campagne a déjà une vague.",
-        "campaignLinkLocked": "Cette vague est déjà liée à une campagne. Le lien ne peut pas être modifié.",
+        "campaignLinkLocked": "Un créateur est sélectionné ou plus avancé sur cette campagne, le lien ne peut donc pas être modifié.",
         "brandArchived": "Cette marque est archivée. Restaurez-la pour modifier ses vagues.",
-        "saveFailed": "Impossible d'enregistrer la vague. Réessayez."
+        "saveFailed": "Impossible d'enregistrer la vague. Réessayez.",
+        "waveNotAvailable": "Cette vague ne peut pas être liée à cette campagne."
       },
       "dialog": {
         "createTitle": "Nouvelle vague",
@@ -1457,15 +1491,23 @@
         "campaign": "Campagne (facultatif)",
         "noCampaign": "Aucune campagne",
         "campaignHint": "Vous pourrez lier une campagne plus tard.",
-        "campaignLocked": "Une campagne liée ne peut pas être modifiée ici.",
+        "campaignLocked": "Un créateur est sélectionné ou plus avancé, la campagne ne peut donc pas être modifiée ni retirée.",
         "create": "Créer la vague",
-        "save": "Enregistrer les modifications"
+        "save": "Enregistrer les modifications",
+        "choice": {
+          "none": "Pas encore de campagne",
+          "existing": "Une campagne existante pour une vague",
+          "new": "Créer dès maintenant une campagne pour cette vague"
+        },
+        "newCampaignName": "Nom de la campagne",
+        "newCampaignHint": "Créée en brouillon sans budget. Définissez le budget sur la page de la campagne avant sa mise en ligne."
       },
       "validation": {
         "nameRequired": "Saisissez un nom de vague.",
         "goLiveRequired": "Choisissez une date de mise en ligne.",
         "marketsRequired": "Ajoutez au moins un marché.",
-        "marketsMax": "Ajoutez 20 marchés au maximum."
+        "marketsMax": "Ajoutez 20 marchés au maximum.",
+        "newCampaignNameRequired": "Saisissez un nom de campagne."
       },
       "detail": {
         "title": "Vague",
@@ -1473,7 +1515,8 @@
         "campaign": "Campagne liée",
         "noCampaign": "Aucune campagne liée",
         "createdBy": "Créée par",
-        "notFound": "Cette vague est introuvable."
+        "notFound": "Cette vague est introuvable.",
+        "linkLocked": "Verrouillé : un créateur est sélectionné ou plus avancé sur cette campagne."
       }
     },
     "brandFiles": {

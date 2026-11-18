@@ -782,7 +782,8 @@
         "automationsButton": "Automations",
         "applications": {
           "title": "Hakemukset",
-          "empty": "Ei odottavia hakemuksia"
+          "empty": "Ei odottavia hakemuksia",
+          "titleWave": "Hakeneet"
         },
         "card": {
           "unnamed": "Unnamed creator",
@@ -855,6 +856,19 @@
             "auto": "Automation",
             "from": "from",
             "to": "to"
+          }
+        },
+        "wave": {
+          "moveRefused": "Tähän sarakkeeseen voi siirtää vain tekijän, joka on hyväksynyt.",
+          "stage": {
+            "invited": "Kutsutut",
+            "selected": "Valitut",
+            "filming": "Kuvaus",
+            "submitted": "Lähetetty / tarkistettavana",
+            "in_edits": "Muokkauksessa",
+            "client_review": "Asiakkaan tarkistus",
+            "approved": "Hyväksytyt",
+            "dropped": "Pudonneet"
           }
         }
       },
@@ -997,7 +1011,9 @@
         "restrictNeedsRegions": "Valitse vähintään yksi alue rajataksesi hakemukset.",
         "exclusivityDateInPast": "Valitse tämä päivä tai myöhempi päivä.",
         "exclusivityOwnBrand": "Kampanja ei voi estää omaa brändiään.",
-        "brandExclusivityDisabled": "Brändin yksinoikeus ei ole vielä käytettävissä."
+        "brandExclusivityDisabled": "Brändin yksinoikeus ei ole vielä käytettävissä.",
+        "waveBudgetRequired": "Anna budjetti, ennen kuin tämä aallolle tehty kampanja aktivoidaan tai listataan työtaululle.",
+        "waveTypeDisabled": "Aalloille tehtyjä kampanjoita ei ole vielä saatavilla."
       },
       "listing": {
         "sectionTitle": "Ilmoitus työtaulussa",
@@ -1090,6 +1106,23 @@
           "payment": "Maksu on alkanut."
         },
         "error": "Tarjouksen muuttaminen ei onnistunut. Yritä uudelleen."
+      },
+      "type": {
+        "label": "Kampanjan tyyppi",
+        "normal": "Tavallinen kampanja",
+        "normalHelp": "Tavallinen kampanja, jolla on oma seitsemän sarakkeen taulu.",
+        "forWave": "Aallolle",
+        "forWaveHelp": "Kuuluu aallolle ja käyttää yhdeksän sarakkeen aaltotaulua."
+      },
+      "waveCard": {
+        "none": "Ei liitettyä aaltoa",
+        "link": "Liitä aalto",
+        "change": "Vaihda",
+        "unlink": "Poista liitos",
+        "locked": "Lukittu: tekijä on valittu tai pidemmällä, joten aaltoa ei voi muuttaa tai poistaa.",
+        "pick": "Valitse aalto",
+        "noOptions": "Tällä brändillä ei ole aaltoa ilman kampanjaa.",
+        "failed": "Aaltoliitosta ei voitu tallentaa. Yritä uudelleen."
       }
     },
     "pools": {
@@ -1440,9 +1473,10 @@
         "loadFailed": "Aaltojen lataaminen epäonnistui.",
         "campaignNotAvailable": "Tuota kampanjaa ei voi liittää tämän brändin aaltoon.",
         "campaignAlreadyLinked": "Tuolla kampanjalla on jo aalto.",
-        "campaignLinkLocked": "Tämä aalto on jo liitetty kampanjaan. Liitosta ei voi muuttaa.",
+        "campaignLinkLocked": "Tekijä on valittu tai pidemmällä tässä kampanjassa, joten linkkiä ei voi muuttaa.",
         "brandArchived": "Tämä brändi on arkistoitu. Palauta se muuttaaksesi sen aaltoja.",
-        "saveFailed": "Aallon tallentaminen epäonnistui. Yritä uudelleen."
+        "saveFailed": "Aallon tallentaminen epäonnistui. Yritä uudelleen.",
+        "waveNotAvailable": "Tätä aaltoa ei voi liittää tähän kampanjaan."
       },
       "dialog": {
         "createTitle": "Uusi aalto",
@@ -1457,15 +1491,23 @@
         "campaign": "Kampanja (valinnainen)",
         "noCampaign": "Ei kampanjaa",
         "campaignHint": "Voit liittää kampanjan myöhemmin.",
-        "campaignLocked": "Liitettyä kampanjaa ei voi muuttaa täällä.",
+        "campaignLocked": "Tekijä on valittu tai pidemmällä, joten kampanjaa ei voi muuttaa tai poistaa.",
         "create": "Luo aalto",
-        "save": "Tallenna muutokset"
+        "save": "Tallenna muutokset",
+        "choice": {
+          "none": "Ei vielä kampanjaa",
+          "existing": "Olemassa oleva kampanja aallolle",
+          "new": "Luo tälle aallolle kampanja nyt"
+        },
+        "newCampaignName": "Kampanjan nimi",
+        "newCampaignHint": "Luodaan luonnoksena ilman budjettia. Aseta budjetti kampanjan sivulla ennen julkaisua."
       },
       "validation": {
         "nameRequired": "Anna aallolle nimi.",
         "goLiveRequired": "Valitse julkaisupäivä.",
         "marketsRequired": "Lisää vähintään yksi markkina.",
-        "marketsMax": "Lisää enintään 20 markkinaa."
+        "marketsMax": "Lisää enintään 20 markkinaa.",
+        "newCampaignNameRequired": "Anna kampanjan nimi."
       },
       "detail": {
         "title": "Aalto",
@@ -1473,7 +1515,8 @@
         "campaign": "Liitetty kampanja",
         "noCampaign": "Ei liitettyä kampanjaa",
         "createdBy": "Luonut",
-        "notFound": "Tätä aaltoa ei löytynyt."
+        "notFound": "Tätä aaltoa ei löytynyt.",
+        "linkLocked": "Lukittu: tekijä on valittu tai pidemmällä tässä kampanjassa."
       }
     },
     "brandFiles": {

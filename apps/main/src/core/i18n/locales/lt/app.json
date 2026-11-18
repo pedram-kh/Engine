@@ -782,7 +782,8 @@
         "automationsButton": "Automations",
         "applications": {
           "title": "Paraiškos",
-          "empty": "Nėra laukiančių paraiškų"
+          "empty": "Nėra laukiančių paraiškų",
+          "titleWave": "Pateikę paraiškas"
         },
         "card": {
           "unnamed": "Unnamed creator",
@@ -855,6 +856,19 @@
             "auto": "Automation",
             "from": "from",
             "to": "to"
+          }
+        },
+        "wave": {
+          "moveRefused": "Į šį stulpelį galima perkelti tik sutikusį kūrėją.",
+          "stage": {
+            "invited": "Pakviesti",
+            "selected": "Pasirinkti",
+            "filming": "Filmavimas",
+            "submitted": "Pateikta / peržiūrima",
+            "in_edits": "Redaguojama",
+            "client_review": "Kliento peržiūra",
+            "approved": "Patvirtinta",
+            "dropped": "Iškritę"
           }
         }
       },
@@ -997,7 +1011,9 @@
         "restrictNeedsRegions": "Pasirink bent vieną regioną, kad apribotum kandidatūras.",
         "exclusivityDateInPast": "Pasirink šiandienos ar vėlesnę datą.",
         "exclusivityOwnBrand": "Kampanija negali blokuoti savo prekių ženklo.",
-        "brandExclusivityDisabled": "Prekių ženklo išskirtinumas dar nepasiekiamas."
+        "brandExclusivityDisabled": "Prekių ženklo išskirtinumas dar nepasiekiamas.",
+        "waveBudgetRequired": "Įveskite biudžetą, kol ši bangai skirta kampanija netapo aktyvi ar nebuvo paskelbta darbų lentoje.",
+        "waveTypeDisabled": "Bangoms skirtų kampanijų dar nėra."
       },
       "listing": {
         "sectionTitle": "Skelbimas darbų lentoje",
@@ -1090,6 +1106,23 @@
           "payment": "Mokėjimas prasidėjo."
         },
         "error": "Pasiūlymo pakeisti nepavyko. Bandyk dar kartą."
+      },
+      "type": {
+        "label": "Kampanijos tipas",
+        "normal": "Įprasta kampanija",
+        "normalHelp": "Įprasta kampanija su sava septynių stulpelių lenta.",
+        "forWave": "Bangai",
+        "forWaveHelp": "Priklauso bangai ir naudoja devynių stulpelių bangos lentą."
+      },
+      "waveCard": {
+        "none": "Susietos bangos nėra",
+        "link": "Susieti bangą",
+        "change": "Keisti",
+        "unlink": "Atsieti",
+        "locked": "Užrakinta: kūrėjas yra pasirinktas arba toliau, todėl bangos keisti ar pašalinti negalima.",
+        "pick": "Pasirinkite bangą",
+        "noOptions": "Šis prekių ženklas neturi bangos be kampanijos.",
+        "failed": "Nepavyko išsaugoti bangos nuorodos. Bandykite dar kartą."
       }
     },
     "pools": {
@@ -1440,9 +1473,10 @@
         "loadFailed": "Nepavyko įkelti bangų.",
         "campaignNotAvailable": "Šios kampanijos negalima susieti su šio prekių ženklo banga.",
         "campaignAlreadyLinked": "Ši kampanija jau turi bangą.",
-        "campaignLinkLocked": "Ši banga jau susieta su kampanija. Ryšio pakeisti negalima.",
+        "campaignLinkLocked": "Šioje kampanijoje kūrėjas yra pasirinktas arba toliau, todėl nuorodos keisti negalima.",
         "brandArchived": "Šis prekių ženklas suarchyvuotas. Atkurkite jį, kad galėtumėte keisti jo bangas.",
-        "saveFailed": "Nepavyko išsaugoti bangos. Bandykite dar kartą."
+        "saveFailed": "Nepavyko išsaugoti bangos. Bandykite dar kartą.",
+        "waveNotAvailable": "Šios bangos negalima susieti su šia kampanija."
       },
       "dialog": {
         "createTitle": "Nauja banga",
@@ -1457,15 +1491,23 @@
         "campaign": "Kampanija (neprivaloma)",
         "noCampaign": "Be kampanijos",
         "campaignHint": "Kampaniją galite susieti vėliau.",
-        "campaignLocked": "Susietos kampanijos čia pakeisti negalima.",
+        "campaignLocked": "Kūrėjas yra pasirinktas arba toliau, todėl kampanijos keisti ar pašalinti negalima.",
         "create": "Sukurti bangą",
-        "save": "Išsaugoti pakeitimus"
+        "save": "Išsaugoti pakeitimus",
+        "choice": {
+          "none": "Kampanijos dar nėra",
+          "existing": "Esama bangos kampanija",
+          "new": "Sukurti šiai bangai kampaniją dabar"
+        },
+        "newCampaignName": "Kampanijos pavadinimas",
+        "newCampaignHint": "Sukuriama kaip juodraštis be biudžeto. Prieš paleidimą nustatykite biudžetą kampanijos puslapyje."
       },
       "validation": {
         "nameRequired": "Įveskite bangos pavadinimą.",
         "goLiveRequired": "Pasirinkite paleidimo datą.",
         "marketsRequired": "Pridėkite bent vieną rinką.",
-        "marketsMax": "Pridėkite ne daugiau kaip 20 rinkų."
+        "marketsMax": "Pridėkite ne daugiau kaip 20 rinkų.",
+        "newCampaignNameRequired": "Įveskite kampanijos pavadinimą."
       },
       "detail": {
         "title": "Banga",
@@ -1473,7 +1515,8 @@
         "campaign": "Susieta kampanija",
         "noCampaign": "Kampanija nesusieta",
         "createdBy": "Sukūrė",
-        "notFound": "Šios bangos nerasta."
+        "notFound": "Šios bangos nerasta.",
+        "linkLocked": "Užrakinta: šioje kampanijoje kūrėjas yra pasirinktas arba toliau."
       }
     },
     "brandFiles": {

@@ -782,7 +782,8 @@
         "automationsButton": "Automations",
         "applications": {
           "title": "Iarratais",
-          "empty": "Níl aon iarratas ar feitheamh"
+          "empty": "Níl aon iarratas ar feitheamh",
+          "titleWave": "Iarratasóirí"
         },
         "card": {
           "unnamed": "Unnamed creator",
@@ -855,6 +856,19 @@
             "auto": "Automation",
             "from": "from",
             "to": "to"
+          }
+        },
+        "wave": {
+          "moveRefused": "Ní féidir ach cruthaitheoir a ghlac leis a bhogadh isteach sa cholún seo.",
+          "stage": {
+            "invited": "Tugadh cuireadh",
+            "selected": "Roghnaithe",
+            "filming": "Scannánú",
+            "submitted": "Curtha isteach / á athbhreithniú",
+            "in_edits": "In eagarthóireacht",
+            "client_review": "Athbhreithniú cliaint",
+            "approved": "Ceadaithe",
+            "dropped": "Tarlaithe amach"
           }
         }
       },
@@ -997,7 +1011,9 @@
         "restrictNeedsRegions": "Roghnaigh réigiún amháin ar a laghad chun iarratais a theorannú.",
         "exclusivityDateInPast": "Roghnaigh inniu nó dáta níos déanaí.",
         "exclusivityOwnBrand": "Ní féidir le feachtas a bhranda féin a bhacadh.",
-        "brandExclusivityDisabled": "Níl eisiachtacht brandaí ar fáil go fóill."
+        "brandExclusivityDisabled": "Níl eisiachtacht brandaí ar fáil go fóill.",
+        "waveBudgetRequired": "Cuir isteach buiséad sula n-éiríonn an feachtas seo do thonn gníomhach nó sula liostaítear é ar an mbord post.",
+        "waveTypeDisabled": "Níl feachtais do thonn ar fáil fós."
       },
       "listing": {
         "sectionTitle": "Fógra ar an gclár post",
@@ -1090,6 +1106,23 @@
           "payment": "Tá tús curtha leis an íocaíocht."
         },
         "error": "Níorbh fhéidir an tairiscint a athrú. Bain triail eile as."
+      },
+      "type": {
+        "label": "Cineál feachtais",
+        "normal": "Gnáthfheachtas",
+        "normalHelp": "Gnáthfheachtas a bhfuil a bhord seacht gcolún féin aige.",
+        "forWave": "Do thonn",
+        "forWaveHelp": "Baineann sé le tonn agus úsáideann sé bord an toinn le naoi gcolún."
+      },
+      "waveCard": {
+        "none": "Níl tonn nasctha",
+        "link": "Nasc tonn",
+        "change": "Athraigh",
+        "unlink": "Dínasc",
+        "locked": "Faoi ghlas: roghnaíodh cruthaitheoir nó tá sé níos faide ar aghaidh, mar sin ní féidir an tonn a athrú ná a bhaint.",
+        "pick": "Roghnaigh tonn",
+        "noOptions": "Níl aon tonn gan feachtas ag an mbranda seo.",
+        "failed": "Níorbh fhéidir nasc an toinn a shábháil. Bain triail eile as."
       }
     },
     "pools": {
@@ -1440,9 +1473,10 @@
         "loadFailed": "Níorbh fhéidir na tonnta a luchtú.",
         "campaignNotAvailable": "Ní féidir an feachtas sin a nascadh le tonn den bhranda seo.",
         "campaignAlreadyLinked": "Tá tonn ag an bhfeachtas sin cheana.",
-        "campaignLinkLocked": "Tá an tonn seo nasctha le feachtas cheana. Ní féidir an nasc a athrú.",
+        "campaignLinkLocked": "Roghnaíodh cruthaitheoir nó tá sé níos faide ar aghaidh san fheachtas seo, mar sin ní féidir an nasc a athrú.",
         "brandArchived": "Tá an branda seo cartlannaithe. Athchóirigh é chun a thonnta a athrú.",
-        "saveFailed": "Níorbh fhéidir an tonn a shábháil. Bain triail eile as."
+        "saveFailed": "Níorbh fhéidir an tonn a shábháil. Bain triail eile as.",
+        "waveNotAvailable": "Ní féidir an tonn sin a nascadh leis an bhfeachtas seo."
       },
       "dialog": {
         "createTitle": "Tonn nua",
@@ -1457,15 +1491,23 @@
         "campaign": "Feachtas (roghnach)",
         "noCampaign": "Gan feachtas",
         "campaignHint": "Is féidir leat feachtas a nascadh níos déanaí.",
-        "campaignLocked": "Ní féidir feachtas nasctha a athrú anseo.",
+        "campaignLocked": "Roghnaíodh cruthaitheoir nó tá sé níos faide ar aghaidh, mar sin ní féidir an feachtas a athrú ná a bhaint.",
         "create": "Cruthaigh tonn",
-        "save": "Sábháil na hathruithe"
+        "save": "Sábháil na hathruithe",
+        "choice": {
+          "none": "Gan feachtas fós",
+          "existing": "Feachtas atá ann cheana do thonn",
+          "new": "Cruthaigh feachtas don tonn seo anois"
+        },
+        "newCampaignName": "Ainm an fheachtais",
+        "newCampaignHint": "Cruthaítear mar dhréacht gan buiséad é. Socraigh an buiséad ar leathanach an fheachtais sula féidir leis dul beo."
       },
       "validation": {
         "nameRequired": "Cuir isteach ainm toinn.",
         "goLiveRequired": "Roghnaigh dáta dul beo.",
         "marketsRequired": "Cuir margadh amháin ar a laghad leis.",
-        "marketsMax": "Cuir 20 margadh ar a mhéad leis."
+        "marketsMax": "Cuir 20 margadh ar a mhéad leis.",
+        "newCampaignNameRequired": "Cuir isteach ainm feachtais."
       },
       "detail": {
         "title": "Tonn",
@@ -1473,7 +1515,8 @@
         "campaign": "Feachtas nasctha",
         "noCampaign": "Gan feachtas nasctha",
         "createdBy": "Cruthaithe ag",
-        "notFound": "Níor aimsíodh an tonn seo."
+        "notFound": "Níor aimsíodh an tonn seo.",
+        "linkLocked": "Faoi ghlas: roghnaíodh cruthaitheoir nó tá sé níos faide ar aghaidh san fheachtas seo."
       }
     },
     "brandFiles": {

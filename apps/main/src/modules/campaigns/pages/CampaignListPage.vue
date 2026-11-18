@@ -244,6 +244,10 @@ function goToPage(page: number): void {
   void loadCampaigns()
 }
 
+function typeBadge(item: CampaignResource): number[] {
+  return item.attributes.campaign_type === 'for_wave' ? [1] : []
+}
+
 function startsLine(item: CampaignResource): string | null {
   const startsAt = item.attributes.starts_at
   return startsAt === null
@@ -550,6 +554,13 @@ async function commitListing(item: CampaignResource, value: boolean): Promise<vo
             data-test="campaign-name"
             >{{ item.attributes.name }}</router-link
           >
+          <AgencyStatusPill
+            v-for="n in typeBadge(item)"
+            :key="n"
+            tone="neutral"
+            :label="t('app.campaigns.type.forWave')"
+            :data-test="`campaign-type-${item.id}`"
+          />
           <span
             v-if="startsLine(item) !== null"
             class="agency-cell__sub"

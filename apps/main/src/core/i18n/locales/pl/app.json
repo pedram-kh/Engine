@@ -782,7 +782,8 @@
         "automationsButton": "Automatyzacje",
         "applications": {
           "title": "Zgłoszenia",
-          "empty": "Brak oczekujących zgłoszeń"
+          "empty": "Brak oczekujących zgłoszeń",
+          "titleWave": "Zgłoszeni"
         },
         "card": {
           "unnamed": "Nienazwany twórca",
@@ -855,6 +856,19 @@
             "auto": "Automatyzacja",
             "from": "z",
             "to": "do"
+          }
+        },
+        "wave": {
+          "moveRefused": "Do tej kolumny można przenieść tylko twórcę, który zaakceptował.",
+          "stage": {
+            "invited": "Zaproszeni",
+            "selected": "Wybrani",
+            "filming": "Zdjęcia",
+            "submitted": "Przesłane / w ocenie",
+            "in_edits": "W montażu",
+            "client_review": "Ocena klienta",
+            "approved": "Zatwierdzeni",
+            "dropped": "Odpadli"
           }
         }
       },
@@ -997,7 +1011,9 @@
         "restrictNeedsRegions": "Wybierz co najmniej jeden region, aby ograniczyć zgłoszenia.",
         "exclusivityDateInPast": "Wybierz dzisiejszą lub późniejszą datę.",
         "exclusivityOwnBrand": "Kampania nie może blokować własnej marki.",
-        "brandExclusivityDisabled": "Wyłączność marki nie jest jeszcze dostępna."
+        "brandExclusivityDisabled": "Wyłączność marki nie jest jeszcze dostępna.",
+        "waveBudgetRequired": "Wpisz budżet, zanim ta kampania dla fali stanie się aktywna lub trafi na tablicę ofert.",
+        "waveTypeDisabled": "Kampanie dla fali nie są jeszcze dostępne."
       },
       "listing": {
         "sectionTitle": "Ogłoszenie na tablicy zleceń",
@@ -1090,6 +1106,23 @@
           "payment": "Płatność została rozpoczęta."
         },
         "error": "Nie udało się zmienić oferty. Spróbuj ponownie."
+      },
+      "type": {
+        "label": "Typ kampanii",
+        "normal": "Zwykła kampania",
+        "normalHelp": "Zwykła kampania z własną tablicą o siedmiu kolumnach.",
+        "forWave": "Dla fali",
+        "forWaveHelp": "Należy do fali i korzysta z tablicy fali z dziewięcioma kolumnami."
+      },
+      "waveCard": {
+        "none": "Brak powiązanej fali",
+        "link": "Powiąż falę",
+        "change": "Zmień",
+        "unlink": "Odłącz",
+        "locked": "Zablokowane: twórca jest wybrany lub dalej, więc fali nie można zmienić ani usunąć.",
+        "pick": "Wybierz falę",
+        "noOptions": "Ta marka nie ma fali bez kampanii.",
+        "failed": "Nie udało się zapisać powiązania z falą. Spróbuj ponownie."
       }
     },
     "pools": {
@@ -1440,9 +1473,10 @@
         "loadFailed": "Nie udało się wczytać fal.",
         "campaignNotAvailable": "Tej kampanii nie można powiązać z falą tej marki.",
         "campaignAlreadyLinked": "Ta kampania ma już falę.",
-        "campaignLinkLocked": "Ta fala jest już powiązana z kampanią. Powiązania nie można zmienić.",
+        "campaignLinkLocked": "W tej kampanii twórca jest wybrany lub dalej, więc powiązania nie można zmienić.",
         "brandArchived": "Ta marka jest zarchiwizowana. Przywróć ją, aby zmieniać jej fale.",
-        "saveFailed": "Nie udało się zapisać fali. Spróbuj ponownie."
+        "saveFailed": "Nie udało się zapisać fali. Spróbuj ponownie.",
+        "waveNotAvailable": "Tej fali nie można powiązać z tą kampanią."
       },
       "dialog": {
         "createTitle": "Nowa fala",
@@ -1457,15 +1491,23 @@
         "campaign": "Kampania (opcjonalnie)",
         "noCampaign": "Bez kampanii",
         "campaignHint": "Kampanię możesz powiązać później.",
-        "campaignLocked": "Powiązanej kampanii nie można tu zmienić.",
+        "campaignLocked": "Twórca jest wybrany lub dalej, więc kampanii nie można zmienić ani usunąć.",
         "create": "Utwórz falę",
-        "save": "Zapisz zmiany"
+        "save": "Zapisz zmiany",
+        "choice": {
+          "none": "Jeszcze bez kampanii",
+          "existing": "Istniejąca kampania dla fali",
+          "new": "Utwórz teraz kampanię dla tej fali"
+        },
+        "newCampaignName": "Nazwa kampanii",
+        "newCampaignHint": "Powstaje jako szkic bez budżetu. Ustaw budżet na stronie kampanii, zanim wystartuje."
       },
       "validation": {
         "nameRequired": "Wpisz nazwę fali.",
         "goLiveRequired": "Wybierz datę startu.",
         "marketsRequired": "Dodaj co najmniej jeden rynek.",
-        "marketsMax": "Dodaj najwyżej 20 rynków."
+        "marketsMax": "Dodaj najwyżej 20 rynków.",
+        "newCampaignNameRequired": "Wpisz nazwę kampanii."
       },
       "detail": {
         "title": "Fala",
@@ -1473,7 +1515,8 @@
         "campaign": "Powiązana kampania",
         "noCampaign": "Brak powiązanej kampanii",
         "createdBy": "Utworzył(a)",
-        "notFound": "Nie znaleziono tej fali."
+        "notFound": "Nie znaleziono tej fali.",
+        "linkLocked": "Zablokowane: w tej kampanii twórca jest wybrany lub dalej."
       }
     },
     "brandFiles": {

@@ -782,7 +782,8 @@
         "automationsButton": "Automatizace",
         "applications": {
           "title": "Přihlášky",
-          "empty": "Žádné čekající přihlášky"
+          "empty": "Žádné čekající přihlášky",
+          "titleWave": "Přihlášení"
         },
         "card": {
           "unnamed": "Nepojmenovaný tvůrce",
@@ -855,6 +856,19 @@
             "auto": "Automatizace",
             "from": "z",
             "to": "do"
+          }
+        },
+        "wave": {
+          "moveRefused": "Do tohoto sloupce lze přesunout pouze tvůrce, který přijal.",
+          "stage": {
+            "invited": "Pozváno",
+            "selected": "Vybráno",
+            "filming": "Natáčení",
+            "submitted": "Odevzdáno / v kontrole",
+            "in_edits": "Úpravy",
+            "client_review": "Kontrola klientem",
+            "approved": "Schváleno",
+            "dropped": "Vyřazeno"
           }
         }
       },
@@ -997,7 +1011,9 @@
         "restrictNeedsRegions": "Vyber alespoň jeden region, abys omezil přihlášky.",
         "exclusivityDateInPast": "Vyber dnešní nebo pozdější datum.",
         "exclusivityOwnBrand": "Kampaň nemůže blokovat vlastní značku.",
-        "brandExclusivityDisabled": "Exkluzivita značky zatím není k dispozici."
+        "brandExclusivityDisabled": "Exkluzivita značky zatím není k dispozici.",
+        "waveBudgetRequired": "Zadejte rozpočet dříve, než se tato kampaň pro vlnu aktivuje nebo zveřejní na nástěnce nabídek.",
+        "waveTypeDisabled": "Kampaně pro vlnu zatím nejsou k dispozici."
       },
       "listing": {
         "sectionTitle": "Nabídka na nástěnce zakázek",
@@ -1090,6 +1106,23 @@
           "payment": "Platba už začala."
         },
         "error": "Nabídku se nepodařilo změnit. Zkus to znovu."
+      },
+      "type": {
+        "label": "Typ kampaně",
+        "normal": "Běžná kampaň",
+        "normalHelp": "Běžná kampaň s vlastní nástěnkou o sedmi sloupcích.",
+        "forWave": "Pro vlnu",
+        "forWaveHelp": "Patří k vlně a používá nástěnku vlny s devíti sloupci."
+      },
+      "waveCard": {
+        "none": "Žádná propojená vlna",
+        "link": "Propojit vlnu",
+        "change": "Změnit",
+        "unlink": "Odpojit",
+        "locked": "Uzamčeno: tvůrce je vybrán nebo dál, proto nelze vlnu změnit ani odebrat.",
+        "pick": "Vyberte vlnu",
+        "noOptions": "Tato značka nemá žádnou vlnu bez kampaně.",
+        "failed": "Propojení s vlnou se nepodařilo uložit. Zkuste to znovu."
       }
     },
     "pools": {
@@ -1440,9 +1473,10 @@
         "loadFailed": "Vlny se nepodařilo načíst.",
         "campaignNotAvailable": "Tuto kampaň nelze propojit s vlnou této značky.",
         "campaignAlreadyLinked": "Tato kampaň už vlnu má.",
-        "campaignLinkLocked": "Tato vlna je již propojena s kampaní. Propojení nelze změnit.",
+        "campaignLinkLocked": "Tvůrce je na této kampani vybrán nebo dál, proto nelze propojení změnit.",
         "brandArchived": "Tato značka je archivovaná. Obnovte ji, abyste mohli měnit její vlny.",
-        "saveFailed": "Vlnu se nepodařilo uložit. Zkuste to znovu."
+        "saveFailed": "Vlnu se nepodařilo uložit. Zkuste to znovu.",
+        "waveNotAvailable": "Tuto vlnu nelze propojit s touto kampaní."
       },
       "dialog": {
         "createTitle": "Nová vlna",
@@ -1457,15 +1491,23 @@
         "campaign": "Kampaň (volitelné)",
         "noCampaign": "Bez kampaně",
         "campaignHint": "Kampaň můžete propojit později.",
-        "campaignLocked": "Propojenou kampaň zde nelze změnit.",
+        "campaignLocked": "Tvůrce je vybrán nebo dál, proto nelze kampaň změnit ani odebrat.",
         "create": "Vytvořit vlnu",
-        "save": "Uložit změny"
+        "save": "Uložit změny",
+        "choice": {
+          "none": "Zatím žádná kampaň",
+          "existing": "Existující kampaň pro vlnu",
+          "new": "Vytvořit kampaň pro tuto vlnu hned"
+        },
+        "newCampaignName": "Název kampaně",
+        "newCampaignHint": "Vytvoří se jako návrh bez rozpočtu. Rozpočet nastavte na stránce kampaně, než půjde živě."
       },
       "validation": {
         "nameRequired": "Zadejte název vlny.",
         "goLiveRequired": "Vyberte datum spuštění.",
         "marketsRequired": "Přidejte alespoň jeden trh.",
-        "marketsMax": "Přidejte nejvýše 20 trhů."
+        "marketsMax": "Přidejte nejvýše 20 trhů.",
+        "newCampaignNameRequired": "Zadejte název kampaně."
       },
       "detail": {
         "title": "Vlna",
@@ -1473,7 +1515,8 @@
         "campaign": "Propojená kampaň",
         "noCampaign": "Žádná propojená kampaň",
         "createdBy": "Vytvořil(a)",
-        "notFound": "Tato vlna nebyla nalezena."
+        "notFound": "Tato vlna nebyla nalezena.",
+        "linkLocked": "Uzamčeno: tvůrce je na této kampani vybrán nebo dál."
       }
     },
     "brandFiles": {
