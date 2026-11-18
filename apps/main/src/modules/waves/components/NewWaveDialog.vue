@@ -2,10 +2,12 @@
 /**
  * PL-1.1 — the New wave dialog, in two modes.
  *
- *  - Create: name, go-live date, markets, and an optional campaign (this brand's, no wave yet, never
- *    Cancelled). "No campaign" sends `campaign_id: null`.
- *  - Edit (`wave` given): the same fields. The campaign field is editable only while the wave has no link;
- *    once linked it is a read-only name (the server answers 422 `wave.campaign_link_locked` to any change).
+ *  - Create: name, go-live date, markets, and one of three campaign choices (PL-1.2): none yet (sends
+ *    `campaign_id: null`), an existing campaign for a wave of this brand that has no wave, or "create one now"
+ *    (sends `new_campaign: {name}`; the server makes the campaign, its board and the link in one step).
+ *  - Edit (`wave` given): the same fields. The campaign can be set, changed or removed until a creator is Selected
+ *    or further (`link_locked`); after that it is a read-only name with the reason (the server answers 422
+ *    `wave.campaign_link_locked` to any change).
  *
  * No design frame exists for this dialog; it is built from the design system's dialog and field styles.
  * Server codes map to strings; anything else is the generic save error.
@@ -35,12 +37,18 @@ const emit = defineEmits<{
 const { t, te } = useI18n()
 
 const isEdit = computed(() => props.wave !== undefined && props.wave !== null)
-const linkLocked = computed(() => props.wave?.relationships.campaign != null)
+const hasLink = computed(() => props.wave?.relationships.campaign != null)
+// PL-1.2 (Q3): a link is editable until a card is Selected or further. A payload without the field (an API that
+// predates it) falls back to the PL-1.1 rule: once linked, it is fixed.
+const linkLocked = computed(() => props.wave?.attributes.link_locked ?? hasLink.value)
 
 const name = ref('')
 const goLiveOn = ref('')
 const markets = ref<string[]>([])
 const campaignId = ref<string | null>(null)
+type CampaignChoice = 'none' | 'existing' | 'new'
+const campaignChoice = ref<CampaignChoice>('none')
+const newCampaignName = ref('')
 const options = ref<WaveCampaignOption[]>([])
 const saving = ref(false)
 const submitted = ref(false)
@@ -59,14 +67,36 @@ const marketsError = computed(() => {
   return null
 })
 
-const campaignItems = computed(() => [
-  { value: null as string | null, title: t('app.waves.dialog.noCampaign') },
+const newCampaignNameError = computed(() =>
+  submitted.value &&
+  !isEdit.value &&
+  campaignChoice.value === 'new' &&
+  newCampaignName.value.trim() === ''
+    ? t('app.waves.validation.newCampaignNameRequired')
+    : null,
+)
+
+const campaignOptionItems = computed(() => [
   ...options.value.map((o) => {
     const key = `app.campaigns.status.${o.attributes.status}`
     const status = te(key) ? t(key) : o.attributes.status
     return { value: o.id as string | null, title: `${o.attributes.name} · ${status}` }
   }),
 ])
+
+const campaignItems = computed(() => {
+  const linked = props.wave?.relationships.campaign?.data
+  // The wave's own campaign is not in the server's list (it already has a wave): keep it selectable on edit.
+  const own =
+    isEdit.value && linked
+      ? [{ value: linked.id as string | null, title: linked.attributes.name }]
+      : []
+  return [
+    { value: null as string | null, title: t('app.waves.dialog.noCampaign') },
+    ...own,
+    ...campaignOptionItems.value,
+  ]
+})
 
 async function loadOptions(): Promise<void> {
   if (linkLocked.value) return
@@ -90,6 +120,8 @@ watch(
     goLiveOn.value = props.wave?.attributes.go_live_on ?? ''
     markets.value = [...(props.wave?.attributes.markets ?? [])]
     campaignId.value = props.wave?.relationships.campaign?.data.id ?? null
+    campaignChoice.value = 'none'
+    newCampaignName.value = ''
     void loadOptions()
   },
   { immediate: true },
@@ -118,7 +150,8 @@ function close(): void {
 async function submit(): Promise<void> {
   submitted.value = true
   formError.value = null
-  if (nameError.value || goLiveError.value || marketsError.value) return
+  if (nameError.value || goLiveError.value || marketsError.value || newCampaignNameError.value)
+    return
 
   saving.value = true
   try {
@@ -129,14 +162,19 @@ async function submit(): Promise<void> {
       if (goLiveOn.value !== props.wave.attributes.go_live_on) body.go_live_on = goLiveOn.value
       if (markets.value.join(',') !== props.wave.attributes.markets.join(','))
         body.markets = [...markets.value]
-      if (!linkLocked.value && campaignId.value !== null) body.campaign_id = campaignId.value
+      // Set, change or remove (null) the link, but only when it differs from what is saved.
+      const savedCampaignId = props.wave.relationships.campaign?.data.id ?? null
+      if (!linkLocked.value && campaignId.value !== savedCampaignId)
+        body.campaign_id = campaignId.value
       res = await wavesApi.update(props.agencyId, props.brandId, props.wave.id, body)
     } else {
       res = await wavesApi.create(props.agencyId, props.brandId, {
         name: name.value.trim(),
         go_live_on: goLiveOn.value,
         markets: [...markets.value],
-        campaign_id: campaignId.value,
+        ...(campaignChoice.value === 'new'
+          ? { new_campaign: { name: newCampaignName.value.trim() } }
+          : { campaign_id: campaignChoice.value === 'existing' ? campaignId.value : null }),
       })
     }
     emit('saved', res.data)
@@ -192,30 +230,85 @@ async function submit(): Promise<void> {
           <MarketPicker v-model="markets" :error-message="marketsError" />
         </div>
 
-        <v-text-field
-          v-if="linkLocked"
-          :model-value="wave?.relationships.campaign?.data.attributes.name"
-          :label="t('app.waves.dialog.campaign')"
-          :hint="t('app.waves.dialog.campaignLocked')"
-          persistent-hint
-          variant="outlined"
-          density="comfortable"
-          readonly
-          data-test="wave-campaign-locked"
-        />
-        <v-select
-          v-else
-          v-model="campaignId"
-          :items="campaignItems"
-          item-title="title"
-          item-value="value"
-          :label="t('app.waves.dialog.campaign')"
-          :hint="t('app.waves.dialog.campaignHint')"
-          persistent-hint
-          variant="outlined"
-          density="comfortable"
-          data-test="wave-campaign"
-        />
+        <template v-if="linkLocked">
+          <v-text-field
+            :model-value="wave?.relationships.campaign?.data.attributes.name"
+            :label="t('app.waves.dialog.campaign')"
+            :hint="t('app.waves.dialog.campaignLocked')"
+            persistent-hint
+            variant="outlined"
+            density="comfortable"
+            readonly
+            data-test="wave-campaign-locked"
+          />
+        </template>
+        <template v-else-if="isEdit">
+          <v-select
+            v-model="campaignId"
+            :items="campaignItems"
+            item-title="title"
+            item-value="value"
+            :label="t('app.waves.dialog.campaign')"
+            :hint="t('app.waves.dialog.campaignHint')"
+            persistent-hint
+            variant="outlined"
+            density="comfortable"
+            data-test="wave-campaign"
+          />
+        </template>
+        <template v-else>
+          <v-radio-group
+            v-model="campaignChoice"
+            :label="t('app.waves.dialog.campaign')"
+            density="compact"
+            hide-details
+            data-test="wave-campaign-choice"
+          >
+            <v-radio
+              value="none"
+              color="primary"
+              :label="t('app.waves.dialog.choice.none')"
+              data-test="wave-choice-none"
+            />
+            <v-radio
+              value="existing"
+              color="primary"
+              :label="t('app.waves.dialog.choice.existing')"
+              data-test="wave-choice-existing"
+            />
+            <v-radio
+              value="new"
+              color="primary"
+              :label="t('app.waves.dialog.choice.new')"
+              data-test="wave-choice-new"
+            />
+          </v-radio-group>
+          <v-select
+            v-if="campaignChoice === 'existing'"
+            v-model="campaignId"
+            :items="campaignOptionItems"
+            item-title="title"
+            item-value="value"
+            :label="t('app.waves.dialog.campaign')"
+            :hint="t('app.waves.dialog.campaignHint')"
+            persistent-hint
+            variant="outlined"
+            density="comfortable"
+            data-test="wave-campaign"
+          />
+          <v-text-field
+            v-else-if="campaignChoice === 'new'"
+            v-model="newCampaignName"
+            :label="t('app.waves.dialog.newCampaignName')"
+            :hint="t('app.waves.dialog.newCampaignHint')"
+            persistent-hint
+            variant="outlined"
+            density="comfortable"
+            maxlength="255"
+            :error-messages="newCampaignNameError ? [newCampaignNameError] : []"
+            data-test="wave-new-campaign-name"
+          />
+        </template>
 
         <v-alert v-if="formError" type="error" variant="tonal" data-test="wave-form-error">
           {{ formError }}

@@ -55,6 +55,12 @@ async function fillValid(w: Awaited<ReturnType<typeof mountWithApp>>): Promise<v
   await pickMarket(w, 'ES')
 }
 
+async function chooseCampaign(choice: 'none' | 'existing' | 'new'): Promise<void> {
+  const input = body(`[data-test="wave-choice-${choice}"] input`) as HTMLInputElement
+  input.click()
+  await flushPromises()
+}
+
 async function submit(): Promise<void> {
   ;(body('[data-test="wave-submit"]') as HTMLElement).click()
   await flushPromises()
@@ -98,11 +104,12 @@ describe('NewWaveDialog (PL-1.1 W3)', () => {
   it("loads this brand's campaign options and shows each one with its status", async () => {
     const w = await mountWithApp(NewWaveDialog, props())
     expect(wavesApi.campaignOptions).toHaveBeenCalledWith(AGENCY_ULID, BRAND_ULID)
+    await chooseCampaign('existing')
     const select = w.findComponent(VSelect)
     const titles = (select.props('items') as { title: string; value: string | null }[]).map(
       (i) => i.title,
     )
-    expect(titles).toEqual(['No campaign', 'Spring campaign · Active', 'Autumn · Draft'])
+    expect(titles).toEqual(['Spring campaign · Active', 'Autumn · Draft'])
     w.unmount()
   })
 
@@ -122,6 +129,7 @@ describe('NewWaveDialog (PL-1.1 W3)', () => {
   it('a chosen campaign sends its ulid', async () => {
     const w = await mountWithApp(NewWaveDialog, props())
     await fillValid(w)
+    await chooseCampaign('existing')
     w.findComponent(VSelect).vm.$emit('update:modelValue', CAMPAIGN)
     await flushPromises()
     await submit()
@@ -194,8 +202,54 @@ describe('NewWaveDialog (PL-1.1 W3)', () => {
     await setInput('[data-test="wave-name"]', 'Renamed')
     await submit()
     expect(body('[data-test="wave-form-error"]')?.textContent).toContain(
-      'already linked to a campaign',
+      'Selected or further on this campaign',
     )
     w.unmount()
+  })
+
+  // ── PL-1.2 W4 ────────────────────────────────────────────────────────────────────────────────────────
+  it('W4: offers three choices, and "create now" sends new_campaign and no campaign_id', async () => {
+    const w = await mountWithApp(NewWaveDialog, props())
+    for (const c of ['none', 'existing', 'new']) {
+      expect(body(`[data-test="wave-choice-${c}"]`), c).not.toBeNull()
+    }
+    await fillValid(w)
+    await chooseCampaign('new')
+    await setInput('[data-test="wave-new-campaign-name"]', '  Spring for wave  ')
+    await submit()
+    const sent = vi.mocked(wavesApi.create).mock.calls[0]?.[2] as unknown as Record<string, unknown>
+    expect(sent.new_campaign).toEqual({ name: 'Spring for wave' })
+    expect('campaign_id' in sent).toBe(false)
+    w.unmount()
+  })
+
+  it('W4: the new campaign needs a name, and nothing is sent without it', async () => {
+    const w = await mountWithApp(NewWaveDialog, props())
+    await fillValid(w)
+    await chooseCampaign('new')
+    await submit()
+    expect(wavesApi.create).not.toHaveBeenCalled()
+    expect(body('[data-test="wave-dialog"]')?.textContent ?? document.body.textContent).toContain(
+      'Enter a campaign name.',
+    )
+    w.unmount()
+  })
+
+  it('W4: an unlocked link can be removed on edit (campaign_id null), a locked one is read-only', async () => {
+    vi.mocked(wavesApi.update).mockResolvedValue({ data: makeWave() })
+    const open = await mountWithApp(NewWaveDialog, props(makeWave({ link_locked: false }, true)))
+    expect(body('[data-test="wave-campaign"]')).not.toBeNull()
+    open.findComponent(VSelect).vm.$emit('update:modelValue', null)
+    await flushPromises()
+    await submit()
+    expect(vi.mocked(wavesApi.update).mock.calls[0]?.[3]).toEqual({ campaign_id: null })
+    open.unmount()
+    document.body.innerHTML = ''
+
+    const locked = await mountWithApp(NewWaveDialog, props(makeWave({ link_locked: true }, true)))
+    expect(body('[data-test="wave-campaign"]')).toBeNull()
+    expect(body('[data-test="wave-campaign-locked"]')).not.toBeNull()
+    expect(document.body.textContent).toContain('Selected or further')
+    locked.unmount()
   })
 })

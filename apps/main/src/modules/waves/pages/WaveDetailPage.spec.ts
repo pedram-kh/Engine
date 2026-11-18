@@ -52,6 +52,20 @@ describe('WaveDetailPage (PL-1.1 W6)', () => {
     unlinked.unmount()
   })
 
+  it('PL-1.2 W3: a locked link says why, an open one does not', async () => {
+    vi.mocked(wavesApi.show).mockResolvedValue({ data: makeWave({ link_locked: true }, true) })
+    const locked = await mountWithApp(WaveDetailPage, {})
+    await flushPromises()
+    expect(locked.get('[data-test="wave-link-locked"]').text()).toContain('Selected or further')
+    locked.unmount()
+
+    vi.mocked(wavesApi.show).mockResolvedValue({ data: makeWave({ link_locked: false }, true) })
+    const open = await mountWithApp(WaveDetailPage, {})
+    await flushPromises()
+    expect(open.find('[data-test="wave-link-locked"]').exists()).toBe(false)
+    open.unmount()
+  })
+
   it('Edit is for an admin or manager only', async () => {
     vi.mocked(wavesApi.show).mockResolvedValue({ data: makeWave() })
     const admin = await mountWithApp(WaveDetailPage, {})

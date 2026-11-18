@@ -148,6 +148,13 @@ onMounted(async () => {
               {{ wave.relationships.campaign.data.attributes.name }}
             </router-link>
             <span v-else class="text-medium-emphasis">{{ t('app.waves.detail.noCampaign') }}</span>
+            <div
+              v-if="wave.attributes.link_locked === true"
+              class="text-caption text-medium-emphasis mt-1"
+              data-test="wave-link-locked"
+            >
+              {{ t('app.waves.detail.linkLocked') }}
+            </div>
           </dd>
         </div>
         <div class="agency-field" data-test="wave-field-created-by">
