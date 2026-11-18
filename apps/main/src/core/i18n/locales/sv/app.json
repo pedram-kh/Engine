@@ -792,6 +792,11 @@
           "dueToday": "Förfaller idag",
           "overdue": "Försenad"
         },
+        "inviteLabel": {
+          "acceptedInvite": "Inbjudan accepterad",
+          "applicationAccepted": "Ansökan accepterad",
+          "offerSent": "Erbjudande skickat"
+        },
         "column": {
           "add": "Lägg till kolumn",
           "edit": "Byt namn / färg",

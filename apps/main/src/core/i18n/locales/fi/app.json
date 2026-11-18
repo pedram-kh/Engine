@@ -792,6 +792,11 @@
           "dueToday": "Due today",
           "overdue": "Overdue"
         },
+        "inviteLabel": {
+          "acceptedInvite": "Kutsu hyväksytty",
+          "applicationAccepted": "Hakemus hyväksytty",
+          "offerSent": "Tarjous lähetetty"
+        },
         "column": {
           "add": "Lisää column",
           "edit": "Rename / recolor",

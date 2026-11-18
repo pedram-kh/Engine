@@ -47,7 +47,26 @@ const avatarUrl = computed(() => creatorAvatarUrl(assignment.value?.creator))
 
 const avatarInitial = computed(() => creatorInitial(assignment.value?.creator))
 
+// PL-1.2 (D3): on a wave board's Invited column the label says how the creator got there, not the raw status (an
+// accepted creator is `contracted` by then). `invite_origin` is only sent for those cards. Everywhere else, and in the
+// working columns, the label is the assignment status, as before.
+const inviteLabelKey = computed<string | null>(() => {
+  const state = props.card.invite_state
+  if (state === undefined || props.card.invite_origin === undefined) return null
+  const applied = props.card.invite_origin === 'application'
+  if (state === 'declined') return 'app.campaigns.assignmentStatus.declined'
+  if (state === 'invited') {
+    return applied
+      ? 'app.campaigns.board.inviteLabel.offerSent'
+      : 'app.campaigns.assignmentStatus.invited'
+  }
+  return applied
+    ? 'app.campaigns.board.inviteLabel.applicationAccepted'
+    : 'app.campaigns.board.inviteLabel.acceptedInvite'
+})
+
 const statusLabel = computed(() => {
+  if (inviteLabelKey.value !== null) return t(inviteLabelKey.value)
   const status = assignment.value?.status
   return status ? t(`app.campaigns.assignmentStatus.${status}`) : null
 })

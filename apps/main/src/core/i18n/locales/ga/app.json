@@ -792,6 +792,11 @@
           "dueToday": "Due today",
           "overdue": "Overdue"
         },
+        "inviteLabel": {
+          "acceptedInvite": "Glacadh leis an gcuireadh",
+          "applicationAccepted": "Glacadh leis an iarratas",
+          "offerSent": "Seoladh an tairiscint"
+        },
         "column": {
           "add": "Cuir leis column",
           "edit": "Rename / recolor",

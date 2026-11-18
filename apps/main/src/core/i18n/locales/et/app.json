@@ -792,6 +792,11 @@
           "dueToday": "Due today",
           "overdue": "Overdue"
         },
+        "inviteLabel": {
+          "acceptedInvite": "Kutse vastu võetud",
+          "applicationAccepted": "Taotlus heaks kiidetud",
+          "offerSent": "Pakkumine saadetud"
+        },
         "column": {
           "add": "Lisa column",
           "edit": "Rename / recolor",

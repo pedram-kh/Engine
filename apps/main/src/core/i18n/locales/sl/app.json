@@ -792,6 +792,11 @@
           "dueToday": "Splatné dnes",
           "overdue": "Po termínu"
         },
+        "inviteLabel": {
+          "acceptedInvite": "Povabilo sprejeto",
+          "applicationAccepted": "Prijava sprejeta",
+          "offerSent": "Ponudba poslana"
+        },
         "column": {
           "add": "Dodaj sloupec",
           "edit": "Přejmenovat / barva",

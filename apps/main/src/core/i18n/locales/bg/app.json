@@ -792,6 +792,11 @@
           "dueToday": "Due today",
           "overdue": "Overdue"
         },
+        "inviteLabel": {
+          "acceptedInvite": "Приета покана",
+          "applicationAccepted": "Кандидатурата е приета",
+          "offerSent": "Офертата е изпратена"
+        },
         "column": {
           "add": "Добавете column",
           "edit": "Rename / recolor",

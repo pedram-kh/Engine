@@ -792,6 +792,11 @@
           "dueToday": "Due today",
           "overdue": "Overdue"
         },
+        "inviteLabel": {
+          "acceptedInvite": "Stedina aċċettata",
+          "applicationAccepted": "Applikazzjoni aċċettata",
+          "offerSent": "Offerta mibgħuta"
+        },
         "column": {
           "add": "Żid column",
           "edit": "Rename / recolor",

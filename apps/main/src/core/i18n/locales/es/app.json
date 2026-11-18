@@ -792,6 +792,11 @@
           "dueToday": "Vence hoy",
           "overdue": "Vencida"
         },
+        "inviteLabel": {
+          "acceptedInvite": "Invitación aceptada",
+          "applicationAccepted": "Solicitud aceptada",
+          "offerSent": "Oferta enviada"
+        },
         "column": {
           "add": "Añadir columna",
           "edit": "Renombrar / recolorear",

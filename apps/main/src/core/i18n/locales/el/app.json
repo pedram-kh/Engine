@@ -792,6 +792,11 @@
           "dueToday": "Due today",
           "overdue": "Overdue"
         },
+        "inviteLabel": {
+          "acceptedInvite": "Η πρόσκληση έγινε δεκτή",
+          "applicationAccepted": "Η αίτηση έγινε δεκτή",
+          "offerSent": "Η προσφορά στάλθηκε"
+        },
         "column": {
           "add": "Προσθήκη column",
           "edit": "Rename / recolor",

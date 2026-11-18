@@ -792,6 +792,11 @@
           "dueToday": "Termin dziś",
           "overdue": "Zalegające"
         },
+        "inviteLabel": {
+          "acceptedInvite": "Zaproszenie przyjęte",
+          "applicationAccepted": "Zgłoszenie zaakceptowane",
+          "offerSent": "Oferta wysłana"
+        },
         "column": {
           "add": "Dodaj kolumnę",
           "edit": "Zmień nazwę / kolor",

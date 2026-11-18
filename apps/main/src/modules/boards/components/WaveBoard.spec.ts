@@ -9,7 +9,12 @@
  */
 
 import { ApiError } from '@catalyst/api-client'
-import type { BoardCardResource, BoardColumnResource, BoardWaveStage } from '@catalyst/api-client'
+import type {
+  AssignmentStatus,
+  BoardCardResource,
+  BoardColumnResource,
+  BoardWaveStage,
+} from '@catalyst/api-client'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -113,11 +118,14 @@ function card(
   id: string,
   columnId: string,
   invite?: 'invited' | 'accepted' | 'declined',
+  origin?: 'invite' | 'application',
+  status?: AssignmentStatus,
 ): BoardCardResource {
   return {
     id,
     type: 'board_cards',
     ...(invite ? { invite_state: invite } : {}),
+    ...(origin ? { invite_origin: origin } : {}),
     attributes: { position: 0, created_at: 'x', updated_at: 'x' },
     relationships: {
       column: { data: { id: columnId, type: 'board_columns' } },
@@ -125,7 +133,7 @@ function card(
         data: {
           id: `a-${id}`,
           type: 'campaign_assignments',
-          status: invite ?? 'accepted',
+          status: status ?? (invite === 'declined' ? 'declined' : (invite ?? 'accepted')),
           deliverables: ['1 reel'],
           posting_due_at: '2030-01-01T00:00:00Z',
           agreed_fee_minor_units: 20_000,
@@ -223,6 +231,43 @@ describe('wave board (PL-1.2 W5)', () => {
     expect(w.find('[data-test="board-card-fee-k1"]').exists()).toBe(false)
     expect(w.find('[data-test="board-card-due-k1"]').exists()).toBe(false)
     expect(w.find('[data-test="board-card-k1"]').text()).not.toMatch(/€|reel|script/)
+    w.unmount()
+  })
+
+  it('D3: the Invited label says how the creator got there, for each state and each origin', async () => {
+    const cases: Array<
+      [
+        string,
+        'invited' | 'accepted' | 'declined',
+        'invite' | 'application',
+        AssignmentStatus,
+        string,
+      ]
+    > = [
+      ['i1', 'invited', 'invite', 'invited', 'Invited'],
+      ['i2', 'accepted', 'invite', 'contracted', 'Accepted invite'],
+      ['i3', 'declined', 'invite', 'declined', 'Declined'],
+      ['a1', 'invited', 'application', 'invited', 'Offer sent'],
+      ['a2', 'accepted', 'application', 'contracted', 'Application accepted'],
+      ['a3', 'declined', 'application', 'declined', 'Declined'],
+    ]
+    const w = await mountView(
+      waveColumns(),
+      cases.map(([id, state, origin, status]) => card(id, 'w0', state, origin, status)),
+    )
+    for (const [id, , , , label] of cases) {
+      expect(w.find(`[data-test="board-card-status-${id}"]`).text(), id).toBe(label)
+    }
+    w.unmount()
+  })
+
+  it('D3: a working column keeps the assignment status label (no origin sent)', async () => {
+    const w = await mountView(waveColumns(), [
+      card('c1', 'w1', undefined, undefined, 'contracted'),
+      card('c2', 'w1', 'accepted', undefined, 'accepted'),
+    ])
+    expect(w.find('[data-test="board-card-status-c1"]').text()).toBe('Contracted')
+    expect(w.find('[data-test="board-card-status-c2"]').text()).toBe('Accepted')
     w.unmount()
   })
 

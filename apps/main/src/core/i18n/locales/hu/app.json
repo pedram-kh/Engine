@@ -792,6 +792,11 @@
           "dueToday": "Due today",
           "overdue": "Overdue"
         },
+        "inviteLabel": {
+          "acceptedInvite": "Meghívás elfogadva",
+          "applicationAccepted": "Jelentkezés elfogadva",
+          "offerSent": "Ajánlat elküldve"
+        },
         "column": {
           "add": "Hozzáadás column",
           "edit": "Rename / recolor",

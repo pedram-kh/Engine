@@ -792,6 +792,11 @@
           "dueToday": "Due today",
           "overdue": "Overdue"
         },
+        "inviteLabel": {
+          "acceptedInvite": "Invitație acceptată",
+          "applicationAccepted": "Candidatură acceptată",
+          "offerSent": "Ofertă trimisă"
+        },
         "column": {
           "add": "Adăugați column",
           "edit": "Rename / recolor",

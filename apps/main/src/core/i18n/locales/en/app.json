@@ -792,6 +792,11 @@
           "dueToday": "Due today",
           "overdue": "Overdue"
         },
+        "inviteLabel": {
+          "acceptedInvite": "Accepted invite",
+          "applicationAccepted": "Application accepted",
+          "offerSent": "Offer sent"
+        },
         "column": {
           "add": "Add column",
           "edit": "Rename / recolor",

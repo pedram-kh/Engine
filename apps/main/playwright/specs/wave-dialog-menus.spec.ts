@@ -1,7 +1,12 @@
 import type { Locator } from '@playwright/test'
 import { expect, test } from '../fixtures/test'
-import { seedAgencyAdmin, setFeatureFlag } from '../fixtures/test-helpers'
-import { SEL } from '../helpers/selectors'
+import {
+  neutralizeThrottle,
+  restoreThrottle,
+  seedAgencyAdmin,
+  setFeatureFlag,
+} from '../fixtures/test-helpers'
+import { dt, testIds } from '../helpers/selectors'
 
 /**
  * PL-1.2 walk defect D1. The New wave dialog is position:fixed. VMenu is position:absolute, so once
@@ -13,11 +18,13 @@ test.describe.configure({ mode: 'serial' })
 
 test.describe('New wave dialog menus', () => {
   test.beforeEach(async ({ request }) => {
+    await neutralizeThrottle(request, 'auth-ip')
     await setFeatureFlag(request, 'waves_enabled', true)
   })
 
   test.afterEach(async ({ request }) => {
     await setFeatureFlag(request, 'waves_enabled', false)
+    await restoreThrottle(request, 'auth-ip')
   })
 
   test('a market picked inside the dialog becomes a chip, and the list stays inside the window', async ({
@@ -27,10 +34,10 @@ test.describe('New wave dialog menus', () => {
     const { email, password, agencyUlid } = await seedAgencyAdmin(request)
 
     await page.goto('/sign-in')
-    await page.locator(`[data-test="${SEL.signInEmail}"] input`).fill(email)
-    await page.locator(`[data-test="${SEL.signInPassword}"] input`).fill(password)
-    await page.locator(`[data-test="${SEL.signInSubmit}"]`).click()
-    await expect(page.locator(`[data-test="${SEL.agencyLayout}"]`)).toBeVisible()
+    await page.locator(dt(testIds.signInEmail)).locator('input').fill(email)
+    await page.locator(dt(testIds.signInPassword)).locator('input').fill(password)
+    await page.locator(dt(testIds.signInSubmit)).click()
+    await expect(page.locator(dt(testIds.agencyLayout))).toBeVisible()
 
     const brandId = await page.evaluate(async (agencyId: string) => {
       const token = decodeURIComponent(
@@ -144,11 +151,13 @@ test.describe('New wave dialog menus', () => {
 
 test.describe('New wave dialog menus, reopen sequence', () => {
   test.beforeEach(async ({ request }) => {
+    await neutralizeThrottle(request, 'auth-ip')
     await setFeatureFlag(request, 'waves_enabled', true)
   })
 
   test.afterEach(async ({ request }) => {
     await setFeatureFlag(request, 'waves_enabled', false)
+    await restoreThrottle(request, 'auth-ip')
   })
 
   // Walk defect D1 (Pedram's Chrome): the dialog was closed with the market menu still open and reopened before
@@ -160,10 +169,10 @@ test.describe('New wave dialog menus, reopen sequence', () => {
   }) => {
     const { email, password, agencyUlid } = await seedAgencyAdmin(request)
     await page.goto('/sign-in')
-    await page.locator(`[data-test="${SEL.signInEmail}"] input`).fill(email)
-    await page.locator(`[data-test="${SEL.signInPassword}"] input`).fill(password)
-    await page.locator(`[data-test="${SEL.signInSubmit}"]`).click()
-    await expect(page.locator(`[data-test="${SEL.agencyLayout}"]`)).toBeVisible()
+    await page.locator(dt(testIds.signInEmail)).locator('input').fill(email)
+    await page.locator(dt(testIds.signInPassword)).locator('input').fill(password)
+    await page.locator(dt(testIds.signInSubmit)).click()
+    await expect(page.locator(dt(testIds.agencyLayout))).toBeVisible()
 
     const brandId = await page.evaluate(async (agencyId: string) => {
       const token = decodeURIComponent(

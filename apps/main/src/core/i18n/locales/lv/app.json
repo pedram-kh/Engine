@@ -792,6 +792,11 @@
           "dueToday": "Due today",
           "overdue": "Overdue"
         },
+        "inviteLabel": {
+          "acceptedInvite": "Uzaicinājums pieņemts",
+          "applicationAccepted": "Pieteikums pieņemts",
+          "offerSent": "Piedāvājums nosūtīts"
+        },
         "column": {
           "add": "Pievienot column",
           "edit": "Rename / recolor",

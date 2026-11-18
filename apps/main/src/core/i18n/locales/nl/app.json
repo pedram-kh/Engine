@@ -792,6 +792,11 @@
           "dueToday": "Vandaag deadline",
           "overdue": "Verlopen"
         },
+        "inviteLabel": {
+          "acceptedInvite": "Uitnodiging geaccepteerd",
+          "applicationAccepted": "Aanmelding geaccepteerd",
+          "offerSent": "Aanbod verzonden"
+        },
         "column": {
           "add": "Kolom toevoegen",
           "edit": "Hernoemen / herkleur",

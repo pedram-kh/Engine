@@ -792,6 +792,11 @@
           "dueToday": "Deadline i dag",
           "overdue": "Overskredet"
         },
+        "inviteLabel": {
+          "acceptedInvite": "Invitation accepteret",
+          "applicationAccepted": "Ansøgning accepteret",
+          "offerSent": "Tilbud sendt"
+        },
         "column": {
           "add": "Tilføj kolonne",
           "edit": "Omdøb / farveændring",

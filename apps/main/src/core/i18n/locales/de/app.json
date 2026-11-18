@@ -792,6 +792,11 @@
           "dueToday": "Heute fällig",
           "overdue": "Überfällig"
         },
+        "inviteLabel": {
+          "acceptedInvite": "Einladung angenommen",
+          "applicationAccepted": "Bewerbung angenommen",
+          "offerSent": "Angebot gesendet"
+        },
         "column": {
           "add": "Spalte hinzufügen",
           "edit": "Umbenennen / Farbe ändern",
