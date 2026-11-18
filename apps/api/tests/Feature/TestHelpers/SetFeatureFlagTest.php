@@ -13,6 +13,7 @@ use App\Modules\Waves\Features\WavesEnabled;
 use App\TestHelpers\Http\Controllers\SetFeatureFlagController;
 use App\TestHelpers\Http\Middleware\VerifyTestHelperToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Process;
 use Laravel\Pennant\Feature;
 use Tests\TestCase;
 
@@ -97,4 +98,27 @@ it('is not reachable when the gate is closed', function (): void {
 
     $this->postJson('/api/v1/_test/feature-flag/'.AccountDeletionEnabled::NAME)->assertNotFound();
     expect(Feature::active(AccountDeletionEnabled::NAME))->toBeFalse();
+});
+
+it('has no _test routes at all when the app boots in production, and has the feature-flag routes in local', function (): void {
+    // A real boot of a second process, not a flipped config value: the provider decides at boot, so only a fresh
+    // process shows what a production deploy would register. The token is set on purpose: the environment check
+    // must close the surface on its own (app/TestHelpers/TestHelpersServiceProvider.php, gateOpen()).
+    $routes = static function (string $env): array {
+        $result = Process::path(base_path())
+            ->env(['APP_ENV' => $env, 'TEST_HELPERS_TOKEN' => 'a-token-that-is-set', 'CACHE_STORE' => 'array'])
+            ->run([PHP_BINARY, 'artisan', 'route:list', '--json']);
+        expect($result->successful())->toBeTrue($result->errorOutput());
+
+        /** @var list<array{uri: string}> $rows */
+        $rows = json_decode($result->output(), true, flags: JSON_THROW_ON_ERROR);
+
+        return array_column($rows, 'uri');
+    };
+
+    $production = $routes('production');
+    $local = $routes('local');
+
+    expect(array_values(array_filter($production, static fn (string $uri): bool => str_contains($uri, '_test/'))))->toBe([])
+        ->and(array_values(array_filter($local, static fn (string $uri): bool => str_contains($uri, '_test/feature-flag'))))->toHaveCount(2);
 });
