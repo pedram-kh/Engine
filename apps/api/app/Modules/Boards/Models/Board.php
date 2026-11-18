@@ -8,6 +8,7 @@ use App\Core\Concerns\HasUlid;
 use App\Core\Tenancy\BelongsToAgency;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Boards\Database\Factories\BoardFactory;
+use App\Modules\Campaigns\Enums\CampaignType;
 use App\Modules\Campaigns\Models\Campaign;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -86,6 +87,19 @@ final class Board extends Model
     public function agency(): BelongsTo
     {
         return $this->belongsTo(Agency::class);
+    }
+
+    /**
+     * PL-1.2 — true when this board belongs to a for-a-wave campaign. Read from the campaign row directly (no
+     * tenancy scope, no soft-delete filter) so a job or listener without an agency context gets the right answer.
+     */
+    public function isWaveBoard(): bool
+    {
+        return Campaign::query()
+            ->withoutGlobalScopes()
+            ->withTrashed()
+            ->whereKey($this->campaign_id)
+            ->value('campaign_type') === CampaignType::ForWave;
     }
 
     protected static function newFactory(): BoardFactory

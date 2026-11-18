@@ -40,6 +40,9 @@ final class BoardColumnController
     public function store(CreateBoardColumnRequest $request, Agency $agency, Campaign $campaign): JsonResponse
     {
         $board = $this->authorizeConfig($campaign, $agency);
+        if ($refused = $this->refuseWaveStructureEdit($request, $board)) {
+            return $refused;
+        }
         $validated = $request->validated();
 
         $column = $this->columns->create(
@@ -53,9 +56,12 @@ final class BoardColumnController
         return (new BoardColumnResource($column))->response()->setStatusCode(Response::HTTP_CREATED);
     }
 
-    public function update(UpdateBoardColumnRequest $request, Agency $agency, Campaign $campaign, BoardColumn $column): BoardColumnResource
+    public function update(UpdateBoardColumnRequest $request, Agency $agency, Campaign $campaign, BoardColumn $column): BoardColumnResource|JsonResponse
     {
         $board = $this->authorizeConfig($campaign, $agency);
+        if ($refused = $this->refuseWaveStructureEdit($request, $board)) {
+            return $refused;
+        }
         $this->assertColumnOnBoard($column, $board);
 
         $updated = $this->columns->update($column, $request->validated());
@@ -67,6 +73,9 @@ final class BoardColumnController
     {
         $board = $this->authorizeConfig($campaign, $agency);
         $this->assertColumnOnBoard($column, $board);
+        if ($refused = $this->refuseWaveStructureEdit($request, $board)) {
+            return $refused;
+        }
 
         // §7.5: a board keeps at least one column.
         if ($board->columns()->count() <= 1) {
@@ -100,6 +109,9 @@ final class BoardColumnController
     public function reorder(ReorderBoardColumnsRequest $request, Agency $agency, Campaign $campaign): JsonResponse
     {
         $board = $this->authorizeConfig($campaign, $agency);
+        if ($refused = $this->refuseWaveStructureEdit($request, $board)) {
+            return $refused;
+        }
 
         /** @var list<string> $orderedUlids */
         $orderedUlids = $request->validated()['column_ids'];

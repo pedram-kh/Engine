@@ -7,10 +7,13 @@ namespace App\Modules\Boards\Services;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Facades\Audit;
 use App\Modules\Boards\Enums\MovementTrigger;
+use App\Modules\Boards\Exceptions\BoardRuleViolation;
 use App\Modules\Boards\Models\BoardCard;
 use App\Modules\Boards\Models\BoardCardMovement;
 use App\Modules\Boards\Models\BoardColumn;
+use App\Modules\Boards\Support\BoardDefaults;
 use App\Modules\Identity\Models\User;
+use App\Modules\Waves\Services\WaveCampaignLink;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -37,7 +40,29 @@ final class BoardCardMoveService
             return $card;
         }
 
-        DB::transaction(function () use ($card, $targetColumn, $actor, $reason): void {
+        $working = BoardDefaults::waveWorkingStages();
+        $toWorking = $targetColumn->stage_key !== null && in_array($targetColumn->stage_key, $working, true);
+
+        // PL-1.2 (Q4) — on a wave board only a creator who has Accepted can enter a working column. Dropped and
+        // every move back are free. The rule is HERE, in the one write path, so no route can bypass it.
+        if ($toWorking && $card->assignment?->status->countsAsSelected() !== true) {
+            throw BoardRuleViolation::selectionRequiresAcceptance();
+        }
+
+        $fromStage = $card->column?->stage_key;
+        $fromWorking = $fromStage !== null && in_array($fromStage, $working, true);
+
+        DB::transaction(function () use ($card, $targetColumn, $actor, $reason, $toWorking, $fromWorking): void {
+            // PL-1.2 (Q3) — the link lock reads where cards are NOW, so a move INTO the working set (can lock) and a
+            // move OUT of it (can unlock) both take the wave row lock before the card changes. A move between two
+            // working columns, or between two non-working ones, cannot change the answer and takes no lock.
+            if ($toWorking !== $fromWorking) {
+                $board = $card->board()->withoutGlobalScopes()->first();
+                if ($board !== null) {
+                    app(WaveCampaignLink::class)->lockWaveOfCampaign($board->campaign_id);
+                }
+            }
+
             $fromColumnId = $card->column_id;
             $card->update(['column_id' => $targetColumn->id]);
 

@@ -8,6 +8,7 @@ use App\Core\Tenancy\BelongsToAgencyScope;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Facades\Audit;
 use App\Modules\Boards\Enums\BoardAutomationActionType;
+use App\Modules\Boards\Exceptions\BoardRuleViolation;
 use App\Modules\Boards\Models\Board;
 use App\Modules\Boards\Models\BoardAutomation;
 use App\Modules\Boards\Models\BoardCard;
@@ -61,6 +62,12 @@ final class BoardResetService
 
     public function reset(Board $board, User $actor): Board
     {
+        // PL-1.2 (Q6) — a reset deletes every column and re-seeds the default seven, which would destroy a wave
+        // board's nine. Refused here as well as in the controller (defence in depth: any caller).
+        if ($board->isWaveBoard()) {
+            throw BoardRuleViolation::waveColumnsFixed();
+        }
+
         DB::transaction(function () use ($board, $actor): void {
             $oldColumnIds = $board->columns()->pluck('id')->all();
 

@@ -45,10 +45,10 @@ final class BoardController
         $board = $this->boards->forCampaign($campaign);
 
         $board->load([
-            'campaign:id,ulid,creator_posts_content',
+            'campaign:id,ulid,creator_posts_content,campaign_type',
             'columns' => fn ($q) => $q->withCount('cards'),
             'automations.targetColumn:id,ulid',
-            'cards.column:id,ulid',
+            'cards.column:id,ulid,stage_key',
             'cards.assignment:id,ulid,status,previously_declined,deliverables,posting_due_at,agreed_fee_minor_units,agreed_fee_currency,fee_per,creator_id',
             'cards.assignment.creator:id,ulid,display_name,avatar_path,erased_at',
         ]);
@@ -67,13 +67,16 @@ final class BoardController
         $actor = $request->user();
 
         $board = $this->boards->ensureBoard($campaign);
+        if ($refused = $this->refuseWaveStructureEdit($request, $board)) {
+            return $refused;
+        }
         $reset->reset($board, $actor);
 
         $board->load([
-            'campaign:id,ulid,creator_posts_content',
+            'campaign:id,ulid,creator_posts_content,campaign_type',
             'columns' => fn ($q) => $q->withCount('cards'),
             'automations.targetColumn:id,ulid',
-            'cards.column:id,ulid',
+            'cards.column:id,ulid,stage_key',
             'cards.assignment:id,ulid,status,previously_declined,deliverables,posting_due_at,agreed_fee_minor_units,agreed_fee_currency,fee_per,creator_id',
             'cards.assignment.creator:id,ulid,display_name,avatar_path,erased_at',
         ]);

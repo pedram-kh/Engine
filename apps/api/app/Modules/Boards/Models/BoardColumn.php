@@ -33,6 +33,7 @@ use Illuminate\Support\Carbon;
  * @property string $color_token
  * @property bool $is_terminal_success
  * @property bool $is_terminal_failure
+ * @property string|null $stage_key
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -56,6 +57,7 @@ final class BoardColumn extends Model
         'color_token',
         'is_terminal_success',
         'is_terminal_failure',
+        'stage_key',
     ];
 
     /**

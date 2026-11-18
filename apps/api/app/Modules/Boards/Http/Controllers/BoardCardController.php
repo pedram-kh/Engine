@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Boards\Http\Controllers;
 
+use App\Core\Errors\ErrorResponse;
 use App\Modules\Agencies\Models\Agency;
+use App\Modules\Boards\Exceptions\BoardRuleViolation;
 use App\Modules\Boards\Http\Controllers\Concerns\ResolvesBoardEntities;
 use App\Modules\Boards\Http\Requests\MoveBoardCardRequest;
 use App\Modules\Boards\Http\Resources\BoardCardMovementResource;
@@ -18,6 +20,7 @@ use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 
 /**
@@ -39,7 +42,7 @@ final class BoardCardController
         private readonly BoardCardMoveService $moves,
     ) {}
 
-    public function move(MoveBoardCardRequest $request, Agency $agency, Campaign $campaign, BoardCard $card): BoardCardResource
+    public function move(MoveBoardCardRequest $request, Agency $agency, Campaign $campaign, BoardCard $card): BoardCardResource|JsonResponse
     {
         $this->assertCampaignBelongsToAgency($campaign, $agency);
         Gate::authorize('invite', $campaign);
@@ -52,11 +55,15 @@ final class BoardCardController
 
         /** @var User $actor */
         $actor = $request->user();
-        $this->moves->move($card, $target, $actor, $validated['reason'] ?? null);
+        try {
+            $this->moves->move($card, $target, $actor, $validated['reason'] ?? null);
+        } catch (BoardRuleViolation $e) {
+            return ErrorResponse::single($request, Response::HTTP_UNPROCESSABLE_ENTITY, $e->errorCode, $e->getMessage());
+        }
 
         return new BoardCardResource(
             $card->fresh([
-                'column:id,ulid',
+                'column:id,ulid,stage_key',
                 // Keep the moved-card face in parity with the board GET select
                 // (board-card facelift + re-offer chunk) — otherwise the card
                 // loses its avatar / fee / decline-history on move.

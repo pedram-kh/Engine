@@ -45,7 +45,8 @@ final class BoardProvisioningService
         }
 
         $position = 1;
-        foreach (BoardDefaults::columns() as $column) {
+        $wave = $board->isWaveBoard();
+        foreach ($wave ? BoardDefaults::waveColumns() : BoardDefaults::columns() as $column) {
             BoardColumn::query()->create([
                 'board_id' => $board->id,
                 'agency_id' => $board->agency_id,
@@ -54,6 +55,7 @@ final class BoardProvisioningService
                 'color_token' => $column['color_token'],
                 'is_terminal_success' => $column['is_terminal_success'],
                 'is_terminal_failure' => $column['is_terminal_failure'],
+                'stage_key' => $column['stage_key'] ?? null,
             ]);
         }
     }
@@ -65,7 +67,7 @@ final class BoardProvisioningService
             ->get(['id', 'name'])
             ->pluck('id', 'name');
 
-        foreach (BoardDefaults::automations() as $automation) {
+        foreach ($board->isWaveBoard() ? BoardDefaults::waveAutomations() : BoardDefaults::automations() as $automation) {
             $targetColumnId = $columnIdsByName[$automation['target_column_name']] ?? null;
 
             // firstOrCreate on the (board_id, event_key) UNIQUE — idempotent, and

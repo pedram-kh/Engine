@@ -42,13 +42,16 @@ final class BoardAutomationController
         ]);
     }
 
-    public function update(UpdateBoardAutomationRequest $request, Agency $agency, Campaign $campaign, BoardAutomation $automation): BoardAutomationResource
+    public function update(UpdateBoardAutomationRequest $request, Agency $agency, Campaign $campaign, BoardAutomation $automation): BoardAutomationResource|JsonResponse
     {
         $this->assertCampaignBelongsToAgency($campaign, $agency);
         Gate::authorize('update', $campaign);
 
         $board = $this->boards->ensureBoard($campaign);
         $this->assertAutomationOnBoard($automation, $board);
+        if ($refused = $this->refuseWaveStructureEdit($request, $board)) {
+            return $refused;
+        }
 
         $validated = $request->validated();
         $updates = [];

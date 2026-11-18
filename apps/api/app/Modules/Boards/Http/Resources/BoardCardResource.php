@@ -6,6 +6,7 @@ namespace App\Modules\Boards\Http\Resources;
 
 use App\Modules\Agencies\Http\Resources\CreatorDiscoveryResource;
 use App\Modules\Boards\Models\BoardCard;
+use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Creators\Concerns\EmitsErasedState;
 use Illuminate\Filesystem\AwsS3V3Adapter;
 use Illuminate\Http\Request;
@@ -54,6 +55,10 @@ final class BoardCardResource extends JsonResource
                 'created_at' => $card->created_at->toIso8601String(),
                 'updated_at' => $card->updated_at->toIso8601String(),
             ],
+            // PL-1.2 — the label on a wave board's cards: present ONLY when the card's column is a wave column
+            // (it carries a stage key) and the assignment is still at the invite stage. Absent on a normal board and
+            // for any later status, so a normal board's JSON is byte-for-byte what it was.
+            ...($this->inviteState($card) === null ? [] : ['invite_state' => $this->inviteState($card)]),
             'relationships' => [
                 'column' => [
                     'data' => ['id' => $card->column?->ulid, 'type' => 'board_columns'],
@@ -92,6 +97,23 @@ final class BoardCardResource extends JsonResource
      * the path is null OR the disk is non-S3 (test fakes use the local driver,
      * which throws on temporaryUrl). Mirrors {@see CreatorDiscoveryResource}.
      */
+    /**
+     * `invited` (invited or countered), `accepted`, `declined`; null for anything later or off a wave board.
+     */
+    private function inviteState(BoardCard $card): ?string
+    {
+        if ($card->column?->stage_key === null) {
+            return null;
+        }
+
+        return match ($card->assignment?->status) {
+            AssignmentStatus::Invited, AssignmentStatus::Countered => 'invited',
+            AssignmentStatus::Accepted => 'accepted',
+            AssignmentStatus::Declined => 'declined',
+            default => null,
+        };
+    }
+
     private function signedViewUrl(?string $path): ?string
     {
         if ($path === null) {

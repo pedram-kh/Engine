@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace App\Modules\Boards\Http\Controllers\Concerns;
 
+use App\Core\Errors\ErrorResponse;
 use App\Modules\Agencies\Models\Agency;
+use App\Modules\Boards\Exceptions\BoardRuleViolation;
 use App\Modules\Boards\Models\Board;
 use App\Modules\Boards\Models\BoardAutomation;
 use App\Modules\Boards\Models\BoardCard;
 use App\Modules\Boards\Models\BoardColumn;
 use App\Modules\Campaigns\Models\Campaign;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 /**
  * Cross-tenant + cross-parent guards for the board surface (Sprint 12 Chunk 1).
@@ -24,6 +29,21 @@ use App\Modules\Campaigns\Models\Campaign;
  */
 trait ResolvesBoardEntities
 {
+    /**
+     * PL-1.2 (Q6) — the structure of a for-a-wave board (columns, order, automations, reset) is fixed: 422
+     * `board.wave_columns_fixed`. A normal board is untouched.
+     */
+    private function refuseWaveStructureEdit(Request $request, Board $board): ?JsonResponse
+    {
+        if (! $board->isWaveBoard()) {
+            return null;
+        }
+
+        $violation = BoardRuleViolation::waveColumnsFixed();
+
+        return ErrorResponse::single($request, Response::HTTP_UNPROCESSABLE_ENTITY, $violation->errorCode, $violation->getMessage());
+    }
+
     private function assertCampaignBelongsToAgency(Campaign $campaign, Agency $agency): void
     {
         if ($campaign->agency_id !== $agency->id) {

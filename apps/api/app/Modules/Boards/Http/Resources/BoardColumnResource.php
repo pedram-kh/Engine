@@ -33,6 +33,8 @@ final class BoardColumnResource extends JsonResource
                 'is_terminal_success' => $column->is_terminal_success,
                 'is_terminal_failure' => $column->is_terminal_failure,
                 'card_count' => $column->cards_count ?? null,
+                // PL-1.2 — present ONLY on a wave board's columns (NULL elsewhere), so a normal board's JSON is unchanged.
+                ...($column->stage_key === null ? [] : ['stage_key' => $column->stage_key]),
                 'created_at' => $column->created_at->toIso8601String(),
                 'updated_at' => $column->updated_at->toIso8601String(),
             ],

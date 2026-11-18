@@ -108,6 +108,57 @@ final class BoardDefaults
     /**
      * @return array{name: string, color_token: string, is_terminal_success: bool, is_terminal_failure: bool}
      */
+    /**
+     * PL-1.2 — the eight DATA columns of a for-a-wave board, in order. The ninth, Applied, is the existing
+     * pseudo-column of pending applications and is not a row (Q1). `stage_key` is what the link lock and the
+     * acceptance rule read, so neither depends on a name or a position. Colours are the existing palette only.
+     *
+     * @return list<array{name: string, color_token: string, is_terminal_success: bool, is_terminal_failure: bool, stage_key: string}>
+     */
+    public static function waveColumns(): array
+    {
+        return [
+            self::waveColumn('Invited', 'status-progress', 'invited'),
+            self::waveColumn('Selected', 'status-todefine', 'selected'),
+            self::waveColumn('Filming', 'status-posted', 'filming'),
+            self::waveColumn('Submitted / in review', 'status-review', 'submitted'),
+            self::waveColumn('In edits', 'status-progress', 'in_edits'),
+            self::waveColumn('Client review', 'status-review', 'client_review'),
+            self::waveColumn('Approved', 'status-aligned', 'approved'),
+            self::waveColumn('Dropped', 'status-blocked', 'dropped', failure: true),
+        ];
+    }
+
+    /**
+     * PL-1.2 — TWO automations only: an invite creates the card in Invited, a cancel lands it in Dropped. Every
+     * other move on a wave board is by hand. Accepted and Declined have no automation, so they stay in Invited.
+     *
+     * @return list<array{event_key: string, target_column_name: string}>
+     */
+    public static function waveAutomations(): array
+    {
+        return [
+            self::automation(AuditAction::AssignmentInvited, 'Invited'),
+            self::automation(AuditAction::AssignmentCancelled, 'Dropped'),
+        ];
+    }
+
+    /**
+     * PL-1.2 — the stage keys a creator must have Accepted to enter, and the set that locks the campaign's wave
+     * link while at least one card sits in it (Q3, Q4).
+     *
+     * @return list<string>
+     */
+    public static function waveWorkingStages(): array
+    {
+        return ['selected', 'filming', 'submitted', 'in_edits', 'client_review', 'approved'];
+    }
+
+    private static function waveColumn(string $name, string $colorToken, string $stageKey, bool $failure = false): array
+    {
+        return [...self::column($name, $colorToken, failure: $failure), 'stage_key' => $stageKey];
+    }
+
     private static function column(string $name, string $colorToken, bool $success = false, bool $failure = false): array
     {
         return [
