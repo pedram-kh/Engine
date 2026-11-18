@@ -7,7 +7,7 @@ import { COUNTRY_OPTIONS, labelForCountryCode } from '@catalyst/api-client'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { MAX_MARKETS } from '../constants'
+import { MAX_MARKETS, MENU_ABOVE_DIALOG_Z } from '../constants'
 
 const props = defineProps<{
   modelValue: string[]
@@ -63,15 +63,17 @@ function remove(code: string): void {
       </v-chip>
 
       <!--
-        VMenu forces `absolute`. The New wave dialog is `position: fixed`, and Stage 2 made it tall enough
-        to cover this list, so the fixed dialog paints over the absolute menu. Fixed positioning puts the
-        list in the same overlay stack, one step above the dialog. The max height keeps it in a short window.
+        `location="end bottom"` opens the list beside the chip and upwards, so it does not cover the campaign
+        choice and the dialog's buttons (Vuetify flips it when there is no room). The z-index is the fallback for an empty overlay stack (see MENU_ABOVE_DIALOG_Z);
+        with the dialog in the stack Vuetify puts the menu one step above it. The max height keeps the list in
+        a short window.
       -->
       <v-menu
         v-model="menu"
         :close-on-content-click="false"
         :disabled="atLimit"
-        :style="{ position: 'fixed' }"
+        :z-index="MENU_ABOVE_DIALOG_Z"
+        location="end bottom"
         max-height="calc(100dvh - 24px)"
         content-class="market-picker__menu"
       >

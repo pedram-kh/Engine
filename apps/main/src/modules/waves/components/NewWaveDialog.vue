@@ -17,7 +17,7 @@ import type { CreateWavePayload, WaveCampaignOption, WaveResource } from '@catal
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { MAX_MARKETS } from '../constants'
+import { MAX_MARKETS, MENU_ABOVE_DIALOG_Z } from '../constants'
 import { wavesApi } from '../api/waves.api'
 import MarketPicker from './MarketPicker.vue'
 
@@ -37,15 +37,22 @@ const emit = defineEmits<{
 const { t, te } = useI18n()
 
 /**
- * VMenu is position:absolute and this dialog is position:fixed. A fixed dialog paints over an absolute
- * menu once the dialog is tall enough to cover it, which Stage 2 made true. Fixed positioning puts the
- * menu in the same overlay stack, one step above the dialog, and the max height keeps it in a short window.
+ * Menus inside this dialog. With the dialog in Vuetify's overlay stack a menu gets the top z-index plus 10; the
+ * z-index here is the fallback for an empty stack, so a menu is never behind the dialog. The max height keeps
+ * the list inside a short window.
  */
 const menuAboveDialog = {
+  zIndex: MENU_ABOVE_DIALOG_Z,
   maxHeight: 'calc(100dvh - 24px)',
   contentClass: 'wave-dialog-menu',
-  style: { position: 'fixed' },
 }
+
+/**
+ * Bumped every time the dialog opens or closes and used as the key of the card, so every menu inside it is
+ * unmounted. A menu left open when the dialog closed used to survive a quick reopen: the dialog then took a
+ * z-index above the stale menu (2420 against 2410), and the list opened behind the dialog.
+ */
+const session = ref(0)
 
 const isEdit = computed(() => props.wave !== undefined && props.wave !== null)
 const hasLink = computed(() => props.wave?.relationships.campaign != null)
@@ -123,6 +130,7 @@ async function loadOptions(): Promise<void> {
 watch(
   () => props.modelValue,
   (open) => {
+    session.value++
     if (!open) return
     submitted.value = false
     formError.value = null
@@ -210,7 +218,7 @@ async function submit(): Promise<void> {
       }
     "
   >
-    <v-card>
+    <v-card :key="session">
       <v-card-title class="text-h6 pt-4 px-6">
         {{ isEdit ? t('app.waves.dialog.editTitle') : t('app.waves.dialog.createTitle') }}
       </v-card-title>

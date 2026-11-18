@@ -142,6 +142,84 @@ test.describe('New wave dialog menus', () => {
   })
 })
 
+test.describe('New wave dialog menus, reopen sequence', () => {
+  test.beforeEach(async ({ request }) => {
+    await setFeatureFlag(request, 'waves_enabled', true)
+  })
+
+  test.afterEach(async ({ request }) => {
+    await setFeatureFlag(request, 'waves_enabled', false)
+  })
+
+  // Walk defect D1 (Pedram's Chrome): the dialog was closed with the market menu still open and reopened before
+  // the leave animation ended. The stale menu kept z-index 2410, the dialog took 2420, and the list opened
+  // behind it. The menu must not survive the dialog closing, and the list must be what a click hits.
+  test('a menu open when the dialog closes does not survive a quick reopen', async ({
+    page,
+    request,
+  }) => {
+    const { email, password, agencyUlid } = await seedAgencyAdmin(request)
+    await page.goto('/sign-in')
+    await page.locator(`[data-test="${SEL.signInEmail}"] input`).fill(email)
+    await page.locator(`[data-test="${SEL.signInPassword}"] input`).fill(password)
+    await page.locator(`[data-test="${SEL.signInSubmit}"]`).click()
+    await expect(page.locator(`[data-test="${SEL.agencyLayout}"]`)).toBeVisible()
+
+    const brandId = await page.evaluate(async (agencyId: string) => {
+      const token = decodeURIComponent(
+        document.cookie
+          .split('; ')
+          .find((row) => row.startsWith('XSRF-TOKEN='))
+          ?.slice('XSRF-TOKEN='.length) ?? '',
+      )
+      const response = await fetch(`/api/v1/agencies/${agencyId}/brands`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'X-XSRF-TOKEN': token,
+        },
+        body: JSON.stringify({
+          name: 'Reopen Bolt',
+          slug: 'reopen-bolt',
+          description: 'A brand for the reopen check.',
+          industry: 'Food',
+          website_url: 'https://example.com',
+        }),
+      })
+      if (!response.ok) throw new Error(`brand create failed: ${response.status}`)
+      const body = (await response.json()) as { data: { id: string } }
+      return body.data.id
+    }, agencyUlid)
+
+    await page.setViewportSize({ width: 1900, height: 870 })
+    await page.goto(`/brands/${brandId}`)
+
+    for (const delayMs of [0, 60, 150]) {
+      await page.locator('[data-test="wave-new-btn"]').click()
+      await page.locator('[data-test="market-add"]').click()
+      await expect(page.locator('[data-test="market-option-IE"]')).toBeVisible()
+
+      // Close with the menu open (the click is dispatched: the open list may cover Cancel), then reopen fast.
+      await page.locator('[data-test="wave-cancel"]').dispatchEvent('click')
+      await page.waitForTimeout(delayMs)
+      await page.locator('[data-test="wave-new-btn"]').dispatchEvent('click')
+      await expect(page.locator('[data-test="wave-dialog"]')).toBeVisible()
+      await expect(page.locator('.market-picker__menu')).toHaveCount(0)
+
+      await page.locator('[data-test="market-add"]').click()
+      const ireland = page.locator('[data-test="market-option-IE"]')
+      await expect(ireland).toBeVisible()
+      await expect.poll(async () => topmost(ireland)).toBe(true)
+      await page.mouse.click(5, 5)
+      await expect(page.locator('.market-picker__menu')).toHaveCount(0)
+      await page.locator('[data-test="wave-cancel"]').click()
+      await expect(page.locator('[data-test="wave-dialog"]')).toBeHidden()
+    }
+  })
+})
+
 /** True when the element is what a click would hit, not a dialog painted over it. */
 async function topmost(locator: Locator): Promise<boolean> {
   return locator.evaluate((element) => {
