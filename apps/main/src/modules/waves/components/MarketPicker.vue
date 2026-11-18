@@ -62,7 +62,19 @@ function remove(code: string): void {
         {{ labelForCountryCode(code) }}
       </v-chip>
 
-      <v-menu v-model="menu" :close-on-content-click="false" :disabled="atLimit">
+      <!--
+        VMenu forces `absolute`. The New wave dialog is `position: fixed`, and Stage 2 made it tall enough
+        to cover this list, so the fixed dialog paints over the absolute menu. Fixed positioning puts the
+        list in the same overlay stack, one step above the dialog. The max height keeps it in a short window.
+      -->
+      <v-menu
+        v-model="menu"
+        :close-on-content-click="false"
+        :disabled="atLimit"
+        :style="{ position: 'fixed' }"
+        max-height="calc(100dvh - 24px)"
+        content-class="market-picker__menu"
+      >
         <template #activator="{ props: activatorProps }">
           <v-chip
             v-bind="activatorProps"
@@ -86,7 +98,7 @@ function remove(code: string): void {
             :placeholder="t('app.waves.dialog.searchMarket')"
             data-test="market-search"
           />
-          <v-list density="compact" max-height="260" class="overflow-y-auto">
+          <v-list density="compact" class="market-picker__list">
             <v-list-item
               v-for="c in available"
               :key="c.code"
@@ -109,3 +121,23 @@ function remove(code: string): void {
     </p>
   </div>
 </template>
+
+<style>
+/* Teleported, so this cannot be scoped. The class exists only while the menu is open. */
+.market-picker__menu {
+  max-height: calc(100dvh - 24px);
+  overflow: hidden;
+}
+
+.market-picker__menu > .v-card {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 24px);
+}
+
+.market-picker__list {
+  min-height: 0;
+  overflow-y: auto;
+  max-height: min(260px, calc(100dvh - 120px));
+}
+</style>

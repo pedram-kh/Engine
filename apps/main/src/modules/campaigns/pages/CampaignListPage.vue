@@ -560,6 +560,7 @@ async function commitListing(item: CampaignResource, value: boolean): Promise<vo
             tone="neutral"
             :label="t('app.campaigns.type.forWave')"
             :data-test="`campaign-type-${item.id}`"
+            style="align-self: flex-start; width: max-content; max-width: 100%"
           />
           <span
             v-if="startsLine(item) !== null"

@@ -11,6 +11,7 @@ use App\Modules\Identity\Features\AccountDeletionEnabled;
 use App\Modules\Messaging\Features\MessagesV2CreatorInboxEnabled;
 use App\Modules\Messaging\Features\MessagesV2EditSearchEnabled;
 use App\Modules\Messaging\Features\MessagesV2InboxEnabled;
+use App\Modules\Waves\Features\WavesEnabled;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Laravel\Pennant\Feature;
@@ -60,6 +61,8 @@ final class SetFeatureFlagController
         MessagesV2CreatorInboxEnabled::NAME,
         // AH-120 — OFF at deploy; the brand-exclusivity E2E leg drives each state.
         CampaignBrandExclusivityEnabled::NAME,
+        // PL-1.2 — OFF at deploy; the New wave dialog E2E leg drives it on, then off.
+        WavesEnabled::NAME,
     ];
 
     public function store(Request $request, string $name): JsonResponse

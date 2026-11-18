@@ -36,6 +36,17 @@ const emit = defineEmits<{
 
 const { t, te } = useI18n()
 
+/**
+ * VMenu is position:absolute and this dialog is position:fixed. A fixed dialog paints over an absolute
+ * menu once the dialog is tall enough to cover it, which Stage 2 made true. Fixed positioning puts the
+ * menu in the same overlay stack, one step above the dialog, and the max height keeps it in a short window.
+ */
+const menuAboveDialog = {
+  maxHeight: 'calc(100dvh - 24px)',
+  contentClass: 'wave-dialog-menu',
+  style: { position: 'fixed' },
+}
+
 const isEdit = computed(() => props.wave !== undefined && props.wave !== null)
 const hasLink = computed(() => props.wave?.relationships.campaign != null)
 // PL-1.2 (Q3): a link is editable until a card is Selected or further. A payload without the field (an API that
@@ -253,6 +264,7 @@ async function submit(): Promise<void> {
             persistent-hint
             variant="outlined"
             density="comfortable"
+            :menu-props="menuAboveDialog"
             data-test="wave-campaign"
           />
         </template>
@@ -294,6 +306,7 @@ async function submit(): Promise<void> {
             persistent-hint
             variant="outlined"
             density="comfortable"
+            :menu-props="menuAboveDialog"
             data-test="wave-campaign"
           />
           <v-text-field
@@ -332,3 +345,11 @@ async function submit(): Promise<void> {
     </v-card>
   </v-dialog>
 </template>
+
+<style>
+/* Teleported select menus. The class exists only while a menu in this dialog is open. */
+.wave-dialog-menu {
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+}
+</style>

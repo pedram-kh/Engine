@@ -9,6 +9,7 @@ use App\Modules\Identity\Features\AccountDeletionEnabled;
 use App\Modules\Messaging\Features\MessagesV2CreatorInboxEnabled;
 use App\Modules\Messaging\Features\MessagesV2EditSearchEnabled;
 use App\Modules\Messaging\Features\MessagesV2InboxEnabled;
+use App\Modules\Waves\Features\WavesEnabled;
 use App\TestHelpers\Http\Controllers\SetFeatureFlagController;
 use App\TestHelpers\Http\Middleware\VerifyTestHelperToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -87,6 +88,7 @@ it('allows exactly the flags the E2E legs need (a new entry is a reviewed change
         MessagesV2EditSearchEnabled::NAME,
         MessagesV2CreatorInboxEnabled::NAME,
         CampaignBrandExclusivityEnabled::NAME,
+        WavesEnabled::NAME,
     ]);
 });
 

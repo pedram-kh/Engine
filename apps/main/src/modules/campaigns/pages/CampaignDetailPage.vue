@@ -814,6 +814,7 @@ const requirementRows = computed<RequirementRow[]>(() => {
         <AgencyStatusPill
           v-for="n in waveTypePillRows"
           :key="n"
+          class="campaign-type-pill"
           tone="neutral"
           :label="t('app.campaigns.type.forWave')"
           data-test="campaign-detail-type"
@@ -1631,6 +1632,13 @@ const requirementRows = computed<RequirementRow[]>(() => {
 </template>
 
 <style scoped>
+/* The heading is a row. The type pill is a label, sized to its text, not a flex item that can grow. */
+.campaign-type-pill {
+  flex: none;
+  width: max-content;
+  max-width: 100%;
+}
+
 .overview-description__text {
   /* RichBrief's own <p>/<br> markup owns line breaks now (AH-081) — pre-wrap
      would additionally render the sanitized HTML's literal whitespace
