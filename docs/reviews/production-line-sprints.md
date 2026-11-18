@@ -145,7 +145,7 @@ Recorded with the PL-1.2 plan (`pl-1-2-plan.md`). They sharpen R3, R4 and R9; **
 
 **Plan rulings Q1 to Q12 (Pedram, 2026-11-17)** are recorded in `pl-1-2-plan.md` §11. Three matter beyond PL-1.2: **Q3** the P5 lock reads where cards are now, not history (locked while a card sits in Selected, Filming, Submitted / in review, In edits, Client review or Approved); **Q4** only an Accepted creator's card can enter a working column, any card can be moved to Dropped, moves back are free; **Q10** the board is built from the design system with no screenshot, like a ClickUp board, and the card face carries only the creator name, the invite label and the reserved script-tracker place.
 
-**MUST CONFIRM BEFORE `pl` IS MERGED TO `main` (Q11):** the production Aurora PostgreSQL major version (Pedram asks a colleague). PL-1.2's `ADD COLUMN … DEFAULT` on `campaigns` is a no-rewrite change from PostgreSQL 11. It does **not** block the build; it blocks the merge.
+**Q11 CONFIRMED (2026-11-18):** production is PostgreSQL 17.9 on aarch64 (Aurora). PL-1.2's `ADD COLUMN … DEFAULT <constant>` on `campaigns` uses the fast default and does not rewrite the table. Source: the colleague's read-back, relayed by Pedram; not read by Cursor.
 
 **Amendment to PL-1.1 (by P2 and P5):** PL-1.1 let a wave link to any campaign of the brand and locked the link once set. Under P2 the link accepts only a for-a-wave campaign; under P5 and Q3 the link is locked only while a card sits in a working column (Selected or later), not once a link is set. PL-1.1's tests, seeder and dialog change in PL-1.2 (list in `pl-1-2-plan.md` §6). PL-1.1 as built and walked is not edited retroactively.
 
@@ -157,6 +157,7 @@ Recorded with the PL-1.2 plan (`pl-1-2-plan.md`). They sharpen R3, R4 and R9; **
 
 ### Open items from these rulings
 
+- **PL-3 (2026-11-18):** the origin of a wave-board card (application or invite) is derived from accepted application rows, not stored. The one misread case, an applicant later invited separately, has no path today. The creator picker reads the same data, so PL-3 must decide whether the origin is stored once a second path to a card exists.
 - **PL-6 (Q15, 2026-11-18):** the creator's "Submit your draft" form still appears on a for_wave campaign (left as is in PL-1, Q9). PL-6 replaces it with the footage hand-in. `waves_enabled` must not be turned on in production for real creators before that is decided.
 - R8: the "release creator" action; PL-3 or PL-5 not decided.
 - Docs that still say a wave is a campaign kind. Dated addenda of 2026-11-17 now sit in `production-line-inventory.md` §A5 and §N, and in `new-sections-design-review.md` §9 ruling 4. Closed review files stay verbatim (`WORKING-PROCESS.md` §8); the correction is a dated addendum.

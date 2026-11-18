@@ -39,6 +39,8 @@ The type pill stretched to the name column, and the market list sat under the di
 
 **Where the origin is stored.** Nowhere. It is derived: an accepted `campaign_applications` row for the same campaign and creator means the creator came from an application. `WaveInviteOrigin` reads those rows once per board load (and once per card move). Nothing was added to the database.
 
+**Origin is derived, not stored (record, 2026-11-18).** The application-or-invite origin of a card is computed from accepted application rows and never written. The one case that would be misread, an applicant later invited separately, has no path today. It is on the PL-3 open items, where the creator picker reads the same data.
+
 **Is it reliable for existing rows?** Yes for rows made through the application flow, because the accepted application row is the record of it. One case is misread: a creator who applied, was accepted, and was later also invited by the agency in a separate step on the same campaign would show as application. No second invite path exists for a creator who already has an assignment, so no such row is expected; it is stated, not proven on production data (nothing was run there).
 
 **Labels in the Invited column** (every status that `countsAsSelected()` counts as accepted):
@@ -126,7 +128,7 @@ No design frame exists for these; each was built from the design system and the 
 ## Production posture
 
 - Flag default OFF; with it OFF the campaign and board DOM equals the recorded baseline (above) and the waves routes answer 404.
-- Both migrations are additive and were rehearsed on synthetic data (above). The Aurora engine version is still **not confirmed** (Q11: must be confirmed before `pl` merges to `main`; it does not block the build).
+- Both migrations are additive and were rehearsed on synthetic data (above). The production engine is **confirmed** (Q11, 2026-11-18): PostgreSQL 17.9 on aarch64 (Aurora). The fast default for `ADD COLUMN … DEFAULT <constant>` applies, so migration M1 does not rewrite `campaigns`. Source: the colleague's read-back, relayed by Pedram; not read by Cursor.
 - New campaigns made for a wave are normal rows of the normal tables. After the flag goes OFF they keep working and the link stays in the data (Q7).
 - Nothing was run against any deployed environment. Migrations were run on local and throwaway test databases only.
 
@@ -147,4 +149,4 @@ No design frame exists for these; each was built from the design system and the 
 
 - **Not run:** the Playwright specs other than `wave-dialog-menus.spec.ts` (they run in CI; Pedram's walk covers the same ground by hand). The other 110 targets of the agency walk. ESLint for `packages/api-client` (no ESLint binary in that package; the app lint does not include it). Two real concurrent requests against PostgreSQL (the lock tests assert the `for update` SQL; they do not race two clients).
 - **Not read:** `CampaignListPage.vue` beyond the name cell and the status column; the creator-side walk files; the Pl11 walk spec details.
-- **Not verified:** the Aurora engine version (Q11); any deployed storage or environment.
+- **Not read by Cursor:** the Aurora engine version (Q11) is a read-back relayed by Pedram, not read by Cursor. **Not verified:** any deployed storage or environment.

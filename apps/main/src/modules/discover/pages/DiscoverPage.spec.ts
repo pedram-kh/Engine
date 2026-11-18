@@ -429,7 +429,9 @@ describe('DiscoverPage (Sprint 6.6a)', () => {
     ;(harness.wrapper.vm as unknown as { page: number }).page = 3
     await flushPromises()
 
-    expect(harness.router.currentRoute.value.query.page).toBe('3')
+    // router.replace is asynchronous: on a loaded runner one flush can return
+    // before the navigation commits, so wait for the URL instead of reading it once.
+    await vi.waitFor(() => expect(harness.router.currentRoute.value.query.page).toBe('3'))
     // Replace, not push: paging must not stack history entries.
     expect(replaceSpy).toHaveBeenCalled()
   })
