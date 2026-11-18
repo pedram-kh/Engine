@@ -18,7 +18,6 @@ use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Testing\TestResponse;
 use Tests\Support\WaveFixtures;
 use Tests\TestCase;
 
@@ -69,9 +68,10 @@ function wbUrl(array $w, string $suffix = ''): string
     return "/api/v1/agencies/{$w['agency']->ulid}/campaigns/{$w['campaign']->ulid}/board".($suffix !== '' ? '/'.$suffix : '');
 }
 
-function wbMoveTo(array $w, BoardCard $card, BoardColumn $column, ?User $as = null): TestResponse
+/** @return array{target_column_id: string} */
+function wbMoveBody(BoardColumn $column): array
 {
-    return test()->actingAs($as ?? $w['admin'])->postJson(wbUrl($w, "cards/{$card->ulid}/move"), ['target_column_id' => $column->ulid]);
+    return ['target_column_id' => $column->ulid];
 }
 
 it('C3: a normal campaign still gets exactly the seven default columns and ten automations, and its JSON has no wave keys', function (): void {
@@ -83,7 +83,8 @@ it('C3: a normal campaign still gets exactly the seven default columns and ten a
         ->and($w['board']->columns()->whereNotNull('stage_key')->count())->toBe(0);
 
     $json = $this->actingAs($w['admin'])->getJson(wbUrl($w))->assertOk()->json();
-    expect(json_encode($json))->not->toContain('stage_key')->not->toContain('invite_state');
+    expect(str_contains((string) json_encode($json), 'stage_key'))->toBeFalse()
+        ->and(str_contains((string) json_encode($json), 'invite_state'))->toBeFalse();
     expect($card->exists)->toBeTrue();
 });
 
@@ -156,14 +157,14 @@ it('B2a: a move into each working column needs an Accepted creator: Invited, Cou
     foreach ([AssignmentStatus::Invited, AssignmentStatus::Countered, AssignmentStatus::Declined, AssignmentStatus::Cancelled] as $status) {
         $card = wbCard($w, $status);
         $from = $card->column_id;
-        wbMoveTo($w, $card, $target)->assertUnprocessable()->assertJsonPath('errors.0.code', 'board.selection_requires_acceptance');
+        $this->actingAs($w['admin'])->postJson(wbUrl($w, "cards/{$card->ulid}/move"), wbMoveBody($target))->assertUnprocessable()->assertJsonPath('errors.0.code', 'board.selection_requires_acceptance');
 
         expect($card->fresh()?->column_id)->toBe($from)
             ->and(BoardCardMovement::query()->where('card_id', $card->id)->count())->toBe(0);
     }
 
     $accepted = wbCard($w, AssignmentStatus::Accepted);
-    wbMoveTo($w, $accepted, $target)->assertOk();
+    $this->actingAs($w['admin'])->postJson(wbUrl($w, "cards/{$accepted->ulid}/move"), wbMoveBody($target))->assertOk();
     expect($accepted->fresh()?->column_id)->toBe($target->id);
 })->with(WB_WORKING);
 
@@ -174,9 +175,9 @@ it('B2b: any card can be moved to Dropped and back to Invited, and neither touch
 
     foreach ([AssignmentStatus::Invited, AssignmentStatus::Declined, AssignmentStatus::Accepted] as $status) {
         $card = wbCard($w, $status);
-        wbMoveTo($w, $card, $dropped)->assertOk();
+        $this->actingAs($w['admin'])->postJson(wbUrl($w, "cards/{$card->ulid}/move"), wbMoveBody($dropped))->assertOk();
         expect($card->fresh()?->column_id)->toBe($dropped->id);
-        wbMoveTo($w, $card, $invited)->assertOk();
+        $this->actingAs($w['admin'])->postJson(wbUrl($w, "cards/{$card->ulid}/move"), wbMoveBody($invited))->assertOk();
         expect($card->fresh()?->column_id)->toBe($invited->id)
             ->and($card->assignment()->first()?->status)->toBe($status);
     }
@@ -187,7 +188,7 @@ it('B2b: an Accepted card moves back out of a working column to Invited and betw
     $card = wbCard($w, AssignmentStatus::Accepted);
 
     foreach (['selected', 'filming', 'approved', 'selected', 'invited'] as $stage) {
-        wbMoveTo($w, $card, wbStage($w['board'], $stage))->assertOk();
+        $this->actingAs($w['admin'])->postJson(wbUrl($w, "cards/{$card->ulid}/move"), wbMoveBody(wbStage($w['board'], $stage)))->assertOk();
         expect($card->fresh()?->column_id)->toBe(wbStage($w['board'], $stage)->id);
     }
 });
@@ -197,10 +198,10 @@ it('B3: staff can move cards but cannot touch structure; another agency gets 404
     $card = wbCard($w, AssignmentStatus::Accepted);
     $other = wbBoard();
 
-    wbMoveTo($w, $card, wbStage($w['board'], 'selected'), $w['staff'])->assertOk();
+    $this->actingAs($w['staff'])->postJson(wbUrl($w, "cards/{$card->ulid}/move"), wbMoveBody(wbStage($w['board'], 'selected')))->assertOk();
     $this->actingAs($w['staff'])->postJson(wbUrl($w, 'columns'), ['name' => 'X', 'color_token' => 'status-paid'])->assertForbidden();
     $this->actingAs($other['admin'])->getJson(wbUrl($w))->assertNotFound();
-    wbMoveTo($w, $card, wbStage($w['board'], 'filming'), $other['admin'])->assertNotFound();
+    $this->actingAs($other['admin'])->postJson(wbUrl($w, "cards/{$card->ulid}/move"), wbMoveBody(wbStage($w['board'], 'filming')))->assertNotFound();
 });
 
 it('B4: invite_state is invited / accepted / declined on Invited cards, absent for later statuses, and stage_key is on wave columns', function (): void {
@@ -214,7 +215,7 @@ it('B4: invite_state is invited / accepted / declined on Invited cards, absent f
     ];
 
     $json = $this->actingAs($w['admin'])->getJson(wbUrl($w))->assertOk()->json();
-    $byId = collect($json['data']['cards'])->keyBy('id');
+    $byId = array_column($json['data']['cards'], null, 'id');
     $state = fn (string $k) => $byId[$cards[$k]->ulid]['invite_state'] ?? 'ABSENT';
 
     expect($state('invited'))->toBe('invited')
@@ -222,7 +223,7 @@ it('B4: invite_state is invited / accepted / declined on Invited cards, absent f
         ->and($state('accepted'))->toBe('accepted')
         ->and($state('declined'))->toBe('declined')
         ->and($state('later'))->toBe('ABSENT')
-        ->and(collect($json['data']['columns'])->pluck('attributes.stage_key')->all())->toBe(WB_STAGES);
+        ->and(array_map(static fn (array $c): mixed => $c['attributes']['stage_key'] ?? null, $json['data']['columns']))->toBe(WB_STAGES);
 
     // Declined never moves by itself.
     expect($cards['declined']->fresh()?->column_id)->toBe(wbStage($w['board'], 'invited')->id);

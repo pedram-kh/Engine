@@ -132,10 +132,10 @@ it('L5: the campaign side links, changes and unlinks, writes the SAME wave.updat
 
     $audits = AuditLog::query()->where('action', 'wave.updated')->orderBy('id')->get();
     expect($audits)->toHaveCount(4)
-        ->and(array_keys($audits[0]->after))->toBe(array_keys($audits[3]->after))
-        ->and($audits[0]->after['campaign_id'])->toBe($campaign->ulid)
-        ->and($audits[3]->before['campaign_id'])->toBe($campaign->ulid)
-        ->and($audits[3]->after['campaign_id'])->toBeNull();
+        ->and(WaveFixtures::auditKeys($audits[0]))->toBe(WaveFixtures::auditKeys($audits[3]))
+        ->and(WaveFixtures::auditCampaign($audits[0], 'after'))->toBe($campaign->ulid)
+        ->and(WaveFixtures::auditCampaign($audits[3], 'before'))->toBe($campaign->ulid)
+        ->and(WaveFixtures::auditCampaign($audits[3], 'after'))->toBeNull();
 });
 
 it('L5: the campaign side obeys the same rules: normal campaign, another brand, another agency, an unknown wave are one refusal; a locked link is refused', function (): void {
@@ -238,7 +238,7 @@ it('L4: the wave-side update, the campaign-side link and a card move into a work
     $campaign = WaveFixtures::waveCampaign($w['agency'], $w['brand']);
     $wave = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->linkedTo($campaign->id)->create();
     $card = WaveFixtures::cardIn($campaign, 'invited');
-    $selected = $card->board->columns()->where('stage_key', 'selected')->firstOrFail();
+    $selected = WaveFixtures::stageColumn($card, 'selected');
 
     $lockedWaveSelects = static function (callable $act): int {
         $n = 0;

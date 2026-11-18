@@ -73,6 +73,7 @@ final class AuditPayloadKeys
             'A timestamp.' => 'exclusivity_ends_on,approved_at,blacklisted_at,deleted_at,invitation_expires_at,invitation_sent_at,kyc_verified_at,last_active_at,last_engaged_at,last_login_at,mfa_exempted_at,rejected_at,scheduled_for,submitted_at,suspended_at,verified_at,was_scheduled_for',
             'A count, threshold, window or score.' => 'code_count,columns_removed,columns_seeded,internal_rating,pool_memberships_deleted,profile_completeness_score,remaining_count,revoked,row_count,threshold,window_hours,window_minutes',
             'Money or currency of an assignment, not a person.' => 'agreed_fee_currency,agreed_fee_minor_units,currency,previous_agreed_fee_minor_units',
+            'PL-1.2 campaign snapshot written when a wave is created with its campaign (P3): the campaign\'s own settings (objective, budget, posting and listing flags). An agency\'s planning data, no creator is a field of it.' => 'budget_currency,budget_minor_units,creator_posts_content,listed_on_jobs_board,objective',
             'A from/to state or column transition label.' => 'from,to',
             'A user id on each side of an owner reassign (AH-119 A3): an id, not a name.' => 'from_user,to_user',
             'The ulids of a message and its thread (AH-119 B2 edit and delete audit rows): ids, never the text.' => 'message_ulid,thread_ulid',

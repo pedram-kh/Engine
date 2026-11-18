@@ -167,7 +167,7 @@ final class WaveController
     }
 
     /**
-     * @return array<string, list<string>>
+     * @return array<string, array<int, mixed>>
      */
     private function rules(bool $creating, ?Request $request = null): array
     {

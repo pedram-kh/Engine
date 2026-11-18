@@ -480,3 +480,14 @@ Commits: feature commit and docs commit as a pair (`WORKING-PROCESS.md` §2). **
 - **C2:** tech-debt row 41 records that a **normal** campaign can be set Active or listed with budget 0 today and nothing refuses it. Not fixed in this chunk (the WB1 guard covers for-a-wave campaigns only).
 - **C3 (read before any code): can a creator be invited to a campaign in draft status? Yes.** `AssignmentInviteGate` reads only the hard-blacklist and availability checks; `CampaignInvitationService::invite` writes the assignment with no campaign-status check; `CampaignAssignmentController` refuses only on tenancy (404), blacklist (422) and availability (409). The only status check on the creator path is in `JobsBoardVisibility::visibleTo` (via `listedOnJobsBoard`): a creator can **apply** only to a campaign that is listed and whose status is draft, active or paused (`Campaign::LISTABLE_STATUSES`). **Nothing is loosened.** What the walk needs: the for-a-wave campaign must be **listed** (so creators can apply), which under WB1 needs **budget above 0**, plus the listing floor fields (description, duration, fee, languages, regions). Status may be draft or active. The walk seeder therefore creates "Bolt Summer Wave Campaign" as `for_wave`, `active`, `listed_on_jobs_board`, budget above 0, floor fields filled. Invites themselves need no status or budget.
 - **C4:** the full body of `BoardCardDrawer.vue` is read before any board web code is touched (Stage 2).
+
+### Migration rehearsal (2026-11-18, local, synthetic data only — C1)
+
+No production data was copied, exported or sampled. The rows were generated locally by `generate_series` in a throwaway local PostgreSQL database (`pl12_test`, dropped afterwards): 200,000 synthetic `campaigns` rows and 200,000 synthetic `board_columns` rows, with the two new columns removed first.
+
+| Migration                                                                | Time    | Table rewritten?             |
+| ------------------------------------------------------------------------ | ------- | ---------------------------- |
+| `add_campaign_type_to_campaigns` (NOT NULL, constant default `'normal'`) | 4.15 ms | no (`relfilenode` unchanged) |
+| `add_stage_key_to_board_columns` (nullable, no default)                  | 2.26 ms | no (`relfilenode` unchanged) |
+
+Lock: `ACCESS EXCLUSIVE` on the one table, for the duration of the `ALTER` (read from `pg_locks` inside the transaction), capped by `SET LOCAL lock_timeout = '5s'`. After the run all 200,000 campaigns read `normal` and all 200,000 columns have a null `stage_key`. No data was written by the migrations themselves.

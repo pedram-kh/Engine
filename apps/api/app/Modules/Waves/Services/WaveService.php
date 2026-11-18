@@ -39,7 +39,7 @@ final class WaveService
     public function __construct(private readonly WaveCampaignLink $links) {}
 
     /**
-     * @param  array{name: string, go_live_on: string, markets: list<string>, campaign_id?: string|null}  $data
+     * @param  array<string, mixed>  $data  name, go_live_on, markets, campaign_id (already validated)
      */
     public function create(Agency $agency, Brand $brand, User $actor, array $data): Wave
     {
@@ -63,7 +63,7 @@ final class WaveService
      * off, objective ugc, budget 0 in the agency's default currency: the rest is filled in later), its nine-column
      * board, and the wave linked to it. Any failure rolls back all three. Audit rows are written after commit.
      *
-     * @param  array{name: string, go_live_on: string, markets: list<string>, new_campaign: array{name: string}}  $data
+     * @param  array<string, mixed>  $data  name, go_live_on, markets, new_campaign.name (already validated)
      */
     public function createWithNewCampaign(Agency $agency, Brand $brand, User $actor, array $data): Wave
     {
@@ -189,8 +189,8 @@ final class WaveService
                 sort($ids);
                 $rows = Wave::query()->whereIn('id', $ids)->orderBy('id')->lockForUpdate()->get()->keyBy('id');
 
-                $target = $rows[(int) $targetId];
-                $current = $currentId === null ? null : $rows[(int) $currentId];
+                $target = $rows->get((int) $targetId) ?? throw WaveRuleViolation::campaignNotAvailable();
+                $current = $currentId === null ? null : $rows->get((int) $currentId);
 
                 if ($current !== null && $current->id === $target->id) {
                     return $target;

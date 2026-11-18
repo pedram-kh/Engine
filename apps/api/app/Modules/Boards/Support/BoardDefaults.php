@@ -106,9 +106,6 @@ final class BoardDefaults
     }
 
     /**
-     * @return array{name: string, color_token: string, is_terminal_success: bool, is_terminal_failure: bool}
-     */
-    /**
      * PL-1.2 — the eight DATA columns of a for-a-wave board, in order. The ninth, Applied, is the existing
      * pseudo-column of pending applications and is not a row (Q1). `stage_key` is what the link lock and the
      * acceptance rule read, so neither depends on a name or a position. Colours are the existing palette only.
@@ -154,11 +151,17 @@ final class BoardDefaults
         return ['selected', 'filming', 'submitted', 'in_edits', 'client_review', 'approved'];
     }
 
+    /**
+     * @return array{name: string, color_token: string, is_terminal_success: bool, is_terminal_failure: bool, stage_key: string}
+     */
     private static function waveColumn(string $name, string $colorToken, string $stageKey, bool $failure = false): array
     {
         return [...self::column($name, $colorToken, failure: $failure), 'stage_key' => $stageKey];
     }
 
+    /**
+     * @return array{name: string, color_token: string, is_terminal_success: bool, is_terminal_failure: bool}
+     */
     private static function column(string $name, string $colorToken, bool $success = false, bool $failure = false): array
     {
         return [

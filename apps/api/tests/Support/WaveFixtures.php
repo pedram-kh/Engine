@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Tests\Support;
 
 use App\Modules\Agencies\Models\Agency;
+use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Boards\Models\BoardCard;
+use App\Modules\Boards\Models\BoardColumn;
 use App\Modules\Boards\Services\BoardService;
 use App\Modules\Brands\Models\Brand;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
@@ -84,6 +86,29 @@ final class WaveFixtures
         $card->update(['column_id' => $board->columns()->where('stage_key', $stage)->firstOrFail()->id]);
 
         return $card;
+    }
+
+    /** The column of a card's board that carries the stage key. */
+    public static function stageColumn(BoardCard $card, string $stage): BoardColumn
+    {
+        return BoardColumn::query()->where('board_id', $card->board_id)->where('stage_key', $stage)->firstOrFail();
+    }
+
+    /** The campaign ulid an audit row records on one side of a wave change (null when none). */
+    public static function auditCampaign(?AuditLog $audit, string $side): ?string
+    {
+        $payload = $audit === null ? null : ($side === 'before' ? $audit->before : $audit->after);
+        $value = is_array($payload) ? ($payload['campaign_id'] ?? null) : null;
+
+        return is_string($value) ? $value : null;
+    }
+
+    /** @return list<string> */
+    public static function auditKeys(?AuditLog $audit): array
+    {
+        $after = $audit === null ? null : $audit->after;
+
+        return array_map('strval', array_keys(is_array($after) ? $after : []));
     }
 
     public static function wavesUrl(Agency $agency, Brand $brand, string $suffix = ''): string

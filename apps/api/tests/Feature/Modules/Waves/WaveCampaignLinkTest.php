@@ -201,9 +201,9 @@ it('L3a: with no card in a working column an existing link can be changed and re
 
     $audits = AuditLog::query()->where('action', 'wave.updated')->orderBy('id')->get();
     expect($audits)->toHaveCount(2)
-        ->and($audits[0]->before['campaign_id'])->toBe($linked->ulid)
-        ->and($audits[0]->after['campaign_id'])->toBe($other->ulid)
-        ->and($audits[1]->after['campaign_id'])->toBeNull();
+        ->and(WaveFixtures::auditCampaign($audits[0], 'before'))->toBe($linked->ulid)
+        ->and(WaveFixtures::auditCampaign($audits[0], 'after'))->toBe($other->ulid)
+        ->and(WaveFixtures::auditCampaign($audits[1], 'after'))->toBeNull();
 });
 
 it('L3a: a card currently in ANY working column locks the link: change and remove are 422 wave.campaign_link_locked and nothing changes', function (string $stage): void {
@@ -232,7 +232,6 @@ it('L3b: the lock releases when the card leaves the working set, even though it 
     $wave = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->linkedTo($linked->id)->create();
     $url = WaveFixtures::wavesUrl($w['agency'], $w['brand'], $wave->ulid);
     $card = WaveFixtures::cardIn($linked, 'selected');
-    $board = $card->board;
     $link = app(WaveCampaignLink::class);
 
     expect($link->isLocked($linked->id))->toBeTrue();
@@ -241,7 +240,7 @@ it('L3b: the lock releases when the card leaves the working set, even though it 
     // Moved back to Invited (by the real route): unlocked, though the card WAS selected.
     $this->actingAs($w['admin'], 'web')
         ->postJson("/api/v1/agencies/{$w['agency']->ulid}/campaigns/{$linked->ulid}/board/cards/{$card->ulid}/move", [
-            'target_column_id' => $board->columns()->where('stage_key', 'invited')->firstOrFail()->ulid,
+            'target_column_id' => WaveFixtures::stageColumn($card, 'invited')->ulid,
         ])->assertOk();
     expect($link->isLocked($linked->id))->toBeFalse();
     $this->actingAs($w['admin'], 'web')->patchJson($url, ['campaign_id' => null])->assertOk();
@@ -256,10 +255,9 @@ it('L3b: moved to Dropped it unlocks too; L3c: the answer flips with every move 
     expect($link->isLocked($linked->id))->toBeFalse();   // no board yet
 
     $card = WaveFixtures::cardIn($linked, 'invited');
-    $columns = $card->board->columns()->pluck('id', 'stage_key');
     $answers = [];
     foreach (['selected', 'dropped', 'filming', 'invited', 'approved', 'dropped'] as $stage) {
-        $card->update(['column_id' => $columns[$stage]]);
+        $card->update(['column_id' => WaveFixtures::stageColumn($card, $stage)->id]);
         $answers[$stage.'#'.count($answers)] = $link->isLocked($linked->id);
     }
 
@@ -376,13 +374,13 @@ it('F2: a second edit holding a STALE wave re-reads the locked row: unlocked, a 
 
     // (a) the card leaves the working set: the same stale model's change is now applied on the FRESH row, and the
     // audit's "before" is the winner's campaign, not the stale null.
-    $card->update(['column_id' => $card->board->columns()->where('stage_key', 'invited')->firstOrFail()->id]);
+    $card->update(['column_id' => WaveFixtures::stageColumn($card, 'invited')->id]);
     $auditsBefore = AuditLog::query()->where('action', 'wave.updated')->count();
     $returned = $service->update($w['agency'], $w['brand'], $staleForB, ['campaign_id' => $second->ulid]);
     $audit = AuditLog::query()->where('action', 'wave.updated')->orderByDesc('id')->firstOrFail();
     expect($returned->campaign_id)->toBe($second->id)
-        ->and($audit->before['campaign_id'])->toBe($first->ulid)
-        ->and($audit->after['campaign_id'])->toBe($second->ulid);
+        ->and(WaveFixtures::auditCampaign($audit, 'before'))->toBe($first->ulid)
+        ->and(WaveFixtures::auditCampaign($audit, 'after'))->toBe($second->ulid);
 
     // The same campaign the row already has: a no-op, no audit row.
     $count = AuditLog::query()->where('action', 'wave.updated')->count();
@@ -403,6 +401,6 @@ it('F2: the stale loser asking for the winner\'s campaign with a rename applies 
 
     $audit = AuditLog::query()->where('action', 'wave.updated')->firstOrFail();
     expect(Wave::query()->findOrFail($wave->id)->name)->toBe('Renamed')
-        ->and($audit->before['campaign_id'] ?? null)->toBe($first->ulid)
-        ->and($audit->after['campaign_id'] ?? null)->toBe($first->ulid);
+        ->and(WaveFixtures::auditCampaign($audit, 'before') ?? null)->toBe($first->ulid)
+        ->and(WaveFixtures::auditCampaign($audit, 'after') ?? null)->toBe($first->ulid);
 });
