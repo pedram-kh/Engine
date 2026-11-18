@@ -14,6 +14,7 @@ use App\Modules\Waves\Enums\WaveStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
@@ -31,6 +32,7 @@ use Illuminate\Support\Carbon;
  * @property list<string> $markets
  * @property WaveStatus $status
  * @property int $created_by_user_id
+ * @property Carbon|null $steps_provisioned_at
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
@@ -87,6 +89,14 @@ final class Wave extends Model
     }
 
     /**
+     * @return HasMany<WaveStep, $this>
+     */
+    public function steps(): HasMany
+    {
+        return $this->hasMany(WaveStep::class);
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array
@@ -95,6 +105,7 @@ final class Wave extends Model
             'go_live_on' => 'date:Y-m-d',
             'markets' => 'array',
             'status' => WaveStatus::class,
+            'steps_provisioned_at' => 'datetime',
         ];
     }
 

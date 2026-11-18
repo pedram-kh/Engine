@@ -326,6 +326,9 @@ final class ErasureRegistry
             'waves' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); a wave holds no creator data.', ['created_by_user_id'], [], null, [
                 'name' => 'A wave title.',
             ]),
+            'wave_steps' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); a step of a wave\'s tracker holds no creator data. The owner is an agency member (a reference, nulled when the user row is hard-deleted).', ['owner_user_id'], [], null, [
+                'name' => 'A step title, not creator data.',
+            ]),
             'brand_files' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); client files on a brand.', ['uploaded_by_user_id']),
             'talent_pools' => new TableRule(Disposition::NotApplicable, 'Agency-authored; membership is talent_pool_creators (§3.7).', ['created_by_user_id'], [], null, [
                 'name' => 'A pool title.',

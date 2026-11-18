@@ -81,6 +81,7 @@ final class AuditPayloadKeys
             'Boolean marker of a completed step.' => 'payout_method_set',
             'PL-1.1 wave attributes (name, go-live date, markets): an agency\'s planning data about a brand, no creator is a field of it. `name` is also decided under scrubKeys() for user snapshots; that decision stands.' => 'go_live_on,markets',
             'PL-1.1 client-file attributes (filename, type, MIME, size): an agency-owned file about a brand. The filename is typed by the uploading agency user; it is not creator data.' => 'file_type,mime_type,original_filename,size_bytes',
+            'PL-1.3 wave tracker attributes (stream, step key, owner flag, status source, planned and actual dates): an agency\'s planning data about a wave, no creator is a field of it. A step owner is carried by the already decided `from_user` and `to_user` ids (AH-119 A3), never a name; `owner_client` is a boolean flag; `name` and `status` are decided above.' => 'stream,step_key,owner_client,status_source,starts_on,due_on,completed_on',
             'The erasure run\'s own bookkeeping: its ledger ulid, digest and per-table counts. No person.' => 'audit_rows_scrubbed,counts,digest,files_deleted,ledger_ulid',
         ];
 

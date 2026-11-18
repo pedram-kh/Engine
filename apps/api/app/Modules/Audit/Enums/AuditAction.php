@@ -523,6 +523,16 @@ enum AuditAction: string
     case BrandFileUploaded = 'brand_file.uploaded';
     case BrandFileDeleted = 'brand_file.deleted';
 
+    // PL-1.3 — the wave project tracker. One audit row per request, literal payload keys, ids only for a user
+    // (`from_user`, `to_user`, the AH-119 A3 precedent). `wave_steps.provisioned` is written once, by the
+    // provisioner, when a wave gets its default steps (at creation or on first open).
+    case WaveStepsProvisioned = 'wave_steps.provisioned';
+    case WaveStepAdded = 'wave_step.added';
+    case WaveStepUpdated = 'wave_step.updated';
+    case WaveStepRemoved = 'wave_step.removed';
+    case WaveStreamRemoved = 'wave_stream.removed';
+    case WaveStreamAdded = 'wave_stream.added';
+
     // Campaign attachments from the Files library, chunk B (AH-092). A
     // linkage action on the campaign, not a library action on the file — the
     // file's own audit trail (above) is unaffected by any of these. No
