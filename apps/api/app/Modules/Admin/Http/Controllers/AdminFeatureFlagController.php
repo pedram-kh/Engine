@@ -28,6 +28,7 @@ use App\Modules\Identity\Features\AccountDeletionEnabled;
 use App\Modules\Messaging\Features\MessagesV2CreatorInboxEnabled;
 use App\Modules\Messaging\Features\MessagesV2EditSearchEnabled;
 use App\Modules\Messaging\Features\MessagesV2InboxEnabled;
+use App\Modules\Strategy\Features\StrategyEnabled;
 use App\Modules\Waves\Features\WavesEnabled;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -145,6 +146,10 @@ final class AdminFeatureFlagController
         WavesEnabled::NAME => [
             'label' => 'Waves and client files',
             'description' => 'Turns on the Client files and Waves panels on the Brand page, the New wave dialog, the wave page and the endpoints behind them. Off: those panels are not shown and the endpoints answer 404; nothing else on the Brand page changes. Arm after the web deploy.',
+        ],
+        StrategyEnabled::NAME => [
+            'label' => 'Strategy workspace',
+            'description' => 'PL-2: the Strategy & Scripts workspace on a wave (USPs and personas first) and the endpoints behind it. Needs the Waves flag: with Waves off nothing shows. Off: the endpoints answer 404 and the wave page is exactly as PL-1 left it. Arm after the web deploy.',
         ],
         AccountErasureExecuteEnabled::NAME => [
             'label' => 'Account erasure (admin Erase button)',

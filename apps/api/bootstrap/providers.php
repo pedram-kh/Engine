@@ -15,6 +15,7 @@ use App\Modules\Identity\IdentityServiceProvider;
 use App\Modules\Messaging\MessagingServiceProvider;
 use App\Modules\Notifications\NotificationsServiceProvider;
 use App\Modules\Payments\PaymentsServiceProvider;
+use App\Modules\Strategy\StrategyServiceProvider;
 use App\Modules\TalentPools\TalentPoolsServiceProvider;
 use App\Modules\TrackedJobs\TrackedJobsServiceProvider;
 use App\Modules\Waves\WavesServiceProvider;
@@ -41,6 +42,7 @@ return [
     MessagingServiceProvider::class,
     NotificationsServiceProvider::class,
     PaymentsServiceProvider::class,
+    StrategyServiceProvider::class,
     TalentPoolsServiceProvider::class,
     TrackedJobsServiceProvider::class,
     WavesServiceProvider::class,
