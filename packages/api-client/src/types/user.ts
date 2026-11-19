@@ -143,6 +143,8 @@ export interface UserAttributes {
     messages_v2_creator_inbox?: boolean
     /** PL-1: agency-side only; true while brand client files and waves are on. */
     waves?: boolean
+    /** PL-2.1: agency-side only; true while strategy_enabled AND waves_enabled are on. */
+    strategy?: boolean
   }
 }
 

@@ -32,6 +32,12 @@
  */
 
 import type { DeletionPendingMeta } from './types/auth'
+import type {
+  CopyExceedsCapMeta,
+  MarketHasPersonasMeta,
+  UspInUseAffected,
+  UspInUseMeta,
+} from './types/strategy'
 
 /**
  * The shape of a single error entry inside the envelope's `errors`
@@ -244,6 +250,71 @@ export function deletionPendingMeta(error: unknown): DeletionPendingMeta | null 
     scheduledFor,
     mfaVia: via === 'totp' || via === 'recovery_code' ? via : 'none',
   }
+}
+
+/**
+ * PL-2.1 — the typed `meta` of a 422 `wave.market_has_personas` (a wave edit that would remove markets that still
+ * have personas), or `null` when the error is anything else or the server sent no usable list. Never throws.
+ */
+export function marketHasPersonasMeta(error: unknown): MarketHasPersonasMeta | null {
+  if (!(error instanceof ApiError) || error.code !== 'wave.market_has_personas') {
+    return null
+  }
+  const raw = error.details[0]?.meta?.['markets']
+  if (!Array.isArray(raw)) {
+    return null
+  }
+  const markets = raw.flatMap((entry: unknown) => {
+    if (!isObjectRecord(entry)) return []
+    const market = entry['market']
+    const count = entry['persona_count']
+    return typeof market === 'string' && typeof count === 'number'
+      ? [{ market, persona_count: count }]
+      : []
+  })
+  return markets.length === 0 ? null : { markets }
+}
+
+/**
+ * PL-2.1 — the typed `meta` of a 409 `usp.in_use`: how many angles use the USP and which personas they belong to,
+ * or `null` for any other error. Never throws.
+ */
+export function uspInUseMeta(error: unknown): UspInUseMeta | null {
+  if (!(error instanceof ApiError) || error.code !== 'usp.in_use') {
+    return null
+  }
+  const meta = error.details[0]?.meta
+  const count = meta?.['angle_count']
+  const raw = meta?.['affected']
+  if (typeof count !== 'number' || !Array.isArray(raw)) {
+    return null
+  }
+  const affected = raw.flatMap((entry: unknown): UspInUseAffected[] => {
+    if (!isObjectRecord(entry)) return []
+    const { persona, market, code, title, explanation } = entry
+    return typeof persona === 'string' &&
+      typeof market === 'string' &&
+      typeof code === 'string' &&
+      typeof title === 'string' &&
+      typeof explanation === 'string'
+      ? [{ persona, market, code, title, explanation }]
+      : []
+  })
+  return { angleCount: count, affected }
+}
+
+/** PL-2.1 — the typed `meta` of a 422 `persona.copy_exceeds_cap`, or `null`. Never throws. */
+export function copyExceedsCapMeta(error: unknown): CopyExceedsCapMeta | null {
+  if (!(error instanceof ApiError) || error.code !== 'persona.copy_exceeds_cap') {
+    return null
+  }
+  const meta = error.details[0]?.meta
+  const target = meta?.['target_count']
+  const copy = meta?.['copy_count']
+  const max = meta?.['max']
+  return typeof target === 'number' && typeof copy === 'number' && typeof max === 'number'
+    ? { targetCount: target, copyCount: copy, max }
+    : null
 }
 
 function fieldFromDetail(detail: ApiErrorDetail): string | null {

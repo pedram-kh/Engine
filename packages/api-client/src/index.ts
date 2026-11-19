@@ -16,8 +16,11 @@
 export { createAuthApi, type AuthApi, type AuthVariant, type CreateAuthApiOptions } from './auth'
 export {
   ApiError,
+  copyExceedsCapMeta,
   deletionPendingMeta,
   extractFieldErrors,
+  marketHasPersonasMeta,
+  uspInUseMeta,
   type ApiErrorDetail,
   type ApiErrorOptions,
 } from './errors'
