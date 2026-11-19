@@ -1,6 +1,6 @@
 # PL-2.1 plan: Workspace, USPs and Personas
 
-**Date:** 2026-11-19. **Branch:** `pl`, from tip `d790eb12`. **Status:** plan. Docs only: no code, no migration file, no push. No build starts until Pedram has answered section 11.
+**Date:** 2026-11-19. **Branch:** `pl`, from tip `d790eb12`. **Status:** plan, **amended 2026-11-19 with Pedram's rulings Q1 to Q16 and the three gap checks G1 to G3** (§1.9, §3.1, §4.1, §5, §8, §11, §13). Docs only: no code, no migration file. No build starts until Pedram says so.
 **Inputs:** `pl-2-1-inventory.md` (read it first; "inventory §n" points into it), `production-line-sprints.md` (PL-2 now four chunks, §1 and §6), `pl-1-3-plan.md` and `pl-1-3-review.md` (the template and the baselines), `WORKING-PROCESS.md` §4.1 and §4.2, `PROJECT-WORKFLOW.md` §12.
 **Standing rules applied:** schema-only migrations, the alarm rule, break-revert on every gate, the 24-locale gate, one flag per sprint and never reused, `WORKING-PROCESS.md` §4.1 local-run rules and §4.2 (real browser, wide and narrow), the Erasure folder before every push, the PostgreSQL rule of section 6.
 
@@ -42,7 +42,7 @@
 | M3 `wave_personas` + 1 index       | 4.0 ms + 0.6 ms          | `agencies`, `waves`: ShareRowExclusive                                                      |
 | M4 `wave_persona_angles` + 1 index | 4.3 ms + 0.7 ms          | `agencies`, `waves`, `wave_usps`, `wave_personas`: ShareRowExclusive (the last two are new) |
 
-These are laptop numbers on a nearly empty database; the build repeats the rehearsal through `artisan migrate` and records the numbers in the review (the PL-1.3 rule). The production server version is not read here; the lock modes are the documented ones for `CREATE TABLE … REFERENCES` and `ADD COLUMN`.
+**G3 (ruled 2026-11-19): these hand-typed numbers are not the record.** They were typed in `psql`, not run through Laravel. The build **repeats the rehearsal through `php artisan migrate` on a synthetic throwaway database** (the real migration files, synthetic waves and agencies, nothing from production) and records those timings and lock modes in the review; only that run counts. The numbers above say only that no step looked slow and which lock modes to expect. The production server version is not read here; the lock modes are the documented ones for `CREATE TABLE … REFERENCES` and `ADD COLUMN`.
 
 - **Why no user foreign key.** The new tables carry **no `created_by` or `updated_by` user column**; who did what is in the audit log. That keeps `users` (the busiest table) out of the lock list and keeps the erasure registry `refs` empty. This is a deliberate choice (section 1.5).
 - **`waves` is not in production yet.** PL-1 is built and walked, not merged, not deployed (`production-line-sprints.md` §6). So the four migrations will run in the same deploy that creates `waves`, on empty tables, once `pl` is merged. Stated from the sprint file, not from any server. If PL-1 deploys first, M1 to M4 are a second, millisecond-long lock event on `waves` and `agencies`; `lock_timeout = 5s` (PostgreSQL only) makes a blocked migration fail instead of hanging.
@@ -151,6 +151,16 @@ An empty list item is dropped; a list with more than 6 items or an item over 120
 - **Adding** a market changes nothing: the new tab shows the empty state. USPs are per wave, so a market change never touches them (Q5).
 - "Market must belong to the wave" is enforced on persona create, persona copy (both ends) and the personas list (`?market=` not in the wave is 422).
 
+**G1 (read 2026-11-19): exactly where the refusal goes.**
+
+- **File and place:** `apps/api/app/Modules/Waves/Services/WaveService.php`, `update()` (lines 119 to 165). It already runs `assertBrandWritable`, then `DB::transaction(...)` whose first step is `Wave::query()->whereKey($wave->id)->lockForUpdate()->firstOrFail()` (line 128). The refusal goes **inside that transaction, in the `if (array_key_exists('markets', $data))` block (lines 143 to 145), before `$locked->markets = …` is assigned**: take the codes in `$locked->markets` (the locked, fresh copy, not the caller's stale `$wave`) that are absent from the new list; if any, ask the guard (below) for persona counts per removed market; if any count is above 0, throw the new `WaveRuleViolation::marketHasPersonas(array $counts)`. A thrown rule violation leaves the transaction before any save, so nothing is written and no audit row is made (the audit call is after the transaction). The `UniqueConstraintViolationException` catch around it is not involved.
+- **Why this is race-safe:** every strategy write takes the same wave-row lock first (§1.10), so a persona create and a market removal are serialised; whichever is second sees the other's result.
+- **Module boundary:** `Waves` must not read a `Strategy` table. `Waves` gets a one-method contract, `Waves\Contracts\WaveMarketGuard::personaCountsByMarket(Wave $locked, array $removedCodes): array`, implemented in `Strategy` and bound in `StrategyServiceProvider`; `WaveService` receives it through its constructor. It is **bound whatever the strategy flag says** (Q5: the refusal applies with the flag off; with no persona rows it returns an empty array). Every `WaveService` in the repo is built by the container (`app(WaveService::class)` in the tests, constructor injection in the controller), so the new constructor argument breaks no caller.
+- **Controller:** `WaveController::update` (line 155) already maps `WaveRuleViolation` to 422 through `ErrorResponse::single(...)`; that helper accepts a `meta` argument, so the catch passes the counts as `meta.markets` (`{ "SK": 3 }`) for this one code. `show` (line 143) is unchanged: it only reads.
+- **Code and message:** 422 `wave.market_has_personas`.
+- **Web:** the wave edit dialog is `NewWaveDialog.vue` in edit mode; its `CODE_KEYS` map (line 153) gains `wave.market_has_personas` with a new key under `app.waves.errors` (24 locales and `waveKeys.spec.ts`). The message needs the counts from `meta`; how `ApiError` exposes `meta` is **not read yet** and the build reads it first.
+- **PL-1 tests that change: none expected.** The PL-1 tests that touch markets are in `WaveApiTest.php` (create with markets, the edit at line 161 that sets markets to `['PL']` on a wave with no personas, the validation cases at lines 102 to 107 and 186) and `WaveCampaignLinkTest.php`; none has persona rows, so the guard returns an empty array and they pass as they are. `WaveSchemaTest` asserts columns with `Schema::hasColumns('waves', [...])` (a "has these" check), so the M1 column does not break it. Tests that **are added**: M3 and M4 of §6 (in `Strategy`, plus one case in `WaveApiTest` for the 422 with the flag off). The build runs the whole Waves folder first to prove the "none" claim and records the result.
+
 ### 1.10 Server-side limits that are safe under concurrent requests
 
 Every strategy write runs in a transaction that starts with **`Wave::query()->whereKey($id)->lockForUpdate()`** (the wave-row lock `WaveService::update` and `WaveStepService` use). **Lock order is always wave row first, then card rows by ascending id**, so two strategy writes (and a wave edit) are serialised per wave and cannot deadlock. Contention is low: one agency team on one wave.
@@ -188,6 +198,12 @@ Under `agencies/{agency}/brands/{brand}/waves/{wave}/strategy`, same middleware 
 1. Both flags (`waves_enabled` and the new one): either off is **404 `not_found`** before anything is read.
 2. Brand belongs to the agency, else 404; wave found by ulid in this agency and brand (soft-deleted or foreign is 404).
 3. Cards are looked up **through the wave** (`wave_id = $wave->id`), so a USP or persona ulid from another wave or agency is 404.
+
+**G2 (read 2026-11-19): how the web route is guarded by both flags.** The `waves.detail` route (`auth/routes.ts` line 324) has **no feature guard**: its `meta` is `{ layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] }`. The flag is checked **inside the page**: `WaveDetailPage.vue` reads `authStore.user.attributes.features.waves` and, in `onMounted`, calls `router.replace({ name: 'brands.detail', params: { ulid } })` and returns before loading anything (lines 34 and 64 to 70); the page shows a skeleton while `loading` is true. The workspace route is guarded **the same way, with no new route-guard type**:
+
+- Route `meta` `{ layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] }`, and the new route **names are added to the expected set** in `agency-routes-agency-user-guard.spec.ts` (it pins `waves.detail` today, line 110) and to the MFA and other route-guard architecture specs if they pin by name (the build reads them; they are not re-read here).
+- The workspace page reads `features.strategy`. The server computes it as **waves on AND strategy on AND agency side** (§5), so one check covers both flags. In `onMounted`, when it is not true the page does `router.replace({ name: 'waves.detail', … })` and returns before any API call; that page then redirects to the brand if waves is off (so waves off and strategy on ends on the brand page, showing nothing of the workspace). Until the check the page renders only the skeleton, never the workspace.
+- **The page redirect is the web courtesy, not the security.** The API is the gate: every strategy endpoint returns 404 for either flag off (§3.1), so a user who forces the page open sees an error state and no data.
 
 ### 3.2 Endpoints
 
@@ -251,11 +267,11 @@ New module `apps/main/src/modules/strategy` (pages, components, api, composable,
 
 ### 4.1 What is built
 
-**Routes.** `/brands/:brand/waves/:wave/strategy` redirects to `/strategy/usps`; `/strategy/usps` and `/strategy/personas` (market in `?market=SK`, default the wave's first market). Registered in `auth/routes.ts` beside `waves.detail`, guarded like the wave route (both `features.waves` and `features.strategy`; the existing guard is copied, not re-read here). Deep links and a reload keep the step and market.
+**Routes.** `/brands/:ulid/waves/:waveUlid/strategy` redirects to `/strategy/usps`; `/strategy/usps` and `/strategy/personas` (market in `?market=SK`, default the wave's first market). Registered in `auth/routes.ts` beside `waves.detail`, with the same route params (`:ulid` for the brand, `:waveUlid` for the wave) and the same guards, guarded by the flags as §3.1 (G2) says. Deep links and a reload keep the step and market.
 
 **Entry.** On `WaveDetailPage.vue` (waves module, not frozen) a button **"Strategy & Scripts"** in the header `actions` slot, all agency roles, rendered only when `features.strategy` is true. With the flag off nothing renders, not even a comment node (§6, W-OFF).
 
-**Header.** Back arrow (to the wave page), title "Bolt Food — Wave 7" (brand name and wave name). **No breadcrumb, no status pill, no Preview, no Share** (inventory D6, D11, Q12).
+**Header (Q12, ruled).** `AgencyPageHeader` with the back button (to the wave page) in `leading`, the title "Strategy & Scripts" and the **brand and wave in the `subtitle` slot** ("Bolt Food · Wave 7"). **No breadcrumb, no status pill, no Preview, no Share** (inventory D6, D11). A breadcrumb for the agency pages is a separate job: tech-debt row 44.
 
 **Stepper** (one bar, six steps, from the frame, numbers and names as drawn):
 
@@ -305,7 +321,7 @@ None edited. The agency pin test is run before and after. `brandColorVar()` is i
 
 ## 5. Flag
 
-**New flag `strategy_enabled`** (Pennant, `Feature::define` in `StrategyServiceProvider`, default **false**, a `StrategyEnabled` class with `NAME`). Registered in the four places: `AdminFeatureFlagController::FLAGS` (label "Strategy workspace", description "PL-2: USPs, personas and the strategy workspace. Needs the Waves flag."), `SetFeatureFlagController` allowlist, `docs/feature-flags.md`, and `UserResource` `features` as `'strategy' => agencySide && Feature::active(WavesEnabled::NAME) && Feature::active(StrategyEnabled::NAME)`. It is **never reused by a later sprint** (the standing rule); PL-2.2 to PL-2.4 ship behind the same flag because they are the same sprint. The build never turns it on.
+**New flag `strategy_enabled`** (Pennant, `Feature::define` in `StrategyServiceProvider`, default **false**, a `StrategyEnabled` class with `NAME`). Registered in the four places: `AdminFeatureFlagController::FLAGS` (label "Strategy workspace", description "PL-2: USPs, personas and the strategy workspace. Needs the Waves flag."), `SetFeatureFlagController` allowlist, `docs/feature-flags.md`, and `UserResource` `features` as `'strategy' => agencySide && Feature::active(WavesEnabled::NAME) && Feature::active(StrategyEnabled::NAME)`. **Standing rule, repeated (Pedram, 2026-11-19): one flag per sprint, and a flag is never reused by a later sprint.** `strategy_enabled` is PL-2's flag and nothing else's; PL-2.2 to PL-2.4 ship behind the same flag because they are the same sprint. The build never turns it on.
 
 | `waves_enabled` | `strategy_enabled` | What the user sees                                                                                                                                     |
 | --------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -447,7 +463,32 @@ All new strings in the **24 locales** (`verify-locale.mjs`, a `strategyKeys.spec
 
 ---
 
-## 11. Open questions (for Pedram), each with a recommendation
+## 11. Rulings on the plan (Pedram, 2026-11-19)
+
+**All sixteen questions are ruled as recommended.** Recorded here; the table below keeps the question and recommendation text for the record.
+
+| #       | Ruling                                                                                                                                                                         |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Q1**  | Flag `strategy_enabled`; it needs `waves_enabled`. Waves off and strategy on shows nothing. **Standing rule recorded again: one flag per sprint.**                             |
+| **Q2**  | Persona colours wrap the six for slots 7 and 8.                                                                                                                                |
+| **Q3**  | The persona code chip is fully editable, 2 to 8 characters, unique per market.                                                                                                 |
+| **Q4**  | Two people on one card: per-field last write wins.                                                                                                                             |
+| **Q5**  | A wave edit that removes a market with personas is refused, with the counts. Applies whatever the strategy flag says (§1.9).                                                   |
+| **Q6**  | Copy from another market: a tick list, all or nothing, with angles.                                                                                                            |
+| **Q7**  | Required: USP title; persona title, name and pronoun.                                                                                                                          |
+| **Q8**  | The limits in §1.6 are accepted.                                                                                                                                               |
+| **Q9**  | Left out of the frames: the Approval dropdown, "Import from brief", the stepper status words, the breadcrumb, the "Scripts in client review" pill.                             |
+| **Q10** | Matrix and Concepts show "Not available yet". Creators and Scripts show a lock and "Locked until all concepts are approved".                                                   |
+| **Q11** | Counter wording from the frame: "6 of 6 USPs · maximum reached".                                                                                                               |
+| **Q12** | No breadcrumb. `AgencyPageHeader` with the back button and the brand and wave in the subtitle (§4.1). **Tech-debt row 44:** a breadcrumb for the agency pages, as its own job. |
+| **Q13** | Deleting a persona: all three roles, with a confirmation that states the angle count.                                                                                          |
+| **Q14** | PL-2.1 stays one chunk, built in the order of §12, which has a USP-only stopping point (after step 6).                                                                         |
+| **Q15** | The audience title is typed by hand and optional.                                                                                                                              |
+| **Q16** | USPs, personas and angles are hard-deleted, each confirmed and audited.                                                                                                        |
+
+**Gaps closed the same day:** G1 (§1.9, where the market refusal goes and which PL-1 tests change), G2 (§3.1, how the workspace route is guarded), G3 (§8, the lock numbers are not the record).
+
+### The questions as asked (kept for the record)
 
 | #       | Question                                                                                                                                                                                                                                      | Recommendation                                                                                                                                              |
 | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -497,6 +538,8 @@ Commits: feature commit and docs commit as a pair (`WORKING-PROCESS.md` §2). **
 
 ## Read and not read
 
+**Read (added 2026-11-19, for G1 and G2):** `WaveController` `show`, `update`, `rules`, `flagOff` and `assertBrand`; `WaveService::update` (lines 119 to 165) and the start of `linkFromCampaign`; `ErrorResponse::single` signature; the `waves.detail` route entry and its neighbours in `auth/routes.ts`; `WaveDetailPage.vue` lines 30 to 72 and 205 to 215; the `CODE_KEYS` map of `NewWaveDialog.vue`; the line in `agency-routes-agency-user-guard.spec.ts` that pins `waves.detail`; `WaveApiTest.php` and `WaveSchemaTest.php` lines that mention markets and columns; the way the tests build `WaveService`.
+
 **Read:** Figma frames 13:428 and 13:828 (every text node, colour and size through `get_design_context`, plus the screenshot of each and the tree through `get_metadata`); everything listed under "Read" in `pl-2-1-inventory.md` §8; `production-line-sprints.md` (the table, rulings, F1 to F3); `pl-1-3-plan.md` sections 5, 7, 10, 12 and the section headings of the rest; `Waves/Routes/api.php`, `ResolvesWaveRoute`, `WaveRuleViolation` (to confirm the 422 and brand-archived pattern and the `WaveController` order); the registry `waves` and `wave_steps` entries; `AuditPayloadKeys` wave lines.
 
 **Run:** one local lock probe on a throwaway PostgreSQL database that I created and dropped (§8). No test, no walk, no browser, no migration file, no server.
@@ -505,6 +548,12 @@ Commits: feature commit and docs commit as a pair (`WORKING-PROCESS.md` §2). **
 
 - **The developer brief** (only the relay S1 to S10).
 - **Every frame state not drawn** (inventory §1.2 and §1.3) and any width below 1600, any light theme.
-- **Not re-read in this pass:** `WaveController::show` and `update` bodies; `WaveService::update` beyond its docblock and lock (the §1.9 change is designed from the summary of it, so the build must read it first); the route guard of `waves.detail`; the market-name helper behind `MarketPicker`; `BrandWavesPanel.vue`; `WaveStepKey` and `WaveTrackerCalculator` (F1 is quoted from `production-line-sprints.md`, not from the code); the Tenancy suite file that lists tenant models; the local seed's account names; whether the six strategy tracker rows share anything with the new step names beyond text (they are not touched).
+- **Not re-read in this pass:** the market-name helper behind `MarketPicker`; `BrandWavesPanel.vue`; `WaveStepKey` and `WaveTrackerCalculator` (F1 is quoted from `production-line-sprints.md`, not from the code); the Tenancy suite file that lists tenant models; the local seed's account names; how `ApiError` exposes `meta` to `NewWaveDialog` (§1.9); the MFA and creator route-guard architecture specs beyond the grep that shows they mention route names; the rest of `WaveService` (create, campaign linking); whether the six strategy tracker rows share anything with the new step names beyond text (they are not touched).
 - **The production PostgreSQL version and any production table size.** The lock numbers are from a local PostgreSQL 16 container with synthetic rows.
 - **Limits and wording that are proposals:** every number in §1.6, the error code names, the strings of §4.1 and §10 that the frames do not carry. None is read from a design.
+
+---
+
+## 13. Corrections and rulings log
+
+**2026-11-19, rulings and gaps.** Section 11 records Q1 to Q16 as ruled. Changes this made to the text above: the header is `AgencyPageHeader` with the brand and wave in the subtitle (§4.1, was a title "Bolt Food — Wave 7"); the standing rule is repeated (§5); G1 added to §1.9, G2 to §3.1, G3 to §8; the route params are `:ulid` and `:waveUlid` as `waves.detail` has them (§4.1; the first draft wrote `:brand` and `:wave`); the lock-measurement caveat (§8); tech-debt row 44 opened (`docs/tech-debt.md`).
