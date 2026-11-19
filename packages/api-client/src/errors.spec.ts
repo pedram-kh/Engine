@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { ApiError, extractFieldErrors } from './errors'
+import {
+  ApiError,
+  copyExceedsCapMeta,
+  extractFieldErrors,
+  marketHasPersonasMeta,
+  uspInUseMeta,
+} from './errors'
 
 describe('ApiError', () => {
   it('preserves status, code, message, details, raw, requestId from a well-formed envelope', () => {
@@ -236,5 +242,78 @@ describe('extractFieldErrors', () => {
 
   it('returns an empty object for an error with no details (e.g. transport failure)', () => {
     expect(extractFieldErrors(ApiError.fromNetworkError(new Error('boom')))).toEqual({})
+  })
+})
+
+describe('PL-2.1 typed meta readers', () => {
+  const err = (code: string, meta: unknown): ApiError =>
+    new ApiError({
+      status: 409,
+      code,
+      message: 'x',
+      details: [{ code, meta: meta as Record<string, unknown> }],
+    })
+
+  it('marketHasPersonasMeta reads error.details[0].meta.markets', () => {
+    expect(
+      marketHasPersonasMeta(
+        err('wave.market_has_personas', {
+          markets: [
+            { market: 'SK', persona_count: 2 },
+            { market: 'RO', persona_count: 1 },
+          ],
+        }),
+      ),
+    ).toEqual({
+      markets: [
+        { market: 'SK', persona_count: 2 },
+        { market: 'RO', persona_count: 1 },
+      ],
+    })
+  })
+
+  it('marketHasPersonasMeta drops malformed entries and is null for another code, a non-array or a non-error', () => {
+    expect(
+      marketHasPersonasMeta(
+        err('wave.market_has_personas', {
+          markets: [
+            { market: 'SK', persona_count: 'two' },
+            null,
+            { market: 'RO', persona_count: 1 },
+          ],
+        }),
+      ),
+    ).toEqual({ markets: [{ market: 'RO', persona_count: 1 }] })
+    expect(marketHasPersonasMeta(err('wave.market_has_personas', { markets: 'x' }))).toBeNull()
+    expect(marketHasPersonasMeta(err('wave.market_has_personas', { markets: [null] }))).toBeNull()
+    expect(marketHasPersonasMeta(err('other.code', { markets: [] }))).toBeNull()
+    expect(marketHasPersonasMeta(new Error('boom'))).toBeNull()
+    expect(marketHasPersonasMeta(null)).toBeNull()
+  })
+
+  it('uspInUseMeta reads the angle count and the affected list, and ignores malformed rows', () => {
+    const row = { persona: 'p', market: 'SK', code: 'SKA', title: 'T', explanation: 'E' }
+    expect(
+      uspInUseMeta(err('usp.in_use', { angle_count: 2, affected: [row, { persona: 1 }] })),
+    ).toEqual({
+      angleCount: 2,
+      affected: [row],
+    })
+    expect(uspInUseMeta(err('usp.in_use', { affected: [] }))).toBeNull()
+    expect(uspInUseMeta(err('usp.in_use', { angle_count: 1, affected: 'x' }))).toBeNull()
+    expect(uspInUseMeta(err('other', { angle_count: 1, affected: [] }))).toBeNull()
+    expect(uspInUseMeta(undefined)).toBeNull()
+  })
+
+  it('copyExceedsCapMeta reads target, copy and max, and is null when any is missing', () => {
+    expect(
+      copyExceedsCapMeta(
+        err('persona.copy_exceeds_cap', { target_count: 6, copy_count: 3, max: 8 }),
+      ),
+    ).toEqual({ targetCount: 6, copyCount: 3, max: 8 })
+    expect(
+      copyExceedsCapMeta(err('persona.copy_exceeds_cap', { target_count: 6, max: 8 })),
+    ).toBeNull()
+    expect(copyExceedsCapMeta(err('other', { target_count: 6, copy_count: 3, max: 8 }))).toBeNull()
   })
 })

@@ -88,6 +88,8 @@ export interface MountKitOptions {
   role?: Role
   /** `true`, `false`, or `'absent'` (no features block at all). */
   flag?: boolean | 'absent'
+  /** PL-2.1: `features.strategy`. Left out (undefined) the key is absent, exactly as before PL-2.1. */
+  strategy?: boolean
   route?: string
 }
 
@@ -106,7 +108,14 @@ export async function mountWithApp(
   useAuthStore().user = {
     id: 'user-1',
     type: 'users',
-    attributes: { features: flag === 'absent' ? {} : { waves: flag } },
+    attributes: {
+      features:
+        flag === 'absent'
+          ? {}
+          : options.strategy === undefined
+            ? { waves: flag }
+            : { waves: flag, strategy: options.strategy },
+    },
   } as never
 
   const page = { template: '<div />' }
@@ -118,6 +127,16 @@ export async function mountWithApp(
       { path: '/brands/:ulid/edit', name: 'brands.edit', component: page },
       { path: '/brands/:ulid/waves/:waveUlid', name: 'waves.detail', component: page },
       { path: '/campaigns/:ulid', name: 'campaigns.detail', component: page },
+      {
+        path: '/brands/:ulid/waves/:waveUlid/strategy/usps',
+        name: 'strategy.usps',
+        component: page,
+      },
+      {
+        path: '/brands/:ulid/waves/:waveUlid/strategy/personas',
+        name: 'strategy.personas',
+        component: page,
+      },
     ],
   })
   await router.push(options.route ?? `/brands/${BRAND_ULID}/waves/${WAVE_ULID}`)

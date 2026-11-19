@@ -252,4 +252,52 @@ describe('NewWaveDialog (PL-1.1 W3)', () => {
     expect(document.body.textContent).toContain('Selected or further')
     locked.unmount()
   })
+
+  // ── PL-2.1 ────────────────────────────────────────────────────────────────────────────────────────────
+  it('PL-2.1: wave.market_has_personas names the markets and their persona counts', async () => {
+    vi.mocked(wavesApi.update).mockRejectedValue(
+      new ApiError({
+        status: 422,
+        code: 'wave.market_has_personas',
+        message: 'x',
+        details: [
+          {
+            code: 'wave.market_has_personas',
+            meta: {
+              markets: [
+                { market: 'SK', persona_count: 2 },
+                { market: 'RO', persona_count: 1 },
+              ],
+            },
+          },
+        ],
+        raw: null,
+      } as never),
+    )
+    const w = await mountWithApp(NewWaveDialog, props(makeWave()))
+    await setInput('[data-test="wave-name"]', 'Renamed')
+    await submit()
+    expect(body('[data-test="wave-form-error"]')?.textContent).toContain(
+      'Remove the personas of these markets first: SK (2), RO (1).',
+    )
+    w.unmount()
+  })
+
+  it('PL-2.1: a wave.market_has_personas without the meta falls back to a plain message, never a crash', async () => {
+    vi.mocked(wavesApi.update).mockRejectedValue(
+      new ApiError({
+        status: 422,
+        code: 'wave.market_has_personas',
+        message: 'x',
+        details: [{ code: 'wave.market_has_personas', meta: { markets: 'nope' } }],
+        raw: null,
+      } as never),
+    )
+    const w = await mountWithApp(NewWaveDialog, props(makeWave()))
+    await setInput('[data-test="wave-name"]', 'Renamed')
+    await submit()
+    expect(body('[data-test="wave-form-error"]')).not.toBeNull()
+    expect(body('[data-test="wave-form-error"]')?.textContent).not.toContain('undefined')
+    w.unmount()
+  })
 })
