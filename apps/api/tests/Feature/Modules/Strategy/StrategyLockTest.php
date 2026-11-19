@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
+use App\Modules\Strategy\Models\WavePersona;
 use Illuminate\Database\Connection;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Tests\PostgresCommittedTestCase;
 use Tests\Support\StrategyFixtures as S;
+use Tests\Support\WaveFixtures;
 
 uses(PostgresCommittedTestCase::class)->group('pg');
 
@@ -133,4 +135,27 @@ it('L5: each persona and angle write (create, update, copy, angle add, edit, rem
         });
         expect($seen)->not->toBeEmpty("{$method} {$path} took no wave lock")->and($seen)->each->toBeTrue();
     }
+});
+
+it('M4: a wave edit holds the SAME wave row lock the strategy writes take, so a persona create and a market removal are serialised', function (): void {
+    $w = S::world();
+    $edit = fn () => S::call($w['admin'], 'PATCH', WaveFixtures::wavesUrl($w['agency'], $w['brand'], $w['wave']->ulid), ['markets' => ['SK', 'RO']]);
+
+    $seen = strategyProbeWhileAppLocks($w['wave']->id, fn () => $edit()->assertOk());
+    expect($seen)->not->toBeEmpty('the wave edit took no lock')->and($seen)->each->toBeTrue();
+});
+
+it('M4: both orders end consistent: persona first then the edit is refused; edit first then the create is refused; never a persona in a removed market', function (): void {
+    $w = S::world();
+    $url = WaveFixtures::wavesUrl($w['agency'], $w['brand'], $w['wave']->ulid);
+
+    S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => 'CZ', 'title' => 'T', 'name' => 'N'])->assertCreated();
+    S::call($w['admin'], 'PATCH', $url, ['markets' => ['SK', 'RO']])->assertUnprocessable()->assertJsonPath('errors.0.code', 'wave.market_has_personas');
+
+    WavePersona::query()->delete();
+    S::call($w['admin'], 'PATCH', $url, ['markets' => ['SK', 'RO']])->assertOk();
+    S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => 'CZ', 'title' => 'T', 'name' => 'N'])->assertUnprocessable();
+
+    $markets = $w['wave']->fresh()->markets;
+    expect(WavePersona::query()->whereNotIn('market', $markets)->count())->toBe(0);
 });

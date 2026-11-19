@@ -35,13 +35,14 @@ it('B1: every wave route answers 404 not_found while the flag is OFF, writes not
 
 it('B1: route table: every route in the waves route file is covered by the flag gate test above', function (): void {
     $routes = collect(app('router')->getRoutes()->getRoutes())
-        ->filter(static fn ($r): bool => str_contains($r->uri(), '/waves'))
+        ->filter(static fn ($r): bool => str_contains($r->uri(), '/waves') && ! str_contains($r->uri(), '/waves/{wave}/strategy'))
         ->map(static fn ($r): string => implode('|', $r->methods()).' '.$r->uri())
         ->values()->all();
 
     // The gate test above exercises the five PL-1.1 routes; the six PL-1.3 tracker routes (tracker, step add, update,
     // remove, stream remove and add) are exercised by F1 in WaveTrackerAccessTest. A twelfth route fails here until it
-    // is added to one of the two.
+    // is added to one of the two. The PL-2.1 strategy routes (`/waves/{wave}/strategy/...`) have their own table and gate
+    // test (Strategy/StrategyFlagGatesTest).
     expect($routes)->toHaveCount(11);
 });
 

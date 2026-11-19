@@ -167,7 +167,7 @@ final class WaveController
         try {
             $updated = $this->waves->update($agency, $brand, $model, $data);
         } catch (WaveRuleViolation $e) {
-            return ErrorResponse::single($request, Response::HTTP_UNPROCESSABLE_ENTITY, $e->errorCode, $e->getMessage());
+            return ErrorResponse::single($request, Response::HTTP_UNPROCESSABLE_ENTITY, $e->errorCode, $e->getMessage(), meta: $e->meta);
         }
 
         return (new WaveResource($updated->load(['brand', 'campaign', 'createdBy'])))->response();

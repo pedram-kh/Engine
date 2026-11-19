@@ -15,6 +15,7 @@ use App\Modules\Campaigns\Enums\CampaignStatus;
 use App\Modules\Campaigns\Enums\CampaignType;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Identity\Models\User;
+use App\Modules\Waves\Contracts\WaveMarketGuard;
 use App\Modules\Waves\Enums\WaveStatus;
 use App\Modules\Waves\Models\Wave;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -39,6 +40,7 @@ final class WaveService
     public function __construct(
         private readonly WaveCampaignLink $links,
         private readonly WaveStepProvisioner $provisioner,
+        private readonly WaveMarketGuard $marketGuard,
     ) {}
 
     /**
@@ -141,7 +143,19 @@ final class WaveService
                     $locked->go_live_on = $data['go_live_on'];
                 }
                 if (array_key_exists('markets', $data)) {
-                    $locked->markets = array_values((array) $data['markets']);
+                    $newMarkets = array_values((array) $data['markets']);
+
+                    // PL-2.1 (Q5): a market that still has personas cannot be removed. Decided HERE, on the locked
+                    // row, so it is serialised with every strategy write (they lock this same row first).
+                    $removed = array_values(array_diff($locked->markets, $newMarkets));
+                    if ($removed !== []) {
+                        $withPersonas = $this->marketGuard->personaCountsByMarket($locked, $removed);
+                        if ($withPersonas !== []) {
+                            throw WaveRuleViolation::marketHasPersonas($withPersonas);
+                        }
+                    }
+
+                    $locked->markets = $newMarkets;
                 }
 
                 $changed = $locked->isDirty();

@@ -9,6 +9,8 @@ use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WavePersonaAngle;
 use App\Modules\Strategy\Models\WaveUsp;
 use App\Modules\Strategy\Policies\WaveStrategyPolicy;
+use App\Modules\Strategy\Services\StrategyWaveMarketGuard;
+use App\Modules\Waves\Contracts\WaveMarketGuard;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
@@ -17,7 +19,11 @@ use Laravel\Pennant\Feature;
 
 final class StrategyServiceProvider extends ServiceProvider
 {
-    public function register(): void {}
+    public function register(): void
+    {
+        // Bound whether or not the flag is on: a wave edit that removes a market with personas is refused either way.
+        $this->app->bind(WaveMarketGuard::class, StrategyWaveMarketGuard::class);
+    }
 
     public function boot(): void
     {

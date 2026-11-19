@@ -11,7 +11,10 @@ use RuntimeException;
  */
 final class WaveRuleViolation extends RuntimeException
 {
-    private function __construct(public readonly string $errorCode, string $title)
+    /**
+     * @param  array<string, mixed>|null  $meta
+     */
+    private function __construct(public readonly string $errorCode, string $title, public readonly ?array $meta = null)
     {
         parent::__construct($title);
     }
@@ -19,6 +22,22 @@ final class WaveRuleViolation extends RuntimeException
     public static function brandArchived(): self
     {
         return new self('wave.brand_archived', 'An archived brand is read-only; restore it before changing its waves.');
+    }
+
+    /**
+     * PL-2.1 — a wave edit would remove a market that still has personas (422). `meta.markets` lists the markets and
+     * their persona counts so the dialog can say "Remove the personas of SK first (3)".
+     *
+     * @param  array<string, int>  $counts  market code => persona count
+     */
+    public static function marketHasPersonas(array $counts): self
+    {
+        $markets = [];
+        foreach ($counts as $market => $n) {
+            $markets[] = ['market' => (string) $market, 'persona_count' => $n];
+        }
+
+        return new self('wave.market_has_personas', 'Remove the personas of those markets before removing the markets from the wave.', ['markets' => $markets]);
     }
 
     public static function campaignNotAvailable(): self
