@@ -329,6 +329,26 @@ final class ErasureRegistry
             'wave_steps' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); a step of a wave\'s tracker holds no creator data. The owner is an agency member (a reference, nulled when the user row is hard-deleted).', ['owner_user_id'], [], null, [
                 'name' => 'A step title, not creator data.',
             ]),
+            'wave_usps' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); marketing planning text about a brand\'s wave (PL-2.1). No creator or user is a field of it; there is no user column.', [], [], null, [
+                'title' => 'A USP title: agency-authored free text.',
+                'explainer' => 'Agency-authored free text.',
+                'creative_angle' => 'Agency-authored free text.',
+                'copy_seed' => 'Agency-authored free text.',
+            ]),
+            'wave_personas' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); an invented marketing archetype for a target audience (PL-2.1), linked to no creator, user or client row; there is no user column.', [], [], null, [
+                'name' => 'An invented persona name, not a real person\'s: a marketing archetype written by the agency.',
+                'title' => 'A persona title: agency-authored free text.',
+                'summary' => 'Agency-authored free text.',
+                'core_job' => 'Agency-authored free text.',
+                'need' => 'Agency-authored free text.',
+                'drivers' => 'Agency-authored list of short texts.',
+                'goals' => 'Agency-authored list of short texts.',
+                'self_talk' => 'Agency-authored list of short texts.',
+                'barriers' => 'Agency-authored list of short texts.',
+            ]),
+            'wave_persona_angles' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); a persona\'s one-line angle on a USP of the same wave (PL-2.1). No creator or user is a field of it.', [], [], null, [
+                'explanation' => 'Agency-authored one-line free text.',
+            ]),
             'brand_files' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); client files on a brand.', ['uploaded_by_user_id']),
             'talent_pools' => new TableRule(Disposition::NotApplicable, 'Agency-authored; membership is talent_pool_creators (§3.7).', ['created_by_user_id'], [], null, [
                 'name' => 'A pool title.',

@@ -1,0 +1,170 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Modules\Strategy\Enums\UspColor;
+use App\Modules\Strategy\Models\WavePersona;
+use App\Modules\Strategy\Models\WavePersonaAngle;
+use App\Modules\Strategy\Models\WaveUsp;
+use App\Modules\Waves\Models\Wave;
+use Illuminate\Database\QueryException;
+use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
+use Tests\TestCase;
+
+uses(TestCase::class, RefreshDatabase::class);
+
+/*
+ * PL-2.1 — P1 (the four migrations, up and down), L2 and L4 (the unique-index belts), T3 and U1 (the composite foreign
+ * keys), C5 (RESTRICT). A statement expected to fail runs inside a nested transaction (a savepoint): on PostgreSQL a
+ * failed statement aborts the surrounding transaction, on SQLite it does not. These tests run on both.
+ */
+
+/**
+ * @param  Closure(): mixed  $fn
+ */
+function strategySavepoint(Closure $fn): Closure
+{
+    return fn (): mixed => DB::transaction($fn);
+}
+
+it('P1: creates the three tables with the planned columns and the nullable audience title on waves', function (): void {
+    expect(Schema::hasColumns('wave_usps', [
+        'id', 'ulid', 'agency_id', 'wave_id', 'color_key', 'position', 'title', 'explainer', 'creative_angle', 'copy_seed', 'created_at', 'updated_at',
+    ]))->toBeTrue()
+        ->and(Schema::hasColumns('wave_personas', [
+            'id', 'ulid', 'agency_id', 'wave_id', 'market', 'slot', 'code', 'title', 'name', 'pronoun', 'summary', 'core_job', 'need',
+            'drivers', 'goals', 'self_talk', 'barriers', 'created_at', 'updated_at',
+        ]))->toBeTrue()
+        ->and(Schema::hasColumns('wave_persona_angles', [
+            'id', 'ulid', 'agency_id', 'wave_id', 'persona_id', 'usp_id', 'explanation', 'origin', 'created_at', 'updated_at',
+        ]))->toBeTrue()
+        ->and(Schema::hasColumn('waves', 'usp_audience_title'))->toBeTrue();
+
+    // No user column anywhere (who did it is in the audit log), and no avatar column.
+    foreach (['wave_usps', 'wave_personas', 'wave_persona_angles'] as $table) {
+        expect(Schema::hasColumn($table, 'created_by_user_id'))->toBeFalse()
+            ->and(Schema::hasColumn($table, 'updated_by_user_id'))->toBeFalse();
+    }
+    expect(Schema::hasColumn('wave_personas', 'avatar'))->toBeFalse();
+
+    // Existing waves keep a null title: the column has no default.
+    expect(Wave::query()->findOrFail(Wave::factory()->create()->id)->usp_audience_title)->toBeNull();
+});
+
+it('P1: the four migrations run down and up again', function (): void {
+    $names = [
+        '2026_11_20_100000_add_usp_audience_title_to_waves',
+        '2026_11_20_100001_create_wave_usps_table',
+        '2026_11_20_100002_create_wave_personas_table',
+        '2026_11_20_100003_create_wave_persona_angles_table',
+    ];
+    foreach (array_reverse($names) as $name) {
+        (require database_path("migrations/{$name}.php"))->down();
+    }
+    expect(Schema::hasTable('wave_usps'))->toBeFalse()
+        ->and(Schema::hasTable('wave_personas'))->toBeFalse()
+        ->and(Schema::hasTable('wave_persona_angles'))->toBeFalse()
+        ->and(Schema::hasColumn('waves', 'usp_audience_title'))->toBeFalse();
+
+    foreach ($names as $name) {
+        (require database_path("migrations/{$name}.php"))->up();
+    }
+    expect(Schema::hasTable('wave_usps'))->toBeTrue()
+        ->and(Schema::hasTable('wave_personas'))->toBeTrue()
+        ->and(Schema::hasTable('wave_persona_angles'))->toBeTrue()
+        ->and(Schema::hasColumn('waves', 'usp_audience_title'))->toBeTrue();
+});
+
+it('L2: unique (wave_id, color_key) refuses a duplicate colour and a seventh row cannot exist; another wave is free', function (): void {
+    $wave = Wave::factory()->create();
+    foreach (UspColor::cases() as $i => $color) {
+        WaveUsp::factory()->create(['wave_id' => $wave->id, 'color_key' => $color, 'position' => $i + 1]);
+    }
+
+    expect(strategySavepoint(fn () => WaveUsp::factory()->create(['wave_id' => $wave->id, 'color_key' => UspColor::Violet, 'position' => 7])))
+        ->toThrow(UniqueConstraintViolationException::class);
+    // Any seventh row needs a colour already taken (the six keys are all used).
+    expect(WaveUsp::query()->where('wave_id', $wave->id)->count())->toBe(6);
+
+    $other = Wave::factory()->create();
+    WaveUsp::factory()->create(['wave_id' => $other->id, 'color_key' => UspColor::Violet]);
+    expect(WaveUsp::query()->where('wave_id', $other->id)->count())->toBe(1);
+});
+
+it('L4: unique (wave_id, market, slot) refuses a duplicate slot; another market and another wave are free', function (): void {
+    $wave = Wave::factory()->create(['markets' => ['SK', 'RO']]);
+    WavePersona::factory()->create(['wave_id' => $wave->id, 'market' => 'SK', 'slot' => 3, 'code' => 'SK3']);
+
+    expect(strategySavepoint(fn () => WavePersona::factory()->create(['wave_id' => $wave->id, 'market' => 'SK', 'slot' => 3, 'code' => 'SKX'])))
+        ->toThrow(UniqueConstraintViolationException::class);
+
+    WavePersona::factory()->create(['wave_id' => $wave->id, 'market' => 'RO', 'slot' => 3, 'code' => 'RO3']);
+    WavePersona::factory()->create(['market' => 'SK', 'slot' => 3, 'code' => 'SK3']);
+    expect(WavePersona::query()->count())->toBe(3);
+});
+
+it('L4: unique (wave_id, market, code) refuses a duplicate code in a market, the same code in another market is free', function (): void {
+    $wave = Wave::factory()->create(['markets' => ['SK', 'RO']]);
+    WavePersona::factory()->create(['wave_id' => $wave->id, 'market' => 'SK', 'slot' => 1, 'code' => 'B2B']);
+
+    expect(strategySavepoint(fn () => WavePersona::factory()->create(['wave_id' => $wave->id, 'market' => 'SK', 'slot' => 2, 'code' => 'B2B'])))
+        ->toThrow(UniqueConstraintViolationException::class);
+
+    WavePersona::factory()->create(['wave_id' => $wave->id, 'market' => 'RO', 'slot' => 1, 'code' => 'B2B']);
+    expect(WavePersona::query()->count())->toBe(2);
+});
+
+it('T3: the composite foreign keys refuse an angle whose USP or persona is in another wave (DB level)', function (): void {
+    $waveA = Wave::factory()->create();
+    $persona = WavePersona::factory()->create(['wave_id' => $waveA->id, 'agency_id' => $waveA->agency_id]);
+    $uspOfB = WaveUsp::factory()->create();   // its own wave
+    $uspOfA = WaveUsp::factory()->create(['wave_id' => $waveA->id, 'agency_id' => $waveA->agency_id]);
+
+    $row = fn (int $uspId, int $personaId, int $waveId): array => [
+        'ulid' => (string) Str::ulid(), 'agency_id' => $waveA->agency_id, 'wave_id' => $waveId,
+        'persona_id' => $personaId, 'usp_id' => $uspId, 'explanation' => 'x', 'origin' => 'manual',
+        'created_at' => now(), 'updated_at' => now(),
+    ];
+
+    expect(strategySavepoint(fn () => DB::table('wave_persona_angles')->insert($row($uspOfB->id, $persona->id, $waveA->id))))
+        ->toThrow(QueryException::class);
+    $personaOfB = WavePersona::factory()->create();
+    expect(strategySavepoint(fn () => DB::table('wave_persona_angles')->insert($row($uspOfA->id, $personaOfB->id, $waveA->id))))
+        ->toThrow(QueryException::class);
+
+    // The honest row is accepted.
+    DB::table('wave_persona_angles')->insert($row($uspOfA->id, $persona->id, $waveA->id));
+    expect(WavePersonaAngle::query()->count())->toBe(1);
+});
+
+it('C5: RESTRICT: a USP an angle uses, a persona with angles and a wave with strategy rows cannot be hard-deleted', function (): void {
+    $angle = WavePersonaAngle::factory()->create();
+
+    expect(strategySavepoint(fn () => DB::table('wave_usps')->where('id', $angle->usp_id)->delete()))->toThrow(QueryException::class);
+    expect(strategySavepoint(fn () => DB::table('wave_personas')->where('id', $angle->persona_id)->delete()))->toThrow(QueryException::class);
+    expect(strategySavepoint(fn () => DB::table('waves')->where('id', $angle->wave_id)->delete()))->toThrow(QueryException::class);
+    expect(WavePersonaAngle::query()->count())->toBe(1);
+});
+
+it('P1: unique (persona_id, usp_id) refuses a second angle of a persona on one USP', function (): void {
+    $angle = WavePersonaAngle::factory()->create();
+
+    expect(strategySavepoint(fn () => WavePersonaAngle::factory()->create(['persona_id' => $angle->persona_id, 'usp_id' => $angle->usp_id])))
+        ->toThrow(UniqueConstraintViolationException::class);
+});
+
+it('P1: a new persona defaults to pronoun they and no text; colours wrap the six for slots 7 and 8', function (): void {
+    $fresh = WavePersona::query()->findOrFail(WavePersona::factory()->create()->id);
+
+    expect($fresh->pronoun->value)->toBe('they')
+        ->and($fresh->drivers)->toBeNull()
+        ->and($fresh->ulid)->toHaveLength(26)
+        ->and(UspColor::forSlot(1))->toBe(UspColor::Violet)
+        ->and(UspColor::forSlot(6))->toBe(UspColor::Pink)
+        ->and(UspColor::forSlot(7))->toBe(UspColor::Violet)
+        ->and(UspColor::forSlot(8))->toBe(UspColor::Green);
+});

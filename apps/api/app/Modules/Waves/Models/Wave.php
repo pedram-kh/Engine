@@ -33,6 +33,7 @@ use Illuminate\Support\Carbon;
  * @property WaveStatus $status
  * @property int $created_by_user_id
  * @property Carbon|null $steps_provisioned_at
+ * @property string|null $usp_audience_title
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
