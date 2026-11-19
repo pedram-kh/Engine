@@ -533,6 +533,14 @@ enum AuditAction: string
     case WaveStreamRemoved = 'wave_stream.removed';
     case WaveStreamAdded = 'wave_stream.added';
 
+    // PL-2.1 — the strategy workspace (USPs). One audit row per request, literal payload keys: ids (ulids), colour keys,
+    // counts and field NAMES, never the card text. `wave_usp.updated` is written only when a field changed.
+    case WaveUspCreated = 'wave_usp.created';
+    case WaveUspUpdated = 'wave_usp.updated';
+    case WaveUspReordered = 'wave_usp.reordered';
+    case WaveUspDeleted = 'wave_usp.deleted';
+    case WaveAudienceTitleUpdated = 'wave.audience_title_updated';
+
     // Campaign attachments from the Files library, chunk B (AH-092). A
     // linkage action on the campaign, not a library action on the file — the
     // file's own audit trail (above) is unaffected by any of these. No
