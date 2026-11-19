@@ -60,4 +60,17 @@ final class StrategyFixtures
     {
         return self::url($w['agency'], $w['brand'], $w['wave'], $suffix);
     }
+
+    /** @return list<array{string, string}> method, suffix (after .../strategy/) */
+    public static function routeTable(): array
+    {
+        $u = '01HZZZZZZZZZZZZZZZZZZZZZZZ';
+
+        return [
+            ['GET', ''], ['PATCH', 'audience-title'],
+            ['GET', 'usps'], ['POST', 'usps'], ['PUT', 'usps/order'], ['PATCH', "usps/{$u}"], ['DELETE', "usps/{$u}"],
+            ['GET', 'personas'], ['POST', 'personas'], ['POST', 'personas/copy'], ['PATCH', "personas/{$u}"], ['DELETE', "personas/{$u}"],
+            ['POST', "personas/{$u}/angles"], ['PATCH', "personas/{$u}/angles/{$u}"], ['DELETE', "personas/{$u}/angles/{$u}"],
+        ];
+    }
 }

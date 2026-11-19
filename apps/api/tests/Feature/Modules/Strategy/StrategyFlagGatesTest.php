@@ -21,26 +21,13 @@ uses(TestCase::class, RefreshDatabase::class);
  * router, so a new strategy route fails here until it is added.
  */
 
-/** @return list<array{string, string}> method, suffix (after .../strategy/) */
-function strategyRouteTable(): array
-{
-    $u = '01HZZZZZZZZZZZZZZZZZZZZZZZ';
-
-    return [
-        ['GET', ''], ['PATCH', 'audience-title'],
-        ['GET', 'usps'], ['POST', 'usps'], ['PUT', 'usps/order'], ['PATCH', "usps/{$u}"], ['DELETE', "usps/{$u}"],
-        ['GET', 'personas'], ['POST', 'personas'], ['POST', 'personas/copy'], ['PATCH', "personas/{$u}"], ['DELETE', "personas/{$u}"],
-        ['POST', "personas/{$u}/angles"], ['PATCH', "personas/{$u}/angles/{$u}"], ['DELETE', "personas/{$u}/angles/{$u}"],
-    ];
-}
-
 it('K1, K2: the route table of the strategy module is covered by this gate test', function (): void {
     $routes = collect(app('router')->getRoutes()->getRoutes())
         ->filter(static fn ($r): bool => str_contains($r->uri(), '/waves/{wave}/strategy'))
         ->flatMap(static fn ($r): array => collect($r->methods())->reject(fn ($m) => in_array($m, ['HEAD'], true))->map(fn ($m) => $m.' '.$r->uri())->all())
         ->count();
 
-    expect($routes)->toBe(count(strategyRouteTable()));
+    expect($routes)->toBe(count(S::routeTable()));
 });
 
 it('K1: every strategy route is 404 not_found while strategy_enabled is OFF (waves ON), writes and audits nothing', function (): void {
@@ -48,7 +35,7 @@ it('K1: every strategy route is 404 not_found while strategy_enabled is OFF (wav
     Feature::deactivate(StrategyEnabled::NAME);
     $before = AuditLog::query()->count();
 
-    foreach (strategyRouteTable() as [$method, $suffix]) {
+    foreach (S::routeTable() as [$method, $suffix]) {
         S::call($w['admin'], $method, S::u($w, $suffix), ['title' => 'x', 'name' => 'x', 'market' => 'SK', 'order' => [], 'usp_audience_title' => 'x', 'from_market' => 'SK', 'to_market' => 'RO', 'usp' => 'x', 'explanation' => 'x'])
             ->assertNotFound()->assertJsonPath('errors.0.code', 'not_found');
     }
@@ -60,7 +47,7 @@ it('K2: every strategy route is 404 not_found while waves_enabled is OFF even wi
     Feature::deactivate(WavesEnabled::NAME);
     Feature::activate(StrategyEnabled::NAME);
 
-    foreach (strategyRouteTable() as [$method, $suffix]) {
+    foreach (S::routeTable() as [$method, $suffix]) {
         S::call($w['admin'], $method, S::u($w, $suffix), ['title' => 'x'])->assertNotFound()->assertJsonPath('errors.0.code', 'not_found');
     }
 });
