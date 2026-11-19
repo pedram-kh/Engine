@@ -67,3 +67,43 @@
 | T1                     | BelongsToAgency removed from WavePersonaAngle                                                                             | 1 failed, 4 passed (70 assertions)                | 5 passed (71 assertions)                |
 | C2                     | USP delete skips the renumber (positions keep a gap)                                                                      | 3 failed, 1 skipped, 19 passed (210 assertions)   | 1 skipped, 22 passed (215 assertions)   |
 | C4                     | USP delete: DB::transaction removed (the injected failure after the angle delete leaves the angles deleted)               | 1 failed, 1 skipped, 21 passed (214 assertions)   | 1 skipped, 22 passed (215 assertions)   |
+
+## Stage 2 (web)
+
+**Date:** 2026-11-19. Vitest, run from `apps/main` with `VITEST_MAX_WORKERS=4`. Each break was applied to the shipped file, the named spec file(s) run and watched failing, the file restored from the commit, the same specs run and watched passing. The "red" column is the Vitest `Tests` line with the break in; the "green" column is the line after the restore. The driver script is not in the repo.
+
+| Gate                  | Break                                                                                | Red                      | Green          |
+| --------------------- | ------------------------------------------------------------------------------------ | ------------------------ | -------------- |
+| W-OFF                 | entry button drawn with v-if instead of the zero-or-one list (leaves a comment node) | 1 failed, 3 passed (4)   | 4 passed (4)   |
+| W1 (waves)            | page does not check the waves flag                                                   | 1 failed, 4 passed (5)   | 5 passed (5)   |
+| W1 (strategy)         | page does not check the strategy flag                                                | 1 failed, 4 passed (5)   | 5 passed (5)   |
+| W1 (no request first) | flag check runs after the data is requested                                          | 2 failed, 3 passed (5)   | 5 passed (5)   |
+| W3                    | locked steps become live links                                                       | 1 failed, 4 passed (5)   | 5 passed (5)   |
+| W4 (max)              | Add USP never disabled at the maximum                                                | 1 failed, 11 passed (12) | 12 passed (12) |
+| W4 (warning)          | warning under four removed                                                           | 1 failed, 11 passed (12) | 12 passed (12) |
+| W5 (explicit save)    | dialog saves without validating the title                                            | 1 failed, 11 passed (12) | 12 passed (12) |
+| W5 (partial PATCH)    | edit sends every field, changed or not                                               | 1 failed, 11 passed (12) | 12 passed (12) |
+| W6                    | reorder sends only the first id, not the full list                                   | 1 failed, 11 passed (12) | 12 passed (12) |
+| W6 (reload)           | refused order does not reload the grid                                               | 1 failed, 11 passed (12) | 12 passed (12) |
+| W7 (count)            | delete of an in-use USP sends no confirm count                                       | 1 failed, 11 passed (12) | 12 passed (12) |
+| W7 (409 refresh)      | 409 usp.in_use is not read; the stale list stays                                     | 1 failed, 11 passed (12) | 12 passed (12) |
+| W7 (staff)            | staff may delete an in-use USP in the UI                                             | 1 failed, 11 passed (12) | 12 passed (12) |
+| W7 (list)             | affected list not built from the personas                                            | 1 failed, 11 passed (12) | 12 passed (12) |
+| W8 (address)          | active market ignores ?market=                                                       | 1 failed, 12 passed (13) | 13 passed (13) |
+| W8 (dot)              | dot under two removed                                                                | 1 failed, 12 passed (13) | 13 passed (13) |
+| W9 (max)              | Add persona never disabled at eight                                                  | 1 failed, 12 passed (13) | 13 passed (13) |
+| W9 (warning)          | persona warning under two removed                                                    | 1 failed, 12 passed (13) | 13 passed (13) |
+| W9 (pronoun)          | need label ignores the pronoun                                                       | 1 failed, 12 passed (13) | 13 passed (13) |
+| W10 (linked)          | USP list never marks a linked USP                                                    | 1 failed, 12 passed (13) | 13 passed (13) |
+| W10 (empty line)      | angle with an empty line is sent                                                     | 1 failed, 12 passed (13) | 13 passed (13) |
+| W11 (copy cap)        | copy button not disabled over the maximum                                            | 1 failed, 12 passed (13) | 13 passed (13) |
+| W11 (all)             | copy always sends the tick list instead of omitting it for all                       | 1 failed, 12 passed (13) | 13 passed (13) |
+| W11 (delete count)    | persona delete does not say how many angles go                                       | 1 failed, 12 passed (13) | 13 passed (13) |
+| H1 (plain text, spec) | USP title drawn with v-html                                                          | 2 failed, 12 passed (14) | 14 passed (14) |
+| H1 (arch, innerHTML)  | a component writes innerHTML                                                         | 1 failed, 1 passed (2)   | 2 passed (2)   |
+| H2                    | persona title drawn with v-html                                                      | 1 failed, 12 passed (13) | 13 passed (13) |
+| E1 (reader)           | marketHasPersonasMeta returns null always                                            | 1 failed, 16 passed (17) | 17 passed (17) |
+| E2 (reader)           | uspInUseMeta ignores the affected list                                               | 1 failed, 11 passed (12) | 12 passed (12) |
+| I1 (parity)           | a placeholder dropped in one locale (de usp.counter)                                 | 1 failed, 6 passed (7)   | 7 passed (7)   |
+| I2 (english copy)     | one locale ships the English text (fr usp.warning)                                   | 1 failed, 6 passed (7)   | 7 passed (7)   |
+| R1 (route pin)        | a strategy route renamed so it is not in the pinned set                              | 1 failed, 2 passed (3)   | 3 passed (3)   |

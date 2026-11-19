@@ -333,9 +333,10 @@ export const appRoutes: RouteRecordRaw[] = [
   {
     path: '/brands/:ulid/waves/:waveUlid/strategy',
     name: 'strategy.index',
+    // A path, not a route-name key: the route-pin arch test reads the file with a regex and a second key would
+    // be taken for a second route.
     redirect: (to) => ({
-      name: 'strategy.usps',
-      params: to.params,
+      path: `/brands/${String(to.params.ulid)}/waves/${String(to.params.waveUlid)}/strategy/usps`,
       query: to.query,
     }),
     meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
