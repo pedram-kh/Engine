@@ -1481,7 +1481,8 @@
         "campaignLinkLocked": "Tekijä on valittu tai pidemmällä tässä kampanjassa, joten linkkiä ei voi muuttaa.",
         "brandArchived": "Tämä brändi on arkistoitu. Palauta se muuttaaksesi sen aaltoja.",
         "saveFailed": "Aallon tallentaminen epäonnistui. Yritä uudelleen.",
-        "waveNotAvailable": "Tätä aaltoa ei voi liittää tähän kampanjaan."
+        "waveNotAvailable": "Tätä aaltoa ei voi liittää tähän kampanjaan.",
+        "marketHasPersonas": "Poista ensin näiden markkinoiden personat: {markets}."
       },
       "dialog": {
         "createTitle": "Uusi aalto",
@@ -1683,6 +1684,177 @@
         "deleteFailed": "Tiedoston poistaminen epäonnistui. Yritä uudelleen.",
         "downloadFailed": "Latausta ei voitu aloittaa.",
         "brandArchived": "Tämä brändi on arkistoitu. Palauta se muuttaaksesi sen tiedostoja."
+      }
+    },
+    "strategy": {
+      "title": "Strategia ja käsikirjoitukset",
+      "entry": "Strategia ja käsikirjoitukset",
+      "back": "Takaisin aaltoon",
+      "cancel": "Peruuta",
+      "close": "Sulje",
+      "save": "Tallenna",
+      "stepper": {
+        "label": "Strategian vaiheet",
+        "usps": "USP:t",
+        "personas": "Personat",
+        "matrix": "Viestimatriisi",
+        "concepts": "Konseptit",
+        "creators": "Tekijät",
+        "scripts": "Käsikirjoitukset",
+        "uspNone": "Ei vielä USP:itä",
+        "statusUsps": "{count} USP | {count} USP:tä",
+        "personaNone": "Ei vielä personia",
+        "statusPersonas": "{count} persona · {covered} / {markets} markkinaa | {count} personaa · {covered} / {markets} markkinaa",
+        "notAvailable": "Ei vielä saatavilla",
+        "locked": "Lukittu, kunnes kaikki konseptit on hyväksytty"
+      },
+      "audience": {
+        "label": "Kohderyhmän otsikko",
+        "placeholder": "Lisää kohderyhmän otsikko",
+        "edit": "Muokkaa kohderyhmän otsikkoa",
+        "dialogTitle": "Kohderyhmän otsikko"
+      },
+      "usp": {
+        "title": "USP:t",
+        "subtitle": "4–6 aaltoa kohden, yhteiset kaikille markkinoille.",
+        "counter": "{count} / {max} USP:tä",
+        "counterMax": "{count} / {max} USP:tä · enimmäismäärä saavutettu",
+        "add": "Lisää USP",
+        "maxReason": "Aallolla on enintään {max} USP:tä.",
+        "warning": "Lisää vähintään {min} USP:tä täydellistä kokonaisuutta varten.",
+        "emptyTitle": "Ei vielä USP:itä",
+        "emptyBody": "Lisää myyntiargumentit, joihin tämä aalto perustuu.",
+        "explainer": "Selitys",
+        "creativeAngle": "Luova näkökulma",
+        "copySeed": "Tekstin ohjeet",
+        "menu": "Toiminnot: {title}",
+        "edit": "Muokkaa",
+        "delete": "Poista",
+        "moveEarlier": "Siirrä aiemmaksi",
+        "moveLater": "Siirrä myöhemmäksi",
+        "deleteStaffReason": "Vain admin tai manageri voi poistaa USP:n, jota personat käyttävät.",
+        "usedBy": "{count} näkökulman käytössä | {count} näkökulman käytössä",
+        "validation": {
+          "titleRequired": "Anna otsikko."
+        },
+        "dialog": {
+          "addTitle": "Lisää USP",
+          "editTitle": "Muokkaa USP:tä",
+          "title": "Otsikko",
+          "colourAuto": "Väri annetaan automaattisesti.",
+          "colourFixed": "Tämän kortin väri."
+        },
+        "deleteDialog": {
+          "title": "Poistetaanko ”{title}”?",
+          "body": "Mikään persona ei käytä tätä USP:tä.",
+          "bodyInUse": "{count} näkökulma käyttää tätä USP:tä ja poistuu sen mukana: | {count} näkökulmaa käyttää tätä USP:tä ja poistuu sen mukana:",
+          "confirmInUse": "Poista ja poista {count} näkökulma | Poista ja poista {count} näkökulmaa",
+          "refreshed": "Luettelo muuttui ikkunan ollessa auki. Tarkista se ja vahvista uudelleen."
+        }
+      },
+      "persona": {
+        "markets": "Markkinat",
+        "title": "Personat · {market}",
+        "subtitle": "{min}–{max} personaa markkinaa kohden. Luovat näkökulmat viittaavat vaiheen 1 USP:iin.",
+        "add": "Lisää persona",
+        "tile": "Lisää persona · käytössä {count} / {max}, {market}",
+        "tileMax": "Käytössä {count} / {max}, {market} · enimmäismäärä saavutettu",
+        "warning": "Lisää vähintään {min} personaa markkinalle {market}.",
+        "fewerThanMin": "Alle {min} personaa",
+        "empty": "Markkinalla {market} ei ole vielä personia.",
+        "coreJob": "Ydintehtävä",
+        "drivers": "Tunnepohjaiset motiivit",
+        "goals": "Arvot ja tavoitteet",
+        "selfTalk": {
+          "she": "Mitä hän sanoo itselleen (nainen)",
+          "he": "Mitä hän sanoo itselleen (mies)",
+          "they": "Mitä he sanovat itselleen"
+        },
+        "need": {
+          "she": "Mitä hän tarvitsee (nainen)",
+          "he": "Mitä hän tarvitsee (mies)",
+          "they": "Mitä he tarvitsevat"
+        },
+        "barriers": "Esteet ja kitka",
+        "angles": "Vakuuttavat luovat näkökulmat",
+        "nameLine": "Nimi · {name}",
+        "menu": "Toiminnot: {name}",
+        "edit": "Muokkaa",
+        "delete": "Poista",
+        "deleteTitle": "Poistetaanko {name}?",
+        "deleteBody": "Persona poistetaan.",
+        "deleteBodyAngles": "Persona ja sen {count} näkökulma poistetaan. | Persona ja sen {count} näkökulmaa poistetaan.",
+        "addedByHand": "Lisätty käsin",
+        "linked": "Linkitetty",
+        "addAngle": "Lisää näkökulma USP:istä",
+        "noUsps": "Lisää ensin USP:t vaiheessa 1.",
+        "goToUsps": "Siirry USP:ihin",
+        "angleAdd": "Lisää",
+        "angleEdit": "Muokkaa",
+        "angleRemove": "Poista",
+        "angleMenu": "Toiminnot näkökulmalle {title}",
+        "anglePlaceholder": "Miten tämä persona liittyy USP:hen",
+        "angleText": "Näkökulman teksti",
+        "removeAngleTitle": "Poistetaanko tämä näkökulma?",
+        "removeAngleBody": "Näkökulma ”{usp}” poistetaan tältä personalta.",
+        "pronounName": {
+          "she": "Hän (nainen)",
+          "he": "Hän (mies)",
+          "they": "He"
+        },
+        "dialog": {
+          "addTitle": "Lisää persona · {market}",
+          "editTitle": "Muokkaa personaa",
+          "code": "Koodi",
+          "codeAuto": "Automaattinen",
+          "codeHint": "{min}–{max} kirjainta tai numeroa, yksilöllinen markkinalla.",
+          "title": "Otsikko",
+          "name": "Nimi",
+          "nameHint": "Personan keksitty nimi, ei oikea henkilö.",
+          "pronoun": "Pronomini",
+          "pronounHint": "Muuttaa vain nimikkeiden sanamuotoa.",
+          "summary": "Yhteenveto",
+          "listCount": "{count} / {max}",
+          "addItem": "Lisää kohta",
+          "removeItem": "Poista kohta"
+        },
+        "validation": {
+          "titleRequired": "Anna otsikko.",
+          "nameRequired": "Anna nimi.",
+          "codeRequired": "Anna koodi.",
+          "codeFormat": "Käytä {min}–{max} kirjainta tai numeroa.",
+          "angleRequired": "Kirjoita rivi."
+        }
+      },
+      "copy": {
+        "open": "Kopioi kohteesta…",
+        "title": "Kopioi personat markkinalle {market}",
+        "source": "Kopioi kohteesta",
+        "submit": "Kopioi",
+        "line": "Kopioidaan {count} → markkinalla {market} on {total} / {max}",
+        "over": "Kopioidaan {count} → markkinalla {market} olisi {total} / {max}: yli enimmäismäärän."
+      },
+      "validation": {
+        "tooLong": "Enintään {max} merkkiä."
+      },
+      "errors": {
+        "loadFailed": "Lataus epäonnistui. Yritä uudelleen.",
+        "saveFailed": "Tallennus epäonnistui. Yritä uudelleen.",
+        "gone": "Joku muu poisti tämän. Sulje ja lataa uudelleen.",
+        "workspaceGone": "Tätä strategiatyötilaa ei löytynyt.",
+        "uspMaxReached": "Aallolla on jo USP:iden enimmäismäärä.",
+        "uspOrderMismatch": "USP:t ovat muuttuneet sivun latauksen jälkeen. Luettelo ladattiin uudelleen; yritä uudelleen.",
+        "uspInUse": "Personat käyttävät tätä USP:tä. Vahvista, jos haluat poistaa sen näkökulmineen.",
+        "personaMaxReached": "Tällä markkinalla on jo personien enimmäismäärä.",
+        "personaMarketNotInWave": "Tämä markkina ei kuulu tämän aallon markkinoihin.",
+        "personaCodeTaken": "Toinen persona tällä markkinalla käyttää jo tätä koodia.",
+        "copyInvalid": "Valitse kaksi eri markkinaa tästä aallosta ja vähintään yksi persona.",
+        "copyExceedsCap": "{copy} personan kopiointi markkinalle, jolla on {target}, ylittäisi enimmäismäärän {max}.",
+        "copyExceedsCapPlain": "Tämä kopiointi ylittäisi personien enimmäismäärän.",
+        "angleAlreadyLinked": "Tällä personalla on jo näkökulma tähän USP:hen.",
+        "conflict": "Joku muutti tätä samaan aikaan. Lataa uudelleen ja yritä uudelleen.",
+        "brandArchived": "Arkistoitu brändi on vain luettavissa. Palauta se ensin.",
+        "forbidden": "Vain admin tai manageri voi tehdä tämän."
       }
     }
   },

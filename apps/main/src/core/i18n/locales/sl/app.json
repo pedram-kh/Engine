@@ -1481,7 +1481,8 @@
         "campaignLinkLocked": "V tej kampanji je ustvarjalec izbran ali dlje, zato povezave ni mogoče spremeniti.",
         "brandArchived": "Ta znamka je arhivirana. Obnovite jo, da boste lahko spreminjali njene valove.",
         "saveFailed": "Vala ni bilo mogoče shraniti. Poskusite znova.",
-        "waveNotAvailable": "Tega vala ni mogoče povezati s to kampanjo."
+        "waveNotAvailable": "Tega vala ni mogoče povezati s to kampanjo.",
+        "marketHasPersonas": "Najprej odstranite persone teh trgov: {markets}."
       },
       "dialog": {
         "createTitle": "Nov val",
@@ -1683,6 +1684,177 @@
         "deleteFailed": "Datoteke ni bilo mogoče izbrisati. Poskusite znova.",
         "downloadFailed": "Prenosa ni bilo mogoče začeti.",
         "brandArchived": "Ta znamka je arhivirana. Obnovite jo, da boste lahko spreminjali njene datoteke."
+      }
+    },
+    "strategy": {
+      "title": "Strategija in scenariji",
+      "entry": "Strategija in scenariji",
+      "back": "Nazaj na val",
+      "cancel": "Prekliči",
+      "close": "Zapri",
+      "save": "Shrani",
+      "stepper": {
+        "label": "Koraki strategije",
+        "usps": "USP",
+        "personas": "Persone",
+        "matrix": "Matrika sporočil",
+        "concepts": "Koncepti",
+        "creators": "Ustvarjalci",
+        "scripts": "Scenariji",
+        "uspNone": "Še ni USP",
+        "statusUsps": "{count} USP | {count} USP",
+        "personaNone": "Še ni person",
+        "statusPersonas": "{count} persona · {covered} od {markets} trgov | {count} person · {covered} od {markets} trgov",
+        "notAvailable": "Še ni na voljo",
+        "locked": "Zaklenjeno, dokler niso potrjeni vsi koncepti"
+      },
+      "audience": {
+        "label": "Naslov ciljne skupine",
+        "placeholder": "Dodajte naslov ciljne skupine",
+        "edit": "Uredi naslov ciljne skupine",
+        "dialogTitle": "Naslov ciljne skupine"
+      },
+      "usp": {
+        "title": "USP",
+        "subtitle": "4–6 na val, skupni vsem trgom.",
+        "counter": "{count} od {max} USP",
+        "counterMax": "{count} od {max} USP · doseženo največje število",
+        "add": "Dodaj USP",
+        "maxReason": "Val ima največ {max} USP.",
+        "warning": "Dodajte vsaj {min} USP za popoln nabor.",
+        "emptyTitle": "Še ni USP",
+        "emptyBody": "Dodajte prodajne argumente, na katerih temelji ta val.",
+        "explainer": "Razlaga",
+        "creativeAngle": "Ustvarjalni kot",
+        "copySeed": "Smernice za besedilo",
+        "menu": "Dejanja za {title}",
+        "edit": "Uredi",
+        "delete": "Izbriši",
+        "moveEarlier": "Premakni naprej",
+        "moveLater": "Premakni nazaj",
+        "deleteStaffReason": "USP, ki ga uporabljajo persone, lahko izbriše samo admin ali manager.",
+        "usedBy": "Uporablja {count} kot | Uporablja {count} kotov",
+        "validation": {
+          "titleRequired": "Vnesite naslov."
+        },
+        "dialog": {
+          "addTitle": "Dodaj USP",
+          "editTitle": "Uredi USP",
+          "title": "Naslov",
+          "colourAuto": "Barva se dodeli samodejno.",
+          "colourFixed": "Barva te kartice."
+        },
+        "deleteDialog": {
+          "title": "Izbrišem »{title}«?",
+          "body": "Nobena persona ne uporablja tega USP.",
+          "bodyInUse": "{count} kot uporablja ta USP in se odstrani z njim: | {count} kotov uporablja ta USP in se odstranijo z njim:",
+          "confirmInUse": "Izbriši in odstrani {count} kot | Izbriši in odstrani {count} kotov",
+          "refreshed": "Seznam se je spremenil, medtem ko je bilo okno odprto. Preverite ga in znova potrdite."
+        }
+      },
+      "persona": {
+        "markets": "Trgi",
+        "title": "Persone · {market}",
+        "subtitle": "{min}–{max} person na trg. Ustvarjalni koti se navezujejo na USP iz koraka 1.",
+        "add": "Dodaj persono",
+        "tile": "Dodaj persono · porabljeno {count} od {max} na trgu {market}",
+        "tileMax": "Porabljeno {count} od {max} na trgu {market} · doseženo največje število",
+        "warning": "Dodajte vsaj {min} person za trg {market}.",
+        "fewerThanMin": "Manj kot {min} person",
+        "empty": "Za trg {market} še ni person.",
+        "coreJob": "Glavna naloga",
+        "drivers": "Čustveni motivi",
+        "goals": "Vrednote in cilji",
+        "selfTalk": {
+          "she": "Kaj si reče ona",
+          "he": "Kaj si reče on",
+          "they": "Kaj si rečejo oni"
+        },
+        "need": {
+          "she": "Kaj potrebuje ona",
+          "he": "Kaj potrebuje on",
+          "they": "Kaj potrebujejo oni"
+        },
+        "barriers": "Ovire in trenja",
+        "angles": "Ustvarjalni koti, ki prepričajo",
+        "nameLine": "Ime · {name}",
+        "menu": "Dejanja za {name}",
+        "edit": "Uredi",
+        "delete": "Izbriši",
+        "deleteTitle": "Izbrišem {name}?",
+        "deleteBody": "Persona se odstrani.",
+        "deleteBodyAngles": "Persona in njen {count} kot se odstranita. | Persona in njenih {count} kotov se odstrani.",
+        "addedByHand": "Dodano ročno",
+        "linked": "Povezano",
+        "addAngle": "Dodaj kot iz USP",
+        "noUsps": "Najprej dodajte USP v koraku 1.",
+        "goToUsps": "Pojdi na USP",
+        "angleAdd": "Dodaj",
+        "angleEdit": "Uredi",
+        "angleRemove": "Odstrani",
+        "angleMenu": "Dejanja za kot {title}",
+        "anglePlaceholder": "Kako se ta persona povezuje z USP",
+        "angleText": "Besedilo kota",
+        "removeAngleTitle": "Odstranim ta kot?",
+        "removeAngleBody": "Kot za »{usp}« se odstrani iz te persone.",
+        "pronounName": {
+          "she": "Ona",
+          "he": "On",
+          "they": "Oni / one"
+        },
+        "dialog": {
+          "addTitle": "Dodaj persono · {market}",
+          "editTitle": "Uredi persono",
+          "code": "Koda",
+          "codeAuto": "Samodejno",
+          "codeHint": "{min}–{max} črk ali števk, enolična na trgu.",
+          "title": "Naslov",
+          "name": "Ime",
+          "nameHint": "Izmišljeno ime persone, ne resnična oseba.",
+          "pronoun": "Zaimek",
+          "pronounHint": "Spremeni le besedilo oznak.",
+          "summary": "Povzetek",
+          "listCount": "{count} od {max}",
+          "addItem": "Dodaj postavko",
+          "removeItem": "Odstrani postavko"
+        },
+        "validation": {
+          "titleRequired": "Vnesite naslov.",
+          "nameRequired": "Vnesite ime.",
+          "codeRequired": "Vnesite kodo.",
+          "codeFormat": "Uporabite {min}–{max} črk ali števk.",
+          "angleRequired": "Vnesite vrstico."
+        }
+      },
+      "copy": {
+        "open": "Kopiraj iz …",
+        "title": "Kopiraj persone na trg {market}",
+        "source": "Kopiraj iz",
+        "submit": "Kopiraj",
+        "line": "Kopiranje {count} → trg {market} bo imel {total} od {max}",
+        "over": "Kopiranje {count} → trg {market} bi imel {total} od {max}: nad največjim številom."
+      },
+      "validation": {
+        "tooLong": "Največ {max} znakov."
+      },
+      "errors": {
+        "loadFailed": "Nalaganje ni uspelo. Poskusite znova.",
+        "saveFailed": "Shranjevanje ni uspelo. Poskusite znova.",
+        "gone": "To je odstranil nekdo drug. Zaprite in znova naložite.",
+        "workspaceGone": "Tega strateškega prostora ni mogoče najti.",
+        "uspMaxReached": "Val ima že največje število USP.",
+        "uspOrderMismatch": "USP so se spremenili od nalaganja strani. Seznam je bil znova naložen; poskusite znova.",
+        "uspInUse": "Ta USP uporabljajo persone. Potrdite, da se odstrani skupaj z njegovimi koti.",
+        "personaMaxReached": "Ta trg ima že največje število person.",
+        "personaMarketNotInWave": "Ta trg ni med trgi tega vala.",
+        "personaCodeTaken": "To kodo že uporablja druga persona na tem trgu.",
+        "copyInvalid": "Izberite dva različna trga tega vala in vsaj eno persono.",
+        "copyExceedsCap": "Kopiranje {copy} person na trg, ki jih ima {target}, bi preseglo največ {max}.",
+        "copyExceedsCapPlain": "Ta kopija bi presegla največje število person.",
+        "angleAlreadyLinked": "Ta persona že ima kot za ta USP.",
+        "conflict": "Nekdo je to spremenil istočasno. Znova naložite in poskusite znova.",
+        "brandArchived": "Arhivirana blagovna znamka je samo za branje. Najprej jo obnovite.",
+        "forbidden": "To lahko stori samo admin ali manager."
       }
     }
   },

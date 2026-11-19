@@ -1481,7 +1481,8 @@
         "campaignLinkLocked": "Hay un creador seleccionado o más avanzado en esta campaña, así que el vínculo no se puede cambiar.",
         "brandArchived": "Esta marca está archivada. Restáurala para cambiar sus oleadas.",
         "saveFailed": "No se pudo guardar la oleada. Inténtalo de nuevo.",
-        "waveNotAvailable": "Esa oleada no se puede vincular a esta campaña."
+        "waveNotAvailable": "Esa oleada no se puede vincular a esta campaña.",
+        "marketHasPersonas": "Quita primero las personas de estos mercados: {markets}."
       },
       "dialog": {
         "createTitle": "Nueva oleada",
@@ -1683,6 +1684,177 @@
         "deleteFailed": "No se pudo eliminar el archivo. Inténtalo de nuevo.",
         "downloadFailed": "No se pudo iniciar la descarga.",
         "brandArchived": "Esta marca está archivada. Restáurala para cambiar sus archivos."
+      }
+    },
+    "strategy": {
+      "title": "Estrategia y guiones",
+      "entry": "Estrategia y guiones",
+      "back": "Volver a la oleada",
+      "cancel": "Cancelar",
+      "close": "Cerrar",
+      "save": "Guardar",
+      "stepper": {
+        "label": "Pasos de la estrategia",
+        "usps": "USP",
+        "personas": "Personas",
+        "matrix": "Matriz de mensajes",
+        "concepts": "Conceptos",
+        "creators": "Creadores",
+        "scripts": "Guiones",
+        "uspNone": "Aún no hay USP",
+        "statusUsps": "{count} USP | {count} USP",
+        "personaNone": "Aún no hay personas",
+        "statusPersonas": "{count} persona · {covered} de {markets} mercados | {count} personas · {covered} de {markets} mercados",
+        "notAvailable": "Aún no disponible",
+        "locked": "Bloqueado hasta que se aprueben todos los conceptos"
+      },
+      "audience": {
+        "label": "Título de la audiencia",
+        "placeholder": "Añade un título de audiencia",
+        "edit": "Editar el título de la audiencia",
+        "dialogTitle": "Título de la audiencia"
+      },
+      "usp": {
+        "title": "USP",
+        "subtitle": "De 4 a 6 por oleada, comunes a todos los mercados.",
+        "counter": "{count} de {max} USP",
+        "counterMax": "{count} de {max} USP · máximo alcanzado",
+        "add": "Añadir USP",
+        "maxReason": "Una oleada tiene como máximo {max} USP.",
+        "warning": "Añade al menos {min} USP para un conjunto completo.",
+        "emptyTitle": "Aún no hay USP",
+        "emptyBody": "Añade los argumentos de venta en los que se basa esta oleada.",
+        "explainer": "Explicación",
+        "creativeAngle": "Ángulo creativo",
+        "copySeed": "Pautas para el texto",
+        "menu": "Acciones para {title}",
+        "edit": "Editar",
+        "delete": "Eliminar",
+        "moveEarlier": "Mover antes",
+        "moveLater": "Mover después",
+        "deleteStaffReason": "Solo un admin o un manager puede eliminar una USP que usan personas.",
+        "usedBy": "Usada por {count} ángulo | Usada por {count} ángulos",
+        "validation": {
+          "titleRequired": "Escribe un título."
+        },
+        "dialog": {
+          "addTitle": "Añadir USP",
+          "editTitle": "Editar USP",
+          "title": "Título",
+          "colourAuto": "El color se asigna automáticamente.",
+          "colourFixed": "El color de esta tarjeta."
+        },
+        "deleteDialog": {
+          "title": "¿Eliminar «{title}»?",
+          "body": "Ninguna persona usa esta USP.",
+          "bodyInUse": "{count} ángulo usa esta USP y se eliminará con ella: | {count} ángulos usan esta USP y se eliminarán con ella:",
+          "confirmInUse": "Eliminar y quitar {count} ángulo | Eliminar y quitar {count} ángulos",
+          "refreshed": "La lista cambió mientras esto estaba abierto. Revísala y confirma de nuevo."
+        }
+      },
+      "persona": {
+        "markets": "Mercados",
+        "title": "Personas · {market}",
+        "subtitle": "De {min} a {max} personas por mercado. Los ángulos creativos enlazan con las USP del paso 1.",
+        "add": "Añadir persona",
+        "tile": "Añadir persona · {count} de {max} usadas en {market}",
+        "tileMax": "{count} de {max} usadas en {market} · máximo alcanzado",
+        "warning": "Añade al menos {min} personas para {market}.",
+        "fewerThanMin": "Menos de {min} personas",
+        "empty": "Aún no hay personas para {market}.",
+        "coreJob": "Tarea principal",
+        "drivers": "Motivadores emocionales",
+        "goals": "Valores y objetivos",
+        "selfTalk": {
+          "she": "Lo que ella se dice",
+          "he": "Lo que él se dice",
+          "they": "Lo que se dicen"
+        },
+        "need": {
+          "she": "Lo que ella necesita",
+          "he": "Lo que él necesita",
+          "they": "Lo que necesitan"
+        },
+        "barriers": "Barreras y fricciones",
+        "angles": "Ángulos creativos que convencen",
+        "nameLine": "Nombre · {name}",
+        "menu": "Acciones para {name}",
+        "edit": "Editar",
+        "delete": "Eliminar",
+        "deleteTitle": "¿Eliminar a {name}?",
+        "deleteBody": "Se eliminará la persona.",
+        "deleteBodyAngles": "Se eliminarán la persona y su {count} ángulo. | Se eliminarán la persona y sus {count} ángulos.",
+        "addedByHand": "Añadido a mano",
+        "linked": "Vinculado",
+        "addAngle": "Añadir ángulo desde las USP",
+        "noUsps": "Primero añade USP en el paso 1.",
+        "goToUsps": "Ir a las USP",
+        "angleAdd": "Añadir",
+        "angleEdit": "Editar",
+        "angleRemove": "Quitar",
+        "angleMenu": "Acciones para el ángulo {title}",
+        "anglePlaceholder": "Cómo conecta esta persona con la USP",
+        "angleText": "Texto del ángulo",
+        "removeAngleTitle": "¿Quitar este ángulo?",
+        "removeAngleBody": "El ángulo sobre «{usp}» se quitará de esta persona.",
+        "pronounName": {
+          "she": "Ella",
+          "he": "Él",
+          "they": "Ellos / ellas"
+        },
+        "dialog": {
+          "addTitle": "Añadir persona · {market}",
+          "editTitle": "Editar persona",
+          "code": "Código",
+          "codeAuto": "Automático",
+          "codeHint": "De {min} a {max} letras o cifras, único en el mercado.",
+          "title": "Título",
+          "name": "Nombre",
+          "nameHint": "Un nombre inventado para la persona, no una persona real.",
+          "pronoun": "Pronombre",
+          "pronounHint": "Solo cambia la redacción de las etiquetas.",
+          "summary": "Resumen",
+          "listCount": "{count} de {max}",
+          "addItem": "Añadir elemento",
+          "removeItem": "Quitar elemento"
+        },
+        "validation": {
+          "titleRequired": "Escribe un título.",
+          "nameRequired": "Escribe un nombre.",
+          "codeRequired": "Escribe un código.",
+          "codeFormat": "Usa de {min} a {max} letras o cifras.",
+          "angleRequired": "Escribe una línea."
+        }
+      },
+      "copy": {
+        "open": "Copiar desde…",
+        "title": "Copiar personas a {market}",
+        "source": "Copiar desde",
+        "submit": "Copiar",
+        "line": "Copiar {count} → {market} tendrá {total} de {max}",
+        "over": "Copiar {count} → {market} tendría {total} de {max}: supera el máximo."
+      },
+      "validation": {
+        "tooLong": "Máximo {max} caracteres."
+      },
+      "errors": {
+        "loadFailed": "No se pudo cargar. Inténtalo de nuevo.",
+        "saveFailed": "No se pudo guardar. Inténtalo de nuevo.",
+        "gone": "Alguien más eliminó esto. Cierra y recarga.",
+        "workspaceGone": "No se encontró este espacio de estrategia.",
+        "uspMaxReached": "La oleada ya tiene el número máximo de USP.",
+        "uspOrderMismatch": "Las USP cambiaron desde que se cargó la página. Se recargó la lista; inténtalo de nuevo.",
+        "uspInUse": "Hay personas que usan esta USP. Confirma para eliminarla junto con sus ángulos.",
+        "personaMaxReached": "Este mercado ya tiene el número máximo de personas.",
+        "personaMarketNotInWave": "Ese mercado no es uno de los mercados de esta oleada.",
+        "personaCodeTaken": "Otra persona de este mercado ya usa este código.",
+        "copyInvalid": "Elige dos mercados distintos de esta oleada y al menos una persona.",
+        "copyExceedsCap": "Copiar {copy} personas a un mercado que ya tiene {target} superaría el máximo de {max}.",
+        "copyExceedsCapPlain": "Esa copia superaría el número máximo de personas.",
+        "angleAlreadyLinked": "Esta persona ya tiene un ángulo en esa USP.",
+        "conflict": "Alguien cambió esto al mismo tiempo. Recarga e inténtalo de nuevo.",
+        "brandArchived": "Una marca archivada es de solo lectura. Restáurala primero.",
+        "forbidden": "Solo un admin o un manager puede hacer esto."
       }
     }
   },

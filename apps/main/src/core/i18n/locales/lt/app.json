@@ -1481,7 +1481,8 @@
         "campaignLinkLocked": "Šioje kampanijoje kūrėjas yra pasirinktas arba toliau, todėl nuorodos keisti negalima.",
         "brandArchived": "Šis prekių ženklas suarchyvuotas. Atkurkite jį, kad galėtumėte keisti jo bangas.",
         "saveFailed": "Nepavyko išsaugoti bangos. Bandykite dar kartą.",
-        "waveNotAvailable": "Šios bangos negalima susieti su šia kampanija."
+        "waveNotAvailable": "Šios bangos negalima susieti su šia kampanija.",
+        "marketHasPersonas": "Pirmiausia pašalinkite šių rinkų personas: {markets}."
       },
       "dialog": {
         "createTitle": "Nauja banga",
@@ -1683,6 +1684,177 @@
         "deleteFailed": "Nepavyko ištrinti failo. Bandykite dar kartą.",
         "downloadFailed": "Nepavyko pradėti atsisiuntimo.",
         "brandArchived": "Šis prekių ženklas suarchyvuotas. Atkurkite jį, kad galėtumėte keisti jo failus."
+      }
+    },
+    "strategy": {
+      "title": "Strategija ir scenarijai",
+      "entry": "Strategija ir scenarijai",
+      "back": "Atgal į bangą",
+      "cancel": "Atšaukti",
+      "close": "Uždaryti",
+      "save": "Išsaugoti",
+      "stepper": {
+        "label": "Strategijos žingsniai",
+        "usps": "USP",
+        "personas": "Personos",
+        "matrix": "Žinučių matrica",
+        "concepts": "Koncepcijos",
+        "creators": "Kūrėjai",
+        "scripts": "Scenarijai",
+        "uspNone": "USP dar nėra",
+        "statusUsps": "{count} USP | {count} USP",
+        "personaNone": "Personų dar nėra",
+        "statusPersonas": "{count} persona · {covered} iš {markets} rinkų | {count} personos · {covered} iš {markets} rinkų",
+        "notAvailable": "Dar neprieinama",
+        "locked": "Užrakinta, kol bus patvirtintos visos koncepcijos"
+      },
+      "audience": {
+        "label": "Auditorijos pavadinimas",
+        "placeholder": "Pridėkite auditorijos pavadinimą",
+        "edit": "Redaguoti auditorijos pavadinimą",
+        "dialogTitle": "Auditorijos pavadinimas"
+      },
+      "usp": {
+        "title": "USP",
+        "subtitle": "4–6 vienai bangai, bendri visoms rinkoms.",
+        "counter": "{count} iš {max} USP",
+        "counterMax": "{count} iš {max} USP · pasiektas maksimumas",
+        "add": "Pridėti USP",
+        "maxReason": "Banga gali turėti daugiausia {max} USP.",
+        "warning": "Pridėkite bent {min} USP, kad rinkinys būtų išsamus.",
+        "emptyTitle": "USP dar nėra",
+        "emptyBody": "Pridėkite pardavimo argumentus, kuriais remiasi ši banga.",
+        "explainer": "Paaiškinimas",
+        "creativeAngle": "Kūrybinis kampas",
+        "copySeed": "Teksto gairės",
+        "menu": "Veiksmai: {title}",
+        "edit": "Redaguoti",
+        "delete": "Ištrinti",
+        "moveEarlier": "Perkelti anksčiau",
+        "moveLater": "Perkelti vėliau",
+        "deleteStaffReason": "USP, kurį naudoja personos, gali ištrinti tik adminas arba vadovas.",
+        "usedBy": "Naudoja {count} kampas | Naudoja {count} kampai",
+        "validation": {
+          "titleRequired": "Įveskite pavadinimą."
+        },
+        "dialog": {
+          "addTitle": "Pridėti USP",
+          "editTitle": "Redaguoti USP",
+          "title": "Pavadinimas",
+          "colourAuto": "Spalva priskiriama automatiškai.",
+          "colourFixed": "Šios kortelės spalva."
+        },
+        "deleteDialog": {
+          "title": "Ištrinti „{title}“?",
+          "body": "Šio USP nenaudoja jokia persona.",
+          "bodyInUse": "{count} kampas naudoja šį USP ir bus pašalintas kartu su juo: | {count} kampai naudoja šį USP ir bus pašalinti kartu su juo:",
+          "confirmInUse": "Ištrinti ir pašalinti {count} kampą | Ištrinti ir pašalinti {count} kampus",
+          "refreshed": "Sąrašas pasikeitė, kol langas buvo atidarytas. Peržiūrėkite jį ir patvirtinkite dar kartą."
+        }
+      },
+      "persona": {
+        "markets": "Rinkos",
+        "title": "Personos · {market}",
+        "subtitle": "{min}–{max} personų vienai rinkai. Kūrybiniai kampai nurodo 1 žingsnio USP.",
+        "add": "Pridėti personą",
+        "tile": "Pridėti personą · panaudota {count} iš {max}, rinka {market}",
+        "tileMax": "Panaudota {count} iš {max}, rinka {market} · pasiektas maksimumas",
+        "warning": "Pridėkite bent {min} personų rinkai {market}.",
+        "fewerThanMin": "Mažiau nei {min} personų",
+        "empty": "Rinkai {market} personų dar nėra.",
+        "coreJob": "Pagrindinė užduotis",
+        "drivers": "Emociniai motyvai",
+        "goals": "Vertybės ir tikslai",
+        "selfTalk": {
+          "she": "Ką ji sako sau",
+          "he": "Ką jis sako sau",
+          "they": "Ką jie sako sau"
+        },
+        "need": {
+          "she": "Ko jai reikia",
+          "he": "Ko jam reikia",
+          "they": "Ko jiems reikia"
+        },
+        "barriers": "Kliūtys ir trintis",
+        "angles": "Įtikinami kūrybiniai kampai",
+        "nameLine": "Vardas · {name}",
+        "menu": "Veiksmai: {name}",
+        "edit": "Redaguoti",
+        "delete": "Ištrinti",
+        "deleteTitle": "Ištrinti {name}?",
+        "deleteBody": "Persona bus pašalinta.",
+        "deleteBodyAngles": "Persona ir jos {count} kampas bus pašalinti. | Persona ir jos {count} kampai bus pašalinti.",
+        "addedByHand": "Pridėta rankiniu būdu",
+        "linked": "Susieta",
+        "addAngle": "Pridėti kampą iš USP",
+        "noUsps": "Pirmiausia pridėkite USP 1 žingsnyje.",
+        "goToUsps": "Eiti į USP",
+        "angleAdd": "Pridėti",
+        "angleEdit": "Redaguoti",
+        "angleRemove": "Pašalinti",
+        "angleMenu": "Veiksmai kampui {title}",
+        "anglePlaceholder": "Kaip ši persona siejasi su USP",
+        "angleText": "Kampo tekstas",
+        "removeAngleTitle": "Pašalinti šį kampą?",
+        "removeAngleBody": "Kampas „{usp}“ bus pašalintas iš šios personos.",
+        "pronounName": {
+          "she": "Ji",
+          "he": "Jis",
+          "they": "Jie"
+        },
+        "dialog": {
+          "addTitle": "Pridėti personą · {market}",
+          "editTitle": "Redaguoti personą",
+          "code": "Kodas",
+          "codeAuto": "Automatinis",
+          "codeHint": "{min}–{max} raidės arba skaitmenys, rinkoje unikalus.",
+          "title": "Pavadinimas",
+          "name": "Vardas",
+          "nameHint": "Išgalvotas personos vardas, ne tikras žmogus.",
+          "pronoun": "Įvardis",
+          "pronounHint": "Keičia tik etikečių formuluotę.",
+          "summary": "Santrauka",
+          "listCount": "{count} iš {max}",
+          "addItem": "Pridėti elementą",
+          "removeItem": "Pašalinti elementą"
+        },
+        "validation": {
+          "titleRequired": "Įveskite pavadinimą.",
+          "nameRequired": "Įveskite vardą.",
+          "codeRequired": "Įveskite kodą.",
+          "codeFormat": "Naudokite {min}–{max} raides arba skaitmenis.",
+          "angleRequired": "Įveskite eilutę."
+        }
+      },
+      "copy": {
+        "open": "Kopijuoti iš…",
+        "title": "Kopijuoti personas į rinką {market}",
+        "source": "Kopijuoti iš",
+        "submit": "Kopijuoti",
+        "line": "Kopijuojama {count} → rinkoje {market} bus {total} iš {max}",
+        "over": "Kopijuojama {count} → rinkoje {market} būtų {total} iš {max}: viršija maksimumą."
+      },
+      "validation": {
+        "tooLong": "Daugiausia {max} simbolių."
+      },
+      "errors": {
+        "loadFailed": "Nepavyko įkelti. Bandykite dar kartą.",
+        "saveFailed": "Nepavyko išsaugoti. Bandykite dar kartą.",
+        "gone": "Tai pašalino kitas asmuo. Uždarykite ir įkelkite iš naujo.",
+        "workspaceGone": "Šios strategijos darbo srities nepavyko rasti.",
+        "uspMaxReached": "Banga jau turi didžiausią leidžiamą USP skaičių.",
+        "uspOrderMismatch": "USP pasikeitė nuo puslapio įkėlimo. Sąrašas įkeltas iš naujo; bandykite dar kartą.",
+        "uspInUse": "Šį USP naudoja personos. Patvirtinkite, kad jis būtų pašalintas kartu su kampais.",
+        "personaMaxReached": "Ši rinka jau turi didžiausią leidžiamą personų skaičių.",
+        "personaMarketNotInWave": "Ši rinka nepriklauso šios bangos rinkoms.",
+        "personaCodeTaken": "Šį kodą jau naudoja kita šios rinkos persona.",
+        "copyInvalid": "Pasirinkite dvi skirtingas šios bangos rinkas ir bent vieną personą.",
+        "copyExceedsCap": "Nukopijavus {copy} personų į rinką, kurioje jų yra {target}, būtų viršytas {max} maksimumas.",
+        "copyExceedsCapPlain": "Šis kopijavimas viršytų didžiausią personų skaičių.",
+        "angleAlreadyLinked": "Ši persona jau turi kampą šiam USP.",
+        "conflict": "Kažkas tai pakeitė tuo pačiu metu. Įkelkite iš naujo ir bandykite dar kartą.",
+        "brandArchived": "Archyvuotas prekės ženklas yra tik skaitomas. Pirmiausia jį atkurkite.",
+        "forbidden": "Tai gali padaryti tik adminas arba vadovas."
       }
     }
   },

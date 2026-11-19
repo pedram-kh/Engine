@@ -1481,7 +1481,8 @@
         "campaignLinkLocked": "Roghnaíodh cruthaitheoir nó tá sé níos faide ar aghaidh san fheachtas seo, mar sin ní féidir an nasc a athrú.",
         "brandArchived": "Tá an branda seo cartlannaithe. Athchóirigh é chun a thonnta a athrú.",
         "saveFailed": "Níorbh fhéidir an tonn a shábháil. Bain triail eile as.",
-        "waveNotAvailable": "Ní féidir an tonn sin a nascadh leis an bhfeachtas seo."
+        "waveNotAvailable": "Ní féidir an tonn sin a nascadh leis an bhfeachtas seo.",
+        "marketHasPersonas": "Bain pearsain na margaí seo ar dtús: {markets}."
       },
       "dialog": {
         "createTitle": "Tonn nua",
@@ -1683,6 +1684,177 @@
         "deleteFailed": "Níorbh fhéidir an comhad a scriosadh. Bain triail eile as.",
         "downloadFailed": "Níorbh fhéidir an íoslódáil a thosú.",
         "brandArchived": "Tá an branda seo cartlannaithe. Athchóirigh é chun a chomhaid a athrú."
+      }
+    },
+    "strategy": {
+      "title": "Straitéis agus scripteanna",
+      "entry": "Straitéis agus scripteanna",
+      "back": "Ar ais chuig an tonn",
+      "cancel": "Cealaigh",
+      "close": "Dún",
+      "save": "Sábháil",
+      "stepper": {
+        "label": "Céimeanna straitéise",
+        "usps": "USPanna",
+        "personas": "Pearsain",
+        "matrix": "Maitrís teachtaireachtaí",
+        "concepts": "Coincheapa",
+        "creators": "Cruthaitheoirí",
+        "scripts": "Scripteanna",
+        "uspNone": "Níl aon USP ann fós",
+        "statusUsps": "{count} USP | {count} USP",
+        "personaNone": "Níl aon phearsa ann fós",
+        "statusPersonas": "{count} phearsa · {covered} as {markets} margadh | {count} pearsa · {covered} as {markets} margadh",
+        "notAvailable": "Níl sé ar fáil fós",
+        "locked": "Faoi ghlas go dtí go ndéantar na coincheapa go léir a cheadú"
+      },
+      "audience": {
+        "label": "Teideal an lucht féachana",
+        "placeholder": "Cuir teideal lucht féachana leis",
+        "edit": "Cuir teideal an lucht féachana in eagar",
+        "dialogTitle": "Teideal an lucht féachana"
+      },
+      "usp": {
+        "title": "USPanna",
+        "subtitle": "4–6 in aghaidh an toinn, roinnte ar gach margadh.",
+        "counter": "{count} as {max} USP",
+        "counterMax": "{count} as {max} USP · sroichte an uasmhéid",
+        "add": "Cuir USP leis",
+        "maxReason": "Níl níos mó ná {max} USP i dtonn.",
+        "warning": "Cuir {min} USP ar a laghad leis le haghaidh tacar iomlán.",
+        "emptyTitle": "Níl aon USP ann fós",
+        "emptyBody": "Cuir leis na hargóintí díola ar a bhfuil an tonn seo bunaithe.",
+        "explainer": "Míniú",
+        "creativeAngle": "Uillinn chruthaitheach",
+        "copySeed": "Treoirlínte téacs",
+        "menu": "Gníomhartha do {title}",
+        "edit": "Cuir in eagar",
+        "delete": "Scrios",
+        "moveEarlier": "Bog níos luaithe",
+        "moveLater": "Bog níos déanaí",
+        "deleteStaffReason": "Ní féidir ach le riarthóir nó bainisteoir USP a úsáideann pearsain a scriosadh.",
+        "usedBy": "In úsáid ag {count} uillinn | In úsáid ag {count} uillinn",
+        "validation": {
+          "titleRequired": "Cuir teideal isteach."
+        },
+        "dialog": {
+          "addTitle": "Cuir USP leis",
+          "editTitle": "Cuir USP in eagar",
+          "title": "Teideal",
+          "colourAuto": "Cuirtear an dath ar fáil go huathoibríoch.",
+          "colourFixed": "Dath an chárta seo."
+        },
+        "deleteDialog": {
+          "title": "Scrios “{title}”?",
+          "body": "Ní úsáideann aon phearsa an USP seo.",
+          "bodyInUse": "Úsáideann {count} uillinn an USP seo agus bainfear í leis: | Úsáideann {count} uillinn an USP seo agus bainfear iad leis:",
+          "confirmInUse": "Scrios agus bain {count} uillinn | Scrios agus bain {count} uillinn",
+          "refreshed": "D'athraigh an liosta agus an fhuinneog oscailte. Seiceáil é agus deimhnigh arís."
+        }
+      },
+      "persona": {
+        "markets": "Margaí",
+        "title": "Pearsain · {market}",
+        "subtitle": "{min}–{max} pearsa in aghaidh an mhargaidh. Tagraíonn uillinneacha cruthaitheacha do na USPanna ó chéim 1.",
+        "add": "Cuir pearsa leis",
+        "tile": "Cuir pearsa leis · {count} as {max} in úsáid i {market}",
+        "tileMax": "{count} as {max} in úsáid i {market} · sroichte an uasmhéid",
+        "warning": "Cuir {min} phearsa ar a laghad le {market}.",
+        "fewerThanMin": "Níos lú ná {min} pearsa",
+        "empty": "Níl aon phearsa ann do {market} fós.",
+        "coreJob": "Croíthasc",
+        "drivers": "Spreagthaí mothúchánacha",
+        "goals": "Luachanna agus spriocanna",
+        "selfTalk": {
+          "she": "An rud a deir sí léi féin",
+          "he": "An rud a deir sé leis féin",
+          "they": "An rud a deir siad leo féin"
+        },
+        "need": {
+          "she": "An rud atá ag teastáil uaithi",
+          "he": "An rud atá ag teastáil uaidh",
+          "they": "An rud atá ag teastáil uathu"
+        },
+        "barriers": "Bacainní agus frithchuimilt",
+        "angles": "Uillinneacha cruthaitheacha a chuireann ina luí",
+        "nameLine": "Ainm · {name}",
+        "menu": "Gníomhartha do {name}",
+        "edit": "Cuir in eagar",
+        "delete": "Scrios",
+        "deleteTitle": "Scrios {name}?",
+        "deleteBody": "Bainfear an phearsa.",
+        "deleteBodyAngles": "Bainfear an phearsa agus a {count} uillinn. | Bainfear an phearsa agus a {count} uillinn.",
+        "addedByHand": "Curtha leis de láimh",
+        "linked": "Nasctha",
+        "addAngle": "Cuir uillinn leis ó USPanna",
+        "noUsps": "Cuir USPanna leis i gcéim 1 ar dtús.",
+        "goToUsps": "Téigh go dtí na USPanna",
+        "angleAdd": "Cuir leis",
+        "angleEdit": "Cuir in eagar",
+        "angleRemove": "Bain",
+        "angleMenu": "Gníomhartha don uillinn {title}",
+        "anglePlaceholder": "Conas a nascann an phearsa seo leis an USP",
+        "angleText": "Téacs na huillinne",
+        "removeAngleTitle": "Bain an uillinn seo?",
+        "removeAngleBody": "Bainfear an uillinn ar “{usp}” den phearsa seo.",
+        "pronounName": {
+          "she": "Sí",
+          "he": "Sé",
+          "they": "Siad"
+        },
+        "dialog": {
+          "addTitle": "Cuir pearsa leis · {market}",
+          "editTitle": "Cuir pearsa in eagar",
+          "code": "Cód",
+          "codeAuto": "Uathoibríoch",
+          "codeHint": "{min}–{max} litir nó digit, uathúil sa mhargadh.",
+          "title": "Teideal",
+          "name": "Ainm",
+          "nameHint": "Ainm samhlaithe don phearsa, ní duine fíor.",
+          "pronoun": "Forainm",
+          "pronounHint": "Ní athraíonn sé ach foclaíocht na lipéad.",
+          "summary": "Achoimre",
+          "listCount": "{count} as {max}",
+          "addItem": "Cuir mír leis",
+          "removeItem": "Bain an mhír"
+        },
+        "validation": {
+          "titleRequired": "Cuir teideal isteach.",
+          "nameRequired": "Cuir ainm isteach.",
+          "codeRequired": "Cuir cód isteach.",
+          "codeFormat": "Úsáid {min}–{max} litir nó digit.",
+          "angleRequired": "Cuir líne isteach."
+        }
+      },
+      "copy": {
+        "open": "Cóipeáil ó…",
+        "title": "Cóipeáil pearsain go {market}",
+        "source": "Cóipeáil ó",
+        "submit": "Cóipeáil",
+        "line": "Ag cóipeáil {count} → beidh {total} as {max} ag {market}",
+        "over": "Ag cóipeáil {count} → bheadh {total} as {max} ag {market}: os cionn an uasmhéid."
+      },
+      "validation": {
+        "tooLong": "{max} carachtar ar a mhéad."
+      },
+      "errors": {
+        "loadFailed": "Níorbh fhéidir é a luchtú. Bain triail eile as.",
+        "saveFailed": "Níorbh fhéidir é a shábháil. Bain triail eile as.",
+        "gone": "Bhain duine eile é seo. Dún agus athluchtaigh.",
+        "workspaceGone": "Níor aimsíodh an spás oibre straitéise seo.",
+        "uspMaxReached": "Tá an líon uasta USPanna sa tonn cheana féin.",
+        "uspOrderMismatch": "D'athraigh na USPanna ó luchtaíodh an leathanach. Athluchtaíodh an liosta; bain triail eile as.",
+        "uspInUse": "Úsáideann pearsain an USP seo. Deimhnigh chun é a bhaint lena uillinneacha.",
+        "personaMaxReached": "Tá an líon uasta pearsan sa mhargadh seo cheana féin.",
+        "personaMarketNotInWave": "Ní ceann de mhargaí an toinn seo an margadh sin.",
+        "personaCodeTaken": "Úsáideann pearsa eile sa mhargadh seo an cód seo cheana.",
+        "copyInvalid": "Roghnaigh dhá mhargadh éagsúla den tonn seo agus pearsa amháin ar a laghad.",
+        "copyExceedsCap": "Dá gcóipeálfaí {copy} pearsa chuig margadh a bhfuil {target} ann, rachadh sé thar an uasmhéid {max}.",
+        "copyExceedsCapPlain": "Rachadh an chóip sin thar an líon uasta pearsan.",
+        "angleAlreadyLinked": "Tá uillinn ag an phearsa seo cheana ar an USP sin.",
+        "conflict": "D'athraigh duine éigin é seo ag an am céanna. Athluchtaigh agus bain triail eile as.",
+        "brandArchived": "Níl brandáil chartlannaithe inléite ach amháin. Athchóirigh í ar dtús.",
+        "forbidden": "Ní féidir ach le riarthóir nó bainisteoir é seo a dhéanamh."
       }
     }
   },

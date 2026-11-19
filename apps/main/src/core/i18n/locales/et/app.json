@@ -1481,7 +1481,8 @@
         "campaignLinkLocked": "Selles kampaanias on loovisik valitud või kaugemal, seega ei saa linki muuta.",
         "brandArchived": "See bränd on arhiveeritud. Taastage see, et selle laineid muuta.",
         "saveFailed": "Lainet ei õnnestunud salvestada. Proovige uuesti.",
-        "waveNotAvailable": "Seda lainet ei saa selle kampaaniaga siduda."
+        "waveNotAvailable": "Seda lainet ei saa selle kampaaniaga siduda.",
+        "marketHasPersonas": "Eemalda kõigepealt nende turgude personad: {markets}."
       },
       "dialog": {
         "createTitle": "Uus laine",
@@ -1683,6 +1684,177 @@
         "deleteFailed": "Faili kustutamine ebaõnnestus. Proovige uuesti.",
         "downloadFailed": "Allalaadimist ei õnnestunud alustada.",
         "brandArchived": "See bränd on arhiveeritud. Taastage see, et selle faile muuta."
+      }
+    },
+    "strategy": {
+      "title": "Strateegia ja skriptid",
+      "entry": "Strateegia ja skriptid",
+      "back": "Tagasi laine juurde",
+      "cancel": "Tühista",
+      "close": "Sulge",
+      "save": "Salvesta",
+      "stepper": {
+        "label": "Strateegia sammud",
+        "usps": "USP-d",
+        "personas": "Personad",
+        "matrix": "Sõnumimaatriks",
+        "concepts": "Kontseptsioonid",
+        "creators": "Loojad",
+        "scripts": "Skriptid",
+        "uspNone": "USP-sid veel pole",
+        "statusUsps": "{count} USP | {count} USP-d",
+        "personaNone": "Persoone veel pole",
+        "statusPersonas": "{count} persona · {covered} turust {markets}-st | {count} persooni · {covered} turust {markets}-st",
+        "notAvailable": "Veel pole saadaval",
+        "locked": "Lukus, kuni kõik kontseptsioonid on kinnitatud"
+      },
+      "audience": {
+        "label": "Sihtrühma pealkiri",
+        "placeholder": "Lisa sihtrühma pealkiri",
+        "edit": "Muuda sihtrühma pealkirja",
+        "dialogTitle": "Sihtrühma pealkiri"
+      },
+      "usp": {
+        "title": "USP-d",
+        "subtitle": "4–6 laine kohta, ühised kõigile turgudele.",
+        "counter": "{count} / {max} USP-d",
+        "counterMax": "{count} / {max} USP-d · maksimum täis",
+        "add": "Lisa USP",
+        "maxReason": "Lainel on kuni {max} USP-d.",
+        "warning": "Lisa vähemalt {min} USP-d täieliku komplekti jaoks.",
+        "emptyTitle": "USP-sid veel pole",
+        "emptyBody": "Lisa müügiargumendid, millele see laine toetub.",
+        "explainer": "Selgitus",
+        "creativeAngle": "Loominguline nurk",
+        "copySeed": "Teksti suunised",
+        "menu": "Toimingud: {title}",
+        "edit": "Muuda",
+        "delete": "Kustuta",
+        "moveEarlier": "Liiguta varasemaks",
+        "moveLater": "Liiguta hilisemaks",
+        "deleteStaffReason": "Personade kasutatavat USP-d saab kustutada ainult admin või haldur.",
+        "usedBy": "Kasutab {count} nurk | Kasutab {count} nurka",
+        "validation": {
+          "titleRequired": "Sisesta pealkiri."
+        },
+        "dialog": {
+          "addTitle": "Lisa USP",
+          "editTitle": "Muuda USP-d",
+          "title": "Pealkiri",
+          "colourAuto": "Värv määratakse automaatselt.",
+          "colourFixed": "Selle kaardi värv."
+        },
+        "deleteDialog": {
+          "title": "Kas kustutada „{title}“?",
+          "body": "Ükski persona ei kasuta seda USP-d.",
+          "bodyInUse": "{count} nurk kasutab seda USP-d ja eemaldatakse koos sellega: | {count} nurka kasutavad seda USP-d ja eemaldatakse koos sellega:",
+          "confirmInUse": "Kustuta ja eemalda {count} nurk | Kustuta ja eemalda {count} nurka",
+          "refreshed": "Loend muutus, kui aken oli avatud. Vaata see üle ja kinnita uuesti."
+        }
+      },
+      "persona": {
+        "markets": "Turud",
+        "title": "Personad · {market}",
+        "subtitle": "{min}–{max} persooni turu kohta. Loomingulised nurgad viitavad 1. sammu USP-dele.",
+        "add": "Lisa persona",
+        "tile": "Lisa persona · kasutatud {count} / {max} turul {market}",
+        "tileMax": "Kasutatud {count} / {max} turul {market} · maksimum täis",
+        "warning": "Lisa vähemalt {min} persooni turule {market}.",
+        "fewerThanMin": "Vähem kui {min} persooni",
+        "empty": "Turul {market} pole veel persoone.",
+        "coreJob": "Põhiülesanne",
+        "drivers": "Emotsionaalsed ajendid",
+        "goals": "Väärtused ja eesmärgid",
+        "selfTalk": {
+          "she": "Mida ta endale ütleb (naine)",
+          "he": "Mida ta endale ütleb (mees)",
+          "they": "Mida nad endale ütlevad"
+        },
+        "need": {
+          "she": "Mida ta vajab (naine)",
+          "he": "Mida ta vajab (mees)",
+          "they": "Mida nad vajavad"
+        },
+        "barriers": "Tõkked ja hõõrdumine",
+        "angles": "Veenvad loomingulised nurgad",
+        "nameLine": "Nimi · {name}",
+        "menu": "Toimingud: {name}",
+        "edit": "Muuda",
+        "delete": "Kustuta",
+        "deleteTitle": "Kas kustutada {name}?",
+        "deleteBody": "Persona eemaldatakse.",
+        "deleteBodyAngles": "Persona ja tema {count} nurk eemaldatakse. | Persona ja tema {count} nurka eemaldatakse.",
+        "addedByHand": "Lisatud käsitsi",
+        "linked": "Seotud",
+        "addAngle": "Lisa nurk USP-dest",
+        "noUsps": "Lisa kõigepealt 1. sammus USP-d.",
+        "goToUsps": "Ava USP-d",
+        "angleAdd": "Lisa",
+        "angleEdit": "Muuda",
+        "angleRemove": "Eemalda",
+        "angleMenu": "Toimingud nurgale {title}",
+        "anglePlaceholder": "Kuidas see persona USP-ga seondub",
+        "angleText": "Nurga tekst",
+        "removeAngleTitle": "Kas eemaldada see nurk?",
+        "removeAngleBody": "Nurk „{usp}“ eemaldatakse sellelt personalt.",
+        "pronounName": {
+          "she": "Tema (naine)",
+          "he": "Tema (mees)",
+          "they": "Nemad"
+        },
+        "dialog": {
+          "addTitle": "Lisa persona · {market}",
+          "editTitle": "Muuda persooni",
+          "code": "Kood",
+          "codeAuto": "Automaatne",
+          "codeHint": "{min}–{max} tähte või numbrit, turul kordumatu.",
+          "title": "Pealkiri",
+          "name": "Nimi",
+          "nameHint": "Persona väljamõeldud nimi, mitte päris inimene.",
+          "pronoun": "Asesõna",
+          "pronounHint": "Muudab ainult siltide sõnastust.",
+          "summary": "Kokkuvõte",
+          "listCount": "{count} / {max}",
+          "addItem": "Lisa kirje",
+          "removeItem": "Eemalda kirje"
+        },
+        "validation": {
+          "titleRequired": "Sisesta pealkiri.",
+          "nameRequired": "Sisesta nimi.",
+          "codeRequired": "Sisesta kood.",
+          "codeFormat": "Kasuta {min}–{max} tähte või numbrit.",
+          "angleRequired": "Sisesta rida."
+        }
+      },
+      "copy": {
+        "open": "Kopeeri allikast…",
+        "title": "Kopeeri personad turule {market}",
+        "source": "Kopeeri allikast",
+        "submit": "Kopeeri",
+        "line": "Kopeerin {count} → turul {market} on {total} / {max}",
+        "over": "Kopeerin {count} → turul {market} oleks {total} / {max}: üle maksimumi."
+      },
+      "validation": {
+        "tooLong": "Kuni {max} märki."
+      },
+      "errors": {
+        "loadFailed": "Laadimine ebaõnnestus. Proovi uuesti.",
+        "saveFailed": "Salvestamine ebaõnnestus. Proovi uuesti.",
+        "gone": "Keegi teine eemaldas selle. Sulge ja laadi uuesti.",
+        "workspaceGone": "Seda strateegia tööala ei leitud.",
+        "uspMaxReached": "Lainel on juba USP-de maksimumarv.",
+        "uspOrderMismatch": "USP-d muutusid pärast lehe laadimist. Loend laaditi uuesti; proovi veel kord.",
+        "uspInUse": "Personad kasutavad seda USP-d. Kinnita, et see eemaldatakse koos selle nurkadega.",
+        "personaMaxReached": "Sellel turul on juba personade maksimumarv.",
+        "personaMarketNotInWave": "See turg ei kuulu selle laine turgude hulka.",
+        "personaCodeTaken": "Seda koodi kasutab juba teine persona sellel turul.",
+        "copyInvalid": "Vali selle laine kaks erinevat turgu ja vähemalt üks persona.",
+        "copyExceedsCap": "{copy} persooni kopeerimine turule, kus neid on {target}, ületaks maksimumi {max}.",
+        "copyExceedsCapPlain": "See kopeerimine ületaks personade maksimumarvu.",
+        "angleAlreadyLinked": "Sellel personal on selle USP jaoks juba nurk.",
+        "conflict": "Keegi muutis seda samal ajal. Laadi uuesti ja proovi veel kord.",
+        "brandArchived": "Arhiveeritud bränd on kirjutuskaitstud. Taasta see kõigepealt.",
+        "forbidden": "Seda saab teha ainult admin või haldur."
       }
     }
   },

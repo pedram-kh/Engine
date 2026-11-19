@@ -1481,7 +1481,8 @@
         "campaignLinkLocked": "Šajā kampaņā autors ir izvēlēts vai tālāk, tāpēc saiti mainīt nevar.",
         "brandArchived": "Šī preču zīme ir arhivēta. Atjaunojiet to, lai mainītu tās vilņus.",
         "saveFailed": "Neizdevās saglabāt vilni. Mēģiniet vēlreiz.",
-        "waveNotAvailable": "Šo vilni nevar saistīt ar šo kampaņu."
+        "waveNotAvailable": "Šo vilni nevar saistīt ar šo kampaņu.",
+        "marketHasPersonas": "Vispirms noņemiet šo tirgu personas: {markets}."
       },
       "dialog": {
         "createTitle": "Jauns vilnis",
@@ -1683,6 +1684,177 @@
         "deleteFailed": "Neizdevās izdzēst failu. Mēģiniet vēlreiz.",
         "downloadFailed": "Neizdevās sākt lejupielādi.",
         "brandArchived": "Šī preču zīme ir arhivēta. Atjaunojiet to, lai mainītu tās failus."
+      }
+    },
+    "strategy": {
+      "title": "Stratēģija un scenāriji",
+      "entry": "Stratēģija un scenāriji",
+      "back": "Atpakaļ uz vilni",
+      "cancel": "Atcelt",
+      "close": "Aizvērt",
+      "save": "Saglabāt",
+      "stepper": {
+        "label": "Stratēģijas soļi",
+        "usps": "USP",
+        "personas": "Personas",
+        "matrix": "Ziņojumu matrica",
+        "concepts": "Koncepcijas",
+        "creators": "Veidotāji",
+        "scripts": "Scenāriji",
+        "uspNone": "USP vēl nav",
+        "statusUsps": "{count} USP | {count} USP",
+        "personaNone": "Personu vēl nav",
+        "statusPersonas": "{count} persona · {covered} no {markets} tirgiem | {count} personas · {covered} no {markets} tirgiem",
+        "notAvailable": "Vēl nav pieejams",
+        "locked": "Bloķēts, līdz tiek apstiprinātas visas koncepcijas"
+      },
+      "audience": {
+        "label": "Mērķauditorijas nosaukums",
+        "placeholder": "Pievienojiet mērķauditorijas nosaukumu",
+        "edit": "Rediģēt mērķauditorijas nosaukumu",
+        "dialogTitle": "Mērķauditorijas nosaukums"
+      },
+      "usp": {
+        "title": "USP",
+        "subtitle": "4–6 vienam vilnim, kopīgi visiem tirgiem.",
+        "counter": "{count} no {max} USP",
+        "counterMax": "{count} no {max} USP · sasniegts maksimums",
+        "add": "Pievienot USP",
+        "maxReason": "Vilnim ir ne vairāk kā {max} USP.",
+        "warning": "Pievienojiet vismaz {min} USP pilnam komplektam.",
+        "emptyTitle": "USP vēl nav",
+        "emptyBody": "Pievienojiet pārdošanas argumentus, uz kuriem balstās šis vilnis.",
+        "explainer": "Paskaidrojums",
+        "creativeAngle": "Radošais leņķis",
+        "copySeed": "Teksta norādes",
+        "menu": "Darbības: {title}",
+        "edit": "Rediģēt",
+        "delete": "Dzēst",
+        "moveEarlier": "Pārvietot agrāk",
+        "moveLater": "Pārvietot vēlāk",
+        "deleteStaffReason": "USP, ko izmanto personas, var dzēst tikai administrators vai vadītājs.",
+        "usedBy": "Izmanto {count} leņķis | Izmanto {count} leņķi",
+        "validation": {
+          "titleRequired": "Ievadiet nosaukumu."
+        },
+        "dialog": {
+          "addTitle": "Pievienot USP",
+          "editTitle": "Rediģēt USP",
+          "title": "Nosaukums",
+          "colourAuto": "Krāsa tiek piešķirta automātiski.",
+          "colourFixed": "Šīs kartītes krāsa."
+        },
+        "deleteDialog": {
+          "title": "Dzēst “{title}”?",
+          "body": "Šo USP neizmanto neviena persona.",
+          "bodyInUse": "{count} leņķis izmanto šo USP un tiks noņemts kopā ar to: | {count} leņķi izmanto šo USP un tiks noņemti kopā ar to:",
+          "confirmInUse": "Dzēst un noņemt {count} leņķi | Dzēst un noņemt {count} leņķus",
+          "refreshed": "Saraksts mainījās, kamēr logs bija atvērts. Pārbaudiet to un apstipriniet vēlreiz."
+        }
+      },
+      "persona": {
+        "markets": "Tirgi",
+        "title": "Personas · {market}",
+        "subtitle": "{min}–{max} personas vienam tirgum. Radošie leņķi norāda uz 1. soļa USP.",
+        "add": "Pievienot personu",
+        "tile": "Pievienot personu · izmantotas {count} no {max}, tirgus {market}",
+        "tileMax": "Izmantotas {count} no {max}, tirgus {market} · sasniegts maksimums",
+        "warning": "Pievienojiet vismaz {min} personas tirgum {market}.",
+        "fewerThanMin": "Mazāk nekā {min} personas",
+        "empty": "Tirgum {market} personu vēl nav.",
+        "coreJob": "Galvenais uzdevums",
+        "drivers": "Emocionālie motīvi",
+        "goals": "Vērtības un mērķi",
+        "selfTalk": {
+          "she": "Ko viņa saka sev",
+          "he": "Ko viņš saka sev",
+          "they": "Ko viņi saka sev"
+        },
+        "need": {
+          "she": "Kas viņai vajadzīgs",
+          "he": "Kas viņam vajadzīgs",
+          "they": "Kas viņiem vajadzīgs"
+        },
+        "barriers": "Šķēršļi un berze",
+        "angles": "Pārliecinoši radošie leņķi",
+        "nameLine": "Vārds · {name}",
+        "menu": "Darbības: {name}",
+        "edit": "Rediģēt",
+        "delete": "Dzēst",
+        "deleteTitle": "Dzēst {name}?",
+        "deleteBody": "Persona tiks noņemta.",
+        "deleteBodyAngles": "Persona un tās {count} leņķis tiks noņemti. | Persona un tās {count} leņķi tiks noņemti.",
+        "addedByHand": "Pievienots manuāli",
+        "linked": "Saistīts",
+        "addAngle": "Pievienot leņķi no USP",
+        "noUsps": "Vispirms pievienojiet USP 1. solī.",
+        "goToUsps": "Doties uz USP",
+        "angleAdd": "Pievienot",
+        "angleEdit": "Rediģēt",
+        "angleRemove": "Noņemt",
+        "angleMenu": "Darbības leņķim {title}",
+        "anglePlaceholder": "Kā šī persona saistās ar USP",
+        "angleText": "Leņķa teksts",
+        "removeAngleTitle": "Noņemt šo leņķi?",
+        "removeAngleBody": "Leņķis “{usp}” tiks noņemts no šīs personas.",
+        "pronounName": {
+          "she": "Viņa",
+          "he": "Viņš",
+          "they": "Viņi"
+        },
+        "dialog": {
+          "addTitle": "Pievienot personu · {market}",
+          "editTitle": "Rediģēt personu",
+          "code": "Kods",
+          "codeAuto": "Automātisks",
+          "codeHint": "{min}–{max} burti vai cipari, tirgū unikāls.",
+          "title": "Nosaukums",
+          "name": "Vārds",
+          "nameHint": "Personas izdomāts vārds, nevis reāls cilvēks.",
+          "pronoun": "Vietniekvārds",
+          "pronounHint": "Maina tikai etiķešu formulējumu.",
+          "summary": "Kopsavilkums",
+          "listCount": "{count} no {max}",
+          "addItem": "Pievienot ierakstu",
+          "removeItem": "Noņemt ierakstu"
+        },
+        "validation": {
+          "titleRequired": "Ievadiet nosaukumu.",
+          "nameRequired": "Ievadiet vārdu.",
+          "codeRequired": "Ievadiet kodu.",
+          "codeFormat": "Izmantojiet {min}–{max} burtus vai ciparus.",
+          "angleRequired": "Ievadiet rindu."
+        }
+      },
+      "copy": {
+        "open": "Kopēt no…",
+        "title": "Kopēt personas uz tirgu {market}",
+        "source": "Kopēt no",
+        "submit": "Kopēt",
+        "line": "Kopē {count} → tirgū {market} būs {total} no {max}",
+        "over": "Kopē {count} → tirgū {market} būtu {total} no {max}: pārsniedz maksimumu."
+      },
+      "validation": {
+        "tooLong": "Ne vairāk kā {max} rakstzīmes."
+      },
+      "errors": {
+        "loadFailed": "Neizdevās ielādēt. Mēģiniet vēlreiz.",
+        "saveFailed": "Neizdevās saglabāt. Mēģiniet vēlreiz.",
+        "gone": "To noņēma kāds cits. Aizveriet un ielādējiet no jauna.",
+        "workspaceGone": "Šo stratēģijas darbvietu neizdevās atrast.",
+        "uspMaxReached": "Vilnim jau ir maksimālais USP skaits.",
+        "uspOrderMismatch": "USP ir mainījušies kopš lapas ielādes. Saraksts ielādēts no jauna; mēģiniet vēlreiz.",
+        "uspInUse": "Šo USP izmanto personas. Apstipriniet, lai to noņemtu kopā ar leņķiem.",
+        "personaMaxReached": "Šim tirgum jau ir maksimālais personu skaits.",
+        "personaMarketNotInWave": "Šis tirgus nav starp šī viļņa tirgiem.",
+        "personaCodeTaken": "Šo kodu jau izmanto cita persona šajā tirgū.",
+        "copyInvalid": "Izvēlieties divus dažādus šī viļņa tirgus un vismaz vienu personu.",
+        "copyExceedsCap": "Kopējot {copy} personas uz tirgu, kurā to ir {target}, tiktu pārsniegts maksimums {max}.",
+        "copyExceedsCapPlain": "Šī kopēšana pārsniegtu maksimālo personu skaitu.",
+        "angleAlreadyLinked": "Šai personai jau ir leņķis šim USP.",
+        "conflict": "Kāds to mainīja tajā pašā brīdī. Ielādējiet no jauna un mēģiniet vēlreiz.",
+        "brandArchived": "Arhivēts zīmols ir tikai lasāms. Vispirms atjaunojiet to.",
+        "forbidden": "To var izdarīt tikai administrators vai vadītājs."
       }
     }
   },

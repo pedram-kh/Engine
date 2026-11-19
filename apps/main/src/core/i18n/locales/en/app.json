@@ -1481,7 +1481,8 @@
         "campaignLinkLocked": "A creator is Selected or further on this campaign, so the link cannot be changed.",
         "brandArchived": "This brand is archived. Restore it to change its waves.",
         "saveFailed": "The wave could not be saved. Try again.",
-        "waveNotAvailable": "That wave cannot be linked to this campaign."
+        "waveNotAvailable": "That wave cannot be linked to this campaign.",
+        "marketHasPersonas": "Remove the personas of these markets first: {markets}."
       },
       "dialog": {
         "createTitle": "New wave",
@@ -1683,6 +1684,177 @@
         "deleteFailed": "Failed to delete the file. Try again.",
         "downloadFailed": "The download could not be started.",
         "brandArchived": "This brand is archived. Restore it to change its files."
+      }
+    },
+    "strategy": {
+      "title": "Strategy & Scripts",
+      "entry": "Strategy & Scripts",
+      "back": "Back to wave",
+      "cancel": "Cancel",
+      "close": "Close",
+      "save": "Save",
+      "stepper": {
+        "label": "Strategy steps",
+        "usps": "USPs",
+        "personas": "Personas",
+        "matrix": "Messaging matrix",
+        "concepts": "Concepts",
+        "creators": "Creators",
+        "scripts": "Scripts",
+        "uspNone": "No USPs yet",
+        "statusUsps": "{count} USP | {count} USPs",
+        "personaNone": "No personas yet",
+        "statusPersonas": "{count} persona · {covered} of {markets} markets | {count} personas · {covered} of {markets} markets",
+        "notAvailable": "Not available yet",
+        "locked": "Locked until all concepts are approved"
+      },
+      "audience": {
+        "label": "Audience title",
+        "placeholder": "Add an audience title",
+        "edit": "Edit audience title",
+        "dialogTitle": "Audience title"
+      },
+      "usp": {
+        "title": "USPs",
+        "subtitle": "4–6 per wave, shared across all markets.",
+        "counter": "{count} of {max} USPs",
+        "counterMax": "{count} of {max} USPs · maximum reached",
+        "add": "Add USP",
+        "maxReason": "A wave has at most {max} USPs.",
+        "warning": "Add at least {min} USPs for a complete set.",
+        "emptyTitle": "No USPs yet",
+        "emptyBody": "Add the selling points this wave is built on.",
+        "explainer": "Explainer",
+        "creativeAngle": "Creative angle",
+        "copySeed": "Copy seed directions",
+        "menu": "Actions for {title}",
+        "edit": "Edit",
+        "delete": "Delete",
+        "moveEarlier": "Move earlier",
+        "moveLater": "Move later",
+        "deleteStaffReason": "Only an admin or manager can delete a USP that personas use.",
+        "usedBy": "Used by {count} angle | Used by {count} angles",
+        "validation": {
+          "titleRequired": "Enter a title."
+        },
+        "dialog": {
+          "addTitle": "Add USP",
+          "editTitle": "Edit USP",
+          "title": "Title",
+          "colourAuto": "The colour is set automatically.",
+          "colourFixed": "The colour of this card."
+        },
+        "deleteDialog": {
+          "title": "Delete “{title}”?",
+          "body": "No persona uses this USP.",
+          "bodyInUse": "{count} angle uses this USP and is removed with it: | {count} angles use this USP and are removed with it:",
+          "confirmInUse": "Delete and remove {count} angle | Delete and remove {count} angles",
+          "refreshed": "The list changed while this was open. Check it and confirm again."
+        }
+      },
+      "persona": {
+        "markets": "Markets",
+        "title": "Personas · {market}",
+        "subtitle": "{min}–{max} personas per market. Creative angles link to the USPs from step 1.",
+        "add": "Add persona",
+        "tile": "Add persona · {count} of {max} used in {market}",
+        "tileMax": "{count} of {max} used in {market} · maximum reached",
+        "warning": "Add at least {min} personas for {market}.",
+        "fewerThanMin": "Fewer than {min} personas",
+        "empty": "No personas for {market} yet.",
+        "coreJob": "Core job",
+        "drivers": "Emotional drivers",
+        "goals": "Values & goals",
+        "selfTalk": {
+          "she": "What she tells herself",
+          "he": "What he tells himself",
+          "they": "What they tell themselves"
+        },
+        "need": {
+          "she": "What she needs",
+          "he": "What he needs",
+          "they": "What they need"
+        },
+        "barriers": "Barriers & frictions",
+        "angles": "Creative angles that unlock",
+        "nameLine": "Name · {name}",
+        "menu": "Actions for {name}",
+        "edit": "Edit",
+        "delete": "Delete",
+        "deleteTitle": "Delete {name}?",
+        "deleteBody": "The persona is removed.",
+        "deleteBodyAngles": "The persona and its {count} angle are removed. | The persona and its {count} angles are removed.",
+        "addedByHand": "Added by hand",
+        "linked": "Linked",
+        "addAngle": "Add angle from USPs",
+        "noUsps": "Add USPs in step 1 first.",
+        "goToUsps": "Go to USPs",
+        "angleAdd": "Add",
+        "angleEdit": "Edit",
+        "angleRemove": "Remove",
+        "angleMenu": "Actions for the {title} angle",
+        "anglePlaceholder": "How this persona connects with the USP",
+        "angleText": "Angle text",
+        "removeAngleTitle": "Remove this angle?",
+        "removeAngleBody": "The angle on “{usp}” is removed from this persona.",
+        "pronounName": {
+          "she": "She / her",
+          "he": "He / him",
+          "they": "They / them"
+        },
+        "dialog": {
+          "addTitle": "Add persona · {market}",
+          "editTitle": "Edit persona",
+          "code": "Code",
+          "codeAuto": "Automatic",
+          "codeHint": "{min}–{max} letters or digits, unique in the market.",
+          "title": "Title",
+          "name": "Name",
+          "nameHint": "An invented name for the persona, not a real person.",
+          "pronoun": "Pronoun",
+          "pronounHint": "Changes only the wording of the labels.",
+          "summary": "Summary",
+          "listCount": "{count} of {max}",
+          "addItem": "Add item",
+          "removeItem": "Remove item"
+        },
+        "validation": {
+          "titleRequired": "Enter a title.",
+          "nameRequired": "Enter a name.",
+          "codeRequired": "Enter a code.",
+          "codeFormat": "Use {min}–{max} letters or digits.",
+          "angleRequired": "Enter a line."
+        }
+      },
+      "copy": {
+        "open": "Copy from…",
+        "title": "Copy personas to {market}",
+        "source": "Copy from",
+        "submit": "Copy",
+        "line": "Copying {count} → {market} will have {total} of {max}",
+        "over": "Copying {count} → {market} would have {total} of {max}: over the maximum."
+      },
+      "validation": {
+        "tooLong": "Use at most {max} characters."
+      },
+      "errors": {
+        "loadFailed": "Could not load this. Try again.",
+        "saveFailed": "Could not save. Try again.",
+        "gone": "This was removed by someone else. Close and reload.",
+        "workspaceGone": "This strategy workspace was not found.",
+        "uspMaxReached": "The wave already has the maximum number of USPs.",
+        "uspOrderMismatch": "The USPs changed since this page loaded. The list was reloaded; try again.",
+        "uspInUse": "Personas use this USP. Confirm to remove it together with its angles.",
+        "personaMaxReached": "This market already has the maximum number of personas.",
+        "personaMarketNotInWave": "That market is not one of this wave's markets.",
+        "personaCodeTaken": "This code is used by another persona in this market.",
+        "copyInvalid": "Choose two different markets of this wave and at least one persona.",
+        "copyExceedsCap": "Copying {copy} personas to a market that has {target} would pass the maximum of {max}.",
+        "copyExceedsCapPlain": "That copy would pass the maximum number of personas.",
+        "angleAlreadyLinked": "This persona already has an angle on that USP.",
+        "conflict": "Someone changed this at the same moment. Reload and try again.",
+        "brandArchived": "An archived brand is read-only. Restore it first.",
+        "forbidden": "Only an admin or manager can do this."
       }
     }
   },

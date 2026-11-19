@@ -1481,7 +1481,8 @@
         "campaignLinkLocked": "Kreator je odabran ili dalje u ovoj kampanji, pa se veza ne može promijeniti.",
         "brandArchived": "Ovaj brend je arhiviran. Vratite ga da biste mijenjali njegove valove.",
         "saveFailed": "Val nije moguće spremiti. Pokušajte ponovno.",
-        "waveNotAvailable": "Taj val ne može se povezati s ovom kampanjom."
+        "waveNotAvailable": "Taj val ne može se povezati s ovom kampanjom.",
+        "marketHasPersonas": "Prvo uklonite persone ovih tržišta: {markets}."
       },
       "dialog": {
         "createTitle": "Novi val",
@@ -1683,6 +1684,177 @@
         "deleteFailed": "Datoteku nije moguće izbrisati. Pokušajte ponovno.",
         "downloadFailed": "Preuzimanje nije moguće pokrenuti.",
         "brandArchived": "Ovaj brend je arhiviran. Vratite ga da biste mijenjali njegove datoteke."
+      }
+    },
+    "strategy": {
+      "title": "Strategija i skripte",
+      "entry": "Strategija i skripte",
+      "back": "Natrag na val",
+      "cancel": "Odustani",
+      "close": "Zatvori",
+      "save": "Spremi",
+      "stepper": {
+        "label": "Koraci strategije",
+        "usps": "USP-ovi",
+        "personas": "Persone",
+        "matrix": "Matrica poruka",
+        "concepts": "Koncepti",
+        "creators": "Kreatori",
+        "scripts": "Skripte",
+        "uspNone": "Još nema USP-ova",
+        "statusUsps": "{count} USP | {count} USP-ova",
+        "personaNone": "Još nema persona",
+        "statusPersonas": "{count} persona · {covered} od {markets} tržišta | {count} persona · {covered} od {markets} tržišta",
+        "notAvailable": "Još nije dostupno",
+        "locked": "Zaključano dok se ne odobre svi koncepti"
+      },
+      "audience": {
+        "label": "Naslov ciljne skupine",
+        "placeholder": "Dodajte naslov ciljne skupine",
+        "edit": "Uredi naslov ciljne skupine",
+        "dialogTitle": "Naslov ciljne skupine"
+      },
+      "usp": {
+        "title": "USP-ovi",
+        "subtitle": "4–6 po valu, zajednički za sva tržišta.",
+        "counter": "{count} od {max} USP-ova",
+        "counterMax": "{count} od {max} USP-ova · dosegnut maksimum",
+        "add": "Dodaj USP",
+        "maxReason": "Val ima najviše {max} USP-ova.",
+        "warning": "Dodajte barem {min} USP-a za potpun skup.",
+        "emptyTitle": "Još nema USP-ova",
+        "emptyBody": "Dodajte prodajne argumente na kojima se temelji ovaj val.",
+        "explainer": "Objašnjenje",
+        "creativeAngle": "Kreativni kut",
+        "copySeed": "Smjernice za tekst",
+        "menu": "Radnje za {title}",
+        "edit": "Uredi",
+        "delete": "Izbriši",
+        "moveEarlier": "Pomakni ranije",
+        "moveLater": "Pomakni kasnije",
+        "deleteStaffReason": "USP koji koriste persone može izbrisati samo admin ili manager.",
+        "usedBy": "Koristi {count} kut | Koristi {count} kutova",
+        "validation": {
+          "titleRequired": "Unesite naslov."
+        },
+        "dialog": {
+          "addTitle": "Dodaj USP",
+          "editTitle": "Uredi USP",
+          "title": "Naslov",
+          "colourAuto": "Boja se dodjeljuje automatski.",
+          "colourFixed": "Boja ove kartice."
+        },
+        "deleteDialog": {
+          "title": "Izbrisati „{title}”?",
+          "body": "Nijedna persona ne koristi ovaj USP.",
+          "bodyInUse": "{count} kut koristi ovaj USP i uklanja se s njim: | {count} kutova koristi ovaj USP i uklanjaju se s njim:",
+          "confirmInUse": "Izbriši i ukloni {count} kut | Izbriši i ukloni {count} kutova",
+          "refreshed": "Popis se promijenio dok je prozor bio otvoren. Provjerite ga i ponovno potvrdite."
+        }
+      },
+      "persona": {
+        "markets": "Tržišta",
+        "title": "Persone · {market}",
+        "subtitle": "{min}–{max} persona po tržištu. Kreativni kutovi povezuju se s USP-ovima iz koraka 1.",
+        "add": "Dodaj personu",
+        "tile": "Dodaj personu · iskorišteno {count} od {max} na tržištu {market}",
+        "tileMax": "Iskorišteno {count} od {max} na tržištu {market} · dosegnut maksimum",
+        "warning": "Dodajte barem {min} persona za tržište {market}.",
+        "fewerThanMin": "Manje od {min} persona",
+        "empty": "Za tržište {market} još nema persona.",
+        "coreJob": "Glavni zadatak",
+        "drivers": "Emocionalni pokretači",
+        "goals": "Vrijednosti i ciljevi",
+        "selfTalk": {
+          "she": "Što govori sebi ona",
+          "he": "Što govori sebi on",
+          "they": "Što govore sebi oni"
+        },
+        "need": {
+          "she": "Što treba ona",
+          "he": "Što treba on",
+          "they": "Što trebaju oni"
+        },
+        "barriers": "Prepreke i trenja",
+        "angles": "Kreativni kutovi koji uvjeravaju",
+        "nameLine": "Ime · {name}",
+        "menu": "Radnje za {name}",
+        "edit": "Uredi",
+        "delete": "Izbriši",
+        "deleteTitle": "Izbrisati {name}?",
+        "deleteBody": "Persona se uklanja.",
+        "deleteBodyAngles": "Persona i njezin {count} kut uklanjaju se. | Persona i njezinih {count} kutova uklanjaju se.",
+        "addedByHand": "Dodano ručno",
+        "linked": "Povezano",
+        "addAngle": "Dodaj kut iz USP-ova",
+        "noUsps": "Prvo dodajte USP-ove u koraku 1.",
+        "goToUsps": "Idi na USP-ove",
+        "angleAdd": "Dodaj",
+        "angleEdit": "Uredi",
+        "angleRemove": "Ukloni",
+        "angleMenu": "Radnje za kut {title}",
+        "anglePlaceholder": "Kako se ova persona povezuje s USP-om",
+        "angleText": "Tekst kuta",
+        "removeAngleTitle": "Ukloniti ovaj kut?",
+        "removeAngleBody": "Kut za „{usp}” uklanja se s ove persone.",
+        "pronounName": {
+          "she": "Ona",
+          "he": "On",
+          "they": "Oni / one"
+        },
+        "dialog": {
+          "addTitle": "Dodaj personu · {market}",
+          "editTitle": "Uredi personu",
+          "code": "Šifra",
+          "codeAuto": "Automatski",
+          "codeHint": "{min}–{max} slova ili znamenki, jedinstvena na tržištu.",
+          "title": "Naslov",
+          "name": "Ime",
+          "nameHint": "Izmišljeno ime persone, a ne stvarna osoba.",
+          "pronoun": "Zamjenica",
+          "pronounHint": "Mijenja samo tekst oznaka.",
+          "summary": "Sažetak",
+          "listCount": "{count} od {max}",
+          "addItem": "Dodaj stavku",
+          "removeItem": "Ukloni stavku"
+        },
+        "validation": {
+          "titleRequired": "Unesite naslov.",
+          "nameRequired": "Unesite ime.",
+          "codeRequired": "Unesite šifru.",
+          "codeFormat": "Upotrijebite {min}–{max} slova ili znamenki.",
+          "angleRequired": "Unesite redak."
+        }
+      },
+      "copy": {
+        "open": "Kopiraj iz…",
+        "title": "Kopiraj persone na tržište {market}",
+        "source": "Kopiraj iz",
+        "submit": "Kopiraj",
+        "line": "Kopiranje {count} → tržište {market} imat će {total} od {max}",
+        "over": "Kopiranje {count} → tržište {market} imalo bi {total} od {max}: iznad maksimuma."
+      },
+      "validation": {
+        "tooLong": "Najviše {max} znakova."
+      },
+      "errors": {
+        "loadFailed": "Učitavanje nije uspjelo. Pokušajte ponovno.",
+        "saveFailed": "Spremanje nije uspjelo. Pokušajte ponovno.",
+        "gone": "Ovo je uklonio netko drugi. Zatvorite i ponovno učitajte.",
+        "workspaceGone": "Ovaj strateški prostor nije pronađen.",
+        "uspMaxReached": "Val već ima najveći broj USP-ova.",
+        "uspOrderMismatch": "USP-ovi su se promijenili otkako je stranica učitana. Popis je ponovno učitan; pokušajte ponovno.",
+        "uspInUse": "Ovaj USP koriste persone. Potvrdite da se ukloni zajedno s njegovim kutovima.",
+        "personaMaxReached": "Ovo tržište već ima najveći broj persona.",
+        "personaMarketNotInWave": "To tržište nije među tržištima ovog vala.",
+        "personaCodeTaken": "Ovu šifru već koristi druga persona na ovom tržištu.",
+        "copyInvalid": "Odaberite dva različita tržišta ovog vala i barem jednu personu.",
+        "copyExceedsCap": "Kopiranje {copy} persona na tržište koje ih ima {target} premašilo bi maksimum od {max}.",
+        "copyExceedsCapPlain": "Ta bi kopija premašila najveći broj persona.",
+        "angleAlreadyLinked": "Ova persona već ima kut za taj USP.",
+        "conflict": "Netko je ovo promijenio u isto vrijeme. Ponovno učitajte i pokušajte ponovno.",
+        "brandArchived": "Arhivirani brend samo je za čitanje. Prvo ga vratite.",
+        "forbidden": "To može učiniti samo admin ili manager."
       }
     }
   },

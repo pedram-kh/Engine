@@ -1481,7 +1481,8 @@
         "campaignLinkLocked": "Egy alkotó ki van választva vagy már továbbhaladt ebben a kampányban, ezért a kapcsolat nem módosítható.",
         "brandArchived": "Ez a márka archivált. Állítsa vissza, hogy módosíthassa a hullámait.",
         "saveFailed": "A hullámot nem sikerült menteni. Próbálja újra.",
-        "waveNotAvailable": "Ez a hullám nem kapcsolható ehhez a kampányhoz."
+        "waveNotAvailable": "Ez a hullám nem kapcsolható ehhez a kampányhoz.",
+        "marketHasPersonas": "Előbb távolítsd el a perszónákat ezekről a piacokról: {markets}."
       },
       "dialog": {
         "createTitle": "Új hullám",
@@ -1683,6 +1684,177 @@
         "deleteFailed": "A fájl törlése nem sikerült. Próbálja újra.",
         "downloadFailed": "A letöltést nem sikerült elindítani.",
         "brandArchived": "Ez a márka archivált. Állítsa vissza, hogy módosíthassa a fájljait."
+      }
+    },
+    "strategy": {
+      "title": "Stratégia és forgatókönyvek",
+      "entry": "Stratégia és forgatókönyvek",
+      "back": "Vissza a hullámhoz",
+      "cancel": "Mégse",
+      "close": "Bezárás",
+      "save": "Mentés",
+      "stepper": {
+        "label": "A stratégia lépései",
+        "usps": "USP-k",
+        "personas": "Perszónák",
+        "matrix": "Üzenetmátrix",
+        "concepts": "Koncepciók",
+        "creators": "Alkotók",
+        "scripts": "Forgatókönyvek",
+        "uspNone": "Még nincs USP",
+        "statusUsps": "{count} USP | {count} USP",
+        "personaNone": "Még nincs perszóna",
+        "statusPersonas": "{count} perszóna · {covered} / {markets} piac | {count} perszóna · {covered} / {markets} piac",
+        "notAvailable": "Még nem elérhető",
+        "locked": "Zárolva, amíg az összes koncepciót el nem fogadják"
+      },
+      "audience": {
+        "label": "Célközönség címe",
+        "placeholder": "Adj meg egy célközönségcímet",
+        "edit": "Célközönség címének szerkesztése",
+        "dialogTitle": "Célközönség címe"
+      },
+      "usp": {
+        "title": "USP-k",
+        "subtitle": "Hullámonként 4–6, minden piacon közös.",
+        "counter": "{count} / {max} USP",
+        "counterMax": "{count} / {max} USP · elérted a maximumot",
+        "add": "USP hozzáadása",
+        "maxReason": "Egy hullámnak legfeljebb {max} USP-je lehet.",
+        "warning": "Adj hozzá legalább {min} USP-t a teljes készlethez.",
+        "emptyTitle": "Még nincs USP",
+        "emptyBody": "Add hozzá az értékesítési érveket, amelyekre ez a hullám épül.",
+        "explainer": "Magyarázat",
+        "creativeAngle": "Kreatív szög",
+        "copySeed": "Szövegirányok",
+        "menu": "Műveletek: {title}",
+        "edit": "Szerkesztés",
+        "delete": "Törlés",
+        "moveEarlier": "Előrébb",
+        "moveLater": "Hátrébb",
+        "deleteStaffReason": "A perszónák által használt USP-t csak admin vagy menedzser törölheti.",
+        "usedBy": "{count} szög használja | {count} szög használja",
+        "validation": {
+          "titleRequired": "Adj meg egy címet."
+        },
+        "dialog": {
+          "addTitle": "USP hozzáadása",
+          "editTitle": "USP szerkesztése",
+          "title": "Cím",
+          "colourAuto": "A színt automatikusan kapja.",
+          "colourFixed": "Ennek a kártyának a színe."
+        },
+        "deleteDialog": {
+          "title": "Törlöd ezt: „{title}”?",
+          "body": "Egyetlen perszóna sem használja ezt az USP-t.",
+          "bodyInUse": "{count} szög használja ezt az USP-t, és vele együtt törlődik: | {count} szög használja ezt az USP-t, és vele együtt törlődnek:",
+          "confirmInUse": "Törlés és {count} szög eltávolítása | Törlés és {count} szög eltávolítása",
+          "refreshed": "A lista megváltozott, amíg az ablak nyitva volt. Nézd át, és erősítsd meg újra."
+        }
+      },
+      "persona": {
+        "markets": "Piacok",
+        "title": "Perszónák · {market}",
+        "subtitle": "Piaconként {min}–{max} perszóna. A kreatív szögek az 1. lépés USP-ire hivatkoznak.",
+        "add": "Perszóna hozzáadása",
+        "tile": "Perszóna hozzáadása · {count} / {max} felhasználva itt: {market}",
+        "tileMax": "{count} / {max} felhasználva itt: {market} · elérted a maximumot",
+        "warning": "Adj hozzá legalább {min} perszónát ide: {market}.",
+        "fewerThanMin": "Kevesebb mint {min} perszóna",
+        "empty": "Még nincs perszóna ide: {market}.",
+        "coreJob": "Fő feladat",
+        "drivers": "Érzelmi hajtóerők",
+        "goals": "Értékek és célok",
+        "selfTalk": {
+          "she": "Mit mond magának ő (nő)",
+          "he": "Mit mond magának ő (férfi)",
+          "they": "Mit mondanak maguknak ők"
+        },
+        "need": {
+          "she": "Mire van szüksége neki (nő)",
+          "he": "Mire van szüksége neki (férfi)",
+          "they": "Mire van szükségük nekik"
+        },
+        "barriers": "Akadályok és súrlódások",
+        "angles": "Meggyőző kreatív szögek",
+        "nameLine": "Név · {name}",
+        "menu": "Műveletek: {name}",
+        "edit": "Szerkesztés",
+        "delete": "Törlés",
+        "deleteTitle": "Törlöd ezt: {name}?",
+        "deleteBody": "A perszóna törlődik.",
+        "deleteBodyAngles": "A perszóna és {count} szöge törlődik. | A perszóna és {count} szöge törlődik.",
+        "addedByHand": "Kézzel hozzáadva",
+        "linked": "Összekapcsolva",
+        "addAngle": "Szög hozzáadása USP-kből",
+        "noUsps": "Előbb adj hozzá USP-ket az 1. lépésben.",
+        "goToUsps": "Ugrás az USP-khez",
+        "angleAdd": "Hozzáadás",
+        "angleEdit": "Szerkesztés",
+        "angleRemove": "Eltávolítás",
+        "angleMenu": "Műveletek a(z) {title} szöghöz",
+        "anglePlaceholder": "Hogyan kapcsolódik ez a perszóna az USP-hez",
+        "angleText": "A szög szövege",
+        "removeAngleTitle": "Eltávolítod ezt a szöget?",
+        "removeAngleBody": "A(z) „{usp}” szög eltávolításra kerül erről a perszónáról.",
+        "pronounName": {
+          "she": "Ő (nő)",
+          "he": "Ő (férfi)",
+          "they": "Ők"
+        },
+        "dialog": {
+          "addTitle": "Perszóna hozzáadása · {market}",
+          "editTitle": "Perszóna szerkesztése",
+          "code": "Kód",
+          "codeAuto": "Automatikus",
+          "codeHint": "{min}–{max} betű vagy számjegy, a piacon egyedi.",
+          "title": "Cím",
+          "name": "Név",
+          "nameHint": "A perszóna kitalált neve, nem valódi személy.",
+          "pronoun": "Névmás",
+          "pronounHint": "Csak a címkék megfogalmazását változtatja.",
+          "summary": "Összefoglaló",
+          "listCount": "{count} / {max}",
+          "addItem": "Elem hozzáadása",
+          "removeItem": "Elem eltávolítása"
+        },
+        "validation": {
+          "titleRequired": "Adj meg egy címet.",
+          "nameRequired": "Adj meg egy nevet.",
+          "codeRequired": "Adj meg egy kódot.",
+          "codeFormat": "{min}–{max} betűt vagy számjegyet használj.",
+          "angleRequired": "Írj be egy sort."
+        }
+      },
+      "copy": {
+        "open": "Másolás innen…",
+        "title": "Perszónák másolása ide: {market}",
+        "source": "Másolás innen",
+        "submit": "Másolás",
+        "line": "{count} másolása → {market} piacon {total} / {max} lesz",
+        "over": "{count} másolása → {market} piacon {total} / {max} lenne: a maximum fölött."
+      },
+      "validation": {
+        "tooLong": "Legfeljebb {max} karakter."
+      },
+      "errors": {
+        "loadFailed": "Nem sikerült betölteni. Próbáld újra.",
+        "saveFailed": "Nem sikerült menteni. Próbáld újra.",
+        "gone": "Ezt valaki más eltávolította. Zárd be, és töltsd újra.",
+        "workspaceGone": "Ez a stratégiai munkaterület nem található.",
+        "uspMaxReached": "A hullámnak már megvan a legnagyobb USP-szám.",
+        "uspOrderMismatch": "Az USP-k megváltoztak az oldal betöltése óta. A lista újratöltődött; próbáld újra.",
+        "uspInUse": "Perszónák használják ezt az USP-t. Erősítsd meg, hogy a szögeivel együtt törlődjön.",
+        "personaMaxReached": "Ezen a piacon már megvan a legnagyobb perszónaszám.",
+        "personaMarketNotInWave": "Ez a piac nem tartozik e hullám piacai közé.",
+        "personaCodeTaken": "Ezt a kódot már használja egy másik perszóna ezen a piacon.",
+        "copyInvalid": "Válassz két különböző piacot e hullámból és legalább egy perszónát.",
+        "copyExceedsCap": "{copy} perszóna átmásolása egy {target} perszónás piacra túllépné a {max} maximumot.",
+        "copyExceedsCapPlain": "Ez a másolás túllépné a perszónák maximális számát.",
+        "angleAlreadyLinked": "Ennek a perszónának már van szöge ehhez az USP-hez.",
+        "conflict": "Valaki ugyanekkor módosította ezt. Töltsd újra, és próbáld újra.",
+        "brandArchived": "Az archivált márka csak olvasható. Előbb állítsd vissza.",
+        "forbidden": "Ezt csak admin vagy menedzser teheti meg."
       }
     }
   },

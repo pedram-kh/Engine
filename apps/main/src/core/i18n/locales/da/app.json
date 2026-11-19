@@ -1481,7 +1481,8 @@
         "campaignLinkLocked": "En creator er valgt eller videre på denne kampagne, så linket kan ikke ændres.",
         "brandArchived": "Dette brand er arkiveret. Gendan det for at ændre dets bølger.",
         "saveFailed": "Bølgen kunne ikke gemmes. Prøv igen.",
-        "waveNotAvailable": "Den bølge kan ikke knyttes til denne kampagne."
+        "waveNotAvailable": "Den bølge kan ikke knyttes til denne kampagne.",
+        "marketHasPersonas": "Fjern først personaerne for disse markeder: {markets}."
       },
       "dialog": {
         "createTitle": "Ny bølge",
@@ -1683,6 +1684,177 @@
         "deleteFailed": "Filen kunne ikke slettes. Prøv igen.",
         "downloadFailed": "Download kunne ikke startes.",
         "brandArchived": "Dette brand er arkiveret. Gendan det for at ændre dets filer."
+      }
+    },
+    "strategy": {
+      "title": "Strategi og scripts",
+      "entry": "Strategi og scripts",
+      "back": "Tilbage til bølgen",
+      "cancel": "Annuller",
+      "close": "Luk",
+      "save": "Gem",
+      "stepper": {
+        "label": "Strategitrin",
+        "usps": "USP'er",
+        "personas": "Personaer",
+        "matrix": "Budskabsmatrix",
+        "concepts": "Koncepter",
+        "creators": "Creators",
+        "scripts": "Scripts",
+        "uspNone": "Ingen USP'er endnu",
+        "statusUsps": "{count} USP | {count} USP'er",
+        "personaNone": "Ingen personaer endnu",
+        "statusPersonas": "{count} persona · {covered} af {markets} markeder | {count} personaer · {covered} af {markets} markeder",
+        "notAvailable": "Ikke tilgængelig endnu",
+        "locked": "Låst, indtil alle koncepter er godkendt"
+      },
+      "audience": {
+        "label": "Målgruppetitel",
+        "placeholder": "Tilføj en målgruppetitel",
+        "edit": "Rediger målgruppetitel",
+        "dialogTitle": "Målgruppetitel"
+      },
+      "usp": {
+        "title": "USP'er",
+        "subtitle": "4–6 pr. bølge, fælles for alle markeder.",
+        "counter": "{count} af {max} USP'er",
+        "counterMax": "{count} af {max} USP'er · maksimum nået",
+        "add": "Tilføj USP",
+        "maxReason": "En bølge har højst {max} USP'er.",
+        "warning": "Tilføj mindst {min} USP'er for et komplet sæt.",
+        "emptyTitle": "Ingen USP'er endnu",
+        "emptyBody": "Tilføj de salgsargumenter, denne bølge bygger på.",
+        "explainer": "Forklaring",
+        "creativeAngle": "Kreativ vinkel",
+        "copySeed": "Retningslinjer for teksten",
+        "menu": "Handlinger for {title}",
+        "edit": "Rediger",
+        "delete": "Slet",
+        "moveEarlier": "Flyt tidligere",
+        "moveLater": "Flyt senere",
+        "deleteStaffReason": "Kun en admin eller manager kan slette en USP, som personaer bruger.",
+        "usedBy": "Brugt af {count} vinkel | Brugt af {count} vinkler",
+        "validation": {
+          "titleRequired": "Angiv en titel."
+        },
+        "dialog": {
+          "addTitle": "Tilføj USP",
+          "editTitle": "Rediger USP",
+          "title": "Titel",
+          "colourAuto": "Farven tildeles automatisk.",
+          "colourFixed": "Dette korts farve."
+        },
+        "deleteDialog": {
+          "title": "Slet “{title}”?",
+          "body": "Ingen persona bruger denne USP.",
+          "bodyInUse": "{count} vinkel bruger denne USP og fjernes sammen med den: | {count} vinkler bruger denne USP og fjernes sammen med den:",
+          "confirmInUse": "Slet og fjern {count} vinkel | Slet og fjern {count} vinkler",
+          "refreshed": "Listen er ændret, mens dette var åbent. Tjek den, og bekræft igen."
+        }
+      },
+      "persona": {
+        "markets": "Markeder",
+        "title": "Personaer · {market}",
+        "subtitle": "{min}–{max} personaer pr. marked. Kreative vinkler peger på USP'erne fra trin 1.",
+        "add": "Tilføj persona",
+        "tile": "Tilføj persona · {count} af {max} brugt i {market}",
+        "tileMax": "{count} af {max} brugt i {market} · maksimum nået",
+        "warning": "Tilføj mindst {min} personaer for {market}.",
+        "fewerThanMin": "Færre end {min} personaer",
+        "empty": "Ingen personaer for {market} endnu.",
+        "coreJob": "Kerneopgave",
+        "drivers": "Følelsesmæssige drivkræfter",
+        "goals": "Værdier og mål",
+        "selfTalk": {
+          "she": "Det, hun siger til sig selv",
+          "he": "Det, han siger til sig selv",
+          "they": "Det, de siger til sig selv"
+        },
+        "need": {
+          "she": "Det, hun har brug for",
+          "he": "Det, han har brug for",
+          "they": "Det, de har brug for"
+        },
+        "barriers": "Barrierer og gnidninger",
+        "angles": "Kreative vinkler, der overbeviser",
+        "nameLine": "Navn · {name}",
+        "menu": "Handlinger for {name}",
+        "edit": "Rediger",
+        "delete": "Slet",
+        "deleteTitle": "Slet {name}?",
+        "deleteBody": "Personaen fjernes.",
+        "deleteBodyAngles": "Personaen og dens {count} vinkel fjernes. | Personaen og dens {count} vinkler fjernes.",
+        "addedByHand": "Tilføjet manuelt",
+        "linked": "Knyttet",
+        "addAngle": "Tilføj vinkel fra USP'er",
+        "noUsps": "Tilføj først USP'er i trin 1.",
+        "goToUsps": "Gå til USP'erne",
+        "angleAdd": "Tilføj",
+        "angleEdit": "Rediger",
+        "angleRemove": "Fjern",
+        "angleMenu": "Handlinger for vinklen {title}",
+        "anglePlaceholder": "Hvordan denne persona hænger sammen med USP'en",
+        "angleText": "Vinkeltekst",
+        "removeAngleTitle": "Fjern denne vinkel?",
+        "removeAngleBody": "Vinklen på “{usp}” fjernes fra denne persona.",
+        "pronounName": {
+          "she": "Hun / hende",
+          "he": "Han / ham",
+          "they": "De / dem"
+        },
+        "dialog": {
+          "addTitle": "Tilføj persona · {market}",
+          "editTitle": "Rediger persona",
+          "code": "Kode",
+          "codeAuto": "Automatisk",
+          "codeHint": "{min}–{max} bogstaver eller cifre, unik på markedet.",
+          "title": "Titel",
+          "name": "Navn",
+          "nameHint": "Et opfundet navn til personaen, ikke en rigtig person.",
+          "pronoun": "Pronomen",
+          "pronounHint": "Ændrer kun ordlyden af etiketterne.",
+          "summary": "Resumé",
+          "listCount": "{count} af {max}",
+          "addItem": "Tilføj punkt",
+          "removeItem": "Fjern punkt"
+        },
+        "validation": {
+          "titleRequired": "Angiv en titel.",
+          "nameRequired": "Angiv et navn.",
+          "codeRequired": "Angiv en kode.",
+          "codeFormat": "Brug {min}–{max} bogstaver eller cifre.",
+          "angleRequired": "Angiv en linje."
+        }
+      },
+      "copy": {
+        "open": "Kopiér fra…",
+        "title": "Kopiér personaer til {market}",
+        "source": "Kopiér fra",
+        "submit": "Kopiér",
+        "line": "Kopierer {count} → {market} får {total} af {max}",
+        "over": "Kopierer {count} → {market} ville få {total} af {max}: over maksimum."
+      },
+      "validation": {
+        "tooLong": "Højst {max} tegn."
+      },
+      "errors": {
+        "loadFailed": "Kunne ikke indlæses. Prøv igen.",
+        "saveFailed": "Kunne ikke gemmes. Prøv igen.",
+        "gone": "Dette er fjernet af en anden. Luk og indlæs igen.",
+        "workspaceGone": "Dette strategiområde blev ikke fundet.",
+        "uspMaxReached": "Bølgen har allerede det maksimale antal USP'er.",
+        "uspOrderMismatch": "USP'erne er ændret, siden siden blev indlæst. Listen er indlæst igen; prøv igen.",
+        "uspInUse": "Personaer bruger denne USP. Bekræft for at fjerne den sammen med dens vinkler.",
+        "personaMaxReached": "Dette marked har allerede det maksimale antal personaer.",
+        "personaMarketNotInWave": "Det marked hører ikke til denne bølges markeder.",
+        "personaCodeTaken": "Denne kode bruges af en anden persona på dette marked.",
+        "copyInvalid": "Vælg to forskellige markeder i denne bølge og mindst én persona.",
+        "copyExceedsCap": "At kopiere {copy} personaer til et marked med {target} ville overskride maksimum på {max}.",
+        "copyExceedsCapPlain": "Den kopi ville overskride det maksimale antal personaer.",
+        "angleAlreadyLinked": "Denne persona har allerede en vinkel på den USP.",
+        "conflict": "Nogen ændrede dette på samme tid. Indlæs igen og prøv igen.",
+        "brandArchived": "Et arkiveret brand er skrivebeskyttet. Gendan det først.",
+        "forbidden": "Kun en admin eller manager kan gøre dette."
       }
     }
   },

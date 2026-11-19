@@ -1481,7 +1481,8 @@
         "campaignLinkLocked": "Un créateur est sélectionné ou plus avancé sur cette campagne, le lien ne peut donc pas être modifié.",
         "brandArchived": "Cette marque est archivée. Restaurez-la pour modifier ses vagues.",
         "saveFailed": "Impossible d'enregistrer la vague. Réessayez.",
-        "waveNotAvailable": "Cette vague ne peut pas être liée à cette campagne."
+        "waveNotAvailable": "Cette vague ne peut pas être liée à cette campagne.",
+        "marketHasPersonas": "Supprimez d'abord les personas de ces marchés : {markets}."
       },
       "dialog": {
         "createTitle": "Nouvelle vague",
@@ -1683,6 +1684,177 @@
         "deleteFailed": "Impossible de supprimer le fichier. Réessayez.",
         "downloadFailed": "Impossible de démarrer le téléchargement.",
         "brandArchived": "Cette marque est archivée. Restaurez-la pour modifier ses fichiers."
+      }
+    },
+    "strategy": {
+      "title": "Stratégie et scripts",
+      "entry": "Stratégie et scripts",
+      "back": "Retour à la vague",
+      "cancel": "Annuler",
+      "close": "Fermer",
+      "save": "Enregistrer",
+      "stepper": {
+        "label": "Étapes de la stratégie",
+        "usps": "USP",
+        "personas": "Personas",
+        "matrix": "Matrice de messages",
+        "concepts": "Concepts",
+        "creators": "Créateurs",
+        "scripts": "Scripts",
+        "uspNone": "Aucune USP pour l'instant",
+        "statusUsps": "{count} USP | {count} USP",
+        "personaNone": "Aucun persona pour l'instant",
+        "statusPersonas": "{count} persona · {covered} marché sur {markets} | {count} personas · {covered} marchés sur {markets}",
+        "notAvailable": "Pas encore disponible",
+        "locked": "Verrouillé jusqu'à l'approbation de tous les concepts"
+      },
+      "audience": {
+        "label": "Titre de l'audience",
+        "placeholder": "Ajouter un titre d'audience",
+        "edit": "Modifier le titre de l'audience",
+        "dialogTitle": "Titre de l'audience"
+      },
+      "usp": {
+        "title": "USP",
+        "subtitle": "4 à 6 par vague, communes à tous les marchés.",
+        "counter": "{count} sur {max} USP",
+        "counterMax": "{count} sur {max} USP · maximum atteint",
+        "add": "Ajouter une USP",
+        "maxReason": "Une vague compte au plus {max} USP.",
+        "warning": "Ajoutez au moins {min} USP pour un ensemble complet.",
+        "emptyTitle": "Aucune USP pour l'instant",
+        "emptyBody": "Ajoutez les arguments sur lesquels repose cette vague.",
+        "explainer": "Explication",
+        "creativeAngle": "Angle créatif",
+        "copySeed": "Pistes de rédaction",
+        "menu": "Actions pour {title}",
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "moveEarlier": "Déplacer plus tôt",
+        "moveLater": "Déplacer plus tard",
+        "deleteStaffReason": "Seul un admin ou un manager peut supprimer une USP utilisée par des personas.",
+        "usedBy": "Utilisée par {count} angle | Utilisée par {count} angles",
+        "validation": {
+          "titleRequired": "Saisissez un titre."
+        },
+        "dialog": {
+          "addTitle": "Ajouter une USP",
+          "editTitle": "Modifier l'USP",
+          "title": "Titre",
+          "colourAuto": "La couleur est attribuée automatiquement.",
+          "colourFixed": "La couleur de cette carte."
+        },
+        "deleteDialog": {
+          "title": "Supprimer « {title} » ?",
+          "body": "Aucun persona n'utilise cette USP.",
+          "bodyInUse": "{count} angle utilise cette USP et sera supprimé avec elle : | {count} angles utilisent cette USP et seront supprimés avec elle :",
+          "confirmInUse": "Supprimer et retirer {count} angle | Supprimer et retirer {count} angles",
+          "refreshed": "La liste a changé pendant que cette fenêtre était ouverte. Vérifiez-la et confirmez à nouveau."
+        }
+      },
+      "persona": {
+        "markets": "Marchés",
+        "title": "Personas · {market}",
+        "subtitle": "{min} à {max} personas par marché. Les angles créatifs renvoient aux USP de l'étape 1.",
+        "add": "Ajouter un persona",
+        "tile": "Ajouter un persona · {count} sur {max} utilisés pour {market}",
+        "tileMax": "{count} sur {max} utilisés pour {market} · maximum atteint",
+        "warning": "Ajoutez au moins {min} personas pour {market}.",
+        "fewerThanMin": "Moins de {min} personas",
+        "empty": "Aucun persona pour {market} pour l'instant.",
+        "coreJob": "Mission principale",
+        "drivers": "Moteurs émotionnels",
+        "goals": "Valeurs et objectifs",
+        "selfTalk": {
+          "she": "Ce qu'elle se dit",
+          "he": "Ce qu'il se dit",
+          "they": "Ce qu'ils se disent"
+        },
+        "need": {
+          "she": "Ce dont elle a besoin",
+          "he": "Ce dont il a besoin",
+          "they": "Ce dont ils ont besoin"
+        },
+        "barriers": "Freins et frictions",
+        "angles": "Angles créatifs qui convainquent",
+        "nameLine": "Nom · {name}",
+        "menu": "Actions pour {name}",
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "deleteTitle": "Supprimer {name} ?",
+        "deleteBody": "Le persona sera supprimé.",
+        "deleteBodyAngles": "Le persona et son {count} angle seront supprimés. | Le persona et ses {count} angles seront supprimés.",
+        "addedByHand": "Ajouté à la main",
+        "linked": "Lié",
+        "addAngle": "Ajouter un angle depuis les USP",
+        "noUsps": "Ajoutez d'abord des USP à l'étape 1.",
+        "goToUsps": "Aller aux USP",
+        "angleAdd": "Ajouter",
+        "angleEdit": "Modifier",
+        "angleRemove": "Retirer",
+        "angleMenu": "Actions pour l'angle {title}",
+        "anglePlaceholder": "Comment ce persona se relie à l'USP",
+        "angleText": "Texte de l'angle",
+        "removeAngleTitle": "Retirer cet angle ?",
+        "removeAngleBody": "L'angle sur « {usp} » sera retiré de ce persona.",
+        "pronounName": {
+          "she": "Elle",
+          "he": "Il",
+          "they": "Ils / elles"
+        },
+        "dialog": {
+          "addTitle": "Ajouter un persona · {market}",
+          "editTitle": "Modifier le persona",
+          "code": "Code",
+          "codeAuto": "Automatique",
+          "codeHint": "{min} à {max} lettres ou chiffres, unique dans le marché.",
+          "title": "Titre",
+          "name": "Nom",
+          "nameHint": "Un nom inventé pour le persona, pas une vraie personne.",
+          "pronoun": "Pronom",
+          "pronounHint": "Ne change que la formulation des libellés.",
+          "summary": "Résumé",
+          "listCount": "{count} sur {max}",
+          "addItem": "Ajouter un élément",
+          "removeItem": "Retirer l'élément"
+        },
+        "validation": {
+          "titleRequired": "Saisissez un titre.",
+          "nameRequired": "Saisissez un nom.",
+          "codeRequired": "Saisissez un code.",
+          "codeFormat": "Utilisez {min} à {max} lettres ou chiffres.",
+          "angleRequired": "Saisissez une ligne."
+        }
+      },
+      "copy": {
+        "open": "Copier depuis…",
+        "title": "Copier des personas vers {market}",
+        "source": "Copier depuis",
+        "submit": "Copier",
+        "line": "Copie de {count} → {market} aura {total} sur {max}",
+        "over": "Copie de {count} → {market} aurait {total} sur {max} : au-dessus du maximum."
+      },
+      "validation": {
+        "tooLong": "{max} caractères au maximum."
+      },
+      "errors": {
+        "loadFailed": "Chargement impossible. Réessayez.",
+        "saveFailed": "Enregistrement impossible. Réessayez.",
+        "gone": "Cet élément a été supprimé par quelqu'un d'autre. Fermez et rechargez.",
+        "workspaceGone": "Cet espace stratégie est introuvable.",
+        "uspMaxReached": "La vague a déjà le nombre maximal d'USP.",
+        "uspOrderMismatch": "Les USP ont changé depuis le chargement de la page. La liste a été rechargée ; réessayez.",
+        "uspInUse": "Des personas utilisent cette USP. Confirmez pour la supprimer avec ses angles.",
+        "personaMaxReached": "Ce marché a déjà le nombre maximal de personas.",
+        "personaMarketNotInWave": "Ce marché ne fait pas partie des marchés de cette vague.",
+        "personaCodeTaken": "Ce code est utilisé par un autre persona de ce marché.",
+        "copyInvalid": "Choisissez deux marchés différents de cette vague et au moins un persona.",
+        "copyExceedsCap": "Copier {copy} personas vers un marché qui en compte {target} dépasserait le maximum de {max}.",
+        "copyExceedsCapPlain": "Cette copie dépasserait le nombre maximal de personas.",
+        "angleAlreadyLinked": "Ce persona a déjà un angle sur cette USP.",
+        "conflict": "Quelqu'un a modifié cet élément au même moment. Rechargez et réessayez.",
+        "brandArchived": "Une marque archivée est en lecture seule. Restaurez-la d'abord.",
+        "forbidden": "Seul un admin ou un manager peut faire cela."
       }
     }
   },

@@ -1481,7 +1481,8 @@
         "campaignLinkLocked": "Er is een creator geselecteerd of verder in deze campagne, dus de koppeling kan niet worden gewijzigd.",
         "brandArchived": "Dit merk is gearchiveerd. Herstel het om de golven te wijzigen.",
         "saveFailed": "De golf kon niet worden opgeslagen. Probeer het opnieuw.",
-        "waveNotAvailable": "Die golf kan niet aan deze campagne worden gekoppeld."
+        "waveNotAvailable": "Die golf kan niet aan deze campagne worden gekoppeld.",
+        "marketHasPersonas": "Verwijder eerst de persona's van deze markten: {markets}."
       },
       "dialog": {
         "createTitle": "Nieuwe golf",
@@ -1683,6 +1684,177 @@
         "deleteFailed": "Het bestand kon niet worden verwijderd. Probeer het opnieuw.",
         "downloadFailed": "De download kon niet worden gestart.",
         "brandArchived": "Dit merk is gearchiveerd. Herstel het om de bestanden te wijzigen."
+      }
+    },
+    "strategy": {
+      "title": "Strategie en scripts",
+      "entry": "Strategie en scripts",
+      "back": "Terug naar de golf",
+      "cancel": "Annuleren",
+      "close": "Sluiten",
+      "save": "Opslaan",
+      "stepper": {
+        "label": "Strategiestappen",
+        "usps": "USP's",
+        "personas": "Persona's",
+        "matrix": "Berichtenmatrix",
+        "concepts": "Concepten",
+        "creators": "Creators",
+        "scripts": "Scripts",
+        "uspNone": "Nog geen USP's",
+        "statusUsps": "{count} USP | {count} USP's",
+        "personaNone": "Nog geen persona's",
+        "statusPersonas": "{count} persona · {covered} van {markets} markten | {count} persona's · {covered} van {markets} markten",
+        "notAvailable": "Nog niet beschikbaar",
+        "locked": "Vergrendeld tot alle concepten zijn goedgekeurd"
+      },
+      "audience": {
+        "label": "Doelgroeptitel",
+        "placeholder": "Voeg een doelgroeptitel toe",
+        "edit": "Doelgroeptitel bewerken",
+        "dialogTitle": "Doelgroeptitel"
+      },
+      "usp": {
+        "title": "USP's",
+        "subtitle": "4–6 per golf, gedeeld door alle markten.",
+        "counter": "{count} van {max} USP's",
+        "counterMax": "{count} van {max} USP's · maximum bereikt",
+        "add": "USP toevoegen",
+        "maxReason": "Een golf heeft hoogstens {max} USP's.",
+        "warning": "Voeg minstens {min} USP's toe voor een complete set.",
+        "emptyTitle": "Nog geen USP's",
+        "emptyBody": "Voeg de verkoopargumenten toe waarop deze golf is gebouwd.",
+        "explainer": "Toelichting",
+        "creativeAngle": "Creatieve invalshoek",
+        "copySeed": "Richtlijnen voor de tekst",
+        "menu": "Acties voor {title}",
+        "edit": "Bewerken",
+        "delete": "Verwijderen",
+        "moveEarlier": "Eerder zetten",
+        "moveLater": "Later zetten",
+        "deleteStaffReason": "Alleen een admin of manager kan een USP verwijderen die persona's gebruiken.",
+        "usedBy": "Gebruikt door {count} invalshoek | Gebruikt door {count} invalshoeken",
+        "validation": {
+          "titleRequired": "Vul een titel in."
+        },
+        "dialog": {
+          "addTitle": "USP toevoegen",
+          "editTitle": "USP bewerken",
+          "title": "Titel",
+          "colourAuto": "De kleur wordt automatisch toegewezen.",
+          "colourFixed": "De kleur van deze kaart."
+        },
+        "deleteDialog": {
+          "title": "“{title}” verwijderen?",
+          "body": "Geen enkele persona gebruikt deze USP.",
+          "bodyInUse": "{count} invalshoek gebruikt deze USP en wordt mee verwijderd: | {count} invalshoeken gebruiken deze USP en worden mee verwijderd:",
+          "confirmInUse": "Verwijderen en {count} invalshoek wissen | Verwijderen en {count} invalshoeken wissen",
+          "refreshed": "De lijst is veranderd terwijl dit openstond. Controleer hem en bevestig opnieuw."
+        }
+      },
+      "persona": {
+        "markets": "Markten",
+        "title": "Persona's · {market}",
+        "subtitle": "{min}–{max} persona's per markt. Creatieve invalshoeken verwijzen naar de USP's uit stap 1.",
+        "add": "Persona toevoegen",
+        "tile": "Persona toevoegen · {count} van {max} gebruikt in {market}",
+        "tileMax": "{count} van {max} gebruikt in {market} · maximum bereikt",
+        "warning": "Voeg minstens {min} persona's toe voor {market}.",
+        "fewerThanMin": "Minder dan {min} persona's",
+        "empty": "Nog geen persona's voor {market}.",
+        "coreJob": "Kerntaak",
+        "drivers": "Emotionele drijfveren",
+        "goals": "Waarden en doelen",
+        "selfTalk": {
+          "she": "Wat zij tegen zichzelf zegt",
+          "he": "Wat hij tegen zichzelf zegt",
+          "they": "Wat zij tegen zichzelf zeggen"
+        },
+        "need": {
+          "she": "Wat zij nodig heeft",
+          "he": "Wat hij nodig heeft",
+          "they": "Wat zij nodig hebben"
+        },
+        "barriers": "Drempels en wrijving",
+        "angles": "Creatieve invalshoeken die overtuigen",
+        "nameLine": "Naam · {name}",
+        "menu": "Acties voor {name}",
+        "edit": "Bewerken",
+        "delete": "Verwijderen",
+        "deleteTitle": "{name} verwijderen?",
+        "deleteBody": "De persona wordt verwijderd.",
+        "deleteBodyAngles": "De persona en haar {count} invalshoek worden verwijderd. | De persona en haar {count} invalshoeken worden verwijderd.",
+        "addedByHand": "Handmatig toegevoegd",
+        "linked": "Gekoppeld",
+        "addAngle": "Invalshoek toevoegen uit USP's",
+        "noUsps": "Voeg eerst USP's toe in stap 1.",
+        "goToUsps": "Naar de USP's",
+        "angleAdd": "Toevoegen",
+        "angleEdit": "Bewerken",
+        "angleRemove": "Verwijderen",
+        "angleMenu": "Acties voor de invalshoek {title}",
+        "anglePlaceholder": "Hoe deze persona aansluit bij de USP",
+        "angleText": "Tekst van de invalshoek",
+        "removeAngleTitle": "Deze invalshoek verwijderen?",
+        "removeAngleBody": "De invalshoek op “{usp}” wordt van deze persona verwijderd.",
+        "pronounName": {
+          "she": "Zij / haar",
+          "he": "Hij / hem",
+          "they": "Zij (meervoud) / hen"
+        },
+        "dialog": {
+          "addTitle": "Persona toevoegen · {market}",
+          "editTitle": "Persona bewerken",
+          "code": "Code",
+          "codeAuto": "Automatisch",
+          "codeHint": "{min}–{max} letters of cijfers, uniek binnen de markt.",
+          "title": "Titel",
+          "name": "Naam",
+          "nameHint": "Een verzonnen naam voor de persona, geen echt persoon.",
+          "pronoun": "Voornaamwoord",
+          "pronounHint": "Verandert alleen de formulering van de labels.",
+          "summary": "Samenvatting",
+          "listCount": "{count} van {max}",
+          "addItem": "Item toevoegen",
+          "removeItem": "Item verwijderen"
+        },
+        "validation": {
+          "titleRequired": "Vul een titel in.",
+          "nameRequired": "Vul een naam in.",
+          "codeRequired": "Vul een code in.",
+          "codeFormat": "Gebruik {min}–{max} letters of cijfers.",
+          "angleRequired": "Vul een regel in."
+        }
+      },
+      "copy": {
+        "open": "Kopiëren van…",
+        "title": "Persona's kopiëren naar {market}",
+        "source": "Kopiëren van",
+        "submit": "Kopiëren",
+        "line": "{count} kopiëren → {market} heeft dan {total} van {max}",
+        "over": "{count} kopiëren → {market} zou {total} van {max} hebben: boven het maximum."
+      },
+      "validation": {
+        "tooLong": "Maximaal {max} tekens."
+      },
+      "errors": {
+        "loadFailed": "Laden is mislukt. Probeer het opnieuw.",
+        "saveFailed": "Opslaan is mislukt. Probeer het opnieuw.",
+        "gone": "Dit is door iemand anders verwijderd. Sluit en laad opnieuw.",
+        "workspaceGone": "Deze strategiewerkruimte is niet gevonden.",
+        "uspMaxReached": "De golf heeft al het maximale aantal USP's.",
+        "uspOrderMismatch": "De USP's zijn veranderd sinds de pagina werd geladen. De lijst is opnieuw geladen; probeer het opnieuw.",
+        "uspInUse": "Persona's gebruiken deze USP. Bevestig om hem samen met zijn invalshoeken te verwijderen.",
+        "personaMaxReached": "Deze markt heeft al het maximale aantal persona's.",
+        "personaMarketNotInWave": "Die markt hoort niet bij de markten van deze golf.",
+        "personaCodeTaken": "Deze code wordt al gebruikt door een andere persona in deze markt.",
+        "copyInvalid": "Kies twee verschillende markten van deze golf en minstens één persona.",
+        "copyExceedsCap": "{copy} persona's kopiëren naar een markt met {target} zou het maximum van {max} overschrijden.",
+        "copyExceedsCapPlain": "Die kopie zou het maximale aantal persona's overschrijden.",
+        "angleAlreadyLinked": "Deze persona heeft al een invalshoek op die USP.",
+        "conflict": "Iemand heeft dit tegelijk gewijzigd. Laad opnieuw en probeer het nog eens.",
+        "brandArchived": "Een gearchiveerd merk is alleen-lezen. Herstel het eerst.",
+        "forbidden": "Alleen een admin of manager kan dit doen."
       }
     }
   },

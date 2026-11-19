@@ -1481,7 +1481,8 @@
         "campaignLinkLocked": "W tej kampanii twórca jest wybrany lub dalej, więc powiązania nie można zmienić.",
         "brandArchived": "Ta marka jest zarchiwizowana. Przywróć ją, aby zmieniać jej fale.",
         "saveFailed": "Nie udało się zapisać fali. Spróbuj ponownie.",
-        "waveNotAvailable": "Tej fali nie można powiązać z tą kampanią."
+        "waveNotAvailable": "Tej fali nie można powiązać z tą kampanią.",
+        "marketHasPersonas": "Najpierw usuń persony z tych rynków: {markets}."
       },
       "dialog": {
         "createTitle": "Nowa fala",
@@ -1683,6 +1684,177 @@
         "deleteFailed": "Nie udało się usunąć pliku. Spróbuj ponownie.",
         "downloadFailed": "Nie udało się rozpocząć pobierania.",
         "brandArchived": "Ta marka jest zarchiwizowana. Przywróć ją, aby zmieniać jej pliki."
+      }
+    },
+    "strategy": {
+      "title": "Strategia i skrypty",
+      "entry": "Strategia i skrypty",
+      "back": "Wróć do fali",
+      "cancel": "Anuluj",
+      "close": "Zamknij",
+      "save": "Zapisz",
+      "stepper": {
+        "label": "Kroki strategii",
+        "usps": "USP",
+        "personas": "Persony",
+        "matrix": "Macierz komunikatów",
+        "concepts": "Koncepcje",
+        "creators": "Twórcy",
+        "scripts": "Skrypty",
+        "uspNone": "Brak USP",
+        "statusUsps": "{count} USP | {count} USP",
+        "personaNone": "Brak person",
+        "statusPersonas": "{count} persona · {covered} z {markets} rynków | {count} person · {covered} z {markets} rynków",
+        "notAvailable": "Jeszcze niedostępne",
+        "locked": "Zablokowane do zatwierdzenia wszystkich koncepcji"
+      },
+      "audience": {
+        "label": "Tytuł grupy docelowej",
+        "placeholder": "Dodaj tytuł grupy docelowej",
+        "edit": "Edytuj tytuł grupy docelowej",
+        "dialogTitle": "Tytuł grupy docelowej"
+      },
+      "usp": {
+        "title": "USP",
+        "subtitle": "4–6 na falę, wspólne dla wszystkich rynków.",
+        "counter": "{count} z {max} USP",
+        "counterMax": "{count} z {max} USP · osiągnięto maksimum",
+        "add": "Dodaj USP",
+        "maxReason": "Fala ma najwyżej {max} USP.",
+        "warning": "Dodaj co najmniej {min} USP, aby zestaw był kompletny.",
+        "emptyTitle": "Brak USP",
+        "emptyBody": "Dodaj argumenty sprzedażowe, na których opiera się ta fala.",
+        "explainer": "Wyjaśnienie",
+        "creativeAngle": "Kąt kreatywny",
+        "copySeed": "Wytyczne do tekstu",
+        "menu": "Działania dla {title}",
+        "edit": "Edytuj",
+        "delete": "Usuń",
+        "moveEarlier": "Przesuń wcześniej",
+        "moveLater": "Przesuń później",
+        "deleteStaffReason": "Tylko admin lub manager może usunąć USP używane przez persony.",
+        "usedBy": "Używane przez {count} kąt | Używane przez {count} kątów",
+        "validation": {
+          "titleRequired": "Wpisz tytuł."
+        },
+        "dialog": {
+          "addTitle": "Dodaj USP",
+          "editTitle": "Edytuj USP",
+          "title": "Tytuł",
+          "colourAuto": "Kolor jest nadawany automatycznie.",
+          "colourFixed": "Kolor tej karty."
+        },
+        "deleteDialog": {
+          "title": "Usunąć „{title}”?",
+          "body": "Żadna persona nie używa tego USP.",
+          "bodyInUse": "{count} kąt używa tego USP i zostanie usunięty razem z nim: | {count} kątów używa tego USP i zostanie usuniętych razem z nim:",
+          "confirmInUse": "Usuń i skasuj {count} kąt | Usuń i skasuj {count} kątów",
+          "refreshed": "Lista zmieniła się, gdy to okno było otwarte. Sprawdź ją i potwierdź ponownie."
+        }
+      },
+      "persona": {
+        "markets": "Rynki",
+        "title": "Persony · {market}",
+        "subtitle": "{min}–{max} person na rynek. Kąty kreatywne odwołują się do USP z kroku 1.",
+        "add": "Dodaj personę",
+        "tile": "Dodaj personę · wykorzystano {count} z {max} w: {market}",
+        "tileMax": "Wykorzystano {count} z {max} w: {market} · osiągnięto maksimum",
+        "warning": "Dodaj co najmniej {min} person dla: {market}.",
+        "fewerThanMin": "Mniej niż {min} person",
+        "empty": "Brak person dla: {market}.",
+        "coreJob": "Główne zadanie",
+        "drivers": "Motywacje emocjonalne",
+        "goals": "Wartości i cele",
+        "selfTalk": {
+          "she": "Co sobie mówi ona",
+          "he": "Co sobie mówi on",
+          "they": "Co sobie mówią oni"
+        },
+        "need": {
+          "she": "Czego potrzebuje ona",
+          "he": "Czego potrzebuje on",
+          "they": "Czego potrzebują oni"
+        },
+        "barriers": "Bariery i tarcia",
+        "angles": "Kąty kreatywne, które przekonują",
+        "nameLine": "Imię · {name}",
+        "menu": "Działania dla {name}",
+        "edit": "Edytuj",
+        "delete": "Usuń",
+        "deleteTitle": "Usunąć: {name}?",
+        "deleteBody": "Persona zostanie usunięta.",
+        "deleteBodyAngles": "Persona i jej {count} kąt zostaną usunięte. | Persona i jej {count} kątów zostaną usunięte.",
+        "addedByHand": "Dodano ręcznie",
+        "linked": "Powiązano",
+        "addAngle": "Dodaj kąt z USP",
+        "noUsps": "Najpierw dodaj USP w kroku 1.",
+        "goToUsps": "Przejdź do USP",
+        "angleAdd": "Dodaj",
+        "angleEdit": "Edytuj",
+        "angleRemove": "Usuń",
+        "angleMenu": "Działania dla kąta {title}",
+        "anglePlaceholder": "Jak ta persona łączy się z USP",
+        "angleText": "Tekst kąta",
+        "removeAngleTitle": "Usunąć ten kąt?",
+        "removeAngleBody": "Kąt dla „{usp}” zostanie usunięty z tej persony.",
+        "pronounName": {
+          "she": "Ona",
+          "he": "On",
+          "they": "Oni / one"
+        },
+        "dialog": {
+          "addTitle": "Dodaj personę · {market}",
+          "editTitle": "Edytuj personę",
+          "code": "Kod",
+          "codeAuto": "Automatyczny",
+          "codeHint": "{min}–{max} liter lub cyfr, unikalny na rynku.",
+          "title": "Tytuł",
+          "name": "Imię",
+          "nameHint": "Wymyślone imię persony, nie prawdziwa osoba.",
+          "pronoun": "Zaimek",
+          "pronounHint": "Zmienia tylko brzmienie etykiet.",
+          "summary": "Podsumowanie",
+          "listCount": "{count} z {max}",
+          "addItem": "Dodaj pozycję",
+          "removeItem": "Usuń pozycję"
+        },
+        "validation": {
+          "titleRequired": "Wpisz tytuł.",
+          "nameRequired": "Wpisz imię.",
+          "codeRequired": "Wpisz kod.",
+          "codeFormat": "Użyj {min}–{max} liter lub cyfr.",
+          "angleRequired": "Wpisz linijkę tekstu."
+        }
+      },
+      "copy": {
+        "open": "Kopiuj z…",
+        "title": "Kopiuj persony do: {market}",
+        "source": "Kopiuj z",
+        "submit": "Kopiuj",
+        "line": "Kopiowanie {count} → w: {market} będzie {total} z {max}",
+        "over": "Kopiowanie {count} → w: {market} byłoby {total} z {max}: powyżej maksimum."
+      },
+      "validation": {
+        "tooLong": "Najwyżej {max} znaków."
+      },
+      "errors": {
+        "loadFailed": "Nie udało się wczytać. Spróbuj ponownie.",
+        "saveFailed": "Nie udało się zapisać. Spróbuj ponownie.",
+        "gone": "Ktoś inny to usunął. Zamknij i wczytaj ponownie.",
+        "workspaceGone": "Nie znaleziono tej przestrzeni strategii.",
+        "uspMaxReached": "Fala ma już maksymalną liczbę USP.",
+        "uspOrderMismatch": "USP zmieniły się od wczytania strony. Lista została wczytana ponownie; spróbuj jeszcze raz.",
+        "uspInUse": "Persony używają tego USP. Potwierdź, aby usunąć go razem z jego kątami.",
+        "personaMaxReached": "Ten rynek ma już maksymalną liczbę person.",
+        "personaMarketNotInWave": "Ten rynek nie należy do rynków tej fali.",
+        "personaCodeTaken": "Ten kod jest używany przez inną personę na tym rynku.",
+        "copyInvalid": "Wybierz dwa różne rynki tej fali i co najmniej jedną personę.",
+        "copyExceedsCap": "Skopiowanie {copy} person na rynek, który ma {target}, przekroczyłoby maksimum {max}.",
+        "copyExceedsCapPlain": "Ta kopia przekroczyłaby maksymalną liczbę person.",
+        "angleAlreadyLinked": "Ta persona ma już kąt dla tego USP.",
+        "conflict": "Ktoś zmienił to w tej samej chwili. Wczytaj ponownie i spróbuj jeszcze raz.",
+        "brandArchived": "Zarchiwizowana marka jest tylko do odczytu. Najpierw ją przywróć.",
+        "forbidden": "Może to zrobić tylko admin lub manager."
       }
     }
   },

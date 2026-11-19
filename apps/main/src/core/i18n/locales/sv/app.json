@@ -1481,7 +1481,8 @@
         "campaignLinkLocked": "En skapare är vald eller längre fram i den här kampanjen, så länken kan inte ändras.",
         "brandArchived": "Det här varumärket är arkiverat. Återställ det för att ändra dess vågor.",
         "saveFailed": "Vågen kunde inte sparas. Försök igen.",
-        "waveNotAvailable": "Den vågen kan inte kopplas till den här kampanjen."
+        "waveNotAvailable": "Den vågen kan inte kopplas till den här kampanjen.",
+        "marketHasPersonas": "Ta först bort personorna för de här marknaderna: {markets}."
       },
       "dialog": {
         "createTitle": "Ny våg",
@@ -1683,6 +1684,177 @@
         "deleteFailed": "Filen kunde inte tas bort. Försök igen.",
         "downloadFailed": "Nedladdningen kunde inte startas.",
         "brandArchived": "Det här varumärket är arkiverat. Återställ det för att ändra dess filer."
+      }
+    },
+    "strategy": {
+      "title": "Strategi och manus",
+      "entry": "Strategi och manus",
+      "back": "Tillbaka till vågen",
+      "cancel": "Avbryt",
+      "close": "Stäng",
+      "save": "Spara",
+      "stepper": {
+        "label": "Strategisteg",
+        "usps": "USP:er",
+        "personas": "Personor",
+        "matrix": "Budskapsmatris",
+        "concepts": "Koncept",
+        "creators": "Creators",
+        "scripts": "Manus",
+        "uspNone": "Inga USP:er än",
+        "statusUsps": "{count} USP | {count} USP:er",
+        "personaNone": "Inga personor än",
+        "statusPersonas": "{count} persona · {covered} av {markets} marknader | {count} personor · {covered} av {markets} marknader",
+        "notAvailable": "Inte tillgängligt än",
+        "locked": "Låst tills alla koncept är godkända"
+      },
+      "audience": {
+        "label": "Målgruppstitel",
+        "placeholder": "Lägg till en målgruppstitel",
+        "edit": "Redigera målgruppstitel",
+        "dialogTitle": "Målgruppstitel"
+      },
+      "usp": {
+        "title": "USP:er",
+        "subtitle": "4–6 per våg, gemensamma för alla marknader.",
+        "counter": "{count} av {max} USP:er",
+        "counterMax": "{count} av {max} USP:er · maxgräns nådd",
+        "add": "Lägg till USP",
+        "maxReason": "En våg har högst {max} USP:er.",
+        "warning": "Lägg till minst {min} USP:er för en komplett uppsättning.",
+        "emptyTitle": "Inga USP:er än",
+        "emptyBody": "Lägg till de säljargument som den här vågen bygger på.",
+        "explainer": "Förklaring",
+        "creativeAngle": "Kreativ vinkel",
+        "copySeed": "Riktlinjer för texten",
+        "menu": "Åtgärder för {title}",
+        "edit": "Redigera",
+        "delete": "Ta bort",
+        "moveEarlier": "Flytta tidigare",
+        "moveLater": "Flytta senare",
+        "deleteStaffReason": "Bara en admin eller manager kan ta bort en USP som personor använder.",
+        "usedBy": "Används av {count} vinkel | Används av {count} vinklar",
+        "validation": {
+          "titleRequired": "Ange en titel."
+        },
+        "dialog": {
+          "addTitle": "Lägg till USP",
+          "editTitle": "Redigera USP",
+          "title": "Titel",
+          "colourAuto": "Färgen tilldelas automatiskt.",
+          "colourFixed": "Det här kortets färg."
+        },
+        "deleteDialog": {
+          "title": "Ta bort ”{title}”?",
+          "body": "Ingen persona använder den här USP:n.",
+          "bodyInUse": "{count} vinkel använder den här USP:n och tas bort med den: | {count} vinklar använder den här USP:n och tas bort med den:",
+          "confirmInUse": "Ta bort och radera {count} vinkel | Ta bort och radera {count} vinklar",
+          "refreshed": "Listan ändrades medan det här var öppet. Kontrollera den och bekräfta igen."
+        }
+      },
+      "persona": {
+        "markets": "Marknader",
+        "title": "Personor · {market}",
+        "subtitle": "{min}–{max} personor per marknad. Kreativa vinklar kopplas till USP:erna från steg 1.",
+        "add": "Lägg till persona",
+        "tile": "Lägg till persona · {count} av {max} använda i {market}",
+        "tileMax": "{count} av {max} använda i {market} · maxgräns nådd",
+        "warning": "Lägg till minst {min} personor för {market}.",
+        "fewerThanMin": "Färre än {min} personor",
+        "empty": "Inga personor för {market} än.",
+        "coreJob": "Huvuduppgift",
+        "drivers": "Känslomässiga drivkrafter",
+        "goals": "Värderingar och mål",
+        "selfTalk": {
+          "she": "Vad hon säger till sig själv",
+          "he": "Vad han säger till sig själv",
+          "they": "Vad de säger till sig själva"
+        },
+        "need": {
+          "she": "Vad hon behöver",
+          "he": "Vad han behöver",
+          "they": "Vad de behöver"
+        },
+        "barriers": "Hinder och friktion",
+        "angles": "Kreativa vinklar som övertygar",
+        "nameLine": "Namn · {name}",
+        "menu": "Åtgärder för {name}",
+        "edit": "Redigera",
+        "delete": "Ta bort",
+        "deleteTitle": "Ta bort {name}?",
+        "deleteBody": "Personan tas bort.",
+        "deleteBodyAngles": "Personan och dess {count} vinkel tas bort. | Personan och dess {count} vinklar tas bort.",
+        "addedByHand": "Tillagd manuellt",
+        "linked": "Kopplad",
+        "addAngle": "Lägg till vinkel från USP:er",
+        "noUsps": "Lägg först till USP:er i steg 1.",
+        "goToUsps": "Gå till USP:erna",
+        "angleAdd": "Lägg till",
+        "angleEdit": "Redigera",
+        "angleRemove": "Ta bort",
+        "angleMenu": "Åtgärder för vinkeln {title}",
+        "anglePlaceholder": "Hur den här personan hänger ihop med USP:n",
+        "angleText": "Vinkeltext",
+        "removeAngleTitle": "Ta bort den här vinkeln?",
+        "removeAngleBody": "Vinkeln på ”{usp}” tas bort från den här personan.",
+        "pronounName": {
+          "she": "Hon / henne",
+          "he": "Han / honom",
+          "they": "De / dem"
+        },
+        "dialog": {
+          "addTitle": "Lägg till persona · {market}",
+          "editTitle": "Redigera persona",
+          "code": "Kod",
+          "codeAuto": "Automatisk",
+          "codeHint": "{min}–{max} bokstäver eller siffror, unik på marknaden.",
+          "title": "Titel",
+          "name": "Namn",
+          "nameHint": "Ett påhittat namn på personan, ingen verklig person.",
+          "pronoun": "Pronomen",
+          "pronounHint": "Ändrar bara ordalydelsen i etiketterna.",
+          "summary": "Sammanfattning",
+          "listCount": "{count} av {max}",
+          "addItem": "Lägg till punkt",
+          "removeItem": "Ta bort punkt"
+        },
+        "validation": {
+          "titleRequired": "Ange en titel.",
+          "nameRequired": "Ange ett namn.",
+          "codeRequired": "Ange en kod.",
+          "codeFormat": "Använd {min}–{max} bokstäver eller siffror.",
+          "angleRequired": "Ange en rad."
+        }
+      },
+      "copy": {
+        "open": "Kopiera från…",
+        "title": "Kopiera personor till {market}",
+        "source": "Kopiera från",
+        "submit": "Kopiera",
+        "line": "Kopierar {count} → {market} får {total} av {max}",
+        "over": "Kopierar {count} → {market} skulle få {total} av {max}: över maxgränsen."
+      },
+      "validation": {
+        "tooLong": "Högst {max} tecken."
+      },
+      "errors": {
+        "loadFailed": "Det gick inte att läsa in. Försök igen.",
+        "saveFailed": "Det gick inte att spara. Försök igen.",
+        "gone": "Det här har tagits bort av någon annan. Stäng och läs in igen.",
+        "workspaceGone": "Den här strategiytan hittades inte.",
+        "uspMaxReached": "Vågen har redan högsta antal USP:er.",
+        "uspOrderMismatch": "USP:erna har ändrats sedan sidan lästes in. Listan lästes in på nytt; försök igen.",
+        "uspInUse": "Personor använder den här USP:n. Bekräfta för att ta bort den tillsammans med dess vinklar.",
+        "personaMaxReached": "Den här marknaden har redan högsta antal personor.",
+        "personaMarketNotInWave": "Den marknaden är inte en av vågens marknader.",
+        "personaCodeTaken": "Koden används av en annan persona på den här marknaden.",
+        "copyInvalid": "Välj två olika marknader i den här vågen och minst en persona.",
+        "copyExceedsCap": "Att kopiera {copy} personor till en marknad med {target} skulle överskrida maxgränsen på {max}.",
+        "copyExceedsCapPlain": "Den kopian skulle överskrida högsta antal personor.",
+        "angleAlreadyLinked": "Den här personan har redan en vinkel på den USP:n.",
+        "conflict": "Någon ändrade det här samtidigt. Läs in på nytt och försök igen.",
+        "brandArchived": "Ett arkiverat varumärke är skrivskyddat. Återställ det först.",
+        "forbidden": "Bara en admin eller manager kan göra det här."
       }
     }
   },

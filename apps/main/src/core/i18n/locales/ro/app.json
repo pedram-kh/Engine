@@ -1481,7 +1481,8 @@
         "campaignLinkLocked": "În această campanie un creator este selectat sau mai departe, deci legătura nu poate fi schimbată.",
         "brandArchived": "Acest brand este arhivat. Restaurați-l pentru a-i modifica valurile.",
         "saveFailed": "Valul nu a putut fi salvat. Încercați din nou.",
-        "waveNotAvailable": "Acel val nu poate fi legat de această campanie."
+        "waveNotAvailable": "Acel val nu poate fi legat de această campanie.",
+        "marketHasPersonas": "Elimină mai întâi persona din aceste piețe: {markets}."
       },
       "dialog": {
         "createTitle": "Val nou",
@@ -1683,6 +1684,177 @@
         "deleteFailed": "Fișierul nu a putut fi șters. Încercați din nou.",
         "downloadFailed": "Descărcarea nu a putut fi pornită.",
         "brandArchived": "Acest brand este arhivat. Restaurați-l pentru a-i modifica fișierele."
+      }
+    },
+    "strategy": {
+      "title": "Strategie și scripturi",
+      "entry": "Strategie și scripturi",
+      "back": "Înapoi la val",
+      "cancel": "Anulează",
+      "close": "Închide",
+      "save": "Salvează",
+      "stepper": {
+        "label": "Pașii strategiei",
+        "usps": "USP-uri",
+        "personas": "Persona",
+        "matrix": "Matricea mesajelor",
+        "concepts": "Concepte",
+        "creators": "Creatori",
+        "scripts": "Scripturi",
+        "uspNone": "Încă niciun USP",
+        "statusUsps": "{count} USP | {count} USP-uri",
+        "personaNone": "Încă nicio persona",
+        "statusPersonas": "{count} persona · {covered} din {markets} piețe | {count} persona · {covered} din {markets} piețe",
+        "notAvailable": "Încă indisponibil",
+        "locked": "Blocat până când toate conceptele sunt aprobate"
+      },
+      "audience": {
+        "label": "Titlul audienței",
+        "placeholder": "Adaugă un titlu al audienței",
+        "edit": "Editează titlul audienței",
+        "dialogTitle": "Titlul audienței"
+      },
+      "usp": {
+        "title": "USP-uri",
+        "subtitle": "4–6 pe val, comune tuturor piețelor.",
+        "counter": "{count} din {max} USP-uri",
+        "counterMax": "{count} din {max} USP-uri · maximum atins",
+        "add": "Adaugă USP",
+        "maxReason": "Un val are cel mult {max} USP-uri.",
+        "warning": "Adaugă cel puțin {min} USP-uri pentru un set complet.",
+        "emptyTitle": "Încă niciun USP",
+        "emptyBody": "Adaugă argumentele de vânzare pe care se sprijină acest val.",
+        "explainer": "Explicație",
+        "creativeAngle": "Unghi creativ",
+        "copySeed": "Indicații pentru text",
+        "menu": "Acțiuni pentru {title}",
+        "edit": "Editează",
+        "delete": "Șterge",
+        "moveEarlier": "Mută mai devreme",
+        "moveLater": "Mută mai târziu",
+        "deleteStaffReason": "Doar un admin sau un manager poate șterge un USP folosit de persona.",
+        "usedBy": "Folosit de {count} unghi | Folosit de {count} unghiuri",
+        "validation": {
+          "titleRequired": "Introdu un titlu."
+        },
+        "dialog": {
+          "addTitle": "Adaugă USP",
+          "editTitle": "Editează USP",
+          "title": "Titlu",
+          "colourAuto": "Culoarea este atribuită automat.",
+          "colourFixed": "Culoarea acestui card."
+        },
+        "deleteDialog": {
+          "title": "Ștergi „{title}”?",
+          "body": "Nicio persona nu folosește acest USP.",
+          "bodyInUse": "{count} unghi folosește acest USP și este eliminat odată cu el: | {count} unghiuri folosesc acest USP și sunt eliminate odată cu el:",
+          "confirmInUse": "Șterge și elimină {count} unghi | Șterge și elimină {count} unghiuri",
+          "refreshed": "Lista s-a schimbat cât timp fereastra a fost deschisă. Verific-o și confirmă din nou."
+        }
+      },
+      "persona": {
+        "markets": "Piețe",
+        "title": "Persona · {market}",
+        "subtitle": "{min}–{max} persona pe piață. Unghiurile creative trimit la USP-urile din pasul 1.",
+        "add": "Adaugă persona",
+        "tile": "Adaugă persona · {count} din {max} folosite în {market}",
+        "tileMax": "{count} din {max} folosite în {market} · maximum atins",
+        "warning": "Adaugă cel puțin {min} persona pentru {market}.",
+        "fewerThanMin": "Mai puțin de {min} persona",
+        "empty": "Încă nicio persona pentru {market}.",
+        "coreJob": "Sarcina principală",
+        "drivers": "Motivații emoționale",
+        "goals": "Valori și obiective",
+        "selfTalk": {
+          "she": "Ce își spune ea",
+          "he": "Ce își spune el",
+          "they": "Ce își spun ei"
+        },
+        "need": {
+          "she": "De ce are nevoie ea",
+          "he": "De ce are nevoie el",
+          "they": "De ce au nevoie ei"
+        },
+        "barriers": "Bariere și fricțiuni",
+        "angles": "Unghiuri creative care conving",
+        "nameLine": "Nume · {name}",
+        "menu": "Acțiuni pentru {name}",
+        "edit": "Editează",
+        "delete": "Șterge",
+        "deleteTitle": "Ștergi {name}?",
+        "deleteBody": "Persona este eliminată.",
+        "deleteBodyAngles": "Persona și {count} unghi al ei sunt eliminate. | Persona și cele {count} unghiuri ale ei sunt eliminate.",
+        "addedByHand": "Adăugat manual",
+        "linked": "Legat",
+        "addAngle": "Adaugă unghi din USP-uri",
+        "noUsps": "Adaugă mai întâi USP-uri în pasul 1.",
+        "goToUsps": "Mergi la USP-uri",
+        "angleAdd": "Adaugă",
+        "angleEdit": "Editează",
+        "angleRemove": "Elimină",
+        "angleMenu": "Acțiuni pentru unghiul {title}",
+        "anglePlaceholder": "Cum se leagă această persona de USP",
+        "angleText": "Textul unghiului",
+        "removeAngleTitle": "Elimini acest unghi?",
+        "removeAngleBody": "Unghiul pentru „{usp}” este eliminat din această persona.",
+        "pronounName": {
+          "she": "Ea",
+          "he": "El",
+          "they": "Ei / ele"
+        },
+        "dialog": {
+          "addTitle": "Adaugă persona · {market}",
+          "editTitle": "Editează persona",
+          "code": "Cod",
+          "codeAuto": "Automat",
+          "codeHint": "{min}–{max} litere sau cifre, unic în piață.",
+          "title": "Titlu",
+          "name": "Nume",
+          "nameHint": "Un nume inventat pentru persona, nu o persoană reală.",
+          "pronoun": "Pronume",
+          "pronounHint": "Schimbă doar formularea etichetelor.",
+          "summary": "Rezumat",
+          "listCount": "{count} din {max}",
+          "addItem": "Adaugă element",
+          "removeItem": "Elimină elementul"
+        },
+        "validation": {
+          "titleRequired": "Introdu un titlu.",
+          "nameRequired": "Introdu un nume.",
+          "codeRequired": "Introdu un cod.",
+          "codeFormat": "Folosește {min}–{max} litere sau cifre.",
+          "angleRequired": "Introdu un rând."
+        }
+      },
+      "copy": {
+        "open": "Copiază din…",
+        "title": "Copiază persona în {market}",
+        "source": "Copiază din",
+        "submit": "Copiază",
+        "line": "Copiere {count} → {market} va avea {total} din {max}",
+        "over": "Copiere {count} → {market} ar avea {total} din {max}: peste maximum."
+      },
+      "validation": {
+        "tooLong": "Cel mult {max} caractere."
+      },
+      "errors": {
+        "loadFailed": "Nu s-a putut încărca. Încearcă din nou.",
+        "saveFailed": "Nu s-a putut salva. Încearcă din nou.",
+        "gone": "Acest element a fost eliminat de altcineva. Închide și reîncarcă.",
+        "workspaceGone": "Acest spațiu de strategie nu a fost găsit.",
+        "uspMaxReached": "Valul are deja numărul maxim de USP-uri.",
+        "uspOrderMismatch": "USP-urile s-au schimbat de la încărcarea paginii. Lista a fost reîncărcată; încearcă din nou.",
+        "uspInUse": "Persona folosesc acest USP. Confirmă pentru a-l elimina împreună cu unghiurile sale.",
+        "personaMaxReached": "Această piață are deja numărul maxim de persona.",
+        "personaMarketNotInWave": "Această piață nu este printre piețele acestui val.",
+        "personaCodeTaken": "Acest cod este folosit de o altă persona din această piață.",
+        "copyInvalid": "Alege două piețe diferite ale acestui val și cel puțin o persona.",
+        "copyExceedsCap": "Copierea a {copy} persona într-o piață care are {target} ar depăși maximul de {max}.",
+        "copyExceedsCapPlain": "Această copiere ar depăși numărul maxim de persona.",
+        "angleAlreadyLinked": "Această persona are deja un unghi pentru acest USP.",
+        "conflict": "Cineva a schimbat asta în același timp. Reîncarcă și încearcă din nou.",
+        "brandArchived": "Un brand arhivat este doar pentru citire. Restaurează-l mai întâi.",
+        "forbidden": "Doar un admin sau un manager poate face asta."
       }
     }
   },

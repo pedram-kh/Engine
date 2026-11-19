@@ -1481,7 +1481,8 @@
         "campaignLinkLocked": "Tvůrce je na této kampani vybrán nebo dál, proto nelze propojení změnit.",
         "brandArchived": "Tato značka je archivovaná. Obnovte ji, abyste mohli měnit její vlny.",
         "saveFailed": "Vlnu se nepodařilo uložit. Zkuste to znovu.",
-        "waveNotAvailable": "Tuto vlnu nelze propojit s touto kampaní."
+        "waveNotAvailable": "Tuto vlnu nelze propojit s touto kampaní.",
+        "marketHasPersonas": "Nejprve odeberte persony z těchto trhů: {markets}."
       },
       "dialog": {
         "createTitle": "Nová vlna",
@@ -1683,6 +1684,177 @@
         "deleteFailed": "Soubor se nepodařilo smazat. Zkuste to znovu.",
         "downloadFailed": "Stahování se nepodařilo spustit.",
         "brandArchived": "Tato značka je archivovaná. Obnovte ji, abyste mohli měnit její soubory."
+      }
+    },
+    "strategy": {
+      "title": "Strategie a skripty",
+      "entry": "Strategie a skripty",
+      "back": "Zpět na vlnu",
+      "cancel": "Zrušit",
+      "close": "Zavřít",
+      "save": "Uložit",
+      "stepper": {
+        "label": "Kroky strategie",
+        "usps": "USP",
+        "personas": "Persony",
+        "matrix": "Matice sdělení",
+        "concepts": "Koncepty",
+        "creators": "Tvůrci",
+        "scripts": "Skripty",
+        "uspNone": "Zatím žádné USP",
+        "statusUsps": "{count} USP | {count} USP",
+        "personaNone": "Zatím žádné persony",
+        "statusPersonas": "{count} persona · {covered} z {markets} trhů | {count} person · {covered} z {markets} trhů",
+        "notAvailable": "Zatím nedostupné",
+        "locked": "Zamčeno, dokud nejsou schváleny všechny koncepty"
+      },
+      "audience": {
+        "label": "Název cílové skupiny",
+        "placeholder": "Přidejte název cílové skupiny",
+        "edit": "Upravit název cílové skupiny",
+        "dialogTitle": "Název cílové skupiny"
+      },
+      "usp": {
+        "title": "USP",
+        "subtitle": "4–6 na vlnu, společná pro všechny trhy.",
+        "counter": "{count} z {max} USP",
+        "counterMax": "{count} z {max} USP · dosaženo maxima",
+        "add": "Přidat USP",
+        "maxReason": "Vlna má nejvýše {max} USP.",
+        "warning": "Přidejte alespoň {min} USP pro úplnou sadu.",
+        "emptyTitle": "Zatím žádné USP",
+        "emptyBody": "Přidejte prodejní argumenty, na kterých tato vlna stojí.",
+        "explainer": "Vysvětlení",
+        "creativeAngle": "Kreativní úhel",
+        "copySeed": "Pokyny pro text",
+        "menu": "Akce pro {title}",
+        "edit": "Upravit",
+        "delete": "Smazat",
+        "moveEarlier": "Posunout dříve",
+        "moveLater": "Posunout později",
+        "deleteStaffReason": "USP, které persony používají, může smazat jen admin nebo manažer.",
+        "usedBy": "Používá {count} úhel | Používá {count} úhlů",
+        "validation": {
+          "titleRequired": "Zadejte název."
+        },
+        "dialog": {
+          "addTitle": "Přidat USP",
+          "editTitle": "Upravit USP",
+          "title": "Název",
+          "colourAuto": "Barva se přidělí automaticky.",
+          "colourFixed": "Barva této karty."
+        },
+        "deleteDialog": {
+          "title": "Smazat „{title}“?",
+          "body": "Toto USP nepoužívá žádná persona.",
+          "bodyInUse": "Toto USP používá {count} úhel a smaže se s ním: | Toto USP používá {count} úhlů a smažou se s ním:",
+          "confirmInUse": "Smazat a odebrat {count} úhel | Smazat a odebrat {count} úhlů",
+          "refreshed": "Seznam se změnil, když bylo okno otevřené. Zkontrolujte ho a potvrďte znovu."
+        }
+      },
+      "persona": {
+        "markets": "Trhy",
+        "title": "Persony · {market}",
+        "subtitle": "{min}–{max} person na trh. Kreativní úhly odkazují na USP z kroku 1.",
+        "add": "Přidat personu",
+        "tile": "Přidat personu · využito {count} z {max} na trhu {market}",
+        "tileMax": "Využito {count} z {max} na trhu {market} · dosaženo maxima",
+        "warning": "Přidejte alespoň {min} person pro trh {market}.",
+        "fewerThanMin": "Méně než {min} person",
+        "empty": "Pro trh {market} zatím žádné persony.",
+        "coreJob": "Hlavní úkol",
+        "drivers": "Emoční motivace",
+        "goals": "Hodnoty a cíle",
+        "selfTalk": {
+          "she": "Co si říká ona",
+          "he": "Co si říká on",
+          "they": "Co si říkají oni"
+        },
+        "need": {
+          "she": "Co potřebuje ona",
+          "he": "Co potřebuje on",
+          "they": "Co potřebují oni"
+        },
+        "barriers": "Překážky a třecí plochy",
+        "angles": "Kreativní úhly, které přesvědčí",
+        "nameLine": "Jméno · {name}",
+        "menu": "Akce pro {name}",
+        "edit": "Upravit",
+        "delete": "Smazat",
+        "deleteTitle": "Smazat {name}?",
+        "deleteBody": "Persona se odebere.",
+        "deleteBodyAngles": "Persona a její {count} úhel se odeberou. | Persona a jejích {count} úhlů se odeberou.",
+        "addedByHand": "Přidáno ručně",
+        "linked": "Propojeno",
+        "addAngle": "Přidat úhel z USP",
+        "noUsps": "Nejprve přidejte USP v kroku 1.",
+        "goToUsps": "Přejít na USP",
+        "angleAdd": "Přidat",
+        "angleEdit": "Upravit",
+        "angleRemove": "Odebrat",
+        "angleMenu": "Akce pro úhel {title}",
+        "anglePlaceholder": "Jak tato persona souvisí s USP",
+        "angleText": "Text úhlu",
+        "removeAngleTitle": "Odebrat tento úhel?",
+        "removeAngleBody": "Úhel k „{usp}“ se z této persony odebere.",
+        "pronounName": {
+          "she": "Ona",
+          "he": "On",
+          "they": "Oni / ony"
+        },
+        "dialog": {
+          "addTitle": "Přidat personu · {market}",
+          "editTitle": "Upravit personu",
+          "code": "Kód",
+          "codeAuto": "Automaticky",
+          "codeHint": "{min}–{max} písmen nebo číslic, jedinečný v rámci trhu.",
+          "title": "Název",
+          "name": "Jméno",
+          "nameHint": "Vymyšlené jméno persony, ne skutečná osoba.",
+          "pronoun": "Zájmeno",
+          "pronounHint": "Mění jen znění popisků.",
+          "summary": "Shrnutí",
+          "listCount": "{count} z {max}",
+          "addItem": "Přidat položku",
+          "removeItem": "Odebrat položku"
+        },
+        "validation": {
+          "titleRequired": "Zadejte název.",
+          "nameRequired": "Zadejte jméno.",
+          "codeRequired": "Zadejte kód.",
+          "codeFormat": "Použijte {min}–{max} písmen nebo číslic.",
+          "angleRequired": "Zadejte řádek."
+        }
+      },
+      "copy": {
+        "open": "Kopírovat z…",
+        "title": "Kopírovat persony na trh {market}",
+        "source": "Kopírovat z",
+        "submit": "Kopírovat",
+        "line": "Kopírování {count} → trh {market} bude mít {total} z {max}",
+        "over": "Kopírování {count} → trh {market} by měl {total} z {max}: nad maximem."
+      },
+      "validation": {
+        "tooLong": "Nejvýše {max} znaků."
+      },
+      "errors": {
+        "loadFailed": "Načtení se nepodařilo. Zkuste to znovu.",
+        "saveFailed": "Uložení se nepodařilo. Zkuste to znovu.",
+        "gone": "Někdo jiný to odstranil. Zavřete a načtěte znovu.",
+        "workspaceGone": "Tento strategický prostor nebyl nalezen.",
+        "uspMaxReached": "Vlna už má maximální počet USP.",
+        "uspOrderMismatch": "USP se změnila od načtení stránky. Seznam se načetl znovu; zkuste to ještě jednou.",
+        "uspInUse": "Toto USP používají persony. Potvrďte, aby se odstranilo spolu s jeho úhly.",
+        "personaMaxReached": "Tento trh už má maximální počet person.",
+        "personaMarketNotInWave": "Tento trh není mezi trhy této vlny.",
+        "personaCodeTaken": "Tento kód už používá jiná persona na tomto trhu.",
+        "copyInvalid": "Vyberte dva různé trhy této vlny a alespoň jednu personu.",
+        "copyExceedsCap": "Zkopírováním {copy} person na trh, který jich má {target}, by se překročilo maximum {max}.",
+        "copyExceedsCapPlain": "Tato kopie by překročila maximální počet person.",
+        "angleAlreadyLinked": "Tato persona už má úhel pro toto USP.",
+        "conflict": "Někdo to změnil ve stejnou chvíli. Načtěte znovu a zkuste to ještě jednou.",
+        "brandArchived": "Archivovaná značka je jen pro čtení. Nejprve ji obnovte.",
+        "forbidden": "Může to udělat jen admin nebo manažer."
       }
     }
   },

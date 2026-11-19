@@ -1481,7 +1481,8 @@
         "campaignLinkLocked": "Il-ħallieq huwa magħżul jew aktar 'il quddiem f'din il-kampanja, għalhekk ir-rabta ma tistax tinbidel.",
         "brandArchived": "Din il-marka hija arkivjata. Irkuprah biex tbiddel il-mewġ tagħha.",
         "saveFailed": "Il-mewġa ma setgħetx tiġi ssejvjata. Erġa' pprova.",
-        "waveNotAvailable": "Dik il-mewġa ma tistax tiġi marbuta ma' din il-kampanja."
+        "waveNotAvailable": "Dik il-mewġa ma tistax tiġi marbuta ma' din il-kampanja.",
+        "marketHasPersonas": "Neħħi l-ewwel il-persunaġġi ta' dawn is-swieq: {markets}."
       },
       "dialog": {
         "createTitle": "Mewġa ġdida",
@@ -1683,6 +1684,177 @@
         "deleteFailed": "Il-fajl ma setax jitħassar. Erġa' pprova.",
         "downloadFailed": "It-tniżżil ma setax jibda.",
         "brandArchived": "Din il-marka hija arkivjata. Irkuprah biex tbiddel il-fajls tagħha."
+      }
+    },
+    "strategy": {
+      "title": "Strateġija u skripts",
+      "entry": "Strateġija u skripts",
+      "back": "Lura għall-mewġa",
+      "cancel": "Ikkanċella",
+      "close": "Agħlaq",
+      "save": "Issejvja",
+      "stepper": {
+        "label": "Passi tal-istrateġija",
+        "usps": "USP",
+        "personas": "Persunaġġi",
+        "matrix": "Matriċi tal-messaġġi",
+        "concepts": "Kunċetti",
+        "creators": "Kreaturi",
+        "scripts": "Skripts",
+        "uspNone": "Għad m'hemm l-ebda USP",
+        "statusUsps": "{count} USP | {count} USP",
+        "personaNone": "Għad m'hemm l-ebda persunaġġ",
+        "statusPersonas": "{count} persunaġġ · {covered} minn {markets} swieq | {count} persunaġġi · {covered} minn {markets} swieq",
+        "notAvailable": "Għadu mhux disponibbli",
+        "locked": "Imsakkar sakemm jiġu approvati l-kunċetti kollha"
+      },
+      "audience": {
+        "label": "Titlu tal-udjenza",
+        "placeholder": "Żid titlu tal-udjenza",
+        "edit": "Editja t-titlu tal-udjenza",
+        "dialogTitle": "Titlu tal-udjenza"
+      },
+      "usp": {
+        "title": "USP",
+        "subtitle": "4–6 għal kull mewġa, maqsuma bejn is-swieq kollha.",
+        "counter": "{count} minn {max} USP",
+        "counterMax": "{count} minn {max} USP · intlaħaq il-massimu",
+        "add": "Żid USP",
+        "maxReason": "Mewġa jista' jkollha l-aktar {max} USP.",
+        "warning": "Żid mill-inqas {min} USP għal sett sħiħ.",
+        "emptyTitle": "Għad m'hemm l-ebda USP",
+        "emptyBody": "Żid l-argumenti tal-bejgħ li fuqhom hija mibnija din il-mewġa.",
+        "explainer": "Spjegazzjoni",
+        "creativeAngle": "Angolu kreattiv",
+        "copySeed": "Direzzjonijiet tat-test",
+        "menu": "Azzjonijiet għal {title}",
+        "edit": "Editja",
+        "delete": "Ħassar",
+        "moveEarlier": "Mexxi qabel",
+        "moveLater": "Mexxi aktar tard",
+        "deleteStaffReason": "Admin jew maniġer biss jista' jħassar USP li jużaw il-persunaġġi.",
+        "usedBy": "Użat minn {count} angolu | Użat minn {count} angoli",
+        "validation": {
+          "titleRequired": "Daħħal titlu."
+        },
+        "dialog": {
+          "addTitle": "Żid USP",
+          "editTitle": "Editja USP",
+          "title": "Titlu",
+          "colourAuto": "Il-kulur jingħata awtomatikament.",
+          "colourFixed": "Il-kulur ta' din il-karta."
+        },
+        "deleteDialog": {
+          "title": "Tħassar “{title}”?",
+          "body": "L-ebda persunaġġ ma juża dan l-USP.",
+          "bodyInUse": "{count} angolu juża dan l-USP u jitneħħa miegħu: | {count} angoli jużaw dan l-USP u jitneħħew miegħu:",
+          "confirmInUse": "Ħassar u neħħi {count} angolu | Ħassar u neħħi {count} angoli",
+          "refreshed": "Il-lista nbidlet waqt li t-tieqa kienet miftuħa. Iċċekkjaha u kkonferma mill-ġdid."
+        }
+      },
+      "persona": {
+        "markets": "Swieq",
+        "title": "Persunaġġi · {market}",
+        "subtitle": "{min}–{max} persunaġġi għal kull suq. L-angoli kreattivi jirreferu għall-USP mill-pass 1.",
+        "add": "Żid persunaġġ",
+        "tile": "Żid persunaġġ · {count} minn {max} użati f'{market}",
+        "tileMax": "{count} minn {max} użati f'{market} · intlaħaq il-massimu",
+        "warning": "Żid mill-inqas {min} persunaġġi għal {market}.",
+        "fewerThanMin": "Inqas minn {min} persunaġġi",
+        "empty": "Għad m'hemm l-ebda persunaġġ għal {market}.",
+        "coreJob": "Kompitu ewlieni",
+        "drivers": "Motivazzjonijiet emozzjonali",
+        "goals": "Valuri u għanijiet",
+        "selfTalk": {
+          "she": "Dak li tgħid hi lilha nfisha",
+          "he": "Dak li jgħid hu lilu nfisu",
+          "they": "Dak li jgħidu huma lilhom infushom"
+        },
+        "need": {
+          "she": "Dak li teħtieġ hi",
+          "he": "Dak li jeħtieġ hu",
+          "they": "Dak li jeħtieġu huma"
+        },
+        "barriers": "Ostakli u frizzjoni",
+        "angles": "Angoli kreattivi li jikkonvinċu",
+        "nameLine": "Isem · {name}",
+        "menu": "Azzjonijiet għal {name}",
+        "edit": "Editja",
+        "delete": "Ħassar",
+        "deleteTitle": "Tħassar {name}?",
+        "deleteBody": "Il-persunaġġ jitneħħa.",
+        "deleteBodyAngles": "Il-persunaġġ u l-{count} angolu tiegħu jitneħħew. | Il-persunaġġ u l-{count} angoli tiegħu jitneħħew.",
+        "addedByHand": "Miżjud bl-idejn",
+        "linked": "Marbut",
+        "addAngle": "Żid angolu mill-USP",
+        "noUsps": "Żid l-ewwel USP fil-pass 1.",
+        "goToUsps": "Mur għall-USP",
+        "angleAdd": "Żid",
+        "angleEdit": "Editja",
+        "angleRemove": "Neħħi",
+        "angleMenu": "Azzjonijiet għall-angolu {title}",
+        "anglePlaceholder": "Kif dan il-persunaġġ jitqabbel mal-USP",
+        "angleText": "Test tal-angolu",
+        "removeAngleTitle": "Tneħħi dan l-angolu?",
+        "removeAngleBody": "L-angolu fuq “{usp}” jitneħħa minn dan il-persunaġġ.",
+        "pronounName": {
+          "she": "Hi",
+          "he": "Hu",
+          "they": "Huma"
+        },
+        "dialog": {
+          "addTitle": "Żid persunaġġ · {market}",
+          "editTitle": "Editja persunaġġ",
+          "code": "Kodiċi",
+          "codeAuto": "Awtomatiku",
+          "codeHint": "{min}–{max} ittri jew ċifri, uniku fis-suq.",
+          "title": "Titlu",
+          "name": "Isem",
+          "nameHint": "Isem maħluq għall-persunaġġ, mhux persuna vera.",
+          "pronoun": "Pronom",
+          "pronounHint": "Jibdel biss kif huma miktuba t-tikketti.",
+          "summary": "Sommarju",
+          "listCount": "{count} minn {max}",
+          "addItem": "Żid element",
+          "removeItem": "Neħħi l-element"
+        },
+        "validation": {
+          "titleRequired": "Daħħal titlu.",
+          "nameRequired": "Daħħal isem.",
+          "codeRequired": "Daħħal kodiċi.",
+          "codeFormat": "Uża {min}–{max} ittri jew ċifri.",
+          "angleRequired": "Daħħal linja."
+        }
+      },
+      "copy": {
+        "open": "Ikkopja minn…",
+        "title": "Ikkopja persunaġġi lejn {market}",
+        "source": "Ikkopja minn",
+        "submit": "Ikkopja",
+        "line": "Qed tikkopja {count} → {market} se jkollu {total} minn {max}",
+        "over": "Qed tikkopja {count} → {market} jkollu {total} minn {max}: aktar mill-massimu."
+      },
+      "validation": {
+        "tooLong": "L-aktar {max} karattri."
+      },
+      "errors": {
+        "loadFailed": "Ma setax jitgħabba. Erġa' pprova.",
+        "saveFailed": "Ma setax jiġi ssejvjat. Erġa' pprova.",
+        "gone": "Dan tneħħa minn xi ħadd ieħor. Agħlaq u erġa' tgħabbi.",
+        "workspaceGone": "Din l-ispazju tal-istrateġija ma nstabx.",
+        "uspMaxReached": "Il-mewġa diġà għandha l-akbar numru ta' USP.",
+        "uspOrderMismatch": "L-USP inbidlu minn meta tgħabbiet il-paġna. Il-lista ntgħabbiet mill-ġdid; erġa' pprova.",
+        "uspInUse": "Il-persunaġġi jużaw dan l-USP. Ikkonferma biex jitneħħa flimkien mal-angoli tiegħu.",
+        "personaMaxReached": "Dan is-suq diġà għandu l-akbar numru ta' persunaġġi.",
+        "personaMarketNotInWave": "Dak is-suq mhuwiex wieħed mis-swieq ta' din il-mewġa.",
+        "personaCodeTaken": "Dan il-kodiċi diġà jintuża minn persunaġġ ieħor f'dan is-suq.",
+        "copyInvalid": "Agħżel żewġ swieq differenti ta' din il-mewġa u mill-inqas persunaġġ wieħed.",
+        "copyExceedsCap": "Il-kopjar ta' {copy} persunaġġi lejn suq li għandu {target} jaqbeż il-massimu ta' {max}.",
+        "copyExceedsCapPlain": "Dik il-kopja taqbeż l-akbar numru ta' persunaġġi.",
+        "angleAlreadyLinked": "Dan il-persunaġġ diġà għandu angolu fuq dak l-USP.",
+        "conflict": "Xi ħadd biddel dan fl-istess ħin. Erġa' tgħabbi u pprova mill-ġdid.",
+        "brandArchived": "Marka arkivjata hija read-only. Irrestawraha l-ewwel.",
+        "forbidden": "Admin jew maniġer biss jista' jagħmel dan."
       }
     }
   },
