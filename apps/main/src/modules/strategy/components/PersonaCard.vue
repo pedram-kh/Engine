@@ -33,23 +33,41 @@ const { t } = useI18n()
 const a = computed(() => props.persona.attributes)
 const menuOpen = ref(false)
 
-const initials = computed(() =>
-  a.value.name
-    .split(/\s+/)
-    .filter((w) => w !== '')
-    .slice(0, 2)
-    .map((w) => Array.from(w)[0] ?? '')
-    .join('')
-    .toUpperCase(),
-)
+/**
+ * Two letters, as the frame draws them ("Zuzana" is "ZU"): the first letters of the first two words, or the first two
+ * letters of a single word.
+ */
+const initials = computed(() => {
+  const words = a.value.name.split(/\s+/).filter((w) => w !== '')
+  const letters =
+    words.length >= 2
+      ? words.slice(0, 2).map((w) => Array.from(w)[0] ?? '')
+      : Array.from(words[0] ?? '').slice(0, 2)
+  return letters.join('').toLocaleUpperCase()
+})
 
+/** The line icon and its colour (a theme token) of each block, as the frame draws them. */
 const lists = computed(() => [
-  { key: 'drivers', label: t('app.strategy.persona.drivers'), items: a.value.drivers },
-  { key: 'goals', label: t('app.strategy.persona.goals'), items: a.value.goals },
+  {
+    key: 'drivers',
+    label: t('app.strategy.persona.drivers'),
+    items: a.value.drivers,
+    icon: 'mdi-heart-outline',
+    tone: 'pink',
+  },
+  {
+    key: 'goals',
+    label: t('app.strategy.persona.goals'),
+    items: a.value.goals,
+    icon: 'mdi-target',
+    tone: 'error',
+  },
   {
     key: 'self-talk',
     label: t(`app.strategy.persona.selfTalk.${a.value.pronoun}`),
     items: a.value.self_talk,
+    icon: 'mdi-message-outline',
+    tone: 'info',
   },
 ])
 
@@ -72,7 +90,7 @@ function pick(action: 'edit' | 'remove'): void {
         initials
       }}</span>
       <div class="persona-card__who">
-        <div class="d-flex align-center ga-2 flex-wrap">
+        <div class="persona-card__line">
           <span class="persona-card__code" data-test="persona-code">{{ a.code }}</span>
           <h3 class="persona-card__title" data-test="persona-title">{{ a.title }}</h3>
         </div>
@@ -84,12 +102,14 @@ function pick(action: 'edit' | 'remove'): void {
         <template #activator="{ props: act }">
           <v-btn
             v-bind="act"
-            icon="mdi-dots-vertical"
             variant="text"
             size="small"
+            class="persona-card__menu"
             :aria-label="t('app.strategy.persona.menu', { name: a.name })"
             data-test="persona-menu-btn"
-          />
+          >
+            <v-icon icon="mdi-dots-horizontal" size="18" />
+          </v-btn>
         </template>
         <v-list density="compact" data-test="persona-menu">
           <v-list-item data-test="persona-menu-edit" @click="pick('edit')">
@@ -103,25 +123,67 @@ function pick(action: 'edit' | 'remove'): void {
     </header>
 
     <div class="persona-card__body">
-      <p v-if="a.summary" class="persona-card__text" data-test="persona-summary">{{ a.summary }}</p>
-      <section v-if="a.core_job" data-test="persona-core-job">
-        <h4 class="persona-card__label">{{ t('app.strategy.persona.coreJob') }}</h4>
+      <p v-if="a.summary" class="persona-card__summary" data-test="persona-summary">
+        {{ a.summary }}
+      </p>
+      <section v-if="a.core_job" class="persona-card__block" data-test="persona-core-job">
+        <h4 class="persona-card__label">
+          <v-icon
+            icon="mdi-flash-outline"
+            size="15"
+            class="persona-card__icon persona-card__icon--warning"
+            aria-hidden="true"
+          />
+          {{ t('app.strategy.persona.coreJob') }}
+        </h4>
         <p class="persona-card__text">{{ a.core_job }}</p>
       </section>
       <template v-for="list in lists" :key="list.key">
-        <section v-if="list.items.length > 0" :data-test="`persona-${list.key}`">
-          <h4 class="persona-card__label">{{ list.label }}</h4>
+        <section
+          v-if="list.items.length > 0"
+          class="persona-card__block"
+          :data-test="`persona-${list.key}`"
+        >
+          <h4 class="persona-card__label">
+            <v-icon
+              :icon="list.icon"
+              size="15"
+              :class="['persona-card__icon', `persona-card__icon--${list.tone}`]"
+              aria-hidden="true"
+            />
+            {{ list.label }}
+          </h4>
           <ul class="persona-card__list">
             <li v-for="(item, i) in list.items" :key="i">{{ item }}</li>
           </ul>
         </section>
       </template>
-      <section v-if="a.need" data-test="persona-need">
-        <h4 class="persona-card__label">{{ t(`app.strategy.persona.need.${a.pronoun}`) }}</h4>
+      <section v-if="a.need" class="persona-card__block" data-test="persona-need">
+        <h4 class="persona-card__label">
+          <v-icon
+            icon="mdi-check-circle-outline"
+            size="15"
+            class="persona-card__icon persona-card__icon--success"
+            aria-hidden="true"
+          />
+          {{ t(`app.strategy.persona.need.${a.pronoun}`) }}
+        </h4>
         <p class="persona-card__text">{{ a.need }}</p>
       </section>
-      <section v-if="a.barriers.length > 0" data-test="persona-barriers">
-        <h4 class="persona-card__label">{{ t('app.strategy.persona.barriers') }}</h4>
+      <section
+        v-if="a.barriers.length > 0"
+        class="persona-card__block"
+        data-test="persona-barriers"
+      >
+        <h4 class="persona-card__label">
+          <v-icon
+            icon="mdi-alert-outline"
+            size="15"
+            class="persona-card__icon persona-card__icon--warning"
+            aria-hidden="true"
+          />
+          {{ t('app.strategy.persona.barriers') }}
+        </h4>
         <ul class="persona-card__list">
           <li v-for="(item, i) in a.barriers" :key="i">{{ item }}</li>
         </ul>
@@ -140,11 +202,16 @@ function pick(action: 'edit' | 'remove'): void {
 </template>
 
 <style scoped>
+/*
+ * Values from frame 13:828 (persona card SK1), through the agency theme tokens: `surface`, `border-color`,
+ * `on-surface`, `on-surface-variant` and `text-tertiary` (lifted by the agency theme for contrast). The persona
+ * colour is `--usp-color`.
+ */
 .persona-card {
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(var(--v-theme-on-surface), 0.12);
-  border-radius: 12px;
+  border: 1px solid rgb(var(--v-theme-border-color));
+  border-radius: 10px;
   background: rgb(var(--v-theme-surface));
   overflow: hidden;
   min-width: 0;
@@ -153,9 +220,8 @@ function pick(action: 'edit' | 'remove'): void {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 12px 12px 16px;
-  background: color-mix(in srgb, var(--usp-color) 16%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--usp-color) 40%, transparent);
+  padding: 16px 18px;
+  background: color-mix(in srgb, var(--usp-color) 8%, transparent);
 }
 .persona-card__avatar {
   flex: 0 0 auto;
@@ -165,58 +231,123 @@ function pick(action: 'edit' | 'remove'): void {
   width: 40px;
   height: 40px;
   border-radius: 9999px;
-  font-size: 14px;
-  font-weight: 700;
-  border: 2px solid var(--usp-color);
-  background: rgb(var(--v-theme-surface));
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 14px;
+  color: rgb(var(--v-theme-on-primary));
+  background: var(--usp-color);
 }
 .persona-card__who {
   flex: 1 1 auto;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.persona-card__line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
 }
 .persona-card__code {
-  padding: 1px 8px;
-  border-radius: 6px;
-  font-size: 12px;
+  padding: 2px 6px;
+  border: 1px solid color-mix(in srgb, var(--usp-color) 60%, transparent);
+  border-radius: 4px;
+  font-size: 11px;
   font-weight: 700;
-  border: 1px solid var(--usp-color);
-  background: rgb(var(--v-theme-surface));
+  line-height: normal;
+  color: var(--usp-color);
 }
 .persona-card__title {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
+  line-height: normal;
+  color: rgb(var(--v-theme-on-surface));
   overflow-wrap: anywhere;
 }
 .persona-card__name {
-  font-size: 13px;
-  color: rgba(var(--v-theme-on-surface), 0.7);
+  font-size: 12px;
+  line-height: normal;
+  color: rgb(var(--v-theme-text-tertiary));
   overflow-wrap: anywhere;
+}
+.persona-card__menu {
+  flex: 0 0 auto;
+  color: rgb(var(--v-theme-text-tertiary));
 }
 .persona-card__body {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 16px;
+  gap: 16px;
+  padding: 18px;
+}
+.persona-card__summary {
+  margin: 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: rgb(var(--v-theme-on-surface));
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.persona-card__block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 .persona-card__label {
-  margin: 0 0 4px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: rgba(var(--v-theme-on-surface), 0.65);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: normal;
+  color: rgb(var(--v-theme-on-surface));
+}
+.persona-card__icon--warning {
+  color: rgb(var(--v-theme-warning));
+}
+.persona-card__icon--success {
+  color: rgb(var(--v-theme-success));
+}
+.persona-card__icon--error {
+  color: rgb(var(--v-theme-error));
+}
+.persona-card__icon--info {
+  color: rgb(var(--v-theme-info));
+}
+.persona-card__icon--pink {
+  color: var(--agency-brand-pink);
 }
 .persona-card__text {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 19px;
+  color: rgb(var(--v-theme-on-surface-variant));
   white-space: pre-line;
   overflow-wrap: anywhere;
 }
 .persona-card__list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   margin: 0;
-  padding-left: 18px;
-  font-size: 14px;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  line-height: 19px;
+  color: rgb(var(--v-theme-on-surface-variant));
   overflow-wrap: anywhere;
+}
+.persona-card__list li {
+  display: flex;
+  gap: 8px;
+}
+.persona-card__list li::before {
+  content: '•';
+  flex: 0 0 auto;
+  color: rgb(var(--v-theme-text-tertiary));
 }
 </style>

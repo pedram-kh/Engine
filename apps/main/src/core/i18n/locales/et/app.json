@@ -1754,10 +1754,11 @@
       },
       "persona": {
         "markets": "Turud",
+        "marketLabel": "Turg",
         "title": "Personad · {market}",
         "subtitle": "{min}–{max} persooni turu kohta. Loomingulised nurgad viitavad 1. sammu USP-dele.",
         "add": "Lisa persona",
-        "tile": "Lisa persona · kasutatud {count} / {max} turul {market}",
+        "tile": "kasutatud {count} / {max} turul {market}",
         "tileMax": "Kasutatud {count} / {max} turul {market} · maksimum täis",
         "warning": "Lisa vähemalt {min} persooni turule {market}.",
         "fewerThanMin": "Vähem kui {min} persooni",
@@ -1777,7 +1778,7 @@
         },
         "barriers": "Tõkked ja hõõrdumine",
         "angles": "Veenvad loomingulised nurgad",
-        "nameLine": "Nimi · {name}",
+        "nameLine": "{name} · persooni nimi",
         "menu": "Toimingud: {name}",
         "edit": "Muuda",
         "delete": "Kustuta",
@@ -1824,7 +1825,8 @@
           "codeRequired": "Sisesta kood.",
           "codeFormat": "Kasuta {min}–{max} tähte või numbrit.",
           "angleRequired": "Sisesta rida."
-        }
+        },
+        "linkAUsp": "Seo USP"
       },
       "copy": {
         "open": "Kopeeri allikast…",

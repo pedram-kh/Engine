@@ -1754,10 +1754,11 @@
       },
       "persona": {
         "markets": "Swieq",
+        "marketLabel": "Suq",
         "title": "Persunaġġi · {market}",
         "subtitle": "{min}–{max} persunaġġi għal kull suq. L-angoli kreattivi jirreferu għall-USP mill-pass 1.",
         "add": "Żid persunaġġ",
-        "tile": "Żid persunaġġ · {count} minn {max} użati f'{market}",
+        "tile": "{count} minn {max} użati f'{market}",
         "tileMax": "{count} minn {max} użati f'{market} · intlaħaq il-massimu",
         "warning": "Żid mill-inqas {min} persunaġġi għal {market}.",
         "fewerThanMin": "Inqas minn {min} persunaġġi",
@@ -1777,14 +1778,14 @@
         },
         "barriers": "Ostakli u frizzjoni",
         "angles": "Angoli kreattivi li jikkonvinċu",
-        "nameLine": "Isem · {name}",
+        "nameLine": "{name} · isem tal-persunaġġ",
         "menu": "Azzjonijiet għal {name}",
         "edit": "Editja",
         "delete": "Ħassar",
         "deleteTitle": "Tħassar {name}?",
         "deleteBody": "Il-persunaġġ jitneħħa.",
         "deleteBodyAngles": "Il-persunaġġ u l-{count} angolu tiegħu jitneħħew. | Il-persunaġġ u l-{count} angoli tiegħu jitneħħew.",
-        "addedByHand": "Miżjud bl-idejn",
+        "addedByHand": "Miżjud manwalment",
         "linked": "Marbut",
         "addAngle": "Żid angolu mill-USP",
         "noUsps": "Żid l-ewwel USP fil-pass 1.",
@@ -1824,7 +1825,8 @@
           "codeRequired": "Daħħal kodiċi.",
           "codeFormat": "Uża {min}–{max} ittri jew ċifri.",
           "angleRequired": "Daħħal linja."
-        }
+        },
+        "linkAUsp": "Qabbad USP"
       },
       "copy": {
         "open": "Ikkopja minn…",

@@ -1754,10 +1754,11 @@
       },
       "persona": {
         "markets": "Markets",
+        "marketLabel": "Market",
         "title": "Personas · {market}",
         "subtitle": "{min}–{max} personas per market. Creative angles link to the USPs from step 1.",
         "add": "Add persona",
-        "tile": "Add persona · {count} of {max} used in {market}",
+        "tile": "{count} of {max} used in {market}",
         "tileMax": "{count} of {max} used in {market} · maximum reached",
         "warning": "Add at least {min} personas for {market}.",
         "fewerThanMin": "Fewer than {min} personas",
@@ -1777,14 +1778,14 @@
         },
         "barriers": "Barriers & frictions",
         "angles": "Creative angles that unlock",
-        "nameLine": "Name · {name}",
+        "nameLine": "{name} · persona name",
         "menu": "Actions for {name}",
         "edit": "Edit",
         "delete": "Delete",
         "deleteTitle": "Delete {name}?",
         "deleteBody": "The persona is removed.",
         "deleteBodyAngles": "The persona and its {count} angle are removed. | The persona and its {count} angles are removed.",
-        "addedByHand": "Added by hand",
+        "addedByHand": "Manually added",
         "linked": "Linked",
         "addAngle": "Add angle from USPs",
         "noUsps": "Add USPs in step 1 first.",
@@ -1824,7 +1825,8 @@
           "codeRequired": "Enter a code.",
           "codeFormat": "Use {min}–{max} letters or digits.",
           "angleRequired": "Enter a line."
-        }
+        },
+        "linkAUsp": "Link a USP"
       },
       "copy": {
         "open": "Copy from…",

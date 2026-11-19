@@ -68,6 +68,7 @@ Total: 47 chunks (PL-1 is 3 chunks since 2026-11-17; **PL-2 is 4 chunks since 20
 7. **Naming.** Chunks are named **`PL-<sprint>.<n>`**. AH numbers stay for ad-hoc work on `main`.
 8. **Approval on the client's behalf.** The strategist may record a client approval, with **their name and a note saved on the record**.
 9. **Plain-words brief before every sprint and chunk.** Before each sprint and each chunk, Claude gives Pedram a plain-words brief of what is being built: who uses it, what they see, what changes behind the scenes, what he will check on the walk, and what is left out. **No Cursor prompt for the chunk is issued until Pedram has read the brief and said go.**
+10. **Design fidelity (Pedram, 2026-11-19).** For every screen that has a design frame, before a walk is offered: read the frame with `get_design_context`, open the built screen in a real browser at the frame's width, and put a difference table (element, frame value, built value, VISUAL or FUNCTIONAL) in the review file. Visual differences are fixed. Functional differences are reported to Pedram and left as they are until he rules. "Matches the design" is never written without that table. Screens with no frame are named as built from the design system.
 
 ## 3. What follows from the rulings
 

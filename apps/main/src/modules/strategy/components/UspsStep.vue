@@ -127,30 +127,29 @@ function move(usp: WaveUspResource, by: -1 | 1): void {
 
 <template>
   <section class="usps-step" data-test="usps-step">
-    <div>
-      <h2 class="text-h6 mb-1" data-test="usps-heading">{{ t('app.strategy.usp.title') }}</h2>
-      <p class="text-body-2 text-medium-emphasis mb-0">{{ t('app.strategy.usp.subtitle') }}</p>
+    <div class="step-head">
+      <h2 class="step-head__title" data-test="usps-heading">{{ t('app.strategy.usp.title') }}</h2>
+      <p class="step-head__sub">{{ t('app.strategy.usp.subtitle') }}</p>
     </div>
 
-    <div class="agency-card usps-bar" data-test="usps-bar">
+    <div class="usps-bar" data-test="usps-bar">
       <div class="usps-bar__audience">
-        <span class="agency-field__label">{{ t('app.strategy.audience.label') }}</span>
-        <div class="d-flex align-center ga-2">
-          <span v-if="audienceTitle" class="usps-bar__title" data-test="audience-title">{{
-            audienceTitle
-          }}</span>
-          <span v-else class="text-medium-emphasis" data-test="audience-title-empty">
-            {{ t('app.strategy.audience.placeholder') }}
-          </span>
-          <v-btn
-            icon="mdi-pencil-outline"
-            variant="text"
-            size="small"
-            :aria-label="t('app.strategy.audience.edit')"
-            data-test="audience-edit"
-            @click="audienceDialog = true"
-          />
-        </div>
+        <span class="usps-bar__label">{{ t('app.strategy.audience.label') }}</span>
+        <span v-if="audienceTitle" class="usps-bar__title" data-test="audience-title">{{
+          audienceTitle
+        }}</span>
+        <span v-else class="usps-bar__empty" data-test="audience-title-empty">
+          {{ t('app.strategy.audience.placeholder') }}
+        </span>
+        <v-btn
+          icon="mdi-pencil-outline"
+          variant="text"
+          size="x-small"
+          class="usps-bar__edit"
+          :aria-label="t('app.strategy.audience.edit')"
+          data-test="audience-edit"
+          @click="audienceDialog = true"
+        />
       </div>
       <div class="usps-bar__side">
         <span class="usps-bar__counter" data-test="usp-counter">
@@ -164,8 +163,9 @@ function move(usp: WaveUspResource, by: -1 | 1): void {
           <template #activator="{ props: tip }">
             <span v-bind="tip">
               <v-btn
-                color="primary"
-                variant="flat"
+                variant="outlined"
+                size="small"
+                class="step-btn"
                 prepend-icon="mdi-plus"
                 :disabled="atMax || loading || failed"
                 data-test="usp-add"
@@ -271,43 +271,111 @@ function move(usp: WaveUspResource, by: -1 | 1): void {
 </template>
 
 <style scoped>
+/*
+ * Values from frame 13:428 (section head, audience bar), through the agency theme tokens.
+ */
 .usps-step {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
-/* `.agency-card` (theme) sets a column; the bar is a row that wraps. Two classes beat the theme's one. */
-.usps-step .usps-bar {
+.step-head {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  gap: 4px;
+}
+.step-head__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: normal;
+  color: rgb(var(--v-theme-on-surface));
+}
+.step-head__sub {
+  margin: 0;
+  font-size: 13px;
+  line-height: normal;
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+.usps-bar {
+  display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 12px 24px;
+  gap: 8px 24px;
+  padding: 12px 16px;
+  border: 1px solid rgb(var(--v-theme-border-color));
+  border-radius: 8px;
+  background: rgb(var(--v-theme-surface));
 }
 .usps-bar__audience {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
   min-width: 0;
 }
+.usps-bar__label {
+  font-size: 12px;
+  line-height: normal;
+  color: rgb(var(--v-theme-text-tertiary));
+}
 .usps-bar__title {
+  font-size: 16px;
   font-weight: 600;
+  line-height: normal;
+  color: rgb(var(--v-theme-on-surface));
   overflow-wrap: anywhere;
+}
+.usps-bar__empty {
+  font-size: 14px;
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+.usps-bar__edit {
+  color: rgb(var(--v-theme-text-tertiary));
 }
 .usps-bar__side {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 .usps-bar__counter {
+  font-size: 12px;
+  line-height: normal;
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+/*
+ * 13px medium, 14px icon, 8px gap, 6px 12px padding, 8px radius, 1px border (frame: "Add USP", drawn with no fill
+ * and the default border; the agency theme's secondary button has a surface fill and the strong border, and its
+ * selector is more specific than any scoped one, hence the !important).
+ */
+.usps-bar .step-btn {
+  height: auto;
+  min-height: 0;
+  padding: 6px 12px;
+  border: 1px solid rgb(var(--v-theme-border-color)) !important;
+  border-radius: 8px;
+  background-color: transparent !important;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+  color: rgb(var(--v-theme-on-surface));
+}
+.usps-bar .step-btn:disabled,
+.usps-bar .step-btn.v-btn--disabled {
+  border-color: color-mix(in srgb, rgb(var(--v-theme-text-tertiary)) 80%, transparent) !important;
+  color: rgb(var(--v-theme-text-tertiary)) !important;
+  opacity: 1;
+}
+.usps-bar .step-btn :deep(.v-btn__prepend) {
+  margin-inline: 0 8px;
   font-size: 14px;
-  font-weight: 600;
 }
 .usps-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr));
   gap: 16px;
 }
 .usps-empty {

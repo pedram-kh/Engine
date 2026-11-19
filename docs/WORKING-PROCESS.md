@@ -193,6 +193,8 @@ reboot. From now on, for every agent and developer, on a local machine:
 
 Stacking, width and overlay defects are invisible to unit tests: a menu behind a dialog, a pill stretched to its column and a list outside the window all passed Vitest and Pest. Any new dialog, menu or board is opened in a real browser, including a quick close and reopen, before a walk is offered to Pedram.
 
+**Design fidelity (standing rule, Pedram, 2026-11-19, after the PL-2.1 walk).** For every screen that has a design frame, before a walk is offered: read the frame with `get_design_context`, open the built screen in a real browser at the frame's width, and put a difference table (element, frame value, built value, VISUAL or FUNCTIONAL) in the review file. Visual differences are fixed. Functional differences are reported to Pedram and left as they are until he rules. "Matches the design" is never written without that table. Screens with no frame are named as built from the design system.
+
 ---
 
 ## 5. Production-data safety (we are live)

@@ -1,6 +1,6 @@
 /**
  * PL-2.1 W8-W11 — step 2, Personas: market tabs from the wave's markets, "n of 8 used in [market]", warning under
- * two, pronoun-driven labels, angles with the USP dropdown ("Linked" / "Added by hand"), copy from another market
+ * two, pronoun-driven labels, angles with the USP dropdown ("Linked" / "Manually added"), copy from another market
  * with a tick list, delete with the angle count, and hostile text rendered as plain text.
  */
 import { flushPromises } from '@vue/test-utils'
@@ -113,9 +113,7 @@ describe('PersonasStep (PL-2.1)', () => {
 
   it('W9: the tile counts n of 8 in the market, the warning shows under two, and Add is off at eight', async () => {
     const one = await mountStep(many(1, 'SK'))
-    expect(one.get('[data-test="persona-tile-text"]').text()).toBe(
-      'Add persona · 1 of 8 used in Slovakia',
-    )
+    expect(one.get('[data-test="persona-tile-text"]').text()).toBe('1 of 8 used in Slovakia')
     expect(one.get('[data-test="persona-warning"]').text()).toBe(
       'Add at least 2 personas for Slovakia.',
     )
@@ -164,7 +162,7 @@ describe('PersonasStep (PL-2.1)', () => {
     w.unmount()
   })
 
-  it('W10: angles show Added by hand; the USP list marks a linked USP and offers the others', async () => {
+  it('W10: angles show Manually added; the USP list marks a linked USP and offers the others', async () => {
     const usps = makeUsps(3)
     const first = usps[0] ?? makeUsp(1)
     const w = await mountStep(
@@ -176,7 +174,7 @@ describe('PersonasStep (PL-2.1)', () => {
     )
     const card = w.findAll('[data-test="persona-card"]')[0]
     if (card === undefined) throw new Error('no card')
-    expect(card.get('[data-test="angle-origin"]').text()).toBe('Added by hand')
+    expect(card.get('[data-test="angle-origin"]').text()).toBe('Manually added')
     expect(card.get('[data-test="angle-explanation"]').text()).toBe('Fast for busy parents')
 
     await card.get('[data-test="angle-link-btn"]').trigger('click')

@@ -1754,10 +1754,11 @@
       },
       "persona": {
         "markets": "Marchés",
+        "marketLabel": "Marché",
         "title": "Personas · {market}",
         "subtitle": "{min} à {max} personas par marché. Les angles créatifs renvoient aux USP de l'étape 1.",
         "add": "Ajouter un persona",
-        "tile": "Ajouter un persona · {count} sur {max} utilisés pour {market}",
+        "tile": "{count} sur {max} utilisés pour {market}",
         "tileMax": "{count} sur {max} utilisés pour {market} · maximum atteint",
         "warning": "Ajoutez au moins {min} personas pour {market}.",
         "fewerThanMin": "Moins de {min} personas",
@@ -1777,14 +1778,14 @@
         },
         "barriers": "Freins et frictions",
         "angles": "Angles créatifs qui convainquent",
-        "nameLine": "Nom · {name}",
+        "nameLine": "{name} · nom du persona",
         "menu": "Actions pour {name}",
         "edit": "Modifier",
         "delete": "Supprimer",
         "deleteTitle": "Supprimer {name} ?",
         "deleteBody": "Le persona sera supprimé.",
         "deleteBodyAngles": "Le persona et son {count} angle seront supprimés. | Le persona et ses {count} angles seront supprimés.",
-        "addedByHand": "Ajouté à la main",
+        "addedByHand": "Ajouté manuellement",
         "linked": "Lié",
         "addAngle": "Ajouter un angle depuis les USP",
         "noUsps": "Ajoutez d'abord des USP à l'étape 1.",
@@ -1824,7 +1825,8 @@
           "codeRequired": "Saisissez un code.",
           "codeFormat": "Utilisez {min} à {max} lettres ou chiffres.",
           "angleRequired": "Saisissez une ligne."
-        }
+        },
+        "linkAUsp": "Lier un USP"
       },
       "copy": {
         "open": "Copier depuis…",

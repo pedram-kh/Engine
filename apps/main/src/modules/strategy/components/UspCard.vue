@@ -64,13 +64,15 @@ function pick(action: 'edit' | 'remove' | 'earlier' | 'later'): void {
         <template #activator="{ props: act }">
           <v-btn
             v-bind="act"
-            icon="mdi-dots-vertical"
             variant="text"
             size="small"
+            class="usp-card__menu"
             :aria-label="t('app.strategy.usp.menu', { title: a.title })"
             :disabled="busy"
             data-test="usp-menu-btn"
-          />
+          >
+            <v-icon icon="mdi-dots-horizontal" size="18" />
+          </v-btn>
         </template>
         <v-list density="compact" data-test="usp-menu">
           <v-list-item data-test="usp-menu-edit" @click="pick('edit')">
@@ -112,9 +114,11 @@ function pick(action: 'edit' | 'remove' | 'earlier' | 'later'): void {
       <h4 class="usp-card__label">{{ t('app.strategy.usp.creativeAngle') }}</h4>
       <p class="usp-card__text">{{ a.creative_angle }}</p>
     </section>
-    <section v-if="a.copy_seed" class="usp-card__block usp-card__quote" data-test="usp-copy-seed">
+    <section v-if="a.copy_seed" class="usp-card__block" data-test="usp-copy-seed">
       <h4 class="usp-card__label">{{ t('app.strategy.usp.copySeed') }}</h4>
-      <p class="usp-card__text">{{ a.copy_seed }}</p>
+      <blockquote class="usp-card__quote">
+        <p class="usp-card__quote-text">{{ a.copy_seed }}</p>
+      </blockquote>
     </section>
 
     <footer v-if="a.angle_count > 0" class="usp-card__foot" data-test="usp-angle-count">
@@ -124,14 +128,18 @@ function pick(action: 'edit' | 'remove' | 'earlier' | 'later'): void {
 </template>
 
 <style scoped>
+/*
+ * Values from frame 13:428 (USP card), through the agency theme tokens: `surface`, `border-color`, `on-surface`,
+ * `on-surface-variant` and `text-tertiary` (lifted by the agency theme for contrast). The card colour is
+ * `--usp-color`.
+ */
 .usp-card {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  border: 1px solid rgba(var(--v-theme-on-surface), 0.12);
-  border-top: 3px solid var(--usp-color);
-  border-radius: 12px;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid rgb(var(--v-theme-border-color));
+  border-radius: 10px;
   background: rgb(var(--v-theme-surface));
   min-width: 0;
 }
@@ -143,53 +151,77 @@ function pick(action: 'edit' | 'remove' | 'earlier' | 'later'): void {
 .usp-grip {
   display: inline-flex;
   cursor: grab;
-  color: rgba(var(--v-theme-on-surface), 0.55);
+  color: rgb(var(--v-theme-text-tertiary));
   touch-action: none;
 }
 .usp-card__num {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-width: 28px;
-  height: 24px;
-  padding: 0 6px;
+  padding: 3px 7px;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  color: rgb(var(--v-theme-on-surface));
-  background: color-mix(in srgb, var(--usp-color) 22%, transparent);
-  border: 1px solid var(--usp-color);
+  line-height: normal;
+  color: var(--usp-color);
+  background: color-mix(in srgb, var(--usp-color) 18%, transparent);
 }
 .usp-card__title {
   flex: 1 1 auto;
   min-width: 0;
   margin: 0;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
+  line-height: normal;
+  color: rgb(var(--v-theme-on-surface));
   overflow-wrap: anywhere;
 }
+.usp-card__menu {
+  flex: 0 0 auto;
+  color: rgb(var(--v-theme-text-tertiary));
+}
+.usp-card__block {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
 .usp-card__label {
-  margin: 0 0 4px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  margin: 0;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: normal;
+  letter-spacing: 0.6px;
   text-transform: uppercase;
-  color: rgba(var(--v-theme-on-surface), 0.65);
+  color: rgb(var(--v-theme-text-tertiary));
 }
 .usp-card__text {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 19px;
+  color: rgb(var(--v-theme-on-surface-variant));
   white-space: pre-line;
   overflow-wrap: anywhere;
 }
 .usp-card__quote {
-  padding: 10px 12px;
-  border-left: 3px solid var(--usp-color);
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--usp-color) 12%, transparent);
+  margin: 0;
+  padding: 8px 10px;
+  border-left: 2px solid var(--usp-color);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--usp-color) 7%, transparent);
+}
+.usp-card__quote-text {
+  margin: 0;
+  font-size: 13px;
+  font-style: italic;
+  line-height: 19px;
+  color: rgb(var(--v-theme-on-surface));
+  white-space: pre-line;
+  overflow-wrap: anywhere;
 }
 .usp-card__foot {
-  font-size: 12px;
-  color: rgba(var(--v-theme-on-surface), 0.65);
+  padding-top: 10px;
+  border-top: 1px solid rgb(var(--v-theme-border-color));
+  font-size: 11px;
+  line-height: normal;
+  color: rgb(var(--v-theme-text-tertiary));
 }
 </style>

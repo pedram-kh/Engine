@@ -71,6 +71,8 @@ const KEYS = [
   'app.strategy.usp.deleteDialog.confirmInUse',
   'app.strategy.usp.deleteDialog.refreshed',
   'app.strategy.persona.markets',
+  'app.strategy.persona.marketLabel',
+  'app.strategy.persona.linkAUsp',
   'app.strategy.persona.title',
   'app.strategy.persona.subtitle',
   'app.strategy.persona.add',
@@ -181,7 +183,6 @@ const SAME_AS_ENGLISH_BY_DESIGN = new Set<string>([
   'de:app.strategy.stepper.statusUsps',
   'de:app.strategy.usp.title',
   'de:app.strategy.persona.title',
-  'de:app.strategy.persona.nameLine',
   'de:app.strategy.persona.dialog.code',
   'de:app.strategy.persona.dialog.name',
   'es:app.strategy.stepper.personas',
@@ -221,8 +222,8 @@ function tokens(text: string): string[] {
 }
 
 describe('PL-2.1 strategy strings', () => {
-  it('checks 140 keys across 24 locales', () => {
-    expect(KEYS).toHaveLength(140)
+  it('checks 142 keys across 24 locales', () => {
+    expect(KEYS).toHaveLength(142)
     expect(UI_LOCALES).toHaveLength(24)
   })
 

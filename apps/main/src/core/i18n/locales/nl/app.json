@@ -1754,10 +1754,11 @@
       },
       "persona": {
         "markets": "Markten",
+        "marketLabel": "Markt",
         "title": "Persona's · {market}",
         "subtitle": "{min}–{max} persona's per markt. Creatieve invalshoeken verwijzen naar de USP's uit stap 1.",
         "add": "Persona toevoegen",
-        "tile": "Persona toevoegen · {count} van {max} gebruikt in {market}",
+        "tile": "{count} van {max} gebruikt in {market}",
         "tileMax": "{count} van {max} gebruikt in {market} · maximum bereikt",
         "warning": "Voeg minstens {min} persona's toe voor {market}.",
         "fewerThanMin": "Minder dan {min} persona's",
@@ -1777,7 +1778,7 @@
         },
         "barriers": "Drempels en wrijving",
         "angles": "Creatieve invalshoeken die overtuigen",
-        "nameLine": "Naam · {name}",
+        "nameLine": "{name} · naam van de persona",
         "menu": "Acties voor {name}",
         "edit": "Bewerken",
         "delete": "Verwijderen",
@@ -1824,7 +1825,8 @@
           "codeRequired": "Vul een code in.",
           "codeFormat": "Gebruik {min}–{max} letters of cijfers.",
           "angleRequired": "Vul een regel in."
-        }
+        },
+        "linkAUsp": "Koppel een USP"
       },
       "copy": {
         "open": "Kopiëren van…",

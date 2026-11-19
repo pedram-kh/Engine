@@ -1754,10 +1754,11 @@
       },
       "persona": {
         "markets": "Trhy",
+        "marketLabel": "Trh",
         "title": "Persony · {market}",
         "subtitle": "{min}–{max} person na trh. Kreativní úhly odkazují na USP z kroku 1.",
         "add": "Přidat personu",
-        "tile": "Přidat personu · využito {count} z {max} na trhu {market}",
+        "tile": "využito {count} z {max} na trhu {market}",
         "tileMax": "Využito {count} z {max} na trhu {market} · dosaženo maxima",
         "warning": "Přidejte alespoň {min} person pro trh {market}.",
         "fewerThanMin": "Méně než {min} person",
@@ -1777,7 +1778,7 @@
         },
         "barriers": "Překážky a třecí plochy",
         "angles": "Kreativní úhly, které přesvědčí",
-        "nameLine": "Jméno · {name}",
+        "nameLine": "{name} · jméno persony",
         "menu": "Akce pro {name}",
         "edit": "Upravit",
         "delete": "Smazat",
@@ -1824,7 +1825,8 @@
           "codeRequired": "Zadejte kód.",
           "codeFormat": "Použijte {min}–{max} písmen nebo číslic.",
           "angleRequired": "Zadejte řádek."
-        }
+        },
+        "linkAUsp": "Propojit USP"
       },
       "copy": {
         "open": "Kopírovat z…",

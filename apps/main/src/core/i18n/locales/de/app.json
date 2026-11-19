@@ -1754,10 +1754,11 @@
       },
       "persona": {
         "markets": "Märkte",
+        "marketLabel": "Markt",
         "title": "Personas · {market}",
         "subtitle": "{min}–{max} Personas pro Markt. Kreative Ansätze verweisen auf die USPs aus Schritt 1.",
         "add": "Persona hinzufügen",
-        "tile": "Persona hinzufügen · {count} von {max} in {market} belegt",
+        "tile": "{count} von {max} in {market} belegt",
         "tileMax": "{count} von {max} in {market} belegt · Maximum erreicht",
         "warning": "Füge mindestens {min} Personas für {market} hinzu.",
         "fewerThanMin": "Weniger als {min} Personas",
@@ -1777,14 +1778,14 @@
         },
         "barriers": "Hürden & Reibungen",
         "angles": "Kreative Ansätze, die überzeugen",
-        "nameLine": "Name · {name}",
+        "nameLine": "{name} · Name der Persona",
         "menu": "Aktionen für {name}",
         "edit": "Bearbeiten",
         "delete": "Löschen",
         "deleteTitle": "{name} löschen?",
         "deleteBody": "Die Persona wird entfernt.",
         "deleteBodyAngles": "Die Persona und ihr {count} Ansatz werden entfernt. | Die Persona und ihre {count} Ansätze werden entfernt.",
-        "addedByHand": "Von Hand hinzugefügt",
+        "addedByHand": "Manuell hinzugefügt",
         "linked": "Verknüpft",
         "addAngle": "Ansatz aus USPs hinzufügen",
         "noUsps": "Füge zuerst in Schritt 1 USPs hinzu.",
@@ -1824,7 +1825,8 @@
           "codeRequired": "Gib einen Code ein.",
           "codeFormat": "Verwende {min}–{max} Buchstaben oder Ziffern.",
           "angleRequired": "Gib eine Zeile ein."
-        }
+        },
+        "linkAUsp": "USP verknüpfen"
       },
       "copy": {
         "open": "Kopieren von …",

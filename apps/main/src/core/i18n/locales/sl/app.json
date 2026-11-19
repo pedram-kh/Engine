@@ -1754,10 +1754,11 @@
       },
       "persona": {
         "markets": "Trgi",
+        "marketLabel": "Trg",
         "title": "Persone · {market}",
         "subtitle": "{min}–{max} person na trg. Ustvarjalni koti se navezujejo na USP iz koraka 1.",
         "add": "Dodaj persono",
-        "tile": "Dodaj persono · porabljeno {count} od {max} na trgu {market}",
+        "tile": "porabljeno {count} od {max} na trgu {market}",
         "tileMax": "Porabljeno {count} od {max} na trgu {market} · doseženo največje število",
         "warning": "Dodajte vsaj {min} person za trg {market}.",
         "fewerThanMin": "Manj kot {min} person",
@@ -1777,14 +1778,14 @@
         },
         "barriers": "Ovire in trenja",
         "angles": "Ustvarjalni koti, ki prepričajo",
-        "nameLine": "Ime · {name}",
+        "nameLine": "{name} · ime persone",
         "menu": "Dejanja za {name}",
         "edit": "Uredi",
         "delete": "Izbriši",
         "deleteTitle": "Izbrišem {name}?",
         "deleteBody": "Persona se odstrani.",
         "deleteBodyAngles": "Persona in njen {count} kot se odstranita. | Persona in njenih {count} kotov se odstrani.",
-        "addedByHand": "Dodano ročno",
+        "addedByHand": "Ročno dodano",
         "linked": "Povezano",
         "addAngle": "Dodaj kot iz USP",
         "noUsps": "Najprej dodajte USP v koraku 1.",
@@ -1824,7 +1825,8 @@
           "codeRequired": "Vnesite kodo.",
           "codeFormat": "Uporabite {min}–{max} črk ali števk.",
           "angleRequired": "Vnesite vrstico."
-        }
+        },
+        "linkAUsp": "Poveži USP"
       },
       "copy": {
         "open": "Kopiraj iz …",

@@ -1754,10 +1754,11 @@
       },
       "persona": {
         "markets": "Rynki",
+        "marketLabel": "Rynek",
         "title": "Persony · {market}",
         "subtitle": "{min}–{max} person na rynek. Kąty kreatywne odwołują się do USP z kroku 1.",
         "add": "Dodaj personę",
-        "tile": "Dodaj personę · wykorzystano {count} z {max} w: {market}",
+        "tile": "wykorzystano {count} z {max} w: {market}",
         "tileMax": "Wykorzystano {count} z {max} w: {market} · osiągnięto maksimum",
         "warning": "Dodaj co najmniej {min} person dla: {market}.",
         "fewerThanMin": "Mniej niż {min} person",
@@ -1777,7 +1778,7 @@
         },
         "barriers": "Bariery i tarcia",
         "angles": "Kąty kreatywne, które przekonują",
-        "nameLine": "Imię · {name}",
+        "nameLine": "{name} · imię persony",
         "menu": "Działania dla {name}",
         "edit": "Edytuj",
         "delete": "Usuń",
@@ -1824,7 +1825,8 @@
           "codeRequired": "Wpisz kod.",
           "codeFormat": "Użyj {min}–{max} liter lub cyfr.",
           "angleRequired": "Wpisz linijkę tekstu."
-        }
+        },
+        "linkAUsp": "Powiąż USP"
       },
       "copy": {
         "open": "Kopiuj z…",

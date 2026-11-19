@@ -15,13 +15,14 @@ import type {
   WavePersonaResource,
 } from '@catalyst/api-client'
 import { ApiError, labelForCountryCode } from '@catalyst/api-client'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
 
 import { strategyApi, type WaveScope } from '../api/strategy.api'
 import { MENU_PROPS } from '../constants'
 import { fieldErrorsOf, formErrorFor, isGone, strategyErrorMessage } from '../strategyErrors'
+import { revealFirstError } from '../revealError'
 import ListField from './ListField.vue'
 
 const props = defineProps<{
@@ -171,8 +172,10 @@ async function submit(): Promise<void> {
     coreJobError.value ||
     needError.value ||
     listsTooLong.value
-  )
+  ) {
+    reveal()
     return
+  }
 
   saving.value = true
   try {
@@ -228,9 +231,16 @@ async function submit(): Promise<void> {
       ['code', 'title', 'name', 'summary', 'core_job', 'need'],
       t,
     )
+    reveal()
   } finally {
     saving.value = false
   }
+}
+
+const card = ref<{ $el: HTMLElement } | null>(null)
+/** Scroll the first field in error into view once it is drawn (the body scrolls, Save stays put). */
+function reveal(): void {
+  void nextTick(() => revealFirstError(card.value?.$el))
 }
 
 function fe(field: string, local: string | null): string[] {
@@ -253,7 +263,7 @@ function fe(field: string, local: string | null): string[] {
       }
     "
   >
-    <v-card :key="session">
+    <v-card ref="card" :key="session">
       <v-card-title class="text-h6 text-wrap text-break pt-4 px-6">
         {{
           isEdit
@@ -385,16 +395,17 @@ function fe(field: string, local: string | null): string[] {
           :submitted="submitted"
           test-id="persona-list-barriers"
         />
-        <v-alert
-          v-if="formError"
-          type="error"
-          variant="tonal"
-          density="compact"
-          data-test="persona-dialog-error"
-        >
-          {{ formError }}
-        </v-alert>
       </v-card-text>
+      <v-alert
+        v-if="formError"
+        class="mx-6 mb-3 strategy-dialog-error"
+        type="error"
+        variant="tonal"
+        density="compact"
+        data-test="persona-dialog-error"
+      >
+        {{ formError }}
+      </v-alert>
       <v-card-actions class="px-6 pb-4">
         <v-spacer />
         <v-btn variant="text" :disabled="saving" data-test="persona-dialog-cancel" @click="close">
@@ -416,6 +427,12 @@ function fe(field: string, local: string | null): string[] {
 </template>
 
 <style scoped>
+/* The dialog is `scrollable`: only the body scrolls. The alert sits between that body and the actions and keeps its
+   full height, so the message is never cut off. */
+.strategy-dialog-error {
+  flex: 0 0 auto;
+}
+
 .persona-dialog__row {
   display: grid;
   grid-template-columns: 1fr 1fr;

@@ -1754,10 +1754,11 @@
       },
       "persona": {
         "markets": "Markeder",
+        "marketLabel": "Marked",
         "title": "Personaer · {market}",
         "subtitle": "{min}–{max} personaer pr. marked. Kreative vinkler peger på USP'erne fra trin 1.",
         "add": "Tilføj persona",
-        "tile": "Tilføj persona · {count} af {max} brugt i {market}",
+        "tile": "{count} af {max} brugt i {market}",
         "tileMax": "{count} af {max} brugt i {market} · maksimum nået",
         "warning": "Tilføj mindst {min} personaer for {market}.",
         "fewerThanMin": "Færre end {min} personaer",
@@ -1777,7 +1778,7 @@
         },
         "barriers": "Barrierer og gnidninger",
         "angles": "Kreative vinkler, der overbeviser",
-        "nameLine": "Navn · {name}",
+        "nameLine": "{name} · personaens navn",
         "menu": "Handlinger for {name}",
         "edit": "Rediger",
         "delete": "Slet",
@@ -1824,7 +1825,8 @@
           "codeRequired": "Angiv en kode.",
           "codeFormat": "Brug {min}–{max} bogstaver eller cifre.",
           "angleRequired": "Angiv en linje."
-        }
+        },
+        "linkAUsp": "Knyt et USP"
       },
       "copy": {
         "open": "Kopiér fra…",

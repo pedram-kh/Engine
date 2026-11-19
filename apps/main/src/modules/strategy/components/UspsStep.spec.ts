@@ -155,6 +155,32 @@ describe('UspsStep (PL-2.1)', () => {
     w.unmount()
   })
 
+  it('D3: a save refused because the card was removed shows the alert outside the scrolling body, and Close reloads the grid', async () => {
+    const w = await mountStep(makeUsps(3))
+    const card = w.findAll('[data-test="usp-card"]')[1]
+    if (card === undefined) throw new Error('no card')
+    await card.get('[data-test="usp-menu-btn"]').trigger('click')
+    await flushPromises()
+    await click('[data-test="usp-menu-edit"]')
+    type('[data-test="usp-field-explainer"] textarea', 'Under 30 minutes')
+    vi.mocked(strategyApi.updateUsp).mockRejectedValue(
+      new ApiError({ status: 404, code: 'usp.not_found', message: 'gone' }),
+    )
+    await click('[data-test="usp-dialog-save"]')
+
+    const alert = overlay('.strategy-dialog-error')
+    expect(alert).not.toBeNull()
+    // Pinned between the scrolling body and the actions: never inside the body that scrolls and cuts it off.
+    expect(alert?.closest('.v-card-text')).toBeNull()
+    expect(alert?.closest('.v-dialog--scrollable')).not.toBeNull()
+    expect(alert?.textContent).toContain('removed by someone else')
+
+    vi.mocked(strategyApi.listUsps).mockClear()
+    await click('[data-test="usp-dialog-cancel"]')
+    expect(strategyApi.listUsps).toHaveBeenCalled()
+    w.unmount()
+  })
+
   it('W5: hostile text in a title and an explainer is shown as plain text, never as markup', async () => {
     const usps = [makeUsp(1, { title: HOSTILE, explainer: HOSTILE }), ...makeUsps(4).slice(1)]
     const w = await mountStep(usps)

@@ -67,6 +67,7 @@ async function submit(): Promise<void> {
     :model-value="modelValue"
     max-width="440"
     persistent
+    scrollable
     data-test="audience-dialog"
     @update:model-value="
       (v: boolean) => {
@@ -91,17 +92,17 @@ async function submit(): Promise<void> {
           data-test="audience-field"
           @keydown.enter.prevent="submit"
         />
-        <v-alert
-          v-if="error"
-          type="error"
-          variant="tonal"
-          density="compact"
-          class="mt-3"
-          data-test="audience-error"
-        >
-          {{ error }}
-        </v-alert>
       </v-card-text>
+      <v-alert
+        v-if="error"
+        class="mx-6 mb-3 strategy-dialog-error"
+        type="error"
+        variant="tonal"
+        density="compact"
+        data-test="audience-error"
+      >
+        {{ error }}
+      </v-alert>
       <v-card-actions class="px-6 pb-4">
         <v-spacer />
         <v-btn variant="text" :disabled="saving" data-test="audience-cancel" @click="close">
@@ -121,3 +122,11 @@ async function submit(): Promise<void> {
     </v-card>
   </v-dialog>
 </template>
+
+<style scoped>
+/* The dialog is `scrollable`: only the body scrolls. The alert sits between that body and the actions and keeps its
+   full height, so the message is never cut off. */
+.strategy-dialog-error {
+  flex: 0 0 auto;
+}
+</style>

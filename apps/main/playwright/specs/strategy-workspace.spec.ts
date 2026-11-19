@@ -52,7 +52,8 @@ async function api(
         body: body === undefined ? undefined : JSON.stringify(body),
       })
       if (!response.ok) throw new Error(`${method} ${path} failed: ${response.status}`)
-      return (await response.json()) as { data: { id: string } }
+      const text = await response.text()
+      return (text === '' ? {} : JSON.parse(text)) as { data: { id: string } }
     },
     { method, path, body },
   )
@@ -178,6 +179,32 @@ test.describe('Strategy workspace', () => {
       await expect(page.locator('[data-test="usp-explainer"]').first()).toContainText(HOSTILE)
       await expect(page.locator('img[src="x"]')).toHaveCount(0)
 
+      // D3: a save refused because the card was removed by someone else shows its alert in full, above the
+      // actions, without scrolling; Close then reloads the grid.
+      const gone = await api(page, 'POST', `${base}/usps`, { title: 'Gone soon' })
+      await page.reload()
+      await closeDrawer()
+      await expect(page.locator('[data-test="usp-card"]')).toHaveCount(2)
+      const goneCard = page.locator('[data-test="usp-card"]').filter({ hasText: 'Gone soon' })
+      await goneCard.locator('[data-test="usp-menu-btn"]').click()
+      await page.locator('[data-test="usp-menu-edit"]').click()
+      await page.locator('[data-test="usp-field-title"] input').fill('Gone soon, edited')
+      await api(page, 'DELETE', `${base}/usps/${gone.data.id}`)
+      await page.locator('[data-test="usp-dialog-save"]').click()
+      const goneAlert = page.locator('[data-test="usp-dialog"] .strategy-dialog-error')
+      await expect(goneAlert).toContainText('removed by someone else')
+      const alertBox = await goneAlert.boundingBox()
+      const actionsBox = await page.locator('[data-test="usp-dialog-cancel"]').boundingBox()
+      if (alertBox === null || actionsBox === null) throw new Error('no box')
+      expect(alertBox.y).toBeGreaterThanOrEqual(0)
+      expect(alertBox.y + alertBox.height).toBeLessThanOrEqual(actionsBox.y + 1)
+      expect(alertBox.y + alertBox.height).toBeLessThanOrEqual(size.height)
+      expect(
+        await goneAlert.evaluate((el) => el.scrollHeight - el.clientHeight),
+      ).toBeLessThanOrEqual(1)
+      await page.locator('[data-test="usp-dialog-cancel"]').click()
+      await expect(page.locator('[data-test="usp-card"]')).toHaveCount(1)
+
       // Five more through the API, then the maximum.
       for (const title of ['Fast', 'Cheap', 'Local', 'Open late', 'Tracked']) {
         await api(page, 'POST', `${base}/usps`, { title })
@@ -247,7 +274,7 @@ test.describe('Strategy workspace', () => {
       )
       await expect(page.locator('[data-test="persona-warning"]')).toBeVisible()
       await expect(page.locator('[data-test="persona-tile-text"]')).toHaveText(
-        'Add persona · 0 of 8 used in Slovakia',
+        '0 of 8 used in Slovakia',
       )
 
       for (const delay of [0, 60, 150]) {
@@ -301,7 +328,7 @@ test.describe('Strategy workspace', () => {
         .fill(HOSTILE)
       await card.locator('[data-test="angle-add"]').click()
       await expect(card.locator('[data-test="angle-explanation"]')).toHaveText(HOSTILE)
-      await expect(card.locator('[data-test="angle-origin"]')).toHaveText('Added by hand')
+      await expect(card.locator('[data-test="angle-origin"]')).toHaveText('Manually added')
       await expect(page.locator('img[src="x"]')).toHaveCount(0)
 
       // That USP is now Linked in the list.

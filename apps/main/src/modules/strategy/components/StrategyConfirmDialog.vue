@@ -45,6 +45,7 @@ function close(): void {
     :model-value="modelValue"
     max-width="520"
     persistent
+    scrollable
     :data-test="testId"
     @update:model-value="
       (v: boolean) => {
@@ -57,17 +58,17 @@ function close(): void {
       <v-card-text class="px-6">
         <p v-if="body" class="mb-3" data-test="confirm-body">{{ body }}</p>
         <slot />
-        <v-alert
-          v-if="error"
-          type="error"
-          variant="tonal"
-          density="compact"
-          class="mt-3"
-          data-test="confirm-error"
-        >
-          {{ error }}
-        </v-alert>
       </v-card-text>
+      <v-alert
+        v-if="error"
+        class="mx-6 mb-3 strategy-dialog-error"
+        type="error"
+        variant="tonal"
+        density="compact"
+        data-test="confirm-error"
+      >
+        {{ error }}
+      </v-alert>
       <v-card-actions class="px-6 pb-4">
         <v-spacer />
         <v-btn variant="text" :disabled="busy" data-test="confirm-cancel" @click="close">
@@ -87,3 +88,11 @@ function close(): void {
     </v-card>
   </v-dialog>
 </template>
+
+<style scoped>
+/* The dialog is `scrollable`: only the body scrolls. The alert sits between that body and the actions and keeps its
+   full height, so the message is never cut off. */
+.strategy-dialog-error {
+  flex: 0 0 auto;
+}
+</style>

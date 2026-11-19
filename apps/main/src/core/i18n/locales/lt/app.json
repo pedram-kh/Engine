@@ -1754,10 +1754,11 @@
       },
       "persona": {
         "markets": "Rinkos",
+        "marketLabel": "Rinka",
         "title": "Personos · {market}",
         "subtitle": "{min}–{max} personų vienai rinkai. Kūrybiniai kampai nurodo 1 žingsnio USP.",
         "add": "Pridėti personą",
-        "tile": "Pridėti personą · panaudota {count} iš {max}, rinka {market}",
+        "tile": "panaudota {count} iš {max}, rinka {market}",
         "tileMax": "Panaudota {count} iš {max}, rinka {market} · pasiektas maksimumas",
         "warning": "Pridėkite bent {min} personų rinkai {market}.",
         "fewerThanMin": "Mažiau nei {min} personų",
@@ -1777,7 +1778,7 @@
         },
         "barriers": "Kliūtys ir trintis",
         "angles": "Įtikinami kūrybiniai kampai",
-        "nameLine": "Vardas · {name}",
+        "nameLine": "{name} · personos vardas",
         "menu": "Veiksmai: {name}",
         "edit": "Redaguoti",
         "delete": "Ištrinti",
@@ -1824,7 +1825,8 @@
           "codeRequired": "Įveskite kodą.",
           "codeFormat": "Naudokite {min}–{max} raides arba skaitmenis.",
           "angleRequired": "Įveskite eilutę."
-        }
+        },
+        "linkAUsp": "Susieti USP"
       },
       "copy": {
         "open": "Kopijuoti iš…",

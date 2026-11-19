@@ -106,14 +106,22 @@ function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUli
 </template>
 
 <style scoped>
+/*
+ * Values from frame 13:828 / 13:428 (stepper): a bar of surface fill, 1px border, 10px radius, 6px padding and
+ * 6px gaps; steps of 10px 14px with a 12px gap and 8px radius; a 28px circle; the current step on the raised fill
+ * with a 60% primary border; names 14px (600 and on-surface for the current step, 500 and on-surface-variant for the
+ * others); status 12px.
+ */
 .strategy-stepper {
   overflow-x: auto;
-  border: 1px solid rgba(var(--v-theme-on-surface), 0.12);
-  border-radius: 12px;
+  padding: 6px;
+  border: 1px solid rgb(var(--v-theme-border-color));
+  border-radius: 10px;
   background: rgb(var(--v-theme-surface));
 }
 .strategy-stepper__list {
   display: flex;
+  gap: 6px;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -121,46 +129,61 @@ function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUli
 }
 .strategy-stepper__item {
   flex: 1 0 auto;
-  border-right: 1px solid rgba(var(--v-theme-on-surface), 0.08);
-}
-.strategy-stepper__item:last-child {
-  border-right: 0;
+  display: flex;
 }
 .strategy-step {
+  flex: 1 1 auto;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid transparent;
+  border-radius: 8px;
   white-space: nowrap;
   color: inherit;
   text-decoration: none;
 }
 .strategy-step__circle {
+  flex: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 9999px;
   font-size: 12px;
   font-weight: 600;
-  background: rgba(var(--v-theme-on-surface), 0.08);
+  line-height: normal;
+  color: rgb(var(--v-theme-on-surface-variant));
+  background: rgb(var(--v-theme-surface-bright));
 }
 .strategy-step__text {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 .strategy-step__name {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
+  line-height: normal;
+  color: rgb(var(--v-theme-on-surface-variant));
 }
 .strategy-step__status {
   font-size: 12px;
-  color: rgba(var(--v-theme-on-surface), 0.7);
+  line-height: normal;
+  color: rgb(var(--v-theme-on-surface-variant));
   min-height: 1.2em;
 }
 .strategy-step--live:hover {
-  background: rgba(var(--v-theme-on-surface), 0.04);
+  background: rgb(var(--v-theme-surface-bright));
+}
+.strategy-step--active {
+  border-color: color-mix(in srgb, rgb(var(--v-theme-primary)) 60%, transparent);
+  background: rgb(var(--v-theme-surface-bright));
+}
+.strategy-step--active .strategy-step__name {
+  font-weight: 600;
+  color: rgb(var(--v-theme-on-surface));
 }
 .strategy-step--active .strategy-step__circle {
   background: rgb(var(--v-theme-primary));
@@ -178,11 +201,6 @@ function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUli
   }
   .strategy-step {
     white-space: normal;
-    padding: 12px;
-    gap: 8px;
-  }
-  .strategy-step__circle {
-    flex: none;
   }
 }
 .strategy-step--off {

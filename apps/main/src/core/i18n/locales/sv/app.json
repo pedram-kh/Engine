@@ -1754,10 +1754,11 @@
       },
       "persona": {
         "markets": "Marknader",
+        "marketLabel": "Marknad",
         "title": "Personor · {market}",
         "subtitle": "{min}–{max} personor per marknad. Kreativa vinklar kopplas till USP:erna från steg 1.",
         "add": "Lägg till persona",
-        "tile": "Lägg till persona · {count} av {max} använda i {market}",
+        "tile": "{count} av {max} använda i {market}",
         "tileMax": "{count} av {max} använda i {market} · maxgräns nådd",
         "warning": "Lägg till minst {min} personor för {market}.",
         "fewerThanMin": "Färre än {min} personor",
@@ -1777,7 +1778,7 @@
         },
         "barriers": "Hinder och friktion",
         "angles": "Kreativa vinklar som övertygar",
-        "nameLine": "Namn · {name}",
+        "nameLine": "{name} · personans namn",
         "menu": "Åtgärder för {name}",
         "edit": "Redigera",
         "delete": "Ta bort",
@@ -1824,7 +1825,8 @@
           "codeRequired": "Ange en kod.",
           "codeFormat": "Använd {min}–{max} bokstäver eller siffror.",
           "angleRequired": "Ange en rad."
-        }
+        },
+        "linkAUsp": "Länka en USP"
       },
       "copy": {
         "open": "Kopiera från…",

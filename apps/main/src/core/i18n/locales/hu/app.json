@@ -1754,10 +1754,11 @@
       },
       "persona": {
         "markets": "Piacok",
+        "marketLabel": "Piac",
         "title": "Perszónák · {market}",
         "subtitle": "Piaconként {min}–{max} perszóna. A kreatív szögek az 1. lépés USP-ire hivatkoznak.",
         "add": "Perszóna hozzáadása",
-        "tile": "Perszóna hozzáadása · {count} / {max} felhasználva itt: {market}",
+        "tile": "{count} / {max} felhasználva itt: {market}",
         "tileMax": "{count} / {max} felhasználva itt: {market} · elérted a maximumot",
         "warning": "Adj hozzá legalább {min} perszónát ide: {market}.",
         "fewerThanMin": "Kevesebb mint {min} perszóna",
@@ -1777,7 +1778,7 @@
         },
         "barriers": "Akadályok és súrlódások",
         "angles": "Meggyőző kreatív szögek",
-        "nameLine": "Név · {name}",
+        "nameLine": "{name} · perszóna neve",
         "menu": "Műveletek: {name}",
         "edit": "Szerkesztés",
         "delete": "Törlés",
@@ -1824,7 +1825,8 @@
           "codeRequired": "Adj meg egy kódot.",
           "codeFormat": "{min}–{max} betűt vagy számjegyet használj.",
           "angleRequired": "Írj be egy sort."
-        }
+        },
+        "linkAUsp": "USP csatolása"
       },
       "copy": {
         "open": "Másolás innen…",

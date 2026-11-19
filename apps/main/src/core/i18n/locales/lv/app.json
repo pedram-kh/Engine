@@ -1754,10 +1754,11 @@
       },
       "persona": {
         "markets": "Tirgi",
+        "marketLabel": "Tirgus",
         "title": "Personas · {market}",
         "subtitle": "{min}–{max} personas vienam tirgum. Radošie leņķi norāda uz 1. soļa USP.",
         "add": "Pievienot personu",
-        "tile": "Pievienot personu · izmantotas {count} no {max}, tirgus {market}",
+        "tile": "izmantotas {count} no {max}, tirgus {market}",
         "tileMax": "Izmantotas {count} no {max}, tirgus {market} · sasniegts maksimums",
         "warning": "Pievienojiet vismaz {min} personas tirgum {market}.",
         "fewerThanMin": "Mazāk nekā {min} personas",
@@ -1777,7 +1778,7 @@
         },
         "barriers": "Šķēršļi un berze",
         "angles": "Pārliecinoši radošie leņķi",
-        "nameLine": "Vārds · {name}",
+        "nameLine": "{name} · personas vārds",
         "menu": "Darbības: {name}",
         "edit": "Rediģēt",
         "delete": "Dzēst",
@@ -1824,7 +1825,8 @@
           "codeRequired": "Ievadiet kodu.",
           "codeFormat": "Izmantojiet {min}–{max} burtus vai ciparus.",
           "angleRequired": "Ievadiet rindu."
-        }
+        },
+        "linkAUsp": "Saistīt USP"
       },
       "copy": {
         "open": "Kopēt no…",

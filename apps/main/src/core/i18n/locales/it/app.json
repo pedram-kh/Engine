@@ -1754,10 +1754,11 @@
       },
       "persona": {
         "markets": "Mercati",
+        "marketLabel": "Mercato",
         "title": "Persone · {market}",
         "subtitle": "Da {min} a {max} persone per mercato. Gli angoli creativi rimandano alle USP del passaggio 1.",
         "add": "Aggiungi persona",
-        "tile": "Aggiungi persona · {count} di {max} usate in {market}",
+        "tile": "{count} di {max} usate in {market}",
         "tileMax": "{count} di {max} usate in {market} · massimo raggiunto",
         "warning": "Aggiungi almeno {min} persone per {market}.",
         "fewerThanMin": "Meno di {min} persone",
@@ -1777,14 +1778,14 @@
         },
         "barriers": "Ostacoli e attriti",
         "angles": "Angoli creativi che convincono",
-        "nameLine": "Nome · {name}",
+        "nameLine": "{name} · nome della persona",
         "menu": "Azioni per {name}",
         "edit": "Modifica",
         "delete": "Elimina",
         "deleteTitle": "Eliminare {name}?",
         "deleteBody": "La persona viene rimossa.",
         "deleteBodyAngles": "La persona e il suo {count} angolo vengono rimossi. | La persona e i suoi {count} angoli vengono rimossi.",
-        "addedByHand": "Aggiunto a mano",
+        "addedByHand": "Aggiunto manualmente",
         "linked": "Collegato",
         "addAngle": "Aggiungi angolo dalle USP",
         "noUsps": "Aggiungi prima le USP nel passaggio 1.",
@@ -1824,7 +1825,8 @@
           "codeRequired": "Inserisci un codice.",
           "codeFormat": "Usa da {min} a {max} lettere o cifre.",
           "angleRequired": "Inserisci una riga."
-        }
+        },
+        "linkAUsp": "Collega un USP"
       },
       "copy": {
         "open": "Copia da…",

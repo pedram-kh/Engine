@@ -1754,10 +1754,11 @@
       },
       "persona": {
         "markets": "Markkinat",
+        "marketLabel": "Markkina",
         "title": "Personat · {market}",
         "subtitle": "{min}–{max} personaa markkinaa kohden. Luovat näkökulmat viittaavat vaiheen 1 USP:iin.",
         "add": "Lisää persona",
-        "tile": "Lisää persona · käytössä {count} / {max}, {market}",
+        "tile": "käytössä {count} / {max}, {market}",
         "tileMax": "Käytössä {count} / {max}, {market} · enimmäismäärä saavutettu",
         "warning": "Lisää vähintään {min} personaa markkinalle {market}.",
         "fewerThanMin": "Alle {min} personaa",
@@ -1777,14 +1778,14 @@
         },
         "barriers": "Esteet ja kitka",
         "angles": "Vakuuttavat luovat näkökulmat",
-        "nameLine": "Nimi · {name}",
+        "nameLine": "{name} · personan nimi",
         "menu": "Toiminnot: {name}",
         "edit": "Muokkaa",
         "delete": "Poista",
         "deleteTitle": "Poistetaanko {name}?",
         "deleteBody": "Persona poistetaan.",
         "deleteBodyAngles": "Persona ja sen {count} näkökulma poistetaan. | Persona ja sen {count} näkökulmaa poistetaan.",
-        "addedByHand": "Lisätty käsin",
+        "addedByHand": "Lisätty manuaalisesti",
         "linked": "Linkitetty",
         "addAngle": "Lisää näkökulma USP:istä",
         "noUsps": "Lisää ensin USP:t vaiheessa 1.",
@@ -1824,7 +1825,8 @@
           "codeRequired": "Anna koodi.",
           "codeFormat": "Käytä {min}–{max} kirjainta tai numeroa.",
           "angleRequired": "Kirjoita rivi."
-        }
+        },
+        "linkAUsp": "Linkitä USP"
       },
       "copy": {
         "open": "Kopioi kohteesta…",

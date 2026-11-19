@@ -133,59 +133,66 @@ const angleCount = computed(() => deleting.value?.attributes.angles.length ?? 0)
 
 <template>
   <section class="personas-step" data-test="personas-step">
-    <div
-      role="tablist"
-      class="market-tabs"
-      :aria-label="t('app.strategy.persona.markets')"
-      data-test="market-tabs"
-    >
-      <button
-        v-for="code in markets"
-        :key="code"
-        type="button"
-        role="tab"
-        class="market-tab"
-        :class="{ 'market-tab--active': code === market }"
-        :aria-selected="code === market"
-        :data-test="`market-tab-${code}`"
-        @click="selectMarket(code)"
+    <div class="market-bar">
+      <span class="market-bar__label" aria-hidden="true">{{
+        t('app.strategy.persona.marketLabel')
+      }}</span>
+      <div
+        role="tablist"
+        class="market-tabs"
+        :aria-label="t('app.strategy.persona.markets')"
+        data-test="market-tabs"
       >
-        <span class="market-tab__code">{{ code }}</span>
-        <span class="market-tab__name">{{ labelForCountryCode(code) }}</span>
-        <span class="market-tab__count" :data-test="`market-count-${code}`">{{
-          loading ? '' : inMarket(code).length
-        }}</span>
-        <v-tooltip
-          v-if="!loading && inMarket(code).length < limits.persona_min"
-          location="bottom"
-          activator="parent"
+        <button
+          v-for="code in markets"
+          :key="code"
+          type="button"
+          role="tab"
+          class="market-tab"
+          :class="{ 'market-tab--active': code === market }"
+          :aria-selected="code === market"
+          :data-test="`market-tab-${code}`"
+          @click="selectMarket(code)"
         >
-          {{ t('app.strategy.persona.fewerThanMin', { min: limits.persona_min }) }}
-        </v-tooltip>
-        <span
-          v-if="!loading && inMarket(code).length < limits.persona_min"
-          class="market-tab__dot"
-          :data-test="`market-dot-${code}`"
-          role="img"
-          :aria-label="t('app.strategy.persona.fewerThanMin', { min: limits.persona_min })"
-        />
-      </button>
+          <span class="market-tab__code">{{ code }}</span>
+          <span class="market-tab__name">{{ labelForCountryCode(code) }}</span>
+          <span class="market-tab__count" :data-test="`market-count-${code}`">{{
+            loading ? '' : inMarket(code).length
+          }}</span>
+          <v-tooltip
+            v-if="!loading && inMarket(code).length < limits.persona_min"
+            location="bottom"
+            activator="parent"
+          >
+            {{ t('app.strategy.persona.fewerThanMin', { min: limits.persona_min }) }}
+          </v-tooltip>
+          <span
+            v-if="!loading && inMarket(code).length < limits.persona_min"
+            class="market-tab__dot"
+            :data-test="`market-dot-${code}`"
+            role="img"
+            :aria-label="t('app.strategy.persona.fewerThanMin', { min: limits.persona_min })"
+          />
+        </button>
+      </div>
     </div>
 
-    <div class="d-flex flex-wrap align-center justify-space-between ga-3">
+    <div class="step-head">
       <div>
-        <h2 class="text-h6 mb-1" data-test="personas-heading">
+        <h2 class="step-head__title" data-test="personas-heading">
           {{ t('app.strategy.persona.title', { market: marketName }) }}
         </h2>
-        <p class="text-body-2 text-medium-emphasis mb-0">
+        <p class="step-head__sub">
           {{
             t('app.strategy.persona.subtitle', { min: limits.persona_min, max: limits.persona_max })
           }}
         </p>
       </div>
-      <div class="d-flex ga-2 flex-wrap">
+      <div class="step-head__actions">
         <v-btn
           variant="outlined"
+          size="small"
+          class="step-btn"
           prepend-icon="mdi-content-copy"
           :disabled="!canCopy || loading || failed"
           data-test="persona-copy"
@@ -194,8 +201,9 @@ const angleCount = computed(() => deleting.value?.attributes.angles.length ?? 0)
           {{ t('app.strategy.copy.open') }}
         </v-btn>
         <v-btn
-          color="primary"
-          variant="flat"
+          variant="outlined"
+          size="small"
+          class="step-btn"
           prepend-icon="mdi-plus"
           :disabled="atMax || loading || failed || market === ''"
           data-test="persona-add"
@@ -249,8 +257,16 @@ const angleCount = computed(() => deleting.value?.attributes.angles.length ?? 0)
           data-test="persona-tile"
           @click="openAdd"
         >
-          <v-icon icon="mdi-plus" size="20" aria-hidden="true" />
-          <span data-test="persona-tile-text">
+          <v-icon
+            icon="mdi-account-plus-outline"
+            size="24"
+            class="persona-tile__icon"
+            aria-hidden="true"
+          />
+          <span class="persona-tile__title" data-test="persona-tile-title">
+            {{ t('app.strategy.persona.add') }}
+          </span>
+          <span class="persona-tile__count" data-test="persona-tile-text">
             {{
               atMax
                 ? t('app.strategy.persona.tileMax', {
@@ -307,16 +323,34 @@ const angleCount = computed(() => deleting.value?.attributes.angles.length ?? 0)
 </template>
 
 <style scoped>
+/*
+ * Values from frame 13:828 (market bar, section head, "Add persona" slot), through the agency theme tokens.
+ */
 .personas-step {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
+}
+.market-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px 14px;
+  border-bottom: 1px solid rgb(var(--v-theme-border-color));
+}
+.market-bar__label {
+  padding-bottom: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: normal;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: rgb(var(--v-theme-text-tertiary));
 }
 .market-tabs {
   display: flex;
-  gap: 8px;
+  gap: 4px;
   overflow-x: auto;
-  padding-bottom: 4px;
+  min-width: 0;
 }
 .market-tab {
   position: relative;
@@ -324,33 +358,91 @@ const angleCount = computed(() => deleting.value?.attributes.angles.length ?? 0)
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 14px;
-  border: 1px solid rgba(var(--v-theme-on-surface), 0.2);
-  border-radius: 9999px;
-  background: rgb(var(--v-theme-surface));
-  color: inherit;
+  padding: 10px 14px 12px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: rgb(var(--v-theme-on-surface-variant));
   font: inherit;
   font-size: 14px;
+  line-height: normal;
   cursor: pointer;
   white-space: nowrap;
 }
 .market-tab--active {
-  background: rgb(var(--v-theme-primary));
-  border-color: rgb(var(--v-theme-primary));
-  color: rgb(var(--v-theme-on-primary));
+  border-bottom-color: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-surface));
+  font-weight: 600;
 }
 .market-tab__code {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
   font-weight: 700;
+  background: rgb(var(--v-theme-surface-bright));
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+.market-tab--active .market-tab__code {
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary));
 }
 .market-tab__count {
   font-size: 12px;
-  opacity: 0.85;
+  font-weight: 400;
+  color: rgb(var(--v-theme-text-tertiary));
 }
 .market-tab__dot {
   width: 8px;
   height: 8px;
   border-radius: 9999px;
   background: rgb(var(--v-theme-warning));
+}
+.step-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.step-head__title {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: normal;
+  color: rgb(var(--v-theme-on-surface));
+}
+.step-head__sub {
+  margin: 0;
+  font-size: 13px;
+  line-height: normal;
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+.step-head__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+/*
+ * 13px medium, 14px icon, 8px gap, 6px 12px padding, 8px radius, 1px border. The frame draws these buttons with no
+ * fill and the default border; the agency theme's secondary button has a surface fill and the strong border, and
+ * its selector is more specific than any scoped one, hence the !important.
+ */
+.step-head__actions .step-btn {
+  height: auto;
+  min-height: 0;
+  padding: 6px 12px;
+  border: 1px solid rgb(var(--v-theme-border-color)) !important;
+  border-radius: 8px;
+  background-color: transparent !important;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+  color: rgb(var(--v-theme-on-surface));
+}
+.step-head__actions .step-btn :deep(.v-btn__prepend) {
+  margin-inline: 0 8px;
+  font-size: 14px;
 }
 .personas-grid {
   display: grid;
@@ -360,13 +452,14 @@ const angleCount = computed(() => deleting.value?.attributes.angles.length ?? 0)
 }
 .persona-tile {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-height: 96px;
-  padding: 16px;
-  border: 2px dashed rgba(var(--v-theme-on-surface), 0.3);
-  border-radius: 12px;
+  gap: 10px;
+  min-height: 160px;
+  padding: 32px;
+  border: 1px dashed rgb(var(--v-theme-border-color));
+  border-radius: 10px;
   background: transparent;
   color: inherit;
   font: inherit;
@@ -376,5 +469,19 @@ const angleCount = computed(() => deleting.value?.attributes.angles.length ?? 0)
 .persona-tile:disabled {
   cursor: default;
   opacity: 0.6;
+}
+.persona-tile__icon,
+.persona-tile__title {
+  color: rgb(var(--v-theme-primary));
+}
+.persona-tile__title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: normal;
+}
+.persona-tile__count {
+  font-size: 12px;
+  line-height: normal;
+  color: rgb(var(--v-theme-text-tertiary));
 }
 </style>

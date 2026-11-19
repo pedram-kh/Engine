@@ -8,12 +8,13 @@
  * both keep their change. A 404 means the card was removed by someone else.
  */
 import type { StrategyLimits, WaveUspPayload, WaveUspResource } from '@catalyst/api-client'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { brandColorVar } from '@/modules/agency/composables/brandColor'
 import { strategyApi, type WaveScope } from '../api/strategy.api'
 import { fieldErrorsOf, formErrorFor, isGone } from '../strategyErrors'
+import { revealFirstError } from '../revealError'
 
 const props = defineProps<{
   modelValue: boolean
@@ -99,7 +100,10 @@ async function submit(): Promise<void> {
   submitted.value = true
   formError.value = null
   serverErrors.value = {}
-  if (titleError.value || explainerError.value || angleError.value || seedError.value) return
+  if (titleError.value || explainerError.value || angleError.value || seedError.value) {
+    reveal()
+    return
+  }
 
   saving.value = true
   try {
@@ -136,9 +140,16 @@ async function submit(): Promise<void> {
       ['title', 'explainer', 'creative_angle', 'copy_seed'],
       t,
     )
+    reveal()
   } finally {
     saving.value = false
   }
+}
+
+const card = ref<{ $el: HTMLElement } | null>(null)
+/** Scroll the first field in error into view once it is drawn (the body scrolls, Save stays put). */
+function reveal(): void {
+  void nextTick(() => revealFirstError(card.value?.$el))
 }
 
 function fe(field: string, local: string | null): string[] {
@@ -152,6 +163,7 @@ function fe(field: string, local: string | null): string[] {
     :model-value="modelValue"
     max-width="560"
     persistent
+    scrollable
     data-test="usp-dialog"
     @update:model-value="
       (v: boolean) => {
@@ -159,7 +171,7 @@ function fe(field: string, local: string | null): string[] {
       }
     "
   >
-    <v-card :key="session">
+    <v-card ref="card" :key="session">
       <v-card-title class="text-h6 text-wrap text-break pt-4 px-6">
         {{
           isEdit ? t('app.strategy.usp.dialog.editTitle') : t('app.strategy.usp.dialog.addTitle')
@@ -228,16 +240,17 @@ function fe(field: string, local: string | null): string[] {
               : t('app.strategy.usp.dialog.colourAuto')
           }}
         </div>
-        <v-alert
-          v-if="formError"
-          type="error"
-          variant="tonal"
-          density="compact"
-          data-test="usp-dialog-error"
-        >
-          {{ formError }}
-        </v-alert>
       </v-card-text>
+      <v-alert
+        v-if="formError"
+        class="mx-6 mb-3 strategy-dialog-error"
+        type="error"
+        variant="tonal"
+        density="compact"
+        data-test="usp-dialog-error"
+      >
+        {{ formError }}
+      </v-alert>
       <v-card-actions class="px-6 pb-4">
         <v-spacer />
         <v-btn variant="text" :disabled="saving" data-test="usp-dialog-cancel" @click="close">
@@ -259,6 +272,12 @@ function fe(field: string, local: string | null): string[] {
 </template>
 
 <style scoped>
+/* The dialog is `scrollable`: only the body scrolls. The alert sits between that body and the actions and keeps its
+   full height, so the message is never cut off. */
+.strategy-dialog-error {
+  flex: 0 0 auto;
+}
+
 .usp-dialog__dot {
   display: inline-block;
   width: 12px;

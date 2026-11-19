@@ -1754,10 +1754,11 @@
       },
       "persona": {
         "markets": "Piețe",
+        "marketLabel": "Piață",
         "title": "Persona · {market}",
         "subtitle": "{min}–{max} persona pe piață. Unghiurile creative trimit la USP-urile din pasul 1.",
         "add": "Adaugă persona",
-        "tile": "Adaugă persona · {count} din {max} folosite în {market}",
+        "tile": "{count} din {max} folosite în {market}",
         "tileMax": "{count} din {max} folosite în {market} · maximum atins",
         "warning": "Adaugă cel puțin {min} persona pentru {market}.",
         "fewerThanMin": "Mai puțin de {min} persona",
@@ -1777,7 +1778,7 @@
         },
         "barriers": "Bariere și fricțiuni",
         "angles": "Unghiuri creative care conving",
-        "nameLine": "Nume · {name}",
+        "nameLine": "{name} · numele personei",
         "menu": "Acțiuni pentru {name}",
         "edit": "Editează",
         "delete": "Șterge",
@@ -1824,7 +1825,8 @@
           "codeRequired": "Introdu un cod.",
           "codeFormat": "Folosește {min}–{max} litere sau cifre.",
           "angleRequired": "Introdu un rând."
-        }
+        },
+        "linkAUsp": "Leagă un USP"
       },
       "copy": {
         "open": "Copiază din…",

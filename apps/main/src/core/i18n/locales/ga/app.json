@@ -1754,10 +1754,11 @@
       },
       "persona": {
         "markets": "Margaí",
+        "marketLabel": "Margadh",
         "title": "Pearsain · {market}",
         "subtitle": "{min}–{max} pearsa in aghaidh an mhargaidh. Tagraíonn uillinneacha cruthaitheacha do na USPanna ó chéim 1.",
         "add": "Cuir pearsa leis",
-        "tile": "Cuir pearsa leis · {count} as {max} in úsáid i {market}",
+        "tile": "{count} as {max} in úsáid i {market}",
         "tileMax": "{count} as {max} in úsáid i {market} · sroichte an uasmhéid",
         "warning": "Cuir {min} phearsa ar a laghad le {market}.",
         "fewerThanMin": "Níos lú ná {min} pearsa",
@@ -1777,7 +1778,7 @@
         },
         "barriers": "Bacainní agus frithchuimilt",
         "angles": "Uillinneacha cruthaitheacha a chuireann ina luí",
-        "nameLine": "Ainm · {name}",
+        "nameLine": "{name} · ainm an phearsa",
         "menu": "Gníomhartha do {name}",
         "edit": "Cuir in eagar",
         "delete": "Scrios",
@@ -1824,7 +1825,8 @@
           "codeRequired": "Cuir cód isteach.",
           "codeFormat": "Úsáid {min}–{max} litir nó digit.",
           "angleRequired": "Cuir líne isteach."
-        }
+        },
+        "linkAUsp": "Nasc USP"
       },
       "copy": {
         "open": "Cóipeáil ó…",
