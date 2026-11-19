@@ -55,7 +55,7 @@ final class StrategyFixtures
         return WaveFixtures::wavesUrl($agency, $brand, $wave->ulid.'/strategy'.($suffix !== '' ? '/'.$suffix : ''));
     }
 
-    /** @param  array{agency: Agency, brand: Brand, wave: Wave}  $w */
+    /** @param  array<string, mixed>  $w  a world() result (or a superset of it) */
     public static function u(array $w, string $suffix = ''): string
     {
         return self::url($w['agency'], $w['brand'], $w['wave'], $suffix);

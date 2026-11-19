@@ -12,6 +12,7 @@ use App\Modules\Waves\Services\WaveService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
 use Laravel\Pennant\Feature;
+use Symfony\Component\HttpFoundation\Response;
 use Tests\Support\StrategyFixtures as S;
 use Tests\Support\WaveFixtures;
 use Tests\TestCase;
@@ -31,6 +32,7 @@ function personaIn(array $w, string $market, int $n = 1): void
     }
 }
 
+/** @return TestResponse<Response> */
 function editMarkets(array $w, array $markets): TestResponse
 {
     return S::call($w['admin'], 'PATCH', WaveFixtures::wavesUrl($w['agency'], $w['brand'], $w['wave']->ulid), ['markets' => $markets]);
@@ -45,7 +47,7 @@ it('M3: removing a market that has personas is 422 wave.market_has_personas with
 
     expect($res->json('errors.0.code'))->toBe('wave.market_has_personas')
         ->and($res->json('errors.0.meta.markets'))->toBe([['market' => 'SK', 'persona_count' => 3]])
-        ->and($w['wave']->fresh()->markets)->toBe(['SK', 'RO', 'CZ'])
+        ->and($w['wave']->refresh()->markets)->toBe(['SK', 'RO', 'CZ'])
         ->and(AuditLog::query()->where('action', 'like', 'wave.%')->count())->toBe($auditBefore);
 });
 
@@ -65,7 +67,7 @@ it('M3: removing a market with no personas is allowed, adding and re-ordering ar
     editMarkets($w, ['SK', 'RO'])->assertOk();                // CZ had none
     editMarkets($w, ['RO', 'SK'])->assertOk();                // re-ordered
     editMarkets($w, ['RO', 'SK', 'PL'])->assertOk();          // added
-    expect($w['wave']->fresh()->markets)->toBe(['RO', 'SK', 'PL'])->and(WavePersona::query()->count())->toBe(2);
+    expect($w['wave']->refresh()->markets)->toBe(['RO', 'SK', 'PL'])->and(WavePersona::query()->count())->toBe(2);
 });
 
 it('M3: after the personas of the market are deleted the market can be removed', function (): void {
@@ -75,7 +77,7 @@ it('M3: after the personas of the market are deleted the market can be removed',
 
     WavePersona::query()->delete();
     editMarkets($w, ['SK', 'RO'])->assertOk();
-    expect($w['wave']->fresh()->markets)->toBe(['SK', 'RO']);
+    expect($w['wave']->refresh()->markets)->toBe(['SK', 'RO']);
 });
 
 it('M3: the refusal works with strategy_enabled OFF, and with no persona rows the edit is exactly PL-1', function (): void {

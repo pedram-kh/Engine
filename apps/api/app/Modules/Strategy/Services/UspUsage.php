@@ -19,20 +19,18 @@ final class UspUsage
      */
     public static function affected(WaveUsp $usp): array
     {
-        return WavePersonaAngle::query()
-            ->where('usp_id', $usp->id)
-            ->with('persona')
-            ->orderBy('id')
-            ->get()
-            ->map(static fn (WavePersonaAngle $a): array => [
+        $out = [];
+        foreach (WavePersonaAngle::query()->where('usp_id', $usp->id)->with('persona')->orderBy('id')->get() as $a) {
+            $out[] = [
                 'persona' => $a->persona->ulid,
                 'market' => $a->persona->market,
                 'code' => $a->persona->code,
                 'title' => $a->persona->title,
                 'explanation' => $a->explanation,
-            ])
-            ->values()
-            ->all();
+            ];
+        }
+
+        return $out;
     }
 
     public static function angleCount(WaveUsp $usp): int

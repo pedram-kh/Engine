@@ -27,10 +27,7 @@ function uspBody(array $o = []): array
     return array_merge(['title' => 'Affordability', 'explainer' => 'Value, not price.', 'creative_angle' => 'Value perception', 'copy_seed' => '"A fair price."'], $o);
 }
 
-/**
- * @param  array<string, mixed>  $w
- * @return list<string> the ulids created, in order
- */
+/** @return list<string> */
 function makeUsps(array $w, int $n): array
 {
     $ulids = [];
@@ -236,7 +233,7 @@ it('C2: with the matching confirm_angle_count the angles and the USP are removed
         ->and(WavePersonaAngle::query()->count())->toBe(0)
         ->and(WavePersona::query()->count())->toBe(2);   // the personas stay
     $audit = AuditLog::query()->where('action', 'wave_usp.deleted')->firstOrFail();
-    expect($audit->metadata['angles_removed'])->toBe(2);
+    expect($audit->metadata)->toMatchArray(['angles_removed' => 2]);
 });
 
 it('C3: with a stale count it is 409 again with the fresh list; nothing is deleted', function (): void {
@@ -330,10 +327,11 @@ it('A1: each USP write makes exactly one audit row with decided keys and never t
     S::call($w['admin'], 'DELETE', S::u($w, "usps/{$ulid}"))->assertNoContent();
 
     $rows = AuditLog::query()->whereIn('action', ['wave_usp.created', 'wave_usp.updated', 'wave_usp.deleted'])->orderBy('id')->get();
+    $meta = array_values($rows->pluck('metadata')->all());
     expect($rows->pluck('action')->map(fn ($a) => is_string($a) ? $a : $a->value)->all())->toBe(['wave_usp.created', 'wave_usp.updated', 'wave_usp.deleted'])
-        ->and($rows[0]->metadata)->toBe(['wave' => $w['wave']->ulid, 'usp' => $ulid, 'color_key' => 'violet'])
-        ->and($rows[1]->metadata['changed'])->toBe(['explainer', 'copy_seed'])
-        ->and($rows[2]->metadata['angles_removed'])->toBe(0);
+        ->and($meta[0])->toBe(['wave' => $w['wave']->ulid, 'usp' => $ulid, 'color_key' => 'violet'])
+        ->and($meta[1])->toMatchArray(['changed' => ['explainer', 'copy_seed']])
+        ->and($meta[2])->toMatchArray(['angles_removed' => 0]);
     expect(json_encode($rows->map(fn ($r) => [$r->metadata, $r->before, $r->after])->all()))->not->toContain('SECRET');
 });
 

@@ -25,10 +25,7 @@ function personaBody(array $o = []): array
     return array_merge(['market' => 'SK', 'title' => 'The Office Lunch Organiser', 'name' => 'Zuzana', 'pronoun' => 'she'], $o);
 }
 
-/**
- * @param  array<string, mixed>  $w
- * @return list<string>
- */
+/** @return list<string> */
 function makePersonas(array $w, int $n, string $market = 'SK'): array
 {
     $ids = [];
@@ -180,7 +177,7 @@ it('deletes a persona with its angles and nothing else (every role), one audit r
 
     S::call($w['staff'], 'DELETE', S::u($w, "personas/{$a}"))->assertNoContent();
     expect(WavePersona::query()->count())->toBe(1)->and(WavePersonaAngle::query()->count())->toBe(1)->and(WaveUsp::query()->count())->toBe(1);
-    expect(AuditLog::query()->where('action', 'wave_persona.deleted')->firstOrFail()->metadata['angles_removed'])->toBe(1);
+    expect(AuditLog::query()->where('action', 'wave_persona.deleted')->firstOrFail()->metadata)->toMatchArray(['angles_removed' => 1]);
 });
 
 it('L6: deleting down to zero personas is allowed (the minimum only warns)', function (): void {
@@ -339,11 +336,12 @@ it('A1: each persona and angle write makes one audit row of the right action and
 
     $actions = ['wave_persona.created', 'wave_persona.updated', 'wave_persona_angle.added', 'wave_persona_angle.updated', 'wave_persona_angle.removed', 'wave_persona.copied', 'wave_persona.deleted'];
     $rows = AuditLog::query()->whereIn('action', $actions)->orderBy('id')->get();
+    $meta = array_values($rows->pluck('metadata')->all());
     expect($rows->map(fn ($r) => is_string($r->action) ? $r->action : $r->action->value)->all())->toBe($actions)
-        ->and($rows[0]->metadata)->toBe(['wave' => $w['wave']->ulid, 'persona' => $p, 'market' => 'SK'])
-        ->and($rows[1]->metadata['changed'])->toBe(['title', 'drivers'])
-        ->and($rows[2]->metadata)->toBe(['wave' => $w['wave']->ulid, 'persona' => $p, 'angle' => $a, 'usp' => $usp, 'market' => 'SK'])
-        ->and($rows[3]->metadata['changed'])->toBe(['explanation']);
+        ->and($meta[0])->toBe(['wave' => $w['wave']->ulid, 'persona' => $p, 'market' => 'SK'])
+        ->and($meta[1])->toMatchArray(['changed' => ['title', 'drivers']])
+        ->and($meta[2])->toBe(['wave' => $w['wave']->ulid, 'persona' => $p, 'angle' => $a, 'usp' => $usp, 'market' => 'SK'])
+        ->and($meta[3])->toMatchArray(['changed' => ['explanation']]);
     expect(json_encode($rows->map(fn ($r) => [$r->metadata, $r->before, $r->after])->all()))->not->toContain('SECRET');
 });
 

@@ -34,7 +34,7 @@ it('R6: a creator, a platform admin and a guest are refused on every strategy ro
         }
         app(TenancyContext::class)->forget();
         auth()->guard('web')->logout();
-        test()->json($method, S::u($w, $suffix), ['title' => 'x'])->assertUnauthorized();
+        $this->json($method, S::u($w, $suffix), ['title' => 'x'])->assertUnauthorized();
     }
     expect(WaveUsp::query()->count())->toBe(0);
 });
@@ -93,8 +93,13 @@ it('T1: writes made under agency A put agency A on every row (agency_id comes fr
     $p = S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => 'SK', 'title' => 'T', 'name' => 'N', 'agency_id' => $w['otherAgency']->id, 'slot' => 8])->assertCreated()->json('data.id');
     S::call($w['admin'], 'POST', S::u($w, "personas/{$p}/angles"), ['usp' => $usp, 'explanation' => 'x', 'agency_id' => $w['otherAgency']->id, 'origin' => 'ai'])->assertCreated();
 
-    foreach ([WaveUsp::withoutGlobalScopes()->get(), WavePersona::withoutGlobalScopes()->get(), WavePersonaAngle::withoutGlobalScopes()->get()] as $rows) {
-        expect($rows)->toHaveCount(1)->and($rows[0]->agency_id)->toBe($w['agency']->id)->and($rows[0]->wave_id)->toBe($w['wave']->id);
+    $owners = [
+        WaveUsp::withoutGlobalScopes()->get(['agency_id', 'wave_id'])->toArray(),
+        WavePersona::withoutGlobalScopes()->get(['agency_id', 'wave_id'])->toArray(),
+        WavePersonaAngle::withoutGlobalScopes()->get(['agency_id', 'wave_id'])->toArray(),
+    ];
+    foreach ($owners as $rows) {
+        expect($rows)->toBe([['agency_id' => $w['agency']->id, 'wave_id' => $w['wave']->id]]);
     }
     expect(WavePersona::query()->firstOrFail()->slot)->toBe(1)->and(WavePersonaAngle::query()->firstOrFail()->origin->value)->toBe('manual');
 });

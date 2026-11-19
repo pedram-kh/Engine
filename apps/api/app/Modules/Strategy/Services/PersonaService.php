@@ -70,8 +70,8 @@ final class PersonaService
                 throw StrategyRuleViolation::personaMaxReached($market);
             }
 
-            $slot = self::firstFreeSlot($existing->pluck('slot')->all());
-            $taken = $existing->pluck('code')->all();
+            $slot = self::firstFreeSlot(self::slotsOf($existing));
+            $taken = self::codesOf($existing);
             if (isset($data['code'])) {
                 if (in_array($data['code'], $taken, true)) {
                     throw StrategyRuleViolation::personaCodeTaken((string) $data['code']);
@@ -206,8 +206,8 @@ final class PersonaService
                 throw StrategyRuleViolation::personaCopyExceedsCap($existing->count(), $sources->count());
             }
 
-            $slots = $existing->pluck('slot')->all();
-            $codes = $existing->pluck('code')->all();
+            $slots = self::slotsOf($existing);
+            $codes = self::codesOf($existing);
             $created = new Collection;
 
             foreach ($sources as $source) {
@@ -254,6 +254,24 @@ final class PersonaService
         if (! in_array($market, $wave->markets, true)) {
             throw StrategyRuleViolation::personaMarketNotInWave($market);
         }
+    }
+
+    /**
+     * @param  Collection<int, WavePersona>  $personas
+     * @return list<int>
+     */
+    private static function slotsOf(Collection $personas): array
+    {
+        return array_values($personas->map(static fn (WavePersona $p): int => $p->slot)->all());
+    }
+
+    /**
+     * @param  Collection<int, WavePersona>  $personas
+     * @return list<string>
+     */
+    private static function codesOf(Collection $personas): array
+    {
+        return array_values($personas->map(static fn (WavePersona $p): string => $p->code)->all());
     }
 
     /** @param  list<int>  $used */

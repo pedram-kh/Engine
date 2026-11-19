@@ -105,11 +105,11 @@ it('L5: each persona and angle write (create, update, copy, angle add, edit, rem
         ['POST', 'personas', fn () => ['market' => 'SK', 'title' => 'T', 'name' => 'N'], function ($r) use (&$persona): void {
             $persona = $r->json('data.id');
         }],
-        ['PATCH', function () use (&$persona, &$angle) {
+        ['PATCH', function () use (&$persona) {
             return "personas/{$persona}";
         }, fn () => ['title' => 'T2'], null],
         ['POST', 'personas/copy', fn () => ['from_market' => 'SK', 'to_market' => 'RO'], null],
-        ['POST', function () use (&$persona, &$angle) {
+        ['POST', function () use (&$persona) {
             return "personas/{$persona}/angles";
         }, fn () => ['usp' => $usp, 'explanation' => 'x'], function ($r) use (&$angle): void {
             $angle = $r->json('data.id');
@@ -120,7 +120,7 @@ it('L5: each persona and angle write (create, update, copy, angle add, edit, rem
         ['DELETE', function () use (&$persona, &$angle) {
             return "personas/{$persona}/angles/{$angle}";
         }, fn () => [], null],
-        ['DELETE', function () use (&$persona, &$angle) {
+        ['DELETE', function () use (&$persona) {
             return "personas/{$persona}";
         }, fn () => [], null],
     ];
@@ -156,6 +156,6 @@ it('M4: both orders end consistent: persona first then the edit is refused; edit
     S::call($w['admin'], 'PATCH', $url, ['markets' => ['SK', 'RO']])->assertOk();
     S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => 'CZ', 'title' => 'T', 'name' => 'N'])->assertUnprocessable();
 
-    $markets = $w['wave']->fresh()->markets;
+    $markets = $w['wave']->refresh()->markets;
     expect(WavePersona::query()->whereNotIn('market', $markets)->count())->toBe(0);
 });

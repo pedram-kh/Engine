@@ -183,6 +183,6 @@ final class UspController
             ->whereIn('usp_id', $usps->pluck('id'))
             ->selectRaw('usp_id, count(*) as n')->groupBy('usp_id')->pluck('n', 'usp_id')->map(static fn (mixed $n): int => (int) $n)->all();
 
-        return $usps->map(static fn (WaveUsp $u): array => StrategyPresenter::usp($u, $counts[$u->id] ?? 0))->values()->all();
+        return array_values($usps->map(static fn (WaveUsp $u): array => StrategyPresenter::usp($u, $counts[$u->id] ?? 0))->all());
     }
 }
