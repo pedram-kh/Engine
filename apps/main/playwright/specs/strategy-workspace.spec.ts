@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test'
+import type { APIRequestContext, Page } from '@playwright/test'
 import { expect, test } from '../fixtures/test'
 import {
   neutralizeThrottle,
@@ -59,6 +59,47 @@ async function api(
   )
 }
 
+/** Sign in as a fresh agency admin and make a brand and a wave through the API; the drawer helper closes the menu on a phone. */
+async function startWave(
+  page: Page,
+  request: APIRequestContext,
+  size: { name: string; width: number; height: number },
+  tag: string,
+  markets: string[],
+) {
+  const { email, password, agencyUlid } = await seedAgencyAdmin(request)
+  await page.setViewportSize({ width: size.width, height: size.height })
+  await page.goto('/sign-in')
+  await page.locator(dt(testIds.signInEmail)).locator('input').fill(email)
+  await page.locator(dt(testIds.signInPassword)).locator('input').fill(password)
+  await page.locator(dt(testIds.signInSubmit)).click()
+  await expect(page.locator(dt(testIds.agencyLayout))).toBeVisible()
+
+  const brand = await api(page, 'POST', `/agencies/${agencyUlid}/brands`, {
+    name: `${tag} Bolt ${size.name}`,
+    slug: `${tag.toLowerCase()}-bolt-${size.name}`,
+    description: 'A brand for the strategy check.',
+    industry: 'Food',
+    website_url: 'https://example.com',
+  })
+  const wave = await api(page, 'POST', `/agencies/${agencyUlid}/brands/${brand.data.id}/waves`, {
+    name: `${tag} wave`,
+    go_live_on: '2027-03-01',
+    markets,
+    campaign_id: null,
+  })
+  const base = `/agencies/${agencyUlid}/brands/${brand.data.id}/waves/${wave.data.id}/strategy`
+  const closeDrawer = async (): Promise<void> => {
+    if (size.width >= 768) return
+    const drawer = page.locator('.v-navigation-drawer')
+    if ((await drawer.getAttribute('inert')) === null) {
+      await page.locator('.v-app-bar-nav-icon').click()
+      await expect(drawer).toHaveAttribute('inert', '')
+    }
+  }
+  return { brandId: brand.data.id, waveId: wave.data.id, base, closeDrawer }
+}
+
 async function sideways(page: Page): Promise<number> {
   return page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -79,7 +120,7 @@ test.describe('Strategy workspace', () => {
   })
 
   for (const size of WIDTHS) {
-    test(`at ${size.name}: entry, USPs, personas, angles, dialogs and menus, hostile text`, async ({
+    test(`at ${size.name}: entry, USPs, dialogs and menus, hostile text`, async ({
       page,
       request,
     }) => {
@@ -179,32 +220,6 @@ test.describe('Strategy workspace', () => {
       await expect(page.locator('[data-test="usp-explainer"]').first()).toContainText(HOSTILE)
       await expect(page.locator('img[src="x"]')).toHaveCount(0)
 
-      // D3: a save refused because the card was removed by someone else shows its alert in full, above the
-      // actions, without scrolling; Close then reloads the grid.
-      const gone = await api(page, 'POST', `${base}/usps`, { title: 'Gone soon' })
-      await page.reload()
-      await closeDrawer()
-      await expect(page.locator('[data-test="usp-card"]')).toHaveCount(2)
-      const goneCard = page.locator('[data-test="usp-card"]').filter({ hasText: 'Gone soon' })
-      await goneCard.locator('[data-test="usp-menu-btn"]').click()
-      await page.locator('[data-test="usp-menu-edit"]').click()
-      await page.locator('[data-test="usp-field-title"] input').fill('Gone soon, edited')
-      await api(page, 'DELETE', `${base}/usps/${gone.data.id}`)
-      await page.locator('[data-test="usp-dialog-save"]').click()
-      const goneAlert = page.locator('[data-test="usp-dialog"] .strategy-dialog-error')
-      await expect(goneAlert).toContainText('removed by someone else')
-      const alertBox = await goneAlert.boundingBox()
-      const actionsBox = await page.locator('[data-test="usp-dialog-cancel"]').boundingBox()
-      if (alertBox === null || actionsBox === null) throw new Error('no box')
-      expect(alertBox.y).toBeGreaterThanOrEqual(0)
-      expect(alertBox.y + alertBox.height).toBeLessThanOrEqual(actionsBox.y + 1)
-      expect(alertBox.y + alertBox.height).toBeLessThanOrEqual(size.height)
-      expect(
-        await goneAlert.evaluate((el) => el.scrollHeight - el.clientHeight),
-      ).toBeLessThanOrEqual(1)
-      await page.locator('[data-test="usp-dialog-cancel"]').click()
-      await expect(page.locator('[data-test="usp-card"]')).toHaveCount(1)
-
       // Five more through the API, then the maximum.
       for (const title of ['Fast', 'Cheap', 'Local', 'Open late', 'Tracked']) {
         await api(page, 'POST', `${base}/usps`, { title })
@@ -264,6 +279,32 @@ test.describe('Strategy workspace', () => {
         await page.locator('[data-test="confirm-cancel"]').click()
         await page.waitForTimeout(delay)
       }
+
+      expect(alerts).toEqual([])
+    })
+  }
+
+  // The personas step: dialogs, hostile text, angles, copy to another market, and the delete-in-use list. Its own
+  // test (and its own wave, with one USP made through the API) so that no single test nears the time limit.
+  for (const size of WIDTHS) {
+    test(`at ${size.name}: personas, angles, copy to another market, delete of a USP in use`, async ({
+      page,
+      request,
+    }) => {
+      const alerts: string[] = []
+      page.on('dialog', async (dialog) => {
+        alerts.push(dialog.message())
+        await dialog.dismiss()
+      })
+      const { brandId, waveId, base, closeDrawer } = await startWave(page, request, size, 'Pers', [
+        'SK',
+        'RO',
+      ])
+      await api(page, 'POST', `${base}/usps`, { title: 'Fast' })
+
+      await page.goto(`/brands/${brandId}/waves/${waveId}/strategy/usps`)
+      await closeDrawer()
+      await expect(page.locator('[data-test="usp-card"]')).toHaveCount(1)
 
       // Personas step.
       await page.locator('[data-test="strategy-step-personas"]').click()
@@ -367,6 +408,45 @@ test.describe('Strategy workspace', () => {
       await page.locator('[data-test="confirm-cancel"]').click()
 
       expect(alerts).toEqual([])
+    })
+  }
+
+  // D3 (walk step 12): a save refused because the card was removed by someone else shows its alert in full, above
+  // the actions, without scrolling; Close then reloads the grid. Its own short test, with its own setup.
+  for (const size of WIDTHS) {
+    test(`at ${size.name}: the "removed by someone else" alert is fully visible and Close reloads the grid`, async ({
+      page,
+      request,
+    }) => {
+      const { brandId, waveId, base, closeDrawer } = await startWave(page, request, size, 'Gone', [
+        'SK',
+      ])
+      const stay = await api(page, 'POST', `${base}/usps`, { title: 'Stays' })
+      const gone = await api(page, 'POST', `${base}/usps`, { title: 'Gone soon' })
+      expect(stay.data.id).not.toBe(gone.data.id)
+
+      await page.goto(`/brands/${brandId}/waves/${waveId}/strategy/usps`)
+      await closeDrawer()
+      await expect(page.locator('[data-test="usp-card"]')).toHaveCount(2)
+      const goneCard = page.locator('[data-test="usp-card"]').filter({ hasText: 'Gone soon' })
+      await goneCard.locator('[data-test="usp-menu-btn"]').click()
+      await page.locator('[data-test="usp-menu-edit"]').click()
+      await page.locator('[data-test="usp-field-title"] input').fill('Gone soon, edited')
+      await api(page, 'DELETE', `${base}/usps/${gone.data.id}`)
+      await page.locator('[data-test="usp-dialog-save"]').click()
+      const goneAlert = page.locator('[data-test="usp-dialog"] .strategy-dialog-error')
+      await expect(goneAlert).toContainText('removed by someone else')
+      const alertBox = await goneAlert.boundingBox()
+      const actionsBox = await page.locator('[data-test="usp-dialog-cancel"]').boundingBox()
+      if (alertBox === null || actionsBox === null) throw new Error('no box')
+      expect(alertBox.y).toBeGreaterThanOrEqual(0)
+      expect(alertBox.y + alertBox.height).toBeLessThanOrEqual(actionsBox.y + 1)
+      expect(alertBox.y + alertBox.height).toBeLessThanOrEqual(size.height)
+      expect(
+        await goneAlert.evaluate((el) => el.scrollHeight - el.clientHeight),
+      ).toBeLessThanOrEqual(1)
+      await page.locator('[data-test="usp-dialog-cancel"]').click()
+      await expect(page.locator('[data-test="usp-card"]')).toHaveCount(1)
     })
   }
 
