@@ -32,6 +32,11 @@ const brandUlid = route.params.ulid as string
 const waveUlid = route.params.waveUlid as string
 
 const wavesOn = computed(() => authStore.user?.attributes.features?.waves === true)
+// PL-2.1: true only while waves AND strategy are on (the server computes it). The entry button is drawn from a list
+// of zero or one item, not a `v-if`: with the flag off a `v-if` leaves a comment node in the DOM, and the wave page
+// must be byte-identical to PL-1 (W-OFF).
+const strategyOn = computed(() => authStore.user?.attributes.features?.strategy === true)
+const strategyEntry = computed(() => (strategyOn.value ? ['strategy'] : []))
 const canManage = computed(
   () => agencyStore.currentRole === 'agency_admin' || agencyStore.currentRole === 'agency_manager',
 )
@@ -103,8 +108,24 @@ onMounted(async () => {
           data-test="wave-health"
         />
       </template>
-      <template v-if="wave && canManage" #actions>
-        <v-btn variant="outlined" data-test="wave-edit-btn" @click="editOpen = true">
+      <template v-if="wave && (canManage || strategyOn)" #actions>
+        <v-btn
+          v-for="entry in strategyEntry"
+          :key="entry"
+          variant="flat"
+          color="primary"
+          prepend-icon="mdi-lightbulb-on-outline"
+          :to="{ name: 'strategy.usps', params: { ulid: brandUlid, waveUlid: waveUlid } }"
+          data-test="wave-strategy-btn"
+        >
+          {{ t('app.strategy.entry') }}
+        </v-btn>
+        <v-btn
+          v-if="canManage"
+          variant="outlined"
+          data-test="wave-edit-btn"
+          @click="editOpen = true"
+        >
           {{ t('app.brands.actions.edit') }}
         </v-btn>
       </template>

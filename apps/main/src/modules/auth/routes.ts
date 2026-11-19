@@ -328,6 +328,30 @@ export const appRoutes: RouteRecordRaw[] = [
     component: () => import('@/modules/waves/pages/WaveDetailPage.vue'),
     meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
+  // PL-2.1 — the Strategy & Scripts workspace of a wave. The page leaves for the wave (or the brand) unless
+  // `features.strategy` is true, which needs `waves_enabled` AND `strategy_enabled`.
+  {
+    path: '/brands/:ulid/waves/:waveUlid/strategy',
+    name: 'strategy.index',
+    redirect: (to) => ({
+      name: 'strategy.usps',
+      params: to.params,
+      query: to.query,
+    }),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
+  {
+    path: '/brands/:ulid/waves/:waveUlid/strategy/usps',
+    name: 'strategy.usps',
+    component: () => import('@/modules/strategy/pages/StrategyPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
+  {
+    path: '/brands/:ulid/waves/:waveUlid/strategy/personas',
+    name: 'strategy.personas',
+    component: () => import('@/modules/strategy/pages/StrategyPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
 
   // ── Campaigns ──────────────────────────────────────────────────────────────
   // Sprint 8 Chunk 1. Any agency member may view (list/detail); create + the

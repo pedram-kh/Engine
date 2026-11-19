@@ -12,7 +12,7 @@
  * No design frame exists for this dialog; it is built from the design system's dialog and field styles.
  * Server codes map to strings; anything else is the generic save error.
  */
-import { ApiError } from '@catalyst/api-client'
+import { ApiError, marketHasPersonasMeta } from '@catalyst/api-client'
 import type { CreateWavePayload, WaveCampaignOption, WaveResource } from '@catalyst/api-client'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -154,6 +154,13 @@ const CODE_KEYS: Record<string, string> = {
 }
 
 function messageFor(err: unknown): string {
+  // PL-2.1: removing a market that still has personas is refused with the markets and their counts in the meta.
+  const personas = marketHasPersonasMeta(err)
+  if (personas !== null) {
+    return t('app.waves.errors.marketHasPersonas', {
+      markets: personas.markets.map((m) => `${m.market} (${m.persona_count})`).join(', '),
+    })
+  }
   if (err instanceof ApiError) {
     const key = CODE_KEYS[err.code]
     if (key !== undefined) return t(key)
