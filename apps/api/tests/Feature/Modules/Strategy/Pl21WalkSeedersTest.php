@@ -101,6 +101,14 @@ it('S3: a persona angle uses a USP in Wave 9 (delete-in-use) and in Wave 10, and
     foreach ($codes as $code) {
         expect($code)->toMatch('/^[A-Z0-9]{2,8}$/');
     }
+
+    // The seeded codes are the server's defaults (market plus slot), as the frame shows.
+    $seven = pl21Wave('Wave 7');
+    $sevenSk = WavePersona::withoutGlobalScopes()->where('wave_id', $seven->id)->where('market', 'SK')->orderBy('slot')->pluck('code')->all();
+    expect($sevenSk)->toBe(['SK1', 'SK2']);
+    foreach (WavePersona::withoutGlobalScopes()->get() as $persona) {
+        expect($persona->code)->toBe($persona->market.$persona->slot);
+    }
 });
 
 it('S4: Agency B has its own brand and a wave with two USPs, and no row crosses agencies', function (): void {

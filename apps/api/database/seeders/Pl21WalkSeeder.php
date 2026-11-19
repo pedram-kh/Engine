@@ -38,7 +38,7 @@ use RuntimeException;
  *     php artisan db:seed --class='Database\Seeders\Pl21WalkSeeder'
  *
  * GUARDED to local + testing only. Idempotent: a second run changes nothing. It prints the ulids the walk needs.
- * The persona codes are valid codes (2 to 8 letters or digits, no hyphen).
+ * The persona codes are the defaults the server gives (market plus slot: SK1, SK2, RO1 ...), as the frame shows.
  */
 final class Pl21WalkSeeder extends Seeder
 {
@@ -119,7 +119,7 @@ final class Pl21WalkSeeder extends Seeder
         $wave7 = $make('Wave 7', '2027-01-09', ['SK', 'RO', 'CZ']);
         $wave7->forceFill(['usp_audience_title' => self::AUDIENCE_TITLE])->save();
         $usps7 = $this->usps($wave7, 6);
-        $zuzana = $this->persona($wave7, 'SK', 'SKA', 'The Busy Parent', 'Zuzana', PersonaPronoun::She, [
+        $zuzana = $this->persona($wave7, 'SK', 'The Busy Parent', 'Zuzana', PersonaPronoun::She, [
             'summary' => 'Two children, a full-time job and no time to cook on weekdays.',
             'core_job' => 'Get a proper dinner on the table without a second shift in the kitchen.',
             'need' => 'A reliable dinner that arrives when she says it will.',
@@ -128,7 +128,7 @@ final class Pl21WalkSeeder extends Seeder
             'self_talk' => ['I cannot cook again tonight', 'They will eat anything if it is warm'],
             'barriers' => ['Delivery fees add up', 'Cold food on arrival'],
         ]);
-        $marek = $this->persona($wave7, 'SK', 'SKB', 'The Night-Shift Student', 'Marek', PersonaPronoun::He, [
+        $marek = $this->persona($wave7, 'SK', 'The Night-Shift Student', 'Marek', PersonaPronoun::He, [
             'summary' => 'Studies by day, works late, eats whenever the kitchen is open.',
             'core_job' => 'Find something good to eat after everything else has closed.',
             'need' => 'Cheap, filling food at odd hours.',
@@ -147,12 +147,12 @@ final class Pl21WalkSeeder extends Seeder
         // Wave 9: three USPs (warning), SK one persona (warning), RO eight (maximum), the first RO persona uses USP 1.
         $wave9 = $make('Wave 9', '2027-02-20', ['SK', 'RO']);
         $usps9 = $this->usps($wave9, 3);
-        $this->persona($wave9, 'SK', 'SKA', 'The Lunch-Break Office Worker', 'Lenka', PersonaPronoun::She, ['summary' => 'Thirty minutes to eat and get back to the desk.']);
+        $this->persona($wave9, 'SK', 'The Lunch-Break Office Worker', 'Lenka', PersonaPronoun::She, ['summary' => 'Thirty minutes to eat and get back to the desk.']);
         $names = ['Radu', 'Ioana', 'Mihai', 'Elena', 'Andrei', 'Maria', 'Vlad', 'Ana'];
         $pronouns = [PersonaPronoun::He, PersonaPronoun::She, PersonaPronoun::He, PersonaPronoun::She, PersonaPronoun::He, PersonaPronoun::She, PersonaPronoun::They, PersonaPronoun::She];
         $first = null;
         foreach ($names as $i => $name) {
-            $persona = $this->persona($wave9, 'RO', 'RO'.chr(65 + $i), 'Persona '.($i + 1).' of Romania', $name, $pronouns[$i], ['summary' => "{$name} orders delivery a few times a week."]);
+            $persona = $this->persona($wave9, 'RO', 'Persona '.($i + 1).' of Romania', $name, $pronouns[$i], ['summary' => "{$name} orders delivery a few times a week."]);
             $first ??= $persona;
         }
         $this->angle($first, $usps9[0], 'The half-hour promise is the whole reason {name} stays with the app.');
@@ -162,10 +162,10 @@ final class Pl21WalkSeeder extends Seeder
         $usps10 = $this->usps($wave10, 5);
         $sk = [];
         foreach (['Jana' => PersonaPronoun::She, 'Peter' => PersonaPronoun::He, 'Alex' => PersonaPronoun::They] as $name => $pronoun) {
-            $sk[] = $this->persona($wave10, 'SK', 'SK'.chr(65 + count($sk)), 'Slovak persona '.(count($sk) + 1), $name, $pronoun, []);
+            $sk[] = $this->persona($wave10, 'SK', 'Slovak persona '.(count($sk) + 1), $name, $pronoun, []);
         }
         foreach (['Bogdan', 'Carmen', 'Dan', 'Eva', 'Florin', 'Gabi'] as $i => $name) {
-            $this->persona($wave10, 'RO', 'RO'.chr(65 + $i), 'Romanian persona '.($i + 1), $name, PersonaPronoun::They, []);
+            $this->persona($wave10, 'RO', 'Romanian persona '.($i + 1), $name, PersonaPronoun::They, []);
         }
         $this->angle($sk[0], $usps10[1], 'Her favourite restaurant, without the trip.');
     }
@@ -210,13 +210,12 @@ final class Pl21WalkSeeder extends Seeder
     /**
      * @param  array<string, mixed>  $extra
      */
-    private function persona(Wave $wave, string $market, string $code, string $title, string $name, PersonaPronoun $pronoun, array $extra): WavePersona
+    private function persona(Wave $wave, string $market, string $title, string $name, PersonaPronoun $pronoun, array $extra): WavePersona
     {
         return WavePersona::factory()->create([
             'wave_id' => $wave->id,
             'agency_id' => $wave->agency_id,
             'market' => $market,
-            'code' => $code,
             'title' => $title,
             'name' => $name,
             'pronoun' => $pronoun,

@@ -189,6 +189,11 @@ reboot. From now on, for every agent and developer, on a local machine:
    Missing one of them has reached CI red three times: Erasure payload keys in
    PL-1.1 and PL-1.2, the audit catalogue in PL-1.3.
 
+**Feature flags and throwaway databases (standing rule, Pedram, 2026-11-19, after the PL-2.1 tinker incident).** A `tinker` call meant for a throwaway database wrote to the walk database and switched `strategy_enabled` on (corrected within a minute, disclosed). From now on:
+
+- Never write a feature flag by tinker, SQL or any command in a database Pedram uses. Only Pedram flips flags, in the admin app.
+- Any command against a throwaway database must name its connection explicitly and first print the database name it is connected to; if the name is the dev or walk database, stop. (`tinker` ignored `DB_DATABASE` here; `migrate`, `db:seed` and `serve` honour it. Check the printed name, do not trust the variable.)
+
 ### 4.2 Stacking, width and overlay defects (lesson, PL-1.2 walk, 2026-11-18)
 
 Stacking, width and overlay defects are invisible to unit tests: a menu behind a dialog, a pill stretched to its column and a list outside the window all passed Vitest and Pest. Any new dialog, menu or board is opened in a real browser, including a quick close and reopen, before a walk is offered to Pedram.
