@@ -91,3 +91,46 @@ it('L5: the lock is released when the request ends (a second connection gets the
 
     expect(strategyWaveLockedByAnother(strategyProbeConnection(), $w['wave']->id))->toBeFalse();
 });
+
+it('L5: each persona and angle write (create, update, copy, angle add, edit, remove, delete) holds the wave row lock', function (): void {
+    $w = S::world();
+    $id = $w['wave']->id;
+    $usp = S::call($w['admin'], 'POST', S::u($w, 'usps'), ['title' => 'U'])->assertCreated()->json('data.id');
+    $persona = null;
+    $angle = null;
+
+    $steps = [
+        ['POST', 'personas', fn () => ['market' => 'SK', 'title' => 'T', 'name' => 'N'], function ($r) use (&$persona): void {
+            $persona = $r->json('data.id');
+        }],
+        ['PATCH', function () use (&$persona, &$angle) {
+            return "personas/{$persona}";
+        }, fn () => ['title' => 'T2'], null],
+        ['POST', 'personas/copy', fn () => ['from_market' => 'SK', 'to_market' => 'RO'], null],
+        ['POST', function () use (&$persona, &$angle) {
+            return "personas/{$persona}/angles";
+        }, fn () => ['usp' => $usp, 'explanation' => 'x'], function ($r) use (&$angle): void {
+            $angle = $r->json('data.id');
+        }],
+        ['PATCH', function () use (&$persona, &$angle) {
+            return "personas/{$persona}/angles/{$angle}";
+        }, fn () => ['explanation' => 'y'], null],
+        ['DELETE', function () use (&$persona, &$angle) {
+            return "personas/{$persona}/angles/{$angle}";
+        }, fn () => [], null],
+        ['DELETE', function () use (&$persona, &$angle) {
+            return "personas/{$persona}";
+        }, fn () => [], null],
+    ];
+
+    foreach ($steps as [$method, $suffix, $body, $after]) {
+        $path = is_callable($suffix) ? $suffix() : $suffix;
+        $seen = strategyProbeWhileAppLocks($id, function () use ($w, $method, $path, $body, $after): void {
+            $res = S::call($w['admin'], $method, S::u($w, $path), $body())->assertSuccessful();
+            if ($after) {
+                $after($res);
+            }
+        });
+        expect($seen)->not->toBeEmpty("{$method} {$path} took no wave lock")->and($seen)->each->toBeTrue();
+    }
+});

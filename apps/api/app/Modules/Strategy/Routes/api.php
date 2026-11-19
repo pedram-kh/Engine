@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Modules\Strategy\Http\Controllers\AngleController;
+use App\Modules\Strategy\Http\Controllers\PersonaController;
 use App\Modules\Strategy\Http\Controllers\StrategyController;
 use App\Modules\Strategy\Http\Controllers\UspController;
 use Illuminate\Support\Facades\Route;
@@ -30,4 +32,15 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         Route::put('usps/order', [UspController::class, 'reorder'])->withTrashed()->name('waves.strategy.usps.order');
         Route::patch('usps/{usp}', [UspController::class, 'update'])->withTrashed()->name('waves.strategy.usps.update');
         Route::delete('usps/{usp}', [UspController::class, 'destroy'])->withTrashed()->name('waves.strategy.usps.destroy');
+
+        Route::get('personas', [PersonaController::class, 'index'])->withTrashed()->name('waves.strategy.personas.index');
+        Route::post('personas', [PersonaController::class, 'store'])->withTrashed()->name('waves.strategy.personas.store');
+        // Literal route BEFORE `{persona}`.
+        Route::post('personas/copy', [PersonaController::class, 'copy'])->withTrashed()->name('waves.strategy.personas.copy');
+        Route::patch('personas/{persona}', [PersonaController::class, 'update'])->withTrashed()->name('waves.strategy.personas.update');
+        Route::delete('personas/{persona}', [PersonaController::class, 'destroy'])->withTrashed()->name('waves.strategy.personas.destroy');
+
+        Route::post('personas/{persona}/angles', [AngleController::class, 'store'])->withTrashed()->name('waves.strategy.angles.store');
+        Route::patch('personas/{persona}/angles/{angle}', [AngleController::class, 'update'])->withTrashed()->name('waves.strategy.angles.update');
+        Route::delete('personas/{persona}/angles/{angle}', [AngleController::class, 'destroy'])->withTrashed()->name('waves.strategy.angles.destroy');
     });

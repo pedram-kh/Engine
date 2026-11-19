@@ -541,6 +541,16 @@ enum AuditAction: string
     case WaveUspDeleted = 'wave_usp.deleted';
     case WaveAudienceTitleUpdated = 'wave.audience_title_updated';
 
+    // PL-2.1 — personas and their angles. Same rules: ids, market codes, counts and field NAMES; never the persona name
+    // or any card text. `wave_persona.updated` and `wave_persona_angle.updated` only when a field changed.
+    case WavePersonaCreated = 'wave_persona.created';
+    case WavePersonaUpdated = 'wave_persona.updated';
+    case WavePersonaDeleted = 'wave_persona.deleted';
+    case WavePersonaCopied = 'wave_persona.copied';
+    case WavePersonaAngleAdded = 'wave_persona_angle.added';
+    case WavePersonaAngleUpdated = 'wave_persona_angle.updated';
+    case WavePersonaAngleRemoved = 'wave_persona_angle.removed';
+
     // Campaign attachments from the Files library, chunk B (AH-092). A
     // linkage action on the campaign, not a library action on the file — the
     // file's own audit trail (above) is unaffected by any of these. No

@@ -36,6 +36,9 @@ final class StrategyText
 
         $out = [];
         foreach ($value as $item) {
+            if ($item === null) {
+                continue;   // an empty string arrives as null (ConvertEmptyStringsToNull): dropped like a blank item
+            }
             if (! is_string($item)) {
                 $out[] = $item;   // left for the validator to refuse
 
