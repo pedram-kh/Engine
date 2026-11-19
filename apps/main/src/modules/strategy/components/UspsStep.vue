@@ -276,8 +276,10 @@ function move(usp: WaveUspResource, by: -1 | 1): void {
   flex-direction: column;
   gap: 16px;
 }
-.usps-bar {
+/* `.agency-card` (theme) sets a column; the bar is a row that wraps. Two classes beat the theme's one. */
+.usps-step .usps-bar {
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;

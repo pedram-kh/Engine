@@ -6,7 +6,6 @@
 import type { StrategySummaryResource } from '@catalyst/api-client'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useDisplay } from 'vuetify'
 
 import { strategyApi, type WaveScope } from '../api/strategy.api'
 import { fieldErrorsOf, strategyErrorMessage } from '../strategyErrors'
@@ -24,7 +23,6 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const { xs } = useDisplay()
 const session = ref(0)
 const value = ref('')
 const saving = ref(false)
@@ -69,7 +67,6 @@ async function submit(): Promise<void> {
     :model-value="modelValue"
     max-width="440"
     persistent
-    :fullscreen="xs"
     data-test="audience-dialog"
     @update:model-value="
       (v: boolean) => {
@@ -78,7 +75,7 @@ async function submit(): Promise<void> {
     "
   >
     <v-card :key="session">
-      <v-card-title class="text-h6 pt-4 px-6">{{
+      <v-card-title class="text-h6 text-wrap text-break pt-4 px-6">{{
         t('app.strategy.audience.dialogTitle')
       }}</v-card-title>
       <v-card-text class="px-6">

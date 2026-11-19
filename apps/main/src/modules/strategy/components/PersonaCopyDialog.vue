@@ -9,7 +9,6 @@ import type { StrategyLimits, WavePersonaResource } from '@catalyst/api-client'
 import { labelForCountryCode } from '@catalyst/api-client'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useDisplay } from 'vuetify'
 
 import { strategyApi, type WaveScope } from '../api/strategy.api'
 import { MENU_PROPS } from '../constants'
@@ -31,7 +30,6 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const { xs } = useDisplay()
 const session = ref(0)
 const source = ref<string | null>(null)
 const ticked = ref<string[]>([])
@@ -101,7 +99,6 @@ async function submit(): Promise<void> {
     :model-value="modelValue"
     max-width="520"
     persistent
-    :fullscreen="xs"
     data-test="copy-dialog"
     @update:model-value="
       (v: boolean) => {
@@ -110,7 +107,7 @@ async function submit(): Promise<void> {
     "
   >
     <v-card :key="session">
-      <v-card-title class="text-h6 pt-4 px-6">
+      <v-card-title class="text-h6 text-wrap text-break pt-4 px-6">
         {{ t('app.strategy.copy.title', { market: labelForCountryCode(target) }) }}
       </v-card-title>
       <v-card-text class="px-6">

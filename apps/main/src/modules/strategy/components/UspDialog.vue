@@ -10,7 +10,6 @@
 import type { StrategyLimits, WaveUspPayload, WaveUspResource } from '@catalyst/api-client'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useDisplay } from 'vuetify'
 
 import { brandColorVar } from '@/modules/agency/composables/brandColor'
 import { strategyApi, type WaveScope } from '../api/strategy.api'
@@ -31,7 +30,6 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const { xs } = useDisplay()
 
 /** Bumped on every open and close; the card is keyed by it so nothing inside survives a quick reopen. */
 const session = ref(0)
@@ -154,7 +152,6 @@ function fe(field: string, local: string | null): string[] {
     :model-value="modelValue"
     max-width="560"
     persistent
-    :fullscreen="xs"
     data-test="usp-dialog"
     @update:model-value="
       (v: boolean) => {
@@ -163,7 +160,7 @@ function fe(field: string, local: string | null): string[] {
     "
   >
     <v-card :key="session">
-      <v-card-title class="text-h6 pt-4 px-6">
+      <v-card-title class="text-h6 text-wrap text-break pt-4 px-6">
         {{
           isEdit ? t('app.strategy.usp.dialog.editTitle') : t('app.strategy.usp.dialog.addTitle')
         }}

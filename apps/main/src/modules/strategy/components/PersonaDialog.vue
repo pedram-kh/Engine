@@ -254,7 +254,7 @@ function fe(field: string, local: string | null): string[] {
     "
   >
     <v-card :key="session">
-      <v-card-title class="text-h6 pt-4 px-6">
+      <v-card-title class="text-h6 text-wrap text-break pt-4 px-6">
         {{
           isEdit
             ? t('app.strategy.persona.dialog.editTitle')

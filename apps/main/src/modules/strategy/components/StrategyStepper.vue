@@ -166,6 +166,25 @@ function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUli
   background: rgb(var(--v-theme-primary));
   color: rgb(var(--v-theme-on-primary));
 }
+/* Wide enough for six steps: share the width and let the status wrap, so no step is clipped. Narrower, the bar
+   keeps its natural width and scrolls inside itself. */
+@media (min-width: 1100px) {
+  .strategy-stepper__list {
+    min-width: 0;
+  }
+  .strategy-stepper__item {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .strategy-step {
+    white-space: normal;
+    padding: 12px;
+    gap: 8px;
+  }
+  .strategy-step__circle {
+    flex: none;
+  }
+}
 .strategy-step--off {
   cursor: default;
   opacity: 0.6;

@@ -6,7 +6,6 @@
  */
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useDisplay } from 'vuetify'
 
 const props = defineProps<{
   modelValue: boolean
@@ -26,7 +25,6 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const { xs } = useDisplay()
 const session = ref(0)
 
 watch(
@@ -47,7 +45,6 @@ function close(): void {
     :model-value="modelValue"
     max-width="520"
     persistent
-    :fullscreen="xs"
     :data-test="testId"
     @update:model-value="
       (v: boolean) => {
@@ -56,7 +53,7 @@ function close(): void {
     "
   >
     <v-card :key="session">
-      <v-card-title class="text-h6 pt-4 px-6">{{ title }}</v-card-title>
+      <v-card-title class="text-h6 text-wrap text-break pt-4 px-6">{{ title }}</v-card-title>
       <v-card-text class="px-6">
         <p v-if="body" class="mb-3" data-test="confirm-body">{{ body }}</p>
         <slot />
