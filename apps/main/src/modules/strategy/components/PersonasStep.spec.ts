@@ -25,6 +25,7 @@ import {
   AGENCY_ULID,
   BRAND_ULID,
   makeAngle,
+  makeSyncedAngle,
   makePersona,
   makeSummary,
   makeUsp,
@@ -327,6 +328,30 @@ describe('PersonasStep (PL-2.1)', () => {
     await flushPromises()
     expect(w.get('[data-test="personas-error"]').text()).toBe('Could not load this. Try again.')
     expect(w.get('[data-test="persona-add"]').attributes('disabled')).toBeDefined()
+    w.unmount()
+  })
+
+  it('W12 (PL-2.2): a synced angle says "Synced from matrix", is read-only, links to the matrix and is plain text', async () => {
+    const usps = makeUsps(3)
+    const first = usps[0] ?? makeUsp(1)
+    const w = await mountStep(
+      [
+        makePersona(1, 'SK', {
+          angles: [makeSyncedAngle(first, HOSTILE), makeAngle(usps[1] ?? makeUsp(2), 'By hand')],
+        }),
+        ...many(1, 'SK', 2),
+      ],
+      usps,
+    )
+    const card = w.findAll('[data-test="persona-card"]')[0]
+    if (card === undefined) throw new Error('no card')
+    const origins = card.findAll('[data-test="angle-origin"]')
+    expect(origins[0]?.text()).toBe('Synced from matrix')
+    expect(origins[1]?.text()).toBe('Manually added')
+    expect(card.findAll('[data-test="angle-explanation"]')[0]?.text()).toBe(HOSTILE)
+    expect(card.find('img').exists()).toBe(false)
+    expect(card.findAll('[data-test="angle-matrix-link"]')).toHaveLength(1)
+    expect(card.findAll('[data-test="angle-menu-btn"]')).toHaveLength(1)
     w.unmount()
   })
 })

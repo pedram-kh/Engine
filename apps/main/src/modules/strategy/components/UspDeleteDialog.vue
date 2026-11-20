@@ -1,7 +1,8 @@
 <script setup lang="ts">
 /**
- * PL-2.1 — delete a USP. A USP no persona angle uses is a plain confirm. For one that angles use, the dialog lists
- * what is affected (market, persona, the angle text) and the button says how many angles go with it.
+ * PL-2.1 — delete a USP. A USP no persona angle or matrix cell uses is a plain confirm. For one that is used, the dialog
+ * lists what is affected (market, persona, the angle text, or the cell's level and message line) and the button says how
+ * many items go with it. A cell and the angle synced from it are one item (PL-2.2).
  *
  * The list is first built from the wave's personas (read only, safe to do on open). The delete carries
  * `confirm_count` equal to the number shown; if the server counts differently (someone linked or unlinked an
@@ -47,13 +48,32 @@ async function loadAffected(usp: WaveUspResource, id: number): Promise<void> {
     const out: UspInUseAffected[] = []
     for (const p of res.data) {
       for (const a of p.attributes.angles) {
-        if (a.attributes.usp === usp.id) {
+        // A synced angle is part of its cell and is listed with it, not twice.
+        if (a.attributes.usp === usp.id && !a.attributes.read_only) {
           out.push({
+            kind: 'angle',
+            level: null,
             persona: p.id,
             market: p.attributes.market,
             code: p.attributes.code,
             title: p.attributes.title,
             explanation: a.attributes.explanation,
+          })
+        }
+      }
+      for (const c of p.attributes.matrix_cells) {
+        if (c.usp === usp.id) {
+          const synced = p.attributes.angles.find(
+            (a) => a.attributes.usp === usp.id && a.attributes.read_only,
+          )
+          out.push({
+            kind: 'cell',
+            level: c.level,
+            persona: p.id,
+            market: p.attributes.market,
+            code: p.attributes.code,
+            title: p.attributes.title,
+            explanation: synced?.attributes.explanation ?? '',
           })
         }
       }
@@ -76,7 +96,11 @@ watch(
     refreshed.value = false
     gone.value = false
     loadingList.value = false
-    if (open && props.usp && props.usp.attributes.angle_count > 0) {
+    if (
+      open &&
+      props.usp &&
+      (props.usp.attributes.angle_count > 0 || props.usp.attributes.cell_count > 0)
+    ) {
       void loadAffected(props.usp, openId)
     }
   },
@@ -84,13 +108,16 @@ watch(
 )
 
 const inUse = computed(() => affected.value.length > 0)
+const hasCells = computed(() => affected.value.some((i) => i.kind === 'cell'))
 const title = computed(() =>
   t('app.strategy.usp.deleteDialog.title', { title: props.usp?.attributes.title ?? '' }),
 )
 const confirmLabel = computed(() =>
   inUse.value
     ? t(
-        'app.strategy.usp.deleteDialog.confirmInUse',
+        hasCells.value
+          ? 'app.strategy.usp.deleteDialog.confirmInUseCells'
+          : 'app.strategy.usp.deleteDialog.confirmInUse',
         { count: affected.value.length },
         affected.value.length,
       )
@@ -139,7 +166,13 @@ async function confirm(): Promise<void> {
     :title="title"
     :body="
       inUse
-        ? t('app.strategy.usp.deleteDialog.bodyInUse', { count: affected.length }, affected.length)
+        ? t(
+            hasCells
+              ? 'app.strategy.usp.deleteDialog.bodyInUseCells'
+              : 'app.strategy.usp.deleteDialog.bodyInUse',
+            { count: affected.length },
+            affected.length,
+          )
         : t('app.strategy.usp.deleteDialog.body')
     "
     :confirm-label="confirmLabel"
@@ -168,13 +201,21 @@ async function confirm(): Promise<void> {
       <ul v-if="inUse" class="usp-delete-list" data-test="usp-delete-affected">
         <li
           v-for="item in affected"
-          :key="`${item.persona}-${item.explanation}`"
+          :key="`${item.kind}-${item.persona}-${item.explanation}`"
           class="usp-delete-list__row"
         >
           <span class="usp-delete-list__who"
             >{{ item.market }} · {{ item.code }} · {{ item.title }}</span
           >
-          <span class="usp-delete-list__what">{{ item.explanation }}</span>
+          <span class="usp-delete-list__what"
+            ><template v-if="item.kind === 'cell' && item.level"
+              >{{
+                t('app.strategy.usp.deleteDialog.itemCell', {
+                  level: t(`app.strategy.matrix.level.${item.level}`),
+                })
+              }}<template v-if="item.explanation"> · </template></template
+            >{{ item.explanation }}</span
+          >
         </li>
       </ul>
     </template>

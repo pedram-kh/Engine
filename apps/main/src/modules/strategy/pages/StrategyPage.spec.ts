@@ -13,6 +13,7 @@ vi.mock('../api/strategy.api', () => ({
     summary: vi.fn(),
     listUsps: vi.fn(),
     listPersonas: vi.fn(),
+    matrix: vi.fn(),
   },
 }))
 
@@ -83,23 +84,23 @@ describe('StrategyPage (PL-2.1 W1-W3)', () => {
     w.unmount()
   })
 
-  it('W3: six steps; USPs and Personas live, Matrix not available, Creators and Scripts locked', async () => {
+  it('W3: six steps; USPs, Personas and Matrix live, Concepts, Creators and Scripts locked', async () => {
     prime()
     const w = await mountStrategy(StrategyPage, {})
     await flushPromises()
-    const live = ['usps', 'personas']
+    const live = ['usps', 'personas', 'matrix']
     for (const key of live) {
       const step = w.get(`[data-test="strategy-step-${key}"]`)
       expect(step.element.tagName).toBe('A')
       expect(step.attributes('aria-disabled')).toBeUndefined()
     }
-    for (const key of ['matrix', 'concepts', 'creators', 'scripts']) {
+    for (const key of ['concepts', 'creators', 'scripts']) {
       const step = w.get(`[data-test="strategy-step-${key}"]`)
       expect(step.element.tagName).not.toBe('A')
       expect(step.attributes('aria-disabled')).toBe('true')
       expect(step.attributes('tabindex')).toBeUndefined()
     }
-    expect(w.get('[data-test="strategy-step-matrix-status"]').text()).toBe('Not available yet')
+    expect(w.get('[data-test="strategy-step-matrix-status"]').text()).not.toBe('')
     expect(w.get('[data-test="strategy-step-creators-status"]').text()).toBe(
       'Locked until all concepts are approved',
     )

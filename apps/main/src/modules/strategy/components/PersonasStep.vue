@@ -128,7 +128,17 @@ async function confirmDelete(): Promise<void> {
   }
 }
 
-const angleCount = computed(() => deleting.value?.attributes.angles.length ?? 0)
+const angleCount = computed(
+  () => deleting.value?.attributes.angles.filter((a) => !a.attributes.read_only).length ?? 0,
+)
+const cellCount = computed(() => deleting.value?.attributes.matrix_cells.length ?? 0)
+/** The persona's cells for the confirmation: the USP and the level, in the USPs' order. */
+const deletingCells = computed(() =>
+  (deleting.value?.attributes.matrix_cells ?? []).map((c) => ({
+    usp: usps.value.find((u) => u.id === c.usp)?.attributes.title ?? '',
+    level: c.level,
+  })),
+)
 </script>
 
 <template>
@@ -310,15 +320,26 @@ const angleCount = computed(() => deleting.value?.attributes.angles.length ?? 0)
       test-id="persona-delete-dialog"
       :title="t('app.strategy.persona.deleteTitle', { name: deleting?.attributes.name ?? '' })"
       :body="
-        angleCount > 0
-          ? t('app.strategy.persona.deleteBodyAngles', { count: angleCount }, angleCount)
-          : t('app.strategy.persona.deleteBody')
+        cellCount > 0
+          ? t('app.strategy.persona.deleteBodyCells', {
+              angles: t('app.strategy.counts.angles', { count: angleCount }, angleCount),
+              cells: t('app.strategy.counts.cells', { count: cellCount }, cellCount),
+            })
+          : angleCount > 0
+            ? t('app.strategy.persona.deleteBodyAngles', { count: angleCount }, angleCount)
+            : t('app.strategy.persona.deleteBody')
       "
       :confirm-label="t('app.strategy.persona.delete')"
       :busy="deleteBusy"
       :error="deleteError"
       @confirm="confirmDelete"
-    />
+    >
+      <ul v-if="cellCount > 0" class="persona-delete-cells" data-test="persona-delete-cells">
+        <li v-for="c in deletingCells" :key="c.usp + c.level">
+          {{ c.usp }} · {{ t(`app.strategy.matrix.level.${c.level}`) }}
+        </li>
+      </ul>
+    </StrategyConfirmDialog>
   </section>
 </template>
 
@@ -483,5 +504,13 @@ const angleCount = computed(() => deleting.value?.attributes.angles.length ?? 0)
   font-size: 12px;
   line-height: normal;
   color: rgb(var(--v-theme-text-tertiary));
+}
+.persona-delete-cells {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 19px;
+  max-height: 30vh;
+  overflow-y: auto;
 }
 </style>

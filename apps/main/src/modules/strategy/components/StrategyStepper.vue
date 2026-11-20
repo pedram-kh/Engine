@@ -2,7 +2,7 @@
 /**
  * PL-2.1 — the six-step bar of the strategy workspace.
  *
- * Steps 1 and 2 are real links with a counts-only status line. Steps 3 and 4 ("Not available yet") and 5 and 6
+ * Steps 1, 2 and (PL-2.2) 3 are real links with a counts-only status line. Step 4 ("Not available yet") and 5 and 6
  * (locked, with a lock) are plain elements: not links, not buttons, not in the tab order, `aria-disabled`, no
  * hover state, no pointer cursor. No tick is ever drawn: there is no "done" rule (S7). On a narrow screen the bar
  * scrolls sideways inside itself and step names never wrap.
@@ -22,11 +22,20 @@ const props = defineProps<{
 
 const { t } = useI18n()
 
-const statusLine = computed<Record<'usps' | 'personas', string>>(() => {
+const statusLine = computed<Record<'usps' | 'personas' | 'matrix', string>>(() => {
   const a = props.summary?.attributes
-  if (!a) return { usps: '', personas: '' }
+  if (!a) return { usps: '', personas: '', matrix: '' }
   const withPersonas = a.markets.filter((m) => m.persona_count > 0).length
+  const m = a.matrix
   return {
+    matrix:
+      m.cells_total === 0
+        ? t('app.strategy.stepper.matrixNone')
+        : t(
+            'app.strategy.stepper.matrixStatus',
+            { set: m.cells_set, total: m.cells_total },
+            m.cells_total,
+          ),
     usps:
       a.usp_count === 0
         ? t('app.strategy.stepper.uspNone')
@@ -44,7 +53,8 @@ const statusLine = computed<Record<'usps' | 'personas', string>>(() => {
 
 function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUlid: string } } {
   return {
-    name: key === 'usps' ? 'strategy.usps' : 'strategy.personas',
+    name:
+      key === 'usps' ? 'strategy.usps' : key === 'matrix' ? 'strategy.matrix' : 'strategy.personas',
     params: { ulid: props.brandId, waveUlid: props.waveId },
   }
 }

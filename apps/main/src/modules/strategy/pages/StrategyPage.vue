@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * PL-2.1 — the Strategy & Scripts workspace of a wave: header, six-step stepper, and the working step (1 USPs or
- * 2 Personas; both routes render this page). Behind two flags: `features.strategy` is true only while waves AND
+ * PL-2.1 — the Strategy & Scripts workspace of a wave: header, six-step stepper, and the working step (1 USPs,
+ * 2 Personas or, from PL-2.2, 3 Messaging matrix; all three routes render this page). Behind two flags: `features.strategy` is true only while waves AND
  * strategy are on. With waves off the page goes to the brand; with waves on and strategy off it goes to the wave
  * page, which is then exactly as PL-1 left it. Nothing is requested before that check.
  *
@@ -17,6 +17,7 @@ import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { wavesApi } from '@/modules/waves/api/waves.api'
 import { strategyApi } from '../api/strategy.api'
+import MatrixStep from '../components/MatrixStep.vue'
 import PersonasStep from '../components/PersonasStep.vue'
 import StrategyStepper from '../components/StrategyStepper.vue'
 import UspsStep from '../components/UspsStep.vue'
@@ -36,7 +37,13 @@ const summary = ref<StrategySummaryResource | null>(null)
 const loading = ref(true)
 const failed = ref(false)
 
-const step = computed<StepKey>(() => (route.name === 'strategy.personas' ? 'personas' : 'usps'))
+const step = computed<StepKey>(() =>
+  route.name === 'strategy.personas'
+    ? 'personas'
+    : route.name === 'strategy.matrix'
+      ? 'matrix'
+      : 'usps',
+)
 const markets = computed(() => summary.value?.attributes.markets.map((m) => m.market) ?? [])
 
 async function load(): Promise<void> {
@@ -124,6 +131,13 @@ onMounted(async () => {
         :key="'usps'"
         :summary="summary"
         @summary="onSummary"
+        @changed="refreshSummary"
+      />
+      <MatrixStep
+        v-else-if="step === 'matrix'"
+        :key="'matrix'"
+        :summary="summary"
+        :markets="markets"
         @changed="refreshSummary"
       />
       <PersonasStep

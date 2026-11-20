@@ -44,6 +44,14 @@ const sources = computed(() =>
 const sourcePersonas = computed(() =>
   props.personas.filter((p) => p.attributes.market === source.value),
 )
+/** Synced angles of the ticked personas: they come from a matrix cell, which a copy does not carry (Q3). */
+const syncedSkipped = computed(
+  () =>
+    sourcePersonas.value
+      .filter((p) => ticked.value.includes(p.id))
+      .flatMap((p) => p.attributes.angles)
+      .filter((a) => a.attributes.read_only).length,
+)
 const targetCount = computed(
   () => props.personas.filter((p) => p.attributes.market === props.target).length,
 )
@@ -160,6 +168,20 @@ async function submit(): Promise<void> {
                   total,
                   max: limits.persona_max,
                 })
+          }}
+        </p>
+        <p
+          v-if="syncedSkipped > 0"
+          class="mt-2 mb-0 text-body-2 text-medium-emphasis"
+          role="status"
+          data-test="copy-synced"
+        >
+          {{
+            t(
+              'app.strategy.copy.synced',
+              { count: syncedSkipped, market: labelForCountryCode(target) },
+              syncedSkipped,
+            )
           }}
         </p>
       </v-card-text>

@@ -48,6 +48,13 @@ const error = ref<string | null>(null)
 const removing = ref<WaveAngleResource | null>(null)
 const removeOpen = ref(false)
 const removeBusy = ref(false)
+/** Removing a hand-written angle on a pair whose cell is Priority or Support: the synced angle takes its place. */
+const removeSyncs = computed(() => {
+  const usp = removing.value?.attributes.usp
+  return props.persona.attributes.matrix_cells.some(
+    (c) => c.usp === usp && (c.level === 'priority' || c.level === 'support'),
+  )
+})
 const removeError = ref<string | null>(null)
 
 function startAdd(usp: WaveUspResource): void {
@@ -189,11 +196,29 @@ async function confirmRemove(): Promise<void> {
             <p class="angle__text" data-test="angle-explanation">
               {{ angle.attributes.explanation }}
             </p>
-            <span class="angle__origin" data-test="angle-origin">{{
+            <span
+              v-if="angle.attributes.read_only"
+              class="angle__origin angle__origin--synced"
+              data-test="angle-origin"
+              >{{ t('app.strategy.persona.syncedFromMatrix') }}</span
+            >
+            <span v-else class="angle__origin" data-test="angle-origin">{{
               t('app.strategy.persona.addedByHand')
             }}</span>
+            <router-link
+              v-if="angle.attributes.read_only"
+              class="angle__matrix-link"
+              :to="{
+                name: 'strategy.matrix',
+                params: { ulid: brandId, waveUlid: waveId },
+                query: { market: angle.attributes.market ?? persona.attributes.market },
+              }"
+              data-test="angle-matrix-link"
+            >
+              {{ t('app.strategy.persona.changeInMatrix') }}
+            </router-link>
           </div>
-          <v-menu v-bind="MENU_PROPS" location="bottom end">
+          <v-menu v-if="!angle.attributes.read_only" v-bind="MENU_PROPS" location="bottom end">
             <template #activator="{ props: act }">
               <v-btn
                 v-bind="act"
@@ -335,7 +360,11 @@ async function confirmRemove(): Promise<void> {
       test-id="angle-remove-dialog"
       :title="t('app.strategy.persona.removeAngleTitle')"
       :body="
-        t('app.strategy.persona.removeAngleBody', { usp: removing?.attributes.usp_title ?? '' })
+        removeSyncs
+          ? t('app.strategy.persona.removeAngleBodySyncs', {
+              usp: removing?.attributes.usp_title ?? '',
+            })
+          : t('app.strategy.persona.removeAngleBody', { usp: removing?.attributes.usp_title ?? '' })
       "
       :confirm-label="t('app.strategy.persona.angleRemove')"
       :busy="removeBusy"
@@ -518,5 +547,16 @@ async function confirmRemove(): Promise<void> {
 }
 .angle-list__plus {
   color: rgb(var(--v-theme-primary));
+}
+
+.angle__origin--synced {
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+.angle__matrix-link {
+  display: inline-block;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: normal;
+  color: rgb(var(--v-theme-primary-text, var(--v-theme-primary)));
 }
 </style>

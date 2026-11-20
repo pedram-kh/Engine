@@ -287,6 +287,8 @@ describe('UspsStep (PL-2.1)', () => {
               count: 2,
               affected: [
                 {
+                  kind: 'angle',
+                  level: null,
                   persona: 'p1',
                   market: 'SK',
                   code: 'SKA',
@@ -294,6 +296,8 @@ describe('UspsStep (PL-2.1)', () => {
                   explanation: 'First',
                 },
                 {
+                  kind: 'angle',
+                  level: null,
                   persona: 'p2',
                   market: 'RO',
                   code: 'ROA',

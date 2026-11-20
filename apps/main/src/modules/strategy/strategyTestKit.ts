@@ -3,6 +3,11 @@
  * and a mount helper on top of the wave test kit (Pinia, router with the strategy routes, English i18n, Vuetify).
  */
 import type {
+  MatrixCell,
+  MatrixLevel,
+  MatrixPersona,
+  MatrixResource,
+  MatrixUsp,
   StrategyLimits,
   StrategySummaryResource,
   UspColorKey,
@@ -35,6 +40,8 @@ export const LIMITS: StrategyLimits = {
   list_items: 8,
   list_item: 200,
   angle_explanation: 500,
+  matrix_line: 140,
+  matrix_batch_max: 48,
 }
 
 export function makeSummary(
@@ -52,6 +59,7 @@ export function makeSummary(
         { market: 'RO', persona_count: 0 },
       ],
       limits: LIMITS,
+      matrix: { cells_set: 0, cells_total: 0, by_market: [] },
       ...over,
     },
   }
@@ -74,6 +82,7 @@ export function makeUsp(
       creative_angle: null,
       copy_seed: null,
       angle_count: 0,
+      cell_count: 0,
       created_at: '2026-11-01T10:00:00.000000Z',
       updated_at: '2026-11-01T10:00:00.000000Z',
       ...over,
@@ -98,6 +107,8 @@ export function makeAngle(
       color_key: usp.attributes.color_key,
       explanation,
       origin: 'manual',
+      read_only: false,
+      market: null,
     },
   }
 }
@@ -126,9 +137,77 @@ export function makePersona(
       self_talk: [],
       barriers: [],
       angles: [],
+      matrix_cells: [],
       created_at: '2026-11-01T10:00:00.000000Z',
       updated_at: '2026-11-01T10:00:00.000000Z',
       ...over,
+    },
+  }
+}
+
+/** An angle synced from a matrix cell: read only on the persona card. */
+export function makeSyncedAngle(
+  usp: WaveUspResource,
+  explanation = 'Lead line',
+  market = 'SK',
+): WaveAngleResource {
+  const a = makeAngle(usp, explanation)
+  return {
+    ...a,
+    id: `01SYN${usp.id.slice(5, 25)}`,
+    attributes: { ...a.attributes, origin: 'matrix', read_only: true, market },
+  }
+}
+
+export function makeMatrixCell(
+  persona: WavePersonaResource,
+  usp: WaveUspResource,
+  level: MatrixLevel | null,
+  over: Partial<MatrixCell> = {},
+): MatrixCell {
+  return {
+    persona: persona.id,
+    usp: usp.id,
+    level,
+    rationale: level === null ? null : 'Because it matters',
+    message_line: level === null || level === 'low' ? null : 'Lead line',
+    source: 'manual',
+    has_manual_angle: false,
+    ...over,
+  }
+}
+
+/** One market's matrix as `GET matrix` returns it. */
+export function makeMatrix(
+  market: string,
+  usps: WaveUspResource[],
+  personas: WavePersonaResource[],
+  cells: MatrixCell[] = [],
+): MatrixResource {
+  const u: MatrixUsp[] = usps.map((x) => ({
+    id: x.id,
+    title: x.attributes.title,
+    color_key: x.attributes.color_key,
+    position: x.attributes.position,
+  }))
+  const p: MatrixPersona[] = personas.map((x) => ({
+    id: x.id,
+    slot: x.attributes.slot,
+    color_key: x.attributes.color_key,
+    code: x.attributes.code,
+    title: x.attributes.title,
+    name: x.attributes.name,
+    summary: x.attributes.summary,
+  }))
+  return {
+    id: `01WAVEULIDXXXXXXXXXXXXXXX:${market}`,
+    type: 'wave_matrix',
+    attributes: {
+      market,
+      usps: u,
+      personas: p,
+      cells,
+      progress: { cells_set: cells.length, cells_total: u.length * p.length, by_market: [] },
     },
   }
 }

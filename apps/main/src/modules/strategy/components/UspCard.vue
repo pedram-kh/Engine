@@ -36,7 +36,8 @@ const { t } = useI18n()
 const menuOpen = ref(false)
 const a = computed(() => props.usp.attributes)
 const number = computed(() => String(props.index).padStart(2, '0'))
-const deleteBlocked = computed(() => a.value.angle_count > 0 && !props.canDeleteInUse)
+const inUse = computed(() => a.value.angle_count > 0 || a.value.cell_count > 0)
+const deleteBlocked = computed(() => inUse.value && !props.canDeleteInUse)
 
 function pick(action: 'edit' | 'remove' | 'earlier' | 'later'): void {
   menuOpen.value = false
@@ -121,8 +122,15 @@ function pick(action: 'edit' | 'remove' | 'earlier' | 'later'): void {
       </blockquote>
     </section>
 
-    <footer v-if="a.angle_count > 0" class="usp-card__foot" data-test="usp-angle-count">
-      {{ t('app.strategy.usp.usedBy', { count: a.angle_count }, a.angle_count) }}
+    <footer v-if="inUse" class="usp-card__foot" data-test="usp-angle-count">
+      {{
+        a.cell_count > 0
+          ? t('app.strategy.usp.usedByBoth', {
+              angles: t('app.strategy.counts.angles', { count: a.angle_count }, a.angle_count),
+              cells: t('app.strategy.counts.cells', { count: a.cell_count }, a.cell_count),
+            })
+          : t('app.strategy.usp.usedBy', { count: a.angle_count }, a.angle_count)
+      }}
     </footer>
   </article>
 </template>

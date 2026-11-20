@@ -17,6 +17,7 @@ const CODE_KEYS: Record<string, string> = {
   'persona.code_taken': 'app.strategy.errors.personaCodeTaken',
   'persona.copy_invalid': 'app.strategy.errors.copyInvalid',
   'angle.already_linked': 'app.strategy.errors.angleAlreadyLinked',
+  'angle.synced_read_only': 'app.strategy.errors.angleSyncedReadOnly',
   'strategy.conflict': 'app.strategy.errors.conflict',
   'wave.brand_archived': 'app.strategy.errors.brandArchived',
   forbidden: 'app.strategy.errors.forbidden',
