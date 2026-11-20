@@ -1,0 +1,431 @@
+# PL-2.2 plan: Messaging matrix by hand
+
+**Date:** 2026-11-20. **Branch:** `pl`, from tip `1a20f000`. **Status:** plan only. No code, no migration file, no push.
+**Inputs:** `pl-2-2-inventory.md` (read it first; "inventory §n" points into it), `pl-2-1-plan.md` (the template), `pl-2-1-review.md`, `WORKING-PROCESS.md` §4.1 and §4.2, Pedram's rulings X1 to X12.
+**Standing rules applied:** schema-only migrations, the alarm rule, a break-revert on every gate, the 24-locale gate, one flag per sprint and never reused (`strategy_enabled` again), design fidelity (§4.2, ruling 10: VISUAL differences fixed, FUNCTIONAL reported), the flag-write rule (nobody but Pedram writes a flag in a database he uses).
+
+**Goal.** Step 3 of the Strategy workspace opens: for one market, a table of the wave's USPs (rows) against that market's personas (columns). A person fills each cell by hand: a level (Priority, Support, Low), a one-line rationale and a message line. Priority and Support cells create, update and remove **synced angles** on the persona, so the persona card and the matrix never disagree. Everything behind `strategy_enabled` (which needs `waves_enabled`), OFF by default. With the flag off nothing changes.
+
+## Rulings for this chunk (X1 to X12) and where each lands
+
+| #       | Ruling (short)                                                                                                              | Where it lands       |
+| ------- | --------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| **X1**  | By hand only; AI parts not built; say what the data model holds for PL-9                                                    | §1.1, §9, §11 (list) |
+| **X2**  | Per market; rows = USPs in order and colour; columns = personas in slot order; USP column pinned                            | §3.2, §4             |
+| **X3**  | Cell = level, rationale, message line; legend; Priority green tint, Low muted                                               | §1.1, §4, §7         |
+| **X4**  | Cells start empty ("Not set"); stepper "12 of 48 cells set"; how it reads with several markets                              | §3.4, §4.1           |
+| **X5**  | Persona header: code, title, name, "Lead with:" Priority USPs                                                               | §4                   |
+| **X6**  | Sync: Priority/Support creates or updates one angle (`matrix`); Low or clear removes it                                     | §1.6, §1.7           |
+| **X7**  | Manual angle never touched; cell shows what; what happens when the manual angle goes later                                  | §1.7                 |
+| **X8**  | Synced angle read-only on the persona card; "Add angle" list shows it linked                                                | §3.5, §4.5           |
+| **X9**  | New USP = empty row, new persona = empty column; deletes remove cells and synced angles and list them; copy copies no cells | §1.8, §3.4, §4.5     |
+| **X10** | Admin, manager, staff edit cells                                                                                            | §3.3                 |
+| **X11** | Explicit save, per-field last write wins; how a cell is edited; many cells stay quick                                       | §1.5, §4.2           |
+| **X12** | 480 cells per wave; one request per market matrix; no N+1                                                                   | §3.2, §6             |
+
+---
+
+## 8. PROD-DATA RISK (stated first, before any code)
+
+**PROD-DATA RISK: NONE for existing data, but brief write locks on live tables.** Two additive migrations. Neither reads, writes or backfills a row. The angle table, the persona table's data and the USP table's data are not changed.
+
+- **M1** `wave_personas`: add `unique (wave_id, market, id)`. This is the target of the new cell's "persona belongs to this market" foreign key. `ALTER TABLE … ADD CONSTRAINT … UNIQUE` takes an **AccessExclusiveLock on `wave_personas`** (and builds the index under a ShareLock). On the table that PL-2.1 created and that is empty until a person types a persona.
+- **M2** `wave_matrix_cells`: a new, empty table with four indexes and three foreign keys. Its foreign keys take a **ShareRowExclusiveLock on `agencies`, `waves`, `wave_usps` and `wave_personas`**: writes to those tables wait, reads do not, for the length of the migration transaction.
+- **Measured on a throwaway local PostgreSQL database `pl22_probe`** (container `catalyst-postgres`, PostgreSQL 16, port 5435). Exactly what was run: the database was created; `DB_DATABASE=pl22_probe php artisan migrate --force` ran the **existing** migrations up to and including the four PL-2.1 ones (all DONE, 1.5 to 10 ms each); I printed `current_database()` = `pl22_probe` before the DDL; the proposed M1 and M2 were then **typed by hand in `psql` inside `BEGIN … COMMIT` with `SET LOCAL lock_timeout = '5s'`**, lock modes read from `pg_locks` before commit; the database was dropped. **No PL-2.2 migration file exists; no dev or walk database was touched; no flag was written; no synthetic rows were inserted** (lock modes do not depend on row count). Same limits as PL-2.1 G3: **these hand-typed numbers are not the record**. The build repeats the rehearsal through `php artisan migrate` with the real files on a synthetic database and records that run in the review.
+
+| Migration                                             | Statement time (psql)             | Locks held on tables that exist before it                                                                 |
+| ----------------------------------------------------- | --------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| M1 `wave_personas` add unique `(wave_id, market, id)` | 2.6 ms                            | `wave_personas`: AccessExclusive (and ShareLock for the index build)                                      |
+| M2 `wave_matrix_cells` + 3 indexes                    | 4.7 ms + 1.0 ms + 0.8 ms + 0.6 ms | `agencies`, `waves`, `wave_usps`, `wave_personas`: ShareRowExclusive (the last three are new with PL-2.1) |
+
+- **Where the tables are in production.** `waves`, `wave_usps`, `wave_personas` and `wave_persona_angles` are **not in production** (PL-1 and PL-2.1 are built, not merged, not deployed; `production-line-sprints.md` §6). So M1 and M2 will run in the same deploy that creates them, on empty tables. Stated from the sprint file, not from a server. If PL-2.1 deploys first, M1 is a millisecond AccessExclusive on an empty `wave_personas` and M2 a millisecond ShareRowExclusive on four tables of which only `agencies` is busy; `lock_timeout = 5s` (PostgreSQL only) makes a blocked migration fail instead of hang.
+- **PL-2.1 migration files are not edited.** They may already have run on Pedram's dev and walk databases; M1 is a new file.
+- **Why no user column.** As PL-2.1 (§1.5): who changed a cell is in the audit log. That keeps `users` out of the lock list and the erasure `refs` empty. PL-9's "Edited by Jess" needs a user column later; it is a **nullable additive column** then (§1.1) and an erasure decision at that time.
+- **No data-writing migration.** Nothing writes a cell until the flag is on and a person types one. No backfill: empty cells are "no row".
+- `down()` is lossy (drop table, drop constraint); a rollback tool only before the flag is armed.
+- **A behaviour change with the flag OFF: none.** The extra checks in `AngleService`, `PersonaService` and `UspService` read the new table only inside strategy endpoints, which 404 with the flag off.
+
+---
+
+## 1. Data model
+
+### 1.1 `wave_matrix_cells` (M2)
+
+One row per **set** cell. "Not set" is **no row**. Module `Strategy`, model `WaveMatrixCell`, `BelongsToAgency`, factory.
+
+| Column                     | Type and rule                                                                                                                                         |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`, `ulid`               | bigint, ulid unique (the route key; the API shows cells by persona ulid and USP ulid, not by cell id)                                                 |
+| `agency_id`                | FK `agencies`, RESTRICT, indexed                                                                                                                      |
+| `wave_id`                  | FK `waves`, RESTRICT                                                                                                                                  |
+| `market`                   | `char(2)`, the persona's market, **copied at write time** (a persona's market never changes: not in `FIELDS`)                                         |
+| `persona_id`, `usp_id`     | bigint, not null                                                                                                                                      |
+| `level`                    | `varchar(8)` not null: `priority`, `support`, `low`. PHP enum `MatrixLevel` plus a DB `CHECK (level in (…))` (the table is new, so the check is free) |
+| `rationale`                | `varchar(140)` null: the one-line reason (the frame's second line)                                                                                    |
+| `message_line`             | `varchar(140)` null: the line in the yellow box. 140 = `ANGLE_EXPLANATION` because the synced angle's explanation **is** this text                    |
+| `source`                   | `varchar(16)` not null default `'manual'`. PL-9 will write `'agent'`                                                                                  |
+| `edited_at`                | `timestamp` null. Unused in PL-2.2 (stays null). PL-9 sets it when a person changes a cell whose source is `agent`                                    |
+| `created_at`, `updated_at` |                                                                                                                                                       |
+
+**Keys and guards (in the database, not only in code):**
+
+- `unique (persona_id, usp_id)`: one cell per USP and persona.
+- `FOREIGN KEY (wave_id, usp_id) → wave_usps (wave_id, id)` RESTRICT: the USP is in this wave.
+- `FOREIGN KEY (wave_id, market, persona_id) → wave_personas (wave_id, market, id)` RESTRICT (needs M1): the persona is in this wave **and** this market. Together: a cell cannot pair a USP of one wave with a persona of another, nor carry a market other than its persona's.
+- Indexes: `(wave_id, market)` (the matrix load), `usp_id`, `agency_id`.
+- Deletes are explicit service code (RESTRICT everywhere): angles first, then cells, then the persona or USP, in one transaction.
+
+**What the table holds for PL-9 (X1).** `source` says who wrote the cell (`manual` now, `agent` later) and `edited_at` says a person changed an agent cell. A generation run table, reasoning text, "edited by" user, the generation id and the "out of date" flag are all **additive later** (a new table and nullable columns); **no existing column changes meaning and no row needs rewriting**, so there is no destructive migration. The synced angle's `origin` is `matrix` for both hand and agent cells (the angle does not care who wrote the cell).
+
+### 1.2 `wave_persona_angles`: no schema change
+
+`origin` is already a plain string; the enum gains `Matrix = 'matrix'`. The synced angle is **found by `(persona_id, usp_id)`** (the unique key) and `origin = 'matrix'`; no link column is added. A manual angle on the same pair has `origin = 'manual'`. Nothing else changes in the table.
+
+### 1.3 The invariant (the one sentence every test checks)
+
+For every cell with level Priority or Support, **exactly one angle exists** on that persona and USP: either `origin = matrix` with `explanation = message_line` (synced), or `origin = manual` (hand-written, never touched). For every other pair (Low, no cell) there is **no** `matrix` angle. A `matrix` angle without a Priority/Support cell must never exist.
+
+### 1.4 Free text limits and sanitising
+
+Rationale 140, message line 140 (proposal, Q10; the frame draws no field). Same server-side clean-up as PL-2.1 (`StrategyText::cleanInput`: trim, strip control characters and tags the same way). Rendered with interpolation only (no `v-html`; the PL-2.1 no-`v-html` spec covers the new files). The quotes in the frame are **display only** (the app adds “ ” around the stored text, so a hostile `"` stays text).
+
+### 1.5 Save model (X11)
+
+Explicit save, **per-field last write wins**, as PL-2.1. A write names a persona, a USP and the fields it sends; a field not sent is not written. Two people editing different fields of the same cell both keep their change; the same field: the later save wins. The level is a field like the others.
+
+**How a cell is edited (proposal, Q4).** The frame draws a level menu (pill with a chevron, three rows) and no text fields. Proposal: **a popover** anchored to the cell (a bottom sheet below 720 px) that holds the level menu exactly as the frame draws it (three rows with dot, label, hint; the selected row tinted), the **rationale** field, the **message line** field, and buttons **Save**, **Cancel** and, for a set cell, **Clear cell**. Clicking the pill or anywhere in the cell opens it; Esc and click outside close it without saving. **Save and next** (Ctrl/Cmd+Enter) saves and opens the next unset cell in reading order, so filling a market is a short loop without leaving the keyboard.
+
+**Why a popover and not inline or a dialog.** Inline editing in a 280-px cell cannot hold two fields and a menu without growing the row under the pointer; a dialog hides the table, which the person is reading to compare cells. A popover keeps the table visible and is the smallest thing that holds the frame's menu.
+
+**How saving many cells stays quick.** Each save is **one request** that returns the changed cell and the new counts, and takes the wave lock for a few milliseconds. The write endpoint accepts a **list of 1 to 48 cell changes** applied in **one transaction under one wave lock** (all or nothing). The UI sends one cell at a time in PL-2.2; the list form is there so a later bulk action (PL-9's generation, "clear a column") reuses the same code and the same sync, and a test proves a 48-cell write is one transaction. No page reload, no refetch of the whole matrix after a save (the response carries the cell and the counts; a conflict or 404 reloads).
+
+### 1.6 The sync (X6): one transaction, one lock, idempotent
+
+`MatrixService::save(brand, wave, actor, market, changes[])`:
+
+1. `StrategyGuard::assertBrandWritable`; `DB::transaction`; **`StrategyGuard::lockWave` first** (the same first line as every PL-2.1 write, so a matrix write, a USP delete, a persona copy and a wave edit are serialised per wave and cannot deadlock).
+2. Look up every persona (by ulid, `wave_id`, `agency_id`, **and market equals the request's market**) and every USP (by ulid, `wave_id`, `agency_id`) **through the wave**; one query each for the whole list (`whereIn`). Any miss: 404 for the whole request, nothing written.
+3. Load the existing cells and angles for those (persona, USP) pairs in two queries.
+4. For each change: compute the new cell state from the old row and the fields sent (per field), then **reconcile** the angle (§1.7 table). `reconcile(cell, angle)` is a pure function of the final cell and the angle that exists, so running the same request twice leaves the same rows and writes nothing the second time (no `updated_at` bump when nothing changed).
+5. One audit row per request (§3.6). Commit.
+
+`StrategyGuard::retryOnClash` wraps it as in PL-2.1 (unique clash is the belt).
+
+### 1.7 Every case of X6 to X9 (cell before and after, angle before and after)
+
+"M" is a hand-written angle (`manual`), "S" a synced angle (`matrix`), "—" none. The cell's `message_line` is the text of S. P = Priority, Su = Support, L = Low, ∅ = Not set.
+
+| #   | Event                                                                        | Cell before | Cell after               | Angle before | Angle after                                                        | What the user sees                                                                                                                              |
+| --- | ---------------------------------------------------------------------------- | ----------- | ------------------------ | ------------ | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Set a level (P or Su) with a message line                                    | ∅           | P or Su                  | —            | **S created**, explanation = message line                          | persona card gains the pill "Synced from matrix"; "Lead with" updates (P only)                                                                  |
+| 2   | Same, but a hand-written angle exists                                        | ∅           | P or Su                  | M            | **M unchanged**, no second angle                                   | the cell shows its level and texts plus a note "Hand-written angle kept on the persona" (see below); the persona card shows M exactly as before |
+| 3   | P to Su or Su to P, message unchanged                                        | P / Su      | Su / P                   | S            | S unchanged (idempotent)                                           | level changes; the persona card is the same                                                                                                     |
+| 4   | Change the message line only                                                 | P / Su      | same                     | S            | **S explanation updated**                                          | the persona card line changes                                                                                                                   |
+| 5   | Change the message line only                                                 | P / Su      | same                     | M            | M unchanged                                                        | cell text changes; persona card same                                                                                                            |
+| 6   | Set Low                                                                      | P / Su      | L                        | S            | **S removed**                                                      | the angle disappears from the persona; the cell keeps its texts                                                                                 |
+| 7   | Set Low                                                                      | P / Su      | L                        | M            | M unchanged                                                        | nothing on the persona changes                                                                                                                  |
+| 8   | Clear the cell                                                               | P / Su / L  | ∅ (row deleted)          | S or —       | **S removed**, or none                                             | the cell reads "Not set"                                                                                                                        |
+| 9   | Clear the cell                                                               | P / Su / L  | ∅                        | M            | M unchanged                                                        | same                                                                                                                                            |
+| 10  | Set Low on an empty cell                                                     | ∅           | L                        | —            | —                                                                  | muted cell, no angle                                                                                                                            |
+| 11  | Set Low on an empty cell                                                     | ∅           | L                        | M            | M unchanged                                                        | same                                                                                                                                            |
+| 12  | Low to P / Su (with a message line)                                          | L           | P / Su                   | —            | **S created**                                                      | as 1                                                                                                                                            |
+| 13  | Low to P / Su                                                                | L           | P / Su                   | M            | M unchanged                                                        | as 2                                                                                                                                            |
+| 14  | P / Su with an empty message line                                            | any         | P / Su                   | any          | refused, 422 `message_line` required                               | the Save button stays disabled until the line is typed (Q1)                                                                                     |
+| 15  | **The hand-written angle is later removed** on the persona card, cell P / Su | P / Su      | same                     | M            | **S created from the cell** in the same transaction as the removal | the persona card shows the synced pill instead of the removed hand-written one; the cell note disappears (Q2)                                   |
+| 16  | The hand-written angle is later removed, cell L, ∅                           | L / ∅       | same                     | M            | —                                                                  | nothing replaces it                                                                                                                             |
+| 17  | A person tries to add a hand-written angle for a USP that has S              | P / Su      | same                     | S            | refused, 422 `angle_already_linked` (the PL-2.1 rule)              | the "Add angle" list shows the USP as linked                                                                                                    |
+| 18  | A person edits or removes S on the persona card (API call)                   | P / Su      | same                     | S            | refused, 422 `angle.synced_read_only`                              | the card shows no menu; the API refuses even if called by hand                                                                                  |
+| 19  | Delete the USP                                                               | any         | all of its cells deleted | M and S      | **both removed**                                                   | the confirmation listed them (§3.4)                                                                                                             |
+| 20  | Delete the persona                                                           | any         | all of its cells deleted | M and S      | **both removed**                                                   | same                                                                                                                                            |
+| 21  | Copy personas to another market                                              | n/a         | **no cells copied**      | M and S      | M copied (as PL-2.1); **S not copied**                             | the copy dialog says "Synced angles (N) are not copied; fill the matrix of the new market" (Q3)                                                 |
+| 22  | Add a USP / add a persona                                                    | n/a         | no row                   | n/a          | n/a                                                                | empty row / empty column of "Not set" cells                                                                                                     |
+| 23  | Brand archived                                                               | any         | refused                  | any          | refused, 422 `brand_archived`                                      | table read-only, a notice                                                                                                                       |
+| 24  | Same request twice                                                           | any         | same                     | any          | same, no write                                                     | nothing changes (idempotent)                                                                                                                    |
+
+**What the cell shows when a hand-written angle exists (X7, rows 2, 5, 7, 9, 13).** The cell is a normal cell with its own level, rationale and message line (the matrix stays the strategist's table and "Lead with" counts the level). Below the message box, one muted line with an info icon: **"This persona already has a hand-written angle on this USP. It is kept as written."** The cell editor shows the same line; the cell's message line is saved but not used for an angle while the hand-written one exists. The line is derived on load from "a manual angle exists for this pair" (§3.2).
+
+**If the hand-written angle is removed later while the cell is Priority or Support (row 15).** Recommended: the removal **creates the synced angle in the same transaction** from the cell, so the invariant (§1.3) holds at every moment and the persona never silently loses the angle the matrix promised. The removal confirmation on the persona card says so ("The matrix still marks this USP as Priority for this persona; a synced angle will replace this one."). The audit row of the removal carries `matrix_angle_created: true`. The alternative (leave the cell Priority with no angle until the next save of that cell) breaks the invariant and is not recommended (Q2).
+
+### 1.8 Deleting and copying (X9)
+
+- **Delete a USP** (`UspService::delete`): `UspUsage::affected` lists **manual angles and cells** (§3.4). Under the wave lock: synced angles of the USP, then cells, then manual angles (as PL-2.1), then the USP. Audit adds `cells_removed`.
+- **Delete a persona** (`PersonaService::delete`): angles (manual and synced), then cells, then the persona. Audit adds `cells_removed`.
+- **Copy** (`PersonaService::copy`): copies persona fields and **manual angles only** (`origin = manual`); no cell, no synced angle. The response and the dialog report how many synced angles were skipped.
+- **A wave edit that removes a market** is already refused while the market has personas (PL-2.1 §1.9); cells hang off personas, so nothing new.
+
+### 1.9 Concurrent limits
+
+The cap of 8 personas and 6 USPs is unchanged. A cell write and a persona or USP delete are serialised by the wave lock; a cell written for a persona deleted a moment ago is a 404 (looked up under the lock), and the composite FKs are the belt. Two people writing the same cell at once: the lock serialises them; per-field last write wins; `unique (persona_id, usp_id)` clash on the very first write of a cell is retried once by `retryOnClash`.
+
+---
+
+## 2. Migrations
+
+| File (proposed name)                                            | Content                                                                                                                       |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `2026_11_21_100000_add_market_unique_to_wave_personas.php` (M1) | `SET LOCAL lock_timeout = '5s'` (pgsql only), then `unique (wave_id, market, id)` named `unique_wave_personas_wave_market_id` |
+| `2026_11_21_100001_create_wave_matrix_cells_table.php` (M2)     | `SET LOCAL lock_timeout = '5s'`, the table of §1.1, the three indexes, the `CHECK` on level                                   |
+
+Both carry `@migration-risk low` and the PROD-DATA RISK text of §8 in the file header, as the PL-2.1 migrations do. Rules kept from PL-1: schema only, no data statement, `down()` documented as lossy. Tests: the schema test (`StrategySchemaTest` pattern) checks the unique and foreign keys exist on PostgreSQL and that on SQLite the same table is created (SQLite skips the lock statement and the CHECK is kept).
+
+---
+
+## 3. API
+
+### 3.1 The first three lines of every action
+
+As PL-2.1: (1) `flagOff` (both flags, 404 `not_found`); (2) `assertBrand` and the wave lookup (404 for a wave of another brand or agency); (3) `Gate::authorize`. Then validation, then the service. New `MatrixController` uses the same `ResolvesStrategyRoute` trait.
+
+### 3.2 Endpoints (under `agencies/{agency}/brands/{brand}/waves/{wave}/strategy`)
+
+| Method and path                 | Does                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET matrix?market=SK`          | **One request loads a market's matrix.** The market must be one of the wave's (422 otherwise). Returns the wave's USPs in order (ulid, title, colour key), the market's personas in slot order (ulid, code, title, name, colour), the **cells** of that market (persona ulid, usp ulid, level, rationale, message line, `has_manual_angle`), and the counts (§3.4). Queries: USPs (1), personas of the market (1), cells by `(wave_id, market)` (1), manual angle pairs of those personas (1) = **4, constant** whatever the number of personas or cells |
+| `PUT matrix/cells`              | Body `{ market, cells: [{ persona, usp, level?, rationale?, message_line?, clear? }] }`, 1 to 48 items, one transaction (§1.6). Returns the changed cells and the counts                                                                                                                                                                                                                                                                                                                                                                                 |
+| `GET summary` (existing `show`) | gains `matrix: { cells_set, cells_total, by_market: [{ market, set, total }] }` from **one** grouped query on cells (the totals come from counts already read)                                                                                                                                                                                                                                                                                                                                                                                           |
+
+`PUT`, not `PATCH`, because it is idempotent and a cell has no id the client holds. `clear: true` deletes the cell (rows 8 and 9). A cell with no level and no row cannot receive text alone: the first write of a cell needs `level` (422 `level` required), later writes may omit it (per-field).
+
+Presenter additions: persona resource gains `matrix_cells: [{ usp, level }]` (one grouped query for the persona list); angle resource gains `origin` (already there) and, for `matrix`, `read_only: true` and `market` for the link to the matrix.
+
+### 3.3 Roles (X10)
+
+`WaveStrategyPolicy` as it is: `view` for the GET, `update` for the PUT (admin, manager, staff). Clearing a cell is a write (`update`), not `delete`. **Consequence stated:** a USP with any cell or hand-written angle is "in use": **staff cannot delete it**, admin and manager can after confirming (PL-2.1 S6, unchanged).
+
+### 3.4 Deleting a USP or persona that cells use (X9); the counts (X4)
+
+- `UspUsage::affected` returns items of `kind` `angle` (manual) or `cell` (a cell, with `has_synced_angle`). A cell and its synced angle are **one item**. The 409 `usp.in_use` list therefore names, per persona, "Priority — Affordability (SK1): message line" or the manual angle.
+- The confirm field **`confirm_angle_count` is renamed `confirm_count`** and equals the number of items (Q6). PL-2.1 is not released, so no client depends on the old name; the PL-2.1 tests and the api-client are updated in the same commit and listed in the corrections log.
+- Persona delete keeps its client-side confirmation; the dialog now lists the persona's cells (from `matrix_cells`) next to its angles.
+- **Stepper count (X4).** The status line of step 3 is "**{set} of {total} cells set**" for the **whole wave**: `set` = cells with a row (Low counts as set), `total` = USPs × personas over **all the wave's markets** that have personas. With several markets it adds them: a wave with SK (2 personas), RO (3), CZ (0) and 6 USPs reads "x of 30 cells set" (CZ adds nothing). Each **market tab** on the matrix page shows its own "set/total" in small text (e.g. "8/12"). With no USPs or no personas the total is 0 and the line reads "Add USPs and personas first" (counts-only rule of S7: no "done" state, nothing else changes).
+
+### 3.5 Persona-angle endpoints (X8)
+
+`AngleService::update` and `remove` refuse an angle with `origin = matrix`: 422 `angle.synced_read_only` with the message "Change this on the Messaging matrix". `AngleService::add` is unchanged (the unique rule refuses a second angle, 422 `angle_already_linked`). `AngleService::remove` of a manual angle reconciles the cell (row 15) inside its transaction.
+
+### 3.6 Audit
+
+One row per write request, ids, counts and field names, never the text:
+
+- **New action `wave_matrix_cell.saved`**: metadata `wave`, `market`, `cells_set`, `cells_cleared`, `cells_unchanged`, `angles_created`, `angles_updated`, `angles_removed`, `kept_manual` (count), `changed` (field names).
+- Existing `wave_usp.deleted` and `wave_persona.deleted` gain `cells_removed`; `wave_persona_angle.removed` gains `matrix_angle_created`.
+- The action goes into `AuditActionEnumTest` (the literal catalogue) and has its Erasure decision **in the same commit**: no user, creator or personal data in the metadata (ids and counts), so no erasure step (`NotApplicable`), as the `wave_persona.*` actions.
+
+### 3.7 Erasure and tenancy
+
+- `ErasureRegistry`: a rule for `wave_matrix_cells`, `NotApplicable`, agency-authored free text (`rationale`, `message_line`), no user column, in the same commit as M2 (the completeness test fails otherwise).
+- Tenancy: `agency_id` on every row; the standard stack; persona and USP ulids looked up **through the wave and the agency**; the matrix market is checked against the wave. Rows for `docs/security/tenancy.md` (the table of routes) are added in the same commit as the routes.
+
+---
+
+## 4. Web
+
+Module `apps/main/src/modules/strategy` (frozen files as PL-2.1 §4.4 are not touched). Route `strategy.matrix` at `/brands/:ulid/waves/:waveUlid/strategy/matrix`, same guard as the other two (`features.strategy`). `STEPS` step 3 becomes `live`; the stepper link, the status "x of y cells set" (§3.4), and the stepper stays six steps with 4 to 6 as PL-2.1 left them.
+
+### 4.1 What is built (from the frame)
+
+- Page shell as PL-2.1 (header, stepper, **market bar**: the tabs of PL-2.1 with persona count and warning dot; plus "set/total" per tab).
+- Heading "Messaging matrix · {Market name}" (22 / 600) and a one-line hand-written subtitle (§7); the legend row (three items, 12 px, right-aligned); the table; the footer note without its last sentence changed to the hand-filled truth (§7).
+- **Table** (`MatrixTable.vue`): container with border `#2e2e33`, radius 10, fill surface; **inside it a scroller** (`overflow-x: auto`); first column **pinned** (`position: sticky; left: 0`, opaque fill so cells do not show through, a 1-px right edge when scrolled, which the frame does not draw: named in §4.2). Header row fill `#232326`. Rows in USP order with the USP colour dot.
+- **Persona header cell** (`MatrixPersonaHeader.vue`): code chip in the persona colour (`UspColor::forSlot`, same as PL-2.1), title 16 / 600, "name" line 12 (the frame's "Zuzana · shared services, Bratislava" is name plus the persona's one-line summary; PL-2.1 stores `name` and `summary`: the line is `name · first line of summary`, truncated with an ellipsis), and "Lead with:" followed by the **Priority USP titles joined with " + "** in row order, 12 / 600 green; when a persona has no Priority cell: "Lead with: —" in the muted colour (Q8).
+- **Cell** (`MatrixCell.vue`): pill, rationale, message box, tint and mutedness exactly as inventory §1.1; the "Agent" tag and "Edited" badge are not built.
+- **Empty cell**: no frame; built from the design system: a dashed pill "Not set" (border `#2e2e33`, 11 / 700, tracking 0.6, `#6e6e76`, radius 6, same size as the pills) and no text lines; hover shows the cell as clickable.
+- **Level popover** (`MatrixCellEditor.vue`): the menu of frame 04b (fill `#1b1b1d`, border `#2e2e33`, radius 8, pad 6, gap 2, shadow `0 12 32 rgba(0,0,0,.5)`, items pad 10 / 7 radius 6, dot 8, label 13 / 500, hint 12 `#6e6e76`; the selected row tinted by its level colour) with the two fields and buttons below it.
+- **Narrow:** below 720 px the editor is a bottom sheet; the table keeps its minimum widths and scrolls inside its container; **the page never scrolls sideways**.
+- **Persona and USP steps** change as §4.5.
+
+### 4.2 Assumptions with no design (named, to be measured and walked)
+
+| Item                          | No frame for it                  | Built as                                                                                       |
+| ----------------------------- | -------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Persona column width          | the frame has two columns at 502 | `min-width: 280px; flex: 1 0 280px`, so 2 personas share the width (as the frame) and 8 scroll |
+| Pinned column at narrow width | none                             | 230 wide above 720 px, **140** wide below it (the name wraps to two lines, dot kept)           |
+| Pinned edge                   | none                             | a 1-px border always, plus a soft shadow only while scrolled away from the left                |
+| Empty cell                    | none                             | §4.1                                                                                           |
+| Cell editor                   | the frame has the menu only      | §1.5                                                                                           |
+| Hand-written angle note       | none                             | muted 12-px line with an info icon inside the cell                                             |
+| Archived brand                | none                             | table read-only, cells not clickable, the PL-2.1 notice                                        |
+| Loading and error             | none                             | skeleton rows (surface-bright) and the PL-2.1 error state with retry                           |
+
+### 4.3 Widths
+
+Checked at 1440 and 390 and, for the table, at 1 / 2 / 8 personas: the USP column stays visible while the persona columns scroll; the sticky column never overlaps the persona header; the legend wraps to two lines below 720 px; nothing runs off the page.
+
+### 4.4 Frozen files
+
+As PL-2.1 §4.4: `modules/agency` is not edited; the strategy module owns the new components.
+
+### 4.5 Changes to the PL-2.1 screens
+
+- **`AngleBlock.vue`:** a `matrix` angle shows the pill and the line, the label **"Synced from matrix"** instead of "Manually added", **no menu**, and a small link "Change it in the Messaging matrix" to `strategy.matrix?market=…`. The "Add angle from USPs" list shows that USP "Linked" (already so, because the angle exists).
+- **Remove of a manual angle** while the cell is Priority/Support: the confirmation adds the sentence of §1.7 row 15.
+- **`UspDeleteDialog.vue` / `UspCard.vue`:** the list shows angles and cells; the footer reads "Used by N angles" today; with cells it reads **"Used by N angles and M cells"** (or the plural-aware pair of keys); the count to confirm is `confirm_count`.
+- **Persona delete confirmation:** lists the persona's cells.
+- **`PersonaCopyDialog.vue`:** one line when the source personas have synced angles: "N synced angles are not copied. Fill the matrix of {market}."
+
+---
+
+## 5. Flag
+
+`strategy_enabled`, the same flag (one flag per sprint, PL-2 is one sprint; PL-2.2 ships behind it). Needs `waves_enabled`. `features.strategy` unchanged. **Flag-write rule:** no test, seeder, script or command in this chunk writes a flag in a database Pedram uses; the walk seeder never touches a flag (PL-2.1 pattern); tests write flags only in their own throwaway test database (SQLite memory, or `catalyst_test`). Any command against a throwaway database names its connection and **first prints the database name**.
+
+**Flag-off check (agency and creator walk targets identical):** `node tools/walk/walk.mjs --set agency --compare ../../docs/reviews/ah-115-agency-baseline/baseline.json` → 126 targets identical; `--set creator …ah-115-creator-baseline…` → 146 identical; and the comment-node check of PL-2.1 (no leftover comment nodes from the new `v-if`s on the wave page). Both runs recorded in the review.
+
+---
+
+## 6. Tests (each gate has a break-revert)
+
+### Backend gates (Pest, SQLite and PostgreSQL)
+
+| Gate                      | What it proves                                                                                                                                                          | Break-revert (break it, watch it fail, restore)                       |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Flags                     | both flags needed for GET and PUT (strategy off, waves off, both off: 404 `not_found`); first line of the controller                                                    | remove the flag check from `MatrixController::show`                   |
+| Tenancy                   | another agency's wave, brand, persona ulid or USP ulid: 404; a persona of another market than the request's: 404; nothing written                                       | look up the persona without `agency_id`                               |
+| Roles                     | admin, manager, staff may GET and PUT; a creator or an unrelated user: 403; **staff cannot delete a USP that has cells**                                                | change the policy for `update` to manager-only                        |
+| Same wave and market (DB) | inserting a cell whose USP is of another wave, or whose persona is of another wave or market, fails at the database (composite FK)                                      | drop one composite FK in the test schema                              |
+| One cell per pair         | a second row for the same persona and USP is refused (unique)                                                                                                           | drop the unique                                                       |
+| Sync create               | rows 1, 12                                                                                                                                                              | skip the angle creation                                               |
+| Sync update               | rows 4                                                                                                                                                                  | skip the update                                                       |
+| Sync remove               | rows 6, 8                                                                                                                                                               | skip the removal                                                      |
+| Manual untouched          | rows 2, 5, 7, 9, 11, 13: manual angle row identical (id, text, origin, `updated_at`) before and after, no second angle                                                  | let sync overwrite a manual angle                                     |
+| Manual removed later      | row 15 (S created in the same transaction), row 16 (nothing)                                                                                                            | drop the reconcile in `AngleService::remove`                          |
+| Idempotent                | row 24: the same PUT twice, second changes no row and no `updated_at`                                                                                                   | always write                                                          |
+| Invariant                 | after every case above: for every cell with P/Su exactly one angle on its pair; no `matrix` angle without a P/Su cell (a helper asserts it)                             | break any one sync rule above                                         |
+| Synced angle read-only    | PATCH and DELETE of a `matrix` angle on the persona endpoints: 422 `angle.synced_read_only`; POST for a linked USP: 422 `angle_already_linked`                          | remove the origin check                                               |
+| Delete cascades           | rows 19, 20: cells and synced angles gone, manual angles gone, audit counts right; USP confirm with `confirm_count`; staff refused                                      | skip the cell delete (the FK then refuses: the test sees the failure) |
+| Copy                      | row 21: no cell on the target; manual angles copied; synced not copied; the count reported                                                                              | copy every angle                                                      |
+| Atomic                    | a 48-item PUT with one unknown USP writes nothing; a failing sync rolls the cell back                                                                                   | write cells outside the transaction                                   |
+| Validation                | levels, lengths (140), message line required for P/Su, first write needs a level, 1 to 48 items, hostile strings stored as text                                         | remove one rule                                                       |
+| Queries                   | `GET matrix` issues the same number of queries for 1 and for 8 personas, and for 10 markets × 8 × 6 = 480 cells seeded, each market loads in that number (`DB::listen`) | add a per-persona query                                               |
+| Summary                   | `cells_set`, `cells_total`, `by_market` for several markets, a market without personas, no USPs                                                                         | count wrongly                                                         |
+| Audit                     | one `wave_matrix_cell.saved` row per request with ids and counts only (no text); the enum test lists the action                                                         | put the message line in the metadata                                  |
+| Erasure                   | the registry rule exists for the new table (the completeness test)                                                                                                      | remove the rule                                                       |
+| Archived brand            | PUT: 422 `brand_archived`; GET works                                                                                                                                    | remove the guard                                                      |
+| Lock                      | two concurrent writes to one cell and a USP delete interleaved: no deadlock, invariant holds (the `StrategyLockTest` pattern)                                           | take the wave lock after the first read                               |
+
+### Web gates (Vitest and Playwright)
+
+- **Vitest:** `MatrixCell` renders the three levels and "Not set" with the frame's colours as classes; `MatrixPersonaHeader` builds "Lead with" from Priority cells in row order (none: "—"); the editor disables Save for P/Su without a message line, sends only changed fields, Clear sends `clear`; `AngleBlock` shows "Synced from matrix" with no menu; the status line reads "x of y cells set" for 1 and several markets; the no-`v-html` spec covers the new files; the 24-locale key spec (`strategyKeys.spec.ts`) covers the new keys.
+- **Playwright (strategy spec, serial, each test under 30 s, split by width as PL-2.1 after run 44631106079):** (1) at 1440: open the matrix, fill one Priority cell, see "Lead with", open the persona step and see the synced angle with no menu, set the cell Low and see it gone; (2) at 1440: a manual angle exists, set the cell Priority, the manual angle is unchanged and the cell shows the note; (3) at 390: the table scrolls inside its container with the USP column pinned (the scroll position moves, the first column's left edge stays), the editor opens as a sheet, the page has no sideways scroll; (4) flag off: no Strategy entry and the matrix route redirects. Each test short; no timeout raised.
+- Break-reverts for the web gates are recorded in `pl-2-2-break-reverts.md` as in PL-2.1.
+
+### §4.2 real-browser checks (`WORKING-PROCESS.md`)
+
+Before the walk is offered: the fidelity table (below) filled from a **real browser**, wide (1440) and narrow (390); **every menu and dialog opened, closed and reopened quickly** at least five times (the level popover, the sheet, the USP delete dialog, the persona delete dialog, the copy dialog), no stuck overlay, no console error; hostile strings in rationale and message line; the pinned column checked by scrolling at 8 personas.
+
+**Fidelity table the build must produce** (measured with `getComputedStyle` and `getBoundingClientRect` on the built screen against the frame; VISUAL differences fixed, FUNCTIONAL reported to Pedram):
+
+| Element                                     | Frame value                                                                                                                            | Built value   | Class |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ----- |
+| Heading                                     | 22 / 600 `#ededed`                                                                                                                     | (build fills) |       |
+| Subtitle                                    | 13 / 400 `#a0a0a8` (text differs, FUNCTIONAL)                                                                                          |               |       |
+| Legend item                                 | dot 8, gap 6, label 12 / 600 `#ededed`, hint 12 `#6e6e76`, group gap 20, right-aligned                                                 |               |       |
+| Table container                             | border `#2e2e33`, radius 10, fill `#1b1b1d`                                                                                            |               |       |
+| Header row                                  | fill `#232326`, first cell 230 wide, pad 18 / 20, 11 / 600, tracking 0.6, `#6e6e76`                                                    |               |       |
+| Persona header                              | pad 16 / 20, gap 6, left border `#2e2e33`                                                                                              |               |       |
+| Code chip                                   | border 1 px colour at 60 %, radius 4, pad 2 / 6, 11 / 700                                                                              |               |       |
+| Persona title                               | 16 / 600 `#ededed`                                                                                                                     |               |       |
+| Name line                                   | 12 `#a0a0a8`                                                                                                                           |               |       |
+| "Lead with:"                                | label 12 `#6e6e76`, names 12 / 600 `#34c77b`, gap 6                                                                                    |               |       |
+| Pinned (USP) cell                           | 230 wide, pad 18 / 20, dot 8, gap 8, name 14 / 600 `#ededed`, no tint                                                                  |               |       |
+| Cell                                        | pad 16 / 20, gap 10, left border `#2e2e33`                                                                                             |               |       |
+| Pill (Low / Support / Priority)             | radius 6, pad 4 / 8 / 4 / 10, gap 6, 11 / 700, tracking 0.6; fills and text colours of inventory §1.1; chevron 12; widths 63 / 93 / 92 |               |       |
+| Priority tint                               | `rgba(52,199,123,0.04)`                                                                                                                |               |       |
+| Rationale                                   | 13 / 400, line height 19; `#ededed`, Low `#6e6e76`                                                                                     |               |       |
+| Message box                                 | radius 6, pad 9 / 12, border 1.5 px yellow 80 % (Low 35 %), fill yellow 6 %, text 13 italic                                            |               |       |
+| Level menu                                  | fill `#1b1b1d`, border `#2e2e33`, radius 8, pad 6, gap 2, shadow; items pad 10 / 7 radius 6, label 13 / 500, hint 12                   |               |       |
+| Footer note                                 | 12 `#6e6e76`, icon 14, gap 8                                                                                                           |               |       |
+| Row heights                                 | 130 at 502 px columns; grow with text                                                                                                  |               |       |
+| Empty / editor / hand-written note / narrow | (no frame: named in §4.2)                                                                                                              |               |       |
+
+**FUNCTIONAL differences from the frames (reported, not fixed):** the Agent bar and its three controls, the "Generated by Catalyst Agent …" line, the "Agent" tag, "Edited by …" badge, "Generate matrix" empty state, generating state, "out of date" banner with Regenerate and Dismiss, the "Changing a cell marks it Edited" note (all PL-9); the subtitle's agent sentence (reworded); "Approval" pill and step statuses (PL-5); check icons (PL-2.4); "Notes" and "Comments" (PL-2.4); "Add market" and "Script language" (PL-3); "Preview as client" and "Share with client"; the cell editor holds two text fields the frame's menu does not; the editor popover instead of an immediate menu pick; "Not set" empty cell; "Clear cell".
+
+### Local gates (before any push, `WORKING-PROCESS.md` §4.1)
+
+Pest on **SQLite and PostgreSQL** (`php -d memory_limit=2G vendor/bin/pest`; PG via `DB_PORT=5435 DB_DATABASE=catalyst_test -c phpunit.pgsql.xml`) for the suites **Strategy, Waves, Brands, Audit, Erasure, Tenancy**; Vitest (strategy, waves, and the locale key spec); Playwright strategy spec serial; `vue-tsc`, ESLint, Prettier, Pint, Larastan; the two walk compares (flag off, 126 and 146); `AuditActionEnumTest` and the Erasure decision in the same commit as the action.
+
+---
+
+## 7. Strings
+
+All new keys under `app.strategy.matrix.*`, 24 locales, interpolated (never concatenated), counts through pluralisation. Proposed English (the build adds `strategyKeys.spec.ts` coverage):
+
+- Step: "Messaging matrix"; status "{set} of {total} cells set"; "Add USPs and personas first".
+- Heading "Messaging matrix · {market}"; subtitle **"USPs × personas. Set the hierarchy for each persona and the lines to lead with."** (the frame's agent sentence is not true by hand).
+- Legend: "Priority" / "lead with this", "Support" / "worth including", "Low" / "not the motivator".
+- Table: "USP / PERSONA"; "Lead with:"; "Not set"; levels "PRIORITY", "SUPPORT", "LOW".
+- Editor: "Rationale", "Message line", "Save", "Save and next", "Cancel", "Clear cell"; level hints as the frame ("Priority — lead with this" …); errors "Add a message line to save a Priority or Support cell."
+- Notes: "This persona already has a hand-written angle on this USP. It is kept as written."; footer **"The table grows with the wave: columns are the personas in this market (2 to 8), rows are the wave's USPs. Wide tables scroll sideways with the USP column pinned. Priority and Support cells become each persona's angles."**
+- Persona card: "Synced from matrix"; "Change it in the Messaging matrix"; "Change this on the Messaging matrix."
+- Dialogs: USP footer "Used by {angles} angles and {cells} cells"; delete lists; "N synced angles are not copied. Fill the matrix of {market}."; the row 15 sentence.
+
+---
+
+## 9. Left out of this chunk
+
+All AI parts (X1), approval, notes and comments, add market, script language, preview and share, bulk actions in the UI (the endpoint accepts a list; no button uses it), cell history and comments, a "convert synced angle to hand-written" action, copying a matrix to another market, import and export, reordering of persona columns (slot order is fixed), per-cell attachments, keyboard grid navigation beyond Tab and "Save and next".
+
+---
+
+## 10. Walk script for Pedram (local)
+
+**Setup (named seed data).** A new seeder pair **`Pl22WalkSeeder`** and **`Pl22WalkCleanupSeeder`** (local and testing only, refuse production, idempotent, additive, **never touches a flag**; Pedram turns both flags on and off by hand). `Pl22WalkSeeder` **runs on top of `Pl21WalkSeeder`'s data** (calls it if missing) and adds cells; the cleanup deletes cells **before** the PL-2.1 cleanup runs (RESTRICT). Same accounts (`admin@`, `manager@`, `staff@pl21-walk.local`, `admin@pl21-walk-b.local`, password from the PL-2.1 seeder).
+
+- **Wave 7 (SK, RO, CZ), the frame's data:** 6 USPs, SK has the two personas SK1 "The Office Lunch Organiser" and SK2 "The Value Seeker". The seeder sets **7 of the 12 SK cells** with the frame's texts (Category entry points LOW / LOW, Affordability SUPPORT / PRIORITY, Selection PRIORITY / …); the other 5 are Not set; SK2 Selection has a **manual angle** and a Priority cell (the conflict case); RO and CZ have no cells.
+- **Wave 8 (SK, RO):** empty (the walk builds it).
+- **Wave 9:** SK 1 persona, RO **8 personas**, 3 USPs (the 8-column scroll test).
+- **Wave 10 (SK, RO):** 5 USPs, SK 3 personas with 4 cells set and two synced angles, RO 6 personas (the copy and delete tests).
+- **Agency B:** Glovo Wave 1 with 2 USPs and no personas (isolation).
+
+**Steps:**
+
+1. **Both flags OFF.** `admin@`: Wave 7 page as PL-1; paste `/…/strategy/matrix`: sent away as the wave route does. **Waves ON, strategy OFF:** the same. (The walk compares 126 and 146 are run by me, not by you.)
+2. **Both ON.** Wave 7 → Strategy & Scripts: the stepper shows step 3 as a link with **"7 of 12 cells set"** (SK only has personas). Open it.
+3. **Open the matrix for SK.** Two persona columns, six USP rows in the USP order and colours, the legend, the pinned USP column; 7 cells set, 5 "Not set"; SK1 header "Lead with: …", SK2 "Lead with: Affordability + Selection"; the SK tab reads "7/12".
+4. **Fill a Priority cell.** Click a Not set cell: the popover opens with the three level rows; pick Priority, type rationale and message line, Save: the cell turns green, "Lead with" of that persona gains the USP, the stepper reads "8 of 12". Try Priority with an empty message line: Save is disabled.
+5. **See the synced angle.** Open Personas (step 2) for SK: that persona has a new angle with the USP's colour and **"Synced from matrix"**, no menu, a link back. In "Add angle from USPs" the USP shows "Linked".
+6. **Set it to Low.** Back in the matrix change the cell to Low: muted; the persona has lost the angle; "Lead with" lost the USP. On a persona that also has a **hand-written** angle on another USP, check that angle did not change.
+7. **Manual angle already present.** In Wave 7, SK2 × Selection: the Priority cell shows the note "This persona already has a hand-written angle…"; on the persona card the hand-written angle is as it was and there is no second one. Edit the cell's message line: the persona's angle text is unchanged. Remove the hand-written angle on the persona card (the dialog explains): a **synced** angle appears in its place. Set the cell Low; the synced angle goes.
+8. **Markets.** Open RO and CZ: no personas message or empty columns; switch tabs quickly; each market's matrix is separate; the stepper counts all markets. Add a persona in RO (step 2) and return: a new empty column; add a USP: a new empty row.
+9. **Delete a USP with cells.** Wave 10 as `staff@`: Delete on a USP with cells is disabled with the reason. As `manager@`: the confirmation lists the cells and angles with a count; confirm: the row is gone, the synced angles are gone from the personas, hand-written ones with it as in PL-2.1; cancel once and check nothing changed.
+10. **Delete a persona with cells.** The confirmation lists its cells; the column disappears; the stepper count drops.
+11. **Copy personas** in Wave 10 from SK to RO: the dialog says synced angles are not copied; the copied personas have empty matrix columns and their hand-written angles.
+12. **Eight personas (Wave 9, RO):** the table scrolls sideways inside its box, the USP column stays; at **390 px** the editor is a sheet, the page does not scroll sideways; open and close the popover quickly several times.
+13. **Two tabs:** edit the same cell's rationale in one tab and its message line in the other; both survive; edit the same field: the later wins.
+14. **Staff** (`staff@`) can set and clear cells. **Second agency:** `admin@pl21-walk-b.local` opens Glovo Wave 1's matrix (works, empty); a Wave 7 matrix address: not found.
+15. **Flag back OFF:** the wave page returns to PL-1; flags on again: the cells are still there.
+16. **Cleanup:** `Pl22WalkCleanupSeeder`, then `Pl21WalkCleanupSeeder`; the flag state is reported, not changed.
+
+---
+
+## 11. Open questions for Pedram (each with a recommendation)
+
+| #       | Question                                                                                                                                                | Recommendation                                                                                                                                                                                                                                                                                                   |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Q1**  | May a Priority or Support cell be saved **without a message line**? The synced angle's explanation is the message line and an angle cannot be empty.    | **No**: a message line is required for Priority and Support (Save disabled until typed); Low needs nothing. Otherwise the invariant (§1.3) breaks or "Lead with" would show a USP that has no angle.                                                                                                             |
+| **Q2**  | A hand-written angle is removed while the cell is Priority/Support.                                                                                     | **Create the synced angle at once** in the same transaction (row 15), with a sentence in the removal confirmation. The alternative leaves the cell promising an angle that does not exist.                                                                                                                       |
+| **Q3**  | Copying personas to another market: what happens to **synced** angles?                                                                                  | **Do not copy them** (a copy without its cell would be a read-only orphan); manual angles copy as in PL-2.1; the dialog says how many were skipped. Alternative: copy them as hand-written angles (keeps the text, but then they block the matrix cell there as in row 2, which surprises).                      |
+| **Q4**  | How is a cell edited and saved?                                                                                                                         | **Popover with level menu, two fields, Save, Cancel, Clear, "Save and next"**, one request per save; the endpoint also takes a list of up to 48 (unused by the UI now). Alternative: stage many edits and save with one bar button (faster for bulk, but unsaved state, leave-page guard, and a conflict story). |
+| **Q5**  | Add `unique (wave_id, market, id)` to `wave_personas` (M1) so the database itself refuses a cell whose persona is in another market?                    | **Yes**: AccessExclusive for 2.6 ms on a table that is empty until a person types a persona. Alternative: no M1, market checked only in code (no lock on `wave_personas`, weaker guarantee).                                                                                                                     |
+| **Q6**  | Rename the USP-delete field `confirm_angle_count` to `confirm_count` (it now counts angles and cells)?                                                  | **Yes**: PL-2.1 is not released; tests and api-client change in the same commit.                                                                                                                                                                                                                                 |
+| **Q7**  | Does a **Low** cell count as "set" in "x of y cells set"?                                                                                               | **Yes** (Low is a decision), and nothing defaults to Low (X4).                                                                                                                                                                                                                                                   |
+| **Q8**  | A persona with no Priority cell: header "Lead with: —" or nothing?                                                                                      | Show **"Lead with: —"** muted, so the empty state is visible.                                                                                                                                                                                                                                                    |
+| **Q9**  | Persona column minimum 280 px, pinned column 230 px (140 px below 720 px), pinned edge shadow only while scrolled: acceptable where there is no design? | **Yes**; measured and walked at 1440 and 390 and reported in the fidelity table.                                                                                                                                                                                                                                 |
+| **Q10** | Limits: rationale 140, message line 140 (equal to the angle explanation limit).                                                                         | **Yes**; the frame's lines are one sentence. Raise the rationale only if you want more than one line.                                                                                                                                                                                                            |
+| **Q11** | PL-9 data model: only `source` and `edited_at` now, no user column.                                                                                     | **Yes**: "Edited by Jess" needs a nullable `edited_by_user_id` later (additive; an Erasure decision then). Nothing now keeps `users` out of the lock list.                                                                                                                                                       |
+| **Q12** | A USP that has only cells (no hand-written angle) counts as "in use": staff cannot delete it, manager and admin confirm.                                | **Yes**, one rule for everything that hangs off a USP (`UspUsage`).                                                                                                                                                                                                                                              |
+| **Q13** | USP footer wording when cells exist: "Used by N angles and M cells".                                                                                    | **Yes**, or "Used in N matrix cells" if you prefer a shorter line.                                                                                                                                                                                                                                               |
+
+---
+
+## 12. Size estimate and build order
+
+**Backend (about 2 days):** M1 and M2 and their schema tests; `MatrixLevel`, `AngleOrigin::Matrix`, `WaveMatrixCell` and factory; `MatrixService` (save, reconcile) and `MatrixController` and routes; `AngleService` guards and the row 15 reconcile; `UspUsage`, `UspService`, `PersonaService` delete and copy; presenter and summary; audit action and enum test and registry rule; the gates of §6; migration rehearsal through `artisan migrate` on a synthetic database.
+**Web (about 2.5 days):** api-client types and module; route, `STEPS`, stepper status; `MatrixStep`, `MatrixTable`, `MatrixPersonaHeader`, `MatrixCell`, `MatrixCellEditor`, legend; `AngleBlock`, delete dialogs, copy dialog; 24 locales; Vitest and Playwright; §4.2 browser pass and the fidelity table.
+**Seeders, walk, records (0.5 day).** Total about **5 days**. Build order: M1, M2, model and enum; `MatrixService` with the sync and the invariant tests; `AngleService`/`UspUsage`/delete/copy changes; summary; web table read-only; cell editor; persona-step changes; locales; Playwright; browser pass; seeders; walk; push only when told.
+
+**Read and not read.** See `pl-2-2-inventory.md` §6. In addition for this plan: not read the production server's PostgreSQL version; the lock modes are the documented ones and were observed on local PostgreSQL 16.
+
+## 13. Corrections and rulings log
+
+(empty; Pedram's rulings on this plan will be recorded here.)
