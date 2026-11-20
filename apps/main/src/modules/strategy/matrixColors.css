@@ -1,0 +1,35 @@
+/*
+ * PL-2.2 — the messaging matrix's own colours (frame 13:1375): the level fills, the Priority cell tint, the yellow
+ * message-line frame and the editor's shadow. Dark values are the frame's; light values are the same hues stepped
+ * darker. Read by the matrix components through `--mx-*` (see `MatrixStep.vue`); the level colours themselves are the
+ * agency brand green and blue.
+ *
+ * Why a file of its own: `agency/theme/agency.css` is content-pinned and part of the agency baseline walk, and a
+ * literal colour may not sit in a `.vue` file (`no-hard-coded-colors`). Moving these into `@catalyst/design-tokens` is
+ * the long-term home; this file is loaded only with the strategy page, so no other screen can change.
+ */
+:is(.v-theme--agency-dark, .v-theme--agency-light) {
+  --agency-matrix-low: #6e6e76;
+  --agency-matrix-priority-fill: rgba(52, 199, 123, 0.15);
+  --agency-matrix-support-fill: rgba(76, 141, 255, 0.15);
+  --agency-matrix-low-fill: rgba(110, 110, 118, 0.25);
+  --agency-matrix-priority-tint: rgba(52, 199, 123, 0.04);
+  --agency-matrix-line-strong: rgba(242, 211, 91, 0.8);
+  --agency-matrix-line-soft: rgba(242, 211, 91, 0.35);
+  --agency-matrix-line-fill: rgba(242, 211, 91, 0.06);
+  --agency-matrix-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  --agency-matrix-shadow-soft: 6px 0 12px -6px rgba(0, 0, 0, 0.45);
+}
+
+:is(.v-theme--agency-dark, .v-theme--agency-light).v-theme--agency-light {
+  --agency-matrix-low: #71717a;
+  --agency-matrix-priority-fill: rgba(30, 158, 90, 0.14);
+  --agency-matrix-support-fill: rgba(47, 111, 224, 0.12);
+  --agency-matrix-low-fill: rgba(113, 113, 122, 0.16);
+  --agency-matrix-priority-tint: rgba(30, 158, 90, 0.05);
+  --agency-matrix-line-strong: rgba(194, 124, 10, 0.75);
+  --agency-matrix-line-soft: rgba(194, 124, 10, 0.3);
+  --agency-matrix-line-fill: rgba(194, 124, 10, 0.07);
+  --agency-matrix-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  --agency-matrix-shadow-soft: 6px 0 12px -6px rgba(0, 0, 0, 0.18);
+}

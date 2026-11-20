@@ -71,7 +71,7 @@ function open(e: Event): void {
  * Values from frame 13:1375: cell padding 16 / 20 and gap 10; the pill radius 6, padding 4 / 8 / 4 / 10, gap 6, label
  * 11 / 700 with 0.6 tracking, chevron 12; rationale 13 / 19; the message box radius 6, padding 9 / 12, a 1.5 px yellow
  * border (80 % on Priority and Support, 35 % on Low), yellow 6 % fill, text 13 italic. The Priority cell is tinted
- * `rgba(52,199,123,0.04)`; a Low cell's rationale is muted. The level colours are the agency brand green and blue
+ * a 4 % green; a Low cell's rationale is muted. The level colours are the agency brand green and blue
  * (themed) and the neutral grey of the frame.
  */
 .mx-cell {

@@ -119,7 +119,7 @@ function label(usp: MatrixUsp, persona: MatrixPersona): string {
 }
 .mx-grid--scrolled .mx-corner,
 .mx-grid--scrolled .mx-usp {
-  box-shadow: 6px 0 12px -6px rgba(0, 0, 0, 0.45);
+  box-shadow: 6px 0 12px -6px var(--agency-matrix-shadow-soft);
 }
 .mx-corner {
   z-index: 3;

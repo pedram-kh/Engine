@@ -330,7 +330,7 @@ function doClear(): void {
   border-radius: 10px;
   background: rgb(var(--v-theme-surface));
   color: rgb(var(--v-theme-on-surface));
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 12px 32px var(--agency-matrix-shadow);
   max-height: inherit;
   overflow-y: auto;
 }

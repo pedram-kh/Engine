@@ -20,6 +20,7 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
+import '../matrixColors.css'
 import { strategyApi } from '../api/strategy.api'
 import { useStrategyContext } from '../composables/useStrategyContext'
 import { cellKey, changeFor, nextCell, type EditorState } from '../matrixLogic'
@@ -298,32 +299,21 @@ const errorText = computed(() => (failed.value ? t('app.strategy.errors.loadFail
 </template>
 
 <style>
-/* The level colours, shared by the table, the legend and the teleported editor. Dark: the frame's values (the agency
-   brand green and blue are the same hexes there); light: the themed brand values and a darker neutral. */
+/* The level colours, shared by the table, the legend and the teleported editor. The fills and the line colours are
+   frame 13:1375's values and live in `../matrixColors.css` (`--agency-matrix-*`); the
+   level colours are the agency brand green and blue. */
 .mx-root,
 .mx-editor-overlay {
   --mx-priority: var(--agency-brand-green);
   --mx-support: var(--agency-brand-blue);
-  --mx-low: #6e6e76;
-  --mx-priority-fill: rgba(52, 199, 123, 0.15);
-  --mx-support-fill: rgba(76, 141, 255, 0.15);
-  --mx-low-fill: rgba(110, 110, 118, 0.25);
-  --mx-priority-tint: rgba(52, 199, 123, 0.04);
-  --mx-yellow-strong: rgba(242, 211, 91, 0.8);
-  --mx-yellow-soft: rgba(242, 211, 91, 0.35);
-  --mx-yellow-fill: rgba(242, 211, 91, 0.06);
-}
-.v-theme--agency-light .mx-root,
-.v-theme--agency-light .mx-editor-overlay,
-.v-theme--agency-light.mx-editor-overlay {
-  --mx-low: #71717a;
-  --mx-priority-fill: rgba(30, 158, 90, 0.14);
-  --mx-support-fill: rgba(47, 111, 224, 0.12);
-  --mx-low-fill: rgba(113, 113, 122, 0.16);
-  --mx-priority-tint: rgba(30, 158, 90, 0.05);
-  --mx-yellow-strong: rgba(194, 124, 10, 0.75);
-  --mx-yellow-soft: rgba(194, 124, 10, 0.3);
-  --mx-yellow-fill: rgba(194, 124, 10, 0.07);
+  --mx-low: var(--agency-matrix-low);
+  --mx-priority-fill: var(--agency-matrix-priority-fill);
+  --mx-support-fill: var(--agency-matrix-support-fill);
+  --mx-low-fill: var(--agency-matrix-low-fill);
+  --mx-priority-tint: var(--agency-matrix-priority-tint);
+  --mx-yellow-strong: var(--agency-matrix-line-strong);
+  --mx-yellow-soft: var(--agency-matrix-line-soft);
+  --mx-yellow-fill: var(--agency-matrix-line-fill);
 }
 </style>
 
