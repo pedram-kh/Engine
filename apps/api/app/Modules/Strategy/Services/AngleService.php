@@ -9,6 +9,7 @@ use App\Modules\Audit\Facades\Audit;
 use App\Modules\Brands\Models\Brand;
 use App\Modules\Identity\Models\User;
 use App\Modules\Strategy\Enums\AngleOrigin;
+use App\Modules\Strategy\Models\WaveMatrixCell;
 use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WavePersonaAngle;
 use App\Modules\Strategy\Models\WaveUsp;
@@ -109,6 +110,50 @@ final class AngleService
                 metadata: ['wave' => $locked->ulid, 'persona' => $persona->ulid, 'angle' => $angle->ulid, 'usp' => $uspUlid, 'matrix_angle_created' => $matrixAngleCreated],
                 agencyId: $locked->agency_id,
             );
+        });
+    }
+
+    /**
+     * PL-2.2 ruling change R2: "Use the matrix line". A hand-written angle and the Priority or Support cell of the same
+     * persona and USP sit with two different texts; the user chose the cell's. The angle becomes a SYNCED one whose text
+     * is the message line (same row, `origin = matrix`), in one transaction under the wave lock. Idempotent: an angle that
+     * is already synced is returned as it is, nothing written, nothing audited. Refused when there is no Priority or
+     * Support cell with a message line (422 `angle.no_matrix_line`) or when the two texts are already equal (422
+     * `angle.nothing_to_resolve`). Audit: ids and counts, never a text.
+     */
+    public function useMatrixLine(Brand $brand, Wave $wave, string $personaUlid, string $angleUlid, User $actor): WavePersonaAngle
+    {
+        StrategyGuard::assertBrandWritable($brand);
+
+        return DB::transaction(function () use ($wave, $personaUlid, $angleUlid, $actor): WavePersonaAngle {
+            $locked = StrategyGuard::lockWave($wave);
+            $persona = $this->persona($locked, $personaUlid);
+            $angle = $this->angle($persona, $angleUlid);
+            if ($angle->origin === AngleOrigin::Matrix) {
+                return $angle->load(['usp', 'persona']);
+            }
+
+            $cell = WaveMatrixCell::query()->where('persona_id', $persona->id)->where('usp_id', $angle->usp_id)->first();
+            if ($cell === null || ! $cell->level->feedsAngle() || $cell->message_line === null || $cell->message_line === '') {
+                throw StrategyRuleViolation::angleNoMatrixLine();
+            }
+            if ($cell->message_line === $angle->explanation) {
+                throw StrategyRuleViolation::angleNothingToResolve();
+            }
+
+            $angle->explanation = $cell->message_line;
+            $angle->origin = AngleOrigin::Matrix;
+            $angle->save();
+
+            Audit::log(
+                action: AuditAction::WavePersonaAngleMatrixLineUsed,
+                actor: $actor,
+                subject: $angle,
+                metadata: ['wave' => $locked->ulid, 'persona' => $persona->ulid, 'angle' => $angle->ulid, 'usp' => $angle->usp->ulid, 'market' => $persona->market, 'level' => $cell->level->value, 'angles_converted' => 1],
+                agencyId: $locked->agency_id,
+            );
+
+            return $angle->load(['usp', 'persona']);
         });
     }
 

@@ -98,6 +98,16 @@ final class StrategyRuleViolation extends RuntimeException
         return new self('angle.synced_read_only', 'This angle is synced from the messaging matrix; change it there.');
     }
 
+    public static function angleNoMatrixLine(): self
+    {
+        return new self('angle.no_matrix_line', 'The matrix has no Priority or Support message line for this persona and USP.');
+    }
+
+    public static function angleNothingToResolve(): self
+    {
+        return new self('angle.nothing_to_resolve', 'The angle and the matrix line already say the same.');
+    }
+
     public static function conflict(): self
     {
         return new self('strategy.conflict', 'Someone changed this at the same moment; reload and try again.', 409);

@@ -194,3 +194,15 @@ it('M4: both orders end consistent: persona first then the edit is refused; edit
     $markets = $w['wave']->refresh()->markets;
     expect(WavePersona::query()->whereNotIn('market', $markets)->count())->toBe(0);
 });
+
+it('L7 (PL-2.2 ruling change): "Use the matrix line" takes the wave lock', function (): void {
+    $w = S::world();
+    $usp = S::call($w['admin'], 'POST', S::u($w, 'usps'), ['title' => 'U'])->assertCreated()->json('data.id');
+    $persona = S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => 'SK', 'title' => 'T', 'name' => 'N'])->assertCreated()->json('data.id');
+    $angle = S::call($w['admin'], 'POST', S::u($w, "personas/{$persona}/angles"), ['usp' => $usp, 'explanation' => 'x'])->assertCreated()->json('data.id');
+    S::call($w['admin'], 'PUT', S::u($w, 'matrix/cells'), ['market' => 'SK', 'cells' => [['persona' => $persona, 'usp' => $usp, 'level' => 'support', 'message_line' => 'M']]])->assertOk();
+    $id = $w['wave']->id;
+
+    $seen = strategyProbeWhileAppLocks($id, fn () => S::call($w['admin'], 'POST', S::u($w, "personas/{$persona}/angles/{$angle}/use-matrix-line"))->assertOk());
+    expect($seen)->not->toBeEmpty('use-matrix-line took no wave lock')->and($seen)->each->toBeTrue();
+});

@@ -310,7 +310,7 @@ it('X-18: a synced angle cannot be edited or removed on the persona endpoints (4
 
     $row = collect((array) S::call($w['admin'], 'GET', S::u($w, 'personas?market=SK'))->assertOk()->json('data'))->firstWhere('id', $w['p1']);
     expect($row['attributes']['angles'][0]['attributes'])->toMatchArray(['origin' => 'matrix', 'read_only' => true, 'market' => 'SK'])
-        ->and($row['attributes']['matrix_cells'])->toBe([['usp' => $w['uA'], 'level' => 'priority']]);
+        ->and($row['attributes']['matrix_cells'])->toBe([['usp' => $w['uA'], 'level' => 'priority', 'message_line' => 'M']]);
 });
 
 it('X-19: deleting a USP removes its cells, its synced angles and its hand-written angles after the confirmation lists them', function (): void {
@@ -636,4 +636,179 @@ it('T-03: a persona or a USP of ANOTHER WAVE of the same agency is a 404 on this
     mxPut($w, ['persona' => $w['p1'], 'usp' => $theirUsp, 'level' => 'low'])->assertNotFound();
     mxPut($w, ['persona' => $theirPersona, 'usp' => $w['uA'], 'level' => 'low'])->assertNotFound();
     expect(WaveMatrixCell::withoutGlobalScopes()->count())->toBe(0);
+});
+
+/*
+ * PL-2.2 ruling change (2026-11-20, amends X7): a hand-written angle and a cell for the same pair must not sit there with two
+ * different texts without the user seeing it and being able to resolve it. Rows 25 to 31 of the sync table.
+ */
+
+/** @return TestResponse<Response> */
+function mxUse(array $w, string $persona, string $angle, string $who = 'admin'): TestResponse
+{
+    return S::call($w[$who], 'POST', S::u($w, "personas/{$persona}/angles/{$angle}/use-matrix-line"));
+}
+
+it('X-25 (R1 data): the matrix answers the text of the hand-written angle of a pair, for the editor to prefill an empty line', function (): void {
+    $w = mx();
+    $manualId = mxManual($w, $w['p1'], $w['uA'], 'Mine, by hand');
+
+    $cells = S::call($w['admin'], 'GET', S::u($w, 'matrix').'?market=SK')->assertOk()->json('data.attributes.cells');
+    expect($cells)->toBe([]);
+    // No cell yet, and the pair is still listed: a cell that is not set can be prefilled from the hand-written angle.
+    S::call($w['admin'], 'GET', S::u($w, 'matrix').'?market=SK')->assertOk()
+        ->assertJsonPath('data.attributes.manual_angles', [['persona' => $w['p1'], 'usp' => $w['uA'], 'angle' => $manualId, 'text' => 'Mine, by hand']]);
+
+    mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'support', 'message_line' => 'Lead line'])->assertOk()
+        ->assertJsonPath('data.cells.0.manual_text', 'Mine, by hand');
+    S::call($w['admin'], 'GET', S::u($w, 'matrix').'?market=SK')->assertOk()
+        ->assertJsonPath('data.attributes.cells.0.manual_text', 'Mine, by hand')
+        ->assertJsonPath('data.attributes.cells.0.manual_angle', $manualId)
+        ->assertJsonPath('data.attributes.cells.0.has_manual_angle', true);
+
+    mxPut($w, ['persona' => $w['p2'], 'usp' => $w['uA'], 'level' => 'low'])->assertOk()->assertJsonPath('data.cells.0.manual_text', null);
+});
+
+it('X-26 (R2): "Use the matrix line" turns the hand-written angle into the synced one, same row, text = message line, one audit row without a text', function (): void {
+    $w = mx();
+    $manual = mxManual($w, $w['p1'], $w['uA'], 'Mine, by hand');
+    mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'priority', 'message_line' => 'From the cell'])->assertOk();
+    $id = mxAngle($w['p1'], $w['uA'])->id;
+
+    mxUse($w, $w['p1'], $manual)->assertOk()
+        ->assertJsonPath('data.attributes.origin', 'matrix')->assertJsonPath('data.attributes.read_only', true)
+        ->assertJsonPath('data.attributes.explanation', 'From the cell');
+
+    $angle = mxAngle($w['p1'], $w['uA']);
+    expect(WavePersonaAngle::query()->count())->toBe(1)
+        ->and($angle->id)->toBe($id)
+        ->and($angle->origin)->toBe(AngleOrigin::Matrix)
+        ->and($angle->explanation)->toBe('From the cell');
+    $rows = AuditLog::query()->where('action', 'wave_persona_angle.matrix_line_used')->get();
+    expect($rows)->toHaveCount(1);
+    $metadata = $rows->firstOrFail()->metadata;
+    $encoded = (string) json_encode($metadata);
+    expect($metadata)->toMatchArray(['angles_converted' => 1, 'level' => 'priority'])
+        ->and(str_contains($encoded, 'Mine, by hand'))->toBeFalse()
+        ->and(str_contains($encoded, 'From the cell'))->toBeFalse();
+    mxInvariant();
+});
+
+it('X-27 (R2): equal texts are nothing to resolve: 422, nothing written', function (): void {
+    $w = mx();
+    $manual = mxManual($w, $w['p1'], $w['uA'], 'Same words');
+    mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'priority', 'message_line' => 'Same words'])->assertOk();
+    $before = mxAngle($w['p1'], $w['uA'])->only(['id', 'explanation', 'origin', 'updated_at']);
+
+    mxUse($w, $w['p1'], $manual)->assertStatus(422)->assertJsonPath('errors.0.code', 'angle.nothing_to_resolve');
+
+    expect(mxAngle($w['p1'], $w['uA'])->only(['id', 'explanation', 'origin', 'updated_at']))->toEqual($before)
+        ->and(AuditLog::query()->where('action', 'wave_persona_angle.matrix_line_used')->count())->toBe(0);
+});
+
+it('X-28 (R2): a Low cell, no cell, or a cell without a message line has no line to use: 422, the angle stays as written', function (): void {
+    $w = mx();
+    $a = mxManual($w, $w['p1'], $w['uA'], 'Mine');
+    mxUse($w, $w['p1'], $a)->assertStatus(422)->assertJsonPath('errors.0.code', 'angle.no_matrix_line');   // no cell
+
+    mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'low', 'message_line' => 'A line on a Low cell'])->assertOk();
+    mxUse($w, $w['p1'], $a)->assertStatus(422)->assertJsonPath('errors.0.code', 'angle.no_matrix_line');   // Low
+
+    expect(mxAngle($w['p1'], $w['uA'])->explanation)->toBe('Mine')
+        ->and(mxAngle($w['p1'], $w['uA'])->origin)->toBe(AngleOrigin::Manual)
+        ->and(AuditLog::query()->where('action', 'wave_persona_angle.matrix_line_used')->count())->toBe(0);
+});
+
+it('X-29 (R2): pressing it twice is the same as once: the second answer is 200, nothing written, nothing audited', function (): void {
+    $w = mx();
+    $manual = mxManual($w, $w['p1'], $w['uA'], 'Mine');
+    mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'support', 'message_line' => 'From the cell'])->assertOk();
+    mxUse($w, $w['p1'], $manual)->assertOk();
+    $before = mxAngle($w['p1'], $w['uA'])->only(['id', 'explanation', 'origin', 'updated_at']);
+
+    mxUse($w, $w['p1'], $manual)->assertOk()->assertJsonPath('data.attributes.origin', 'matrix');
+
+    expect(mxAngle($w['p1'], $w['uA'])->only(['id', 'explanation', 'origin', 'updated_at']))->toEqual($before)
+        ->and(AuditLog::query()->where('action', 'wave_persona_angle.matrix_line_used')->count())->toBe(1);
+});
+
+it('X-30 (R2): admin, manager and staff may all use it; another agency gets a 404 and an unknown angle a 404', function (): void {
+    $w = mx();
+    foreach (['admin', 'manager', 'staff'] as $i => $who) {
+        $persona = $i === 0 ? $w['p1'] : $w['p2'];
+        $usp = $i === 2 ? $w['uB'] : $w['uA'];
+        $angle = mxManual($w, $persona, $usp, "Mine {$who}");
+        mxPut($w, ['persona' => $persona, 'usp' => $usp, 'level' => 'priority', 'message_line' => "Cell {$who}"])->assertOk();
+        mxUse($w, $persona, $angle, $who)->assertOk()->assertJsonPath('data.attributes.explanation', "Cell {$who}");
+    }
+
+    $o = $w;
+    $b = mxManual($w, $w['p1'], $w['uC'], 'Mine again');
+    mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uC'], 'level' => 'priority', 'message_line' => 'Cell again'])->assertOk();
+    S::call($w['otherAdmin'], 'POST', S::url($o['agency'], $o['brand'], $o['wave'], "personas/{$w['p1']}/angles/{$b}/use-matrix-line"))->assertNotFound();
+    mxUse($w, $w['p1'], '01HZZZZZZZZZZZZZZZZZZZZZZZ')->assertNotFound();
+    expect(mxAngle($w['p1'], $w['uC'])->origin)->toBe(AngleOrigin::Manual);
+});
+
+it('X-31 (R4): a cell save alone never changes the hand-written angle, even when the two texts differ', function (): void {
+    $w = mx();
+    $manual = mxManual($w, $w['p1'], $w['uA'], 'Mine');
+    mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'priority', 'message_line' => 'One'])->assertOk();
+    mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'message_line' => 'Two'])->assertOk()->assertJsonPath('data.cells.0.manual_text', 'Mine');
+
+    $angle = mxAngle($w['p1'], $w['uA']);
+    expect($angle->ulid)->toBe($manual)->and($angle->explanation)->toBe('Mine')->and($angle->origin)->toBe(AngleOrigin::Manual);
+});
+
+it('X-32 (R3 data): the persona card gets the message line of each of its cells, to compare with its hand-written angles', function (): void {
+    $w = mx();
+    mxManual($w, $w['p1'], $w['uA'], 'Mine');
+    mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'priority', 'message_line' => 'From the cell'])->assertOk();
+
+    $cards = S::call($w['admin'], 'GET', S::u($w, 'personas').'?market=SK')->assertOk()->json('data');
+    $card = array_values(array_filter($cards, fn (array $c): bool => $c['id'] === $w['p1']))[0];
+    expect($card['attributes']['matrix_cells'])->toBe([['usp' => $w['uA'], 'level' => 'priority', 'message_line' => 'From the cell']]);
+});
+
+/*
+ * PL-2.2 walk defect D1 (2026-11-20): staff must not delete a USP that is in use. The three cases of "in use", each judged
+ * by the server at the moment of the delete (not by what the page showed): cells only, hand-written angles only, both.
+ */
+dataset('d1_in_use_cases', [
+    'D1-a: cells only' => ['cells'],
+    'D1-b: angles only' => ['angles'],
+    'D1-c: cells and angles' => ['both'],
+]);
+
+it('D1: staff cannot delete a USP in use (403, with or without a count); nothing is removed or audited; a manager can with the count', function (string $case): void {
+    $w = mx();
+    if ($case === 'cells' || $case === 'both') {
+        mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'low'])->assertOk();
+    }
+    if ($case === 'angles' || $case === 'both') {
+        mxManual($w, $w['p2'], $w['uA'], 'Mine');
+    }
+    $items = $case === 'both' ? 2 : 1;
+    $usp = WaveUsp::query()->where('ulid', $w['uA'])->firstOrFail();
+
+    foreach (['', "?confirm_count={$items}", '?confirm_count=0'] as $query) {
+        S::call($w['staff'], 'DELETE', S::u($w, "usps/{$w['uA']}{$query}"))->assertForbidden()->assertJsonPath('errors.0.code', 'forbidden');
+    }
+
+    expect(WaveUsp::query()->whereKey($usp->id)->exists())->toBeTrue()
+        ->and(WaveMatrixCell::query()->where('usp_id', $usp->id)->count())->toBe($case === 'angles' ? 0 : 1)
+        ->and(WavePersonaAngle::query()->where('usp_id', $usp->id)->count())->toBe($case === 'cells' ? 0 : 1)
+        ->and(AuditLog::query()->where('action', 'wave_usp.deleted')->count())->toBe(0);
+
+    S::call($w['manager'], 'DELETE', S::u($w, "usps/{$w['uA']}?confirm_count={$items}"))->assertNoContent();
+    expect(WaveUsp::query()->whereKey($usp->id)->exists())->toBeFalse();
+})->with('d1_in_use_cases');
+
+it('D1: the server judges "in use" at the delete, so a page that showed the USP as unused (a stale list) still cannot let staff delete it', function (): void {
+    $w = mx();
+    S::call($w['staff'], 'GET', S::u($w, 'usps'))->assertOk()->assertJsonPath('data.0.attributes.cell_count', 0);   // what the page showed
+    mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'priority', 'message_line' => 'Line'], who: 'manager')->assertOk();   // someone else, meanwhile
+
+    S::call($w['staff'], 'DELETE', S::u($w, "usps/{$w['uA']}"))->assertForbidden();
+    expect(WaveUsp::query()->where('ulid', $w['uA'])->exists())->toBeTrue()->and(WaveMatrixCell::query()->count())->toBe(1);
 });

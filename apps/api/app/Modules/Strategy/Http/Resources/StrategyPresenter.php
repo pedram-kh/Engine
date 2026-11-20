@@ -94,7 +94,7 @@ final class StrategyPresenter
                     ? $persona->angles->map(static fn (WavePersonaAngle $a): array => self::angle($a, $persona->market))->values()->all()
                     : [],
                 'matrix_cells' => $persona->relationLoaded('cells')
-                    ? $persona->cells->map(static fn (WaveMatrixCell $c): array => ['usp' => $c->usp->ulid, 'level' => $c->level->value])->values()->all()
+                    ? $persona->cells->map(static fn (WaveMatrixCell $c): array => ['usp' => $c->usp->ulid, 'level' => $c->level->value, 'message_line' => $c->message_line])->values()->all()
                     : [],
                 'created_at' => $persona->created_at->toIso8601String(),
                 'updated_at' => $persona->updated_at->toIso8601String(),
@@ -131,7 +131,7 @@ final class StrategyPresenter
      * @param  iterable<int, WaveUsp>  $usps
      * @param  iterable<int, WavePersona>  $personas
      * @param  iterable<int, WaveMatrixCell>  $cells
-     * @param  array<string, true>  $manual  "personaId:uspId" pairs that have a hand-written angle
+     * @param  array<string, array{ulid: string, text: string}>  $manual  "personaId:uspId" => the hand-written angle on that pair
      * @param  array{cells_set: int, cells_total: int, by_market: list<array{market: string, set: int, total: int}>}  $progress
      * @return array<string, mixed>
      */
@@ -154,7 +154,17 @@ final class StrategyPresenter
         }
         $cellRows = [];
         foreach ($cells as $c) {
-            $cellRows[] = self::cell($c, $personaUlid[$c->persona_id], $uspUlid[$c->usp_id], isset($manual[$c->persona_id.':'.$c->usp_id]));
+            $cellRows[] = self::cell($c, $personaUlid[$c->persona_id], $uspUlid[$c->usp_id], $manual[$c->persona_id.':'.$c->usp_id] ?? null);
+        }
+
+        // Every hand-written angle of the market's personas, set cell or not (R1: a cell that is not set yet can still
+        // be prefilled from it).
+        $manualRows = [];
+        foreach ($manual as $key => $angle) {
+            [$pid, $uid] = array_map('intval', explode(':', $key));
+            if (isset($personaUlid[$pid], $uspUlid[$uid])) {
+                $manualRows[] = ['persona' => $personaUlid[$pid], 'usp' => $uspUlid[$uid], 'angle' => $angle['ulid'], 'text' => $angle['text']];
+            }
         }
 
         return [
@@ -165,6 +175,7 @@ final class StrategyPresenter
                 'usps' => $uspRows,
                 'personas' => $personaRows,
                 'cells' => $cellRows,
+                'manual_angles' => $manualRows,
                 'progress' => $progress,
             ],
         ];
@@ -173,7 +184,7 @@ final class StrategyPresenter
     /**
      * @return array<string, mixed>
      */
-    public static function cell(?WaveMatrixCell $cell, string $persona, string $usp, bool $hasManualAngle): array
+    public static function cell(?WaveMatrixCell $cell, string $persona, string $usp, ?array $manualAngle): array
     {
         return [
             'persona' => $persona,
@@ -182,7 +193,11 @@ final class StrategyPresenter
             'rationale' => $cell?->rationale,
             'message_line' => $cell?->message_line,
             'source' => $cell?->source,
-            'has_manual_angle' => $hasManualAngle,
+            'has_manual_angle' => $manualAngle !== null,
+            // PL-2.2 ruling change R1/R2: the id and the text of the hand-written angle on the pair, so the editor can
+            // prefill an empty message line and the note can show both texts and act on the angle. Null when there is none.
+            'manual_angle' => $manualAngle === null ? null : $manualAngle['ulid'],
+            'manual_text' => $manualAngle === null ? null : $manualAngle['text'],
         ];
     }
 }

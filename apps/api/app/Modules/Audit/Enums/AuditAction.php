@@ -558,6 +558,10 @@ enum AuditAction: string
     // something changed.
     case WaveMatrixCellSaved = 'wave_matrix_cell.saved';
 
+    // PL-2.2 ruling change R2 — "Use the matrix line": a hand-written angle becomes the synced one of its cell. One row
+    // per conversion; ids, market code, the cell's level and a count; never a text. Written only when it converted.
+    case WavePersonaAngleMatrixLineUsed = 'wave_persona_angle.matrix_line_used';
+
     // Campaign attachments from the Files library, chunk B (AH-092). A
     // linkage action on the campaign, not a library action on the file — the
     // file's own audit trail (above) is unaffected by any of these. No

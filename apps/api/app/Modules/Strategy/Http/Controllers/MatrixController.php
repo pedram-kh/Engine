@@ -115,7 +115,7 @@ final class MatrixController
 
         return response()->json(['data' => [
             'cells' => array_map(
-                static fn (array $r): array => StrategyPresenter::cell($r['cell'], $r['persona'], $r['usp'], $r['manual']),
+                static fn (array $r): array => StrategyPresenter::cell($r['cell'], $r['persona'], $r['usp'], $r['manual_angle']),
                 $out['results'],
             ),
             'progress' => $this->matrix->progress($out['wave'], $uspCount),

@@ -39,7 +39,7 @@ use Illuminate\Validation\ValidationException;
 final class MatrixService
 {
     /**
-     * @return array{usps: Collection<int, WaveUsp>, personas: Collection<int, WavePersona>, cells: Collection<int, WaveMatrixCell>, manual: array<string, true>}
+     * @return array{usps: Collection<int, WaveUsp>, personas: Collection<int, WavePersona>, cells: Collection<int, WaveMatrixCell>, manual: array<string, array{ulid: string, text: string}>}
      */
     public function load(Wave $wave, string $market): array
     {
@@ -54,8 +54,8 @@ final class MatrixService
             foreach (WavePersonaAngle::query()
                 ->where('wave_id', $wave->id)->where('origin', AngleOrigin::Manual->value)
                 ->whereIn('persona_id', $personas->modelKeys())
-                ->get(['persona_id', 'usp_id']) as $a) {
-                $manual[$a->persona_id.':'.$a->usp_id] = true;
+                ->get(['persona_id', 'usp_id', 'ulid', 'explanation']) as $a) {
+                $manual[$a->persona_id.':'.$a->usp_id] = ['ulid' => $a->ulid, 'text' => $a->explanation];
             }
         }
 
@@ -92,7 +92,7 @@ final class MatrixService
 
     /**
      * @param  list<array{persona: string, usp: string, level?: string|null, rationale?: string|null, message_line?: string|null, clear?: bool}>  $changes
-     * @return array{results: list<array{persona: string, usp: string, cell: WaveMatrixCell|null, manual: bool}>, wave: Wave}
+     * @return array{results: list<array{persona: string, usp: string, cell: WaveMatrixCell|null, manual: bool, manual_angle: array{ulid: string, text: string}|null}>, wave: Wave}
      */
     public function save(Brand $brand, Wave $wave, User $actor, string $market, array $changes): array
     {
@@ -209,11 +209,14 @@ final class MatrixService
                     $count['cells_unchanged']++;
                 }
 
+                $final = $angles->get($key);
+                $isManual = $final?->origin === AngleOrigin::Manual;
                 $results[] = [
                     'persona' => $persona->ulid,
                     'usp' => $usp->ulid,
                     'cell' => $cell,
-                    'manual' => $angles->get($key)?->origin === AngleOrigin::Manual,
+                    'manual' => $isManual,
+                    'manual_angle' => $isManual ? ['ulid' => $final->ulid, 'text' => $final->explanation] : null,
                 ];
             }
 

@@ -80,6 +80,28 @@ final class AngleController
         return response()->json(['data' => StrategyPresenter::angle($updated)]);
     }
 
+    /** PL-2.2 R2: convert a hand-written angle to the synced one of its Priority or Support cell. Any role. */
+    public function useMatrixLine(Request $request, Agency $agency, Brand $brand, string $wave, string $persona, string $angle): JsonResponse
+    {
+        if ($off = $this->flagOff($request)) {
+            return $off;
+        }
+        $this->assertBrand($brand, $agency);
+        $model = $this->findWave($wave, $agency, $brand);
+        Gate::authorize('update', WavePersona::class);
+
+        /** @var User $actor */
+        $actor = $request->user();
+
+        try {
+            $converted = $this->angles->useMatrixLine($brand, $model, $persona, $angle, $actor);
+        } catch (StrategyRuleViolation $e) {
+            return $this->refuse($request, $e);
+        }
+
+        return response()->json(['data' => StrategyPresenter::angle($converted)]);
+    }
+
     public function destroy(Request $request, Agency $agency, Brand $brand, string $wave, string $persona, string $angle): JsonResponse|Response
     {
         if ($off = $this->flagOff($request)) {

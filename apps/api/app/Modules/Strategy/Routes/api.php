@@ -43,6 +43,7 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
 
         Route::post('personas/{persona}/angles', [AngleController::class, 'store'])->withTrashed()->name('waves.strategy.angles.store');
         Route::patch('personas/{persona}/angles/{angle}', [AngleController::class, 'update'])->withTrashed()->name('waves.strategy.angles.update');
+        Route::post('personas/{persona}/angles/{angle}/use-matrix-line', [AngleController::class, 'useMatrixLine'])->withTrashed()->name('waves.strategy.angles.use-matrix-line');
         Route::delete('personas/{persona}/angles/{angle}', [AngleController::class, 'destroy'])->withTrashed()->name('waves.strategy.angles.destroy');
 
         // PL-2.2: the messaging matrix. One market per GET; the PUT takes 1 to 48 cell changes in one transaction.
