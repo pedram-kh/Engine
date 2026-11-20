@@ -247,7 +247,7 @@ function doClear(): void {
           class="mx-field__input"
           rows="2"
           data-test="matrix-line-input"
-          :aria-invalid="lineError !== null && (touched || lineLong)"
+          :aria-invalid="lineMissing || (lineError !== null && (touched || lineLong))"
         />
         <span class="mx-field__foot">
           <span
@@ -458,6 +458,10 @@ function doClear(): void {
 .mx-field__input[aria-invalid='true'] {
   border-color: rgb(var(--v-theme-error));
 }
+/* The focus ring must not hide the error state: a focused field in error keeps a red ring. */
+.mx-field__input[aria-invalid='true']:focus-visible {
+  outline-color: rgb(var(--v-theme-error));
+}
 .mx-field__foot {
   display: flex;
   justify-content: space-between;
@@ -481,10 +485,12 @@ function doClear(): void {
   display: inline-flex;
   align-items: flex-start;
   gap: 6px;
-  color: rgb(var(--v-theme-on-surface-variant));
+  /* The rule that keeps Save off is unmet: the theme's error colour for the text and the icon (Pedram, 2026-11-21). */
+  color: rgb(var(--v-theme-error));
 }
 .mx-field__hint--why .v-icon {
   flex: none;
+  color: rgb(var(--v-theme-error));
   margin-top: 1px;
 }
 .mx-editor__error {

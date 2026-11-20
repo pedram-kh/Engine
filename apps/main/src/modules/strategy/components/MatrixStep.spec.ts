@@ -381,6 +381,8 @@ describe('PL-2.2 ruling change: manual angle and cell must not disagree unseen',
     const hint = overlay('[data-test="matrix-line-hint"]')
     expect(hint?.textContent).toContain('message line')
     expect(overlay('[data-test="matrix-save"]')?.hasAttribute('disabled')).toBe(true)
+    // The field is in its error state while the rule is unmet (the red hint and border are asserted in the browser).
+    expect(overlay('[data-test="matrix-line-input"]')?.getAttribute('aria-invalid')).toBe('true')
     expect(overlay('[data-test="matrix-save"]')?.getAttribute('aria-describedby')).toBe(
       'mx-line-hint',
     )
