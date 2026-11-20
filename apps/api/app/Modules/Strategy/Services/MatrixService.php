@@ -224,8 +224,20 @@ final class MatrixService
                     action: AuditAction::WaveMatrixCellSaved,
                     actor: $actor,
                     subject: $locked,
-                    metadata: ['wave' => $locked->ulid, 'market' => $market] + $count
-                        + ['levels' => $levels, 'changed' => array_values(array_unique($fields))],
+                    metadata: [
+                        'wave' => $locked->ulid,
+                        'market' => $market,
+                        'cells_created' => $count['cells_created'],
+                        'cells_updated' => $count['cells_updated'],
+                        'cells_cleared' => $count['cells_cleared'],
+                        'cells_unchanged' => $count['cells_unchanged'],
+                        'angles_created' => $count['angles_created'],
+                        'angles_updated' => $count['angles_updated'],
+                        'angles_removed' => $count['angles_removed'],
+                        'kept_manual' => $count['kept_manual'],
+                        'levels' => $levels,
+                        'changed' => array_values(array_unique($fields)),
+                    ],
                     agencyId: $locked->agency_id,
                 );
             }

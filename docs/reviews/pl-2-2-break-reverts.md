@@ -38,3 +38,11 @@ Each row: one break applied to the real file, the named test files run, the resu
 B25 first ran as a foreign-key rename; that is not a break (renaming a constraint changes no behaviour) and showed green, so it was replaced by B25/B26 below, which weaken the keys. B30 also stops the code compiling against the enum case, so the catalogue test is the one named.
 
 No test can fail when only `agency_id` is dropped from the persona/USP lookups: the `wave_id` filter and the composite keys already hold the line, so the agency filter is a second layer. That is stated, not hidden.
+
+## Review correction C1 (literal audit payload)
+
+| #   | Break                                                                               | Result                                                                                                  |
+| --- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| B31 | an undecided key `zz_undecided` added to the literal `WaveMatrixCellSaved` metadata | RED (AuditPayloadKeysGuardTest: "Audit payload key `zz_undecided` (metadata) is not decided"); restored |
+
+The `dynamicPayloadFiles()` entry for `MatrixService.php|metadata` was removed; every key is named in the `Audit::log` call and decided in `notPersonalKeys()`. Test W-06 kept.
