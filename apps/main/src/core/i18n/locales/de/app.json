@@ -1706,7 +1706,9 @@
         "personaNone": "Noch keine Personas",
         "statusPersonas": "{count} Persona · {covered} von {markets} Märkten | {count} Personas · {covered} von {markets} Märkten",
         "notAvailable": "Noch nicht verfügbar",
-        "locked": "Gesperrt, bis alle Konzepte freigegeben sind"
+        "locked": "Gesperrt, bis alle Konzepte freigegeben sind",
+        "matrixStatus": "{set} von {total} Zelle gesetzt | {set} von {total} Zellen gesetzt",
+        "matrixNone": "Zuerst USPs und Personas hinzufügen"
       },
       "audience": {
         "label": "Zielgruppentitel",
@@ -1749,8 +1751,12 @@
           "body": "Keine Persona verwendet diesen USP.",
           "bodyInUse": "{count} Ansatz verwendet diesen USP und wird mit entfernt: | {count} Ansätze verwenden diesen USP und werden mit entfernt:",
           "confirmInUse": "Löschen und {count} Ansatz entfernen | Löschen und {count} Ansätze entfernen",
-          "refreshed": "Die Liste hat sich geändert, während dieser Dialog offen war. Prüfe sie und bestätige erneut."
-        }
+          "refreshed": "Die Liste hat sich geändert, während dieser Dialog offen war. Prüfe sie und bestätige erneut.",
+          "bodyInUseCells": "{count} Stelle verwendet diesen USP und wird mit ihm geleert: | {count} Stellen verwenden diesen USP und werden mit ihm geleert:",
+          "confirmInUseCells": "Löschen und {count} Eintrag leeren | Löschen und {count} Einträge leeren",
+          "itemCell": "Zelle {level}"
+        },
+        "usedByBoth": "Verwendet von {angles} und {cells}"
       },
       "persona": {
         "markets": "Märkte",
@@ -1826,7 +1832,11 @@
           "codeFormat": "Verwende {min}–{max} Buchstaben oder Ziffern.",
           "angleRequired": "Gib eine Zeile ein."
         },
-        "linkAUsp": "USP verknüpfen"
+        "linkAUsp": "USP verknüpfen",
+        "syncedFromMatrix": "Aus der Matrix synchronisiert",
+        "changeInMatrix": "In der Messaging-Matrix ändern",
+        "removeAngleBodySyncs": "Der Ansatz zu „{usp}“ wird entfernt. Die Zelle dieser Persona für diesen USP hat Priorität oder Unterstützung, daher tritt ein aus der Matrix synchronisierter Ansatz an seine Stelle.",
+        "deleteBodyCells": "Die Persona wird zusammen mit {angles} und {cells} entfernt:"
       },
       "copy": {
         "open": "Kopieren von …",
@@ -1834,7 +1844,8 @@
         "source": "Kopieren von",
         "submit": "Kopieren",
         "line": "{count} kopieren → {market} hat dann {total} von {max}",
-        "over": "{count} kopieren → {market} hätte {total} von {max}: über dem Maximum."
+        "over": "{count} kopieren → {market} hätte {total} von {max}: über dem Maximum.",
+        "synced": "{count} synchronisierter Ansatz wird nicht kopiert. Fülle die Matrix für {market}. | {count} synchronisierte Ansätze werden nicht kopiert. Fülle die Matrix für {market}."
       },
       "validation": {
         "tooLong": "Höchstens {max} Zeichen."
@@ -1856,7 +1867,45 @@
         "angleAlreadyLinked": "Diese Persona hat bereits einen Ansatz zu diesem USP.",
         "conflict": "Jemand hat das gleichzeitig geändert. Neu laden und erneut versuchen.",
         "brandArchived": "Eine archivierte Marke ist schreibgeschützt. Stelle sie zuerst wieder her.",
-        "forbidden": "Das können nur Admins oder Manager."
+        "forbidden": "Das können nur Admins oder Manager.",
+        "angleSyncedReadOnly": "Ändere das in der Messaging-Matrix."
+      },
+      "counts": {
+        "angles": "{count} Ansatz | {count} Ansätze",
+        "cells": "{count} Zelle | {count} Zellen"
+      },
+      "matrix": {
+        "title": "Messaging-Matrix · {market}",
+        "subtitle": "USPs × Personas. Lege für jede Persona die Hierarchie und die Botschaften fest, mit denen sie angesprochen wird.",
+        "level": {
+          "priority": "Priorität",
+          "support": "Unterstützung",
+          "low": "Niedrig"
+        },
+        "legend": {
+          "priorityHint": "damit anführen",
+          "supportHint": "sollte dabei sein",
+          "lowHint": "nicht der Hauptantrieb"
+        },
+        "corner": "USP / Persona",
+        "leadWith": "Anführen mit:",
+        "notSet": "Nicht gesetzt",
+        "tabProgress": "{set} von {total} Zellen gesetzt für {market}",
+        "handNote": "Diese Persona hat zu diesem USP bereits einen von Hand geschriebenen Ansatz. Er bleibt, wie er geschrieben ist.",
+        "footer": "Die Tabelle wächst mit der Welle: Die Spalten sind die Personas dieses Marktes (2 bis 8), die Zeilen die USPs der Welle. Breite Tabellen scrollen seitwärts, die USP-Spalte bleibt fixiert. Zellen mit Priorität und Unterstützung werden zu den Ansätzen der jeweiligen Persona.",
+        "noUsps": "Füge zuerst in Schritt 1 USPs hinzu.",
+        "noPersonas": "Noch keine Personas für {market}.",
+        "goToPersonas": "Personas in Schritt 2 hinzufügen",
+        "retry": "Erneut versuchen",
+        "editor": {
+          "level": "Stufe",
+          "rationale": "Begründung",
+          "messageLine": "Botschaftszeile",
+          "counter": "{count} von {max}",
+          "lineRequired": "Füge eine Botschaftszeile hinzu, um eine Zelle mit Priorität oder Unterstützung zu speichern.",
+          "saveNext": "Speichern und weiter",
+          "clear": "Zelle leeren"
+        }
       }
     }
   },

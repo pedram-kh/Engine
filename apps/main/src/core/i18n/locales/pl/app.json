@@ -1706,7 +1706,9 @@
         "personaNone": "Brak person",
         "statusPersonas": "{count} persona · {covered} z {markets} rynków | {count} person · {covered} z {markets} rynków",
         "notAvailable": "Jeszcze niedostępne",
-        "locked": "Zablokowane do zatwierdzenia wszystkich koncepcji"
+        "locked": "Zablokowane do zatwierdzenia wszystkich koncepcji",
+        "matrixStatus": "Ustawiono {set} z {total} komórki | Ustawiono {set} z {total} komórek",
+        "matrixNone": "Najpierw dodaj USP i persony"
       },
       "audience": {
         "label": "Tytuł grupy docelowej",
@@ -1749,8 +1751,12 @@
           "body": "Żadna persona nie używa tego USP.",
           "bodyInUse": "{count} kąt używa tego USP i zostanie usunięty razem z nim: | {count} kątów używa tego USP i zostanie usuniętych razem z nim:",
           "confirmInUse": "Usuń i skasuj {count} kąt | Usuń i skasuj {count} kątów",
-          "refreshed": "Lista zmieniła się, gdy to okno było otwarte. Sprawdź ją i potwierdź ponownie."
-        }
+          "refreshed": "Lista zmieniła się, gdy to okno było otwarte. Sprawdź ją i potwierdź ponownie.",
+          "bodyInUseCells": "{count} miejsce używa tego USP i zostanie z nim wyczyszczone: | {count} miejsc używa tego USP i zostanie z nim wyczyszczonych:",
+          "confirmInUseCells": "Usuń i wyczyść {count} element | Usuń i wyczyść {count} elementów",
+          "itemCell": "Komórka: {level}"
+        },
+        "usedByBoth": "Używane przez {angles} i {cells}"
       },
       "persona": {
         "markets": "Rynki",
@@ -1826,7 +1832,11 @@
           "codeFormat": "Użyj {min}–{max} liter lub cyfr.",
           "angleRequired": "Wpisz linijkę tekstu."
         },
-        "linkAUsp": "Powiąż USP"
+        "linkAUsp": "Powiąż USP",
+        "syncedFromMatrix": "Zsynchronizowano z macierzy",
+        "changeInMatrix": "Zmień to w macierzy komunikatów",
+        "removeAngleBodySyncs": "Kąt dla „{usp}” zostanie usunięty. Komórka tej persony dla tego USP ma Priorytet lub Wsparcie, więc jego miejsce zajmie kąt zsynchronizowany z macierzy.",
+        "deleteBodyCells": "Persona zostanie usunięta razem z: {angles} i {cells}:"
       },
       "copy": {
         "open": "Kopiuj z…",
@@ -1834,7 +1844,8 @@
         "source": "Kopiuj z",
         "submit": "Kopiuj",
         "line": "Kopiowanie {count} → w: {market} będzie {total} z {max}",
-        "over": "Kopiowanie {count} → w: {market} byłoby {total} z {max}: powyżej maksimum."
+        "over": "Kopiowanie {count} → w: {market} byłoby {total} z {max}: powyżej maksimum.",
+        "synced": "{count} zsynchronizowany kąt nie jest kopiowany. Wypełnij macierz dla: {market}. | {count} zsynchronizowanych kątów nie jest kopiowanych. Wypełnij macierz dla: {market}."
       },
       "validation": {
         "tooLong": "Najwyżej {max} znaków."
@@ -1856,7 +1867,45 @@
         "angleAlreadyLinked": "Ta persona ma już kąt dla tego USP.",
         "conflict": "Ktoś zmienił to w tej samej chwili. Wczytaj ponownie i spróbuj jeszcze raz.",
         "brandArchived": "Zarchiwizowana marka jest tylko do odczytu. Najpierw ją przywróć.",
-        "forbidden": "Może to zrobić tylko admin lub manager."
+        "forbidden": "Może to zrobić tylko admin lub manager.",
+        "angleSyncedReadOnly": "Zmień to w macierzy komunikatów."
+      },
+      "counts": {
+        "angles": "{count} kąt | {count} kątów",
+        "cells": "{count} komórka | {count} komórek"
+      },
+      "matrix": {
+        "title": "Macierz komunikatów · {market}",
+        "subtitle": "USP × persony. Ustal hierarchię dla każdej persony i komunikaty, od których zaczynać.",
+        "level": {
+          "priority": "Priorytet",
+          "support": "Wsparcie",
+          "low": "Niski"
+        },
+        "legend": {
+          "priorityHint": "zacznij od tego",
+          "supportHint": "warto uwzględnić",
+          "lowHint": "nie jest głównym motywem"
+        },
+        "corner": "USP / persona",
+        "leadWith": "Zacznij od:",
+        "notSet": "Nie ustawiono",
+        "tabProgress": "Ustawiono {set} z {total} komórek dla: {market}",
+        "handNote": "Ta persona ma już ręcznie napisany kąt dla tego USP. Zostaje tak, jak został napisany.",
+        "footer": "Tabela rośnie wraz z falą: kolumny to persony na tym rynku (od 2 do 8), wiersze to USP fali. Szerokie tabele przewijają się na boki, a kolumna USP pozostaje przypięta. Komórki Priorytetu i Wsparcia stają się kątami każdej persony.",
+        "noUsps": "Najpierw dodaj USP w kroku 1.",
+        "noPersonas": "Brak person dla: {market}.",
+        "goToPersonas": "Dodaj persony w kroku 2",
+        "retry": "Spróbuj ponownie",
+        "editor": {
+          "level": "Poziom",
+          "rationale": "Uzasadnienie",
+          "messageLine": "Linia komunikatu",
+          "counter": "{count} z {max}",
+          "lineRequired": "Dodaj linię komunikatu, aby zapisać komórkę Priorytetu lub Wsparcia.",
+          "saveNext": "Zapisz i dalej",
+          "clear": "Wyczyść komórkę"
+        }
       }
     }
   },

@@ -1706,7 +1706,9 @@
         "personaNone": "Zatiaľ žiadne persóny",
         "statusPersonas": "{count} persóna · {covered} z {markets} trhov | {count} persón · {covered} z {markets} trhov",
         "notAvailable": "Zatiaľ nedostupné",
-        "locked": "Zamknuté, kým nie sú schválené všetky koncepty"
+        "locked": "Zamknuté, kým nie sú schválené všetky koncepty",
+        "matrixStatus": "Nastavená {set} z {total} bunky | Nastavených {set} z {total} buniek",
+        "matrixNone": "Najprv pridajte USP a persóny"
       },
       "audience": {
         "label": "Názov cieľovej skupiny",
@@ -1749,8 +1751,12 @@
           "body": "Toto USP nepoužíva žiadna persóna.",
           "bodyInUse": "Toto USP používa {count} uhol a odstráni sa s ním: | Toto USP používa {count} uhlov a odstránia sa s ním:",
           "confirmInUse": "Odstrániť a vymazať {count} uhol | Odstrániť a vymazať {count} uhlov",
-          "refreshed": "Zoznam sa zmenil, kým bolo okno otvorené. Skontrolujte ho a potvrďte znova."
-        }
+          "refreshed": "Zoznam sa zmenil, kým bolo okno otvorené. Skontrolujte ho a potvrďte znova.",
+          "bodyInUseCells": "{count} miesto používa toto USP a vymaže sa s ním: | {count} miest používa toto USP a vymaže sa s ním:",
+          "confirmInUseCells": "Odstrániť a vymazať {count} položku | Odstrániť a vymazať {count} položiek",
+          "itemCell": "Bunka: {level}"
+        },
+        "usedByBoth": "Používa {angles} a {cells}"
       },
       "persona": {
         "markets": "Trhy",
@@ -1826,7 +1832,11 @@
           "codeFormat": "Použite {min}–{max} písmen alebo číslic.",
           "angleRequired": "Zadajte riadok."
         },
-        "linkAUsp": "Prepojiť USP"
+        "linkAUsp": "Prepojiť USP",
+        "syncedFromMatrix": "Synchronizované z matice",
+        "changeInMatrix": "Zmeňte to v matici odkazov",
+        "removeAngleBodySyncs": "Uhol pre „{usp}“ sa odstráni. Bunka tejto persóny pre toto USP má prioritu alebo podporu, preto ho nahradí uhol synchronizovaný z matice.",
+        "deleteBodyCells": "Persóna sa odstráni spolu s: {angles} a {cells}:"
       },
       "copy": {
         "open": "Kopírovať z…",
@@ -1834,7 +1844,8 @@
         "source": "Kopírovať z",
         "submit": "Kopírovať",
         "line": "Kopírovanie {count} → trh {market} bude mať {total} z {max}",
-        "over": "Kopírovanie {count} → trh {market} by mal {total} z {max}: nad maximom."
+        "over": "Kopírovanie {count} → trh {market} by mal {total} z {max}: nad maximom.",
+        "synced": "{count} synchronizovaný uhol sa nekopíruje. Vyplňte maticu trhu {market}. | {count} synchronizovaných uhlov sa nekopíruje. Vyplňte maticu trhu {market}."
       },
       "validation": {
         "tooLong": "Najviac {max} znakov."
@@ -1856,7 +1867,45 @@
         "angleAlreadyLinked": "Táto persóna už má uhol pre toto USP.",
         "conflict": "Niekto to zmenil v rovnakej chvíli. Načítajte znova a skúste to ešte raz.",
         "brandArchived": "Archivovaná značka je len na čítanie. Najprv ju obnovte.",
-        "forbidden": "Môže to urobiť len admin alebo manažér."
+        "forbidden": "Môže to urobiť len admin alebo manažér.",
+        "angleSyncedReadOnly": "Zmeňte to v matici odkazov."
+      },
+      "counts": {
+        "angles": "{count} uhol | {count} uhlov",
+        "cells": "{count} bunka | {count} buniek"
+      },
+      "matrix": {
+        "title": "Matica odkazov · {market}",
+        "subtitle": "USP × persóny. Nastavte pre každú personu hierarchiu a odkazy, ktorými sa začína.",
+        "level": {
+          "priority": "Priorita",
+          "support": "Podpora",
+          "low": "Nízka"
+        },
+        "legend": {
+          "priorityHint": "začnite týmto",
+          "supportHint": "oplatí sa zahrnúť",
+          "lowHint": "nie je hlavná motivácia"
+        },
+        "corner": "USP / persóna",
+        "leadWith": "Začnite s:",
+        "notSet": "Nenastavené",
+        "tabProgress": "Nastavených {set} z {total} buniek pre {market}",
+        "handNote": "Táto persóna už má k tomuto USP ručne napísaný uhol. Zostáva tak, ako je napísaný.",
+        "footer": "Tabuľka rastie s vlnou: stĺpce sú persóny na tomto trhu (2 až 8), riadky sú USP vlny. Široké tabuľky sa posúvajú do strán a stĺpec USP zostáva pripnutý. Bunky s prioritou a podporou sa stanú uhlami jednotlivých person.",
+        "noUsps": "Najprv pridajte USP v kroku 1.",
+        "noPersonas": "Pre trh {market} zatiaľ žiadne persóny.",
+        "goToPersonas": "Pridajte persóny v kroku 2",
+        "retry": "Skúsiť znova",
+        "editor": {
+          "level": "Úroveň",
+          "rationale": "Zdôvodnenie",
+          "messageLine": "Riadok odkazu",
+          "counter": "{count} z {max}",
+          "lineRequired": "Pridajte riadok odkazu, aby sa dala uložiť bunka s prioritou alebo podporou.",
+          "saveNext": "Uložiť a ďalej",
+          "clear": "Vymazať bunku"
+        }
       }
     }
   },

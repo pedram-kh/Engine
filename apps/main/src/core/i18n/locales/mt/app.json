@@ -1706,7 +1706,9 @@
         "personaNone": "Għad m'hemm l-ebda persunaġġ",
         "statusPersonas": "{count} persunaġġ · {covered} minn {markets} swieq | {count} persunaġġi · {covered} minn {markets} swieq",
         "notAvailable": "Għadu mhux disponibbli",
-        "locked": "Imsakkar sakemm jiġu approvati l-kunċetti kollha"
+        "locked": "Imsakkar sakemm jiġu approvati l-kunċetti kollha",
+        "matrixStatus": "{set} minn {total} ċellola ssettjata | {set} minn {total} ċelloli ssettjati",
+        "matrixNone": "Żid l-ewwel USPs u persunaġġi"
       },
       "audience": {
         "label": "Titlu tal-udjenza",
@@ -1749,8 +1751,12 @@
           "body": "L-ebda persunaġġ ma juża dan l-USP.",
           "bodyInUse": "{count} angolu juża dan l-USP u jitneħħa miegħu: | {count} angoli jużaw dan l-USP u jitneħħew miegħu:",
           "confirmInUse": "Ħassar u neħħi {count} angolu | Ħassar u neħħi {count} angoli",
-          "refreshed": "Il-lista nbidlet waqt li t-tieqa kienet miftuħa. Iċċekkjaha u kkonferma mill-ġdid."
-        }
+          "refreshed": "Il-lista nbidlet waqt li t-tieqa kienet miftuħa. Iċċekkjaha u kkonferma mill-ġdid.",
+          "bodyInUseCells": "{count} post juża dan l-USP u jitnaddaf miegħu: | {count} postijiet jużaw dan l-USP u jitnaddfu miegħu:",
+          "confirmInUseCells": "Neħħi u naddaf {count} element | Neħħi u naddaf {count} elementi",
+          "itemCell": "Ċellola: {level}"
+        },
+        "usedByBoth": "Użat minn {angles} u {cells}"
       },
       "persona": {
         "markets": "Swieq",
@@ -1826,7 +1832,11 @@
           "codeFormat": "Uża {min}–{max} ittri jew ċifri.",
           "angleRequired": "Daħħal linja."
         },
-        "linkAUsp": "Qabbad USP"
+        "linkAUsp": "Qabbad USP",
+        "syncedFromMatrix": "Sinkronizzat mill-matriċi",
+        "changeInMatrix": "Biddlu fil-Matriċi tal-messaġġi",
+        "removeAngleBodySyncs": "L-angolu fuq “{usp}” jitneħħa. Iċ-ċellola ta' dan il-persunaġġ għal dan l-USP hija Prijorità jew Appoġġ, għalhekk angolu sinkronizzat mill-matriċi jieħu postu.",
+        "deleteBodyCells": "Il-persunaġġ jitneħħa flimkien ma' {angles} u {cells}:"
       },
       "copy": {
         "open": "Ikkopja minn…",
@@ -1834,7 +1844,8 @@
         "source": "Ikkopja minn",
         "submit": "Ikkopja",
         "line": "Qed tikkopja {count} → {market} se jkollu {total} minn {max}",
-        "over": "Qed tikkopja {count} → {market} jkollu {total} minn {max}: aktar mill-massimu."
+        "over": "Qed tikkopja {count} → {market} jkollu {total} minn {max}: aktar mill-massimu.",
+        "synced": "{count} angolu sinkronizzat ma jiġix ikkopjat. Imla l-matriċi ta' {market}. | {count} angoli sinkronizzati ma jiġux ikkopjati. Imla l-matriċi ta' {market}."
       },
       "validation": {
         "tooLong": "L-aktar {max} karattri."
@@ -1856,7 +1867,45 @@
         "angleAlreadyLinked": "Dan il-persunaġġ diġà għandu angolu fuq dak l-USP.",
         "conflict": "Xi ħadd biddel dan fl-istess ħin. Erġa' tgħabbi u pprova mill-ġdid.",
         "brandArchived": "Marka arkivjata hija read-only. Irrestawraha l-ewwel.",
-        "forbidden": "Admin jew maniġer biss jista' jagħmel dan."
+        "forbidden": "Admin jew maniġer biss jista' jagħmel dan.",
+        "angleSyncedReadOnly": "Biddel dan fil-Matriċi tal-messaġġi."
+      },
+      "counts": {
+        "angles": "{count} angolu | {count} angoli",
+        "cells": "{count} ċellola | {count} ċelloli"
+      },
+      "matrix": {
+        "title": "Matriċi tal-messaġġi · {market}",
+        "subtitle": "USPs × persunaġġi. Issettja l-ġerarkija għal kull persunaġġ u l-linji li jmexxu magħhom.",
+        "level": {
+          "priority": "Prijorità",
+          "support": "Appoġġ",
+          "low": "Baxx"
+        },
+        "legend": {
+          "priorityHint": "ibda b'dan",
+          "supportHint": "jixraq jiddaħħal",
+          "lowHint": "mhuwiex il-motivatur ewlieni"
+        },
+        "corner": "USP / persunaġġ",
+        "leadWith": "Ibda b'dan:",
+        "notSet": "Mhux issettjat",
+        "tabProgress": "{set} minn {total} ċelloli ssettjati għal {market}",
+        "handNote": "Dan il-persunaġġ diġà għandu angolu miktub bl-id fuq dan l-USP. Jibqa' kif inkiteb.",
+        "footer": "It-tabella tikber mal-mewġa: il-kolonni huma l-persunaġġi f'dan is-suq (2 sa 8), ir-ringieli huma l-USPs tal-mewġa. Tabelli wesgħin jiskrollaw 'il ġemb bil-kolonna tal-USP imwaħħla. Iċ-ċelloli ta' Prijorità u Appoġġ isiru l-angoli ta' kull persunaġġ.",
+        "noUsps": "Żid l-ewwel l-USPs fil-pass 1.",
+        "noPersonas": "Għad m'hemm l-ebda persunaġġ għal {market}.",
+        "goToPersonas": "Żid persunaġġi fil-pass 2",
+        "retry": "Erġa' pprova",
+        "editor": {
+          "level": "Livell",
+          "rationale": "Raġunament",
+          "messageLine": "Linja tal-messaġġ",
+          "counter": "{count} minn {max}",
+          "lineRequired": "Żid linja tal-messaġġ biex tissejvja ċellola ta' Prijorità jew Appoġġ.",
+          "saveNext": "Issejvja u li jmiss",
+          "clear": "Ras iċ-ċellola"
+        }
       }
     }
   },

@@ -1706,7 +1706,9 @@
         "personaNone": "No personas yet",
         "statusPersonas": "{count} persona · {covered} of {markets} markets | {count} personas · {covered} of {markets} markets",
         "notAvailable": "Not available yet",
-        "locked": "Locked until all concepts are approved"
+        "locked": "Locked until all concepts are approved",
+        "matrixStatus": "{set} of {total} cell set | {set} of {total} cells set",
+        "matrixNone": "Add USPs and personas first"
       },
       "audience": {
         "label": "Audience title",
@@ -1749,8 +1751,12 @@
           "body": "No persona uses this USP.",
           "bodyInUse": "{count} angle uses this USP and is removed with it: | {count} angles use this USP and are removed with it:",
           "confirmInUse": "Delete and remove {count} angle | Delete and remove {count} angles",
-          "refreshed": "The list changed while this was open. Check it and confirm again."
-        }
+          "refreshed": "The list changed while this was open. Check it and confirm again.",
+          "bodyInUseCells": "{count} place uses this USP and is cleared with it: | {count} places use this USP and are cleared with it:",
+          "confirmInUseCells": "Delete and clear {count} item | Delete and clear {count} items",
+          "itemCell": "{level} cell"
+        },
+        "usedByBoth": "Used by {angles} and {cells}"
       },
       "persona": {
         "markets": "Markets",
@@ -1826,7 +1832,11 @@
           "codeFormat": "Use {min}–{max} letters or digits.",
           "angleRequired": "Enter a line."
         },
-        "linkAUsp": "Link a USP"
+        "linkAUsp": "Link a USP",
+        "syncedFromMatrix": "Synced from matrix",
+        "changeInMatrix": "Change it in the Messaging matrix",
+        "removeAngleBodySyncs": "The angle on “{usp}” is removed. This persona's cell for the USP is Priority or Support, so an angle synced from the matrix takes its place.",
+        "deleteBodyCells": "The persona is removed with its {angles} and {cells}:"
       },
       "copy": {
         "open": "Copy from…",
@@ -1834,7 +1844,8 @@
         "source": "Copy from",
         "submit": "Copy",
         "line": "Copying {count} → {market} will have {total} of {max}",
-        "over": "Copying {count} → {market} would have {total} of {max}: over the maximum."
+        "over": "Copying {count} → {market} would have {total} of {max}: over the maximum.",
+        "synced": "{count} synced angle is not copied. Fill the matrix of {market}. | {count} synced angles are not copied. Fill the matrix of {market}."
       },
       "validation": {
         "tooLong": "Use at most {max} characters."
@@ -1856,7 +1867,45 @@
         "angleAlreadyLinked": "This persona already has an angle on that USP.",
         "conflict": "Someone changed this at the same moment. Reload and try again.",
         "brandArchived": "An archived brand is read-only. Restore it first.",
-        "forbidden": "Only an admin or manager can do this."
+        "forbidden": "Only an admin or manager can do this.",
+        "angleSyncedReadOnly": "Change this on the Messaging matrix."
+      },
+      "counts": {
+        "angles": "{count} angle | {count} angles",
+        "cells": "{count} cell | {count} cells"
+      },
+      "matrix": {
+        "title": "Messaging matrix · {market}",
+        "subtitle": "USPs × personas. Set the hierarchy for each persona and the lines to lead with.",
+        "level": {
+          "priority": "Priority",
+          "support": "Support",
+          "low": "Low"
+        },
+        "legend": {
+          "priorityHint": "lead with this",
+          "supportHint": "worth including",
+          "lowHint": "not the motivator"
+        },
+        "corner": "USP / persona",
+        "leadWith": "Lead with:",
+        "notSet": "Not set",
+        "tabProgress": "{set} of {total} cells set in {market}",
+        "handNote": "This persona already has a hand-written angle on this USP. It is kept as written.",
+        "footer": "The table grows with the wave: columns are the personas in this market (2 to 8), rows are the wave's USPs. Wide tables scroll sideways with the USP column pinned. Priority and Support cells become each persona's angles.",
+        "noUsps": "Add USPs in step 1 first.",
+        "noPersonas": "No personas for {market} yet.",
+        "goToPersonas": "Add personas in step 2",
+        "retry": "Try again",
+        "editor": {
+          "level": "Level",
+          "rationale": "Rationale",
+          "messageLine": "Message line",
+          "counter": "{count} of {max}",
+          "lineRequired": "Add a message line to save a Priority or Support cell.",
+          "saveNext": "Save and next",
+          "clear": "Clear cell"
+        }
       }
     }
   },

@@ -1706,7 +1706,9 @@
         "personaNone": "Nog geen persona's",
         "statusPersonas": "{count} persona · {covered} van {markets} markten | {count} persona's · {covered} van {markets} markten",
         "notAvailable": "Nog niet beschikbaar",
-        "locked": "Vergrendeld tot alle concepten zijn goedgekeurd"
+        "locked": "Vergrendeld tot alle concepten zijn goedgekeurd",
+        "matrixStatus": "{set} van {total} cel ingesteld | {set} van {total} cellen ingesteld",
+        "matrixNone": "Voeg eerst USP's en persona's toe"
       },
       "audience": {
         "label": "Doelgroeptitel",
@@ -1749,8 +1751,12 @@
           "body": "Geen enkele persona gebruikt deze USP.",
           "bodyInUse": "{count} invalshoek gebruikt deze USP en wordt mee verwijderd: | {count} invalshoeken gebruiken deze USP en worden mee verwijderd:",
           "confirmInUse": "Verwijderen en {count} invalshoek wissen | Verwijderen en {count} invalshoeken wissen",
-          "refreshed": "De lijst is veranderd terwijl dit openstond. Controleer hem en bevestig opnieuw."
-        }
+          "refreshed": "De lijst is veranderd terwijl dit openstond. Controleer hem en bevestig opnieuw.",
+          "bodyInUseCells": "{count} plek gebruikt deze USP en wordt ermee gewist: | {count} plekken gebruiken deze USP en worden ermee gewist:",
+          "confirmInUseCells": "Verwijderen en {count} item wissen | Verwijderen en {count} items wissen",
+          "itemCell": "Cel {level}"
+        },
+        "usedByBoth": "Gebruikt door {angles} en {cells}"
       },
       "persona": {
         "markets": "Markten",
@@ -1826,7 +1832,11 @@
           "codeFormat": "Gebruik {min}–{max} letters of cijfers.",
           "angleRequired": "Vul een regel in."
         },
-        "linkAUsp": "Koppel een USP"
+        "linkAUsp": "Koppel een USP",
+        "syncedFromMatrix": "Gesynchroniseerd vanuit de matrix",
+        "changeInMatrix": "Wijzig het in de berichtenmatrix",
+        "removeAngleBodySyncs": "De invalshoek op “{usp}” wordt verwijderd. De cel van deze persona voor die USP is Prioriteit of Ondersteunend, dus een invalshoek gesynchroniseerd vanuit de matrix neemt zijn plaats in.",
+        "deleteBodyCells": "De persona wordt verwijderd met {angles} en {cells}:"
       },
       "copy": {
         "open": "Kopiëren van…",
@@ -1834,7 +1844,8 @@
         "source": "Kopiëren van",
         "submit": "Kopiëren",
         "line": "{count} kopiëren → {market} heeft dan {total} van {max}",
-        "over": "{count} kopiëren → {market} zou {total} van {max} hebben: boven het maximum."
+        "over": "{count} kopiëren → {market} zou {total} van {max} hebben: boven het maximum.",
+        "synced": "{count} gesynchroniseerde invalshoek wordt niet gekopieerd. Vul de matrix van {market} in. | {count} gesynchroniseerde invalshoeken worden niet gekopieerd. Vul de matrix van {market} in."
       },
       "validation": {
         "tooLong": "Maximaal {max} tekens."
@@ -1856,7 +1867,45 @@
         "angleAlreadyLinked": "Deze persona heeft al een invalshoek op die USP.",
         "conflict": "Iemand heeft dit tegelijk gewijzigd. Laad opnieuw en probeer het nog eens.",
         "brandArchived": "Een gearchiveerd merk is alleen-lezen. Herstel het eerst.",
-        "forbidden": "Alleen een admin of manager kan dit doen."
+        "forbidden": "Alleen een admin of manager kan dit doen.",
+        "angleSyncedReadOnly": "Wijzig dit in de berichtenmatrix."
+      },
+      "counts": {
+        "angles": "{count} invalshoek | {count} invalshoeken",
+        "cells": "{count} cel | {count} cellen"
+      },
+      "matrix": {
+        "title": "Berichtenmatrix · {market}",
+        "subtitle": "USP's × persona's. Bepaal per persona de hiërarchie en de zinnen waarmee je leidt.",
+        "level": {
+          "priority": "Prioriteit",
+          "support": "Ondersteunend",
+          "low": "Laag"
+        },
+        "legend": {
+          "priorityHint": "leid hiermee",
+          "supportHint": "het opnemen waard",
+          "lowHint": "niet de hoofdreden"
+        },
+        "corner": "USP / persona",
+        "leadWith": "Leid met:",
+        "notSet": "Niet ingesteld",
+        "tabProgress": "{set} van {total} cellen ingesteld voor {market}",
+        "handNote": "Deze persona heeft al een met de hand geschreven invalshoek op deze USP. Die blijft zoals geschreven.",
+        "footer": "De tabel groeit mee met de wave: de kolommen zijn de persona's in deze markt (2 tot 8), de rijen zijn de USP's van de wave. Brede tabellen schuiven zijwaarts met de USP-kolom vastgezet. Cellen met Prioriteit en Ondersteunend worden de invalshoeken van elke persona.",
+        "noUsps": "Voeg eerst USP's toe in stap 1.",
+        "noPersonas": "Nog geen persona's voor {market}.",
+        "goToPersonas": "Voeg persona's toe in stap 2",
+        "retry": "Opnieuw proberen",
+        "editor": {
+          "level": "Niveau",
+          "rationale": "Onderbouwing",
+          "messageLine": "Berichtregel",
+          "counter": "{count} van {max}",
+          "lineRequired": "Voeg een berichtregel toe om een cel met Prioriteit of Ondersteunend op te slaan.",
+          "saveNext": "Opslaan en volgende",
+          "clear": "Cel wissen"
+        }
       }
     }
   },

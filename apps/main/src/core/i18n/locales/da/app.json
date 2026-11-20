@@ -1706,7 +1706,9 @@
         "personaNone": "Ingen personaer endnu",
         "statusPersonas": "{count} persona · {covered} af {markets} markeder | {count} personaer · {covered} af {markets} markeder",
         "notAvailable": "Ikke tilgængelig endnu",
-        "locked": "Låst, indtil alle koncepter er godkendt"
+        "locked": "Låst, indtil alle koncepter er godkendt",
+        "matrixStatus": "{set} af {total} celle sat | {set} af {total} celler sat",
+        "matrixNone": "Tilføj først USP'er og personaer"
       },
       "audience": {
         "label": "Målgruppetitel",
@@ -1749,8 +1751,12 @@
           "body": "Ingen persona bruger denne USP.",
           "bodyInUse": "{count} vinkel bruger denne USP og fjernes sammen med den: | {count} vinkler bruger denne USP og fjernes sammen med den:",
           "confirmInUse": "Slet og fjern {count} vinkel | Slet og fjern {count} vinkler",
-          "refreshed": "Listen er ændret, mens dette var åbent. Tjek den, og bekræft igen."
-        }
+          "refreshed": "Listen er ændret, mens dette var åbent. Tjek den, og bekræft igen.",
+          "bodyInUseCells": "{count} sted bruger denne USP og ryddes med den: | {count} steder bruger denne USP og ryddes med den:",
+          "confirmInUseCells": "Slet og ryd {count} element | Slet og ryd {count} elementer",
+          "itemCell": "Celle: {level}"
+        },
+        "usedByBoth": "Brugt af {angles} og {cells}"
       },
       "persona": {
         "markets": "Markeder",
@@ -1826,7 +1832,11 @@
           "codeFormat": "Brug {min}–{max} bogstaver eller cifre.",
           "angleRequired": "Angiv en linje."
         },
-        "linkAUsp": "Knyt et USP"
+        "linkAUsp": "Knyt et USP",
+        "syncedFromMatrix": "Synkroniseret fra matrixen",
+        "changeInMatrix": "Ret det i budskabsmatrixen",
+        "removeAngleBodySyncs": "Vinklen på “{usp}” fjernes. Personaens celle for denne USP er prioritet eller støtte, så en vinkel synkroniseret fra matrixen træder i stedet.",
+        "deleteBodyCells": "Personaen fjernes sammen med {angles} og {cells}:"
       },
       "copy": {
         "open": "Kopiér fra…",
@@ -1834,7 +1844,8 @@
         "source": "Kopiér fra",
         "submit": "Kopiér",
         "line": "Kopierer {count} → {market} får {total} af {max}",
-        "over": "Kopierer {count} → {market} ville få {total} af {max}: over maksimum."
+        "over": "Kopierer {count} → {market} ville få {total} af {max}: over maksimum.",
+        "synced": "{count} synkroniseret vinkel kopieres ikke. Udfyld matrixen for {market}. | {count} synkroniserede vinkler kopieres ikke. Udfyld matrixen for {market}."
       },
       "validation": {
         "tooLong": "Højst {max} tegn."
@@ -1856,7 +1867,45 @@
         "angleAlreadyLinked": "Denne persona har allerede en vinkel på den USP.",
         "conflict": "Nogen ændrede dette på samme tid. Indlæs igen og prøv igen.",
         "brandArchived": "Et arkiveret brand er skrivebeskyttet. Gendan det først.",
-        "forbidden": "Kun en admin eller manager kan gøre dette."
+        "forbidden": "Kun en admin eller manager kan gøre dette.",
+        "angleSyncedReadOnly": "Ret det i budskabsmatrixen."
+      },
+      "counts": {
+        "angles": "{count} vinkel | {count} vinkler",
+        "cells": "{count} celle | {count} celler"
+      },
+      "matrix": {
+        "title": "Budskabsmatrix · {market}",
+        "subtitle": "USP'er × personaer. Fastlæg hierarkiet for hver persona og de linjer, der skal føre.",
+        "level": {
+          "priority": "Prioritet",
+          "support": "Støtte",
+          "low": "Lav"
+        },
+        "legend": {
+          "priorityHint": "led med dette",
+          "supportHint": "værd at medtage",
+          "lowHint": "ikke den vigtigste drivkraft"
+        },
+        "corner": "USP / persona",
+        "leadWith": "Led med:",
+        "notSet": "Ikke sat",
+        "tabProgress": "{set} af {total} celler sat for {market}",
+        "handNote": "Denne persona har allerede en håndskrevet vinkel på denne USP. Den bevares, som den er skrevet.",
+        "footer": "Tabellen vokser med waven: kolonnerne er personaerne på dette marked (2 til 8), rækkerne er wavens USP'er. Brede tabeller ruller sidelæns, mens USP-kolonnen er fastgjort. Celler med prioritet og støtte bliver til hver persona's vinkler.",
+        "noUsps": "Tilføj først USP'er i trin 1.",
+        "noPersonas": "Ingen personaer for {market} endnu.",
+        "goToPersonas": "Tilføj personaer i trin 2",
+        "retry": "Prøv igen",
+        "editor": {
+          "level": "Niveau",
+          "rationale": "Begrundelse",
+          "messageLine": "Budskabslinje",
+          "counter": "{count} af {max}",
+          "lineRequired": "Tilføj en budskabslinje for at gemme en celle med prioritet eller støtte.",
+          "saveNext": "Gem og næste",
+          "clear": "Ryd celle"
+        }
       }
     }
   },

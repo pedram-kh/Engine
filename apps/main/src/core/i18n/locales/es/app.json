@@ -1706,7 +1706,9 @@
         "personaNone": "Aún no hay personas",
         "statusPersonas": "{count} persona · {covered} de {markets} mercados | {count} personas · {covered} de {markets} mercados",
         "notAvailable": "Aún no disponible",
-        "locked": "Bloqueado hasta que se aprueben todos los conceptos"
+        "locked": "Bloqueado hasta que se aprueben todos los conceptos",
+        "matrixStatus": "{set} de {total} celda definida | {set} de {total} celdas definidas",
+        "matrixNone": "Añade primero USP y personas"
       },
       "audience": {
         "label": "Título de la audiencia",
@@ -1749,8 +1751,12 @@
           "body": "Ninguna persona usa esta USP.",
           "bodyInUse": "{count} ángulo usa esta USP y se eliminará con ella: | {count} ángulos usan esta USP y se eliminarán con ella:",
           "confirmInUse": "Eliminar y quitar {count} ángulo | Eliminar y quitar {count} ángulos",
-          "refreshed": "La lista cambió mientras esto estaba abierto. Revísala y confirma de nuevo."
-        }
+          "refreshed": "La lista cambió mientras esto estaba abierto. Revísala y confirma de nuevo.",
+          "bodyInUseCells": "{count} lugar usa este USP y se vacía con él: | {count} lugares usan este USP y se vacían con él:",
+          "confirmInUseCells": "Eliminar y vaciar {count} elemento | Eliminar y vaciar {count} elementos",
+          "itemCell": "Celda: {level}"
+        },
+        "usedByBoth": "Usado por {angles} y {cells}"
       },
       "persona": {
         "markets": "Mercados",
@@ -1826,7 +1832,11 @@
           "codeFormat": "Usa de {min} a {max} letras o cifras.",
           "angleRequired": "Escribe una línea."
         },
-        "linkAUsp": "Vincular un USP"
+        "linkAUsp": "Vincular un USP",
+        "syncedFromMatrix": "Sincronizado desde la matriz",
+        "changeInMatrix": "Cámbialo en la matriz de mensajes",
+        "removeAngleBodySyncs": "Se elimina el ángulo de «{usp}». La celda de esta persona para ese USP es de Prioridad o Apoyo, así que un ángulo sincronizado desde la matriz ocupa su lugar.",
+        "deleteBodyCells": "La persona se elimina junto con {angles} y {cells}:"
       },
       "copy": {
         "open": "Copiar desde…",
@@ -1834,7 +1844,8 @@
         "source": "Copiar desde",
         "submit": "Copiar",
         "line": "Copiar {count} → {market} tendrá {total} de {max}",
-        "over": "Copiar {count} → {market} tendría {total} de {max}: supera el máximo."
+        "over": "Copiar {count} → {market} tendría {total} de {max}: supera el máximo.",
+        "synced": "{count} ángulo sincronizado no se copia. Rellena la matriz de {market}. | {count} ángulos sincronizados no se copian. Rellena la matriz de {market}."
       },
       "validation": {
         "tooLong": "Máximo {max} caracteres."
@@ -1856,7 +1867,45 @@
         "angleAlreadyLinked": "Esta persona ya tiene un ángulo en esa USP.",
         "conflict": "Alguien cambió esto al mismo tiempo. Recarga e inténtalo de nuevo.",
         "brandArchived": "Una marca archivada es de solo lectura. Restáurala primero.",
-        "forbidden": "Solo un admin o un manager puede hacer esto."
+        "forbidden": "Solo un admin o un manager puede hacer esto.",
+        "angleSyncedReadOnly": "Cámbialo en la matriz de mensajes."
+      },
+      "counts": {
+        "angles": "{count} ángulo | {count} ángulos",
+        "cells": "{count} celda | {count} celdas"
+      },
+      "matrix": {
+        "title": "Matriz de mensajes · {market}",
+        "subtitle": "USP × personas. Define la jerarquía de cada persona y las frases con las que liderar.",
+        "level": {
+          "priority": "Prioridad",
+          "support": "Apoyo",
+          "low": "Baja"
+        },
+        "legend": {
+          "priorityHint": "liderar con esto",
+          "supportHint": "merece incluirse",
+          "lowHint": "no es la motivación principal"
+        },
+        "corner": "USP / Persona",
+        "leadWith": "Liderar con:",
+        "notSet": "Sin definir",
+        "tabProgress": "{set} de {total} celdas definidas en {market}",
+        "handNote": "Esta persona ya tiene un ángulo escrito a mano para este USP. Se mantiene tal como está escrito.",
+        "footer": "La tabla crece con la oleada: las columnas son las personas de este mercado (de 2 a 8) y las filas son los USP de la oleada. Las tablas anchas se desplazan hacia los lados con la columna de USP fija. Las celdas de Prioridad y Apoyo se convierten en los ángulos de cada persona.",
+        "noUsps": "Añade primero USP en el paso 1.",
+        "noPersonas": "Aún no hay personas para {market}.",
+        "goToPersonas": "Añadir personas en el paso 2",
+        "retry": "Reintentar",
+        "editor": {
+          "level": "Nivel",
+          "rationale": "Justificación",
+          "messageLine": "Frase del mensaje",
+          "counter": "{count} de {max}",
+          "lineRequired": "Añade una frase de mensaje para guardar una celda de Prioridad o Apoyo.",
+          "saveNext": "Guardar y siguiente",
+          "clear": "Vaciar celda"
+        }
       }
     }
   },

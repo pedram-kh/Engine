@@ -1706,7 +1706,9 @@
         "personaNone": "Još nema persona",
         "statusPersonas": "{count} persona · {covered} od {markets} tržišta | {count} persona · {covered} od {markets} tržišta",
         "notAvailable": "Još nije dostupno",
-        "locked": "Zaključano dok se ne odobre svi koncepti"
+        "locked": "Zaključano dok se ne odobre svi koncepti",
+        "matrixStatus": "{set} od {total} ćelije postavljeno | {set} od {total} ćelija postavljeno",
+        "matrixNone": "Prvo dodajte USP-ove i persone"
       },
       "audience": {
         "label": "Naslov ciljne skupine",
@@ -1749,8 +1751,12 @@
           "body": "Nijedna persona ne koristi ovaj USP.",
           "bodyInUse": "{count} kut koristi ovaj USP i uklanja se s njim: | {count} kutova koristi ovaj USP i uklanjaju se s njim:",
           "confirmInUse": "Izbriši i ukloni {count} kut | Izbriši i ukloni {count} kutova",
-          "refreshed": "Popis se promijenio dok je prozor bio otvoren. Provjerite ga i ponovno potvrdite."
-        }
+          "refreshed": "Popis se promijenio dok je prozor bio otvoren. Provjerite ga i ponovno potvrdite.",
+          "bodyInUseCells": "{count} mjesto koristi ovaj USP i briše se s njim: | {count} mjesta koriste ovaj USP i brišu se s njim:",
+          "confirmInUseCells": "Izbriši i očisti {count} stavku | Izbriši i očisti {count} stavki",
+          "itemCell": "Ćelija: {level}"
+        },
+        "usedByBoth": "Koristi {angles} i {cells}"
       },
       "persona": {
         "markets": "Tržišta",
@@ -1826,7 +1832,11 @@
           "codeFormat": "Upotrijebite {min}–{max} slova ili znamenki.",
           "angleRequired": "Unesite redak."
         },
-        "linkAUsp": "Poveži USP"
+        "linkAUsp": "Poveži USP",
+        "syncedFromMatrix": "Sinkronizirano iz matrice",
+        "changeInMatrix": "Promijenite to u matrici poruka",
+        "removeAngleBodySyncs": "Kut za „{usp}“ uklanja se. Ćelija ove persone za taj USP je Prioritet ili Podrška, pa njegovo mjesto zauzima kut sinkroniziran iz matrice.",
+        "deleteBodyCells": "Persona se uklanja zajedno s: {angles} i {cells}:"
       },
       "copy": {
         "open": "Kopiraj iz…",
@@ -1834,7 +1844,8 @@
         "source": "Kopiraj iz",
         "submit": "Kopiraj",
         "line": "Kopiranje {count} → tržište {market} imat će {total} od {max}",
-        "over": "Kopiranje {count} → tržište {market} imalo bi {total} od {max}: iznad maksimuma."
+        "over": "Kopiranje {count} → tržište {market} imalo bi {total} od {max}: iznad maksimuma.",
+        "synced": "{count} sinkronizirani kut se ne kopira. Ispunite matricu za {market}. | {count} sinkronizirana kuta se ne kopiraju. Ispunite matricu za {market}."
       },
       "validation": {
         "tooLong": "Najviše {max} znakova."
@@ -1856,7 +1867,45 @@
         "angleAlreadyLinked": "Ova persona već ima kut za taj USP.",
         "conflict": "Netko je ovo promijenio u isto vrijeme. Ponovno učitajte i pokušajte ponovno.",
         "brandArchived": "Arhivirani brend samo je za čitanje. Prvo ga vratite.",
-        "forbidden": "To može učiniti samo admin ili manager."
+        "forbidden": "To može učiniti samo admin ili manager.",
+        "angleSyncedReadOnly": "Promijenite to u matrici poruka."
+      },
+      "counts": {
+        "angles": "{count} kut | {count} kutova",
+        "cells": "{count} ćelija | {count} ćelija"
+      },
+      "matrix": {
+        "title": "Matrica poruka · {market}",
+        "subtitle": "USP-ovi × persone. Odredite hijerarhiju za svaku personu i poruke kojima se vodi.",
+        "level": {
+          "priority": "Prioritet",
+          "support": "Podrška",
+          "low": "Nizak"
+        },
+        "legend": {
+          "priorityHint": "vodite ovim",
+          "supportHint": "vrijedi uključiti",
+          "lowHint": "nije glavni motiv"
+        },
+        "corner": "USP / persona",
+        "leadWith": "Vodite s:",
+        "notSet": "Nije postavljeno",
+        "tabProgress": "{set} od {total} ćelija postavljeno za {market}",
+        "handNote": "Ova persona već ima ručno napisan kut za ovaj USP. Ostaje onakav kakav je napisan.",
+        "footer": "Tablica raste s valom: stupci su persone na ovom tržištu (2 do 8), reci su USP-ovi vala. Široke tablice klize bočno, a stupac USP-a ostaje prikvačen. Ćelije Prioriteta i Podrške postaju kutovi svake persone.",
+        "noUsps": "Prvo dodajte USP-ove u koraku 1.",
+        "noPersonas": "Za tržište {market} još nema persona.",
+        "goToPersonas": "Dodajte persone u koraku 2",
+        "retry": "Pokušaj ponovno",
+        "editor": {
+          "level": "Razina",
+          "rationale": "Obrazloženje",
+          "messageLine": "Redak poruke",
+          "counter": "{count} od {max}",
+          "lineRequired": "Dodajte redak poruke da biste spremili ćeliju Prioriteta ili Podrške.",
+          "saveNext": "Spremi i dalje",
+          "clear": "Očisti ćeliju"
+        }
       }
     }
   },

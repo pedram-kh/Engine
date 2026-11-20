@@ -1706,7 +1706,9 @@
         "personaNone": "Ancora nessuna persona",
         "statusPersonas": "{count} persona · {covered} mercati su {markets} | {count} persone · {covered} mercati su {markets}",
         "notAvailable": "Non ancora disponibile",
-        "locked": "Bloccato finché tutti i concept non sono approvati"
+        "locked": "Bloccato finché tutti i concept non sono approvati",
+        "matrixStatus": "{set} cella impostata su {total} | {set} celle impostate su {total}",
+        "matrixNone": "Aggiungi prima USP e persona"
       },
       "audience": {
         "label": "Titolo del pubblico",
@@ -1749,8 +1751,12 @@
           "body": "Nessuna persona usa questa USP.",
           "bodyInUse": "{count} angolo usa questa USP e viene rimosso con essa: | {count} angoli usano questa USP e vengono rimossi con essa:",
           "confirmInUse": "Elimina e rimuovi {count} angolo | Elimina e rimuovi {count} angoli",
-          "refreshed": "L'elenco è cambiato mentre questa finestra era aperta. Controllalo e conferma di nuovo."
-        }
+          "refreshed": "L'elenco è cambiato mentre questa finestra era aperta. Controllalo e conferma di nuovo.",
+          "bodyInUseCells": "{count} punto usa questo USP e viene svuotato con esso: | {count} punti usano questo USP e vengono svuotati con esso:",
+          "confirmInUseCells": "Elimina e svuota {count} elemento | Elimina e svuota {count} elementi",
+          "itemCell": "Cella {level}"
+        },
+        "usedByBoth": "Usato da {angles} e {cells}"
       },
       "persona": {
         "markets": "Mercati",
@@ -1826,7 +1832,11 @@
           "codeFormat": "Usa da {min} a {max} lettere o cifre.",
           "angleRequired": "Inserisci una riga."
         },
-        "linkAUsp": "Collega un USP"
+        "linkAUsp": "Collega un USP",
+        "syncedFromMatrix": "Sincronizzato dalla matrice",
+        "changeInMatrix": "Modificalo nella matrice dei messaggi",
+        "removeAngleBodySyncs": "L'angolo su «{usp}» viene rimosso. La cella di questa persona per questo USP è Priorità o Supporto, quindi al suo posto subentra un angolo sincronizzato dalla matrice.",
+        "deleteBodyCells": "La persona viene rimossa insieme a {angles} e {cells}:"
       },
       "copy": {
         "open": "Copia da…",
@@ -1834,7 +1844,8 @@
         "source": "Copia da",
         "submit": "Copia",
         "line": "Copiando {count} → {market} avrà {total} di {max}",
-        "over": "Copiando {count} → {market} avrebbe {total} di {max}: oltre il massimo."
+        "over": "Copiando {count} → {market} avrebbe {total} di {max}: oltre il massimo.",
+        "synced": "{count} angolo sincronizzato non viene copiato. Compila la matrice di {market}. | {count} angoli sincronizzati non vengono copiati. Compila la matrice di {market}."
       },
       "validation": {
         "tooLong": "Al massimo {max} caratteri."
@@ -1856,7 +1867,45 @@
         "angleAlreadyLinked": "Questa persona ha già un angolo su quella USP.",
         "conflict": "Qualcuno ha modificato questo elemento nello stesso momento. Ricarica e riprova.",
         "brandArchived": "Un brand archiviato è in sola lettura. Ripristinalo prima.",
-        "forbidden": "Solo un admin o un manager può farlo."
+        "forbidden": "Solo un admin o un manager può farlo.",
+        "angleSyncedReadOnly": "Modificalo nella matrice dei messaggi."
+      },
+      "counts": {
+        "angles": "{count} angolo | {count} angoli",
+        "cells": "{count} cella | {count} celle"
+      },
+      "matrix": {
+        "title": "Matrice dei messaggi · {market}",
+        "subtitle": "USP × persona. Imposta la gerarchia per ogni persona e le frasi con cui aprire.",
+        "level": {
+          "priority": "Priorità",
+          "support": "Supporto",
+          "low": "Bassa"
+        },
+        "legend": {
+          "priorityHint": "apri con questo",
+          "supportHint": "vale la pena includerlo",
+          "lowHint": "non è la leva principale"
+        },
+        "corner": "USP / persona",
+        "leadWith": "Apri con:",
+        "notSet": "Non impostata",
+        "tabProgress": "{set} celle impostate su {total} per {market}",
+        "handNote": "Questa persona ha già un angolo scritto a mano su questo USP. Resta com'è scritto.",
+        "footer": "La tabella cresce con l'ondata: le colonne sono le persone di questo mercato (da 2 a 8), le righe sono gli USP dell'ondata. Le tabelle larghe scorrono di lato con la colonna USP fissata. Le celle Priorità e Supporto diventano gli angoli di ogni persona.",
+        "noUsps": "Aggiungi prima gli USP nel passo 1.",
+        "noPersonas": "Ancora nessuna persona per {market}.",
+        "goToPersonas": "Aggiungi persone nel passo 2",
+        "retry": "Riprova",
+        "editor": {
+          "level": "Livello",
+          "rationale": "Motivazione",
+          "messageLine": "Frase del messaggio",
+          "counter": "{count} di {max}",
+          "lineRequired": "Aggiungi una frase del messaggio per salvare una cella Priorità o Supporto.",
+          "saveNext": "Salva e avanti",
+          "clear": "Svuota cella"
+        }
       }
     }
   },

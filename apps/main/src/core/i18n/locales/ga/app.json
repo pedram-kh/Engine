@@ -1706,7 +1706,9 @@
         "personaNone": "Níl aon phearsa ann fós",
         "statusPersonas": "{count} phearsa · {covered} as {markets} margadh | {count} pearsa · {covered} as {markets} margadh",
         "notAvailable": "Níl sé ar fáil fós",
-        "locked": "Faoi ghlas go dtí go ndéantar na coincheapa go léir a cheadú"
+        "locked": "Faoi ghlas go dtí go ndéantar na coincheapa go léir a cheadú",
+        "matrixStatus": "{set} as {total} cill socraithe | {set} as {total} cill socraithe",
+        "matrixNone": "Cuir USPanna agus pearsana leis ar dtús"
       },
       "audience": {
         "label": "Teideal an lucht féachana",
@@ -1749,8 +1751,12 @@
           "body": "Ní úsáideann aon phearsa an USP seo.",
           "bodyInUse": "Úsáideann {count} uillinn an USP seo agus bainfear í leis: | Úsáideann {count} uillinn an USP seo agus bainfear iad leis:",
           "confirmInUse": "Scrios agus bain {count} uillinn | Scrios agus bain {count} uillinn",
-          "refreshed": "D'athraigh an liosta agus an fhuinneog oscailte. Seiceáil é agus deimhnigh arís."
-        }
+          "refreshed": "D'athraigh an liosta agus an fhuinneog oscailte. Seiceáil é agus deimhnigh arís.",
+          "bodyInUseCells": "Úsáideann {count} áit an USP seo agus glanfar í leis: | Úsáideann {count} áit an USP seo agus glanfar iad leis:",
+          "confirmInUseCells": "Scrios agus glan {count} mhír | Scrios agus glan {count} mír",
+          "itemCell": "Cill: {level}"
+        },
+        "usedByBoth": "In úsáid ag {angles} agus {cells}"
       },
       "persona": {
         "markets": "Margaí",
@@ -1826,7 +1832,11 @@
           "codeFormat": "Úsáid {min}–{max} litir nó digit.",
           "angleRequired": "Cuir líne isteach."
         },
-        "linkAUsp": "Nasc USP"
+        "linkAUsp": "Nasc USP",
+        "syncedFromMatrix": "Sioncronaithe ón maitrís",
+        "changeInMatrix": "Athraigh é sa Mhaitrís teachtaireachtaí",
+        "removeAngleBodySyncs": "Bainfear an uillinn ar “{usp}”. Tá cill na pearsan seo don USP seo ar Tosaíocht nó Tacaíocht, mar sin glacfaidh uillinn sioncronaithe ón maitrís a háit.",
+        "deleteBodyCells": "Bainfear an phearsa le {angles} agus {cells}:"
       },
       "copy": {
         "open": "Cóipeáil ó…",
@@ -1834,7 +1844,8 @@
         "source": "Cóipeáil ó",
         "submit": "Cóipeáil",
         "line": "Ag cóipeáil {count} → beidh {total} as {max} ag {market}",
-        "over": "Ag cóipeáil {count} → bheadh {total} as {max} ag {market}: os cionn an uasmhéid."
+        "over": "Ag cóipeáil {count} → bheadh {total} as {max} ag {market}: os cionn an uasmhéid.",
+        "synced": "Ní chóipeáiltear {count} uillinn sioncronaithe. Líon maitrís {market}. | Ní chóipeáiltear {count} uillinn sioncronaithe. Líon maitrís {market}."
       },
       "validation": {
         "tooLong": "{max} carachtar ar a mhéad."
@@ -1856,7 +1867,45 @@
         "angleAlreadyLinked": "Tá uillinn ag an phearsa seo cheana ar an USP sin.",
         "conflict": "D'athraigh duine éigin é seo ag an am céanna. Athluchtaigh agus bain triail eile as.",
         "brandArchived": "Níl brandáil chartlannaithe inléite ach amháin. Athchóirigh í ar dtús.",
-        "forbidden": "Ní féidir ach le riarthóir nó bainisteoir é seo a dhéanamh."
+        "forbidden": "Ní féidir ach le riarthóir nó bainisteoir é seo a dhéanamh.",
+        "angleSyncedReadOnly": "Athraigh é seo sa Mhaitrís teachtaireachtaí."
+      },
+      "counts": {
+        "angles": "{count} uillinn | {count} uillinn",
+        "cells": "{count} chill | {count} cill"
+      },
+      "matrix": {
+        "title": "Maitrís teachtaireachtaí · {market}",
+        "subtitle": "USPanna × pearsana. Socraigh an ordlathas do gach pearsa agus na línte a threoróidh.",
+        "level": {
+          "priority": "Tosaíocht",
+          "support": "Tacaíocht",
+          "low": "Íseal"
+        },
+        "legend": {
+          "priorityHint": "tosaigh leis seo",
+          "supportHint": "fiú a chur san áireamh",
+          "lowHint": "nach é an príomhspreagadh é"
+        },
+        "corner": "USP / pearsa",
+        "leadWith": "Tosaigh le:",
+        "notSet": "Gan socrú",
+        "tabProgress": "{set} as {total} cill socraithe do {market}",
+        "handNote": "Tá uillinn lámhscríofa ag an bpearsa seo ar an USP seo cheana. Fanann sí mar a scríobhadh í.",
+        "footer": "Fásann an tábla leis an tonn: is iad na colúin na pearsana sa mhargadh seo (2 go 8), is iad na sraitheanna USPanna an toinn. Scrollaíonn táblaí leathana ar an taobh agus an colún USP greamaithe. Éiríonn cealla Tosaíochta agus Tacaíochta ina n-uillinneacha de chuid gach pearsa.",
+        "noUsps": "Cuir USPanna leis i gcéim 1 ar dtús.",
+        "noPersonas": "Níl aon phearsa ann do {market} fós.",
+        "goToPersonas": "Cuir pearsana leis i gcéim 2",
+        "retry": "Bain triail eile as",
+        "editor": {
+          "level": "Leibhéal",
+          "rationale": "Réasúnú",
+          "messageLine": "Líne teachtaireachta",
+          "counter": "{count} as {max}",
+          "lineRequired": "Cuir líne teachtaireachta leis chun cill Tosaíochta nó Tacaíochta a shábháil.",
+          "saveNext": "Sábháil agus an chéad cheann eile",
+          "clear": "Glan an chill"
+        }
       }
     }
   },

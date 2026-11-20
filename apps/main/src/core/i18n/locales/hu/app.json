@@ -1706,7 +1706,9 @@
         "personaNone": "Még nincs perszóna",
         "statusPersonas": "{count} perszóna · {covered} / {markets} piac | {count} perszóna · {covered} / {markets} piac",
         "notAvailable": "Még nem elérhető",
-        "locked": "Zárolva, amíg az összes koncepciót el nem fogadják"
+        "locked": "Zárolva, amíg az összes koncepciót el nem fogadják",
+        "matrixStatus": "{set} / {total} cella beállítva | {set} / {total} cella beállítva",
+        "matrixNone": "Először adjon hozzá USP-ket és perszónákat"
       },
       "audience": {
         "label": "Célközönség címe",
@@ -1749,8 +1751,12 @@
           "body": "Egyetlen perszóna sem használja ezt az USP-t.",
           "bodyInUse": "{count} szög használja ezt az USP-t, és vele együtt törlődik: | {count} szög használja ezt az USP-t, és vele együtt törlődnek:",
           "confirmInUse": "Törlés és {count} szög eltávolítása | Törlés és {count} szög eltávolítása",
-          "refreshed": "A lista megváltozott, amíg az ablak nyitva volt. Nézd át, és erősítsd meg újra."
-        }
+          "refreshed": "A lista megváltozott, amíg az ablak nyitva volt. Nézd át, és erősítsd meg újra.",
+          "bodyInUseCells": "{count} hely használja ezt az USP-t, és vele együtt törlődik: | {count} hely használja ezt az USP-t, és vele együtt törlődik:",
+          "confirmInUseCells": "Törlés és {count} elem kiürítése | Törlés és {count} elem kiürítése",
+          "itemCell": "Cella: {level}"
+        },
+        "usedByBoth": "Használja: {angles} és {cells}"
       },
       "persona": {
         "markets": "Piacok",
@@ -1826,7 +1832,11 @@
           "codeFormat": "{min}–{max} betűt vagy számjegyet használj.",
           "angleRequired": "Írj be egy sort."
         },
-        "linkAUsp": "USP csatolása"
+        "linkAUsp": "USP csatolása",
+        "syncedFromMatrix": "A mátrixból szinkronizálva",
+        "changeInMatrix": "Módosítsa az Üzenetmátrixban",
+        "removeAngleBodySyncs": "A(z) „{usp}” szög törlődik. A perszóna cellája ehhez az USP-hez Elsődleges vagy Támogató, ezért a helyére a mátrixból szinkronizált szög kerül.",
+        "deleteBodyCells": "A perszóna törlődik ezekkel együtt: {angles} és {cells}:"
       },
       "copy": {
         "open": "Másolás innen…",
@@ -1834,7 +1844,8 @@
         "source": "Másolás innen",
         "submit": "Másolás",
         "line": "{count} másolása → {market} piacon {total} / {max} lesz",
-        "over": "{count} másolása → {market} piacon {total} / {max} lenne: a maximum fölött."
+        "over": "{count} másolása → {market} piacon {total} / {max} lenne: a maximum fölött.",
+        "synced": "{count} szinkronizált szög nem másolódik. Töltse ki a(z) {market} mátrixát. | {count} szinkronizált szög nem másolódik. Töltse ki a(z) {market} mátrixát."
       },
       "validation": {
         "tooLong": "Legfeljebb {max} karakter."
@@ -1856,7 +1867,45 @@
         "angleAlreadyLinked": "Ennek a perszónának már van szöge ehhez az USP-hez.",
         "conflict": "Valaki ugyanekkor módosította ezt. Töltsd újra, és próbáld újra.",
         "brandArchived": "Az archivált márka csak olvasható. Előbb állítsd vissza.",
-        "forbidden": "Ezt csak admin vagy menedzser teheti meg."
+        "forbidden": "Ezt csak admin vagy menedzser teheti meg.",
+        "angleSyncedReadOnly": "Ezt az Üzenetmátrixban módosítsa."
+      },
+      "counts": {
+        "angles": "{count} szög | {count} szög",
+        "cells": "{count} cella | {count} cella"
+      },
+      "matrix": {
+        "title": "Üzenetmátrix · {market}",
+        "subtitle": "USP-k × perszónák. Állítsa be minden perszónához a hierarchiát és az üzeneteket, amelyekkel vezet.",
+        "level": {
+          "priority": "Elsődleges",
+          "support": "Támogató",
+          "low": "Alacsony"
+        },
+        "legend": {
+          "priorityHint": "ezzel vezessen",
+          "supportHint": "érdemes belevenni",
+          "lowHint": "nem ez a fő motiváció"
+        },
+        "corner": "USP / perszóna",
+        "leadWith": "Ezzel vezessen:",
+        "notSet": "Nincs beállítva",
+        "tabProgress": "{set} / {total} cella beállítva: {market}",
+        "handNote": "Ennek a perszónának már van kézzel írt szöge ehhez az USP-hez. Úgy marad, ahogy meg van írva.",
+        "footer": "A táblázat a hullámmal nő: az oszlopok a piac perszónái (2–8), a sorok a hullám USP-i. A széles táblázatok oldalra görgethetők, az USP oszlop rögzített marad. Az Elsődleges és Támogató cellák az egyes perszónák szögeivé válnak.",
+        "noUsps": "Először adjon hozzá USP-ket az 1. lépésben.",
+        "noPersonas": "Még nincs perszóna ide: {market}.",
+        "goToPersonas": "Perszónák hozzáadása a 2. lépésben",
+        "retry": "Próbálja újra",
+        "editor": {
+          "level": "Szint",
+          "rationale": "Indoklás",
+          "messageLine": "Üzenetsor",
+          "counter": "{count} / {max}",
+          "lineRequired": "Adjon meg üzenetsort az Elsődleges vagy Támogató cella mentéséhez.",
+          "saveNext": "Mentés és tovább",
+          "clear": "Cella törlése"
+        }
       }
     }
   },

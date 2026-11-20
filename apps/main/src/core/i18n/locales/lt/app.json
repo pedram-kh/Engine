@@ -1706,7 +1706,9 @@
         "personaNone": "Personų dar nėra",
         "statusPersonas": "{count} persona · {covered} iš {markets} rinkų | {count} personos · {covered} iš {markets} rinkų",
         "notAvailable": "Dar neprieinama",
-        "locked": "Užrakinta, kol bus patvirtintos visos koncepcijos"
+        "locked": "Užrakinta, kol bus patvirtintos visos koncepcijos",
+        "matrixStatus": "Nustatytas {set} langelis iš {total} | Nustatyta {set} langelių iš {total}",
+        "matrixNone": "Pirmiausia pridėkite USP ir personas"
       },
       "audience": {
         "label": "Auditorijos pavadinimas",
@@ -1749,8 +1751,12 @@
           "body": "Šio USP nenaudoja jokia persona.",
           "bodyInUse": "{count} kampas naudoja šį USP ir bus pašalintas kartu su juo: | {count} kampai naudoja šį USP ir bus pašalinti kartu su juo:",
           "confirmInUse": "Ištrinti ir pašalinti {count} kampą | Ištrinti ir pašalinti {count} kampus",
-          "refreshed": "Sąrašas pasikeitė, kol langas buvo atidarytas. Peržiūrėkite jį ir patvirtinkite dar kartą."
-        }
+          "refreshed": "Sąrašas pasikeitė, kol langas buvo atidarytas. Peržiūrėkite jį ir patvirtinkite dar kartą.",
+          "bodyInUseCells": "{count} vieta naudoja šį USP ir išvaloma kartu su juo: | {count} vietos naudoja šį USP ir išvalomos kartu su juo:",
+          "confirmInUseCells": "Ištrinti ir išvalyti {count} elementą | Ištrinti ir išvalyti {count} elementus",
+          "itemCell": "Langelis: {level}"
+        },
+        "usedByBoth": "Naudoja {angles} ir {cells}"
       },
       "persona": {
         "markets": "Rinkos",
@@ -1826,7 +1832,11 @@
           "codeFormat": "Naudokite {min}–{max} raides arba skaitmenis.",
           "angleRequired": "Įveskite eilutę."
         },
-        "linkAUsp": "Susieti USP"
+        "linkAUsp": "Susieti USP",
+        "syncedFromMatrix": "Sinchronizuota iš matricos",
+        "changeInMatrix": "Pakeiskite tai Žinučių matricoje",
+        "removeAngleBodySyncs": "Kampas „{usp}“ pašalinamas. Šios personos langelis šiam USP yra Prioritetas arba Parama, todėl jo vietą užima iš matricos sinchronizuotas kampas.",
+        "deleteBodyCells": "Persona pašalinama kartu su: {angles} ir {cells}:"
       },
       "copy": {
         "open": "Kopijuoti iš…",
@@ -1834,7 +1844,8 @@
         "source": "Kopijuoti iš",
         "submit": "Kopijuoti",
         "line": "Kopijuojama {count} → rinkoje {market} bus {total} iš {max}",
-        "over": "Kopijuojama {count} → rinkoje {market} būtų {total} iš {max}: viršija maksimumą."
+        "over": "Kopijuojama {count} → rinkoje {market} būtų {total} iš {max}: viršija maksimumą.",
+        "synced": "{count} sinchronizuotas kampas nekopijuojamas. Užpildykite rinkos {market} matricą. | {count} sinchronizuoti kampai nekopijuojami. Užpildykite rinkos {market} matricą."
       },
       "validation": {
         "tooLong": "Daugiausia {max} simbolių."
@@ -1856,7 +1867,45 @@
         "angleAlreadyLinked": "Ši persona jau turi kampą šiam USP.",
         "conflict": "Kažkas tai pakeitė tuo pačiu metu. Įkelkite iš naujo ir bandykite dar kartą.",
         "brandArchived": "Archyvuotas prekės ženklas yra tik skaitomas. Pirmiausia jį atkurkite.",
-        "forbidden": "Tai gali padaryti tik adminas arba vadovas."
+        "forbidden": "Tai gali padaryti tik adminas arba vadovas.",
+        "angleSyncedReadOnly": "Pakeiskite tai Žinučių matricoje."
+      },
+      "counts": {
+        "angles": "{count} kampas | {count} kampai",
+        "cells": "{count} langelis | {count} langeliai"
+      },
+      "matrix": {
+        "title": "Žinučių matrica · {market}",
+        "subtitle": "USP × personos. Nustatykite kiekvienos personos hierarchiją ir eilutes, kuriomis vadovaujamasi.",
+        "level": {
+          "priority": "Prioritetas",
+          "support": "Parama",
+          "low": "Žemas"
+        },
+        "legend": {
+          "priorityHint": "pradėkite nuo šito",
+          "supportHint": "verta įtraukti",
+          "lowHint": "ne pagrindinis motyvas"
+        },
+        "corner": "USP / persona",
+        "leadWith": "Pradėkite nuo:",
+        "notSet": "Nenustatyta",
+        "tabProgress": "Nustatyta {set} langelių iš {total}: {market}",
+        "handNote": "Ši persona jau turi ranka parašytą kampą šiam USP. Jis paliekamas toks, koks parašytas.",
+        "footer": "Lentelė auga su banga: stulpeliai yra šios rinkos personos (nuo 2 iki 8), eilutės yra bangos USP. Plačios lentelės slenka į šoną, o USP stulpelis lieka prisegtas. Prioriteto ir paramos langeliai tampa kiekvienos personos kampais.",
+        "noUsps": "Pirmiausia pridėkite USP 1 žingsnyje.",
+        "noPersonas": "Rinkai {market} personų dar nėra.",
+        "goToPersonas": "Pridėkite personas 2 žingsnyje",
+        "retry": "Bandyti dar kartą",
+        "editor": {
+          "level": "Lygis",
+          "rationale": "Pagrindimas",
+          "messageLine": "Žinutės eilutė",
+          "counter": "{count} iš {max}",
+          "lineRequired": "Pridėkite žinutės eilutę, kad išsaugotumėte Prioriteto ar Paramos langelį.",
+          "saveNext": "Išsaugoti ir toliau",
+          "clear": "Išvalyti langelį"
+        }
       }
     }
   },

@@ -1706,7 +1706,9 @@
         "personaNone": "Încă nicio persona",
         "statusPersonas": "{count} persona · {covered} din {markets} piețe | {count} persona · {covered} din {markets} piețe",
         "notAvailable": "Încă indisponibil",
-        "locked": "Blocat până când toate conceptele sunt aprobate"
+        "locked": "Blocat până când toate conceptele sunt aprobate",
+        "matrixStatus": "{set} din {total} celulă setată | {set} din {total} celule setate",
+        "matrixNone": "Adaugă mai întâi USP-uri și persone"
       },
       "audience": {
         "label": "Titlul audienței",
@@ -1749,8 +1751,12 @@
           "body": "Nicio persona nu folosește acest USP.",
           "bodyInUse": "{count} unghi folosește acest USP și este eliminat odată cu el: | {count} unghiuri folosesc acest USP și sunt eliminate odată cu el:",
           "confirmInUse": "Șterge și elimină {count} unghi | Șterge și elimină {count} unghiuri",
-          "refreshed": "Lista s-a schimbat cât timp fereastra a fost deschisă. Verific-o și confirmă din nou."
-        }
+          "refreshed": "Lista s-a schimbat cât timp fereastra a fost deschisă. Verific-o și confirmă din nou.",
+          "bodyInUseCells": "{count} loc folosește acest USP și este golit odată cu el: | {count} locuri folosesc acest USP și sunt golite odată cu el:",
+          "confirmInUseCells": "Șterge și golește {count} element | Șterge și golește {count} elemente",
+          "itemCell": "Celulă: {level}"
+        },
+        "usedByBoth": "Folosit de {angles} și {cells}"
       },
       "persona": {
         "markets": "Piețe",
@@ -1826,7 +1832,11 @@
           "codeFormat": "Folosește {min}–{max} litere sau cifre.",
           "angleRequired": "Introdu un rând."
         },
-        "linkAUsp": "Leagă un USP"
+        "linkAUsp": "Leagă un USP",
+        "syncedFromMatrix": "Sincronizat din matrice",
+        "changeInMatrix": "Modifică în matricea mesajelor",
+        "removeAngleBodySyncs": "Unghiul pentru „{usp}” este eliminat. Celula acestei persone pentru acest USP este Prioritate sau Sprijin, deci locul lui este luat de un unghi sincronizat din matrice.",
+        "deleteBodyCells": "Persona este eliminată împreună cu {angles} și {cells}:"
       },
       "copy": {
         "open": "Copiază din…",
@@ -1834,7 +1844,8 @@
         "source": "Copiază din",
         "submit": "Copiază",
         "line": "Copiere {count} → {market} va avea {total} din {max}",
-        "over": "Copiere {count} → {market} ar avea {total} din {max}: peste maximum."
+        "over": "Copiere {count} → {market} ar avea {total} din {max}: peste maximum.",
+        "synced": "{count} unghi sincronizat nu este copiat. Completează matricea pentru {market}. | {count} unghiuri sincronizate nu sunt copiate. Completează matricea pentru {market}."
       },
       "validation": {
         "tooLong": "Cel mult {max} caractere."
@@ -1856,7 +1867,45 @@
         "angleAlreadyLinked": "Această persona are deja un unghi pentru acest USP.",
         "conflict": "Cineva a schimbat asta în același timp. Reîncarcă și încearcă din nou.",
         "brandArchived": "Un brand arhivat este doar pentru citire. Restaurează-l mai întâi.",
-        "forbidden": "Doar un admin sau un manager poate face asta."
+        "forbidden": "Doar un admin sau un manager poate face asta.",
+        "angleSyncedReadOnly": "Modifică asta în matricea mesajelor."
+      },
+      "counts": {
+        "angles": "{count} unghi | {count} unghiuri",
+        "cells": "{count} celulă | {count} celule"
+      },
+      "matrix": {
+        "title": "Matricea mesajelor · {market}",
+        "subtitle": "USP-uri × persone. Stabilește ierarhia pentru fiecare persona și frazele cu care se deschide.",
+        "level": {
+          "priority": "Prioritate",
+          "support": "Sprijin",
+          "low": "Scăzută"
+        },
+        "legend": {
+          "priorityHint": "începe cu asta",
+          "supportHint": "merită inclus",
+          "lowHint": "nu este motivul principal"
+        },
+        "corner": "USP / persona",
+        "leadWith": "Începe cu:",
+        "notSet": "Nesetat",
+        "tabProgress": "{set} din {total} celule setate pentru {market}",
+        "handNote": "Această persona are deja un unghi scris de mână pentru acest USP. Rămâne așa cum a fost scris.",
+        "footer": "Tabelul crește odată cu valul: coloanele sunt personele de pe această piață (2–8), rândurile sunt USP-urile valului. Tabelele late derulează lateral, cu coloana USP fixată. Celulele Prioritate și Sprijin devin unghiurile fiecărei persone.",
+        "noUsps": "Adaugă mai întâi USP-uri la pasul 1.",
+        "noPersonas": "Încă nicio persona pentru {market}.",
+        "goToPersonas": "Adaugă persone la pasul 2",
+        "retry": "Încearcă din nou",
+        "editor": {
+          "level": "Nivel",
+          "rationale": "Justificare",
+          "messageLine": "Fraza mesajului",
+          "counter": "{count} din {max}",
+          "lineRequired": "Adaugă o frază de mesaj pentru a salva o celulă Prioritate sau Sprijin.",
+          "saveNext": "Salvează și următorul",
+          "clear": "Golește celula"
+        }
       }
     }
   },

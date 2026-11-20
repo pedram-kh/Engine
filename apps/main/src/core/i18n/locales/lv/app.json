@@ -1706,7 +1706,9 @@
         "personaNone": "Personu vēl nav",
         "statusPersonas": "{count} persona · {covered} no {markets} tirgiem | {count} personas · {covered} no {markets} tirgiem",
         "notAvailable": "Vēl nav pieejams",
-        "locked": "Bloķēts, līdz tiek apstiprinātas visas koncepcijas"
+        "locked": "Bloķēts, līdz tiek apstiprinātas visas koncepcijas",
+        "matrixStatus": "Iestatīta {set} šūna no {total} | Iestatītas {set} šūnas no {total}",
+        "matrixNone": "Vispirms pievienojiet USP un personas"
       },
       "audience": {
         "label": "Mērķauditorijas nosaukums",
@@ -1749,8 +1751,12 @@
           "body": "Šo USP neizmanto neviena persona.",
           "bodyInUse": "{count} leņķis izmanto šo USP un tiks noņemts kopā ar to: | {count} leņķi izmanto šo USP un tiks noņemti kopā ar to:",
           "confirmInUse": "Dzēst un noņemt {count} leņķi | Dzēst un noņemt {count} leņķus",
-          "refreshed": "Saraksts mainījās, kamēr logs bija atvērts. Pārbaudiet to un apstipriniet vēlreiz."
-        }
+          "refreshed": "Saraksts mainījās, kamēr logs bija atvērts. Pārbaudiet to un apstipriniet vēlreiz.",
+          "bodyInUseCells": "{count} vieta izmanto šo USP un tiek notīrīta kopā ar to: | {count} vietas izmanto šo USP un tiek notīrītas kopā ar to:",
+          "confirmInUseCells": "Dzēst un notīrīt {count} vienumu | Dzēst un notīrīt {count} vienumus",
+          "itemCell": "Šūna: {level}"
+        },
+        "usedByBoth": "Izmanto {angles} un {cells}"
       },
       "persona": {
         "markets": "Tirgi",
@@ -1826,7 +1832,11 @@
           "codeFormat": "Izmantojiet {min}–{max} burtus vai ciparus.",
           "angleRequired": "Ievadiet rindu."
         },
-        "linkAUsp": "Saistīt USP"
+        "linkAUsp": "Saistīt USP",
+        "syncedFromMatrix": "Sinhronizēts no matricas",
+        "changeInMatrix": "Mainiet to Ziņojumu matricā",
+        "removeAngleBodySyncs": "Leņķis “{usp}” tiek noņemts. Šīs personas šūna šim USP ir Prioritāte vai Atbalsts, tāpēc tā vietā stājas no matricas sinhronizēts leņķis.",
+        "deleteBodyCells": "Persona tiek noņemta kopā ar: {angles} un {cells}:"
       },
       "copy": {
         "open": "Kopēt no…",
@@ -1834,7 +1844,8 @@
         "source": "Kopēt no",
         "submit": "Kopēt",
         "line": "Kopē {count} → tirgū {market} būs {total} no {max}",
-        "over": "Kopē {count} → tirgū {market} būtu {total} no {max}: pārsniedz maksimumu."
+        "over": "Kopē {count} → tirgū {market} būtu {total} no {max}: pārsniedz maksimumu.",
+        "synced": "{count} sinhronizēts leņķis netiek kopēts. Aizpildiet tirgus {market} matricu. | {count} sinhronizēti leņķi netiek kopēti. Aizpildiet tirgus {market} matricu."
       },
       "validation": {
         "tooLong": "Ne vairāk kā {max} rakstzīmes."
@@ -1856,7 +1867,45 @@
         "angleAlreadyLinked": "Šai personai jau ir leņķis šim USP.",
         "conflict": "Kāds to mainīja tajā pašā brīdī. Ielādējiet no jauna un mēģiniet vēlreiz.",
         "brandArchived": "Arhivēts zīmols ir tikai lasāms. Vispirms atjaunojiet to.",
-        "forbidden": "To var izdarīt tikai administrators vai vadītājs."
+        "forbidden": "To var izdarīt tikai administrators vai vadītājs.",
+        "angleSyncedReadOnly": "Mainiet to Ziņojumu matricā."
+      },
+      "counts": {
+        "angles": "{count} leņķis | {count} leņķi",
+        "cells": "{count} šūna | {count} šūnas"
+      },
+      "matrix": {
+        "title": "Ziņojumu matrica · {market}",
+        "subtitle": "USP × personas. Iestatiet katras personas prioritāšu secību un rindas, ar kurām vadīt.",
+        "level": {
+          "priority": "Prioritāte",
+          "support": "Atbalsts",
+          "low": "Zems"
+        },
+        "legend": {
+          "priorityHint": "vadiet ar šo",
+          "supportHint": "vērts iekļaut",
+          "lowHint": "nav galvenais motīvs"
+        },
+        "corner": "USP / persona",
+        "leadWith": "Vadiet ar:",
+        "notSet": "Nav iestatīts",
+        "tabProgress": "Iestatītas {set} šūnas no {total}: {market}",
+        "handNote": "Šai personai jau ir ar roku rakstīts leņķis šim USP. Tas paliek tāds, kāds uzrakstīts.",
+        "footer": "Tabula aug līdz ar vilni: kolonnas ir šī tirgus personas (no 2 līdz 8), rindas ir viļņa USP. Platas tabulas ritinās uz sāniem, USP kolonna paliek piespraustā. Prioritātes un atbalsta šūnas kļūst par katras personas leņķiem.",
+        "noUsps": "Vispirms pievienojiet USP 1. solī.",
+        "noPersonas": "Tirgum {market} personu vēl nav.",
+        "goToPersonas": "Pievienojiet personas 2. solī",
+        "retry": "Mēģināt vēlreiz",
+        "editor": {
+          "level": "Līmenis",
+          "rationale": "Pamatojums",
+          "messageLine": "Ziņojuma rindiņa",
+          "counter": "{count} no {max}",
+          "lineRequired": "Pievienojiet ziņojuma rindiņu, lai saglabātu Prioritātes vai Atbalsta šūnu.",
+          "saveNext": "Saglabāt un tālāk",
+          "clear": "Notīrīt šūnu"
+        }
       }
     }
   },

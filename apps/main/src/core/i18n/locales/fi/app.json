@@ -1706,7 +1706,9 @@
         "personaNone": "Ei vielä personia",
         "statusPersonas": "{count} persona · {covered} / {markets} markkinaa | {count} personaa · {covered} / {markets} markkinaa",
         "notAvailable": "Ei vielä saatavilla",
-        "locked": "Lukittu, kunnes kaikki konseptit on hyväksytty"
+        "locked": "Lukittu, kunnes kaikki konseptit on hyväksytty",
+        "matrixStatus": "{set} / {total} solua asetettu | {set} / {total} solua asetettu",
+        "matrixNone": "Lisää ensin USP:t ja personat"
       },
       "audience": {
         "label": "Kohderyhmän otsikko",
@@ -1749,8 +1751,12 @@
           "body": "Mikään persona ei käytä tätä USP:tä.",
           "bodyInUse": "{count} näkökulma käyttää tätä USP:tä ja poistuu sen mukana: | {count} näkökulmaa käyttää tätä USP:tä ja poistuu sen mukana:",
           "confirmInUse": "Poista ja poista {count} näkökulma | Poista ja poista {count} näkökulmaa",
-          "refreshed": "Luettelo muuttui ikkunan ollessa auki. Tarkista se ja vahvista uudelleen."
-        }
+          "refreshed": "Luettelo muuttui ikkunan ollessa auki. Tarkista se ja vahvista uudelleen.",
+          "bodyInUseCells": "{count} paikka käyttää tätä USP:tä ja tyhjennetään sen mukana: | {count} paikkaa käyttää tätä USP:tä ja tyhjennetään sen mukana:",
+          "confirmInUseCells": "Poista ja tyhjennä {count} kohde | Poista ja tyhjennä {count} kohdetta",
+          "itemCell": "Solu: {level}"
+        },
+        "usedByBoth": "Käytössä: {angles} ja {cells}"
       },
       "persona": {
         "markets": "Markkinat",
@@ -1826,7 +1832,11 @@
           "codeFormat": "Käytä {min}–{max} kirjainta tai numeroa.",
           "angleRequired": "Kirjoita rivi."
         },
-        "linkAUsp": "Linkitä USP"
+        "linkAUsp": "Linkitä USP",
+        "syncedFromMatrix": "Synkronoitu matriisista",
+        "changeInMatrix": "Muuta se viestimatriisissa",
+        "removeAngleBodySyncs": "Näkökulma “{usp}” poistetaan. Tämän personan solu tälle USP:lle on ensisijainen tai tukeva, joten sen tilalle tulee matriisista synkronoitu näkökulma.",
+        "deleteBodyCells": "Persona poistetaan yhdessä näiden kanssa: {angles} ja {cells}:"
       },
       "copy": {
         "open": "Kopioi kohteesta…",
@@ -1834,7 +1844,8 @@
         "source": "Kopioi kohteesta",
         "submit": "Kopioi",
         "line": "Kopioidaan {count} → markkinalla {market} on {total} / {max}",
-        "over": "Kopioidaan {count} → markkinalla {market} olisi {total} / {max}: yli enimmäismäärän."
+        "over": "Kopioidaan {count} → markkinalla {market} olisi {total} / {max}: yli enimmäismäärän.",
+        "synced": "{count} synkronoitua näkökulmaa ei kopioida. Täytä markkinan {market} matriisi. | {count} synkronoitua näkökulmaa ei kopioida. Täytä markkinan {market} matriisi."
       },
       "validation": {
         "tooLong": "Enintään {max} merkkiä."
@@ -1856,7 +1867,45 @@
         "angleAlreadyLinked": "Tällä personalla on jo näkökulma tähän USP:hen.",
         "conflict": "Joku muutti tätä samaan aikaan. Lataa uudelleen ja yritä uudelleen.",
         "brandArchived": "Arkistoitu brändi on vain luettavissa. Palauta se ensin.",
-        "forbidden": "Vain admin tai manageri voi tehdä tämän."
+        "forbidden": "Vain admin tai manageri voi tehdä tämän.",
+        "angleSyncedReadOnly": "Muuta tämä viestimatriisissa."
+      },
+      "counts": {
+        "angles": "{count} näkökulma | {count} näkökulmaa",
+        "cells": "{count} solu | {count} solua"
+      },
+      "matrix": {
+        "title": "Viestimatriisi · {market}",
+        "subtitle": "USP:t × personat. Määritä kullekin personalle tärkeysjärjestys ja viestit, joilla johdetaan.",
+        "level": {
+          "priority": "Ensisijainen",
+          "support": "Tukeva",
+          "low": "Matala"
+        },
+        "legend": {
+          "priorityHint": "johda tällä",
+          "supportHint": "kannattaa ottaa mukaan",
+          "lowHint": "ei ole pääsyy"
+        },
+        "corner": "USP / persona",
+        "leadWith": "Johda tällä:",
+        "notSet": "Ei asetettu",
+        "tabProgress": "{set} / {total} solua asetettu: {market}",
+        "handNote": "Tällä personalla on jo käsin kirjoitettu näkökulma tähän USP:hen. Se säilyy sellaisenaan.",
+        "footer": "Taulukko kasvaa aallon mukana: sarakkeet ovat tämän markkinan personat (2–8), rivit aallon USP:t. Leveät taulukot vierivät sivusuunnassa USP-sarake kiinnitettynä. Ensisijaisen ja tukevan tason solut muuttuvat kunkin personan näkökulmiksi.",
+        "noUsps": "Lisää ensin USP:t vaiheessa 1.",
+        "noPersonas": "Markkinalla {market} ei ole vielä personia.",
+        "goToPersonas": "Lisää personat vaiheessa 2",
+        "retry": "Yritä uudelleen",
+        "editor": {
+          "level": "Taso",
+          "rationale": "Perustelu",
+          "messageLine": "Viestirivi",
+          "counter": "{count} / {max}",
+          "lineRequired": "Lisää viestirivi, jotta voit tallentaa ensisijaisen tai tukevan solun.",
+          "saveNext": "Tallenna ja seuraava",
+          "clear": "Tyhjennä solu"
+        }
       }
     }
   },
