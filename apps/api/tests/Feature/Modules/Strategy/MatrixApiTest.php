@@ -13,6 +13,7 @@ use App\Modules\Waves\Models\Wave;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\TestResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Tests\Support\StrategyFixtures as S;
 use Tests\TestCase;
 
@@ -46,19 +47,30 @@ function mx(): array
 /**
  * @param  array<string, mixed>  $cell
  */
+/** @return TestResponse<Response> */
 function mxPut(array $w, array $cell, string $who = 'admin', string $market = 'SK'): TestResponse
 {
     return S::call($w[$who], 'PUT', S::u($w, 'matrix/cells'), ['market' => $market, 'cells' => [$cell]]);
 }
 
-function mxCell(string $persona, string $usp): ?WaveMatrixCell
+function mxCell(string $persona, string $usp): WaveMatrixCell
+{
+    return mxCellOrNull($persona, $usp) ?? throw new RuntimeException('no cell on this pair');
+}
+
+function mxCellOrNull(string $persona, string $usp): ?WaveMatrixCell
 {
     return WaveMatrixCell::query()
         ->where('persona_id', WavePersona::query()->where('ulid', $persona)->value('id'))
         ->where('usp_id', WaveUsp::query()->where('ulid', $usp)->value('id'))->first();
 }
 
-function mxAngle(string $persona, string $usp): ?WavePersonaAngle
+function mxAngle(string $persona, string $usp): WavePersonaAngle
+{
+    return mxAngleOrNull($persona, $usp) ?? throw new RuntimeException('no angle on this pair');
+}
+
+function mxAngleOrNull(string $persona, string $usp): ?WavePersonaAngle
 {
     return WavePersonaAngle::query()
         ->where('persona_id', WavePersona::query()->where('ulid', $persona)->value('id'))
@@ -81,17 +93,16 @@ function mxInvariant(): void
         $angles = WavePersonaAngle::query()->where('persona_id', $cell->persona_id)->where('usp_id', $cell->usp_id)->get();
         if ($cell->level->feedsAngle() && $cell->message_line !== null) {
             expect($angles)->toHaveCount(1);
-            if ($angles[0]->origin === AngleOrigin::Matrix) {
-                expect($angles[0]->explanation)->toBe($cell->message_line);
+            if ($angles->firstOrFail()->origin === AngleOrigin::Matrix) {
+                expect($angles->firstOrFail()->explanation)->toBe($cell->message_line);
             }
         } else {
             expect($angles->where('origin', AngleOrigin::Matrix))->toHaveCount(0);
         }
     }
     foreach (WavePersonaAngle::query()->where('origin', AngleOrigin::Matrix->value)->get() as $angle) {
-        $cell = WaveMatrixCell::query()->where('persona_id', $angle->persona_id)->where('usp_id', $angle->usp_id)->first();
-        expect($cell)->not->toBeNull()
-            ->and($cell->level->feedsAngle())->toBeTrue();
+        $cell = WaveMatrixCell::query()->where('persona_id', $angle->persona_id)->where('usp_id', $angle->usp_id)->firstOrFail();
+        expect($cell->level->feedsAngle())->toBeTrue();
     }
 }
 
@@ -157,10 +168,10 @@ it('X-06: setting a Priority or Support cell to Low removes the synced angle and
     $w = mx();
     foreach (['priority', 'support'] as $level) {
         mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => $level, 'rationale' => 'R', 'message_line' => 'M'])->assertOk();
-        expect(mxAngle($w['p1'], $w['uA']))->not->toBeNull();
+        expect(mxAngleOrNull($w['p1'], $w['uA']))->not->toBeNull();
 
         mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'low'])->assertOk();
-        expect(mxAngle($w['p1'], $w['uA']))->toBeNull()
+        expect(mxAngleOrNull($w['p1'], $w['uA']))->toBeNull()
             ->and(mxCell($w['p1'], $w['uA'])->message_line)->toBe('M')->and(mxCell($w['p1'], $w['uA'])->rationale)->toBe('R');
     }
     mxInvariant();
@@ -181,11 +192,11 @@ it('X-08: clearing a cell deletes the row and the synced angle', function (): vo
     mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'priority', 'message_line' => 'M'])->assertOk();
     mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'clear' => true])->assertOk()->assertJsonPath('data.cells.0.level', null);
 
-    expect(mxCell($w['p1'], $w['uA']))->toBeNull()->and(mxAngle($w['p1'], $w['uA']))->toBeNull();
+    expect(mxCellOrNull($w['p1'], $w['uA']))->toBeNull()->and(mxAngleOrNull($w['p1'], $w['uA']))->toBeNull();
     // A Low cell is cleared the same way (no angle to remove).
     mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uB'], 'level' => 'low'])->assertOk();
     mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uB'], 'clear' => true])->assertOk();
-    expect(mxCell($w['p1'], $w['uB']))->toBeNull();
+    expect(mxCellOrNull($w['p1'], $w['uB']))->toBeNull();
     mxInvariant();
 });
 
@@ -195,7 +206,7 @@ it('X-09: clearing a cell with a hand-written angle there leaves that angle alon
     mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'support', 'message_line' => 'M'])->assertOk();
     mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'clear' => true])->assertOk();
 
-    expect(mxCell($w['p1'], $w['uA']))->toBeNull()->and(mxAngle($w['p1'], $w['uA'])->explanation)->toBe('Mine');
+    expect(mxCellOrNull($w['p1'], $w['uA']))->toBeNull()->and(mxAngle($w['p1'], $w['uA'])->explanation)->toBe('Mine');
 });
 
 it('X-10: a Low cell on an empty pair makes no angle, and a Low cell needs no message line', function (): void {
@@ -216,7 +227,7 @@ it('X-11: a Low cell with a hand-written angle there leaves that angle alone', f
 it('X-12: Low to Priority with a message line creates the synced angle', function (): void {
     $w = mx();
     mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'low', 'message_line' => 'Kept text'])->assertOk();
-    expect(mxAngle($w['p1'], $w['uA']))->toBeNull();
+    expect(mxAngleOrNull($w['p1'], $w['uA']))->toBeNull();
 
     mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'priority'])->assertOk();   // the stored message line is enough
 
@@ -269,12 +280,12 @@ it('X-16: removing the hand-written angle while the cell is Low or not set leave
     $a = mxManual($w, $w['p1'], $w['uA']);
     mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'low'])->assertOk();
     S::call($w['admin'], 'DELETE', S::u($w, "personas/{$w['p1']}/angles/{$a}"))->assertNoContent();
-    expect(mxAngle($w['p1'], $w['uA']))->toBeNull();
+    expect(mxAngleOrNull($w['p1'], $w['uA']))->toBeNull();
 
     $b = mxManual($w, $w['p2'], $w['uA']);   // no cell at all
     S::call($w['admin'], 'DELETE', S::u($w, "personas/{$w['p2']}/angles/{$b}"))->assertNoContent();
-    expect(mxAngle($w['p2'], $w['uA']))->toBeNull()
-        ->and(AuditLog::query()->where('action', 'wave_persona_angle.removed')->get()->every(fn ($r) => $r->metadata['matrix_angle_created'] === false))->toBeTrue();
+    expect(mxAngleOrNull($w['p2'], $w['uA']))->toBeNull()
+        ->and(AuditLog::query()->where('action', 'wave_persona_angle.removed')->get()->every(fn ($r) => ($r->metadata ?? [])['matrix_angle_created'] === false))->toBeTrue();
 });
 
 it('X-17: a hand-written angle cannot be added for a USP that already has a synced angle (422 angle.already_linked)', function (): void {
@@ -295,9 +306,9 @@ it('X-18: a synced angle cannot be edited or removed on the persona endpoints (4
         ->assertUnprocessable()->assertJsonPath('errors.0.code', 'angle.synced_read_only');
     S::call($w['admin'], 'DELETE', S::u($w, "personas/{$w['p1']}/angles/{$angle->ulid}"))
         ->assertUnprocessable()->assertJsonPath('errors.0.code', 'angle.synced_read_only');
-    expect($angle->fresh()->explanation)->toBe('M');
+    expect($angle->refresh()->explanation)->toBe('M');
 
-    $row = collect(S::call($w['admin'], 'GET', S::u($w, 'personas?market=SK'))->assertOk()->json('data'))->firstWhere('id', $w['p1']);
+    $row = collect((array) S::call($w['admin'], 'GET', S::u($w, 'personas?market=SK'))->assertOk()->json('data'))->firstWhere('id', $w['p1']);
     expect($row['attributes']['angles'][0]['attributes'])->toMatchArray(['origin' => 'matrix', 'read_only' => true, 'market' => 'SK'])
         ->and($row['attributes']['matrix_cells'])->toBe([['usp' => $w['uA'], 'level' => 'priority']]);
 });
@@ -310,7 +321,7 @@ it('X-19: deleting a USP removes its cells, its synced angles and its hand-writt
 
     $res = S::call($w['admin'], 'DELETE', S::u($w, "usps/{$w['uA']}"))->assertStatus(409);
     expect($res->json('errors.0.meta.count'))->toBe(3)
-        ->and(collect($res->json('errors.0.meta.affected'))->pluck('kind')->sort()->values()->all())->toBe(['angle', 'cell', 'cell']);
+        ->and(collect((array) $res->json('errors.0.meta.affected'))->pluck('kind')->sort()->values()->all())->toBe(['angle', 'cell', 'cell']);
 
     S::call($w['admin'], 'DELETE', S::u($w, "usps/{$w['uA']}?confirm_count=2"))->assertStatus(409);   // stale
     S::call($w['admin'], 'DELETE', S::u($w, "usps/{$w['uA']}?confirm_count=3"))->assertNoContent();
@@ -344,7 +355,7 @@ it('X-21: copying personas to another market copies hand-written angles only; no
     expect($copies)->toHaveCount(2)
         ->and(WaveMatrixCell::query()->where('market', 'CZ')->count())->toBe(0)
         ->and(WavePersonaAngle::query()->whereIn('persona_id', $copies->modelKeys())->count())->toBe(1)
-        ->and(WavePersonaAngle::query()->whereIn('persona_id', $copies->modelKeys())->first()->origin)->toBe(AngleOrigin::Manual);
+        ->and(WavePersonaAngle::query()->whereIn('persona_id', $copies->modelKeys())->firstOrFail()->origin)->toBe(AngleOrigin::Manual);
     expect(AuditLog::query()->where('action', 'wave_persona.copied')->firstOrFail()->metadata)->toMatchArray(['synced_angles_skipped' => 2]);
     mxInvariant();
 });
@@ -445,9 +456,7 @@ it('M-03: one request loads a market in a constant number of queries, for 1 pers
             }
         }
         foreach (WaveUsp::query()->get() as $usp) {
-            if ($i < 8) {
-                mxPut($w, ['persona' => $p, 'usp' => $usp->ulid, 'level' => 'low'])->assertOk();
-            }
+            mxPut($w, ['persona' => $p, 'usp' => $usp->ulid, 'level' => 'low'])->assertOk();
         }
     }
     expect(WaveMatrixCell::query()->where('market', 'SK')->count())->toBe(48);
@@ -498,8 +507,8 @@ it('W-01: a list of cells is written in one request: 48 cells, one audit row wit
         ->and(WaveMatrixCell::query()->count())->toBe(48)->and(WavePersonaAngle::query()->count())->toBe(24);
     $rows = AuditLog::query()->where('action', 'wave_matrix_cell.saved')->get();
     expect($rows)->toHaveCount(1)
-        ->and($rows[0]->metadata)->toMatchArray(['market' => 'SK', 'cells_created' => 48, 'angles_created' => 24, 'levels' => ['priority' => 24, 'low' => 24]])
-        ->and(json_encode($rows[0]->metadata))->not->toContain('SECRET');
+        ->and(($rows[0]->metadata ?? []))->toMatchArray(['market' => 'SK', 'cells_created' => 48, 'angles_created' => 24, 'levels' => ['priority' => 24, 'low' => 24]])
+        ->and(json_encode(($rows[0]->metadata ?? [])))->not->toContain('SECRET');
     mxInvariant();
 });
 
@@ -566,9 +575,10 @@ it('W-06: audit: one row per write, ids and counts and levels and field names on
 
     $rows = AuditLog::query()->where('action', 'wave_matrix_cell.saved')->orderBy('id')->get();
     expect($rows)->toHaveCount(2)
-        ->and($rows[0]->metadata)->toMatchArray(['wave' => $w['wave']->ulid, 'market' => 'SK', 'cells_created' => 1, 'angles_created' => 1, 'levels' => ['support' => 1]])
-        ->and($rows[1]->metadata)->toMatchArray(['cells_updated' => 1, 'angles_updated' => 1, 'changed' => ['message_line']])
-        ->and(json_encode($rows->pluck('metadata')))->not->toContain('SECRET')->not->toContain($w['p1']);
+        ->and(($rows[0]->metadata ?? []))->toMatchArray(['wave' => $w['wave']->ulid, 'market' => 'SK', 'cells_created' => 1, 'angles_created' => 1, 'levels' => ['support' => 1]])
+        ->and(($rows[1]->metadata ?? []))->toMatchArray(['cells_updated' => 1, 'angles_updated' => 1, 'changed' => ['message_line']])
+        ->and(json_encode($rows->pluck('metadata')))->not->toContain('SECRET');
+    expect(json_encode($rows->pluck('metadata')))->not->toContain($w['p1']);
 });
 
 // --- roles, tenancy -------------------------------------------------------------------------------------------------
@@ -583,7 +593,7 @@ it('R-01: admin, manager and staff can read and write cells; staff cannot delete
     mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uB'], 'level' => 'low'], 'staff')->assertOk();
 
     S::call($w['staff'], 'DELETE', S::u($w, "usps/{$w['uB']}?confirm_count=1"))->assertForbidden();
-    expect(mxCell($w['p1'], $w['uB']))->not->toBeNull();
+    expect(mxCellOrNull($w['p1'], $w['uB']))->not->toBeNull();
     S::call($w['manager'], 'DELETE', S::u($w, "usps/{$w['uB']}?confirm_count=1"))->assertNoContent();
     expect(WaveMatrixCell::query()->count())->toBe(0);
 });
@@ -595,7 +605,7 @@ it('T-01: another agency cannot read or write the matrix of this wave, and a per
 
     S::call($w['otherAdmin'], 'GET', S::u($w, 'matrix?market=SK'))->assertNotFound();
     S::call($w['otherAdmin'], 'PUT', S::u($w, 'matrix/cells'), ['market' => 'SK', 'cells' => [['persona' => $w['p1'], 'usp' => $w['uA'], 'clear' => true]]])->assertNotFound();
-    expect(mxCell($w['p1'], $w['uA']))->not->toBeNull();
+    expect(mxCellOrNull($w['p1'], $w['uA']))->not->toBeNull();
 
     // The other agency's own wave works, but it cannot name this agency's persona or USP.
     $theirUsp = S::call($w['otherAdmin'], 'POST', S::url($o['agency'], $o['brand'], $o['wave'], 'usps'), ['title' => 'Theirs'])->assertCreated()->json('data.id');

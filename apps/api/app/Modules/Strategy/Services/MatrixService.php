@@ -131,8 +131,8 @@ final class MatrixService
             $results = [];
 
             foreach ($changes as $i => $change) {
-                $persona = $personas[$change['persona']];
-                $usp = $usps[$change['usp']];
+                $persona = $personas->get($change['persona']) ?? throw new ModelNotFoundException;
+                $usp = $usps->get($change['usp']) ?? throw new ModelNotFoundException;
                 $key = $persona->id.':'.$usp->id;
                 $cell = $cells->get($key);
                 $changed = false;
@@ -147,7 +147,8 @@ final class MatrixService
                     }
                 } else {
                     if ($cell === null) {
-                        if (! isset($change['level'])) {
+                        $level = $change['level'] ?? null;
+                        if ($level === null) {
                             throw ValidationException::withMessages(["cells.{$i}.level" => ['A cell that is not set needs a level.']]);
                         }
                         $cell = new WaveMatrixCell([
@@ -156,7 +157,7 @@ final class MatrixService
                             'market' => $market,
                             'persona_id' => $persona->id,
                             'usp_id' => $usp->id,
-                            'level' => MatrixLevel::from($change['level']),
+                            'level' => MatrixLevel::from($level),
                             'rationale' => $change['rationale'] ?? null,
                             'message_line' => $change['message_line'] ?? null,
                             'source' => 'manual',
@@ -174,8 +175,9 @@ final class MatrixService
                                 continue;
                             }
                             if ($field === 'level') {
-                                if ($change['level'] !== null) {
-                                    $cell->level = MatrixLevel::from($change['level']);
+                                $newLevel = $change['level'] ?? null;
+                                if ($newLevel !== null) {
+                                    $cell->level = MatrixLevel::from($newLevel);
                                 }
                             } else {
                                 $cell->{$field} = $change[$field];

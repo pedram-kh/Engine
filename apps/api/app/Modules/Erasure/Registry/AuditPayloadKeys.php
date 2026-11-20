@@ -83,6 +83,7 @@ final class AuditPayloadKeys
             'PL-1.1 client-file attributes (filename, type, MIME, size): an agency-owned file about a brand. The filename is typed by the uploading agency user; it is not creator data.' => 'file_type,mime_type,original_filename,size_bytes',
             'PL-1.3 wave tracker attributes (stream, step key, owner flag, status source, planned and actual dates): an agency\'s planning data about a wave, no creator is a field of it. A step owner is carried by the already decided `from_user` and `to_user` ids (AH-119 A3), never a name; `owner_client` is a boolean flag; `name` and `status` are decided above.' => 'stream,step_key,owner_client,status_source,starts_on,due_on,completed_on',
             'PL-2.1 strategy workspace attributes (the wave and USP/persona/angle ulids, market codes, a USP colour key, a list of changed FIELD NAMES, a list of ulids in a new order, counts of angles or personas): ids, codes and counts of an agency\'s planning data, no creator is a field of it. The card TEXT and the persona name are never put in a payload.' => 'wave,usp,persona,angle,market,from_market,to_market,color_key,changed,order,angles_removed,personas_copied',
+            'PL-2.2 messaging-matrix counts and a flag (matrix cells removed with a USP or persona, whether removing a hand-written angle created the synced one, synced angles skipped by a persona copy): numbers and a boolean of an agency\'s planning data, no creator is a field of it. The rationale and the message line are never put in a payload.' => 'cells_removed,matrix_angle_created,synced_angles_skipped',
             'The erasure run\'s own bookkeeping: its ledger ulid, digest and per-table counts. No person.' => 'audit_rows_scrubbed,counts,digest,files_deleted,ledger_ulid',
         ];
 
@@ -130,6 +131,7 @@ final class AuditPayloadKeys
         $out[$p.'Creators/Jobs/BulkCreatorInvitationJob.php|metadata'] = 'Run statistics (counts); the typed addresses live in tracked_jobs.result, which is scrubbed separately.';
         $out[$p.'Audit/Concerns/Audited.php|after'] = 'The Audited trait: snapshot is restricted to each model\'s auditableAllowlist(), whose keys the guard reads below.';
         $out[$p.'Audit/Concerns/Audited.php|before'] = 'The Audited trait: snapshot is restricted to each model\'s auditableAllowlist(), whose keys the guard reads below.';
+        $out[$p.'Strategy/Services/MatrixService.php|metadata'] = 'Built from the wave ulid, a market code, the integer counts of one cell write, the level counts and the FIELD NAMES changed; the rationale and the message line are never passed (the audit test W-06 searches the stored payload for the typed text).';
         $out[$p.'Campaigns/Services/CampaignAssignmentStateMachine.php|metadata'] = 'RESIDUAL: array_merge(from/to, caller-supplied $context). The keys callers pass today are fees, draft ids and flags; the parser does not follow them (tech-debt row).';
 
         ksort($out);
