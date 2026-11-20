@@ -1768,7 +1768,6 @@
         "tileMax": "Využité {count} z {max} na trhu {market} · dosiahnuté maximum",
         "warning": "Pridajte aspoň {min} persón pre trh {market}.",
         "fewerThanMin": "Menej ako {min} persón",
-        "empty": "Pre trh {market} zatiaľ žiadne persóny.",
         "coreJob": "Hlavná úloha",
         "drivers": "Emocionálne motivácie",
         "goals": "Hodnoty a ciele",
@@ -1784,7 +1783,6 @@
         },
         "barriers": "Prekážky a trenie",
         "angles": "Kreatívne uhly, ktoré presvedčia",
-        "nameLine": "{name} · meno persóny",
         "menu": "Akcie pre {name}",
         "edit": "Upraviť",
         "delete": "Odstrániť",
@@ -1836,7 +1834,13 @@
         "syncedFromMatrix": "Synchronizované z matice",
         "changeInMatrix": "Zmeňte to v matici odkazov",
         "removeAngleBodySyncs": "Uhol pre „{usp}“ sa odstráni. Bunka tejto persóny pre toto USP má prioritu alebo podporu, preto ho nahradí uhol synchronizovaný z matice.",
-        "deleteBodyCells": "Persóna sa odstráni spolu s: {angles} a {cells}:"
+        "deleteBodyCells": "Persóna sa odstráni spolu s: {angles} a {cells}:",
+        "differsFromMatrix": "Líši sa od riadku v matici.",
+        "seeMatrixCell": "Zobraziť bunku v matici",
+        "emptyState": {
+          "title": "Pre trh {market} zatiaľ žiadne persóny",
+          "body": "Pridajte {min} až {max} persón, ktoré opisujú, pre koho na tomto trhu píšete."
+        }
       },
       "copy": {
         "open": "Kopírovať z…",
@@ -1891,11 +1895,8 @@
         "leadWith": "Začnite s:",
         "notSet": "Nenastavené",
         "tabProgress": "Nastavených {set} z {total} buniek pre {market}",
-        "handNote": "Táto persóna už má k tomuto USP ručne napísaný uhol. Zostáva tak, ako je napísaný.",
+        "handNote": "Táto persóna už má k tomuto USP ručne pridaný uhol. Zostáva tak, ako je napísaný.",
         "footer": "Tabuľka rastie s vlnou: stĺpce sú persóny na tomto trhu (2 až 8), riadky sú USP vlny. Široké tabuľky sa posúvajú do strán a stĺpec USP zostáva pripnutý. Bunky s prioritou a podporou sa stanú uhlami jednotlivých person.",
-        "noUsps": "Najprv pridajte USP v kroku 1.",
-        "noPersonas": "Pre trh {market} zatiaľ žiadne persóny.",
-        "goToPersonas": "Pridajte persóny v kroku 2",
         "retry": "Skúsiť znova",
         "editor": {
           "level": "Úroveň",
@@ -1904,7 +1905,23 @@
           "counter": "{count} z {max}",
           "lineRequired": "Pridajte riadok odkazu, aby sa dala uložiť bunka s prioritou alebo podporou.",
           "saveNext": "Uložiť a ďalej",
-          "clear": "Vymazať bunku"
+          "clear": "Vymazať bunku",
+          "prefilled": "Predvyplnené z ručne pridaného uhla. Uloženie tento uhol nemení."
+        },
+        "conflictNote": "Ručne pridaný uhol pre túto persónu a USP hovorí niečo iné. Zostáva tak, ako je napísaný, kým sa nerozhodnete.",
+        "useLine": "Použiť riadok z matice",
+        "useLineDialog": {
+          "title": "Použiť riadok z matice?",
+          "manual": "Ručne pridaný uhol",
+          "matrix": "Riadok odkazu v matici",
+          "effect": "Ručne pridaný uhol sa stane synchronizovaným uhlom a povie to, čo riadok odkazu. Jeho súčasný text sa nahradí."
+        },
+        "emptyUsps": {
+          "body": "V kroku 1 pridajte predajné argumenty tejto vlny a potom vyplňte maticu."
+        },
+        "emptyPersonas": {
+          "body": "V kroku 2 pridajte persóny pre tento trh a potom vyplňte jeho maticu.",
+          "cta": "Pridať persóny"
         }
       }
     }

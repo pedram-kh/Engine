@@ -1768,7 +1768,6 @@
         "tileMax": "{count} af {max} brugt i {market} · maksimum nået",
         "warning": "Tilføj mindst {min} personaer for {market}.",
         "fewerThanMin": "Færre end {min} personaer",
-        "empty": "Ingen personaer for {market} endnu.",
         "coreJob": "Kerneopgave",
         "drivers": "Følelsesmæssige drivkræfter",
         "goals": "Værdier og mål",
@@ -1784,7 +1783,6 @@
         },
         "barriers": "Barrierer og gnidninger",
         "angles": "Kreative vinkler, der overbeviser",
-        "nameLine": "{name} · personaens navn",
         "menu": "Handlinger for {name}",
         "edit": "Rediger",
         "delete": "Slet",
@@ -1836,7 +1834,13 @@
         "syncedFromMatrix": "Synkroniseret fra matrixen",
         "changeInMatrix": "Ret det i budskabsmatrixen",
         "removeAngleBodySyncs": "Vinklen på “{usp}” fjernes. Personaens celle for denne USP er prioritet eller støtte, så en vinkel synkroniseret fra matrixen træder i stedet.",
-        "deleteBodyCells": "Personaen fjernes sammen med {angles} og {cells}:"
+        "deleteBodyCells": "Personaen fjernes sammen med {angles} og {cells}:",
+        "differsFromMatrix": "Afviger fra matrixlinjen.",
+        "seeMatrixCell": "Se matrixcellen",
+        "emptyState": {
+          "title": "Ingen personaer for {market} endnu",
+          "body": "Tilføj {min} til {max} personaer, der beskriver, hvem du skriver til på dette marked."
+        }
       },
       "copy": {
         "open": "Kopiér fra…",
@@ -1891,11 +1895,8 @@
         "leadWith": "Led med:",
         "notSet": "Ikke sat",
         "tabProgress": "{set} af {total} celler sat for {market}",
-        "handNote": "Denne persona har allerede en håndskrevet vinkel på denne USP. Den bevares, som den er skrevet.",
+        "handNote": "Denne persona har allerede en manuelt tilføjet vinkel på denne USP. Den bevares, som den er skrevet.",
         "footer": "Tabellen vokser med waven: kolonnerne er personaerne på dette marked (2 til 8), rækkerne er wavens USP'er. Brede tabeller ruller sidelæns, mens USP-kolonnen er fastgjort. Celler med prioritet og støtte bliver til hver persona's vinkler.",
-        "noUsps": "Tilføj først USP'er i trin 1.",
-        "noPersonas": "Ingen personaer for {market} endnu.",
-        "goToPersonas": "Tilføj personaer i trin 2",
         "retry": "Prøv igen",
         "editor": {
           "level": "Niveau",
@@ -1904,7 +1905,23 @@
           "counter": "{count} af {max}",
           "lineRequired": "Tilføj en budskabslinje for at gemme en celle med prioritet eller støtte.",
           "saveNext": "Gem og næste",
-          "clear": "Ryd celle"
+          "clear": "Ryd celle",
+          "prefilled": "Udfyldt fra den manuelt tilføjede vinkel. Gem ændrer ikke den vinkel."
+        },
+        "conflictNote": "En manuelt tilføjet vinkel for denne persona og USP siger noget andet. Den bevares, som den er skrevet, indtil du vælger.",
+        "useLine": "Brug matrixlinjen",
+        "useLineDialog": {
+          "title": "Vil du bruge matrixlinjen?",
+          "manual": "Manuelt tilføjet vinkel",
+          "matrix": "Budskabslinje i matrixen",
+          "effect": "Den manuelt tilføjede vinkel bliver til den synkroniserede vinkel og siger det, budskabslinjen siger. Dens nuværende tekst erstattes."
+        },
+        "emptyUsps": {
+          "body": "Tilføj denne bølges salgsargumenter i trin 1, og udfyld derefter matrixen."
+        },
+        "emptyPersonas": {
+          "body": "Tilføj personaer for dette marked i trin 2, og udfyld derefter dets matrix.",
+          "cta": "Tilføj personaer"
         }
       }
     }

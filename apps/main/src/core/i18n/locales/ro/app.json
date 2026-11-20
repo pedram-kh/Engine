@@ -1768,7 +1768,6 @@
         "tileMax": "{count} din {max} folosite în {market} · maximum atins",
         "warning": "Adaugă cel puțin {min} persona pentru {market}.",
         "fewerThanMin": "Mai puțin de {min} persona",
-        "empty": "Încă nicio persona pentru {market}.",
         "coreJob": "Sarcina principală",
         "drivers": "Motivații emoționale",
         "goals": "Valori și obiective",
@@ -1784,7 +1783,6 @@
         },
         "barriers": "Bariere și fricțiuni",
         "angles": "Unghiuri creative care conving",
-        "nameLine": "{name} · numele personei",
         "menu": "Acțiuni pentru {name}",
         "edit": "Editează",
         "delete": "Șterge",
@@ -1836,7 +1834,13 @@
         "syncedFromMatrix": "Sincronizat din matrice",
         "changeInMatrix": "Modifică în matricea mesajelor",
         "removeAngleBodySyncs": "Unghiul pentru „{usp}” este eliminat. Celula acestei persone pentru acest USP este Prioritate sau Sprijin, deci locul lui este luat de un unghi sincronizat din matrice.",
-        "deleteBodyCells": "Persona este eliminată împreună cu {angles} și {cells}:"
+        "deleteBodyCells": "Persona este eliminată împreună cu {angles} și {cells}:",
+        "differsFromMatrix": "Diferă de fraza din matrice.",
+        "seeMatrixCell": "Vezi celula din matrice",
+        "emptyState": {
+          "title": "Încă nicio persona pentru {market}",
+          "body": "Adaugă între {min} și {max} persone care descriu cui te adresezi pe această piață."
+        }
       },
       "copy": {
         "open": "Copiază din…",
@@ -1891,11 +1895,8 @@
         "leadWith": "Începe cu:",
         "notSet": "Nesetat",
         "tabProgress": "{set} din {total} celule setate pentru {market}",
-        "handNote": "Această persona are deja un unghi scris de mână pentru acest USP. Rămâne așa cum a fost scris.",
+        "handNote": "Această persona are deja un unghi adăugat manual pentru acest USP. Rămâne așa cum este scris.",
         "footer": "Tabelul crește odată cu valul: coloanele sunt personele de pe această piață (2–8), rândurile sunt USP-urile valului. Tabelele late derulează lateral, cu coloana USP fixată. Celulele Prioritate și Sprijin devin unghiurile fiecărei persone.",
-        "noUsps": "Adaugă mai întâi USP-uri la pasul 1.",
-        "noPersonas": "Încă nicio persona pentru {market}.",
-        "goToPersonas": "Adaugă persone la pasul 2",
         "retry": "Încearcă din nou",
         "editor": {
           "level": "Nivel",
@@ -1904,7 +1905,23 @@
           "counter": "{count} din {max}",
           "lineRequired": "Adaugă o frază de mesaj pentru a salva o celulă Prioritate sau Sprijin.",
           "saveNext": "Salvează și următorul",
-          "clear": "Golește celula"
+          "clear": "Golește celula",
+          "prefilled": "Completat din unghiul adăugat manual. Salvarea nu modifică acel unghi."
+        },
+        "conflictNote": "Un unghi adăugat manual pentru această persona și acest USP spune altceva. Rămâne așa cum este scris până alegi.",
+        "useLine": "Folosește fraza din matrice",
+        "useLineDialog": {
+          "title": "Folosești fraza din matrice?",
+          "manual": "Unghi adăugat manual",
+          "matrix": "Fraza de mesaj din matrice",
+          "effect": "Unghiul adăugat manual devine unghiul sincronizat și spune ce spune fraza de mesaj. Textul său actual este înlocuit."
+        },
+        "emptyUsps": {
+          "body": "La pasul 1 adaugă argumentele de vânzare ale acestui val, apoi completează matricea."
+        },
+        "emptyPersonas": {
+          "body": "La pasul 2 adaugă persone pentru această piață, apoi completează matricea ei.",
+          "cta": "Adaugă persone"
         }
       }
     }

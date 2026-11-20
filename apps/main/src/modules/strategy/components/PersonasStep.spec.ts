@@ -303,8 +303,8 @@ describe('PersonasStep (PL-2.1)', () => {
       makePersona(1, 'SK', {
         angles: [makeSyncedAngle(first)],
         matrix_cells: [
-          { usp: first.id, level: 'priority' },
-          { usp: second.id, level: 'low' },
+          { usp: first.id, level: 'priority', message_line: 'Lead line' },
+          { usp: second.id, level: 'low', message_line: null },
         ],
       }),
       ...many(2, 'SK', 2),
@@ -401,6 +401,52 @@ describe('PersonasStep (PL-2.1)', () => {
     expect(card.find('img').exists()).toBe(false)
     expect(card.findAll('[data-test="angle-matrix-link"]')).toHaveLength(1)
     expect(card.findAll('[data-test="angle-menu-btn"]')).toHaveLength(1)
+    w.unmount()
+  })
+
+  it('R3 (PL-2.2 ruling change): a manual angle that differs from its Priority or Support cell is marked, with a link to that cell', async () => {
+    const usps = makeUsps(3)
+    const [a, b, c] = [usps[0] ?? makeUsp(1), usps[1] ?? makeUsp(2), usps[2] ?? makeUsp(3)]
+    const people = [
+      makePersona(1, 'SK', {
+        angles: [makeAngle(a, 'Mine A'), makeAngle(b, 'Same words'), makeAngle(c, 'Mine C')],
+        matrix_cells: [
+          { usp: a.id, level: 'priority', message_line: 'From the cell' },
+          { usp: b.id, level: 'support', message_line: 'Same words' },
+          { usp: c.id, level: 'low', message_line: 'A line on a Low cell' },
+        ],
+      }),
+      ...many(1, 'SK', 2),
+    ]
+    const w = await mountStep(people, usps)
+    const card = w.findAll('[data-test="persona-card"]')[0]
+    if (card === undefined) throw new Error('no card')
+    // Only the first angle differs from a Priority or Support cell: equal text and a Low cell are not marked.
+    expect(card.findAll('[data-test="angle-differs"]')).toHaveLength(1)
+    const link = card.get('[data-test="angle-differs-link"]')
+    expect(link.attributes('href')).toContain('/strategy/matrix')
+    expect(link.attributes('href')).toContain('market=SK')
+    expect(link.attributes('href')).toContain(`cell=${people[0]?.id}:${a.id}`)
+    w.unmount()
+  })
+
+  it('P2: the persona card shows the name only, not "name · persona name"', async () => {
+    const w = await mountStep(many(2, 'SK'))
+    const name = w.findAll('[data-test="persona-name"]')[0]
+    expect(name?.text()).toBe(many(2, 'SK')[0]?.attributes.name)
+    expect(name?.text()).not.toContain('persona name')
+    w.unmount()
+  })
+
+  it('P5: no personas in a market is an empty state with an icon, a title, one sentence and a primary Add that opens the dialog', async () => {
+    const w = await mountStep([])
+    const box = w.get('[data-test="personas-empty"]')
+    expect(box.find('.v-icon').exists()).toBe(true)
+    expect(box.find('h3').text()).toContain('No personas for Slovakia yet')
+    expect(w.find('[data-test="persona-tile"]').exists()).toBe(false)
+    await w.get('[data-test="personas-empty-cta"]').trigger('click')
+    await flushPromises()
+    expect(overlay('[data-test="persona-dialog"]') ?? overlay('form')).not.toBeNull()
     w.unmount()
   })
 })

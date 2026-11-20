@@ -1768,7 +1768,6 @@
         "tileMax": "Kasutatud {count} / {max} turul {market} · maksimum täis",
         "warning": "Lisa vähemalt {min} persooni turule {market}.",
         "fewerThanMin": "Vähem kui {min} persooni",
-        "empty": "Turul {market} pole veel persoone.",
         "coreJob": "Põhiülesanne",
         "drivers": "Emotsionaalsed ajendid",
         "goals": "Väärtused ja eesmärgid",
@@ -1784,7 +1783,6 @@
         },
         "barriers": "Tõkked ja hõõrdumine",
         "angles": "Veenvad loomingulised nurgad",
-        "nameLine": "{name} · persooni nimi",
         "menu": "Toimingud: {name}",
         "edit": "Muuda",
         "delete": "Kustuta",
@@ -1836,7 +1834,13 @@
         "syncedFromMatrix": "Sünkroonitud maatriksist",
         "changeInMatrix": "Muuda seda sõnumimaatriksis",
         "removeAngleBodySyncs": "Nurk „{usp}“ eemaldatakse. Selle persoona lahter selle USP jaoks on prioriteet või toetav, nii et selle asemele tuleb maatriksist sünkroonitud nurk.",
-        "deleteBodyCells": "Persoona eemaldatakse koos: {angles} ja {cells}:"
+        "deleteBodyCells": "Persoona eemaldatakse koos: {angles} ja {cells}:",
+        "differsFromMatrix": "Erineb maatriksi reast.",
+        "seeMatrixCell": "Vaata maatriksi lahtrit",
+        "emptyState": {
+          "title": "Turul {market} pole veel persoone",
+          "body": "Lisa {min} kuni {max} persoonat, kes kirjeldavad, kellele sellel turul kirjutad."
+        }
       },
       "copy": {
         "open": "Kopeeri allikast…",
@@ -1891,11 +1895,8 @@
         "leadWith": "Juhi sellega:",
         "notSet": "Määramata",
         "tabProgress": "{set} lahtrit {total}-st määratud turul {market}",
-        "handNote": "Sellel persoonal on selle USP kohta juba käsitsi kirjutatud nurk. See jääb nii, nagu on kirjutatud.",
+        "handNote": "Sellel personal on selle USP jaoks juba käsitsi lisatud nurk. See jääb nii, nagu on kirjutatud.",
         "footer": "Tabel kasvab lainega: veerud on selle turu persoonad (2 kuni 8), read on laine USP-d. Laiad tabelid kerivad küljele, USP veerg jääb kinni. Prioriteedi ja toetava lahtrid saavad iga persoona nurkadeks.",
-        "noUsps": "Lisa kõigepealt USP-d sammus 1.",
-        "noPersonas": "Turul {market} pole veel persoone.",
-        "goToPersonas": "Lisa persoonad sammus 2",
         "retry": "Proovi uuesti",
         "editor": {
           "level": "Tase",
@@ -1904,7 +1905,23 @@
           "counter": "{count} / {max}",
           "lineRequired": "Prioriteedi või toetava lahtri salvestamiseks lisa sõnumirida.",
           "saveNext": "Salvesta ja edasi",
-          "clear": "Tühjenda lahter"
+          "clear": "Tühjenda lahter",
+          "prefilled": "Eeltäidetud käsitsi lisatud nurgast. Salvestamine seda nurka ei muuda."
+        },
+        "conflictNote": "Käsitsi lisatud nurk selle persona ja USP jaoks ütleb midagi muud. See jääb nii, nagu on kirjutatud, kuni sa valid.",
+        "useLine": "Kasuta maatriksi rida",
+        "useLineDialog": {
+          "title": "Kas kasutada maatriksi rida?",
+          "manual": "Käsitsi lisatud nurk",
+          "matrix": "Maatriksi sõnumirida",
+          "effect": "Käsitsi lisatud nurk muutub sünkroonitud nurgaks ja ütleb seda, mida sõnumirida. Selle praegune tekst asendatakse."
+        },
+        "emptyUsps": {
+          "body": "Lisa sammus 1 selle laine müügiargumendid ja täida seejärel maatriks."
+        },
+        "emptyPersonas": {
+          "body": "Lisa sammus 2 sellele turule persoonad ja täida seejärel selle maatriks.",
+          "cta": "Lisa persoonad"
         }
       }
     }

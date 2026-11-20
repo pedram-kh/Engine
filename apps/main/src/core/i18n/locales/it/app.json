@@ -1768,7 +1768,6 @@
         "tileMax": "{count} di {max} usate in {market} · massimo raggiunto",
         "warning": "Aggiungi almeno {min} persone per {market}.",
         "fewerThanMin": "Meno di {min} persone",
-        "empty": "Ancora nessuna persona per {market}.",
         "coreJob": "Compito principale",
         "drivers": "Motivazioni emotive",
         "goals": "Valori e obiettivi",
@@ -1784,7 +1783,6 @@
         },
         "barriers": "Ostacoli e attriti",
         "angles": "Angoli creativi che convincono",
-        "nameLine": "{name} · nome della persona",
         "menu": "Azioni per {name}",
         "edit": "Modifica",
         "delete": "Elimina",
@@ -1836,7 +1834,13 @@
         "syncedFromMatrix": "Sincronizzato dalla matrice",
         "changeInMatrix": "Modificalo nella matrice dei messaggi",
         "removeAngleBodySyncs": "L'angolo su «{usp}» viene rimosso. La cella di questa persona per questo USP è Priorità o Supporto, quindi al suo posto subentra un angolo sincronizzato dalla matrice.",
-        "deleteBodyCells": "La persona viene rimossa insieme a {angles} e {cells}:"
+        "deleteBodyCells": "La persona viene rimossa insieme a {angles} e {cells}:",
+        "differsFromMatrix": "Differisce dalla frase della matrice.",
+        "seeMatrixCell": "Vedi la cella della matrice",
+        "emptyState": {
+          "title": "Ancora nessuna persona per {market}",
+          "body": "Aggiungi da {min} a {max} persone che descrivono a chi scrivi in questo mercato."
+        }
       },
       "copy": {
         "open": "Copia da…",
@@ -1891,11 +1895,8 @@
         "leadWith": "Apri con:",
         "notSet": "Non impostata",
         "tabProgress": "{set} celle impostate su {total} per {market}",
-        "handNote": "Questa persona ha già un angolo scritto a mano su questo USP. Resta com'è scritto.",
+        "handNote": "Questa persona ha già un angolo aggiunto manualmente su questo USP. Resta come è scritto.",
         "footer": "La tabella cresce con l'ondata: le colonne sono le persone di questo mercato (da 2 a 8), le righe sono gli USP dell'ondata. Le tabelle larghe scorrono di lato con la colonna USP fissata. Le celle Priorità e Supporto diventano gli angoli di ogni persona.",
-        "noUsps": "Aggiungi prima gli USP nel passo 1.",
-        "noPersonas": "Ancora nessuna persona per {market}.",
-        "goToPersonas": "Aggiungi persone nel passo 2",
         "retry": "Riprova",
         "editor": {
           "level": "Livello",
@@ -1904,7 +1905,23 @@
           "counter": "{count} di {max}",
           "lineRequired": "Aggiungi una frase del messaggio per salvare una cella Priorità o Supporto.",
           "saveNext": "Salva e avanti",
-          "clear": "Svuota cella"
+          "clear": "Svuota cella",
+          "prefilled": "Precompilato dall'angolo aggiunto manualmente. Salvare non modifica quell'angolo."
+        },
+        "conflictNote": "Un angolo aggiunto manualmente per questa persona e questo USP dice altro. Resta come è scritto finché non scegli.",
+        "useLine": "Usa la frase della matrice",
+        "useLineDialog": {
+          "title": "Usare la frase della matrice?",
+          "manual": "Angolo aggiunto manualmente",
+          "matrix": "Frase del messaggio della matrice",
+          "effect": "L'angolo aggiunto manualmente diventa l'angolo sincronizzato e dice ciò che dice la frase del messaggio. Il suo testo attuale viene sostituito."
+        },
+        "emptyUsps": {
+          "body": "Nel passo 1 aggiungi gli argomenti di vendita di questa ondata, poi compila la matrice."
+        },
+        "emptyPersonas": {
+          "body": "Nel passo 2 aggiungi persone per questo mercato, poi compila la sua matrice.",
+          "cta": "Aggiungi persone"
         }
       }
     }

@@ -1768,7 +1768,6 @@
         "tileMax": "{count} de {max} usadas em {market} · máximo atingido",
         "warning": "Adicione pelo menos {min} personas para {market}.",
         "fewerThanMin": "Menos de {min} personas",
-        "empty": "Ainda sem personas para {market}.",
         "coreJob": "Tarefa principal",
         "drivers": "Motivadores emocionais",
         "goals": "Valores e objetivos",
@@ -1784,7 +1783,6 @@
         },
         "barriers": "Barreiras e atritos",
         "angles": "Ângulos criativos que convencem",
-        "nameLine": "{name} · nome da persona",
         "menu": "Ações para {name}",
         "edit": "Editar",
         "delete": "Eliminar",
@@ -1836,7 +1834,13 @@
         "syncedFromMatrix": "Sincronizado da matriz",
         "changeInMatrix": "Altere-o na matriz de mensagens",
         "removeAngleBodySyncs": "O ângulo em «{usp}» é removido. A célula desta persona para este USP é de Prioridade ou Apoio, por isso um ângulo sincronizado da matriz ocupa o seu lugar.",
-        "deleteBodyCells": "A persona é removida com {angles} e {cells}:"
+        "deleteBodyCells": "A persona é removida com {angles} e {cells}:",
+        "differsFromMatrix": "Difere da frase da matriz.",
+        "seeMatrixCell": "Ver a célula da matriz",
+        "emptyState": {
+          "title": "Ainda sem personas para {market}",
+          "body": "Adiciona de {min} a {max} personas que descrevam a quem escreves neste mercado."
+        }
       },
       "copy": {
         "open": "Copiar de…",
@@ -1891,11 +1895,8 @@
         "leadWith": "Liderar com:",
         "notSet": "Não definida",
         "tabProgress": "{set} de {total} células definidas em {market}",
-        "handNote": "Esta persona já tem um ângulo escrito à mão neste USP. Mantém-se como foi escrito.",
+        "handNote": "Esta persona já tem um ângulo adicionado manualmente neste USP. É mantido tal como foi escrito.",
         "footer": "A tabela cresce com a vaga: as colunas são as personas deste mercado (2 a 8) e as linhas são os USPs da vaga. As tabelas largas deslocam-se para os lados com a coluna dos USPs fixa. As células de Prioridade e Apoio passam a ser os ângulos de cada persona.",
-        "noUsps": "Adicione primeiro USPs no passo 1.",
-        "noPersonas": "Ainda sem personas para {market}.",
-        "goToPersonas": "Adicionar personas no passo 2",
         "retry": "Tentar novamente",
         "editor": {
           "level": "Nível",
@@ -1904,7 +1905,23 @@
           "counter": "{count} de {max}",
           "lineRequired": "Adicione uma frase de mensagem para guardar uma célula de Prioridade ou Apoio.",
           "saveNext": "Guardar e seguinte",
-          "clear": "Limpar célula"
+          "clear": "Limpar célula",
+          "prefilled": "Preenchido a partir do ângulo adicionado manualmente. Guardar não altera esse ângulo."
+        },
+        "conflictNote": "Um ângulo adicionado manualmente para esta persona e este USP diz outra coisa. É mantido tal como foi escrito até escolheres.",
+        "useLine": "Usar a frase da matriz",
+        "useLineDialog": {
+          "title": "Usar a frase da matriz?",
+          "manual": "Ângulo adicionado manualmente",
+          "matrix": "Frase de mensagem da matriz",
+          "effect": "O ângulo adicionado manualmente passa a ser o ângulo sincronizado e diz o que a frase de mensagem diz. O texto atual é substituído."
+        },
+        "emptyUsps": {
+          "body": "No passo 1, adiciona os argumentos de venda desta vaga e depois preenche a matriz."
+        },
+        "emptyPersonas": {
+          "body": "No passo 2, adiciona personas para este mercado e depois preenche a respetiva matriz.",
+          "cta": "Adicionar personas"
         }
       }
     }

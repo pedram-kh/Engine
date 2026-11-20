@@ -11,7 +11,7 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { brandColorVar } from '@/modules/agency/composables/brandColor'
-import { cellKey, leadWith } from '../matrixLogic'
+import { cellKey, leadWith, type ManualAngle } from '../matrixLogic'
 import MatrixCellView from './MatrixCell.vue'
 import MatrixPersonaHeader from './MatrixPersonaHeader.vue'
 
@@ -19,12 +19,15 @@ const props = defineProps<{
   usps: MatrixUsp[]
   personas: MatrixPersona[]
   cells: ReadonlyMap<string, MatrixCell>
+  /** The hand-written angles of the market by `persona:usp`. */
+  manual: ReadonlyMap<string, ManualAngle>
   /** `persona:usp` of the cell the editor is open on, or null. */
   activeKey: string | null
 }>()
 
 const emit = defineEmits<{
   open: [persona: MatrixPersona, usp: MatrixUsp, el: HTMLElement]
+  useLine: [persona: MatrixPersona, usp: MatrixUsp]
 }>()
 
 const { t } = useI18n()
@@ -73,9 +76,11 @@ function label(usp: MatrixUsp, persona: MatrixPersona): string {
             :cell="cells.get(cellKey(p.id, u.id)) ?? null"
             :label="label(u, p)"
             :active="activeKey === cellKey(p.id, u.id)"
+            :manual="manual.get(cellKey(p.id, u.id)) ?? null"
             :data-persona-id="p.id"
             :data-usp-id="u.id"
             @open="(el: HTMLElement) => emit('open', p, u, el)"
+            @use-line="emit('useLine', p, u)"
           />
         </template>
       </div>

@@ -14,6 +14,7 @@ import type {
   WaveUspResource,
 } from '@catalyst/api-client'
 import { labelForCountryCode } from '@catalyst/api-client'
+import { CEmptyState } from '@catalyst/ui'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -239,14 +240,36 @@ const deletingCells = computed(() =>
       {{ t('app.strategy.errors.loadFailed') }}
     </v-alert>
     <template v-else-if="scope">
-      <p
+      <CEmptyState
         v-if="count === 0"
-        class="text-body-2 text-medium-emphasis mb-0"
+        class="agency-card"
         data-test="personas-empty"
+        title-tag="h3"
+        :title="t('app.strategy.persona.emptyState.title', { market: marketName })"
+        :body="
+          t('app.strategy.persona.emptyState.body', {
+            min: limits.persona_min,
+            max: limits.persona_max,
+          })
+        "
       >
-        {{ t('app.strategy.persona.empty', { market: marketName }) }}
-      </p>
-      <div class="personas-grid" data-test="personas-grid">
+        <template #icon>
+          <v-icon icon="mdi-account-group-outline" size="48" aria-hidden="true" />
+        </template>
+        <template #action>
+          <v-btn
+            color="primary"
+            variant="flat"
+            prepend-icon="mdi-plus"
+            :disabled="atMax || market === ''"
+            data-test="personas-empty-cta"
+            @click="openAdd"
+          >
+            {{ t('app.strategy.persona.add') }}
+          </v-btn>
+        </template>
+      </CEmptyState>
+      <div v-else class="personas-grid" data-test="personas-grid">
         <PersonaCard
           v-for="p in current"
           :key="p.id"

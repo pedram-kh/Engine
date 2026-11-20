@@ -9,7 +9,7 @@
  * angle meanwhile) it answers 409 `usp.in_use` with a fresh list, read through `uspInUseMeta`, the dialog shows
  * that list with a note and asks again. It never deletes more than what was shown.
  */
-import { uspInUseMeta } from '@catalyst/api-client'
+import { ApiError, uspInUseMeta } from '@catalyst/api-client'
 import type { UspInUseAffected, WaveUspResource } from '@catalyst/api-client'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -22,11 +22,15 @@ const props = defineProps<{
   modelValue: boolean
   scope: WaveScope
   usp: WaveUspResource | null
+  /** Admin or manager. Staff cannot delete a USP that is in use (ruling Q12). */
+  canDeleteInUse: boolean
 }>()
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
   deleted: []
+  /** The page's list is older than the server: reload it. */
+  stale: []
 }>()
 
 const { t } = useI18n()
@@ -96,11 +100,10 @@ watch(
     refreshed.value = false
     gone.value = false
     loadingList.value = false
-    if (
-      open &&
-      props.usp &&
-      (props.usp.attributes.angle_count > 0 || props.usp.attributes.cell_count > 0)
-    ) {
+    // Always read what uses the USP when the dialog opens, not only when the page's counts say "in use": the list on the
+    // page can be older than the server (someone set a cell meanwhile), and for staff the answer decides whether Delete
+    // is offered at all.
+    if (open && props.usp) {
       void loadAffected(props.usp, openId)
     }
   },
@@ -108,6 +111,8 @@ watch(
 )
 
 const inUse = computed(() => affected.value.length > 0)
+/** Staff may not delete a USP that is in use: the dialog says why and offers only Close (the server refuses too). */
+const staffBlocked = computed(() => inUse.value && !props.canDeleteInUse)
 const hasCells = computed(() => affected.value.some((i) => i.kind === 'cell'))
 const title = computed(() =>
   t('app.strategy.usp.deleteDialog.title', { title: props.usp?.attributes.title ?? '' }),
@@ -150,6 +155,10 @@ async function confirm(): Promise<void> {
     } else if (isGone(err)) {
       gone.value = true
       error.value = strategyErrorMessage(err, t)
+    } else if (err instanceof ApiError && err.status === 403 && !props.canDeleteInUse) {
+      // The server judged the USP in use (the page's counts were old): same answer as the list, and the page reloads.
+      error.value = t('app.strategy.usp.deleteStaffReason')
+      emit('stale')
     } else {
       error.value = strategyErrorMessage(err, t)
     }
@@ -165,20 +174,22 @@ async function confirm(): Promise<void> {
     test-id="usp-delete-dialog"
     :title="title"
     :body="
-      inUse
-        ? t(
-            hasCells
-              ? 'app.strategy.usp.deleteDialog.bodyInUseCells'
-              : 'app.strategy.usp.deleteDialog.bodyInUse',
-            { count: affected.length },
-            affected.length,
-          )
-        : t('app.strategy.usp.deleteDialog.body')
+      staffBlocked
+        ? undefined
+        : inUse
+          ? t(
+              hasCells
+                ? 'app.strategy.usp.deleteDialog.bodyInUseCells'
+                : 'app.strategy.usp.deleteDialog.bodyInUse',
+              { count: affected.length },
+              affected.length,
+            )
+          : t('app.strategy.usp.deleteDialog.body')
     "
     :confirm-label="confirmLabel"
     :busy="busy || loadingList"
     :error="error"
-    :confirm-disabled="gone"
+    :confirm-disabled="gone || staffBlocked"
     @update:model-value="onClose"
     @confirm="confirm"
   >
@@ -197,6 +208,16 @@ async function confirm(): Promise<void> {
         data-test="usp-delete-refreshed"
       >
         {{ t('app.strategy.usp.deleteDialog.refreshed') }}
+      </v-alert>
+      <v-alert
+        v-if="staffBlocked"
+        type="info"
+        variant="tonal"
+        density="compact"
+        class="mb-3"
+        data-test="usp-delete-staff-reason"
+      >
+        {{ t('app.strategy.usp.deleteStaffReason') }}
       </v-alert>
       <ul v-if="inUse" class="usp-delete-list" data-test="usp-delete-affected">
         <li

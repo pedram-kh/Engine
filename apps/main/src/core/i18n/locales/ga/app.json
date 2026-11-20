@@ -1768,7 +1768,6 @@
         "tileMax": "{count} as {max} in úsáid i {market} · sroichte an uasmhéid",
         "warning": "Cuir {min} phearsa ar a laghad le {market}.",
         "fewerThanMin": "Níos lú ná {min} pearsa",
-        "empty": "Níl aon phearsa ann do {market} fós.",
         "coreJob": "Croíthasc",
         "drivers": "Spreagthaí mothúchánacha",
         "goals": "Luachanna agus spriocanna",
@@ -1784,7 +1783,6 @@
         },
         "barriers": "Bacainní agus frithchuimilt",
         "angles": "Uillinneacha cruthaitheacha a chuireann ina luí",
-        "nameLine": "{name} · ainm an phearsa",
         "menu": "Gníomhartha do {name}",
         "edit": "Cuir in eagar",
         "delete": "Scrios",
@@ -1836,7 +1834,13 @@
         "syncedFromMatrix": "Sioncronaithe ón maitrís",
         "changeInMatrix": "Athraigh é sa Mhaitrís teachtaireachtaí",
         "removeAngleBodySyncs": "Bainfear an uillinn ar “{usp}”. Tá cill na pearsan seo don USP seo ar Tosaíocht nó Tacaíocht, mar sin glacfaidh uillinn sioncronaithe ón maitrís a háit.",
-        "deleteBodyCells": "Bainfear an phearsa le {angles} agus {cells}:"
+        "deleteBodyCells": "Bainfear an phearsa le {angles} agus {cells}:",
+        "differsFromMatrix": "Tá sé difriúil ó líne na maitríse.",
+        "seeMatrixCell": "Féach cill na maitríse",
+        "emptyState": {
+          "title": "Níl aon phearsa ann do {market} fós",
+          "body": "Cuir {min} go {max} pearsa leis a thugann cur síos ar cé dó a scríobhann tú sa mhargadh seo."
+        }
       },
       "copy": {
         "open": "Cóipeáil ó…",
@@ -1891,11 +1895,8 @@
         "leadWith": "Tosaigh le:",
         "notSet": "Gan socrú",
         "tabProgress": "{set} as {total} cill socraithe do {market}",
-        "handNote": "Tá uillinn lámhscríofa ag an bpearsa seo ar an USP seo cheana. Fanann sí mar a scríobhadh í.",
+        "handNote": "Tá uillinn curtha leis de láimh ag an bpearsa seo cheana don USP seo. Fanann sí mar a scríobhadh í.",
         "footer": "Fásann an tábla leis an tonn: is iad na colúin na pearsana sa mhargadh seo (2 go 8), is iad na sraitheanna USPanna an toinn. Scrollaíonn táblaí leathana ar an taobh agus an colún USP greamaithe. Éiríonn cealla Tosaíochta agus Tacaíochta ina n-uillinneacha de chuid gach pearsa.",
-        "noUsps": "Cuir USPanna leis i gcéim 1 ar dtús.",
-        "noPersonas": "Níl aon phearsa ann do {market} fós.",
-        "goToPersonas": "Cuir pearsana leis i gcéim 2",
         "retry": "Bain triail eile as",
         "editor": {
           "level": "Leibhéal",
@@ -1904,7 +1905,23 @@
           "counter": "{count} as {max}",
           "lineRequired": "Cuir líne teachtaireachta leis chun cill Tosaíochta nó Tacaíochta a shábháil.",
           "saveNext": "Sábháil agus an chéad cheann eile",
-          "clear": "Glan an chill"
+          "clear": "Glan an chill",
+          "prefilled": "Réamhlíonta ón uillinn a cuireadh leis de láimh. Ní athraíonn sábháil an uillinn sin."
+        },
+        "conflictNote": "Deir uillinn a cuireadh leis de láimh don phearsa agus don USP seo rud éigin eile. Fanann sí mar a scríobhadh í go roghnóidh tú.",
+        "useLine": "Úsáid líne na maitríse",
+        "useLineDialog": {
+          "title": "An úsáidfear líne na maitríse?",
+          "manual": "Uillinn a cuireadh leis de láimh",
+          "matrix": "Líne teachtaireachta na maitríse",
+          "effect": "Éiríonn an uillinn a cuireadh leis de láimh ina huillinn shioncronaithe agus deir sí an rud a deir líne na teachtaireachta. Cuirtear a téacs reatha in ionad."
+        },
+        "emptyUsps": {
+          "body": "Cuir argóintí díolacháin an tonn seo leis i gcéim 1, ansin líon an mhaitrís."
+        },
+        "emptyPersonas": {
+          "body": "Cuir pearsana don mhargadh seo leis i gcéim 2, ansin líon a mhaitrís.",
+          "cta": "Cuir pearsana leis"
         }
       }
     }

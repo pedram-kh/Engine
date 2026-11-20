@@ -5,7 +5,17 @@ import { describe, expect, it } from 'vitest'
 
 import type { MatrixCell } from '@catalyst/api-client'
 
-import { cellKey, changeFor, fieldValue, leadWith, needsMessageLine, nextCell } from './matrixLogic'
+import {
+  cellKey,
+  changeFor,
+  fieldValue,
+  initialMessageLine,
+  leadWith,
+  manualDiffers,
+  manualNote,
+  needsMessageLine,
+  nextCell,
+} from './matrixLogic'
 
 const cell = (over: Partial<MatrixCell> = {}): MatrixCell => ({
   persona: 'p1',
@@ -15,6 +25,8 @@ const cell = (over: Partial<MatrixCell> = {}): MatrixCell => ({
   message_line: 'Line',
   source: 'manual',
   has_manual_angle: false,
+  manual_angle: null,
+  manual_text: null,
   ...over,
 })
 
@@ -91,5 +103,35 @@ describe('matrixLogic (PL-2.2)', () => {
     expect(nextCell(0, 0, 2, 3)).toEqual({ personaIndex: 0, uspIndex: 1 })
     expect(nextCell(0, 2, 2, 3)).toEqual({ personaIndex: 1, uspIndex: 0 })
     expect(nextCell(1, 2, 2, 3)).toBeNull()
+  })
+
+  it('R1: only an EMPTY message line is prefilled from the manual angle; an existing one is kept', () => {
+    const hand = { angle: 'a1', text: 'Mine' }
+    expect(initialMessageLine(null, hand)).toBe('Mine')
+    expect(initialMessageLine(cell({ message_line: null }), hand)).toBe('Mine')
+    expect(initialMessageLine(cell({ message_line: '' }), hand)).toBe('Mine')
+    expect(initialMessageLine(cell({ message_line: 'Cell line' }), hand)).toBe('Cell line')
+    expect(initialMessageLine(cell({ message_line: null }), null)).toBe('')
+    expect(initialMessageLine(null, null)).toBe('')
+  })
+
+  it('R2: the conflict is Priority or Support, a line, a manual angle and DIFFERENT texts', () => {
+    const hand = { angle: 'a1', text: 'Mine' }
+    expect(manualDiffers(cell({ level: 'priority', message_line: 'Other' }), hand)).toBe(true)
+    expect(manualDiffers(cell({ level: 'support', message_line: 'Other' }), hand)).toBe(true)
+    expect(manualDiffers(cell({ level: 'priority', message_line: 'Mine' }), hand)).toBe(false)
+    expect(manualDiffers(cell({ level: 'low', message_line: 'Other' }), hand)).toBe(false)
+    expect(manualDiffers(cell({ level: 'priority', message_line: null }), hand)).toBe(false)
+    expect(manualDiffers(cell({ level: 'priority', message_line: 'Other' }), null)).toBe(false)
+    expect(manualDiffers(null, hand)).toBe(false)
+  })
+
+  it('R2: the note is conflict, kept (Low) or none (no angle, or equal texts)', () => {
+    const hand = { angle: 'a1', text: 'Mine' }
+    expect(manualNote(cell({ level: 'priority', message_line: 'Other' }), hand)).toBe('conflict')
+    expect(manualNote(cell({ level: 'priority', message_line: 'Mine' }), hand)).toBe('none')
+    expect(manualNote(cell({ level: 'low', message_line: null }), hand)).toBe('kept')
+    expect(manualNote(cell({ level: 'priority', message_line: 'Other' }), null)).toBe('none')
+    expect(manualNote(null, hand)).toBe('none')
   })
 })

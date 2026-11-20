@@ -1768,7 +1768,6 @@
         "tileMax": "{count} / {max} felhasználva itt: {market} · elérted a maximumot",
         "warning": "Adj hozzá legalább {min} perszónát ide: {market}.",
         "fewerThanMin": "Kevesebb mint {min} perszóna",
-        "empty": "Még nincs perszóna ide: {market}.",
         "coreJob": "Fő feladat",
         "drivers": "Érzelmi hajtóerők",
         "goals": "Értékek és célok",
@@ -1784,7 +1783,6 @@
         },
         "barriers": "Akadályok és súrlódások",
         "angles": "Meggyőző kreatív szögek",
-        "nameLine": "{name} · perszóna neve",
         "menu": "Műveletek: {name}",
         "edit": "Szerkesztés",
         "delete": "Törlés",
@@ -1836,7 +1834,13 @@
         "syncedFromMatrix": "A mátrixból szinkronizálva",
         "changeInMatrix": "Módosítsa az Üzenetmátrixban",
         "removeAngleBodySyncs": "A(z) „{usp}” szög törlődik. A perszóna cellája ehhez az USP-hez Elsődleges vagy Támogató, ezért a helyére a mátrixból szinkronizált szög kerül.",
-        "deleteBodyCells": "A perszóna törlődik ezekkel együtt: {angles} és {cells}:"
+        "deleteBodyCells": "A perszóna törlődik ezekkel együtt: {angles} és {cells}:",
+        "differsFromMatrix": "Eltér a mátrixsortól.",
+        "seeMatrixCell": "A mátrixcella megtekintése",
+        "emptyState": {
+          "title": "Még nincs perszóna ide: {market}",
+          "body": "Adjon hozzá {min}–{max} perszónát, akik leírják, kinek ír ezen a piacon."
+        }
       },
       "copy": {
         "open": "Másolás innen…",
@@ -1891,11 +1895,8 @@
         "leadWith": "Ezzel vezessen:",
         "notSet": "Nincs beállítva",
         "tabProgress": "{set} / {total} cella beállítva: {market}",
-        "handNote": "Ennek a perszónának már van kézzel írt szöge ehhez az USP-hez. Úgy marad, ahogy meg van írva.",
+        "handNote": "Ennek a perszónának már van kézzel hozzáadott szöge ehhez az USP-hez. Úgy marad, ahogy meg van írva.",
         "footer": "A táblázat a hullámmal nő: az oszlopok a piac perszónái (2–8), a sorok a hullám USP-i. A széles táblázatok oldalra görgethetők, az USP oszlop rögzített marad. Az Elsődleges és Támogató cellák az egyes perszónák szögeivé válnak.",
-        "noUsps": "Először adjon hozzá USP-ket az 1. lépésben.",
-        "noPersonas": "Még nincs perszóna ide: {market}.",
-        "goToPersonas": "Perszónák hozzáadása a 2. lépésben",
         "retry": "Próbálja újra",
         "editor": {
           "level": "Szint",
@@ -1904,7 +1905,23 @@
           "counter": "{count} / {max}",
           "lineRequired": "Adjon meg üzenetsort az Elsődleges vagy Támogató cella mentéséhez.",
           "saveNext": "Mentés és tovább",
-          "clear": "Cella törlése"
+          "clear": "Cella törlése",
+          "prefilled": "A kézzel hozzáadott szögből előre kitöltve. A mentés nem módosítja azt a szöget."
+        },
+        "conflictNote": "Egy kézzel hozzáadott szög ehhez a perszónához és USP-hez mást mond. Úgy marad, ahogy meg van írva, amíg nem dönt.",
+        "useLine": "A mátrixsor használata",
+        "useLineDialog": {
+          "title": "A mátrixsort használja?",
+          "manual": "Kézzel hozzáadott szög",
+          "matrix": "A mátrix üzenetsora",
+          "effect": "A kézzel hozzáadott szög szinkronizált szöggé válik, és azt mondja, amit az üzenetsor. A jelenlegi szövege lecserélődik."
+        },
+        "emptyUsps": {
+          "body": "Az 1. lépésben adja hozzá e hullám értékesítési érveit, majd töltse ki a mátrixot."
+        },
+        "emptyPersonas": {
+          "body": "A 2. lépésben adjon hozzá perszónákat ehhez a piachoz, majd töltse ki a mátrixát.",
+          "cta": "Perszónák hozzáadása"
         }
       }
     }

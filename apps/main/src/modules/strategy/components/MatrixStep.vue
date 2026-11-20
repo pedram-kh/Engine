@@ -6,7 +6,10 @@
  * request, and the screen takes the server's answer for that cell, so what is drawn is what is held.
  *
  * Each tab shows its own "set/total"; the stepper shows the wave's total (the summary is refreshed after every save).
- * With no persona in the market, or no USP in the wave, the table is replaced by a line that says where to add them.
+ * With no persona in the market, or no USP in the wave, the table is replaced by an empty state (icon, title, one
+ * sentence and a primary button to the step that adds them).
+ * The hand-written angles of the market are held by pair (`manual`), so the editor can prefill an empty line, a note can
+ * compare the two texts, and "Use the matrix line" can act on the angle.
  */
 import type {
   MatrixCell,
@@ -16,16 +19,18 @@ import type {
   StrategySummaryResource,
 } from '@catalyst/api-client'
 import { labelForCountryCode } from '@catalyst/api-client'
-import { computed, ref, watch } from 'vue'
+import { CEmptyState } from '@catalyst/ui'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
 import '../matrixColors.css'
 import { strategyApi } from '../api/strategy.api'
 import { useStrategyContext } from '../composables/useStrategyContext'
-import { cellKey, changeFor, nextCell, type EditorState } from '../matrixLogic'
+import { cellKey, changeFor, nextCell, type EditorState, type ManualAngle } from '../matrixLogic'
 import MatrixCellEditor from './MatrixCellEditor.vue'
 import MatrixTable from './MatrixTable.vue'
+import MatrixUseLineDialog from './MatrixUseLineDialog.vue'
 
 const props = defineProps<{ summary: StrategySummaryResource; markets: string[] }>()
 const emit = defineEmits<{ changed: [] }>()
@@ -45,6 +50,8 @@ const marketName = computed(() => (market.value === '' ? '' : labelForCountryCod
 
 const data = ref<MatrixResource['attributes'] | null>(null)
 const cells = ref(new Map<string, MatrixCell>())
+/** The hand-written angles of the market by `persona:usp` (set cell or not). */
+const manual = ref(new Map<string, ManualAngle>())
 const loading = ref(true)
 const failed = ref(false)
 /** Bumped on every load; an answer for a market the user already left must not fill the screen. */
@@ -68,6 +75,12 @@ async function load(): Promise<void> {
     cells.value = new Map(
       res.data.attributes.cells.map((c) => [cellKey(c.persona, c.usp), c] as const),
     )
+    manual.value = new Map(
+      res.data.attributes.manual_angles.map(
+        (m) => [cellKey(m.persona, m.usp), { angle: m.angle, text: m.text }] as const,
+      ),
+    )
+    void focusLinkedCell()
   } catch {
     if (id === loadId) {
       data.value = null
@@ -76,6 +89,18 @@ async function load(): Promise<void> {
   } finally {
     if (id === loadId) loading.value = false
   }
+}
+/** The persona card links to a cell with `?cell=persona:usp`: scroll to it and put the focus on it. */
+async function focusLinkedCell(): Promise<void> {
+  const wanted = route.query.cell
+  if (typeof wanted !== 'string') return
+  const [pid, uid] = wanted.split(':')
+  await nextTick()
+  const el = document.querySelector<HTMLElement>(
+    `[data-test="matrix-cell"][data-persona-id="${pid ?? ''}"][data-usp-id="${uid ?? ''}"]`,
+  )
+  el?.scrollIntoView({ block: 'center', inline: 'center' })
+  el?.focus({ preventScroll: true })
 }
 function selectMarket(code: string): void {
   if (code === market.value) return
@@ -96,6 +121,11 @@ const editorOpen = ref(false)
 const anchor = ref<HTMLElement | null>(null)
 const editing = ref<{ persona: MatrixPersona; usp: MatrixUsp } | null>(null)
 
+const editingManual = computed(() =>
+  editing.value === null
+    ? null
+    : (manual.value.get(cellKey(editing.value.persona.id, editing.value.usp.id)) ?? null),
+)
 const editingCell = computed(() =>
   editing.value === null
     ? null
@@ -127,11 +157,52 @@ function closeEditor(): void {
 
 function take(changed: MatrixCell[]): void {
   const m = new Map(cells.value)
+  const hand = new Map(manual.value)
   for (const c of changed) {
-    if (c.level === null) m.delete(cellKey(c.persona, c.usp))
-    else m.set(cellKey(c.persona, c.usp), c)
+    const key = cellKey(c.persona, c.usp)
+    if (c.level === null) m.delete(key)
+    else m.set(key, c)
+    if (c.manual_angle !== null && c.manual_text !== null) {
+      hand.set(key, { angle: c.manual_angle, text: c.manual_text })
+    } else hand.delete(key)
   }
   cells.value = m
+  manual.value = hand
+}
+
+// "Use the matrix line" (R2) ----------------------------------------------------------------------------------
+const useLineOpen = ref(false)
+/** What the dialog is about, copied when it opens, so it does not change under the user's eyes. */
+const useLineFor = ref<{
+  persona: MatrixPersona
+  usp: MatrixUsp
+  angle: string
+  manualText: string
+  matrixLine: string
+} | null>(null)
+const useLineHeading = computed(() =>
+  useLineFor.value === null
+    ? ''
+    : `${useLineFor.value.usp.title} · ${useLineFor.value.persona.code}`,
+)
+function askUseLine(persona: MatrixPersona, usp: MatrixUsp): void {
+  const key = cellKey(persona.id, usp.id)
+  const hand = manual.value.get(key)
+  const line = cells.value.get(key)?.message_line
+  if (hand === undefined || line === null || line === undefined) return
+  useLineFor.value = { persona, usp, angle: hand.angle, manualText: hand.text, matrixLine: line }
+  useLineOpen.value = true
+}
+async function applyUseLine(): Promise<void> {
+  const s = scope.value
+  const f = useLineFor.value
+  if (s === null || f === null) return
+  await strategyApi.useMatrixLine(s, f.persona.id, f.angle)
+  // The angle is a synced one now: the pair has no hand-written angle any more.
+  const hands = new Map(manual.value)
+  hands.delete(cellKey(f.persona.id, f.usp.id))
+  manual.value = hands
+  emit('changed')
 }
 
 async function saveCell(state: EditorState): Promise<void> {
@@ -252,31 +323,65 @@ const errorText = computed(() => (failed.value ? t('app.strategy.errors.loadFail
         {{ t('app.strategy.matrix.retry') }}
       </v-btn>
     </div>
-    <p v-else-if="usps.length === 0" class="mx-empty" data-test="matrix-no-usps">
-      {{ t('app.strategy.matrix.noUsps') }}
-      <router-link :to="{ name: 'strategy.usps', params: { ulid: brandId, waveUlid: waveId } }">
-        {{ t('app.strategy.persona.goToUsps') }}
-      </router-link>
-    </p>
-    <p v-else-if="personas.length === 0" class="mx-empty" data-test="matrix-no-personas">
-      {{ t('app.strategy.matrix.noPersonas', { market: marketName }) }}
-      <router-link
-        :to="{
-          name: 'strategy.personas',
-          params: { ulid: brandId, waveUlid: waveId },
-          query: { market },
-        }"
-      >
-        {{ t('app.strategy.matrix.goToPersonas') }}
-      </router-link>
-    </p>
+    <CEmptyState
+      v-else-if="usps.length === 0"
+      class="agency-card mx-emptystate"
+      data-test="matrix-no-usps"
+      title-tag="h3"
+      :title="t('app.strategy.usp.emptyTitle')"
+      :body="t('app.strategy.matrix.emptyUsps.body')"
+    >
+      <template #icon>
+        <v-icon icon="mdi-lightbulb-outline" size="48" aria-hidden="true" />
+      </template>
+      <template #action>
+        <v-btn
+          color="primary"
+          variant="flat"
+          prepend-icon="mdi-plus"
+          :to="{ name: 'strategy.usps', params: { ulid: brandId, waveUlid: waveId } }"
+          data-test="matrix-no-usps-cta"
+        >
+          {{ t('app.strategy.usp.add') }}
+        </v-btn>
+      </template>
+    </CEmptyState>
+    <CEmptyState
+      v-else-if="personas.length === 0"
+      class="agency-card mx-emptystate"
+      data-test="matrix-no-personas"
+      title-tag="h3"
+      :title="t('app.strategy.persona.emptyState.title', { market: marketName })"
+      :body="t('app.strategy.matrix.emptyPersonas.body')"
+    >
+      <template #icon>
+        <v-icon icon="mdi-account-group-outline" size="48" aria-hidden="true" />
+      </template>
+      <template #action>
+        <v-btn
+          color="primary"
+          variant="flat"
+          prepend-icon="mdi-plus"
+          :to="{
+            name: 'strategy.personas',
+            params: { ulid: brandId, waveUlid: waveId },
+            query: { market },
+          }"
+          data-test="matrix-no-personas-cta"
+        >
+          {{ t('app.strategy.matrix.emptyPersonas.cta') }}
+        </v-btn>
+      </template>
+    </CEmptyState>
     <MatrixTable
       v-else-if="ready"
       :usps="usps"
       :personas="personas"
       :cells="cells"
+      :manual="manual"
       :active-key="activeKey"
       @open="openEditor"
+      @use-line="askUseLine"
     />
 
     <p class="mx-foot" data-test="matrix-footer">
@@ -288,12 +393,22 @@ const errorText = computed(() => (failed.value ? t('app.strategy.errors.loadFail
       v-model="editorOpen"
       :anchor="anchor"
       :cell="editingCell"
+      :manual="editingManual"
       :heading="heading"
       :limits="limits"
       :has-next="next !== null"
       :save="saveCell"
       :clear="clearCell"
       @done="onDone"
+    />
+
+    <MatrixUseLineDialog
+      v-if="useLineFor !== null"
+      v-model="useLineOpen"
+      :heading="useLineHeading"
+      :manual-text="useLineFor.manualText"
+      :matrix-line="useLineFor.matrixLine"
+      :apply="applyUseLine"
     />
   </section>
 </template>
@@ -450,6 +565,9 @@ const errorText = computed(() => (failed.value ? t('app.strategy.errors.loadFail
   margin: 0;
   font-size: 13px;
   color: rgb(var(--v-theme-on-surface-variant));
+}
+.mx-emptystate {
+  min-width: 0;
 }
 .mx-foot {
   display: flex;

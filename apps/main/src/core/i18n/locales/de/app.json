@@ -1768,7 +1768,6 @@
         "tileMax": "{count} von {max} in {market} belegt · Maximum erreicht",
         "warning": "Füge mindestens {min} Personas für {market} hinzu.",
         "fewerThanMin": "Weniger als {min} Personas",
-        "empty": "Noch keine Personas für {market}.",
         "coreJob": "Kernaufgabe",
         "drivers": "Emotionale Treiber",
         "goals": "Werte & Ziele",
@@ -1784,7 +1783,6 @@
         },
         "barriers": "Hürden & Reibungen",
         "angles": "Kreative Ansätze, die überzeugen",
-        "nameLine": "{name} · Name der Persona",
         "menu": "Aktionen für {name}",
         "edit": "Bearbeiten",
         "delete": "Löschen",
@@ -1836,7 +1834,13 @@
         "syncedFromMatrix": "Aus der Matrix synchronisiert",
         "changeInMatrix": "In der Messaging-Matrix ändern",
         "removeAngleBodySyncs": "Der Ansatz zu „{usp}“ wird entfernt. Die Zelle dieser Persona für diesen USP hat Priorität oder Unterstützung, daher tritt ein aus der Matrix synchronisierter Ansatz an seine Stelle.",
-        "deleteBodyCells": "Die Persona wird zusammen mit {angles} und {cells} entfernt:"
+        "deleteBodyCells": "Die Persona wird zusammen mit {angles} und {cells} entfernt:",
+        "differsFromMatrix": "Weicht von der Matrix-Zeile ab.",
+        "seeMatrixCell": "Matrix-Zelle ansehen",
+        "emptyState": {
+          "title": "Noch keine Personas für {market}",
+          "body": "Füge {min} bis {max} Personas hinzu, die beschreiben, für wen du auf diesem Markt schreibst."
+        }
       },
       "copy": {
         "open": "Kopieren von …",
@@ -1891,11 +1895,8 @@
         "leadWith": "Anführen mit:",
         "notSet": "Nicht gesetzt",
         "tabProgress": "{set} von {total} Zellen gesetzt für {market}",
-        "handNote": "Diese Persona hat zu diesem USP bereits einen von Hand geschriebenen Ansatz. Er bleibt, wie er geschrieben ist.",
+        "handNote": "Diese Persona hat zu diesem USP bereits einen manuell hinzugefügten Ansatz. Er bleibt, wie er geschrieben ist.",
         "footer": "Die Tabelle wächst mit der Welle: Die Spalten sind die Personas dieses Marktes (2 bis 8), die Zeilen die USPs der Welle. Breite Tabellen scrollen seitwärts, die USP-Spalte bleibt fixiert. Zellen mit Priorität und Unterstützung werden zu den Ansätzen der jeweiligen Persona.",
-        "noUsps": "Füge zuerst in Schritt 1 USPs hinzu.",
-        "noPersonas": "Noch keine Personas für {market}.",
-        "goToPersonas": "Personas in Schritt 2 hinzufügen",
         "retry": "Erneut versuchen",
         "editor": {
           "level": "Stufe",
@@ -1904,7 +1905,23 @@
           "counter": "{count} von {max}",
           "lineRequired": "Füge eine Botschaftszeile hinzu, um eine Zelle mit Priorität oder Unterstützung zu speichern.",
           "saveNext": "Speichern und weiter",
-          "clear": "Zelle leeren"
+          "clear": "Zelle leeren",
+          "prefilled": "Aus dem manuell hinzugefügten Ansatz vorausgefüllt. Speichern ändert diesen Ansatz nicht."
+        },
+        "conflictNote": "Ein manuell hinzugefügter Ansatz für diese Persona und diesen USP sagt etwas anderes. Er bleibt, wie er geschrieben ist, bis du dich entscheidest.",
+        "useLine": "Matrix-Zeile verwenden",
+        "useLineDialog": {
+          "title": "Matrix-Zeile verwenden?",
+          "manual": "Manuell hinzugefügter Ansatz",
+          "matrix": "Botschaftszeile der Matrix",
+          "effect": "Der manuell hinzugefügte Ansatz wird zum synchronisierten Ansatz und sagt, was die Botschaftszeile sagt. Sein bisheriger Text wird ersetzt."
+        },
+        "emptyUsps": {
+          "body": "Füge in Schritt 1 die Verkaufsargumente dieser Welle hinzu und fülle dann die Matrix."
+        },
+        "emptyPersonas": {
+          "body": "Füge in Schritt 2 Personas für diesen Markt hinzu und fülle dann dessen Matrix.",
+          "cta": "Personas hinzufügen"
         }
       }
     }

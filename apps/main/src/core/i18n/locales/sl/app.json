@@ -1768,7 +1768,6 @@
         "tileMax": "Porabljeno {count} od {max} na trgu {market} · doseženo največje število",
         "warning": "Dodajte vsaj {min} person za trg {market}.",
         "fewerThanMin": "Manj kot {min} person",
-        "empty": "Za trg {market} še ni person.",
         "coreJob": "Glavna naloga",
         "drivers": "Čustveni motivi",
         "goals": "Vrednote in cilji",
@@ -1784,7 +1783,6 @@
         },
         "barriers": "Ovire in trenja",
         "angles": "Ustvarjalni koti, ki prepričajo",
-        "nameLine": "{name} · ime persone",
         "menu": "Dejanja za {name}",
         "edit": "Uredi",
         "delete": "Izbriši",
@@ -1836,7 +1834,13 @@
         "syncedFromMatrix": "Sinhronizirano iz matrike",
         "changeInMatrix": "Spremenite to v matriki sporočil",
         "removeAngleBodySyncs": "Kot za »{usp}« se odstrani. Celica te persone za ta USP ima prednost ali podporo, zato njegovo mesto zavzame kot, sinhroniziran iz matrike.",
-        "deleteBodyCells": "Persona se odstrani skupaj z: {angles} in {cells}:"
+        "deleteBodyCells": "Persona se odstrani skupaj z: {angles} in {cells}:",
+        "differsFromMatrix": "Razlikuje se od vrstice v matriki.",
+        "seeMatrixCell": "Poglej celico matrike",
+        "emptyState": {
+          "title": "Za trg {market} še ni person",
+          "body": "Dodajte od {min} do {max} person, ki opisujejo, komu pišete na tem trgu."
+        }
       },
       "copy": {
         "open": "Kopiraj iz …",
@@ -1891,11 +1895,8 @@
         "leadWith": "Vodite z:",
         "notSet": "Ni nastavljeno",
         "tabProgress": "Nastavljenih {set} od {total} celic za {market}",
-        "handNote": "Ta persona ima za ta USP že ročno napisan kot. Ostane tak, kot je napisan.",
+        "handNote": "Ta persona ima že ročno dodan kot za ta USP. Ostane, kot je napisan.",
         "footer": "Tabela raste z valom: stolpci so persone na tem trgu (od 2 do 8), vrstice so USP-ji vala. Široke tabele se pomikajo vstran, stolpec USP pa ostane pripet. Celice s prednostjo in podporo postanejo koti posamezne persone.",
-        "noUsps": "Najprej dodajte USP-je v koraku 1.",
-        "noPersonas": "Za trg {market} še ni person.",
-        "goToPersonas": "Dodajte persone v koraku 2",
         "retry": "Poskusi znova",
         "editor": {
           "level": "Raven",
@@ -1904,7 +1905,23 @@
           "counter": "{count} od {max}",
           "lineRequired": "Dodajte vrstico sporočila, da shranite celico s prednostjo ali podporo.",
           "saveNext": "Shrani in naprej",
-          "clear": "Počisti celico"
+          "clear": "Počisti celico",
+          "prefilled": "Predhodno izpolnjeno iz ročno dodanega kota. Shranjevanje tega kota ne spremeni."
+        },
+        "conflictNote": "Ročno dodan kot za to persono in USP pove nekaj drugega. Ostane, kot je napisan, dokler ne izberete.",
+        "useLine": "Uporabi vrstico iz matrike",
+        "useLineDialog": {
+          "title": "Uporabim vrstico iz matrike?",
+          "manual": "Ročno dodan kot",
+          "matrix": "Vrstica sporočila v matriki",
+          "effect": "Ročno dodan kot postane sinhroniziran kot in pove, kar pove vrstica sporočila. Njegovo trenutno besedilo se zamenja."
+        },
+        "emptyUsps": {
+          "body": "V koraku 1 dodajte prodajne argumente tega vala, nato izpolnite matriko."
+        },
+        "emptyPersonas": {
+          "body": "V koraku 2 dodajte persone za ta trg, nato izpolnite njegovo matriko.",
+          "cta": "Dodaj persone"
         }
       }
     }

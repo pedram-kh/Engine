@@ -34,9 +34,18 @@ const KEYS = [
   'app.strategy.matrix.tabProgress',
   'app.strategy.matrix.handNote',
   'app.strategy.matrix.footer',
-  'app.strategy.matrix.noUsps',
-  'app.strategy.matrix.noPersonas',
-  'app.strategy.matrix.goToPersonas',
+  'app.strategy.matrix.conflictNote',
+  'app.strategy.matrix.useLine',
+  'app.strategy.matrix.useLineDialog.title',
+  'app.strategy.matrix.useLineDialog.manual',
+  'app.strategy.matrix.useLineDialog.matrix',
+  'app.strategy.matrix.useLineDialog.effect',
+  'app.strategy.matrix.editor.prefilled',
+  'app.strategy.matrix.emptyUsps.body',
+  'app.strategy.matrix.emptyPersonas.body',
+  'app.strategy.matrix.emptyPersonas.cta',
+  'app.strategy.persona.differsFromMatrix',
+  'app.strategy.persona.seeMatrixCell',
   'app.strategy.matrix.retry',
   'app.strategy.matrix.editor.level',
   'app.strategy.matrix.editor.rationale',
@@ -106,8 +115,8 @@ function tokens(text: string): string[] {
 }
 
 describe('PL-2.2 matrix strings', () => {
-  it('checks 39 keys across 24 locales', () => {
-    expect(KEYS).toHaveLength(39)
+  it('checks 48 keys across 24 locales', () => {
+    expect(KEYS).toHaveLength(48)
     expect(UI_LOCALES).toHaveLength(24)
   })
 

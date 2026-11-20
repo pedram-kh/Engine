@@ -2,12 +2,16 @@
 /**
  * PL-2.2 — one cell of the messaging matrix (frame 13:1375): a level pill with a chevron, the rationale and the
  * message line in a yellow-edged box. Priority tints the whole cell green; Low is muted. A cell that is not set shows
- * a dashed "Not set" pill (no frame for it). A pair with a hand-written angle carries a small note. The cell is one
+ * a dashed "Not set" pill (no frame for it). A pair with a manually added angle carries a small note: when its text
+ * differs from the message line of a Priority or Support cell the note says so and offers "Use the matrix line"
+ * (no frame; built from the cell's own note style); equal texts show nothing. The cell is one
  * button that opens the editor; every string from the server is drawn with `{{ }}`, never as HTML.
  */
 import type { MatrixCell } from '@catalyst/api-client'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import { manualNote, type ManualAngle } from '../matrixLogic'
 
 const props = defineProps<{
   cell: MatrixCell | null
@@ -15,12 +19,15 @@ const props = defineProps<{
   label: string
   /** The editor is open on this cell. */
   active: boolean
+  /** The hand-written angle on this pair, if there is one. */
+  manual: ManualAngle | null
 }>()
 
-const emit = defineEmits<{ open: [el: HTMLElement] }>()
+const emit = defineEmits<{ open: [el: HTMLElement]; useLine: [] }>()
 const { t } = useI18n()
 
 const level = computed(() => props.cell?.level ?? null)
+const note = computed(() => manualNote(props.cell, props.manual))
 
 function open(e: Event): void {
   emit('open', e.currentTarget as HTMLElement)
@@ -32,7 +39,7 @@ function open(e: Event): void {
     class="mx-cell"
     :class="[
       level ? `mx-cell--${level}` : 'mx-cell--empty',
-      { 'mx-cell--active': active, 'mx-cell--has-manual': cell?.has_manual_angle === true },
+      { 'mx-cell--active': active, 'mx-cell--has-manual': note !== 'none' },
     ]"
     role="button"
     tabindex="0"
@@ -58,10 +65,29 @@ function open(e: Event): void {
       <div v-if="cell?.message_line" class="mx-cell__line" data-test="matrix-line">
         <p class="mx-cell__line-text">“{{ cell.message_line }}”</p>
       </div>
-      <p v-if="cell?.has_manual_angle" class="mx-cell__note" data-test="matrix-manual-note">
+      <p v-if="note === 'kept'" class="mx-cell__note" data-test="matrix-manual-note">
         <v-icon icon="mdi-information-outline" size="13" aria-hidden="true" />
         <span>{{ t('app.strategy.matrix.handNote') }}</span>
       </p>
+      <div
+        v-else-if="note === 'conflict'"
+        class="mx-cell__conflict"
+        data-test="matrix-conflict-note"
+      >
+        <p class="mx-cell__note mx-cell__note--conflict">
+          <v-icon icon="mdi-alert-outline" size="13" aria-hidden="true" />
+          <span>{{ t('app.strategy.matrix.conflictNote') }}</span>
+        </p>
+        <button
+          type="button"
+          class="mx-cell__action"
+          data-test="matrix-use-line"
+          @click.stop="emit('useLine')"
+          @keydown.stop
+        >
+          {{ t('app.strategy.matrix.useLine') }}
+        </button>
+      </div>
     </template>
   </div>
 </template>
@@ -175,5 +201,34 @@ function open(e: Event): void {
 .mx-cell__note .v-icon {
   flex: none;
   margin-top: 1px;
+}
+.mx-cell__conflict {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+}
+.mx-cell__note--conflict {
+  color: rgb(var(--v-theme-warning-text));
+}
+.mx-cell__action {
+  padding: 4px 10px;
+  border: 1px solid rgb(var(--v-theme-border-color));
+  border-radius: 6px;
+  background: rgb(var(--v-theme-surface));
+  color: rgb(var(--v-theme-on-surface));
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: normal;
+  cursor: pointer;
+}
+.mx-cell__action:hover {
+  background: color-mix(in srgb, rgb(var(--v-theme-on-surface)) 6%, rgb(var(--v-theme-surface)));
+}
+.mx-cell__action:focus-visible {
+  outline: 2px solid rgb(var(--v-theme-primary));
+  outline-offset: 1px;
 }
 </style>

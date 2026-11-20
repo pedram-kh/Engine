@@ -121,10 +121,14 @@ test.describe('Messaging matrix', () => {
       await page.goto(`/brands/${brand.data.id}/waves/${wave.data.id}/strategy/matrix`)
       if (size.width < 768) {
         const drawer = page.locator('.v-navigation-drawer')
-        if ((await drawer.getAttribute('inert')) === null) {
-          await page.locator('.v-app-bar-nav-icon').click()
-          await expect(drawer).toHaveAttribute('inert', '')
-        }
+        // The drawer settles after a load; closing it while it still moves can leave it open and the page 70 px wide.
+        await expect(async () => {
+          if ((await drawer.getAttribute('inert')) === null) {
+            await page.locator('.v-app-bar-nav-icon').click()
+          }
+          await expect(drawer).toHaveAttribute('inert', '', { timeout: 1000 })
+        }).toPass({ timeout: 8000 })
+        await page.waitForTimeout(400)
       }
 
       const cells = page.locator('[data-test="matrix-cell"]')

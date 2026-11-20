@@ -8,6 +8,7 @@
  * grid, so the screen never keeps an order the server did not accept.
  */
 import type { StrategySummaryResource, WaveUspResource } from '@catalyst/api-client'
+import { CEmptyState } from '@catalyst/ui'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import draggable from 'vuedraggable'
@@ -205,19 +206,29 @@ function move(usp: WaveUspResource, by: -1 | 1): void {
     <v-alert v-else-if="failed" type="error" variant="tonal" data-test="usps-error">
       {{ t('app.strategy.errors.loadFailed') }}
     </v-alert>
-    <div v-else-if="count === 0" class="agency-card usps-empty" data-test="usps-empty">
-      <p class="text-subtitle-1 mb-1">{{ t('app.strategy.usp.emptyTitle') }}</p>
-      <p class="text-body-2 text-medium-emphasis mb-3">{{ t('app.strategy.usp.emptyBody') }}</p>
-      <v-btn
-        color="primary"
-        variant="flat"
-        prepend-icon="mdi-plus"
-        data-test="usp-add-empty"
-        @click="openAdd"
-      >
-        {{ t('app.strategy.usp.add') }}
-      </v-btn>
-    </div>
+    <CEmptyState
+      v-else-if="count === 0"
+      class="agency-card usps-empty"
+      data-test="usps-empty"
+      title-tag="h3"
+      :title="t('app.strategy.usp.emptyTitle')"
+      :body="t('app.strategy.usp.emptyBody')"
+    >
+      <template #icon>
+        <v-icon icon="mdi-lightbulb-outline" size="48" aria-hidden="true" />
+      </template>
+      <template #action>
+        <v-btn
+          color="primary"
+          variant="flat"
+          prepend-icon="mdi-plus"
+          data-test="usp-add-empty"
+          @click="openAdd"
+        >
+          {{ t('app.strategy.usp.add') }}
+        </v-btn>
+      </template>
+    </CEmptyState>
     <draggable
       v-else
       v-model="usps"
@@ -257,7 +268,9 @@ function move(usp: WaveUspResource, by: -1 | 1): void {
       v-model="deleteDialog"
       :scope="scope"
       :usp="deleting"
+      :can-delete-in-use="canDeleteInUse"
       @deleted="onDeleted"
+      @stale="load"
     />
     <AudienceTitleDialog
       v-if="scope"

@@ -1768,7 +1768,6 @@
         "tileMax": "{count} of {max} used in {market} · maximum reached",
         "warning": "Add at least {min} personas for {market}.",
         "fewerThanMin": "Fewer than {min} personas",
-        "empty": "No personas for {market} yet.",
         "coreJob": "Core job",
         "drivers": "Emotional drivers",
         "goals": "Values & goals",
@@ -1784,7 +1783,6 @@
         },
         "barriers": "Barriers & frictions",
         "angles": "Creative angles that unlock",
-        "nameLine": "{name} · persona name",
         "menu": "Actions for {name}",
         "edit": "Edit",
         "delete": "Delete",
@@ -1836,7 +1834,13 @@
         "syncedFromMatrix": "Synced from matrix",
         "changeInMatrix": "Change it in the Messaging matrix",
         "removeAngleBodySyncs": "The angle on “{usp}” is removed. This persona's cell for the USP is Priority or Support, so an angle synced from the matrix takes its place.",
-        "deleteBodyCells": "The persona is removed with its {angles} and {cells}:"
+        "deleteBodyCells": "The persona is removed with its {angles} and {cells}:",
+        "differsFromMatrix": "Differs from the matrix line.",
+        "seeMatrixCell": "See the matrix cell",
+        "emptyState": {
+          "title": "No personas for {market} yet",
+          "body": "Add {min} to {max} personas to describe who you are writing for in this market."
+        }
       },
       "copy": {
         "open": "Copy from…",
@@ -1891,11 +1895,8 @@
         "leadWith": "Lead with:",
         "notSet": "Not set",
         "tabProgress": "{set} of {total} cells set in {market}",
-        "handNote": "This persona already has a hand-written angle on this USP. It is kept as written.",
+        "handNote": "This persona already has a manually added angle on this USP. It is kept as written.",
         "footer": "The table grows with the wave: columns are the personas in this market (2 to 8), rows are the wave's USPs. Wide tables scroll sideways with the USP column pinned. Priority and Support cells become each persona's angles.",
-        "noUsps": "Add USPs in step 1 first.",
-        "noPersonas": "No personas for {market} yet.",
-        "goToPersonas": "Add personas in step 2",
         "retry": "Try again",
         "editor": {
           "level": "Level",
@@ -1904,7 +1905,23 @@
           "counter": "{count} of {max}",
           "lineRequired": "Add a message line to save a Priority or Support cell.",
           "saveNext": "Save and next",
-          "clear": "Clear cell"
+          "clear": "Clear cell",
+          "prefilled": "Prefilled from the manually added angle. Saving does not change that angle."
+        },
+        "conflictNote": "A manually added angle for this persona and USP says something else. It is kept as written until you choose.",
+        "useLine": "Use the matrix line",
+        "useLineDialog": {
+          "title": "Use the matrix line?",
+          "manual": "Manually added angle",
+          "matrix": "Matrix message line",
+          "effect": "The manually added angle becomes the synced angle and says what the message line says. Its current text is replaced."
+        },
+        "emptyUsps": {
+          "body": "Add the selling points of this wave in step 1, then fill the matrix."
+        },
+        "emptyPersonas": {
+          "body": "Add personas for this market in step 2, then fill its matrix.",
+          "cta": "Add personas"
         }
       }
     }

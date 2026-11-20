@@ -130,6 +130,16 @@ export const strategyApi = {
     })
   },
 
+  /**
+   * PL-2.2 "Use the matrix line": a hand-written angle becomes the synced one of its Priority or Support cell (the same
+   * row, the text of the message line). Idempotent on the server. Any role.
+   */
+  useMatrixLine(s: WaveScope, personaId: string, angleId: string): Promise<WaveAngleEnvelope> {
+    return http.post<WaveAngleEnvelope>(
+      `${base(s)}/personas/${personaId}/angles/${angleId}/use-matrix-line`,
+    )
+  },
+
   removeAngle(s: WaveScope, personaId: string, angleId: string): Promise<void> {
     return http.delete<void>(`${base(s)}/personas/${personaId}/angles/${angleId}`)
   },

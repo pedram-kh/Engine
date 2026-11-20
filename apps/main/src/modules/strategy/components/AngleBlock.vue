@@ -57,6 +57,19 @@ const removeSyncs = computed(() => {
 })
 const removeError = ref<string | null>(null)
 
+/**
+ * R3: a manually added angle whose text differs from the message line of its Priority or Support cell is marked, with a
+ * link to that cell. The cell's text comes with the persona (`matrix_cells`).
+ */
+function differingCell(angle: WaveAngleResource): string | null {
+  if (angle.attributes.read_only) return null
+  const cell = props.persona.attributes.matrix_cells.find((c) => c.usp === angle.attributes.usp)
+  if (cell === undefined) return null
+  if (cell.level !== 'priority' && cell.level !== 'support') return null
+  if (cell.message_line === null || cell.message_line === '') return null
+  return cell.message_line === angle.attributes.explanation ? null : cell.usp
+}
+
 function startAdd(usp: WaveUspResource): void {
   listOpen.value = false
   editing.value = null
@@ -205,6 +218,28 @@ async function confirmRemove(): Promise<void> {
             <span v-else class="angle__origin" data-test="angle-origin">{{
               t('app.strategy.persona.addedByHand')
             }}</span>
+            <span
+              v-if="differingCell(angle) !== null"
+              class="angle__differs"
+              data-test="angle-differs"
+            >
+              <v-icon icon="mdi-alert-outline" size="13" aria-hidden="true" />
+              {{ t('app.strategy.persona.differsFromMatrix') }}
+              <router-link
+                class="angle__matrix-link"
+                :to="{
+                  name: 'strategy.matrix',
+                  params: { ulid: brandId, waveUlid: waveId },
+                  query: {
+                    market: angle.attributes.market ?? persona.attributes.market,
+                    cell: `${persona.id}:${angle.attributes.usp}`,
+                  },
+                }"
+                data-test="angle-differs-link"
+              >
+                {{ t('app.strategy.persona.seeMatrixCell') }}
+              </router-link>
+            </span>
             <router-link
               v-if="angle.attributes.read_only"
               class="angle__matrix-link"
@@ -551,6 +586,19 @@ async function confirmRemove(): Promise<void> {
 
 .angle__origin--synced {
   color: rgb(var(--v-theme-on-surface-variant));
+}
+.angle__differs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 6px;
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 16px;
+  color: rgb(var(--v-theme-warning-text));
+}
+.angle__differs .v-icon {
+  align-self: center;
 }
 .angle__matrix-link {
   display: inline-block;

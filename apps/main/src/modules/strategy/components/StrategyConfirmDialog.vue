@@ -17,6 +17,8 @@ const props = defineProps<{
   /** After "removed by someone else" only Close is offered. */
   confirmDisabled?: boolean
   testId: string
+  /** The confirm button's colour: `error` for a delete (the default), `primary` for anything else. */
+  confirmColor?: string
 }>()
 
 const emit = defineEmits<{
@@ -76,7 +78,7 @@ function close(): void {
         </v-btn>
         <v-btn
           v-if="!confirmDisabled"
-          color="error"
+          :color="confirmColor ?? 'error'"
           variant="flat"
           :loading="busy"
           data-test="confirm-ok"

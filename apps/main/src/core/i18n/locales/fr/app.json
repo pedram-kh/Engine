@@ -1768,7 +1768,6 @@
         "tileMax": "{count} sur {max} utilisés pour {market} · maximum atteint",
         "warning": "Ajoutez au moins {min} personas pour {market}.",
         "fewerThanMin": "Moins de {min} personas",
-        "empty": "Aucun persona pour {market} pour l'instant.",
         "coreJob": "Mission principale",
         "drivers": "Moteurs émotionnels",
         "goals": "Valeurs et objectifs",
@@ -1784,7 +1783,6 @@
         },
         "barriers": "Freins et frictions",
         "angles": "Angles créatifs qui convainquent",
-        "nameLine": "{name} · nom du persona",
         "menu": "Actions pour {name}",
         "edit": "Modifier",
         "delete": "Supprimer",
@@ -1836,7 +1834,13 @@
         "syncedFromMatrix": "Synchronisé depuis la matrice",
         "changeInMatrix": "Modifiez-le dans la matrice de messages",
         "removeAngleBodySyncs": "L'angle sur « {usp} » est supprimé. La cellule de ce persona pour cet USP est en Priorité ou Soutien : un angle synchronisé depuis la matrice prend donc sa place.",
-        "deleteBodyCells": "Le persona est supprimé avec {angles} et {cells} :"
+        "deleteBodyCells": "Le persona est supprimé avec {angles} et {cells} :",
+        "differsFromMatrix": "Diffère de la phrase de la matrice.",
+        "seeMatrixCell": "Voir la cellule de la matrice",
+        "emptyState": {
+          "title": "Aucun persona pour {market} pour l'instant",
+          "body": "Ajoutez de {min} à {max} personas qui décrivent à qui vous écrivez sur ce marché."
+        }
       },
       "copy": {
         "open": "Copier depuis…",
@@ -1891,11 +1895,8 @@
         "leadWith": "Mettre en avant :",
         "notSet": "Non défini",
         "tabProgress": "{set} cellules définies sur {total} pour {market}",
-        "handNote": "Ce persona a déjà un angle écrit à la main sur cet USP. Il est conservé tel quel.",
+        "handNote": "Ce persona a déjà un angle ajouté manuellement sur cet USP. Il est conservé tel quel.",
         "footer": "Le tableau grandit avec la vague : les colonnes sont les personas de ce marché (de 2 à 8), les lignes les USP de la vague. Les tableaux larges défilent latéralement, la colonne des USP restant épinglée. Les cellules Priorité et Soutien deviennent les angles de chaque persona.",
-        "noUsps": "Ajoutez d'abord des USP à l'étape 1.",
-        "noPersonas": "Aucun persona pour {market} pour l'instant.",
-        "goToPersonas": "Ajouter des personas à l'étape 2",
         "retry": "Réessayer",
         "editor": {
           "level": "Niveau",
@@ -1904,7 +1905,23 @@
           "counter": "{count} sur {max}",
           "lineRequired": "Ajoutez une phrase de message pour enregistrer une cellule Priorité ou Soutien.",
           "saveNext": "Enregistrer et suivant",
-          "clear": "Vider la cellule"
+          "clear": "Vider la cellule",
+          "prefilled": "Prérempli à partir de l'angle ajouté manuellement. Enregistrer ne modifie pas cet angle."
+        },
+        "conflictNote": "Un angle ajouté manuellement pour ce persona et cet USP dit autre chose. Il est conservé tel quel jusqu'à ce que vous choisissiez.",
+        "useLine": "Utiliser la phrase de la matrice",
+        "useLineDialog": {
+          "title": "Utiliser la phrase de la matrice ?",
+          "manual": "Angle ajouté manuellement",
+          "matrix": "Phrase de message de la matrice",
+          "effect": "L'angle ajouté manuellement devient l'angle synchronisé et dit ce que dit la phrase de message. Son texte actuel est remplacé."
+        },
+        "emptyUsps": {
+          "body": "Ajoutez à l'étape 1 les arguments de vente de cette vague, puis remplissez la matrice."
+        },
+        "emptyPersonas": {
+          "body": "Ajoutez à l'étape 2 des personas pour ce marché, puis remplissez sa matrice.",
+          "cta": "Ajouter des personas"
         }
       }
     }

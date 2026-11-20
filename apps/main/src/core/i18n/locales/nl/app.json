@@ -1768,7 +1768,6 @@
         "tileMax": "{count} van {max} gebruikt in {market} · maximum bereikt",
         "warning": "Voeg minstens {min} persona's toe voor {market}.",
         "fewerThanMin": "Minder dan {min} persona's",
-        "empty": "Nog geen persona's voor {market}.",
         "coreJob": "Kerntaak",
         "drivers": "Emotionele drijfveren",
         "goals": "Waarden en doelen",
@@ -1784,7 +1783,6 @@
         },
         "barriers": "Drempels en wrijving",
         "angles": "Creatieve invalshoeken die overtuigen",
-        "nameLine": "{name} · naam van de persona",
         "menu": "Acties voor {name}",
         "edit": "Bewerken",
         "delete": "Verwijderen",
@@ -1836,7 +1834,13 @@
         "syncedFromMatrix": "Gesynchroniseerd vanuit de matrix",
         "changeInMatrix": "Wijzig het in de berichtenmatrix",
         "removeAngleBodySyncs": "De invalshoek op “{usp}” wordt verwijderd. De cel van deze persona voor die USP is Prioriteit of Ondersteunend, dus een invalshoek gesynchroniseerd vanuit de matrix neemt zijn plaats in.",
-        "deleteBodyCells": "De persona wordt verwijderd met {angles} en {cells}:"
+        "deleteBodyCells": "De persona wordt verwijderd met {angles} en {cells}:",
+        "differsFromMatrix": "Wijkt af van de matrixregel.",
+        "seeMatrixCell": "Bekijk de matrixcel",
+        "emptyState": {
+          "title": "Nog geen persona's voor {market}",
+          "body": "Voeg {min} tot {max} persona's toe die beschrijven voor wie je op deze markt schrijft."
+        }
       },
       "copy": {
         "open": "Kopiëren van…",
@@ -1891,11 +1895,8 @@
         "leadWith": "Leid met:",
         "notSet": "Niet ingesteld",
         "tabProgress": "{set} van {total} cellen ingesteld voor {market}",
-        "handNote": "Deze persona heeft al een met de hand geschreven invalshoek op deze USP. Die blijft zoals geschreven.",
+        "handNote": "Deze persona heeft al een handmatig toegevoegde invalshoek voor deze USP. Die blijft zoals hij is geschreven.",
         "footer": "De tabel groeit mee met de wave: de kolommen zijn de persona's in deze markt (2 tot 8), de rijen zijn de USP's van de wave. Brede tabellen schuiven zijwaarts met de USP-kolom vastgezet. Cellen met Prioriteit en Ondersteunend worden de invalshoeken van elke persona.",
-        "noUsps": "Voeg eerst USP's toe in stap 1.",
-        "noPersonas": "Nog geen persona's voor {market}.",
-        "goToPersonas": "Voeg persona's toe in stap 2",
         "retry": "Opnieuw proberen",
         "editor": {
           "level": "Niveau",
@@ -1904,7 +1905,23 @@
           "counter": "{count} van {max}",
           "lineRequired": "Voeg een berichtregel toe om een cel met Prioriteit of Ondersteunend op te slaan.",
           "saveNext": "Opslaan en volgende",
-          "clear": "Cel wissen"
+          "clear": "Cel wissen",
+          "prefilled": "Vooraf ingevuld vanuit de handmatig toegevoegde invalshoek. Opslaan wijzigt die invalshoek niet."
+        },
+        "conflictNote": "Een handmatig toegevoegde invalshoek voor deze persona en USP zegt iets anders. Die blijft zoals hij is geschreven tot je kiest.",
+        "useLine": "Gebruik de matrixregel",
+        "useLineDialog": {
+          "title": "De matrixregel gebruiken?",
+          "manual": "Handmatig toegevoegde invalshoek",
+          "matrix": "Berichtregel van de matrix",
+          "effect": "De handmatig toegevoegde invalshoek wordt de gesynchroniseerde invalshoek en zegt wat de berichtregel zegt. De huidige tekst wordt vervangen."
+        },
+        "emptyUsps": {
+          "body": "Voeg in stap 1 de verkoopargumenten van deze wave toe en vul daarna de matrix in."
+        },
+        "emptyPersonas": {
+          "body": "Voeg in stap 2 persona's voor deze markt toe en vul daarna de matrix ervan in.",
+          "cta": "Persona's toevoegen"
         }
       }
     }

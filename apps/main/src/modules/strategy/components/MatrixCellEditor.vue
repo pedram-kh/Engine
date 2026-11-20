@@ -6,7 +6,9 @@
  * Level: the three rows of frame 04b (dot, label, hint; the selected row tinted). Rationale and message line: 140
  * characters each. A Priority or Support cell cannot be saved without a message line (Q1); a Low cell can. Save sends
  * only the fields that changed; with nothing changed it just closes. "Save and next" saves and opens the next cell in
- * reading order. Clear deletes the cell. Errors sit above the buttons and wrap: nothing is cut off.
+ * reading order. Clear deletes the cell. An EMPTY message line is prefilled with the text of the manually added angle on
+ * the pair (R1); an existing line is never replaced. While Save is off because a Priority or Support cell has no
+ * line, a hint beside the field says why. Errors sit above the buttons and wrap: nothing is cut off.
  *
  * The inside is keyed by a counter that moves on every open, so a quick close and reopen starts clean.
  */
@@ -17,13 +19,23 @@ import { useDisplay } from 'vuetify'
 import { VBottomSheet, VMenu } from 'vuetify/components'
 
 import { fieldErrorsOf, strategyErrorMessage } from '../strategyErrors'
-import { changeFor, fieldValue, LEVELS, needsMessageLine, type EditorState } from '../matrixLogic'
+import {
+  changeFor,
+  fieldValue,
+  initialMessageLine,
+  LEVELS,
+  needsMessageLine,
+  type EditorState,
+  type ManualAngle,
+} from '../matrixLogic'
 
 const props = defineProps<{
   modelValue: boolean
   /** The clicked cell, the popover's anchor. */
   anchor: HTMLElement | null
   cell: MatrixCell | null
+  /** The manually added angle on this pair, if any: an EMPTY message line is prefilled from it (R1). */
+  manual: ManualAngle | null
   /** What the editor says it edits: "{usp} · {persona}". */
   heading: string
   limits: StrategyLimits
@@ -52,6 +64,8 @@ const busy = ref(false)
 const error = ref<string | null>(null)
 const fieldErrors = ref<Record<string, string>>({})
 const touched = ref(false)
+/** The line started as the manually added angle's text (R1); the angle itself is not changed by saving. */
+const prefilled = ref(false)
 
 watch(
   () => props.modelValue,
@@ -64,7 +78,9 @@ watch(
     if (!open) return
     level.value = props.cell?.level ?? null
     rationale.value = props.cell?.rationale ?? ''
-    messageLine.value = props.cell?.message_line ?? ''
+    messageLine.value = initialMessageLine(props.cell, props.manual)
+    prefilled.value =
+      messageLine.value !== '' && messageLine.value !== (props.cell?.message_line ?? '')
   },
   { immediate: true },
 )
@@ -240,9 +256,21 @@ function doClear(): void {
             data-test="matrix-line-error"
             >{{ lineError }}</span
           >
-          <span v-else-if="lineMissing" class="mx-field__hint" data-test="matrix-line-hint">{{
-            t('app.strategy.matrix.editor.lineRequired')
-          }}</span>
+          <span
+            v-else-if="lineMissing"
+            id="mx-line-hint"
+            class="mx-field__hint mx-field__hint--why"
+            data-test="matrix-line-hint"
+          >
+            <v-icon icon="mdi-information-outline" size="14" aria-hidden="true" />
+            {{ t('app.strategy.matrix.editor.lineRequired') }}
+          </span>
+          <span
+            v-else-if="prefilled && messageLine === manual?.text"
+            class="mx-field__hint"
+            data-test="matrix-line-prefilled"
+            >{{ t('app.strategy.matrix.editor.prefilled') }}</span
+          >
           <span class="mx-field__count" :class="{ 'mx-field__count--over': lineLong }">{{
             t('app.strategy.matrix.editor.counter', {
               count: Array.from(messageLine).length,
@@ -266,6 +294,7 @@ function doClear(): void {
           variant="flat"
           :disabled="!canSave"
           :loading="busy"
+          :aria-describedby="lineMissing ? 'mx-line-hint' : undefined"
           data-test="matrix-save"
           @click="submit(false)"
         >
@@ -447,6 +476,16 @@ function doClear(): void {
 }
 .mx-field__hint {
   color: rgb(var(--v-theme-text-tertiary));
+}
+.mx-field__hint--why {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 6px;
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+.mx-field__hint--why .v-icon {
+  flex: none;
+  margin-top: 1px;
 }
 .mx-editor__error {
   margin: 0;

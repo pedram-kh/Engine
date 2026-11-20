@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * PL-2.1 — one persona card (frame: tinted header band, initials avatar, code chip, title, "Name · persona name",
+ * PL-2.1 — one persona card (frame: tinted header band, initials avatar, code chip, title, the name,
  * three-dot menu, the body blocks, then the creative angles). A block with no text is left out. The labels of the
  * self-talk and need blocks follow the pronoun: "What she tells herself" / "What he needs" / "What they tell
  * themselves". The colour is derived from the slot on the server. Every string is drawn with interpolation.
@@ -95,7 +95,7 @@ function pick(action: 'edit' | 'remove'): void {
           <h3 class="persona-card__title" data-test="persona-title">{{ a.title }}</h3>
         </div>
         <div class="persona-card__name" data-test="persona-name">
-          {{ t('app.strategy.persona.nameLine', { name: a.name }) }}
+          {{ a.name }}
         </div>
       </div>
       <v-menu v-model="menuOpen" v-bind="MENU_PROPS" location="bottom end">
@@ -245,12 +245,15 @@ function pick(action: 'edit' | 'remove'): void {
   gap: 2px;
 }
 .persona-card__line {
+  /* One row whatever the title length (frame 13:828: the chip sits beside the title): a long title wraps inside its own
+     column, the chip never moves above it. */
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 4px 8px;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  gap: 8px;
 }
 .persona-card__code {
+  flex: none;
   padding: 2px 6px;
   border: 1px solid color-mix(in srgb, var(--usp-color) 60%, transparent);
   border-radius: 4px;
@@ -260,6 +263,7 @@ function pick(action: 'edit' | 'remove'): void {
   color: var(--usp-color);
 }
 .persona-card__title {
+  min-width: 0;
   margin: 0;
   font-size: 16px;
   font-weight: 600;

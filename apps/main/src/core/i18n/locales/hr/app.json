@@ -1768,7 +1768,6 @@
         "tileMax": "Iskorišteno {count} od {max} na tržištu {market} · dosegnut maksimum",
         "warning": "Dodajte barem {min} persona za tržište {market}.",
         "fewerThanMin": "Manje od {min} persona",
-        "empty": "Za tržište {market} još nema persona.",
         "coreJob": "Glavni zadatak",
         "drivers": "Emocionalni pokretači",
         "goals": "Vrijednosti i ciljevi",
@@ -1784,7 +1783,6 @@
         },
         "barriers": "Prepreke i trenja",
         "angles": "Kreativni kutovi koji uvjeravaju",
-        "nameLine": "{name} · ime persone",
         "menu": "Radnje za {name}",
         "edit": "Uredi",
         "delete": "Izbriši",
@@ -1836,7 +1834,13 @@
         "syncedFromMatrix": "Sinkronizirano iz matrice",
         "changeInMatrix": "Promijenite to u matrici poruka",
         "removeAngleBodySyncs": "Kut za „{usp}“ uklanja se. Ćelija ove persone za taj USP je Prioritet ili Podrška, pa njegovo mjesto zauzima kut sinkroniziran iz matrice.",
-        "deleteBodyCells": "Persona se uklanja zajedno s: {angles} i {cells}:"
+        "deleteBodyCells": "Persona se uklanja zajedno s: {angles} i {cells}:",
+        "differsFromMatrix": "Razlikuje se od retka u matrici.",
+        "seeMatrixCell": "Pogledaj ćeliju matrice",
+        "emptyState": {
+          "title": "Za tržište {market} još nema persona",
+          "body": "Dodajte od {min} do {max} persona koje opisuju kome pišete na ovom tržištu."
+        }
       },
       "copy": {
         "open": "Kopiraj iz…",
@@ -1891,11 +1895,8 @@
         "leadWith": "Vodite s:",
         "notSet": "Nije postavljeno",
         "tabProgress": "{set} od {total} ćelija postavljeno za {market}",
-        "handNote": "Ova persona već ima ručno napisan kut za ovaj USP. Ostaje onakav kakav je napisan.",
+        "handNote": "Ova persona već ima ručno dodan kut za ovaj USP. Ostaje onako kako je napisan.",
         "footer": "Tablica raste s valom: stupci su persone na ovom tržištu (2 do 8), reci su USP-ovi vala. Široke tablice klize bočno, a stupac USP-a ostaje prikvačen. Ćelije Prioriteta i Podrške postaju kutovi svake persone.",
-        "noUsps": "Prvo dodajte USP-ove u koraku 1.",
-        "noPersonas": "Za tržište {market} još nema persona.",
-        "goToPersonas": "Dodajte persone u koraku 2",
         "retry": "Pokušaj ponovno",
         "editor": {
           "level": "Razina",
@@ -1904,7 +1905,23 @@
           "counter": "{count} od {max}",
           "lineRequired": "Dodajte redak poruke da biste spremili ćeliju Prioriteta ili Podrške.",
           "saveNext": "Spremi i dalje",
-          "clear": "Očisti ćeliju"
+          "clear": "Očisti ćeliju",
+          "prefilled": "Unaprijed ispunjeno iz ručno dodanog kuta. Spremanje ne mijenja taj kut."
+        },
+        "conflictNote": "Ručno dodan kut za ovu personu i USP kaže nešto drugo. Ostaje onako kako je napisan dok ne odaberete.",
+        "useLine": "Upotrijebi redak iz matrice",
+        "useLineDialog": {
+          "title": "Upotrijebiti redak iz matrice?",
+          "manual": "Ručno dodan kut",
+          "matrix": "Redak poruke u matrici",
+          "effect": "Ručno dodan kut postaje sinkronizirani kut i kaže ono što kaže redak poruke. Njegov trenutni tekst se zamjenjuje."
+        },
+        "emptyUsps": {
+          "body": "U koraku 1 dodajte prodajne argumente ovog vala, a zatim ispunite matricu."
+        },
+        "emptyPersonas": {
+          "body": "U koraku 2 dodajte persone za ovo tržište, a zatim ispunite njegovu matricu.",
+          "cta": "Dodaj persone"
         }
       }
     }

@@ -1768,7 +1768,6 @@
         "tileMax": "{count} minn {max} użati f'{market} · intlaħaq il-massimu",
         "warning": "Żid mill-inqas {min} persunaġġi għal {market}.",
         "fewerThanMin": "Inqas minn {min} persunaġġi",
-        "empty": "Għad m'hemm l-ebda persunaġġ għal {market}.",
         "coreJob": "Kompitu ewlieni",
         "drivers": "Motivazzjonijiet emozzjonali",
         "goals": "Valuri u għanijiet",
@@ -1784,7 +1783,6 @@
         },
         "barriers": "Ostakli u frizzjoni",
         "angles": "Angoli kreattivi li jikkonvinċu",
-        "nameLine": "{name} · isem tal-persunaġġ",
         "menu": "Azzjonijiet għal {name}",
         "edit": "Editja",
         "delete": "Ħassar",
@@ -1836,7 +1834,13 @@
         "syncedFromMatrix": "Sinkronizzat mill-matriċi",
         "changeInMatrix": "Biddlu fil-Matriċi tal-messaġġi",
         "removeAngleBodySyncs": "L-angolu fuq “{usp}” jitneħħa. Iċ-ċellola ta' dan il-persunaġġ għal dan l-USP hija Prijorità jew Appoġġ, għalhekk angolu sinkronizzat mill-matriċi jieħu postu.",
-        "deleteBodyCells": "Il-persunaġġ jitneħħa flimkien ma' {angles} u {cells}:"
+        "deleteBodyCells": "Il-persunaġġ jitneħħa flimkien ma' {angles} u {cells}:",
+        "differsFromMatrix": "Differenti mil-linja tal-matriċi.",
+        "seeMatrixCell": "Ara ċ-ċellola tal-matriċi",
+        "emptyState": {
+          "title": "Għad m'hemm l-ebda persunaġġ għal {market}",
+          "body": "Żid minn {min} sa {max} persunaġġi li jiddeskrivu lil min qed tikteb f'dan is-suq."
+        }
       },
       "copy": {
         "open": "Ikkopja minn…",
@@ -1891,11 +1895,8 @@
         "leadWith": "Ibda b'dan:",
         "notSet": "Mhux issettjat",
         "tabProgress": "{set} minn {total} ċelloli ssettjati għal {market}",
-        "handNote": "Dan il-persunaġġ diġà għandu angolu miktub bl-id fuq dan l-USP. Jibqa' kif inkiteb.",
+        "handNote": "Dan il-persunaġġ diġà għandu angolu miżjud manwalment fuq dan l-USP. Jibqa' kif inkiteb.",
         "footer": "It-tabella tikber mal-mewġa: il-kolonni huma l-persunaġġi f'dan is-suq (2 sa 8), ir-ringieli huma l-USPs tal-mewġa. Tabelli wesgħin jiskrollaw 'il ġemb bil-kolonna tal-USP imwaħħla. Iċ-ċelloli ta' Prijorità u Appoġġ isiru l-angoli ta' kull persunaġġ.",
-        "noUsps": "Żid l-ewwel l-USPs fil-pass 1.",
-        "noPersonas": "Għad m'hemm l-ebda persunaġġ għal {market}.",
-        "goToPersonas": "Żid persunaġġi fil-pass 2",
         "retry": "Erġa' pprova",
         "editor": {
           "level": "Livell",
@@ -1904,7 +1905,23 @@
           "counter": "{count} minn {max}",
           "lineRequired": "Żid linja tal-messaġġ biex tissejvja ċellola ta' Prijorità jew Appoġġ.",
           "saveNext": "Issejvja u li jmiss",
-          "clear": "Ras iċ-ċellola"
+          "clear": "Ras iċ-ċellola",
+          "prefilled": "Mimli minn qabel mill-angolu miżjud manwalment. Is-sejvjar ma jibdilx dak l-angolu."
+        },
+        "conflictNote": "Angolu miżjud manwalment għal dan il-persunaġġ u USP jgħid xi ħaġa oħra. Jibqa' kif inkiteb sakemm tagħżel.",
+        "useLine": "Uża l-linja tal-matriċi",
+        "useLineDialog": {
+          "title": "Tuża l-linja tal-matriċi?",
+          "manual": "Angolu miżjud manwalment",
+          "matrix": "Linja tal-messaġġ tal-matriċi",
+          "effect": "L-angolu miżjud manwalment isir l-angolu sinkronizzat u jgħid dak li tgħid il-linja tal-messaġġ. It-test kurrenti tiegħu jinbidel."
+        },
+        "emptyUsps": {
+          "body": "Fil-pass 1 żid l-argumenti tal-bejgħ ta' din il-mewġa, imbagħad imla l-matriċi."
+        },
+        "emptyPersonas": {
+          "body": "Fil-pass 2 żid persunaġġi għal dan is-suq, imbagħad imla l-matriċi tiegħu.",
+          "cta": "Żid persunaġġi"
         }
       }
     }

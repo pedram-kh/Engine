@@ -1768,7 +1768,6 @@
         "tileMax": "Panaudota {count} iš {max}, rinka {market} · pasiektas maksimumas",
         "warning": "Pridėkite bent {min} personų rinkai {market}.",
         "fewerThanMin": "Mažiau nei {min} personų",
-        "empty": "Rinkai {market} personų dar nėra.",
         "coreJob": "Pagrindinė užduotis",
         "drivers": "Emociniai motyvai",
         "goals": "Vertybės ir tikslai",
@@ -1784,7 +1783,6 @@
         },
         "barriers": "Kliūtys ir trintis",
         "angles": "Įtikinami kūrybiniai kampai",
-        "nameLine": "{name} · personos vardas",
         "menu": "Veiksmai: {name}",
         "edit": "Redaguoti",
         "delete": "Ištrinti",
@@ -1836,7 +1834,13 @@
         "syncedFromMatrix": "Sinchronizuota iš matricos",
         "changeInMatrix": "Pakeiskite tai Žinučių matricoje",
         "removeAngleBodySyncs": "Kampas „{usp}“ pašalinamas. Šios personos langelis šiam USP yra Prioritetas arba Parama, todėl jo vietą užima iš matricos sinchronizuotas kampas.",
-        "deleteBodyCells": "Persona pašalinama kartu su: {angles} ir {cells}:"
+        "deleteBodyCells": "Persona pašalinama kartu su: {angles} ir {cells}:",
+        "differsFromMatrix": "Skiriasi nuo matricos eilutės.",
+        "seeMatrixCell": "Žiūrėti matricos langelį",
+        "emptyState": {
+          "title": "Rinkai {market} personų dar nėra",
+          "body": "Pridėkite nuo {min} iki {max} personų, apibūdinančių, kam rašote šioje rinkoje."
+        }
       },
       "copy": {
         "open": "Kopijuoti iš…",
@@ -1891,11 +1895,8 @@
         "leadWith": "Pradėkite nuo:",
         "notSet": "Nenustatyta",
         "tabProgress": "Nustatyta {set} langelių iš {total}: {market}",
-        "handNote": "Ši persona jau turi ranka parašytą kampą šiam USP. Jis paliekamas toks, koks parašytas.",
+        "handNote": "Ši persona jau turi rankiniu būdu pridėtą kampą šiam USP. Jis lieka toks, koks parašytas.",
         "footer": "Lentelė auga su banga: stulpeliai yra šios rinkos personos (nuo 2 iki 8), eilutės yra bangos USP. Plačios lentelės slenka į šoną, o USP stulpelis lieka prisegtas. Prioriteto ir paramos langeliai tampa kiekvienos personos kampais.",
-        "noUsps": "Pirmiausia pridėkite USP 1 žingsnyje.",
-        "noPersonas": "Rinkai {market} personų dar nėra.",
-        "goToPersonas": "Pridėkite personas 2 žingsnyje",
         "retry": "Bandyti dar kartą",
         "editor": {
           "level": "Lygis",
@@ -1904,7 +1905,23 @@
           "counter": "{count} iš {max}",
           "lineRequired": "Pridėkite žinutės eilutę, kad išsaugotumėte Prioriteto ar Paramos langelį.",
           "saveNext": "Išsaugoti ir toliau",
-          "clear": "Išvalyti langelį"
+          "clear": "Išvalyti langelį",
+          "prefilled": "Užpildyta iš rankiniu būdu pridėto kampo. Išsaugojus tas kampas nekeičiamas."
+        },
+        "conflictNote": "Rankiniu būdu pridėtas kampas šiai personai ir USP sako ką kita. Jis lieka toks, koks parašytas, kol pasirinksite.",
+        "useLine": "Naudoti matricos eilutę",
+        "useLineDialog": {
+          "title": "Naudoti matricos eilutę?",
+          "manual": "Rankiniu būdu pridėtas kampas",
+          "matrix": "Matricos žinutės eilutė",
+          "effect": "Rankiniu būdu pridėtas kampas tampa sinchronizuotu kampu ir sako tai, ką sako žinutės eilutė. Dabartinis jo tekstas pakeičiamas."
+        },
+        "emptyUsps": {
+          "body": "1 žingsnyje pridėkite šios bangos pardavimo argumentus, tada užpildykite matricą."
+        },
+        "emptyPersonas": {
+          "body": "2 žingsnyje pridėkite šios rinkos personas, tada užpildykite jos matricą.",
+          "cta": "Pridėti personas"
         }
       }
     }

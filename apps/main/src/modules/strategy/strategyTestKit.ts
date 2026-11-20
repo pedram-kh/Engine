@@ -6,6 +6,7 @@ import type {
   MatrixCell,
   MatrixLevel,
   MatrixPersona,
+  MatrixManualAngle,
   MatrixResource,
   MatrixUsp,
   StrategyLimits,
@@ -173,6 +174,8 @@ export function makeMatrixCell(
     message_line: level === null || level === 'low' ? null : 'Lead line',
     source: 'manual',
     has_manual_angle: false,
+    manual_angle: null,
+    manual_text: null,
     ...over,
   }
 }
@@ -183,6 +186,7 @@ export function makeMatrix(
   usps: WaveUspResource[],
   personas: WavePersonaResource[],
   cells: MatrixCell[] = [],
+  manualAngles: MatrixManualAngle[] = [],
 ): MatrixResource {
   const u: MatrixUsp[] = usps.map((x) => ({
     id: x.id,
@@ -207,6 +211,7 @@ export function makeMatrix(
       usps: u,
       personas: p,
       cells,
+      manual_angles: manualAngles,
       progress: { cells_set: cells.length, cells_total: u.length * p.length, by_market: [] },
     },
   }

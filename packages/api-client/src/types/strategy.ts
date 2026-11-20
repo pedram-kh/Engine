@@ -116,8 +116,8 @@ export interface WavePersonaResource {
     self_talk: string[]
     barriers: string[]
     angles: WaveAngleResource[]
-    /** One entry per set cell of the persona: the USP ulid and the level. */
-    matrix_cells: { usp: string; level: MatrixLevel }[]
+    /** One entry per set cell of the persona: the USP ulid, the level and the message line (to compare with its hand-written angles). */
+    matrix_cells: { usp: string; level: MatrixLevel; message_line: string | null }[]
     created_at: string
     updated_at: string
   }
@@ -234,6 +234,9 @@ export interface MatrixCell {
   source: string | null
   /** A hand-written angle already sits on this pair; the sync leaves it as written. */
   has_manual_angle: boolean
+  /** Its id and its text (null when there is none), as the answer to a save returns them for the pair. */
+  manual_angle: string | null
+  manual_text: string | null
 }
 
 export interface MatrixResource {
@@ -245,8 +248,18 @@ export interface MatrixResource {
     personas: MatrixPersona[]
     /** One entry per SET cell; "Not set" is absence. */
     cells: MatrixCell[]
+    /** Every hand-written angle of the market's personas, set cell or not: the editor prefills from it, the note compares with it. */
+    manual_angles: MatrixManualAngle[]
     progress: MatrixProgress
   }
+}
+
+/** A hand-written angle on a persona and USP of the market (its id and its text). */
+export interface MatrixManualAngle {
+  persona: string
+  usp: string
+  angle: string
+  text: string
 }
 
 export interface MatrixEnvelope {

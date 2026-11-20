@@ -1768,7 +1768,6 @@
         "tileMax": "Izmantotas {count} no {max}, tirgus {market} · sasniegts maksimums",
         "warning": "Pievienojiet vismaz {min} personas tirgum {market}.",
         "fewerThanMin": "Mazāk nekā {min} personas",
-        "empty": "Tirgum {market} personu vēl nav.",
         "coreJob": "Galvenais uzdevums",
         "drivers": "Emocionālie motīvi",
         "goals": "Vērtības un mērķi",
@@ -1784,7 +1783,6 @@
         },
         "barriers": "Šķēršļi un berze",
         "angles": "Pārliecinoši radošie leņķi",
-        "nameLine": "{name} · personas vārds",
         "menu": "Darbības: {name}",
         "edit": "Rediģēt",
         "delete": "Dzēst",
@@ -1836,7 +1834,13 @@
         "syncedFromMatrix": "Sinhronizēts no matricas",
         "changeInMatrix": "Mainiet to Ziņojumu matricā",
         "removeAngleBodySyncs": "Leņķis “{usp}” tiek noņemts. Šīs personas šūna šim USP ir Prioritāte vai Atbalsts, tāpēc tā vietā stājas no matricas sinhronizēts leņķis.",
-        "deleteBodyCells": "Persona tiek noņemta kopā ar: {angles} un {cells}:"
+        "deleteBodyCells": "Persona tiek noņemta kopā ar: {angles} un {cells}:",
+        "differsFromMatrix": "Atšķiras no matricas rindiņas.",
+        "seeMatrixCell": "Skatīt matricas šūnu",
+        "emptyState": {
+          "title": "Tirgum {market} personu vēl nav",
+          "body": "Pievienojiet no {min} līdz {max} personām, kas apraksta, kam jūs rakstāt šajā tirgū."
+        }
       },
       "copy": {
         "open": "Kopēt no…",
@@ -1891,11 +1895,8 @@
         "leadWith": "Vadiet ar:",
         "notSet": "Nav iestatīts",
         "tabProgress": "Iestatītas {set} šūnas no {total}: {market}",
-        "handNote": "Šai personai jau ir ar roku rakstīts leņķis šim USP. Tas paliek tāds, kāds uzrakstīts.",
+        "handNote": "Šai personai jau ir manuāli pievienots leņķis šim USP. Tas paliek tāds, kāds uzrakstīts.",
         "footer": "Tabula aug līdz ar vilni: kolonnas ir šī tirgus personas (no 2 līdz 8), rindas ir viļņa USP. Platas tabulas ritinās uz sāniem, USP kolonna paliek piespraustā. Prioritātes un atbalsta šūnas kļūst par katras personas leņķiem.",
-        "noUsps": "Vispirms pievienojiet USP 1. solī.",
-        "noPersonas": "Tirgum {market} personu vēl nav.",
-        "goToPersonas": "Pievienojiet personas 2. solī",
         "retry": "Mēģināt vēlreiz",
         "editor": {
           "level": "Līmenis",
@@ -1904,7 +1905,23 @@
           "counter": "{count} no {max}",
           "lineRequired": "Pievienojiet ziņojuma rindiņu, lai saglabātu Prioritātes vai Atbalsta šūnu.",
           "saveNext": "Saglabāt un tālāk",
-          "clear": "Notīrīt šūnu"
+          "clear": "Notīrīt šūnu",
+          "prefilled": "Aizpildīts no manuāli pievienotā leņķa. Saglabāšana šo leņķi nemaina."
+        },
+        "conflictNote": "Manuāli pievienots leņķis šai personai un USP saka ko citu. Tas paliek tāds, kāds uzrakstīts, līdz jūs izvēlaties.",
+        "useLine": "Izmantot matricas rindiņu",
+        "useLineDialog": {
+          "title": "Vai izmantot matricas rindiņu?",
+          "manual": "Manuāli pievienots leņķis",
+          "matrix": "Matricas ziņojuma rindiņa",
+          "effect": "Manuāli pievienotais leņķis kļūst par sinhronizēto leņķi un saka to, ko saka ziņojuma rindiņa. Tā pašreizējais teksts tiek aizstāts."
+        },
+        "emptyUsps": {
+          "body": "1. solī pievienojiet šī viļņa pārdošanas argumentus, pēc tam aizpildiet matricu."
+        },
+        "emptyPersonas": {
+          "body": "2. solī pievienojiet šī tirgus personas, pēc tam aizpildiet tā matricu.",
+          "cta": "Pievienot personas"
         }
       }
     }

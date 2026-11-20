@@ -229,12 +229,14 @@ describe('UspsStep (PL-2.1)', () => {
 
   it('W7: deleting a USP no angle uses is a plain confirm and sends no angle count', async () => {
     const w = await mountStep(makeUsps(4))
+    vi.mocked(strategyApi.listPersonas).mockResolvedValue({ data: [] })
     vi.mocked(strategyApi.removeUsp).mockResolvedValue(undefined as never)
     await w.findAll('[data-test="usp-card"]')[2]?.get('[data-test="usp-menu-btn"]').trigger('click')
     await flushPromises()
     await click('[data-test="usp-menu-delete"]')
+    // The dialog always reads what uses the USP when it opens (D1): the page's counts can be older than the server.
+    expect(strategyApi.listPersonas).toHaveBeenCalledTimes(1)
     expect(overlayText()).toContain('No persona uses this USP.')
-    expect(strategyApi.listPersonas).not.toHaveBeenCalled()
     await click('[data-test="confirm-ok"]')
     expect(strategyApi.removeUsp).toHaveBeenCalledWith(SCOPE, makeUsp(3).id, undefined)
     w.unmount()
@@ -277,7 +279,7 @@ describe('UspsStep (PL-2.1)', () => {
       data: [
         makePersona(1, 'SK', {
           angles: [makeSyncedAngle(used, 'Lead line')],
-          matrix_cells: [{ usp: used.id, level: 'priority' }],
+          matrix_cells: [{ usp: used.id, level: 'priority', message_line: 'Lead line' }],
         }),
         makePersona(2, 'RO'),
       ],
@@ -364,6 +366,96 @@ describe('UspsStep (PL-2.1)', () => {
     const item = overlay('[data-test="usp-menu-delete"]')
     expect(item?.className).toContain('v-list-item--disabled')
     expect(overlayText()).toContain('Only an admin or manager can delete a USP that personas use.')
+    staff.unmount()
+  })
+
+  describe.each([
+    ['D1-a: cells only', { cell_count: 2 }],
+    ['D1-b: angles only', { angle_count: 2 }],
+    ['D1-c: cells and angles', { angle_count: 1, cell_count: 2 }],
+  ])('%s', (_name, counts) => {
+    it('staff: Delete is disabled with the reason, a click sends nothing', async () => {
+      const usps = [makeUsp(1, counts), ...makeUsps(4).slice(1)]
+      const staff = await mountStep(usps, 'agency_staff')
+      await staff
+        .findAll('[data-test="usp-card"]')[0]
+        ?.get('[data-test="usp-menu-btn"]')
+        .trigger('click')
+      await flushPromises()
+      expect(overlay('[data-test="usp-menu-delete"]')?.className).toContain('v-list-item--disabled')
+      expect(overlay('[data-test="usp-delete-reason"]')).not.toBeNull()
+      await click('[data-test="usp-menu-delete"]')
+      expect(strategyApi.listPersonas).not.toHaveBeenCalled() // the dialog never opened
+      expect(overlay('[data-test="confirm-ok"]')).toBeNull()
+      expect(strategyApi.removeUsp).not.toHaveBeenCalled()
+      staff.unmount()
+    })
+
+    it('admin and manager: Delete is offered', async () => {
+      for (const role of ['agency_admin', 'agency_manager'] as const) {
+        const usps = [makeUsp(1, counts), ...makeUsps(4).slice(1)]
+        const w = await mountStep(usps, role)
+        await w
+          .findAll('[data-test="usp-card"]')[0]
+          ?.get('[data-test="usp-menu-btn"]')
+          .trigger('click')
+        await flushPromises()
+        expect(overlay('[data-test="usp-menu-delete"]')?.className).not.toContain(
+          'v-list-item--disabled',
+        )
+        w.unmount()
+        document.body.innerHTML = ''
+      }
+    })
+  })
+
+  it('D1: staff on a page that showed the USP as unused: the dialog reads the truth, says why and offers no Delete', async () => {
+    const usps = makeUsps(4)
+    const target = usps[0] ?? makeUsp(1)
+    vi.mocked(strategyApi.listPersonas).mockResolvedValue({
+      data: [
+        makePersona(1, 'SK', {
+          angles: [makeSyncedAngle(target, 'Lead line')],
+          matrix_cells: [{ usp: target.id, level: 'priority', message_line: 'Lead line' }],
+        }),
+      ],
+    })
+    const staff = await mountStep(usps, 'agency_staff')
+    await staff
+      .findAll('[data-test="usp-card"]')[0]
+      ?.get('[data-test="usp-menu-btn"]')
+      .trigger('click')
+    await flushPromises()
+    expect(overlay('[data-test="usp-menu-delete"]')?.className).not.toContain(
+      'v-list-item--disabled',
+    )
+    await click('[data-test="usp-menu-delete"]')
+    await flushPromises()
+    expect(overlay('[data-test="usp-delete-staff-reason"]')).not.toBeNull()
+    expect(overlay('[data-test="confirm-ok"]')).toBeNull()
+    expect(strategyApi.removeUsp).not.toHaveBeenCalled()
+    staff.unmount()
+  })
+
+  it('D1: if the server refuses staff (the list was older still), the dialog says why and the page reloads its list', async () => {
+    vi.mocked(strategyApi.listPersonas).mockResolvedValue({ data: [] })
+    vi.mocked(strategyApi.removeUsp).mockRejectedValue(
+      new ApiError({ status: 403, code: 'forbidden', message: 'x' }),
+    )
+    const staff = await mountStep(makeUsps(4), 'agency_staff')
+    await staff
+      .findAll('[data-test="usp-card"]')[0]
+      ?.get('[data-test="usp-menu-btn"]')
+      .trigger('click')
+    await flushPromises()
+    await click('[data-test="usp-menu-delete"]')
+    await flushPromises()
+    await click('[data-test="confirm-ok"]')
+    await flushPromises()
+    expect(overlay('[data-test="confirm-error"]')?.textContent).toContain(
+      'Only an admin or manager can delete a USP that personas use.',
+    )
+    expect(strategyApi.listUsps).toHaveBeenCalledTimes(2)
     staff.unmount()
   })
 

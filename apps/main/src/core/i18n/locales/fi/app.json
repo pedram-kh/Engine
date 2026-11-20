@@ -1768,7 +1768,6 @@
         "tileMax": "Käytössä {count} / {max}, {market} · enimmäismäärä saavutettu",
         "warning": "Lisää vähintään {min} personaa markkinalle {market}.",
         "fewerThanMin": "Alle {min} personaa",
-        "empty": "Markkinalla {market} ei ole vielä personia.",
         "coreJob": "Ydintehtävä",
         "drivers": "Tunnepohjaiset motiivit",
         "goals": "Arvot ja tavoitteet",
@@ -1784,7 +1783,6 @@
         },
         "barriers": "Esteet ja kitka",
         "angles": "Vakuuttavat luovat näkökulmat",
-        "nameLine": "{name} · personan nimi",
         "menu": "Toiminnot: {name}",
         "edit": "Muokkaa",
         "delete": "Poista",
@@ -1836,7 +1834,13 @@
         "syncedFromMatrix": "Synkronoitu matriisista",
         "changeInMatrix": "Muuta se viestimatriisissa",
         "removeAngleBodySyncs": "Näkökulma “{usp}” poistetaan. Tämän personan solu tälle USP:lle on ensisijainen tai tukeva, joten sen tilalle tulee matriisista synkronoitu näkökulma.",
-        "deleteBodyCells": "Persona poistetaan yhdessä näiden kanssa: {angles} ja {cells}:"
+        "deleteBodyCells": "Persona poistetaan yhdessä näiden kanssa: {angles} ja {cells}:",
+        "differsFromMatrix": "Poikkeaa matriisin rivistä.",
+        "seeMatrixCell": "Katso matriisin solu",
+        "emptyState": {
+          "title": "Markkinalla {market} ei ole vielä personia",
+          "body": "Lisää {min}–{max} personaa, jotka kuvaavat, kenelle kirjoitat tällä markkinalla."
+        }
       },
       "copy": {
         "open": "Kopioi kohteesta…",
@@ -1891,11 +1895,8 @@
         "leadWith": "Johda tällä:",
         "notSet": "Ei asetettu",
         "tabProgress": "{set} / {total} solua asetettu: {market}",
-        "handNote": "Tällä personalla on jo käsin kirjoitettu näkökulma tähän USP:hen. Se säilyy sellaisenaan.",
+        "handNote": "Tällä personalla on jo manuaalisesti lisätty näkökulma tähän USP:hen. Se säilyy sellaisena kuin se on kirjoitettu.",
         "footer": "Taulukko kasvaa aallon mukana: sarakkeet ovat tämän markkinan personat (2–8), rivit aallon USP:t. Leveät taulukot vierivät sivusuunnassa USP-sarake kiinnitettynä. Ensisijaisen ja tukevan tason solut muuttuvat kunkin personan näkökulmiksi.",
-        "noUsps": "Lisää ensin USP:t vaiheessa 1.",
-        "noPersonas": "Markkinalla {market} ei ole vielä personia.",
-        "goToPersonas": "Lisää personat vaiheessa 2",
         "retry": "Yritä uudelleen",
         "editor": {
           "level": "Taso",
@@ -1904,7 +1905,23 @@
           "counter": "{count} / {max}",
           "lineRequired": "Lisää viestirivi, jotta voit tallentaa ensisijaisen tai tukevan solun.",
           "saveNext": "Tallenna ja seuraava",
-          "clear": "Tyhjennä solu"
+          "clear": "Tyhjennä solu",
+          "prefilled": "Esitäytetty manuaalisesti lisätystä näkökulmasta. Tallennus ei muuta kyseistä näkökulmaa."
+        },
+        "conflictNote": "Manuaalisesti lisätty näkökulma tälle personalle ja USP:lle sanoo jotain muuta. Se säilyy sellaisena kuin se on kirjoitettu, kunnes valitset.",
+        "useLine": "Käytä matriisin riviä",
+        "useLineDialog": {
+          "title": "Käytetäänkö matriisin riviä?",
+          "manual": "Manuaalisesti lisätty näkökulma",
+          "matrix": "Matriisin viestirivi",
+          "effect": "Manuaalisesti lisätystä näkökulmasta tulee synkronoitu näkökulma, ja se sanoo sen, mitä viestirivi sanoo. Sen nykyinen teksti korvataan."
+        },
+        "emptyUsps": {
+          "body": "Lisää tämän aallon myyntiargumentit vaiheessa 1 ja täytä sitten matriisi."
+        },
+        "emptyPersonas": {
+          "body": "Lisää tälle markkinalle personat vaiheessa 2 ja täytä sitten sen matriisi.",
+          "cta": "Lisää personat"
         }
       }
     }

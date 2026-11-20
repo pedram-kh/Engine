@@ -92,10 +92,13 @@ async function startWave(
   const closeDrawer = async (): Promise<void> => {
     if (size.width >= 768) return
     const drawer = page.locator('.v-navigation-drawer')
-    if ((await drawer.getAttribute('inert')) === null) {
-      await page.locator('.v-app-bar-nav-icon').click()
-      await expect(drawer).toHaveAttribute('inert', '')
-    }
+    // The drawer settles after a load or reload; closing it while it still moves can leave it open and the page 70 px wide.
+    await expect(async () => {
+      if ((await drawer.getAttribute('inert')) === null)
+        await page.locator('.v-app-bar-nav-icon').click()
+      await expect(drawer).toHaveAttribute('inert', '', { timeout: 1000 })
+    }).toPass({ timeout: 8000 })
+    await page.waitForTimeout(400)
   }
   return { brandId: brand.data.id, waveId: wave.data.id, base, closeDrawer }
 }
@@ -162,10 +165,13 @@ test.describe('Strategy workspace', () => {
       const closeDrawer = async (): Promise<void> => {
         if (size.width >= 768) return
         const drawer = page.locator('.v-navigation-drawer')
-        if ((await drawer.getAttribute('inert')) === null) {
-          await page.locator('.v-app-bar-nav-icon').click()
-          await expect(drawer).toHaveAttribute('inert', '')
-        }
+        // The drawer settles after a load or reload; closing it while it still moves can leave it open and the page 70 px wide.
+        await expect(async () => {
+          if ((await drawer.getAttribute('inert')) === null)
+            await page.locator('.v-app-bar-nav-icon').click()
+          await expect(drawer).toHaveAttribute('inert', '', { timeout: 1000 })
+        }).toPass({ timeout: 8000 })
+        await page.waitForTimeout(400)
       }
 
       // Entry from the wave page.
@@ -314,9 +320,11 @@ test.describe('Strategy workspace', () => {
         'true',
       )
       await expect(page.locator('[data-test="persona-warning"]')).toBeVisible()
-      await expect(page.locator('[data-test="persona-tile-text"]')).toHaveText(
-        '0 of 8 used in Slovakia',
+      // PL-2.2 (P5): a market with no personas is the empty state (icon, title, sentence, primary Add), not the tile.
+      await expect(page.locator('[data-test="personas-empty"]')).toContainText(
+        'No personas for Slovakia yet',
       )
+      await expect(page.locator('[data-test="persona-tile"]')).toHaveCount(0)
 
       for (const delay of [0, 60, 150]) {
         await page.locator('[data-test="persona-add"]').click()

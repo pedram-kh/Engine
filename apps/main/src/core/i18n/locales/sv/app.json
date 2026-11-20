@@ -1768,7 +1768,6 @@
         "tileMax": "{count} av {max} använda i {market} · maxgräns nådd",
         "warning": "Lägg till minst {min} personor för {market}.",
         "fewerThanMin": "Färre än {min} personor",
-        "empty": "Inga personor för {market} än.",
         "coreJob": "Huvuduppgift",
         "drivers": "Känslomässiga drivkrafter",
         "goals": "Värderingar och mål",
@@ -1784,7 +1783,6 @@
         },
         "barriers": "Hinder och friktion",
         "angles": "Kreativa vinklar som övertygar",
-        "nameLine": "{name} · personans namn",
         "menu": "Åtgärder för {name}",
         "edit": "Redigera",
         "delete": "Ta bort",
@@ -1836,7 +1834,13 @@
         "syncedFromMatrix": "Synkroniserad från matrisen",
         "changeInMatrix": "Ändra det i budskapsmatrisen",
         "removeAngleBodySyncs": "Vinkeln på ”{usp}” tas bort. Personans cell för den USP:n har prioritet eller stöd, så en vinkel synkroniserad från matrisen tar dess plats.",
-        "deleteBodyCells": "Personan tas bort tillsammans med {angles} och {cells}:"
+        "deleteBodyCells": "Personan tas bort tillsammans med {angles} och {cells}:",
+        "differsFromMatrix": "Avviker från matrisraden.",
+        "seeMatrixCell": "Visa matriscellen",
+        "emptyState": {
+          "title": "Inga personor för {market} än",
+          "body": "Lägg till {min} till {max} personor som beskriver vem du skriver för på den här marknaden."
+        }
       },
       "copy": {
         "open": "Kopiera från…",
@@ -1891,11 +1895,8 @@
         "leadWith": "Led med:",
         "notSet": "Inte inställd",
         "tabProgress": "{set} av {total} celler inställda för {market}",
-        "handNote": "Den här personan har redan en handskriven vinkel på den här USP:n. Den behålls som den är skriven.",
+        "handNote": "Den här personan har redan en manuellt tillagd vinkel på den här USP:n. Den behålls som den är skriven.",
         "footer": "Tabellen växer med vågen: kolumnerna är personorna på den här marknaden (2 till 8), raderna är vågens USP:er. Breda tabeller rullar i sidled med USP-kolumnen fastsatt. Celler med prioritet och stöd blir varje personas vinklar.",
-        "noUsps": "Lägg först till USP:er i steg 1.",
-        "noPersonas": "Inga personor för {market} än.",
-        "goToPersonas": "Lägg till personor i steg 2",
         "retry": "Försök igen",
         "editor": {
           "level": "Nivå",
@@ -1904,7 +1905,23 @@
           "counter": "{count} av {max}",
           "lineRequired": "Lägg till en budskapsrad för att spara en cell med prioritet eller stöd.",
           "saveNext": "Spara och nästa",
-          "clear": "Rensa cell"
+          "clear": "Rensa cell",
+          "prefilled": "Förifylld från den manuellt tillagda vinkeln. Att spara ändrar inte den vinkeln."
+        },
+        "conflictNote": "En manuellt tillagd vinkel för den här personan och USP:n säger något annat. Den behålls som den är skriven tills du väljer.",
+        "useLine": "Använd matrisraden",
+        "useLineDialog": {
+          "title": "Använda matrisraden?",
+          "manual": "Manuellt tillagd vinkel",
+          "matrix": "Budskapsrad i matrisen",
+          "effect": "Den manuellt tillagda vinkeln blir den synkroniserade vinkeln och säger det budskapsraden säger. Dess nuvarande text ersätts."
+        },
+        "emptyUsps": {
+          "body": "Lägg till den här vågens säljargument i steg 1 och fyll sedan i matrisen."
+        },
+        "emptyPersonas": {
+          "body": "Lägg till personor för den här marknaden i steg 2 och fyll sedan i dess matris.",
+          "cta": "Lägg till personor"
         }
       }
     }

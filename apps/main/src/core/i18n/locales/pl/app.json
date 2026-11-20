@@ -1768,7 +1768,6 @@
         "tileMax": "Wykorzystano {count} z {max} w: {market} · osiągnięto maksimum",
         "warning": "Dodaj co najmniej {min} person dla: {market}.",
         "fewerThanMin": "Mniej niż {min} person",
-        "empty": "Brak person dla: {market}.",
         "coreJob": "Główne zadanie",
         "drivers": "Motywacje emocjonalne",
         "goals": "Wartości i cele",
@@ -1784,7 +1783,6 @@
         },
         "barriers": "Bariery i tarcia",
         "angles": "Kąty kreatywne, które przekonują",
-        "nameLine": "{name} · imię persony",
         "menu": "Działania dla {name}",
         "edit": "Edytuj",
         "delete": "Usuń",
@@ -1836,7 +1834,13 @@
         "syncedFromMatrix": "Zsynchronizowano z macierzy",
         "changeInMatrix": "Zmień to w macierzy komunikatów",
         "removeAngleBodySyncs": "Kąt dla „{usp}” zostanie usunięty. Komórka tej persony dla tego USP ma Priorytet lub Wsparcie, więc jego miejsce zajmie kąt zsynchronizowany z macierzy.",
-        "deleteBodyCells": "Persona zostanie usunięta razem z: {angles} i {cells}:"
+        "deleteBodyCells": "Persona zostanie usunięta razem z: {angles} i {cells}:",
+        "differsFromMatrix": "Różni się od linii w macierzy.",
+        "seeMatrixCell": "Zobacz komórkę macierzy",
+        "emptyState": {
+          "title": "Brak person dla: {market}",
+          "body": "Dodaj od {min} do {max} person opisujących, do kogo piszesz na tym rynku."
+        }
       },
       "copy": {
         "open": "Kopiuj z…",
@@ -1891,11 +1895,8 @@
         "leadWith": "Zacznij od:",
         "notSet": "Nie ustawiono",
         "tabProgress": "Ustawiono {set} z {total} komórek dla: {market}",
-        "handNote": "Ta persona ma już ręcznie napisany kąt dla tego USP. Zostaje tak, jak został napisany.",
+        "handNote": "Ta persona ma już ręcznie dodany kąt dla tego USP. Zostaje taki, jak został napisany.",
         "footer": "Tabela rośnie wraz z falą: kolumny to persony na tym rynku (od 2 do 8), wiersze to USP fali. Szerokie tabele przewijają się na boki, a kolumna USP pozostaje przypięta. Komórki Priorytetu i Wsparcia stają się kątami każdej persony.",
-        "noUsps": "Najpierw dodaj USP w kroku 1.",
-        "noPersonas": "Brak person dla: {market}.",
-        "goToPersonas": "Dodaj persony w kroku 2",
         "retry": "Spróbuj ponownie",
         "editor": {
           "level": "Poziom",
@@ -1904,7 +1905,23 @@
           "counter": "{count} z {max}",
           "lineRequired": "Dodaj linię komunikatu, aby zapisać komórkę Priorytetu lub Wsparcia.",
           "saveNext": "Zapisz i dalej",
-          "clear": "Wyczyść komórkę"
+          "clear": "Wyczyść komórkę",
+          "prefilled": "Wstępnie wypełniono z ręcznie dodanego kąta. Zapis nie zmienia tego kąta."
+        },
+        "conflictNote": "Ręcznie dodany kąt dla tej persony i USP mówi coś innego. Zostaje taki, jak został napisany, dopóki nie wybierzesz.",
+        "useLine": "Użyj linii z macierzy",
+        "useLineDialog": {
+          "title": "Użyć linii z macierzy?",
+          "manual": "Ręcznie dodany kąt",
+          "matrix": "Linia komunikatu w macierzy",
+          "effect": "Ręcznie dodany kąt staje się kątem zsynchronizowanym i mówi to, co linia komunikatu. Jego obecny tekst zostaje zastąpiony."
+        },
+        "emptyUsps": {
+          "body": "W kroku 1 dodaj argumenty sprzedażowe tej fali, a potem wypełnij macierz."
+        },
+        "emptyPersonas": {
+          "body": "W kroku 2 dodaj persony dla tego rynku, a potem wypełnij jego macierz.",
+          "cta": "Dodaj persony"
         }
       }
     }

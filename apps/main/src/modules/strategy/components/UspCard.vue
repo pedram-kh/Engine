@@ -41,6 +41,8 @@ const deleteBlocked = computed(() => inUse.value && !props.canDeleteInUse)
 
 function pick(action: 'edit' | 'remove' | 'earlier' | 'later'): void {
   menuOpen.value = false
+  // A disabled list item still emits `click` in Vuetify (the CSS only stops the pointer), so the guard is here too.
+  if (action === 'remove' && deleteBlocked.value) return
   if (action === 'edit') emit('edit', props.usp)
   else if (action === 'remove') emit('remove', props.usp)
   else if (action === 'earlier') emit('earlier', props.usp)

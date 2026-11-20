@@ -1768,7 +1768,6 @@
         "tileMax": "{count} de {max} usadas en {market} · máximo alcanzado",
         "warning": "Añade al menos {min} personas para {market}.",
         "fewerThanMin": "Menos de {min} personas",
-        "empty": "Aún no hay personas para {market}.",
         "coreJob": "Tarea principal",
         "drivers": "Motivadores emocionales",
         "goals": "Valores y objetivos",
@@ -1784,7 +1783,6 @@
         },
         "barriers": "Barreras y fricciones",
         "angles": "Ángulos creativos que convencen",
-        "nameLine": "{name} · nombre de la persona",
         "menu": "Acciones para {name}",
         "edit": "Editar",
         "delete": "Eliminar",
@@ -1836,7 +1834,13 @@
         "syncedFromMatrix": "Sincronizado desde la matriz",
         "changeInMatrix": "Cámbialo en la matriz de mensajes",
         "removeAngleBodySyncs": "Se elimina el ángulo de «{usp}». La celda de esta persona para ese USP es de Prioridad o Apoyo, así que un ángulo sincronizado desde la matriz ocupa su lugar.",
-        "deleteBodyCells": "La persona se elimina junto con {angles} y {cells}:"
+        "deleteBodyCells": "La persona se elimina junto con {angles} y {cells}:",
+        "differsFromMatrix": "Difiere de la frase de la matriz.",
+        "seeMatrixCell": "Ver la celda de la matriz",
+        "emptyState": {
+          "title": "Aún no hay personas para {market}",
+          "body": "Añade de {min} a {max} personas que describan a quién escribes en este mercado."
+        }
       },
       "copy": {
         "open": "Copiar desde…",
@@ -1891,11 +1895,8 @@
         "leadWith": "Liderar con:",
         "notSet": "Sin definir",
         "tabProgress": "{set} de {total} celdas definidas en {market}",
-        "handNote": "Esta persona ya tiene un ángulo escrito a mano para este USP. Se mantiene tal como está escrito.",
+        "handNote": "Esta persona ya tiene un ángulo añadido manualmente en este USP. Se conserva tal como está escrito.",
         "footer": "La tabla crece con la oleada: las columnas son las personas de este mercado (de 2 a 8) y las filas son los USP de la oleada. Las tablas anchas se desplazan hacia los lados con la columna de USP fija. Las celdas de Prioridad y Apoyo se convierten en los ángulos de cada persona.",
-        "noUsps": "Añade primero USP en el paso 1.",
-        "noPersonas": "Aún no hay personas para {market}.",
-        "goToPersonas": "Añadir personas en el paso 2",
         "retry": "Reintentar",
         "editor": {
           "level": "Nivel",
@@ -1904,7 +1905,23 @@
           "counter": "{count} de {max}",
           "lineRequired": "Añade una frase de mensaje para guardar una celda de Prioridad o Apoyo.",
           "saveNext": "Guardar y siguiente",
-          "clear": "Vaciar celda"
+          "clear": "Vaciar celda",
+          "prefilled": "Rellenado desde el ángulo añadido manualmente. Guardar no cambia ese ángulo."
+        },
+        "conflictNote": "Un ángulo añadido manualmente para esta persona y este USP dice otra cosa. Se conserva tal como está escrito hasta que elijas.",
+        "useLine": "Usar la frase de la matriz",
+        "useLineDialog": {
+          "title": "¿Usar la frase de la matriz?",
+          "manual": "Ángulo añadido manualmente",
+          "matrix": "Frase de mensaje de la matriz",
+          "effect": "El ángulo añadido manualmente pasa a ser el ángulo sincronizado y dice lo que dice la frase de mensaje. Su texto actual se sustituye."
+        },
+        "emptyUsps": {
+          "body": "Añade en el paso 1 los argumentos de venta de esta oleada y luego rellena la matriz."
+        },
+        "emptyPersonas": {
+          "body": "Añade en el paso 2 personas para este mercado y luego rellena su matriz.",
+          "cta": "Añadir personas"
         }
       }
     }

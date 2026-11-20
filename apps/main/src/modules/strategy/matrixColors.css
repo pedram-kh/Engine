@@ -1,35 +1,40 @@
 /*
  * PL-2.2 — the messaging matrix's own colours (frame 13:1375): the level fills, the Priority cell tint, the yellow
- * message-line frame and the editor's shadow. Dark values are the frame's; light values are the same hues stepped
- * darker. Read by the matrix components through `--mx-*` (see `MatrixStep.vue`); the level colours themselves are the
- * agency brand green and blue.
+ * message-line frame and the editor's shadow. Read by the matrix components through `--mx-*` (see `MatrixStep.vue`); the
+ * level colours themselves are the agency brand green and blue.
  *
- * Why a file of its own: `agency/theme/agency.css` is content-pinned and part of the agency baseline walk, and a
- * literal colour may not sit in a `.vue` file (`no-hard-coded-colors`). Moving these into `@catalyst/design-tokens` is
- * the long-term home; this file is loaded only with the strategy page, so no other screen can change.
+ * DERIVED from the theme (so the matrix follows it, dark and light): every fill is the agency brand green or blue, the
+ * low-level grey or the yellow, mixed with `color-mix` at the frame's percentage (15 % fills, 4 to 5 % tint, 25 % low
+ * fill, 80 / 35 / 6 % yellow). The "Low" grey is the theme's `text-tertiary`, the value the agency theme already lifted
+ * from the frame's #6e6e76 for contrast (see `agencyThemes.ts`). The light yellow is the brand amber.
+ *
+ * LITERALS LEFT (no theme token fits; each is a tech-debt item, `docs/reviews/production-line-sprints.md`):
+ *   1. `--agency-matrix-yellow` in the dark theme: #f2d35b, the frame's message-line yellow. There is no yellow in the
+ *      brand set (amber #f5a524 is another hue).
+ *   2. `--agency-matrix-shadow-ink`: 0 0 0, the black of the editor's drop shadow and the pinned-column shadow (no theme
+ *      token is black), with a per-theme alpha written in the shadow values below.
+ * Moving the matrix colours into `@catalyst/design-tokens` is the long-term home; this file is loaded only with the
+ * strategy page, so no other screen can change. Why a file of its own: `agency/theme/agency.css` is content-pinned and
+ * part of the agency baseline walk, and a literal colour may not sit in a `.vue` file (`no-hard-coded-colors`).
  */
 :is(.v-theme--agency-dark, .v-theme--agency-light) {
-  --agency-matrix-low: #6e6e76;
-  --agency-matrix-priority-fill: rgba(52, 199, 123, 0.15);
-  --agency-matrix-support-fill: rgba(76, 141, 255, 0.15);
-  --agency-matrix-low-fill: rgba(110, 110, 118, 0.25);
-  --agency-matrix-priority-tint: rgba(52, 199, 123, 0.04);
-  --agency-matrix-line-strong: rgba(242, 211, 91, 0.8);
-  --agency-matrix-line-soft: rgba(242, 211, 91, 0.35);
-  --agency-matrix-line-fill: rgba(242, 211, 91, 0.06);
-  --agency-matrix-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
-  --agency-matrix-shadow-soft: 6px 0 12px -6px rgba(0, 0, 0, 0.45);
+  --agency-matrix-yellow: #f2d35b;
+  --agency-matrix-shadow-ink: 0 0 0;
+  --agency-matrix-low: rgb(var(--v-theme-text-tertiary));
+  --agency-matrix-priority-fill: color-mix(in srgb, var(--agency-brand-green) 15%, transparent);
+  --agency-matrix-support-fill: color-mix(in srgb, var(--agency-brand-blue) 15%, transparent);
+  --agency-matrix-low-fill: color-mix(in srgb, var(--agency-matrix-low) 25%, transparent);
+  --agency-matrix-priority-tint: color-mix(in srgb, var(--agency-brand-green) 4%, transparent);
+  --agency-matrix-line-strong: color-mix(in srgb, var(--agency-matrix-yellow) 80%, transparent);
+  --agency-matrix-line-soft: color-mix(in srgb, var(--agency-matrix-yellow) 35%, transparent);
+  --agency-matrix-line-fill: color-mix(in srgb, var(--agency-matrix-yellow) 6%, transparent);
+  --agency-matrix-shadow: 0 12px 32px rgb(var(--agency-matrix-shadow-ink) / 0.5);
+  --agency-matrix-shadow-soft: 6px 0 12px -6px rgb(var(--agency-matrix-shadow-ink) / 0.45);
 }
 
 :is(.v-theme--agency-dark, .v-theme--agency-light).v-theme--agency-light {
-  --agency-matrix-low: #71717a;
-  --agency-matrix-priority-fill: rgba(30, 158, 90, 0.14);
-  --agency-matrix-support-fill: rgba(47, 111, 224, 0.12);
-  --agency-matrix-low-fill: rgba(113, 113, 122, 0.16);
-  --agency-matrix-priority-tint: rgba(30, 158, 90, 0.05);
-  --agency-matrix-line-strong: rgba(194, 124, 10, 0.75);
-  --agency-matrix-line-soft: rgba(194, 124, 10, 0.3);
-  --agency-matrix-line-fill: rgba(194, 124, 10, 0.07);
-  --agency-matrix-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
-  --agency-matrix-shadow-soft: 6px 0 12px -6px rgba(0, 0, 0, 0.18);
+  --agency-matrix-yellow: var(--agency-brand-amber);
+  --agency-matrix-priority-tint: color-mix(in srgb, var(--agency-brand-green) 5%, transparent);
+  --agency-matrix-shadow: 0 12px 32px rgb(var(--agency-matrix-shadow-ink) / 0.18);
+  --agency-matrix-shadow-soft: 6px 0 12px -6px rgb(var(--agency-matrix-shadow-ink) / 0.18);
 }
