@@ -137,6 +137,41 @@ it('L5: each persona and angle write (create, update, copy, angle add, edit, rem
     }
 });
 
+it('L5 (PL-2.2): a matrix cell write (one cell, a list, a clear) and the removal of a hand-written angle that reconciles a cell hold the wave row lock', function (): void {
+    $w = S::world();
+    $id = $w['wave']->id;
+    $usp = S::call($w['admin'], 'POST', S::u($w, 'usps'), ['title' => 'U'])->assertCreated()->json('data.id');
+    $persona = S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => 'SK', 'title' => 'T', 'name' => 'N'])->assertCreated()->json('data.id');
+    $cell = ['persona' => $persona, 'usp' => $usp];
+
+    foreach ([
+        ['level' => 'priority', 'message_line' => 'M'] + $cell,
+        ['message_line' => 'M2'] + $cell,
+        ['clear' => true] + $cell,
+    ] as $change) {
+        $seen = strategyProbeWhileAppLocks($id, fn () => S::call($w['admin'], 'PUT', S::u($w, 'matrix/cells'), ['market' => 'SK', 'cells' => [$change]])->assertOk());
+        expect($seen)->not->toBeEmpty('a matrix write took no wave lock')->and($seen)->each->toBeTrue();
+    }
+
+    $angle = S::call($w['admin'], 'POST', S::u($w, "personas/{$persona}/angles"), ['usp' => $usp, 'explanation' => 'x'])->assertCreated()->json('data.id');
+    S::call($w['admin'], 'PUT', S::u($w, 'matrix/cells'), ['market' => 'SK', 'cells' => [['level' => 'support', 'message_line' => 'M'] + $cell]])->assertOk();
+    $seen = strategyProbeWhileAppLocks($id, fn () => S::call($w['admin'], 'DELETE', S::u($w, "personas/{$persona}/angles/{$angle}"))->assertNoContent());
+    expect($seen)->not->toBeEmpty()->and($seen)->each->toBeTrue();
+});
+
+it('L6 (PL-2.2): the same first cell written by two users in turn ends with one cell and one synced angle (sequential, not a true race)', function (): void {
+    $w = S::world();
+    $usp = S::call($w['admin'], 'POST', S::u($w, 'usps'), ['title' => 'U'])->assertCreated()->json('data.id');
+    $persona = S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => 'SK', 'title' => 'T', 'name' => 'N'])->assertCreated()->json('data.id');
+    $body = ['market' => 'SK', 'cells' => [['persona' => $persona, 'usp' => $usp, 'level' => 'priority', 'message_line' => 'M']]];
+
+    S::call($w['admin'], 'PUT', S::u($w, 'matrix/cells'), $body)->assertOk();
+    S::call($w['manager'], 'PUT', S::u($w, 'matrix/cells'), $body)->assertOk();
+
+    expect(DB::table('wave_matrix_cells')->count())->toBe(1)
+        ->and(DB::table('wave_persona_angles')->where('origin', 'matrix')->count())->toBe(1);
+});
+
 it('M4: a wave edit holds the SAME wave row lock the strategy writes take, so a persona create and a market removal are serialised', function (): void {
     $w = S::world();
     $edit = fn () => S::call($w['admin'], 'PATCH', WaveFixtures::wavesUrl($w['agency'], $w['brand'], $w['wave']->ulid), ['markets' => ['SK', 'RO']]);
