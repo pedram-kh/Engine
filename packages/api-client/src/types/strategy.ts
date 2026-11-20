@@ -163,7 +163,8 @@ export interface UspInUseAffected {
 }
 
 export interface UspInUseMeta {
-  angleCount: number
+  /** Angles plus matrix cells: the number `confirm_count` must carry. */
+  count: number
   affected: UspInUseAffected[]
 }
 

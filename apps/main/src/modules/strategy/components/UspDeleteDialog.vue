@@ -4,7 +4,7 @@
  * what is affected (market, persona, the angle text) and the button says how many angles go with it.
  *
  * The list is first built from the wave's personas (read only, safe to do on open). The delete carries
- * `confirm_angle_count` equal to the number shown; if the server counts differently (someone linked or unlinked an
+ * `confirm_count` equal to the number shown; if the server counts differently (someone linked or unlinked an
  * angle meanwhile) it answers 409 `usp.in_use` with a fresh list, read through `uspInUseMeta`, the dialog shows
  * that list with a note and asks again. It never deletes more than what was shown.
  */

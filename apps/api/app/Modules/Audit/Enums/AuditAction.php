@@ -551,6 +551,13 @@ enum AuditAction: string
     case WavePersonaAngleUpdated = 'wave_persona_angle.updated';
     case WavePersonaAngleRemoved = 'wave_persona_angle.removed';
 
+    // PL-2.2 — the messaging matrix. ONE audit row per write request (one cell or up to 48): ids (ulids), the market
+    // code, counts, the levels written (counts by level) and field NAMES; never the rationale or the message line.
+    // Erasure decision: none needed. The metadata holds no creator, user or personal data (ids and counts only), as the
+    // `wave_persona.*` actions; the table `wave_matrix_cells` is NotApplicable in the ErasureRegistry. Written only when
+    // something changed.
+    case WaveMatrixCellSaved = 'wave_matrix_cell.saved';
+
     // Campaign attachments from the Files library, chunk B (AH-092). A
     // linkage action on the campaign, not a library action on the file — the
     // file's own audit trail (above) is unaffected by any of these. No

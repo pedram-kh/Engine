@@ -93,6 +93,16 @@ final class WavePersona extends Model
     }
 
     /**
+     * The persona's set matrix cells (PL-2.2).
+     *
+     * @return HasMany<WaveMatrixCell, $this>
+     */
+    public function cells(): HasMany
+    {
+        return $this->hasMany(WaveMatrixCell::class, 'persona_id')->orderBy('id');
+    }
+
+    /**
      * @return array<string, mixed>
      */
     protected function casts(): array

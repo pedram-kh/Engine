@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Strategy\Http\Controllers\AngleController;
+use App\Modules\Strategy\Http\Controllers\MatrixController;
 use App\Modules\Strategy\Http\Controllers\PersonaController;
 use App\Modules\Strategy\Http\Controllers\StrategyController;
 use App\Modules\Strategy\Http\Controllers\UspController;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Strategy module routes (PL-2.1)
+| Strategy module routes (PL-2.1, PL-2.2)
 |--------------------------------------------------------------------------
 |
 | Standard tenant stack (auth:web + tenancy.agency + tenancy), nested under the wave. Every action starts with the
@@ -43,4 +44,8 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         Route::post('personas/{persona}/angles', [AngleController::class, 'store'])->withTrashed()->name('waves.strategy.angles.store');
         Route::patch('personas/{persona}/angles/{angle}', [AngleController::class, 'update'])->withTrashed()->name('waves.strategy.angles.update');
         Route::delete('personas/{persona}/angles/{angle}', [AngleController::class, 'destroy'])->withTrashed()->name('waves.strategy.angles.destroy');
+
+        // PL-2.2: the messaging matrix. One market per GET; the PUT takes 1 to 48 cell changes in one transaction.
+        Route::get('matrix', [MatrixController::class, 'show'])->withTrashed()->name('waves.strategy.matrix.show');
+        Route::put('matrix/cells', [MatrixController::class, 'save'])->withTrashed()->name('waves.strategy.matrix.save');
     });

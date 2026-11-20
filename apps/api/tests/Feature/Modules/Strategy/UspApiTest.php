@@ -218,16 +218,16 @@ it('C1: deleting an in-use USP without confirmation is 409 usp.in_use with the a
     $w = inUseWorld();
 
     $res = S::call($w['admin'], 'DELETE', S::u($w, "usps/{$w['usp1']->ulid}"))->assertStatus(409)->assertJsonPath('errors.0.code', 'usp.in_use');
-    expect($res->json('errors.0.meta.angle_count'))->toBe(2)
+    expect($res->json('errors.0.meta.count'))->toBe(2)
         ->and(array_column($res->json('errors.0.meta.affected'), 'market'))->toBe(['SK', 'RO'])
         ->and($res->json('errors.0.meta.affected.0.title'))->toBe('The Office Lunch Organiser');
     expect(WaveUsp::query()->count())->toBe(2)->and(WavePersonaAngle::query()->count())->toBe(2);
 });
 
-it('C2: with the matching confirm_angle_count the angles and the USP are removed and positions are renumbered', function (): void {
+it('C2: with the matching confirm_count the angles and the USP are removed and positions are renumbered', function (): void {
     $w = inUseWorld();
 
-    S::call($w['manager'], 'DELETE', S::u($w, "usps/{$w['usp1']->ulid}?confirm_angle_count=2"))->assertNoContent();
+    S::call($w['manager'], 'DELETE', S::u($w, "usps/{$w['usp1']->ulid}?confirm_count=2"))->assertNoContent();
     expect(WaveUsp::query()->count())->toBe(1)
         ->and(WaveUsp::query()->firstOrFail()->position)->toBe(1)
         ->and(WavePersonaAngle::query()->count())->toBe(0)
@@ -240,8 +240,8 @@ it('C3: with a stale count it is 409 again with the fresh list; nothing is delet
     $w = inUseWorld();
 
     foreach ([1, 3, 0] as $stale) {
-        S::call($w['admin'], 'DELETE', S::u($w, "usps/{$w['usp1']->ulid}?confirm_angle_count={$stale}"))
-            ->assertStatus(409)->assertJsonPath('errors.0.meta.angle_count', 2);
+        S::call($w['admin'], 'DELETE', S::u($w, "usps/{$w['usp1']->ulid}?confirm_count={$stale}"))
+            ->assertStatus(409)->assertJsonPath('errors.0.meta.count', 2);
     }
     expect(WaveUsp::query()->count())->toBe(2)->and(WavePersonaAngle::query()->count())->toBe(2);
 });
@@ -254,7 +254,7 @@ it('C4: the delete is atomic: a failure after the angles are removed leaves ever
         throw new RuntimeException('boom');
     });
     try {
-        S::call($w['admin'], 'DELETE', S::u($w, "usps/{$w['usp1']->ulid}?confirm_angle_count=2"));
+        S::call($w['admin'], 'DELETE', S::u($w, "usps/{$w['usp1']->ulid}?confirm_count=2"));
     } catch (Throwable) {
         // the exception handler may turn it into a 500 or rethrow
     }
@@ -267,7 +267,7 @@ it('R2, R3: staff may delete an unused USP but NOT an in-use one (403, whatever 
     $w = inUseWorld();
 
     S::call($w['staff'], 'DELETE', S::u($w, "usps/{$w['usp1']->ulid}"))->assertForbidden();
-    S::call($w['staff'], 'DELETE', S::u($w, "usps/{$w['usp1']->ulid}?confirm_angle_count=2"))->assertForbidden();
+    S::call($w['staff'], 'DELETE', S::u($w, "usps/{$w['usp1']->ulid}?confirm_count=2"))->assertForbidden();
     expect(WaveUsp::query()->count())->toBe(2);
     S::call($w['staff'], 'DELETE', S::u($w, "usps/{$w['usp2']->ulid}"))->assertNoContent();
     expect(WaveUsp::query()->count())->toBe(1);
@@ -286,7 +286,7 @@ it('R1, R4: staff create, edit, reorder and set the title; manager and admin del
         'usp_id' => WaveUsp::query()->where('ulid', $a)->firstOrFail()->id, 'wave_id' => $w['wave']->id, 'agency_id' => $w['agency']->id,
     ]);
     expect($angle->exists)->toBeTrue();
-    S::call($w['admin'], 'DELETE', S::u($w, "usps/{$a}?confirm_angle_count=1"))->assertNoContent();
+    S::call($w['admin'], 'DELETE', S::u($w, "usps/{$a}?confirm_count=1"))->assertNoContent();
 });
 
 it('audience title: set, clear, limit of 80, cleaned, and an audit row only when it changed', function (): void {

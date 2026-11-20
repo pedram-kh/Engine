@@ -237,6 +237,8 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         'wave_persona_angle.added',
         'wave_persona_angle.updated',
         'wave_persona_angle.removed',
+        // PL-2.2 — the messaging matrix (one row per write request; ids, counts, levels, field names).
+        'wave_matrix_cell.saved',
         // AH-092, chunk B — campaign attachments (linking a Files-library
         // file to a campaign). Audit-only; no NotificationType tie.
         'campaign_attachment.added',

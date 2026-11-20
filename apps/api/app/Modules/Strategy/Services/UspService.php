@@ -9,6 +9,7 @@ use App\Modules\Audit\Facades\Audit;
 use App\Modules\Brands\Models\Brand;
 use App\Modules\Identity\Models\User;
 use App\Modules\Strategy\Enums\UspColor;
+use App\Modules\Strategy\Models\WaveMatrixCell;
 use App\Modules\Strategy\Models\WavePersonaAngle;
 use App\Modules\Strategy\Models\WaveUsp;
 use App\Modules\Strategy\StrategyLimits;
@@ -24,7 +25,7 @@ use Illuminate\Support\Facades\DB;
  *     the life of the USP) and the position are decided under it; `unique (wave_id, color_key)` is the belt;
  *   - a PATCH writes only the fields that were sent (per-field last write wins, ruling Q4);
  *   - reorder takes the full ordered ulid list; a list that is not exactly the wave's USPs is 422;
- *   - deleting a USP that angles use needs the user to confirm the number of angles; admin and manager only (S6).
+ *   - deleting a USP that angles or matrix cells use needs the user to confirm the number of items (`confirm_count`); admin and manager only (S6).
  *
  * One audit row per request, literal payload keys, ids, counts, colour keys and field NAMES; never the text.
  */
@@ -178,29 +179,33 @@ final class UspService
 
     /**
      * @param  bool  $mayDeleteInUse  admin and manager (S6); decided by the controller from the policy
-     * @param  int|null  $confirmAngleCount  the number of angles the user was shown and confirmed
+     * @param  int|null  $confirmCount  the number of items (angles and matrix cells) the user was shown and confirmed
      */
-    public function delete(Brand $brand, Wave $wave, string $uspUlid, User $actor, bool $mayDeleteInUse, ?int $confirmAngleCount): void
+    public function delete(Brand $brand, Wave $wave, string $uspUlid, User $actor, bool $mayDeleteInUse, ?int $confirmCount): void
     {
         StrategyGuard::assertBrandWritable($brand);
 
-        DB::transaction(function () use ($wave, $uspUlid, $actor, $mayDeleteInUse, $confirmAngleCount): void {
+        DB::transaction(function () use ($wave, $uspUlid, $actor, $mayDeleteInUse, $confirmCount): void {
             $locked = StrategyGuard::lockWave($wave);
             $usp = $this->find($locked, $uspUlid);
 
             // The "in use" test is made HERE, under the wave lock, so a USP that became in-use after the page rendered is
             // judged correctly: staff get 403, an admin or manager a fresh list.
             $affected = UspUsage::affected($usp);
-            $angles = count($affected);
+            $items = count($affected);
+            $angles = 0;
+            $cells = 0;
 
-            if ($angles > 0) {
+            if ($items > 0) {
                 if (! $mayDeleteInUse) {
                     throw StrategyRuleViolation::uspInUseForbidden();
                 }
-                if ($confirmAngleCount === null || $confirmAngleCount !== $angles) {
+                if ($confirmCount === null || $confirmCount !== $items) {
                     throw StrategyRuleViolation::uspInUse($affected);
                 }
-                WavePersonaAngle::query()->where('usp_id', $usp->id)->delete();
+                // Angles (hand-written and synced) first, then the cells: every foreign key is RESTRICT.
+                $angles = WavePersonaAngle::query()->where('usp_id', $usp->id)->delete();
+                $cells = WaveMatrixCell::query()->where('usp_id', $usp->id)->delete();
             }
 
             $color = $usp->color_key->value;
@@ -220,7 +225,7 @@ final class UspService
                 action: AuditAction::WaveUspDeleted,
                 actor: $actor,
                 subject: $usp,
-                metadata: ['wave' => $locked->ulid, 'usp' => $usp->ulid, 'color_key' => $color, 'angles_removed' => $angles],
+                metadata: ['wave' => $locked->ulid, 'usp' => $usp->ulid, 'color_key' => $color, 'angles_removed' => $angles, 'cells_removed' => $cells],
                 agencyId: $locked->agency_id,
             );
         });

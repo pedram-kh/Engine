@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 /**
  * A persona's angles: one line linking a persona to a USP of the SAME wave (PL-2.1). The persona and the USP are looked
  * up through the wave (404 otherwise) and the composite foreign keys make the same-wave rule true in the database. One
- * angle per persona per USP. Written by hand only (`origin = manual`). Audit rows carry ids, never the line.
+ * angle per persona per USP. Written by hand (`origin = manual`) or synced from the matrix (`origin = matrix`, read-only here). Audit rows carry ids, never the line.
  */
 final class AngleService
 {
@@ -52,7 +52,7 @@ final class AngleService
                 agencyId: $locked->agency_id,
             );
 
-            return $angle->load('usp');
+            return $angle->load(['usp', 'persona']);
         });
     }
 
@@ -64,6 +64,9 @@ final class AngleService
             $locked = StrategyGuard::lockWave($wave);
             $persona = $this->persona($locked, $personaUlid);
             $angle = $this->angle($persona, $angleUlid);
+            if ($angle->origin === AngleOrigin::Matrix) {
+                throw StrategyRuleViolation::angleSyncedReadOnly();
+            }
 
             $angle->explanation = $explanation;
             if ($angle->isDirty('explanation')) {
@@ -77,7 +80,7 @@ final class AngleService
                 );
             }
 
-            return $angle->load('usp');
+            return $angle->load(['usp', 'persona']);
         });
     }
 
@@ -89,14 +92,21 @@ final class AngleService
             $locked = StrategyGuard::lockWave($wave);
             $persona = $this->persona($locked, $personaUlid);
             $angle = $this->angle($persona, $angleUlid);
-            $uspUlid = WaveUsp::query()->whereKey($angle->usp_id)->value('ulid');
+            if ($angle->origin === AngleOrigin::Matrix) {
+                throw StrategyRuleViolation::angleSyncedReadOnly();
+            }
+            $usp = WaveUsp::query()->whereKey($angle->usp_id)->firstOrFail();
+            $uspUlid = $usp->ulid;
             $angle->delete();
+            // A hand-written angle that was holding the place of a Priority/Support cell's angle is gone: the cell's
+            // synced angle takes over in this same transaction (plan 1.7 row 15).
+            $matrixAngleCreated = MatrixService::reconcileAfterManualRemoval($locked, $persona, $usp);
 
             Audit::log(
                 action: AuditAction::WavePersonaAngleRemoved,
                 actor: $actor,
                 subject: $angle,
-                metadata: ['wave' => $locked->ulid, 'persona' => $persona->ulid, 'angle' => $angle->ulid, 'usp' => $uspUlid],
+                metadata: ['wave' => $locked->ulid, 'persona' => $persona->ulid, 'angle' => $angle->ulid, 'usp' => $uspUlid, 'matrix_angle_created' => $matrixAngleCreated],
                 agencyId: $locked->agency_id,
             );
         });

@@ -79,7 +79,7 @@ final class PersonaController
             return $this->refuse($request, $e);
         }
 
-        return response()->json(['data' => StrategyPresenter::persona($persona->load('angles.usp'))], Response::HTTP_CREATED);
+        return response()->json(['data' => StrategyPresenter::persona($persona->load(['angles.usp', 'cells.usp']))], Response::HTTP_CREATED);
     }
 
     public function update(Request $request, Agency $agency, Brand $brand, string $wave, string $persona): JsonResponse
@@ -102,7 +102,7 @@ final class PersonaController
             return $this->refuse($request, $e);
         }
 
-        return response()->json(['data' => StrategyPresenter::persona($updated->load('angles.usp'))]);
+        return response()->json(['data' => StrategyPresenter::persona($updated->load(['angles.usp', 'cells.usp']))]);
     }
 
     public function destroy(Request $request, Agency $agency, Brand $brand, string $wave, string $persona): JsonResponse|Response
@@ -153,7 +153,10 @@ final class PersonaController
         }
 
         return response()->json(
-            ['data' => $created->map(static fn (WavePersona $p): array => StrategyPresenter::persona($p))->all()],
+            [
+                'data' => $created['personas']->map(static fn (WavePersona $p): array => StrategyPresenter::persona($p))->all(),
+                'meta' => ['synced_angles_skipped' => $created['synced_skipped']],
+            ],
             Response::HTTP_CREATED,
         );
     }

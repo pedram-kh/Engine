@@ -284,7 +284,7 @@ describe('UspsStep (PL-2.1)', () => {
           {
             code: 'usp.in_use',
             meta: {
-              angle_count: 2,
+              count: 2,
               affected: [
                 {
                   persona: 'p1',

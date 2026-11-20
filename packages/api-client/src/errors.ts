@@ -276,7 +276,7 @@ export function marketHasPersonasMeta(error: unknown): MarketHasPersonasMeta | n
 }
 
 /**
- * PL-2.1 — the typed `meta` of a 409 `usp.in_use`: how many angles use the USP and which personas they belong to,
+ * PL-2.1 — the typed `meta` of a 409 `usp.in_use`: how many items (angles and matrix cells) use the USP and which personas they belong to,
  * or `null` for any other error. Never throws.
  */
 export function uspInUseMeta(error: unknown): UspInUseMeta | null {
@@ -284,7 +284,7 @@ export function uspInUseMeta(error: unknown): UspInUseMeta | null {
     return null
   }
   const meta = error.details[0]?.meta
-  const count = meta?.['angle_count']
+  const count = meta?.['count']
   const raw = meta?.['affected']
   if (typeof count !== 'number' || !Array.isArray(raw)) {
     return null
@@ -300,7 +300,7 @@ export function uspInUseMeta(error: unknown): UspInUseMeta | null {
       ? [{ persona, market, code, title, explanation }]
       : []
   })
-  return { angleCount: count, affected }
+  return { count, affected }
 }
 
 /** PL-2.1 — the typed `meta` of a 422 `persona.copy_exceeds_cap`, or `null`. Never throws. */

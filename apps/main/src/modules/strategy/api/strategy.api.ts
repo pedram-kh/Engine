@@ -60,12 +60,12 @@ export const strategyApi = {
 
   /**
    * A USP no angle uses is deleted straight away. For one that angles use the server answers 409 `usp.in_use`
-   * (with the list) until the same call carries `confirm_angle_count` equal to the number it counted.
+   * (with the list) until the same call carries `confirm_count` equal to the number it counted (angles and matrix cells).
    */
-  removeUsp(s: WaveScope, uspId: string, confirmAngleCount?: number): Promise<void> {
+  removeUsp(s: WaveScope, uspId: string, confirmCount?: number): Promise<void> {
     return http.delete<void>(
       `${base(s)}/usps/${uspId}`,
-      confirmAngleCount === undefined ? undefined : { confirm_angle_count: confirmAngleCount },
+      confirmCount === undefined ? undefined : { confirm_count: confirmCount },
     )
   },
 

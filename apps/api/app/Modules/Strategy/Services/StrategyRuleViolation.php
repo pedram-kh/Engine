@@ -41,15 +41,15 @@ final class StrategyRuleViolation extends RuntimeException
     }
 
     /**
-     * @param  list<array{persona: string, market: string, code: string, title: string, explanation: string}>  $affected
+     * @param  list<array{kind: string, persona: string, market: string, code: string, title: string, level: string|null, explanation: string}>  $affected
      */
     public static function uspInUse(array $affected): self
     {
         return new self(
             'usp.in_use',
-            'Personas use this USP; confirm to remove it together with its angles.',
+            'Personas or matrix cells use this USP; confirm to remove it together with them.',
             409,
-            ['angle_count' => count($affected), 'affected' => $affected],
+            ['count' => count($affected), 'affected' => $affected],
         );
     }
 
@@ -91,6 +91,11 @@ final class StrategyRuleViolation extends RuntimeException
     public static function angleAlreadyLinked(): self
     {
         return new self('angle.already_linked', 'This persona already has an angle on that USP.');
+    }
+
+    public static function angleSyncedReadOnly(): self
+    {
+        return new self('angle.synced_read_only', 'This angle is synced from the messaging matrix; change it there.');
     }
 
     public static function conflict(): self

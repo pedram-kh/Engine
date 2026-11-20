@@ -71,6 +71,7 @@ final class StrategyFixtures
             ['GET', 'usps'], ['POST', 'usps'], ['PUT', 'usps/order'], ['PATCH', "usps/{$u}"], ['DELETE', "usps/{$u}"],
             ['GET', 'personas'], ['POST', 'personas'], ['POST', 'personas/copy'], ['PATCH', "personas/{$u}"], ['DELETE', "personas/{$u}"],
             ['POST', "personas/{$u}/angles"], ['PATCH', "personas/{$u}/angles/{$u}"], ['DELETE', "personas/{$u}/angles/{$u}"],
+            ['GET', 'matrix'], ['PUT', 'matrix/cells'],
         ];
     }
 }

@@ -68,7 +68,7 @@ it('R3: the role is judged in the route agency: staff in A and admin in B is sta
     $persona = WavePersona::factory()->create(['wave_id' => $w['wave']->id, 'agency_id' => $w['agency']->id]);
     WavePersonaAngle::factory()->create(['persona_id' => $persona->id, 'usp_id' => $usp->id, 'wave_id' => $w['wave']->id, 'agency_id' => $w['agency']->id]);
 
-    S::call($mixed, 'DELETE', S::u($w, "usps/{$usp->ulid}?confirm_angle_count=1"))->assertForbidden();
+    S::call($mixed, 'DELETE', S::u($w, "usps/{$usp->ulid}?confirm_count=1"))->assertForbidden();
     expect(WaveUsp::query()->count())->toBe(1);
 });
 

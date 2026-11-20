@@ -9,6 +9,7 @@ use App\Modules\Brands\Models\Brand;
 use App\Modules\Identity\Models\User;
 use App\Modules\Strategy\Http\Controllers\Concerns\ResolvesStrategyRoute;
 use App\Modules\Strategy\Http\Resources\StrategyPresenter;
+use App\Modules\Strategy\Models\WaveMatrixCell;
 use App\Modules\Strategy\Models\WavePersonaAngle;
 use App\Modules\Strategy\Models\WaveUsp;
 use App\Modules\Strategy\Services\StrategyRuleViolation;
@@ -91,7 +92,7 @@ final class UspController
             return $this->refuse($request, $e);
         }
 
-        return response()->json(['data' => StrategyPresenter::usp($updated, UspUsage::angleCount($updated))]);
+        return response()->json(['data' => StrategyPresenter::usp($updated, UspUsage::angleCount($updated), UspUsage::cellCount($updated))]);
     }
 
     public function reorder(Request $request, Agency $agency, Brand $brand, string $wave): JsonResponse
@@ -130,9 +131,9 @@ final class UspController
         $model = $this->findWave($wave, $agency, $brand);
         Gate::authorize('delete', WaveUsp::class);
 
-        /** @var array{confirm_angle_count?: int|null} $data */
+        /** @var array{confirm_count?: int|null} $data */
         $data = Validator::make($request->all(), [
-            'confirm_angle_count' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:1000'],
+            'confirm_count' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:1000'],
         ])->validate();
 
         /** @var User $actor */
@@ -145,7 +146,7 @@ final class UspController
                 $usp,
                 $actor,
                 Gate::allows('deleteInUse', WaveUsp::class),
-                isset($data['confirm_angle_count']) ? (int) $data['confirm_angle_count'] : null,
+                isset($data['confirm_count']) ? (int) $data['confirm_count'] : null,
             );
         } catch (StrategyRuleViolation $e) {
             return $this->refuse($request, $e);
@@ -183,6 +184,11 @@ final class UspController
             ->whereIn('usp_id', $usps->pluck('id'))
             ->selectRaw('usp_id, count(*) as n')->groupBy('usp_id')->pluck('n', 'usp_id')->map(static fn (mixed $n): int => (int) $n)->all();
 
-        return array_values($usps->map(static fn (WaveUsp $u): array => StrategyPresenter::usp($u, $counts[$u->id] ?? 0))->all());
+        /** @var array<int, int> $cellCounts */
+        $cellCounts = $usps->isEmpty() ? [] : WaveMatrixCell::query()
+            ->whereIn('usp_id', $usps->pluck('id'))
+            ->selectRaw('usp_id, count(*) as n')->groupBy('usp_id')->pluck('n', 'usp_id')->map(static fn (mixed $n): int => (int) $n)->all();
+
+        return array_values($usps->map(static fn (WaveUsp $u): array => StrategyPresenter::usp($u, $counts[$u->id] ?? 0, $cellCounts[$u->id] ?? 0))->all());
     }
 }

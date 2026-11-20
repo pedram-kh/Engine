@@ -46,6 +46,12 @@ final class StrategyLimits
 
     public const ANGLE_EXPLANATION = 140;
 
+    /** PL-2.2: the rationale and the message line of a matrix cell (the message line becomes the synced angle). */
+    public const MATRIX_LINE = 140;
+
+    /** PL-2.2: cells in one write request (a market holds at most 8 personas times 6 USPs). */
+    public const MATRIX_BATCH_MAX = 48;
+
     /** @return array<string, int> */
     public static function all(): array
     {
@@ -68,6 +74,8 @@ final class StrategyLimits
             'list_items' => self::LIST_ITEMS,
             'list_item' => self::LIST_ITEM,
             'angle_explanation' => self::ANGLE_EXPLANATION,
+            'matrix_line' => self::MATRIX_LINE,
+            'matrix_batch_max' => self::MATRIX_BATCH_MAX,
         ];
     }
 }

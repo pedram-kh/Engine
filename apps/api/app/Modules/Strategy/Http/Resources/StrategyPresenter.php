@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Strategy\Http\Resources;
 
+use App\Modules\Strategy\Enums\AngleOrigin;
+use App\Modules\Strategy\Models\WaveMatrixCell;
 use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WavePersonaAngle;
 use App\Modules\Strategy\Models\WaveUsp;
@@ -18,9 +20,10 @@ final class StrategyPresenter
 {
     /**
      * @param  array<string, int>  $personaCounts  market => personas
+     * @param  array{cells_set: int, cells_total: int, by_market: list<array{market: string, set: int, total: int}>}|null  $matrix
      * @return array<string, mixed>
      */
-    public static function summary(Wave $wave, int $uspCount, array $personaCounts): array
+    public static function summary(Wave $wave, int $uspCount, array $personaCounts, ?array $matrix = null): array
     {
         $markets = [];
         foreach ($wave->markets as $code) {
@@ -36,6 +39,7 @@ final class StrategyPresenter
                 'persona_count' => array_sum(array_column($markets, 'persona_count')),
                 'markets' => $markets,
                 'limits' => StrategyLimits::all(),
+                'matrix' => $matrix ?? ['cells_set' => 0, 'cells_total' => 0, 'by_market' => []],
             ],
         ];
     }
@@ -43,7 +47,7 @@ final class StrategyPresenter
     /**
      * @return array<string, mixed>
      */
-    public static function usp(WaveUsp $usp, int $angleCount): array
+    public static function usp(WaveUsp $usp, int $angleCount, int $cellCount = 0): array
     {
         return [
             'id' => $usp->ulid,
@@ -56,6 +60,7 @@ final class StrategyPresenter
                 'creative_angle' => $usp->creative_angle,
                 'copy_seed' => $usp->copy_seed,
                 'angle_count' => $angleCount,
+                'cell_count' => $cellCount,
                 'created_at' => $usp->created_at->toIso8601String(),
                 'updated_at' => $usp->updated_at->toIso8601String(),
             ],
@@ -86,7 +91,10 @@ final class StrategyPresenter
                 'self_talk' => $persona->self_talk ?? [],
                 'barriers' => $persona->barriers ?? [],
                 'angles' => $persona->relationLoaded('angles')
-                    ? $persona->angles->map(static fn (WavePersonaAngle $a): array => self::angle($a))->values()->all()
+                    ? $persona->angles->map(static fn (WavePersonaAngle $a): array => self::angle($a, $persona->market))->values()->all()
+                    : [],
+                'matrix_cells' => $persona->relationLoaded('cells')
+                    ? $persona->cells->map(static fn (WaveMatrixCell $c): array => ['usp' => $c->usp->ulid, 'level' => $c->level->value])->values()->all()
                     : [],
                 'created_at' => $persona->created_at->toIso8601String(),
                 'updated_at' => $persona->updated_at->toIso8601String(),
@@ -97,8 +105,10 @@ final class StrategyPresenter
     /**
      * @return array<string, mixed>
      */
-    public static function angle(WavePersonaAngle $angle): array
+    public static function angle(WavePersonaAngle $angle, ?string $market = null): array
     {
+        $market ??= $angle->relationLoaded('persona') ? $angle->persona->market : null;
+
         return [
             'id' => $angle->ulid,
             'type' => 'wave_persona_angle',
@@ -108,7 +118,71 @@ final class StrategyPresenter
                 'color_key' => $angle->usp->color_key->value,
                 'explanation' => $angle->explanation,
                 'origin' => $angle->origin->value,
+                'read_only' => $angle->origin === AngleOrigin::Matrix,
+                'market' => $market,
             ],
+        ];
+    }
+
+    /**
+     * One market's matrix: the USPs in order, the personas in slot order, the set cells, and which pairs already have a
+     * hand-written angle. `cells` holds one entry per SET cell; "Not set" is absence.
+     *
+     * @param  iterable<int, WaveUsp>  $usps
+     * @param  iterable<int, WavePersona>  $personas
+     * @param  iterable<int, WaveMatrixCell>  $cells
+     * @param  array<string, true>  $manual  "personaId:uspId" pairs that have a hand-written angle
+     * @param  array{cells_set: int, cells_total: int, by_market: list<array{market: string, set: int, total: int}>}  $progress
+     * @return array<string, mixed>
+     */
+    public static function matrix(Wave $wave, string $market, iterable $usps, iterable $personas, iterable $cells, array $manual, array $progress): array
+    {
+        $uspRows = [];
+        $uspUlid = [];
+        foreach ($usps as $u) {
+            $uspUlid[$u->id] = $u->ulid;
+            $uspRows[] = ['id' => $u->ulid, 'title' => $u->title, 'color_key' => $u->color_key->value, 'position' => $u->position];
+        }
+        $personaRows = [];
+        $personaUlid = [];
+        foreach ($personas as $p) {
+            $personaUlid[$p->id] = $p->ulid;
+            $personaRows[] = [
+                'id' => $p->ulid, 'slot' => $p->slot, 'color_key' => $p->colorKey()->value, 'code' => $p->code,
+                'title' => $p->title, 'name' => $p->name, 'summary' => $p->summary,
+            ];
+        }
+        $cellRows = [];
+        foreach ($cells as $c) {
+            $cellRows[] = self::cell($c, $personaUlid[$c->persona_id], $uspUlid[$c->usp_id], isset($manual[$c->persona_id.':'.$c->usp_id]));
+        }
+
+        return [
+            'id' => $wave->ulid.':'.$market,
+            'type' => 'wave_matrix',
+            'attributes' => [
+                'market' => $market,
+                'usps' => $uspRows,
+                'personas' => $personaRows,
+                'cells' => $cellRows,
+                'progress' => $progress,
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function cell(?WaveMatrixCell $cell, string $persona, string $usp, bool $hasManualAngle): array
+    {
+        return [
+            'persona' => $persona,
+            'usp' => $usp,
+            'level' => $cell?->level->value,
+            'rationale' => $cell?->rationale,
+            'message_line' => $cell?->message_line,
+            'source' => $cell?->source,
+            'has_manual_angle' => $hasManualAngle,
         ];
     }
 }

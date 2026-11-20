@@ -8,7 +8,9 @@ use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Facades\Audit;
 use App\Modules\Brands\Models\Brand;
 use App\Modules\Identity\Models\User;
+use App\Modules\Strategy\Enums\AngleOrigin;
 use App\Modules\Strategy\Enums\PersonaPronoun;
+use App\Modules\Strategy\Models\WaveMatrixCell;
 use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WavePersonaAngle;
 use App\Modules\Strategy\StrategyLimits;
@@ -46,7 +48,7 @@ final class PersonaService
         return WavePersona::query()
             ->where('wave_id', $wave->id)
             ->when($market !== null, static fn ($q) => $q->where('market', $market))
-            ->with(['angles.usp'])
+            ->with(['angles.usp', 'cells.usp'])
             ->orderBy('slot')->orderBy('id')
             ->get()
             ->sortBy(static fn (WavePersona $p): int => ($order[$p->market] ?? 99) * 100 + $p->slot)
@@ -157,31 +159,34 @@ final class PersonaService
             $locked = StrategyGuard::lockWave($wave);
             $persona = $this->find($locked, $personaUlid);
 
-            $angles = WavePersonaAngle::query()->where('persona_id', $persona->id)->count();
-            WavePersonaAngle::query()->where('persona_id', $persona->id)->delete();
+            // Angles (hand-written and synced) and the matrix cells go with the persona; every foreign key is RESTRICT.
+            $angles = WavePersonaAngle::query()->where('persona_id', $persona->id)->delete();
+            $cells = WaveMatrixCell::query()->where('persona_id', $persona->id)->delete();
             $persona->delete();
 
             Audit::log(
                 action: AuditAction::WavePersonaDeleted,
                 actor: $actor,
                 subject: $persona,
-                metadata: ['wave' => $locked->ulid, 'persona' => $persona->ulid, 'market' => $persona->market, 'angles_removed' => $angles],
+                metadata: ['wave' => $locked->ulid, 'persona' => $persona->ulid, 'market' => $persona->market, 'angles_removed' => $angles, 'cells_removed' => $cells],
                 agencyId: $locked->agency_id,
             );
         });
     }
 
     /**
-     * Copy personas (default all) from one market to another of the same wave, with their angles. All or nothing.
+     * Copy personas (default all) from one market to another of the same wave, with their HAND-WRITTEN angles. All or
+     * nothing. No matrix cell is copied and no synced angle either (a synced angle without its cell would be a read-only
+     * orphan); the number skipped is returned so the dialog can say it (ruling Q3).
      *
      * @param  list<string>|null  $personaUlids
-     * @return Collection<int, WavePersona>
+     * @return array{personas: Collection<int, WavePersona>, synced_skipped: int}
      */
-    public function copy(Brand $brand, Wave $wave, User $actor, string $from, string $to, ?array $personaUlids): Collection
+    public function copy(Brand $brand, Wave $wave, User $actor, string $from, string $to, ?array $personaUlids): array
     {
         StrategyGuard::assertBrandWritable($brand);
 
-        return StrategyGuard::retryOnClash(fn (): Collection => DB::transaction(function () use ($wave, $actor, $from, $to, $personaUlids): Collection {
+        return StrategyGuard::retryOnClash(fn (): array => DB::transaction(function () use ($wave, $actor, $from, $to, $personaUlids): array {
             $locked = StrategyGuard::lockWave($wave);
             self::assertMarketInWave($locked, $from);
             self::assertMarketInWave($locked, $to);
@@ -209,6 +214,7 @@ final class PersonaService
             $slots = self::slotsOf($existing);
             $codes = self::codesOf($existing);
             $created = new Collection;
+            $skipped = 0;
 
             foreach ($sources as $source) {
                 $slot = self::firstFreeSlot($slots);
@@ -225,6 +231,11 @@ final class PersonaService
                 ] + $source->only(['title', 'name', 'pronoun', 'summary', 'core_job', 'need', 'drivers', 'goals', 'self_talk', 'barriers']));
 
                 foreach ($source->angles as $angle) {
+                    if ($angle->origin === AngleOrigin::Matrix) {
+                        $skipped++;
+
+                        continue;
+                    }
                     WavePersonaAngle::query()->create([
                         'agency_id' => $locked->agency_id,
                         'wave_id' => $locked->id,
@@ -234,18 +245,18 @@ final class PersonaService
                         'origin' => $angle->origin,
                     ]);
                 }
-                $created->push($copy->load('angles.usp'));
+                $created->push($copy->load(['angles.usp', 'cells.usp']));
             }
 
             Audit::log(
                 action: AuditAction::WavePersonaCopied,
                 actor: $actor,
                 subject: $locked,
-                metadata: ['wave' => $locked->ulid, 'from_market' => $from, 'to_market' => $to, 'personas_copied' => $created->count()],
+                metadata: ['wave' => $locked->ulid, 'from_market' => $from, 'to_market' => $to, 'personas_copied' => $created->count(), 'synced_angles_skipped' => $skipped],
                 agencyId: $locked->agency_id,
             );
 
-            return $created;
+            return ['personas' => $created, 'synced_skipped' => $skipped];
         }));
     }
 

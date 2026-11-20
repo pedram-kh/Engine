@@ -36,6 +36,7 @@ final class Pl21WalkCleanupSeeder extends Seeder
                 ->pluck('id')->all();
 
             // Children first: every foreign key of the strategy tables is RESTRICT.
+            DB::table('wave_matrix_cells')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('wave_persona_angles')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('wave_personas')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('wave_usps')->whereIn('agency_id', $agencyIds)->delete();

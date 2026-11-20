@@ -291,17 +291,15 @@ describe('PL-2.1 typed meta readers', () => {
     expect(marketHasPersonasMeta(null)).toBeNull()
   })
 
-  it('uspInUseMeta reads the angle count and the affected list, and ignores malformed rows', () => {
+  it('uspInUseMeta reads the count and the affected list, and ignores malformed rows', () => {
     const row = { persona: 'p', market: 'SK', code: 'SKA', title: 'T', explanation: 'E' }
-    expect(
-      uspInUseMeta(err('usp.in_use', { angle_count: 2, affected: [row, { persona: 1 }] })),
-    ).toEqual({
-      angleCount: 2,
+    expect(uspInUseMeta(err('usp.in_use', { count: 2, affected: [row, { persona: 1 }] }))).toEqual({
+      count: 2,
       affected: [row],
     })
     expect(uspInUseMeta(err('usp.in_use', { affected: [] }))).toBeNull()
-    expect(uspInUseMeta(err('usp.in_use', { angle_count: 1, affected: 'x' }))).toBeNull()
-    expect(uspInUseMeta(err('other', { angle_count: 1, affected: [] }))).toBeNull()
+    expect(uspInUseMeta(err('usp.in_use', { count: 1, affected: 'x' }))).toBeNull()
+    expect(uspInUseMeta(err('other', { count: 1, affected: [] }))).toBeNull()
     expect(uspInUseMeta(undefined)).toBeNull()
   })
 
