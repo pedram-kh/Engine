@@ -63,7 +63,8 @@ it('M2: Matrix Wave 1 holds the walk cases: all levels, a conflict angle, a pers
     // The manual angle sits on a Priority cell, and the sync kept it (it is not replaced by a synced one).
     $manual = WavePersonaAngle::withoutGlobalScopes()->where('wave_id', $wave->id)->where('origin', 'manual')->get();
     expect($manual)->toHaveCount(1);
-    expect(DB::table('wave_matrix_cells')->where('persona_id', $manual[0]->persona_id)->where('usp_id', $manual[0]->usp_id)->value('level'))->toBe('priority');
+    $angle = $manual->firstOrFail();
+    expect(DB::table('wave_matrix_cells')->where('persona_id', $angle->persona_id)->where('usp_id', $angle->usp_id)->value('level'))->toBe('priority');
 });
 
 it('M3: every Priority and Support cell has exactly one angle; Low and Not set have none from the sync', function (): void {

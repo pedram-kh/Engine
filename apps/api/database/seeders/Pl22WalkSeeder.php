@@ -129,15 +129,12 @@ final class Pl22WalkSeeder extends Seeder
         $w3 = $make('Matrix Wave 3', '2027-02-20', ['SK', 'RO']);
         $usps3 = $this->usps($w3, 3);
         $lenka = $this->persona($w3, 'SK', 'The Lunch-Break Office Worker', 'Lenka', PersonaPronoun::She, 'thirty minutes to eat');
-        $first = null;
+        $ro = [];
         foreach (['Radu', 'Ioana', 'Mihai', 'Elena', 'Andrei', 'Maria', 'Vlad', 'Ana'] as $i => $name) {
-            $p = $this->persona($w3, 'RO', 'Romanian persona '.($i + 1), $name, PersonaPronoun::They, 'orders a few times a week');
-            $first ??= $p;
+            $ro[] = $this->persona($w3, 'RO', 'Romanian persona '.($i + 1), $name, PersonaPronoun::They, 'orders a few times a week');
         }
         $this->cells($bolt, $w3, $admin, 'SK', [[$lenka, $usps3[0], 'priority', 'Back at the desk on time.', 'Lunch in thirty minutes.']]);
-        if ($first !== null) {
-            $this->cells($bolt, $w3, $admin, 'RO', [[$first, $usps3[1], 'support', 'Good value, every week.', 'Value every week.']]);
-        }
+        $this->cells($bolt, $w3, $admin, 'RO', [[$ro[0], $usps3[1], 'support', 'Good value, every week.', 'Value every week.']]);
     }
 
     private function agencyB(): void
