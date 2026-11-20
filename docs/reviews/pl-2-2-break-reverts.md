@@ -95,3 +95,15 @@ Each row: apply the mutation, run the named tests, see red, restore the file.
 | W-e   | a disabled Delete item cannot open the dialog        | the guard in `UspCard.pick` removed                                      | RED (`UspsStep.spec` D1-a, D1-b, D1-c)                                                            |
 | W-f   | staff see the reason and no Delete on a stale page   | `staffBlocked` forced to `false`                                         | RED (`UspsStep.spec` stale-list test)                                                             |
 | W-g   | the persona card marks a differing manual angle (R3) | the marker's `v-if` forced to `false`                                    | RED (`PersonasStep.spec` R3)                                                                      |
+
+## Close-out (2026-11-21): the new Playwright spec
+
+Each row: mutation applied, `strategy-matrix-manual.spec.ts` run, red, restored.
+
+| #   | Gate                               | Mutation                                      | Result                                             |
+| --- | ---------------------------------- | --------------------------------------------- | -------------------------------------------------- |
+| E1  | the hint is the theme error colour | hint colour back to `on-surface-variant`      | RED (`expect(colours.text).toBe(colours.error)`)   |
+| E1b | the field is in its error state    | `aria-invalid` without `lineMissing`          | RED (`expect(colours.border).toBe(colours.error)`) |
+| E2  | prefill                            | `initialMessageLine` returns an empty string  | RED (`toHaveValue('Written by hand')`)             |
+| E3  | confirm converts the angle         | the origin write removed from `useMatrixLine` | RED (persona card still "Manually added")          |
+| E4  | the conflict note is shown         | `manualNote` never answers `conflict`         | RED (`matrix-conflict-note` count)                 |
