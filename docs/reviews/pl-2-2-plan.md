@@ -398,7 +398,60 @@ All AI parts (X1), approval, notes and comments, add market, script language, pr
 
 ---
 
-## 11. Open questions for Pedram (each with a recommendation)
+## 11. Rulings on the plan (Pedram, 2026-11-20)
+
+All thirteen open questions are ruled **as recommended**. The questions and recommendations are kept below for the record.
+
+| #   | Ruling                                                                                                                                                                  |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Q1  | A Priority or Support cell cannot be saved without a message line. A Low cell can.                                                                                      |
+| Q2  | When a manual angle is removed while its cell is Priority or Support, the synced angle is created at once, in the same transaction.                                     |
+| Q3  | Copying personas to another market copies manual angles only. Synced angles are skipped and the dialog says how many.                                                   |
+| Q4  | A cell is edited in a popover: level, rationale, message line, Save, "Save and next", Cancel, Clear. One cell is one request; the endpoint also accepts up to 48 cells. |
+| Q5  | Add the unique key to `wave_personas` (M1) so the market guard is in the database.                                                                                      |
+| Q6  | Rename `confirm_angle_count` to `confirm_count`.                                                                                                                        |
+| Q7  | A Low cell counts as set.                                                                                                                                               |
+| Q8  | "Lead with: —", muted, when a persona has no Priority cell.                                                                                                             |
+| Q9  | Persona columns at least 280 px; the pinned column 230 px, 140 px under 720 px.                                                                                         |
+| Q10 | 140 characters for the rationale and for the message line.                                                                                                              |
+| Q11 | The cells table holds `source` and `edited_at` only. No user column.                                                                                                    |
+| Q12 | A USP with cells is in use: staff cannot delete it; admin and manager can after the confirmation.                                                                       |
+| Q13 | USP footer: "Used by N angles and M cells".                                                                                                                             |
+
+**Production database version.** Already recorded in `production-line-sprints.md`: PostgreSQL 17.9 (the colleague's read-back). The sentence in "Read and not read" that says the production version was not read is superseded by that record; the lock modes below were still observed on local PostgreSQL 16 and are repeated on the build's database.
+
+### Gaps closed before any code (2026-11-20)
+
+**G1. Frame code and dot colours.**
+
+- Code lines 700 to 925 of frame 13:1375 (USP rows 3 to 6) are now read. Cells, SK1 then SK2: Selection PRIORITY “Something for the whole team.” and SUPPORT "The range to always find something worth it." “Always something worth it.”; Speed & reliability PRIORITY "On time for the meeting, every time." “On time for the meeting.” and LOW "Not his deciding factor." “Fast to your door.”; Super app convenience SUPPORT "Sort the group order in one app." “The team, one order.” and SUPPORT "Quick, familiar ordering he trusts." “Quick and familiar.”; Local restaurant discovery LOW "Not the frame for a team lunch run." “A local spot to treat the team.” and LOW "Not the frame for him." “Local gems worth the money.” **Every one follows the same pattern as rows 1 and 2** (Support and Priority: yellow border 80 %, text `#ededed`; Low: yellow border 35 %, text `#a0a0a8`; pill fills as in the inventory), so no value in the fidelity table changes.
+- **Dot colours: not obtained.** In the design context the legend dots (nodes 13:1606, 13:1610, 13:1614) and the USP dots are SVG **image assets**, not fills in the code. Reading them means downloading the asset URLs. The two attempts (`curl`, and the WebFetch tool, which returns no pixels for an image) were refused or returned nothing, and the auto-review refused the `curl` as outside the task. **So the legend and USP dot colours are still taken from the pill colours (Priority `#34c77b`, Support `#4c8dff`, Low `#6e6e76`) and from `UspColor`, and that is stated as an inference in the fidelity table.** If you approve one `curl` of the three legend assets (`e2277721…`, `995f129a…`, `2883128f…`, on figma.com/api/mcp/asset, `.svg`) the build reads the real `fill` before the web stage; until then it is "not read".
+
+**G2. Components and presenters this chunk edits, read in full, and the exact edits.** Read in full (script and template; the `<style>` blocks were skipped): `PersonaCard.vue`, `PersonasStep.vue`, `UspsStep.vue` (script and the first 140 lines of template), `UspCard.vue`, `UspDeleteDialog.vue`, `PersonaCopyDialog.vue`, `StrategyConfirmDialog.vue`, `AngleBlock.vue` (head, earlier), and the PHP `StrategyPresenter::persona` and `::angle`, `UspUsage`. **Not read in full:** the bodies of `UspDialog.vue` and `PersonaDialog.vue` (heads and grep only; they have no angle, confirm or matrix logic and take **no edit**), the style blocks, the tail of `UspsStep.vue`, `AngleBlock.vue` after line 60.
+
+| File                                                              | Exact edit (Stage 2 unless it says Stage 1)                                                                                                                                                     |
+| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `StrategyPresenter::persona` (Stage 1)                            | add `'matrix_cells' => [{usp, level}]` to the attributes, from a map the controller passes in (one grouped query per list, no query per persona); the persona already loads `angles` with `usp` |
+| `StrategyPresenter::angle` (Stage 1)                              | add `read_only` (true when origin is `matrix`) and `market`; `origin` is already there                                                                                                          |
+| `StrategyPresenter::usp` (Stage 1)                                | `angle_count` stays; add `cell_count` (one grouped count)                                                                                                                                       |
+| `UspUsage` (Stage 1)                                              | `affected` returns items with `kind` (`angle` manual or `cell`) and `level`; `angleCount` stays; add `cellCount` and `itemCount`                                                                |
+| `UspService::delete`, `PersonaService::delete`, `copy` (Stage 1)  | as plan §1.8                                                                                                                                                                                    |
+| `AngleService` (Stage 1)                                          | synced angle read-only; remove of a manual angle reconciles the cell                                                                                                                            |
+| `PersonaCard.vue`                                                 | no template change; passes `persona` to `AngleBlock` which now reads `read_only`                                                                                                                |
+| `AngleBlock.vue`                                                  | label "Synced from matrix" for `read_only`, no menu, a link to the matrix                                                                                                                       |
+| `PersonasStep.vue`                                                | the delete dialog body also counts `a.matrix_cells.length` (`confirmDelete` unchanged); a hand-written angle removal confirmation (in `AngleBlock`) adds the row 15 sentence                    |
+| `PersonaCopyDialog.vue`                                           | one extra line "N synced angles are not copied" computed from the ticked personas' angles with `read_only`; the submit is unchanged                                                             |
+| `UspsStep.vue`                                                    | no script change; the `UspDeleteDialog` it opens changes                                                                                                                                        |
+| `UspCard.vue`                                                     | `deleteBlocked` becomes `angle_count + cell_count > 0 && !canDeleteInUse`; footer shows "Used by N angles and M cells" (Q13) when `cell_count > 0`, the old line otherwise                      |
+| `UspDeleteDialog.vue`                                             | the list is built from personas' `angles` **and** `matrix_cells` (so the client list matches the server's); the call sends `confirm_count` (Q6); the 409 list now carries `kind` and `level`    |
+| `StrategyConfirmDialog.vue`, `PersonaDialog.vue`, `UspDialog.vue` | no edit                                                                                                                                                                                         |
+| `strategy.api.ts`, api-client `strategy.ts`                       | `removeUsp` sends `confirm_count`; types for the matrix, cells, `matrix_cells`, `read_only`, `cell_count`; `uspInUseMeta` reads `kind` and `level`                                              |
+
+**G3. Lock numbers.** The numbers in §8 were typed by hand in `psql` and **are not the record**. The build runs both real migration files through `php artisan migrate` on a synthetic throwaway database with synthetic rows and records in `pl-2-2-review.md` the row counts, the timings and the locks read from `pg_locks` for each migration.
+
+### The questions as asked (kept for the record)
+
+**Open questions and recommendations as asked:**
 
 | #       | Question                                                                                                                                                | Recommendation                                                                                                                                                                                                                                                                                                   |
 | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
