@@ -55,12 +55,15 @@ it('P1: creates the three tables with the planned columns and the nullable audie
     expect(Wave::query()->findOrFail(Wave::factory()->create()->id)->usp_audience_title)->toBeNull();
 });
 
-it('P1: the four migrations run down and up again', function (): void {
+it('P1: the six migrations run down and up again', function (): void {
     $names = [
         '2026_11_20_100000_add_usp_audience_title_to_waves',
         '2026_11_20_100001_create_wave_usps_table',
         '2026_11_20_100002_create_wave_personas_table',
         '2026_11_20_100003_create_wave_persona_angles_table',
+        // PL-2.2: the cells table depends on wave_personas and wave_usps, so it goes down first.
+        '2026_11_21_100000_add_market_unique_to_wave_personas',
+        '2026_11_21_100001_create_wave_matrix_cells_table',
     ];
     foreach (array_reverse($names) as $name) {
         (require database_path("migrations/{$name}.php"))->down();

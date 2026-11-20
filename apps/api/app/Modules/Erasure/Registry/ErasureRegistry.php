@@ -349,6 +349,10 @@ final class ErasureRegistry
             'wave_persona_angles' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); a persona\'s one-line angle on a USP of the same wave (PL-2.1). No creator or user is a field of it.', [], [], null, [
                 'explanation' => 'Agency-authored one-line free text.',
             ]),
+            'wave_matrix_cells' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); one set cell of the messaging matrix, a level and two short lines about a persona and a USP of the same wave (PL-2.2). No creator or user is a field of it; there is no user column.', [], [], null, [
+                'rationale' => 'Agency-authored one-line free text.',
+                'message_line' => 'Agency-authored one-line free text.',
+            ]),
             'brand_files' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); client files on a brand.', ['uploaded_by_user_id']),
             'talent_pools' => new TableRule(Disposition::NotApplicable, 'Agency-authored; membership is talent_pool_creators (§3.7).', ['created_by_user_id'], [], null, [
                 'name' => 'A pool title.',
