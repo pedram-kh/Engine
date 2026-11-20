@@ -24,6 +24,7 @@ import {
   AGENCY_ULID,
   BRAND_ULID,
   makeAngle,
+  makeSyncedAngle,
   makePersona,
   makeSummary,
   makeUsp,
@@ -267,6 +268,36 @@ describe('UspsStep (PL-2.1)', () => {
 
     await click('[data-test="confirm-ok"]')
     expect(strategyApi.removeUsp).toHaveBeenCalledWith(SCOPE, used.id, 2)
+    w.unmount()
+  })
+
+  it('W7 (PL-2.2): a USP used by cells says so on the card and lists each cell once, with its level, in the dialog', async () => {
+    const used = makeUsp(2, { angle_count: 1, cell_count: 1 })
+    vi.mocked(strategyApi.listPersonas).mockResolvedValue({
+      data: [
+        makePersona(1, 'SK', {
+          angles: [makeSyncedAngle(used, 'Lead line')],
+          matrix_cells: [{ usp: used.id, level: 'priority' }],
+        }),
+        makePersona(2, 'RO'),
+      ],
+    })
+    vi.mocked(strategyApi.removeUsp).mockResolvedValue(undefined as never)
+    const w = await mountStep([makeUsp(1), used, makeUsp(3), makeUsp(4)])
+    const card = w.findAll('[data-test="usp-card"]')[1]
+    expect(card?.get('[data-test="usp-angle-count"]').text()).toBe('Used by 1 angle and 1 cell')
+
+    await card?.get('[data-test="usp-menu-btn"]').trigger('click')
+    await flushPromises()
+    await click('[data-test="usp-menu-delete"]')
+    await flushPromises()
+    const list = overlay('[data-test="usp-delete-affected"]')
+    expect(list?.querySelectorAll('li')).toHaveLength(1)
+    expect(list?.textContent).toContain('SK · SKA · Persona 1')
+    expect(list?.textContent).toContain('Priority')
+    expect(overlay('[data-test="confirm-ok"]')?.textContent).toContain('Delete and clear 1 item')
+    await click('[data-test="confirm-ok"]')
+    expect(strategyApi.removeUsp).toHaveBeenCalledWith(SCOPE, used.id, 1)
     w.unmount()
   })
 

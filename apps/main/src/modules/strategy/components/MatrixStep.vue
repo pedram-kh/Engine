@@ -234,14 +234,15 @@ const errorText = computed(() => (failed.value ? t('app.strategy.errors.loadFail
         </h2>
         <p class="step-head__sub">{{ t('app.strategy.matrix.subtitle') }}</p>
       </div>
-      <ul class="mx-legend" data-test="matrix-legend">
-        <li v-for="l in ['priority', 'support', 'low']" :key="l" class="mx-legend__item">
-          <span class="mx-legend__dot" :class="`mx-legend__dot--${l}`" aria-hidden="true" />
-          <span class="mx-legend__label">{{ t(`app.strategy.matrix.level.${l}`) }}</span>
-          <span class="mx-legend__hint">· {{ t(`app.strategy.matrix.legend.${l}Hint`) }}</span>
-        </li>
-      </ul>
     </div>
+
+    <ul class="mx-legend" data-test="matrix-legend">
+      <li v-for="l in ['priority', 'support', 'low']" :key="l" class="mx-legend__item">
+        <span class="mx-legend__dot" :class="`mx-legend__dot--${l}`" aria-hidden="true" />
+        <span class="mx-legend__label">{{ t(`app.strategy.matrix.level.${l}`) }}</span>
+        <span class="mx-legend__hint">· {{ t(`app.strategy.matrix.legend.${l}Hint`) }}</span>
+      </li>
+    </ul>
 
     <v-skeleton-loader v-if="loading" type="table" data-test="matrix-skeleton" />
     <div v-else-if="errorText" class="mx-empty" data-test="matrix-error">

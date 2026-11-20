@@ -186,7 +186,7 @@ test.describe('Strategy workspace', () => {
       await expect(page.locator('[data-test^="strategy-step-"][data-test$="-status"]')).toHaveCount(
         6,
       )
-      for (const key of ['matrix', 'concepts', 'creators', 'scripts']) {
+      for (const key of ['concepts', 'creators', 'scripts']) {
         await expect(page.locator(`[data-test="strategy-step-${key}"]`)).toHaveAttribute(
           'aria-disabled',
           'true',

@@ -207,15 +207,20 @@ describe('MatrixStep (PL-2.2)', () => {
     w.unmount()
   })
 
-  it('X11: opening, closing and reopening quickly leaves one clean editor', async () => {
+  it('X11: opening, closing and reopening quickly leaves one clean editor, nothing carried over', async () => {
     const w = await mountStep()
     await open(w, 1)
+    await click('[data-test="matrix-level-support"]')
+    await type('[data-test="matrix-line-input"]', 'left over')
     await click('[data-test="matrix-cancel"]')
     await open(w, 2)
     await click('[data-test="matrix-cancel"]')
-    await open(w, 1)
+    await open(w, 3)
     expect(document.body.querySelectorAll('[data-test="matrix-editor"]')).toHaveLength(1)
     expect((overlay('[data-test="matrix-line-input"]') as HTMLTextAreaElement).value).toBe('')
+    expect(overlay('[data-test="matrix-level-support"]')?.getAttribute('aria-checked')).toBe(
+      'false',
+    )
     w.unmount()
   })
 })

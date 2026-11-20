@@ -46,3 +46,25 @@ No test can fail when only `agency_id` is dropped from the persona/USP lookups: 
 | B31 | an undecided key `zz_undecided` added to the literal `WaveMatrixCellSaved` metadata | RED (AuditPayloadKeysGuardTest: "Audit payload key `zz_undecided` (metadata) is not decided"); restored |
 
 The `dynamicPayloadFiles()` entry for `MatrixService.php|metadata` was removed; every key is named in the `Audit::log` call and decided in `notPersonalKeys()`. Test W-06 kept.
+
+## Stage 2 (web)
+
+Each break was made in the source file named, the listed specs were run, and the file was restored (`git status` showed only the intended edits afterwards). Vitest breaks ran in one pass with `/tmp/pl22/brk.py`; the two Playwright breaks were run one at a time against the e2e database.
+
+| #   | Gate                                     | Break                                                        | Result                                                                                                                           |
+| --- | ---------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| W1  | no HTML in the strategy module           | `v-html` added to `MatrixCell.vue`                           | RED (`noVHtml.spec.ts`, 1 failed)                                                                                                |
+| W2  | Priority needs a message line            | `needsMessageLine('priority')` returns false                 | RED (`matrixLogic` L1, `MatrixStep` X4; 2 failed)                                                                                |
+| W3  | only changed fields are sent             | `changeFor` always returns the change                        | RED (`matrixLogic` L4, `MatrixStep` X6; 2 failed)                                                                                |
+| W4  | plain text on the cell (vitest)          | message line drawn with `v-html`                             | RED (`MatrixStep` X10)                                                                                                           |
+| W5  | synced angle is read-only on the card    | the card menu shown on a synced angle                        | RED (`PersonasStep` W12)                                                                                                         |
+| W6  | quick reopen starts clean                | the editor no longer resets the message line on open         | RED (`MatrixStep` X11, X6; 2 failed)                                                                                             |
+| W7  | 140-character limit                      | message-line limit lifted by 10                              | RED (`MatrixStep` X9)                                                                                                            |
+| W8  | USP delete lists the cells               | dialog ignores cell items                                    | RED (`UspsStep` W7 PL-2.2)                                                                                                       |
+| W9  | copy reports synced angles skipped       | synced count forced to 0                                     | RED (`PersonasStep` W11 copy)                                                                                                    |
+| W10 | persona delete lists the cells           | the cell list switched off                                   | RED (`PersonasStep` W11 delete)                                                                                                  |
+| W11 | locales: key present in all 24           | `matrix.title` removed from `de`                             | RED (`matrixKeys.spec.ts`, 2 failed: presence and placeholders)                                                                  |
+| W12 | locales: placeholders and plural shape   | `{count}` removed from the `fr` cells plural                 | RED (`matrixKeys.spec.ts`, plural shape)                                                                                         |
+| W13 | locales: no English copy                 | `sv` legend hint set to English                              | RED (`matrixKeys.spec.ts`, English-copy gate)                                                                                    |
+| W14 | strategy flag off sends the address away | the `features.strategy` check in `StrategyPage.vue` disabled | RED (Playwright `strategy-matrix`, "with strategy off the matrix address leaves for the wave": URL stayed on `/strategy/matrix`) |
+| W15 | plain text in a real browser             | message line drawn with `v-html`                             | RED (Playwright `strategy-matrix` at 1440: `img[src="x"]` count 1, expected 0)                                                   |

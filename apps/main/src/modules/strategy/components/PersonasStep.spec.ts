@@ -295,6 +295,55 @@ describe('PersonasStep (PL-2.1)', () => {
     plain.unmount()
   })
 
+  it('W11 (PL-2.2): delete lists the persona cells (USP and level) that go with it', async () => {
+    const usps = makeUsps(3)
+    const first = usps[0] ?? makeUsp(1)
+    const second = usps[1] ?? makeUsp(2)
+    const people = [
+      makePersona(1, 'SK', {
+        angles: [makeSyncedAngle(first)],
+        matrix_cells: [
+          { usp: first.id, level: 'priority' },
+          { usp: second.id, level: 'low' },
+        ],
+      }),
+      ...many(2, 'SK', 2),
+    ]
+    const w = await mountStep(people, usps)
+    await w
+      .findAll('[data-test="persona-card"]')[0]
+      ?.get('[data-test="persona-menu-btn"]')
+      .trigger('click')
+    await flushPromises()
+    await click('[data-test="persona-menu-delete"]')
+    const rows = [...(overlay('[data-test="persona-delete-cells"]')?.querySelectorAll('li') ?? [])]
+    expect(rows.map((r) => r.textContent?.replace(/\s+/g, ' ').trim())).toEqual([
+      'USP 1 · Priority',
+      'USP 2 · Low',
+    ])
+    expect(overlayText()).toContain('2 cells')
+    w.unmount()
+  })
+
+  it('W11 (PL-2.2): the copy dialog says how many synced angles it leaves behind', async () => {
+    const usps = makeUsps(3)
+    const first = usps[0] ?? makeUsp(1)
+    const w = await mountStep(
+      [
+        makePersona(1, 'RO', {
+          angles: [makeSyncedAngle(first, 'Lead', 'RO'), makeAngle(usps[1] ?? makeUsp(2))],
+        }),
+        makePersona(2, 'RO'),
+        makePersona(3, 'SK'),
+      ],
+      usps,
+    )
+    await w.get('[data-test="persona-copy"]').trigger('click')
+    await flushPromises()
+    expect(overlay('[data-test="copy-synced"]')?.textContent).toContain('1')
+    w.unmount()
+  })
+
   it('hostile text in every persona text field is shown as plain text, never as markup', async () => {
     const hostile = makePersona(1, 'SK', {
       title: HOSTILE,
