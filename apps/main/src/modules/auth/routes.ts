@@ -353,6 +353,13 @@ export const appRoutes: RouteRecordRaw[] = [
     component: () => import('@/modules/strategy/pages/StrategyPage.vue'),
     meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
+  // PL-2.2 — step 3, the messaging matrix. Same page and same flag rule as the two steps above.
+  {
+    path: '/brands/:ulid/waves/:waveUlid/strategy/matrix',
+    name: 'strategy.matrix',
+    component: () => import('@/modules/strategy/pages/StrategyPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
 
   // ── Campaigns ──────────────────────────────────────────────────────────────
   // Sprint 8 Chunk 1. Any agency member may view (list/detail); create + the

@@ -291,13 +291,15 @@ export function uspInUseMeta(error: unknown): UspInUseMeta | null {
   }
   const affected = raw.flatMap((entry: unknown): UspInUseAffected[] => {
     if (!isObjectRecord(entry)) return []
-    const { persona, market, code, title, explanation } = entry
-    return typeof persona === 'string' &&
+    const { persona, market, code, title, explanation, kind, level } = entry
+    const lv = level === 'priority' || level === 'support' || level === 'low' ? level : null
+    return (kind === 'angle' || kind === 'cell') &&
+      typeof persona === 'string' &&
       typeof market === 'string' &&
       typeof code === 'string' &&
       typeof title === 'string' &&
       typeof explanation === 'string'
-      ? [{ persona, market, code, title, explanation }]
+      ? [{ kind, level: lv, persona, market, code, title, explanation }]
       : []
   })
   return { count, affected }

@@ -291,8 +291,16 @@ describe('PL-2.1 typed meta readers', () => {
     expect(marketHasPersonasMeta(null)).toBeNull()
   })
 
-  it('uspInUseMeta reads the count and the affected list, and ignores malformed rows', () => {
-    const row = { persona: 'p', market: 'SK', code: 'SKA', title: 'T', explanation: 'E' }
+  it('uspInUseMeta reads the count, the kind and level of each item, and ignores malformed rows', () => {
+    const row = {
+      kind: 'cell',
+      level: 'priority',
+      persona: 'p',
+      market: 'SK',
+      code: 'SKA',
+      title: 'T',
+      explanation: 'E',
+    }
     expect(uspInUseMeta(err('usp.in_use', { count: 2, affected: [row, { persona: 1 }] }))).toEqual({
       count: 2,
       affected: [row],

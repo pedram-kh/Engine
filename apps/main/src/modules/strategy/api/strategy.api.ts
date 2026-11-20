@@ -6,6 +6,9 @@
  */
 
 import type {
+  MatrixCellChange,
+  MatrixEnvelope,
+  MatrixSaveEnvelope,
   PersonaCopyPayload,
   StrategySummaryEnvelope,
   WaveAngleEnvelope,
@@ -38,6 +41,16 @@ export const strategyApi = {
     return http.patch<StrategySummaryEnvelope>(`${base(s)}/audience-title`, {
       usp_audience_title: title,
     })
+  },
+
+  /** One market's matrix in one request: USPs, personas, set cells, progress. */
+  matrix(s: WaveScope, market: string): Promise<MatrixEnvelope> {
+    return http.get<MatrixEnvelope>(`${base(s)}/matrix?market=${encodeURIComponent(market)}`)
+  },
+
+  /** 1 to 48 cell changes in one transaction; only the fields that changed. */
+  saveCells(s: WaveScope, market: string, cells: MatrixCellChange[]): Promise<MatrixSaveEnvelope> {
+    return http.put<MatrixSaveEnvelope>(`${base(s)}/matrix/cells`, { market, cells })
   },
 
   listUsps(s: WaveScope): Promise<WaveUspListResponse> {

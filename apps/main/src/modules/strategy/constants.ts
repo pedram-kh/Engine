@@ -11,11 +11,11 @@ export const MENU_PROPS = {
   contentClass: 'strategy-menu',
 } as const
 
-/** The two steps that work in PL-2.1, and the four that are shown but not built. */
+/** The three steps that work (PL-2.1 USPs and personas, PL-2.2 the matrix), and the three that are not built. */
 export const STEPS = [
   { n: 1, key: 'usps', state: 'live' },
   { n: 2, key: 'personas', state: 'live' },
-  { n: 3, key: 'matrix', state: 'not_built' },
+  { n: 3, key: 'matrix', state: 'live' },
   { n: 4, key: 'concepts', state: 'not_built' },
   { n: 5, key: 'creators', state: 'locked' },
   { n: 6, key: 'scripts', state: 'locked' },
