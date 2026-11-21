@@ -272,8 +272,8 @@ it('duplicate: a new Awaiting concept at the end, same persona, fields and chips
     $usp = C::usp($w);
     C::cell($p, $usp, MatrixLevel::Priority);
     $id = C::make($w, $p, ['hook' => 'H', 'key_points' => ['k'], 'funnel_stage' => 'bofu']);
-    C::decide($w, $id, 'approved')->assertOk();
     S::call($w['staff'], 'POST', S::u($w, "concepts/{$id}/links"), ['url' => 'https://example.com/x', 'title' => 'X'])->assertCreated();
+    C::decide($w, $id, 'approved')->assertOk();
 
     $copy = S::call($w['staff'], 'POST', S::u($w, "concepts/{$id}/duplicate"))->assertCreated()->json('data');
     $a = $copy['attributes'];

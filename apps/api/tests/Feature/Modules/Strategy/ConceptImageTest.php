@@ -11,6 +11,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\TestResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -253,15 +254,22 @@ it('Q9: a decompression bomb (header 30000 x 30000, a few bytes) gets no thumbna
     expect(WaveConceptImage::query()->firstOrFail()->thumb_key)->toBeNull();
 });
 
-it('Q9: the pixel, side and byte thresholds: 40 MP and 30000 px sides are not decoded; a normal image is', function (array $size, bool $thumbnailed): void {
+it('Q9: the pixel and side thresholds stop the decoder; a corrupt body inside them reaches it and fails soft', function (array $size, bool $decoderReached): void {
     $w = S::world();
     $id = C::make($w, C::persona($w));
+    Log::spy();
     C::upload($w, $id, bombPng($size[0], $size[1]))->assertCreated();
-    expect(WaveConceptImage::query()->firstOrFail()->thumb_key !== null)->toBe($thumbnailed);
+    expect(WaveConceptImage::query()->firstOrFail()->thumb_key)->toBeNull();
+    // Only a decode error logs "thumbnail failed"; a threshold refusal logs at info and never gets that far.
+    if ($decoderReached) {
+        Log::shouldHaveReceived('warning')->once();
+    } else {
+        Log::shouldNotHaveReceived('warning');
+    }
 })->with([
     'over 40 MP' => [[7000, 6000], false],
     'one side over 30000' => [[30001, 10], false],
-    'a corrupt body inside the limits: fails soft' => [[100, 100], false],
+    'a corrupt body inside the limits: fails soft' => [[100, 100], true],
 ]);
 
 it('Q9: an image over the byte threshold gets the placeholder and still downloads', function (): void {
@@ -348,6 +356,7 @@ it('the sweeper removes pending reservations an hour past their expiry (object f
     foreach ([$abandoned, $recent, $justExpired] as $key) {
         Storage::disk('media')->put($key, 'partial');
     }
+    DB::table('wave_concept_images')->where('ulid', $ready)->update(['expires_at' => now()->subHours(3)]);   // a ready row is never swept, whatever its expiry says
     DB::table('wave_concept_images')->where('storage_key', $abandoned)->update(['expires_at' => now()->subHours(2)]);
     DB::table('wave_concept_images')->where('storage_key', $justExpired)->update(['expires_at' => now()->subMinutes(30)]);
 
