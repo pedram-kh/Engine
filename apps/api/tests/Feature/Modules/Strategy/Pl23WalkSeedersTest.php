@@ -41,7 +41,12 @@ function pl23Wave(string $name): Wave
 /** @return list<string> */
 function pl23Statuses(Wave $wave, string $market): array
 {
-    return WaveConcept::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market', $market)->orderBy('position')->pluck('status')->map(fn ($s) => $s->value)->all();
+    $out = [];
+    foreach (WaveConcept::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market', $market)->orderBy('position')->get() as $concept) {
+        $out[] = $concept->status->value;
+    }
+
+    return $out;
 }
 
 it('C1: seeds the accounts and the waves, leaves BOTH flags off, and is idempotent', function (): void {
@@ -77,8 +82,9 @@ it('C2: Wave 1 has three concepts in three statuses in SK, personas but no conce
 
     $changes = WaveConcept::withoutGlobalScopes()->where('wave_id', $wave->id)->where('status', 'changes_requested')->firstOrFail();
     $decision = DB::table('wave_concept_decisions')->where('concept_id', $changes->id)->first();
-    expect($decision?->client_name)->toBe('Tomáš Kováč')
-        ->and($decision?->comment)->not->toBeNull();
+    expect($decision)->not->toBeNull();
+    expect(data_get($decision, 'client_name'))->toBe('Tomáš Kováč')
+        ->and(data_get($decision, 'comment'))->not->toBeNull();
 
     // The approved concept carries a link and stayed approved (the link was added before the decision).
     $approved = WaveConcept::withoutGlobalScopes()->where('wave_id', $wave->id)->where('status', 'approved')->firstOrFail();

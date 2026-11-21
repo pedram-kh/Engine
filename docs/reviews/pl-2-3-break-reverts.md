@@ -229,3 +229,15 @@ Each row: the production line named was broken in the working tree, the listed V
 | W25 | `de`: placeholder `{n}` dropped from a value | red: placeholder sets match en for every key     | 6 passed           |
 | W26 | `fr`: one key deleted                        | red: every locale has every key (and two more)   | 6 passed           |
 | W27 | `de`: the English text copied in for one key | red: no non-English locale ships an English copy | 6 passed           |
+
+### Stage 2 drop line (frame fidelity fix)
+
+| Id  | Break                                                           | Red                                                      | Green after revert |
+| --- | --------------------------------------------------------------- | -------------------------------------------------------- | ------------------ |
+| W28 | `ConceptReferences.vue`: drop line always shown (`v-if="true"`) | red: drop line: shown only while there are no references | 16 passed          |
+
+### Stage 2 Playwright (`pl23-concepts.spec.ts`)
+
+| Id  | Break                                                                    | Red                                                                                    | Green after revert |
+| --- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------- | ------------------ |
+| W29 | `ConceptReferences.vue`: `rel="noopener noreferrer"` to `rel="noopener"` | red: links test, `toHaveAttribute('rel', 'noopener noreferrer')` received `"noopener"` | 1 passed           |

@@ -20,6 +20,7 @@ use App\Modules\Strategy\Services\ConceptService;
 use App\Modules\Strategy\Services\ConceptThumbnailer;
 use App\Modules\Strategy\Services\MatrixService;
 use App\Modules\Waves\Models\Wave;
+use Illuminate\Console\Command;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -262,7 +263,7 @@ final class Pl23WalkSeeder extends Seeder
                 app(ConceptThumbnailer::class)->generate($image);
             }
         } catch (Throwable $e) {
-            $this->command?->warn('Images were not seeded ('.$e->getMessage().'). The concept "References and links" has links only.');
+            $this->say('warn', 'Images were not seeded ('.$e->getMessage().'). The concept "References and links" has links only.');
         }
     }
 
@@ -289,15 +290,15 @@ final class Pl23WalkSeeder extends Seeder
                     }
                 }
             }
-            $this->command?->line('Files to upload: '.$dir);
+            $this->say('line', 'Files to upload: '.$dir);
         } catch (Throwable $e) {
-            $this->command?->warn('Walk files were not written ('.$e->getMessage().').');
+            $this->say('warn', 'Walk files were not written ('.$e->getMessage().').');
         }
     }
 
     private static function imageBytes(string $ext, int $w, int $h, int $seed): ?string
     {
-        $im = imagecreatetruecolor($w, $h);
+        $im = imagecreatetruecolor(max(1, $w), max(1, $h));
         $palette = [[76, 141, 255], [52, 199, 123], [245, 165, 36], [240, 80, 110]];
         [$r, $g, $b] = $palette[$seed % 4];
         imagefilledrectangle($im, 0, 0, $w, $h, (int) imagecolorallocate($im, $r, $g, $b));
@@ -317,7 +318,7 @@ final class Pl23WalkSeeder extends Seeder
     /** About 40 MB of PNG that does not compress: random noise. */
     private static function noisePng(int $w, int $h): string
     {
-        $im = imagecreatetruecolor($w, $h);
+        $im = imagecreatetruecolor(max(1, $w), max(1, $h));
         for ($y = 0; $y < $h; $y++) {
             for ($x = 0; $x < $w; $x += 1) {
                 imagesetpixel($im, $x, $y, random_int(0, 0xFFFFFF));
@@ -335,19 +336,33 @@ final class Pl23WalkSeeder extends Seeder
         if ($agency === null) {
             return;
         }
-        $this->command?->line("Agency A: {$agency->ulid}  (password for every account: ".self::PASSWORD.')');
+        $this->say('line', "Agency A: {$agency->ulid}  (password for every account: ".self::PASSWORD.')');
         $bolt = Brand::query()->where('agency_id', $agency->id)->where('name', 'Bolt Food')->first();
         if ($bolt !== null) {
-            $this->command?->line("Bolt Food: brand {$bolt->ulid}");
+            $this->say('line', "Bolt Food: brand {$bolt->ulid}");
             foreach (Wave::query()->where('brand_id', $bolt->id)->orderBy('id')->get() as $wave) {
-                $this->command?->line("  {$wave->name}: /brands/{$bolt->ulid}/waves/{$wave->ulid}/strategy/concepts");
+                $this->say('line', "  {$wave->name}: /brands/{$bolt->ulid}/waves/{$wave->ulid}/strategy/concepts");
             }
         }
         $b = Agency::query()->where('slug', self::AGENCY_B_SLUG)->first();
         $glovo = $b === null ? null : Brand::query()->where('agency_id', $b->id)->first();
         $gw = $glovo === null ? null : Wave::query()->where('brand_id', $glovo->id)->first();
         if ($glovo !== null && $gw !== null) {
-            $this->command?->line("Glovo (Agency B): /brands/{$glovo->ulid}/waves/{$gw->ulid}/strategy/concepts");
+            $this->say('line', "Glovo (Agency B): /brands/{$glovo->ulid}/waves/{$gw->ulid}/strategy/concepts");
+        }
+    }
+
+    /** Writes to the console when run from `db:seed`; silent when a test calls the seeder directly (no command is bound). */
+    private function say(string $style, string $message): void
+    {
+        $command = $this->command;
+        if (! $command instanceof Command) {
+            return;
+        }
+        if ($style === 'warn') {
+            $command->warn($message);
+        } else {
+            $command->line($message);
         }
     }
 }

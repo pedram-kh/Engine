@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Modules\Strategy\Services\ConceptImageStorage;
+use Illuminate\Console\Command;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -50,7 +51,7 @@ final class Pl23WalkCleanupSeeder extends Seeder
                 try {
                     ConceptImageStorage::deleteAll($keys);
                 } catch (Throwable $e) {
-                    $this->command?->warn('Some stored image objects could not be deleted ('.$e->getMessage().').');
+                    $this->say('warn', 'Some stored image objects could not be deleted ('.$e->getMessage().').');
                 }
             }
 
@@ -84,6 +85,20 @@ final class Pl23WalkCleanupSeeder extends Seeder
                 }
             }
             @rmdir($dir);
+        }
+    }
+
+    /** Writes to the console when run from `db:seed`; silent when a test calls the seeder directly (no command is bound). */
+    private function say(string $style, string $message): void
+    {
+        $command = $this->command;
+        if (! $command instanceof Command) {
+            return;
+        }
+        if ($style === 'warn') {
+            $command->warn($message);
+        } else {
+            $command->line($message);
         }
     }
 }
