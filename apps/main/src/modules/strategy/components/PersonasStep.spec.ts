@@ -487,6 +487,34 @@ describe('PersonasStep (PL-2.1)', () => {
     expect(overlayText()).toContain('Concepts use this persona (2)')
     expect(overlay('[data-test="confirm-ok"]')).toBeNull()
     expect(overlay('[data-test="confirm-cancel"]')?.textContent).toContain('Close')
+    // P2: titled as a refusal, grouped, and it points at the concepts of that persona.
+    const dialog = overlay('[data-test="persona-delete-dialog"]')
+    expect(dialog?.textContent).toContain("can't be deleted")
+    expect(dialog?.textContent).not.toMatch(/Delete .*\?/)
+    expect(overlay('[data-test="persona-delete-concepts-heading"]')?.textContent?.trim()).toBe(
+      'Concepts',
+    )
+    const link = overlay('[data-test="persona-delete-concepts-link"]')
+    expect(link?.getAttribute('href')).toMatch(/strategy\/concepts\?.*persona=/)
+    expect(link?.getAttribute('href')).toContain('market=SK')
+    w.unmount()
+  })
+
+  it('P2: a persona with matrix cells and no concepts is still the ordinary delete, with its cells under "Matrix cells"', async () => {
+    const people = many(3, 'SK')
+    const w = await mountStep(people)
+    vi.mocked(strategyApi.removePersona).mockRejectedValue(
+      new ApiError({ status: 422, code: 'persona.in_use_by_concepts', message: 'x', details: [] }),
+    )
+    // No concept list came back: the dialog must not claim a refusal it cannot list.
+    await w
+      .findAll('[data-test="persona-card"]')[0]
+      ?.get('[data-test="persona-menu-btn"]')
+      .trigger('click')
+    await flushPromises()
+    await click('[data-test="persona-menu-delete"]')
+    expect(overlay('[data-test="persona-delete-dialog"]')?.textContent).toMatch(/Delete .*\?/)
+    expect(overlay('[data-test="persona-delete-concepts-heading"]')).toBeNull()
     w.unmount()
   })
 })

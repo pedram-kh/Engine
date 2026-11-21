@@ -79,6 +79,25 @@ const underMinimum = computed(() =>
   showUnderMinimum(counts.value, limits.value.concept_min_recommended),
 )
 const noPersonas = computed(() => marketPersonas.value.length === 0)
+/**
+ * `?persona=<id>` (from the "see the concepts" link in the refused persona delete) shows only that persona's concepts,
+ * with a line saying so and "Show all". The banner and the tab numbers stay the market's. An id that is not a persona of
+ * this market is ignored.
+ */
+const personaFilter = computed(() => {
+  const q = route.query.persona
+  return typeof q === 'string' ? (marketPersonas.value.find((p) => p.id === q) ?? null) : null
+})
+const visibleConcepts = computed(() =>
+  personaFilter.value === null
+    ? concepts.value
+    : concepts.value.filter((c) => c.attributes.persona.id === personaFilter.value?.id),
+)
+function showAllPersonas(): void {
+  const rest = { ...route.query }
+  delete rest.persona
+  void router.replace({ query: rest })
+}
 
 function tabCount(code: string): number {
   return marketCounts(props.summary.attributes.concepts, code)?.total ?? 0
@@ -423,9 +442,29 @@ const deleteBody = computed(() => {
           </v-btn>
         </template>
       </CEmptyState>
-      <div v-else class="concepts-grid" data-test="concepts-grid">
+      <p
+        v-if="total > 0 && personaFilter"
+        class="concepts-filter"
+        data-test="concepts-persona-filter"
+      >
+        {{
+          t('app.strategy.concepts.personaFilter', {
+            persona: `${personaFilter.attributes.code} · ${personaFilter.attributes.title}`,
+          })
+        }}
+        <v-btn
+          variant="text"
+          size="small"
+          class="px-1"
+          data-test="concepts-persona-filter-clear"
+          @click="showAllPersonas"
+        >
+          {{ t('app.strategy.concepts.showAll') }}
+        </v-btn>
+      </p>
+      <div v-if="total > 0" class="concepts-grid" data-test="concepts-grid">
         <ConceptCard
-          v-for="c in concepts"
+          v-for="c in visibleConcepts"
           :key="c.id"
           :concept="c"
           :scope="scope"
@@ -640,6 +679,15 @@ const deleteBody = computed(() => {
 .concepts-banner .step-btn :deep(.v-btn__prepend) {
   margin-inline: 0 8px;
   font-size: 14px;
+}
+.concepts-filter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  font-size: 13px;
+  color: rgb(var(--v-theme-on-surface-variant, var(--v-theme-on-surface)));
 }
 .concepts-banner {
   display: flex;

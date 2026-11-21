@@ -349,7 +349,11 @@ const deletingCells = computed(() =>
     <StrategyConfirmDialog
       v-model="deleteOpen"
       test-id="persona-delete-dialog"
-      :title="t('app.strategy.persona.deleteTitle', { name: deleting?.attributes.name ?? '' })"
+      :title="
+        blockedBy.length > 0
+          ? t('app.strategy.persona.blockedTitle', { name: deleting?.attributes.name ?? '' })
+          : t('app.strategy.persona.deleteTitle', { name: deleting?.attributes.name ?? '' })
+      "
       :body="
         blockedBy.length > 0
           ? ''
@@ -368,21 +372,50 @@ const deletingCells = computed(() =>
       :confirm-disabled="blockedBy.length > 0"
       @confirm="confirmDelete"
     >
-      <ul
+      <section
         v-if="blockedBy.length > 0"
-        class="persona-delete-cells"
-        data-test="persona-delete-concepts"
+        class="persona-delete-group"
+        data-test="persona-delete-concepts-group"
       >
-        <li v-for="c in blockedBy" :key="c.concept">
-          {{ t('app.strategy.concepts.card.number', { n: c.number }) }} · {{ c.title }} ·
-          {{ t(`app.strategy.concepts.status.${c.status}`) }}
-        </li>
-      </ul>
-      <ul v-if="cellCount > 0" class="persona-delete-cells" data-test="persona-delete-cells">
-        <li v-for="c in deletingCells" :key="c.usp + c.level">
-          {{ c.usp }} · {{ t(`app.strategy.matrix.level.${c.level}`) }}
-        </li>
-      </ul>
+        <h3 class="persona-delete-group__title" data-test="persona-delete-concepts-heading">
+          {{ t('app.strategy.stepper.concepts') }}
+        </h3>
+        <ul class="persona-delete-cells" data-test="persona-delete-concepts">
+          <li v-for="c in blockedBy" :key="c.concept">
+            {{ t('app.strategy.concepts.card.number', { n: c.number }) }} · {{ c.title }} ·
+            {{ t(`app.strategy.concepts.status.${c.status}`) }}
+          </li>
+        </ul>
+        <v-btn
+          v-if="deleting"
+          variant="text"
+          size="small"
+          prepend-icon="mdi-open-in-new"
+          class="px-0 mt-1"
+          :to="{
+            name: 'strategy.concepts',
+            params: { ulid: brandId, waveUlid: waveId },
+            query: { market, persona: deleting.id },
+          }"
+          data-test="persona-delete-concepts-link"
+        >
+          {{ t('app.strategy.persona.seeConcepts') }}
+        </v-btn>
+      </section>
+      <section
+        v-if="cellCount > 0"
+        class="persona-delete-group"
+        data-test="persona-delete-cells-group"
+      >
+        <h3 class="persona-delete-group__title" data-test="persona-delete-cells-heading">
+          {{ t('app.strategy.persona.groupCells') }}
+        </h3>
+        <ul class="persona-delete-cells" data-test="persona-delete-cells">
+          <li v-for="c in deletingCells" :key="c.usp + c.level">
+            {{ c.usp }} · {{ t(`app.strategy.matrix.level.${c.level}`) }}
+          </li>
+        </ul>
+      </section>
     </StrategyConfirmDialog>
   </section>
 </template>
@@ -547,6 +580,17 @@ const deletingCells = computed(() =>
 .persona-tile__count {
   font-size: 12px;
   line-height: normal;
+  color: rgb(var(--v-theme-text-tertiary));
+}
+.persona-delete-group + .persona-delete-group {
+  margin-top: 12px;
+}
+.persona-delete-group__title {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
   color: rgb(var(--v-theme-text-tertiary));
 }
 .persona-delete-cells {
