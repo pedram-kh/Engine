@@ -55,7 +55,7 @@ Screenshots, outside the repo:
 | Card head                                | fill purple 6%, pad 16/18/14, gap 10                                                         | purple 6%, pad 16/18/14, gap 10                                                                                                      | matches              |                                                                                                                              |
 | "CONCEPT 1" chip                         | `#0b0b0c`, pad 2/8, radius 6, 10.5 / 700, tracking 0.6                                       | (11,11,12), pad 2/8, radius 6, 10.5 / 700, 0.6px                                                                                     | matches              |                                                                                                                              |
 | Status pill                              | green 15%, pad 3/9, radius 999, dot 6, 11 / 500, text `#34c77b`                              | green 15%, pad 3/9, 999, dot 6, 11 / 500, (52,199,123)                                                                               | matches              | Awaiting amber `#f5a524`, Changes requested red `#f0506e`, same shape                                                        |
-| Pill text                                | "Approved by client"                                                                         | "Approved"                                                                                                                           | VISUAL, left         | The frame's text names the client; the footer carries "Approved by {name} · {date}" (item 3). Pedram may rule                |
+| Pill text                                | "Approved by client"                                                                         | "Approved"                                                                                                                           | VISUAL, ruled        | Ruled (2026-11-21): the pill stays "Approved"; the footer carries "Approved by {name} · {date}"                              |
 | Title                                    | 18 / 600, `#ededed`                                                                          | 18 / 600, (237,237,237)                                                                                                              | matches              | The frame draws curly quotes inside the sample text; the built title is the stored text                                      |
 | Persona pill                             | border purple 60%, pad 3/9, code 10 / 700 purple, title 12 / 500                             | purple 60%, pad 3/9, 10 / 700 (139,108,255), 12 / 500                                                                                | matches              |                                                                                                                              |
 | Funnel chip                              | `#232326`, pad 3/9, 12 / 400 `#a0a0a8`, chevron 11, gap 4                                    | (35,35,38), pad 3/9, 12 / 400 (160,160,168), gap 4                                                                                   | matches              | Opens a menu of the five stages (FUNCTIONAL addition: the frame's chevron is the cue)                                        |
@@ -79,10 +79,15 @@ Screenshots, outside the repo:
 | "Preview as client", "Share with client" | drawn in the page header                                                                     | absent                                                                                                                               | FUNCTIONAL           | Client portal is PL-4                                                                                                        |
 | Status chip in the page header           | "Concepts in client review"                                                                  | absent                                                                                                                               | FUNCTIONAL           | The banner carries the state                                                                                                 |
 | Stepper, step 4                          | "Client review · 1 of 3"                                                                     | "1 of 3 approved"                                                                                                                    | FUNCTIONAL           | Item 1: the plan's wording                                                                                                   |
-| Stepper, steps 5 and 6                   | lock icon, "Unlocks after concepts"                                                          | no lock, "Not available yet"; the warning with counts when concepts are not all approved                                             | FUNCTIONAL           | Ruling: never locked (PL-3 builds them); item 1                                                                              |
+| Stepper, steps 5 and 6                   | lock icon, "Unlocks after concepts"                                                          | no lock, "Not available yet"; the warning with counts when concepts are not all approved                                             | FUNCTIONAL           | Never locked: Creators and Scripts are built in PL-3, so steps 5 and 6 cannot be opened (not because of concepts). D1 below  |
 | Comment count with icon on the head      | message icon 13 and "1" in amber, dots menu 16                                               | dots menu only                                                                                                                       | FUNCTIONAL           | Per-concept comments are not part of PL-2.3; the comment is the client's one decision comment, shown in the footer           |
 | "Notes & comments" column                | 300 wide, right of the grid                                                                  | absent                                                                                                                               | FUNCTIONAL           | As on the USP and persona steps                                                                                              |
-| Card width                               | 444 (two cards per row beside the 300 column)                                                | fluid: 620 at 1600 wide (two per row)                                                                                                | VISUAL, kept         | Follows from the missing right column; fluid grid as on the other steps                                                      |
+| Card width                               | 444 (two cards per row beside the 300 column)                                                | fluid: 620 at 1600 wide (two per row)                                                                                                | VISUAL, ruled        | Ruled (2026-11-21): stays fluid until the notes column exists (PL-2.4)                                                       |
+| Decision dialog: choice                  | not drawn                                                                                    | two buttons in a radio group; selected = filled (green or red) with a check, other = outlined with an empty circle; `aria-checked`   | FUNCTIONAL           | PL-2.3 walk P1; the design system's selected state; wraps at 390 (no clipping)                                               |
+| Decision dialog: why Save is off         | not drawn                                                                                    | one line in the error colour with an icon, as the matrix hint                                                                        | FUNCTIONAL           | PL-2.3 walk P1                                                                                                               |
+| Persona refusal dialog                   | not in the frame                                                                             | title "{name} can't be deleted"; groups "Concepts" and "Matrix cells"; link "See this persona's concepts"; count and sentence kept   | FUNCTIONAL           | PL-2.3 walk P2                                                                                                               |
+| Concept dialog: angle suggestions        | not drawn                                                                                    | lightbulb button inside the Angle field opens a list: USP, origin (manual or synced), the line                                       | FUNCTIONAL           | PL-2.3 walk A1; no frame, named as built                                                                                     |
+| Image viewer: Download                   | not drawn                                                                                    | text button with a download icon, left of the close button                                                                           | FUNCTIONAL           | PL-2.3 walk A2                                                                                                               |
 | Add concept tile                         | dashed, centred, plus icon, "Add concept", caption                                           | dashed 1px (46,46,51), pad 24, gap 10, 160 high; plus in a 46px circle at 12% primary; title 15 / 600 (62,207,158); caption 12 / 400 | matches              |                                                                                                                              |
 | Market bar                               | "MARKET" label, tabs with code chip, "Add market"; "Script language" on the right            | tabs with code chip and count; no "Add market"; no script-language line                                                              | FUNCTIONAL           | As on the matrix step (Add market and Script language were ruled out in PL-2.1)                                              |
 
@@ -92,12 +97,12 @@ Screenshots, outside the repo:
 
 1. No "Send reminder", "Generate concepts", "Preview as client" or "Share with client" (no backend or sprint for them).
 2. Banner button is "Record client's decision" (admin and manager), not "Approve on client's behalf".
-3. Stepper step 4 reads "n of m approved". Steps 5 and 6 show "Not available yet" and, when concepts are not all approved, a warning with the counts. They are never locked.
+3. Stepper step 4 reads "n of m approved". Steps 5 and 6 show "Not available yet" and, only when there is no concept or at least one is not approved, a warning. They are never locked.
 4. No per-concept comment count or "Notes & comments" column.
 5. No "Add market" or "Script language" on this step.
 6. The Approved and Changes requested footers (name, date, note, comment) are built from the plan; the frame does not draw them.
 7. The funnel chip opens a menu; the link row has an edit pencil; a dashed drop line shows when a concept has no references.
-8. The status pill says "Approved", the frame says "Approved by client".
+8. The status pill says "Approved", the frame says "Approved by client" (ruled: stays).
 
 ### Real-browser checks (real walk data, Chromium)
 
@@ -161,6 +166,77 @@ An earlier Pest run showed 13 and 10 failures in the Audit and Erasure folders. 
 - **Writes to the dev MinIO bucket.** The walk uploaded images (and eight 40 MB test PNGs) into the `catalyst-engine-media` bucket on the local MinIO (`localhost:9100`) under the throwaway agency's keys. The cleanup seeder deletes them; run it when done with the walk data.
 - **No feature flag was written in a database Pedram uses.** `waves_enabled` and `strategy_enabled` are on only in the throwaway `pl23_walk` database. The seeders never write flags. Every throwaway command printed the database name first.
 - No `.env` or secret was printed.
+
+## Walk result and fixes (Pedram, 2026-11-21, `pl23_walk`, steps 1 to 19)
+
+### Rulings recorded
+
+1. The status pill stays "Approved" (the frame says "Approved by client"; the footer carries the name and date).
+2. The card width stays fluid until the notes column exists (PL-2.4).
+3. Steps 5 and 6 cannot be opened because Creators and Scripts are built in PL-3, not because of concepts.
+
+### D1: the amber warning on steps 5 and 6
+
+Rule (`stepWarning` in `conceptsLogic.ts`): the warning appears only when the wave has no concept, or at least one concept is not approved. All approved: "Not available yet" and nothing else. **Several markets combine by summing** the server's wave totals (`total`, `approved`); a market with no concept adds nothing and is not counted against the others. Awaiting client and Changes requested both count as not approved. Cause of the defect: the old rule asked every market to be complete, and the server returns empty markets as not complete.
+
+| Case (market: total / approved / changes requested)         | Step 4 text     | Steps 5 and 6            |
+| ----------------------------------------------------------- | --------------- | ------------------------ |
+| No concepts, one market (0/0/0)                             | No concepts yet | warning: No concepts yet |
+| No concepts, three markets                                  | No concepts yet | warning: No concepts yet |
+| Some approved (3/1/0)                                       | 1 of 3 approved | warning: 1 of 3 approved |
+| None approved (2/0/0)                                       | 0 of 2 approved | warning: 0 of 2 approved |
+| All approved, one market (2/2/0)                            | 2 of 2 approved | **none**                 |
+| One changes requested (3/2/1)                               | 2 of 3 approved | warning: 2 of 3 approved |
+| All approved in one market, two empty (2/2/0, 0, 0): Wave 2 | 2 of 2 approved | **none**                 |
+| Two markets, both all approved (2/2/0 and 4/4/0)            | 6 of 6 approved | **none**                 |
+| Two markets, one all approved, one not (2/2/0 and 3/1/1)    | 3 of 5 approved | warning: 3 of 5 approved |
+| Three markets: approved, changes requested, empty           | 2 of 4 approved | warning: 2 of 4 approved |
+
+All ten are Vitest tests (`StrategyStepper.spec.ts`, "D1 combination"). Two break-reverts (`pl-2-3-break-reverts.md`, W30, W31). In the real browser, Wave 2 shows "Concepts | 2 of 2 approved", steps 5 and 6 "Not available yet" only; Wave 1 (1 of 4) shows the amber warning.
+
+### A1: angle suggestions (as built)
+
+In the concept dialog, a lightbulb button inside the Angle field (shown only when the chosen persona has angles) opens a list titled "Angles of {persona}". Each row shows the USP, whether the line was added by hand or synced from the matrix, and the line. Picking one fills the Angle text; the field stays editable and free typing still works. Changing the persona refreshes the list and never changes text already typed. A persona with no angles: the field behaves as before. The server stores the text only; there is no link between a concept and an angle (the payload's `angle` is a string, and a test checks no other angle key is sent).
+
+### A2: Download in the image viewer
+
+A Download button in the enlarge view saves the original under its original file name (path separators and control characters replaced; an empty name becomes "image"). It reuses the blob the viewer already read through the authenticated endpoint: no second request, no presigned URL, no public link. It is off until the image has loaded. Checked in the browser for admin, manager and staff, at 1440 and 390: `walk-graphic.png`, 3846 bytes, from a `blob:` address. Not checked: Safari, and a file larger than the 10 MB walk files.
+
+### P1: decision dialog
+
+The choice is a radio group (`role="radio"`, `aria-checked`): selected is the filled design-system button (green for Approved, red for Changes requested) with a check, the other is outlined with an empty circle. Required: Approved needs the client's name; Changes requested needs the name and the comment. When Save cannot proceed, one line in the error colour says why: "Enter the client's name.", "Enter the client's comment.", "Enter the client's name and the comment.". The line is hidden when Save can proceed or a server error is shown. At 390 the second button wrapped but clipped; fixed (wrapping label, auto height).
+
+### P2: persona in use by concepts
+
+Titled "{name} can't be deleted" (not "Delete {name}?"). Grouped under "Concepts" and "Matrix cells", with the count and the "move or delete them first" sentence kept, and a link "See this persona's concepts". The link opens the Concepts step with `?persona=`; the step shows only that persona's concepts, a line "Showing only the concepts of {persona}." and "Show all". An unknown persona id in the address is ignored. The banner counts stay for the whole market. (This filter is an addition the link needs.)
+
+### CHECK: "I can't log on"
+
+Real sign-in form, a fresh browser each (no cookies, no storage), 8 s apart:
+
+| Account                   | Result                          |
+| ------------------------- | ------------------------------- |
+| `admin@pl23-walk.local`   | works (login 200, lands on `/`) |
+| `manager@pl23-walk.local` | works                           |
+| `staff@pl23-walk.local`   | works                           |
+| `admin@pl23-walk-b.local` | works                           |
+
+All four work, so the accounts are seeded correctly and I could not reproduce a failure. The most likely cause is the sign-in throttle (`IdentityServiceProvider`): **10 requests per minute per IP on all `/auth/*` routes** (`auth-ip`), and **5 login attempts per minute per email and IP** (`auth-login-email`). Repeated sign-ins in one minute (for example across the roles) reach the per-IP cap and the form then fails until the minute is over; I hit it myself with my walk scripts and a wait of about 65 s cleared it. I did not change the limits. A leftover session for another user is the second possibility. Not confirmed for Pedram's browser.
+
+### Gates run (walk fixes)
+
+| Gate                                                                                          | Result                                                  |
+| --------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| Vitest: `src/core/i18n`, `src/modules/strategy`, `src/modules/waves`, `src/modules/campaigns` | 51 files, 627 tests passed                              |
+| `vue-tsc --noEmit`, ESLint (strategy, the Playwright spec)                                    | clean                                                   |
+| Pint, Larastan                                                                                | passed, `[OK] No errors` (no PHP changed in this round) |
+| Pest Strategy, Audit, Erasure on SQLite (clean environment)                                   | 619 passed, 18 skipped (PostgreSQL-only)                |
+| Pest Strategy, Audit, Erasure on PostgreSQL (`pl12_test`, port 5435)                          | 637 passed                                              |
+| Playwright `pl23-concepts.spec.ts` (chromium), serial                                         | 6 passed, about 33 s                                    |
+
+**Flag-off check: not run, on purpose.** Only files inside `modules/strategy` and the locale JSON were touched; nothing that renders with strategy OFF (the wave page, the entry button, the router guard) changed. The earlier 126/146 identical result stands.
+
+**Not run:** Safari and Firefox; downloading a very large original; a long session for blob leaks after the viewer download.
 
 ## Walking it yourself
 

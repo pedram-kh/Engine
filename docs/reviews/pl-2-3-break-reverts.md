@@ -241,3 +241,23 @@ Each row: the production line named was broken in the working tree, the listed V
 | Id  | Break                                                                    | Red                                                                                    | Green after revert |
 | --- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------- | ------------------ |
 | W29 | `ConceptReferences.vue`: `rel="noopener noreferrer"` to `rel="noopener"` | red: links test, `toHaveAttribute('rel', 'noopener noreferrer')` received `"noopener"` | 1 passed           |
+
+### Walk fixes (2026-11-21): D1, A1, A2, P1, P2, persona filter
+
+| Id  | Break                                                                          | Red                                                     | Green after revert |
+| --- | ------------------------------------------------------------------------------ | ------------------------------------------------------- | ------------------ |
+| W30 | `stepWarning`: `approved < total` becomes `<=` (warn when all approved)        | red: 5 failing (every all-approved combination, Wave 2) | 21 passed          |
+| W31 | `stepWarning`: empty returns "none"                                            | red: 3 failing (the no-concept combinations)            | 21 passed          |
+| W32 | `ConceptImageViewer.vue`: download name fixed to "file"                        | red: 2 failing (file name; hostile name)                | 9 passed           |
+| W33 | `ConceptImageViewer.vue`: `:disabled="!url"` to `false`                        | red: 1 failing (off until loaded)                       | 9 passed           |
+| W34 | `ConceptDecisionDialog.vue`: `aria-checked` always true                        | red: 1 failing (one checked, flips)                     | 9 passed           |
+| W35 | `ConceptDecisionDialog.vue`: name-only message returns empty                   | red: 1 failing (why text)                               | 9 passed           |
+| W36 | `ConceptDecisionDialog.vue`: comment requirement for Changes requested removed | red: 1 failing (why text)                               | 9 passed           |
+| W37 | `ConceptDialog.vue`: suggestions list always empty                             | red: 2 failing (list, payload)                          | 9 passed           |
+| W38 | `ConceptsStep.vue`: persona filter does not filter                             | red: 1 failing (cards shown)                            | 9 passed           |
+| W39 | `ConceptsStep.vue`: any persona id in the address accepted                     | red: 2 failing (unknown id)                             | 9 passed           |
+| W40 | `PersonasStep.vue`: refusal title back to "Delete {name}?"                     | red: 1 failing (refusal title)                          | 21 passed          |
+| W41 | `PersonasStep.vue`: link loses `persona`                                       | red: 1 failing (link target)                            | 21 passed          |
+| W42 | `PersonasStep.vue`: "Concepts" heading test id removed                         | red: 1 failing (grouped heading)                        | 21 passed          |
+
+Playwright (`walk fixes` test, both widths): not break-reverted separately; it repeats the same checks as W34 to W36 and W40 to W41 in a browser, and each of those is red in Vitest.
