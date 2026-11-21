@@ -249,6 +249,7 @@ it('is registered in the scheduler as a daily command', function (): void {
         fn (string $line): bool => str_contains($line, 'push:prune-deliveries'),
     ));
 
+    // schedule:list pads the cron column to the widest expression in the schedule, so compare with spaces collapsed.
     expect($lines)->toHaveCount(1)
-        ->and($lines[0])->toContain('0 0 * * *');
+        ->and(preg_replace('/\s+/', ' ', $lines[0]))->toContain('0 0 * * *');
 });
