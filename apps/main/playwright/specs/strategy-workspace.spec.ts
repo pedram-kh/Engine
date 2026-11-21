@@ -399,7 +399,7 @@ test.describe('Strategy workspace', () => {
 
       // Market tab: the address carries it; the copy dialog opens above the page.
       await page.locator('[data-test="market-tab-RO"]').click()
-      await expect(page).toHaveURL(/market=RO/)
+      await expect(page).toHaveURL(new RegExp(`market=${mk['RO']}`))
       await expect(page.locator('[data-test="personas-empty"]')).toBeVisible()
       for (const delay of [0, 60, 150]) {
         await page.locator('[data-test="persona-copy"]').click()

@@ -72,7 +72,7 @@ test.describe('New wave dialog menus', () => {
     await page.locator('[data-test="wave-new-btn"]').click()
     await expect(page.locator('[data-test="wave-dialog"]')).toBeVisible()
 
-    await page.locator('[data-test="market-add"]').click()
+    await page.locator('[data-test="market-add-country"]').first().click()
     const ireland = page.locator('[data-test="market-option-IE"]')
     await expect(ireland).toBeVisible()
     await expect.poll(async () => topmost(ireland)).toBe(true)
@@ -135,7 +135,7 @@ test.describe('New wave dialog menus', () => {
     await page.goto(`/brands/${brandId}/waves/${waveId}`)
     await page.locator('[data-test="wave-edit-btn"]').click()
     await expect(page.locator('[data-test="wave-dialog"]')).toBeVisible()
-    await page.locator('[data-test="market-add"]').click()
+    await page.locator('[data-test="market-add-country"]').first().click()
     const france = page.locator('[data-test="market-option-FR"]')
     await expect(france).toBeVisible()
     await expect.poll(async () => topmost(france)).toBe(true)
@@ -207,7 +207,7 @@ test.describe('New wave dialog menus, reopen sequence', () => {
 
     for (const delayMs of [0, 60, 150]) {
       await page.locator('[data-test="wave-new-btn"]').click()
-      await page.locator('[data-test="market-add"]').click()
+      await page.locator('[data-test="market-add-country"]').first().click()
       await expect(page.locator('[data-test="market-option-IE"]')).toBeVisible()
 
       // Close with the menu open (the click is dispatched: the open list may cover Cancel), then reopen fast.
@@ -217,7 +217,7 @@ test.describe('New wave dialog menus, reopen sequence', () => {
       await expect(page.locator('[data-test="wave-dialog"]')).toBeVisible()
       await expect(page.locator('.market-picker__menu')).toHaveCount(0)
 
-      await page.locator('[data-test="market-add"]').click()
+      await page.locator('[data-test="market-add-country"]').first().click()
       const ireland = page.locator('[data-test="market-option-IE"]')
       await expect(ireland).toBeVisible()
       await expect.poll(async () => topmost(ireland)).toBe(true)

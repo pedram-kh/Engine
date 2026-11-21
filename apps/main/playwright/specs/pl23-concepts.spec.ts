@@ -112,7 +112,9 @@ async function setup(
       title,
     })
   const open = async (): Promise<void> => {
-    await page.goto(`/brands/${brand.data.id}/waves/${wave.data.id}/strategy/concepts?market=SK`)
+    await page.goto(
+      `/brands/${brand.data.id}/waves/${wave.data.id}/strategy/concepts?market=${mk['SK']}`,
+    )
     await closeDrawer()
     await expect(page.locator('[data-test="concepts-grid"]')).toBeVisible()
   }
