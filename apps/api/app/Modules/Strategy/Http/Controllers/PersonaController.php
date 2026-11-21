@@ -137,8 +137,8 @@ final class PersonaController
 
         /** @var array{from_market: string, to_market: string, persona_ids?: list<string>|null} $data */
         $data = Validator::make($request->all(), [
-            'from_market' => ['required', 'string', 'regex:/^[A-Z]{2}$/'],
-            'to_market' => ['required', 'string', 'regex:/^[A-Z]{2}$/'],
+            'from_market' => ['required', 'string', 'size:26'],
+            'to_market' => ['required', 'string', 'size:26'],
             'persona_ids' => ['sometimes', 'nullable', 'array', 'min:1', 'max:'.StrategyLimits::PERSONA_MAX],
             'persona_ids.*' => ['required', 'string', 'size:26'],
         ])->validate();
@@ -177,7 +177,7 @@ final class PersonaController
 
         /** @var array<string, mixed> $data */
         $data = Validator::make($input, [
-            'market' => $creating ? ['required', 'string', 'regex:/^[A-Z]{2}$/'] : ['prohibited'],
+            'market' => $creating ? ['required', 'string', 'size:26'] : ['prohibited'],
             'code' => $creating
                 ? ['sometimes', 'nullable', 'string', 'regex:/^[A-Z0-9]{'.StrategyLimits::PERSONA_CODE_MIN.','.StrategyLimits::PERSONA_CODE_MAX.'}$/']
                 : ['sometimes', 'string', 'regex:/^[A-Z0-9]{'.StrategyLimits::PERSONA_CODE_MIN.','.StrategyLimits::PERSONA_CODE_MAX.'}$/'],

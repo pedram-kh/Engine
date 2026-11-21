@@ -24,6 +24,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 /**
@@ -48,7 +49,7 @@ final class ConceptController
         Gate::authorize('view', WaveConcept::class);
 
         $market = $request->query('market');
-        if (! is_string($market) || preg_match('/^[A-Z]{2}$/', $market) !== 1) {
+        if (! is_string($market) || ! Str::isUlid($market)) {
             return $this->refuse($request, StrategyRuleViolation::conceptMarketRequired());
         }
 
@@ -225,7 +226,7 @@ final class ConceptController
 
         /** @var array<string, mixed> $data */
         $data = Validator::make($input, [
-            'market' => $creating ? ['required', 'string', 'regex:/^[A-Z]{2}$/'] : ['prohibited'],
+            'market' => $creating ? ['required', 'string', 'size:26'] : ['prohibited'],
             'persona' => [$presence, 'string', 'size:26'],
             'usp_mode' => ['sometimes', 'string', Rule::in(['keep', 'refill'])],
             'usps' => ['sometimes', 'array', 'max:'.StrategyLimits::USP_MAX],

@@ -8,6 +8,7 @@ use App\Core\Concerns\HasUlid;
 use App\Core\Tenancy\BelongsToAgency;
 use App\Modules\Identity\Models\User;
 use App\Modules\Strategy\Enums\ConceptStatus;
+use App\Modules\Waves\Models\WaveMarket;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
@@ -20,7 +21,7 @@ use Illuminate\Support\Carbon;
  * @property string $ulid
  * @property int $agency_id
  * @property int $wave_id
- * @property string $market
+ * @property int $market_id
  * @property int $concept_id
  * @property ConceptStatus $status
  * @property string $client_name
@@ -40,9 +41,19 @@ final class WaveConceptDecision extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'agency_id', 'wave_id', 'market', 'concept_id', 'status', 'client_name', 'note', 'comment', 'source',
+        'agency_id', 'wave_id', 'market_id', 'concept_id', 'status', 'client_name', 'note', 'comment', 'source',
         'recorded_by_user_id', 'recorded_at',
     ];
+
+    /**
+     * PL-2.4: the market (a named group of countries) this row belongs to.
+     *
+     * @return BelongsTo<WaveMarket, $this>
+     */
+    public function market(): BelongsTo
+    {
+        return $this->belongsTo(WaveMarket::class, 'market_id');
+    }
 
     /** @return BelongsTo<User, $this> */
     public function recordedBy(): BelongsTo

@@ -20,16 +20,24 @@ use App\Modules\Waves\Models\Wave;
 final class StrategyPresenter
 {
     /**
-     * @param  array<string, int>  $personaCounts  market => personas
+     * @param  array<int, int>  $personaCounts  market id => personas
      * @param  array{cells_set: int, cells_total: int, by_market: list<array{market: string, set: int, total: int}>}|null  $matrix
      * @param  array<string, mixed>|null  $concepts  {@see ConceptService::summary}
      * @return array<string, mixed>
      */
     public static function summary(Wave $wave, int $uspCount, array $personaCounts, ?array $matrix = null, ?array $concepts = null): array
     {
+        $wave->loadMissing('markets.countries');
         $markets = [];
-        foreach ($wave->markets as $code) {
-            $markets[] = ['market' => $code, 'persona_count' => $personaCounts[$code] ?? 0];
+        foreach ($wave->markets as $market) {
+            // PL-2.4: `market` is the ulid; the name, short code and countries are what the tabs show.
+            $markets[] = [
+                'market' => $market->ulid,
+                'name' => $market->name,
+                'code' => $market->code,
+                'countries' => $market->countryCodes(),
+                'persona_count' => $personaCounts[$market->id] ?? 0,
+            ];
         }
 
         return [
@@ -79,7 +87,7 @@ final class StrategyPresenter
             'id' => $persona->ulid,
             'type' => 'wave_persona',
             'attributes' => [
-                'market' => $persona->market,
+                'market' => $persona->market->ulid,
                 'slot' => $persona->slot,
                 'color_key' => $persona->colorKey()->value,
                 'code' => $persona->code,
@@ -94,7 +102,7 @@ final class StrategyPresenter
                 'self_talk' => $persona->self_talk ?? [],
                 'barriers' => $persona->barriers ?? [],
                 'angles' => $persona->relationLoaded('angles')
-                    ? $persona->angles->map(static fn (WavePersonaAngle $a): array => self::angle($a, $persona->market))->values()->all()
+                    ? $persona->angles->map(static fn (WavePersonaAngle $a): array => self::angle($a, $persona->market->ulid))->values()->all()
                     : [],
                 'matrix_cells' => $persona->relationLoaded('cells')
                     ? $persona->cells->map(static fn (WaveMatrixCell $c): array => ['usp' => $c->usp->ulid, 'level' => $c->level->value, 'message_line' => $c->message_line])->values()->all()
@@ -110,7 +118,7 @@ final class StrategyPresenter
      */
     public static function angle(WavePersonaAngle $angle, ?string $market = null): array
     {
-        $market ??= $angle->relationLoaded('persona') ? $angle->persona->market : null;
+        $market ??= $angle->relationLoaded('persona') ? $angle->persona->market->ulid : null;
 
         return [
             'id' => $angle->ulid,

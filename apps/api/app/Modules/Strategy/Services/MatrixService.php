@@ -41,13 +41,13 @@ final class MatrixService
     /**
      * @return array{usps: Collection<int, WaveUsp>, personas: Collection<int, WavePersona>, cells: Collection<int, WaveMatrixCell>, manual: array<string, array{ulid: string, text: string}>}
      */
-    public function load(Wave $wave, string $market): array
+    public function load(Wave $wave, string $marketUlid): array
     {
-        PersonaService::assertMarketInWave($wave, $market);
+        $market = PersonaService::assertMarketInWave($wave, $marketUlid);
 
         $usps = WaveUsp::query()->where('wave_id', $wave->id)->orderBy('position')->orderBy('id')->get();
-        $personas = WavePersona::query()->where('wave_id', $wave->id)->where('market', $market)->orderBy('slot')->orderBy('id')->get();
-        $cells = WaveMatrixCell::query()->where('wave_id', $wave->id)->where('market', $market)->orderBy('id')->get();
+        $personas = WavePersona::query()->where('wave_id', $wave->id)->where('market_id', $market->id)->orderBy('slot')->orderBy('id')->get();
+        $cells = WaveMatrixCell::query()->where('wave_id', $wave->id)->where('market_id', $market->id)->orderBy('id')->get();
 
         $manual = [];
         if ($personas->isNotEmpty()) {
@@ -69,20 +69,20 @@ final class MatrixService
      */
     public function progress(Wave $wave, int $uspCount): array
     {
-        /** @var array<string, int> $personas */
+        /** @var array<int, int> $personas */
         $personas = WavePersona::query()->where('wave_id', $wave->id)
-            ->selectRaw('market, count(*) as n')->groupBy('market')->pluck('n', 'market')->map(static fn (mixed $n): int => (int) $n)->all();
-        /** @var array<string, int> $set */
+            ->selectRaw('market_id, count(*) as n')->groupBy('market_id')->pluck('n', 'market_id')->map(static fn (mixed $n): int => (int) $n)->all();
+        /** @var array<int, int> $set */
         $set = WaveMatrixCell::query()->where('wave_id', $wave->id)
-            ->selectRaw('market, count(*) as n')->groupBy('market')->pluck('n', 'market')->map(static fn (mixed $n): int => (int) $n)->all();
+            ->selectRaw('market_id, count(*) as n')->groupBy('market_id')->pluck('n', 'market_id')->map(static fn (mixed $n): int => (int) $n)->all();
 
         $by = [];
         $totalSet = 0;
         $total = 0;
-        foreach ($wave->markets as $code) {
-            $n = ($personas[$code] ?? 0) * $uspCount;
-            $s = $set[$code] ?? 0;
-            $by[] = ['market' => $code, 'set' => $s, 'total' => $n];
+        foreach ($wave->markets as $market) {
+            $n = ($personas[$market->id] ?? 0) * $uspCount;
+            $s = $set[$market->id] ?? 0;
+            $by[] = ['market' => $market->ulid, 'set' => $s, 'total' => $n];
             $totalSet += $s;
             $total += $n;
         }
@@ -94,16 +94,16 @@ final class MatrixService
      * @param  list<array{persona: string, usp: string, level?: string|null, rationale?: string|null, message_line?: string|null, clear?: bool}>  $changes
      * @return array{results: list<array{persona: string, usp: string, cell: WaveMatrixCell|null, manual: bool, manual_angle: array{ulid: string, text: string}|null}>, wave: Wave}
      */
-    public function save(Brand $brand, Wave $wave, User $actor, string $market, array $changes): array
+    public function save(Brand $brand, Wave $wave, User $actor, string $marketUlid, array $changes): array
     {
         StrategyGuard::assertBrandWritable($brand);
 
-        return StrategyGuard::retryOnClash(fn (): array => DB::transaction(function () use ($wave, $actor, $market, $changes): array {
+        return StrategyGuard::retryOnClash(fn (): array => DB::transaction(function () use ($wave, $actor, $marketUlid, $changes): array {
             $locked = StrategyGuard::lockWave($wave);
-            PersonaService::assertMarketInWave($locked, $market);
+            $market = PersonaService::assertMarketInWave($locked, $marketUlid);
 
             $personas = WavePersona::query()
-                ->where('wave_id', $locked->id)->where('agency_id', $locked->agency_id)->where('market', $market)
+                ->where('wave_id', $locked->id)->where('agency_id', $locked->agency_id)->where('market_id', $market->id)
                 ->whereIn('ulid', array_values(array_unique(array_column($changes, 'persona'))))->get()->keyBy('ulid');
             $usps = WaveUsp::query()
                 ->where('wave_id', $locked->id)->where('agency_id', $locked->agency_id)
@@ -154,7 +154,7 @@ final class MatrixService
                         $cell = new WaveMatrixCell([
                             'agency_id' => $locked->agency_id,
                             'wave_id' => $locked->id,
-                            'market' => $market,
+                            'market_id' => $market->id,
                             'persona_id' => $persona->id,
                             'usp_id' => $usp->id,
                             'level' => MatrixLevel::from($level),
@@ -229,7 +229,7 @@ final class MatrixService
                     subject: $locked,
                     metadata: [
                         'wave' => $locked->ulid,
-                        'market' => $market,
+                        'market' => $market->ulid,
                         'cells_created' => $count['cells_created'],
                         'cells_updated' => $count['cells_updated'],
                         'cells_cleared' => $count['cells_cleared'],

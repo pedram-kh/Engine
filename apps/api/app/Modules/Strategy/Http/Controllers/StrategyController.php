@@ -41,9 +41,9 @@ final class StrategyController
         $model = $this->findWave($wave, $agency, $brand);
         Gate::authorize('view', WaveUsp::class);
 
-        /** @var array<string, int> $counts */
+        /** @var array<int, int> $counts market id => personas */
         $counts = WavePersona::query()->where('wave_id', $model->id)
-            ->selectRaw('market, count(*) as n')->groupBy('market')->pluck('n', 'market')->map(static fn (mixed $n): int => (int) $n)->all();
+            ->selectRaw('market_id, count(*) as n')->groupBy('market_id')->pluck('n', 'market_id')->map(static fn (mixed $n): int => (int) $n)->all();
 
         return response()->json([
             'data' => StrategyPresenter::summary($model, $uspCount = WaveUsp::query()->where('wave_id', $model->id)->count(), $counts, $this->matrix->progress($model, $uspCount), ConceptService::summary($model)),
@@ -75,7 +75,7 @@ final class StrategyController
         }
 
         $counts = WavePersona::query()->where('wave_id', $model->id)
-            ->selectRaw('market, count(*) as n')->groupBy('market')->pluck('n', 'market')->map(static fn (mixed $n): int => (int) $n)->all();
+            ->selectRaw('market_id, count(*) as n')->groupBy('market_id')->pluck('n', 'market_id')->map(static fn (mixed $n): int => (int) $n)->all();
 
         return response()->json([
             'data' => StrategyPresenter::summary($model->refresh(), $uspCount = WaveUsp::query()->where('wave_id', $model->id)->count(), $counts, $this->matrix->progress($model, $uspCount), ConceptService::summary($model)),

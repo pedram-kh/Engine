@@ -329,6 +329,10 @@ final class ErasureRegistry
             'wave_steps' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); a step of a wave\'s tracker holds no creator data. The owner is an agency member (a reference, nulled when the user row is hard-deleted).', ['owner_user_id'], [], null, [
                 'name' => 'A step title, not creator data.',
             ]),
+            'wave_markets' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); a market of a wave is a named group of countries (PL-2.4), linked to no creator, user or client row; there is no user column.', [], [], null, [
+                'name' => 'A market label typed by the agency (for example "UK & Ireland"): a place name, not a person.',
+            ]),
+            'wave_market_countries' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); the countries of a market (PL-2.4): two-letter ISO codes of an agency\'s planning data, no creator or user is a field of it.'),
             'wave_usps' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); marketing planning text about a brand\'s wave (PL-2.1). No creator or user is a field of it; there is no user column.', [], [], null, [
                 'title' => 'A USP title: agency-authored free text.',
                 'explainer' => 'Agency-authored free text.',

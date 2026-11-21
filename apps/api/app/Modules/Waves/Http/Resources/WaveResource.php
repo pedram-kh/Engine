@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Modules\Waves\Http\Resources;
 
 use App\Modules\Waves\Models\Wave;
+use App\Modules\Waves\Models\WaveMarket;
 use App\Modules\Waves\Services\WaveCampaignLink;
+use App\Modules\Waves\Services\WaveMarketService;
 use App\Modules\Waves\Steps\WaveTrackerCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -28,6 +30,7 @@ final class WaveResource extends JsonResource
         assert($wave instanceof Wave);
 
         $campaign = $wave->campaign;
+        $wave->loadMissing('markets.countries');
 
         // PL-1.3 (Q1) — the six strategy steps as six segments. The list sets it for the whole page with one grouped
         // query; any other caller gets one query here. It never writes: an unprovisioned wave reads "not started".
@@ -41,7 +44,15 @@ final class WaveResource extends JsonResource
             'attributes' => [
                 'name' => $wave->name,
                 'go_live_on' => $wave->go_live_on->format('Y-m-d'),
-                'markets' => array_values($wave->markets),
+                // PL-2.4 — a market is a named group of countries; `id` is its ulid. `markets_version` is the token an
+                // edit that carries `markets` must send back (Q12).
+                'markets' => $wave->markets->map(static fn (WaveMarket $m): array => [
+                    'id' => $m->ulid,
+                    'name' => $m->name,
+                    'code' => $m->code,
+                    'countries' => $m->countryCodes(),
+                ])->values()->all(),
+                'markets_version' => WaveMarketService::version($wave->markets),
                 'status' => $wave->status->value,
                 // PL-1.2 (P5, Q3) — true while a card of the linked campaign sits in a working column, so the page can
                 // explain a disabled control. The server is the authority; this is only the explanation.

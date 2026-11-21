@@ -12,40 +12,40 @@ use App\Modules\Waves\Models\Wave;
 /** The Strategy side of {@see WaveMarketGuard}: personas per market of a wave. Read-only, no lock of its own. */
 final class StrategyWaveMarketGuard implements WaveMarketGuard
 {
-    public function personaCountsByMarket(Wave $locked, array $removedCodes): array
+    public function personaCountsByMarket(Wave $locked, array $removedIds): array
     {
-        if ($removedCodes === []) {
+        if ($removedIds === []) {
             return [];
         }
 
-        /** @var array<string, int> $counts */
+        /** @var array<int, int> $counts */
         $counts = WavePersona::query()
             ->where('wave_id', $locked->id)
-            ->whereIn('market', $removedCodes)
-            ->selectRaw('market, count(*) as n')
-            ->groupBy('market')
-            ->orderBy('market')
-            ->pluck('n', 'market')
+            ->whereIn('market_id', $removedIds)
+            ->selectRaw('market_id, count(*) as n')
+            ->groupBy('market_id')
+            ->orderBy('market_id')
+            ->pluck('n', 'market_id')
             ->map(static fn (mixed $n): int => (int) $n)
             ->all();
 
         return $counts;
     }
 
-    public function conceptCountsByMarket(Wave $locked, array $removedCodes): array
+    public function conceptCountsByMarket(Wave $locked, array $removedIds): array
     {
-        if ($removedCodes === []) {
+        if ($removedIds === []) {
             return [];
         }
 
-        /** @var array<string, int> $counts */
+        /** @var array<int, int> $counts */
         $counts = WaveConcept::query()
             ->where('wave_id', $locked->id)
-            ->whereIn('market', $removedCodes)
-            ->selectRaw('market, count(*) as n')
-            ->groupBy('market')
-            ->orderBy('market')
-            ->pluck('n', 'market')
+            ->whereIn('market_id', $removedIds)
+            ->selectRaw('market_id, count(*) as n')
+            ->groupBy('market_id')
+            ->orderBy('market_id')
+            ->pluck('n', 'market_id')
             ->map(static fn (mixed $n): int => (int) $n)
             ->all();
 

@@ -6,6 +6,7 @@ namespace App\Modules\Strategy\Services;
 
 use App\Modules\Strategy\Http\Controllers\Concerns\ResolvesStrategyRoute;
 use App\Modules\Strategy\StrategyLimits;
+use App\Modules\Waves\Models\WaveMarket;
 use RuntimeException;
 
 /**
@@ -59,14 +60,14 @@ final class StrategyRuleViolation extends RuntimeException
         return new self('forbidden', 'Only an admin or manager can delete a USP that personas use.', 403);
     }
 
-    public static function personaMaxReached(string $market): self
+    public static function personaMaxReached(WaveMarket $market): self
     {
-        return new self('persona.max_reached', "A market has at most 8 personas ({$market}).", 422, ['market' => $market]);
+        return new self('persona.max_reached', "A market has at most 8 personas ({$market->name}).", 422, ['market' => $market->ulid]);
     }
 
     public static function personaMarketNotInWave(string $market): self
     {
-        return new self('persona.market_not_in_wave', "The market {$market} is not one of this wave's markets.", 422, ['market' => $market]);
+        return new self('persona.market_not_in_wave', 'That market is not one of this wave\'s markets.', 422, ['market' => $market]);
     }
 
     public static function personaCodeTaken(string $code): self
@@ -118,7 +119,7 @@ final class StrategyRuleViolation extends RuntimeException
 
     public static function conceptMarketRequired(): self
     {
-        return new self('concept.market_required', 'Pass the market (two capital letters) to list its concepts.');
+        return new self('concept.market_required', 'Pass the market (its id) to list its concepts.');
     }
 
     public static function conceptNotFound(): self
@@ -126,9 +127,9 @@ final class StrategyRuleViolation extends RuntimeException
         return new self('not_found', 'Not found.', 404);
     }
 
-    public static function conceptMarketFull(string $market): self
+    public static function conceptMarketFull(WaveMarket $market): self
     {
-        return new self('concept.market_full', 'A market has at most 30 concepts ('.$market.').', 422, ['market' => $market, 'max' => StrategyLimits::CONCEPT_MAX_PER_MARKET]);
+        return new self('concept.market_full', 'A market has at most 30 concepts ('.$market->name.').', 422, ['market' => $market->ulid, 'max' => StrategyLimits::CONCEPT_MAX_PER_MARKET]);
     }
 
     public static function conceptPersonaInvalid(): self

@@ -24,39 +24,42 @@ final class UspUsage
      * (`kind` concept; `code` is "Concept n", `persona` the persona's ulid; deleting the USP removes the chip and keeps the
      * concept, ruling Q4).
      *
-     * @return list<array{kind: string, persona: string, market: string, code: string, title: string, level: string|null, explanation: string}>
+     * @return list<array{kind: string, persona: string, market: string, market_name: string, code: string, title: string, level: string|null, explanation: string}>
      */
     public static function affected(WaveUsp $usp): array
     {
         $out = [];
-        foreach (WavePersonaAngle::query()->where('usp_id', $usp->id)->where('origin', AngleOrigin::Manual->value)->with('persona')->orderBy('id')->get() as $a) {
+        foreach (WavePersonaAngle::query()->where('usp_id', $usp->id)->where('origin', AngleOrigin::Manual->value)->with('persona.market')->orderBy('id')->get() as $a) {
             $out[] = [
                 'kind' => 'angle',
                 'persona' => $a->persona->ulid,
-                'market' => $a->persona->market,
+                'market' => $a->persona->market->ulid,
+                'market_name' => $a->persona->market->name,
                 'code' => $a->persona->code,
                 'title' => $a->persona->title,
                 'level' => null,
                 'explanation' => $a->explanation,
             ];
         }
-        foreach (WaveMatrixCell::query()->where('usp_id', $usp->id)->with('persona')->orderBy('id')->get() as $c) {
+        foreach (WaveMatrixCell::query()->where('usp_id', $usp->id)->with('persona.market')->orderBy('id')->get() as $c) {
             $out[] = [
                 'kind' => 'cell',
                 'persona' => $c->persona->ulid,
-                'market' => $c->persona->market,
+                'market' => $c->persona->market->ulid,
+                'market_name' => $c->persona->market->name,
                 'code' => $c->persona->code,
                 'title' => $c->persona->title,
                 'level' => $c->level->value,
                 'explanation' => $c->message_line ?? '',
             ];
         }
-        foreach (WaveConceptUsp::query()->where('usp_id', $usp->id)->with(['concept.persona'])->orderBy('id')->get() as $chip) {
+        foreach (WaveConceptUsp::query()->where('usp_id', $usp->id)->with(['concept.persona', 'concept.market'])->orderBy('id')->get() as $chip) {
             $concept = $chip->concept;
             $out[] = [
                 'kind' => 'concept',
                 'persona' => $concept->persona->ulid,
-                'market' => $concept->market,
+                'market' => $concept->market->ulid,
+                'market_name' => $concept->market->name,
                 'code' => 'Concept '.$concept->position,
                 'title' => $concept->title,
                 'level' => null,

@@ -33,7 +33,7 @@ final class ConceptPresenter
             'id' => $concept->ulid,
             'type' => 'wave_concept',
             'attributes' => [
-                'market' => $concept->market,
+                'market' => $concept->market->ulid,
                 'number' => $concept->position,
                 'title' => $concept->title,
                 'status' => $concept->status->value,

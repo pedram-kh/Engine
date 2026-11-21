@@ -18,6 +18,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 /**
@@ -40,7 +41,7 @@ final class MatrixController
         Gate::authorize('view', WaveUsp::class);
 
         $market = $request->query('market');
-        if (! is_string($market) || ! preg_match('/^[A-Z]{2}$/', $market)) {
+        if (! is_string($market) || ! Str::isUlid($market)) {
             return $this->refuse($request, StrategyRuleViolation::personaMarketNotInWave(is_string($market) ? $market : '?'));
         }
 
@@ -76,7 +77,7 @@ final class MatrixController
         $limit = StrategyLimits::MATRIX_LINE;
         /** @var array{market: string, cells: list<array{persona: string, usp: string, level?: string, rationale?: string|null, message_line?: string|null, clear?: bool}>} $data */
         $data = Validator::make($input, [
-            'market' => ['required', 'string', 'regex:/^[A-Z]{2}$/'],
+            'market' => ['required', 'string', 'size:26'],
             'cells' => ['required', 'array', 'min:1', 'max:'.StrategyLimits::MATRIX_BATCH_MAX],
             'cells.*' => ['required', 'array'],
             'cells.*.persona' => ['required', 'string', 'size:26'],

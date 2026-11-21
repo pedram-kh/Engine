@@ -15,7 +15,6 @@ use App\Modules\Campaigns\Enums\CampaignStatus;
 use App\Modules\Campaigns\Enums\CampaignType;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Identity\Models\User;
-use App\Modules\Waves\Contracts\WaveMarketGuard;
 use App\Modules\Waves\Enums\WaveStatus;
 use App\Modules\Waves\Models\Wave;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -40,11 +39,11 @@ final class WaveService
     public function __construct(
         private readonly WaveCampaignLink $links,
         private readonly WaveStepProvisioner $provisioner,
-        private readonly WaveMarketGuard $marketGuard,
+        private readonly WaveMarketService $markets,
     ) {}
 
     /**
-     * @param  array<string, mixed>  $data  name, go_live_on, markets, campaign_id (already validated)
+     * @param  array<string, mixed>  $data  name, go_live_on, markets (list of {name, code?, countries}), campaign_id (already validated)
      */
     public function create(Agency $agency, Brand $brand, User $actor, array $data): Wave
     {
@@ -126,7 +125,7 @@ final class WaveService
             // The whole read-decide-write runs inside one transaction on a ROW-LOCKED copy of the wave, so two
             // concurrent edits are serialised: the second one re-reads the first one's link and re-applies the rule
             // against it (PL-1.1 review fix F2). The caller's $wave may be stale by the time the lock is granted.
-            [$wave, $before, $afterCampaignUlid, $changed] = DB::transaction(function () use ($agency, $brand, $wave, $data): array {
+            [$wave, $before, $afterCampaignUlid, $changed, $marketsResult] = DB::transaction(function () use ($agency, $brand, $wave, $data): array {
                 $locked = Wave::query()->whereKey($wave->id)->lockForUpdate()->firstOrFail();
 
                 $before = $this->snapshot($locked);
@@ -142,28 +141,22 @@ final class WaveService
                 if (array_key_exists('go_live_on', $data)) {
                     $locked->go_live_on = $data['go_live_on'];
                 }
+                $marketsResult = null;
                 if (array_key_exists('markets', $data)) {
-                    $newMarkets = array_values((array) $data['markets']);
-
-                    // PL-2.1 (Q5): a market that still has personas cannot be removed. Decided HERE, on the locked
-                    // row, so it is serialised with every strategy write (they lock this same row first).
-                    $removed = array_values(array_diff($locked->markets, $newMarkets));
-                    if ($removed !== []) {
-                        $withPersonas = $this->marketGuard->personaCountsByMarket($locked, $removed);
-                        if ($withPersonas !== []) {
-                            throw WaveRuleViolation::marketHasPersonas($withPersonas, $this->marketGuard->conceptCountsByMarket($locked, $removed));
-                        }
-                    }
-
-                    $locked->markets = $newMarkets;
+                    // PL-2.4: the markets are rows. The replacement runs HERE, on the locked row, so it is serialised
+                    // with every strategy write (they lock this same row first): version check (Q12), the rules, the
+                    // PL-2.1 refusal of a market that still has personas, then the writes.
+                    $marketsResult = $this->markets->replace($locked, array_values((array) $data['markets']), (string) ($data['markets_version'] ?? ''));
                 }
 
-                $changed = $locked->isDirty();
-                if ($changed) {
+                $changed = $locked->isDirty() || ($marketsResult['changed'] ?? false);
+                if ($locked->isDirty()) {
                     $locked->save();
+                } elseif ($changed) {
+                    $locked->touch();
                 }
 
-                return [$locked, $before, $afterCampaignUlid, $changed];
+                return [$locked, $before, $afterCampaignUlid, $changed, $marketsResult];
             });
         } catch (UniqueConstraintViolationException) {
             throw WaveRuleViolation::campaignAlreadyLinked();
@@ -173,7 +166,7 @@ final class WaveService
             return $wave;
         }
 
-        $this->logUpdated($wave, $before, $afterCampaignUlid);
+        $this->logUpdated($wave, $before, $afterCampaignUlid, $marketsResult);
 
         return $wave;
     }
@@ -292,14 +285,13 @@ final class WaveService
     }
 
     /**
-     * @return array{name: string, go_live_on: string, markets: list<string>, campaign_id: string|null, status: string}
+     * @return array{name: string, go_live_on: string, campaign_id: string|null, status: string}
      */
     private function snapshot(Wave $wave): array
     {
         return [
             'name' => $wave->name,
             'go_live_on' => $wave->go_live_on->toDateString(),
-            'markets' => $wave->markets,
             'campaign_id' => $wave->campaign_id === null
                 ? null
                 : Campaign::query()->withTrashed()->whereKey($wave->campaign_id)->value('ulid'),
@@ -318,10 +310,12 @@ final class WaveService
             'campaign_id' => $campaign?->id,
             'name' => trim((string) $data['name']),
             'go_live_on' => $data['go_live_on'],
-            'markets' => array_values((array) $data['markets']),
             'status' => WaveStatus::Draft,
             'created_by_user_id' => $actor->id,
         ]);
+
+        // PL-2.4 — its markets, in the SAME transaction (a rule or key refusal rolls the wave back too).
+        $this->markets->createFor($wave, array_values((array) $data['markets']));
 
         // PL-1.3 (T1) — a new wave starts with its ready-made steps, in the SAME transaction as the wave: a failure
         // rolls back both. Callers run this inside DB::transaction.
@@ -332,6 +326,8 @@ final class WaveService
 
     private function logCreated(Wave $wave, ?string $campaignUlid): void
     {
+        $summary = $this->markets->currentSummary($wave);
+
         Audit::log(
             action: AuditAction::WaveCreated,
             subject: $wave,
@@ -339,7 +335,8 @@ final class WaveService
             after: [
                 'name' => $wave->name,
                 'go_live_on' => $wave->go_live_on->toDateString(),
-                'markets' => $wave->markets,
+                'markets' => $summary['markets'],
+                'market_countries' => $summary['market_countries'],
                 'campaign_id' => $campaignUlid,
                 'status' => $wave->status->value,
             ],
@@ -348,24 +345,38 @@ final class WaveService
 
     /**
      * @param  array<string, mixed>  $before
+     * @param  array{changed: bool, before: array{markets: list<string>, market_countries: array<string, list<string>>}, after: array{markets: list<string>, market_countries: array<string, list<string>>, markets_renamed: list<string>}}|null  $marketsResult  null when the markets were not part of the edit
      */
-    private function logUpdated(Wave $wave, array $before, ?string $afterCampaignUlid): void
+    private function logUpdated(Wave $wave, array $before, ?string $afterCampaignUlid, ?array $marketsResult = null): void
     {
+        if ($marketsResult === null) {
+            $current = $this->markets->currentSummary($wave);
+            $marketsBefore = $current;
+            $marketsAfter = $current + ['markets_renamed' => []];
+        } else {
+            $marketsBefore = $marketsResult['before'];
+            $marketsAfter = $marketsResult['after'];
+        }
+
         Audit::log(
             action: AuditAction::WaveUpdated,
             subject: $wave,
-            // Literal keys on purpose (see logCreated()).
+            // Literal keys on purpose (see logCreated()). Market NAMES are free text and never go in a payload: the
+            // markets are ulids, their countries ISO codes, and `markets_renamed` the ulids whose name or code changed.
             before: [
                 'name' => $before['name'],
                 'go_live_on' => $before['go_live_on'],
-                'markets' => $before['markets'],
+                'markets' => $marketsBefore['markets'],
+                'market_countries' => $marketsBefore['market_countries'],
                 'campaign_id' => $before['campaign_id'],
                 'status' => $before['status'],
             ],
             after: [
                 'name' => $wave->name,
                 'go_live_on' => $wave->go_live_on->toDateString(),
-                'markets' => $wave->markets,
+                'markets' => $marketsAfter['markets'],
+                'market_countries' => $marketsAfter['market_countries'],
+                'markets_renamed' => $marketsAfter['markets_renamed'],
                 'campaign_id' => $afterCampaignUlid,
                 'status' => $wave->status->value,
             ],

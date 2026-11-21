@@ -69,7 +69,7 @@ final class ConceptImageService
                 'ulid' => $ulid,
                 'agency_id' => $wave->agency_id,
                 'wave_id' => $wave->id,
-                'market' => $concept->market,
+                'market_id' => $concept->market_id,
                 'concept_id' => $concept->id,
                 'storage_key' => ConceptImageStorage::imageKey(ConceptImageStorage::conceptPrefix($agency, $brand, $wave, $concept), $ulid, ConceptImageStorage::MIME_TYPES[$mimeType]),
                 'original_filename' => Str::limit($filename, StrategyLimits::IMAGE_FILENAME, ''),

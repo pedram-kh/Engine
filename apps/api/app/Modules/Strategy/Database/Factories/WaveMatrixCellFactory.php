@@ -29,7 +29,7 @@ final class WaveMatrixCellFactory extends Factory
             'persona_id' => fn () => WavePersona::factory()->create()->id,
             'wave_id' => fn (array $a) => (int) WavePersona::withoutGlobalScopes()->whereKey($a['persona_id'])->value('wave_id'),
             'agency_id' => fn (array $a) => (int) WavePersona::withoutGlobalScopes()->whereKey($a['persona_id'])->value('agency_id'),
-            'market' => fn (array $a) => (string) WavePersona::withoutGlobalScopes()->whereKey($a['persona_id'])->value('market'),
+            'market_id' => fn (array $a) => (int) WavePersona::withoutGlobalScopes()->whereKey($a['persona_id'])->value('market_id'),
             'usp_id' => fn (array $a) => WaveUsp::factory()->create(['wave_id' => $a['wave_id'], 'agency_id' => $a['agency_id']])->id,
             'level' => MatrixLevel::Priority,
             'rationale' => 'Because it matters to them',

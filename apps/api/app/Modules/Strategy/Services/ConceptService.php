@@ -48,12 +48,12 @@ final class ConceptService
      *
      * @return Collection<int, WaveConcept>
      */
-    public function list(Wave $wave, string $market): Collection
+    public function list(Wave $wave, string $marketUlid): Collection
     {
-        PersonaService::assertMarketInWave($wave, $market);
+        $market = PersonaService::assertMarketInWave($wave, $marketUlid);
 
         /** @var Collection<int, WaveConcept> $concepts */
-        $concepts = WaveConcept::query()->where('wave_id', $wave->id)->where('market', $market)->orderBy('position')->orderBy('id')->get();
+        $concepts = WaveConcept::query()->where('wave_id', $wave->id)->where('market_id', $market->id)->orderBy('position')->orderBy('id')->get();
 
         return self::hydrate($concepts);
     }
@@ -70,6 +70,7 @@ final class ConceptService
 
         $concepts->load([
             'persona',
+            'market',
             'chips.usp',
             'images' => static fn ($q) => $q->where('status', WaveConceptImage::READY),
             'links',
@@ -95,14 +96,13 @@ final class ConceptService
     public function create(Brand $brand, Wave $wave, User $actor, array $data): WaveConcept
     {
         StrategyGuard::assertBrandWritable($brand);
-        $market = (string) $data['market'];
-        PersonaService::assertMarketInWave($wave, $market);
+        $market = PersonaService::assertMarketInWave($wave, (string) $data['market']);
 
         return DB::transaction(function () use ($wave, $actor, $data, $market): WaveConcept {
             $locked = StrategyGuard::lockWave($wave);
 
-            $persona = $this->persona($locked, $market, (string) $data['persona']);
-            $existing = WaveConcept::query()->where('wave_id', $locked->id)->where('market', $market)->get(['id', 'position']);
+            $persona = $this->persona($locked, $market->id, (string) $data['persona']);
+            $existing = WaveConcept::query()->where('wave_id', $locked->id)->where('market_id', $market->id)->get(['id', 'position']);
             if ($existing->count() >= StrategyLimits::CONCEPT_MAX_PER_MARKET) {
                 throw StrategyRuleViolation::conceptMarketFull($market);
             }
@@ -110,7 +110,7 @@ final class ConceptService
             $attributes = [
                 'agency_id' => $locked->agency_id,
                 'wave_id' => $locked->id,
-                'market' => $market,
+                'market_id' => $market->id,
                 'persona_id' => $persona->id,
                 'position' => (int) $existing->max('position') + 1,
                 'title' => (string) $data['title'],
@@ -135,7 +135,7 @@ final class ConceptService
                 actor: $actor,
                 subject: $concept,
                 // Literal keys on purpose (AuditPayloadKeysGuardTest reads them statically). Never a title or a text.
-                metadata: ['wave' => $locked->ulid, 'concept' => $concept->ulid, 'market' => $market, 'persona' => $persona->ulid, 'chips' => count($chips)],
+                metadata: ['wave' => $locked->ulid, 'concept' => $concept->ulid, 'market' => $market->ulid, 'persona' => $persona->ulid, 'chips' => count($chips)],
                 agencyId: $locked->agency_id,
             );
 
@@ -183,7 +183,7 @@ final class ConceptService
             }
 
             if (isset($data['persona'])) {
-                $persona = $this->persona($locked, $concept->market, (string) $data['persona']);
+                $persona = $this->persona($locked, $concept->market_id, (string) $data['persona']);
                 if ($persona->id !== $concept->persona_id) {
                     if (! isset($data['usps'])) {
                         $mode = $data['usp_mode'] ?? null;
@@ -227,7 +227,7 @@ final class ConceptService
                 metadata: [
                     'wave' => $locked->ulid,
                     'concept' => $concept->ulid,
-                    'market' => $concept->market,
+                    'market' => $concept->market->ulid,
                     'fields_changed' => $changed,
                     'chips' => WaveConceptUsp::query()->where('concept_id', $concept->id)->count(),
                     'reset_to_awaiting' => $reset,
@@ -285,13 +285,13 @@ final class ConceptService
                 }
 
                 $counts = $this->purgeRows($concept);
-                $this->renumber($locked->id, $concept->market);
+                $this->renumber($locked->id, $concept->market_id);
 
                 Audit::log(
                     action: AuditAction::WaveConceptDeleted,
                     actor: $actor,
                     subject: $concept,
-                    metadata: ['wave' => $locked->ulid, 'concept' => $concept->ulid, 'market' => $concept->market, 'chips_removed' => $counts['chips_removed'], 'images_removed' => $counts['images_removed'], 'links_removed' => $counts['links_removed'], 'decisions_removed' => $counts['decisions_removed']],
+                    metadata: ['wave' => $locked->ulid, 'concept' => $concept->ulid, 'market' => $concept->market->ulid, 'chips_removed' => $counts['chips_removed'], 'images_removed' => $counts['images_removed'], 'links_removed' => $counts['links_removed'], 'decisions_removed' => $counts['decisions_removed']],
                     agencyId: $locked->agency_id,
                 );
 
@@ -322,13 +322,13 @@ final class ConceptService
             $locked = StrategyGuard::lockWave($wave);
             $source = $this->lockedConcept($locked, $conceptUlid);
 
-            $count = WaveConcept::query()->where('wave_id', $locked->id)->where('market', $source->market)->count();
+            $count = WaveConcept::query()->where('wave_id', $locked->id)->where('market_id', $source->market_id)->count();
             if ($count >= StrategyLimits::CONCEPT_MAX_PER_MARKET) {
                 throw StrategyRuleViolation::conceptMarketFull($source->market);
             }
 
-            $attributes = $source->only(['agency_id', 'wave_id', 'market', 'persona_id', 'funnel_stage', 'funnel_note', 'product', 'angle', 'primary_message', 'hypothesis', 'hook', 'format_visual', 'key_points', 'payoff', 'cta']);
-            $attributes['position'] = (int) WaveConcept::query()->where('wave_id', $locked->id)->where('market', $source->market)->max('position') + 1;
+            $attributes = $source->only(['agency_id', 'wave_id', 'market_id', 'persona_id', 'funnel_stage', 'funnel_note', 'product', 'angle', 'primary_message', 'hypothesis', 'hook', 'format_visual', 'key_points', 'payoff', 'cta']);
+            $attributes['position'] = (int) WaveConcept::query()->where('wave_id', $locked->id)->where('market_id', $source->market_id)->max('position') + 1;
             $attributes['title'] = Str::limit($source->title.' (copy)', StrategyLimits::CONCEPT_TITLE, '');
             $attributes['status'] = ConceptStatus::Awaiting;
             $attributes['origin'] = ConceptOrigin::Manual;
@@ -338,7 +338,7 @@ final class ConceptService
 
             $links = 0;
             foreach (WaveConceptLink::query()->where('concept_id', $source->id)->orderBy('position')->orderBy('id')->get() as $link) {
-                WaveConceptLink::query()->create(['agency_id' => $locked->agency_id, 'wave_id' => $locked->id, 'market' => $copy->market, 'concept_id' => $copy->id, 'url' => $link->url, 'title' => $link->title, 'position' => $link->position]);
+                WaveConceptLink::query()->create(['agency_id' => $locked->agency_id, 'wave_id' => $locked->id, 'market_id' => $copy->market_id, 'concept_id' => $copy->id, 'url' => $link->url, 'title' => $link->title, 'position' => $link->position]);
                 $links++;
             }
 
@@ -353,7 +353,7 @@ final class ConceptService
                     'ulid' => $ulid,
                     'agency_id' => $locked->agency_id,
                     'wave_id' => $locked->id,
-                    'market' => $copy->market,
+                    'market_id' => $copy->market_id,
                     'concept_id' => $copy->id,
                     'storage_key' => ConceptImageStorage::imageKey((string) $prefix, $ulid, $ext),
                     'original_filename' => $image->original_filename,
@@ -372,7 +372,7 @@ final class ConceptService
                 action: AuditAction::WaveConceptDuplicated,
                 actor: $actor,
                 subject: $copy,
-                metadata: ['wave' => $locked->ulid, 'concept' => $copy->ulid, 'from_concept' => $source->ulid, 'market' => $copy->market, 'images' => $images, 'links' => $links],
+                metadata: ['wave' => $locked->ulid, 'concept' => $copy->ulid, 'from_concept' => $source->ulid, 'market' => $copy->market->ulid, 'images' => $images, 'links' => $links],
                 agencyId: $locked->agency_id,
             );
 
@@ -412,7 +412,7 @@ final class ConceptService
                     $fresh = WaveConcept::query()->whereKey($copy->id)->lockForUpdate()->first();
                     if ($fresh !== null) {
                         $this->purgeRows($fresh);
-                        $this->renumber($fresh->wave_id, $fresh->market);
+                        $this->renumber($fresh->wave_id, $fresh->market_id);
                     }
                 });
             }
@@ -505,16 +505,22 @@ final class ConceptService
      */
     public static function summary(Wave $wave): array
     {
-        $rows = WaveConcept::query()->where('wave_id', $wave->id)->selectRaw('market, status, count(*) as n')->groupBy('market', 'status')->get();
+        $rows = WaveConcept::query()->where('wave_id', $wave->id)->selectRaw('market_id, status, count(*) as n')->groupBy('market_id', 'status')->get();
+        /** @var array<int, string> $ulids market id => ulid */
+        $ulids = [];
         $by = [];
-        foreach ($wave->markets as $code) {
-            $by[$code] = ['market' => $code, 'total' => 0, 'approved' => 0, 'awaiting' => 0, 'changes_requested' => 0];
+        foreach ($wave->markets as $market) {
+            $ulids[$market->id] = $market->ulid;
+            $by[$market->ulid] = ['market' => $market->ulid, 'total' => 0, 'approved' => 0, 'awaiting' => 0, 'changes_requested' => 0];
         }
         foreach ($rows as $row) {
-            $market = (string) $row->getAttribute('market');
+            $marketId = (int) $row->getAttribute('market_id');
+            $market = $ulids[$marketId] ?? null;
+            if ($market === null) {
+                continue;   // unreachable: the composite key ties every concept to a market of this wave
+            }
             $status = (string) $row->getRawOriginal('status');
             $n = (int) $row->getAttribute('n');
-            $by[$market] ??= ['market' => $market, 'total' => 0, 'approved' => 0, 'awaiting' => 0, 'changes_requested' => 0];
             $by[$market]['total'] += $n;
             if (isset($by[$market][$status])) {
                 $by[$market][$status] += $n;
@@ -563,10 +569,10 @@ final class ConceptService
     }
 
     /** Positions 1..n in a market, after a delete (not a unique key: a renumber never collides). */
-    private function renumber(int $waveId, string $market): void
+    private function renumber(int $waveId, int $marketId): void
     {
         $position = 0;
-        foreach (WaveConcept::query()->where('wave_id', $waveId)->where('market', $market)->orderBy('position')->orderBy('id')->get() as $c) {
+        foreach (WaveConcept::query()->where('wave_id', $waveId)->where('market_id', $marketId)->orderBy('position')->orderBy('id')->get() as $c) {
             $position++;
             if ($c->position !== $position) {
                 $c->position = $position;
@@ -583,7 +589,7 @@ final class ConceptService
             WaveConceptUsp::query()->create([
                 'agency_id' => $concept->agency_id,
                 'wave_id' => $concept->wave_id,
-                'market' => $concept->market,
+                'market_id' => $concept->market_id,
                 'concept_id' => $concept->id,
                 'usp_id' => $uspId,
                 'position' => $i + 1,
@@ -609,9 +615,9 @@ final class ConceptService
         return $ids;
     }
 
-    private function persona(Wave $wave, string $market, string $ulid): WavePersona
+    private function persona(Wave $wave, int $marketId, string $ulid): WavePersona
     {
-        $persona = WavePersona::query()->where('wave_id', $wave->id)->where('market', $market)->where('ulid', $ulid)->first();
+        $persona = WavePersona::query()->where('wave_id', $wave->id)->where('market_id', $marketId)->where('ulid', $ulid)->first();
         if ($persona === null) {
             throw StrategyRuleViolation::conceptPersonaInvalid();
         }

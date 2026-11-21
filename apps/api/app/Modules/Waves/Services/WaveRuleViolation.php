@@ -14,7 +14,7 @@ final class WaveRuleViolation extends RuntimeException
     /**
      * @param  array<string, mixed>|null  $meta
      */
-    private function __construct(public readonly string $errorCode, string $title, public readonly ?array $meta = null)
+    private function __construct(public readonly string $errorCode, string $title, public readonly ?array $meta = null, public readonly int $status = 422)
     {
         parent::__construct($title);
     }
@@ -25,24 +25,49 @@ final class WaveRuleViolation extends RuntimeException
     }
 
     /**
-     * PL-2.1 — a wave edit would remove a market that still has personas (422). `meta.markets` lists the markets and
-     * their persona counts so the dialog can say "Remove the personas of SK first (3)".
+     * PL-2.1 — a wave edit would remove a market that still has personas (422). `meta.markets` lists the markets (by ulid,
+     * with name and short code, PL-2.4) and their counts so the dialog can say "Remove the personas of UK & Ireland first
+     * (3 personas, 2 concepts)". The concept key is added only when above zero.
      *
-     * @param  array<string, int>  $counts  market code => persona count
-     * @param  array<string, int>  $conceptCounts  market code => concept count (PL-2.3); the key is added only when above zero, so a wave with no concepts answers exactly as before
+     * @param  list<array{market: string, name: string, code: string, persona_count: int, concept_count?: int}>  $markets
      */
-    public static function marketHasPersonas(array $counts, array $conceptCounts = []): self
+    public static function marketHasPersonas(array $markets): self
     {
-        $markets = [];
-        foreach ($counts as $market => $n) {
-            $entry = ['market' => (string) $market, 'persona_count' => $n];
-            if (($conceptCounts[$market] ?? 0) > 0) {
-                $entry['concept_count'] = $conceptCounts[$market];
-            }
-            $markets[] = $entry;
-        }
-
         return new self('wave.market_has_personas', 'Remove the personas of those markets before removing the markets from the wave.', ['markets' => $markets]);
+    }
+
+    /** PL-2.4 (M2) — a country is in two markets of the request (422). Names are for the message, never an audit field. */
+    public static function countryInTwoMarkets(string $country, string $first, string $second): self
+    {
+        return new self('wave.country_in_two_markets', 'A country can belong to only one market of a wave.', ['country' => $country, 'markets' => [$first, $second]]);
+    }
+
+    public static function marketCodeTaken(string $code): self
+    {
+        return new self('wave.market_code_taken', 'Two markets of a wave cannot share a short code.', ['code' => $code]);
+    }
+
+    public static function marketNameTaken(string $name): self
+    {
+        return new self('wave.market_name_taken', 'Two markets of a wave cannot share a name.', ['name' => $name]);
+    }
+
+    /** PL-2.4 — a market id in the list is not a market of this wave (422; never says whether it exists elsewhere). */
+    public static function marketUnknown(): self
+    {
+        return new self('wave.market_unknown', 'One of the markets is not a market of this wave.');
+    }
+
+    /** PL-2.4 (Q12) — the markets changed since the list was loaded (409; nothing saved). */
+    public static function marketsChanged(): self
+    {
+        return new self('wave.markets_changed', 'The markets of this wave changed since you opened it. Review the list and save again.', null, 409);
+    }
+
+    /** PL-2.4 — a database key refused the write after every pre-check passed (422; should not happen under the lock). */
+    public static function marketConflict(): self
+    {
+        return new self('wave.market_conflict', 'The markets of this wave changed while you were saving. Reload and try again.');
     }
 
     public static function campaignNotAvailable(): self

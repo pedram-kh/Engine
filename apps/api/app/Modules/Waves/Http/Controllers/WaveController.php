@@ -14,6 +14,7 @@ use App\Modules\Identity\Models\User;
 use App\Modules\Waves\Features\WavesEnabled;
 use App\Modules\Waves\Http\Resources\WaveResource;
 use App\Modules\Waves\Models\Wave;
+use App\Modules\Waves\Services\WaveMarketService;
 use App\Modules\Waves\Services\WaveRuleViolation;
 use App\Modules\Waves\Services\WaveService;
 use App\Modules\Waves\Steps\WaveTrackerCalculator;
@@ -56,7 +57,7 @@ final class WaveController
         $paginator = Wave::query()
             ->where('agency_id', $agency->id)
             ->where('brand_id', $brand->id)
-            ->with(['brand', 'campaign', 'createdBy'])
+            ->with(['brand', 'campaign', 'createdBy', 'markets.countries'])
             ->orderByDesc('updated_at')
             ->orderByDesc('id')
             ->paginate($perPage)
@@ -105,10 +106,10 @@ final class WaveController
                 ? $this->waves->createWithNewCampaign($agency, $brand, $actor, $data)
                 : $this->waves->create($agency, $brand, $actor, $data);
         } catch (WaveRuleViolation $e) {
-            return ErrorResponse::single($request, Response::HTTP_UNPROCESSABLE_ENTITY, $e->errorCode, $e->getMessage());
+            return ErrorResponse::single($request, $e->status, $e->errorCode, $e->getMessage(), meta: $e->meta);
         }
 
-        return (new WaveResource($wave->load(['brand', 'campaign', 'createdBy'])))
+        return (new WaveResource($wave->load(['brand', 'campaign', 'createdBy', 'markets.countries'])))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
     }
@@ -167,10 +168,10 @@ final class WaveController
         try {
             $updated = $this->waves->update($agency, $brand, $model, $data);
         } catch (WaveRuleViolation $e) {
-            return ErrorResponse::single($request, Response::HTTP_UNPROCESSABLE_ENTITY, $e->errorCode, $e->getMessage(), meta: $e->meta);
+            return ErrorResponse::single($request, $e->status, $e->errorCode, $e->getMessage(), meta: $e->meta);
         }
 
-        return (new WaveResource($updated->load(['brand', 'campaign', 'createdBy'])))->response();
+        return (new WaveResource($updated->load(['brand', 'campaign', 'createdBy', 'markets.countries'])))->response();
     }
 
     /**
@@ -189,8 +190,17 @@ final class WaveController
             ] : []),
             'name' => [$presence, 'string', 'min:1', 'max:160'],
             'go_live_on' => [$presence, 'date_format:Y-m-d'],
-            'markets' => [$presence, 'array', 'min:1', 'max:20'],
-            'markets.*' => ['string', 'size:2', 'distinct', 'regex:/^[A-Z]{2}$/'],
+            // PL-2.4 (Q2, Q12) — ONE contract: a list of markets, each a named group of countries. A plain country code
+            // ("SK") is refused: `markets.*` must be an object with only these keys. `id` (a market ulid) is for an edit.
+            // `markets_version` (from the wave resource) is required whenever an edit carries `markets`.
+            'markets' => [$presence, 'array', 'min:1', 'max:'.WaveMarketService::MAX_MARKETS],
+            'markets.*' => ['array:'.($creating ? 'name,code,countries' : 'id,name,code,countries')],
+            'markets.*.id' => $creating ? ['prohibited'] : ['sometimes', 'string', 'size:26', 'distinct'],
+            'markets.*.name' => ['required', 'string', 'min:1', 'max:60'],
+            'markets.*.code' => ['sometimes', 'nullable', 'string', 'regex:/^[A-Z0-9]{2,6}$/'],
+            'markets.*.countries' => ['required', 'array', 'min:1', 'max:'.WaveMarketService::MAX_COUNTRIES],
+            'markets.*.countries.*' => ['string', 'size:2', 'distinct', 'regex:/^[A-Z]{2}$/'],
+            ...($creating ? [] : ['markets_version' => ['required_with:markets', 'string', 'max:64']]),
             'campaign_id' => ['sometimes', 'nullable', 'string', 'size:26', Rule::prohibitedIf(static fn (): bool => $request !== null && is_array($request->input('new_campaign')))],
         ];
     }
@@ -221,7 +231,7 @@ final class WaveController
             ->where('ulid', $ulid)
             ->where('agency_id', $agency->id)
             ->where('brand_id', $brand->id)
-            ->with(['brand', 'campaign', 'createdBy'])
+            ->with(['brand', 'campaign', 'createdBy', 'markets.countries'])
             ->firstOrFail();
     }
 }

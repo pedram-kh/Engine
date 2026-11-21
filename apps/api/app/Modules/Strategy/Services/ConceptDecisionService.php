@@ -59,7 +59,7 @@ final class ConceptDecisionService
             $decision = WaveConceptDecision::query()->create([
                 'agency_id' => $locked->agency_id,
                 'wave_id' => $locked->id,
-                'market' => $concept->market,
+                'market_id' => $concept->market_id,
                 'concept_id' => $concept->id,
                 'status' => $status,
                 'client_name' => $name,
@@ -77,7 +77,7 @@ final class ConceptDecisionService
                 actor: $actor,
                 subject: $concept,
                 // Literal keys. Never the client's name, note or comment (they are a third party's words).
-                metadata: ['wave' => $locked->ulid, 'concept' => $concept->ulid, 'market' => $concept->market, 'status' => $status->value, 'has_note' => $note !== null, 'has_comment' => $comment !== null],
+                metadata: ['wave' => $locked->ulid, 'concept' => $concept->ulid, 'market' => $concept->market->ulid, 'status' => $status->value, 'has_note' => $note !== null, 'has_comment' => $comment !== null],
                 agencyId: $locked->agency_id,
             );
 

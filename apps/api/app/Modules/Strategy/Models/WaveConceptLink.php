@@ -6,7 +6,9 @@ namespace App\Modules\Strategy\Models;
 
 use App\Core\Concerns\HasUlid;
 use App\Core\Tenancy\BelongsToAgency;
+use App\Modules\Waves\Models\WaveMarket;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * A reference link of a concept (PL-2.3). The server never fetches the URL; the domain is derived on read.
@@ -15,7 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $ulid
  * @property int $agency_id
  * @property int $wave_id
- * @property string $market
+ * @property int $market_id
  * @property int $concept_id
  * @property string $url
  * @property string $title
@@ -29,5 +31,15 @@ final class WaveConceptLink extends Model
     /**
      * @var list<string>
      */
-    protected $fillable = ['agency_id', 'wave_id', 'market', 'concept_id', 'url', 'title', 'position'];
+    protected $fillable = ['agency_id', 'wave_id', 'market_id', 'concept_id', 'url', 'title', 'position'];
+
+    /**
+     * PL-2.4: the market (a named group of countries) this row belongs to.
+     *
+     * @return BelongsTo<WaveMarket, $this>
+     */
+    public function market(): BelongsTo
+    {
+        return $this->belongsTo(WaveMarket::class, 'market_id');
+    }
 }

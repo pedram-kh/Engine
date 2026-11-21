@@ -11,6 +11,7 @@ use App\Modules\Strategy\Enums\ConceptOrigin;
 use App\Modules\Strategy\Enums\ConceptStatus;
 use App\Modules\Strategy\Enums\FunnelStage;
 use App\Modules\Waves\Models\Wave;
+use App\Modules\Waves\Models\WaveMarket;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,7 +26,7 @@ use Illuminate\Support\Carbon;
  * @property string $ulid
  * @property int $agency_id
  * @property int $wave_id
- * @property string $market
+ * @property int $market_id
  * @property int $persona_id
  * @property int $position
  * @property string $title
@@ -62,9 +63,19 @@ final class WaveConcept extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'agency_id', 'wave_id', 'market', 'persona_id', 'position', 'title', 'funnel_stage', 'funnel_note', 'product',
+        'agency_id', 'wave_id', 'market_id', 'persona_id', 'position', 'title', 'funnel_stage', 'funnel_note', 'product',
         'angle', 'primary_message', 'hypothesis', 'hook', 'format_visual', 'key_points', 'payoff', 'cta', 'status', 'origin',
     ];
+
+    /**
+     * PL-2.4: the market (a named group of countries) this row belongs to.
+     *
+     * @return BelongsTo<WaveMarket, $this>
+     */
+    public function market(): BelongsTo
+    {
+        return $this->belongsTo(WaveMarket::class, 'market_id');
+    }
 
     /** @return BelongsTo<Wave, $this> */
     public function wave(): BelongsTo

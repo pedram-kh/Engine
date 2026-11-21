@@ -10,6 +10,7 @@ use App\Modules\Strategy\Database\Factories\WavePersonaFactory;
 use App\Modules\Strategy\Enums\PersonaPronoun;
 use App\Modules\Strategy\Enums\UspColor;
 use App\Modules\Waves\Models\Wave;
+use App\Modules\Waves\Models\WaveMarket;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,7 +25,7 @@ use Illuminate\Support\Carbon;
  * @property string $ulid
  * @property int $agency_id
  * @property int $wave_id
- * @property string $market
+ * @property int $market_id
  * @property int $slot
  * @property string $code
  * @property string $title
@@ -40,6 +41,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property-read Wave $wave
+ * @property-read WaveMarket $market
  */
 final class WavePersona extends Model
 {
@@ -56,7 +58,7 @@ final class WavePersona extends Model
     protected $fillable = [
         'agency_id',
         'wave_id',
-        'market',
+        'market_id',
         'slot',
         'code',
         'title',
@@ -70,6 +72,16 @@ final class WavePersona extends Model
         'self_talk',
         'barriers',
     ];
+
+    /**
+     * PL-2.4: the market (a named group of countries) this row belongs to.
+     *
+     * @return BelongsTo<WaveMarket, $this>
+     */
+    public function market(): BelongsTo
+    {
+        return $this->belongsTo(WaveMarket::class, 'market_id');
+    }
 
     public function colorKey(): UspColor
     {

@@ -541,7 +541,7 @@ enum AuditAction: string
     case WaveUspDeleted = 'wave_usp.deleted';
     case WaveAudienceTitleUpdated = 'wave.audience_title_updated';
 
-    // PL-2.1 — personas and their angles. Same rules: ids, market codes, counts and field NAMES; never the persona name
+    // PL-2.1 — personas and their angles. Same rules: ids (market ulids), counts and field NAMES; never the persona name
     // or any card text. `wave_persona.updated` and `wave_persona_angle.updated` only when a field changed.
     case WavePersonaCreated = 'wave_persona.created';
     case WavePersonaUpdated = 'wave_persona.updated';
@@ -551,7 +551,7 @@ enum AuditAction: string
     case WavePersonaAngleUpdated = 'wave_persona_angle.updated';
     case WavePersonaAngleRemoved = 'wave_persona_angle.removed';
 
-    // PL-2.2 — the messaging matrix. ONE audit row per write request (one cell or up to 48): ids (ulids), the market
+    // PL-2.2 — the messaging matrix. ONE audit row per write request (one cell or up to 48): ids (ulids), the market ulid,
     // code, counts, the levels written (counts by level) and field NAMES; never the rationale or the message line.
     // Erasure decision: none needed. The metadata holds no creator, user or personal data (ids and counts only), as the
     // `wave_persona.*` actions; the table `wave_matrix_cells` is NotApplicable in the ErasureRegistry. Written only when
@@ -559,10 +559,10 @@ enum AuditAction: string
     case WaveMatrixCellSaved = 'wave_matrix_cell.saved';
 
     // PL-2.2 ruling change R2 — "Use the matrix line": a hand-written angle becomes the synced one of its cell. One row
-    // per conversion; ids, market code, the cell's level and a count; never a text. Written only when it converted.
+    // per conversion; ids, market ulid, the cell's level and a count; never a text. Written only when it converted.
     case WavePersonaAngleMatrixLineUsed = 'wave_persona_angle.matrix_line_used';
 
-    // PL-2.3 — concepts. One row per request; ids (ulids), the market code, counts, field NAMES, flags and, for an image,
+    // PL-2.3 — concepts. One row per request; ids (ulids), the market ulid, counts, field NAMES, flags and, for an image,
     // its MIME type and size. NEVER a title or card text, a link URL or title, or what a client contact said: the
     // decision row says only that a decision was made, its status and whether a note or comment exists
     // (`has_note`, `has_comment`). Erasure: the payloads hold no creator or user data (ids and counts); the five tables

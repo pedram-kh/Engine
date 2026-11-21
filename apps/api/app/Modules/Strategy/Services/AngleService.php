@@ -49,7 +49,7 @@ final class AngleService
                 action: AuditAction::WavePersonaAngleAdded,
                 actor: $actor,
                 subject: $angle,
-                metadata: ['wave' => $locked->ulid, 'persona' => $persona->ulid, 'angle' => $angle->ulid, 'usp' => $usp->ulid, 'market' => $persona->market],
+                metadata: ['wave' => $locked->ulid, 'persona' => $persona->ulid, 'angle' => $angle->ulid, 'usp' => $usp->ulid, 'market' => $persona->market->ulid],
                 agencyId: $locked->agency_id,
             );
 
@@ -149,7 +149,7 @@ final class AngleService
                 action: AuditAction::WavePersonaAngleMatrixLineUsed,
                 actor: $actor,
                 subject: $angle,
-                metadata: ['wave' => $locked->ulid, 'persona' => $persona->ulid, 'angle' => $angle->ulid, 'usp' => $angle->usp->ulid, 'market' => $persona->market, 'level' => $cell->level->value, 'angles_converted' => 1],
+                metadata: ['wave' => $locked->ulid, 'persona' => $persona->ulid, 'angle' => $angle->ulid, 'usp' => $angle->usp->ulid, 'market' => $persona->market->ulid, 'level' => $cell->level->value, 'angles_converted' => 1],
                 agencyId: $locked->agency_id,
             );
 

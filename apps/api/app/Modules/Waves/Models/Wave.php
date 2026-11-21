@@ -11,6 +11,7 @@ use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Identity\Models\User;
 use App\Modules\Waves\Database\Factories\WaveFactory;
 use App\Modules\Waves\Enums\WaveStatus;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -29,7 +30,6 @@ use Illuminate\Support\Carbon;
  * @property int|null $campaign_id
  * @property string $name
  * @property Carbon $go_live_on
- * @property list<string> $markets
  * @property WaveStatus $status
  * @property int $created_by_user_id
  * @property Carbon|null $steps_provisioned_at
@@ -40,6 +40,7 @@ use Illuminate\Support\Carbon;
  * @property-read Brand $brand
  * @property-read Campaign|null $campaign
  * @property-read User $createdBy
+ * @property-read Collection<int, WaveMarket> $markets
  */
 final class Wave extends Model
 {
@@ -60,7 +61,6 @@ final class Wave extends Model
         'campaign_id',
         'name',
         'go_live_on',
-        'markets',
         'status',
         'created_by_user_id',
     ];
@@ -90,6 +90,16 @@ final class Wave extends Model
     }
 
     /**
+     * PL-2.4: the markets of the wave, in tab order. Load `markets.countries` where the countries are needed.
+     *
+     * @return HasMany<WaveMarket, $this>
+     */
+    public function markets(): HasMany
+    {
+        return $this->hasMany(WaveMarket::class)->orderBy('position')->orderBy('id');
+    }
+
+    /**
      * @return HasMany<WaveStep, $this>
      */
     public function steps(): HasMany
@@ -104,7 +114,6 @@ final class Wave extends Model
     {
         return [
             'go_live_on' => 'date:Y-m-d',
-            'markets' => 'array',
             'status' => WaveStatus::class,
             'steps_provisioned_at' => 'datetime',
         ];

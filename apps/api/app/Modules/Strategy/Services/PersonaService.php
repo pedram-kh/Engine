@@ -16,6 +16,7 @@ use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WavePersonaAngle;
 use App\Modules\Strategy\StrategyLimits;
 use App\Modules\Waves\Models\Wave;
+use App\Modules\Waves\Models\WaveMarket;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -24,12 +25,13 @@ use Illuminate\Support\Facades\DB;
  *
  *   - the wave row is locked FIRST in every write, so the cap of 8 per market, the first-free slot and a wave edit that
  *     removes a market are all decided one at a time;
- *   - the market must be one of the wave's markets (checked under the lock; there is no markets table);
+ *   - the market (PL-2.4: a row of `wave_markets`, addressed by its ulid) must be one of the wave's markets, checked under
+ *     the lock and held by a composite foreign key;
  *   - the slot is the first free one of 1..8 in the market and fixes display order and colour; the default code is
- *     `<market><slot>` and an edited code must be unique inside the market;
+ *     `<market short code><slot>` and an edited code must be unique inside the market;
  *   - copy takes the lock once, is all-or-nothing, and brings the angles along (the USPs are the same wave's).
  *
- * One audit row per request, ids, market codes, counts and field NAMES; never the persona name or any card text.
+ * One audit row per request, ids (market ulids), counts and field NAMES; never the persona name or any card text.
  */
 final class PersonaService
 {
@@ -38,21 +40,20 @@ final class PersonaService
     /**
      * @return Collection<int, WavePersona>
      */
-    public function list(Wave $wave, ?string $market): Collection
+    public function list(Wave $wave, ?string $marketUlid): Collection
     {
-        if ($market !== null) {
-            self::assertMarketInWave($wave, $market);
-        }
+        $market = $marketUlid === null ? null : self::assertMarketInWave($wave, $marketUlid);
 
-        $order = array_flip(array_values($wave->markets));
+        /** @var array<int, int> $order market id => tab position */
+        $order = WaveMarket::query()->where('wave_id', $wave->id)->pluck('position', 'id')->map(static fn (mixed $p): int => (int) $p)->all();
 
         return WavePersona::query()
             ->where('wave_id', $wave->id)
-            ->when($market !== null, static fn ($q) => $q->where('market', $market))
-            ->with(['angles.usp', 'cells.usp'])
+            ->when($market !== null, static fn ($q) => $q->where('market_id', $market?->id))
+            ->with(['market', 'angles.usp', 'cells.usp'])
             ->orderBy('slot')->orderBy('id')
             ->get()
-            ->sortBy(static fn (WavePersona $p): int => ($order[$p->market] ?? 99) * 100 + $p->slot)
+            ->sortBy(static fn (WavePersona $p): int => ($order[$p->market_id] ?? 99) * 100 + $p->slot)
             ->values();
     }
 
@@ -62,13 +63,13 @@ final class PersonaService
     public function create(Brand $brand, Wave $wave, User $actor, array $data): WavePersona
     {
         StrategyGuard::assertBrandWritable($brand);
-        $market = (string) $data['market'];
+        $marketUlid = (string) $data['market'];
 
-        return StrategyGuard::retryOnClash(fn (): WavePersona => DB::transaction(function () use ($wave, $actor, $data, $market): WavePersona {
+        return StrategyGuard::retryOnClash(fn (): WavePersona => DB::transaction(function () use ($wave, $actor, $data, $marketUlid): WavePersona {
             $locked = StrategyGuard::lockWave($wave);
-            self::assertMarketInWave($locked, $market);
+            $market = self::assertMarketInWave($locked, $marketUlid);
 
-            $existing = WavePersona::query()->where('wave_id', $locked->id)->where('market', $market)->get(['id', 'slot', 'code']);
+            $existing = WavePersona::query()->where('wave_id', $locked->id)->where('market_id', $market->id)->get(['id', 'slot', 'code']);
             if ($existing->count() >= StrategyLimits::PERSONA_MAX) {
                 throw StrategyRuleViolation::personaMaxReached($market);
             }
@@ -81,14 +82,14 @@ final class PersonaService
                 }
                 $code = (string) $data['code'];
             } else {
-                $code = self::defaultCode($market, $slot, $taken);
+                $code = self::defaultCode($market->code, $slot, $taken);
             }
 
             $persona = WavePersona::query()->create(self::attributes($data) + [
                 'pronoun' => PersonaPronoun::They,
                 'agency_id' => $locked->agency_id,
                 'wave_id' => $locked->id,
-                'market' => $market,
+                'market_id' => $market->id,
                 'slot' => $slot,
                 'code' => $code,
             ]);
@@ -97,7 +98,7 @@ final class PersonaService
                 action: AuditAction::WavePersonaCreated,
                 actor: $actor,
                 subject: $persona,
-                metadata: ['wave' => $locked->ulid, 'persona' => $persona->ulid, 'market' => $market],
+                metadata: ['wave' => $locked->ulid, 'persona' => $persona->ulid, 'market' => $market->ulid],
                 agencyId: $locked->agency_id,
             );
 
@@ -120,7 +121,7 @@ final class PersonaService
 
             if (isset($data['code']) && $data['code'] !== $persona->code) {
                 $clash = WavePersona::query()
-                    ->where('wave_id', $locked->id)->where('market', $persona->market)
+                    ->where('wave_id', $locked->id)->where('market_id', $persona->market_id)
                     ->where('code', $data['code'])->where('id', '!=', $persona->id)->exists();
                 if ($clash) {
                     throw StrategyRuleViolation::personaCodeTaken((string) $data['code']);
@@ -143,7 +144,7 @@ final class PersonaService
                 action: AuditAction::WavePersonaUpdated,
                 actor: $actor,
                 subject: $persona,
-                metadata: ['wave' => $locked->ulid, 'persona' => $persona->ulid, 'market' => $persona->market, 'changed' => $changed],
+                metadata: ['wave' => $locked->ulid, 'persona' => $persona->ulid, 'market' => $persona->market->ulid, 'changed' => $changed],
                 agencyId: $locked->agency_id,
             );
 
@@ -178,7 +179,7 @@ final class PersonaService
                 action: AuditAction::WavePersonaDeleted,
                 actor: $actor,
                 subject: $persona,
-                metadata: ['wave' => $locked->ulid, 'persona' => $persona->ulid, 'market' => $persona->market, 'angles_removed' => $angles, 'cells_removed' => $cells],
+                metadata: ['wave' => $locked->ulid, 'persona' => $persona->ulid, 'market' => $persona->market->ulid, 'angles_removed' => $angles, 'cells_removed' => $cells],
                 agencyId: $locked->agency_id,
             );
         });
@@ -198,14 +199,14 @@ final class PersonaService
 
         return StrategyGuard::retryOnClash(fn (): array => DB::transaction(function () use ($wave, $actor, $from, $to, $personaUlids): array {
             $locked = StrategyGuard::lockWave($wave);
-            self::assertMarketInWave($locked, $from);
-            self::assertMarketInWave($locked, $to);
-            if ($from === $to) {
+            $fromMarket = self::assertMarketInWave($locked, $from);
+            $toMarket = self::assertMarketInWave($locked, $to);
+            if ($fromMarket->id === $toMarket->id) {
                 throw StrategyRuleViolation::personaCopyInvalid();
             }
 
             $sources = WavePersona::query()
-                ->where('wave_id', $locked->id)->where('market', $from)
+                ->where('wave_id', $locked->id)->where('market_id', $fromMarket->id)
                 ->when($personaUlids !== null, static fn ($q) => $q->whereIn('ulid', $personaUlids))
                 ->with('angles')
                 ->orderBy('slot')->orderBy('id')
@@ -216,7 +217,7 @@ final class PersonaService
                 throw StrategyRuleViolation::personaCopyInvalid();
             }
 
-            $existing = WavePersona::query()->where('wave_id', $locked->id)->where('market', $to)->get(['id', 'slot', 'code']);
+            $existing = WavePersona::query()->where('wave_id', $locked->id)->where('market_id', $toMarket->id)->get(['id', 'slot', 'code']);
             if ($existing->count() + $sources->count() > StrategyLimits::PERSONA_MAX) {
                 throw StrategyRuleViolation::personaCopyExceedsCap($existing->count(), $sources->count());
             }
@@ -228,14 +229,14 @@ final class PersonaService
 
             foreach ($sources as $source) {
                 $slot = self::firstFreeSlot($slots);
-                $code = self::defaultCode($to, $slot, $codes);
+                $code = self::defaultCode($toMarket->code, $slot, $codes);
                 $slots[] = $slot;
                 $codes[] = $code;
 
                 $copy = WavePersona::query()->create([
                     'agency_id' => $locked->agency_id,
                     'wave_id' => $locked->id,
-                    'market' => $to,
+                    'market_id' => $toMarket->id,
                     'slot' => $slot,
                     'code' => $code,
                 ] + $source->only(['title', 'name', 'pronoun', 'summary', 'core_job', 'need', 'drivers', 'goals', 'self_talk', 'barriers']));
@@ -270,11 +271,18 @@ final class PersonaService
         }));
     }
 
-    public static function assertMarketInWave(Wave $wave, string $market): void
+    /**
+     * PL-2.4: resolve a market ulid to one of THIS wave's markets (the wave's agency is implied: the wave is already the
+     * agency's). An unknown ulid, another wave's and another agency's are the same refusal, so nothing is revealed.
+     */
+    public static function assertMarketInWave(Wave $wave, string $marketUlid): WaveMarket
     {
-        if (! in_array($market, $wave->markets, true)) {
-            throw StrategyRuleViolation::personaMarketNotInWave($market);
+        $market = WaveMarket::query()->where('wave_id', $wave->id)->where('agency_id', $wave->agency_id)->where('ulid', $marketUlid)->first();
+        if ($market === null) {
+            throw StrategyRuleViolation::personaMarketNotInWave($marketUlid);
         }
+
+        return $market;
     }
 
     /**
@@ -308,13 +316,14 @@ final class PersonaService
     }
 
     /**
-     * `<market><slot>`; if a person edited another persona's code into it, the next free `<market><slot>A`..`Z`.
+     * `<market short code><slot>`; if a person edited another persona's code into it, the next free
+     * `<code><slot>A`..`Z`. An existing persona keeps its code when the market's short code changes (ruling M4).
      *
      * @param  list<string>  $taken
      */
-    private static function defaultCode(string $market, int $slot, array $taken): string
+    private static function defaultCode(string $marketCode, int $slot, array $taken): string
     {
-        $code = $market.$slot;
+        $code = $marketCode.$slot;
         foreach (array_merge([''], range('A', 'Z')) as $suffix) {
             if (! in_array($code.$suffix, $taken, true)) {
                 return $code.$suffix;
@@ -346,6 +355,7 @@ final class PersonaService
             ->where('ulid', $ulid)
             ->where('wave_id', $wave->id)
             ->where('agency_id', $wave->agency_id)
+            ->with('market')
             ->firstOrFail();
     }
 }

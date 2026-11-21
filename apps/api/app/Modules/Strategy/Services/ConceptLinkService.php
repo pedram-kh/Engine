@@ -40,7 +40,7 @@ final class ConceptLinkService
             $link = WaveConceptLink::query()->create([
                 'agency_id' => $locked->agency_id,
                 'wave_id' => $locked->id,
-                'market' => $concept->market,
+                'market_id' => $concept->market_id,
                 'concept_id' => $concept->id,
                 'url' => $url,
                 'title' => $title,
