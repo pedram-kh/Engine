@@ -13,6 +13,7 @@ use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WavePersonaAngle;
 use App\Modules\Strategy\Models\WaveUsp;
 use App\Modules\Strategy\Services\MatrixService;
+use App\Modules\Waves\Database\Factories\WaveFactory;
 use App\Modules\Waves\Models\Wave;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -88,8 +89,8 @@ final class Pl22WalkSeeder extends Seeder
         User::factory()->agencyStaff($agency)->create(['email' => self::STAFF_EMAIL, 'name' => 'Sam Staff', 'password' => self::PASSWORD]);
 
         $bolt = Brand::factory()->forAgency($agency->id)->create(['name' => 'Bolt Food', 'slug' => 'pl22-bolt-food', 'color' => 'green']);
-        $make = fn (string $name, string $goLive, array $markets): Wave => Wave::factory()->forBrand($agency->id, $bolt->id)->create([
-            'name' => $name, 'go_live_on' => $goLive, 'markets' => $markets, 'created_by_user_id' => $admin->id,
+        $make = fn (string $name, string $goLive, array $markets): Wave => Wave::factory()->forBrand($agency->id, $bolt->id)->withMarkets(WaveFactory::singleCountryMarkets($markets))->create([
+            'name' => $name, 'go_live_on' => $goLive, 'created_by_user_id' => $admin->id,
         ]);
 
         // Matrix Wave 1: the frame's data.
@@ -142,8 +143,8 @@ final class Pl22WalkSeeder extends Seeder
         $agency = AgencyFactory::new()->createOne(['name' => 'PL-2.2 Walk Agency B', 'slug' => self::AGENCY_B_SLUG, 'country_code' => 'SK']);
         $admin = User::factory()->agencyAdmin($agency)->create(['email' => self::B_ADMIN_EMAIL, 'name' => 'Bea Admin', 'password' => self::PASSWORD]);
         $glovo = Brand::factory()->forAgency($agency->id)->create(['name' => 'Glovo', 'slug' => 'pl22-glovo', 'color' => 'amber']);
-        $wave = Wave::factory()->forBrand($agency->id, $glovo->id)->create([
-            'name' => 'Glovo Wave 1', 'go_live_on' => '2026-12-01', 'markets' => ['SK', 'RO'], 'created_by_user_id' => $admin->id,
+        $wave = Wave::factory()->forBrand($agency->id, $glovo->id)->withMarkets(WaveFactory::singleCountryMarkets(['SK', 'RO']))->create([
+            'name' => 'Glovo Wave 1', 'go_live_on' => '2026-12-01', 'created_by_user_id' => $admin->id,
         ]);
         $this->usps($wave, 2);
     }
@@ -164,7 +165,7 @@ final class Pl22WalkSeeder extends Seeder
     private function persona(Wave $wave, string $market, string $title, string $name, PersonaPronoun $pronoun, string $summary): WavePersona
     {
         return WavePersona::factory()->create([
-            'wave_id' => $wave->id, 'agency_id' => $wave->agency_id, 'market' => $market,
+            'wave_id' => $wave->id, 'agency_id' => $wave->agency_id, 'market_id' => WaveFactory::marketId($wave, $market),
             'title' => $title, 'name' => $name, 'pronoun' => $pronoun, 'summary' => $summary,
         ]);
     }
@@ -179,7 +180,7 @@ final class Pl22WalkSeeder extends Seeder
         $changes = array_map(static fn (array $r): array => [
             'persona' => $r[0]->ulid, 'usp' => $r[1]->ulid, 'level' => $r[2], 'rationale' => $r[3], 'message_line' => $r[4],
         ], $rows);
-        app(MatrixService::class)->save($brand, $wave, $actor, $market, $changes);
+        app(MatrixService::class)->save($brand, $wave, $actor, WaveFactory::marketUlid($wave, $market), $changes);
     }
 
     private function printUlids(): void

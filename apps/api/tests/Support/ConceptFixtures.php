@@ -22,7 +22,7 @@ final class ConceptFixtures
     /** @param  array<string, mixed>  $w  a StrategyFixtures::world() result */
     public static function persona(array $w, string $market = 'SK'): WavePersona
     {
-        return WavePersona::factory()->create(['wave_id' => $w['wave']->id, 'agency_id' => $w['agency']->id, 'market' => $market]);
+        return WavePersona::factory()->create(['wave_id' => $w['wave']->id, 'agency_id' => $w['agency']->id, 'market_id' => $w['mkid'][$market]]);
     }
 
     /** @param  array<string, mixed>  $w */
@@ -43,7 +43,7 @@ final class ConceptFixtures
      */
     public static function create(array $w, WavePersona $persona, array $extra = [], ?User $as = null): TestResponse
     {
-        return StrategyFixtures::call($as ?? $w['staff'], 'POST', StrategyFixtures::u($w, 'concepts'), array_merge(['market' => $persona->market, 'persona' => $persona->ulid, 'title' => 'One Order, No Drama'], $extra));
+        return StrategyFixtures::call($as ?? $w['staff'], 'POST', StrategyFixtures::u($w, 'concepts'), array_merge(['market' => $persona->market->ulid, 'persona' => $persona->ulid, 'title' => 'One Order, No Drama'], $extra));
     }
 
     /** @param  array<string, mixed>  $w */

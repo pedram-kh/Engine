@@ -8,6 +8,7 @@ use App\Modules\Strategy\Enums\FunnelStage;
 use App\Modules\Strategy\Models\WaveConcept;
 use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WaveUsp;
+use App\Modules\Waves\Database\Factories\WaveFactory;
 use App\Modules\Waves\Models\Wave;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -28,7 +29,7 @@ uses(TestCase::class, RefreshDatabase::class);
 /** @return array<string, mixed> */
 function conceptRow(WaveConcept $c, array $extra = []): array
 {
-    return array_merge(['ulid' => (string) Str::ulid(), 'agency_id' => $c->agency_id, 'wave_id' => $c->wave_id, 'market' => $c->market, 'concept_id' => $c->id, 'created_at' => now(), 'updated_at' => now()], $extra);
+    return array_merge(['ulid' => (string) Str::ulid(), 'agency_id' => $c->agency_id, 'wave_id' => $c->wave_id, 'market_id' => $c->market_id, 'concept_id' => $c->id, 'created_at' => now(), 'updated_at' => now()], $extra);
 }
 
 /** A statement expected to fail, run in a savepoint so PostgreSQL's aborted-transaction state does not leak. */
@@ -42,8 +43,8 @@ function failing(Closure $statement): Closure
 }
 
 it('CS1: the tables have the planned columns; the text tables carry no creator or user column', function (): void {
-    expect(Schema::hasColumns('wave_concepts', ['id', 'ulid', 'agency_id', 'wave_id', 'market', 'persona_id', 'position', 'title', 'funnel_stage', 'funnel_note', 'product', 'angle', 'primary_message', 'hypothesis', 'hook', 'format_visual', 'key_points', 'payoff', 'cta', 'status', 'origin', 'created_at', 'updated_at']))->toBeTrue()
-        ->and(Schema::hasColumns('wave_concept_usps', ['id', 'agency_id', 'wave_id', 'market', 'concept_id', 'usp_id', 'position']))->toBeTrue()
+    expect(Schema::hasColumns('wave_concepts', ['id', 'ulid', 'agency_id', 'wave_id', 'market_id', 'persona_id', 'position', 'title', 'funnel_stage', 'funnel_note', 'product', 'angle', 'primary_message', 'hypothesis', 'hook', 'format_visual', 'key_points', 'payoff', 'cta', 'status', 'origin', 'created_at', 'updated_at']))->toBeTrue()
+        ->and(Schema::hasColumns('wave_concept_usps', ['id', 'agency_id', 'wave_id', 'market_id', 'concept_id', 'usp_id', 'position']))->toBeTrue()
         ->and(Schema::hasColumns('wave_concept_images', ['id', 'ulid', 'concept_id', 'storage_key', 'thumb_key', 'original_filename', 'mime_type', 'declared_bytes', 'size_bytes', 'status', 'expires_at', 'position', 'uploaded_by_user_id']))->toBeTrue()
         ->and(Schema::hasColumns('wave_concept_links', ['id', 'ulid', 'concept_id', 'url', 'title', 'position']))->toBeTrue()
         ->and(Schema::hasColumns('wave_concept_decisions', ['id', 'ulid', 'concept_id', 'status', 'client_name', 'note', 'comment', 'source', 'recorded_by_user_id', 'recorded_at']))->toBeTrue();
@@ -56,16 +57,17 @@ it('CS1: the tables have the planned columns; the text tables carry no creator o
 });
 
 it('CS2: the persona of a concept must be a persona of the SAME wave and market (composite foreign key)', function (): void {
-    $wave = Wave::factory()->create(['markets' => ['SK', 'RO']]);
-    $sk = WavePersona::factory()->create(['wave_id' => $wave->id, 'agency_id' => $wave->agency_id, 'market' => 'SK']);
-    $ro = WavePersona::factory()->create(['wave_id' => $wave->id, 'agency_id' => $wave->agency_id, 'market' => 'RO']);
+    $wave = Wave::factory()->withMarkets(WaveFactory::singleCountryMarkets(['SK', 'RO']))->create();
+    $skId = WaveFactory::marketId($wave, 'SK');
+    $sk = WavePersona::factory()->create(['wave_id' => $wave->id, 'agency_id' => $wave->agency_id, 'market_id' => $skId]);
+    $ro = WavePersona::factory()->create(['wave_id' => $wave->id, 'agency_id' => $wave->agency_id, 'market_id' => WaveFactory::marketId($wave, 'RO')]);
     $other = WavePersona::factory()->create();
     $base = ['agency_id' => $wave->agency_id, 'wave_id' => $wave->id, 'position' => 1, 'title' => 'x', 'status' => 'awaiting', 'origin' => 'manual', 'created_at' => now(), 'updated_at' => now()];
     $insert = fn (array $row) => failing(fn () => DB::table('wave_concepts')->insert($row + $base));
 
-    expect($insert(['ulid' => (string) Str::ulid(), 'market' => 'SK', 'persona_id' => $ro->id]))->toThrow(QueryException::class);
-    expect($insert(['ulid' => (string) Str::ulid(), 'market' => 'SK', 'persona_id' => $other->id]))->toThrow(QueryException::class);
-    DB::table('wave_concepts')->insert(['ulid' => (string) Str::ulid(), 'market' => 'SK', 'persona_id' => $sk->id] + $base);
+    expect($insert(['ulid' => (string) Str::ulid(), 'market_id' => $skId, 'persona_id' => $ro->id]))->toThrow(QueryException::class);
+    expect($insert(['ulid' => (string) Str::ulid(), 'market_id' => $skId, 'persona_id' => $other->id]))->toThrow(QueryException::class);
+    DB::table('wave_concepts')->insert(['ulid' => (string) Str::ulid(), 'market_id' => $skId, 'persona_id' => $sk->id] + $base);
     expect(WaveConcept::query()->count())->toBe(1);
 });
 
@@ -73,12 +75,12 @@ it('CS3: a chip is a USP of the concept\'s wave, once per concept; its concept i
     $c = WaveConcept::factory()->create();
     $usp = WaveUsp::factory()->create(['wave_id' => $c->wave_id, 'agency_id' => $c->agency_id]);
     $foreign = WaveUsp::factory()->create();
-    $chip = fn (int $uspId, ?string $market = null) => failing(fn () => DB::table('wave_concept_usps')->insert([
-        'agency_id' => $c->agency_id, 'wave_id' => $c->wave_id, 'market' => $market ?? $c->market, 'concept_id' => $c->id, 'usp_id' => $uspId, 'position' => 1, 'created_at' => now(), 'updated_at' => now(),
+    $chip = fn (int $uspId, ?int $marketId = null) => failing(fn () => DB::table('wave_concept_usps')->insert([
+        'agency_id' => $c->agency_id, 'wave_id' => $c->wave_id, 'market_id' => $marketId ?? $c->market_id, 'concept_id' => $c->id, 'usp_id' => $uspId, 'position' => 1, 'created_at' => now(), 'updated_at' => now(),
     ]));
 
     expect($chip($foreign->id))->toThrow(QueryException::class);
-    expect($chip($usp->id, 'XX'))->toThrow(QueryException::class);
+    expect($chip($usp->id, 999999))->toThrow(QueryException::class);
     $chip($usp->id)();
     expect($chip($usp->id))->toThrow(UniqueConstraintViolationException::class);
     expect(DB::table('wave_concept_usps')->count())->toBe(1);
@@ -86,7 +88,7 @@ it('CS3: a chip is a USP of the concept\'s wave, once per concept; its concept i
 
 it('CS4: images, links and decisions are children of a concept of the same wave and market', function (): void {
     $c = WaveConcept::factory()->create();
-    $wrongMarket = conceptRow($c, ['market' => 'XX']);
+    $wrongMarket = conceptRow($c, ['market_id' => 999999]);
     $wrongWave = conceptRow($c, ['wave_id' => Wave::factory()->create()->id]);
 
     foreach ([
@@ -116,7 +118,7 @@ it('CS5: image keys are unique (storage_key, and thumb_key when set)', function 
 it('CS6: RESTRICT: a persona, a USP, a concept or a wave that concepts use cannot be hard-deleted', function (): void {
     $c = WaveConcept::factory()->create();
     $usp = WaveUsp::factory()->create(['wave_id' => $c->wave_id, 'agency_id' => $c->agency_id]);
-    DB::table('wave_concept_usps')->insert(['agency_id' => $c->agency_id, 'wave_id' => $c->wave_id, 'market' => $c->market, 'concept_id' => $c->id, 'usp_id' => $usp->id, 'position' => 1, 'created_at' => now(), 'updated_at' => now()]);
+    DB::table('wave_concept_usps')->insert(['agency_id' => $c->agency_id, 'wave_id' => $c->wave_id, 'market_id' => $c->market_id, 'concept_id' => $c->id, 'usp_id' => $usp->id, 'position' => 1, 'created_at' => now(), 'updated_at' => now()]);
     DB::table('wave_concept_links')->insert(conceptRow($c) + ['url' => 'https://example.com', 'title' => 't', 'position' => 1]);
 
     foreach (['wave_personas' => $c->persona_id, 'wave_usps' => $usp->id, 'waves' => $c->wave_id, 'wave_concepts' => $c->id] as $table => $id) {

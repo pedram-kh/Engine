@@ -10,6 +10,7 @@ use App\Modules\Brands\Models\Brand;
 use App\Modules\Identity\Models\User;
 use App\Modules\Strategy\Features\StrategyEnabled;
 use App\Modules\Waves\Models\Wave;
+use App\Modules\Waves\Models\WaveMarket;
 use Illuminate\Testing\TestResponse;
 use Laravel\Pennant\Feature;
 
@@ -24,8 +25,24 @@ use Symfony\Component\HttpFoundation\Response;
  */
 final class StrategyFixtures
 {
+    /** A well-formed market ulid that belongs to no wave (for the "not one of the wave's markets" cases). */
+    public const NO_MARKET = '01HZZZZZZZZZZZZZZZZZZZZZZZ';
+
     /**
-     * @return array{agency: Agency, brand: Brand, admin: User, manager: User, staff: User, otherAgency: Agency, otherBrand: Brand, otherAdmin: User, wave: Wave, otherWave: Wave}
+     * The `mk` map of the LAST world() built, for helper functions that have no `$w` in scope (a test builds one world).
+     *
+     * @var array<string, string>
+     */
+    public static array $mk = [];
+
+    /** @var array<string, int> */
+    public static array $mkid = [];
+
+    /**
+     * `mk` and `mkid` map a market's short code (SK, RO, CZ) to its ulid and its id, so a test can say `$w['mk']['SK']`
+     * (PL-2.4: a market is a row, addressed by ulid on the wire).
+     *
+     * @return array{agency: Agency, brand: Brand, admin: User, manager: User, staff: User, otherAgency: Agency, otherBrand: Brand, otherAdmin: User, wave: Wave, otherWave: Wave, mk: array<string, string>, mkid: array<string, int>}
      */
     public static function world(): array
     {
@@ -33,10 +50,58 @@ final class StrategyFixtures
         WaveFixtures::armed();
         Feature::activate(StrategyEnabled::NAME);
 
+        $wave = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->withMarkets([
+            ['name' => 'Slovakia', 'code' => 'SK', 'countries' => ['SK']],
+            ['name' => 'Romania', 'code' => 'RO', 'countries' => ['RO']],
+            ['name' => 'Czechia', 'code' => 'CZ', 'countries' => ['CZ']],
+        ])->create();
+
+        self::$mk = self::mk($wave);
+        self::$mkid = self::mkid($wave);
+
         return $w + [
-            'wave' => Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->create(['markets' => ['SK', 'RO', 'CZ']]),
-            'otherWave' => Wave::factory()->forBrand($w['otherAgency']->id, $w['otherBrand']->id)->create(['markets' => ['SK']]),
+            'wave' => $wave,
+            'otherWave' => Wave::factory()->forBrand($w['otherAgency']->id, $w['otherBrand']->id)->create(),
+            'mk' => self::mk($wave),
+            'mkid' => self::mkid($wave),
         ];
+    }
+
+    /**
+     * Short code => market ulid.
+     *
+     * @return array<string, string>
+     */
+    public static function mk(Wave $wave): array
+    {
+        return WaveMarket::withoutGlobalScopes()->where('wave_id', $wave->id)->orderBy('position')->pluck('ulid', 'code')->all();
+    }
+
+    /**
+     * Short code => market id.
+     *
+     * @return array<string, int>
+     */
+    public static function mkid(Wave $wave): array
+    {
+        return WaveMarket::withoutGlobalScopes()->where('wave_id', $wave->id)->orderBy('position')->pluck('id', 'code')->map(static fn (mixed $id): int => (int) $id)->all();
+    }
+
+    /**
+     * Edit the wave's markets the way the web does: read the wave (markets and their version), keep the markets whose short
+     * code is in `$keep`, send the rest back with the version.
+     *
+     * @param  array<string, mixed>  $w
+     * @param  list<string>  $keep
+     * @return TestResponse<Response>
+     */
+    public static function keepMarkets(array $w, array $keep): TestResponse
+    {
+        $url = WaveFixtures::wavesUrl($w['agency'], $w['brand'], $w['wave']->ulid);
+        $attrs = self::call($w['admin'], 'GET', $url)->assertOk()->json('data.attributes');
+        $markets = array_values(array_filter($attrs['markets'], static fn (array $m): bool => in_array($m['code'], $keep, true)));
+
+        return self::call($w['admin'], 'PATCH', $url, ['markets' => $markets, 'markets_version' => $attrs['markets_version']]);
     }
 
     /**

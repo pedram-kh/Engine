@@ -38,7 +38,7 @@ function mx(): array
         $w['u'.$t] = S::call($w['admin'], 'POST', S::u($w, 'usps'), ['title' => "USP {$t}"])->assertCreated()->json('data.id');
     }
     foreach ([['SK', 'p1'], ['SK', 'p2'], ['RO', 'r1']] as [$market, $key]) {
-        $w[$key] = S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => $market, 'title' => "Persona {$key}", 'name' => $key])->assertCreated()->json('data.id');
+        $w[$key] = S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => S::$mk[$market], 'title' => "Persona {$key}", 'name' => $key])->assertCreated()->json('data.id');
     }
 
     return $w;
@@ -50,7 +50,7 @@ function mx(): array
 /** @return TestResponse<Response> */
 function mxPut(array $w, array $cell, string $who = 'admin', string $market = 'SK'): TestResponse
 {
-    return S::call($w[$who], 'PUT', S::u($w, 'matrix/cells'), ['market' => $market, 'cells' => [$cell]]);
+    return S::call($w[$who], 'PUT', S::u($w, 'matrix/cells'), ['market' => S::$mk[$market] ?? S::NO_MARKET, 'cells' => [$cell]]);
 }
 
 function mxCell(string $persona, string $usp): WaveMatrixCell
@@ -308,8 +308,8 @@ it('X-18: a synced angle cannot be edited or removed on the persona endpoints (4
         ->assertUnprocessable()->assertJsonPath('errors.0.code', 'angle.synced_read_only');
     expect($angle->refresh()->explanation)->toBe('M');
 
-    $row = collect((array) S::call($w['admin'], 'GET', S::u($w, 'personas?market=SK'))->assertOk()->json('data'))->firstWhere('id', $w['p1']);
-    expect($row['attributes']['angles'][0]['attributes'])->toMatchArray(['origin' => 'matrix', 'read_only' => true, 'market' => 'SK'])
+    $row = collect((array) S::call($w['admin'], 'GET', S::u($w, "personas?market={$w['mk']['SK']}"))->assertOk()->json('data'))->firstWhere('id', $w['p1']);
+    expect($row['attributes']['angles'][0]['attributes'])->toMatchArray(['origin' => 'matrix', 'read_only' => true, 'market' => $w['mk']['SK']])
         ->and($row['attributes']['matrix_cells'])->toBe([['usp' => $w['uA'], 'level' => 'priority', 'message_line' => 'M']]);
 });
 
@@ -348,12 +348,12 @@ it('X-21: copying personas to another market copies hand-written angles only; no
     mxManual($w, $w['p1'], $w['uB'], 'Mine');                                                                                 // manual on p1
     mxPut($w, ['persona' => $w['p2'], 'usp' => $w['uA'], 'level' => 'support', 'message_line' => 'Synced 2'])->assertOk();    // synced on p2
 
-    $res = S::call($w['admin'], 'POST', S::u($w, 'personas/copy'), ['from_market' => 'SK', 'to_market' => 'CZ'])->assertCreated();
+    $res = S::call($w['admin'], 'POST', S::u($w, 'personas/copy'), ['from_market' => $w['mk']['SK'], 'to_market' => $w['mk']['CZ']])->assertCreated();
 
     expect($res->json('meta.synced_angles_skipped'))->toBe(2);
-    $copies = WavePersona::query()->where('market', 'CZ')->get();
+    $copies = WavePersona::query()->where('market_id', $w['mkid']['CZ'])->get();
     expect($copies)->toHaveCount(2)
-        ->and(WaveMatrixCell::query()->where('market', 'CZ')->count())->toBe(0)
+        ->and(WaveMatrixCell::query()->where('market_id', $w['mkid']['CZ'])->count())->toBe(0)
         ->and(WavePersonaAngle::query()->whereIn('persona_id', $copies->modelKeys())->count())->toBe(1)
         ->and(WavePersonaAngle::query()->whereIn('persona_id', $copies->modelKeys())->firstOrFail()->origin)->toBe(AngleOrigin::Manual);
     expect(AuditLog::query()->where('action', 'wave_persona.copied')->firstOrFail()->metadata)->toMatchArray(['synced_angles_skipped' => 2]);
@@ -366,10 +366,10 @@ it('X-22: a new USP and a new persona add no cell: the new row and column are "N
     $count = WaveMatrixCell::query()->count();
 
     S::call($w['admin'], 'POST', S::u($w, 'usps'), ['title' => 'New USP'])->assertCreated();
-    S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => 'SK', 'title' => 'T', 'name' => 'N'])->assertCreated();
+    S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => $w['mk']['SK'], 'title' => 'T', 'name' => 'N'])->assertCreated();
 
     expect(WaveMatrixCell::query()->count())->toBe($count);
-    $m = S::call($w['admin'], 'GET', S::u($w, 'matrix?market=SK'))->assertOk()->json('data.attributes');
+    $m = S::call($w['admin'], 'GET', S::u($w, "matrix?market={$w['mk']['SK']}"))->assertOk()->json('data.attributes');
     expect($m['usps'])->toHaveCount(4)->and($m['personas'])->toHaveCount(3)->and($m['cells'])->toHaveCount(1);
 });
 
@@ -378,7 +378,7 @@ it('X-23: an archived brand refuses every cell write (422 wave.brand_archived) a
     mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'priority', 'message_line' => 'M'])->assertOk();
     $w['brand']->forceFill(['status' => BrandStatus::Archived])->save();
 
-    S::call($w['admin'], 'GET', S::u($w, 'matrix?market=SK'))->assertOk();
+    S::call($w['admin'], 'GET', S::u($w, "matrix?market={$w['mk']['SK']}"))->assertOk();
     mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'low'])->assertUnprocessable()->assertJsonPath('errors.0.code', 'wave.brand_archived');
     mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'clear' => true])->assertUnprocessable();
     expect(mxCell($w['p1'], $w['uA'])->level->value)->toBe('priority');
@@ -412,7 +412,7 @@ it('M-01: GET matrix returns the USPs in order, the market\'s personas in slot o
     mxPut($w, ['persona' => $w['p2'], 'usp' => $w['uB'], 'level' => 'priority', 'rationale' => 'R', 'message_line' => 'M'])->assertOk();
     mxPut($w, ['persona' => $w['r1'], 'usp' => $w['uA'], 'level' => 'low'], market: 'RO')->assertOk();
 
-    $m = S::call($w['staff'], 'GET', S::u($w, 'matrix?market=SK'))->assertOk()->json('data');
+    $m = S::call($w['staff'], 'GET', S::u($w, "matrix?market={$w['mk']['SK']}"))->assertOk()->json('data');
 
     expect($m['type'])->toBe('wave_matrix')
         ->and(array_column($m['attributes']['usps'], 'title'))->toBe(['USP A', 'USP B', 'USP C'])
@@ -421,7 +421,7 @@ it('M-01: GET matrix returns the USPs in order, the market\'s personas in slot o
         ->and($m['attributes']['cells'])->toHaveCount(1)
         ->and($m['attributes']['cells'][0])->toMatchArray(['persona' => $w['p2'], 'usp' => $w['uB'], 'level' => 'priority', 'rationale' => 'R', 'message_line' => 'M', 'has_manual_angle' => true, 'source' => 'manual']);
     // The RO matrix is separate.
-    $ro = S::call($w['admin'], 'GET', S::u($w, 'matrix?market=RO'))->assertOk()->json('data.attributes');
+    $ro = S::call($w['admin'], 'GET', S::u($w, "matrix?market={$w['mk']['RO']}"))->assertOk()->json('data.attributes');
     expect($ro['cells'])->toHaveCount(1)->and(array_column($ro['personas'], 'id'))->toBe([$w['r1']]);
 });
 
@@ -438,18 +438,18 @@ it('M-03: one request loads a market in a constant number of queries, for 1 pers
     $count = function (string $market) use ($w): int {
         DB::flushQueryLog();
         DB::enableQueryLog();
-        S::call($w['admin'], 'GET', S::u($w, "matrix?market={$market}"))->assertOk();
+        S::call($w['admin'], 'GET', S::u($w, "matrix?market={$w['mk'][$market]}"))->assertOk();
         $n = count(DB::getQueryLog());
         DB::disableQueryLog();
 
         return $n;
     };
-    $w['one'] = S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => 'RO', 'title' => 'T', 'name' => 'N'])->assertCreated()->json('data.id');
+    $w['one'] = S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => $w['mk']['RO'], 'title' => 'T', 'name' => 'N'])->assertCreated()->json('data.id');
     S::call($w['admin'], 'POST', S::u($w, 'usps'), ['title' => 'U'])->assertCreated();
     $small = $count('RO');
 
     for ($i = 0; $i < 8; $i++) {
-        $p = S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => 'SK', 'title' => "T{$i}", 'name' => 'N'])->assertCreated()->json('data.id');
+        $p = S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => $w['mk']['SK'], 'title' => "T{$i}", 'name' => 'N'])->assertCreated()->json('data.id');
         for ($u = 1; $u < 6; $u++) {
             if ($i === 0) {
                 S::call($w['admin'], 'POST', S::u($w, 'usps'), ['title' => "U{$u}"])->assertCreated();
@@ -459,7 +459,7 @@ it('M-03: one request loads a market in a constant number of queries, for 1 pers
             mxPut($w, ['persona' => $p, 'usp' => $usp->ulid, 'level' => 'low'])->assertOk();
         }
     }
-    expect(WaveMatrixCell::query()->where('market', 'SK')->count())->toBe(48);
+    expect(WaveMatrixCell::query()->where('market_id', $w['mkid']['SK'])->count())->toBe(48);
     $big = $count('SK');
 
     expect($big)->toBe($small);
@@ -476,7 +476,7 @@ it('M-04: the summary carries the wave-level progress across markets (Low counts
 
     $m = $read();
     expect($m['cells_set'])->toBe(3)->and($m['cells_total'])->toBe(9)
-        ->and($m['by_market'])->toBe([['market' => 'SK', 'set' => 2, 'total' => 6], ['market' => 'RO', 'set' => 1, 'total' => 3], ['market' => 'CZ', 'set' => 0, 'total' => 0]]);
+        ->and($m['by_market'])->toBe([['market' => $w['mk']['SK'], 'set' => 2, 'total' => 6], ['market' => $w['mk']['RO'], 'set' => 1, 'total' => 3], ['market' => $w['mk']['CZ'], 'set' => 0, 'total' => 0]]);
 
     // The write response carries the same numbers.
     mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uB'], 'level' => 'low'])->assertOk()->assertJsonPath('data.progress.cells_set', 4);
@@ -491,7 +491,7 @@ it('W-01: a list of cells is written in one request: 48 cells, one audit row wit
     }
     $personas = [];
     foreach (range(1, 8) as $i) {
-        $personas[] = S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => 'SK', 'title' => "T{$i}", 'name' => 'N'])->assertCreated()->json('data.id');
+        $personas[] = S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => $w['mk']['SK'], 'title' => "T{$i}", 'name' => 'N'])->assertCreated()->json('data.id');
     }
     $cells = [];
     foreach ($personas as $p) {
@@ -501,13 +501,13 @@ it('W-01: a list of cells is written in one request: 48 cells, one audit row wit
     }
     expect($cells)->toHaveCount(48);
 
-    $res = S::call($w['admin'], 'PUT', S::u($w, 'matrix/cells'), ['market' => 'SK', 'cells' => $cells])->assertOk();
+    $res = S::call($w['admin'], 'PUT', S::u($w, 'matrix/cells'), ['market' => $w['mk']['SK'], 'cells' => $cells])->assertOk();
 
     expect($res->json('data.cells'))->toHaveCount(48)->and($res->json('data.progress.cells_set'))->toBe(48)
         ->and(WaveMatrixCell::query()->count())->toBe(48)->and(WavePersonaAngle::query()->count())->toBe(24);
     $rows = AuditLog::query()->where('action', 'wave_matrix_cell.saved')->get();
     expect($rows)->toHaveCount(1)
-        ->and(($rows[0]->metadata ?? []))->toMatchArray(['market' => 'SK', 'cells_created' => 48, 'angles_created' => 24, 'levels' => ['priority' => 24, 'low' => 24]])
+        ->and(($rows[0]->metadata ?? []))->toMatchArray(['market' => $w['mk']['SK'], 'cells_created' => 48, 'angles_created' => 24, 'levels' => ['priority' => 24, 'low' => 24]])
         ->and(json_encode(($rows[0]->metadata ?? [])))->not->toContain('SECRET');
     mxInvariant();
 });
@@ -515,7 +515,7 @@ it('W-01: a list of cells is written in one request: 48 cells, one audit row wit
 it('W-02: a list is all or nothing: an unknown USP, a missing message line or a persona of another market writes nothing', function (): void {
     $w = mx();
     $ok = ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'priority', 'message_line' => 'M'];
-    $put = fn (array $cells) => S::call($w['admin'], 'PUT', S::u($w, 'matrix/cells'), ['market' => 'SK', 'cells' => $cells]);
+    $put = fn (array $cells) => S::call($w['admin'], 'PUT', S::u($w, 'matrix/cells'), ['market' => $w['mk']['SK'], 'cells' => $cells]);
 
     $put([$ok, ['persona' => $w['p1'], 'usp' => '01HZZZZZZZZZZZZZZZZZZZZZZZ', 'level' => 'low']])->assertNotFound();
     $put([$ok, ['persona' => $w['p2'], 'usp' => $w['uB'], 'level' => 'support']])->assertUnprocessable();
@@ -543,7 +543,7 @@ it('W-03: per field last write wins: two writers of different fields both keep t
 it('W-04: validation: levels, the 140 limit, a first write needs a level, 1 to 48 cells, duplicates, clear carries no other field', function (): void {
     $w = mx();
     $base = ['persona' => $w['p1'], 'usp' => $w['uA']];
-    $put = fn (array $body) => S::call($w['admin'], 'PUT', S::u($w, 'matrix/cells'), $body + ['market' => 'SK']);
+    $put = fn (array $body) => S::call($w['admin'], 'PUT', S::u($w, 'matrix/cells'), $body + ['market' => $w['mk']['SK']]);
 
     mxPut($w, $base + ['level' => 'urgent'])->assertUnprocessable();
     mxPut($w, $base + ['rationale' => 'only text'])->assertUnprocessable()->assertJsonPath('errors.0.meta.field', 'cells.0.level');
@@ -575,7 +575,7 @@ it('W-06: audit: one row per write, ids and counts and levels and field names on
 
     $rows = AuditLog::query()->where('action', 'wave_matrix_cell.saved')->orderBy('id')->get();
     expect($rows)->toHaveCount(2)
-        ->and(($rows[0]->metadata ?? []))->toMatchArray(['wave' => $w['wave']->ulid, 'market' => 'SK', 'cells_created' => 1, 'angles_created' => 1, 'levels' => ['support' => 1]])
+        ->and(($rows[0]->metadata ?? []))->toMatchArray(['wave' => $w['wave']->ulid, 'market' => $w['mk']['SK'], 'cells_created' => 1, 'angles_created' => 1, 'levels' => ['support' => 1]])
         ->and(($rows[1]->metadata ?? []))->toMatchArray(['cells_updated' => 1, 'angles_updated' => 1, 'changed' => ['message_line']])
         ->and(json_encode($rows->pluck('metadata')))->not->toContain('SECRET');
     expect(json_encode($rows->pluck('metadata')))->not->toContain($w['p1']);
@@ -587,7 +587,7 @@ it('R-01: admin, manager and staff can read and write cells; staff cannot delete
     $w = mx();
     foreach (['admin', 'manager', 'staff'] as $who) {
         mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'low', 'rationale' => $who], $who)->assertOk();
-        S::call($w[$who], 'GET', S::u($w, 'matrix?market=SK'))->assertOk();
+        S::call($w[$who], 'GET', S::u($w, "matrix?market={$w['mk']['SK']}"))->assertOk();
     }
     mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'clear' => true], 'staff')->assertOk();   // staff may clear
     mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uB'], 'level' => 'low'], 'staff')->assertOk();
@@ -603,14 +603,14 @@ it('T-01: another agency cannot read or write the matrix of this wave, and a per
     mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'low'])->assertOk();
     $o = ['agency' => $w['otherAgency'], 'brand' => $w['otherBrand'], 'wave' => $w['otherWave']];
 
-    S::call($w['otherAdmin'], 'GET', S::u($w, 'matrix?market=SK'))->assertNotFound();
-    S::call($w['otherAdmin'], 'PUT', S::u($w, 'matrix/cells'), ['market' => 'SK', 'cells' => [['persona' => $w['p1'], 'usp' => $w['uA'], 'clear' => true]]])->assertNotFound();
+    S::call($w['otherAdmin'], 'GET', S::u($w, "matrix?market={$w['mk']['SK']}"))->assertNotFound();
+    S::call($w['otherAdmin'], 'PUT', S::u($w, 'matrix/cells'), ['market' => $w['mk']['SK'], 'cells' => [['persona' => $w['p1'], 'usp' => $w['uA'], 'clear' => true]]])->assertNotFound();
     expect(mxCellOrNull($w['p1'], $w['uA']))->not->toBeNull();
 
     // The other agency's own wave works, but it cannot name this agency's persona or USP.
     $theirUsp = S::call($w['otherAdmin'], 'POST', S::url($o['agency'], $o['brand'], $o['wave'], 'usps'), ['title' => 'Theirs'])->assertCreated()->json('data.id');
-    $theirPersona = S::call($w['otherAdmin'], 'POST', S::url($o['agency'], $o['brand'], $o['wave'], 'personas'), ['market' => 'SK', 'title' => 'T', 'name' => 'N'])->assertCreated()->json('data.id');
-    $put = fn (array $cell) => S::call($w['otherAdmin'], 'PUT', S::url($o['agency'], $o['brand'], $o['wave'], 'matrix/cells'), ['market' => 'SK', 'cells' => [$cell]]);
+    $theirPersona = S::call($w['otherAdmin'], 'POST', S::url($o['agency'], $o['brand'], $o['wave'], 'personas'), ['market' => S::mk($o['wave'])['SK'], 'title' => 'T', 'name' => 'N'])->assertCreated()->json('data.id');
+    $put = fn (array $cell) => S::call($w['otherAdmin'], 'PUT', S::url($o['agency'], $o['brand'], $o['wave'], 'matrix/cells'), ['market' => S::mk($o['wave'])['SK'], 'cells' => [$cell]]);
 
     $put(['persona' => $w['p1'], 'usp' => $theirUsp, 'level' => 'low'])->assertNotFound();
     $put(['persona' => $theirPersona, 'usp' => $w['uA'], 'level' => 'low'])->assertNotFound();
@@ -628,10 +628,10 @@ it('T-02: a persona of another market than the request\'s is a 404 and writes no
 
 it('T-03: a persona or a USP of ANOTHER WAVE of the same agency is a 404 on this wave\'s matrix', function (): void {
     $w = mx();
-    $other = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->create(['markets' => ['SK']]);
+    $other = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->create();
     $otherUrl = S::url($w['agency'], $w['brand'], $other, '');
     $theirUsp = S::call($w['admin'], 'POST', rtrim($otherUrl, '/').'/usps', ['title' => 'Elsewhere'])->assertCreated()->json('data.id');
-    $theirPersona = S::call($w['admin'], 'POST', rtrim($otherUrl, '/').'/personas', ['market' => 'SK', 'title' => 'T', 'name' => 'N'])->assertCreated()->json('data.id');
+    $theirPersona = S::call($w['admin'], 'POST', rtrim($otherUrl, '/').'/personas', ['market' => S::mk($other)['SK'], 'title' => 'T', 'name' => 'N'])->assertCreated()->json('data.id');
 
     mxPut($w, ['persona' => $w['p1'], 'usp' => $theirUsp, 'level' => 'low'])->assertNotFound();
     mxPut($w, ['persona' => $theirPersona, 'usp' => $w['uA'], 'level' => 'low'])->assertNotFound();
@@ -653,15 +653,15 @@ it('X-25 (R1 data): the matrix answers the text of the hand-written angle of a p
     $w = mx();
     $manualId = mxManual($w, $w['p1'], $w['uA'], 'Mine, by hand');
 
-    $cells = S::call($w['admin'], 'GET', S::u($w, 'matrix').'?market=SK')->assertOk()->json('data.attributes.cells');
+    $cells = S::call($w['admin'], 'GET', S::u($w, 'matrix')."?market={$w['mk']['SK']}")->assertOk()->json('data.attributes.cells');
     expect($cells)->toBe([]);
     // No cell yet, and the pair is still listed: a cell that is not set can be prefilled from the hand-written angle.
-    S::call($w['admin'], 'GET', S::u($w, 'matrix').'?market=SK')->assertOk()
+    S::call($w['admin'], 'GET', S::u($w, 'matrix')."?market={$w['mk']['SK']}")->assertOk()
         ->assertJsonPath('data.attributes.manual_angles', [['persona' => $w['p1'], 'usp' => $w['uA'], 'angle' => $manualId, 'text' => 'Mine, by hand']]);
 
     mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'support', 'message_line' => 'Lead line'])->assertOk()
         ->assertJsonPath('data.cells.0.manual_text', 'Mine, by hand');
-    S::call($w['admin'], 'GET', S::u($w, 'matrix').'?market=SK')->assertOk()
+    S::call($w['admin'], 'GET', S::u($w, 'matrix')."?market={$w['mk']['SK']}")->assertOk()
         ->assertJsonPath('data.attributes.cells.0.manual_text', 'Mine, by hand')
         ->assertJsonPath('data.attributes.cells.0.manual_angle', $manualId)
         ->assertJsonPath('data.attributes.cells.0.has_manual_angle', true);
@@ -765,7 +765,7 @@ it('X-32 (R3 data): the persona card gets the message line of each of its cells,
     mxManual($w, $w['p1'], $w['uA'], 'Mine');
     mxPut($w, ['persona' => $w['p1'], 'usp' => $w['uA'], 'level' => 'priority', 'message_line' => 'From the cell'])->assertOk();
 
-    $cards = S::call($w['admin'], 'GET', S::u($w, 'personas').'?market=SK')->assertOk()->json('data');
+    $cards = S::call($w['admin'], 'GET', S::u($w, 'personas')."?market={$w['mk']['SK']}")->assertOk()->json('data');
     $card = array_values(array_filter($cards, fn (array $c): bool => $c['id'] === $w['p1']))[0];
     expect($card['attributes']['matrix_cells'])->toBe([['usp' => $w['uA'], 'level' => 'priority', 'message_line' => 'From the cell']]);
 });

@@ -34,6 +34,8 @@ final class Pl12WalkCleanupSeeder extends Seeder
             $userIds = DB::table('users')->where('email', 'like', '%'.Pl12WalkSeeder::DOMAIN)->pluck('id')->all();
             $creatorIds = DB::table('creators')->whereIn('user_id', $userIds)->pluck('id')->all();
 
+            DB::table('wave_market_countries')->whereIn('agency_id', $agencyIds)->delete();
+            DB::table('wave_markets')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('waves')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('message_threads')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('campaign_applications')->whereIn('agency_id', $agencyIds)->delete();

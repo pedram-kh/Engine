@@ -7,6 +7,7 @@ use App\Modules\Identity\Models\User;
 use App\Modules\Strategy\Features\StrategyEnabled;
 use App\Modules\Strategy\Models\WaveConcept;
 use App\Modules\Strategy\Models\WavePersona;
+use App\Modules\Waves\Database\Factories\WaveFactory;
 use App\Modules\Waves\Features\WavesEnabled;
 use App\Modules\Waves\Models\Wave;
 use Database\Seeders\Pl23WalkCleanupSeeder;
@@ -42,7 +43,7 @@ function pl23Wave(string $name): Wave
 function pl23Statuses(Wave $wave, string $market): array
 {
     $out = [];
-    foreach (WaveConcept::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market', $market)->orderBy('position')->get() as $concept) {
+    foreach (WaveConcept::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market_id', WaveFactory::marketId($wave, $market))->orderBy('position')->get() as $concept) {
         $out[] = $concept->status->value;
     }
 
@@ -72,11 +73,11 @@ it('C2: Wave 1 has three concepts in three statuses in SK, personas but no conce
     $wave = pl23Wave('Concepts Wave 1');
 
     expect(pl23Statuses($wave, 'SK'))->toBe(['approved', 'awaiting', 'changes_requested'])
-        ->and(WaveConcept::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market', 'RO')->count())->toBe(0)
-        ->and(WavePersona::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market', 'RO')->count())->toBe(2)
-        ->and(WavePersona::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market', 'CZ')->count())->toBe(0)
-        ->and(WavePersona::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market', 'SK')->orderBy('slot')->pluck('code')->all())->toBe(['SK1', 'SK2'])
-        ->and(WavePersona::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market', 'RO')->orderBy('slot')->pluck('code')->all())->toBe(['RO1', 'RO2'])
+        ->and(WaveConcept::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market_id', WaveFactory::marketId($wave, 'RO'))->count())->toBe(0)
+        ->and(WavePersona::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market_id', WaveFactory::marketId($wave, 'RO'))->count())->toBe(2)
+        ->and(WavePersona::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market_id', WaveFactory::marketId($wave, 'CZ'))->count())->toBe(0)
+        ->and(WavePersona::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market_id', WaveFactory::marketId($wave, 'SK'))->orderBy('slot')->pluck('code')->all())->toBe(['SK1', 'SK2'])
+        ->and(WavePersona::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market_id', WaveFactory::marketId($wave, 'RO'))->orderBy('slot')->pluck('code')->all())->toBe(['RO1', 'RO2'])
         ->and(DB::table('wave_usps')->where('wave_id', $wave->id)->count())->toBe(6)
         ->and(DB::table('wave_matrix_cells')->where('wave_id', $wave->id)->count())->toBeGreaterThan(0);
 

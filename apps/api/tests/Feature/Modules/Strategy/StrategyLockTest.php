@@ -102,13 +102,13 @@ it('L5: each persona and angle write (create, update, copy, angle add, edit, rem
     $angle = null;
 
     $steps = [
-        ['POST', 'personas', fn () => ['market' => 'SK', 'title' => 'T', 'name' => 'N'], function ($r) use (&$persona): void {
+        ['POST', 'personas', fn () => ['market' => $w['mk']['SK'], 'title' => 'T', 'name' => 'N'], function ($r) use (&$persona): void {
             $persona = $r->json('data.id');
         }],
         ['PATCH', function () use (&$persona) {
             return "personas/{$persona}";
         }, fn () => ['title' => 'T2'], null],
-        ['POST', 'personas/copy', fn () => ['from_market' => 'SK', 'to_market' => 'RO'], null],
+        ['POST', 'personas/copy', fn () => ['from_market' => $w['mk']['SK'], 'to_market' => $w['mk']['RO']], null],
         ['POST', function () use (&$persona) {
             return "personas/{$persona}/angles";
         }, fn () => ['usp' => $usp, 'explanation' => 'x'], function ($r) use (&$angle): void {
@@ -141,7 +141,7 @@ it('L5 (PL-2.2): a matrix cell write (one cell, a list, a clear) and the removal
     $w = S::world();
     $id = $w['wave']->id;
     $usp = S::call($w['admin'], 'POST', S::u($w, 'usps'), ['title' => 'U'])->assertCreated()->json('data.id');
-    $persona = S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => 'SK', 'title' => 'T', 'name' => 'N'])->assertCreated()->json('data.id');
+    $persona = S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => $w['mk']['SK'], 'title' => 'T', 'name' => 'N'])->assertCreated()->json('data.id');
     $cell = ['persona' => $persona, 'usp' => $usp];
 
     foreach ([
@@ -149,12 +149,12 @@ it('L5 (PL-2.2): a matrix cell write (one cell, a list, a clear) and the removal
         ['message_line' => 'M2'] + $cell,
         ['clear' => true] + $cell,
     ] as $change) {
-        $seen = strategyProbeWhileAppLocks($id, fn () => S::call($w['admin'], 'PUT', S::u($w, 'matrix/cells'), ['market' => 'SK', 'cells' => [$change]])->assertOk());
+        $seen = strategyProbeWhileAppLocks($id, fn () => S::call($w['admin'], 'PUT', S::u($w, 'matrix/cells'), ['market' => $w['mk']['SK'], 'cells' => [$change]])->assertOk());
         expect($seen)->not->toBeEmpty('a matrix write took no wave lock')->and($seen)->each->toBeTrue();
     }
 
     $angle = S::call($w['admin'], 'POST', S::u($w, "personas/{$persona}/angles"), ['usp' => $usp, 'explanation' => 'x'])->assertCreated()->json('data.id');
-    S::call($w['admin'], 'PUT', S::u($w, 'matrix/cells'), ['market' => 'SK', 'cells' => [['level' => 'support', 'message_line' => 'M'] + $cell]])->assertOk();
+    S::call($w['admin'], 'PUT', S::u($w, 'matrix/cells'), ['market' => $w['mk']['SK'], 'cells' => [['level' => 'support', 'message_line' => 'M'] + $cell]])->assertOk();
     $seen = strategyProbeWhileAppLocks($id, fn () => S::call($w['admin'], 'DELETE', S::u($w, "personas/{$persona}/angles/{$angle}"))->assertNoContent());
     expect($seen)->not->toBeEmpty()->and($seen)->each->toBeTrue();
 });
@@ -162,8 +162,8 @@ it('L5 (PL-2.2): a matrix cell write (one cell, a list, a clear) and the removal
 it('L6 (PL-2.2): the same first cell written by two users in turn ends with one cell and one synced angle (sequential, not a true race)', function (): void {
     $w = S::world();
     $usp = S::call($w['admin'], 'POST', S::u($w, 'usps'), ['title' => 'U'])->assertCreated()->json('data.id');
-    $persona = S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => 'SK', 'title' => 'T', 'name' => 'N'])->assertCreated()->json('data.id');
-    $body = ['market' => 'SK', 'cells' => [['persona' => $persona, 'usp' => $usp, 'level' => 'priority', 'message_line' => 'M']]];
+    $persona = S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => $w['mk']['SK'], 'title' => 'T', 'name' => 'N'])->assertCreated()->json('data.id');
+    $body = ['market' => $w['mk']['SK'], 'cells' => [['persona' => $persona, 'usp' => $usp, 'level' => 'priority', 'message_line' => 'M']]];
 
     S::call($w['admin'], 'PUT', S::u($w, 'matrix/cells'), $body)->assertOk();
     S::call($w['manager'], 'PUT', S::u($w, 'matrix/cells'), $body)->assertOk();
@@ -174,7 +174,7 @@ it('L6 (PL-2.2): the same first cell written by two users in turn ends with one 
 
 it('M4: a wave edit holds the SAME wave row lock the strategy writes take, so a persona create and a market removal are serialised', function (): void {
     $w = S::world();
-    $edit = fn () => S::call($w['admin'], 'PATCH', WaveFixtures::wavesUrl($w['agency'], $w['brand'], $w['wave']->ulid), ['markets' => ['SK', 'RO']]);
+    $edit = fn () => S::keepMarkets($w, ['SK', 'RO']);
 
     $seen = strategyProbeWhileAppLocks($w['wave']->id, fn () => $edit()->assertOk());
     expect($seen)->not->toBeEmpty('the wave edit took no lock')->and($seen)->each->toBeTrue();
@@ -184,23 +184,23 @@ it('M4: both orders end consistent: persona first then the edit is refused; edit
     $w = S::world();
     $url = WaveFixtures::wavesUrl($w['agency'], $w['brand'], $w['wave']->ulid);
 
-    S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => 'CZ', 'title' => 'T', 'name' => 'N'])->assertCreated();
-    S::call($w['admin'], 'PATCH', $url, ['markets' => ['SK', 'RO']])->assertUnprocessable()->assertJsonPath('errors.0.code', 'wave.market_has_personas');
+    S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => $w['mk']['CZ'], 'title' => 'T', 'name' => 'N'])->assertCreated();
+    S::keepMarkets($w, ['SK', 'RO'])->assertUnprocessable()->assertJsonPath('errors.0.code', 'wave.market_has_personas');
 
     WavePersona::query()->delete();
-    S::call($w['admin'], 'PATCH', $url, ['markets' => ['SK', 'RO']])->assertOk();
-    S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => 'CZ', 'title' => 'T', 'name' => 'N'])->assertUnprocessable();
+    S::keepMarkets($w, ['SK', 'RO'])->assertOk();
+    S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => $w['mk']['CZ'], 'title' => 'T', 'name' => 'N'])->assertUnprocessable();
 
-    $markets = $w['wave']->refresh()->markets;
-    expect(WavePersona::query()->whereNotIn('market', $markets)->count())->toBe(0);
+    $marketIds = $w['wave']->refresh()->markets->pluck('id')->all();
+    expect(WavePersona::query()->whereNotIn('market_id', $marketIds)->count())->toBe(0);
 });
 
 it('L7 (PL-2.2 ruling change): "Use the matrix line" takes the wave lock', function (): void {
     $w = S::world();
     $usp = S::call($w['admin'], 'POST', S::u($w, 'usps'), ['title' => 'U'])->assertCreated()->json('data.id');
-    $persona = S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => 'SK', 'title' => 'T', 'name' => 'N'])->assertCreated()->json('data.id');
+    $persona = S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => $w['mk']['SK'], 'title' => 'T', 'name' => 'N'])->assertCreated()->json('data.id');
     $angle = S::call($w['admin'], 'POST', S::u($w, "personas/{$persona}/angles"), ['usp' => $usp, 'explanation' => 'x'])->assertCreated()->json('data.id');
-    S::call($w['admin'], 'PUT', S::u($w, 'matrix/cells'), ['market' => 'SK', 'cells' => [['persona' => $persona, 'usp' => $usp, 'level' => 'support', 'message_line' => 'M']]])->assertOk();
+    S::call($w['admin'], 'PUT', S::u($w, 'matrix/cells'), ['market' => $w['mk']['SK'], 'cells' => [['persona' => $persona, 'usp' => $usp, 'level' => 'support', 'message_line' => 'M']]])->assertOk();
     $id = $w['wave']->id;
 
     $seen = strategyProbeWhileAppLocks($id, fn () => S::call($w['admin'], 'POST', S::u($w, "personas/{$persona}/angles/{$angle}/use-matrix-line"))->assertOk());

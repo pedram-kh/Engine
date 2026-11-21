@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Modules\Brands\Models\BrandFile;
 use App\Modules\Campaigns\Models\Campaign;
+use App\Modules\Waves\Database\Factories\WaveFactory;
 use App\Modules\Waves\Models\Wave;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -21,7 +22,7 @@ uses(TestCase::class, RefreshDatabase::class);
 
 it('B11: creates both tables with the planned columns', function (): void {
     expect(Schema::hasColumns('waves', [
-        'id', 'ulid', 'agency_id', 'brand_id', 'campaign_id', 'name', 'go_live_on', 'markets', 'status',
+        'id', 'ulid', 'agency_id', 'brand_id', 'campaign_id', 'name', 'go_live_on', 'status',
         'created_by_user_id', 'created_at', 'updated_at', 'deleted_at',
     ]))->toBeTrue()
         ->and(Schema::hasColumns('brand_files', [
@@ -30,12 +31,18 @@ it('B11: creates both tables with the planned columns', function (): void {
         ]))->toBeTrue();
 });
 
-it('B11: a new wave defaults to draft and carries markets as an array and the date as Y-m-d', function (): void {
-    $wave = Wave::factory()->create(['markets' => ['SK', 'RO'], 'go_live_on' => '2026-03-09']);
+it('B11 (PL-2.4): the waves table has no markets column any more; a market is a row (wave_markets)', function (): void {
+    expect(Schema::hasColumn('waves', 'markets'))->toBeFalse()
+        ->and(Schema::hasColumns('wave_markets', ['id', 'ulid', 'agency_id', 'wave_id', 'name', 'code', 'position', 'created_at', 'updated_at']))->toBeTrue()
+        ->and(Schema::hasColumns('wave_market_countries', ['id', 'agency_id', 'wave_id', 'market_id', 'country', 'created_at']))->toBeTrue();
+});
+
+it('B11: a new wave defaults to draft and carries its markets as rows and the date as Y-m-d', function (): void {
+    $wave = Wave::factory()->withMarkets(WaveFactory::singleCountryMarkets(['SK', 'RO']))->create(['go_live_on' => '2026-03-09']);
     $fresh = Wave::query()->findOrFail($wave->id);
 
     expect($fresh->status->value)->toBe('draft')
-        ->and($fresh->markets)->toBe(['SK', 'RO'])
+        ->and($fresh->markets->pluck('code')->all())->toBe(['SK', 'RO'])
         ->and($fresh->go_live_on->format('Y-m-d'))->toBe('2026-03-09')
         ->and($fresh->ulid)->toHaveLength(26);
 });

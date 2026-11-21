@@ -9,6 +9,7 @@ use App\Modules\Agencies\Models\Agency;
 use App\Modules\Agencies\Models\AgencyMembership;
 use App\Modules\Brands\Models\Brand;
 use App\Modules\Identity\Models\User;
+use App\Modules\Waves\Database\Factories\WaveFactory;
 use App\Modules\Waves\Models\Wave;
 use App\Modules\Waves\Services\WaveStepProvisioner;
 use Illuminate\Database\Seeder;
@@ -103,8 +104,8 @@ final class Pl13WalkSeeder extends Seeder
 
         $bolt = Brand::factory()->forAgency($agency->id)->create(['name' => 'Bolt Food', 'slug' => 'pl13-bolt-food', 'color' => 'green']);
 
-        $make = fn (string $name, string $goLive, array $markets): Wave => Wave::factory()->forBrand($agency->id, $bolt->id)->create([
-            'name' => $name, 'go_live_on' => $goLive, 'markets' => $markets, 'created_by_user_id' => $admin->id,
+        $make = fn (string $name, string $goLive, array $markets): Wave => Wave::factory()->forBrand($agency->id, $bolt->id)->withMarkets(WaveFactory::singleCountryMarkets($markets))->create([
+            'name' => $name, 'go_live_on' => $goLive, 'created_by_user_id' => $admin->id,
         ]);
 
         $provisioner = app(WaveStepProvisioner::class);
@@ -153,8 +154,8 @@ final class Pl13WalkSeeder extends Seeder
             'email' => self::B_ADMIN_EMAIL, 'name' => 'Bea Admin', 'password' => self::PASSWORD,
         ]);
         $glovo = Brand::factory()->forAgency($agency->id)->create(['name' => 'Glovo', 'slug' => 'pl13-glovo', 'color' => 'amber']);
-        $wave = Wave::factory()->forBrand($agency->id, $glovo->id)->create([
-            'name' => 'Glovo Wave 1', 'go_live_on' => '2026-12-01', 'markets' => ['SK'], 'created_by_user_id' => $admin->id,
+        $wave = Wave::factory()->forBrand($agency->id, $glovo->id)->withMarkets(WaveFactory::singleCountryMarkets(['SK']))->create([
+            'name' => 'Glovo Wave 1', 'go_live_on' => '2026-12-01', 'created_by_user_id' => $admin->id,
         ]);
         app(WaveStepProvisioner::class)->ensure($wave);
     }

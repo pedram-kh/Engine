@@ -6,6 +6,7 @@ use App\Modules\Strategy\Enums\UspColor;
 use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WavePersonaAngle;
 use App\Modules\Strategy\Models\WaveUsp;
+use App\Modules\Waves\Database\Factories\WaveFactory;
 use App\Modules\Waves\Models\Wave;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -36,7 +37,7 @@ it('P1: creates the three tables with the planned columns and the nullable audie
         'id', 'ulid', 'agency_id', 'wave_id', 'color_key', 'position', 'title', 'explainer', 'creative_angle', 'copy_seed', 'created_at', 'updated_at',
     ]))->toBeTrue()
         ->and(Schema::hasColumns('wave_personas', [
-            'id', 'ulid', 'agency_id', 'wave_id', 'market', 'slot', 'code', 'title', 'name', 'pronoun', 'summary', 'core_job', 'need',
+            'id', 'ulid', 'agency_id', 'wave_id', 'market_id', 'slot', 'code', 'title', 'name', 'pronoun', 'summary', 'core_job', 'need',
             'drivers', 'goals', 'self_talk', 'barriers', 'created_at', 'updated_at',
         ]))->toBeTrue()
         ->and(Schema::hasColumns('wave_persona_angles', [
@@ -109,25 +110,25 @@ it('L2: unique (wave_id, color_key) refuses a duplicate colour and a seventh row
 });
 
 it('L4: unique (wave_id, market, slot) refuses a duplicate slot; another market and another wave are free', function (): void {
-    $wave = Wave::factory()->create(['markets' => ['SK', 'RO']]);
-    WavePersona::factory()->create(['wave_id' => $wave->id, 'market' => 'SK', 'slot' => 3, 'code' => 'SK3']);
+    $wave = Wave::factory()->withMarkets(WaveFactory::singleCountryMarkets(['SK', 'RO']))->create();
+    WavePersona::factory()->create(['wave_id' => $wave->id, 'market_id' => WaveFactory::marketId($wave, 'SK'), 'slot' => 3, 'code' => 'SK3']);
 
-    expect(strategySavepoint(fn () => WavePersona::factory()->create(['wave_id' => $wave->id, 'market' => 'SK', 'slot' => 3, 'code' => 'SKX'])))
+    expect(strategySavepoint(fn () => WavePersona::factory()->create(['wave_id' => $wave->id, 'market_id' => WaveFactory::marketId($wave, 'SK'), 'slot' => 3, 'code' => 'SKX'])))
         ->toThrow(UniqueConstraintViolationException::class);
 
-    WavePersona::factory()->create(['wave_id' => $wave->id, 'market' => 'RO', 'slot' => 3, 'code' => 'RO3']);
-    WavePersona::factory()->create(['market' => 'SK', 'slot' => 3, 'code' => 'SK3']);
+    WavePersona::factory()->create(['wave_id' => $wave->id, 'market_id' => WaveFactory::marketId($wave, 'RO'), 'slot' => 3, 'code' => 'RO3']);
+    WavePersona::factory()->create(['slot' => 3, 'code' => 'SK3']);
     expect(WavePersona::query()->count())->toBe(3);
 });
 
 it('L4: unique (wave_id, market, code) refuses a duplicate code in a market, the same code in another market is free', function (): void {
-    $wave = Wave::factory()->create(['markets' => ['SK', 'RO']]);
-    WavePersona::factory()->create(['wave_id' => $wave->id, 'market' => 'SK', 'slot' => 1, 'code' => 'B2B']);
+    $wave = Wave::factory()->withMarkets(WaveFactory::singleCountryMarkets(['SK', 'RO']))->create();
+    WavePersona::factory()->create(['wave_id' => $wave->id, 'market_id' => WaveFactory::marketId($wave, 'SK'), 'slot' => 1, 'code' => 'B2B']);
 
-    expect(strategySavepoint(fn () => WavePersona::factory()->create(['wave_id' => $wave->id, 'market' => 'SK', 'slot' => 2, 'code' => 'B2B'])))
+    expect(strategySavepoint(fn () => WavePersona::factory()->create(['wave_id' => $wave->id, 'market_id' => WaveFactory::marketId($wave, 'SK'), 'slot' => 2, 'code' => 'B2B'])))
         ->toThrow(UniqueConstraintViolationException::class);
 
-    WavePersona::factory()->create(['wave_id' => $wave->id, 'market' => 'RO', 'slot' => 1, 'code' => 'B2B']);
+    WavePersona::factory()->create(['wave_id' => $wave->id, 'market_id' => WaveFactory::marketId($wave, 'RO'), 'slot' => 1, 'code' => 'B2B']);
     expect(WavePersona::query()->count())->toBe(2);
 });
 

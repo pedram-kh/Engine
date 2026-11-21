@@ -19,6 +19,7 @@ use App\Modules\Strategy\Services\ConceptLinkService;
 use App\Modules\Strategy\Services\ConceptService;
 use App\Modules\Strategy\Services\ConceptThumbnailer;
 use App\Modules\Strategy\Services\MatrixService;
+use App\Modules\Waves\Database\Factories\WaveFactory;
 use App\Modules\Waves\Models\Wave;
 use Illuminate\Console\Command;
 use Illuminate\Database\Seeder;
@@ -103,8 +104,8 @@ final class Pl23WalkSeeder extends Seeder
         User::factory()->agencyStaff($agency)->create(['email' => self::STAFF_EMAIL, 'name' => 'Sam Staff', 'password' => self::PASSWORD]);
 
         $bolt = Brand::factory()->forAgency($agency->id)->create(['name' => 'Bolt Food', 'slug' => 'pl23-bolt-food', 'color' => 'green']);
-        $make = fn (string $name, string $goLive, array $markets): Wave => Wave::factory()->forBrand($agency->id, $bolt->id)->create([
-            'name' => $name, 'go_live_on' => $goLive, 'markets' => $markets, 'created_by_user_id' => $admin->id,
+        $make = fn (string $name, string $goLive, array $markets): Wave => Wave::factory()->forBrand($agency->id, $bolt->id)->withMarkets(WaveFactory::singleCountryMarkets($markets))->create([
+            'name' => $name, 'go_live_on' => $goLive, 'created_by_user_id' => $admin->id,
         ]);
 
         // Wave 1: three concepts in three statuses (SK), an empty market with personas (RO), a market with no persona (CZ).
@@ -186,8 +187,8 @@ final class Pl23WalkSeeder extends Seeder
         $agency = AgencyFactory::new()->createOne(['name' => 'PL-2.3 Walk Agency B', 'slug' => self::AGENCY_B_SLUG, 'country_code' => 'SK']);
         $admin = User::factory()->agencyAdmin($agency)->create(['email' => self::B_ADMIN_EMAIL, 'name' => 'Bea Admin', 'password' => self::PASSWORD]);
         $glovo = Brand::factory()->forAgency($agency->id)->create(['name' => 'Glovo', 'slug' => 'pl23-glovo', 'color' => 'amber']);
-        $wave = Wave::factory()->forBrand($agency->id, $glovo->id)->create([
-            'name' => 'Glovo Wave 1', 'go_live_on' => '2026-12-01', 'markets' => ['SK', 'RO'], 'created_by_user_id' => $admin->id,
+        $wave = Wave::factory()->forBrand($agency->id, $glovo->id)->withMarkets(WaveFactory::singleCountryMarkets(['SK', 'RO']))->create([
+            'name' => 'Glovo Wave 1', 'go_live_on' => '2026-12-01', 'created_by_user_id' => $admin->id,
         ]);
         $this->usps($wave, 2);
         $persona = $this->persona($wave, 'SK', 'The Late-Night Snacker', 'Marek', PersonaPronoun::He, 'orders after ten');
@@ -210,7 +211,7 @@ final class Pl23WalkSeeder extends Seeder
     private function persona(Wave $wave, string $market, string $title, string $name, PersonaPronoun $pronoun, string $summary): WavePersona
     {
         return WavePersona::factory()->create([
-            'wave_id' => $wave->id, 'agency_id' => $wave->agency_id, 'market' => $market,
+            'wave_id' => $wave->id, 'agency_id' => $wave->agency_id, 'market_id' => WaveFactory::marketId($wave, $market),
             'title' => $title, 'name' => $name, 'pronoun' => $pronoun, 'summary' => $summary,
         ]);
     }
@@ -223,7 +224,7 @@ final class Pl23WalkSeeder extends Seeder
         $changes = array_map(static fn (array $r): array => [
             'persona' => $r[0]->ulid, 'usp' => $r[1]->ulid, 'level' => $r[2], 'rationale' => $r[3], 'message_line' => $r[4],
         ], $rows);
-        app(MatrixService::class)->save($brand, $wave, $actor, $market, $changes);
+        app(MatrixService::class)->save($brand, $wave, $actor, WaveFactory::marketUlid($wave, $market), $changes);
     }
 
     /**
@@ -231,7 +232,7 @@ final class Pl23WalkSeeder extends Seeder
      */
     private function concept(Brand $brand, Wave $wave, User $actor, string $market, WavePersona $persona, string $title, array $fields): WaveConcept
     {
-        return app(ConceptService::class)->create($brand, $wave, $actor, [...$fields, 'market' => $market, 'persona' => $persona->ulid, 'title' => $title]);
+        return app(ConceptService::class)->create($brand, $wave, $actor, [...$fields, 'market' => WaveFactory::marketUlid($wave, $market), 'persona' => $persona->ulid, 'title' => $title]);
     }
 
     /** Three real images (JPG, PNG, WebP) on the "References and links" concept, with their thumbnails. */
@@ -256,7 +257,7 @@ final class Pl23WalkSeeder extends Seeder
                 $key = ConceptImageStorage::imageKey($prefix, $ulid, $ext);
                 ConceptImageStorage::disk()->put($key, $bytes);
                 $image = WaveConceptImage::query()->create([
-                    'ulid' => $ulid, 'agency_id' => $agency->id, 'wave_id' => $wave->id, 'market' => $concept->market, 'concept_id' => $concept->id,
+                    'ulid' => $ulid, 'agency_id' => $agency->id, 'wave_id' => $wave->id, 'market_id' => $concept->market_id, 'concept_id' => $concept->id,
                     'storage_key' => $key, 'original_filename' => $name, 'mime_type' => $mime, 'declared_bytes' => strlen($bytes), 'size_bytes' => strlen($bytes),
                     'status' => WaveConceptImage::READY, 'position' => ++$position,
                 ]);

@@ -36,7 +36,7 @@ it('K1: every strategy route is 404 not_found while strategy_enabled is OFF (wav
     $before = AuditLog::query()->count();
 
     foreach (S::routeTable() as [$method, $suffix]) {
-        S::call($w['admin'], $method, S::u($w, $suffix), ['title' => 'x', 'name' => 'x', 'market' => 'SK', 'order' => [], 'usp_audience_title' => 'x', 'from_market' => 'SK', 'to_market' => 'RO', 'usp' => 'x', 'explanation' => 'x'])
+        S::call($w['admin'], $method, S::u($w, $suffix), ['title' => 'x', 'name' => 'x', 'market' => $w['mk']['SK'], 'order' => [], 'usp_audience_title' => 'x', 'from_market' => $w['mk']['SK'], 'to_market' => $w['mk']['RO'], 'usp' => 'x', 'explanation' => 'x'])
             ->assertNotFound()->assertJsonPath('errors.0.code', 'not_found');
     }
     expect(WaveUsp::query()->count())->toBe(0)->and(WavePersona::query()->count())->toBe(0)->and(AuditLog::query()->count())->toBe($before);

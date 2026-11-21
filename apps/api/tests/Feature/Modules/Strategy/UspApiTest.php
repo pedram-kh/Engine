@@ -205,8 +205,8 @@ function inUseWorld(): array
 {
     $w = S::world();
     [$usp1, $usp2] = array_map(fn (string $u) => WaveUsp::query()->where('ulid', $u)->firstOrFail(), makeUsps($w, 2));
-    $p1 = WavePersona::factory()->create(['wave_id' => $w['wave']->id, 'agency_id' => $w['agency']->id, 'market' => 'SK', 'title' => 'The Office Lunch Organiser']);
-    $p2 = WavePersona::factory()->create(['wave_id' => $w['wave']->id, 'agency_id' => $w['agency']->id, 'market' => 'RO']);
+    $p1 = WavePersona::factory()->create(['wave_id' => $w['wave']->id, 'agency_id' => $w['agency']->id, 'market_id' => $w['mkid']['SK'], 'title' => 'The Office Lunch Organiser']);
+    $p2 = WavePersona::factory()->create(['wave_id' => $w['wave']->id, 'agency_id' => $w['agency']->id, 'market_id' => $w['mkid']['RO']]);
     foreach ([$p1, $p2] as $p) {
         WavePersonaAngle::factory()->create(['persona_id' => $p->id, 'usp_id' => $usp1->id, 'wave_id' => $w['wave']->id, 'agency_id' => $w['agency']->id]);
     }
@@ -219,7 +219,7 @@ it('C1: deleting an in-use USP without confirmation is 409 usp.in_use with the a
 
     $res = S::call($w['admin'], 'DELETE', S::u($w, "usps/{$w['usp1']->ulid}"))->assertStatus(409)->assertJsonPath('errors.0.code', 'usp.in_use');
     expect($res->json('errors.0.meta.count'))->toBe(2)
-        ->and(array_column($res->json('errors.0.meta.affected'), 'market'))->toBe(['SK', 'RO'])
+        ->and(array_column($res->json('errors.0.meta.affected'), 'market'))->toBe([$w['mk']['SK'], $w['mk']['RO']])
         ->and($res->json('errors.0.meta.affected.0.title'))->toBe('The Office Lunch Organiser');
     expect(WaveUsp::query()->count())->toBe(2)->and(WavePersonaAngle::query()->count())->toBe(2);
 });
@@ -310,13 +310,13 @@ it('summary: counts, the title, one entry per market of the wave (with 0), and t
     $w = S::world();
     makeUsps($w, 3);
     for ($i = 0; $i < 2; $i++) {
-        WavePersona::factory()->create(['wave_id' => $w['wave']->id, 'agency_id' => $w['agency']->id, 'market' => 'SK']);
+        WavePersona::factory()->create(['wave_id' => $w['wave']->id, 'agency_id' => $w['agency']->id, 'market_id' => $w['mkid']['SK']]);
     }
     S::call($w['admin'], 'PATCH', S::u($w, 'audience-title'), ['usp_audience_title' => 'Eaters'])->assertOk();
 
     $a = S::call($w['staff'], 'GET', S::u($w))->assertOk()->json('data.attributes');
     expect($a['usp_count'])->toBe(3)->and($a['audience_title'])->toBe('Eaters')->and($a['persona_count'])->toBe(2)
-        ->and($a['markets'])->toBe([['market' => 'SK', 'persona_count' => 2], ['market' => 'RO', 'persona_count' => 0], ['market' => 'CZ', 'persona_count' => 0]])
+        ->and($a['markets'])->toBe([['market' => $w['mk']['SK'], 'name' => 'Slovakia', 'code' => 'SK', 'countries' => ['SK'], 'persona_count' => 2], ['market' => $w['mk']['RO'], 'name' => 'Romania', 'code' => 'RO', 'countries' => ['RO'], 'persona_count' => 0], ['market' => $w['mk']['CZ'], 'name' => 'Czechia', 'code' => 'CZ', 'countries' => ['CZ'], 'persona_count' => 0]])
         ->and($a['limits']['usp_max'])->toBe(6)->and($a['limits']['persona_max'])->toBe(8)->and($a['limits']['usp_title'])->toBe(40);
 });
 

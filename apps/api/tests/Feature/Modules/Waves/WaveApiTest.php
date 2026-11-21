@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Brands\Enums\BrandStatus;
+use App\Modules\Waves\Database\Factories\WaveFactory;
 use App\Modules\Waves\Models\Wave;
+use App\Modules\Waves\Services\WaveMarketService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Support\WaveFixtures;
 use Tests\TestCase;
@@ -61,7 +63,7 @@ it('creates a wave, lists it, shows it', function (): void {
     $this->actingAs($w['admin'], 'web')->getJson(WaveFixtures::wavesUrl($w['agency'], $w['brand']))
         ->assertOk()->assertJsonPath('data.0.id', $id)->assertJsonPath('meta.total', 1);
     $this->actingAs($w['admin'], 'web')->getJson(WaveFixtures::wavesUrl($w['agency'], $w['brand'], $id))
-        ->assertOk()->assertJsonPath('data.attributes.markets', ['SK', 'RO']);
+        ->assertOk()->assertJsonPath('data.attributes.markets.0.code', 'SK')->assertJsonPath('data.attributes.markets.1.code', 'RO')->assertJsonPath('data.attributes.markets.1.countries', ['RO']);
 });
 
 it('B8: every accepted create field persists and is returned', function (): void {
@@ -71,13 +73,13 @@ it('B8: every accepted create field persists and is returned', function (): void
 
     $res = $this->actingAs($w['admin'], 'web')
         ->postJson(WaveFixtures::wavesUrl($w['agency'], $w['brand']), WaveFixtures::body([
-            'name' => 'Persisted', 'go_live_on' => '2025-01-31', 'markets' => ['DE', 'FR', 'IT'], 'campaign_id' => $campaign->ulid,
+            'name' => 'Persisted', 'go_live_on' => '2025-01-31', 'markets' => WaveFactory::singleCountryMarkets(['DE', 'FR', 'IT']), 'campaign_id' => $campaign->ulid,
         ]))->assertCreated();
 
     $row = Wave::query()->firstOrFail();
     expect($row->name)->toBe('Persisted')
         ->and($row->go_live_on->format('Y-m-d'))->toBe('2025-01-31')
-        ->and($row->markets)->toBe(['DE', 'FR', 'IT'])
+        ->and($row->markets()->orderBy('position')->pluck('code')->all())->toBe(['DE', 'FR', 'IT'])
         ->and($row->campaign_id)->toBe($campaign->id)
         ->and($row->created_by_user_id)->toBe($w['admin']->id)
         ->and($row->agency_id)->toBe($w['agency']->id)
@@ -101,18 +103,19 @@ it('B8: refuses each invalid create body with 422 and writes nothing', function 
     'not a date' => [['go_live_on' => 'tomorrow'], 'go_live_on'],
     'wrong date format' => [['go_live_on' => '01/12/2026'], 'go_live_on'],
     'no markets' => [['markets' => []], 'markets'],
-    '21 markets' => [['markets' => array_map(static fn (int $i): string => chr(65 + intdiv($i, 26)).chr(65 + $i % 26), range(0, 20))], 'markets'],
-    'lowercase market' => [['markets' => ['sk']], 'markets.0'],
-    'three-letter market' => [['markets' => ['SVK']], 'markets.0'],
-    'duplicate market' => [['markets' => ['SK', 'SK']], 'markets.0'],
-    'non-string market' => [['markets' => [12]], 'markets.0'],
+    '21 markets' => [['markets' => array_map(static fn (int $i): array => ['name' => 'Market '.$i, 'code' => 'M'.chr(65 + $i), 'countries' => ['A'.chr(65 + $i)]], range(0, 20))], 'markets'],
+    'a plain country code (the old shape)' => [['markets' => ['SK']], 'markets.0'],
+    'lowercase country' => [['markets' => [['name' => 'Slovakia', 'code' => 'SK', 'countries' => ['sk']]]], 'markets.0.countries.0'],
+    'three-letter country' => [['markets' => [['name' => 'Slovakia', 'code' => 'SK', 'countries' => ['SVK']]]], 'markets.0.countries.0'],
+    'a country twice in one market' => [['markets' => [['name' => 'Slovakia', 'code' => 'SK', 'countries' => ['SK', 'SK']]]], 'markets.0.countries.0'],
+    'non-string country' => [['markets' => [['name' => 'Slovakia', 'code' => 'SK', 'countries' => [12]]]], 'markets.0.countries.0'],
     'wrong-length campaign id' => [['campaign_id' => 'abc'], 'campaign_id'],
 ]);
 
 it('B8: accepts exactly 20 markets and a past go-live date', function (): void {
     $w = WaveFixtures::world();
     WaveFixtures::armed();
-    $twenty = array_map(static fn (int $i): string => 'A'.chr(65 + $i), range(0, 19));
+    $twenty = array_map(static fn (int $i): array => ['name' => 'Market '.$i, 'code' => 'M'.chr(65 + $i), 'countries' => ['A'.chr(65 + $i)]], range(0, 19));
 
     $this->actingAs($w['admin'], 'web')
         ->postJson(WaveFixtures::wavesUrl($w['agency'], $w['brand']), WaveFixtures::body(['markets' => $twenty, 'go_live_on' => '2020-01-01']))
@@ -166,13 +169,13 @@ it('edits name, go-live date and markets, and ignores an empty body', function (
     $url = WaveFixtures::wavesUrl($w['agency'], $w['brand'], $wave->ulid);
 
     $this->actingAs($w['manager'], 'web')
-        ->patchJson($url, ['name' => 'Renamed', 'go_live_on' => '2027-02-02', 'markets' => ['PL']])
+        ->patchJson($url, ['name' => 'Renamed', 'go_live_on' => '2027-02-02', 'markets' => WaveFactory::singleCountryMarkets(['PL']), 'markets_version' => WaveMarketService::version($wave->load('markets.countries')->markets)])
         ->assertOk()->assertJsonPath('data.attributes.name', 'Renamed');
 
     $row = $wave->fresh();
     expect($row?->name)->toBe('Renamed')
         ->and($row?->go_live_on->format('Y-m-d'))->toBe('2027-02-02')
-        ->and($row?->markets)->toBe(['PL']);
+        ->and($row?->markets()->pluck('code')->all())->toBe(['PL']);
 
     $this->actingAs($w['manager'], 'web')->patchJson($url, [])->assertOk();
     expect(AuditLog::query()->where('action', 'wave.updated')->count())->toBe(1);
@@ -184,7 +187,7 @@ it('B8: a PATCH refuses an invalid value with 422', function (): void {
     $wave = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->create();
 
     $this->actingAs($w['admin'], 'web')
-        ->patchJson(WaveFixtures::wavesUrl($w['agency'], $w['brand'], $wave->ulid), ['markets' => ['sk']])
+        ->patchJson(WaveFixtures::wavesUrl($w['agency'], $w['brand'], $wave->ulid), ['markets' => ['sk'], 'markets_version' => 'x'])
         ->assertUnprocessable()->assertJsonPath('errors.0.meta.field', 'markets.0');
 });
 
@@ -205,10 +208,10 @@ it('B10: audits wave.created and wave.updated with actor, agency and subject, an
         ->and($updated->actor_id)->toBe($w['admin']->id);
 
     // The payloads carry the decided literal keys and nothing else: no internal id, no creator data.
-    $keys = ['go_live_on', 'campaign_id', 'markets', 'name', 'status'];
+    $keys = ['go_live_on', 'campaign_id', 'markets', 'market_countries', 'name', 'status'];
     expect(array_keys($created->after ?? []))->toEqualCanonicalizing($keys)
         ->and(array_keys($updated->before ?? []))->toEqualCanonicalizing($keys)
-        ->and(array_keys($updated->after ?? []))->toEqualCanonicalizing($keys)
+        ->and(array_keys($updated->after ?? []))->toEqualCanonicalizing([...$keys, 'markets_renamed'])
         ->and($updated->before['name'] ?? null)->not->toBe($updated->after['name'] ?? null);
 
     // A refused request audits nothing.

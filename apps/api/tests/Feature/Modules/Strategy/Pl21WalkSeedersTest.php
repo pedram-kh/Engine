@@ -9,6 +9,7 @@ use App\Modules\Strategy\Features\StrategyEnabled;
 use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WavePersonaAngle;
 use App\Modules\Strategy\Models\WaveUsp;
+use App\Modules\Waves\Database\Factories\WaveFactory;
 use App\Modules\Waves\Features\WavesEnabled;
 use App\Modules\Waves\Models\Wave;
 use Database\Seeders\Pl21WalkCleanupSeeder;
@@ -34,7 +35,7 @@ function pl21Usps(Wave $wave): int
 
 function pl21Personas(Wave $wave, string $market): int
 {
-    return WavePersona::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market', $market)->count();
+    return WavePersona::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market_id', WaveFactory::marketId($wave, $market))->count();
 }
 
 it('S1: seeds both walk agencies and the accounts, leaves BOTH flags off, and is idempotent', function (): void {
@@ -67,10 +68,10 @@ it('S2: the waves hold the cases of the walk (two markets, under four and six US
     $nine = pl21Wave('Wave 9');
     $ten = pl21Wave('Wave 10');
 
-    expect($six->markets)->toBe(['SK', 'RO'])
+    expect($six->markets->pluck('code')->all())->toBe(['SK', 'RO'])
         ->and(pl21Usps($six))->toBe(0)
         ->and(WavePersona::withoutGlobalScopes()->where('wave_id', $six->id)->count())->toBe(0)
-        ->and($seven->markets)->toBe(['SK', 'RO', 'CZ'])
+        ->and($seven->markets->pluck('code')->all())->toBe(['SK', 'RO', 'CZ'])
         ->and(pl21Usps($seven))->toBe(6)
         ->and($seven->usp_audience_title)->toBe('Bolt Food Eaters — 6 core USPs')
         ->and(pl21Personas($seven, 'SK'))->toBe(2)
@@ -104,10 +105,10 @@ it('S3: a persona angle uses a USP in Wave 9 (delete-in-use) and in Wave 10, and
 
     // The seeded codes are the server's defaults (market plus slot), as the frame shows.
     $seven = pl21Wave('Wave 7');
-    $sevenSk = WavePersona::withoutGlobalScopes()->where('wave_id', $seven->id)->where('market', 'SK')->orderBy('slot')->pluck('code')->all();
+    $sevenSk = WavePersona::withoutGlobalScopes()->where('wave_id', $seven->id)->where('market_id', WaveFactory::marketId($seven, 'SK'))->orderBy('slot')->pluck('code')->all();
     expect($sevenSk)->toBe(['SK1', 'SK2']);
     foreach (WavePersona::withoutGlobalScopes()->get() as $persona) {
-        expect($persona->code)->toBe($persona->market.$persona->slot);
+        expect($persona->code)->toBe($persona->market->code.$persona->slot);
     }
 });
 

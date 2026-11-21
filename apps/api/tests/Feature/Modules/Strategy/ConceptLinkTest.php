@@ -34,7 +34,7 @@ it('adds, edits and removes a link; the domain is derived from the stored URL (l
     $edited = S::call($w['staff'], 'PATCH', linkUrl($w, $id, $link['id']), ['url' => 'https://other.org/x'])->assertOk()->json('data');
     expect($edited['domain'])->toBe('other.org')->and($edited['title'])->toBe('Moodboard');
 
-    $shown = S::call($w['admin'], 'GET', S::u($w, 'concepts?market=SK'))->json('data.0.attributes.links');
+    $shown = S::call($w['admin'], 'GET', S::u($w, "concepts?market={$w['mk']['SK']}"))->json('data.0.attributes.links');
     expect($shown)->toHaveCount(1)->and($shown[0]['url'])->toBe('https://other.org/x');
 
     S::call($w['staff'], 'DELETE', linkUrl($w, $id, $link['id']))->assertOk();
@@ -102,7 +102,7 @@ it('the server never fetches a pasted URL: no HTTP request on add, edit, list, d
 
     $link = S::call($w['staff'], 'POST', linkUrl($w, $id), ['url' => 'https://example.com/a', 'title' => 'A'])->assertCreated()->json('data.id');
     S::call($w['staff'], 'PATCH', linkUrl($w, $id, $link), ['url' => 'https://example.org/b'])->assertOk();
-    S::call($w['staff'], 'GET', S::u($w, 'concepts?market=SK'))->assertOk();
+    S::call($w['staff'], 'GET', S::u($w, "concepts?market={$w['mk']['SK']}"))->assertOk();
     $copy = S::call($w['staff'], 'POST', S::u($w, "concepts/{$id}/duplicate"))->assertCreated()->json('data.id');
     S::call($w['staff'], 'DELETE', linkUrl($w, $id, $link))->assertOk();
     S::call($w['admin'], 'DELETE', S::u($w, "concepts/{$copy}"))->assertNoContent();

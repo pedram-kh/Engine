@@ -90,7 +90,7 @@ it('T1: the BelongsToAgency scope: under agency B the three models never return 
 it('T1: writes made under agency A put agency A on every row (agency_id comes from the wave, never the request)', function (): void {
     $w = S::world();
     $usp = S::call($w['admin'], 'POST', S::u($w, 'usps'), ['title' => 'U', 'agency_id' => $w['otherAgency']->id, 'wave_id' => 999])->assertCreated()->json('data.id');
-    $p = S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => 'SK', 'title' => 'T', 'name' => 'N', 'agency_id' => $w['otherAgency']->id, 'slot' => 8])->assertCreated()->json('data.id');
+    $p = S::call($w['admin'], 'POST', S::u($w, 'personas'), ['market' => $w['mk']['SK'], 'title' => 'T', 'name' => 'N', 'agency_id' => $w['otherAgency']->id, 'slot' => 8])->assertCreated()->json('data.id');
     S::call($w['admin'], 'POST', S::u($w, "personas/{$p}/angles"), ['usp' => $usp, 'explanation' => 'x', 'agency_id' => $w['otherAgency']->id, 'origin' => 'ai'])->assertCreated();
 
     $owners = [

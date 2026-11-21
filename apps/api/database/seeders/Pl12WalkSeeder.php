@@ -15,6 +15,7 @@ use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Creators\Enums\RelationshipStatus;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
+use App\Modules\Waves\Database\Factories\WaveFactory;
 use App\Modules\Waves\Models\Wave;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -120,11 +121,11 @@ final class Pl12WalkSeeder extends Seeder
         ]);
         Campaign::factory()->create($base + ['name' => 'Bolt Normal Promo']);
 
-        Wave::factory()->forBrand($agency->id, $bolt->id)->create([
-            'name' => 'Wave 7', 'go_live_on' => '2026-12-05', 'markets' => ['SK', 'CZ'], 'created_by_user_id' => $admin->id,
+        Wave::factory()->forBrand($agency->id, $bolt->id)->withMarkets(WaveFactory::singleCountryMarkets(['SK', 'CZ']))->create([
+            'name' => 'Wave 7', 'go_live_on' => '2026-12-05', 'created_by_user_id' => $admin->id,
         ]);
-        Wave::factory()->forBrand($agency->id, $bolt->id)->create([
-            'name' => 'Wave 8', 'go_live_on' => '2027-01-09', 'markets' => ['SK', 'RO'], 'created_by_user_id' => $admin->id,
+        Wave::factory()->forBrand($agency->id, $bolt->id)->withMarkets(WaveFactory::singleCountryMarkets(['SK', 'RO']))->create([
+            'name' => 'Wave 8', 'go_live_on' => '2027-01-09', 'created_by_user_id' => $admin->id,
         ]);
 
         $creators = [];
@@ -188,8 +189,8 @@ final class Pl12WalkSeeder extends Seeder
         Campaign::factory()->forWave()->create([
             'agency_id' => $agency->id, 'created_by_user_id' => $admin->id, 'brand_id' => $zeta->id, 'name' => 'Zeta Wave Campaign',
         ]);
-        Wave::factory()->forBrand($agency->id, $zeta->id)->create([
-            'name' => 'Zeta Wave 1', 'go_live_on' => '2026-12-01', 'markets' => ['SK'], 'created_by_user_id' => $admin->id,
+        Wave::factory()->forBrand($agency->id, $zeta->id)->withMarkets(WaveFactory::singleCountryMarkets(['SK']))->create([
+            'name' => 'Zeta Wave 1', 'go_live_on' => '2026-12-01', 'created_by_user_id' => $admin->id,
         ]);
     }
 

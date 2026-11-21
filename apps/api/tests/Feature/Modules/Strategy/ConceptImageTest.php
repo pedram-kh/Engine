@@ -61,7 +61,7 @@ it('init reserves a pending row and returns an upload URL and id; the key is und
         ->and($row->status)->toBe('pending')->and($row->declared_bytes)->toBe(1000)->and($row->size_bytes)->toBeNull()->and($row->mime_type)->toBeNull()
         ->and($row->expires_at?->isFuture())->toBeTrue();
     // A pending reservation is not an image: the card does not show it.
-    expect(S::call($w['admin'], 'GET', S::u($w, 'concepts?market=SK'))->json('data.0.attributes.images'))->toBe([]);
+    expect(S::call($w['admin'], 'GET', S::u($w, "concepts?market={$w['mk']['SK']}"))->json('data.0.attributes.images'))->toBe([]);
 });
 
 it('init refuses a type that is not JPG, PNG or WebP, an empty file and a file over 300 MB', function (): void {
@@ -176,7 +176,7 @@ it('reads go through the API: file and thumbnail are streamed with nosniff and a
     $bytes = C::webp(50, 40);
     $image = C::upload($w, $id, $bytes, 'image/webp', 'pic one.webp')->assertCreated()->json('data');
 
-    $list = S::call($w['admin'], 'GET', S::u($w, 'concepts?market=SK'));
+    $list = S::call($w['admin'], 'GET', S::u($w, "concepts?market={$w['mk']['SK']}"));
     $json = $list->getContent();
     expect($json)->not->toContain('X-Amz')->and($json)->not->toContain('storage_key')->and($json)->not->toContain('agencies/')->and($json)->not->toContain('https://');
     $card = $list->json('data.0.attributes.images.0');
@@ -231,7 +231,7 @@ it('the thumbnail endpoint is a 404 when there is no thumbnail (the web shows th
 
     S::call($w['staff'], 'GET', S::u($w, "concepts/{$id}/images/{$image}/thumbnail"))->assertNotFound();
     S::call($w['staff'], 'GET', S::u($w, "concepts/{$id}/images/{$image}/file"))->assertOk();
-    expect(S::call($w['staff'], 'GET', S::u($w, 'concepts?market=SK'))->json('data.0.attributes.images.0'))->toMatchArray(['has_thumbnail' => false, 'thumbnail_url' => null]);
+    expect(S::call($w['staff'], 'GET', S::u($w, "concepts?market={$w['mk']['SK']}"))->json('data.0.attributes.images.0'))->toMatchArray(['has_thumbnail' => false, 'thumbnail_url' => null]);
 });
 
 it('Q9: a decompression bomb (header 30000 x 30000, a few bytes) gets no thumbnail, does not take the worker down, and still downloads', function (): void {

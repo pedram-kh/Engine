@@ -122,7 +122,10 @@ final class WaveFixtures
         return array_merge([
             'name' => 'Wave 7',
             'go_live_on' => '2026-12-01',
-            'markets' => ['SK', 'RO'],
+            'markets' => [
+                ['name' => 'Slovakia', 'code' => 'SK', 'countries' => ['SK']],
+                ['name' => 'Romania', 'code' => 'RO', 'countries' => ['RO']],
+            ],
         ], $overrides);
     }
 }

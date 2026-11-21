@@ -7,6 +7,7 @@ use App\Modules\Identity\Models\User;
 use App\Modules\Strategy\Features\StrategyEnabled;
 use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WavePersonaAngle;
+use App\Modules\Waves\Database\Factories\WaveFactory;
 use App\Modules\Waves\Features\WavesEnabled;
 use App\Modules\Waves\Models\Wave;
 use Database\Seeders\Pl22WalkCleanupSeeder;
@@ -31,7 +32,7 @@ it('M1: seeds the accounts and the three waves, leaves BOTH flags off, and is id
     expect(User::query()->where('email', 'like', '%'.Pl22WalkSeeder::DOMAIN)->pluck('email')->sort()->values()->all())
         ->toBe(['admin@pl22-walk.local', 'manager@pl22-walk.local', 'staff@pl22-walk.local'])
         ->and(User::query()->where('email', 'like', '%'.Pl22WalkSeeder::DOMAIN_B)->count())->toBe(1)
-        ->and(pl22Wave('Matrix Wave 1')->markets)->toBe(['SK', 'RO', 'CZ'])
+        ->and(pl22Wave('Matrix Wave 1')->markets->pluck('code')->all())->toBe(['SK', 'RO', 'CZ'])
         ->and(Feature::active(WavesEnabled::NAME))->toBeFalse()
         ->and(Feature::active(StrategyEnabled::NAME))->toBeFalse();
 
@@ -50,11 +51,11 @@ it('M2: Matrix Wave 1 holds the walk cases: all levels, a conflict angle, a pers
 
     $cells = DB::table('wave_matrix_cells')->where('wave_id', $wave->id);
     expect(DB::table('wave_usps')->where('wave_id', $wave->id)->count())->toBe(6)
-        ->and((clone $cells)->where('market', 'SK')->count())->toBe(7)
+        ->and((clone $cells)->where('market_id', WaveFactory::marketId($wave, 'SK'))->count())->toBe(7)
         ->and((clone $cells)->distinct()->orderBy('level')->pluck('level')->all())->toBe(['low', 'priority', 'support'])
-        ->and(WavePersona::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market', 'SK')->orderBy('slot')->pluck('code')->all())->toBe(['SK1', 'SK2'])
-        ->and(WavePersona::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market', 'RO')->orderBy('slot')->pluck('code')->all())->toBe(['RO1', 'RO2'])
-        ->and(WavePersona::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market', 'CZ')->count())->toBe(0);
+        ->and(WavePersona::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market_id', WaveFactory::marketId($wave, 'SK'))->orderBy('slot')->pluck('code')->all())->toBe(['SK1', 'SK2'])
+        ->and(WavePersona::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market_id', WaveFactory::marketId($wave, 'RO'))->orderBy('slot')->pluck('code')->all())->toBe(['RO1', 'RO2'])
+        ->and(WavePersona::withoutGlobalScopes()->where('wave_id', $wave->id)->where('market_id', WaveFactory::marketId($wave, 'CZ'))->count())->toBe(0);
 
     $ro2 = WavePersona::withoutGlobalScopes()->where('wave_id', $wave->id)->where('code', 'RO2')->firstOrFail();
     expect((clone $cells)->where('persona_id', $ro2->id)->where('level', 'priority')->count())->toBe(0)
@@ -84,7 +85,7 @@ it('M4: Matrix Wave 2 is empty, Matrix Wave 3 has eight personas in RO, Agency B
     $b = Agency::query()->where('slug', Pl22WalkSeeder::AGENCY_B_SLUG)->firstOrFail();
 
     expect(DB::table('wave_usps')->where('wave_id', $two->id)->count())->toBe(0)
-        ->and(WavePersona::withoutGlobalScopes()->where('wave_id', $three->id)->where('market', 'RO')->count())->toBe(8)
+        ->and(WavePersona::withoutGlobalScopes()->where('wave_id', $three->id)->where('market_id', WaveFactory::marketId($three, 'RO'))->count())->toBe(8)
         ->and(DB::table('wave_usps')->where('agency_id', $b->id)->count())->toBe(2)
         ->and(DB::table('wave_matrix_cells')->where('agency_id', $b->id)->count())->toBe(0);
 });

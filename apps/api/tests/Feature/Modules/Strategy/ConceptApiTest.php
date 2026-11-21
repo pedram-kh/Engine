@@ -19,7 +19,6 @@ use Illuminate\Support\Facades\Storage;
 use Laravel\Pennant\Feature;
 use Tests\Support\ConceptFixtures as C;
 use Tests\Support\StrategyFixtures as S;
-use Tests\Support\WaveFixtures;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
@@ -36,8 +35,8 @@ it('the flags: strategy_enabled OFF and waves_enabled OFF are both 404 not_found
     $w = S::world();
     $p = C::persona($w);
     Feature::deactivate(StrategyEnabled::NAME);
-    S::call($w['admin'], 'GET', S::u($w, 'concepts?market=SK'))->assertNotFound()->assertJsonPath('errors.0.code', 'not_found');
-    S::call($w['admin'], 'POST', S::u($w, 'concepts'), ['market' => 'SK', 'persona' => $p->ulid, 'title' => 'x'])->assertNotFound();
+    S::call($w['admin'], 'GET', S::u($w, "concepts?market={$w['mk']['SK']}"))->assertNotFound()->assertJsonPath('errors.0.code', 'not_found');
+    S::call($w['admin'], 'POST', S::u($w, 'concepts'), ['market' => $w['mk']['SK'], 'persona' => $p->ulid, 'title' => 'x'])->assertNotFound();
     expect(WaveConcept::query()->count())->toBe(0);
 });
 
@@ -72,9 +71,9 @@ it('creates a concept with chips from the matrix: Priority first, then Support, 
 it('a persona of another market, another wave or another agency is refused', function (): void {
     $w = S::world();
     $ro = C::persona($w, 'RO');
-    C::create($w, $ro, ['market' => 'SK'])->assertUnprocessable()->assertJsonPath('errors.0.code', 'concept.persona_invalid');
+    C::create($w, $ro, ['market' => $w['mk']['SK']])->assertUnprocessable()->assertJsonPath('errors.0.code', 'concept.persona_invalid');
     C::create($w, C::persona($w), ['persona' => '01HZZZZZZZZZZZZZZZZZZZZZZZ'])->assertUnprocessable();
-    C::create($w, C::persona($w), ['market' => 'DE'])->assertUnprocessable();
+    C::create($w, C::persona($w), ['market' => S::NO_MARKET])->assertUnprocessable();
     expect(WaveConcept::query()->count())->toBe(0);
 });
 
@@ -85,7 +84,7 @@ it('roles: staff create, edit and duplicate; a creator is refused; the decision 
 
     S::call($w['staff'], 'PATCH', S::u($w, "concepts/{$id}"), ['title' => 'Renamed'])->assertOk();
     S::call($w['staff'], 'POST', S::u($w, "concepts/{$id}/duplicate"))->assertCreated();
-    S::call($w['staff'], 'GET', S::u($w, 'concepts?market=SK'))->assertOk();
+    S::call($w['staff'], 'GET', S::u($w, "concepts?market={$w['mk']['SK']}"))->assertOk();
 
     C::decide($w, $id, 'approved', $w['staff'])->assertForbidden();
     expect(WaveConceptDecision::query()->count())->toBe(0);
@@ -93,14 +92,14 @@ it('roles: staff create, edit and duplicate; a creator is refused; the decision 
     C::decide($w, $id, 'changes_requested', $w['admin'])->assertOk();
 
     $creator = User::factory()->creator()->createOne();
-    expect(S::call($creator, 'GET', S::u($w, 'concepts?market=SK'))->status())->toBeIn([403, 404]);
-    S::call($w['otherAdmin'], 'GET', S::u($w, 'concepts?market=SK'))->assertStatus(404);
+    expect(S::call($creator, 'GET', S::u($w, "concepts?market={$w['mk']['SK']}"))->status())->toBeIn([403, 404]);
+    S::call($w['otherAdmin'], 'GET', S::u($w, "concepts?market={$w['mk']['SK']}"))->assertStatus(404);
 });
 
 it('tenancy: a concept of another wave, brand or agency is a 404', function (): void {
     $w = S::world();
     $id = C::make($w, C::persona($w));
-    $other = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->create(['markets' => ['SK']]);
+    $other = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->create();
     $url = S::url($w['agency'], $w['brand'], $other, "concepts/{$id}");
 
     S::call($w['admin'], 'PATCH', $url, ['title' => 'x'])->assertNotFound();
@@ -118,9 +117,9 @@ it('lists a market in position order; the market is required and must belong to 
     C::make($w, $p, ['title' => 'Second']);
     C::make($w, C::persona($w, 'RO'), ['title' => 'Romanian']);
 
-    $rows = S::call($w['admin'], 'GET', S::u($w, 'concepts?market=SK'))->assertOk()->json();
+    $rows = S::call($w['admin'], 'GET', S::u($w, "concepts?market={$w['mk']['SK']}"))->assertOk()->json();
     expect(array_column(array_column($rows['data'], 'attributes'), 'title'))->toBe(['First', 'Second'])
-        ->and($rows['meta']['market'])->toMatchArray(['market' => 'SK', 'total' => 2, 'under_minimum' => true]);
+        ->and($rows['meta']['market'])->toMatchArray(['market' => $w['mk']['SK'], 'total' => 2, 'under_minimum' => true]);
     S::call($w['admin'], 'GET', S::u($w, 'concepts'))->assertUnprocessable()->assertJsonPath('errors.0.code', 'concept.market_required');
     S::call($w['admin'], 'GET', S::u($w, 'concepts?market=DE'))->assertUnprocessable();
 });
@@ -133,7 +132,7 @@ it('the list is a constant number of queries however many concepts it holds', fu
     $count = function () use ($w): int {
         DB::flushQueryLog();
         DB::enableQueryLog();
-        S::call($w['admin'], 'GET', S::u($w, 'concepts?market=SK'))->assertOk();
+        S::call($w['admin'], 'GET', S::u($w, "concepts?market={$w['mk']['SK']}"))->assertOk();
         $n = count(DB::getQueryLog());
         DB::disableQueryLog();
 
@@ -389,7 +388,7 @@ it('Q4: deleting a USP removes its chip, keeps the concepts, resets an approved 
         ->and(WaveConcept::query()->where('ulid', $approved)->firstOrFail()->status->value)->toBe('awaiting')
         ->and(WaveConceptDecision::query()->count())->toBe(1)
         ->and(WaveConceptUsp::query()->count())->toBe(2);
-    $row = S::call($w['admin'], 'GET', S::u($w, 'concepts?market=SK'))->json('data.0.attributes');
+    $row = S::call($w['admin'], 'GET', S::u($w, "concepts?market={$w['mk']['SK']}"))->json('data.0.attributes');
     expect(array_column($row['usps'], 'title'))->toBe(['Y'])->and(array_column(WaveConceptUsp::query()->orderBy('id')->get()->all(), 'position'))->toBe([1, 1]);
     $audit = C::lastAudit('wave_usp.deleted');
     expect($audit['chips_removed'] ?? null)->toBe(2)->and($audit['concepts_reset'] ?? null)->toBe(1);
@@ -400,10 +399,10 @@ it('Q4: a market that has concepts cannot be removed from the wave (its personas
     C::make($w, C::persona($w, 'RO'));
 
     C::make($w, C::persona($w, 'RO'));
-    S::call($w['admin'], 'PATCH', WaveFixtures::wavesUrl($w['agency'], $w['brand'], $w['wave']->ulid), ['markets' => ['SK', 'CZ']])
+    S::keepMarkets($w, ['SK', 'CZ'])
         ->assertUnprocessable()->assertJsonPath('errors.0.code', 'wave.market_has_personas')
         ->assertJsonPath('errors.0.meta.markets.0.concept_count', 2);
-    expect(Wave::query()->findOrFail($w['wave']->id)->markets)->toBe(['SK', 'RO', 'CZ']);
+    expect(Wave::query()->findOrFail($w['wave']->id)->markets->pluck('code')->all())->toBe(['SK', 'RO', 'CZ']);
 });
 
 it('the stepper counts: totals, per market, complete when every concept is approved, under the recommended three', function (): void {
@@ -422,6 +421,7 @@ it('the stepper counts: totals, per market, complete when every concept is appro
     $s = S::call($w['staff'], 'GET', S::u($w))->assertOk()->json('data.attributes.concepts');
     expect($s)->toMatchArray(['total' => 4, 'approved' => 3, 'awaiting' => 0, 'changes_requested' => 1, 'markets_complete' => 1]);
     $by = array_column($s['by_market'], null, 'market');
+    $by = array_combine(array_map(static fn (string $u): string => array_search($u, $w['mk'], true), array_keys($by)), $by);
     expect($by['SK'])->toMatchArray(['total' => 3, 'approved' => 2, 'changes_requested' => 1, 'complete' => false, 'under_minimum' => false])
         ->and($by['RO'])->toMatchArray(['total' => 1, 'complete' => true, 'under_minimum' => true])
         ->and($by['CZ'])->toMatchArray(['total' => 0, 'complete' => false, 'under_minimum' => true])
@@ -443,7 +443,7 @@ it('free text: limits per field, control characters removed, an empty optional f
     $row = C::create($w, $p, ['title' => "Title\x00 with\x07 controls", 'hook' => '   '])->assertCreated()->json('data.attributes');
     expect($row['title'])->toBe('Title with controls')->and($row['hook'])->toBeNull();
     $id = (string) WaveConcept::query()->latest('id')->value('ulid');
-    S::call($w['staff'], 'PATCH', S::u($w, "concepts/{$id}"), ['market' => 'RO'])->assertUnprocessable();
+    S::call($w['staff'], 'PATCH', S::u($w, "concepts/{$id}"), ['market' => $w['mk']['RO']])->assertUnprocessable();
     expect(strlen((string) json_encode(S::call($w['staff'], 'PATCH', S::u($w, "concepts/{$id}"), ['title' => '<script>alert(1)</script>'])->json('data.attributes.title'))))->toBeGreaterThan(10);
 });
 
@@ -453,9 +453,9 @@ it('an archived brand is read-only: every concept write is 422 wave.brand_archiv
     $id = C::make($w, $p);
     $w['brand']->forceFill(['status' => BrandStatus::Archived])->save();
 
-    S::call($w['admin'], 'GET', S::u($w, 'concepts?market=SK'))->assertOk();
+    S::call($w['admin'], 'GET', S::u($w, "concepts?market={$w['mk']['SK']}"))->assertOk();
     foreach ([
-        ['POST', 'concepts', ['market' => 'SK', 'persona' => $p->ulid, 'title' => 'x']],
+        ['POST', 'concepts', ['market' => $w['mk']['SK'], 'persona' => $p->ulid, 'title' => 'x']],
         ['PATCH', "concepts/{$id}", ['title' => 'x']],
         ['POST', "concepts/{$id}/duplicate", []],
         ['DELETE', "concepts/{$id}", []],

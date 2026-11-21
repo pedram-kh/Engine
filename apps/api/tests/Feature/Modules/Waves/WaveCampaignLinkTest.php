@@ -96,7 +96,7 @@ it('B5: the race: when a competing row lands first the index fires and the answe
         $armed = false;
         DB::table('waves')->insert([
             'ulid' => (string) Str::ulid(), 'agency_id' => $w['agency']->id, 'brand_id' => $w['brand']->id,
-            'campaign_id' => $campaign->id, 'name' => 'Winner', 'go_live_on' => '2026-12-01', 'markets' => '["SK"]',
+            'campaign_id' => $campaign->id, 'name' => 'Winner', 'go_live_on' => '2026-12-01',
             'status' => 'draft', 'created_by_user_id' => $w['admin']->id, 'created_at' => now(), 'updated_at' => now(),
         ]);
     });
