@@ -143,7 +143,7 @@ const title = computed(() =>
 const confirmLabel = computed(() =>
   inUse.value
     ? t(
-        hasCells.value
+        hasCells.value || hasConcepts.value
           ? 'app.strategy.usp.deleteDialog.confirmInUseCells'
           : 'app.strategy.usp.deleteDialog.confirmInUse',
         { count: affected.value.length },

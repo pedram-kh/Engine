@@ -351,14 +351,16 @@ const deletingCells = computed(() =>
       test-id="persona-delete-dialog"
       :title="t('app.strategy.persona.deleteTitle', { name: deleting?.attributes.name ?? '' })"
       :body="
-        cellCount > 0
-          ? t('app.strategy.persona.deleteBodyCells', {
-              angles: t('app.strategy.counts.angles', { count: angleCount }, angleCount),
-              cells: t('app.strategy.counts.cells', { count: cellCount }, cellCount),
-            })
-          : angleCount > 0
-            ? t('app.strategy.persona.deleteBodyAngles', { count: angleCount }, angleCount)
-            : t('app.strategy.persona.deleteBody')
+        blockedBy.length > 0
+          ? ''
+          : cellCount > 0
+            ? t('app.strategy.persona.deleteBodyCells', {
+                angles: t('app.strategy.counts.angles', { count: angleCount }, angleCount),
+                cells: t('app.strategy.counts.cells', { count: cellCount }, cellCount),
+              })
+            : angleCount > 0
+              ? t('app.strategy.persona.deleteBodyAngles', { count: angleCount }, angleCount)
+              : t('app.strategy.persona.deleteBody')
       "
       :confirm-label="t('app.strategy.persona.delete')"
       :busy="deleteBusy"

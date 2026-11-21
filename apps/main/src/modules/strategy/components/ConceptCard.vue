@@ -36,7 +36,7 @@ const emit = defineEmits<{
   changed: []
 }>()
 
-const { t, d } = useI18n()
+const { t, locale } = useI18n()
 const a = computed(() => props.concept.attributes)
 const menuOpen = ref(false)
 const stageOpen = ref(false)
@@ -66,7 +66,11 @@ const textFields = computed(() => {
 
 const decidedOn = computed(() => {
   const dec = a.value.decision
-  return dec === null ? '' : d(new Date(dec.recorded_at), 'short')
+  return dec === null
+    ? ''
+    : new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium' }).format(
+        new Date(dec.recorded_at),
+      )
 })
 
 function pickStage(stage: FunnelStage | null): void {

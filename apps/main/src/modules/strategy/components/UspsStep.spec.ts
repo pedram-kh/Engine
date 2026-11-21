@@ -25,6 +25,7 @@ import {
   AGENCY_ULID,
   BRAND_ULID,
   makeAngle,
+  makeConcept,
   makeSyncedAngle,
   makePersona,
   makeSummary,
@@ -475,5 +476,37 @@ describe('UspsStep (PL-2.1)', () => {
     const unset = await mountStep(makeUsps(4))
     expect(unset.get('[data-test="audience-title-empty"]').text()).toBe('Add an audience title')
     unset.unmount()
+  })
+
+  it('PL-2.3: deleting a USP lists the concepts that carry it as a chip, with the note, and counts them', async () => {
+    const used = makeUsp(2)
+    vi.mocked(strategyApi.listPersonas).mockResolvedValue({ data: [] })
+    vi.mocked(strategyApi.listConcepts).mockImplementation(async (_s, market) => ({
+      data:
+        market === 'SK'
+          ? [
+              makeConcept(7, makePersona(1, 'SK'), {
+                title: HOSTILE,
+                usps: [{ id: used.id, title: used.attributes.title, color_key: 'violet' }],
+              }),
+              makeConcept(8, makePersona(1, 'SK')),
+            ]
+          : [],
+      meta: { market: null },
+    }))
+    vi.mocked(strategyApi.removeUsp).mockResolvedValue(undefined as never)
+    const w = await mountStep([makeUsp(1), used, makeUsp(3), makeUsp(4)])
+    await w.findAll('[data-test="usp-card"]')[1]?.get('[data-test="usp-menu-btn"]').trigger('click')
+    await flushPromises()
+    await click('[data-test="usp-menu-delete"]')
+    await flushPromises()
+    const list = overlay('[data-test="usp-delete-affected"]')
+    expect(list?.querySelectorAll('li')).toHaveLength(1)
+    expect(list?.textContent).toContain('Concept 7')
+    expect(list?.textContent).toContain(HOSTILE)
+    expect(list?.querySelector('img')).toBeNull()
+    expect(overlay('[data-test="usp-delete-concepts-note"]')).not.toBeNull()
+    expect(overlay('[data-test="confirm-ok"]')?.textContent).toContain('Delete and clear 1 item')
+    w.unmount()
   })
 })

@@ -3,6 +3,7 @@
  * two, pronoun-driven labels, angles with the USP dropdown ("Linked" / "Manually added"), copy from another market
  * with a tick list, delete with the angle count, and hostile text rendered as plain text.
  */
+import { ApiError } from '@catalyst/api-client'
 import { flushPromises } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -447,6 +448,45 @@ describe('PersonasStep (PL-2.1)', () => {
     await w.get('[data-test="personas-empty-cta"]').trigger('click')
     await flushPromises()
     expect(overlay('[data-test="persona-dialog"]') ?? overlay('form')).not.toBeNull()
+    w.unmount()
+  })
+
+  it('PL-2.3: a persona with concepts is refused; the dialog lists them (as text) and the confirm stays off', async () => {
+    const people = many(3, 'SK')
+    const w = await mountStep(people)
+    vi.mocked(strategyApi.removePersona).mockRejectedValue(
+      new ApiError({
+        status: 422,
+        code: 'persona.in_use_by_concepts',
+        message: 'x',
+        details: [
+          {
+            code: 'persona.in_use_by_concepts',
+            meta: {
+              count: 2,
+              affected: [
+                { concept: 'c1', number: 1, title: HOSTILE, status: 'approved' },
+                { concept: 'c2', number: 2, title: 'Second', status: 'awaiting' },
+              ],
+            },
+          },
+        ],
+      }),
+    )
+    await w
+      .findAll('[data-test="persona-card"]')[0]
+      ?.get('[data-test="persona-menu-btn"]')
+      .trigger('click')
+    await flushPromises()
+    await click('[data-test="persona-menu-delete"]')
+    await click('[data-test="confirm-ok"]')
+    const list = overlay('[data-test="persona-delete-concepts"]')
+    expect(list?.querySelectorAll('li')).toHaveLength(2)
+    expect(list?.textContent).toContain(HOSTILE)
+    expect(list?.querySelector('img')).toBeNull()
+    expect(overlayText()).toContain('Concepts use this persona (2)')
+    expect(overlay('[data-test="confirm-ok"]')).toBeNull()
+    expect(overlay('[data-test="confirm-cancel"]')?.textContent).toContain('Close')
     w.unmount()
   })
 })

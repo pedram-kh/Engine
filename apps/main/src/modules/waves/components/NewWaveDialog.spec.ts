@@ -283,6 +283,36 @@ describe('NewWaveDialog (PL-1.1 W3)', () => {
     w.unmount()
   })
 
+  it('PL-2.3: the same refusal adds the concept counts of the markets that have concepts', async () => {
+    vi.mocked(wavesApi.update).mockRejectedValue(
+      new ApiError({
+        status: 422,
+        code: 'wave.market_has_personas',
+        message: 'x',
+        details: [
+          {
+            code: 'wave.market_has_personas',
+            meta: {
+              markets: [
+                { market: 'SK', persona_count: 2, concept_count: 3 },
+                { market: 'RO', persona_count: 1, concept_count: 0 },
+              ],
+            },
+          },
+        ],
+        raw: null,
+      } as never),
+    )
+    const w = await mountWithApp(NewWaveDialog, props(makeWave()))
+    await setInput('[data-test="wave-name"]', 'Renamed')
+    await submit()
+    const text = body('[data-test="wave-form-error"]')?.textContent ?? ''
+    expect(text).toContain('SK (2), RO (1).')
+    expect(text).toContain('Concepts exist in: SK (3).')
+    expect(text).not.toContain('RO (0)')
+    w.unmount()
+  })
+
   it('PL-2.1: a wave.market_has_personas without the meta falls back to a plain message, never a crash', async () => {
     vi.mocked(wavesApi.update).mockRejectedValue(
       new ApiError({
