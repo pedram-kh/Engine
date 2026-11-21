@@ -37,7 +37,7 @@ final class ConceptPresenter
                 'number' => $concept->position,
                 'title' => $concept->title,
                 'status' => $concept->status->value,
-                'persona' => ['id' => $persona->ulid, 'code' => $persona->code, 'title' => $persona->title, 'name' => $persona->name],
+                'persona' => ['id' => $persona->ulid, 'code' => $persona->code, 'title' => $persona->title, 'name' => $persona->name, 'color_key' => $persona->colorKey()->value],
                 'funnel_stage' => $concept->funnel_stage?->value,
                 'funnel_note' => $concept->funnel_note,
                 'product' => $concept->product,

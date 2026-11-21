@@ -20,4 +20,14 @@ interface WaveMarketGuard
      * @return array<string, int> market code => number of personas, only for markets with at least one
      */
     public function personaCountsByMarket(Wave $locked, array $removedCodes): array;
+
+    /**
+     * PL-2.3: the concepts of those markets, so the refusal can name them. A market with concepts always has personas
+     * (a persona with concepts cannot be deleted), so this never decides the refusal; it only adds a count to it.
+     *
+     * @param  Wave  $locked  the wave, already locked FOR UPDATE by the caller
+     * @param  list<string>  $removedCodes
+     * @return array<string, int> market code => number of concepts, only for markets with at least one
+     */
+    public function conceptCountsByMarket(Wave $locked, array $removedCodes): array;
 }

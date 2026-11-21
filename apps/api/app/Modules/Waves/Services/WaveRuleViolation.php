@@ -29,12 +29,17 @@ final class WaveRuleViolation extends RuntimeException
      * their persona counts so the dialog can say "Remove the personas of SK first (3)".
      *
      * @param  array<string, int>  $counts  market code => persona count
+     * @param  array<string, int>  $conceptCounts  market code => concept count (PL-2.3); the key is added only when above zero, so a wave with no concepts answers exactly as before
      */
-    public static function marketHasPersonas(array $counts): self
+    public static function marketHasPersonas(array $counts, array $conceptCounts = []): self
     {
         $markets = [];
         foreach ($counts as $market => $n) {
-            $markets[] = ['market' => (string) $market, 'persona_count' => $n];
+            $entry = ['market' => (string) $market, 'persona_count' => $n];
+            if (($conceptCounts[$market] ?? 0) > 0) {
+                $entry['concept_count'] = $conceptCounts[$market];
+            }
+            $markets[] = $entry;
         }
 
         return new self('wave.market_has_personas', 'Remove the personas of those markets before removing the markets from the wave.', ['markets' => $markets]);

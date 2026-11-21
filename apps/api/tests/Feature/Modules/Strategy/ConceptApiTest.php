@@ -399,8 +399,10 @@ it('Q4: a market that has concepts cannot be removed from the wave (its personas
     $w = S::world();
     C::make($w, C::persona($w, 'RO'));
 
+    C::make($w, C::persona($w, 'RO'));
     S::call($w['admin'], 'PATCH', WaveFixtures::wavesUrl($w['agency'], $w['brand'], $w['wave']->ulid), ['markets' => ['SK', 'CZ']])
-        ->assertUnprocessable()->assertJsonPath('errors.0.code', 'wave.market_has_personas');
+        ->assertUnprocessable()->assertJsonPath('errors.0.code', 'wave.market_has_personas')
+        ->assertJsonPath('errors.0.meta.markets.0.concept_count', 2);
     expect(Wave::query()->findOrFail($w['wave']->id)->markets)->toBe(['SK', 'RO', 'CZ']);
 });
 

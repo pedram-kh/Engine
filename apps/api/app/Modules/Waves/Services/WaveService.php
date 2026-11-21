@@ -151,7 +151,7 @@ final class WaveService
                     if ($removed !== []) {
                         $withPersonas = $this->marketGuard->personaCountsByMarket($locked, $removed);
                         if ($withPersonas !== []) {
-                            throw WaveRuleViolation::marketHasPersonas($withPersonas);
+                            throw WaveRuleViolation::marketHasPersonas($withPersonas, $this->marketGuard->conceptCountsByMarket($locked, $removed));
                         }
                     }
 
