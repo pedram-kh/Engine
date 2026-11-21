@@ -18,7 +18,6 @@ const { url, failed, loading } = useAuthenticatedImage(() => props.image.file_ur
 
 /** A name the file system accepts: the stored original name with path separators and control characters removed. */
 function saveName(name: string): string {
-  // eslint-disable-next-line no-control-regex
   const clean = name.replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_').trim()
   return clean === '' ? 'image' : clean
 }

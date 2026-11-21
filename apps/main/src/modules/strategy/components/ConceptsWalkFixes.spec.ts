@@ -5,6 +5,7 @@
  */
 import type { WaveConceptResource } from '@catalyst/api-client'
 import { flushPromises } from '@vue/test-utils'
+import type { ComponentPublicInstance } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('../api/strategy.api', () => ({
@@ -105,7 +106,10 @@ async function choosePersona(
 ): Promise<void> {
   const p = [personaWithAngles, personaBare].find((x) => x.attributes.title === title)
   if (!p) throw new Error(title)
-  w.findComponent('[data-test="concept-field-persona"]').vm.$emit('update:modelValue', p.id)
+  w.findComponent<ComponentPublicInstance>('[data-test="concept-field-persona"]').vm.$emit(
+    'update:modelValue',
+    p.id,
+  )
   await flushPromises()
 }
 

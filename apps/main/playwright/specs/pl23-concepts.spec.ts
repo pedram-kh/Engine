@@ -111,7 +111,7 @@ async function setup(
     await closeDrawer()
     await expect(page.locator('[data-test="concepts-grid"]')).toBeVisible()
   }
-  return { base, concept, open, page }
+  return { base, concept, open, closeDrawer, page }
 }
 
 async function sideways(page: Page): Promise<number> {
@@ -225,6 +225,60 @@ test.describe('Concepts step', () => {
       await expect(anchor).toHaveAttribute('target', '_blank')
       await expect(anchor).toHaveAttribute('rel', 'noopener noreferrer')
       await expect(page.locator('img[src="x"]')).toHaveCount(0)
+      expect(await sideways(page)).toBeLessThanOrEqual(1)
+    })
+
+    test(`at ${size.name}: walk fixes - stepper warning, decision choice, persona refusal and its link`, async ({
+      page,
+      request,
+    }) => {
+      const s = await setup(page, request, size)
+      const only = await s.concept('Only idea')
+      await s.open()
+      const stepper = page.locator('[data-test="strategy-stepper"]')
+      // One concept, not approved: steps 5 and 6 carry the amber count.
+      await expect(stepper).toContainText('Concepts: 0 of 1 approved')
+
+      // P1: the choice is a radio group; Save says why it cannot proceed.
+      await page.locator('[data-test="concepts-record-decision"]').click()
+      const approved = page.locator('[data-test="concept-decision-approved"]')
+      const changes = page.locator('[data-test="concept-decision-changes"]')
+      await expect(approved).toHaveAttribute('aria-checked', 'true')
+      await expect(page.locator('[data-test="concept-decision-why"]')).toHaveText(
+        "Enter the client's name.",
+      )
+      await changes.click()
+      await expect(changes).toHaveAttribute('aria-checked', 'true')
+      await expect(approved).toHaveAttribute('aria-checked', 'false')
+      await expect(page.locator('[data-test="concept-decision-why"]')).toHaveText(
+        "Enter the client's name and the comment.",
+      )
+      await approved.click()
+      await page.locator('[data-test="concept-decision-name"] input').fill('Dana')
+      await expect(page.locator('[data-test="concept-decision-why"]')).toHaveCount(0)
+      await page.locator('[data-test="concept-decision-save"]').click()
+      await expect(page.locator('[data-test="concept-decision-dialog"]')).toHaveCount(0)
+
+      // D1: everything approved - steps 5 and 6 show "Not available yet" and nothing else.
+      await expect(stepper).toContainText('1 of 1 approved')
+      await expect(stepper).not.toContainText('Concepts: ')
+      expect(only.data.id).not.toBe('')
+
+      // P2: a persona with concepts is refused, grouped, with a link to its concepts.
+      await page.goto(page.url().replace('/concepts', '/personas'))
+      await s.closeDrawer()
+      await page.locator('[data-test="persona-menu-btn"]').first().click()
+      await page.locator('[data-test="persona-menu-delete"]').click()
+      await page.locator('[data-test="confirm-ok"]').click()
+      const dialog = page.locator('[data-test="persona-delete-dialog"]')
+      await expect(dialog).toContainText("can't be deleted")
+      await expect(page.locator('[data-test="persona-delete-concepts-heading"]')).toHaveText(
+        'Concepts',
+      )
+      await page.locator('[data-test="persona-delete-concepts-link"]').click()
+      await s.closeDrawer()
+      await expect(page.locator('[data-test="concepts-persona-filter"]')).toBeVisible()
+      await expect(page.locator('[data-test^="concept-card-"]')).toHaveCount(1)
       expect(await sideways(page)).toBeLessThanOrEqual(1)
     })
   }

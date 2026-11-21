@@ -307,10 +307,18 @@ async function submit(): Promise<void> {
 }
 .decision-choice__btn {
   min-width: 0;
+  height: auto;
+  min-height: 40px;
+  padding: 6px 10px;
   white-space: normal;
   text-transform: none;
   letter-spacing: normal;
   font-weight: 500;
+}
+.decision-choice__btn :deep(.v-btn__content) {
+  white-space: normal;
+  text-align: center;
+  min-width: 0;
 }
 .decision-choice__btn--on {
   font-weight: 700;
