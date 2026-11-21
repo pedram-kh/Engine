@@ -350,8 +350,27 @@ describe('ConceptsStep (PL-2.3)', () => {
 
     await w.get('[data-test="concept-image-remove"]').trigger('click')
     await flushPromises()
+    expect(strategyApi.removeImage).not.toHaveBeenCalled()
     await click('[data-test="concept-reset-dialog"] [data-test="confirm-ok"]')
     expect(strategyApi.removeImage).toHaveBeenCalledTimes(1)
+    w.unmount()
+  })
+
+  it('A1: adding a link or an image to an Approved concept asks first; Cancel opens and uploads nothing', async () => {
+    const w = await mountStep([makeConcept(1, persona, { decision: decision() }, 'approved')])
+    await w.get('[data-test="concept-link-add"]').trigger('click')
+    await flushPromises()
+    expect(overlay('[data-test="concept-reset-dialog"]')).not.toBeNull()
+    await click('[data-test="concept-reset-dialog"] [data-test="confirm-cancel"]')
+    expect(overlay('[data-test="concept-link-dialog"]')).toBeNull()
+
+    const input = w.get('[data-test="concept-image-input"]').element as HTMLInputElement
+    const picked = pick(input, [new File(['x'], 'ok.jpg', { type: 'image/jpeg' })])
+    await flushPromises()
+    expect(overlay('[data-test="concept-reset-dialog"]')).not.toBeNull()
+    await click('[data-test="concept-reset-dialog"] [data-test="confirm-cancel"]')
+    await picked
+    expect(strategyApi.initImage).not.toHaveBeenCalled()
     w.unmount()
   })
 
