@@ -257,14 +257,14 @@ it('Q9: a decompression bomb (header 30000 x 30000, a few bytes) gets no thumbna
 it('Q9: the pixel and side thresholds stop the decoder; a corrupt body inside them reaches it and fails soft', function (array $size, bool $decoderReached): void {
     $w = S::world();
     $id = C::make($w, C::persona($w));
-    Log::spy();
+    $log = Log::spy();
     C::upload($w, $id, bombPng($size[0], $size[1]))->assertCreated();
     expect(WaveConceptImage::query()->firstOrFail()->thumb_key)->toBeNull();
     // Only a decode error logs "thumbnail failed"; a threshold refusal logs at info and never gets that far.
     if ($decoderReached) {
-        Log::shouldHaveReceived('warning')->once();
+        $log->shouldHaveReceived('warning')->once();
     } else {
-        Log::shouldNotHaveReceived('warning');
+        $log->shouldNotHaveReceived('warning');
     }
 })->with([
     'over 40 MP' => [[7000, 6000], false],
