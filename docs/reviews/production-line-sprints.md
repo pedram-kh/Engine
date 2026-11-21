@@ -252,3 +252,9 @@ Notes: the walks' mock API carries no `waves_enabled`, so they are flag-off by c
 4. **Q15 (creator draft form):** the creator's "Submit your draft" form still appears on a for-a-wave campaign. `waves_enabled` must not be turned on in production for real creators before PL-6 decides it.
 5. **Tech-debt rows opened in PL-1:** 40 (no virus scan or content check on uploads, brand client files), 41 (a NORMAL campaign can be set Active or listed with budget 0), 42 (`ErasureClaimGuardTest` memory use), 43 (`appIconAssets.spec.ts` local failure).
 6. **Flag:** `waves_enabled` is default OFF everywhere that matters and is never turned on by a deploy.
+
+## PL-2.3 rulings (Pedram, 2026-11-21)
+
+- **Concepts and client contact data.** The agency records the client's decision, and with it a **client contact's name and feedback**, as free text (`wave_concept_decisions`). The privacy documents need a sentence on client contact names and feedback recorded by the agency (for Jordan; `docs/tech-debt.md` row 48). **PL-4 must decide how those names link to a real client user**, and what erasure of a client contact does to them.
+- **No lock.** Steps 5 and 6 (PL-3) are never locked by concepts. The Creators and Scripts screens show the warning ("{approved} of {total} concepts approved" or "No concepts yet") and **never block**.
+- A persona that concepts use cannot be deleted (422 with the count, every role); deleting a USP keeps the concepts and removes the chip; at most 30 concepts per market.
