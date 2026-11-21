@@ -274,7 +274,14 @@ describe('PL-2.1 typed meta readers', () => {
     expect(
       marketHasPersonasMeta(
         err('wave.market_has_personas', {
-          markets: [{ ...ok, persona_count: 'two' }, null, { market: 'x', persona_count: 1 }, ok],
+          markets: [
+            { ...ok, persona_count: 'two' },
+            null,
+            { market: 'x', persona_count: 1 },
+            { market: 'y', code: 'Y', persona_count: 1 },
+            { market: 'z', name: 'Zed', persona_count: 1 },
+            ok,
+          ],
         }),
       ),
     ).toEqual({ markets: [ok] })

@@ -79,3 +79,68 @@ this change did not touch. Not measured: duration on a production-sized table.
 - No browser walk (Stage 2). No new UI.
 - Lock duration on production-sized tables: not run.
 - `apps/api` Pest with `--parallel`: not run (serial only, WORKING-PROCESS §4.1).
+
+# Stage 2 (web)
+
+## Stage 1 differences accepted at review
+
+- The name key is an expression index on `lower(name)`.
+- The market replace runs inside a savepoint.
+- `markets_renamed` is always present in the `wave.updated` payload.
+- Playwright runs serially, only because the e2e database is shared.
+
+## Fidelity: frame 13:4000 (New wave) against the build, 1600 wide and 390 wide
+
+Measured in a real browser on the walk data. Screenshots are in `/tmp/pl24/shots/`.
+
+| Element                                                  | Frame                                            | Built                                                   | Kind                                        |
+| -------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------- | ------------------------------------------- |
+| Modal width                                              | 640                                              | 640                                                     | match                                       |
+| Title                                                    | 20/600                                           | 20/600                                                  | VISUAL, fixed                               |
+| Brand line                                               | 13, muted                                        | 13, rgb(160,160,168)                                    | VISUAL, fixed                               |
+| Close X                                                  | 22px                                             | 22px, 40px target                                       | VISUAL, fixed                               |
+| Name and go-live                                         | side by side, gap 14                             | same, one column below 560px                            | VISUAL, fixed                               |
+| Markets label                                            | 12/500                                           | 12/500                                                  | VISUAL, fixed                               |
+| Market chip                                              | radius 8, 6/10, 13/500, green 10% and 50% border | same                                                    | VISUAL, fixed                               |
+| Country code badge                                       | 10/700, radius 4, 1/5                            | same                                                    | VISUAL, fixed                               |
+| Add chip                                                 | dashed, radius 8, green text                     | same                                                    | VISUAL, fixed                               |
+| Footer bar                                               | `#1b1b1d`, top border, 16/24, gap 10             | rgb(27,27,29), same                                     | VISUAL, fixed                               |
+| Card fill                                                | `#151516`                                        | `#232326` (surface-bright token)                        | TOKEN, ruling 11                            |
+| Card radius and shadow                                   | 14, `0 24 64 .6`                                 | 10 (`--radius-xl`), overlay token                       | TOKEN, ruling 11                            |
+| Cancel border                                            | `#2e2e33`                                        | rgb(58,58,64) outline token; height 40 against about 39 | TOKEN                                       |
+| Field style                                              | label above, 12/500, box about 39                | Vuetify outlined, floating label, height 48             | VISUAL, app-wide, not fixed, needs a ruling |
+| "Start from: copy previous wave / start fresh"           | present                                          | absent; PL-1 campaign radios kept                       | FUNCTIONAL (PL-3 and later)                 |
+| Market builder card (name, code, hint, countries)        | not in frame                                     | built                                                   | FUNCTIONAL, left as built                   |
+| Tabs show names, truncate at 180px, info button, tooltip | frame bar style                                  | same bar style plus the additions                       | FUNCTIONAL                                  |
+
+The field style difference is app-wide (every form uses the same theme). It is not changed here.
+
+## Interaction checks
+
+- Dialog open, close and quick reopen, every menu and the countries list: `wave-dialog-menus` (2 of 2).
+- Countries list: hover with a mouse, tap in touch emulation, and Tab then Enter all open it. Escape closes it and focus returns to the info button.
+- Hostile market name: renders as text (0 `img` elements), truncates, full name in the tooltip and the list. No `v-html` (`noVHtml.spec.ts`).
+- No sideways scroll at 1600 or 390.
+
+## Flag-off
+
+- Agency target 126 and creator target 146: identical to the baseline, comment nodes included, 0 page errors.
+- Waves ON, strategy OFF, differs from PL-1 only here:
+  - The New wave dialog: header with close X and restyled title and brand line; name and go-live side by side; a Markets label; market builder cards instead of the chip picker; restyled chips; footer bar; outlined Cancel.
+  - The wave page chips and the Brand waves table show market names and an info button.
+- Nothing else differs. The `wave-tracker` and strategy-off Playwright specs pass.
+
+## Gates run (Stage 2)
+
+- Vitest `apps/main`: 5450 passed, 2 failed. Both are in `tests/unit/native/appIconAssets.spec.ts`, which failed the same way at Stage 1 and is untouched.
+- Vitest `api-client`: 236 passed.
+- Pest SQLite: 5239 passed, 56 skipped. Pest PostgreSQL (`pl24_test`): 5295 passed. Both ran before the last seeder refactor; after it only the seeder test (4 of 4), Pint and Larastan were rerun.
+- Playwright, chromium, serial: 22 of 23 in the full run; the one failure was `wave-dialog-menus`, fixed and rerun 2 of 2. Longest test 14.1 s.
+- vue-tsc clean. ESLint 0 errors, 2 old `v-html` warnings in untouched files. Pint pass. Larastan 0 errors.
+- Break-reverts: 49 web gates, each red then green, in `pl-2-4-break-reverts.md`.
+
+## Not run
+
+- Pest full suites after the final seeder refactor.
+- Firefox and WebKit Playwright projects.
+- Real-device touch (touch emulation only).

@@ -47,6 +47,14 @@ const { t } = useI18n()
 </template>
 
 <style>
+/* A finger needs more than 20 px. */
+@media (pointer: coarse) {
+  .market-info-btn.v-btn {
+    width: 36px;
+    height: 36px;
+  }
+}
+
 /* Teleported, so not scoped. */
 .market-info-card__title {
   white-space: normal;

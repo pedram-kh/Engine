@@ -157,6 +157,7 @@ describe('PersonasStep (PL-2.1)', () => {
     await w.get('[data-test="persona-add"]').trigger('click')
     await flushPromises()
     expect(overlay('[data-test="persona-dialog"]')).not.toBeNull()
+    expect(overlayText()).toContain('Add persona · Slovakia')
     await click('[data-test="persona-dialog-save"]')
     expect(strategyApi.createPersona).not.toHaveBeenCalled()
     expect(overlayText()).toContain('Enter a title.')
@@ -240,6 +241,8 @@ describe('PersonasStep (PL-2.1)', () => {
       'Copying 3 → Slovakia will have 4 of 8',
     )
     expect(document.body.querySelectorAll('[data-test="copy-item"]')).toHaveLength(3)
+    expect(overlay('[data-test="copy-dialog"]')?.textContent).toContain('Romania')
+    expect(overlay('[data-test="copy-dialog"]')?.textContent).not.toMatch(/\bRO\b/)
     w.unmount()
 
     const full = await mountStep([...many(6, 'SK'), ...many(3, 'RO', 7)])

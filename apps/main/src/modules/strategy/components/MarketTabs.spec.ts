@@ -47,12 +47,16 @@ describe('MarketTabs (PL-2.4)', () => {
     expect(w.emitted('select')?.[0]).toEqual(['UKI'])
   })
 
+  it('selects by the market ULID, never by the short code', async () => {
+    const list = markets().map((m, i) => ({ ...m, id: `01ULID${i}XXXXXXXXXXXXXXXXXXXX` }))
+    const w = await mountStrategy(MarketTabs, { markets: list, active: list[0]!.id })
+    await w.get('[data-test="market-tab-UKI"]').trigger('click')
+    expect(w.emitted('select')?.[0]).toEqual(['01ULID1XXXXXXXXXXXXXXXXXXXX'])
+    w.unmount()
+  })
+
   it('has an info button per tab with an accessible name that opens the countries list', async () => {
-    const w = await mountStrategy(
-      MarketTabs,
-      { markets: markets(), active: 'SK' },
-      { attachTo: document.body },
-    )
+    const w = await mountStrategy(MarketTabs, { markets: markets(), active: 'SK' })
     const info = w.get('[data-test="market-info-UKI"]')
     expect(info.attributes('aria-label')).toContain('UK & Ireland')
     await info.trigger('click')
@@ -67,11 +71,11 @@ describe('MarketTabs (PL-2.4)', () => {
 
 describe('MarketCountriesInfo (PL-2.4)', () => {
   it('lists the full name and every country, as text', async () => {
-    const w = await mountStrategy(
-      MarketCountriesInfo,
-      { name: HOSTILE, countries: ['FR', 'DE'], id: 'x' },
-      { attachTo: document.body },
-    )
+    const w = await mountStrategy(MarketCountriesInfo, {
+      name: HOSTILE,
+      countries: ['FR', 'DE'],
+      id: 'x',
+    })
     await w.get('[data-test="market-info-x"]').trigger('click')
     await flushPromises()
     expect(overlay('[data-test="market-countries-name"]')?.textContent).toBe(HOSTILE)

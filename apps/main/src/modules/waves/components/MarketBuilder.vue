@@ -84,8 +84,8 @@ function addCountry(index: number, code: string): void {
     m.countries.push(code)
     refreshDraft(d, index)
   })
+  // The list stays open (a market can have many countries); Escape or a click outside closes it.
   search.value = ''
-  openFor.value = null
 }
 
 function removeCountry(index: number, code: string): void {
@@ -186,6 +186,7 @@ function codeError(d: MarketDraft): string[] {
           :key="c"
           size="small"
           closable
+          class="market-chip"
           :close-label="
             t('app.waves.markets.removeCountry', {
               country: labelForCountryCode(c),
@@ -195,8 +196,8 @@ function codeError(d: MarketDraft): string[] {
           :data-test="`market-chip-${c}`"
           @click:close="removeCountry(i, c)"
         >
-          <strong class="mr-1">{{ c }}</strong>
-          {{ labelForCountryCode(c) }}
+          <strong class="market-chip__code">{{ c }}</strong>
+          <span class="market-chip__name">{{ labelForCountryCode(c) }}</span>
         </v-chip>
 
         <v-menu
@@ -220,6 +221,7 @@ function codeError(d: MarketDraft): string[] {
               size="small"
               variant="outlined"
               prepend-icon="mdi-plus"
+              class="market-add-chip"
               :disabled="d.countries.length >= MAX_COUNTRIES"
               data-test="market-add-country"
             >
@@ -279,7 +281,7 @@ function codeError(d: MarketDraft): string[] {
         variant="outlined"
         prepend-icon="mdi-plus"
         :disabled="atMarketLimit"
-        class="market-builder__add"
+        class="market-add-chip market-builder__add"
         data-test="market-add"
         @click="addMarket"
       >
@@ -318,8 +320,19 @@ function codeError(d: MarketDraft): string[] {
 .market-card__code {
   flex: 0 0 110px;
 }
+@media (max-width: 559px) {
+  .market-card__row {
+    flex-wrap: wrap;
+  }
+  .market-card__name {
+    flex: 1 1 100%;
+  }
+  .market-card__code {
+    flex: 1 1 0;
+  }
+}
 .market-card__hint {
-  margin: 4px 0 8px;
+  margin: 6px 0 10px;
   font-size: 12px;
   line-height: 1.3;
   color: rgb(var(--v-theme-on-surface-variant));
@@ -337,6 +350,48 @@ function codeError(d: MarketDraft): string[] {
 }
 .market-builder__add {
   border-style: dashed;
+}
+/* Frame 13:4026: market chip radius 8, pad 6/10, 13 / 500, code badge (10 / 700 on the primary colour, radius 4, pad 1/5),
+   primary at 10 % with a 50 % border; "Add market" dashed, radius 8, 13 / 500 in the primary colour. */
+.market-chip.v-chip,
+.market-add-chip.v-chip {
+  height: auto;
+  min-height: 0;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  gap: 6px;
+}
+.market-chip.v-chip {
+  background: color-mix(in srgb, rgb(var(--v-theme-primary)) 10%, transparent);
+  border: 1px solid color-mix(in srgb, rgb(var(--v-theme-primary)) 50%, transparent);
+  color: rgb(var(--v-theme-on-surface));
+}
+.market-chip :deep(.v-chip__underlay) {
+  display: none;
+}
+.market-chip__code {
+  padding: 1px 5px;
+  margin-right: 6px;
+  border-radius: 4px;
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary));
+  font-size: 10px;
+  font-weight: 700;
+  line-height: normal;
+}
+.market-chip :deep(.v-chip__close) {
+  margin-inline: 6px 0;
+  font-size: 12px;
+}
+.market-add-chip.v-chip {
+  border-color: rgb(var(--v-theme-border-color));
+  color: rgb(var(--v-theme-primary));
+}
+.market-add-chip :deep(.v-icon) {
+  font-size: 13px;
+  margin-inline-end: 0;
 }
 </style>
 

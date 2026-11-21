@@ -62,8 +62,8 @@ final class Pl24WalkSeeder extends Seeder
 
     public const string B_ADMIN_EMAIL = 'admin'.self::DOMAIN_B;
 
-    /** A market name that is not a name: markup, quotes, an ampersand, and a tail long enough to truncate. */
-    public const string HOSTILE_NAME = '<img src=x onerror=alert(1)><b>Bold</b> & "quoted" market with a very long name that keeps going and going';
+    /** A market name that is not a name: markup, quotes and an ampersand, at the 60-character limit, long enough to truncate on a tab. */
+    public const string HOSTILE_NAME = '<img src=x onerror=alert(1)><b>Bad</b> & "q" long market nam';
 
     private const array USPS = [
         'Category entry points', 'Affordability', 'Selection', 'Speed & reliability', 'Super app convenience', 'Local restaurant discovery',
@@ -93,11 +93,8 @@ final class Pl24WalkSeeder extends Seeder
         User::factory()->agencyStaff($agency)->create(['email' => self::STAFF_EMAIL, 'name' => 'Sam Staff', 'password' => self::PASSWORD]);
 
         $bolt = Brand::factory()->forAgency($agency->id)->create(['name' => 'Bolt Food', 'slug' => 'pl24-bolt-food', 'color' => 'green']);
-        $make = fn (string $name, string $goLive, array $markets): Wave => Wave::factory()->forBrand($agency->id, $bolt->id)->withMarkets($markets)->create([
-            'name' => $name, 'go_live_on' => $goLive, 'created_by_user_id' => $admin->id,
-        ]);
 
-        $w1 = $make('Markets Wave 1', '2027-01-09', [
+        $w1 = $this->wave($agency, $bolt, $admin, 'Markets Wave 1', '2027-01-09', [
             ['name' => 'Slovakia', 'code' => 'SK', 'countries' => ['SK']],
             ['name' => 'UK & Ireland', 'code' => 'UKI', 'countries' => ['GB', 'IE']],
             ['name' => 'Nordics', 'code' => 'NOR', 'countries' => ['SE', 'NO', 'DK', 'FI']],
@@ -134,11 +131,21 @@ final class Pl24WalkSeeder extends Seeder
         app(ConceptDecisionService::class)->record($bolt, $w1, $approved->ulid, $admin, ['status' => 'approved', 'client_name' => 'Jana Nováková', 'note' => 'Good to go.']);
         unset($sk1);
 
-        $make('Markets Wave 2', '2027-02-01', [['name' => 'Slovakia', 'code' => 'SK', 'countries' => ['SK']]]);
+        $this->wave($agency, $bolt, $admin, 'Markets Wave 2', '2027-02-01', [['name' => 'Slovakia', 'code' => 'SK', 'countries' => ['SK']]]);
 
-        $w3 = $make('Markets Wave 3', '2027-03-01', [['name' => self::HOSTILE_NAME, 'code' => 'HX', 'countries' => ['FR', 'DE']]]);
+        $w3 = $this->wave($agency, $bolt, $admin, 'Markets Wave 3', '2027-03-01', [['name' => self::HOSTILE_NAME, 'code' => 'HX', 'countries' => ['FR', 'DE']]]);
         $this->usps($w3, 2);
         $this->persona($w3, 'HX', 'The Hostile Market Persona', 'Hex', PersonaPronoun::They, 'a persona in a market with a hostile name');
+    }
+
+    /**
+     * @param  list<array{name: string, code?: string, countries: list<string>}>  $markets
+     */
+    private function wave(Agency $agency, Brand $brand, User $admin, string $name, string $goLive, array $markets): Wave
+    {
+        return Wave::factory()->forBrand($agency->id, $brand->id)->withMarkets($markets)->create([
+            'name' => $name, 'go_live_on' => $goLive, 'created_by_user_id' => $admin->id,
+        ]);
     }
 
     private function agencyB(): void

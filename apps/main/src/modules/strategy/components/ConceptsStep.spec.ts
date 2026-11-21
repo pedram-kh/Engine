@@ -183,6 +183,14 @@ describe('ConceptsStep (PL-2.3)', () => {
     w.unmount()
   })
 
+  it('PL-2.4: the add dialog is titled with the market NAME, not its code', async () => {
+    const w = await mountStep([makeConcept(1, persona)])
+    await w.get('[data-test="concept-add"]').trigger('click')
+    await flushPromises()
+    expect(overlay('[data-test="concept-dialog"]')?.textContent).toContain('Add concept · Slovakia')
+    w.unmount()
+  })
+
   it('30 ceiling: at 30 both Add controls are off and the tile says so', async () => {
     const list = Array.from({ length: 30 }, (_, i) => makeConcept(i + 1, persona))
     const w = await mountStep(list)

@@ -116,7 +116,7 @@ test.describe('Market builder and tabs (PL-2.4)', () => {
     await expect(taken).toContainText('Slovakia')
     await expect(taken).toHaveClass(/v-list-item--disabled/)
     await page.locator('[data-test="market-option-GB"]').click()
-    await page.locator('[data-test="market-add-country"]').nth(1).click()
+    // The list stays open: a market can have many countries.
     await page.locator('[data-test="market-option-IE"]').click()
     await page.keyboard.press('Escape')
     const name = page.locator('[data-test="market-card-1"] [data-test="market-name-input"] input')
@@ -167,7 +167,7 @@ test.describe('Market builder and tabs (PL-2.4)', () => {
     await page.locator('[data-test="market-tab-SK"]').hover()
     await tab.hover()
     await expect(
-      page.locator('.v-tooltip .v-overlay__content', { hasText: 'Ireland' }).last(),
+      page.locator('.v-tooltip .v-overlay__content', { hasText: 'United Kingdom' }).last(),
     ).toBeVisible()
     await page.mouse.move(5, 5)
 

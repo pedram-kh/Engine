@@ -31,6 +31,11 @@ describe('suggestMarketCode', () => {
     ).toBeLessThanOrEqual(6)
   })
 
+  it('never makes a code longer than six, whatever the name', () => {
+    expect(suggestMarketCode('A B C D E F G H I J', ['SE', 'NO'])).toHaveLength(6)
+    expect(suggestMarketCode('Alpha', ['SE', 'NO'], ['ALP', 'ALP2'])).toBe('ALP3')
+  })
+
   it('handles a name with no letters', () => {
     expect(suggestMarketCode('!!!', ['SE', 'NO'])).toMatch(/^[A-Z0-9]{2,6}$/)
   })

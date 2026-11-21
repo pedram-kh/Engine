@@ -86,6 +86,9 @@ test.describe('New wave dialog menus', () => {
 
     await ireland.click()
     await expect(page.locator('[data-test="market-chip-IE"]')).toBeVisible()
+    // The list stays open for more countries (PL-2.4); Escape closes it and the date field is reachable again.
+    await page.keyboard.press('Escape')
+    await expect(menu).toHaveCount(0)
 
     // The date control is the browser's own picker (input type=date), not a Vuetify menu.
     // What can be asserted is that the field itself is the topmost element inside the dialog.

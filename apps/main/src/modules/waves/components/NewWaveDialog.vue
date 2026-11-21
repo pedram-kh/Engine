@@ -306,34 +306,49 @@ async function submit(): Promise<void> {
       }
     "
   >
-    <v-card :key="session">
-      <v-card-title class="text-h6 pt-4 px-6">
-        {{ isEdit ? t('app.waves.dialog.editTitle') : t('app.waves.dialog.createTitle') }}
-      </v-card-title>
-      <v-card-subtitle class="px-6" data-test="wave-dialog-brand">{{ brandName }}</v-card-subtitle>
-      <v-card-text class="d-flex flex-column ga-4 px-6">
-        <v-text-field
-          v-model="name"
-          :label="t('app.waves.dialog.name')"
-          variant="outlined"
-          density="comfortable"
-          maxlength="120"
-          hide-details="auto"
-          :error-messages="nameError ? [nameError] : []"
-          data-test="wave-name"
+    <v-card :key="session" class="wave-dialog-card">
+      <div class="wave-dialog__head">
+        <div class="wave-dialog__titles">
+          <div class="wave-dialog__title">
+            {{ isEdit ? t('app.waves.dialog.editTitle') : t('app.waves.dialog.createTitle') }}
+          </div>
+          <div class="wave-dialog__brand" data-test="wave-dialog-brand">{{ brandName }}</div>
+        </div>
+        <v-btn
+          icon="mdi-close"
+          variant="text"
+          size="small"
+          :disabled="saving"
+          :aria-label="t('app.strategy.close')"
+          data-test="wave-close"
+          @click="close"
         />
-        <v-text-field
-          v-model="goLiveOn"
-          type="date"
-          :label="t('app.waves.dialog.goLive')"
-          variant="outlined"
-          density="comfortable"
-          hide-details="auto"
-          :error-messages="goLiveError ? [goLiveError] : []"
-          data-test="wave-go-live"
-        />
+      </div>
+      <v-card-text class="d-flex flex-column ga-4 px-6 pt-0">
+        <div class="wave-dialog__pair">
+          <v-text-field
+            v-model="name"
+            :label="t('app.waves.dialog.name')"
+            variant="outlined"
+            density="comfortable"
+            maxlength="120"
+            hide-details="auto"
+            :error-messages="nameError ? [nameError] : []"
+            data-test="wave-name"
+          />
+          <v-text-field
+            v-model="goLiveOn"
+            type="date"
+            :label="t('app.waves.dialog.goLive')"
+            variant="outlined"
+            density="comfortable"
+            hide-details="auto"
+            :error-messages="goLiveError ? [goLiveError] : []"
+            data-test="wave-go-live"
+          />
+        </div>
         <div>
-          <div class="text-body-2 mb-2">{{ t('app.waves.dialog.markets') }}</div>
+          <div class="wave-dialog__label">{{ t('app.waves.dialog.markets') }}</div>
           <MarketBuilder v-model="drafts" :errors="marketErrors" :error-message="marketsError" />
         </div>
 
@@ -434,9 +449,8 @@ async function submit(): Promise<void> {
           </template>
         </v-alert>
       </v-card-text>
-      <v-card-actions class="px-6 pb-4">
-        <v-spacer />
-        <v-btn variant="text" :disabled="saving" data-test="wave-cancel" @click="close">
+      <div class="wave-dialog__foot">
+        <v-btn variant="outlined" :disabled="saving" data-test="wave-cancel" @click="close">
           {{ t('app.brands.archive.cancel') }}
         </v-btn>
         <v-btn
@@ -448,10 +462,76 @@ async function submit(): Promise<void> {
         >
           {{ isEdit ? t('app.waves.dialog.save') : t('app.waves.dialog.create') }}
         </v-btn>
-      </v-card-actions>
+      </div>
     </v-card>
   </v-dialog>
 </template>
+
+<style scoped>
+/* Frame 13:4000: a header with the title (20 / 600), the brand (13) and a close button, name and date side by side,
+   and a footer bar (the surface colour, a top border, 16 / 24 padding, 10 between the buttons). The field style itself
+   (Vuetify outlined with a floating label), the card radius and shadow, and the secondary button's border are the app's
+   design-system tokens, shared by every dialog and form (see pl-2-4-review.md). */
+.wave-dialog-card {
+  overflow: hidden;
+}
+.wave-dialog__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 22px 24px;
+}
+.wave-dialog__titles {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.wave-dialog__head :deep(.v-btn .v-icon) {
+  font-size: 22px;
+}
+.wave-dialog__title {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: normal;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.wave-dialog__brand {
+  font-size: 13px;
+  line-height: normal;
+  opacity: 1;
+  color: rgb(var(--v-theme-on-surface-variant));
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.wave-dialog__pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.wave-dialog__label {
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+.wave-dialog__foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px;
+  background: rgb(var(--v-theme-surface));
+  border-top: 1px solid rgb(var(--v-theme-border-color));
+}
+@media (max-width: 559px) {
+  .wave-dialog__pair {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
 
 <style>
 /* Teleported select menus. The class exists only while a menu in this dialog is open. */
