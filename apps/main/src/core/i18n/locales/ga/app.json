@@ -2072,6 +2072,13 @@
           "noPersonasTitle": "Níl pearsana ag {market} go fóill",
           "noPersonasBody": "Tá coincheap bunaithe ar phearsa. Cuir pearsana leis don mhargadh seo ar dtús.",
           "toPersonas": "Téigh chuig na pearsana"
+        },
+        "references": {
+          "title": "Tagairtí",
+          "subtitle": "íomhánna agus naisc",
+          "image": "Íomhá",
+          "link": "Nasc",
+          "drop": "Scaoil íomhánna anseo nó cuir nasc leis"
         }
       }
     }

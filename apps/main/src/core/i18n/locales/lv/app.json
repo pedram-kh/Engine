@@ -2072,6 +2072,13 @@
           "noPersonasTitle": "Tirgum {market} personu vēl nav",
           "noPersonasBody": "Koncepts balstās uz personu. Vispirms pievienojiet šī tirgus personas.",
           "toPersonas": "Doties uz personām"
+        },
+        "references": {
+          "title": "Atsauces",
+          "subtitle": "attēli un saites",
+          "image": "Attēls",
+          "link": "Saite",
+          "drop": "Velciet attēlus šeit vai pievienojiet saiti"
         }
       }
     }

@@ -2072,6 +2072,13 @@
           "noPersonasTitle": "{market} n'a pas encore de persona",
           "noPersonasBody": "Un concept repose sur une persona. Ajoutez d'abord des personas pour ce marché.",
           "toPersonas": "Aller aux personas"
+        },
+        "references": {
+          "title": "Références",
+          "subtitle": "images et liens",
+          "image": "Image",
+          "link": "Lien",
+          "drop": "Déposez des images ici ou ajoutez un lien"
         }
       }
     }

@@ -447,12 +447,9 @@ const deleteBody = computed(() => {
           data-test="concept-tile"
           @click="openAdd"
         >
-          <v-icon
-            icon="mdi-plus-circle-outline"
-            size="24"
-            class="concept-tile__icon"
-            aria-hidden="true"
-          />
+          <span class="concept-tile__icon"
+            ><v-icon icon="mdi-plus" size="22" aria-hidden="true"
+          /></span>
           <span class="concept-tile__title">{{ t('app.strategy.concepts.add') }}</span>
           <span class="concept-tile__count" data-test="concept-tile-text">
             {{
@@ -649,15 +646,15 @@ const deleteBody = computed(() => {
   flex-wrap: wrap;
   align-items: center;
   gap: 10px 12px;
-  padding: 10px 14px;
+  padding: 14px 16px;
   border: 1px solid transparent;
   border-radius: 10px;
-  font-size: 13px;
+  font-size: 14px;
   line-height: normal;
   --banner: var(--agency-brand-amber);
   color: rgb(var(--v-theme-on-surface));
   background: color-mix(in srgb, var(--banner) 8%, transparent);
-  border-color: color-mix(in srgb, var(--banner) 35%, transparent);
+  border-color: color-mix(in srgb, var(--banner) 40%, transparent);
 }
 .concepts-banner--green {
   --banner: var(--agency-brand-green);
@@ -668,6 +665,8 @@ const deleteBody = computed(() => {
 .concepts-banner__text {
   flex: 1 1 auto;
   min-width: 0;
+  font-weight: 600;
+  color: var(--banner);
 }
 .concepts-grid {
   display: grid;
@@ -682,7 +681,7 @@ const deleteBody = computed(() => {
   justify-content: center;
   gap: 10px;
   min-height: 160px;
-  padding: 32px;
+  padding: 24px;
   border: 1px dashed rgb(var(--v-theme-border-color));
   border-radius: 12px;
   background: transparent;
@@ -695,13 +694,20 @@ const deleteBody = computed(() => {
   cursor: default;
   opacity: 0.6;
 }
-.concept-tile__icon,
-.concept-tile__title {
+.concept-tile__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, rgb(var(--v-theme-primary)) 12%, transparent);
   color: rgb(var(--v-theme-primary));
 }
 .concept-tile__title {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
+  color: rgb(var(--v-theme-primary));
 }
 .concept-tile__count {
   font-size: 12px;

@@ -282,7 +282,7 @@ function pick(action: 'edit' | 'decide' | 'duplicate' | 'remove'): void {
  * colour at 6% with 16 / 18 / 14 padding and a 10px gap; the "CONCEPT n" chip on the page fill, 10.5px / 700 with
  * 0.6px tracking; the status pill 11px / 500 with a 6px dot at 15%; title 18 / 600; chips 12px, radius 999; body 18 / 16
  * padding, 12px gap, label cell 108px (12 / 500, tertiary), value 13 / 19; Hook, Payoff and CTA in a box at 6% fill and
- * the matrix's yellow-line border; key points a column with a tertiary bullet; the changes-requested border at 50%, its footer 7% fill and
+ * the matrix's yellow-line border (70%); key points a column with a tertiary bullet; the changes-requested border at 50%, its footer 7% fill and
  * 30% top border with a 24px avatar. The approved footer is the same geometry in green (an assumption: the frame has none).
  */
 .concept-card {
@@ -421,7 +421,7 @@ function pick(action: 'edit' | 'decide' | 'duplicate' | 'remove'): void {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 18px 16px;
+  padding: 16px 18px;
 }
 .concept-card__field {
   display: flex;
@@ -448,7 +448,7 @@ function pick(action: 'edit' | 'decide' | 'duplicate' | 'remove'): void {
 }
 .concept-card__box {
   padding: 7px 10px;
-  border: 1px solid var(--agency-matrix-line-strong);
+  border: 1px solid var(--agency-matrix-line-concept);
   border-radius: 6px;
   background: var(--agency-matrix-line-fill);
   font-style: italic;

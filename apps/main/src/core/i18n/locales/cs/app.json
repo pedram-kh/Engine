@@ -2072,6 +2072,13 @@
           "noPersonasTitle": "{market} zatím nemá žádné persony",
           "noPersonasBody": "Koncept stojí na persóně. Nejprve přidejte persony pro tento trh.",
           "toPersonas": "Přejít na persony"
+        },
+        "references": {
+          "title": "Reference",
+          "subtitle": "obrázky a odkazy",
+          "image": "Obrázek",
+          "link": "Odkaz",
+          "drop": "Přetáhněte sem obrázky nebo přidejte odkaz"
         }
       }
     }

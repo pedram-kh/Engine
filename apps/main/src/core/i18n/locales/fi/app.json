@@ -2072,6 +2072,13 @@
           "noPersonasTitle": "Markkinalla {market} ei ole vielä persoonia",
           "noPersonasBody": "Konsepti perustuu persoonaan. Lisää ensin persoonia tälle markkinalle.",
           "toPersonas": "Siirry persooniin"
+        },
+        "references": {
+          "title": "Viitteet",
+          "subtitle": "kuvat ja linkit",
+          "image": "Kuva",
+          "link": "Linkki",
+          "drop": "Pudota kuvia tähän tai lisää linkki"
         }
       }
     }

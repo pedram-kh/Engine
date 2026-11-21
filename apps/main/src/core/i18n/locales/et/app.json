@@ -2072,6 +2072,13 @@
           "noPersonasTitle": "Turul {market} pole veel personasid",
           "noPersonasBody": "Kontseptsioon põhineb personal. Lisa kõigepealt sellele turule personad.",
           "toPersonas": "Mine personade juurde"
+        },
+        "references": {
+          "title": "Viited",
+          "subtitle": "pildid ja lingid",
+          "image": "Pilt",
+          "link": "Link",
+          "drop": "Lohista pildid siia või lisa link"
         }
       }
     }

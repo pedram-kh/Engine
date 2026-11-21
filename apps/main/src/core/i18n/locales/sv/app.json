@@ -2072,6 +2072,13 @@
           "noPersonasTitle": "{market} har inga personor ännu",
           "noPersonasBody": "Ett koncept bygger på en persona. Lägg först till personor för den här marknaden.",
           "toPersonas": "Gå till personor"
+        },
+        "references": {
+          "title": "Referenser",
+          "subtitle": "bilder och länkar",
+          "image": "Bild",
+          "link": "Länk",
+          "drop": "Släpp bilder här eller lägg till en länk"
         }
       }
     }

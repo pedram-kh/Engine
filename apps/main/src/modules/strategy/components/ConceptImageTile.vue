@@ -44,28 +44,32 @@ const { url, failed } = useAuthenticatedImage(() =>
       data-test="concept-image-remove"
       @click="emit('remove', image)"
     >
-      <v-icon icon="mdi-close" size="12" />
+      <v-icon icon="mdi-close" size="10" />
     </button>
+    <span class="image-tile__name">{{ image.original_filename }}</span>
   </div>
 </template>
 
 <style scoped>
+/* Frame 13:4412: 96 x 64, radius 6, the file name (10.5px, tertiary) under it; the remove button is a 16px circle at 5px / 6px. */
 .image-tile {
   position: relative;
-  width: 64px;
-  height: 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 96px;
   flex: none;
 }
 .image-tile__open {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
+  width: 96px;
+  height: 64px;
   padding: 0;
   overflow: hidden;
-  border: 1px solid rgb(var(--v-theme-border-color));
-  border-radius: 8px;
+  border: 0;
+  border-radius: 6px;
   background: rgb(var(--v-theme-surface-bright));
   cursor: zoom-in;
 }
@@ -77,19 +81,27 @@ const { url, failed } = useAuthenticatedImage(() =>
 .image-tile__placeholder {
   color: rgb(var(--v-theme-text-tertiary));
 }
+.image-tile__name {
+  overflow: hidden;
+  font-size: 10.5px;
+  line-height: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgb(var(--v-theme-text-tertiary));
+}
 .image-tile__remove {
   position: absolute;
-  top: -6px;
-  right: -6px;
+  top: 5px;
+  right: 6px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   padding: 0;
-  border: 1px solid rgb(var(--v-theme-border-color));
+  border: 0;
   border-radius: 9999px;
-  background: rgb(var(--v-theme-surface));
+  background: color-mix(in srgb, rgb(var(--v-theme-background)) 80%, transparent);
   color: rgb(var(--v-theme-on-surface));
   cursor: pointer;
 }

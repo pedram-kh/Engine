@@ -2072,6 +2072,13 @@
           "noPersonasTitle": "{market} għad m'għandux persuni",
           "noPersonasBody": "Kunċett huwa bbażat fuq persuna. Żid l-ewwel persuni għal dan is-suq.",
           "toPersonas": "Mur għall-persuni"
+        },
+        "references": {
+          "title": "Referenzi",
+          "subtitle": "immaġini u links",
+          "image": "Immaġni",
+          "link": "Link",
+          "drop": "Waqqa’ l-immaġini hawn jew żid link"
         }
       }
     }

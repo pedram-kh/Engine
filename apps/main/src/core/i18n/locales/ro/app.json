@@ -2072,6 +2072,13 @@
           "noPersonasTitle": "{market} nu are încă persona",
           "noPersonasBody": "Un concept se bazează pe o persona. Adaugă mai întâi persona pentru această piață.",
           "toPersonas": "Mergi la persona"
+        },
+        "references": {
+          "title": "Referințe",
+          "subtitle": "imagini și linkuri",
+          "image": "Imagine",
+          "link": "Link",
+          "drop": "Trageți imagini aici sau adăugați un link"
         }
       }
     }

@@ -453,6 +453,28 @@ describe('ConceptsStep (PL-2.3)', () => {
     w.unmount()
   })
 
+  it('drop line: shown only while there are no references; a dropped non-image is refused before any request', async () => {
+    const w = await mountStep([makeConcept(1, persona)])
+    expect(w.find('[data-test="concept-drop"]').exists()).toBe(true)
+    const drop = new Event('drop', { bubbles: true, cancelable: true })
+    Object.defineProperty(drop, 'dataTransfer', {
+      value: { files: [new File(['x'], 'notes.pdf', { type: 'application/pdf' })] },
+    })
+    w.get('[data-test="concept-drop"]').element.dispatchEvent(drop)
+    await flushPromises()
+    expect(w.get('[data-test="concept-upload-notices"]').text()).toContain('notes.pdf: only JPG')
+    expect(strategyApi.initImage).not.toHaveBeenCalled()
+    w.unmount()
+
+    const withLink = await mountStep([
+      makeConcept(1, persona, {
+        links: [{ id: 'L1', url: 'https://example.com/a', title: 'Brief', domain: 'example.com' }],
+      }),
+    ])
+    expect(withLink.find('[data-test="concept-drop"]').exists()).toBe(false)
+    withLink.unmount()
+  })
+
   it('uploads: files over the 300 MB total are refused before any byte moves', async () => {
     const w = await mountStep([makeConcept(1, persona)])
     const big = (name: string, mb: number): File => {

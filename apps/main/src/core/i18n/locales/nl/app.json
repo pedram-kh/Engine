@@ -2072,6 +2072,13 @@
           "noPersonasTitle": "{market} heeft nog geen persona's",
           "noPersonasBody": "Een concept is gebaseerd op een persona. Voeg eerst persona's toe voor deze markt.",
           "toPersonas": "Naar persona's"
+        },
+        "references": {
+          "title": "Referenties",
+          "subtitle": "afbeeldingen en links",
+          "image": "Afbeelding",
+          "link": "Link",
+          "drop": "Sleep afbeeldingen hierheen of voeg een link toe"
         }
       }
     }

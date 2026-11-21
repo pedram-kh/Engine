@@ -2072,6 +2072,13 @@
           "noPersonasTitle": "Rinkai {market} personų dar nėra",
           "noPersonasBody": "Konceptas grindžiamas persona. Pirmiausia pridėkite šios rinkos personų.",
           "toPersonas": "Eiti į personas"
+        },
+        "references": {
+          "title": "Šaltiniai",
+          "subtitle": "vaizdai ir nuorodos",
+          "image": "Vaizdas",
+          "link": "Nuoroda",
+          "drop": "Nutempkite vaizdus čia arba pridėkite nuorodą"
         }
       }
     }

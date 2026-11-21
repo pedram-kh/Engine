@@ -39,6 +39,11 @@ const KEYS = [
   'app.strategy.concepts.menu.duplicate',
   'app.strategy.concepts.menu.delete',
   'app.strategy.concepts.menu.deleteDecided',
+  'app.strategy.concepts.references.title',
+  'app.strategy.concepts.references.subtitle',
+  'app.strategy.concepts.references.image',
+  'app.strategy.concepts.references.link',
+  'app.strategy.concepts.references.drop',
   'app.strategy.concepts.banner.counts',
   'app.strategy.concepts.banner.allApproved',
   'app.strategy.concepts.banner.record',
@@ -212,6 +217,17 @@ const SAME_AS_ENGLISH_BY_DESIGN = new Set<string>([
   'sv:app.strategy.concepts.field.hook',
   'sv:app.strategy.concepts.field.cta',
   'sv:app.strategy.concepts.dialog.persona',
+  'da:app.strategy.concepts.references.link',
+  'nl:app.strategy.concepts.references.link',
+  'et:app.strategy.concepts.references.link',
+  'de:app.strategy.concepts.references.link',
+  'hu:app.strategy.concepts.references.link',
+  'it:app.strategy.concepts.references.link',
+  'mt:app.strategy.concepts.references.link',
+  'pl:app.strategy.concepts.references.link',
+  'pt:app.strategy.concepts.references.link',
+  'ro:app.strategy.concepts.references.link',
+  'fr:app.strategy.concepts.references.image',
 ])
 
 type Bundle = Record<string, unknown>
@@ -234,8 +250,8 @@ function tokens(text: string): string[] {
 }
 
 describe('PL-2.3 concepts strings', () => {
-  it('checks 117 keys across 24 locales', () => {
-    expect(KEYS).toHaveLength(117)
+  it('checks 122 keys across 24 locales', () => {
+    expect(KEYS).toHaveLength(122)
     expect(new Set(KEYS).size).toBe(KEYS.length)
     expect(UI_LOCALES).toHaveLength(24)
   })

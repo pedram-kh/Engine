@@ -2072,6 +2072,13 @@
           "noPersonasTitle": "{market} has no personas yet",
           "noPersonasBody": "A concept is built on a persona. Add personas for this market first.",
           "toPersonas": "Go to personas"
+        },
+        "references": {
+          "title": "References",
+          "subtitle": "images & links",
+          "image": "Image",
+          "link": "Link",
+          "drop": "Drop images here or add a link"
         }
       }
     }

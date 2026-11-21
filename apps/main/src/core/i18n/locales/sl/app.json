@@ -2072,6 +2072,13 @@
           "noPersonasTitle": "{market} še nima person",
           "noPersonasBody": "Koncept temelji na personi. Najprej dodajte persone za ta trg.",
           "toPersonas": "Pojdi na persone"
+        },
+        "references": {
+          "title": "Reference",
+          "subtitle": "slike in povezave",
+          "image": "Slika",
+          "link": "Povezava",
+          "drop": "Spustite slike sem ali dodajte povezavo"
         }
       }
     }

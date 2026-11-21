@@ -41,6 +41,7 @@ const linkOpen = ref(false)
 const editingLink = ref<ConceptLink | null>(null)
 const removing = ref<string | null>(null)
 const error = ref<string | null>(null)
+const dragging = ref(false)
 
 const usedBytes = computed(() => a.value.images.reduce((n, i) => n + (i.size_bytes ?? 0), 0))
 const imagesFull = computed(() => a.value.images.length >= props.limits.images_per_concept)
@@ -62,6 +63,12 @@ const upload = useConceptImageUpload({
 function choose(): void {
   upload.clearNotices()
   picker.value?.click()
+}
+async function onDropped(e: DragEvent): Promise<void> {
+  dragging.value = false
+  const files = Array.from(e.dataTransfer?.files ?? [])
+  upload.clearNotices()
+  if (files.length > 0) await upload.add(files)
 }
 async function onPicked(e: Event): Promise<void> {
   const input = e.target as HTMLInputElement
@@ -130,38 +137,34 @@ onBeforeUnmount(() => {
 
 <template>
   <section class="refs" data-test="concept-references">
-    <div class="refs__group">
-      <div class="refs__head">
-        <span class="refs__label">{{ t('app.strategy.concepts.images.label') }}</span>
-        <span class="refs__count" data-test="concept-image-count">
-          {{
-            t('app.strategy.concepts.images.count', {
-              count: a.images.length,
-              max: limits.images_per_concept,
-              used: formatMegabytes(usedBytes),
-              total: formatMegabytes(limits.image_total_bytes),
-            })
-          }}
-        </span>
+    <div class="refs__top">
+      <div class="refs__title">
+        <v-icon icon="mdi-image-outline" size="14" class="refs__title-icon" aria-hidden="true" />
+        <span class="refs__title-text">{{ t('app.strategy.concepts.references.title') }}</span>
+        <span class="refs__title-sub">{{ t('app.strategy.concepts.references.subtitle') }}</span>
       </div>
-      <div class="refs__tiles">
-        <ConceptImageTile
-          v-for="img in a.images"
-          :key="img.id"
-          :image="img"
-          :busy="removing === img.id"
-          @open="viewing = $event"
-          @remove="removeImage"
-        />
+      <div class="refs__actions">
         <button
           type="button"
-          class="refs__add refs__add--tile"
+          class="refs__btn"
           :disabled="imagesFull"
           :aria-label="t('app.strategy.concepts.images.add')"
           data-test="concept-image-add"
           @click="choose"
         >
-          <v-icon icon="mdi-plus" size="18" />
+          <v-icon icon="mdi-tray-arrow-up" size="12" aria-hidden="true" />
+          {{ t('app.strategy.concepts.references.image') }}
+        </button>
+        <button
+          type="button"
+          class="refs__btn"
+          :disabled="linksFull"
+          :aria-label="t('app.strategy.concepts.links.add')"
+          data-test="concept-link-add"
+          @click="openLinkDialog(null)"
+        >
+          <v-icon icon="mdi-link-variant" size="12" aria-hidden="true" />
+          {{ t('app.strategy.concepts.references.link') }}
         </button>
         <input
           ref="picker"
@@ -174,114 +177,137 @@ onBeforeUnmount(() => {
           @change="onPicked"
         />
       </div>
-      <p v-if="imagesFull" class="refs__hint" data-test="concept-image-full">
-        {{ t('app.strategy.concepts.images.full', { max: limits.images_per_concept }) }}
-      </p>
-      <ul v-if="upload.items.value.length > 0" class="refs__uploads" data-test="concept-uploads">
-        <li
-          v-for="u in upload.items.value"
-          :key="u.key"
-          class="refs__upload"
-          data-test="concept-upload"
-        >
-          <span class="refs__upload-name">{{ u.name }}</span>
-          <v-progress-linear
-            v-if="u.state === 'uploading'"
-            :model-value="u.progress"
-            :indeterminate="u.progress === 0"
-            height="4"
-            rounded
-            class="refs__upload-bar"
-            :aria-label="t('app.strategy.concepts.upload.progress', { name: u.name })"
-          />
-          <template v-else>
-            <span class="refs__upload-error" data-test="concept-upload-error">{{ u.error }}</span>
-            <v-btn
-              size="x-small"
-              variant="text"
-              data-test="concept-upload-retry"
-              @click="upload.retry(u.key)"
-            >
-              {{ t('app.strategy.concepts.upload.retry') }}
-            </v-btn>
-            <v-btn
-              size="x-small"
-              variant="text"
-              data-test="concept-upload-dismiss"
-              @click="upload.dismiss(u.key)"
-            >
-              {{ t('app.strategy.concepts.upload.dismiss') }}
-            </v-btn>
-          </template>
-        </li>
-      </ul>
-      <ul
-        v-if="upload.notices.value.length > 0"
-        class="refs__notices"
-        data-test="concept-upload-notices"
-      >
-        <li v-for="(n, i) in upload.notices.value" :key="i">{{ n }}</li>
-      </ul>
     </div>
 
-    <div class="refs__group">
-      <div class="refs__head">
-        <span class="refs__label">{{ t('app.strategy.concepts.links.label') }}</span>
-        <span class="refs__count" data-test="concept-link-count">
-          {{ a.links.length }} / {{ limits.links_per_concept }}
-        </span>
-      </div>
-      <ul v-if="a.links.length > 0" class="refs__links">
-        <li v-for="l in a.links" :key="l.id" class="refs__link" data-test="concept-link">
-          <v-icon icon="mdi-link-variant" size="14" class="refs__link-icon" />
-          <a
-            v-if="safeHref(l.url)"
-            :href="safeHref(l.url) ?? undefined"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="refs__link-title"
-            data-test="concept-link-anchor"
-            >{{ l.title }}</a
-          >
-          <span v-else class="refs__link-title" data-test="concept-link-text">{{ l.title }}</span>
-          <span class="refs__link-domain">{{ l.domain }}</span>
-          <v-spacer />
-          <v-btn
-            icon="mdi-pencil-outline"
-            size="x-small"
-            variant="text"
-            density="comfortable"
-            :aria-label="t('app.strategy.concepts.links.edit', { title: l.title })"
-            data-test="concept-link-edit"
-            @click="openLinkDialog(l)"
-          />
-          <v-btn
-            icon="mdi-close"
-            size="x-small"
-            variant="text"
-            density="comfortable"
-            :disabled="removing === l.id"
-            :aria-label="t('app.strategy.concepts.links.remove', { title: l.title })"
-            data-test="concept-link-remove"
-            @click="removeLink(l)"
-          />
-        </li>
-      </ul>
-      <button
-        type="button"
-        class="refs__add refs__add--link"
-        :disabled="linksFull"
-        data-test="concept-link-add"
-        @click="openLinkDialog(null)"
-      >
-        <v-icon icon="mdi-plus" size="14" />
+    <p class="refs__counts">
+      <span data-test="concept-image-count">
         {{
-          linksFull
-            ? t('app.strategy.concepts.links.full', { max: limits.links_per_concept })
-            : t('app.strategy.concepts.links.add')
+          t('app.strategy.concepts.images.count', {
+            count: a.images.length,
+            max: limits.images_per_concept,
+            used: formatMegabytes(usedBytes),
+            total: formatMegabytes(limits.image_total_bytes),
+          })
         }}
-      </button>
+      </span>
+      <span aria-hidden="true"> · </span>
+      <span data-test="concept-link-count">
+        {{ t('app.strategy.concepts.links.label') }} {{ a.links.length }} /
+        {{ limits.links_per_concept }}
+      </span>
+    </p>
+
+    <div v-if="a.images.length > 0" class="refs__tiles">
+      <ConceptImageTile
+        v-for="img in a.images"
+        :key="img.id"
+        :image="img"
+        :busy="removing === img.id"
+        @open="viewing = $event"
+        @remove="removeImage"
+      />
     </div>
+    <p v-if="imagesFull" class="refs__hint" data-test="concept-image-full">
+      {{ t('app.strategy.concepts.images.full', { max: limits.images_per_concept }) }}
+    </p>
+    <ul v-if="upload.items.value.length > 0" class="refs__uploads" data-test="concept-uploads">
+      <li
+        v-for="u in upload.items.value"
+        :key="u.key"
+        class="refs__upload"
+        data-test="concept-upload"
+      >
+        <span class="refs__upload-name">{{ u.name }}</span>
+        <v-progress-linear
+          v-if="u.state === 'uploading'"
+          :model-value="u.progress"
+          :indeterminate="u.progress === 0"
+          height="4"
+          rounded
+          class="refs__upload-bar"
+          :aria-label="t('app.strategy.concepts.upload.progress', { name: u.name })"
+        />
+        <template v-else>
+          <span class="refs__upload-error" data-test="concept-upload-error">{{ u.error }}</span>
+          <v-btn
+            size="x-small"
+            variant="text"
+            data-test="concept-upload-retry"
+            @click="upload.retry(u.key)"
+          >
+            {{ t('app.strategy.concepts.upload.retry') }}
+          </v-btn>
+          <v-btn
+            size="x-small"
+            variant="text"
+            data-test="concept-upload-dismiss"
+            @click="upload.dismiss(u.key)"
+          >
+            {{ t('app.strategy.concepts.upload.dismiss') }}
+          </v-btn>
+        </template>
+      </li>
+    </ul>
+    <ul
+      v-if="upload.notices.value.length > 0"
+      class="refs__notices"
+      data-test="concept-upload-notices"
+    >
+      <li v-for="(n, i) in upload.notices.value" :key="i">{{ n }}</li>
+    </ul>
+
+    <ul v-if="a.links.length > 0" class="refs__links">
+      <li v-for="l in a.links" :key="l.id" class="refs__link" data-test="concept-link">
+        <v-icon icon="mdi-link-variant" size="13" class="refs__link-icon" />
+        <a
+          v-if="safeHref(l.url)"
+          :href="safeHref(l.url) ?? undefined"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="refs__link-title"
+          data-test="concept-link-anchor"
+          >{{ l.title }}</a
+        >
+        <span v-else class="refs__link-title" data-test="concept-link-text">{{ l.title }}</span>
+        <span class="refs__link-domain">{{ l.domain }}</span>
+        <v-spacer />
+        <v-btn
+          icon="mdi-pencil-outline"
+          size="x-small"
+          variant="text"
+          density="comfortable"
+          :aria-label="t('app.strategy.concepts.links.edit', { title: l.title })"
+          data-test="concept-link-edit"
+          @click="openLinkDialog(l)"
+        />
+        <v-btn
+          icon="mdi-close"
+          size="x-small"
+          variant="text"
+          density="comfortable"
+          :disabled="removing === l.id"
+          :aria-label="t('app.strategy.concepts.links.remove', { title: l.title })"
+          data-test="concept-link-remove"
+          @click="removeLink(l)"
+        />
+      </li>
+    </ul>
+
+    <button
+      v-if="a.images.length === 0 && a.links.length === 0 && upload.items.value.length === 0"
+      type="button"
+      class="refs__drop"
+      :class="{ 'refs__drop--over': dragging }"
+      :disabled="imagesFull"
+      data-test="concept-drop"
+      @click="choose"
+      @dragover.prevent="dragging = true"
+      @dragleave="dragging = false"
+      @drop.prevent="onDropped"
+    >
+      <v-icon icon="mdi-tray-arrow-up" size="14" aria-hidden="true" />
+      {{ t('app.strategy.concepts.references.drop') }}
+    </button>
 
     <p v-if="error" class="refs__error" role="alert" data-test="concept-references-error">
       {{ error }}
@@ -300,32 +326,75 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
+/*
+ * Frame 13:4412, the references block of a card: 14 / 18 / 16 padding, a 10px gap, a top border; the title row is a 14px
+ * image icon, "References" 13 / 600 and "images & links" 12 tertiary, with two 12px outlined buttons (radius 6, 9 / 4
+ * padding, 12 / 500, the brand green) on the right; thumbnails 96 x 64 with the file name under them; links on a
+ * surface-bright row (radius 8, 8 / 10 padding); the empty block shows a drop line. The count line is added (the limits
+ * must show before any byte moves).
+ */
 .refs {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 14px 16px 16px;
+  gap: 10px;
+  padding: 14px 18px 16px;
   border-top: 1px solid rgb(var(--v-theme-border-color));
 }
-.refs__group {
+.refs__top {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
   gap: 8px;
 }
-.refs__head {
+.refs__title {
   display: flex;
-  align-items: baseline;
-  gap: 8px;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
 }
-.refs__label {
+.refs__title-icon {
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+.refs__title-text {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: normal;
+  color: rgb(var(--v-theme-on-surface));
+}
+.refs__title-sub {
   font-size: 12px;
-  font-weight: 500;
+  line-height: normal;
   color: rgb(var(--v-theme-text-tertiary));
 }
-.refs__count,
+.refs__actions {
+  display: flex;
+  gap: 6px;
+}
+.refs__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border: 1px solid rgb(var(--v-theme-border-color));
+  border-radius: 6px;
+  background: transparent;
+  color: rgb(var(--v-theme-primary));
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: normal;
+  cursor: pointer;
+}
+.refs__btn:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+.refs__counts,
 .refs__hint {
   margin: 0;
   font-size: 11.5px;
+  line-height: normal;
   color: rgb(var(--v-theme-text-tertiary));
 }
 .refs__tiles {
@@ -336,37 +405,35 @@ onBeforeUnmount(() => {
 .refs__picker {
   display: none;
 }
-.refs__add {
-  display: inline-flex;
+.refs__drop {
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 10px;
+  padding: 15px 10px;
   border: 1px dashed rgb(var(--v-theme-border-color));
   border-radius: 8px;
   background: transparent;
-  color: rgb(var(--v-theme-on-surface-variant));
+  color: rgb(var(--v-theme-text-tertiary));
   font: inherit;
   font-size: 12px;
+  line-height: normal;
   cursor: pointer;
 }
-.refs__add:disabled {
+.refs__drop:disabled {
   cursor: default;
   opacity: 0.5;
 }
-.refs__add--tile {
-  width: 64px;
-  height: 64px;
-}
-.refs__add--link {
-  align-self: flex-start;
-  padding: 6px 12px;
+.refs__drop--over {
+  border-color: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-primary));
 }
 .refs__uploads,
 .refs__notices,
 .refs__links {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -400,20 +467,30 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 8px;
   min-width: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgb(var(--v-theme-surface-bright));
   font-size: 13px;
+  font-weight: 500;
+  line-height: normal;
 }
 .refs__link-icon {
   flex: none;
-  color: rgb(var(--v-theme-text-tertiary));
+  color: rgb(var(--v-theme-info));
 }
 .refs__link-title {
   min-width: 0;
-  color: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-surface));
+  text-decoration: none;
   overflow-wrap: anywhere;
+}
+a.refs__link-title:hover {
+  text-decoration: underline;
 }
 .refs__link-domain {
   flex: none;
   font-size: 11.5px;
+  font-weight: 400;
   color: rgb(var(--v-theme-text-tertiary));
 }
 </style>

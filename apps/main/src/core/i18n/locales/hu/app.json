@@ -2072,6 +2072,13 @@
           "noPersonasTitle": "{market} piacon még nincs perszóna",
           "noPersonasBody": "A koncepció perszónára épül. Előbb adj hozzá perszónákat a piachoz.",
           "toPersonas": "Ugrás a perszónákhoz"
+        },
+        "references": {
+          "title": "Hivatkozások",
+          "subtitle": "képek és linkek",
+          "image": "Kép",
+          "link": "Link",
+          "drop": "Húzzon ide képeket, vagy adjon hozzá linket"
         }
       }
     }

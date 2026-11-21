@@ -2072,6 +2072,13 @@
           "noPersonasTitle": "{market} har ingen personaer endnu",
           "noPersonasBody": "Et koncept bygger på en persona. Tilføj først personaer for dette marked.",
           "toPersonas": "Gå til personaer"
+        },
+        "references": {
+          "title": "Referencer",
+          "subtitle": "billeder og links",
+          "image": "Billede",
+          "link": "Link",
+          "drop": "Slip billeder her eller tilføj et link"
         }
       }
     }
