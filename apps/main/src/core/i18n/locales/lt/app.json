@@ -1483,7 +1483,8 @@
         "saveFailed": "Nepavyko išsaugoti bangos. Bandykite dar kartą.",
         "waveNotAvailable": "Šios bangos negalima susieti su šia kampanija.",
         "marketHasPersonas": "Pirmiausia pašalinkite šių rinkų personas: {markets}.",
-        "marketHasConcepts": "Konceptų yra rinkose: {markets}."
+        "marketHasConcepts": "Konceptų yra rinkose: {markets}.",
+        "marketsChanged": "Šios bangos rinkos pasikeitė nuo to laiko, kai ją atidarėte. Uždarykite langą, iš naujo atidarykite bangą ir bandykite dar kartą."
       },
       "dialog": {
         "createTitle": "Nauja banga",

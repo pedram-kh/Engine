@@ -7,6 +7,7 @@ import {
   setFeatureFlag,
 } from '../fixtures/test-helpers'
 import { dt, testIds } from '../helpers/selectors'
+import { marketIds, wireMarkets } from '../helpers/markets'
 
 /**
  * PL-2.3 — the concepts step in a real browser, at a desktop width and a phone width (WORKING-PROCESS §4.2).
@@ -81,12 +82,16 @@ async function setup(
   const wave = await api(page, 'POST', `/agencies/${agencyUlid}/brands/${brand.data.id}/waves`, {
     name: 'Concepts wave',
     go_live_on: '2027-03-01',
-    markets: ['SK'],
+    markets: wireMarkets(['SK']),
     campaign_id: null,
   })
   const base = `/agencies/${agencyUlid}/brands/${brand.data.id}/waves/${wave.data.id}/strategy`
+  const mk = await marketIds(
+    (path) => api(page, 'GET', path),
+    `/agencies/${agencyUlid}/brands/${brand.data.id}/waves/${wave.data.id}`,
+  )
   const persona = await api(page, 'POST', `${base}/personas`, {
-    market: 'SK',
+    market: mk['SK'],
     title: 'The Office Organiser',
     name: 'Eva',
   })
@@ -102,7 +107,7 @@ async function setup(
   }
   const concept = (title: string) =>
     api(page, 'POST', `${base}/concepts`, {
-      market: 'SK',
+      market: mk['SK'],
       persona: persona.data.id,
       title,
     })

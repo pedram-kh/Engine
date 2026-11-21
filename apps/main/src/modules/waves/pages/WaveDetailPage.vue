@@ -7,7 +7,7 @@
  * With `features.waves` off the page redirects to the brand; an unknown wave (or one in another agency) is
  * the not-found state, since the server answers 404 for both.
  */
-import { formatDateTime, labelForCountryCode } from '@catalyst/api-client'
+import { formatDateTime } from '@catalyst/api-client'
 import type { WaveResource, WaveTrackerResource } from '@catalyst/api-client'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -167,8 +167,8 @@ onMounted(async () => {
       <div class="agency-field" data-test="wave-field-markets">
         <h3 class="agency-field__label">{{ t('app.waves.dialog.markets') }}</h3>
         <div class="d-flex flex-wrap ga-2">
-          <v-chip v-for="code in wave.attributes.markets" :key="code" size="small">
-            {{ labelForCountryCode(code) }}
+          <v-chip v-for="m in wave.attributes.markets" :key="m.id" size="small">
+            {{ m.name }}
           </v-chip>
         </div>
       </div>

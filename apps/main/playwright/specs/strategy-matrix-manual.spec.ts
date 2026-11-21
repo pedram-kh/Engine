@@ -7,6 +7,7 @@ import {
   setFeatureFlag,
 } from '../fixtures/test-helpers'
 import { dt, testIds } from '../helpers/selectors'
+import { marketIds, wireMarkets } from '../helpers/markets'
 
 /**
  * PL-2.2 (ruling change of 2026-11-20, R1 and R2) in a real browser, at 1440 and 390, each with its own setup:
@@ -102,9 +103,18 @@ test.describe('Messaging matrix: manual angle and cell', () => {
         page,
         'POST',
         `/agencies/${agencyUlid}/brands/${brand.data.id}/waves`,
-        { name: 'Manual wave', go_live_on: '2027-03-01', markets: ['SK'], campaign_id: null },
+        {
+          name: 'Manual wave',
+          go_live_on: '2027-03-01',
+          markets: wireMarkets(['SK']),
+          campaign_id: null,
+        },
       )
       const base = `/agencies/${agencyUlid}/brands/${brand.data.id}/waves/${wave.data.id}/strategy`
+      const mk = await marketIds(
+        (path) => api(page, 'GET', path),
+        `/agencies/${agencyUlid}/brands/${brand.data.id}/waves/${wave.data.id}`,
+      )
       const usps: string[] = []
       for (const title of ['Fast', 'Cheap', 'Wide range']) {
         usps.push((await api(page, 'POST', `${base}/usps`, { title })).data.id)
@@ -117,7 +127,7 @@ test.describe('Messaging matrix: manual angle and cell', () => {
         personas.push(
           (
             await api(page, 'POST', `${base}/personas`, {
-              market: 'SK',
+              market: mk['SK'],
               title,
               name,
               pronoun: 'she',
@@ -135,7 +145,7 @@ test.describe('Messaging matrix: manual angle and cell', () => {
         explanation: 'Also by hand',
       })
       await api(page, 'PUT', `${base}/matrix/cells`, {
-        market: 'SK',
+        market: mk['SK'],
         cells: [
           { persona: personas[0], usp: usps[1], level: 'priority', message_line: 'From the cell' },
         ],
@@ -205,7 +215,7 @@ test.describe('Messaging matrix: manual angle and cell', () => {
       await page.locator('[data-test="confirm-cancel"]').click()
       await expect(page.locator('[data-test="use-line-texts"]')).toHaveCount(0)
       await expect(note).toHaveCount(1)
-      const before = (await api(page, 'GET', `${base}/personas?market=SK`)) as unknown as {
+      const before = (await api(page, 'GET', `${base}/personas?market=${mk['SK']}`)) as unknown as {
         data: {
           attributes: { angles: { attributes: { origin: string; explanation: string } }[] }
         }[]

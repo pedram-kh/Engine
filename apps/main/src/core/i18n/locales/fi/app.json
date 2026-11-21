@@ -1483,7 +1483,8 @@
         "saveFailed": "Aallon tallentaminen epäonnistui. Yritä uudelleen.",
         "waveNotAvailable": "Tätä aaltoa ei voi liittää tähän kampanjaan.",
         "marketHasPersonas": "Poista ensin näiden markkinoiden personat: {markets}.",
-        "marketHasConcepts": "Konsepteja on markkinoilla: {markets}."
+        "marketHasConcepts": "Konsepteja on markkinoilla: {markets}.",
+        "marketsChanged": "Tämän aallon markkinat ovat muuttuneet sen jälkeen, kun avasit sen. Sulje ikkuna, avaa aalto uudelleen ja yritä uudelleen."
       },
       "dialog": {
         "createTitle": "Uusi aalto",

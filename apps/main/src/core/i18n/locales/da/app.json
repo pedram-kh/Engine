@@ -1483,7 +1483,8 @@
         "saveFailed": "Bølgen kunne ikke gemmes. Prøv igen.",
         "waveNotAvailable": "Den bølge kan ikke knyttes til denne kampagne.",
         "marketHasPersonas": "Fjern først personaerne for disse markeder: {markets}.",
-        "marketHasConcepts": "Der findes koncepter i: {markets}."
+        "marketHasConcepts": "Der findes koncepter i: {markets}.",
+        "marketsChanged": "Bølgens markeder er ændret, siden du åbnede den. Luk vinduet, åbn bølgen igen og prøv igen."
       },
       "dialog": {
         "createTitle": "Ny bølge",

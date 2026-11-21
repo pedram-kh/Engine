@@ -1483,7 +1483,8 @@
         "saveFailed": "Vala ni bilo mogoče shraniti. Poskusite znova.",
         "waveNotAvailable": "Tega vala ni mogoče povezati s to kampanjo.",
         "marketHasPersonas": "Najprej odstranite persone teh trgov: {markets}.",
-        "marketHasConcepts": "Koncepti obstajajo na trgih: {markets}."
+        "marketHasConcepts": "Koncepti obstajajo na trgih: {markets}.",
+        "marketsChanged": "Trgi tega vala so se spremenili, odkar ste ga odprli. Zaprite okno, ponovno odprite val in poskusite znova."
       },
       "dialog": {
         "createTitle": "Nov val",

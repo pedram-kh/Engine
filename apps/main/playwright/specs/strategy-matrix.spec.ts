@@ -7,6 +7,7 @@ import {
   setFeatureFlag,
 } from '../fixtures/test-helpers'
 import { dt, testIds } from '../helpers/selectors'
+import { marketIds, wireMarkets } from '../helpers/markets'
 
 /**
  * PL-2.2 — the messaging matrix in a real browser, at a desktop width and a phone width (WORKING-PROCESS §4.2).
@@ -103,11 +104,15 @@ test.describe('Messaging matrix', () => {
         {
           name: 'Matrix wave',
           go_live_on: '2027-03-01',
-          markets: ['SK', 'RO'],
+          markets: wireMarkets(['SK', 'RO']),
           campaign_id: null,
         },
       )
       const base = `/agencies/${agencyUlid}/brands/${brand.data.id}/waves/${wave.data.id}/strategy`
+      const mk = await marketIds(
+        (path) => api(page, 'GET', path),
+        `/agencies/${agencyUlid}/brands/${brand.data.id}/waves/${wave.data.id}`,
+      )
       for (const title of ['Fast', 'Cheap', 'Wide range']) {
         await api(page, 'POST', `${base}/usps`, { title })
       }
@@ -115,7 +120,12 @@ test.describe('Messaging matrix', () => {
         ['First persona', 'Zuzana'],
         ['Second persona', 'Peter'],
       ]) {
-        await api(page, 'POST', `${base}/personas`, { market: 'SK', title, name, pronoun: 'she' })
+        await api(page, 'POST', `${base}/personas`, {
+          market: mk['SK'],
+          title,
+          name,
+          pronoun: 'she',
+        })
       }
 
       await page.goto(`/brands/${brand.data.id}/waves/${wave.data.id}/strategy/matrix`)
@@ -205,7 +215,7 @@ test.describe('Messaging matrix', () => {
     const wave = await api(page, 'POST', `/agencies/${agencyUlid}/brands/${brand.data.id}/waves`, {
       name: 'Off wave',
       go_live_on: '2027-03-01',
-      markets: ['SK'],
+      markets: wireMarkets(['SK']),
       campaign_id: null,
     })
     await page.goto(`/brands/${brand.data.id}/waves/${wave.data.id}/strategy/matrix`)

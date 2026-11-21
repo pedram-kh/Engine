@@ -1483,7 +1483,8 @@
         "saveFailed": "Impossibile salvare l'ondata. Riprova.",
         "waveNotAvailable": "Quell'ondata non può essere collegata a questa campagna.",
         "marketHasPersonas": "Rimuovi prima le persone di questi mercati: {markets}.",
-        "marketHasConcepts": "Esistono concept in: {markets}."
+        "marketHasConcepts": "Esistono concept in: {markets}.",
+        "marketsChanged": "I mercati di questa ondata sono cambiati da quando l'hai aperta. Chiudi la finestra, riapri l'ondata e riprova."
       },
       "dialog": {
         "createTitle": "Nuova ondata",

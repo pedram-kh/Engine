@@ -12,8 +12,13 @@
  * No design frame exists for this dialog; it is built from the design system's dialog and field styles.
  * Server codes map to strings; anything else is the generic save error.
  */
-import { ApiError, marketHasPersonasMeta } from '@catalyst/api-client'
-import type { CreateWavePayload, WaveCampaignOption, WaveResource } from '@catalyst/api-client'
+import { ApiError, labelForCountryCode, marketHasPersonasMeta } from '@catalyst/api-client'
+import type {
+  UpdateWavePayload,
+  WaveCampaignOption,
+  WaveMarketInput,
+  WaveResource,
+} from '@catalyst/api-client'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -137,7 +142,7 @@ watch(
     saving.value = false
     name.value = props.wave?.attributes.name ?? ''
     goLiveOn.value = props.wave?.attributes.go_live_on ?? ''
-    markets.value = [...(props.wave?.attributes.markets ?? [])]
+    markets.value = (props.wave?.attributes.markets ?? []).map((m) => m.code)
     campaignId.value = props.wave?.relationships.campaign?.data.id ?? null
     campaignChoice.value = 'none'
     newCampaignName.value = ''
@@ -151,6 +156,7 @@ const CODE_KEYS: Record<string, string> = {
   'wave.campaign_already_linked': 'app.waves.errors.campaignAlreadyLinked',
   'wave.campaign_link_locked': 'app.waves.errors.campaignLinkLocked',
   'wave.brand_archived': 'app.waves.errors.brandArchived',
+  'wave.markets_changed': 'app.waves.errors.marketsChanged',
 }
 
 function messageFor(err: unknown): string {
@@ -158,14 +164,14 @@ function messageFor(err: unknown): string {
   const personas = marketHasPersonasMeta(err)
   if (personas !== null) {
     const base = t('app.waves.errors.marketHasPersonas', {
-      markets: personas.markets.map((m) => `${m.market} (${m.persona_count})`).join(', '),
+      markets: personas.markets.map((m) => `${m.name ?? m.market} (${m.persona_count})`).join(', '),
     })
     // PL-2.3: the same markets, with their concept counts, when concepts use their personas.
     const withConcepts = personas.markets.filter((m) => (m.concept_count ?? 0) > 0)
     return withConcepts.length === 0
       ? base
       : `${base} ${t('app.waves.errors.marketHasConcepts', {
-          markets: withConcepts.map((m) => `${m.market} (${m.concept_count})`).join(', '),
+          markets: withConcepts.map((m) => `${m.name ?? m.market} (${m.concept_count})`).join(', '),
         })}`
   }
   if (err instanceof ApiError) {
@@ -173,6 +179,11 @@ function messageFor(err: unknown): string {
     if (key !== undefined) return t(key)
   }
   return t('app.waves.errors.saveFailed')
+}
+
+/** One country, one market: named for the country, with the country code as its short code. */
+function singleCountryMarket(code: string): WaveMarketInput {
+  return { name: labelForCountryCode(code), code, countries: [code] }
 }
 
 function close(): void {
@@ -190,11 +201,16 @@ async function submit(): Promise<void> {
   try {
     let res
     if (isEdit.value && props.wave) {
-      const body: Partial<CreateWavePayload> = {}
+      const body: UpdateWavePayload = {}
       if (name.value.trim() !== props.wave.attributes.name) body.name = name.value.trim()
       if (goLiveOn.value !== props.wave.attributes.go_live_on) body.go_live_on = goLiveOn.value
-      if (markets.value.join(',') !== props.wave.attributes.markets.join(','))
-        body.markets = [...markets.value]
+      if (markets.value.join(',') !== props.wave.attributes.markets.map((m) => m.code).join(',')) {
+        // PL-2.4: a market that is already there is sent back as it is (ulid, name, code, countries); a country the user
+        // added becomes a new one-country market named for the country. The version says what the list was built from.
+        const existing = new Map(props.wave.attributes.markets.map((m) => [m.code, m]))
+        body.markets = markets.value.map((code) => existing.get(code) ?? singleCountryMarket(code))
+        body.markets_version = props.wave.attributes.markets_version
+      }
       // Set, change or remove (null) the link, but only when it differs from what is saved.
       const savedCampaignId = props.wave.relationships.campaign?.data.id ?? null
       if (!linkLocked.value && campaignId.value !== savedCampaignId)
@@ -204,7 +220,7 @@ async function submit(): Promise<void> {
       res = await wavesApi.create(props.agencyId, props.brandId, {
         name: name.value.trim(),
         go_live_on: goLiveOn.value,
-        markets: [...markets.value],
+        markets: markets.value.map(singleCountryMarket),
         ...(campaignChoice.value === 'new'
           ? { new_campaign: { name: newCampaignName.value.trim() } }
           : { campaign_id: campaignChoice.value === 'existing' ? campaignId.value : null }),

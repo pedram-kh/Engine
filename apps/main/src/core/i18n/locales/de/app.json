@@ -1483,7 +1483,8 @@
         "saveFailed": "Die Welle konnte nicht gespeichert werden. Versuchen Sie es erneut.",
         "waveNotAvailable": "Diese Welle kann nicht mit dieser Kampagne verknüpft werden.",
         "marketHasPersonas": "Entferne zuerst die Personas dieser Märkte: {markets}.",
-        "marketHasConcepts": "Konzepte gibt es in: {markets}."
+        "marketHasConcepts": "Konzepte gibt es in: {markets}.",
+        "marketsChanged": "Die Märkte dieser Welle wurden geändert, seit Sie sie geöffnet haben. Schließen Sie das Fenster, öffnen Sie die Welle erneut und versuchen Sie es noch einmal."
       },
       "dialog": {
         "createTitle": "Neue Welle",

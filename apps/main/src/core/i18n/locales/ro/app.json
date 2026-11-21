@@ -1483,7 +1483,8 @@
         "saveFailed": "Valul nu a putut fi salvat. Încercați din nou.",
         "waveNotAvailable": "Acel val nu poate fi legat de această campanie.",
         "marketHasPersonas": "Elimină mai întâi persona din aceste piețe: {markets}.",
-        "marketHasConcepts": "Există concepte în: {markets}."
+        "marketHasConcepts": "Există concepte în: {markets}.",
+        "marketsChanged": "Piețele acestui val s-au schimbat de când l-ai deschis. Închide fereastra, redeschide valul și încearcă din nou."
       },
       "dialog": {
         "createTitle": "Val nou",

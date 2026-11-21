@@ -1483,7 +1483,8 @@
         "saveFailed": "Val nije moguće spremiti. Pokušajte ponovno.",
         "waveNotAvailable": "Taj val ne može se povezati s ovom kampanjom.",
         "marketHasPersonas": "Prvo uklonite persone ovih tržišta: {markets}.",
-        "marketHasConcepts": "Koncepti postoje na tržištima: {markets}."
+        "marketHasConcepts": "Koncepti postoje na tržištima: {markets}.",
+        "marketsChanged": "Tržišta ovog vala promijenjena su otkako ste ga otvorili. Zatvorite prozor, ponovno otvorite val i pokušajte ponovno."
       },
       "dialog": {
         "createTitle": "Novi val",

@@ -7,6 +7,7 @@ import {
   setFeatureFlag,
 } from '../fixtures/test-helpers'
 import { dt, testIds } from '../helpers/selectors'
+import { wireMarkets } from '../helpers/markets'
 
 /**
  * PL-1.3 — the wave tracker in a real browser, at a desktop width and a phone width (WORKING-PROCESS §4.2).
@@ -94,7 +95,7 @@ test.describe('Wave tracker', () => {
         {
           name: 'Tracker wave',
           go_live_on: '2027-03-01',
-          markets: ['IE'],
+          markets: wireMarkets(['IE']),
           campaign_id: null,
         },
       )

@@ -1483,7 +1483,8 @@
         "saveFailed": "The wave could not be saved. Try again.",
         "waveNotAvailable": "That wave cannot be linked to this campaign.",
         "marketHasPersonas": "Remove the personas of these markets first: {markets}.",
-        "marketHasConcepts": "Concepts exist in: {markets}."
+        "marketHasConcepts": "Concepts exist in: {markets}.",
+        "marketsChanged": "The markets of this wave changed since you opened it. Close this window, reopen the wave and try again."
       },
       "dialog": {
         "createTitle": "New wave",

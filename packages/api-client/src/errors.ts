@@ -267,14 +267,19 @@ export function marketHasPersonasMeta(error: unknown): MarketHasPersonasMeta | n
   }
   const markets = raw.flatMap((entry: unknown) => {
     if (!isObjectRecord(entry)) return []
-    const market = entry['market']
+    // PL-2.4: the entry names the market by ulid, name and short code; the screens use the short code.
+    const market = typeof entry['code'] === 'string' ? entry['code'] : entry['market']
+    const marketName = typeof entry['name'] === 'string' ? entry['name'] : undefined
     const count = entry['persona_count']
     const concepts = entry['concept_count']
     return typeof market === 'string' && typeof count === 'number'
       ? [
-          typeof concepts === 'number'
-            ? { market, persona_count: count, concept_count: concepts }
-            : { market, persona_count: count },
+          {
+            market,
+            ...(marketName === undefined ? {} : { name: marketName }),
+            persona_count: count,
+            ...(typeof concepts === 'number' ? { concept_count: concepts } : {}),
+          },
         ]
       : []
   })
@@ -297,7 +302,9 @@ export function uspInUseMeta(error: unknown): UspInUseMeta | null {
   }
   const affected = raw.flatMap((entry: unknown): UspInUseAffected[] => {
     if (!isObjectRecord(entry)) return []
-    const { persona, market, code, title, explanation, kind, level } = entry
+    const { persona, code, title, explanation, kind, level } = entry
+    // PL-2.4: the server names the market by ulid and name; the dialog shows the name.
+    const market = typeof entry['market_name'] === 'string' ? entry['market_name'] : entry['market']
     const lv = level === 'priority' || level === 'support' || level === 'low' ? level : null
     return (kind === 'angle' || kind === 'cell' || kind === 'concept') &&
       typeof persona === 'string' &&

@@ -1483,7 +1483,8 @@
         "saveFailed": "Il-mewġa ma setgħetx tiġi ssejvjata. Erġa' pprova.",
         "waveNotAvailable": "Dik il-mewġa ma tistax tiġi marbuta ma' din il-kampanja.",
         "marketHasPersonas": "Neħħi l-ewwel il-persunaġġi ta' dawn is-swieq: {markets}.",
-        "marketHasConcepts": "Hemm kunċetti f'dawn is-swieq: {markets}."
+        "marketHasConcepts": "Hemm kunċetti f'dawn is-swieq: {markets}.",
+        "marketsChanged": "Is-swieq ta' din il-mewġa nbidlu minn meta fethitha. Agħlaq it-tieqa, iftaħ il-mewġa mill-ġdid u erġa' pprova."
       },
       "dialog": {
         "createTitle": "Mewġa ġdida",

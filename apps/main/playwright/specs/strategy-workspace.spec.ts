@@ -7,6 +7,7 @@ import {
   setFeatureFlag,
 } from '../fixtures/test-helpers'
 import { dt, testIds } from '../helpers/selectors'
+import { marketIds, wireMarkets } from '../helpers/markets'
 
 /**
  * PL-2.1 — the Strategy & Scripts workspace in a real browser, at a desktop width and a phone width
@@ -85,7 +86,7 @@ async function startWave(
   const wave = await api(page, 'POST', `/agencies/${agencyUlid}/brands/${brand.data.id}/waves`, {
     name: `${tag} wave`,
     go_live_on: '2027-03-01',
-    markets,
+    markets: wireMarkets(markets),
     campaign_id: null,
   })
   const base = `/agencies/${agencyUlid}/brands/${brand.data.id}/waves/${wave.data.id}/strategy`
@@ -100,7 +101,11 @@ async function startWave(
     }).toPass({ timeout: 8000 })
     await page.waitForTimeout(400)
   }
-  return { brandId: brand.data.id, waveId: wave.data.id, base, closeDrawer }
+  const mk = await marketIds(
+    (path) => api(page, 'GET', path),
+    `/agencies/${agencyUlid}/brands/${brand.data.id}/waves/${wave.data.id}`,
+  )
+  return { brandId: brand.data.id, waveId: wave.data.id, base, closeDrawer, mk }
 }
 
 async function sideways(page: Page): Promise<number> {
@@ -156,7 +161,7 @@ test.describe('Strategy workspace', () => {
         {
           name: 'Strategy wave',
           go_live_on: '2027-03-01',
-          markets: ['SK', 'RO'],
+          markets: wireMarkets(['SK', 'RO']),
           campaign_id: null,
         },
       )
@@ -306,10 +311,13 @@ test.describe('Strategy workspace', () => {
         alerts.push(dialog.message())
         await dialog.dismiss()
       })
-      const { brandId, waveId, base, closeDrawer } = await startWave(page, request, size, 'Pers', [
-        'SK',
-        'RO',
-      ])
+      const { brandId, waveId, base, closeDrawer, mk } = await startWave(
+        page,
+        request,
+        size,
+        'Pers',
+        ['SK', 'RO'],
+      )
       await api(page, 'POST', `${base}/usps`, { title: 'Fast' })
 
       await page.goto(`/brands/${brandId}/waves/${waveId}/strategy/usps`)
@@ -352,7 +360,7 @@ test.describe('Strategy workspace', () => {
 
       // A second persona by API, then angles through the UI.
       await api(page, 'POST', `${base}/personas`, {
-        market: 'SK',
+        market: mk['SK'],
         title: 'Second',
         name: 'Eva',
         pronoun: 'she',
@@ -484,7 +492,7 @@ test.describe('Strategy workspace', () => {
     const wave = await api(page, 'POST', `/agencies/${agencyUlid}/brands/${brand.data.id}/waves`, {
       name: 'Off wave',
       go_live_on: '2027-03-01',
-      markets: ['SK'],
+      markets: wireMarkets(['SK']),
       campaign_id: null,
     })
 

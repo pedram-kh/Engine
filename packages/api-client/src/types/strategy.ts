@@ -57,7 +57,12 @@ export interface StrategyLimits {
 }
 
 export interface StrategyMarketCount {
+  /** The market's short code in the screens (the ULID on the wire, bridged in the strategy API module). */
   market: string
+  /** PL-2.4: the market's name, short code and countries, as the summary lists them. */
+  name?: string
+  code?: string
+  countries?: string[]
   persona_count: number
 }
 

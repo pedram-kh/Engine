@@ -50,7 +50,7 @@ async function load(): Promise<void> {
 }
 
 function marketsLabel(w: WaveResource): { shown: string[]; more: number } {
-  const all = w.attributes.markets
+  const all = w.attributes.markets.map((m) => m.code)
   return {
     shown: all.slice(0, MAX_VISIBLE_MARKETS),
     more: Math.max(0, all.length - MAX_VISIBLE_MARKETS),

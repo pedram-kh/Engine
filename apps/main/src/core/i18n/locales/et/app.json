@@ -1483,7 +1483,8 @@
         "saveFailed": "Lainet ei õnnestunud salvestada. Proovige uuesti.",
         "waveNotAvailable": "Seda lainet ei saa selle kampaaniaga siduda.",
         "marketHasPersonas": "Eemalda kõigepealt nende turgude personad: {markets}.",
-        "marketHasConcepts": "Kontseptsioonid on turgudel: {markets}."
+        "marketHasConcepts": "Kontseptsioonid on turgudel: {markets}.",
+        "marketsChanged": "Selle laine turud on muutunud pärast selle avamist. Sulgege aken, avage laine uuesti ja proovige uuesti."
       },
       "dialog": {
         "createTitle": "Uus laine",

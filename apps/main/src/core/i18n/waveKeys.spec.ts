@@ -34,6 +34,7 @@ const KEYS = [
   'app.waves.errors.campaignAlreadyLinked',
   'app.waves.errors.campaignLinkLocked',
   'app.waves.errors.brandArchived',
+  'app.waves.errors.marketsChanged',
   'app.waves.errors.saveFailed',
   'app.waves.dialog.createTitle',
   'app.waves.dialog.editTitle',
@@ -297,8 +298,8 @@ function tokens(value: string): string[] {
 }
 
 describe('PL-1.1 wave and client-file i18n keys', () => {
-  it('checks 186 keys across 24 locales', () => {
-    expect(KEYS).toHaveLength(186)
+  it('checks 187 keys across 24 locales', () => {
+    expect(KEYS).toHaveLength(187)
     expect(UI_LOCALES).toHaveLength(24)
   })
 

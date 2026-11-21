@@ -1483,7 +1483,8 @@
         "saveFailed": "No se pudo guardar la oleada. Inténtalo de nuevo.",
         "waveNotAvailable": "Esa oleada no se puede vincular a esta campaña.",
         "marketHasPersonas": "Quita primero las personas de estos mercados: {markets}.",
-        "marketHasConcepts": "Hay conceptos en: {markets}."
+        "marketHasConcepts": "Hay conceptos en: {markets}.",
+        "marketsChanged": "Los mercados de esta oleada han cambiado desde que la abriste. Cierra la ventana, vuelve a abrir la oleada e inténtalo de nuevo."
       },
       "dialog": {
         "createTitle": "Nueva oleada",

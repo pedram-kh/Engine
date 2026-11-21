@@ -1483,7 +1483,8 @@
         "saveFailed": "De golf kon niet worden opgeslagen. Probeer het opnieuw.",
         "waveNotAvailable": "Die golf kan niet aan deze campagne worden gekoppeld.",
         "marketHasPersonas": "Verwijder eerst de persona's van deze markten: {markets}.",
-        "marketHasConcepts": "Er zijn concepten in: {markets}."
+        "marketHasConcepts": "Er zijn concepten in: {markets}.",
+        "marketsChanged": "De markten van deze golf zijn gewijzigd sinds je hem opende. Sluit het venster, open de golf opnieuw en probeer het nog eens."
       },
       "dialog": {
         "createTitle": "Nieuwe golf",

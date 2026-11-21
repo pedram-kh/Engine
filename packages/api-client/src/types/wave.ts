@@ -24,6 +24,25 @@ export interface WaveCreatedByRelationship {
   data: { id: string; type: 'users'; attributes: { name: string } }
 }
 
+/**
+ * PL-2.4 — a market is a named group of one or more countries. `id` is its ULID, `code` the short code (2 to 6 capitals or
+ * digits, unique within the wave, the prefix of its persona codes), `countries` uppercase ISO 3166-1 alpha-2 codes.
+ */
+export interface WaveMarket {
+  id: string
+  name: string
+  code: string
+  countries: string[]
+}
+
+/** A market in a create or edit body: `id` only for a market that exists, `code` omitted to let the server derive it. */
+export interface WaveMarketInput {
+  id?: string
+  name: string
+  code?: string | null
+  countries: string[]
+}
+
 export interface WaveResource {
   id: string
   type: 'waves'
@@ -31,8 +50,10 @@ export interface WaveResource {
     name: string
     /** A plain `Y-m-d` date, no time zone. */
     go_live_on: string
-    /** Uppercase ISO 3166-1 alpha-2 codes, in the order the user picked them. */
-    markets: string[]
+    /** The wave's markets in tab order (PL-2.4). */
+    markets: WaveMarket[]
+    /** The token an edit that carries `markets` must send back as `markets_version` (409 `wave.markets_changed` when stale). */
+    markets_version: string
     status: WaveStatus
     /** PL-1.2 (P5): true while a card of the linked campaign sits in a working column. */
     link_locked?: boolean
@@ -66,7 +87,7 @@ export interface WaveListParams {
 export interface CreateWavePayload {
   name: string
   go_live_on: string
-  markets: string[]
+  markets: WaveMarketInput[]
   /** Absent or null = no link. Never together with `new_campaign`. */
   campaign_id?: string | null
   /** PL-1.2 (P3): create a for-a-wave campaign with the wave, in one step. Create only. */
@@ -74,7 +95,10 @@ export interface CreateWavePayload {
 }
 
 /** A partial body. `campaign_id` sets, changes or (null) removes the link while it is not locked. */
-export type UpdateWavePayload = Partial<CreateWavePayload>
+export type UpdateWavePayload = Partial<CreateWavePayload> & {
+  /** Required whenever `markets` is sent. */
+  markets_version?: string
+}
 
 /** One row of `GET brands/{brand}/waves/campaign-options`. Cancelled campaigns are never offered. */
 export interface WaveCampaignOption {

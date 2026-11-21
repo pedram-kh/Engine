@@ -121,7 +121,7 @@ test.describe('New wave dialog menus', () => {
           body: JSON.stringify({
             name: 'Menu wave',
             go_live_on: '2026-12-01',
-            markets: ['IE'],
+            markets: [{ name: 'Ireland', code: 'IE', countries: ['IE'] }],
             campaign_id: null,
           }),
         })

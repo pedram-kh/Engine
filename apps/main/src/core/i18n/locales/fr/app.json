@@ -1483,7 +1483,8 @@
         "saveFailed": "Impossible d'enregistrer la vague. Réessayez.",
         "waveNotAvailable": "Cette vague ne peut pas être liée à cette campagne.",
         "marketHasPersonas": "Supprimez d'abord les personas de ces marchés : {markets}.",
-        "marketHasConcepts": "Des concepts existent dans : {markets}."
+        "marketHasConcepts": "Des concepts existent dans : {markets}.",
+        "marketsChanged": "Les marchés de cette vague ont changé depuis son ouverture. Fermez la fenêtre, rouvrez la vague et réessayez."
       },
       "dialog": {
         "createTitle": "Nouvelle vague",

@@ -1483,7 +1483,8 @@
         "saveFailed": "Níorbh fhéidir an tonn a shábháil. Bain triail eile as.",
         "waveNotAvailable": "Ní féidir an tonn sin a nascadh leis an bhfeachtas seo.",
         "marketHasPersonas": "Bain pearsain na margaí seo ar dtús: {markets}.",
-        "marketHasConcepts": "Tá coincheapa sna margaí seo: {markets}."
+        "marketHasConcepts": "Tá coincheapa sna margaí seo: {markets}.",
+        "marketsChanged": "Tá margaí an tonn seo athraithe ó d'oscail tú é. Dún an fhuinneog, oscail an tonn arís agus bain triail eile as."
       },
       "dialog": {
         "createTitle": "Tonn nua",

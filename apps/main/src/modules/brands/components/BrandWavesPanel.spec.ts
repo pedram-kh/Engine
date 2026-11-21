@@ -17,6 +17,7 @@ import {
   AGENCY_ULID,
   BRAND_ULID,
   makeWave,
+  marketsOf,
   mountWithApp,
   WAVE_ULID,
 } from '@/modules/waves/waveTestKit'
@@ -41,7 +42,7 @@ describe('BrandWavesPanel (PL-1.1 W2)', () => {
   beforeEach(() => vi.clearAllMocks())
 
   it('lists a wave with name, go-live date, market codes, progress, status and updated', async () => {
-    list([makeWave({ markets: ['ES', 'PT', 'FR', 'DE', 'IT'] })])
+    list([makeWave({ markets: marketsOf(['ES', 'PT', 'FR', 'DE', 'IT']) })])
     const w = await mountWithApp(BrandWavesPanel, props(true), { route })
     await flushPromises()
     expect(wavesApi.list).toHaveBeenCalledWith(AGENCY_ULID, BRAND_ULID, { per_page: 25 })

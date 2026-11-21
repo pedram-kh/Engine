@@ -120,7 +120,7 @@ describe('NewWaveDialog (PL-1.1 W3)', () => {
     expect(wavesApi.create).toHaveBeenCalledWith(AGENCY_ULID, BRAND_ULID, {
       name: 'Spring push',
       go_live_on: '2026-11-07',
-      markets: ['ES'],
+      markets: [{ name: 'Spain', code: 'ES', countries: ['ES'] }],
       campaign_id: null,
     })
     w.unmount()
@@ -279,6 +279,81 @@ describe('NewWaveDialog (PL-1.1 W3)', () => {
     await submit()
     expect(body('[data-test="wave-form-error"]')?.textContent).toContain(
       'Remove the personas of these markets first: SK (2), RO (1).',
+    )
+    w.unmount()
+  })
+
+  // ── PL-2.4 ────────────────────────────────────────────────────────────────────────────────────────────
+  it('PL-2.4: a market that is already there goes back as it is (ulid, name, code, countries), a new country as a one-country market, with the version', async () => {
+    vi.mocked(wavesApi.update).mockResolvedValue({ data: makeWave() })
+    const wave = makeWave()
+    const w = await mountWithApp(NewWaveDialog, props(wave))
+    await pickMarket(w, 'FR')
+    await submit()
+    expect(wavesApi.update).toHaveBeenCalledWith(AGENCY_ULID, BRAND_ULID, wave.id, {
+      markets: [...wave.attributes.markets, { name: 'France', code: 'FR', countries: ['FR'] }],
+      markets_version: wave.attributes.markets_version,
+    })
+    w.unmount()
+  })
+
+  it('PL-2.4: an edit that leaves the markets alone sends neither markets nor the version', async () => {
+    vi.mocked(wavesApi.update).mockResolvedValue({ data: makeWave({ name: 'Renamed' }) })
+    const w = await mountWithApp(NewWaveDialog, props(makeWave()))
+    await setInput('[data-test="wave-name"]', 'Renamed')
+    await submit()
+    expect(wavesApi.update).toHaveBeenCalledWith(AGENCY_ULID, BRAND_ULID, makeWave().id, {
+      name: 'Renamed',
+    })
+    w.unmount()
+  })
+
+  it('PL-2.4: the refusal names the markets by their names', async () => {
+    vi.mocked(wavesApi.update).mockRejectedValue(
+      new ApiError({
+        status: 422,
+        code: 'wave.market_has_personas',
+        message: 'x',
+        details: [
+          {
+            code: 'wave.market_has_personas',
+            meta: {
+              markets: [
+                {
+                  market: '01JWMARKETULID000000000000',
+                  name: 'Slovakia',
+                  code: 'SK',
+                  persona_count: 2,
+                },
+              ],
+            },
+          },
+        ],
+        raw: null,
+      } as never),
+    )
+    const w = await mountWithApp(NewWaveDialog, props(makeWave()))
+    await setInput('[data-test="wave-name"]', 'Renamed')
+    await submit()
+    expect(body('[data-test="wave-form-error"]')?.textContent).toContain('Slovakia (2)')
+    w.unmount()
+  })
+
+  it('PL-2.4: 409 wave.markets_changed says the markets changed and to reopen the wave', async () => {
+    vi.mocked(wavesApi.update).mockRejectedValue(
+      new ApiError({
+        status: 409,
+        code: 'wave.markets_changed',
+        message: 'x',
+        details: [{ code: 'wave.markets_changed' }],
+        raw: null,
+      } as never),
+    )
+    const w = await mountWithApp(NewWaveDialog, props(makeWave()))
+    await pickMarket(w, 'FR')
+    await submit()
+    expect(body('[data-test="wave-form-error"]')?.textContent).toContain(
+      'The markets of this wave changed since you opened it.',
     )
     w.unmount()
   })

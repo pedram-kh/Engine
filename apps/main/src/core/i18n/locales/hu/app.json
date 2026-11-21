@@ -1483,7 +1483,8 @@
         "saveFailed": "A hullámot nem sikerült menteni. Próbálja újra.",
         "waveNotAvailable": "Ez a hullám nem kapcsolható ehhez a kampányhoz.",
         "marketHasPersonas": "Előbb távolítsd el a perszónákat ezekről a piacokról: {markets}.",
-        "marketHasConcepts": "Koncepciók vannak itt: {markets}."
+        "marketHasConcepts": "Koncepciók vannak itt: {markets}.",
+        "marketsChanged": "A hullám piacai megváltoztak, mióta megnyitotta. Zárja be az ablakot, nyissa meg újra a hullámot, és próbálja újra."
       },
       "dialog": {
         "createTitle": "Új hullám",

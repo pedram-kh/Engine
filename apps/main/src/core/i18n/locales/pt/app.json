@@ -1483,7 +1483,8 @@
         "saveFailed": "Não foi possível guardar a onda. Tente novamente.",
         "waveNotAvailable": "Essa onda não pode ser ligada a esta campanha.",
         "marketHasPersonas": "Remova primeiro as personas destes mercados: {markets}.",
-        "marketHasConcepts": "Existem conceitos em: {markets}."
+        "marketHasConcepts": "Existem conceitos em: {markets}.",
+        "marketsChanged": "Os mercados desta vaga mudaram desde que a abriu. Feche a janela, volte a abrir a vaga e tente novamente."
       },
       "dialog": {
         "createTitle": "Nova onda",

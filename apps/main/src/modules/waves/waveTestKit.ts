@@ -5,6 +5,7 @@
 import type {
   BrandFileResource,
   WaveProgress,
+  WaveMarket,
   WaveResource,
   WaveStepResource,
   WaveStream,
@@ -28,6 +29,16 @@ export const BRAND_ULID = '01BRANDULIDXXXXXXXXXXXXXX'
 export const AGENCY_ULID = 'agency-ulid'
 export const WAVE_ULID = '01WAVEULIDXXXXXXXXXXXXXXX'
 
+/** Single-country markets for a test wave: name = the code, one country each. */
+export function marketsOf(codes: string[]): WaveMarket[] {
+  return codes.map((code, i) => ({
+    id: `01JWMARKET${code}${String(i).padStart(14, '0')}`,
+    name: code,
+    code,
+    countries: [code],
+  }))
+}
+
 export function makeWave(
   over: Partial<WaveResource['attributes']> = {},
   linked = false,
@@ -38,7 +49,11 @@ export function makeWave(
     attributes: {
       name: 'Spring push',
       go_live_on: '2026-11-07',
-      markets: ['ES', 'PT'],
+      markets: [
+        { id: '01JWMARKETES0000000000000A', name: 'Spain', code: 'ES', countries: ['ES'] },
+        { id: '01JWMARKETPT0000000000000B', name: 'Portugal', code: 'PT', countries: ['PT'] },
+      ],
+      markets_version: 'v1-es-pt',
       status: 'draft',
       created_at: '2026-11-01T10:00:00.000000Z',
       updated_at: '2026-11-02T10:00:00.000000Z',

@@ -1483,7 +1483,8 @@
         "saveFailed": "Vågen kunde inte sparas. Försök igen.",
         "waveNotAvailable": "Den vågen kan inte kopplas till den här kampanjen.",
         "marketHasPersonas": "Ta först bort personorna för de här marknaderna: {markets}.",
-        "marketHasConcepts": "Koncept finns i: {markets}."
+        "marketHasConcepts": "Koncept finns i: {markets}.",
+        "marketsChanged": "Vågens marknader har ändrats sedan du öppnade den. Stäng fönstret, öppna vågen igen och försök på nytt."
       },
       "dialog": {
         "createTitle": "Ny våg",

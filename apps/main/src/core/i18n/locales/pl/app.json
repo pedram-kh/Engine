@@ -1483,7 +1483,8 @@
         "saveFailed": "Nie udało się zapisać fali. Spróbuj ponownie.",
         "waveNotAvailable": "Tej fali nie można powiązać z tą kampanią.",
         "marketHasPersonas": "Najpierw usuń persony z tych rynków: {markets}.",
-        "marketHasConcepts": "Koncepty istnieją w: {markets}."
+        "marketHasConcepts": "Koncepty istnieją w: {markets}.",
+        "marketsChanged": "Rynki tej fali zmieniły się od chwili jej otwarcia. Zamknij okno, otwórz falę ponownie i spróbuj jeszcze raz."
       },
       "dialog": {
         "createTitle": "Nowa fala",

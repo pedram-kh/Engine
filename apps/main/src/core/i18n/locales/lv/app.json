@@ -1483,7 +1483,8 @@
         "saveFailed": "Neizdevās saglabāt vilni. Mēģiniet vēlreiz.",
         "waveNotAvailable": "Šo vilni nevar saistīt ar šo kampaņu.",
         "marketHasPersonas": "Vispirms noņemiet šo tirgu personas: {markets}.",
-        "marketHasConcepts": "Koncepti ir tirgos: {markets}."
+        "marketHasConcepts": "Koncepti ir tirgos: {markets}.",
+        "marketsChanged": "Šī viļņa tirgi ir mainījušies, kopš to atvērāt. Aizveriet logu, atkārtoti atveriet vilni un mēģiniet vēlreiz."
       },
       "dialog": {
         "createTitle": "Jauns vilnis",

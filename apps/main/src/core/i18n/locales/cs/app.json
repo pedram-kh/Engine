@@ -1483,7 +1483,8 @@
         "saveFailed": "Vlnu se nepodařilo uložit. Zkuste to znovu.",
         "waveNotAvailable": "Tuto vlnu nelze propojit s touto kampaní.",
         "marketHasPersonas": "Nejprve odeberte persony z těchto trhů: {markets}.",
-        "marketHasConcepts": "Koncepty existují na trzích: {markets}."
+        "marketHasConcepts": "Koncepty existují na trzích: {markets}.",
+        "marketsChanged": "Trhy této vlny se změnily od chvíle, kdy jste ji otevřeli. Zavřete okno, otevřete vlnu znovu a zkuste to znovu."
       },
       "dialog": {
         "createTitle": "Nová vlna",
