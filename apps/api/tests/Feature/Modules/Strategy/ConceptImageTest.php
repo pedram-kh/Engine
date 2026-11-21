@@ -209,6 +209,17 @@ it('reads are authenticated and scoped: another agency, a creator and a missing 
     S::call($w['staff'], 'GET', S::u($w, "concepts/{$id}/images/01HZZZZZZZZZZZZZZZZZZZZZZZ/file"))->assertNotFound();
 });
 
+it('a reservation that was never completed cannot be read, even when an object sits at its key', function (): void {
+    $w = S::world();
+    $id = C::make($w, C::persona($w));
+    $init = conceptImageInit($w, $id, ['mime_type' => 'image/png', 'declared_bytes' => 1000, 'original_filename' => 'a.png'])->assertCreated()->json('data.upload_id');
+    Storage::disk('media')->put($init, C::png());
+    $ulid = (string) DB::table('wave_concept_images')->value('ulid');
+
+    S::call($w['staff'], 'GET', S::u($w, "concepts/{$id}/images/{$ulid}/file"))->assertNotFound();
+    S::call($w['staff'], 'GET', S::u($w, "concepts/{$id}/images/{$ulid}/thumbnail"))->assertNotFound();
+});
+
 it('the thumbnail endpoint is a 404 when there is no thumbnail (the web shows the placeholder), and the original still downloads', function (): void {
     $w = S::world();
     $id = C::make($w, C::persona($w));

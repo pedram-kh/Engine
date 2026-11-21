@@ -96,8 +96,10 @@ it('CL1: every concept write holds the concept row lock, taken AFTER the wave ro
         expect($seen)->not->toContain('wave_concepts:FREE')->and($seen)->not->toContain('waves:FREE');
         $firstConcept = array_search('wave_concepts:held', $seen, true);
         $firstWave = array_search('waves:held', $seen, true);
-        if ($firstWave !== false && $name !== 'image init' && $name !== 'image upload') {
-            expect([$name => $firstWave < $firstConcept])->toBe([$name => true]);
+        // Image init and complete take the concept row only (nothing else is read or written); every other write
+        // takes the wave row first.
+        if ($name !== 'image init' && $name !== 'image upload') {
+            expect([$name => $firstWave !== false && $firstWave < $firstConcept])->toBe([$name => true]);
         }
     }
 
