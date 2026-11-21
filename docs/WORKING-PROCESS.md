@@ -209,6 +209,14 @@ Mirrors the `PROJECT-WORKFLOW.md` §5 standard:
 - **Migrations are additive-first.** Nullable/defaulted new columns; no
   destructive DDL on populated tables without a separately-reviewed plan;
   renames go expand→migrate→contract.
+- **A migration may be edited in place only while no environment other than
+  local and CI has run it (standing rule, Pedram, 2026-11-21, PL-2.4 Q1).**
+  From the first merge of `pl` to `main` onward, every PL migration is
+  **frozen** and every change is a NEW migration. Before editing in place,
+  prove it: the file is not on `main`, and the deploy log and the production
+  migration status show it was never run. An in-place edit leaves local
+  databases that already ran the old file silently stale; the chunk's review
+  names the exact rebuild commands.
 - **Migrations modify SCHEMA ONLY — no data writes in a migration file, ever.**
   No backfills, no default-flips on existing rows, no seeding of business data,
   no matter how narrow or how well guarded. **No exception clause.** A migration

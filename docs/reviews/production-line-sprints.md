@@ -253,6 +253,8 @@ Notes: the walks' mock API carries no `waves_enabled`, so they are flag-off by c
 4. **Q15 (creator draft form):** the creator's "Submit your draft" form still appears on a for-a-wave campaign. `waves_enabled` must not be turned on in production for real creators before PL-6 decides it.
 5. **Tech-debt rows opened in PL-1:** 40 (no virus scan or content check on uploads, brand client files), 41 (a NORMAL campaign can be set Active or listed with budget 0), 42 (`ErasureClaimGuardTest` memory use), 43 (`appIconAssets.spec.ts` local failure).
 6. **Flag:** `waves_enabled` is default OFF everywhere that matters and is never turned on by a deploy.
+7. **No PL migration has run in production (added 2026-11-21, PL-2.4 Q1).** The production migration status must show **none** of the 17 PL migrations (`2026_11_17_100000_create_waves_table` through the PL-2.3 concept tables, plus the PL-2.4 market tables). This is the colleague's read-back, and it is the condition that lets PL-2.4 edit those migrations in place. **Not read** for production.
+8. **Standing rule: PL migrations are frozen from the first merge.** A migration may be edited in place only while no environment other than local and CI has run it (`WORKING-PROCESS.md` §5). From the first merge of `pl` to `main`, every PL change is a new migration.
 
 ## PL-2.3 rulings (Pedram, 2026-11-21)
 
