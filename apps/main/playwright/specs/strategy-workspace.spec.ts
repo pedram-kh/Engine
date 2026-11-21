@@ -188,11 +188,15 @@ test.describe('Strategy workspace', () => {
       await expect(page.locator('[data-test="usp-counter"]')).toHaveText('0 of 6 USPs')
       await expect(page.locator('[data-test="usp-warning"]')).toBeVisible()
 
-      // Stepper: six steps, two live links, four plain elements.
+      // Stepper: six steps; the first four are live links (Concepts since PL-2.3), Creators and Scripts are plain (PL-3).
       await expect(page.locator('[data-test^="strategy-step-"][data-test$="-status"]')).toHaveCount(
         6,
       )
-      for (const key of ['concepts', 'creators', 'scripts']) {
+      await expect(page.locator('[data-test="strategy-step-concepts"]')).not.toHaveAttribute(
+        'aria-disabled',
+        'true',
+      )
+      for (const key of ['creators', 'scripts']) {
         await expect(page.locator(`[data-test="strategy-step-${key}"]`)).toHaveAttribute(
           'aria-disabled',
           'true',

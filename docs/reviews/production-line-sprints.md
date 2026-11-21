@@ -256,7 +256,7 @@ Notes: the walks' mock API carries no `waves_enabled`, so they are flag-off by c
 ## PL-2.3 rulings (Pedram, 2026-11-21)
 
 - **Concepts and client contact data.** The agency records the client's decision, and with it a **client contact's name and feedback**, as free text (`wave_concept_decisions`). The privacy documents need a sentence on client contact names and feedback recorded by the agency (for Jordan; `docs/tech-debt.md` row 48). **PL-4 must decide how those names link to a real client user**, and what erasure of a client contact does to them.
-- **No lock.** Steps 5 and 6 (PL-3) are never locked by concepts. The Creators and Scripts screens show the warning ("{approved} of {total} concepts approved" or "No concepts yet") and **never block**.
+- **No lock.** Steps 5 and 6 (PL-3) are never locked by concepts. The Creators and Scripts screens show a warning ("Concepts: {approved} of {total} approved" or "No concepts yet") **only when there is no concept or at least one is not approved** (walk fix D1, 2026-11-21), and **never block**. Several markets are summed. Until PL-3 builds them the two steps read "Not available yet".
 - A persona that concepts use cannot be deleted (422 with the count, every role); deleting a USP keeps the concepts and removes the chip; at most 30 concepts per market.
 
 ### PL-2.3: must confirm before `pl` is merged (added 2026-11-21, Pedram's A2)
@@ -270,3 +270,9 @@ PL-2.3 makes thumbnails from uploaded images and sweeps unfinished uploads. Thre
 | **The queue the thumbnail job runs on.**                     | `GenerateConceptImageThumbnail` is dispatched without a queue name, so it runs on `default`. If the production worker listens elsewhere, no thumbnail is ever made.                                                                                       | The job's own comment, and `docs/runbooks/production-queue-worker.md` (every job goes to `default`; worker `queue:work --memory=768 --tries=3 --max-time=3600`).                                                                                     | The **runbook** is read. The running production supervisor config is **not read**.                                                                      |
 
 Nothing in this table blocks local use. All three are checks for the person who merges `pl`.
+
+### PL-2.3 status (2026-11-21)
+
+**Built and walked locally; not merged, not deployed.** Pedram walked it on `pl23_walk` (19 steps), the findings were fixed (D1, A1, A2, P1, P2) and accepted at his re-check the same day. The local gates, the flag-off walks (126 and 146 identical) and CI on `pl` are in `pl-2-3-review.md`, "Close-out". The staging walk and the phone walk are not run. `waves_enabled` and `strategy_enabled` are default OFF; a deploy never turns them on.
+
+The "must confirm before `pl` is merged" table above is **current**: the code still uses GD (`ConceptThumbnailer.php`), the sweeper is still registered at `apps/api/bootstrap/app.php` line 70 (every 15 minutes), and the thumbnail job is still dispatched without a queue name (`ConceptImageService.php`). None of the three is read for production.

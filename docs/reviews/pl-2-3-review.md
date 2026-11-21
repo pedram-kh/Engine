@@ -238,6 +238,57 @@ All four work, so the accounts are seeded correctly and I could not reproduce a 
 
 **Not run:** Safari and Firefox; downloading a very large original; a long session for blob leaks after the viewer download.
 
+## Close-out (2026-11-21)
+
+### The walk and the re-check
+
+Pedram walked PL-2.3 locally on `pl23_walk` (19 steps, three roles at two widths, plus the other agency). The result was one defect (D1), two additions (A1, A2), two polish items (P1, P2) and one thing to check (sign-in). Nothing else was reported. All six are fixed and recorded above (the persona filter was added only because the P2 link needs it). **Pedram re-checked the fixes on 2026-11-21 and accepted them.** The three rulings are recorded at the top of "Walk result and fixes". Steps 5 and 6 cannot be opened because Creators and Scripts are built in PL-3, not because of concepts.
+
+### Close-out gates (local, 2026-11-21)
+
+| Gate                                                                                          | Result                                                                                             |
+| --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Pest: Strategy, Waves, Brands, Audit, Erasure, Tenancy, Console on SQLite (clean env)         | 975 passed, 21 skipped (PostgreSQL-only)                                                           |
+| Same folders on PostgreSQL (`pl12_test`, port 5435)                                           | 996 passed                                                                                         |
+| Vitest: `src/core/i18n`, `src/modules/strategy`, `src/modules/waves`, `src/modules/campaigns` | 51 files, 627 tests passed                                                                         |
+| `vue-tsc --noEmit`, Pint, Larastan                                                            | clean, passed, `[OK] No errors`                                                                    |
+| ESLint (`src`, `playwright` of `apps/main`)                                                   | 0 errors, 2 warnings (existing)                                                                    |
+| Walk compare agency / creator (with comment nodes)                                            | 126 / 146 identical, 0 page errors                                                                 |
+| Waves on, strategy off (PL-1 as before)                                                       | `wave-dialog-menus` and `wave-tracker` specs passed (4 tests); the two "strategy off" tests passed |
+
+Playwright, serial, one worker, chromium, throwaway `pl12_test`. Every test is under 15 s:
+
+| Spec                                 | Test                                                  | 1440          | 390    |
+| ------------------------------------ | ----------------------------------------------------- | ------------- | ------ |
+| `pl23-concepts`                      | decision, hostile text, A1 confirmation               | 5.6 s         | 5.7 s  |
+| `pl23-concepts`                      | links, dialogs reopen                                 | 5.3 s         | 5.4 s  |
+| `pl23-concepts`                      | walk fixes (stepper, decision, persona refusal, link) | 4.1 s         | 4.7 s  |
+| `strategy-matrix-manual`             | prefill, red hint, Use the matrix line                | 4.7 s         | 5.3 s  |
+| `strategy-matrix`                    | editor, reopen, hostile text, synced angle            | 4.5 s         | 5.1 s  |
+| `strategy-matrix`                    | strategy off: address leaves for the wave             | 1.6 s         |        |
+| `strategy-workspace`                 | entry, USPs, dialogs, hostile text                    | 12.7 s        | 14.1 s |
+| `strategy-workspace`                 | personas, angles, copy, delete of a USP in use        | 9.5 s         | 10.5 s |
+| `strategy-workspace`                 | "removed by someone else" alert                       | 2.5 s         | 2.8 s  |
+| `strategy-workspace`                 | strategy off: wave page has no entry                  | 2.6 s         |        |
+| `wave-dialog-menus` / `wave-tracker` | 4 tests (run separately)                              | 4.6 to 10.5 s | 11.6 s |
+
+**A stale test was found and fixed here:** `strategy-workspace` (PL-2.1) still expected the Concepts step to be disabled, which has been wrong since PL-2.3 made it a live link. It now expects Concepts live and Creators and Scripts disabled. It was red before the fix and green after; the other 17 were green throughout.
+
+### Clean-up
+
+`Pl23WalkCleanupSeeder` ran on `pl23_walk` (database name printed first): 16 image rows, 0 after; both walk agencies gone. The `media` bucket then held 5 objects, none under a walk concept key (they belong to earlier dev data and were left alone). `pl23_walk` was dropped. The servers on 8003 and 5185 were stopped. `apps/api/storage/app/pl23-walk-files` does not exist and the path is git-ignored (`storage/app/.gitignore`), so nothing about it is committed. `/tmp/pl23` was left for Pedram.
+
+Flags in Pedram's database `catalyst` (read only, a SELECT with a read-only session): **`waves_enabled` = true and `strategy_enabled` = true** (global). They were not written by this work.
+
+### Not run
+
+- Safari and Firefox; a phone device; the creator app.
+- Image upload in Playwright (the suite's media disk is local); it was walked by hand against MinIO.
+- Downloading a very large original in the viewer.
+- The staging walk (there is no staging).
+- The full Pest suite outside the seven folders.
+- The production container checks in `production-line-sprints.md` (GD and exif, the scheduler, the queue): **not read** for production.
+
 ## Walking it yourself
 
 See the end of the report in chat for the exact commands, addresses and logins.
