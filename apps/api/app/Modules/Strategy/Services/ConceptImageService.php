@@ -103,6 +103,12 @@ final class ConceptImageService
             throw StrategyRuleViolation::imageUnknownUpload();
         }
 
+        // Nothing stored yet (the browser has not finished, or the PUT failed): refuse but KEEP the reservation, so the
+        // same upload can be completed once the object is there (or the sweeper removes it after it expires).
+        if (! ConceptImageStorage::disk()->exists($image->storage_key)) {
+            throw StrategyRuleViolation::imageInvalid('The uploaded file was not found. Upload it again, then complete.');
+        }
+
         // The object, as it is stored: its own size and MIME, and a look at the first bytes. The request says nothing.
         $verified = $this->verify($image);
         if (is_string($verified)) {

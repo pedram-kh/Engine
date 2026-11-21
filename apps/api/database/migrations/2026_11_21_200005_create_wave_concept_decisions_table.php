@@ -40,7 +40,7 @@ return new class extends Migration
             $table->foreign(['wave_id', 'market', 'concept_id'], 'fk_wave_concept_decisions_concept')
                 ->references(['wave_id', 'market', 'id'])->on('wave_concepts')->restrictOnDelete();
 
-            $table->string('status', 17);
+            $table->string('status', 20);
             $table->string('client_name', 80);
             $table->string('note', 500)->nullable();
             $table->string('comment', 1000)->nullable();

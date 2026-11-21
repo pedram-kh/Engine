@@ -291,7 +291,7 @@ final class ConceptService
                     action: AuditAction::WaveConceptDeleted,
                     actor: $actor,
                     subject: $concept,
-                    metadata: ['wave' => $locked->ulid, 'concept' => $concept->ulid, 'market' => $concept->market] + $counts,
+                    metadata: ['wave' => $locked->ulid, 'concept' => $concept->ulid, 'market' => $concept->market, 'chips_removed' => $counts['chips_removed'], 'images_removed' => $counts['images_removed'], 'links_removed' => $counts['links_removed'], 'decisions_removed' => $counts['decisions_removed']],
                     agencyId: $locked->agency_id,
                 );
 
@@ -512,7 +512,7 @@ final class ConceptService
         }
         foreach ($rows as $row) {
             $market = (string) $row->getAttribute('market');
-            $status = (string) $row->getAttribute('status');
+            $status = (string) $row->getRawOriginal('status');
             $n = (int) $row->getAttribute('n');
             $by[$market] ??= ['market' => $market, 'total' => 0, 'approved' => 0, 'awaiting' => 0, 'changes_requested' => 0];
             $by[$market]['total'] += $n;

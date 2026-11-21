@@ -53,7 +53,7 @@ return new class extends Migration
             $table->jsonb('key_points')->nullable();
             $table->string('payoff', 300)->nullable();
             $table->string('cta', 200)->nullable();
-            $table->string('status', 16)->default('awaiting');
+            $table->string('status', 20)->default('awaiting');
             $table->string('origin', 8)->default('manual');
 
             $table->timestamps();
