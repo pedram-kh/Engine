@@ -1846,7 +1846,10 @@
         "emptyState": {
           "title": "Turul {market} pole veel persoone",
           "body": "Lisa {min} kuni {max} persoonat, kes kirjeldavad, kellele sellel turul kirjutad."
-        }
+        },
+        "blockedTitle": "Persoonat {name} ei saa kustutada",
+        "groupCells": "Maatriksi lahtrid",
+        "seeConcepts": "Vaata selle persooni kontseptsioone"
       },
       "copy": {
         "open": "Kopeeri allikast…",
@@ -2015,7 +2018,14 @@
           "clientName": "Kliendi nimi",
           "note": "Märkus (valikuline)",
           "comment": "Mida tuleks muuta",
-          "replaces": "Uus otsus asendab oleku. Varasemad otsused jäävad ajalukku."
+          "replaces": "Uus otsus asendab oleku. Varasemad otsused jäävad ajalukku.",
+          "choice": "Kliendi otsus",
+          "why": {
+            "concept": "Vali, millise kontseptsiooni otsus puudutab.",
+            "name": "Sisesta kliendi nimi.",
+            "nameAndComment": "Sisesta kliendi nimi ja kommentaar.",
+            "comment": "Sisesta kliendi kommentaar."
+          }
         },
         "delete": {
           "title": "Kas kustutada kontseptsioon {title}?",
@@ -2035,7 +2045,8 @@
           "open": "Ava {name}",
           "remove": "Eemalda {name}",
           "close": "Sulge",
-          "loadFailed": "Pilti ei õnnestunud laadida."
+          "loadFailed": "Pilti ei õnnestunud laadida.",
+          "download": "Laadi alla"
         },
         "links": {
           "label": "Lingid",
@@ -2079,7 +2090,13 @@
           "image": "Pilt",
           "link": "Link",
           "drop": "Lohista pildid siia või lisa link"
-        }
+        },
+        "angleSuggestions": {
+          "button": "Nurga soovitused",
+          "heading": "Persoona {persona} nurgad"
+        },
+        "personaFilter": "Kuvatakse ainult persoona {persona} kontseptsioonid.",
+        "showAll": "Näita kõiki"
       }
     }
   },

@@ -139,10 +139,24 @@ const KEYS = [
   'app.strategy.usp.deleteDialog.conceptsNote',
   'app.waves.errors.marketHasConcepts',
   'app.strategy.validation.required',
+  'app.strategy.concepts.images.download',
+  'app.strategy.concepts.angleSuggestions.button',
+  'app.strategy.concepts.angleSuggestions.heading',
+  'app.strategy.concepts.decision.choice',
+  'app.strategy.concepts.decision.why.concept',
+  'app.strategy.concepts.decision.why.name',
+  'app.strategy.concepts.decision.why.nameAndComment',
+  'app.strategy.concepts.decision.why.comment',
+  'app.strategy.persona.blockedTitle',
+  'app.strategy.persona.groupCells',
+  'app.strategy.persona.seeConcepts',
+  'app.strategy.concepts.personaFilter',
+  'app.strategy.concepts.showAll',
 ]
 
 /** `locale:key` pairs that are the same text as English on purpose (a product term, an address example), checked by hand. */
 const SAME_AS_ENGLISH_BY_DESIGN = new Set<string>([
+  'da:app.strategy.concepts.images.download', // "Download" is the Danish word too
   'bg:app.strategy.concepts.field.cta',
   'cs:app.strategy.concepts.field.hook',
   'cs:app.strategy.concepts.field.cta',
@@ -251,7 +265,7 @@ function tokens(text: string): string[] {
 
 describe('PL-2.3 concepts strings', () => {
   it('checks 122 keys across 24 locales', () => {
-    expect(KEYS).toHaveLength(122)
+    expect(KEYS).toHaveLength(135)
     expect(new Set(KEYS).size).toBe(KEYS.length)
     expect(UI_LOCALES).toHaveLength(24)
   })

@@ -1846,7 +1846,10 @@
         "emptyState": {
           "title": "Níl aon phearsa ann do {market} fós",
           "body": "Cuir {min} go {max} pearsa leis a thugann cur síos ar cé dó a scríobhann tú sa mhargadh seo."
-        }
+        },
+        "blockedTitle": "Ní féidir {name} a scriosadh",
+        "groupCells": "Cealla maitríse",
+        "seeConcepts": "Féach ar choincheapa an phearsa seo"
       },
       "copy": {
         "open": "Cóipeáil ó…",
@@ -2015,7 +2018,14 @@
           "clientName": "Ainm an chliaint",
           "note": "Nóta (roghnach)",
           "comment": "Cad ba cheart a athrú",
-          "replaces": "Cuireann cinneadh nua an stádas ina ionad. Fanann cinntí roimhe sin sa taifead."
+          "replaces": "Cuireann cinneadh nua an stádas ina ionad. Fanann cinntí roimhe sin sa taifead.",
+          "choice": "Cinneadh an chliaint",
+          "why": {
+            "concept": "Roghnaigh cén coincheap a bhaineann leis an gcinneadh seo.",
+            "name": "Cuir isteach ainm an chliaint.",
+            "nameAndComment": "Cuir isteach ainm an chliaint agus an trácht.",
+            "comment": "Cuir isteach trácht an chliaint."
+          }
         },
         "delete": {
           "title": "An scriosfar an coincheap {title}?",
@@ -2035,7 +2045,8 @@
           "open": "Oscail {name}",
           "remove": "Bain {name}",
           "close": "Dún",
-          "loadFailed": "Níorbh fhéidir an íomhá a luchtú."
+          "loadFailed": "Níorbh fhéidir an íomhá a luchtú.",
+          "download": "Íoslódáil"
         },
         "links": {
           "label": "Naisc",
@@ -2079,7 +2090,13 @@
           "image": "Íomhá",
           "link": "Nasc",
           "drop": "Scaoil íomhánna anseo nó cuir nasc leis"
-        }
+        },
+        "angleSuggestions": {
+          "button": "Moltaí uillinne",
+          "heading": "Uillinneacha {persona}"
+        },
+        "personaFilter": "Ní thaispeántar ach coincheapa {persona}.",
+        "showAll": "Taispeáin gach ceann"
       }
     }
   },

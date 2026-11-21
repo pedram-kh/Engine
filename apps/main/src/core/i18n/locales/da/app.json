@@ -1846,7 +1846,10 @@
         "emptyState": {
           "title": "Ingen personaer for {market} endnu",
           "body": "Tilføj {min} til {max} personaer, der beskriver, hvem du skriver til på dette marked."
-        }
+        },
+        "blockedTitle": "{name} kan ikke slettes",
+        "groupCells": "Matrixceller",
+        "seeConcepts": "Se denne personas koncepter"
       },
       "copy": {
         "open": "Kopiér fra…",
@@ -2015,7 +2018,14 @@
           "clientName": "Kundens navn",
           "note": "Note (valgfri)",
           "comment": "Hvad skal ændres",
-          "replaces": "En ny beslutning erstatter status. Tidligere beslutninger bliver i historikken."
+          "replaces": "En ny beslutning erstatter status. Tidligere beslutninger bliver i historikken.",
+          "choice": "Kundens beslutning",
+          "why": {
+            "concept": "Vælg, hvilket koncept beslutningen gælder.",
+            "name": "Angiv kundens navn.",
+            "nameAndComment": "Angiv kundens navn og kommentaren.",
+            "comment": "Angiv kundens kommentar."
+          }
         },
         "delete": {
           "title": "Slet konceptet {title}?",
@@ -2035,7 +2045,8 @@
           "open": "Åbn {name}",
           "remove": "Fjern {name}",
           "close": "Luk",
-          "loadFailed": "Billedet kunne ikke indlæses."
+          "loadFailed": "Billedet kunne ikke indlæses.",
+          "download": "Download"
         },
         "links": {
           "label": "Links",
@@ -2079,7 +2090,13 @@
           "image": "Billede",
           "link": "Link",
           "drop": "Slip billeder her eller tilføj et link"
-        }
+        },
+        "angleSuggestions": {
+          "button": "Forslag til vinkler",
+          "heading": "Vinkler for {persona}"
+        },
+        "personaFilter": "Viser kun koncepter for {persona}.",
+        "showAll": "Vis alle"
       }
     }
   },

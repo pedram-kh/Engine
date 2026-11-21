@@ -1846,7 +1846,10 @@
         "emptyState": {
           "title": "Aún no hay personas para {market}",
           "body": "Añade de {min} a {max} personas que describan a quién escribes en este mercado."
-        }
+        },
+        "blockedTitle": "No se puede eliminar a {name}",
+        "groupCells": "Celdas de la matriz",
+        "seeConcepts": "Ver los conceptos de esta persona"
       },
       "copy": {
         "open": "Copiar desde…",
@@ -2015,7 +2018,14 @@
           "clientName": "Nombre del cliente",
           "note": "Nota (opcional)",
           "comment": "Qué debe cambiar",
-          "replaces": "Una nueva decisión sustituye al estado. Las decisiones anteriores quedan en el registro."
+          "replaces": "Una nueva decisión sustituye al estado. Las decisiones anteriores quedan en el registro.",
+          "choice": "Decisión del cliente",
+          "why": {
+            "concept": "Elige a qué concepto se refiere esta decisión.",
+            "name": "Introduce el nombre del cliente.",
+            "nameAndComment": "Introduce el nombre del cliente y el comentario.",
+            "comment": "Introduce el comentario del cliente."
+          }
         },
         "delete": {
           "title": "¿Eliminar el concepto {title}?",
@@ -2035,7 +2045,8 @@
           "open": "Abrir {name}",
           "remove": "Quitar {name}",
           "close": "Cerrar",
-          "loadFailed": "No se pudo cargar la imagen."
+          "loadFailed": "No se pudo cargar la imagen.",
+          "download": "Descargar"
         },
         "links": {
           "label": "Enlaces",
@@ -2079,7 +2090,13 @@
           "image": "Imagen",
           "link": "Enlace",
           "drop": "Suelta imágenes aquí o añade un enlace"
-        }
+        },
+        "angleSuggestions": {
+          "button": "Sugerencias de ángulo",
+          "heading": "Ángulos de {persona}"
+        },
+        "personaFilter": "Se muestran solo los conceptos de {persona}.",
+        "showAll": "Mostrar todos"
       }
     }
   },

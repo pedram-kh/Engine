@@ -1846,7 +1846,10 @@
         "emptyState": {
           "title": "Aucun persona pour {market} pour l'instant",
           "body": "Ajoutez de {min} à {max} personas qui décrivent à qui vous écrivez sur ce marché."
-        }
+        },
+        "blockedTitle": "{name} ne peut pas être supprimé",
+        "groupCells": "Cellules de la matrice",
+        "seeConcepts": "Voir les concepts de ce persona"
       },
       "copy": {
         "open": "Copier depuis…",
@@ -2015,7 +2018,14 @@
           "clientName": "Nom du client",
           "note": "Note (facultatif)",
           "comment": "Ce qui doit changer",
-          "replaces": "Une nouvelle décision remplace le statut. Les décisions précédentes restent dans l'historique."
+          "replaces": "Une nouvelle décision remplace le statut. Les décisions précédentes restent dans l'historique.",
+          "choice": "Décision du client",
+          "why": {
+            "concept": "Choisissez le concept concerné par cette décision.",
+            "name": "Saisissez le nom du client.",
+            "nameAndComment": "Saisissez le nom du client et le commentaire.",
+            "comment": "Saisissez le commentaire du client."
+          }
         },
         "delete": {
           "title": "Supprimer le concept {title} ?",
@@ -2035,7 +2045,8 @@
           "open": "Ouvrir {name}",
           "remove": "Retirer {name}",
           "close": "Fermer",
-          "loadFailed": "L'image n'a pas pu être chargée."
+          "loadFailed": "L'image n'a pas pu être chargée.",
+          "download": "Télécharger"
         },
         "links": {
           "label": "Liens",
@@ -2079,7 +2090,13 @@
           "image": "Image",
           "link": "Lien",
           "drop": "Déposez des images ici ou ajoutez un lien"
-        }
+        },
+        "angleSuggestions": {
+          "button": "Suggestions d'angle",
+          "heading": "Angles de {persona}"
+        },
+        "personaFilter": "Seuls les concepts de {persona} sont affichés.",
+        "showAll": "Tout afficher"
       }
     }
   },

@@ -1846,7 +1846,10 @@
         "emptyState": {
           "title": "Rinkai {market} personų dar nėra",
           "body": "Pridėkite nuo {min} iki {max} personų, apibūdinančių, kam rašote šioje rinkoje."
-        }
+        },
+        "blockedTitle": "Persona {name} negalima ištrinti",
+        "groupCells": "Matricos langeliai",
+        "seeConcepts": "Peržiūrėti šios personos koncepcijas"
       },
       "copy": {
         "open": "Kopijuoti iš…",
@@ -2015,7 +2018,14 @@
           "clientName": "Kliento vardas",
           "note": "Pastaba (neprivaloma)",
           "comment": "Ką reikia pakeisti",
-          "replaces": "Naujas sprendimas pakeičia būseną. Ankstesni sprendimai lieka istorijoje."
+          "replaces": "Naujas sprendimas pakeičia būseną. Ankstesni sprendimai lieka istorijoje.",
+          "choice": "Kliento sprendimas",
+          "why": {
+            "concept": "Pasirinkite, kuriai koncepcijai taikomas sprendimas.",
+            "name": "Įveskite kliento vardą.",
+            "nameAndComment": "Įveskite kliento vardą ir komentarą.",
+            "comment": "Įveskite kliento komentarą."
+          }
         },
         "delete": {
           "title": "Ištrinti konceptą {title}?",
@@ -2035,7 +2045,8 @@
           "open": "Atidaryti {name}",
           "remove": "Pašalinti {name}",
           "close": "Uždaryti",
-          "loadFailed": "Nepavyko įkelti paveikslėlio."
+          "loadFailed": "Nepavyko įkelti paveikslėlio.",
+          "download": "Atsisiųsti"
         },
         "links": {
           "label": "Nuorodos",
@@ -2079,7 +2090,13 @@
           "image": "Vaizdas",
           "link": "Nuoroda",
           "drop": "Nutempkite vaizdus čia arba pridėkite nuorodą"
-        }
+        },
+        "angleSuggestions": {
+          "button": "Kampo pasiūlymai",
+          "heading": "{persona} kampai"
+        },
+        "personaFilter": "Rodomos tik {persona} koncepcijos.",
+        "showAll": "Rodyti visas"
       }
     }
   },

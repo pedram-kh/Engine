@@ -1846,7 +1846,10 @@
         "emptyState": {
           "title": "Markkinalla {market} ei ole vielä personia",
           "body": "Lisää {min}–{max} personaa, jotka kuvaavat, kenelle kirjoitat tällä markkinalla."
-        }
+        },
+        "blockedTitle": "Persoonaa {name} ei voi poistaa",
+        "groupCells": "Matriisin solut",
+        "seeConcepts": "Näytä tämän persoonan konseptit"
       },
       "copy": {
         "open": "Kopioi kohteesta…",
@@ -2015,7 +2018,14 @@
           "clientName": "Asiakkaan nimi",
           "note": "Muistiinpano (valinnainen)",
           "comment": "Mitä pitäisi muuttaa",
-          "replaces": "Uusi päätös korvaa tilan. Aiemmat päätökset säilyvät historiassa."
+          "replaces": "Uusi päätös korvaa tilan. Aiemmat päätökset säilyvät historiassa.",
+          "choice": "Asiakkaan päätös",
+          "why": {
+            "concept": "Valitse, mitä konseptia päätös koskee.",
+            "name": "Anna asiakkaan nimi.",
+            "nameAndComment": "Anna asiakkaan nimi ja kommentti.",
+            "comment": "Anna asiakkaan kommentti."
+          }
         },
         "delete": {
           "title": "Poistetaanko konsepti {title}?",
@@ -2035,7 +2045,8 @@
           "open": "Avaa {name}",
           "remove": "Poista {name}",
           "close": "Sulje",
-          "loadFailed": "Kuvaa ei voitu ladata."
+          "loadFailed": "Kuvaa ei voitu ladata.",
+          "download": "Lataa"
         },
         "links": {
           "label": "Linkit",
@@ -2079,7 +2090,13 @@
           "image": "Kuva",
           "link": "Linkki",
           "drop": "Pudota kuvia tähän tai lisää linkki"
-        }
+        },
+        "angleSuggestions": {
+          "button": "Kulmaehdotukset",
+          "heading": "Persoonan {persona} kulmat"
+        },
+        "personaFilter": "Näytetään vain persoonan {persona} konseptit.",
+        "showAll": "Näytä kaikki"
       }
     }
   },

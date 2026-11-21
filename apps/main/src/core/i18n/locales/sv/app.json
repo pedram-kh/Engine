@@ -1846,7 +1846,10 @@
         "emptyState": {
           "title": "Inga personor för {market} än",
           "body": "Lägg till {min} till {max} personor som beskriver vem du skriver för på den här marknaden."
-        }
+        },
+        "blockedTitle": "{name} kan inte tas bort",
+        "groupCells": "Matrisceller",
+        "seeConcepts": "Se den här personans koncept"
       },
       "copy": {
         "open": "Kopiera från…",
@@ -2015,7 +2018,14 @@
           "clientName": "Kundens namn",
           "note": "Anteckning (valfritt)",
           "comment": "Vad som ska ändras",
-          "replaces": "Ett nytt beslut ersätter statusen. Tidigare beslut finns kvar i historiken."
+          "replaces": "Ett nytt beslut ersätter statusen. Tidigare beslut finns kvar i historiken.",
+          "choice": "Kundens beslut",
+          "why": {
+            "concept": "Välj vilket koncept beslutet gäller.",
+            "name": "Ange kundens namn.",
+            "nameAndComment": "Ange kundens namn och kommentaren.",
+            "comment": "Ange kundens kommentar."
+          }
         },
         "delete": {
           "title": "Ta bort konceptet {title}?",
@@ -2035,7 +2045,8 @@
           "open": "Öppna {name}",
           "remove": "Ta bort {name}",
           "close": "Stäng",
-          "loadFailed": "Bilden kunde inte läsas in."
+          "loadFailed": "Bilden kunde inte läsas in.",
+          "download": "Ladda ned"
         },
         "links": {
           "label": "Länkar",
@@ -2079,7 +2090,13 @@
           "image": "Bild",
           "link": "Länk",
           "drop": "Släpp bilder här eller lägg till en länk"
-        }
+        },
+        "angleSuggestions": {
+          "button": "Vinkelförslag",
+          "heading": "Vinklar för {persona}"
+        },
+        "personaFilter": "Visar bara koncept för {persona}.",
+        "showAll": "Visa alla"
       }
     }
   },

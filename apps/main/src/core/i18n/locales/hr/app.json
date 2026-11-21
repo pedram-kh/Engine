@@ -1846,7 +1846,10 @@
         "emptyState": {
           "title": "Za tržište {market} još nema persona",
           "body": "Dodajte od {min} do {max} persona koje opisuju kome pišete na ovom tržištu."
-        }
+        },
+        "blockedTitle": "{name} nije moguće izbrisati",
+        "groupCells": "Ćelije matrice",
+        "seeConcepts": "Pogledaj koncepte ove persone"
       },
       "copy": {
         "open": "Kopiraj iz…",
@@ -2015,7 +2018,14 @@
           "clientName": "Ime klijenta",
           "note": "Bilješka (neobavezno)",
           "comment": "Što treba promijeniti",
-          "replaces": "Nova odluka zamjenjuje status. Prethodne odluke ostaju u povijesti."
+          "replaces": "Nova odluka zamjenjuje status. Prethodne odluke ostaju u povijesti.",
+          "choice": "Odluka klijenta",
+          "why": {
+            "concept": "Odaberite na koji se koncept odluka odnosi.",
+            "name": "Unesite ime klijenta.",
+            "nameAndComment": "Unesite ime klijenta i komentar.",
+            "comment": "Unesite komentar klijenta."
+          }
         },
         "delete": {
           "title": "Izbrisati koncept {title}?",
@@ -2035,7 +2045,8 @@
           "open": "Otvori {name}",
           "remove": "Ukloni {name}",
           "close": "Zatvori",
-          "loadFailed": "Slika se nije mogla učitati."
+          "loadFailed": "Slika se nije mogla učitati.",
+          "download": "Preuzmi"
         },
         "links": {
           "label": "Poveznice",
@@ -2079,7 +2090,13 @@
           "image": "Slika",
           "link": "Poveznica",
           "drop": "Povucite slike ovdje ili dodajte poveznicu"
-        }
+        },
+        "angleSuggestions": {
+          "button": "Prijedlozi kuta",
+          "heading": "Kutovi persone {persona}"
+        },
+        "personaFilter": "Prikazani su samo koncepti persone {persona}.",
+        "showAll": "Prikaži sve"
       }
     }
   },

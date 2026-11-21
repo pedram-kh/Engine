@@ -1846,7 +1846,10 @@
         "emptyState": {
           "title": "Még nincs perszóna ide: {market}",
           "body": "Adjon hozzá {min}–{max} perszónát, akik leírják, kinek ír ezen a piacon."
-        }
+        },
+        "blockedTitle": "{name} nem törölhető",
+        "groupCells": "Mátrixcellák",
+        "seeConcepts": "A persona koncepcióinak megtekintése"
       },
       "copy": {
         "open": "Másolás innen…",
@@ -2015,7 +2018,14 @@
           "clientName": "Az ügyfél neve",
           "note": "Megjegyzés (nem kötelező)",
           "comment": "Mit kell megváltoztatni",
-          "replaces": "Az új döntés felváltja az állapotot. A korábbi döntések megmaradnak az előzményekben."
+          "replaces": "Az új döntés felváltja az állapotot. A korábbi döntések megmaradnak az előzményekben.",
+          "choice": "Az ügyfél döntése",
+          "why": {
+            "concept": "Válassza ki, melyik koncepcióra vonatkozik a döntés.",
+            "name": "Adja meg az ügyfél nevét.",
+            "nameAndComment": "Adja meg az ügyfél nevét és a megjegyzést.",
+            "comment": "Adja meg az ügyfél megjegyzését."
+          }
         },
         "delete": {
           "title": "Törlöd a(z) {title} koncepciót?",
@@ -2035,7 +2045,8 @@
           "open": "{name} megnyitása",
           "remove": "{name} eltávolítása",
           "close": "Bezárás",
-          "loadFailed": "A képet nem sikerült betölteni."
+          "loadFailed": "A képet nem sikerült betölteni.",
+          "download": "Letöltés"
         },
         "links": {
           "label": "Hivatkozások",
@@ -2079,7 +2090,13 @@
           "image": "Kép",
           "link": "Link",
           "drop": "Húzzon ide képeket, vagy adjon hozzá linket"
-        }
+        },
+        "angleSuggestions": {
+          "button": "Szögjavaslatok",
+          "heading": "{persona} szögei"
+        },
+        "personaFilter": "Csak {persona} koncepciói láthatók.",
+        "showAll": "Összes megjelenítése"
       }
     }
   },

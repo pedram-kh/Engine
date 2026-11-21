@@ -1846,7 +1846,10 @@
         "emptyState": {
           "title": "Ancora nessuna persona per {market}",
           "body": "Aggiungi da {min} a {max} persone che descrivono a chi scrivi in questo mercato."
-        }
+        },
+        "blockedTitle": "{name} non può essere eliminato",
+        "groupCells": "Celle della matrice",
+        "seeConcepts": "Vedi i concept di questa persona"
       },
       "copy": {
         "open": "Copia da…",
@@ -2015,7 +2018,14 @@
           "clientName": "Nome del cliente",
           "note": "Nota (facoltativa)",
           "comment": "Cosa deve cambiare",
-          "replaces": "Una nuova decisione sostituisce lo stato. Le decisioni precedenti restano nello storico."
+          "replaces": "Una nuova decisione sostituisce lo stato. Le decisioni precedenti restano nello storico.",
+          "choice": "Decisione del cliente",
+          "why": {
+            "concept": "Scegli a quale concept si riferisce questa decisione.",
+            "name": "Inserisci il nome del cliente.",
+            "nameAndComment": "Inserisci il nome del cliente e il commento.",
+            "comment": "Inserisci il commento del cliente."
+          }
         },
         "delete": {
           "title": "Eliminare il concept {title}?",
@@ -2035,7 +2045,8 @@
           "open": "Apri {name}",
           "remove": "Rimuovi {name}",
           "close": "Chiudi",
-          "loadFailed": "Impossibile caricare l'immagine."
+          "loadFailed": "Impossibile caricare l'immagine.",
+          "download": "Scarica"
         },
         "links": {
           "label": "Link",
@@ -2079,7 +2090,13 @@
           "image": "Immagine",
           "link": "Link",
           "drop": "Trascina qui le immagini o aggiungi un link"
-        }
+        },
+        "angleSuggestions": {
+          "button": "Suggerimenti di angolo",
+          "heading": "Angoli di {persona}"
+        },
+        "personaFilter": "Sono mostrati solo i concept di {persona}.",
+        "showAll": "Mostra tutti"
       }
     }
   },

@@ -1846,7 +1846,10 @@
         "emptyState": {
           "title": "No personas for {market} yet",
           "body": "Add {min} to {max} personas to describe who you are writing for in this market."
-        }
+        },
+        "blockedTitle": "{name} can't be deleted",
+        "groupCells": "Matrix cells",
+        "seeConcepts": "See this persona's concepts"
       },
       "copy": {
         "open": "Copy from…",
@@ -2015,7 +2018,14 @@
           "clientName": "Client's name",
           "note": "Note (optional)",
           "comment": "What should change",
-          "replaces": "A new decision replaces the status. Earlier decisions stay in the record."
+          "replaces": "A new decision replaces the status. Earlier decisions stay in the record.",
+          "choice": "Client's decision",
+          "why": {
+            "concept": "Choose which concept this decision is about.",
+            "name": "Enter the client's name.",
+            "nameAndComment": "Enter the client's name and the comment.",
+            "comment": "Enter the client's comment."
+          }
         },
         "delete": {
           "title": "Delete concept {title}?",
@@ -2035,7 +2045,8 @@
           "open": "Open {name}",
           "remove": "Remove {name}",
           "close": "Close",
-          "loadFailed": "The image could not be loaded."
+          "loadFailed": "The image could not be loaded.",
+          "download": "Download"
         },
         "links": {
           "label": "Links",
@@ -2079,7 +2090,13 @@
           "image": "Image",
           "link": "Link",
           "drop": "Drop images here or add a link"
-        }
+        },
+        "angleSuggestions": {
+          "button": "Angle suggestions",
+          "heading": "Angles of {persona}"
+        },
+        "personaFilter": "Showing only the concepts of {persona}.",
+        "showAll": "Show all"
       }
     }
   },

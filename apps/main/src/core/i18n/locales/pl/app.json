@@ -1846,7 +1846,10 @@
         "emptyState": {
           "title": "Brak person dla: {market}",
           "body": "Dodaj od {min} do {max} person opisujących, do kogo piszesz na tym rynku."
-        }
+        },
+        "blockedTitle": "Persony {name} nie można usunąć",
+        "groupCells": "Komórki macierzy",
+        "seeConcepts": "Zobacz koncepcje tej persony"
       },
       "copy": {
         "open": "Kopiuj z…",
@@ -2015,7 +2018,14 @@
           "clientName": "Imię i nazwisko klienta",
           "note": "Notatka (opcjonalnie)",
           "comment": "Co należy zmienić",
-          "replaces": "Nowa decyzja zastępuje status. Wcześniejsze decyzje pozostają w historii."
+          "replaces": "Nowa decyzja zastępuje status. Wcześniejsze decyzje pozostają w historii.",
+          "choice": "Decyzja klienta",
+          "why": {
+            "concept": "Wybierz, której koncepcji dotyczy ta decyzja.",
+            "name": "Wpisz nazwę klienta.",
+            "nameAndComment": "Wpisz nazwę klienta i komentarz.",
+            "comment": "Wpisz komentarz klienta."
+          }
         },
         "delete": {
           "title": "Usunąć koncept {title}?",
@@ -2035,7 +2045,8 @@
           "open": "Otwórz {name}",
           "remove": "Usuń {name}",
           "close": "Zamknij",
-          "loadFailed": "Nie udało się wczytać obrazu."
+          "loadFailed": "Nie udało się wczytać obrazu.",
+          "download": "Pobierz"
         },
         "links": {
           "label": "Linki",
@@ -2079,7 +2090,13 @@
           "image": "Obraz",
           "link": "Link",
           "drop": "Upuść obrazy tutaj lub dodaj link"
-        }
+        },
+        "angleSuggestions": {
+          "button": "Propozycje kątów",
+          "heading": "Kąty persony {persona}"
+        },
+        "personaFilter": "Wyświetlane są tylko koncepcje persony {persona}.",
+        "showAll": "Pokaż wszystkie"
       }
     }
   },

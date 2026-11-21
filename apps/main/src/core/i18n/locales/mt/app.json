@@ -1846,7 +1846,10 @@
         "emptyState": {
           "title": "Għad m'hemm l-ebda persunaġġ għal {market}",
           "body": "Żid minn {min} sa {max} persunaġġi li jiddeskrivu lil min qed tikteb f'dan is-suq."
-        }
+        },
+        "blockedTitle": "{name} ma jistax jitħassar",
+        "groupCells": "Ċelloli tal-matriċi",
+        "seeConcepts": "Ara l-kunċetti ta' din il-persuna"
       },
       "copy": {
         "open": "Ikkopja minn…",
@@ -2015,7 +2018,14 @@
           "clientName": "Isem il-klijent",
           "note": "Nota (mhux obbligatorja)",
           "comment": "X'għandu jinbidel",
-          "replaces": "Deċiżjoni ġdida tieħu post l-istatus. Id-deċiżjonijiet ta' qabel jibqgħu fl-istorja."
+          "replaces": "Deċiżjoni ġdida tieħu post l-istatus. Id-deċiżjonijiet ta' qabel jibqgħu fl-istorja.",
+          "choice": "Deċiżjoni tal-klijent",
+          "why": {
+            "concept": "Agħżel liema kunċett tirrigwarda din id-deċiżjoni.",
+            "name": "Daħħal l-isem tal-klijent.",
+            "nameAndComment": "Daħħal l-isem tal-klijent u l-kummentarju.",
+            "comment": "Daħħal il-kummentarju tal-klijent."
+          }
         },
         "delete": {
           "title": "Tħassar il-kunċett {title}?",
@@ -2035,7 +2045,8 @@
           "open": "Iftaħ {name}",
           "remove": "Neħħi {name}",
           "close": "Agħlaq",
-          "loadFailed": "L-immaġni ma setgħetx titgħabba."
+          "loadFailed": "L-immaġni ma setgħetx titgħabba.",
+          "download": "Niżżel"
         },
         "links": {
           "label": "Rabtiet",
@@ -2079,7 +2090,13 @@
           "image": "Immaġni",
           "link": "Link",
           "drop": "Waqqa’ l-immaġini hawn jew żid link"
-        }
+        },
+        "angleSuggestions": {
+          "button": "Suġġerimenti ta' angolu",
+          "heading": "Angoli ta' {persona}"
+        },
+        "personaFilter": "Qed jintwerew biss il-kunċetti ta' {persona}.",
+        "showAll": "Uri kollha"
       }
     }
   },

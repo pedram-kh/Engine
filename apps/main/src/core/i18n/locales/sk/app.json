@@ -1846,7 +1846,10 @@
         "emptyState": {
           "title": "Pre trh {market} zatiaľ žiadne persóny",
           "body": "Pridajte {min} až {max} persón, ktoré opisujú, pre koho na tomto trhu píšete."
-        }
+        },
+        "blockedTitle": "Persónu {name} nie je možné odstrániť",
+        "groupCells": "Bunky matice",
+        "seeConcepts": "Zobraziť koncepcie tejto persóny"
       },
       "copy": {
         "open": "Kopírovať z…",
@@ -2015,7 +2018,14 @@
           "clientName": "Meno klienta",
           "note": "Poznámka (voliteľná)",
           "comment": "Čo sa má zmeniť",
-          "replaces": "Nové rozhodnutie nahradí stav. Predchádzajúce rozhodnutia ostávajú v histórii."
+          "replaces": "Nové rozhodnutie nahradí stav. Predchádzajúce rozhodnutia ostávajú v histórii.",
+          "choice": "Rozhodnutie klienta",
+          "why": {
+            "concept": "Vyberte, ktorej koncepcie sa rozhodnutie týka.",
+            "name": "Zadajte meno klienta.",
+            "nameAndComment": "Zadajte meno klienta a komentár.",
+            "comment": "Zadajte komentár klienta."
+          }
         },
         "delete": {
           "title": "Odstrániť koncept {title}?",
@@ -2035,7 +2045,8 @@
           "open": "Otvoriť {name}",
           "remove": "Odstrániť {name}",
           "close": "Zavrieť",
-          "loadFailed": "Obrázok sa nepodarilo načítať."
+          "loadFailed": "Obrázok sa nepodarilo načítať.",
+          "download": "Stiahnuť"
         },
         "links": {
           "label": "Odkazy",
@@ -2079,7 +2090,13 @@
           "image": "Obrázok",
           "link": "Odkaz",
           "drop": "Presuňte sem obrázky alebo pridajte odkaz"
-        }
+        },
+        "angleSuggestions": {
+          "button": "Návrhy uhla",
+          "heading": "Uhly persóny {persona}"
+        },
+        "personaFilter": "Zobrazené sú len koncepcie persóny {persona}.",
+        "showAll": "Zobraziť všetko"
       }
     }
   },

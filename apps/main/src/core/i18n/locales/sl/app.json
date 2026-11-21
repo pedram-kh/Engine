@@ -1846,7 +1846,10 @@
         "emptyState": {
           "title": "Za trg {market} še ni person",
           "body": "Dodajte od {min} do {max} person, ki opisujejo, komu pišete na tem trgu."
-        }
+        },
+        "blockedTitle": "Persone {name} ni mogoče izbrisati",
+        "groupCells": "Celice matrike",
+        "seeConcepts": "Oglejte si koncepte te persone"
       },
       "copy": {
         "open": "Kopiraj iz …",
@@ -2015,7 +2018,14 @@
           "clientName": "Ime stranke",
           "note": "Opomba (neobvezno)",
           "comment": "Kaj naj se spremeni",
-          "replaces": "Nova odločitev nadomesti stanje. Prejšnje odločitve ostanejo v zgodovini."
+          "replaces": "Nova odločitev nadomesti stanje. Prejšnje odločitve ostanejo v zgodovini.",
+          "choice": "Odločitev stranke",
+          "why": {
+            "concept": "Izberite, na kateri koncept se odločitev nanaša.",
+            "name": "Vnesite ime stranke.",
+            "nameAndComment": "Vnesite ime stranke in komentar.",
+            "comment": "Vnesite komentar stranke."
+          }
         },
         "delete": {
           "title": "Izbrišem koncept {title}?",
@@ -2035,7 +2045,8 @@
           "open": "Odpri {name}",
           "remove": "Odstrani {name}",
           "close": "Zapri",
-          "loadFailed": "Slike ni bilo mogoče naložiti."
+          "loadFailed": "Slike ni bilo mogoče naložiti.",
+          "download": "Prenesi"
         },
         "links": {
           "label": "Povezave",
@@ -2079,7 +2090,13 @@
           "image": "Slika",
           "link": "Povezava",
           "drop": "Spustite slike sem ali dodajte povezavo"
-        }
+        },
+        "angleSuggestions": {
+          "button": "Predlogi kota",
+          "heading": "Koti persone {persona}"
+        },
+        "personaFilter": "Prikazani so samo koncepti persone {persona}.",
+        "showAll": "Pokaži vse"
       }
     }
   },

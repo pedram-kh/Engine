@@ -1846,7 +1846,10 @@
         "emptyState": {
           "title": "Nog geen persona's voor {market}",
           "body": "Voeg {min} tot {max} persona's toe die beschrijven voor wie je op deze markt schrijft."
-        }
+        },
+        "blockedTitle": "{name} kan niet worden verwijderd",
+        "groupCells": "Matrixcellen",
+        "seeConcepts": "Bekijk de concepten van deze persona"
       },
       "copy": {
         "open": "Kopiëren van…",
@@ -2015,7 +2018,14 @@
           "clientName": "Naam van de klant",
           "note": "Notitie (optioneel)",
           "comment": "Wat moet er veranderen",
-          "replaces": "Een nieuwe beslissing vervangt de status. Eerdere beslissingen blijven bewaard."
+          "replaces": "Een nieuwe beslissing vervangt de status. Eerdere beslissingen blijven bewaard.",
+          "choice": "Beslissing van de klant",
+          "why": {
+            "concept": "Kies op welk concept deze beslissing betrekking heeft.",
+            "name": "Voer de naam van de klant in.",
+            "nameAndComment": "Voer de naam van de klant en de opmerking in.",
+            "comment": "Voer de opmerking van de klant in."
+          }
         },
         "delete": {
           "title": "Concept {title} verwijderen?",
@@ -2035,7 +2045,8 @@
           "open": "{name} openen",
           "remove": "{name} verwijderen",
           "close": "Sluiten",
-          "loadFailed": "De afbeelding kon niet worden geladen."
+          "loadFailed": "De afbeelding kon niet worden geladen.",
+          "download": "Downloaden"
         },
         "links": {
           "label": "Links",
@@ -2079,7 +2090,13 @@
           "image": "Afbeelding",
           "link": "Link",
           "drop": "Sleep afbeeldingen hierheen of voeg een link toe"
-        }
+        },
+        "angleSuggestions": {
+          "button": "Hoeksuggesties",
+          "heading": "Hoeken van {persona}"
+        },
+        "personaFilter": "Alleen de concepten van {persona} worden getoond.",
+        "showAll": "Alles tonen"
       }
     }
   },

@@ -1846,7 +1846,10 @@
         "emptyState": {
           "title": "Încă nicio persona pentru {market}",
           "body": "Adaugă între {min} și {max} persone care descriu cui te adresezi pe această piață."
-        }
+        },
+        "blockedTitle": "{name} nu poate fi șters",
+        "groupCells": "Celulele matricei",
+        "seeConcepts": "Vezi conceptele acestei persoane"
       },
       "copy": {
         "open": "Copiază din…",
@@ -2015,7 +2018,14 @@
           "clientName": "Numele clientului",
           "note": "Notă (opțional)",
           "comment": "Ce trebuie schimbat",
-          "replaces": "O decizie nouă înlocuiește statusul. Deciziile anterioare rămân în istoric."
+          "replaces": "O decizie nouă înlocuiește statusul. Deciziile anterioare rămân în istoric.",
+          "choice": "Decizia clientului",
+          "why": {
+            "concept": "Alege la ce concept se referă decizia.",
+            "name": "Introdu numele clientului.",
+            "nameAndComment": "Introdu numele clientului și comentariul.",
+            "comment": "Introdu comentariul clientului."
+          }
         },
         "delete": {
           "title": "Ștergi conceptul {title}?",
@@ -2035,7 +2045,8 @@
           "open": "Deschide {name}",
           "remove": "Elimină {name}",
           "close": "Închide",
-          "loadFailed": "Imaginea nu a putut fi încărcată."
+          "loadFailed": "Imaginea nu a putut fi încărcată.",
+          "download": "Descarcă"
         },
         "links": {
           "label": "Linkuri",
@@ -2079,7 +2090,13 @@
           "image": "Imagine",
           "link": "Link",
           "drop": "Trageți imagini aici sau adăugați un link"
-        }
+        },
+        "angleSuggestions": {
+          "button": "Sugestii de unghi",
+          "heading": "Unghiurile persoanei {persona}"
+        },
+        "personaFilter": "Sunt afișate doar conceptele persoanei {persona}.",
+        "showAll": "Afișează tot"
       }
     }
   },

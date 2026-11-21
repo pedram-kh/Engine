@@ -1846,7 +1846,10 @@
         "emptyState": {
           "title": "Noch keine Personas für {market}",
           "body": "Füge {min} bis {max} Personas hinzu, die beschreiben, für wen du auf diesem Markt schreibst."
-        }
+        },
+        "blockedTitle": "{name} kann nicht gelöscht werden",
+        "groupCells": "Matrixzellen",
+        "seeConcepts": "Konzepte dieser Persona ansehen"
       },
       "copy": {
         "open": "Kopieren von …",
@@ -2015,7 +2018,14 @@
           "clientName": "Name des Kunden",
           "note": "Notiz (optional)",
           "comment": "Was soll geändert werden",
-          "replaces": "Eine neue Entscheidung ersetzt den Status. Frühere Entscheidungen bleiben erhalten."
+          "replaces": "Eine neue Entscheidung ersetzt den Status. Frühere Entscheidungen bleiben erhalten.",
+          "choice": "Entscheidung des Kunden",
+          "why": {
+            "concept": "Wählen Sie, auf welches Konzept sich die Entscheidung bezieht.",
+            "name": "Geben Sie den Namen des Kunden ein.",
+            "nameAndComment": "Geben Sie den Namen des Kunden und den Kommentar ein.",
+            "comment": "Geben Sie den Kommentar des Kunden ein."
+          }
         },
         "delete": {
           "title": "Konzept {title} löschen?",
@@ -2035,7 +2045,8 @@
           "open": "{name} öffnen",
           "remove": "{name} entfernen",
           "close": "Schließen",
-          "loadFailed": "Das Bild konnte nicht geladen werden."
+          "loadFailed": "Das Bild konnte nicht geladen werden.",
+          "download": "Herunterladen"
         },
         "links": {
           "label": "Links",
@@ -2079,7 +2090,13 @@
           "image": "Bild",
           "link": "Link",
           "drop": "Bilder hierher ziehen oder einen Link hinzufügen"
-        }
+        },
+        "angleSuggestions": {
+          "button": "Winkel-Vorschläge",
+          "heading": "Winkel von {persona}"
+        },
+        "personaFilter": "Es werden nur die Konzepte von {persona} angezeigt.",
+        "showAll": "Alle anzeigen"
       }
     }
   },
