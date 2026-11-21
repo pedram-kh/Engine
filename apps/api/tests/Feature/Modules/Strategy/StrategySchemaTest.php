@@ -55,7 +55,7 @@ it('P1: creates the three tables with the planned columns and the nullable audie
     expect(Wave::query()->findOrFail(Wave::factory()->create()->id)->usp_audience_title)->toBeNull();
 });
 
-it('P1: the six migrations run down and up again', function (): void {
+it('P1: the eleven migrations run down and up again', function (): void {
     $names = [
         '2026_11_20_100000_add_usp_audience_title_to_waves',
         '2026_11_20_100001_create_wave_usps_table',
@@ -64,6 +64,12 @@ it('P1: the six migrations run down and up again', function (): void {
         // PL-2.2: the cells table depends on wave_personas and wave_usps, so it goes down first.
         '2026_11_21_100000_add_market_unique_to_wave_personas',
         '2026_11_21_100001_create_wave_matrix_cells_table',
+        // PL-2.3: the concept tables depend on wave_personas and wave_usps (and the children on wave_concepts), so they go down first.
+        '2026_11_21_200001_create_wave_concepts_table',
+        '2026_11_21_200002_create_wave_concept_usps_table',
+        '2026_11_21_200003_create_wave_concept_images_table',
+        '2026_11_21_200004_create_wave_concept_links_table',
+        '2026_11_21_200005_create_wave_concept_decisions_table',
     ];
     foreach (array_reverse($names) as $name) {
         (require database_path("migrations/{$name}.php"))->down();
@@ -71,6 +77,8 @@ it('P1: the six migrations run down and up again', function (): void {
     expect(Schema::hasTable('wave_usps'))->toBeFalse()
         ->and(Schema::hasTable('wave_personas'))->toBeFalse()
         ->and(Schema::hasTable('wave_persona_angles'))->toBeFalse()
+        ->and(Schema::hasTable('wave_concepts'))->toBeFalse()
+        ->and(Schema::hasTable('wave_concept_decisions'))->toBeFalse()
         ->and(Schema::hasColumn('waves', 'usp_audience_title'))->toBeFalse();
 
     foreach ($names as $name) {
@@ -79,6 +87,8 @@ it('P1: the six migrations run down and up again', function (): void {
     expect(Schema::hasTable('wave_usps'))->toBeTrue()
         ->and(Schema::hasTable('wave_personas'))->toBeTrue()
         ->and(Schema::hasTable('wave_persona_angles'))->toBeTrue()
+        ->and(Schema::hasTable('wave_concepts'))->toBeTrue()
+        ->and(Schema::hasTable('wave_concept_decisions'))->toBeTrue()
         ->and(Schema::hasColumn('waves', 'usp_audience_title'))->toBeTrue();
 });
 
