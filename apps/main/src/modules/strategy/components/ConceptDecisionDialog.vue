@@ -60,6 +60,21 @@ watch(
   { immediate: true },
 )
 
+const CHOICES = [
+  {
+    value: 'approved',
+    color: 'success',
+    icon: 'mdi-circle-outline',
+    test: 'concept-decision-approved',
+  },
+  {
+    value: 'changes_requested',
+    color: 'error',
+    icon: 'mdi-circle-outline',
+    test: 'concept-decision-changes',
+  },
+] as const
+
 const len = (v: string): number => Array.from(v.trim()).length
 const items = computed(() =>
   props.concepts.map((c) => ({
@@ -98,6 +113,20 @@ const invalid = computed(
       ? len(note.value) > props.limits.decision_note
       : comment.value.trim() === '' || len(comment.value) > props.limits.decision_comment),
 )
+
+/**
+ * Why Save cannot proceed, in words and in the error colour (as the matrix hint does): the first thing missing, by status.
+ * Empty when Save would go ahead.
+ */
+const why = computed<string>(() => {
+  if (conceptId.value === null) return t('app.strategy.concepts.decision.why.concept')
+  const noName = clientName.value.trim() === ''
+  const noComment = status.value === 'changes_requested' && comment.value.trim() === ''
+  if (noName && noComment) return t('app.strategy.concepts.decision.why.nameAndComment')
+  if (noName) return t('app.strategy.concepts.decision.why.name')
+  if (noComment) return t('app.strategy.concepts.decision.why.comment')
+  return ''
+})
 
 function close(): void {
   if (!saving.value) emit('update:modelValue', false)
@@ -164,21 +193,29 @@ async function submit(): Promise<void> {
         <p v-else class="text-body-2 mb-3 text-break" data-test="concept-decision-subject">
           {{ concept.attributes.number }} · {{ concept.attributes.title }}
         </p>
-        <v-btn-toggle
-          v-model="status"
-          mandatory
-          divided
-          density="comfortable"
-          class="mb-4"
+        <div
+          class="decision-choice mb-4"
+          role="radiogroup"
+          :aria-label="t('app.strategy.concepts.decision.choice')"
           data-test="concept-decision-status"
         >
-          <v-btn value="approved" data-test="concept-decision-approved">
-            {{ t('app.strategy.concepts.status.approved') }}
+          <v-btn
+            v-for="c in CHOICES"
+            :key="c.value"
+            role="radio"
+            :aria-checked="status === c.value"
+            :color="c.color"
+            :variant="status === c.value ? 'flat' : 'outlined'"
+            :prepend-icon="status === c.value ? 'mdi-check-circle' : c.icon"
+            class="decision-choice__btn"
+            :class="{ 'decision-choice__btn--on': status === c.value }"
+            :data-test="c.test"
+            :data-selected="status === c.value ? 'true' : 'false'"
+            @click="status = c.value"
+          >
+            {{ t(`app.strategy.concepts.status.${c.value}`) }}
           </v-btn>
-          <v-btn value="changes_requested" data-test="concept-decision-changes">
-            {{ t('app.strategy.concepts.status.changes_requested') }}
-          </v-btn>
-        </v-btn-toggle>
+        </div>
         <v-text-field
           v-model="clientName"
           :label="t('app.strategy.concepts.decision.clientName')"
@@ -221,6 +258,15 @@ async function submit(): Promise<void> {
           {{ t('app.strategy.concepts.decision.replaces') }}
         </p>
       </v-card-text>
+      <p
+        v-if="why !== '' && !error"
+        class="decision-why mx-6 mb-3"
+        role="status"
+        data-test="concept-decision-why"
+      >
+        <v-icon icon="mdi-information-outline" size="14" aria-hidden="true" />
+        {{ why }}
+      </p>
       <v-alert
         v-if="error"
         class="mx-6 mb-3 strategy-dialog-error"
@@ -253,5 +299,32 @@ async function submit(): Promise<void> {
 <style scoped>
 .strategy-dialog-error {
   flex: 0 0 auto;
+}
+.decision-choice {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.decision-choice__btn {
+  min-width: 0;
+  white-space: normal;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 500;
+}
+.decision-choice__btn--on {
+  font-weight: 700;
+}
+.decision-why {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: rgb(var(--v-theme-error));
+}
+.decision-why .v-icon {
+  margin-top: 1px;
 }
 </style>
