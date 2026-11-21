@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Core\Tenancy\TenancyContext;
 use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Waves\Database\Factories\WaveFactory;
@@ -91,6 +92,30 @@ it('W2: the old shape (plain country codes) is refused on create and on edit, an
         ->assertUnprocessable()->assertJsonPath('errors.0.meta.field', 'markets.0');
 
     expect(WaveMarket::withoutGlobalScopes()->count())->toBe($before);
+});
+
+it('W2b: a market object with a key outside name, code, countries (and id on an edit) is refused, on create and on edit', function (): void {
+    $w = mkWorld();
+    $before = WaveMarket::withoutGlobalScopes()->count();
+
+    mkCreate($w, [['name' => 'X', 'countries' => ['SE'], 'position' => 1]])->assertUnprocessable();
+    mkCreate($w, [['name' => 'X', 'countries' => ['SE'], 'agency_id' => 1]])->assertUnprocessable();
+    $r = mkRead($w);
+    $r['markets'][0]['wave_id'] = 1;
+    mkPatch($w, $r['markets'], $r['markets_version'])->assertUnprocessable();
+
+    expect(WaveMarket::withoutGlobalScopes()->count())->toBe($before);
+});
+
+it('W2c: markets of another agency are invisible to the model (tenancy scope), not only to the routes', function (): void {
+    $w = mkWorld();
+    $mine = WaveMarket::withoutGlobalScopes()->where('wave_id', $w['wave']->id)->count();
+    expect($mine)->toBeGreaterThan(0);
+
+    $seen = app(TenancyContext::class)->runAs($w['agency']->id + 1000, fn (): int => WaveMarket::query()->count());
+    $own = app(TenancyContext::class)->runAs($w['agency']->id, fn (): int => WaveMarket::query()->where('wave_id', $w['wave']->id)->count());
+
+    expect($seen)->toBe(0)->and($own)->toBe($mine);
 });
 
 it('W3 (M2): a country in two markets is 422 wave.country_in_two_markets, on create and on edit', function (): void {

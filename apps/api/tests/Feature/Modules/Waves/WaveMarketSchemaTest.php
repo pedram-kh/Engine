@@ -94,6 +94,27 @@ it('MK6: RESTRICT: a market that has a persona, a country row or a wave behind i
         ->and(marketFails(fn () => DB::table('waves')->where('id', $wave->id)->delete()))->toThrow(QueryException::class);
 });
 
+it('MK6b: RESTRICT on the wave alone: a wave with a market (and no country row, no persona) cannot be hard-deleted', function (): void {
+    $wave = Wave::factory()->withMarkets([])->create();
+    DB::table('wave_markets')->insert(marketRow($wave, 'Alone', 'AL'));
+
+    expect(marketFails(fn () => DB::table('waves')->where('id', $wave->id)->delete()))->toThrow(QueryException::class);
+});
+
+it('MK8: the market migrations (new and edited) are schema-only (no data statement) and set a lock timeout first', function (): void {
+    $files = array_merge(
+        glob(database_path('migrations/2026_11_20_09000*.php')) ?: [],
+        glob(database_path('migrations/2026_11_20_100002*.php')) ?: [],
+        glob(database_path('migrations/2026_11_21_10000*.php')) ?: [],
+    );
+    expect(count($files))->toBeGreaterThanOrEqual(5);
+    foreach ($files as $file) {
+        $source = (string) file_get_contents($file);
+        expect($source)->not->toMatch('/DB::table\(|->insert\(|->update\(|->delete\(|insertOrIgnore|upsert\(|Model::|(?<!Schema)::create\(|DB::unprepared\(/')
+            ->and($source)->toContain("SET LOCAL lock_timeout = '5s'");
+    }
+});
+
 it('MK7: the market ulid is unique', function (): void {
     $a = Wave::factory()->withMarkets([])->create();
     DB::table('wave_markets')->insert($one = marketRow($a, 'One', 'ON'));

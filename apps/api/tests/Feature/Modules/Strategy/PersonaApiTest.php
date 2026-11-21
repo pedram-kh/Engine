@@ -8,6 +8,7 @@ use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WavePersonaAngle;
 use App\Modules\Strategy\Models\WaveUsp;
 use App\Modules\Waves\Models\Wave;
+use App\Modules\Waves\Models\WaveMarket;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Support\StrategyFixtures as S;
 use Tests\TestCase;
@@ -105,6 +106,16 @@ it('a default code that another persona edited into is not reused: the next free
     $second = S::call($w['admin'], 'POST', S::u($w, 'personas'), personaBody())->assertCreated()->json('data.attributes');
 
     expect($second['slot'])->toBe(2)->and($second['code'])->toBe('SK2A');
+});
+
+it('M1b: a market of a SIBLING wave of the same agency is 422 persona.market_not_in_wave, and nothing is written', function (): void {
+    $w = S::world();
+    $sibling = Wave::factory()->forBrand($w['agency']->id, $w['brand']->id)->create();
+    $foreign = WaveMarket::query()->where('wave_id', $sibling->id)->firstOrFail()->ulid;
+
+    S::call($w['admin'], 'POST', S::u($w, 'personas'), personaBody(['market' => $foreign]))->assertUnprocessable()->assertJsonPath('errors.0.code', 'persona.market_not_in_wave');
+    S::call($w['admin'], 'GET', S::u($w, 'personas?market='.$foreign))->assertUnprocessable()->assertJsonPath('errors.0.code', 'persona.market_not_in_wave');
+    expect(WavePersona::withoutGlobalScopes()->count())->toBe(0);
 });
 
 it('M1: a market that is not the wave\'s is 422 persona.market_not_in_wave on create and list', function (): void {
