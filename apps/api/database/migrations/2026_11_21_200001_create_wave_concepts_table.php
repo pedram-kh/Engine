@@ -35,10 +35,10 @@ return new class extends Migration
             $table->unsignedBigInteger('wave_id');
             $table->foreign('wave_id')->references('id')->on('waves')->restrictOnDelete();
 
-            $table->char('market', 2);
+            $table->unsignedBigInteger('market_id');
             $table->unsignedBigInteger('persona_id');
-            $table->foreign(['wave_id', 'market', 'persona_id'], 'fk_wave_concepts_persona')
-                ->references(['wave_id', 'market', 'id'])->on('wave_personas')->restrictOnDelete();
+            $table->foreign(['wave_id', 'market_id', 'persona_id'], 'fk_wave_concepts_persona')
+                ->references(['wave_id', 'market_id', 'id'])->on('wave_personas')->restrictOnDelete();
 
             $table->unsignedSmallInteger('position');
             $table->string('title', 120);
@@ -58,8 +58,8 @@ return new class extends Migration
 
             $table->timestamps();
 
-            $table->unique(['wave_id', 'market', 'id'], 'unique_wave_concepts_wave_market_id');
-            $table->index(['wave_id', 'market', 'position'], 'idx_wave_concepts_wave_market_position');
+            $table->unique(['wave_id', 'market_id', 'id'], 'unique_wave_concepts_wave_market_id');
+            $table->index(['wave_id', 'market_id', 'position'], 'idx_wave_concepts_wave_market_position');
             $table->index('persona_id', 'idx_wave_concepts_persona_id');
             $table->index('agency_id', 'idx_wave_concepts_agency_id');
         });

@@ -20,7 +20,9 @@ use Illuminate\Support\Facades\Schema;
  *     `unique_brand_creator_blacklist` precedent): nulls never collide, and a soft-deleted wave frees its
  *     campaign. The "same brand" rule is a service rule, not a foreign key (it would need a new index on
  *     `campaigns`, which this migration does not touch).
- *   - `markets` is a jsonb array of uppercase ISO 3166-1 alpha-2 codes (the `campaigns.listing_regions` shape).
+ *   - Markets are NOT a column (PL-2.4): they are rows of `wave_markets` (a named group of countries), with their
+ *     countries in `wave_market_countries`. This migration was edited in place; no PL migration had run outside local
+ *     and CI (WORKING-PROCESS.md section 5).
  *   - `status` is a plain string column; the PHP enum is the constraint, so adding a case needs no migration.
  *   - Every foreign key is RESTRICT: nothing cascades into a wave.
  *
@@ -52,7 +54,6 @@ return new class extends Migration
 
             $table->string('name', 160);
             $table->date('go_live_on');
-            $table->jsonb('markets');
             $table->string('status', 16)->default('draft');
 
             $table->unsignedBigInteger('created_by_user_id');

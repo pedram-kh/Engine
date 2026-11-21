@@ -32,7 +32,7 @@ return new class extends Migration
         }
 
         Schema::table('wave_personas', function (Blueprint $table): void {
-            $table->unique(['wave_id', 'market', 'id'], 'unique_wave_personas_wave_market_id');
+            $table->unique(['wave_id', 'market_id', 'id'], 'unique_wave_personas_wave_market_id');
         });
     }
 

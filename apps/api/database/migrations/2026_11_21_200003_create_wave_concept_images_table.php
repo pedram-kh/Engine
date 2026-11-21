@@ -34,10 +34,10 @@ return new class extends Migration
             $table->unsignedBigInteger('wave_id');
             $table->foreign('wave_id')->references('id')->on('waves')->restrictOnDelete();
 
-            $table->char('market', 2);
+            $table->unsignedBigInteger('market_id');
             $table->unsignedBigInteger('concept_id');
-            $table->foreign(['wave_id', 'market', 'concept_id'], 'fk_wave_concept_images_concept')
-                ->references(['wave_id', 'market', 'id'])->on('wave_concepts')->restrictOnDelete();
+            $table->foreign(['wave_id', 'market_id', 'concept_id'], 'fk_wave_concept_images_concept')
+                ->references(['wave_id', 'market_id', 'id'])->on('wave_concepts')->restrictOnDelete();
 
             $table->string('storage_key', 255)->unique();
             $table->string('thumb_key', 255)->nullable()->unique();

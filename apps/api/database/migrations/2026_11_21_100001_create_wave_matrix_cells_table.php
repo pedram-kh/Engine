@@ -45,11 +45,11 @@ return new class extends Migration
             $table->unsignedBigInteger('wave_id');
             $table->foreign('wave_id')->references('id')->on('waves')->restrictOnDelete();
 
-            $table->char('market', 2);
+            $table->unsignedBigInteger('market_id');
             $table->unsignedBigInteger('persona_id');
             $table->unsignedBigInteger('usp_id');
-            $table->foreign(['wave_id', 'market', 'persona_id'], 'fk_wave_matrix_cells_persona')
-                ->references(['wave_id', 'market', 'id'])->on('wave_personas')->restrictOnDelete();
+            $table->foreign(['wave_id', 'market_id', 'persona_id'], 'fk_wave_matrix_cells_persona')
+                ->references(['wave_id', 'market_id', 'id'])->on('wave_personas')->restrictOnDelete();
             $table->foreign(['wave_id', 'usp_id'], 'fk_wave_matrix_cells_usp')
                 ->references(['wave_id', 'id'])->on('wave_usps')->restrictOnDelete();
 
@@ -62,7 +62,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['persona_id', 'usp_id'], 'unique_wave_matrix_cells_persona_usp');
-            $table->index(['wave_id', 'market'], 'idx_wave_matrix_cells_wave_market');
+            $table->index(['wave_id', 'market_id'], 'idx_wave_matrix_cells_wave_market');
             $table->index('usp_id', 'idx_wave_matrix_cells_usp_id');
             $table->index('agency_id', 'idx_wave_matrix_cells_agency_id');
         });
