@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace App\Modules\Strategy;
 
+use App\Modules\Strategy\Console\SweepPendingConceptImages;
 use App\Modules\Strategy\Features\StrategyEnabled;
+use App\Modules\Strategy\Models\WaveConcept;
+use App\Modules\Strategy\Models\WaveConceptDecision;
+use App\Modules\Strategy\Models\WaveConceptImage;
+use App\Modules\Strategy\Models\WaveConceptLink;
 use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WavePersonaAngle;
 use App\Modules\Strategy\Models\WaveUsp;
+use App\Modules\Strategy\Policies\WaveConceptPolicy;
 use App\Modules\Strategy\Policies\WaveStrategyPolicy;
 use App\Modules\Strategy\Services\StrategyWaveMarketGuard;
 use App\Modules\Waves\Contracts\WaveMarketGuard;
@@ -31,6 +37,13 @@ final class StrategyServiceProvider extends ServiceProvider
         Gate::policy(WaveUsp::class, WaveStrategyPolicy::class);
         Gate::policy(WavePersona::class, WaveStrategyPolicy::class);
         Gate::policy(WavePersonaAngle::class, WaveStrategyPolicy::class);
+        Gate::policy(WaveConcept::class, WaveConceptPolicy::class);
+        Gate::policy(WaveConceptImage::class, WaveConceptPolicy::class);
+        Gate::policy(WaveConceptLink::class, WaveConceptPolicy::class);
+        Gate::policy(WaveConceptDecision::class, WaveConceptPolicy::class);
+        if ($this->app->runningInConsole()) {
+            $this->commands([SweepPendingConceptImages::class]);
+        }
         $this->registerRoutes();
     }
 

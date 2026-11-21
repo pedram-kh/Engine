@@ -9,6 +9,7 @@ use App\Modules\Strategy\Models\WaveMatrixCell;
 use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WavePersonaAngle;
 use App\Modules\Strategy\Models\WaveUsp;
+use App\Modules\Strategy\Services\ConceptService;
 use App\Modules\Strategy\StrategyLimits;
 use App\Modules\Waves\Models\Wave;
 
@@ -21,9 +22,10 @@ final class StrategyPresenter
     /**
      * @param  array<string, int>  $personaCounts  market => personas
      * @param  array{cells_set: int, cells_total: int, by_market: list<array{market: string, set: int, total: int}>}|null  $matrix
+     * @param  array<string, mixed>|null  $concepts  {@see ConceptService::summary}
      * @return array<string, mixed>
      */
-    public static function summary(Wave $wave, int $uspCount, array $personaCounts, ?array $matrix = null): array
+    public static function summary(Wave $wave, int $uspCount, array $personaCounts, ?array $matrix = null, ?array $concepts = null): array
     {
         $markets = [];
         foreach ($wave->markets as $code) {
@@ -40,6 +42,7 @@ final class StrategyPresenter
                 'markets' => $markets,
                 'limits' => StrategyLimits::all(),
                 'matrix' => $matrix ?? ['cells_set' => 0, 'cells_total' => 0, 'by_market' => []],
+                'concepts' => $concepts ?? ['total' => 0, 'approved' => 0, 'awaiting' => 0, 'changes_requested' => 0, 'markets_complete' => 0, 'by_market' => []],
             ],
         ];
     }

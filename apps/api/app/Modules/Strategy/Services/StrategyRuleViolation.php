@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Strategy\Services;
 
 use App\Modules\Strategy\Http\Controllers\Concerns\ResolvesStrategyRoute;
+use App\Modules\Strategy\StrategyLimits;
 use RuntimeException;
 
 /**
@@ -111,5 +112,115 @@ final class StrategyRuleViolation extends RuntimeException
     public static function conflict(): self
     {
         return new self('strategy.conflict', 'Someone changed this at the same moment; reload and try again.', 409);
+    }
+
+    // ---- PL-2.3: concepts ----
+
+    public static function conceptMarketRequired(): self
+    {
+        return new self('concept.market_required', 'Pass the market (two capital letters) to list its concepts.');
+    }
+
+    public static function conceptNotFound(): self
+    {
+        return new self('not_found', 'Not found.', 404);
+    }
+
+    public static function conceptMarketFull(string $market): self
+    {
+        return new self('concept.market_full', 'A market has at most 30 concepts ('.$market.').', 422, ['market' => $market, 'max' => StrategyLimits::CONCEPT_MAX_PER_MARKET]);
+    }
+
+    public static function conceptPersonaInvalid(): self
+    {
+        return new self('concept.persona_invalid', 'The persona must be one of the personas of the concept\'s market.');
+    }
+
+    public static function conceptUspModeRequired(): self
+    {
+        return new self('concept.usp_mode_required', 'Changing the persona needs a choice for the USP chips: keep them or replace them.');
+    }
+
+    public static function conceptDeleteDecidedForbidden(): self
+    {
+        return new self('forbidden', 'Only an admin or manager can delete a concept the client has decided on.', 403);
+    }
+
+    public static function conceptDeleteFailed(): self
+    {
+        return new self('concept.delete_failed', 'A stored image could not be deleted; nothing was removed. Try again.', 500);
+    }
+
+    public static function conceptDuplicateFailed(): self
+    {
+        return new self('concept.duplicate_failed', 'The images could not be copied; no copy was made. Try again.', 500);
+    }
+
+    /**
+     * @param  array<int, array{concept: string, number: int, title: string, status: string}>  $affected
+     */
+    public static function personaInUseByConcepts(array $affected): self
+    {
+        return new self(
+            'persona.in_use_by_concepts',
+            'Concepts use this persona. Move them to another persona or delete them first.',
+            422,
+            ['count' => count($affected), 'affected' => $affected],
+        );
+    }
+
+    public static function linkInvalidUrl(string $why): self
+    {
+        return new self('link.invalid_url', $why);
+    }
+
+    public static function linksFull(): self
+    {
+        return new self('concept_link.limit_count', 'A concept has at most '.StrategyLimits::LINKS_PER_CONCEPT.' links.', 422, ['max' => StrategyLimits::LINKS_PER_CONCEPT]);
+    }
+
+    public static function imageLimitCount(int $used): self
+    {
+        return new self('concept_image.limit_count', 'A concept has at most '.StrategyLimits::IMAGES_PER_CONCEPT.' images.', 422, ['used' => $used, 'max' => StrategyLimits::IMAGES_PER_CONCEPT]);
+    }
+
+    public static function imageLimitBytes(int $usedBytes, int $askedBytes): self
+    {
+        return new self('concept_image.limit_bytes', 'The images of a concept add up to at most 300 MB.', 422, ['used_bytes' => $usedBytes, 'asked_bytes' => $askedBytes, 'max_bytes' => StrategyLimits::IMAGE_TOTAL_BYTES]);
+    }
+
+    public static function imageInvalid(string $why): self
+    {
+        return new self('concept_image.invalid', $why);
+    }
+
+    public static function imageUnknownUpload(): self
+    {
+        return new self('concept_image.unknown_upload', 'This upload is not reserved on this concept, or it expired. Start the upload again.');
+    }
+
+    public static function imageAlreadyCompleted(): self
+    {
+        return new self('concept_image.already_completed', 'This upload was already completed.');
+    }
+
+    public static function decisionInvalid(string $why): self
+    {
+        return new self('concept.decision_invalid', $why);
+    }
+
+    public static function conflict404(): self
+    {
+        return new self('not_found', 'Not found.', 404);
+    }
+
+    public static function conceptUspInvalid(): self
+    {
+        return new self('concept.usp_invalid', 'A USP chip must be a USP of this wave.');
+    }
+
+    public static function imageDeleteFailed(): self
+    {
+        return new self('concept_image.delete_failed', 'The stored image could not be deleted; nothing was removed. Try again.', 500);
     }
 }

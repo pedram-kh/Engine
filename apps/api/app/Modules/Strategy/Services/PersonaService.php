@@ -10,6 +10,7 @@ use App\Modules\Brands\Models\Brand;
 use App\Modules\Identity\Models\User;
 use App\Modules\Strategy\Enums\AngleOrigin;
 use App\Modules\Strategy\Enums\PersonaPronoun;
+use App\Modules\Strategy\Models\WaveConcept;
 use App\Modules\Strategy\Models\WaveMatrixCell;
 use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WavePersonaAngle;
@@ -158,6 +159,15 @@ final class PersonaService
         DB::transaction(function () use ($wave, $personaUlid, $actor): void {
             $locked = StrategyGuard::lockWave($wave);
             $persona = $this->find($locked, $personaUlid);
+
+            // PL-2.3 (Q4): a persona that concepts use cannot be deleted, for every role and with no confirmation path.
+            // The person moves the concepts to another persona or deletes them first; nothing cascades to concepts.
+            $concepts = WaveConcept::query()->where('persona_id', $persona->id)->orderBy('position')->orderBy('id')->get(['ulid', 'position', 'title', 'status']);
+            if ($concepts->isNotEmpty()) {
+                throw StrategyRuleViolation::personaInUseByConcepts(
+                    $concepts->map(static fn (WaveConcept $c): array => ['concept' => $c->ulid, 'number' => $c->position, 'title' => $c->title, 'status' => $c->status->value])->all(),
+                );
+            }
 
             // Angles (hand-written and synced) and the matrix cells go with the persona; every foreign key is RESTRICT.
             $angles = WavePersonaAngle::query()->where('persona_id', $persona->id)->delete();

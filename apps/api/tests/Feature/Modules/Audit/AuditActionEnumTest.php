@@ -240,6 +240,17 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         // PL-2.2 — the messaging matrix (one row per write request; ids, counts, levels, field names).
         'wave_matrix_cell.saved',
         'wave_persona_angle.matrix_line_used',
+        // PL-2.3 — concepts (ids, counts, field names, flags; never a text, a URL or a client's words).
+        'wave_concept.created',
+        'wave_concept.updated',
+        'wave_concept.duplicated',
+        'wave_concept.deleted',
+        'wave_concept.decided',
+        'wave_concept_image.added',
+        'wave_concept_image.removed',
+        'wave_concept_link.added',
+        'wave_concept_link.updated',
+        'wave_concept_link.removed',
         // AH-092, chunk B — campaign attachments (linking a Files-library
         // file to a campaign). Audit-only; no NotificationType tie.
         'campaign_attachment.added',

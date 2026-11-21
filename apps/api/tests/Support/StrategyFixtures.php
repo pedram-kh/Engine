@@ -73,6 +73,11 @@ final class StrategyFixtures
             ['POST', "personas/{$u}/angles"], ['PATCH', "personas/{$u}/angles/{$u}"], ['DELETE', "personas/{$u}/angles/{$u}"],
             ['POST', "personas/{$u}/angles/{$u}/use-matrix-line"],
             ['GET', 'matrix'], ['PUT', 'matrix/cells'],
+            ['GET', 'concepts'], ['POST', 'concepts'], ['PATCH', "concepts/{$u}"], ['DELETE', "concepts/{$u}"], ['POST', "concepts/{$u}/duplicate"],
+            ['POST', "concepts/{$u}/decision"], ['GET', "concepts/{$u}/decisions"],
+            ['POST', "concepts/{$u}/images/uploads/init"], ['POST', "concepts/{$u}/images/uploads/complete"],
+            ['GET', "concepts/{$u}/images/{$u}/file"], ['GET', "concepts/{$u}/images/{$u}/thumbnail"], ['DELETE', "concepts/{$u}/images/{$u}"],
+            ['POST', "concepts/{$u}/links"], ['PATCH', "concepts/{$u}/links/{$u}"], ['DELETE', "concepts/{$u}/links/{$u}"],
         ];
     }
 }

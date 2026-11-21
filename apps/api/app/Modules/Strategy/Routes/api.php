@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use App\Modules\Strategy\Http\Controllers\AngleController;
+use App\Modules\Strategy\Http\Controllers\ConceptController;
+use App\Modules\Strategy\Http\Controllers\ConceptImageController;
+use App\Modules\Strategy\Http\Controllers\ConceptLinkController;
 use App\Modules\Strategy\Http\Controllers\MatrixController;
 use App\Modules\Strategy\Http\Controllers\PersonaController;
 use App\Modules\Strategy\Http\Controllers\StrategyController;
@@ -49,4 +52,23 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         // PL-2.2: the messaging matrix. One market per GET; the PUT takes 1 to 48 cell changes in one transaction.
         Route::get('matrix', [MatrixController::class, 'show'])->withTrashed()->name('waves.strategy.matrix.show');
         Route::put('matrix/cells', [MatrixController::class, 'save'])->withTrashed()->name('waves.strategy.matrix.save');
+
+        // PL-2.3: concepts. `{concept}`, `{image}` and `{link}` are plain ulids looked up THROUGH the wave in the services.
+        Route::get('concepts', [ConceptController::class, 'index'])->withTrashed()->name('waves.strategy.concepts.index');
+        Route::post('concepts', [ConceptController::class, 'store'])->withTrashed()->name('waves.strategy.concepts.store');
+        Route::patch('concepts/{concept}', [ConceptController::class, 'update'])->withTrashed()->name('waves.strategy.concepts.update');
+        Route::delete('concepts/{concept}', [ConceptController::class, 'destroy'])->withTrashed()->name('waves.strategy.concepts.destroy');
+        Route::post('concepts/{concept}/duplicate', [ConceptController::class, 'duplicate'])->withTrashed()->name('waves.strategy.concepts.duplicate');
+        Route::post('concepts/{concept}/decision', [ConceptController::class, 'decide'])->withTrashed()->name('waves.strategy.concepts.decide');
+        Route::get('concepts/{concept}/decisions', [ConceptController::class, 'decisionHistory'])->withTrashed()->name('waves.strategy.concepts.decisions');
+
+        Route::post('concepts/{concept}/images/uploads/init', [ConceptImageController::class, 'init'])->withTrashed()->name('waves.strategy.concepts.images.init');
+        Route::post('concepts/{concept}/images/uploads/complete', [ConceptImageController::class, 'complete'])->withTrashed()->name('waves.strategy.concepts.images.complete');
+        Route::get('concepts/{concept}/images/{image}/file', [ConceptImageController::class, 'file'])->withTrashed()->name('waves.strategy.concepts.images.file');
+        Route::get('concepts/{concept}/images/{image}/thumbnail', [ConceptImageController::class, 'thumbnail'])->withTrashed()->name('waves.strategy.concepts.images.thumbnail');
+        Route::delete('concepts/{concept}/images/{image}', [ConceptImageController::class, 'destroy'])->withTrashed()->name('waves.strategy.concepts.images.destroy');
+
+        Route::post('concepts/{concept}/links', [ConceptLinkController::class, 'store'])->withTrashed()->name('waves.strategy.concepts.links.store');
+        Route::patch('concepts/{concept}/links/{link}', [ConceptLinkController::class, 'update'])->withTrashed()->name('waves.strategy.concepts.links.update');
+        Route::delete('concepts/{concept}/links/{link}', [ConceptLinkController::class, 'destroy'])->withTrashed()->name('waves.strategy.concepts.links.destroy');
     });

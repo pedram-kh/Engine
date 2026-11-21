@@ -353,6 +353,32 @@ final class ErasureRegistry
                 'rationale' => 'Agency-authored one-line free text.',
                 'message_line' => 'Agency-authored one-line free text.',
             ]),
+            'wave_concepts' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); a creative concept of a market of a wave (PL-2.3), about a persona and USPs of the same wave. No creator or user is a field of it; there is no user column. The status is the denormalised latest client decision.', [], [], null, [
+                'title' => 'A concept title: agency-authored free text.',
+                'funnel_note' => 'Agency-authored short free text.',
+                'product' => 'Agency-authored free text.',
+                'angle' => 'Agency-authored free text.',
+                'primary_message' => 'Agency-authored free text.',
+                'hypothesis' => 'Agency-authored free text.',
+                'hook' => 'Agency-authored free text.',
+                'format_visual' => 'Agency-authored free text.',
+                'key_points' => 'Agency-authored list of short texts.',
+                'payoff' => 'Agency-authored free text.',
+                'cta' => 'Agency-authored free text.',
+            ]),
+            'wave_concept_usps' => new TableRule(Disposition::NotApplicable, 'Structure only (§3.7); the chip that links a concept to a USP of the same wave (PL-2.3).'),
+            'wave_concept_images' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); a reference image on a concept (PL-2.3). The uploader is a user reference; the file itself is an agency\'s reference material.', ['uploaded_by_user_id'], [], null, [
+                'original_filename' => 'A filename typed by the uploading agency user; not creator data.',
+            ]),
+            'wave_concept_links' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); a reference link on a concept (PL-2.3). The server never opens it. No user column.', [], [], null, [
+                'url' => 'An https link typed by the agency; not creator data.',
+                'title' => 'A link title typed by the agency.',
+            ]),
+            'wave_concept_decisions' => new TableRule(Disposition::NotApplicable, 'Agency-recorded (§3.7); what a client contact decided on a concept, written by an agency user on their behalf (PL-2.3). The client is NOT a user row and not a creator: the name, note and comment are text the agency typed about a third party. Tech-debt 48: the privacy documents need a sentence on it, and PL-4 decides how the name links to a real client user.', ['recorded_by_user_id'], [], null, [
+                'client_name' => 'A client contact\'s name as the agency typed it (a third party, not a user row). Tech-debt 48.',
+                'note' => 'The agency\'s note on an approval, about a client contact. Tech-debt 48.',
+                'comment' => 'What the client contact asked to change, as the agency typed it. Tech-debt 48.',
+            ]),
             'brand_files' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); client files on a brand.', ['uploaded_by_user_id']),
             'talent_pools' => new TableRule(Disposition::NotApplicable, 'Agency-authored; membership is talent_pool_creators (§3.7).', ['created_by_user_id'], [], null, [
                 'name' => 'A pool title.',

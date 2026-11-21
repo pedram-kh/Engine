@@ -9,6 +9,8 @@ use App\Modules\Audit\Facades\Audit;
 use App\Modules\Brands\Models\Brand;
 use App\Modules\Identity\Models\User;
 use App\Modules\Strategy\Enums\UspColor;
+use App\Modules\Strategy\Models\WaveConcept;
+use App\Modules\Strategy\Models\WaveConceptUsp;
 use App\Modules\Strategy\Models\WaveMatrixCell;
 use App\Modules\Strategy\Models\WavePersonaAngle;
 use App\Modules\Strategy\Models\WaveUsp;
@@ -195,6 +197,8 @@ final class UspService
             $items = count($affected);
             $angles = 0;
             $cells = 0;
+            $chipsRemoved = 0;
+            $conceptsReset = 0;
 
             if ($items > 0) {
                 if (! $mayDeleteInUse) {
@@ -206,6 +210,17 @@ final class UspService
                 // Angles (hand-written and synced) first, then the cells: every foreign key is RESTRICT.
                 $angles = WavePersonaAngle::query()->where('usp_id', $usp->id)->delete();
                 $cells = WaveMatrixCell::query()->where('usp_id', $usp->id)->delete();
+
+                // PL-2.3 (Q4): the chip goes, the concept stays; an approved one goes back to Awaiting (a chip is part of
+                // what the client approved). Lock order: wave (held), then each concept.
+                $conceptIds = WaveConceptUsp::query()->where('usp_id', $usp->id)->pluck('concept_id')->all();
+                foreach (WaveConcept::query()->whereIn('id', $conceptIds)->orderBy('id')->lockForUpdate()->get() as $concept) {
+                    if (ConceptService::resetIfApproved($concept)) {
+                        $conceptsReset++;
+                    }
+                }
+                $chipsRemoved = WaveConceptUsp::query()->where('usp_id', $usp->id)->delete();
+                ConceptService::renumberChips($conceptIds);
             }
 
             $color = $usp->color_key->value;
@@ -225,7 +240,7 @@ final class UspService
                 action: AuditAction::WaveUspDeleted,
                 actor: $actor,
                 subject: $usp,
-                metadata: ['wave' => $locked->ulid, 'usp' => $usp->ulid, 'color_key' => $color, 'angles_removed' => $angles, 'cells_removed' => $cells],
+                metadata: ['wave' => $locked->ulid, 'usp' => $usp->ulid, 'color_key' => $color, 'angles_removed' => $angles, 'cells_removed' => $cells, 'chips_removed' => $chipsRemoved, 'concepts_reset' => $conceptsReset],
                 agencyId: $locked->agency_id,
             );
         });

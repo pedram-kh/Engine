@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Strategy\Services;
 
 use App\Modules\Strategy\Enums\AngleOrigin;
+use App\Modules\Strategy\Models\WaveConceptUsp;
 use App\Modules\Strategy\Models\WaveMatrixCell;
 use App\Modules\Strategy\Models\WavePersonaAngle;
 use App\Modules\Strategy\Models\WaveUsp;
@@ -19,7 +20,9 @@ final class UspUsage
 {
     /**
      * One item per hand-written angle (`kind` angle) and one per matrix cell (`kind` cell, with its level). A synced
-     * angle is not listed on its own: it is part of its cell.
+     * angle is not listed on its own: it is part of its cell. PL-2.3: one item per concept that carries the USP as a chip
+     * (`kind` concept; `code` is "Concept n", `persona` the persona's ulid; deleting the USP removes the chip and keeps the
+     * concept, ruling Q4).
      *
      * @return list<array{kind: string, persona: string, market: string, code: string, title: string, level: string|null, explanation: string}>
      */
@@ -46,6 +49,18 @@ final class UspUsage
                 'title' => $c->persona->title,
                 'level' => $c->level->value,
                 'explanation' => $c->message_line ?? '',
+            ];
+        }
+        foreach (WaveConceptUsp::query()->where('usp_id', $usp->id)->with(['concept.persona'])->orderBy('id')->get() as $chip) {
+            $concept = $chip->concept;
+            $out[] = [
+                'kind' => 'concept',
+                'persona' => $concept->persona->ulid,
+                'market' => $concept->market,
+                'code' => 'Concept '.$concept->position,
+                'title' => $concept->title,
+                'level' => null,
+                'explanation' => '',
             ];
         }
 

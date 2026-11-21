@@ -11,6 +11,7 @@ use App\Modules\Strategy\Http\Controllers\Concerns\ResolvesStrategyRoute;
 use App\Modules\Strategy\Http\Resources\StrategyPresenter;
 use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WaveUsp;
+use App\Modules\Strategy\Services\ConceptService;
 use App\Modules\Strategy\Services\MatrixService;
 use App\Modules\Strategy\Services\StrategyRuleViolation;
 use App\Modules\Strategy\Services\StrategyText;
@@ -45,7 +46,7 @@ final class StrategyController
             ->selectRaw('market, count(*) as n')->groupBy('market')->pluck('n', 'market')->map(static fn (mixed $n): int => (int) $n)->all();
 
         return response()->json([
-            'data' => StrategyPresenter::summary($model, $uspCount = WaveUsp::query()->where('wave_id', $model->id)->count(), $counts, $this->matrix->progress($model, $uspCount)),
+            'data' => StrategyPresenter::summary($model, $uspCount = WaveUsp::query()->where('wave_id', $model->id)->count(), $counts, $this->matrix->progress($model, $uspCount), ConceptService::summary($model)),
         ]);
     }
 
@@ -77,7 +78,7 @@ final class StrategyController
             ->selectRaw('market, count(*) as n')->groupBy('market')->pluck('n', 'market')->map(static fn (mixed $n): int => (int) $n)->all();
 
         return response()->json([
-            'data' => StrategyPresenter::summary($model->refresh(), $uspCount = WaveUsp::query()->where('wave_id', $model->id)->count(), $counts, $this->matrix->progress($model, $uspCount)),
+            'data' => StrategyPresenter::summary($model->refresh(), $uspCount = WaveUsp::query()->where('wave_id', $model->id)->count(), $counts, $this->matrix->progress($model, $uspCount), ConceptService::summary($model)),
         ]);
     }
 }

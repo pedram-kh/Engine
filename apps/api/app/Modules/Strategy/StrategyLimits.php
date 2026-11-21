@@ -52,6 +52,54 @@ final class StrategyLimits
     /** PL-2.2: cells in one write request (a market holds at most 8 personas times 6 USPs). */
     public const MATRIX_BATCH_MAX = 48;
 
+    /** PL-2.3: concepts (plan section 1.10 and ruling Q5: at most 30 per market). */
+    public const CONCEPT_MAX_PER_MARKET = 30;
+
+    public const CONCEPT_MIN_RECOMMENDED = 3;
+
+    public const CONCEPT_TITLE = 120;
+
+    public const CONCEPT_FUNNEL_NOTE = 40;
+
+    public const CONCEPT_PRODUCT = 160;
+
+    public const CONCEPT_ANGLE = 300;
+
+    public const CONCEPT_PRIMARY_MESSAGE = 300;
+
+    public const CONCEPT_HYPOTHESIS = 400;
+
+    public const CONCEPT_HOOK = 300;
+
+    public const CONCEPT_FORMAT_VISUAL = 400;
+
+    public const CONCEPT_PAYOFF = 300;
+
+    public const CONCEPT_CTA = 200;
+
+    public const CONCEPT_KEY_POINTS = 8;
+
+    public const CONCEPT_KEY_POINT = 160;
+
+    public const CLIENT_NAME = 80;
+
+    public const DECISION_NOTE = 500;
+
+    public const DECISION_COMMENT = 1000;
+
+    public const LINK_TITLE = 120;
+
+    public const LINK_URL = 2048;
+
+    public const LINKS_PER_CONCEPT = 10;
+
+    public const IMAGES_PER_CONCEPT = 10;
+
+    /** 300 MB in bytes: the total of one concept's reference images (ruling C4: no separate per-image cap). */
+    public const IMAGE_TOTAL_BYTES = 300 * 1024 * 1024;
+
+    public const IMAGE_FILENAME = 255;
+
     /** @return array<string, int> */
     public static function all(): array
     {
@@ -76,6 +124,19 @@ final class StrategyLimits
             'angle_explanation' => self::ANGLE_EXPLANATION,
             'matrix_line' => self::MATRIX_LINE,
             'matrix_batch_max' => self::MATRIX_BATCH_MAX,
+            'concept_max_per_market' => self::CONCEPT_MAX_PER_MARKET,
+            'concept_min_recommended' => self::CONCEPT_MIN_RECOMMENDED,
+            'concept_title' => self::CONCEPT_TITLE,
+            'concept_funnel_note' => self::CONCEPT_FUNNEL_NOTE,
+            'concept_key_points' => self::CONCEPT_KEY_POINTS,
+            'concept_key_point' => self::CONCEPT_KEY_POINT,
+            'client_name' => self::CLIENT_NAME,
+            'decision_note' => self::DECISION_NOTE,
+            'decision_comment' => self::DECISION_COMMENT,
+            'link_title' => self::LINK_TITLE,
+            'links_per_concept' => self::LINKS_PER_CONCEPT,
+            'images_per_concept' => self::IMAGES_PER_CONCEPT,
+            'image_total_bytes' => self::IMAGE_TOTAL_BYTES,
         ];
     }
 }

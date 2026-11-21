@@ -562,6 +562,22 @@ enum AuditAction: string
     // per conversion; ids, market code, the cell's level and a count; never a text. Written only when it converted.
     case WavePersonaAngleMatrixLineUsed = 'wave_persona_angle.matrix_line_used';
 
+    // PL-2.3 — concepts. One row per request; ids (ulids), the market code, counts, field NAMES, flags and, for an image,
+    // its MIME type and size. NEVER a title or card text, a link URL or title, or what a client contact said: the
+    // decision row says only that a decision was made, its status and whether a note or comment exists
+    // (`has_note`, `has_comment`). Erasure: the payloads hold no creator or user data (ids and counts); the five tables
+    // are decided in the ErasureRegistry. `wave_concept.updated`, `wave_concept_link.updated` only when something changed.
+    case WaveConceptCreated = 'wave_concept.created';
+    case WaveConceptUpdated = 'wave_concept.updated';
+    case WaveConceptDuplicated = 'wave_concept.duplicated';
+    case WaveConceptDeleted = 'wave_concept.deleted';
+    case WaveConceptDecided = 'wave_concept.decided';
+    case WaveConceptImageAdded = 'wave_concept_image.added';
+    case WaveConceptImageRemoved = 'wave_concept_image.removed';
+    case WaveConceptLinkAdded = 'wave_concept_link.added';
+    case WaveConceptLinkUpdated = 'wave_concept_link.updated';
+    case WaveConceptLinkRemoved = 'wave_concept_link.removed';
+
     // Campaign attachments from the Files library, chunk B (AH-092). A
     // linkage action on the campaign, not a library action on the file — the
     // file's own audit trail (above) is unaffected by any of these. No

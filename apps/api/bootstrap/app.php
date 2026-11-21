@@ -15,6 +15,7 @@ use App\Modules\Audit\Http\Middleware\RequireActionReason;
 use App\Modules\Identity\Http\Middleware\EnforceImpersonation;
 use App\Modules\Identity\Http\Middleware\SetLocale;
 use App\Modules\Identity\Http\Middleware\UseAdminSessionCookie;
+use App\Modules\Strategy\Console\SweepPendingConceptImages;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -62,6 +63,11 @@ return Application::configure(basePath: dirname(__DIR__))
         // 24 h ago (the framework command's own default, stated explicitly so a
         // vendor change cannot widen it). Live tokens are never touched.
         $schedule->command('sanctum:prune-expired', ['--hours=24'])->daily();
+
+        // PL-2.3: removes the reservations of concept image uploads that were never completed (object first, then the
+        // row; only rows more than an hour past their expiry). Without the scheduler they pile up as invisible rows and
+        // objects: see docs/reviews/pl-2-3-plan.md section 11, "Deploy needs". Safe by hand: `--dry-run`.
+        $schedule->command(SweepPendingConceptImages::class)->everyFifteenMinutes()->withoutOverlapping();
     })
     ->withMiddleware(function (Middleware $middleware): void {
         // Sanctum SPA cookie auth. EnsureFrontendRequestsAreStateful is
