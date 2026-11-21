@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $agency_id
  * @property int $wave_id
  * @property int $market_id
+ * @property-read WaveMarket $market
  * @property int $concept_id
  * @property string $url
  * @property string $title

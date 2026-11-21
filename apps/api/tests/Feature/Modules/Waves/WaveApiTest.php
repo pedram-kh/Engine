@@ -107,7 +107,7 @@ it('B8: refuses each invalid create body with 422 and writes nothing', function 
     'a plain country code (the old shape)' => [['markets' => ['SK']], 'markets.0'],
     'lowercase country' => [['markets' => [['name' => 'Slovakia', 'code' => 'SK', 'countries' => ['sk']]]], 'markets.0.countries.0'],
     'three-letter country' => [['markets' => [['name' => 'Slovakia', 'code' => 'SK', 'countries' => ['SVK']]]], 'markets.0.countries.0'],
-    'a country twice in one market' => [['markets' => [['name' => 'Slovakia', 'code' => 'SK', 'countries' => ['SK', 'SK']]]], 'markets.0.countries.0'],
+    'a country twice in one market' => [['markets' => [['name' => 'Slovakia', 'code' => 'SK', 'countries' => ['SK', 'SK']]]], 'markets.0.countries'],
     'non-string country' => [['markets' => [['name' => 'Slovakia', 'code' => 'SK', 'countries' => [12]]]], 'markets.0.countries.0'],
     'wrong-length campaign id' => [['campaign_id' => 'abc'], 'campaign_id'],
 ]);

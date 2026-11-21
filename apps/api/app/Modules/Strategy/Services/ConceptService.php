@@ -521,6 +521,7 @@ final class ConceptService
             }
             $status = (string) $row->getRawOriginal('status');
             $n = (int) $row->getAttribute('n');
+            $by[$market] ??= ['market' => $market, 'total' => 0, 'approved' => 0, 'awaiting' => 0, 'changes_requested' => 0];
             $by[$market]['total'] += $n;
             if (isset($by[$market][$status])) {
                 $by[$market][$status] += $n;

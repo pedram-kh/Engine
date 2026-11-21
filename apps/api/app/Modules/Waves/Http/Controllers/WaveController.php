@@ -18,6 +18,7 @@ use App\Modules\Waves\Services\WaveMarketService;
 use App\Modules\Waves\Services\WaveRuleViolation;
 use App\Modules\Waves\Services\WaveService;
 use App\Modules\Waves\Steps\WaveTrackerCalculator;
+use Closure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -198,8 +199,14 @@ final class WaveController
             'markets.*.id' => $creating ? ['prohibited'] : ['sometimes', 'string', 'size:26', 'distinct'],
             'markets.*.name' => ['required', 'string', 'min:1', 'max:60'],
             'markets.*.code' => ['sometimes', 'nullable', 'string', 'regex:/^[A-Z0-9]{2,6}$/'],
-            'markets.*.countries' => ['required', 'array', 'min:1', 'max:'.WaveMarketService::MAX_COUNTRIES],
-            'markets.*.countries.*' => ['string', 'size:2', 'distinct', 'regex:/^[A-Z]{2}$/'],
+            // A country twice in ONE market is a validation error here; a country in TWO markets is the rule the service
+            // enforces (`wave.country_in_two_markets`), so `distinct` must not run across markets.
+            'markets.*.countries' => ['required', 'array', 'min:1', 'max:'.WaveMarketService::MAX_COUNTRIES, static function (string $attribute, mixed $value, Closure $fail): void {
+                if (is_array($value) && count($value) !== count(array_unique($value))) {
+                    $fail('A country can be listed only once in a market.');
+                }
+            }],
+            'markets.*.countries.*' => ['string', 'size:2', 'regex:/^[A-Z]{2}$/'],
             ...($creating ? [] : ['markets_version' => ['required_with:markets', 'string', 'max:64']]),
             'campaign_id' => ['sometimes', 'nullable', 'string', 'size:26', Rule::prohibitedIf(static fn (): bool => $request !== null && is_array($request->input('new_campaign')))],
         ];

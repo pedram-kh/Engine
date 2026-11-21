@@ -421,7 +421,8 @@ it('the stepper counts: totals, per market, complete when every concept is appro
     $s = S::call($w['staff'], 'GET', S::u($w))->assertOk()->json('data.attributes.concepts');
     expect($s)->toMatchArray(['total' => 4, 'approved' => 3, 'awaiting' => 0, 'changes_requested' => 1, 'markets_complete' => 1]);
     $by = array_column($s['by_market'], null, 'market');
-    $by = array_combine(array_map(static fn (string $u): string => array_search($u, $w['mk'], true), array_keys($by)), $by);
+    $codeOf = array_flip($w['mk']);
+    $by = array_combine(array_map(static fn (string $u): string => $codeOf[$u], array_keys($by)), $by);
     expect($by['SK'])->toMatchArray(['total' => 3, 'approved' => 2, 'changes_requested' => 1, 'complete' => false, 'under_minimum' => false])
         ->and($by['RO'])->toMatchArray(['total' => 1, 'complete' => true, 'under_minimum' => true])
         ->and($by['CZ'])->toMatchArray(['total' => 0, 'complete' => false, 'under_minimum' => true])

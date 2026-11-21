@@ -145,7 +145,10 @@ final class WaveMarketService
         $removed = $current->reject(static fn (WaveMarket $m): bool => isset($kept[$m->ulid]));
 
         if ($removed->isNotEmpty()) {
-            $ids = $removed->pluck('id')->map(static fn (mixed $id): int => (int) $id)->values()->all();
+            $ids = [];
+            foreach ($removed as $gone) {
+                $ids[] = $gone->id;
+            }
             $personas = $this->guard->personaCountsByMarket($locked, $ids);
             if ($personas !== []) {
                 $concepts = $this->guard->conceptCountsByMarket($locked, array_keys($personas));
@@ -373,9 +376,16 @@ final class WaveMarketService
     {
         $countries = [];
         foreach ($markets as $market) {
-            $countries[$market->ulid] = $market->countryCodes();
+            $codes = $market->countryCodes();
+            sort($codes);
+            $countries[$market->ulid] = $codes;
         }
 
-        return ['markets' => $markets->pluck('ulid')->values()->all(), 'market_countries' => $countries];
+        $ulids = [];
+        foreach ($markets as $market) {
+            $ulids[] = $market->ulid;
+        }
+
+        return ['markets' => $ulids, 'market_countries' => $countries];
     }
 }

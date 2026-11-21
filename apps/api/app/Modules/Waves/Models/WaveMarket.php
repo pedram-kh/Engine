@@ -66,7 +66,12 @@ final class WaveMarket extends Model
      */
     public function countryCodes(): array
     {
-        return $this->countries->pluck('country')->values()->all();
+        $codes = [];
+        foreach ($this->countries as $country) {
+            $codes[] = $country->country;
+        }
+
+        return $codes;
     }
 
     /**

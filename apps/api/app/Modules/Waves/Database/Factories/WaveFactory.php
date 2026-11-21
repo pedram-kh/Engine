@@ -83,12 +83,12 @@ final class WaveFactory extends Factory
      * One single-country market per code (name = the country, short code = the country code), as the web's "add a country"
      * creates. For tests and seeders.
      *
-     * @param  list<string>  $codes
+     * @param  array<int, string>  $codes
      * @return list<array{name: string, code: string, countries: list<string>}>
      */
     public static function singleCountryMarkets(array $codes): array
     {
-        return array_map(static fn (string $c): array => ['name' => self::NAMES[$c] ?? $c, 'code' => $c, 'countries' => [$c]], $codes);
+        return array_map(static fn (string $c): array => ['name' => self::NAMES[$c] ?? $c, 'code' => $c, 'countries' => [$c]], array_values($codes));
     }
 
     /** The id of the wave's market with this short code (tests and seeders). */

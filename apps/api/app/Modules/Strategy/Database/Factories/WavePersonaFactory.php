@@ -29,7 +29,7 @@ final class WavePersonaFactory extends Factory
             'wave_id' => fn () => Wave::factory()->create()->id,
             'agency_id' => fn (array $a) => (int) Wave::withoutGlobalScopes()->whereKey($a['wave_id'])->value('agency_id'),
             'market_id' => fn (array $a) => (int) (WaveMarket::withoutGlobalScopes()->where('wave_id', $a['wave_id'])->orderBy('position')->orderBy('id')->value('id')
-                ?? WaveFactory::attachMarkets(Wave::withoutGlobalScopes()->findOrFail($a['wave_id']), [['name' => 'Slovakia', 'code' => 'SK', 'countries' => ['SK']]])[0]->id),
+                ?? WaveFactory::attachMarkets(Wave::withoutGlobalScopes()->whereKey($a['wave_id'])->firstOrFail(), [['name' => 'Slovakia', 'code' => 'SK', 'countries' => ['SK']]])[0]->id),
             'slot' => fn (array $a) => self::freeSlot((int) $a['wave_id'], (int) $a['market_id']),
             'code' => fn (array $a) => (string) WaveMarket::withoutGlobalScopes()->whereKey($a['market_id'])->value('code').$a['slot'],
             'title' => 'The Persona '.fake()->unique()->numberBetween(1, 999999),
