@@ -9,6 +9,12 @@
  * Saving an Approved concept with a change asks first (`useConfirmReset`): the client's approval will be cleared. Cancel
  * leaves the dialog open and writes nothing. Errors sit above the actions at full height (the dialog is `scrollable`).
  * Everything the person types is sent as text and drawn as text.
+ *
+ * Angle suggestions (A1, no frame): beside the Angle field a lightbulb button opens the chosen persona's creative angles
+ * (hand-written and synced from the matrix), each with its USP and its line. Picking one fills the Angle text, which stays
+ * an ordinary editable field; typing free text is unchanged. The list follows the persona and never touches text already
+ * typed. The server stores the text only: no link between a concept and an angle is made. A persona with no angle shows no
+ * button and the field behaves as before.
  */
 import type {
   ConceptPayload,
@@ -20,6 +26,8 @@ import type {
 } from '@catalyst/api-client'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import { brandColorVar } from '@/modules/agency/composables/brandColor'
 
 import { strategyApi, type WaveScope } from '../api/strategy.api'
 import { FUNNEL_STAGES, nextFunnelNote } from '../conceptsLogic'
@@ -75,6 +83,14 @@ const uspMode = ref<'keep' | 'refill' | null>(null)
 
 const editing = computed(() => props.concept !== null)
 const persona = computed(() => props.personas.find((p) => p.id === personaId.value) ?? null)
+/** The chosen persona's angles, in the persona card's order. */
+const angleSuggestions = computed(() => persona.value?.attributes.angles ?? [])
+const angleMenu = ref(false)
+function pickAngle(text: string): void {
+  angle.value = text
+  angleMenu.value = false
+}
+
 const personaChanged = computed(
   () => editing.value && personaId.value !== props.concept?.attributes.persona.id,
 )
@@ -396,7 +412,61 @@ async function submit(): Promise<void> {
           class="mt-3"
           hide-details="auto"
           :data-test="`concept-field-${f.key}`"
-        />
+        >
+          <template v-if="f.key === 'angle' && angleSuggestions.length > 0" #append-inner>
+            <v-menu v-model="angleMenu" :close-on-content-click="false" v-bind="MENU_PROPS">
+              <template #activator="{ props: menuProps }">
+                <v-btn
+                  v-bind="menuProps"
+                  icon="mdi-lightbulb-on-outline"
+                  variant="text"
+                  size="small"
+                  density="comfortable"
+                  :aria-label="t('app.strategy.concepts.angleSuggestions.button')"
+                  :title="t('app.strategy.concepts.angleSuggestions.button')"
+                  data-test="concept-angle-suggest"
+                />
+              </template>
+              <v-list
+                class="angle-suggest"
+                density="compact"
+                max-width="440"
+                data-test="concept-angle-suggestions"
+              >
+                <v-list-subheader>{{
+                  t('app.strategy.concepts.angleSuggestions.heading', {
+                    persona: persona?.attributes.title ?? '',
+                  })
+                }}</v-list-subheader>
+                <v-list-item
+                  v-for="a in angleSuggestions"
+                  :key="a.id"
+                  class="angle-suggest__item"
+                  data-test="concept-angle-suggestion"
+                  @click="pickAngle(a.attributes.explanation)"
+                >
+                  <span
+                    class="angle-suggest__usp"
+                    :style="{ '--usp-color': brandColorVar(a.attributes.color_key) }"
+                  >
+                    <span class="angle-suggest__dot" aria-hidden="true" />{{
+                      a.attributes.usp_title
+                    }}
+                    <span class="angle-suggest__origin">
+                      ·
+                      {{
+                        a.attributes.origin === 'matrix'
+                          ? t('app.strategy.persona.syncedFromMatrix')
+                          : t('app.strategy.persona.addedByHand')
+                      }}
+                    </span>
+                  </span>
+                  <span class="angle-suggest__text">{{ a.attributes.explanation }}</span>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </template>
+        </v-textarea>
 
         <ListField
           v-model="keyPoints"
@@ -471,5 +541,34 @@ async function submit(): Promise<void> {
 }
 .strategy-dialog-error {
   flex: 0 0 auto;
+}
+.angle-suggest__item {
+  display: block;
+  white-space: normal;
+}
+.angle-suggest__usp {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--usp-color);
+}
+.angle-suggest__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--usp-color);
+}
+.angle-suggest__origin {
+  font-weight: 400;
+  color: rgb(var(--v-theme-text-tertiary));
+}
+.angle-suggest__text {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  line-height: 19px;
+  overflow-wrap: anywhere;
 }
 </style>
