@@ -47,8 +47,11 @@ export function showUnderMinimum(counts: ConceptMarketCounts | null, minimum: nu
 }
 
 /**
- * Steps 5 and 6 carry a warning while any market of the wave is not complete: "{approved} of {total} approved", or
- * "no concepts yet" when there are none. It is a message, never a block.
+ * Steps 5 and 6 carry a warning only while there is something to say about concepts: the wave has no concept at all
+ * ("no concepts yet"), or at least one concept is not approved ("{approved} of {total} approved"; Awaiting client and
+ * Changes requested both count as not approved). The counts are the wave's, across every market. A market that has no
+ * concept of its own is not counted against the others: when every concept that exists is approved there is no warning,
+ * whatever the other markets hold. It is a message, never a block.
  */
 export type StepWarning =
   | { kind: 'none' }
@@ -56,10 +59,12 @@ export type StepWarning =
   | { kind: 'counts'; approved: number; total: number }
 
 export function stepWarning(concepts: ConceptsSummary | undefined): StepWarning {
-  if (concepts === undefined || concepts.by_market.length === 0) return { kind: 'none' }
-  if (concepts.by_market.every((m) => m.complete)) return { kind: 'none' }
+  if (concepts === undefined) return { kind: 'none' }
   if (concepts.total === 0) return { kind: 'empty' }
-  return { kind: 'counts', approved: concepts.approved, total: concepts.total }
+  if (concepts.approved < concepts.total) {
+    return { kind: 'counts', approved: concepts.approved, total: concepts.total }
+  }
+  return { kind: 'none' }
 }
 
 /** Step 4's own line: "{approved} of {total} approved", or "No concepts yet". */

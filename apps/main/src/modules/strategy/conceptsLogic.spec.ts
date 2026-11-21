@@ -121,6 +121,17 @@ describe('banner, warning, stepper line', () => {
     expect(stepWarning(c(3, 3, true))).toEqual({ kind: 'none' })
     expect(stepWarning(c(3, 1, false))).toEqual({ kind: 'counts', approved: 1, total: 3 })
     expect(stepWarning(c(0, 0, false))).toEqual({ kind: 'empty' })
+    // D1: every concept approved, whatever the other (empty) markets hold: no warning.
+    const withEmptyMarket = {
+      ...c(2, 2, true),
+      by_market: [...c(2, 2, true).by_market, { ...m(0, 0), market: 'RO' }],
+    }
+    expect(stepWarning(withEmptyMarket)).toEqual({ kind: 'none' })
+    expect(stepWarning({ ...c(3, 2, false), changes_requested: 1 })).toEqual({
+      kind: 'counts',
+      approved: 2,
+      total: 3,
+    })
     expect(stepFourLine(c(0, 0, false))).toEqual({ kind: 'empty' })
     expect(stepFourLine(c(4, 1, false))).toEqual({ kind: 'counts', approved: 1, total: 4 })
   })
