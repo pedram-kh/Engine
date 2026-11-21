@@ -1484,7 +1484,12 @@
         "waveNotAvailable": "That wave cannot be linked to this campaign.",
         "marketHasPersonas": "Remove the personas of these markets first: {markets}.",
         "marketHasConcepts": "Concepts exist in: {markets}.",
-        "marketsChanged": "The markets of this wave changed since you opened it. Close this window, reopen the wave and try again."
+        "marketsChanged": "The markets of this wave were changed by someone else since you opened this window. Nothing was saved.",
+        "marketNameTaken": "Two markets of this wave have the same name.",
+        "marketCodeTaken": "Two markets of this wave have the same short code.",
+        "marketUnknown": "One of the markets is no longer part of this wave. Reload the markets.",
+        "marketConflict": "The markets changed while you were saving. Reload the markets and try again.",
+        "countryInTwoMarkets": "{country} is in both {first} and {second}. A country can belong to one market only."
       },
       "dialog": {
         "createTitle": "New wave",
@@ -1652,6 +1657,28 @@
           "streamDefaultsExist": "Every default step of this stream is already on the wave, in another stream. Move them back, or add a step.",
           "brandArchived": "This brand is archived. Restore it to change its waves."
         }
+      },
+      "markets": {
+        "name": "Market name",
+        "code": "Short code",
+        "codeHint": "Prefix of its persona codes, for example {example}. Existing persona codes do not change when you edit it.",
+        "addCountry": "Add country",
+        "searchCountry": "Search countries",
+        "removeCountry": "Remove {country} from {market}",
+        "removeMarket": "Remove market {market}",
+        "countryTaken": "In {market}",
+        "countryLimit": "A market has at most {max} countries.",
+        "marketLimit": "A wave has at most {max} markets.",
+        "nameRequired": "Give the market a name.",
+        "nameTooLong": "A market name has at most {max} characters.",
+        "nameTaken": "Another market already has this name.",
+        "codeInvalid": "Use 2 to 6 capital letters or digits.",
+        "codeTaken": "Another market already has this code.",
+        "countriesRequired": "Add at least one country.",
+        "problems": "Fix the market details marked above.",
+        "countriesOf": "Countries in {market}",
+        "countriesOfWave": "Countries in each market of this wave",
+        "reload": "Reload the markets"
       }
     },
     "brandFiles": {

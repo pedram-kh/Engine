@@ -1484,7 +1484,12 @@
         "waveNotAvailable": "Ní féidir an tonn sin a nascadh leis an bhfeachtas seo.",
         "marketHasPersonas": "Bain pearsain na margaí seo ar dtús: {markets}.",
         "marketHasConcepts": "Tá coincheapa sna margaí seo: {markets}.",
-        "marketsChanged": "Tá margaí an tonn seo athraithe ó d'oscail tú é. Dún an fhuinneog, oscail an tonn arís agus bain triail eile as."
+        "marketsChanged": "Tá margaí an tonn seo athraithe ag duine eile ó d'oscail tú an fhuinneog seo. Níor sábháladh tada.",
+        "marketNameTaken": "Tá an t-ainm céanna ag dhá mhargadh den tonn seo.",
+        "marketCodeTaken": "Tá an cód gearr céanna ag dhá mhargadh den tonn seo.",
+        "marketUnknown": "Níl ceann de na margaí mar chuid den tonn seo a thuilleadh. Athlódáil na margaí.",
+        "marketConflict": "Athraíodh na margaí agus tú ag sábháil. Athlódáil na margaí agus triail arís.",
+        "countryInTwoMarkets": "Tá {country} i {first} agus i {second} araon. Ní féidir le tír a bheith i níos mó ná margadh amháin."
       },
       "dialog": {
         "createTitle": "Tonn nua",
@@ -1652,6 +1657,28 @@
           "streamDefaultsExist": "Tá gach céim réamhshocraithe den sruth seo sa tonn cheana féin, i sruth eile. Bog ar ais iad nó cuir céim leis.",
           "brandArchived": "Tá an brandáil seo cartlannaithe. Athchóirigh í chun a tonnta a athrú."
         }
+      },
+      "markets": {
+        "name": "Ainm an mhargaidh",
+        "code": "Cód gearr",
+        "codeHint": "Réimír chóid na bpearsan, mar shampla {example}. Ní athraíonn cóid na bpearsan atá ann cheana nuair a chuireann tú in eagar é.",
+        "addCountry": "Cuir tír leis",
+        "searchCountry": "Cuardaigh tíortha",
+        "removeCountry": "Bain {country} de {market}",
+        "removeMarket": "Bain an margadh {market}",
+        "countryTaken": "I {market}",
+        "countryLimit": "Tá {max} tír ar a mhéad i margadh.",
+        "marketLimit": "Tá {max} margadh ar a mhéad i dtonn.",
+        "nameRequired": "Tabhair ainm don mhargadh.",
+        "nameTooLong": "Tá {max} carachtar ar a mhéad in ainm margaidh.",
+        "nameTaken": "Tá an t-ainm seo ag margadh eile cheana.",
+        "codeInvalid": "Úsáid 2 go 6 litir mhóra nó digit.",
+        "codeTaken": "Tá an cód seo ag margadh eile cheana.",
+        "countriesRequired": "Cuir tír amháin ar a laghad leis.",
+        "problems": "Ceartaigh sonraí na margaí atá marcáilte thuas.",
+        "countriesOf": "Tíortha i {market}",
+        "countriesOfWave": "Tíortha i ngach margadh den tonn seo",
+        "reload": "Athlódáil na margaí"
       }
     },
     "brandFiles": {

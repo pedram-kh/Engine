@@ -12,6 +12,7 @@ import type {
   MatrixUsp,
   StrategyLimits,
   StrategySummaryResource,
+  StrategyMarketCount,
   UspColorKey,
   WaveAngleResource,
   WaveConceptResource,
@@ -68,6 +69,27 @@ export const LIMITS: StrategyLimits = {
   image_total_bytes: 300 * 1024 * 1024,
 }
 
+/** A market of the summary. The id is opaque to the screens; the tests use the country code for it. */
+export function mkt(
+  code: string,
+  personas = 0,
+  name?: string,
+  countries?: string[],
+): StrategyMarketCount {
+  return {
+    market: code,
+    name:
+      name ??
+      ({ SK: 'Slovakia', RO: 'Romania', CZ: 'Czechia', IE: 'Ireland' } as Record<string, string>)[
+        code
+      ] ??
+      code,
+    code,
+    countries: countries ?? [code],
+    persona_count: personas,
+  }
+}
+
 export function makeSummary(
   over: Partial<StrategySummaryResource['attributes']> = {},
 ): StrategySummaryResource {
@@ -78,10 +100,7 @@ export function makeSummary(
       usp_count: 0,
       audience_title: null,
       persona_count: 0,
-      markets: [
-        { market: 'SK', persona_count: 0 },
-        { market: 'RO', persona_count: 0 },
-      ],
+      markets: [mkt('SK', 0), mkt('RO', 0)],
       limits: LIMITS,
       matrix: { cells_set: 0, cells_total: 0, by_market: [] },
       concepts: {

@@ -1484,7 +1484,12 @@
         "waveNotAvailable": "Tej fali nie można powiązać z tą kampanią.",
         "marketHasPersonas": "Najpierw usuń persony z tych rynków: {markets}.",
         "marketHasConcepts": "Koncepty istnieją w: {markets}.",
-        "marketsChanged": "Rynki tej fali zmieniły się od chwili jej otwarcia. Zamknij okno, otwórz falę ponownie i spróbuj jeszcze raz."
+        "marketsChanged": "Rynki tej fali zostały zmienione przez kogoś innego od otwarcia tego okna. Nic nie zapisano.",
+        "marketNameTaken": "Dwa rynki tej fali mają tę samą nazwę.",
+        "marketCodeTaken": "Dwa rynki tej fali mają ten sam krótki kod.",
+        "marketUnknown": "Jeden z rynków nie należy już do tej fali. Wczytaj rynki ponownie.",
+        "marketConflict": "Rynki zmieniły się podczas zapisywania. Wczytaj rynki ponownie i spróbuj jeszcze raz.",
+        "countryInTwoMarkets": "{country} jest w rynkach {first} i {second}. Kraj może należeć tylko do jednego rynku."
       },
       "dialog": {
         "createTitle": "Nowa fala",
@@ -1652,6 +1657,28 @@
           "streamDefaultsExist": "Wszystkie domyślne kroki tego strumienia są już w fali, w innym strumieniu. Przenieś je z powrotem lub dodaj krok.",
           "brandArchived": "Ta marka jest zarchiwizowana. Przywróć ją, aby zmieniać jej fale."
         }
+      },
+      "markets": {
+        "name": "Nazwa rynku",
+        "code": "Krótki kod",
+        "codeHint": "Prefiks kodów person, na przykład {example}. Istniejące kody person nie zmieniają się po edycji.",
+        "addCountry": "Dodaj kraj",
+        "searchCountry": "Szukaj krajów",
+        "removeCountry": "Usuń {country} z rynku {market}",
+        "removeMarket": "Usuń rynek {market}",
+        "countryTaken": "W rynku {market}",
+        "countryLimit": "Rynek ma najwyżej {max} krajów.",
+        "marketLimit": "Fala ma najwyżej {max} rynków.",
+        "nameRequired": "Nadaj rynkowi nazwę.",
+        "nameTooLong": "Nazwa rynku ma najwyżej {max} znaków.",
+        "nameTaken": "Inny rynek ma już tę nazwę.",
+        "codeInvalid": "Użyj 2 do 6 wielkich liter lub cyfr.",
+        "codeTaken": "Inny rynek ma już ten kod.",
+        "countriesRequired": "Dodaj co najmniej jeden kraj.",
+        "problems": "Popraw dane rynków zaznaczone powyżej.",
+        "countriesOf": "Kraje w rynku {market}",
+        "countriesOfWave": "Kraje w każdym rynku tej fali",
+        "reload": "Wczytaj rynki ponownie"
       }
     },
     "brandFiles": {

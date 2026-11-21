@@ -1484,7 +1484,12 @@
         "waveNotAvailable": "Die golf kan niet aan deze campagne worden gekoppeld.",
         "marketHasPersonas": "Verwijder eerst de persona's van deze markten: {markets}.",
         "marketHasConcepts": "Er zijn concepten in: {markets}.",
-        "marketsChanged": "De markten van deze golf zijn gewijzigd sinds je hem opende. Sluit het venster, open de golf opnieuw en probeer het nog eens."
+        "marketsChanged": "De markten van deze wave zijn door iemand anders gewijzigd sinds je dit venster opende. Er is niets opgeslagen.",
+        "marketNameTaken": "Twee markten van deze wave hebben dezelfde naam.",
+        "marketCodeTaken": "Twee markten van deze wave hebben dezelfde korte code.",
+        "marketUnknown": "Een van de markten hoort niet meer bij deze wave. Laad de markten opnieuw.",
+        "marketConflict": "De markten zijn veranderd terwijl je opsloeg. Laad de markten opnieuw en probeer het nog eens.",
+        "countryInTwoMarkets": "{country} staat in {first} en in {second}. Een land kan maar bij één markt horen."
       },
       "dialog": {
         "createTitle": "Nieuwe golf",
@@ -1652,6 +1657,28 @@
           "streamDefaultsExist": "Alle standaardstappen van deze stroom staan al in de wave, in een andere stroom. Verplaats ze terug of voeg een stap toe.",
           "brandArchived": "Dit merk is gearchiveerd. Herstel het om de waves te wijzigen."
         }
+      },
+      "markets": {
+        "name": "Marktnaam",
+        "code": "Korte code",
+        "codeHint": "Voorvoegsel van de personacodes, bijvoorbeeld {example}. Bestaande personacodes veranderen niet als je het aanpast.",
+        "addCountry": "Land toevoegen",
+        "searchCountry": "Landen zoeken",
+        "removeCountry": "{country} uit {market} verwijderen",
+        "removeMarket": "Markt {market} verwijderen",
+        "countryTaken": "Al in {market}",
+        "countryLimit": "Een markt heeft maximaal {max} landen.",
+        "marketLimit": "Een wave heeft maximaal {max} markten.",
+        "nameRequired": "Geef de markt een naam.",
+        "nameTooLong": "Een marktnaam heeft maximaal {max} tekens.",
+        "nameTaken": "Een andere markt heeft al deze naam.",
+        "codeInvalid": "Gebruik 2 tot 6 hoofdletters of cijfers.",
+        "codeTaken": "Een andere markt heeft al deze code.",
+        "countriesRequired": "Voeg minstens één land toe.",
+        "problems": "Corrigeer de hierboven gemarkeerde marktgegevens.",
+        "countriesOf": "Landen in {market}",
+        "countriesOfWave": "Landen in elke markt van deze wave",
+        "reload": "Markten opnieuw laden"
       }
     },
     "brandFiles": {

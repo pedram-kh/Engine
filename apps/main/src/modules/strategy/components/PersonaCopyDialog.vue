@@ -6,13 +6,13 @@
  * with the personas, and the copies get new codes. No design frame exists for this dialog.
  */
 import type { StrategyLimits, WavePersonaResource } from '@catalyst/api-client'
-import { labelForCountryCode } from '@catalyst/api-client'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { strategyApi, type WaveScope } from '../api/strategy.api'
 import { MENU_PROPS } from '../constants'
 import { strategyErrorMessage } from '../strategyErrors'
+import { useMarkets } from '../useMarkets'
 
 const props = defineProps<{
   modelValue: boolean
@@ -21,7 +21,6 @@ const props = defineProps<{
   /** The market that receives the copies. */
   target: string
   personas: WavePersonaResource[]
-  markets: string[]
 }>()
 
 const emit = defineEmits<{
@@ -30,6 +29,8 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+/** PL-2.4: markets are printed by name. */
+const dir = useMarkets()
 const session = ref(0)
 const source = ref<string | null>(null)
 const ticked = ref<string[]>([])
@@ -37,9 +38,9 @@ const saving = ref(false)
 const error = ref<string | null>(null)
 
 const sources = computed(() =>
-  props.markets
+  dir.ids.value
     .filter((m) => m !== props.target && props.personas.some((p) => p.attributes.market === m))
-    .map((m) => ({ value: m, title: labelForCountryCode(m) })),
+    .map((m) => ({ value: m, title: dir.name(m) })),
 )
 const sourcePersonas = computed(() =>
   props.personas.filter((p) => p.attributes.market === source.value),
@@ -117,7 +118,7 @@ async function submit(): Promise<void> {
   >
     <v-card :key="session">
       <v-card-title class="text-h6 text-wrap text-break pt-4 px-6">
-        {{ t('app.strategy.copy.title', { market: labelForCountryCode(target) }) }}
+        {{ t('app.strategy.copy.title', { market: dir.name(target) }) }}
       </v-card-title>
       <v-card-text class="px-6">
         <v-select
@@ -158,13 +159,13 @@ async function submit(): Promise<void> {
             over
               ? t('app.strategy.copy.over', {
                   count: ticked.length,
-                  market: labelForCountryCode(target),
+                  market: dir.name(target),
                   total,
                   max: limits.persona_max,
                 })
               : t('app.strategy.copy.line', {
                   count: ticked.length,
-                  market: labelForCountryCode(target),
+                  market: dir.name(target),
                   total,
                   max: limits.persona_max,
                 })
@@ -179,7 +180,7 @@ async function submit(): Promise<void> {
           {{
             t(
               'app.strategy.copy.synced',
-              { count: syncedSkipped, market: labelForCountryCode(target) },
+              { count: syncedSkipped, market: dir.name(target) },
               syncedSkipped,
             )
           }}

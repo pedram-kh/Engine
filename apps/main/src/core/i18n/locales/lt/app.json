@@ -1484,7 +1484,12 @@
         "waveNotAvailable": "Šios bangos negalima susieti su šia kampanija.",
         "marketHasPersonas": "Pirmiausia pašalinkite šių rinkų personas: {markets}.",
         "marketHasConcepts": "Konceptų yra rinkose: {markets}.",
-        "marketsChanged": "Šios bangos rinkos pasikeitė nuo to laiko, kai ją atidarėte. Uždarykite langą, iš naujo atidarykite bangą ir bandykite dar kartą."
+        "marketsChanged": "Šios bangos rinkas pakeitė kitas asmuo, nuo kada atidarėte šį langą. Niekas nebuvo išsaugota.",
+        "marketNameTaken": "Dvi šios bangos rinkos turi tą patį pavadinimą.",
+        "marketCodeTaken": "Dvi šios bangos rinkos turi tą patį trumpąjį kodą.",
+        "marketUnknown": "Viena iš rinkų nebėra šios bangos dalis. Iš naujo įkelkite rinkas.",
+        "marketConflict": "Rinkos pasikeitė jums išsaugant. Iš naujo įkelkite rinkas ir bandykite dar kartą.",
+        "countryInTwoMarkets": "{country} yra ir rinkoje {first}, ir rinkoje {second}. Šalis gali priklausyti tik vienai rinkai."
       },
       "dialog": {
         "createTitle": "Nauja banga",
@@ -1652,6 +1657,28 @@
           "streamDefaultsExist": "Visi šio srauto numatytieji žingsniai jau yra bangoje, kitame sraute. Perkelkite juos atgal arba pridėkite žingsnį.",
           "brandArchived": "Šis prekės ženklas suarchyvuotas. Atkurkite jį, kad pakeistumėte jo bangas."
         }
+      },
+      "markets": {
+        "name": "Rinkos pavadinimas",
+        "code": "Trumpasis kodas",
+        "codeHint": "Personų kodų priešdėlis, pavyzdžiui, {example}. Esami personų kodai nesikeičia, kai jį redaguojate.",
+        "addCountry": "Pridėti šalį",
+        "searchCountry": "Ieškoti šalių",
+        "removeCountry": "Pašalinti {country} iš rinkos {market}",
+        "removeMarket": "Pašalinti rinką {market}",
+        "countryTaken": "Rinkoje {market}",
+        "countryLimit": "Rinkoje gali būti ne daugiau kaip {max} šalių.",
+        "marketLimit": "Bangoje gali būti ne daugiau kaip {max} rinkų.",
+        "nameRequired": "Suteikite rinkai pavadinimą.",
+        "nameTooLong": "Rinkos pavadinime gali būti ne daugiau kaip {max} simbolių.",
+        "nameTaken": "Kita rinka jau turi šį pavadinimą.",
+        "codeInvalid": "Naudokite 2–6 didžiąsias raides arba skaitmenis.",
+        "codeTaken": "Kita rinka jau turi šį kodą.",
+        "countriesRequired": "Pridėkite bent vieną šalį.",
+        "problems": "Pataisykite aukščiau pažymėtus rinkų duomenis.",
+        "countriesOf": "Šalys rinkoje {market}",
+        "countriesOfWave": "Šalys kiekvienoje šios bangos rinkoje",
+        "reload": "Iš naujo įkelti rinkas"
       }
     },
     "brandFiles": {

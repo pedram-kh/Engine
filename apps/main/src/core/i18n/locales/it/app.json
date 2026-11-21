@@ -1484,7 +1484,12 @@
         "waveNotAvailable": "Quell'ondata non può essere collegata a questa campagna.",
         "marketHasPersonas": "Rimuovi prima le persone di questi mercati: {markets}.",
         "marketHasConcepts": "Esistono concept in: {markets}.",
-        "marketsChanged": "I mercati di questa ondata sono cambiati da quando l'hai aperta. Chiudi la finestra, riapri l'ondata e riprova."
+        "marketsChanged": "I mercati di questa ondata sono stati modificati da qualcun altro da quando hai aperto questa finestra. Non è stato salvato nulla.",
+        "marketNameTaken": "Due mercati di questa ondata hanno lo stesso nome.",
+        "marketCodeTaken": "Due mercati di questa ondata hanno lo stesso codice breve.",
+        "marketUnknown": "Uno dei mercati non fa più parte di questa ondata. Ricarica i mercati.",
+        "marketConflict": "I mercati sono cambiati durante il salvataggio. Ricarica i mercati e riprova.",
+        "countryInTwoMarkets": "{country} è in {first} e in {second}. Un paese può appartenere a un solo mercato."
       },
       "dialog": {
         "createTitle": "Nuova ondata",
@@ -1652,6 +1657,28 @@
           "streamDefaultsExist": "Tutti i passaggi predefiniti di questo flusso sono già nell’ondata, in un altro flusso. Rimettili qui o aggiungi un passaggio.",
           "brandArchived": "Questo brand è archiviato. Ripristinalo per modificarne le ondate."
         }
+      },
+      "markets": {
+        "name": "Nome del mercato",
+        "code": "Codice breve",
+        "codeHint": "Prefisso dei codici delle sue persona, ad esempio {example}. I codici delle persona esistenti non cambiano quando lo modifichi.",
+        "addCountry": "Aggiungi paese",
+        "searchCountry": "Cerca paesi",
+        "removeCountry": "Rimuovi {country} da {market}",
+        "removeMarket": "Rimuovi il mercato {market}",
+        "countryTaken": "Già in {market}",
+        "countryLimit": "Un mercato ha al massimo {max} paesi.",
+        "marketLimit": "Un'ondata ha al massimo {max} mercati.",
+        "nameRequired": "Dai un nome al mercato.",
+        "nameTooLong": "Il nome di un mercato ha al massimo {max} caratteri.",
+        "nameTaken": "Un altro mercato ha già questo nome.",
+        "codeInvalid": "Usa da 2 a 6 lettere maiuscole o cifre.",
+        "codeTaken": "Un altro mercato ha già questo codice.",
+        "countriesRequired": "Aggiungi almeno un paese.",
+        "problems": "Correggi i dati del mercato segnalati sopra.",
+        "countriesOf": "Paesi di {market}",
+        "countriesOfWave": "Paesi di ogni mercato di questa ondata",
+        "reload": "Ricarica i mercati"
       }
     },
     "brandFiles": {

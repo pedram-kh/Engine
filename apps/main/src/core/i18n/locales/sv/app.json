@@ -1484,7 +1484,12 @@
         "waveNotAvailable": "Den vågen kan inte kopplas till den här kampanjen.",
         "marketHasPersonas": "Ta först bort personorna för de här marknaderna: {markets}.",
         "marketHasConcepts": "Koncept finns i: {markets}.",
-        "marketsChanged": "Vågens marknader har ändrats sedan du öppnade den. Stäng fönstret, öppna vågen igen och försök på nytt."
+        "marketsChanged": "Marknaderna i den här vågen har ändrats av någon annan sedan du öppnade fönstret. Inget sparades.",
+        "marketNameTaken": "Två marknader i den här vågen har samma namn.",
+        "marketCodeTaken": "Två marknader i den här vågen har samma korta kod.",
+        "marketUnknown": "En av marknaderna ingår inte längre i den här vågen. Ladda om marknaderna.",
+        "marketConflict": "Marknaderna ändrades medan du sparade. Ladda om marknaderna och försök igen.",
+        "countryInTwoMarkets": "{country} finns i både {first} och {second}. Ett land kan bara tillhöra en marknad."
       },
       "dialog": {
         "createTitle": "Ny våg",
@@ -1652,6 +1657,28 @@
           "streamDefaultsExist": "Alla standardsteg i det här spåret finns redan i vågen, i ett annat spår. Flytta tillbaka dem eller lägg till ett steg.",
           "brandArchived": "Det här varumärket är arkiverat. Återställ det för att ändra dess vågor."
         }
+      },
+      "markets": {
+        "name": "Marknadens namn",
+        "code": "Kort kod",
+        "codeHint": "Prefix för personakoderna, till exempel {example}. Befintliga personakoder ändras inte när du redigerar den.",
+        "addCountry": "Lägg till land",
+        "searchCountry": "Sök länder",
+        "removeCountry": "Ta bort {country} från {market}",
+        "removeMarket": "Ta bort marknaden {market}",
+        "countryTaken": "I {market}",
+        "countryLimit": "En marknad har högst {max} länder.",
+        "marketLimit": "En våg har högst {max} marknader.",
+        "nameRequired": "Ge marknaden ett namn.",
+        "nameTooLong": "Ett marknadsnamn har högst {max} tecken.",
+        "nameTaken": "En annan marknad har redan det namnet.",
+        "codeInvalid": "Använd 2 till 6 versaler eller siffror.",
+        "codeTaken": "En annan marknad har redan den koden.",
+        "countriesRequired": "Lägg till minst ett land.",
+        "problems": "Åtgärda marknadsuppgifterna som är markerade ovan.",
+        "countriesOf": "Länder i {market}",
+        "countriesOfWave": "Länder i varje marknad i den här vågen",
+        "reload": "Ladda om marknaderna"
       }
     },
     "brandFiles": {

@@ -1484,7 +1484,12 @@
         "waveNotAvailable": "Taj val ne može se povezati s ovom kampanjom.",
         "marketHasPersonas": "Prvo uklonite persone ovih tržišta: {markets}.",
         "marketHasConcepts": "Koncepti postoje na tržištima: {markets}.",
-        "marketsChanged": "Tržišta ovog vala promijenjena su otkako ste ga otvorili. Zatvorite prozor, ponovno otvorite val i pokušajte ponovno."
+        "marketsChanged": "Tržišta ovog vala promijenio je netko drugi otkako ste otvorili ovaj prozor. Ništa nije spremljeno.",
+        "marketNameTaken": "Dva tržišta ovog vala imaju isti naziv.",
+        "marketCodeTaken": "Dva tržišta ovog vala imaju isti kratki kod.",
+        "marketUnknown": "Jedno od tržišta više nije dio ovog vala. Ponovno učitajte tržišta.",
+        "marketConflict": "Tržišta su se promijenila tijekom spremanja. Ponovno učitajte tržišta i pokušajte opet.",
+        "countryInTwoMarkets": "{country} je u tržištima {first} i {second}. Zemlja može pripadati samo jednom tržištu."
       },
       "dialog": {
         "createTitle": "Novi val",
@@ -1652,6 +1657,28 @@
           "streamDefaultsExist": "Svi zadani koraci ovog toka već su u valu, u drugom toku. Premjestite ih natrag ili dodajte korak.",
           "brandArchived": "Ovaj brand je arhiviran. Vratite ga da biste mijenjali njegove valove."
         }
+      },
+      "markets": {
+        "name": "Naziv tržišta",
+        "code": "Kratki kod",
+        "codeHint": "Prefiks kodova persona, na primjer {example}. Postojeći kodovi persona ne mijenjaju se kad ga uredite.",
+        "addCountry": "Dodaj zemlju",
+        "searchCountry": "Traži zemlje",
+        "removeCountry": "Ukloni {country} s tržišta {market}",
+        "removeMarket": "Ukloni tržište {market}",
+        "countryTaken": "U tržištu {market}",
+        "countryLimit": "Tržište ima najviše {max} zemalja.",
+        "marketLimit": "Val ima najviše {max} tržišta.",
+        "nameRequired": "Dajte tržištu naziv.",
+        "nameTooLong": "Naziv tržišta ima najviše {max} znakova.",
+        "nameTaken": "Drugo tržište već ima ovaj naziv.",
+        "codeInvalid": "Upotrijebite 2 do 6 velikih slova ili znamenki.",
+        "codeTaken": "Drugo tržište već ima ovaj kod.",
+        "countriesRequired": "Dodajte barem jednu zemlju.",
+        "problems": "Ispravite gore označene podatke o tržištima.",
+        "countriesOf": "Zemlje u tržištu {market}",
+        "countriesOfWave": "Zemlje u svakom tržištu ovog vala",
+        "reload": "Ponovno učitaj tržišta"
       }
     },
     "brandFiles": {

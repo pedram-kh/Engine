@@ -1484,7 +1484,12 @@
         "waveNotAvailable": "Cette vague ne peut pas être liée à cette campagne.",
         "marketHasPersonas": "Supprimez d'abord les personas de ces marchés : {markets}.",
         "marketHasConcepts": "Des concepts existent dans : {markets}.",
-        "marketsChanged": "Les marchés de cette vague ont changé depuis son ouverture. Fermez la fenêtre, rouvrez la vague et réessayez."
+        "marketsChanged": "Les marchés de cette vague ont été modifiés par quelqu'un d'autre depuis l'ouverture de cette fenêtre. Rien n'a été enregistré.",
+        "marketNameTaken": "Deux marchés de cette vague portent le même nom.",
+        "marketCodeTaken": "Deux marchés de cette vague ont le même code court.",
+        "marketUnknown": "L'un des marchés ne fait plus partie de cette vague. Rechargez les marchés.",
+        "marketConflict": "Les marchés ont changé pendant l'enregistrement. Rechargez les marchés et réessayez.",
+        "countryInTwoMarkets": "{country} figure dans {first} et dans {second}. Un pays ne peut appartenir qu'à un seul marché."
       },
       "dialog": {
         "createTitle": "Nouvelle vague",
@@ -1652,6 +1657,28 @@
           "streamDefaultsExist": "Toutes les étapes par défaut de ce flux sont déjà dans la vague, dans un autre flux. Remettez-les ici ou ajoutez une étape.",
           "brandArchived": "Cette marque est archivée. Restaurez-la pour modifier ses vagues."
         }
+      },
+      "markets": {
+        "name": "Nom du marché",
+        "code": "Code court",
+        "codeHint": "Préfixe des codes de ses personas, par exemple {example}. Les codes de personas existants ne changent pas lorsque vous le modifiez.",
+        "addCountry": "Ajouter un pays",
+        "searchCountry": "Rechercher des pays",
+        "removeCountry": "Retirer {country} de {market}",
+        "removeMarket": "Supprimer le marché {market}",
+        "countryTaken": "Dans {market}",
+        "countryLimit": "Un marché compte au plus {max} pays.",
+        "marketLimit": "Une vague compte au plus {max} marchés.",
+        "nameRequired": "Donnez un nom au marché.",
+        "nameTooLong": "Un nom de marché compte au plus {max} caractères.",
+        "nameTaken": "Un autre marché porte déjà ce nom.",
+        "codeInvalid": "Utilisez 2 à 6 majuscules ou chiffres.",
+        "codeTaken": "Un autre marché a déjà ce code.",
+        "countriesRequired": "Ajoutez au moins un pays.",
+        "problems": "Corrigez les informations de marché signalées ci-dessus.",
+        "countriesOf": "Pays de {market}",
+        "countriesOfWave": "Pays de chaque marché de cette vague",
+        "reload": "Recharger les marchés"
       }
     },
     "brandFiles": {

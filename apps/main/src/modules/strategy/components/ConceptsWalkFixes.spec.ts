@@ -33,6 +33,7 @@ import {
   mountStrategy,
   overlay,
   WAVE_ULID,
+  mkt,
 } from '../strategyTestKit'
 import ConceptImageViewer from './ConceptImageViewer.vue'
 import ConceptsStep from './ConceptsStep.vue'
@@ -74,8 +75,7 @@ async function mountStep(list: WaveConceptResource[], route = ROUTE) {
   const w = await mountStrategy(
     ConceptsStep,
     {
-      summary: makeSummary({ persona_count: 2, markets: [{ market: 'SK', persona_count: 2 }] }),
-      markets: ['SK'],
+      summary: makeSummary({ persona_count: 2, markets: [mkt('SK', 2)] }),
       brandName: 'Acme',
     },
     { role: 'agency_admin', route },

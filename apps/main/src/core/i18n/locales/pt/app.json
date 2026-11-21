@@ -1484,7 +1484,12 @@
         "waveNotAvailable": "Essa onda não pode ser ligada a esta campanha.",
         "marketHasPersonas": "Remova primeiro as personas destes mercados: {markets}.",
         "marketHasConcepts": "Existem conceitos em: {markets}.",
-        "marketsChanged": "Os mercados desta vaga mudaram desde que a abriu. Feche a janela, volte a abrir a vaga e tente novamente."
+        "marketsChanged": "Os mercados desta vaga foram alterados por outra pessoa desde que abriu esta janela. Nada foi guardado.",
+        "marketNameTaken": "Dois mercados desta vaga têm o mesmo nome.",
+        "marketCodeTaken": "Dois mercados desta vaga têm o mesmo código curto.",
+        "marketUnknown": "Um dos mercados já não faz parte desta vaga. Recarregue os mercados.",
+        "marketConflict": "Os mercados mudaram enquanto guardava. Recarregue os mercados e tente novamente.",
+        "countryInTwoMarkets": "{country} está em {first} e em {second}. Um país só pode pertencer a um mercado."
       },
       "dialog": {
         "createTitle": "Nova onda",
@@ -1652,6 +1657,28 @@
           "streamDefaultsExist": "Todos os passos predefinidos deste fluxo já estão na vaga, noutro fluxo. Mova-os de volta ou adicione um passo.",
           "brandArchived": "Esta marca está arquivada. Restaure-a para alterar as suas vagas."
         }
+      },
+      "markets": {
+        "name": "Nome do mercado",
+        "code": "Código curto",
+        "codeHint": "Prefixo dos códigos das suas personas, por exemplo {example}. Os códigos de personas existentes não mudam quando o edita.",
+        "addCountry": "Adicionar país",
+        "searchCountry": "Procurar países",
+        "removeCountry": "Remover {country} de {market}",
+        "removeMarket": "Remover o mercado {market}",
+        "countryTaken": "Em {market}",
+        "countryLimit": "Um mercado tem no máximo {max} países.",
+        "marketLimit": "Uma vaga tem no máximo {max} mercados.",
+        "nameRequired": "Dê um nome ao mercado.",
+        "nameTooLong": "O nome de um mercado tem no máximo {max} caracteres.",
+        "nameTaken": "Outro mercado já tem este nome.",
+        "codeInvalid": "Use de 2 a 6 maiúsculas ou algarismos.",
+        "codeTaken": "Outro mercado já tem este código.",
+        "countriesRequired": "Adicione pelo menos um país.",
+        "problems": "Corrija os dados de mercado assinalados acima.",
+        "countriesOf": "Países de {market}",
+        "countriesOfWave": "Países de cada mercado desta vaga",
+        "reload": "Recarregar os mercados"
       }
     },
     "brandFiles": {

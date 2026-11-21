@@ -1484,7 +1484,12 @@
         "waveNotAvailable": "Acel val nu poate fi legat de această campanie.",
         "marketHasPersonas": "Elimină mai întâi persona din aceste piețe: {markets}.",
         "marketHasConcepts": "Există concepte în: {markets}.",
-        "marketsChanged": "Piețele acestui val s-au schimbat de când l-ai deschis. Închide fereastra, redeschide valul și încearcă din nou."
+        "marketsChanged": "Piețele acestui val au fost modificate de altcineva de când ați deschis această fereastră. Nu s-a salvat nimic.",
+        "marketNameTaken": "Două piețe ale acestui val au același nume.",
+        "marketCodeTaken": "Două piețe ale acestui val au același cod scurt.",
+        "marketUnknown": "Una dintre piețe nu mai face parte din acest val. Reîncărcați piețele.",
+        "marketConflict": "Piețele s-au schimbat în timp ce salvați. Reîncărcați piețele și încercați din nou.",
+        "countryInTwoMarkets": "{country} este și în {first}, și în {second}. O țară poate aparține unei singure piețe."
       },
       "dialog": {
         "createTitle": "Val nou",
@@ -1652,6 +1657,28 @@
           "streamDefaultsExist": "Toți pașii impliciți ai acestui flux sunt deja în val, într-un alt flux. Mută-i înapoi sau adaugă un pas.",
           "brandArchived": "Această marcă este arhivată. Restaureaz-o pentru a-i modifica valurile."
         }
+      },
+      "markets": {
+        "name": "Numele pieței",
+        "code": "Cod scurt",
+        "codeHint": "Prefixul codurilor persoanelor, de exemplu {example}. Codurile persoanelor existente nu se schimbă când îl editați.",
+        "addCountry": "Adaugă țară",
+        "searchCountry": "Caută țări",
+        "removeCountry": "Elimină {country} din {market}",
+        "removeMarket": "Elimină piața {market}",
+        "countryTaken": "În {market}",
+        "countryLimit": "O piață are cel mult {max} țări.",
+        "marketLimit": "Un val are cel mult {max} piețe.",
+        "nameRequired": "Dați un nume pieței.",
+        "nameTooLong": "Numele unei piețe are cel mult {max} caractere.",
+        "nameTaken": "O altă piață are deja acest nume.",
+        "codeInvalid": "Folosiți 2 până la 6 litere mari sau cifre.",
+        "codeTaken": "O altă piață are deja acest cod.",
+        "countriesRequired": "Adăugați cel puțin o țară.",
+        "problems": "Corectați datele piețelor marcate mai sus.",
+        "countriesOf": "Țări în {market}",
+        "countriesOfWave": "Țări în fiecare piață a acestui val",
+        "reload": "Reîncarcă piețele"
       }
     },
     "brandFiles": {

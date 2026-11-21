@@ -1484,7 +1484,12 @@
         "waveNotAvailable": "Dik il-mewġa ma tistax tiġi marbuta ma' din il-kampanja.",
         "marketHasPersonas": "Neħħi l-ewwel il-persunaġġi ta' dawn is-swieq: {markets}.",
         "marketHasConcepts": "Hemm kunċetti f'dawn is-swieq: {markets}.",
-        "marketsChanged": "Is-swieq ta' din il-mewġa nbidlu minn meta fethitha. Agħlaq it-tieqa, iftaħ il-mewġa mill-ġdid u erġa' pprova."
+        "marketsChanged": "Is-swieq ta' din il-mewġa nbidlu minn xi ħadd ieħor minn meta fetaħt din it-tieqa. Ma ssejvja xejn.",
+        "marketNameTaken": "Żewġ swieq ta' din il-mewġa għandhom l-istess isem.",
+        "marketCodeTaken": "Żewġ swieq ta' din il-mewġa għandhom l-istess kodiċi qasir.",
+        "marketUnknown": "Wieħed mis-swieq m'għadux parti minn din il-mewġa. Erġa' tgħabbi s-swieq.",
+        "marketConflict": "Is-swieq inbidlu waqt li kont qed issejvja. Erġa' tgħabbi s-swieq u erġa' pprova.",
+        "countryInTwoMarkets": "{country} qiegħed kemm f'{first} kif ukoll f'{second}. Pajjiż jista' jappartjeni għal suq wieħed biss."
       },
       "dialog": {
         "createTitle": "Mewġa ġdida",
@@ -1652,6 +1657,28 @@
           "streamDefaultsExist": "Il-passi default kollha ta’ dan il-fluss diġà jinsabu fil-mewġa, f’fluss ieħor. Erġa’ qiegħedhom lura jew żid pass.",
           "brandArchived": "Din il-marka hija arkivjata. Irrestawraha biex tbiddel il-mewġ tagħha."
         }
+      },
+      "markets": {
+        "name": "Isem is-suq",
+        "code": "Kodiċi qasir",
+        "codeHint": "Prefiss tal-kodiċijiet tal-persuni, pereżempju {example}. Il-kodiċijiet tal-persuni eżistenti ma jinbidlux meta teditjah.",
+        "addCountry": "Żid pajjiż",
+        "searchCountry": "Fittex pajjiżi",
+        "removeCountry": "Neħħi {country} minn {market}",
+        "removeMarket": "Neħħi s-suq {market}",
+        "countryTaken": "F'{market}",
+        "countryLimit": "Suq għandu massimu ta' {max} pajjiżi.",
+        "marketLimit": "Mewġa għandha massimu ta' {max} swieq.",
+        "nameRequired": "Agħti isem lis-suq.",
+        "nameTooLong": "Isem ta' suq għandu massimu ta' {max} karattri.",
+        "nameTaken": "Suq ieħor diġà għandu dan l-isem.",
+        "codeInvalid": "Uża minn 2 sa 6 ittri kapitali jew ċifri.",
+        "codeTaken": "Suq ieħor diġà għandu dan il-kodiċi.",
+        "countriesRequired": "Żid pajjiż wieħed mill-inqas.",
+        "problems": "Ikkoreġi d-dettalji tas-swieq immarkati hawn fuq.",
+        "countriesOf": "Pajjiżi f'{market}",
+        "countriesOfWave": "Pajjiżi f'kull suq ta' din il-mewġa",
+        "reload": "Erġa' tgħabbi s-swieq"
       }
     },
     "brandFiles": {

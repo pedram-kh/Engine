@@ -15,6 +15,7 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { strategyApi, type WaveScope } from '../api/strategy.api'
+import { useMarkets } from '../useMarkets'
 import { isGone, strategyErrorMessage } from '../strategyErrors'
 import StrategyConfirmDialog from './StrategyConfirmDialog.vue'
 
@@ -22,11 +23,12 @@ const props = defineProps<{
   modelValue: boolean
   scope: WaveScope
   usp: WaveUspResource | null
-  /** PL-2.3: the wave's markets, to find the concepts that carry the USP as a chip. */
-  markets?: string[]
   /** Admin or manager. Staff cannot delete a USP that is in use (ruling Q12). */
   canDeleteInUse: boolean
 }>()
+
+/** PL-2.4: markets are printed by name; the ids are the ones the concept lists are read for. */
+const markets = useMarkets()
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
@@ -60,7 +62,7 @@ async function loadAffected(usp: WaveUspResource, id: number): Promise<void> {
             kind: 'angle',
             level: null,
             persona: p.id,
-            market: p.attributes.market,
+            market: markets.name(p.attributes.market),
             code: p.attributes.code,
             title: p.attributes.title,
             explanation: a.attributes.explanation,
@@ -76,7 +78,7 @@ async function loadAffected(usp: WaveUspResource, id: number): Promise<void> {
             kind: 'cell',
             level: c.level,
             persona: p.id,
-            market: p.attributes.market,
+            market: markets.name(p.attributes.market),
             code: p.attributes.code,
             title: p.attributes.title,
             explanation: synced?.attributes.explanation ?? '',
@@ -86,7 +88,7 @@ async function loadAffected(usp: WaveUspResource, id: number): Promise<void> {
     }
     // PL-2.3: a concept that carries the USP as a chip loses the chip (an Approved one goes back to Awaiting client).
     const lists = await Promise.all(
-      (props.markets ?? []).map((m) => strategyApi.listConcepts(props.scope, m)),
+      markets.ids.value.map((m) => strategyApi.listConcepts(props.scope, m)),
     )
     if (id !== openId) return
     for (const l of lists) {
@@ -96,7 +98,7 @@ async function loadAffected(usp: WaveUspResource, id: number): Promise<void> {
             kind: 'concept',
             level: null,
             persona: c.attributes.persona.id,
-            market: c.attributes.market,
+            market: markets.name(c.attributes.market),
             code: t('app.strategy.concepts.card.number', { n: c.attributes.number }),
             title: c.attributes.title,
             explanation: '',

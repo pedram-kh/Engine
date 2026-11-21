@@ -1484,7 +1484,12 @@
         "waveNotAvailable": "Tätä aaltoa ei voi liittää tähän kampanjaan.",
         "marketHasPersonas": "Poista ensin näiden markkinoiden personat: {markets}.",
         "marketHasConcepts": "Konsepteja on markkinoilla: {markets}.",
-        "marketsChanged": "Tämän aallon markkinat ovat muuttuneet sen jälkeen, kun avasit sen. Sulje ikkuna, avaa aalto uudelleen ja yritä uudelleen."
+        "marketsChanged": "Joku muu on muuttanut tämän aallon markkinoita sen jälkeen, kun avasit tämän ikkunan. Mitään ei tallennettu.",
+        "marketNameTaken": "Kahdella tämän aallon markkinalla on sama nimi.",
+        "marketCodeTaken": "Kahdella tämän aallon markkinalla on sama lyhyt koodi.",
+        "marketUnknown": "Yksi markkinoista ei enää kuulu tähän aaltoon. Lataa markkinat uudelleen.",
+        "marketConflict": "Markkinat muuttuivat tallennuksen aikana. Lataa markkinat uudelleen ja yritä uudestaan.",
+        "countryInTwoMarkets": "{country} on sekä markkinassa {first} että markkinassa {second}. Maa voi kuulua vain yhteen markkinaan."
       },
       "dialog": {
         "createTitle": "Uusi aalto",
@@ -1652,6 +1657,28 @@
           "streamDefaultsExist": "Kaikki tämän virran oletusvaiheet ovat jo aallossa, toisessa virrassa. Siirrä ne takaisin tai lisää vaihe.",
           "brandArchived": "Tämä brändi on arkistoitu. Palauta se muokataksesi sen aaltoja."
         }
+      },
+      "markets": {
+        "name": "Markkinan nimi",
+        "code": "Lyhyt koodi",
+        "codeHint": "Persoonakoodien etuliite, esimerkiksi {example}. Olemassa olevat persoonakoodit eivät muutu, kun muokkaat sitä.",
+        "addCountry": "Lisää maa",
+        "searchCountry": "Hae maita",
+        "removeCountry": "Poista {country} markkinasta {market}",
+        "removeMarket": "Poista markkina {market}",
+        "countryTaken": "Markkinassa {market}",
+        "countryLimit": "Markkinalla on enintään {max} maata.",
+        "marketLimit": "Aallolla on enintään {max} markkinaa.",
+        "nameRequired": "Anna markkinalle nimi.",
+        "nameTooLong": "Markkinan nimessä on enintään {max} merkkiä.",
+        "nameTaken": "Toisella markkinalla on jo tämä nimi.",
+        "codeInvalid": "Käytä 2–6 isoa kirjainta tai numeroa.",
+        "codeTaken": "Toisella markkinalla on jo tämä koodi.",
+        "countriesRequired": "Lisää vähintään yksi maa.",
+        "problems": "Korjaa yllä merkityt markkinatiedot.",
+        "countriesOf": "Maat markkinassa {market}",
+        "countriesOfWave": "Tämän aallon jokaisen markkinan maat",
+        "reload": "Lataa markkinat uudelleen"
       }
     },
     "brandFiles": {

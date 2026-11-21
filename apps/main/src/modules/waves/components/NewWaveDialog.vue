@@ -12,19 +12,22 @@
  * No design frame exists for this dialog; it is built from the design system's dialog and field styles.
  * Server codes map to strings; anything else is the generic save error.
  */
-import { ApiError, labelForCountryCode, marketHasPersonasMeta } from '@catalyst/api-client'
-import type {
-  UpdateWavePayload,
-  WaveCampaignOption,
-  WaveMarketInput,
-  WaveResource,
-} from '@catalyst/api-client'
+import { ApiError, countryInTwoMarketsMeta, marketHasPersonasMeta } from '@catalyst/api-client'
+import type { UpdateWavePayload, WaveCampaignOption, WaveResource } from '@catalyst/api-client'
+import { labelForCountryCode } from '@catalyst/api-client'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { MAX_MARKETS, MENU_ABOVE_DIALOG_Z } from '../constants'
 import { wavesApi } from '../api/waves.api'
-import MarketPicker from './MarketPicker.vue'
+import {
+  draftsFromWave,
+  emptyDraft,
+  toInput,
+  validateDrafts,
+  type MarketDraft,
+} from '../marketDrafts'
+import MarketBuilder from './MarketBuilder.vue'
 
 const props = defineProps<{
   modelValue: boolean
@@ -37,6 +40,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
   saved: [wave: WaveResource]
+  /** The markets were reloaded after a 409 (someone else changed them): the wave as the server has it now. */
+  refreshed: [wave: WaveResource]
 }>()
 
 const { t, te } = useI18n()
@@ -67,7 +72,12 @@ const linkLocked = computed(() => props.wave?.attributes.link_locked ?? hasLink.
 
 const name = ref('')
 const goLiveOn = ref('')
-const markets = ref<string[]>([])
+const drafts = ref<MarketDraft[]>([])
+/** The wave the markets list was built from: the prop on open, the server's copy after a reload (G5). */
+const baseline = ref<WaveResource | null>(null)
+/** The server refused the edit because the markets changed since the list was loaded (409). */
+const staleMarkets = ref(false)
+const reloading = ref(false)
 const campaignId = ref<string | null>(null)
 type CampaignChoice = 'none' | 'existing' | 'new'
 const campaignChoice = ref<CampaignChoice>('none')
@@ -83,10 +93,12 @@ const nameError = computed(() =>
 const goLiveError = computed(() =>
   submitted.value && goLiveOn.value === '' ? t('app.waves.validation.goLiveRequired') : null,
 )
+const marketErrors = computed(() => (submitted.value ? validateDrafts(drafts.value) : {}))
 const marketsError = computed(() => {
   if (!submitted.value) return null
-  if (markets.value.length === 0) return t('app.waves.validation.marketsRequired')
-  if (markets.value.length > MAX_MARKETS) return t('app.waves.validation.marketsMax')
+  if (drafts.value.length === 0) return t('app.waves.validation.marketsRequired')
+  if (drafts.value.length > MAX_MARKETS) return t('app.waves.validation.marketsMax')
+  if (Object.keys(marketErrors.value).length > 0) return t('app.waves.markets.problems')
   return null
 })
 
@@ -142,7 +154,9 @@ watch(
     saving.value = false
     name.value = props.wave?.attributes.name ?? ''
     goLiveOn.value = props.wave?.attributes.go_live_on ?? ''
-    markets.value = (props.wave?.attributes.markets ?? []).map((m) => m.code)
+    baseline.value = props.wave ?? null
+    staleMarkets.value = false
+    drafts.value = props.wave ? draftsFromWave(props.wave.attributes.markets) : [emptyDraft()]
     campaignId.value = props.wave?.relationships.campaign?.data.id ?? null
     campaignChoice.value = 'none'
     newCampaignName.value = ''
@@ -156,7 +170,10 @@ const CODE_KEYS: Record<string, string> = {
   'wave.campaign_already_linked': 'app.waves.errors.campaignAlreadyLinked',
   'wave.campaign_link_locked': 'app.waves.errors.campaignLinkLocked',
   'wave.brand_archived': 'app.waves.errors.brandArchived',
-  'wave.markets_changed': 'app.waves.errors.marketsChanged',
+  'wave.market_name_taken': 'app.waves.errors.marketNameTaken',
+  'wave.market_code_taken': 'app.waves.errors.marketCodeTaken',
+  'wave.market_unknown': 'app.waves.errors.marketUnknown',
+  'wave.market_conflict': 'app.waves.errors.marketConflict',
 }
 
 function messageFor(err: unknown): string {
@@ -174,6 +191,14 @@ function messageFor(err: unknown): string {
           markets: withConcepts.map((m) => `${m.name ?? m.market} (${m.concept_count})`).join(', '),
         })}`
   }
+  const twice = countryInTwoMarketsMeta(err)
+  if (twice !== null) {
+    return t('app.waves.errors.countryInTwoMarkets', {
+      country: labelForCountry(twice.country),
+      first: twice.markets[0] ?? '',
+      second: twice.markets[1] ?? '',
+    })
+  }
   if (err instanceof ApiError) {
     const key = CODE_KEYS[err.code]
     if (key !== undefined) return t(key)
@@ -181,9 +206,36 @@ function messageFor(err: unknown): string {
   return t('app.waves.errors.saveFailed')
 }
 
-/** One country, one market: named for the country, with the country code as its short code. */
-function singleCountryMarket(code: string): WaveMarketInput {
-  return { name: labelForCountryCode(code), code, countries: [code] }
+function labelForCountry(code: string): string {
+  return labelForCountryCode(code)
+}
+
+/** The markets list as the server would hold it, to tell an edit from no change. Countries are compared sorted. */
+function signature(
+  list: { id?: string; name: string; code?: string | null; countries: string[] }[],
+): string {
+  return JSON.stringify(
+    list.map((m) => [m.id ?? null, m.name, m.code ?? null, [...m.countries].sort()]),
+  )
+}
+
+/** G5: take the markets as the server has them now, keep what else the user typed, and say the list was refreshed. */
+async function reloadMarkets(): Promise<void> {
+  if (!props.wave) return
+  reloading.value = true
+  try {
+    const res = await wavesApi.show(props.agencyId, props.brandId, props.wave.id)
+    baseline.value = res.data
+    drafts.value = draftsFromWave(res.data.attributes.markets)
+    staleMarkets.value = false
+    formError.value = null
+    submitted.value = false
+    emit('refreshed', res.data)
+  } catch (err) {
+    formError.value = messageFor(err)
+  } finally {
+    reloading.value = false
+  }
 }
 
 function close(): void {
@@ -194,6 +246,7 @@ function close(): void {
 async function submit(): Promise<void> {
   submitted.value = true
   formError.value = null
+  staleMarkets.value = false
   if (nameError.value || goLiveError.value || marketsError.value || newCampaignNameError.value)
     return
 
@@ -204,12 +257,12 @@ async function submit(): Promise<void> {
       const body: UpdateWavePayload = {}
       if (name.value.trim() !== props.wave.attributes.name) body.name = name.value.trim()
       if (goLiveOn.value !== props.wave.attributes.go_live_on) body.go_live_on = goLiveOn.value
-      if (markets.value.join(',') !== props.wave.attributes.markets.map((m) => m.code).join(',')) {
-        // PL-2.4: a market that is already there is sent back as it is (ulid, name, code, countries); a country the user
-        // added becomes a new one-country market named for the country. The version says what the list was built from.
-        const existing = new Map(props.wave.attributes.markets.map((m) => [m.code, m]))
-        body.markets = markets.value.map((code) => existing.get(code) ?? singleCountryMarket(code))
-        body.markets_version = props.wave.attributes.markets_version
+      const was = baseline.value ?? props.wave
+      const inputs = drafts.value.map(toInput)
+      if (signature(inputs) !== signature(was.attributes.markets)) {
+        // PL-2.4: the whole list, each existing market with its ulid; the version says what the list was built from.
+        body.markets = inputs
+        body.markets_version = was.attributes.markets_version
       }
       // Set, change or remove (null) the link, but only when it differs from what is saved.
       const savedCampaignId = props.wave.relationships.campaign?.data.id ?? null
@@ -220,7 +273,7 @@ async function submit(): Promise<void> {
       res = await wavesApi.create(props.agencyId, props.brandId, {
         name: name.value.trim(),
         go_live_on: goLiveOn.value,
-        markets: markets.value.map(singleCountryMarket),
+        markets: drafts.value.map(toInput),
         ...(campaignChoice.value === 'new'
           ? { new_campaign: { name: newCampaignName.value.trim() } }
           : { campaign_id: campaignChoice.value === 'existing' ? campaignId.value : null }),
@@ -229,7 +282,12 @@ async function submit(): Promise<void> {
     emit('saved', res.data)
     emit('update:modelValue', false)
   } catch (err) {
-    formError.value = messageFor(err)
+    if (err instanceof ApiError && err.code === 'wave.markets_changed') {
+      staleMarkets.value = true
+      formError.value = t('app.waves.errors.marketsChanged')
+    } else {
+      formError.value = messageFor(err)
+    }
   } finally {
     saving.value = false
   }
@@ -239,7 +297,7 @@ async function submit(): Promise<void> {
 <template>
   <v-dialog
     :model-value="modelValue"
-    max-width="520"
+    max-width="640"
     persistent
     data-test="wave-dialog"
     @update:model-value="
@@ -276,7 +334,7 @@ async function submit(): Promise<void> {
         />
         <div>
           <div class="text-body-2 mb-2">{{ t('app.waves.dialog.markets') }}</div>
-          <MarketPicker v-model="markets" :error-message="marketsError" />
+          <MarketBuilder v-model="drafts" :errors="marketErrors" :error-message="marketsError" />
         </div>
 
         <template v-if="linkLocked">
@@ -363,6 +421,17 @@ async function submit(): Promise<void> {
 
         <v-alert v-if="formError" type="error" variant="tonal" data-test="wave-form-error">
           {{ formError }}
+          <template v-if="staleMarkets" #append>
+            <v-btn
+              variant="outlined"
+              size="small"
+              :loading="reloading"
+              data-test="wave-markets-reload"
+              @click="reloadMarkets"
+            >
+              {{ t('app.waves.markets.reload') }}
+            </v-btn>
+          </template>
         </v-alert>
       </v-card-text>
       <v-card-actions class="px-6 pb-4">

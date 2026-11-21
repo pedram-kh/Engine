@@ -18,6 +18,7 @@ import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
 import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { wavesApi } from '../api/waves.api'
+import MarketCountriesInfo from '../components/MarketCountriesInfo.vue'
 import NewWaveDialog from '../components/NewWaveDialog.vue'
 import WaveProgressSegments from '../components/WaveProgressSegments.vue'
 import WaveTrackerSection from '../components/WaveTrackerSection.vue'
@@ -167,9 +168,17 @@ onMounted(async () => {
       <div class="agency-field" data-test="wave-field-markets">
         <h3 class="agency-field__label">{{ t('app.waves.dialog.markets') }}</h3>
         <div class="d-flex flex-wrap ga-2">
-          <v-chip v-for="m in wave.attributes.markets" :key="m.id" size="small">
-            {{ m.name }}
-          </v-chip>
+          <span
+            v-for="m in wave.attributes.markets"
+            :key="m.id"
+            class="wave-market"
+            :data-test="`wave-market-${m.code}`"
+          >
+            <v-chip size="small" class="wave-market__chip">
+              <span class="wave-market__name">{{ m.name }}</span>
+            </v-chip>
+            <MarketCountriesInfo :id="m.code" :name="m.name" :countries="m.countries" />
+          </span>
         </div>
       </div>
 
@@ -232,6 +241,7 @@ onMounted(async () => {
       :brand-name="wave.relationships.brand.data.attributes.name"
       :wave="wave"
       @saved="(w: WaveResource) => (wave = w)"
+      @refreshed="(w: WaveResource) => (wave = w)"
     />
   </div>
 </template>
@@ -255,5 +265,19 @@ onMounted(async () => {
   .wave-detail :deep(.agency-fields) {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+.wave-market {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+}
+.wave-market__chip {
+  max-width: 260px;
+}
+.wave-market__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

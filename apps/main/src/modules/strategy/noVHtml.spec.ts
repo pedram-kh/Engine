@@ -22,4 +22,16 @@ describe('strategy module draws no HTML (PL-2.2)', () => {
     )
     expect(offenders.map((f) => path.relative(__dirname, f))).toEqual([])
   })
+
+  it('PL-2.4: the market builder and the countries lists (waves module) draw no HTML either', () => {
+    const dir = path.join(__dirname, '..', 'waves')
+    const mine = files(dir).filter((f) =>
+      /Market|marketDrafts|NewWaveDialog|WaveDetailPage/.test(f),
+    )
+    expect(mine.length).toBeGreaterThanOrEqual(5)
+    const offenders = mine.filter((f) =>
+      /v-html|innerHTML|outerHTML|insertAdjacentHTML/.test(readFileSync(f, 'utf8')),
+    )
+    expect(offenders.map((f) => path.relative(dir, f))).toEqual([])
+  })
 })

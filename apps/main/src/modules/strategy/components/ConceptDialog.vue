@@ -35,6 +35,7 @@ import { MENU_PROPS } from '../constants'
 import { useConfirmReset } from '../composables/confirmReset'
 import { fieldErrorsOf, strategyErrorMessage } from '../strategyErrors'
 import ListField from './ListField.vue'
+import { useMarkets } from '../useMarkets'
 
 const props = defineProps<{
   modelValue: boolean
@@ -49,6 +50,9 @@ const props = defineProps<{
   /** A persona to preselect on create. */
   initialPersona?: string | null
 }>()
+
+/** PL-2.4: the market is printed by name. */
+const markets = useMarkets()
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
@@ -303,7 +307,7 @@ async function submit(): Promise<void> {
         {{
           editing
             ? t('app.strategy.concepts.dialog.editTitle')
-            : t('app.strategy.concepts.dialog.addTitle', { market })
+            : t('app.strategy.concepts.dialog.addTitle', { market: markets.name(market) })
         }}
       </v-card-title>
       <v-card-text class="px-6">

@@ -41,6 +41,29 @@ function list(waves = [makeWave()]) {
 describe('BrandWavesPanel (PL-1.1 W2)', () => {
   beforeEach(() => vi.clearAllMocks())
 
+  it('PL-2.4: prints market NAMES as text, with the countries behind one info button', async () => {
+    const hostile = '<img src=x onerror=alert(1)>Bad & "market"'
+    list([
+      makeWave({
+        markets: [
+          { id: '01MKT1', name: 'UK & Ireland', code: 'UKI', countries: ['GB', 'IE'] },
+          { id: '01MKT2', name: hostile, code: 'HX', countries: ['FR'] },
+        ],
+      }),
+    ])
+    const w = await mountWithApp(BrandWavesPanel, props(true), { route })
+    await flushPromises()
+    const cell = w.get('[data-test="wave-row-markets"]')
+    expect(cell.text()).toContain('UK & Ireland')
+    expect(cell.text()).toContain(hostile)
+    expect(cell.text()).not.toContain('UKI')
+    expect(cell.find('img').exists()).toBe(false)
+    expect(
+      w.get(`[data-test="wave-markets-info-${WAVE_ULID}"]`).attributes('aria-label'),
+    ).toBeTruthy()
+    w.unmount()
+  })
+
   it('lists a wave with name, go-live date, market codes, progress, status and updated', async () => {
     list([makeWave({ markets: marketsOf(['ES', 'PT', 'FR', 'DE', 'IT']) })])
     const w = await mountWithApp(BrandWavesPanel, props(true), { route })

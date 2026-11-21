@@ -1484,7 +1484,12 @@
         "waveNotAvailable": "Tega vala ni mogoče povezati s to kampanjo.",
         "marketHasPersonas": "Najprej odstranite persone teh trgov: {markets}.",
         "marketHasConcepts": "Koncepti obstajajo na trgih: {markets}.",
-        "marketsChanged": "Trgi tega vala so se spremenili, odkar ste ga odprli. Zaprite okno, ponovno odprite val in poskusite znova."
+        "marketsChanged": "Trge tega vala je spremenil nekdo drug, odkar ste odprli to okno. Nič ni bilo shranjeno.",
+        "marketNameTaken": "Dva trga tega vala imata isto ime.",
+        "marketCodeTaken": "Dva trga tega vala imata isto kratko kodo.",
+        "marketUnknown": "Eden od trgov ni več del tega vala. Znova naložite trge.",
+        "marketConflict": "Trgi so se med shranjevanjem spremenili. Znova naložite trge in poskusite znova.",
+        "countryInTwoMarkets": "{country} je na trgih {first} in {second}. Država lahko spada samo na en trg."
       },
       "dialog": {
         "createTitle": "Nov val",
@@ -1652,6 +1657,28 @@
           "streamDefaultsExist": "Vsi privzeti koraki tega toka so že v valu, v drugem toku. Premaknite jih nazaj ali dodajte korak.",
           "brandArchived": "Ta blagovna znamka je arhivirana. Obnovite jo, da boste lahko spreminjali njene vale."
         }
+      },
+      "markets": {
+        "name": "Ime trga",
+        "code": "Kratka koda",
+        "codeHint": "Predpona kod person, na primer {example}. Obstoječe kode person se ob urejanju ne spremenijo.",
+        "addCountry": "Dodaj državo",
+        "searchCountry": "Išči države",
+        "removeCountry": "Odstrani {country} s trga {market}",
+        "removeMarket": "Odstrani trg {market}",
+        "countryTaken": "Na trgu {market}",
+        "countryLimit": "Trg ima največ {max} držav.",
+        "marketLimit": "Val ima največ {max} trgov.",
+        "nameRequired": "Trgu dodelite ime.",
+        "nameTooLong": "Ime trga ima največ {max} znakov.",
+        "nameTaken": "Drug trg že ima to ime.",
+        "codeInvalid": "Uporabite 2 do 6 velikih črk ali števk.",
+        "codeTaken": "Drug trg že ima to kodo.",
+        "countriesRequired": "Dodajte vsaj eno državo.",
+        "problems": "Popravite zgoraj označene podatke o trgih.",
+        "countriesOf": "Države na trgu {market}",
+        "countriesOfWave": "Države na vsakem trgu tega vala",
+        "reload": "Znova naloži trge"
       }
     },
     "brandFiles": {

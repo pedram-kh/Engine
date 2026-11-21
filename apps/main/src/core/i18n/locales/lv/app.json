@@ -1484,7 +1484,12 @@
         "waveNotAvailable": "Šo vilni nevar saistīt ar šo kampaņu.",
         "marketHasPersonas": "Vispirms noņemiet šo tirgu personas: {markets}.",
         "marketHasConcepts": "Koncepti ir tirgos: {markets}.",
-        "marketsChanged": "Šī viļņa tirgi ir mainījušies, kopš to atvērāt. Aizveriet logu, atkārtoti atveriet vilni un mēģiniet vēlreiz."
+        "marketsChanged": "Šī viļņa tirgus ir mainījis kāds cits, kopš atvērāt šo logu. Nekas netika saglabāts.",
+        "marketNameTaken": "Diviem šī viļņa tirgiem ir viens un tas pats nosaukums.",
+        "marketCodeTaken": "Diviem šī viļņa tirgiem ir viens un tas pats īskods.",
+        "marketUnknown": "Viens no tirgiem vairs nav šī viļņa daļa. Pārlādējiet tirgus.",
+        "marketConflict": "Tirgi mainījās saglabāšanas laikā. Pārlādējiet tirgus un mēģiniet vēlreiz.",
+        "countryInTwoMarkets": "{country} ir gan tirgū {first}, gan tirgū {second}. Valsts var piederēt tikai vienam tirgum."
       },
       "dialog": {
         "createTitle": "Jauns vilnis",
@@ -1652,6 +1657,28 @@
           "streamDefaultsExist": "Visi šīs plūsmas noklusējuma soļi jau ir vilnī, citā plūsmā. Pārvietojiet tos atpakaļ vai pievienojiet soli.",
           "brandArchived": "Šis zīmols ir arhivēts. Atjaunojiet to, lai mainītu tā viļņus."
         }
+      },
+      "markets": {
+        "name": "Tirgus nosaukums",
+        "code": "Īskods",
+        "codeHint": "Persona kodu priedēklis, piemēram, {example}. Esošie persona kodi nemainās, kad to rediģējat.",
+        "addCountry": "Pievienot valsti",
+        "searchCountry": "Meklēt valstis",
+        "removeCountry": "Noņemt {country} no tirgus {market}",
+        "removeMarket": "Noņemt tirgu {market}",
+        "countryTaken": "Tirgū {market}",
+        "countryLimit": "Tirgū ir ne vairāk kā {max} valstu.",
+        "marketLimit": "Vilnī ir ne vairāk kā {max} tirgu.",
+        "nameRequired": "Dodiet tirgum nosaukumu.",
+        "nameTooLong": "Tirgus nosaukumā ir ne vairāk kā {max} rakstzīmju.",
+        "nameTaken": "Citam tirgum jau ir šāds nosaukums.",
+        "codeInvalid": "Izmantojiet 2 līdz 6 lielos burtus vai ciparus.",
+        "codeTaken": "Citam tirgum jau ir šāds kods.",
+        "countriesRequired": "Pievienojiet vismaz vienu valsti.",
+        "problems": "Labojiet augstāk atzīmētos tirgu datus.",
+        "countriesOf": "Valstis tirgū {market}",
+        "countriesOfWave": "Valstis katrā šī viļņa tirgū",
+        "reload": "Pārlādēt tirgus"
       }
     },
     "brandFiles": {

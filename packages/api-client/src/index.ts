@@ -17,6 +17,7 @@ export { createAuthApi, type AuthApi, type AuthVariant, type CreateAuthApiOption
 export {
   ApiError,
   copyExceedsCapMeta,
+  countryInTwoMarketsMeta,
   deletionPendingMeta,
   extractFieldErrors,
   marketHasPersonasMeta,

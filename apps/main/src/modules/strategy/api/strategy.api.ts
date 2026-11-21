@@ -30,38 +30,11 @@ import type {
   WaveUspPayload,
 } from '@catalyst/api-client'
 import { http } from '@/core/api'
-import { fromWire, toWire, urlToWire } from './marketIds'
 
 export interface WaveScope {
   agencyId: string
   brandId: string
   waveId: string
-}
-
-/**
- * `http` for one wave, with the market bridge (see `marketIds.ts`): bodies and `?market=` go out with the market's ULID,
- * market fields come back as the short code the screens use.
- */
-function wire(s: WaveScope): {
-  get<T>(url: string): Promise<T>
-  post<T>(url: string, body?: unknown): Promise<T>
-  put<T>(url: string, body?: unknown): Promise<T>
-  patch<T>(url: string, body?: unknown): Promise<T>
-  delete<T>(url: string, body?: unknown): Promise<T>
-} {
-  const out = <T>(body: unknown): T | undefined =>
-    body === undefined ? undefined : toWire(s.waveId, body as T)
-  return {
-    get: async <T>(url: string) => fromWire(s.waveId, await http.get<T>(urlToWire(s.waveId, url))),
-    post: async <T>(url: string, body?: unknown) =>
-      fromWire(s.waveId, await http.post<T>(url, out(body))),
-    put: async <T>(url: string, body?: unknown) =>
-      fromWire(s.waveId, await http.put<T>(url, out(body))),
-    patch: async <T>(url: string, body?: unknown) =>
-      fromWire(s.waveId, await http.patch<T>(url, out(body))),
-    delete: async <T>(url: string, body?: unknown) =>
-      fromWire(s.waveId, await http.delete<T>(url, out(body))),
-  }
 }
 
 function base(s: WaveScope): string {
@@ -70,42 +43,42 @@ function base(s: WaveScope): string {
 
 export const strategyApi = {
   summary(s: WaveScope): Promise<StrategySummaryEnvelope> {
-    return wire(s).get<StrategySummaryEnvelope>(base(s))
+    return http.get<StrategySummaryEnvelope>(base(s))
   },
 
   /** `null` (or blank) clears the title. */
   setAudienceTitle(s: WaveScope, title: string | null): Promise<StrategySummaryEnvelope> {
-    return wire(s).patch<StrategySummaryEnvelope>(`${base(s)}/audience-title`, {
+    return http.patch<StrategySummaryEnvelope>(`${base(s)}/audience-title`, {
       usp_audience_title: title,
     })
   },
 
   /** One market's matrix in one request: USPs, personas, set cells, progress. */
   matrix(s: WaveScope, market: string): Promise<MatrixEnvelope> {
-    return wire(s).get<MatrixEnvelope>(`${base(s)}/matrix?market=${encodeURIComponent(market)}`)
+    return http.get<MatrixEnvelope>(`${base(s)}/matrix?market=${encodeURIComponent(market)}`)
   },
 
   /** 1 to 48 cell changes in one transaction; only the fields that changed. */
   saveCells(s: WaveScope, market: string, cells: MatrixCellChange[]): Promise<MatrixSaveEnvelope> {
-    return wire(s).put<MatrixSaveEnvelope>(`${base(s)}/matrix/cells`, { market, cells })
+    return http.put<MatrixSaveEnvelope>(`${base(s)}/matrix/cells`, { market, cells })
   },
 
   listUsps(s: WaveScope): Promise<WaveUspListResponse> {
-    return wire(s).get<WaveUspListResponse>(`${base(s)}/usps`)
+    return http.get<WaveUspListResponse>(`${base(s)}/usps`)
   },
 
   createUsp(s: WaveScope, payload: WaveUspPayload): Promise<WaveUspEnvelope> {
-    return wire(s).post<WaveUspEnvelope>(`${base(s)}/usps`, payload)
+    return http.post<WaveUspEnvelope>(`${base(s)}/usps`, payload)
   },
 
   /** Only the fields that changed. */
   updateUsp(s: WaveScope, uspId: string, payload: WaveUspPayload): Promise<WaveUspEnvelope> {
-    return wire(s).patch<WaveUspEnvelope>(`${base(s)}/usps/${uspId}`, payload)
+    return http.patch<WaveUspEnvelope>(`${base(s)}/usps/${uspId}`, payload)
   },
 
   /** The FULL ordered list of this wave's USP ids; anything else is 422 `usp.order_mismatch`. */
   reorderUsps(s: WaveScope, order: string[]): Promise<WaveUspListResponse> {
-    return wire(s).put<WaveUspListResponse>(`${base(s)}/usps/order`, { order })
+    return http.put<WaveUspListResponse>(`${base(s)}/usps/order`, { order })
   },
 
   /**
@@ -113,7 +86,7 @@ export const strategyApi = {
    * (with the list) until the same call carries `confirm_count` equal to the number it counted (angles and matrix cells).
    */
   removeUsp(s: WaveScope, uspId: string, confirmCount?: number): Promise<void> {
-    return wire(s).delete<void>(
+    return http.delete<void>(
       `${base(s)}/usps/${uspId}`,
       confirmCount === undefined ? undefined : { confirm_count: confirmCount },
     )
@@ -121,11 +94,11 @@ export const strategyApi = {
 
   listPersonas(s: WaveScope, market?: string): Promise<WavePersonaListResponse> {
     const qs = market === undefined ? '' : `?market=${encodeURIComponent(market)}`
-    return wire(s).get<WavePersonaListResponse>(`${base(s)}/personas${qs}`)
+    return http.get<WavePersonaListResponse>(`${base(s)}/personas${qs}`)
   },
 
   createPersona(s: WaveScope, payload: WavePersonaPayload): Promise<WavePersonaEnvelope> {
-    return wire(s).post<WavePersonaEnvelope>(`${base(s)}/personas`, payload)
+    return http.post<WavePersonaEnvelope>(`${base(s)}/personas`, payload)
   },
 
   updatePersona(
@@ -133,15 +106,15 @@ export const strategyApi = {
     personaId: string,
     payload: WavePersonaPayload,
   ): Promise<WavePersonaEnvelope> {
-    return wire(s).patch<WavePersonaEnvelope>(`${base(s)}/personas/${personaId}`, payload)
+    return http.patch<WavePersonaEnvelope>(`${base(s)}/personas/${personaId}`, payload)
   },
 
   removePersona(s: WaveScope, personaId: string): Promise<void> {
-    return wire(s).delete<void>(`${base(s)}/personas/${personaId}`)
+    return http.delete<void>(`${base(s)}/personas/${personaId}`)
   },
 
   copyPersonas(s: WaveScope, payload: PersonaCopyPayload): Promise<WavePersonaListResponse> {
-    return wire(s).post<WavePersonaListResponse>(`${base(s)}/personas/copy`, payload)
+    return http.post<WavePersonaListResponse>(`${base(s)}/personas/copy`, payload)
   },
 
   addAngle(
@@ -150,7 +123,7 @@ export const strategyApi = {
     uspId: string,
     explanation: string,
   ): Promise<WaveAngleEnvelope> {
-    return wire(s).post<WaveAngleEnvelope>(`${base(s)}/personas/${personaId}/angles`, {
+    return http.post<WaveAngleEnvelope>(`${base(s)}/personas/${personaId}/angles`, {
       usp: uspId,
       explanation,
     })
@@ -162,7 +135,7 @@ export const strategyApi = {
     angleId: string,
     explanation: string,
   ): Promise<WaveAngleEnvelope> {
-    return wire(s).patch<WaveAngleEnvelope>(`${base(s)}/personas/${personaId}/angles/${angleId}`, {
+    return http.patch<WaveAngleEnvelope>(`${base(s)}/personas/${personaId}/angles/${angleId}`, {
       explanation,
     })
   },
@@ -172,25 +145,23 @@ export const strategyApi = {
    * row, the text of the message line). Idempotent on the server. Any role.
    */
   useMatrixLine(s: WaveScope, personaId: string, angleId: string): Promise<WaveAngleEnvelope> {
-    return wire(s).post<WaveAngleEnvelope>(
+    return http.post<WaveAngleEnvelope>(
       `${base(s)}/personas/${personaId}/angles/${angleId}/use-matrix-line`,
     )
   },
 
   removeAngle(s: WaveScope, personaId: string, angleId: string): Promise<void> {
-    return wire(s).delete<void>(`${base(s)}/personas/${personaId}/angles/${angleId}`)
+    return http.delete<void>(`${base(s)}/personas/${personaId}/angles/${angleId}`)
   },
 
   // --- Concepts (PL-2.3) -----------------------------------------------------------------------------------
 
   listConcepts(s: WaveScope, market: string): Promise<ConceptListResponse> {
-    return wire(s).get<ConceptListResponse>(
-      `${base(s)}/concepts?market=${encodeURIComponent(market)}`,
-    )
+    return http.get<ConceptListResponse>(`${base(s)}/concepts?market=${encodeURIComponent(market)}`)
   },
 
   createConcept(s: WaveScope, payload: ConceptPayload): Promise<ConceptEnvelope> {
-    return wire(s).post<ConceptEnvelope>(`${base(s)}/concepts`, payload)
+    return http.post<ConceptEnvelope>(`${base(s)}/concepts`, payload)
   },
 
   /** Only the fields that changed. A new `persona` needs `usp_mode`. The answer says whether the concept went back to Awaiting. */
@@ -199,15 +170,15 @@ export const strategyApi = {
     conceptId: string,
     payload: ConceptPayload,
   ): Promise<ConceptEnvelope> {
-    return wire(s).patch<ConceptEnvelope>(`${base(s)}/concepts/${conceptId}`, payload)
+    return http.patch<ConceptEnvelope>(`${base(s)}/concepts/${conceptId}`, payload)
   },
 
   duplicateConcept(s: WaveScope, conceptId: string): Promise<ConceptEnvelope> {
-    return wire(s).post<ConceptEnvelope>(`${base(s)}/concepts/${conceptId}/duplicate`)
+    return http.post<ConceptEnvelope>(`${base(s)}/concepts/${conceptId}/duplicate`)
   },
 
   removeConcept(s: WaveScope, conceptId: string): Promise<void> {
-    return wire(s).delete<void>(`${base(s)}/concepts/${conceptId}`)
+    return http.delete<void>(`${base(s)}/concepts/${conceptId}`)
   },
 
   /** Admin and manager only (403 `forbidden` for staff). */
@@ -216,7 +187,7 @@ export const strategyApi = {
     conceptId: string,
     payload: ConceptDecisionPayload,
   ): Promise<ConceptEnvelope> {
-    return wire(s).post<ConceptEnvelope>(`${base(s)}/concepts/${conceptId}/decision`, payload)
+    return http.post<ConceptEnvelope>(`${base(s)}/concepts/${conceptId}/decision`, payload)
   },
 
   initImage(
@@ -224,23 +195,21 @@ export const strategyApi = {
     conceptId: string,
     payload: ConceptImageInitPayload,
   ): Promise<ConceptImageInitResponse> {
-    return wire(s).post<ConceptImageInitResponse>(
+    return http.post<ConceptImageInitResponse>(
       `${base(s)}/concepts/${conceptId}/images/uploads/init`,
       payload,
     )
   },
 
   completeImage(s: WaveScope, conceptId: string, uploadId: string): Promise<ConceptImageEnvelope> {
-    return wire(s).post<ConceptImageEnvelope>(
+    return http.post<ConceptImageEnvelope>(
       `${base(s)}/concepts/${conceptId}/images/uploads/complete`,
       { upload_id: uploadId },
     )
   },
 
   removeImage(s: WaveScope, conceptId: string, imageId: string): Promise<ConceptResetResponse> {
-    return wire(s).delete<ConceptResetResponse>(
-      `${base(s)}/concepts/${conceptId}/images/${imageId}`,
-    )
+    return http.delete<ConceptResetResponse>(`${base(s)}/concepts/${conceptId}/images/${imageId}`)
   },
 
   /**
@@ -259,7 +228,7 @@ export const strategyApi = {
     conceptId: string,
     payload: Required<ConceptLinkPayload>,
   ): Promise<ConceptLinkEnvelope> {
-    return wire(s).post<ConceptLinkEnvelope>(`${base(s)}/concepts/${conceptId}/links`, payload)
+    return http.post<ConceptLinkEnvelope>(`${base(s)}/concepts/${conceptId}/links`, payload)
   },
 
   updateLink(
@@ -268,13 +237,13 @@ export const strategyApi = {
     linkId: string,
     payload: ConceptLinkPayload,
   ): Promise<ConceptLinkEnvelope> {
-    return wire(s).patch<ConceptLinkEnvelope>(
+    return http.patch<ConceptLinkEnvelope>(
       `${base(s)}/concepts/${conceptId}/links/${linkId}`,
       payload,
     )
   },
 
   removeLink(s: WaveScope, conceptId: string, linkId: string): Promise<ConceptResetResponse> {
-    return wire(s).delete<ConceptResetResponse>(`${base(s)}/concepts/${conceptId}/links/${linkId}`)
+    return http.delete<ConceptResetResponse>(`${base(s)}/concepts/${conceptId}/links/${linkId}`)
   },
 }

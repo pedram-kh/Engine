@@ -1484,7 +1484,12 @@
         "waveNotAvailable": "Den bølge kan ikke knyttes til denne kampagne.",
         "marketHasPersonas": "Fjern først personaerne for disse markeder: {markets}.",
         "marketHasConcepts": "Der findes koncepter i: {markets}.",
-        "marketsChanged": "Bølgens markeder er ændret, siden du åbnede den. Luk vinduet, åbn bølgen igen og prøv igen."
+        "marketsChanged": "Markederne i denne bølge er ændret af en anden, siden du åbnede vinduet. Intet blev gemt.",
+        "marketNameTaken": "To markeder i denne bølge har samme navn.",
+        "marketCodeTaken": "To markeder i denne bølge har samme korte kode.",
+        "marketUnknown": "Et af markederne er ikke længere en del af denne bølge. Genindlæs markederne.",
+        "marketConflict": "Markederne ændrede sig, mens du gemte. Genindlæs markederne og prøv igen.",
+        "countryInTwoMarkets": "{country} er i både {first} og {second}. Et land kan kun høre til ét marked."
       },
       "dialog": {
         "createTitle": "Ny bølge",
@@ -1652,6 +1657,28 @@
           "streamDefaultsExist": "Alle standardtrin i dette spor er allerede i bølgen, i et andet spor. Flyt dem tilbage, eller tilføj et trin.",
           "brandArchived": "Dette brand er arkiveret. Gendan det for at ændre dets bølger."
         }
+      },
+      "markets": {
+        "name": "Markedets navn",
+        "code": "Kort kode",
+        "codeHint": "Præfiks for personakoderne, for eksempel {example}. Eksisterende personakoder ændres ikke, når du redigerer den.",
+        "addCountry": "Tilføj land",
+        "searchCountry": "Søg lande",
+        "removeCountry": "Fjern {country} fra {market}",
+        "removeMarket": "Fjern markedet {market}",
+        "countryTaken": "I {market}",
+        "countryLimit": "Et marked har højst {max} lande.",
+        "marketLimit": "En bølge har højst {max} markeder.",
+        "nameRequired": "Giv markedet et navn.",
+        "nameTooLong": "Et markedsnavn har højst {max} tegn.",
+        "nameTaken": "Et andet marked har allerede dette navn.",
+        "codeInvalid": "Brug 2 til 6 store bogstaver eller cifre.",
+        "codeTaken": "Et andet marked har allerede denne kode.",
+        "countriesRequired": "Tilføj mindst ét land.",
+        "problems": "Ret markedsoplysningerne markeret ovenfor.",
+        "countriesOf": "Lande i {market}",
+        "countriesOfWave": "Lande i hvert marked i denne bølge",
+        "reload": "Genindlæs markederne"
       }
     },
     "brandFiles": {

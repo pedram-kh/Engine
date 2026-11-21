@@ -39,6 +39,7 @@ import {
   mountStrategy,
   overlay,
   WAVE_ULID,
+  mkt,
 } from '../strategyTestKit'
 import ConceptsStep from './ConceptsStep.vue'
 
@@ -89,12 +90,8 @@ async function mountStep(
     {
       summary: makeSummary({
         persona_count: 2,
-        markets: [
-          { market: 'SK', persona_count: 2 },
-          { market: 'RO', persona_count: 0 },
-        ],
+        markets: [mkt('SK', 2), mkt('RO', 0)],
       }),
-      markets: ['SK', 'RO'],
       brandName: 'Acme Corp',
     },
     { role, route: ROUTE },

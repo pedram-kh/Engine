@@ -1484,7 +1484,12 @@
         "waveNotAvailable": "Seda lainet ei saa selle kampaaniaga siduda.",
         "marketHasPersonas": "Eemalda kõigepealt nende turgude personad: {markets}.",
         "marketHasConcepts": "Kontseptsioonid on turgudel: {markets}.",
-        "marketsChanged": "Selle laine turud on muutunud pärast selle avamist. Sulgege aken, avage laine uuesti ja proovige uuesti."
+        "marketsChanged": "Selle laine turge on muutnud keegi teine pärast seda, kui selle akna avasid. Midagi ei salvestatud.",
+        "marketNameTaken": "Selle laine kahel turul on sama nimi.",
+        "marketCodeTaken": "Selle laine kahel turul on sama lühikood.",
+        "marketUnknown": "Üks turgudest ei kuulu enam sellesse lainesse. Laadi turud uuesti.",
+        "marketConflict": "Turud muutusid salvestamise ajal. Laadi turud uuesti ja proovi uuesti.",
+        "countryInTwoMarkets": "{country} on nii turul {first} kui ka turul {second}. Riik võib kuuluda ainult ühele turule."
       },
       "dialog": {
         "createTitle": "Uus laine",
@@ -1652,6 +1657,28 @@
           "streamDefaultsExist": "Selle voo kõik vaikesammud on juba lainel, teises voos. Liiguta need tagasi või lisa samm.",
           "brandArchived": "See bränd on arhiveeritud. Taasta see, et selle laineid muuta."
         }
+      },
+      "markets": {
+        "name": "Turu nimi",
+        "code": "Lühikood",
+        "codeHint": "Persoonakoodide eesliide, näiteks {example}. Olemasolevad persoonakoodid ei muutu, kui seda muudad.",
+        "addCountry": "Lisa riik",
+        "searchCountry": "Otsi riike",
+        "removeCountry": "Eemalda {country} turult {market}",
+        "removeMarket": "Eemalda turg {market}",
+        "countryTaken": "Turul {market}",
+        "countryLimit": "Turul on kuni {max} riiki.",
+        "marketLimit": "Lainel on kuni {max} turgu.",
+        "nameRequired": "Pane turule nimi.",
+        "nameTooLong": "Turu nimes on kuni {max} märki.",
+        "nameTaken": "Teisel turul on see nimi juba olemas.",
+        "codeInvalid": "Kasuta 2 kuni 6 suurtähte või numbrit.",
+        "codeTaken": "Teisel turul on see kood juba olemas.",
+        "countriesRequired": "Lisa vähemalt üks riik.",
+        "problems": "Paranda ülal märgitud turuandmed.",
+        "countriesOf": "Riigid turul {market}",
+        "countriesOfWave": "Selle laine iga turu riigid",
+        "reload": "Laadi turud uuesti"
       }
     },
     "brandFiles": {

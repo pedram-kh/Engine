@@ -1484,7 +1484,12 @@
         "waveNotAvailable": "Ez a hullám nem kapcsolható ehhez a kampányhoz.",
         "marketHasPersonas": "Előbb távolítsd el a perszónákat ezekről a piacokról: {markets}.",
         "marketHasConcepts": "Koncepciók vannak itt: {markets}.",
-        "marketsChanged": "A hullám piacai megváltoztak, mióta megnyitotta. Zárja be az ablakot, nyissa meg újra a hullámot, és próbálja újra."
+        "marketsChanged": "A hullám piacait valaki más módosította, mióta megnyitottad ezt az ablakot. Semmi sem lett mentve.",
+        "marketNameTaken": "A hullám két piaca ugyanazt a nevet viseli.",
+        "marketCodeTaken": "A hullám két piacának ugyanaz a rövid kódja.",
+        "marketUnknown": "Az egyik piac már nem tartozik ehhez a hullámhoz. Töltsd újra a piacokat.",
+        "marketConflict": "A piacok megváltoztak mentés közben. Töltsd újra a piacokat, és próbáld újra.",
+        "countryInTwoMarkets": "{country} a(z) {first} és a(z) {second} piacon is szerepel. Egy ország csak egy piachoz tartozhat."
       },
       "dialog": {
         "createTitle": "Új hullám",
@@ -1652,6 +1657,28 @@
           "streamDefaultsExist": "Ennek a folyamnak minden alapértelmezett lépése már a hullámban van, egy másik folyamatban. Mozgasd vissza őket, vagy adj hozzá egy lépést.",
           "brandArchived": "Ez a márka archivált. Állítsd vissza, hogy módosíthasd a hullámait."
         }
+      },
+      "markets": {
+        "name": "Piac neve",
+        "code": "Rövid kód",
+        "codeHint": "A perszónakódok előtagja, például {example}. A meglévő perszónakódok nem változnak, ha szerkeszted.",
+        "addCountry": "Ország hozzáadása",
+        "searchCountry": "Országok keresése",
+        "removeCountry": "{country} eltávolítása innen: {market}",
+        "removeMarket": "A(z) {market} piac eltávolítása",
+        "countryTaken": "Itt: {market}",
+        "countryLimit": "Egy piacnak legfeljebb {max} országa lehet.",
+        "marketLimit": "Egy hullámnak legfeljebb {max} piaca lehet.",
+        "nameRequired": "Adj nevet a piacnak.",
+        "nameTooLong": "A piac neve legfeljebb {max} karakter lehet.",
+        "nameTaken": "Egy másik piac már ezt a nevet viseli.",
+        "codeInvalid": "2–6 nagybetűt vagy számjegyet használj.",
+        "codeTaken": "Egy másik piac már ezt a kódot használja.",
+        "countriesRequired": "Adj hozzá legalább egy országot.",
+        "problems": "Javítsd a fent megjelölt piaci adatokat.",
+        "countriesOf": "Országok itt: {market}",
+        "countriesOfWave": "A hullám minden piacának országai",
+        "reload": "Piacok újratöltése"
       }
     },
     "brandFiles": {

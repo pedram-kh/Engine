@@ -57,12 +57,14 @@ export interface StrategyLimits {
 }
 
 export interface StrategyMarketCount {
-  /** The market's short code in the screens (the ULID on the wire, bridged in the strategy API module). */
+  /** PL-2.4: the market's ULID. It is the market's identity everywhere: the address, request bodies and the lists. */
   market: string
-  /** PL-2.4: the market's name, short code and countries, as the summary lists them. */
-  name?: string
-  code?: string
-  countries?: string[]
+  /** The market's name (free text typed by the agency; always shown as plain text). */
+  name: string
+  /** The short code: the prefix of its persona codes, never its identity. */
+  code: string
+  /** ISO 3166-1 alpha-2 codes, sorted. */
+  countries: string[]
   persona_count: number
 }
 
@@ -244,7 +246,13 @@ export interface UspInUseMeta {
 /** What a 422 `wave.market_has_personas` carries, read through {@link marketHasPersonasMeta}. */
 export interface MarketHasPersonasMeta {
   /** `concept_count` (PL-2.3) is present only for a market that has concepts. */
-  markets: (StrategyMarketCount & { concept_count?: number })[]
+  markets: {
+    market: string
+    name: string
+    code: string
+    persona_count: number
+    concept_count?: number
+  }[]
 }
 
 /** What a 422 `persona.in_use_by_concepts` carries, read through {@link personaInUseByConceptsMeta}. */

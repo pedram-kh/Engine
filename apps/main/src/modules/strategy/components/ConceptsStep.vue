@@ -19,10 +19,12 @@ import type {
   WavePersonaResource,
   WaveUspResource,
 } from '@catalyst/api-client'
-import { labelForCountryCode } from '@catalyst/api-client'
 import { CEmptyState } from '@catalyst/ui'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import { provideMarkets } from '../useMarkets'
+import MarketTabs from './MarketTabs.vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { strategyApi } from '../api/strategy.api'
@@ -37,9 +39,11 @@ import StrategyConfirmDialog from './StrategyConfirmDialog.vue'
 
 const props = defineProps<{
   summary: StrategySummaryResource
-  markets: string[]
   brandName: string
 }>()
+
+/** PL-2.4: the wave's markets by ULID, name and countries; the dialogs below read the same directory. */
+const dir = provideMarkets(() => props.summary)
 const emit = defineEmits<{ changed: [] }>()
 
 const { t } = useI18n()
@@ -62,9 +66,9 @@ let ticket = 0
 const market = computed(() => {
   const q = route.query.market
   const wanted = typeof q === 'string' ? q : null
-  return wanted !== null && props.markets.includes(wanted) ? wanted : (props.markets[0] ?? '')
+  return wanted !== null && dir.ids.value.includes(wanted) ? wanted : (dir.ids.value[0] ?? '')
 })
-const marketName = computed(() => (market.value === '' ? '' : labelForCountryCode(market.value)))
+const marketName = computed(() => dir.name(market.value))
 const marketPersonas = computed(() =>
   personas.value.filter((p) => p.attributes.market === market.value),
 )
@@ -273,35 +277,13 @@ const deleteBody = computed(() => {
 
 <template>
   <section class="concepts-step" data-test="concepts-step">
-    <div class="market-bar">
-      <span class="market-bar__label" aria-hidden="true">{{
-        t('app.strategy.persona.marketLabel')
-      }}</span>
-      <div
-        role="tablist"
-        class="market-tabs"
-        :aria-label="t('app.strategy.persona.markets')"
-        data-test="market-tabs"
-      >
-        <button
-          v-for="code in markets"
-          :key="code"
-          type="button"
-          role="tab"
-          class="market-tab"
-          :class="{ 'market-tab--active': code === market }"
-          :aria-selected="code === market"
-          :data-test="`market-tab-${code}`"
-          @click="selectMarket(code)"
-        >
-          <span class="market-tab__code">{{ code }}</span>
-          <span class="market-tab__name">{{ labelForCountryCode(code) }}</span>
-          <span class="market-tab__count" :data-test="`market-count-${code}`">{{
-            tabCount(code)
-          }}</span>
-        </button>
-      </div>
-    </div>
+    <MarketTabs :markets="dir.list.value" :active="market" @select="selectMarket">
+      <template #extra="{ market: m }">
+        <span class="market-tab__count" :data-test="`market-count-${m.code}`">{{
+          tabCount(m.id)
+        }}</span>
+      </template>
+    </MarketTabs>
 
     <div class="step-head">
       <div>
@@ -564,61 +546,6 @@ const deleteBody = computed(() => {
   display: flex;
   flex-direction: column;
   gap: 20px;
-}
-.market-bar {
-  display: flex;
-  align-items: flex-end;
-  gap: 4px 14px;
-  border-bottom: 1px solid rgb(var(--v-theme-border-color));
-}
-.market-bar__label {
-  padding-bottom: 12px;
-  font-size: 11px;
-  font-weight: 600;
-  line-height: normal;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  color: rgb(var(--v-theme-text-tertiary));
-}
-.market-tabs {
-  display: flex;
-  gap: 4px;
-  overflow-x: auto;
-  min-width: 0;
-}
-.market-tab {
-  position: relative;
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px 12px;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  background: transparent;
-  color: rgb(var(--v-theme-on-surface-variant));
-  font: inherit;
-  font-size: 14px;
-  line-height: normal;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.market-tab--active {
-  border-bottom-color: rgb(var(--v-theme-primary));
-  color: rgb(var(--v-theme-on-surface));
-  font-weight: 600;
-}
-.market-tab__code {
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 700;
-  background: rgb(var(--v-theme-surface-bright));
-  color: rgb(var(--v-theme-on-surface-variant));
-}
-.market-tab--active .market-tab__code {
-  background: rgb(var(--v-theme-primary));
-  color: rgb(var(--v-theme-on-primary));
 }
 .market-tab__count {
   font-size: 12px;

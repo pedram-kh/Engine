@@ -1484,7 +1484,12 @@
         "waveNotAvailable": "Esa oleada no se puede vincular a esta campaña.",
         "marketHasPersonas": "Quita primero las personas de estos mercados: {markets}.",
         "marketHasConcepts": "Hay conceptos en: {markets}.",
-        "marketsChanged": "Los mercados de esta oleada han cambiado desde que la abriste. Cierra la ventana, vuelve a abrir la oleada e inténtalo de nuevo."
+        "marketsChanged": "Otra persona ha cambiado los mercados de esta oleada desde que abriste esta ventana. No se guardó nada.",
+        "marketNameTaken": "Dos mercados de esta oleada tienen el mismo nombre.",
+        "marketCodeTaken": "Dos mercados de esta oleada tienen el mismo código corto.",
+        "marketUnknown": "Uno de los mercados ya no forma parte de esta oleada. Recarga los mercados.",
+        "marketConflict": "Los mercados cambiaron mientras guardabas. Recarga los mercados e inténtalo de nuevo.",
+        "countryInTwoMarkets": "{country} está en {first} y en {second}. Un país solo puede pertenecer a un mercado."
       },
       "dialog": {
         "createTitle": "Nueva oleada",
@@ -1652,6 +1657,28 @@
           "streamDefaultsExist": "Todos los pasos predeterminados de este flujo ya están en la oleada, en otro flujo. Devuélvelos o añade un paso.",
           "brandArchived": "Esta marca está archivada. Restáurala para cambiar sus oleadas."
         }
+      },
+      "markets": {
+        "name": "Nombre del mercado",
+        "code": "Código corto",
+        "codeHint": "Prefijo de los códigos de sus personas, por ejemplo {example}. Los códigos de personas existentes no cambian al editarlo.",
+        "addCountry": "Añadir país",
+        "searchCountry": "Buscar países",
+        "removeCountry": "Quitar {country} de {market}",
+        "removeMarket": "Eliminar el mercado {market}",
+        "countryTaken": "En {market}",
+        "countryLimit": "Un mercado tiene como máximo {max} países.",
+        "marketLimit": "Una oleada tiene como máximo {max} mercados.",
+        "nameRequired": "Dale un nombre al mercado.",
+        "nameTooLong": "El nombre de un mercado tiene como máximo {max} caracteres.",
+        "nameTaken": "Otro mercado ya tiene este nombre.",
+        "codeInvalid": "Usa de 2 a 6 mayúsculas o dígitos.",
+        "codeTaken": "Otro mercado ya tiene este código.",
+        "countriesRequired": "Añade al menos un país.",
+        "problems": "Corrige los datos del mercado marcados arriba.",
+        "countriesOf": "Países de {market}",
+        "countriesOfWave": "Países de cada mercado de esta oleada",
+        "reload": "Recargar los mercados"
       }
     },
     "brandFiles": {

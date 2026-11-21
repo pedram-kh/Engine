@@ -47,8 +47,6 @@ const step = computed<StepKey>(() =>
         ? 'concepts'
         : 'usps',
 )
-const markets = computed(() => summary.value?.attributes.markets.map((m) => m.market) ?? [])
-
 async function load(): Promise<void> {
   const s = scope.value
   if (s === null) return
@@ -140,24 +138,16 @@ onMounted(async () => {
         v-else-if="step === 'matrix'"
         :key="'matrix'"
         :summary="summary"
-        :markets="markets"
         @changed="refreshSummary"
       />
       <ConceptsStep
         v-else-if="step === 'concepts'"
         :key="'concepts'"
         :summary="summary"
-        :markets="markets"
         :brand-name="wave.relationships.brand.data.attributes.name"
         @changed="refreshSummary"
       />
-      <PersonasStep
-        v-else
-        :key="'personas'"
-        :summary="summary"
-        :markets="markets"
-        @changed="refreshSummary"
-      />
+      <PersonasStep v-else :key="'personas'" :summary="summary" @changed="refreshSummary" />
     </template>
   </div>
 </template>

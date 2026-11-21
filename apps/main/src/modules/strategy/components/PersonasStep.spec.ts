@@ -35,6 +35,7 @@ import {
   overlay,
   overlayText,
   WAVE_ULID,
+  mkt,
 } from '../strategyTestKit'
 import PersonasStep from './PersonasStep.vue'
 
@@ -57,8 +58,7 @@ async function mountStep(
   const w = await mountStrategy(
     PersonasStep,
     {
-      summary: makeSummary({ markets: markets.map((m) => ({ market: m, persona_count: 0 })) }),
-      markets,
+      summary: makeSummary({ markets: markets.map((m) => mkt(m, 0)) }),
     },
     { route },
   )

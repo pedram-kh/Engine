@@ -14,6 +14,7 @@ import { useI18n } from 'vue-i18n'
 import draggable from 'vuedraggable'
 
 import { strategyApi } from '../api/strategy.api'
+import { provideMarkets } from '../useMarkets'
 import { useStrategyContext } from '../composables/useStrategyContext'
 import { strategyErrorMessage } from '../strategyErrors'
 import AudienceTitleDialog from './AudienceTitleDialog.vue'
@@ -22,6 +23,9 @@ import UspDeleteDialog from './UspDeleteDialog.vue'
 import UspDialog from './UspDialog.vue'
 
 const props = defineProps<{ summary: StrategySummaryResource }>()
+
+/** PL-2.4: the delete dialog prints each affected market by name and reads the concepts of every market. */
+provideMarkets(() => props.summary)
 const emit = defineEmits<{
   summary: [summary: StrategySummaryResource]
   changed: []
@@ -268,7 +272,6 @@ function move(usp: WaveUspResource, by: -1 | 1): void {
       v-model="deleteDialog"
       :scope="scope"
       :usp="deleting"
-      :markets="summary.attributes.markets.map((m) => m.market)"
       :can-delete-in-use="canDeleteInUse"
       @deleted="onDeleted"
       @stale="load"

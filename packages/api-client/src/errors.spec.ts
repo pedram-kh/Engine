@@ -4,6 +4,7 @@ import {
   ApiError,
   copyExceedsCapMeta,
   extractFieldErrors,
+  countryInTwoMarketsMeta,
   marketHasPersonasMeta,
   uspInUseMeta,
 } from './errors'
@@ -254,41 +255,45 @@ describe('PL-2.1 typed meta readers', () => {
       details: [{ code, meta: meta as Record<string, unknown> }],
     })
 
-  it('marketHasPersonasMeta reads error.details[0].meta.markets', () => {
-    expect(
-      marketHasPersonasMeta(
-        err('wave.market_has_personas', {
-          markets: [
-            { market: 'SK', persona_count: 2 },
-            { market: 'RO', persona_count: 1 },
-          ],
-        }),
-      ),
-    ).toEqual({
-      markets: [
-        { market: 'SK', persona_count: 2 },
-        { market: 'RO', persona_count: 1 },
-      ],
+  it('marketHasPersonasMeta reads error.details[0].meta.markets (ulid, name, code, counts)', () => {
+    const sk = { market: '01JSK', name: 'Slovakia', code: 'SK', persona_count: 2 }
+    const uki = {
+      market: '01JUKI',
+      name: 'UK & Ireland',
+      code: 'UKI',
+      persona_count: 1,
+      concept_count: 3,
+    }
+    expect(marketHasPersonasMeta(err('wave.market_has_personas', { markets: [sk, uki] }))).toEqual({
+      markets: [sk, uki],
     })
   })
 
   it('marketHasPersonasMeta drops malformed entries and is null for another code, a non-array or a non-error', () => {
+    const ok = { market: '01JRO', name: 'Romania', code: 'RO', persona_count: 1 }
     expect(
       marketHasPersonasMeta(
         err('wave.market_has_personas', {
-          markets: [
-            { market: 'SK', persona_count: 'two' },
-            null,
-            { market: 'RO', persona_count: 1 },
-          ],
+          markets: [{ ...ok, persona_count: 'two' }, null, { market: 'x', persona_count: 1 }, ok],
         }),
       ),
-    ).toEqual({ markets: [{ market: 'RO', persona_count: 1 }] })
+    ).toEqual({ markets: [ok] })
     expect(marketHasPersonasMeta(err('wave.market_has_personas', { markets: 'x' }))).toBeNull()
     expect(marketHasPersonasMeta(err('wave.market_has_personas', { markets: [null] }))).toBeNull()
     expect(marketHasPersonasMeta(err('other.code', { markets: [] }))).toBeNull()
     expect(marketHasPersonasMeta(new Error('boom'))).toBeNull()
     expect(marketHasPersonasMeta(null)).toBeNull()
+  })
+
+  it('countryInTwoMarketsMeta reads the country and the two market names, and nothing else', () => {
+    expect(
+      countryInTwoMarketsMeta(
+        err('wave.country_in_two_markets', { country: 'IE', markets: ['UK & Ireland', 'Ireland'] }),
+      ),
+    ).toEqual({ country: 'IE', markets: ['UK & Ireland', 'Ireland'] })
+    expect(countryInTwoMarketsMeta(err('wave.country_in_two_markets', { country: 1 }))).toBeNull()
+    expect(countryInTwoMarketsMeta(err('other', { country: 'IE', markets: [] }))).toBeNull()
+    expect(countryInTwoMarketsMeta(null)).toBeNull()
   })
 
   it('uspInUseMeta reads the count, the kind and level of each item, and ignores malformed rows', () => {

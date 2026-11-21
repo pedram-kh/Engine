@@ -14,7 +14,7 @@ import type {
   WavePersonaPayload,
   WavePersonaResource,
 } from '@catalyst/api-client'
-import { ApiError, labelForCountryCode } from '@catalyst/api-client'
+import { ApiError } from '@catalyst/api-client'
 import { computed, ref, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
@@ -23,6 +23,7 @@ import { strategyApi, type WaveScope } from '../api/strategy.api'
 import { MENU_PROPS } from '../constants'
 import { fieldErrorsOf, formErrorFor, isGone, strategyErrorMessage } from '../strategyErrors'
 import { revealFirstError } from '../revealError'
+import { useMarkets } from '../useMarkets'
 import ListField from './ListField.vue'
 
 const props = defineProps<{
@@ -148,7 +149,8 @@ const listsTooLong = computed(() =>
   ),
 )
 
-const marketLabel = computed(() => labelForCountryCode(openedMarket.value))
+const markets = useMarkets()
+const marketLabel = computed(() => markets.name(openedMarket.value))
 
 function close(): void {
   if (saving.value) return

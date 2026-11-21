@@ -93,6 +93,31 @@ const KEYS = [
   'app.waves.dialog.newCampaignHint',
   'app.waves.dialog.newCampaignName',
   'app.waves.errors.waveNotAvailable',
+  'app.waves.markets.name',
+  'app.waves.markets.code',
+  'app.waves.markets.codeHint',
+  'app.waves.markets.addCountry',
+  'app.waves.markets.searchCountry',
+  'app.waves.markets.removeCountry',
+  'app.waves.markets.removeMarket',
+  'app.waves.markets.countryTaken',
+  'app.waves.markets.countryLimit',
+  'app.waves.markets.marketLimit',
+  'app.waves.markets.nameRequired',
+  'app.waves.markets.nameTooLong',
+  'app.waves.markets.nameTaken',
+  'app.waves.markets.codeInvalid',
+  'app.waves.markets.codeTaken',
+  'app.waves.markets.countriesRequired',
+  'app.waves.markets.problems',
+  'app.waves.markets.countriesOf',
+  'app.waves.markets.countriesOfWave',
+  'app.waves.markets.reload',
+  'app.waves.errors.marketNameTaken',
+  'app.waves.errors.marketCodeTaken',
+  'app.waves.errors.marketUnknown',
+  'app.waves.errors.marketConflict',
+  'app.waves.errors.countryInTwoMarkets',
   'app.waves.validation.newCampaignNameRequired',
   'app.brandFiles.title',
   'app.brandFiles.subtitle',
@@ -298,8 +323,8 @@ function tokens(value: string): string[] {
 }
 
 describe('PL-1.1 wave and client-file i18n keys', () => {
-  it('checks 187 keys across 24 locales', () => {
-    expect(KEYS).toHaveLength(187)
+  it('checks 212 keys across 24 locales', () => {
+    expect(KEYS).toHaveLength(212)
     expect(UI_LOCALES).toHaveLength(24)
   })
 

@@ -38,21 +38,31 @@ async function setInput(selector: string, value: string): Promise<void> {
   await flushPromises()
 }
 
-async function pickMarket(
+/** Pick a country for the market in card `index` (the create dialog opens with one empty card). */
+async function pickCountry(
   w: Awaited<ReturnType<typeof mountWithApp>>,
+  index: number,
   code: string,
 ): Promise<void> {
-  await (body('[data-test="market-add"]') as HTMLElement).click()
+  const card = body(`[data-test="market-card-${index}"]`) as HTMLElement
+  ;(card.querySelector('[data-test="market-add-country"]') as HTMLElement).click()
   await flushPromises()
-  ;(body(`[data-test="market-option-${code}"]`) as HTMLElement).click()
+  // A menu that was closed stays in the DOM, hidden: the one just opened is the last.
+  const options = document.body.querySelectorAll(`[data-test="market-option-${code}"]`)
+  ;(options[options.length - 1] as HTMLElement).click()
   await flushPromises()
   void w
+}
+
+async function addMarketCard(): Promise<void> {
+  ;(body('[data-test="market-add"]') as HTMLElement).click()
+  await flushPromises()
 }
 
 async function fillValid(w: Awaited<ReturnType<typeof mountWithApp>>): Promise<void> {
   await setInput('[data-test="wave-name"]', '  Spring push  ')
   await setInput('[data-test="wave-go-live"]', '2026-11-07')
-  await pickMarket(w, 'ES')
+  await pickCountry(w, 0, 'ES')
 }
 
 async function chooseCampaign(choice: 'none' | 'existing' | 'new'): Promise<void> {
@@ -97,7 +107,10 @@ describe('NewWaveDialog (PL-1.1 W3)', () => {
     expect(wavesApi.create).not.toHaveBeenCalled()
     expect(document.body.textContent).toContain('Enter a wave name.')
     expect(document.body.textContent).toContain('Choose a go-live date.')
-    expect(document.body.textContent).toContain('Add at least one market.')
+    // The create dialog opens with one empty market: it needs a name and a country.
+    expect(document.body.textContent).toContain('Give the market a name.')
+    expect(document.body.textContent).toContain('Add at least one country.')
+    expect(document.body.textContent).toContain('Fix the market details marked above.')
     w.unmount()
   })
 
@@ -265,8 +278,8 @@ describe('NewWaveDialog (PL-1.1 W3)', () => {
             code: 'wave.market_has_personas',
             meta: {
               markets: [
-                { market: 'SK', persona_count: 2 },
-                { market: 'RO', persona_count: 1 },
+                { market: '01JSK', name: 'Slovakia', code: 'SK', persona_count: 2 },
+                { market: '01JRO', name: 'Romania', code: 'RO', persona_count: 1 },
               ],
             },
           },
@@ -278,7 +291,7 @@ describe('NewWaveDialog (PL-1.1 W3)', () => {
     await setInput('[data-test="wave-name"]', 'Renamed')
     await submit()
     expect(body('[data-test="wave-form-error"]')?.textContent).toContain(
-      'Remove the personas of these markets first: SK (2), RO (1).',
+      'Remove the personas of these markets first: Slovakia (2), Romania (1).',
     )
     w.unmount()
   })
@@ -288,7 +301,8 @@ describe('NewWaveDialog (PL-1.1 W3)', () => {
     vi.mocked(wavesApi.update).mockResolvedValue({ data: makeWave() })
     const wave = makeWave()
     const w = await mountWithApp(NewWaveDialog, props(wave))
-    await pickMarket(w, 'FR')
+    await addMarketCard()
+    await pickCountry(w, 2, 'FR')
     await submit()
     expect(wavesApi.update).toHaveBeenCalledWith(AGENCY_ULID, BRAND_ULID, wave.id, {
       markets: [...wave.attributes.markets, { name: 'France', code: 'FR', countries: ['FR'] }],
@@ -339,7 +353,7 @@ describe('NewWaveDialog (PL-1.1 W3)', () => {
     w.unmount()
   })
 
-  it('PL-2.4: 409 wave.markets_changed says the markets changed and to reopen the wave', async () => {
+  it('PL-2.4 (G5): 409 wave.markets_changed says so, offers a reload, and the reload brings in the current markets', async () => {
     vi.mocked(wavesApi.update).mockRejectedValue(
       new ApiError({
         status: 409,
@@ -349,12 +363,39 @@ describe('NewWaveDialog (PL-1.1 W3)', () => {
         raw: null,
       } as never),
     )
+    const fresh = makeWave({
+      markets: [
+        { id: '01JWMARKETNEW000000000000N', name: 'Nordics', code: 'NOR', countries: ['SE', 'NO'] },
+      ],
+      markets_version: 'v2',
+    })
+    vi.mocked(wavesApi.show).mockResolvedValue({ data: fresh })
     const w = await mountWithApp(NewWaveDialog, props(makeWave()))
-    await pickMarket(w, 'FR')
+    await addMarketCard()
+    await pickCountry(w, 2, 'FR')
     await submit()
     expect(body('[data-test="wave-form-error"]')?.textContent).toContain(
-      'The markets of this wave changed since you opened it.',
+      'changed by someone else since you opened this window',
     )
+    ;(body('[data-test="wave-markets-reload"]') as HTMLElement).click()
+    await flushPromises()
+    expect(wavesApi.show).toHaveBeenCalledWith(AGENCY_ULID, BRAND_ULID, makeWave().id)
+    expect(w.emitted('refreshed')?.[0]).toEqual([fresh])
+    expect(body('[data-test="wave-form-error"]')).toBeNull()
+    expect(body('[data-test="market-card-1"]')).toBeNull()
+    expect(
+      (
+        body(
+          '[data-test="market-card-0"] [data-test="market-name-input"] input',
+        ) as HTMLInputElement
+      ).value,
+    ).toBe('Nordics')
+    // The next save carries the fresh version.
+    vi.mocked(wavesApi.update).mockReset()
+    vi.mocked(wavesApi.update).mockResolvedValue({ data: fresh })
+    await pickCountry(w, 0, 'DK')
+    await submit()
+    expect(vi.mocked(wavesApi.update).mock.calls[0]?.[3]).toMatchObject({ markets_version: 'v2' })
     w.unmount()
   })
 
@@ -369,8 +410,20 @@ describe('NewWaveDialog (PL-1.1 W3)', () => {
             code: 'wave.market_has_personas',
             meta: {
               markets: [
-                { market: 'SK', persona_count: 2, concept_count: 3 },
-                { market: 'RO', persona_count: 1, concept_count: 0 },
+                {
+                  market: '01JSK',
+                  name: 'Slovakia',
+                  code: 'SK',
+                  persona_count: 2,
+                  concept_count: 3,
+                },
+                {
+                  market: '01JRO',
+                  name: 'Romania',
+                  code: 'RO',
+                  persona_count: 1,
+                  concept_count: 0,
+                },
               ],
             },
           },
@@ -382,9 +435,9 @@ describe('NewWaveDialog (PL-1.1 W3)', () => {
     await setInput('[data-test="wave-name"]', 'Renamed')
     await submit()
     const text = body('[data-test="wave-form-error"]')?.textContent ?? ''
-    expect(text).toContain('SK (2), RO (1).')
-    expect(text).toContain('Concepts exist in: SK (3).')
-    expect(text).not.toContain('RO (0)')
+    expect(text).toContain('Slovakia (2), Romania (1).')
+    expect(text).toContain('Concepts exist in: Slovakia (3).')
+    expect(text).not.toContain('Romania (0)')
     w.unmount()
   })
 
@@ -403,6 +456,124 @@ describe('NewWaveDialog (PL-1.1 W3)', () => {
     await submit()
     expect(body('[data-test="wave-form-error"]')).not.toBeNull()
     expect(body('[data-test="wave-form-error"]')?.textContent).not.toContain('undefined')
+    w.unmount()
+  })
+
+  // ── PL-2.4 Stage 2: the market builder ────────────────────────────────────────────────────────────────
+  it('a single-country market is named for its country and takes the country code; a second country keeps the name', async () => {
+    const w = await mountWithApp(NewWaveDialog, props())
+    await pickCountry(w, 0, 'IE')
+    const name = () => (body('[data-test="market-name-input"] input') as HTMLInputElement).value
+    const code = () => (body('[data-test="market-code-input"] input') as HTMLInputElement).value
+    expect(name()).toBe('Ireland')
+    expect(code()).toBe('IE')
+    await pickCountry(w, 0, 'GB')
+    expect(name()).toBe('Ireland')
+    await setInput('[data-test="market-name-input"]', 'UK & Ireland')
+    expect(code()).toBe('UKI')
+    await setInput('[data-test="market-code-input"]', 'ukie')
+    expect(code()).toBe('UKIE')
+    await setInput('[data-test="market-name-input"]', 'UK and Ireland')
+    expect(code()).toBe('UKIE')
+    w.unmount()
+  })
+
+  it('a country already in another market is unavailable and says which market has it', async () => {
+    const w = await mountWithApp(NewWaveDialog, props())
+    await pickCountry(w, 0, 'IE')
+    await addMarketCard()
+    const card = body('[data-test="market-card-1"]') as HTMLElement
+    ;(card.querySelector('[data-test="market-add-country"]') as HTMLElement).click()
+    await flushPromises()
+    const options = document.body.querySelectorAll('[data-test="market-option-IE"]')
+    const option = options[options.length - 1] as HTMLElement
+    expect(option.classList.contains('v-list-item--disabled')).toBe(true)
+    expect(option.textContent).toContain('In Ireland')
+    option.click()
+    await flushPromises()
+    expect(card.querySelector('[data-test="market-chip-IE"]')).toBeNull()
+    w.unmount()
+  })
+
+  it('rename, add and remove countries, remove a market; an existing market keeps its id and code', async () => {
+    vi.mocked(wavesApi.update).mockResolvedValue({ data: makeWave() })
+    const wave = makeWave()
+    const w = await mountWithApp(NewWaveDialog, props(wave))
+    await setInput('[data-test="market-card-0"] [data-test="market-name-input"]', 'Iberia')
+    ;(
+      (body('[data-test="market-card-1"]') as HTMLElement).querySelector(
+        '[data-test="market-remove"]',
+      ) as HTMLElement
+    ).click()
+    await flushPromises()
+    await pickCountry(w, 0, 'AD')
+    ;(body('[data-test="market-chip-ES"] .v-chip__close') as HTMLElement).click()
+    await flushPromises()
+    await submit()
+    expect(wavesApi.update).toHaveBeenCalledWith(AGENCY_ULID, BRAND_ULID, wave.id, {
+      markets: [
+        { id: wave.attributes.markets[0]?.id, name: 'Iberia', code: 'ES', countries: ['AD'] },
+      ],
+      markets_version: wave.attributes.markets_version,
+    })
+    w.unmount()
+  })
+
+  it('names, short codes and limits are checked before anything is sent', async () => {
+    const w = await mountWithApp(NewWaveDialog, props())
+    await setInput('[data-test="wave-name"]', 'Spring')
+    await setInput('[data-test="wave-go-live"]', '2026-11-07')
+    await pickCountry(w, 0, 'ES')
+    await addMarketCard()
+    await pickCountry(w, 1, 'PT')
+    await setInput('[data-test="market-card-1"] [data-test="market-name-input"]', 'spain')
+    await setInput('[data-test="market-card-1"] [data-test="market-code-input"]', 'ES')
+    await submit()
+    expect(wavesApi.create).not.toHaveBeenCalled()
+    expect(document.body.textContent).toContain('Another market already has this name.')
+    expect(document.body.textContent).toContain('Another market already has this code.')
+    w.unmount()
+  })
+
+  it('stops at 20 markets', async () => {
+    const w = await mountWithApp(NewWaveDialog, props())
+    for (let i = 0; i < 25; i++) await addMarketCard()
+    expect(document.body.querySelectorAll('[data-test^="market-card-"]').length).toBe(20)
+    expect(body('[data-test="market-limit"]')?.textContent).toContain('20')
+    w.unmount()
+  })
+
+  it('a hostile market name is shown as text, never as markup', async () => {
+    const hostile = '<img src=x onerror=alert(1)><b>x</b>'
+    const w = await mountWithApp(NewWaveDialog, props())
+    await pickCountry(w, 0, 'ES')
+    await setInput('[data-test="market-name-input"]', hostile)
+    expect(document.body.querySelector('img[src="x"]')).toBeNull()
+    expect((body('[data-test="market-name-input"] input') as HTMLInputElement).value).toBe(hostile)
+    w.unmount()
+  })
+
+  it('wave.country_in_two_markets and the other market refusals read in words, with the market names', async () => {
+    vi.mocked(wavesApi.update).mockRejectedValue(
+      new ApiError({
+        status: 422,
+        code: 'wave.country_in_two_markets',
+        message: 'x',
+        details: [
+          {
+            code: 'wave.country_in_two_markets',
+            meta: { country: 'IE', markets: ['UK & Ireland', 'Ireland'] },
+          },
+        ],
+        raw: null,
+      } as never),
+    )
+    const w = await mountWithApp(NewWaveDialog, props(makeWave()))
+    await setInput('[data-test="wave-name"]', 'Renamed')
+    await submit()
+    const text = body('[data-test="wave-form-error"]')?.textContent ?? ''
+    expect(text).toContain('Ireland')
+    expect(text).toContain('UK & Ireland')
     w.unmount()
   })
 })

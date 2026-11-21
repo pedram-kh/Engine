@@ -267,16 +267,20 @@ export function marketHasPersonasMeta(error: unknown): MarketHasPersonasMeta | n
   }
   const markets = raw.flatMap((entry: unknown) => {
     if (!isObjectRecord(entry)) return []
-    // PL-2.4: the entry names the market by ulid, name and short code; the screens use the short code.
-    const market = typeof entry['code'] === 'string' ? entry['code'] : entry['market']
-    const marketName = typeof entry['name'] === 'string' ? entry['name'] : undefined
+    const market = entry['market']
+    const marketName = entry['name']
+    const marketCode = entry['code']
     const count = entry['persona_count']
     const concepts = entry['concept_count']
-    return typeof market === 'string' && typeof count === 'number'
+    return typeof market === 'string' &&
+      typeof marketName === 'string' &&
+      typeof marketCode === 'string' &&
+      typeof count === 'number'
       ? [
           {
             market,
-            ...(marketName === undefined ? {} : { name: marketName }),
+            name: marketName,
+            code: marketCode,
             persona_count: count,
             ...(typeof concepts === 'number' ? { concept_count: concepts } : {}),
           },
@@ -401,4 +405,21 @@ function toDetail(entry: Record<string, unknown>): ApiErrorDetail {
 
 type Mutable<T> = {
   -readonly [K in keyof T]: T[K]
+}
+
+/**
+ * PL-2.4 — the typed `meta` of a 422 `wave.country_in_two_markets`: the country and the NAMES of the two markets that
+ * both listed it, or `null` for any other error. Never throws.
+ */
+export function countryInTwoMarketsMeta(
+  error: unknown,
+): { country: string; markets: string[] } | null {
+  if (!(error instanceof ApiError) || error.code !== 'wave.country_in_two_markets') {
+    return null
+  }
+  const meta = error.details[0]?.meta
+  const country = meta?.['country']
+  const markets = meta?.['markets']
+  if (typeof country !== 'string' || !Array.isArray(markets)) return null
+  return { country, markets: markets.filter((m): m is string => typeof m === 'string') }
 }

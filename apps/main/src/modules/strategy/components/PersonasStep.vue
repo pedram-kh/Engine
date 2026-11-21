@@ -13,11 +13,14 @@ import type {
   WavePersonaResource,
   WaveUspResource,
 } from '@catalyst/api-client'
-import { labelForCountryCode, personaInUseByConceptsMeta } from '@catalyst/api-client'
+import { personaInUseByConceptsMeta } from '@catalyst/api-client'
 import type { PersonaInUseByConceptsMeta } from '@catalyst/api-client'
 import { CEmptyState } from '@catalyst/ui'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import { provideMarkets } from '../useMarkets'
+import MarketTabs from './MarketTabs.vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { strategyApi } from '../api/strategy.api'
@@ -28,7 +31,10 @@ import PersonaCopyDialog from './PersonaCopyDialog.vue'
 import PersonaDialog from './PersonaDialog.vue'
 import StrategyConfirmDialog from './StrategyConfirmDialog.vue'
 
-const props = defineProps<{ summary: StrategySummaryResource; markets: string[] }>()
+const props = defineProps<{ summary: StrategySummaryResource }>()
+
+/** PL-2.4: the wave's markets by ULID, name and countries; the dialogs below read the same directory. */
+const dir = provideMarkets(() => props.summary)
 const emit = defineEmits<{ changed: [] }>()
 
 const { t } = useI18n()
@@ -45,9 +51,9 @@ const failed = ref(false)
 const market = computed(() => {
   const q = route.query.market
   const wanted = typeof q === 'string' ? q : null
-  return wanted !== null && props.markets.includes(wanted) ? wanted : (props.markets[0] ?? '')
+  return wanted !== null && dir.ids.value.includes(wanted) ? wanted : (dir.ids.value[0] ?? '')
 })
-const marketName = computed(() => (market.value === '' ? '' : labelForCountryCode(market.value)))
+const marketName = computed(() => dir.name(market.value))
 
 function inMarket(code: string): WavePersonaResource[] {
   return personas.value.filter((p) => p.attributes.market === code)
@@ -57,7 +63,7 @@ const count = computed(() => current.value.length)
 const atMax = computed(() => count.value >= limits.value.persona_max)
 const belowMin = computed(() => count.value < limits.value.persona_min)
 const canCopy = computed(
-  () => !atMax.value && props.markets.some((m) => m !== market.value && inMarket(m).length > 0),
+  () => !atMax.value && dir.ids.value.some((m) => m !== market.value && inMarket(m).length > 0),
 )
 
 async function load(): Promise<void> {
@@ -152,49 +158,24 @@ const deletingCells = computed(() =>
 
 <template>
   <section class="personas-step" data-test="personas-step">
-    <div class="market-bar">
-      <span class="market-bar__label" aria-hidden="true">{{
-        t('app.strategy.persona.marketLabel')
-      }}</span>
-      <div
-        role="tablist"
-        class="market-tabs"
-        :aria-label="t('app.strategy.persona.markets')"
-        data-test="market-tabs"
-      >
-        <button
-          v-for="code in markets"
-          :key="code"
-          type="button"
-          role="tab"
-          class="market-tab"
-          :class="{ 'market-tab--active': code === market }"
-          :aria-selected="code === market"
-          :data-test="`market-tab-${code}`"
-          @click="selectMarket(code)"
+    <MarketTabs :markets="dir.list.value" :active="market" @select="selectMarket">
+      <template #extra="{ market: m }">
+        <span class="market-tab__count" :data-test="`market-count-${m.code}`">{{
+          loading ? '' : inMarket(m.id).length
+        }}</span>
+        <span
+          v-if="!loading && inMarket(m.id).length < limits.persona_min"
+          class="market-tab__dot"
+          :data-test="`market-dot-${m.code}`"
+          role="img"
+          :aria-label="t('app.strategy.persona.fewerThanMin', { min: limits.persona_min })"
         >
-          <span class="market-tab__code">{{ code }}</span>
-          <span class="market-tab__name">{{ labelForCountryCode(code) }}</span>
-          <span class="market-tab__count" :data-test="`market-count-${code}`">{{
-            loading ? '' : inMarket(code).length
-          }}</span>
-          <v-tooltip
-            v-if="!loading && inMarket(code).length < limits.persona_min"
-            location="bottom"
-            activator="parent"
-          >
+          <v-tooltip location="bottom" activator="parent">
             {{ t('app.strategy.persona.fewerThanMin', { min: limits.persona_min }) }}
           </v-tooltip>
-          <span
-            v-if="!loading && inMarket(code).length < limits.persona_min"
-            class="market-tab__dot"
-            :data-test="`market-dot-${code}`"
-            role="img"
-            :aria-label="t('app.strategy.persona.fewerThanMin', { min: limits.persona_min })"
-          />
-        </button>
-      </div>
-    </div>
+        </span>
+      </template>
+    </MarketTabs>
 
     <div class="step-head">
       <div>
@@ -343,7 +324,6 @@ const deletingCells = computed(() =>
       :limits="limits"
       :target="market"
       :personas="personas"
-      :markets="markets"
       @copied="reload"
     />
     <StrategyConfirmDialog
@@ -428,61 +408,6 @@ const deletingCells = computed(() =>
   display: flex;
   flex-direction: column;
   gap: 20px;
-}
-.market-bar {
-  display: flex;
-  align-items: flex-end;
-  gap: 4px 14px;
-  border-bottom: 1px solid rgb(var(--v-theme-border-color));
-}
-.market-bar__label {
-  padding-bottom: 12px;
-  font-size: 11px;
-  font-weight: 600;
-  line-height: normal;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  color: rgb(var(--v-theme-text-tertiary));
-}
-.market-tabs {
-  display: flex;
-  gap: 4px;
-  overflow-x: auto;
-  min-width: 0;
-}
-.market-tab {
-  position: relative;
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px 12px;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  background: transparent;
-  color: rgb(var(--v-theme-on-surface-variant));
-  font: inherit;
-  font-size: 14px;
-  line-height: normal;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.market-tab--active {
-  border-bottom-color: rgb(var(--v-theme-primary));
-  color: rgb(var(--v-theme-on-surface));
-  font-weight: 600;
-}
-.market-tab__code {
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 700;
-  background: rgb(var(--v-theme-surface-bright));
-  color: rgb(var(--v-theme-on-surface-variant));
-}
-.market-tab--active .market-tab__code {
-  background: rgb(var(--v-theme-primary));
-  color: rgb(var(--v-theme-on-primary));
 }
 .market-tab__count {
   font-size: 12px;

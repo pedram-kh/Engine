@@ -27,6 +27,7 @@ import {
   makeWave,
   mountStrategy,
   WAVE_ULID,
+  mkt,
 } from '../strategyTestKit'
 import StrategyPage from './StrategyPage.vue'
 
@@ -36,10 +37,7 @@ function prime(): void {
     data: makeSummary({
       usp_count: 3,
       persona_count: 2,
-      markets: [
-        { market: 'SK', persona_count: 2 },
-        { market: 'RO', persona_count: 0 },
-      ],
+      markets: [mkt('SK', 2), mkt('RO', 0)],
     }),
   })
   vi.mocked(strategyApi.listUsps).mockResolvedValue({ data: makeUsps(3) })

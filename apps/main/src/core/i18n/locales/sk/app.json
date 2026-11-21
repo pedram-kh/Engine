@@ -1484,7 +1484,12 @@
         "waveNotAvailable": "Túto vlnu nemožno prepojiť s touto kampaňou.",
         "marketHasPersonas": "Najprv odstráňte persóny z týchto trhov: {markets}.",
         "marketHasConcepts": "Koncepty existujú na trhoch: {markets}.",
-        "marketsChanged": "Trhy tejto vlny sa zmenili od chvíle, keď ste ju otvorili. Zavrite okno, vlnu otvorte znova a skúste to znova."
+        "marketsChanged": "Trhy tejto vlny zmenil niekto iný od chvíle, keď ste okno otvorili. Nič sa neuložilo.",
+        "marketNameTaken": "Dva trhy tejto vlny majú rovnaký názov.",
+        "marketCodeTaken": "Dva trhy tejto vlny majú rovnaký krátky kód.",
+        "marketUnknown": "Jeden z trhov už k tejto vlne nepatrí. Znova načítajte trhy.",
+        "marketConflict": "Trhy sa počas ukladania zmenili. Znova načítajte trhy a skúste to znova.",
+        "countryInTwoMarkets": "{country} je v trhoch {first} aj {second}. Krajina môže patriť len k jednému trhu."
       },
       "dialog": {
         "createTitle": "Nová vlna",
@@ -1652,6 +1657,28 @@
           "streamDefaultsExist": "Všetky predvolené kroky tohto prúdu už sú vo vlne, v inom prúde. Presuňte ich späť alebo pridajte krok.",
           "brandArchived": "Táto značka je archivovaná. Obnovte ju, aby ste mohli meniť jej vlny."
         }
+      },
+      "markets": {
+        "name": "Názov trhu",
+        "code": "Krátky kód",
+        "codeHint": "Predpona kódov person, napríklad {example}. Existujúce kódy person sa po úprave nemenia.",
+        "addCountry": "Pridať krajinu",
+        "searchCountry": "Hľadať krajiny",
+        "removeCountry": "Odstrániť {country} z trhu {market}",
+        "removeMarket": "Odstrániť trh {market}",
+        "countryTaken": "V trhu {market}",
+        "countryLimit": "Trh má najviac {max} krajín.",
+        "marketLimit": "Vlna má najviac {max} trhov.",
+        "nameRequired": "Dajte trhu názov.",
+        "nameTooLong": "Názov trhu má najviac {max} znakov.",
+        "nameTaken": "Iný trh už má tento názov.",
+        "codeInvalid": "Použite 2 až 6 veľkých písmen alebo číslic.",
+        "codeTaken": "Iný trh už má tento kód.",
+        "countriesRequired": "Pridajte aspoň jednu krajinu.",
+        "problems": "Opravte údaje o trhoch označené vyššie.",
+        "countriesOf": "Krajiny v trhu {market}",
+        "countriesOfWave": "Krajiny v každom trhu tejto vlny",
+        "reload": "Znova načítať trhy"
       }
     },
     "brandFiles": {

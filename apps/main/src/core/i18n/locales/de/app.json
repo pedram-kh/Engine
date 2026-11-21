@@ -1484,7 +1484,12 @@
         "waveNotAvailable": "Diese Welle kann nicht mit dieser Kampagne verknüpft werden.",
         "marketHasPersonas": "Entferne zuerst die Personas dieser Märkte: {markets}.",
         "marketHasConcepts": "Konzepte gibt es in: {markets}.",
-        "marketsChanged": "Die Märkte dieser Welle wurden geändert, seit Sie sie geöffnet haben. Schließen Sie das Fenster, öffnen Sie die Welle erneut und versuchen Sie es noch einmal."
+        "marketsChanged": "Die Märkte dieser Welle wurden von jemand anderem geändert, seit Sie dieses Fenster geöffnet haben. Es wurde nichts gespeichert.",
+        "marketNameTaken": "Zwei Märkte dieser Welle haben denselben Namen.",
+        "marketCodeTaken": "Zwei Märkte dieser Welle haben denselben Kurzcode.",
+        "marketUnknown": "Einer der Märkte gehört nicht mehr zu dieser Welle. Lade die Märkte neu.",
+        "marketConflict": "Die Märkte haben sich beim Speichern geändert. Lade die Märkte neu und versuche es erneut.",
+        "countryInTwoMarkets": "{country} steht in {first} und in {second}. Ein Land kann nur zu einem Markt gehören."
       },
       "dialog": {
         "createTitle": "Neue Welle",
@@ -1652,6 +1657,28 @@
           "streamDefaultsExist": "Alle Standardschritte dieses Streams sind bereits in der Welle, in einem anderen Stream. Verschiebe sie zurück oder füge einen Schritt hinzu.",
           "brandArchived": "Diese Marke ist archiviert. Stelle sie wieder her, um ihre Wellen zu ändern."
         }
+      },
+      "markets": {
+        "name": "Marktname",
+        "code": "Kurzcode",
+        "codeHint": "Präfix der Persona-Codes, zum Beispiel {example}. Bestehende Persona-Codes ändern sich nicht, wenn du ihn bearbeitest.",
+        "addCountry": "Land hinzufügen",
+        "searchCountry": "Länder suchen",
+        "removeCountry": "{country} aus {market} entfernen",
+        "removeMarket": "Markt {market} entfernen",
+        "countryTaken": "Bereits in {market}",
+        "countryLimit": "Ein Markt hat höchstens {max} Länder.",
+        "marketLimit": "Eine Welle hat höchstens {max} Märkte.",
+        "nameRequired": "Gib dem Markt einen Namen.",
+        "nameTooLong": "Ein Marktname hat höchstens {max} Zeichen.",
+        "nameTaken": "Ein anderer Markt hat bereits diesen Namen.",
+        "codeInvalid": "Verwende 2 bis 6 Großbuchstaben oder Ziffern.",
+        "codeTaken": "Ein anderer Markt hat bereits diesen Code.",
+        "countriesRequired": "Füge mindestens ein Land hinzu.",
+        "problems": "Korrigiere die oben markierten Marktangaben.",
+        "countriesOf": "Länder in {market}",
+        "countriesOfWave": "Länder in jedem Markt dieser Welle",
+        "reload": "Märkte neu laden"
       }
     },
     "brandFiles": {

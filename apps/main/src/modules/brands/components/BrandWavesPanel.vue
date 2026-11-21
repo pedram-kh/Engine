@@ -14,6 +14,7 @@ import { useRouter } from 'vue-router'
 import AgencyStatusPill from '@/modules/agency/components/AgencyStatusPill.vue'
 import { wavesApi } from '@/modules/waves/api/waves.api'
 import NewWaveDialog from '@/modules/waves/components/NewWaveDialog.vue'
+import WaveMarketsInfo from '@/modules/waves/components/WaveMarketsInfo.vue'
 import WaveProgressSegments from '@/modules/waves/components/WaveProgressSegments.vue'
 
 const props = defineProps<{
@@ -50,7 +51,7 @@ async function load(): Promise<void> {
 }
 
 function marketsLabel(w: WaveResource): { shown: string[]; more: number } {
-  const all = w.attributes.markets.map((m) => m.code)
+  const all = w.attributes.markets.map((m) => m.name)
   return {
     shown: all.slice(0, MAX_VISIBLE_MARKETS),
     more: Math.max(0, all.length - MAX_VISIBLE_MARKETS),
@@ -131,10 +132,15 @@ defineExpose({ load })
               </div>
             </td>
             <td data-test="wave-row-markets">
-              {{ marketsLabel(w).shown.join(', ') }}
+              <span
+                class="wave-row-markets__names"
+                :title="w.attributes.markets.map((m) => m.name).join(', ')"
+                >{{ marketsLabel(w).shown.join(', ') }}</span
+              >
               <span v-if="marketsLabel(w).more > 0" class="text-medium-emphasis">
                 +{{ marketsLabel(w).more }}
               </span>
+              <WaveMarketsInfo :id="w.id" :markets="w.attributes.markets" />
             </td>
             <td><WaveProgressSegments :progress="w.attributes.progress" /></td>
             <td><AgencyStatusPill kind="wave" :status="w.attributes.status" /></td>
@@ -154,3 +160,14 @@ defineExpose({ load })
     />
   </section>
 </template>
+
+<style scoped>
+.wave-row-markets__names {
+  display: inline-block;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+</style>
