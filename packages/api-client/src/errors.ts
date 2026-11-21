@@ -34,6 +34,7 @@
 import type { DeletionPendingMeta } from './types/auth'
 import type {
   CopyExceedsCapMeta,
+  PersonaInUseByConceptsMeta,
   MarketHasPersonasMeta,
   UspInUseAffected,
   UspInUseMeta,
@@ -268,8 +269,13 @@ export function marketHasPersonasMeta(error: unknown): MarketHasPersonasMeta | n
     if (!isObjectRecord(entry)) return []
     const market = entry['market']
     const count = entry['persona_count']
+    const concepts = entry['concept_count']
     return typeof market === 'string' && typeof count === 'number'
-      ? [{ market, persona_count: count }]
+      ? [
+          typeof concepts === 'number'
+            ? { market, persona_count: count, concept_count: concepts }
+            : { market, persona_count: count },
+        ]
       : []
   })
   return markets.length === 0 ? null : { markets }
@@ -293,13 +299,40 @@ export function uspInUseMeta(error: unknown): UspInUseMeta | null {
     if (!isObjectRecord(entry)) return []
     const { persona, market, code, title, explanation, kind, level } = entry
     const lv = level === 'priority' || level === 'support' || level === 'low' ? level : null
-    return (kind === 'angle' || kind === 'cell') &&
+    return (kind === 'angle' || kind === 'cell' || kind === 'concept') &&
       typeof persona === 'string' &&
       typeof market === 'string' &&
       typeof code === 'string' &&
       typeof title === 'string' &&
       typeof explanation === 'string'
       ? [{ kind, level: lv, persona, market, code, title, explanation }]
+      : []
+  })
+  return { count, affected }
+}
+
+/**
+ * PL-2.3 — the typed `meta` of a 422 `persona.in_use_by_concepts` (a persona that concepts use cannot be deleted):
+ * the count and the concepts (number, title, status), or `null` for any other error. Never throws.
+ */
+export function personaInUseByConceptsMeta(error: unknown): PersonaInUseByConceptsMeta | null {
+  if (!(error instanceof ApiError) || error.code !== 'persona.in_use_by_concepts') {
+    return null
+  }
+  const meta = error.details[0]?.meta
+  const count = meta?.['count']
+  const raw = meta?.['affected']
+  if (typeof count !== 'number' || !Array.isArray(raw)) {
+    return null
+  }
+  const affected = raw.flatMap((entry: unknown): PersonaInUseByConceptsMeta['affected'] => {
+    if (!isObjectRecord(entry)) return []
+    const { concept, number, title, status } = entry
+    return typeof concept === 'string' &&
+      typeof number === 'number' &&
+      typeof title === 'string' &&
+      (status === 'awaiting' || status === 'approved' || status === 'changes_requested')
+      ? [{ concept, number, title, status }]
       : []
   })
   return { count, affected }

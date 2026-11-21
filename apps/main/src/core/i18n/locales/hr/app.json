@@ -1482,7 +1482,8 @@
         "brandArchived": "Ovaj brend je arhiviran. Vratite ga da biste mijenjali njegove valove.",
         "saveFailed": "Val nije moguće spremiti. Pokušajte ponovno.",
         "waveNotAvailable": "Taj val ne može se povezati s ovom kampanjom.",
-        "marketHasPersonas": "Prvo uklonite persone ovih tržišta: {markets}."
+        "marketHasPersonas": "Prvo uklonite persone ovih tržišta: {markets}.",
+        "marketHasConcepts": "Koncepti postoje na tržištima: {markets}."
       },
       "dialog": {
         "createTitle": "Novi val",
@@ -1706,9 +1707,12 @@
         "personaNone": "Još nema persona",
         "statusPersonas": "{count} persona · {covered} od {markets} tržišta | {count} persona · {covered} od {markets} tržišta",
         "notAvailable": "Još nije dostupno",
-        "locked": "Zaključano dok se ne odobre svi koncepti",
         "matrixStatus": "{set} od {total} ćelije postavljeno | {set} od {total} ćelija postavljeno",
-        "matrixNone": "Prvo dodajte USP-ove i persone"
+        "matrixNone": "Prvo dodajte USP-ove i persone",
+        "conceptsNone": "Još nema koncepata",
+        "conceptsStatus": "Odobreno {approved} od {total}",
+        "conceptsWarning": "Koncepti: odobreno {approved} od {total}",
+        "conceptsWarningNone": "Još nema koncepata"
       },
       "audience": {
         "label": "Naslov ciljne skupine",
@@ -1754,7 +1758,9 @@
           "refreshed": "Popis se promijenio dok je prozor bio otvoren. Provjerite ga i ponovno potvrdite.",
           "bodyInUseCells": "{count} mjesto koristi ovaj USP i briše se s njim: | {count} mjesta koriste ovaj USP i brišu se s njim:",
           "confirmInUseCells": "Izbriši i očisti {count} stavku | Izbriši i očisti {count} stavki",
-          "itemCell": "Ćelija: {level}"
+          "itemCell": "Ćelija: {level}",
+          "itemConcept": "Čip koncepta uklonjen",
+          "conceptsNote": "Koncepti s ovim USP-om gube čip. Odobreni koncept vraća se na Čeka klijenta."
         },
         "usedByBoth": "Koristi {angles} i {cells}"
       },
@@ -1852,7 +1858,8 @@
         "synced": "{count} sinkronizirani kut se ne kopira. Ispunite matricu za {market}. | {count} sinkronizirana kuta se ne kopiraju. Ispunite matricu za {market}."
       },
       "validation": {
-        "tooLong": "Najviše {max} znakova."
+        "tooLong": "Najviše {max} znakova.",
+        "required": "Ovo polje je obavezno."
       },
       "errors": {
         "loadFailed": "Učitavanje nije uspjelo. Pokušajte ponovno.",
@@ -1872,7 +1879,23 @@
         "conflict": "Netko je ovo promijenio u isto vrijeme. Ponovno učitajte i pokušajte ponovno.",
         "brandArchived": "Arhivirani brend samo je za čitanje. Prvo ga vratite.",
         "forbidden": "To može učiniti samo admin ili manager.",
-        "angleSyncedReadOnly": "Promijenite to u matrici poruka."
+        "angleSyncedReadOnly": "Promijenite to u matrici poruka.",
+        "personaInUseByConcepts": "Ovu personu koriste koncepti ({count}). Prvo ih premjestite na drugu personu ili izbrišite.",
+        "conceptPersonaInvalid": "Odaberite personu s ovog tržišta.",
+        "conceptUspModeRequired": "Odaberite hoće li se USP-ovi zadržati ili zamijeniti.",
+        "conceptUspInvalid": "USP čip mora biti USP ovog vala.",
+        "decisionInvalid": "Provjerite ime klijenta te bilješku ili komentar.",
+        "conceptDeleteFailed": "Pohranjena slika nije se mogla izbrisati. Ništa nije uklonjeno. Pokušajte ponovno.",
+        "conceptDuplicateFailed": "Slike se nisu mogle kopirati. Kopija nije napravljena. Pokušajte ponovno.",
+        "conceptMarketFull": "Tržište ima najviše {max} koncepata.",
+        "imageInvalid": "Ova datoteka nije valjana slika JPG, PNG ili WebP.",
+        "imageUnknownUpload": "Ovaj je prijenos istekao. Ponovno dodajte sliku.",
+        "imageAlreadyCompleted": "Ovaj je prijenos već dovršen.",
+        "imageDeleteFailed": "Slika se nije mogla izbrisati. Pokušajte ponovno.",
+        "imageLimitCount": "Koncept može imati najviše {max} slika (trenutno {used}).",
+        "imageLimitBytes": "Slike koncepta zajedno smiju imati najviše {max} MB (trenutno {used} MB).",
+        "linkInvalidUrl": "Ovo nije valjana javna https adresa.",
+        "linkLimitCount": "Dosegnuto je ograničenje poveznica ovog koncepta."
       },
       "counts": {
         "angles": "{count} kut | {count} kutova",
@@ -1922,6 +1945,133 @@
         "emptyPersonas": {
           "body": "U koraku 2 dodajte persone za ovo tržište, a zatim ispunite njegovu matricu.",
           "cta": "Dodaj persone"
+        }
+      },
+      "concepts": {
+        "title": "Koncepti · {market}",
+        "subtitle": "Do {max} koncepata po tržištu. Svaki se temelji na jednoj personi.",
+        "add": "Dodaj koncept",
+        "tile": "{count} od {max} koncepata",
+        "tileMax": "Dosegnut maksimum: {count} od {max} koncepata",
+        "underMinimum": "Tržište {market} ima {count} od preporučenih {min} ili više koncepata.",
+        "status": {
+          "awaiting": "Čeka klijenta",
+          "approved": "Odobreno",
+          "changes_requested": "Zatražene izmjene"
+        },
+        "stage": {
+          "tofu": "Vrh lijevka (TOFU)",
+          "mofu": "Sredina lijevka (MOFU)",
+          "bofu": "Dno lijevka (BOFU)",
+          "none": "Bez faze"
+        },
+        "menu": {
+          "edit": "Uredi",
+          "decide": "Zabilježi odluku klijenta",
+          "duplicate": "Dupliciraj",
+          "delete": "Izbriši",
+          "deleteDecided": "Samo admin ili manager"
+        },
+        "banner": {
+          "counts": "Odobreno {approved} od {total} · {awaiting} čeka klijenta · {changes} sa zatraženim izmjenama",
+          "allApproved": "Svi koncepti su odobreni ({total})",
+          "record": "Zabilježi odluku klijenta"
+        },
+        "card": {
+          "number": "Koncept {n}",
+          "menu": "Radnje za koncept {n}",
+          "stage": "Faza lijevka",
+          "stageNone": "Faza lijevka",
+          "approvedBy": "Odobrio/la {name} · {date}"
+        },
+        "field": {
+          "product": "Proizvod",
+          "angle": "Kut",
+          "primary_message": "Glavna poruka",
+          "hypothesis": "Hipoteza",
+          "hook": "Hook",
+          "format_visual": "Format / vizual",
+          "key_points": "Ključne točke",
+          "payoff": "Poanta",
+          "cta": "CTA"
+        },
+        "dialog": {
+          "addTitle": "Dodaj koncept · {market}",
+          "editTitle": "Uredi koncept",
+          "persona": "Persona",
+          "stage": "Faza lijevka",
+          "stageNote": "Bilješka o lijevku",
+          "title": "Naslov koncepta",
+          "usps": "USP-ovi",
+          "uspsHint": "Iz matrice persone: prvo Prioritet, zatim Podrška.",
+          "uspMode": "Persona je promijenjena. Što učiniti s USP-ovima?",
+          "uspModeRefill": "Zamijeni ih USP-ovima iz matrice nove persone",
+          "uspModeKeep": "Zadrži trenutne USP-ove",
+          "fixFields": "Ispravite polja označena u nastavku."
+        },
+        "decision": {
+          "title": "Zabilježi odluku klijenta",
+          "concept": "Koncept",
+          "clientName": "Ime klijenta",
+          "note": "Bilješka (neobavezno)",
+          "comment": "Što treba promijeniti",
+          "replaces": "Nova odluka zamjenjuje status. Prethodne odluke ostaju u povijesti."
+        },
+        "delete": {
+          "title": "Izbrisati koncept {title}?",
+          "body": "Koncept, njegove slike i poveznice bit će izbrisani. To se ne može poništiti.",
+          "bodyDecided": "Odluka klijenta briše se zajedno s njim."
+        },
+        "reset": {
+          "title": "Poništiti odobrenje klijenta?",
+          "body": "Ovaj je koncept odobren. Promjena ga vraća na Čeka klijenta i poništava odobrenje klijenta.",
+          "confirm": "Promijeni i poništi odobrenje"
+        },
+        "images": {
+          "label": "Slike",
+          "count": "{count} od {max} slika · {used} od {total} MB",
+          "add": "Dodaj slike",
+          "full": "Dosegnut maksimum od {max} slika",
+          "open": "Otvori {name}",
+          "remove": "Ukloni {name}",
+          "close": "Zatvori",
+          "loadFailed": "Slika se nije mogla učitati."
+        },
+        "links": {
+          "label": "Poveznice",
+          "add": "Dodaj poveznicu",
+          "full": "Dosegnut maksimum od {max} poveznica",
+          "edit": "Uredi {title}",
+          "remove": "Ukloni {title}"
+        },
+        "link": {
+          "addTitle": "Dodaj poveznicu",
+          "editTitle": "Uredi poveznicu",
+          "titleLabel": "Naslov",
+          "urlLabel": "Adresa",
+          "urlPlaceholder": "https://primjer.hr/stranica",
+          "problem": {
+            "empty": "Unesite adresu.",
+            "scheme": "Dopuštene su samo https poveznice.",
+            "invalid": "Ovo nije valjana javna https adresa."
+          }
+        },
+        "upload": {
+          "refusedType": "{name}: prihvaćaju se samo slike JPG, PNG i WebP.",
+          "refusedEmpty": "{name}: datoteka je prazna.",
+          "refusedCount": "{name}: koncept može imati najviše {max} slika.",
+          "refusedBytes": "{name}: slike koncepta zajedno smiju imati najviše {max} MB.",
+          "failed": "Prijenos nije uspio.",
+          "progress": "Prijenos: {name}",
+          "retry": "Pokušaj ponovno",
+          "dismiss": "Odbaci"
+        },
+        "emptyState": {
+          "title": "Još nema koncepata za {market}",
+          "body": "Dodajte koncept za personu s ovog tržišta. Preporučujemo {min} ili više.",
+          "noPersonasTitle": "{market} još nema persona",
+          "noPersonasBody": "Koncept se temelji na personi. Prvo dodajte persone za ovo tržište.",
+          "toPersonas": "Idi na persone"
         }
       }
     }

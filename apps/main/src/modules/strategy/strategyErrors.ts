@@ -6,7 +6,7 @@
  */
 import { ApiError, copyExceedsCapMeta, extractFieldErrors } from '@catalyst/api-client'
 
-type Translate = (key: string, named?: Record<string, unknown>) => string
+type Translate = (key: string, named?: Record<string, unknown>, plural?: number) => string
 
 const CODE_KEYS: Record<string, string> = {
   'usp.max_reached': 'app.strategy.errors.uspMaxReached',
@@ -19,6 +19,18 @@ const CODE_KEYS: Record<string, string> = {
   'angle.already_linked': 'app.strategy.errors.angleAlreadyLinked',
   'angle.synced_read_only': 'app.strategy.errors.angleSyncedReadOnly',
   'strategy.conflict': 'app.strategy.errors.conflict',
+  'concept.persona_invalid': 'app.strategy.errors.conceptPersonaInvalid',
+  'concept.usp_mode_required': 'app.strategy.errors.conceptUspModeRequired',
+  'concept.usp_invalid': 'app.strategy.errors.conceptUspInvalid',
+  'concept.decision_invalid': 'app.strategy.errors.decisionInvalid',
+  'concept.delete_failed': 'app.strategy.errors.conceptDeleteFailed',
+  'concept.duplicate_failed': 'app.strategy.errors.conceptDuplicateFailed',
+  'concept_image.invalid': 'app.strategy.errors.imageInvalid',
+  'concept_image.unknown_upload': 'app.strategy.errors.imageUnknownUpload',
+  'concept_image.already_completed': 'app.strategy.errors.imageAlreadyCompleted',
+  'concept_image.delete_failed': 'app.strategy.errors.imageDeleteFailed',
+  'link.invalid_url': 'app.strategy.errors.linkInvalidUrl',
+  'concept_link.limit_count': 'app.strategy.errors.linkLimitCount',
   'wave.brand_archived': 'app.strategy.errors.brandArchived',
   forbidden: 'app.strategy.errors.forbidden',
 }
@@ -45,6 +57,34 @@ export function strategyErrorMessage(err: unknown, t: Translate): string {
             copy: meta.copyCount,
             max: meta.max,
           })
+    }
+    const meta = err.details[0]?.meta
+    const num = (k: string): number | null => {
+      const v = meta?.[k]
+      return typeof v === 'number' ? v : null
+    }
+    if (err.code === 'persona.in_use_by_concepts') {
+      return t(
+        'app.strategy.errors.personaInUseByConcepts',
+        { count: num('count') ?? 0 },
+        num('count') ?? 0,
+      )
+    }
+    if (err.code === 'concept.market_full') {
+      return t('app.strategy.errors.conceptMarketFull', { max: num('max') ?? 30 })
+    }
+    if (err.code === 'concept_image.limit_count') {
+      return t('app.strategy.errors.imageLimitCount', {
+        used: num('used') ?? 10,
+        max: num('max') ?? 10,
+      })
+    }
+    if (err.code === 'concept_image.limit_bytes') {
+      const mb = (n: number | null): number => Math.round((n ?? 0) / (1024 * 1024))
+      return t('app.strategy.errors.imageLimitBytes', {
+        used: mb(num('used_bytes')),
+        max: mb(num('max_bytes') ?? 300 * 1024 * 1024),
+      })
     }
     const key = CODE_KEYS[err.code]
     if (key !== undefined) return t(key)

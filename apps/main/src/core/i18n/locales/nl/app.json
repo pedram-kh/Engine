@@ -1482,7 +1482,8 @@
         "brandArchived": "Dit merk is gearchiveerd. Herstel het om de golven te wijzigen.",
         "saveFailed": "De golf kon niet worden opgeslagen. Probeer het opnieuw.",
         "waveNotAvailable": "Die golf kan niet aan deze campagne worden gekoppeld.",
-        "marketHasPersonas": "Verwijder eerst de persona's van deze markten: {markets}."
+        "marketHasPersonas": "Verwijder eerst de persona's van deze markten: {markets}.",
+        "marketHasConcepts": "Er zijn concepten in: {markets}."
       },
       "dialog": {
         "createTitle": "Nieuwe golf",
@@ -1706,9 +1707,12 @@
         "personaNone": "Nog geen persona's",
         "statusPersonas": "{count} persona · {covered} van {markets} markten | {count} persona's · {covered} van {markets} markten",
         "notAvailable": "Nog niet beschikbaar",
-        "locked": "Vergrendeld tot alle concepten zijn goedgekeurd",
         "matrixStatus": "{set} van {total} cel ingesteld | {set} van {total} cellen ingesteld",
-        "matrixNone": "Voeg eerst USP's en persona's toe"
+        "matrixNone": "Voeg eerst USP's en persona's toe",
+        "conceptsNone": "Nog geen concepten",
+        "conceptsStatus": "{approved} van {total} goedgekeurd",
+        "conceptsWarning": "Concepten: {approved} van {total} goedgekeurd",
+        "conceptsWarningNone": "Nog geen concepten"
       },
       "audience": {
         "label": "Doelgroeptitel",
@@ -1754,7 +1758,9 @@
           "refreshed": "De lijst is veranderd terwijl dit openstond. Controleer hem en bevestig opnieuw.",
           "bodyInUseCells": "{count} plek gebruikt deze USP en wordt ermee gewist: | {count} plekken gebruiken deze USP en worden ermee gewist:",
           "confirmInUseCells": "Verwijderen en {count} item wissen | Verwijderen en {count} items wissen",
-          "itemCell": "Cel {level}"
+          "itemCell": "Cel {level}",
+          "itemConcept": "Conceptchip verwijderd",
+          "conceptsNote": "Concepten met deze USP verliezen de chip. Een goedgekeurd concept gaat terug naar Wacht op klant."
         },
         "usedByBoth": "Gebruikt door {angles} en {cells}"
       },
@@ -1852,7 +1858,8 @@
         "synced": "{count} gesynchroniseerde invalshoek wordt niet gekopieerd. Vul de matrix van {market} in. | {count} gesynchroniseerde invalshoeken worden niet gekopieerd. Vul de matrix van {market} in."
       },
       "validation": {
-        "tooLong": "Maximaal {max} tekens."
+        "tooLong": "Maximaal {max} tekens.",
+        "required": "Dit veld is verplicht."
       },
       "errors": {
         "loadFailed": "Laden is mislukt. Probeer het opnieuw.",
@@ -1872,7 +1879,23 @@
         "conflict": "Iemand heeft dit tegelijk gewijzigd. Laad opnieuw en probeer het nog eens.",
         "brandArchived": "Een gearchiveerd merk is alleen-lezen. Herstel het eerst.",
         "forbidden": "Alleen een admin of manager kan dit doen.",
-        "angleSyncedReadOnly": "Wijzig dit in de berichtenmatrix."
+        "angleSyncedReadOnly": "Wijzig dit in de berichtenmatrix.",
+        "personaInUseByConcepts": "Concepten gebruiken deze persona ({count}). Verplaats ze eerst naar een andere persona of verwijder ze.",
+        "conceptPersonaInvalid": "Kies een persona van deze markt.",
+        "conceptUspModeRequired": "Kies of de USP's behouden of vervangen worden.",
+        "conceptUspInvalid": "Een USP-chip moet een USP van deze wave zijn.",
+        "decisionInvalid": "Controleer de naam van de klant en de notitie of opmerking.",
+        "conceptDeleteFailed": "Een opgeslagen afbeelding kon niet worden verwijderd. Er is niets verwijderd. Probeer het opnieuw.",
+        "conceptDuplicateFailed": "De afbeeldingen konden niet worden gekopieerd. Er is geen kopie gemaakt. Probeer het opnieuw.",
+        "conceptMarketFull": "Een markt heeft maximaal {max} concepten.",
+        "imageInvalid": "Dit bestand is geen geldige JPG-, PNG- of WebP-afbeelding.",
+        "imageUnknownUpload": "Deze upload is verlopen. Voeg de afbeelding opnieuw toe.",
+        "imageAlreadyCompleted": "Deze upload is al voltooid.",
+        "imageDeleteFailed": "De afbeelding kon niet worden verwijderd. Probeer het opnieuw.",
+        "imageLimitCount": "Een concept bevat maximaal {max} afbeeldingen (nu {used}).",
+        "imageLimitBytes": "De afbeeldingen van een concept zijn samen maximaal {max} MB (nu {used} MB).",
+        "linkInvalidUrl": "Dit is geen geldig openbaar https-adres.",
+        "linkLimitCount": "De limiet voor links van dit concept is bereikt."
       },
       "counts": {
         "angles": "{count} invalshoek | {count} invalshoeken",
@@ -1922,6 +1945,133 @@
         "emptyPersonas": {
           "body": "Voeg in stap 2 persona's voor deze markt toe en vul daarna de matrix ervan in.",
           "cta": "Persona's toevoegen"
+        }
+      },
+      "concepts": {
+        "title": "Concepten · {market}",
+        "subtitle": "Maximaal {max} concepten per markt. Elk is gebaseerd op één persona.",
+        "add": "Concept toevoegen",
+        "tile": "{count} van {max} concepten",
+        "tileMax": "Maximum bereikt: {count} van {max} concepten",
+        "underMinimum": "{market} heeft {count} van de {min} of meer aanbevolen concepten.",
+        "status": {
+          "awaiting": "Wacht op klant",
+          "approved": "Goedgekeurd",
+          "changes_requested": "Wijzigingen gevraagd"
+        },
+        "stage": {
+          "tofu": "Bovenin de funnel (TOFU)",
+          "mofu": "Midden in de funnel (MOFU)",
+          "bofu": "Onderin de funnel (BOFU)",
+          "none": "Geen fase"
+        },
+        "menu": {
+          "edit": "Bewerken",
+          "decide": "Beslissing van de klant vastleggen",
+          "duplicate": "Dupliceren",
+          "delete": "Verwijderen",
+          "deleteDecided": "Alleen admin of manager"
+        },
+        "banner": {
+          "counts": "{approved} van {total} goedgekeurd · {awaiting} wachten op klant · {changes} met gevraagde wijzigingen",
+          "allApproved": "Elk concept goedgekeurd ({total})",
+          "record": "Beslissing van de klant vastleggen"
+        },
+        "card": {
+          "number": "Concept {n}",
+          "menu": "Acties voor concept {n}",
+          "stage": "Funnelfase",
+          "stageNone": "Funnelfase",
+          "approvedBy": "Goedgekeurd door {name} · {date}"
+        },
+        "field": {
+          "product": "Product",
+          "angle": "Invalshoek",
+          "primary_message": "Hoofdboodschap",
+          "hypothesis": "Hypothese",
+          "hook": "Hook",
+          "format_visual": "Formaat / visual",
+          "key_points": "Kernpunten",
+          "payoff": "Clou",
+          "cta": "CTA"
+        },
+        "dialog": {
+          "addTitle": "Concept toevoegen · {market}",
+          "editTitle": "Concept bewerken",
+          "persona": "Persona",
+          "stage": "Funnelfase",
+          "stageNote": "Funnelnotitie",
+          "title": "Titel van het concept",
+          "usps": "USP's",
+          "uspsHint": "Uit de matrix van de persona: eerst Prioriteit, dan Ondersteuning.",
+          "uspMode": "De persona is gewijzigd. Wat moet er met de USP's gebeuren?",
+          "uspModeRefill": "Vervangen door de USP's uit de matrix van de nieuwe persona",
+          "uspModeKeep": "De huidige USP's behouden",
+          "fixFields": "Corrigeer de hieronder gemarkeerde velden."
+        },
+        "decision": {
+          "title": "Beslissing van de klant vastleggen",
+          "concept": "Concept",
+          "clientName": "Naam van de klant",
+          "note": "Notitie (optioneel)",
+          "comment": "Wat moet er veranderen",
+          "replaces": "Een nieuwe beslissing vervangt de status. Eerdere beslissingen blijven bewaard."
+        },
+        "delete": {
+          "title": "Concept {title} verwijderen?",
+          "body": "Het concept, de afbeeldingen en de links worden verwijderd. Dit kan niet ongedaan worden gemaakt.",
+          "bodyDecided": "De beslissing van de klant wordt mee verwijderd."
+        },
+        "reset": {
+          "title": "Goedkeuring van de klant wissen?",
+          "body": "Dit concept is goedgekeurd. Als je het wijzigt, gaat het terug naar Wacht op klant en wordt de goedkeuring van de klant gewist.",
+          "confirm": "Wijzigen en goedkeuring wissen"
+        },
+        "images": {
+          "label": "Afbeeldingen",
+          "count": "{count} van {max} afbeeldingen · {used} van {total} MB",
+          "add": "Afbeeldingen toevoegen",
+          "full": "Maximum van {max} afbeeldingen bereikt",
+          "open": "{name} openen",
+          "remove": "{name} verwijderen",
+          "close": "Sluiten",
+          "loadFailed": "De afbeelding kon niet worden geladen."
+        },
+        "links": {
+          "label": "Links",
+          "add": "Link toevoegen",
+          "full": "Maximum van {max} links bereikt",
+          "edit": "{title} bewerken",
+          "remove": "{title} verwijderen"
+        },
+        "link": {
+          "addTitle": "Link toevoegen",
+          "editTitle": "Link bewerken",
+          "titleLabel": "Titel",
+          "urlLabel": "Adres",
+          "urlPlaceholder": "https://voorbeeld.nl/pagina",
+          "problem": {
+            "empty": "Voer een adres in.",
+            "scheme": "Alleen https-links zijn toegestaan.",
+            "invalid": "Dit is geen geldig openbaar https-adres."
+          }
+        },
+        "upload": {
+          "refusedType": "{name}: alleen JPG-, PNG- en WebP-afbeeldingen worden geaccepteerd.",
+          "refusedEmpty": "{name}: het bestand is leeg.",
+          "refusedCount": "{name}: een concept bevat maximaal {max} afbeeldingen.",
+          "refusedBytes": "{name}: de afbeeldingen van een concept zijn samen maximaal {max} MB.",
+          "failed": "Het uploaden is mislukt.",
+          "progress": "{name} uploaden",
+          "retry": "Opnieuw proberen",
+          "dismiss": "Negeren"
+        },
+        "emptyState": {
+          "title": "Nog geen concepten voor {market}",
+          "body": "Voeg een concept toe voor een persona van deze markt. We raden {min} of meer aan.",
+          "noPersonasTitle": "{market} heeft nog geen persona's",
+          "noPersonasBody": "Een concept is gebaseerd op een persona. Voeg eerst persona's toe voor deze markt.",
+          "toPersonas": "Naar persona's"
         }
       }
     }

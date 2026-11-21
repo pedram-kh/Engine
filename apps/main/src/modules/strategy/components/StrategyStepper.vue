@@ -2,15 +2,17 @@
 /**
  * PL-2.1 — the six-step bar of the strategy workspace.
  *
- * Steps 1, 2 and (PL-2.2) 3 are real links with a counts-only status line. Step 4 ("Not available yet") and 5 and 6
- * (locked, with a lock) are plain elements: not links, not buttons, not in the tab order, `aria-disabled`, no
- * hover state, no pointer cursor. No tick is ever drawn: there is no "done" rule (S7). On a narrow screen the bar
+ * Steps 1 to 4 are real links with a counts-only status line (step 4: "{approved} of {total} approved"). Steps 5 and 6
+ * are plain elements: not links, not buttons, not in the tab order, `aria-disabled`, no hover state, no pointer
+ * cursor, NO lock icon: they say "Not available yet" and, while any market has concepts that are not all approved,
+ * carry the warning with the counts (PL-2.3, C6: a message, never a block). No tick is ever drawn: there is no "done" rule (S7). On a narrow screen the bar
  * scrolls sideways inside itself and step names never wrap.
  */
 import type { StrategySummaryResource } from '@catalyst/api-client'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { stepFourLine, stepWarning } from '../conceptsLogic'
 import { STEPS, type StepKey } from '../constants'
 
 const props = defineProps<{
@@ -22,12 +24,17 @@ const props = defineProps<{
 
 const { t } = useI18n()
 
-const statusLine = computed<Record<'usps' | 'personas' | 'matrix', string>>(() => {
+const statusLine = computed<Record<'usps' | 'personas' | 'matrix' | 'concepts', string>>(() => {
   const a = props.summary?.attributes
-  if (!a) return { usps: '', personas: '', matrix: '' }
+  if (!a) return { usps: '', personas: '', matrix: '', concepts: '' }
+  const four = stepFourLine(a.concepts)
   const withPersonas = a.markets.filter((m) => m.persona_count > 0).length
   const m = a.matrix
   return {
+    concepts:
+      four.kind === 'empty'
+        ? t('app.strategy.stepper.conceptsNone')
+        : t('app.strategy.stepper.conceptsStatus', { approved: four.approved, total: four.total }),
     matrix:
       m.cells_total === 0
         ? t('app.strategy.stepper.matrixNone')
@@ -51,10 +58,25 @@ const statusLine = computed<Record<'usps' | 'personas' | 'matrix', string>>(() =
   }
 })
 
+/** The warning steps 5 and 6 carry: the wave's counts while any market is not complete, else nothing. */
+const warning = computed(() => stepWarning(props.summary?.attributes.concepts))
+const warningText = computed(() => {
+  const w = warning.value
+  if (w.kind === 'counts')
+    return t('app.strategy.stepper.conceptsWarning', { approved: w.approved, total: w.total })
+  return w.kind === 'empty' ? t('app.strategy.stepper.conceptsWarningNone') : ''
+})
+
 function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUlid: string } } {
   return {
     name:
-      key === 'usps' ? 'strategy.usps' : key === 'matrix' ? 'strategy.matrix' : 'strategy.personas',
+      key === 'usps'
+        ? 'strategy.usps'
+        : key === 'matrix'
+          ? 'strategy.matrix'
+          : key === 'concepts'
+            ? 'strategy.concepts'
+            : 'strategy.personas',
     params: { ulid: props.brandId, waveUlid: props.waveId },
   }
 }
@@ -90,23 +112,19 @@ function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUli
           aria-disabled="true"
           :data-test="`strategy-step-${step.key}`"
         >
-          <span class="strategy-step__circle">
-            <v-icon
-              v-if="step.state === 'locked'"
-              icon="mdi-lock-outline"
-              size="14"
-              aria-hidden="true"
-            />
-            <template v-else>{{ step.n }}</template>
-          </span>
+          <span class="strategy-step__circle">{{ step.n }}</span>
           <span class="strategy-step__text">
             <span class="strategy-step__name">{{ t(`app.strategy.stepper.${step.key}`) }}</span>
             <span class="strategy-step__status" :data-test="`strategy-step-${step.key}-status`">
-              {{
-                step.state === 'locked'
-                  ? t('app.strategy.stepper.locked')
-                  : t('app.strategy.stepper.notAvailable')
-              }}
+              {{ t('app.strategy.stepper.notAvailable') }}
+            </span>
+            <span
+              v-if="warningText"
+              class="strategy-step__warn"
+              :data-test="`strategy-step-${step.key}-warning`"
+            >
+              <v-icon icon="mdi-alert-outline" size="13" aria-hidden="true" />
+              {{ warningText }}
             </span>
           </span>
         </div>
@@ -183,6 +201,14 @@ function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUli
   line-height: normal;
   color: rgb(var(--v-theme-on-surface-variant));
   min-height: 1.2em;
+}
+.strategy-step__warn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  line-height: normal;
+  color: rgb(var(--v-theme-warning));
 }
 .strategy-step--live:hover {
   background: rgb(var(--v-theme-surface-bright));

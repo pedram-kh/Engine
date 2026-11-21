@@ -3,6 +3,7 @@
  * and a mount helper on top of the wave test kit (Pinia, router with the strategy routes, English i18n, Vuetify).
  */
 import type {
+  ConceptStatus,
   MatrixCell,
   MatrixLevel,
   MatrixPersona,
@@ -13,6 +14,7 @@ import type {
   StrategySummaryResource,
   UspColorKey,
   WaveAngleResource,
+  WaveConceptResource,
   WavePersonaResource,
   WaveUspResource,
 } from '@catalyst/api-client'
@@ -43,6 +45,27 @@ export const LIMITS: StrategyLimits = {
   angle_explanation: 500,
   matrix_line: 140,
   matrix_batch_max: 48,
+  concept_max_per_market: 30,
+  concept_min_recommended: 3,
+  concept_title: 120,
+  concept_funnel_note: 40,
+  concept_product: 160,
+  concept_angle: 300,
+  concept_primary_message: 300,
+  concept_hypothesis: 400,
+  concept_hook: 300,
+  concept_format_visual: 400,
+  concept_payoff: 300,
+  concept_cta: 200,
+  concept_key_points: 8,
+  concept_key_point: 160,
+  client_name: 80,
+  decision_note: 500,
+  decision_comment: 1000,
+  link_title: 120,
+  links_per_concept: 10,
+  images_per_concept: 10,
+  image_total_bytes: 300 * 1024 * 1024,
 }
 
 export function makeSummary(
@@ -61,6 +84,14 @@ export function makeSummary(
       ],
       limits: LIMITS,
       matrix: { cells_set: 0, cells_total: 0, by_market: [] },
+      concepts: {
+        total: 0,
+        approved: 0,
+        awaiting: 0,
+        changes_requested: 0,
+        markets_complete: 0,
+        by_market: [],
+      },
       ...over,
     },
   }
@@ -213,6 +244,51 @@ export function makeMatrix(
       cells,
       manual_angles: manualAngles,
       progress: { cells_set: cells.length, cells_total: u.length * p.length, by_market: [] },
+    },
+  }
+}
+
+/** A concept as `GET concepts` returns it; the persona and chips are the fixtures' own. */
+export function makeConcept(
+  n: number,
+  persona: WavePersonaResource,
+  over: Partial<WaveConceptResource['attributes']> = {},
+  status: ConceptStatus = 'awaiting',
+): WaveConceptResource {
+  return {
+    id: `01CON${String(n).padStart(21, '0')}`,
+    type: 'wave_concept',
+    attributes: {
+      market: persona.attributes.market,
+      number: n,
+      title: `Concept ${n}`,
+      status,
+      persona: {
+        id: persona.id,
+        code: persona.attributes.code,
+        title: persona.attributes.title,
+        name: persona.attributes.name,
+        color_key: persona.attributes.color_key,
+      },
+      funnel_stage: null,
+      funnel_note: null,
+      product: null,
+      angle: null,
+      primary_message: null,
+      hypothesis: null,
+      hook: null,
+      format_visual: null,
+      key_points: [],
+      payoff: null,
+      cta: null,
+      usps: [],
+      images: [],
+      links: [],
+      decision: null,
+      reset_to_awaiting: false,
+      created_at: '2026-11-01T10:00:00.000000Z',
+      updated_at: '2026-11-01T10:00:00.000000Z',
+      ...over,
     },
   }
 }

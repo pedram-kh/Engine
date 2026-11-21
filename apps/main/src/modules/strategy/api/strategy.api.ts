@@ -6,6 +6,16 @@
  */
 
 import type {
+  ConceptDecisionPayload,
+  ConceptEnvelope,
+  ConceptImageEnvelope,
+  ConceptImageInitPayload,
+  ConceptImageInitResponse,
+  ConceptLinkEnvelope,
+  ConceptLinkPayload,
+  ConceptListResponse,
+  ConceptPayload,
+  ConceptResetResponse,
   MatrixCellChange,
   MatrixEnvelope,
   MatrixSaveEnvelope,
@@ -142,5 +152,98 @@ export const strategyApi = {
 
   removeAngle(s: WaveScope, personaId: string, angleId: string): Promise<void> {
     return http.delete<void>(`${base(s)}/personas/${personaId}/angles/${angleId}`)
+  },
+
+  // --- Concepts (PL-2.3) -----------------------------------------------------------------------------------
+
+  listConcepts(s: WaveScope, market: string): Promise<ConceptListResponse> {
+    return http.get<ConceptListResponse>(`${base(s)}/concepts?market=${encodeURIComponent(market)}`)
+  },
+
+  createConcept(s: WaveScope, payload: ConceptPayload): Promise<ConceptEnvelope> {
+    return http.post<ConceptEnvelope>(`${base(s)}/concepts`, payload)
+  },
+
+  /** Only the fields that changed. A new `persona` needs `usp_mode`. The answer says whether the concept went back to Awaiting. */
+  updateConcept(
+    s: WaveScope,
+    conceptId: string,
+    payload: ConceptPayload,
+  ): Promise<ConceptEnvelope> {
+    return http.patch<ConceptEnvelope>(`${base(s)}/concepts/${conceptId}`, payload)
+  },
+
+  duplicateConcept(s: WaveScope, conceptId: string): Promise<ConceptEnvelope> {
+    return http.post<ConceptEnvelope>(`${base(s)}/concepts/${conceptId}/duplicate`)
+  },
+
+  removeConcept(s: WaveScope, conceptId: string): Promise<void> {
+    return http.delete<void>(`${base(s)}/concepts/${conceptId}`)
+  },
+
+  /** Admin and manager only (403 `forbidden` for staff). */
+  decideConcept(
+    s: WaveScope,
+    conceptId: string,
+    payload: ConceptDecisionPayload,
+  ): Promise<ConceptEnvelope> {
+    return http.post<ConceptEnvelope>(`${base(s)}/concepts/${conceptId}/decision`, payload)
+  },
+
+  initImage(
+    s: WaveScope,
+    conceptId: string,
+    payload: ConceptImageInitPayload,
+  ): Promise<ConceptImageInitResponse> {
+    return http.post<ConceptImageInitResponse>(
+      `${base(s)}/concepts/${conceptId}/images/uploads/init`,
+      payload,
+    )
+  },
+
+  completeImage(s: WaveScope, conceptId: string, uploadId: string): Promise<ConceptImageEnvelope> {
+    return http.post<ConceptImageEnvelope>(
+      `${base(s)}/concepts/${conceptId}/images/uploads/complete`,
+      { upload_id: uploadId },
+    )
+  },
+
+  removeImage(s: WaveScope, conceptId: string, imageId: string): Promise<ConceptResetResponse> {
+    return http.delete<ConceptResetResponse>(`${base(s)}/concepts/${conceptId}/images/${imageId}`)
+  },
+
+  /**
+   * An image is read through the API only, with the app's own credentials (the session cookie; the creator app's
+   * bearer token does not reach this screen). `path` is the `file_url` or `thumbnail_url` the server sent.
+   */
+  imageBlob(path: string): Promise<Blob> {
+    return http.get<Blob>(path.replace(/^\/api\/v1/, ''), {
+      responseType: 'blob',
+      headers: { Accept: 'image/*' },
+    })
+  },
+
+  addLink(
+    s: WaveScope,
+    conceptId: string,
+    payload: Required<ConceptLinkPayload>,
+  ): Promise<ConceptLinkEnvelope> {
+    return http.post<ConceptLinkEnvelope>(`${base(s)}/concepts/${conceptId}/links`, payload)
+  },
+
+  updateLink(
+    s: WaveScope,
+    conceptId: string,
+    linkId: string,
+    payload: ConceptLinkPayload,
+  ): Promise<ConceptLinkEnvelope> {
+    return http.patch<ConceptLinkEnvelope>(
+      `${base(s)}/concepts/${conceptId}/links/${linkId}`,
+      payload,
+    )
+  },
+
+  removeLink(s: WaveScope, conceptId: string, linkId: string): Promise<ConceptResetResponse> {
+    return http.delete<ConceptResetResponse>(`${base(s)}/concepts/${conceptId}/links/${linkId}`)
   },
 }

@@ -157,9 +157,16 @@ function messageFor(err: unknown): string {
   // PL-2.1: removing a market that still has personas is refused with the markets and their counts in the meta.
   const personas = marketHasPersonasMeta(err)
   if (personas !== null) {
-    return t('app.waves.errors.marketHasPersonas', {
+    const base = t('app.waves.errors.marketHasPersonas', {
       markets: personas.markets.map((m) => `${m.market} (${m.persona_count})`).join(', '),
     })
+    // PL-2.3: the same markets, with their concept counts, when concepts use their personas.
+    const withConcepts = personas.markets.filter((m) => (m.concept_count ?? 0) > 0)
+    return withConcepts.length === 0
+      ? base
+      : `${base} ${t('app.waves.errors.marketHasConcepts', {
+          markets: withConcepts.map((m) => `${m.market} (${m.concept_count})`).join(', '),
+        })}`
   }
   if (err instanceof ApiError) {
     const key = CODE_KEYS[err.code]

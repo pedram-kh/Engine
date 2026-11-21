@@ -1482,7 +1482,8 @@
         "brandArchived": "See bränd on arhiveeritud. Taastage see, et selle laineid muuta.",
         "saveFailed": "Lainet ei õnnestunud salvestada. Proovige uuesti.",
         "waveNotAvailable": "Seda lainet ei saa selle kampaaniaga siduda.",
-        "marketHasPersonas": "Eemalda kõigepealt nende turgude personad: {markets}."
+        "marketHasPersonas": "Eemalda kõigepealt nende turgude personad: {markets}.",
+        "marketHasConcepts": "Kontseptsioonid on turgudel: {markets}."
       },
       "dialog": {
         "createTitle": "Uus laine",
@@ -1706,9 +1707,12 @@
         "personaNone": "Persoone veel pole",
         "statusPersonas": "{count} persona · {covered} turust {markets}-st | {count} persooni · {covered} turust {markets}-st",
         "notAvailable": "Veel pole saadaval",
-        "locked": "Lukus, kuni kõik kontseptsioonid on kinnitatud",
         "matrixStatus": "{set} lahtrist {total}-st määratud | {set} lahtrit {total}-st määratud",
-        "matrixNone": "Lisa kõigepealt USP-d ja persoonad"
+        "matrixNone": "Lisa kõigepealt USP-d ja persoonad",
+        "conceptsNone": "Kontseptsioone veel pole",
+        "conceptsStatus": "{approved}/{total} kinnitatud",
+        "conceptsWarning": "Kontseptsioonid: {approved}/{total} kinnitatud",
+        "conceptsWarningNone": "Kontseptsioone veel pole"
       },
       "audience": {
         "label": "Sihtrühma pealkiri",
@@ -1754,7 +1758,9 @@
           "refreshed": "Loend muutus, kui aken oli avatud. Vaata see üle ja kinnita uuesti.",
           "bodyInUseCells": "{count} koht kasutab seda USP-d ja tühjendatakse sellega: | {count} kohta kasutavad seda USP-d ja tühjendatakse sellega:",
           "confirmInUseCells": "Kustuta ja tühjenda {count} kirje | Kustuta ja tühjenda {count} kirjet",
-          "itemCell": "Lahter: {level}"
+          "itemCell": "Lahter: {level}",
+          "itemConcept": "Kontseptsiooni kiip eemaldatud",
+          "conceptsNote": "Kontseptsioonid, millel on see USP, kaotavad kiibi. Kinnitatud kontseptsioon läheb tagasi olekusse Ootab klienti."
         },
         "usedByBoth": "Kasutavad {angles} ja {cells}"
       },
@@ -1852,7 +1858,8 @@
         "synced": "{count} sünkroonitud nurka ei kopeerita. Täida turu {market} maatriks. | {count} sünkroonitud nurka ei kopeerita. Täida turu {market} maatriks."
       },
       "validation": {
-        "tooLong": "Kuni {max} märki."
+        "tooLong": "Kuni {max} märki.",
+        "required": "See väli on kohustuslik."
       },
       "errors": {
         "loadFailed": "Laadimine ebaõnnestus. Proovi uuesti.",
@@ -1872,7 +1879,23 @@
         "conflict": "Keegi muutis seda samal ajal. Laadi uuesti ja proovi veel kord.",
         "brandArchived": "Arhiveeritud bränd on kirjutuskaitstud. Taasta see kõigepealt.",
         "forbidden": "Seda saab teha ainult admin või haldur.",
-        "angleSyncedReadOnly": "Muuda seda sõnumimaatriksis."
+        "angleSyncedReadOnly": "Muuda seda sõnumimaatriksis.",
+        "personaInUseByConcepts": "Kontseptsioonid kasutavad seda personat ({count}). Teisalda need kõigepealt teisele personale või kustuta.",
+        "conceptPersonaInvalid": "Vali selle turu persona.",
+        "conceptUspModeRequired": "Vali, kas USP-d säilitada või asendada.",
+        "conceptUspInvalid": "USP-kiip peab olema selle laine USP.",
+        "decisionInvalid": "Kontrolli kliendi nime ning märkust või kommentaari.",
+        "conceptDeleteFailed": "Salvestatud pilti ei õnnestunud kustutada. Midagi ei eemaldatud. Proovi uuesti.",
+        "conceptDuplicateFailed": "Pilte ei õnnestunud kopeerida. Koopiat ei loodud. Proovi uuesti.",
+        "conceptMarketFull": "Turul võib olla kuni {max} kontseptsiooni.",
+        "imageInvalid": "See fail ei ole kehtiv JPG-, PNG- ega WebP-pilt.",
+        "imageUnknownUpload": "See üleslaadimine aegus. Lisa pilt uuesti.",
+        "imageAlreadyCompleted": "See üleslaadimine on juba lõpetatud.",
+        "imageDeleteFailed": "Pilti ei õnnestunud kustutada. Proovi uuesti.",
+        "imageLimitCount": "Kontseptsioonis võib olla kuni {max} pilti (praegu {used}).",
+        "imageLimitBytes": "Kontseptsiooni pildid võivad kokku olla kuni {max} MB (praegu {used} MB).",
+        "linkInvalidUrl": "See ei ole kehtiv avalik https-aadress.",
+        "linkLimitCount": "Selle kontseptsiooni linkide piir on täis."
       },
       "counts": {
         "angles": "{count} nurk | {count} nurka",
@@ -1922,6 +1945,133 @@
         "emptyPersonas": {
           "body": "Lisa sammus 2 sellele turule persoonad ja täida seejärel selle maatriks.",
           "cta": "Lisa persoonad"
+        }
+      },
+      "concepts": {
+        "title": "Kontseptsioonid · {market}",
+        "subtitle": "Kuni {max} kontseptsiooni turu kohta. Igaüks põhineb ühel personal.",
+        "add": "Lisa kontseptsioon",
+        "tile": "{count}/{max} kontseptsiooni",
+        "tileMax": "Maksimum täis: {count}/{max} kontseptsiooni",
+        "underMinimum": "Turul {market} on {count} soovitatud {min} või enamast kontseptsioonist.",
+        "status": {
+          "awaiting": "Ootab klienti",
+          "approved": "Kinnitatud",
+          "changes_requested": "Muudatusi taotletud"
+        },
+        "stage": {
+          "tofu": "Lehtri ülaosa (TOFU)",
+          "mofu": "Lehtri keskosa (MOFU)",
+          "bofu": "Lehtri alaosa (BOFU)",
+          "none": "Etappi pole"
+        },
+        "menu": {
+          "edit": "Muuda",
+          "decide": "Salvesta kliendi otsus",
+          "duplicate": "Dubleeri",
+          "delete": "Kustuta",
+          "deleteDecided": "Ainult administraator või manager"
+        },
+        "banner": {
+          "counts": "{approved}/{total} kinnitatud · {awaiting} ootab klienti · {changes} muudatustaotlusega",
+          "allApproved": "Kõik kontseptsioonid kinnitatud ({total})",
+          "record": "Salvesta kliendi otsus"
+        },
+        "card": {
+          "number": "Kontseptsioon {n}",
+          "menu": "Kontseptsiooni {n} toimingud",
+          "stage": "Lehtri etapp",
+          "stageNone": "Lehtri etapp",
+          "approvedBy": "Kinnitas {name} · {date}"
+        },
+        "field": {
+          "product": "Toode",
+          "angle": "Vaatenurk",
+          "primary_message": "Põhisõnum",
+          "hypothesis": "Hüpotees",
+          "hook": "Konks",
+          "format_visual": "Formaat / visuaal",
+          "key_points": "Põhipunktid",
+          "payoff": "Poeen",
+          "cta": "CTA"
+        },
+        "dialog": {
+          "addTitle": "Lisa kontseptsioon · {market}",
+          "editTitle": "Muuda kontseptsiooni",
+          "persona": "Persona",
+          "stage": "Lehtri etapp",
+          "stageNote": "Lehtri märkus",
+          "title": "Kontseptsiooni pealkiri",
+          "usps": "USP-d",
+          "uspsHint": "Persona maatriksist: kõigepealt Prioriteet, siis Toetav.",
+          "uspMode": "Persona muutus. Mis peaks USP-dega juhtuma?",
+          "uspModeRefill": "Asenda need uue persona maatriksi USP-dega",
+          "uspModeKeep": "Säilita praegused USP-d",
+          "fixFields": "Paranda allpool märgitud väljad."
+        },
+        "decision": {
+          "title": "Salvesta kliendi otsus",
+          "concept": "Kontseptsioon",
+          "clientName": "Kliendi nimi",
+          "note": "Märkus (valikuline)",
+          "comment": "Mida tuleks muuta",
+          "replaces": "Uus otsus asendab oleku. Varasemad otsused jäävad ajalukku."
+        },
+        "delete": {
+          "title": "Kas kustutada kontseptsioon {title}?",
+          "body": "Kontseptsioon, selle pildid ja lingid kustutatakse. Seda ei saa tagasi võtta.",
+          "bodyDecided": "Kliendi otsus kustutatakse koos sellega."
+        },
+        "reset": {
+          "title": "Kas tühistada kliendi kinnitus?",
+          "body": "See kontseptsioon on kinnitatud. Muutmine viib selle tagasi olekusse Ootab klienti ja tühistab kliendi kinnituse.",
+          "confirm": "Muuda ja tühista kinnitus"
+        },
+        "images": {
+          "label": "Pildid",
+          "count": "{count}/{max} pilti · {used}/{total} MB",
+          "add": "Lisa pilte",
+          "full": "Maksimum {max} pilti täis",
+          "open": "Ava {name}",
+          "remove": "Eemalda {name}",
+          "close": "Sulge",
+          "loadFailed": "Pilti ei õnnestunud laadida."
+        },
+        "links": {
+          "label": "Lingid",
+          "add": "Lisa link",
+          "full": "Maksimum {max} linki täis",
+          "edit": "Muuda: {title}",
+          "remove": "Eemalda: {title}"
+        },
+        "link": {
+          "addTitle": "Lisa link",
+          "editTitle": "Muuda linki",
+          "titleLabel": "Pealkiri",
+          "urlLabel": "Aadress",
+          "urlPlaceholder": "https://naide.ee/leht",
+          "problem": {
+            "empty": "Sisesta aadress.",
+            "scheme": "Lubatud on ainult https-lingid.",
+            "invalid": "See ei ole kehtiv avalik https-aadress."
+          }
+        },
+        "upload": {
+          "refusedType": "{name}: aktsepteeritakse ainult JPG-, PNG- ja WebP-pilte.",
+          "refusedEmpty": "{name}: fail on tühi.",
+          "refusedCount": "{name}: kontseptsioonis võib olla kuni {max} pilti.",
+          "refusedBytes": "{name}: kontseptsiooni pildid võivad kokku olla kuni {max} MB.",
+          "failed": "Üleslaadimine ebaõnnestus.",
+          "progress": "Üleslaadimine: {name}",
+          "retry": "Proovi uuesti",
+          "dismiss": "Loobu"
+        },
+        "emptyState": {
+          "title": "Turul {market} pole veel kontseptsioone",
+          "body": "Lisa kontseptsioon selle turu personale. Soovitame {min} või rohkem.",
+          "noPersonasTitle": "Turul {market} pole veel personasid",
+          "noPersonasBody": "Kontseptsioon põhineb personal. Lisa kõigepealt sellele turule personad.",
+          "toPersonas": "Mine personade juurde"
         }
       }
     }

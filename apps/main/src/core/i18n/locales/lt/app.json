@@ -1482,7 +1482,8 @@
         "brandArchived": "Šis prekių ženklas suarchyvuotas. Atkurkite jį, kad galėtumėte keisti jo bangas.",
         "saveFailed": "Nepavyko išsaugoti bangos. Bandykite dar kartą.",
         "waveNotAvailable": "Šios bangos negalima susieti su šia kampanija.",
-        "marketHasPersonas": "Pirmiausia pašalinkite šių rinkų personas: {markets}."
+        "marketHasPersonas": "Pirmiausia pašalinkite šių rinkų personas: {markets}.",
+        "marketHasConcepts": "Konceptų yra rinkose: {markets}."
       },
       "dialog": {
         "createTitle": "Nauja banga",
@@ -1706,9 +1707,12 @@
         "personaNone": "Personų dar nėra",
         "statusPersonas": "{count} persona · {covered} iš {markets} rinkų | {count} personos · {covered} iš {markets} rinkų",
         "notAvailable": "Dar neprieinama",
-        "locked": "Užrakinta, kol bus patvirtintos visos koncepcijos",
         "matrixStatus": "Nustatytas {set} langelis iš {total} | Nustatyta {set} langelių iš {total}",
-        "matrixNone": "Pirmiausia pridėkite USP ir personas"
+        "matrixNone": "Pirmiausia pridėkite USP ir personas",
+        "conceptsNone": "Konceptų dar nėra",
+        "conceptsStatus": "Patvirtinta {approved} iš {total}",
+        "conceptsWarning": "Konceptai: patvirtinta {approved} iš {total}",
+        "conceptsWarningNone": "Konceptų dar nėra"
       },
       "audience": {
         "label": "Auditorijos pavadinimas",
@@ -1754,7 +1758,9 @@
           "refreshed": "Sąrašas pasikeitė, kol langas buvo atidarytas. Peržiūrėkite jį ir patvirtinkite dar kartą.",
           "bodyInUseCells": "{count} vieta naudoja šį USP ir išvaloma kartu su juo: | {count} vietos naudoja šį USP ir išvalomos kartu su juo:",
           "confirmInUseCells": "Ištrinti ir išvalyti {count} elementą | Ištrinti ir išvalyti {count} elementus",
-          "itemCell": "Langelis: {level}"
+          "itemCell": "Langelis: {level}",
+          "itemConcept": "Koncepto žetonas pašalintas",
+          "conceptsNote": "Konceptai su šiuo USP praranda žetoną. Patvirtintas konceptas grįžta į „Laukiama kliento“."
         },
         "usedByBoth": "Naudoja {angles} ir {cells}"
       },
@@ -1852,7 +1858,8 @@
         "synced": "{count} sinchronizuotas kampas nekopijuojamas. Užpildykite rinkos {market} matricą. | {count} sinchronizuoti kampai nekopijuojami. Užpildykite rinkos {market} matricą."
       },
       "validation": {
-        "tooLong": "Daugiausia {max} simbolių."
+        "tooLong": "Daugiausia {max} simbolių.",
+        "required": "Šis laukas privalomas."
       },
       "errors": {
         "loadFailed": "Nepavyko įkelti. Bandykite dar kartą.",
@@ -1872,7 +1879,23 @@
         "conflict": "Kažkas tai pakeitė tuo pačiu metu. Įkelkite iš naujo ir bandykite dar kartą.",
         "brandArchived": "Archyvuotas prekės ženklas yra tik skaitomas. Pirmiausia jį atkurkite.",
         "forbidden": "Tai gali padaryti tik adminas arba vadovas.",
-        "angleSyncedReadOnly": "Pakeiskite tai Žinučių matricoje."
+        "angleSyncedReadOnly": "Pakeiskite tai Žinučių matricoje.",
+        "personaInUseByConcepts": "Šią personą naudoja konceptai ({count}). Pirmiausia perkelkite juos kitai personai arba ištrinkite.",
+        "conceptPersonaInvalid": "Pasirinkite šios rinkos personą.",
+        "conceptUspModeRequired": "Pasirinkite, ar USP palikti, ar pakeisti.",
+        "conceptUspInvalid": "USP žetonas turi būti šios bangos USP.",
+        "decisionInvalid": "Patikrinkite kliento vardą ir pastabą ar komentarą.",
+        "conceptDeleteFailed": "Išsaugoto paveikslėlio nepavyko ištrinti. Niekas nepašalinta. Bandykite dar kartą.",
+        "conceptDuplicateFailed": "Paveikslėlių nepavyko nukopijuoti. Kopija nesukurta. Bandykite dar kartą.",
+        "conceptMarketFull": "Rinkoje gali būti ne daugiau kaip {max} konceptų.",
+        "imageInvalid": "Šis failas nėra tinkamas JPG, PNG ar WebP paveikslėlis.",
+        "imageUnknownUpload": "Šis įkėlimas nebegalioja. Pridėkite paveikslėlį iš naujo.",
+        "imageAlreadyCompleted": "Šis įkėlimas jau baigtas.",
+        "imageDeleteFailed": "Paveikslėlio nepavyko ištrinti. Bandykite dar kartą.",
+        "imageLimitCount": "Konceptą gali sudaryti ne daugiau kaip {max} paveikslėlių (dabar {used}).",
+        "imageLimitBytes": "Koncepto paveikslėliai kartu gali užimti ne daugiau kaip {max} MB (dabar {used} MB).",
+        "linkInvalidUrl": "Tai nėra tinkamas viešas https adresas.",
+        "linkLimitCount": "Pasiektas šio koncepto nuorodų limitas."
       },
       "counts": {
         "angles": "{count} kampas | {count} kampai",
@@ -1922,6 +1945,133 @@
         "emptyPersonas": {
           "body": "2 žingsnyje pridėkite šios rinkos personas, tada užpildykite jos matricą.",
           "cta": "Pridėti personas"
+        }
+      },
+      "concepts": {
+        "title": "Konceptai · {market}",
+        "subtitle": "Iki {max} konceptų vienai rinkai. Kiekvienas grindžiamas viena persona.",
+        "add": "Pridėti konceptą",
+        "tile": "{count} iš {max} konceptų",
+        "tileMax": "Pasiektas maksimumas: {count} iš {max} konceptų",
+        "underMinimum": "Rinkoje {market} yra {count} iš rekomenduojamų {min} ar daugiau konceptų.",
+        "status": {
+          "awaiting": "Laukiama kliento",
+          "approved": "Patvirtinta",
+          "changes_requested": "Prašoma pakeitimų"
+        },
+        "stage": {
+          "tofu": "Piltuvo viršus (TOFU)",
+          "mofu": "Piltuvo vidurys (MOFU)",
+          "bofu": "Piltuvo apačia (BOFU)",
+          "none": "Be etapo"
+        },
+        "menu": {
+          "edit": "Redaguoti",
+          "decide": "Užfiksuoti kliento sprendimą",
+          "duplicate": "Dubliuoti",
+          "delete": "Ištrinti",
+          "deleteDecided": "Tik administratorius arba vadovas"
+        },
+        "banner": {
+          "counts": "Patvirtinta {approved} iš {total} · {awaiting} laukia kliento · {changes} su prašomais pakeitimais",
+          "allApproved": "Visi konceptai patvirtinti ({total})",
+          "record": "Užfiksuoti kliento sprendimą"
+        },
+        "card": {
+          "number": "Konceptas {n}",
+          "menu": "Veiksmai konceptui {n}",
+          "stage": "Piltuvo etapas",
+          "stageNone": "Piltuvo etapas",
+          "approvedBy": "Patvirtino {name} · {date}"
+        },
+        "field": {
+          "product": "Produktas",
+          "angle": "Kampas",
+          "primary_message": "Pagrindinė žinutė",
+          "hypothesis": "Hipotezė",
+          "hook": "Kabliukas",
+          "format_visual": "Formatas / vizualas",
+          "key_points": "Pagrindiniai punktai",
+          "payoff": "Atomazga",
+          "cta": "CTA"
+        },
+        "dialog": {
+          "addTitle": "Pridėti konceptą · {market}",
+          "editTitle": "Redaguoti konceptą",
+          "persona": "Persona",
+          "stage": "Piltuvo etapas",
+          "stageNote": "Piltuvo pastaba",
+          "title": "Koncepto pavadinimas",
+          "usps": "USP",
+          "uspsHint": "Iš personos matricos: pirmiausia Prioritetas, paskui Parama.",
+          "uspMode": "Persona pasikeitė. Ką daryti su USP?",
+          "uspModeRefill": "Pakeisti juos naujos personos matricos USP",
+          "uspModeKeep": "Palikti dabartinius USP",
+          "fixFields": "Pataisykite žemiau pažymėtus laukus."
+        },
+        "decision": {
+          "title": "Užfiksuoti kliento sprendimą",
+          "concept": "Konceptas",
+          "clientName": "Kliento vardas",
+          "note": "Pastaba (neprivaloma)",
+          "comment": "Ką reikia pakeisti",
+          "replaces": "Naujas sprendimas pakeičia būseną. Ankstesni sprendimai lieka istorijoje."
+        },
+        "delete": {
+          "title": "Ištrinti konceptą {title}?",
+          "body": "Konceptas, jo paveikslėliai ir nuorodos bus ištrinti. To atšaukti negalima.",
+          "bodyDecided": "Kliento sprendimas ištrinamas kartu su juo."
+        },
+        "reset": {
+          "title": "Atšaukti kliento patvirtinimą?",
+          "body": "Šis konceptas patvirtintas. Pakeitus jį, jis grįžta į „Laukiama kliento“, o kliento patvirtinimas atšaukiamas.",
+          "confirm": "Pakeisti ir atšaukti patvirtinimą"
+        },
+        "images": {
+          "label": "Paveikslėliai",
+          "count": "{count} iš {max} paveikslėlių · {used} iš {total} MB",
+          "add": "Pridėti paveikslėlių",
+          "full": "Pasiektas {max} paveikslėlių maksimumas",
+          "open": "Atidaryti {name}",
+          "remove": "Pašalinti {name}",
+          "close": "Uždaryti",
+          "loadFailed": "Nepavyko įkelti paveikslėlio."
+        },
+        "links": {
+          "label": "Nuorodos",
+          "add": "Pridėti nuorodą",
+          "full": "Pasiektas {max} nuorodų maksimumas",
+          "edit": "Redaguoti {title}",
+          "remove": "Pašalinti {title}"
+        },
+        "link": {
+          "addTitle": "Pridėti nuorodą",
+          "editTitle": "Redaguoti nuorodą",
+          "titleLabel": "Pavadinimas",
+          "urlLabel": "Adresas",
+          "urlPlaceholder": "https://pavyzdys.lt/puslapis",
+          "problem": {
+            "empty": "Įveskite adresą.",
+            "scheme": "Leidžiamos tik https nuorodos.",
+            "invalid": "Tai nėra tinkamas viešas https adresas."
+          }
+        },
+        "upload": {
+          "refusedType": "{name}: priimami tik JPG, PNG ir WebP paveikslėliai.",
+          "refusedEmpty": "{name}: failas tuščias.",
+          "refusedCount": "{name}: konceptą gali sudaryti ne daugiau kaip {max} paveikslėlių.",
+          "refusedBytes": "{name}: koncepto paveikslėliai kartu gali užimti ne daugiau kaip {max} MB.",
+          "failed": "Įkelti nepavyko.",
+          "progress": "Įkeliama: {name}",
+          "retry": "Bandyti dar kartą",
+          "dismiss": "Atmesti"
+        },
+        "emptyState": {
+          "title": "Rinkai {market} konceptų dar nėra",
+          "body": "Pridėkite konceptą šios rinkos personai. Rekomenduojame {min} ar daugiau.",
+          "noPersonasTitle": "Rinkai {market} personų dar nėra",
+          "noPersonasBody": "Konceptas grindžiamas persona. Pirmiausia pridėkite šios rinkos personų.",
+          "toPersonas": "Eiti į personas"
         }
       }
     }

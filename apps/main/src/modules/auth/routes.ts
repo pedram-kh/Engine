@@ -360,6 +360,13 @@ export const appRoutes: RouteRecordRaw[] = [
     component: () => import('@/modules/strategy/pages/StrategyPage.vue'),
     meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
+  // PL-2.3 — step 4, the concepts. Same page and same flag rule as the steps above.
+  {
+    path: '/brands/:ulid/waves/:waveUlid/strategy/concepts',
+    name: 'strategy.concepts',
+    component: () => import('@/modules/strategy/pages/StrategyPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
 
   // ── Campaigns ──────────────────────────────────────────────────────────────
   // Sprint 8 Chunk 1. Any agency member may view (list/detail); create + the

@@ -14,6 +14,8 @@ export interface StrategyContext {
   scope: ComputedRef<WaveScope | null>
   /** Admin or manager. Staff can do everything except delete a USP that personas use. */
   canDeleteInUse: ComputedRef<boolean>
+  /** PL-2.3: admin or manager. Records a client's decision and deletes a concept that is Approved or Changes requested. */
+  canDecide: ComputedRef<boolean>
 }
 
 export function useStrategyContext(): StrategyContext {
@@ -31,5 +33,5 @@ export function useStrategyContext(): StrategyContext {
     () =>
       agencyStore.currentRole === 'agency_admin' || agencyStore.currentRole === 'agency_manager',
   )
-  return { brandId, waveId, scope, canDeleteInUse }
+  return { brandId, waveId, scope, canDeleteInUse, canDecide: canDeleteInUse }
 }

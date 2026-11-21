@@ -268,6 +268,7 @@ function move(usp: WaveUspResource, by: -1 | 1): void {
       v-model="deleteDialog"
       :scope="scope"
       :usp="deleting"
+      :markets="summary.attributes.markets.map((m) => m.market)"
       :can-delete-in-use="canDeleteInUse"
       @deleted="onDeleted"
       @stale="load"

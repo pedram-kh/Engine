@@ -43,6 +43,11 @@ export interface HttpRequestOptions {
    * not set it manually.
    */
   headers?: Record<string, string>
+  /**
+   * `'blob'` reads the body as binary (an authenticated image). Only meaningful on `get`. The same cookie or bearer
+   * credentials as every other call are sent, which is the point: a file behind the API's policy check has no public URL.
+   */
+  responseType?: 'blob'
 }
 
 export interface CreateHttpClientOptions {
@@ -237,6 +242,7 @@ export function createHttpClient(options: CreateHttpClientOptions): HttpClient {
         method: 'GET',
         url: path,
         ...(opts?.headers ? { headers: opts.headers } : {}),
+        ...(opts?.responseType ? { responseType: opts.responseType } : {}),
       })
     },
     post<T = unknown>(path: string, body?: unknown, opts?: HttpRequestOptions): Promise<T> {

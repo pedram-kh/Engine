@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * PL-2.1 — the Strategy & Scripts workspace of a wave: header, six-step stepper, and the working step (1 USPs,
- * 2 Personas or, from PL-2.2, 3 Messaging matrix; all three routes render this page). Behind two flags: `features.strategy` is true only while waves AND
+ * 2 Personas, 3 Messaging matrix (PL-2.2) or 4 Concepts (PL-2.3); all four routes render this page). Behind two flags: `features.strategy` is true only while waves AND
  * strategy are on. With waves off the page goes to the brand; with waves on and strategy off it goes to the wave
  * page, which is then exactly as PL-1 left it. Nothing is requested before that check.
  *
@@ -17,6 +17,7 @@ import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { wavesApi } from '@/modules/waves/api/waves.api'
 import { strategyApi } from '../api/strategy.api'
+import ConceptsStep from '../components/ConceptsStep.vue'
 import MatrixStep from '../components/MatrixStep.vue'
 import PersonasStep from '../components/PersonasStep.vue'
 import StrategyStepper from '../components/StrategyStepper.vue'
@@ -42,7 +43,9 @@ const step = computed<StepKey>(() =>
     ? 'personas'
     : route.name === 'strategy.matrix'
       ? 'matrix'
-      : 'usps',
+      : route.name === 'strategy.concepts'
+        ? 'concepts'
+        : 'usps',
 )
 const markets = computed(() => summary.value?.attributes.markets.map((m) => m.market) ?? [])
 
@@ -138,6 +141,14 @@ onMounted(async () => {
         :key="'matrix'"
         :summary="summary"
         :markets="markets"
+        @changed="refreshSummary"
+      />
+      <ConceptsStep
+        v-else-if="step === 'concepts'"
+        :key="'concepts'"
+        :summary="summary"
+        :markets="markets"
+        :brand-name="wave.relationships.brand.data.attributes.name"
         @changed="refreshSummary"
       />
       <PersonasStep

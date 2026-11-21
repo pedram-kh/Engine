@@ -1482,7 +1482,8 @@
         "brandArchived": "Acest brand este arhivat. Restaurați-l pentru a-i modifica valurile.",
         "saveFailed": "Valul nu a putut fi salvat. Încercați din nou.",
         "waveNotAvailable": "Acel val nu poate fi legat de această campanie.",
-        "marketHasPersonas": "Elimină mai întâi persona din aceste piețe: {markets}."
+        "marketHasPersonas": "Elimină mai întâi persona din aceste piețe: {markets}.",
+        "marketHasConcepts": "Există concepte în: {markets}."
       },
       "dialog": {
         "createTitle": "Val nou",
@@ -1706,9 +1707,12 @@
         "personaNone": "Încă nicio persona",
         "statusPersonas": "{count} persona · {covered} din {markets} piețe | {count} persona · {covered} din {markets} piețe",
         "notAvailable": "Încă indisponibil",
-        "locked": "Blocat până când toate conceptele sunt aprobate",
         "matrixStatus": "{set} din {total} celulă setată | {set} din {total} celule setate",
-        "matrixNone": "Adaugă mai întâi USP-uri și persone"
+        "matrixNone": "Adaugă mai întâi USP-uri și persone",
+        "conceptsNone": "Încă nu există concepte",
+        "conceptsStatus": "{approved} din {total} aprobate",
+        "conceptsWarning": "Concepte: {approved} din {total} aprobate",
+        "conceptsWarningNone": "Încă nu există concepte"
       },
       "audience": {
         "label": "Titlul audienței",
@@ -1754,7 +1758,9 @@
           "refreshed": "Lista s-a schimbat cât timp fereastra a fost deschisă. Verific-o și confirmă din nou.",
           "bodyInUseCells": "{count} loc folosește acest USP și este golit odată cu el: | {count} locuri folosesc acest USP și sunt golite odată cu el:",
           "confirmInUseCells": "Șterge și golește {count} element | Șterge și golește {count} elemente",
-          "itemCell": "Celulă: {level}"
+          "itemCell": "Celulă: {level}",
+          "itemConcept": "Chip de concept eliminat",
+          "conceptsNote": "Conceptele care au acest USP pierd chipul. Un concept aprobat revine la „În așteptarea clientului”."
         },
         "usedByBoth": "Folosit de {angles} și {cells}"
       },
@@ -1852,7 +1858,8 @@
         "synced": "{count} unghi sincronizat nu este copiat. Completează matricea pentru {market}. | {count} unghiuri sincronizate nu sunt copiate. Completează matricea pentru {market}."
       },
       "validation": {
-        "tooLong": "Cel mult {max} caractere."
+        "tooLong": "Cel mult {max} caractere.",
+        "required": "Acest câmp este obligatoriu."
       },
       "errors": {
         "loadFailed": "Nu s-a putut încărca. Încearcă din nou.",
@@ -1872,7 +1879,23 @@
         "conflict": "Cineva a schimbat asta în același timp. Reîncarcă și încearcă din nou.",
         "brandArchived": "Un brand arhivat este doar pentru citire. Restaurează-l mai întâi.",
         "forbidden": "Doar un admin sau un manager poate face asta.",
-        "angleSyncedReadOnly": "Modifică asta în matricea mesajelor."
+        "angleSyncedReadOnly": "Modifică asta în matricea mesajelor.",
+        "personaInUseByConcepts": "Unele concepte folosesc această persona ({count}). Mută-le la altă persona sau șterge-le mai întâi.",
+        "conceptPersonaInvalid": "Alege o persona din această piață.",
+        "conceptUspModeRequired": "Alege dacă păstrezi sau înlocuiești USP-urile.",
+        "conceptUspInvalid": "Un chip USP trebuie să fie un USP al acestui val.",
+        "decisionInvalid": "Verifică numele clientului și nota sau comentariul.",
+        "conceptDeleteFailed": "O imagine stocată nu a putut fi ștearsă. Nu s-a eliminat nimic. Încearcă din nou.",
+        "conceptDuplicateFailed": "Imaginile nu au putut fi copiate. Nu s-a creat nicio copie. Încearcă din nou.",
+        "conceptMarketFull": "O piață are cel mult {max} concepte.",
+        "imageInvalid": "Acest fișier nu este o imagine JPG, PNG sau WebP validă.",
+        "imageUnknownUpload": "Această încărcare a expirat. Adaugă din nou imaginea.",
+        "imageAlreadyCompleted": "Această încărcare a fost deja finalizată.",
+        "imageDeleteFailed": "Imaginea nu a putut fi ștearsă. Încearcă din nou.",
+        "imageLimitCount": "Un concept conține cel mult {max} imagini (acum {used}).",
+        "imageLimitBytes": "Imaginile unui concept însumează cel mult {max} MB (acum {used} MB).",
+        "linkInvalidUrl": "Aceasta nu este o adresă https publică validă.",
+        "linkLimitCount": "Limita de linkuri a acestui concept a fost atinsă."
       },
       "counts": {
         "angles": "{count} unghi | {count} unghiuri",
@@ -1922,6 +1945,133 @@
         "emptyPersonas": {
           "body": "La pasul 2 adaugă persone pentru această piață, apoi completează matricea ei.",
           "cta": "Adaugă persone"
+        }
+      },
+      "concepts": {
+        "title": "Concepte · {market}",
+        "subtitle": "Până la {max} concepte pe piață. Fiecare se bazează pe o persona.",
+        "add": "Adaugă concept",
+        "tile": "{count} din {max} concepte",
+        "tileMax": "Maximum atins: {count} din {max} concepte",
+        "underMinimum": "{market} are {count} din cele {min} sau mai multe concepte recomandate.",
+        "status": {
+          "awaiting": "În așteptarea clientului",
+          "approved": "Aprobat",
+          "changes_requested": "Modificări solicitate"
+        },
+        "stage": {
+          "tofu": "Partea de sus a pâlniei (TOFU)",
+          "mofu": "Mijlocul pâlniei (MOFU)",
+          "bofu": "Partea de jos a pâlniei (BOFU)",
+          "none": "Fără etapă"
+        },
+        "menu": {
+          "edit": "Editează",
+          "decide": "Înregistrează decizia clientului",
+          "duplicate": "Duplică",
+          "delete": "Șterge",
+          "deleteDecided": "Doar administrator sau manager"
+        },
+        "banner": {
+          "counts": "{approved} din {total} aprobate · {awaiting} în așteptarea clientului · {changes} cu modificări solicitate",
+          "allApproved": "Toate conceptele sunt aprobate ({total})",
+          "record": "Înregistrează decizia clientului"
+        },
+        "card": {
+          "number": "Concept {n}",
+          "menu": "Acțiuni pentru conceptul {n}",
+          "stage": "Etapa pâlniei",
+          "stageNone": "Etapa pâlniei",
+          "approvedBy": "Aprobat de {name} · {date}"
+        },
+        "field": {
+          "product": "Produs",
+          "angle": "Unghi",
+          "primary_message": "Mesaj principal",
+          "hypothesis": "Ipoteză",
+          "hook": "Hook",
+          "format_visual": "Format / vizual",
+          "key_points": "Puncte-cheie",
+          "payoff": "Final",
+          "cta": "CTA"
+        },
+        "dialog": {
+          "addTitle": "Adaugă concept · {market}",
+          "editTitle": "Editează conceptul",
+          "persona": "Persona",
+          "stage": "Etapa pâlniei",
+          "stageNote": "Notă despre pâlnie",
+          "title": "Titlul conceptului",
+          "usps": "USP-uri",
+          "uspsHint": "Din matricea persona: mai întâi Prioritate, apoi Suport.",
+          "uspMode": "Persona s-a schimbat. Ce se întâmplă cu USP-urile?",
+          "uspModeRefill": "Înlocuiește-le cu USP-urile din matricea noii persona",
+          "uspModeKeep": "Păstrează USP-urile actuale",
+          "fixFields": "Corectează câmpurile marcate mai jos."
+        },
+        "decision": {
+          "title": "Înregistrează decizia clientului",
+          "concept": "Concept",
+          "clientName": "Numele clientului",
+          "note": "Notă (opțional)",
+          "comment": "Ce trebuie schimbat",
+          "replaces": "O decizie nouă înlocuiește statusul. Deciziile anterioare rămân în istoric."
+        },
+        "delete": {
+          "title": "Ștergi conceptul {title}?",
+          "body": "Conceptul, imaginile și linkurile sale sunt șterse. Acțiunea nu poate fi anulată.",
+          "bodyDecided": "Decizia clientului este ștearsă odată cu el."
+        },
+        "reset": {
+          "title": "Anulezi aprobarea clientului?",
+          "body": "Acest concept este aprobat. Dacă îl modifici, revine la „În așteptarea clientului” și aprobarea clientului este anulată.",
+          "confirm": "Modifică și anulează aprobarea"
+        },
+        "images": {
+          "label": "Imagini",
+          "count": "{count} din {max} imagini · {used} din {total} MB",
+          "add": "Adaugă imagini",
+          "full": "Maximum de {max} imagini atins",
+          "open": "Deschide {name}",
+          "remove": "Elimină {name}",
+          "close": "Închide",
+          "loadFailed": "Imaginea nu a putut fi încărcată."
+        },
+        "links": {
+          "label": "Linkuri",
+          "add": "Adaugă link",
+          "full": "Maximum de {max} linkuri atins",
+          "edit": "Editează {title}",
+          "remove": "Elimină {title}"
+        },
+        "link": {
+          "addTitle": "Adaugă link",
+          "editTitle": "Editează linkul",
+          "titleLabel": "Titlu",
+          "urlLabel": "Adresă",
+          "urlPlaceholder": "https://exemplu.com/pagina",
+          "problem": {
+            "empty": "Introdu o adresă.",
+            "scheme": "Sunt permise doar linkuri https.",
+            "invalid": "Aceasta nu este o adresă https publică validă."
+          }
+        },
+        "upload": {
+          "refusedType": "{name}: sunt acceptate doar imagini JPG, PNG și WebP.",
+          "refusedEmpty": "{name}: fișierul este gol.",
+          "refusedCount": "{name}: un concept conține cel mult {max} imagini.",
+          "refusedBytes": "{name}: imaginile unui concept însumează cel mult {max} MB.",
+          "failed": "Încărcarea a eșuat.",
+          "progress": "Se încarcă {name}",
+          "retry": "Reîncearcă",
+          "dismiss": "Renunță"
+        },
+        "emptyState": {
+          "title": "Încă nu există concepte pentru {market}",
+          "body": "Adaugă un concept pentru o persona din această piață. Recomandăm {min} sau mai multe.",
+          "noPersonasTitle": "{market} nu are încă persona",
+          "noPersonasBody": "Un concept se bazează pe o persona. Adaugă mai întâi persona pentru această piață.",
+          "toPersonas": "Mergi la persona"
         }
       }
     }

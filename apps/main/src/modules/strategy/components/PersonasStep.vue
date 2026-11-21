@@ -13,7 +13,8 @@ import type {
   WavePersonaResource,
   WaveUspResource,
 } from '@catalyst/api-client'
-import { labelForCountryCode } from '@catalyst/api-client'
+import { labelForCountryCode, personaInUseByConceptsMeta } from '@catalyst/api-client'
+import type { PersonaInUseByConceptsMeta } from '@catalyst/api-client'
 import { CEmptyState } from '@catalyst/ui'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -93,6 +94,8 @@ const deleteOpen = ref(false)
 const deleting = ref<WavePersonaResource | null>(null)
 const deleteBusy = ref(false)
 const deleteError = ref<string | null>(null)
+/** PL-2.3: the concepts that use the persona; while there are any the delete is refused and they are listed. */
+const blockedBy = ref<PersonaInUseByConceptsMeta['affected']>([])
 
 function openAdd(): void {
   editing.value = null
@@ -105,6 +108,7 @@ function openEdit(p: WavePersonaResource): void {
 function askDelete(p: WavePersonaResource): void {
   deleting.value = p
   deleteError.value = null
+  blockedBy.value = []
   deleteOpen.value = true
 }
 
@@ -118,7 +122,11 @@ async function confirmDelete(): Promise<void> {
     deleteOpen.value = false
     await reload()
   } catch (err) {
-    if (isGone(err)) {
+    const inUse = personaInUseByConceptsMeta(err)
+    if (inUse !== null) {
+      blockedBy.value = inUse.affected
+      deleteError.value = strategyErrorMessage(err, t)
+    } else if (isGone(err)) {
       deleteOpen.value = false
       await reload()
     } else {
@@ -355,8 +363,19 @@ const deletingCells = computed(() =>
       :confirm-label="t('app.strategy.persona.delete')"
       :busy="deleteBusy"
       :error="deleteError"
+      :confirm-disabled="blockedBy.length > 0"
       @confirm="confirmDelete"
     >
+      <ul
+        v-if="blockedBy.length > 0"
+        class="persona-delete-cells"
+        data-test="persona-delete-concepts"
+      >
+        <li v-for="c in blockedBy" :key="c.concept">
+          {{ t('app.strategy.concepts.card.number', { n: c.number }) }} · {{ c.title }} ·
+          {{ t(`app.strategy.concepts.status.${c.status}`) }}
+        </li>
+      </ul>
       <ul v-if="cellCount > 0" class="persona-delete-cells" data-test="persona-delete-cells">
         <li v-for="c in deletingCells" :key="c.usp + c.level">
           {{ c.usp }} · {{ t(`app.strategy.matrix.level.${c.level}`) }}

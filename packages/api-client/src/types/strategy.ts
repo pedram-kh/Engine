@@ -32,6 +32,28 @@ export interface StrategyLimits {
   matrix_line: number
   /** Cells in one write request. */
   matrix_batch_max: number
+  /** PL-2.3: concepts. Each is a limit the server enforces; the per-field text limits are the PL-2.3 constants below. */
+  concept_max_per_market: number
+  concept_min_recommended: number
+  concept_title: number
+  concept_funnel_note: number
+  concept_product: number
+  concept_angle: number
+  concept_primary_message: number
+  concept_hypothesis: number
+  concept_hook: number
+  concept_format_visual: number
+  concept_payoff: number
+  concept_cta: number
+  concept_key_points: number
+  concept_key_point: number
+  client_name: number
+  decision_note: number
+  decision_comment: number
+  link_title: number
+  links_per_concept: number
+  images_per_concept: number
+  image_total_bytes: number
 }
 
 export interface StrategyMarketCount {
@@ -51,7 +73,30 @@ export interface StrategySummaryResource {
     limits: StrategyLimits
     /** The wave-level progress of step 3 (PL-2.2): set cells over USPs times personas of every market. */
     matrix: MatrixProgress
+    /** PL-2.3: step 4. Derived from the concept rows; nothing here ever locks a step. */
+    concepts: ConceptsSummary
   }
+}
+
+export interface ConceptMarketCounts {
+  market: string
+  total: number
+  approved: number
+  awaiting: number
+  changes_requested: number
+  /** At least one concept and every one approved. */
+  complete: boolean
+  /** Fewer concepts than the recommended three (a warning, never a block). */
+  under_minimum: boolean
+}
+
+export interface ConceptsSummary {
+  total: number
+  approved: number
+  awaiting: number
+  changes_requested: number
+  markets_complete: number
+  by_market: ConceptMarketCounts[]
 }
 
 /** A cell with a row counts as set, whatever its level (a Low cell is a decision). */
@@ -175,8 +220,8 @@ export interface PersonaCopyPayload {
 
 /** What a 409 `usp.in_use` carries in `error.details[0].meta`, read through {@link uspInUseMeta}. */
 export interface UspInUseAffected {
-  /** A hand-written angle, or a matrix cell (with its level). */
-  kind: 'angle' | 'cell'
+  /** A hand-written angle, a matrix cell (with its level), or (PL-2.3) a concept that carries the USP as a chip. */
+  kind: 'angle' | 'cell' | 'concept'
   level: MatrixLevel | null
   persona: string
   market: string
@@ -193,7 +238,14 @@ export interface UspInUseMeta {
 
 /** What a 422 `wave.market_has_personas` carries, read through {@link marketHasPersonasMeta}. */
 export interface MarketHasPersonasMeta {
-  markets: StrategyMarketCount[]
+  /** `concept_count` (PL-2.3) is present only for a market that has concepts. */
+  markets: (StrategyMarketCount & { concept_count?: number })[]
+}
+
+/** What a 422 `persona.in_use_by_concepts` carries, read through {@link personaInUseByConceptsMeta}. */
+export interface PersonaInUseByConceptsMeta {
+  count: number
+  affected: { concept: string; number: number; title: string; status: ConceptStatus }[]
 }
 
 /** What a 422 `persona.copy_exceeds_cap` carries. */
@@ -278,4 +330,136 @@ export interface MatrixCellChange {
 
 export interface MatrixSaveEnvelope {
   data: { cells: MatrixCell[]; progress: MatrixProgress }
+}
+
+// --- Concepts (PL-2.3) -------------------------------------------------------------------------------------
+
+export type ConceptStatus = 'awaiting' | 'approved' | 'changes_requested'
+export type FunnelStage = 'tofu' | 'mofu' | 'bofu'
+
+export interface ConceptChip {
+  id: string
+  title: string
+  color_key: UspColorKey
+}
+
+export interface ConceptImage {
+  id: string
+  original_filename: string
+  mime_type: string
+  size_bytes: number | null
+  has_thumbnail: boolean
+  /** API paths, fetched with the app's own authentication. Never a storage URL. */
+  file_url: string
+  thumbnail_url: string | null
+}
+
+export interface ConceptLink {
+  id: string
+  url: string
+  title: string
+  /** Derived by the server from the stored URL. */
+  domain: string
+}
+
+export interface ConceptDecision {
+  id: string
+  status: 'approved' | 'changes_requested'
+  client_name: string
+  note: string | null
+  comment: string | null
+  source: string
+  recorded_at: string
+  recorded_by: { id: string; name: string } | null
+}
+
+export interface WaveConceptResource {
+  id: string
+  type: 'wave_concept'
+  attributes: {
+    market: string
+    number: number
+    title: string
+    status: ConceptStatus
+    persona: { id: string; code: string; title: string; name: string; color_key: UspColorKey }
+    funnel_stage: FunnelStage | null
+    funnel_note: string | null
+    product: string | null
+    angle: string | null
+    primary_message: string | null
+    hypothesis: string | null
+    hook: string | null
+    format_visual: string | null
+    key_points: string[]
+    payoff: string | null
+    cta: string | null
+    usps: ConceptChip[]
+    images: ConceptImage[]
+    links: ConceptLink[]
+    decision: ConceptDecision | null
+    reset_to_awaiting: boolean
+    created_at: string
+    updated_at: string
+  }
+}
+
+export interface ConceptListResponse {
+  data: WaveConceptResource[]
+  meta: { market: ConceptMarketCounts | null }
+}
+export interface ConceptEnvelope {
+  data: WaveConceptResource
+}
+
+/** A partial body on PATCH: only the fields that changed. `null` clears a text field. */
+export interface ConceptPayload {
+  market?: string
+  persona?: string
+  /** Required with a new `persona` on PATCH. */
+  usp_mode?: 'keep' | 'refill'
+  usps?: string[]
+  title?: string
+  funnel_stage?: FunnelStage | null
+  funnel_note?: string | null
+  product?: string | null
+  angle?: string | null
+  primary_message?: string | null
+  hypothesis?: string | null
+  hook?: string | null
+  format_visual?: string | null
+  key_points?: string[] | null
+  payoff?: string | null
+  cta?: string | null
+}
+
+export interface ConceptDecisionPayload {
+  status: 'approved' | 'changes_requested'
+  client_name: string
+  note?: string | null
+  comment?: string | null
+}
+
+export interface ConceptImageInitPayload {
+  mime_type: string
+  declared_bytes: number
+  original_filename: string
+}
+export interface ConceptImageInitResponse {
+  data: { upload_url: string; upload_id: string; expires_at: string; max_bytes: number }
+}
+export interface ConceptImageEnvelope {
+  data: ConceptImage
+  meta: { reset_to_awaiting: boolean }
+}
+export interface ConceptLinkPayload {
+  url?: string
+  title?: string
+}
+export interface ConceptLinkEnvelope {
+  data: ConceptLink
+  meta: { reset_to_awaiting: boolean }
+}
+/** What deleting an image or a link answers: whether the concept went back to Awaiting. */
+export interface ConceptResetResponse {
+  meta: { reset_to_awaiting: boolean }
 }

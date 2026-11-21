@@ -1482,7 +1482,8 @@
         "brandArchived": "Cette marque est archivée. Restaurez-la pour modifier ses vagues.",
         "saveFailed": "Impossible d'enregistrer la vague. Réessayez.",
         "waveNotAvailable": "Cette vague ne peut pas être liée à cette campagne.",
-        "marketHasPersonas": "Supprimez d'abord les personas de ces marchés : {markets}."
+        "marketHasPersonas": "Supprimez d'abord les personas de ces marchés : {markets}.",
+        "marketHasConcepts": "Des concepts existent dans : {markets}."
       },
       "dialog": {
         "createTitle": "Nouvelle vague",
@@ -1706,9 +1707,12 @@
         "personaNone": "Aucun persona pour l'instant",
         "statusPersonas": "{count} persona · {covered} marché sur {markets} | {count} personas · {covered} marchés sur {markets}",
         "notAvailable": "Pas encore disponible",
-        "locked": "Verrouillé jusqu'à l'approbation de tous les concepts",
         "matrixStatus": "{set} cellule définie sur {total} | {set} cellules définies sur {total}",
-        "matrixNone": "Ajoutez d'abord des USP et des personas"
+        "matrixNone": "Ajoutez d'abord des USP et des personas",
+        "conceptsNone": "Aucun concept pour l'instant",
+        "conceptsStatus": "{approved} sur {total} approuvés",
+        "conceptsWarning": "Concepts : {approved} sur {total} approuvés",
+        "conceptsWarningNone": "Aucun concept pour l'instant"
       },
       "audience": {
         "label": "Titre de l'audience",
@@ -1754,7 +1758,9 @@
           "refreshed": "La liste a changé pendant que cette fenêtre était ouverte. Vérifiez-la et confirmez à nouveau.",
           "bodyInUseCells": "{count} emplacement utilise cet USP et est vidé avec lui : | {count} emplacements utilisent cet USP et sont vidés avec lui :",
           "confirmInUseCells": "Supprimer et vider {count} élément | Supprimer et vider {count} éléments",
-          "itemCell": "Cellule {level}"
+          "itemCell": "Cellule {level}",
+          "itemConcept": "Pastille de concept retirée",
+          "conceptsNote": "Les concepts qui portent cet USP perdent la pastille. Un concept approuvé repasse en attente du client."
         },
         "usedByBoth": "Utilisée par {angles} et {cells}"
       },
@@ -1852,7 +1858,8 @@
         "synced": "{count} angle synchronisé n'est pas copié. Remplissez la matrice de {market}. | {count} angles synchronisés ne sont pas copiés. Remplissez la matrice de {market}."
       },
       "validation": {
-        "tooLong": "{max} caractères au maximum."
+        "tooLong": "{max} caractères au maximum.",
+        "required": "Ce champ est obligatoire."
       },
       "errors": {
         "loadFailed": "Chargement impossible. Réessayez.",
@@ -1872,7 +1879,23 @@
         "conflict": "Quelqu'un a modifié cet élément au même moment. Rechargez et réessayez.",
         "brandArchived": "Une marque archivée est en lecture seule. Restaurez-la d'abord.",
         "forbidden": "Seul un admin ou un manager peut faire cela.",
-        "angleSyncedReadOnly": "Modifiez cela dans la matrice de messages."
+        "angleSyncedReadOnly": "Modifiez cela dans la matrice de messages.",
+        "personaInUseByConcepts": "Des concepts utilisent cette persona ({count}). Déplacez-les vers une autre persona ou supprimez-les d'abord.",
+        "conceptPersonaInvalid": "Choisissez une persona de ce marché.",
+        "conceptUspModeRequired": "Choisissez de conserver ou de remplacer les USP.",
+        "conceptUspInvalid": "Une pastille USP doit être un USP de cette vague.",
+        "decisionInvalid": "Vérifiez le nom du client et la note ou le commentaire.",
+        "conceptDeleteFailed": "Une image enregistrée n'a pas pu être supprimée. Rien n'a été retiré. Réessayez.",
+        "conceptDuplicateFailed": "Les images n'ont pas pu être copiées. Aucune copie n'a été créée. Réessayez.",
+        "conceptMarketFull": "Un marché compte au plus {max} concepts.",
+        "imageInvalid": "Ce fichier n'est pas une image JPG, PNG ou WebP valide.",
+        "imageUnknownUpload": "Ce téléversement a expiré. Ajoutez à nouveau l'image.",
+        "imageAlreadyCompleted": "Ce téléversement est déjà terminé.",
+        "imageDeleteFailed": "L'image n'a pas pu être supprimée. Réessayez.",
+        "imageLimitCount": "Un concept contient au plus {max} images ({used} actuellement).",
+        "imageLimitBytes": "Les images d'un concept ne peuvent dépasser {max} Mo au total ({used} Mo actuellement).",
+        "linkInvalidUrl": "Ce n'est pas une adresse https publique valide.",
+        "linkLimitCount": "La limite de liens de ce concept est atteinte."
       },
       "counts": {
         "angles": "{count} angle | {count} angles",
@@ -1922,6 +1945,133 @@
         "emptyPersonas": {
           "body": "Ajoutez à l'étape 2 des personas pour ce marché, puis remplissez sa matrice.",
           "cta": "Ajouter des personas"
+        }
+      },
+      "concepts": {
+        "title": "Concepts · {market}",
+        "subtitle": "Jusqu'à {max} concepts par marché. Chacun repose sur une persona.",
+        "add": "Ajouter un concept",
+        "tile": "{count} concepts sur {max}",
+        "tileMax": "Maximum atteint : {count} concepts sur {max}",
+        "underMinimum": "{market} compte {count} concepts sur les {min} ou plus que nous recommandons.",
+        "status": {
+          "awaiting": "En attente du client",
+          "approved": "Approuvé",
+          "changes_requested": "Modifications demandées"
+        },
+        "stage": {
+          "tofu": "Haut de l'entonnoir (TOFU)",
+          "mofu": "Milieu de l'entonnoir (MOFU)",
+          "bofu": "Bas de l'entonnoir (BOFU)",
+          "none": "Aucune étape"
+        },
+        "menu": {
+          "edit": "Modifier",
+          "decide": "Enregistrer la décision du client",
+          "duplicate": "Dupliquer",
+          "delete": "Supprimer",
+          "deleteDecided": "Réservé aux admins et managers"
+        },
+        "banner": {
+          "counts": "{approved} sur {total} approuvés · {awaiting} en attente du client · {changes} avec modifications demandées",
+          "allApproved": "Tous les concepts sont approuvés ({total})",
+          "record": "Enregistrer la décision du client"
+        },
+        "card": {
+          "number": "Concept {n}",
+          "menu": "Actions pour le concept {n}",
+          "stage": "Étape de l'entonnoir",
+          "stageNone": "Étape de l'entonnoir",
+          "approvedBy": "Approuvé par {name} · {date}"
+        },
+        "field": {
+          "product": "Produit",
+          "angle": "Angle",
+          "primary_message": "Message principal",
+          "hypothesis": "Hypothèse",
+          "hook": "Accroche",
+          "format_visual": "Format / visuel",
+          "key_points": "Points clés",
+          "payoff": "Chute",
+          "cta": "CTA"
+        },
+        "dialog": {
+          "addTitle": "Ajouter un concept · {market}",
+          "editTitle": "Modifier le concept",
+          "persona": "Persona",
+          "stage": "Étape de l'entonnoir",
+          "stageNote": "Note sur l'entonnoir",
+          "title": "Titre du concept",
+          "usps": "USP",
+          "uspsHint": "Issus de la matrice de la persona : Priorité d'abord, puis Soutien.",
+          "uspMode": "La persona a changé. Que faire des USP ?",
+          "uspModeRefill": "Les remplacer par les USP de la matrice de la nouvelle persona",
+          "uspModeKeep": "Conserver les USP actuels",
+          "fixFields": "Corrigez les champs signalés ci-dessous."
+        },
+        "decision": {
+          "title": "Enregistrer la décision du client",
+          "concept": "Concept",
+          "clientName": "Nom du client",
+          "note": "Note (facultatif)",
+          "comment": "Ce qui doit changer",
+          "replaces": "Une nouvelle décision remplace le statut. Les décisions précédentes restent dans l'historique."
+        },
+        "delete": {
+          "title": "Supprimer le concept {title} ?",
+          "body": "Le concept, ses images et ses liens sont supprimés. Cette action est irréversible.",
+          "bodyDecided": "La décision du client est supprimée avec lui."
+        },
+        "reset": {
+          "title": "Annuler l'approbation du client ?",
+          "body": "Ce concept est approuvé. Le modifier le remet en attente du client et annule son approbation.",
+          "confirm": "Modifier et annuler l'approbation"
+        },
+        "images": {
+          "label": "Images",
+          "count": "{count} images sur {max} · {used} Mo sur {total}",
+          "add": "Ajouter des images",
+          "full": "Maximum de {max} images atteint",
+          "open": "Ouvrir {name}",
+          "remove": "Retirer {name}",
+          "close": "Fermer",
+          "loadFailed": "L'image n'a pas pu être chargée."
+        },
+        "links": {
+          "label": "Liens",
+          "add": "Ajouter un lien",
+          "full": "Maximum de {max} liens atteint",
+          "edit": "Modifier {title}",
+          "remove": "Retirer {title}"
+        },
+        "link": {
+          "addTitle": "Ajouter un lien",
+          "editTitle": "Modifier le lien",
+          "titleLabel": "Titre",
+          "urlLabel": "Adresse",
+          "urlPlaceholder": "https://exemple.com/page",
+          "problem": {
+            "empty": "Saisissez une adresse.",
+            "scheme": "Seuls les liens https sont autorisés.",
+            "invalid": "Ce n'est pas une adresse https publique valide."
+          }
+        },
+        "upload": {
+          "refusedType": "{name} : seules les images JPG, PNG et WebP sont acceptées.",
+          "refusedEmpty": "{name} : le fichier est vide.",
+          "refusedCount": "{name} : un concept contient au plus {max} images.",
+          "refusedBytes": "{name} : les images d'un concept ne peuvent dépasser {max} Mo au total.",
+          "failed": "Le téléversement a échoué.",
+          "progress": "Téléversement de {name}",
+          "retry": "Réessayer",
+          "dismiss": "Ignorer"
+        },
+        "emptyState": {
+          "title": "Aucun concept pour {market} pour l'instant",
+          "body": "Ajoutez un concept pour une persona de ce marché. Nous en recommandons {min} ou plus.",
+          "noPersonasTitle": "{market} n'a pas encore de persona",
+          "noPersonasBody": "Un concept repose sur une persona. Ajoutez d'abord des personas pour ce marché.",
+          "toPersonas": "Aller aux personas"
         }
       }
     }

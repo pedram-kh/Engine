@@ -1482,7 +1482,8 @@
         "brandArchived": "Tá an branda seo cartlannaithe. Athchóirigh é chun a thonnta a athrú.",
         "saveFailed": "Níorbh fhéidir an tonn a shábháil. Bain triail eile as.",
         "waveNotAvailable": "Ní féidir an tonn sin a nascadh leis an bhfeachtas seo.",
-        "marketHasPersonas": "Bain pearsain na margaí seo ar dtús: {markets}."
+        "marketHasPersonas": "Bain pearsain na margaí seo ar dtús: {markets}.",
+        "marketHasConcepts": "Tá coincheapa sna margaí seo: {markets}."
       },
       "dialog": {
         "createTitle": "Tonn nua",
@@ -1706,9 +1707,12 @@
         "personaNone": "Níl aon phearsa ann fós",
         "statusPersonas": "{count} phearsa · {covered} as {markets} margadh | {count} pearsa · {covered} as {markets} margadh",
         "notAvailable": "Níl sé ar fáil fós",
-        "locked": "Faoi ghlas go dtí go ndéantar na coincheapa go léir a cheadú",
         "matrixStatus": "{set} as {total} cill socraithe | {set} as {total} cill socraithe",
-        "matrixNone": "Cuir USPanna agus pearsana leis ar dtús"
+        "matrixNone": "Cuir USPanna agus pearsana leis ar dtús",
+        "conceptsNone": "Níl coincheapa ann go fóill",
+        "conceptsStatus": "{approved} as {total} ceadaithe",
+        "conceptsWarning": "Coincheapa: {approved} as {total} ceadaithe",
+        "conceptsWarningNone": "Níl coincheapa ann go fóill"
       },
       "audience": {
         "label": "Teideal an lucht féachana",
@@ -1754,7 +1758,9 @@
           "refreshed": "D'athraigh an liosta agus an fhuinneog oscailte. Seiceáil é agus deimhnigh arís.",
           "bodyInUseCells": "Úsáideann {count} áit an USP seo agus glanfar í leis: | Úsáideann {count} áit an USP seo agus glanfar iad leis:",
           "confirmInUseCells": "Scrios agus glan {count} mhír | Scrios agus glan {count} mír",
-          "itemCell": "Cill: {level}"
+          "itemCell": "Cill: {level}",
+          "itemConcept": "Baineadh slis an choincheapa",
+          "conceptsNote": "Cailleann coincheapa a bhfuil an USP seo acu an tslis. Filleann coincheap ceadaithe ar “Ag fanacht leis an gcliant”."
         },
         "usedByBoth": "In úsáid ag {angles} agus {cells}"
       },
@@ -1852,7 +1858,8 @@
         "synced": "Ní chóipeáiltear {count} uillinn sioncronaithe. Líon maitrís {market}. | Ní chóipeáiltear {count} uillinn sioncronaithe. Líon maitrís {market}."
       },
       "validation": {
-        "tooLong": "{max} carachtar ar a mhéad."
+        "tooLong": "{max} carachtar ar a mhéad.",
+        "required": "Tá an réimse seo riachtanach."
       },
       "errors": {
         "loadFailed": "Níorbh fhéidir é a luchtú. Bain triail eile as.",
@@ -1872,7 +1879,23 @@
         "conflict": "D'athraigh duine éigin é seo ag an am céanna. Athluchtaigh agus bain triail eile as.",
         "brandArchived": "Níl brandáil chartlannaithe inléite ach amháin. Athchóirigh í ar dtús.",
         "forbidden": "Ní féidir ach le riarthóir nó bainisteoir é seo a dhéanamh.",
-        "angleSyncedReadOnly": "Athraigh é seo sa Mhaitrís teachtaireachtaí."
+        "angleSyncedReadOnly": "Athraigh é seo sa Mhaitrís teachtaireachtaí.",
+        "personaInUseByConcepts": "Úsáideann coincheapa an phearsa seo ({count}). Bog iad chuig pearsa eile ar dtús nó scrios iad.",
+        "conceptPersonaInvalid": "Roghnaigh pearsa den mhargadh seo.",
+        "conceptUspModeRequired": "Roghnaigh an gcoinneofar nó an gcuirfear na USPanna in ionad.",
+        "conceptUspInvalid": "Caithfidh sliseanna USP a bheith ina USP den tonn seo.",
+        "decisionInvalid": "Seiceáil ainm an chliaint agus an nóta nó an trácht.",
+        "conceptDeleteFailed": "Níorbh fhéidir íomhá stóráilte a scriosadh. Níor baineadh aon rud. Bain triail eile as.",
+        "conceptDuplicateFailed": "Níorbh fhéidir na híomhánna a chóipeáil. Níor cruthaíodh cóip. Bain triail eile as.",
+        "conceptMarketFull": "Tá {max} coincheap ar a mhéad i margadh.",
+        "imageInvalid": "Ní íomhá bhailí JPG, PNG ná WebP é an comhad seo.",
+        "imageUnknownUpload": "Chuaigh an uaslódáil seo in éag. Cuir an íomhá leis arís.",
+        "imageAlreadyCompleted": "Tá an uaslódáil seo críochnaithe cheana.",
+        "imageDeleteFailed": "Níorbh fhéidir an íomhá a scriosadh. Bain triail eile as.",
+        "imageLimitCount": "Tá {max} íomhá ar a mhéad i gcoincheap ({used} anois).",
+        "imageLimitBytes": "Ní fhéadann íomhánna coincheapa a bheith os cionn {max} MB le chéile ({used} MB anois).",
+        "linkInvalidUrl": "Ní seoladh poiblí https bailí é seo.",
+        "linkLimitCount": "Sroichte teorainn nasc an choincheapa seo."
       },
       "counts": {
         "angles": "{count} uillinn | {count} uillinn",
@@ -1922,6 +1945,133 @@
         "emptyPersonas": {
           "body": "Cuir pearsana don mhargadh seo leis i gcéim 2, ansin líon a mhaitrís.",
           "cta": "Cuir pearsana leis"
+        }
+      },
+      "concepts": {
+        "title": "Coincheapa · {market}",
+        "subtitle": "Suas le {max} coincheap in aghaidh an mhargaidh. Tá gach ceann bunaithe ar phearsa amháin.",
+        "add": "Cuir coincheap leis",
+        "tile": "{count} as {max} coincheap",
+        "tileMax": "Sroichte an uastáth: {count} as {max} coincheap",
+        "underMinimum": "Tá {count} de na {min} coincheap nó níos mó molta ag {market}.",
+        "status": {
+          "awaiting": "Ag fanacht leis an gcliant",
+          "approved": "Ceadaithe",
+          "changes_requested": "Athruithe iarrtha"
+        },
+        "stage": {
+          "tofu": "Barr an mhogaill (TOFU)",
+          "mofu": "Lár an mhogaill (MOFU)",
+          "bofu": "Bun an mhogaill (BOFU)",
+          "none": "Gan céim"
+        },
+        "menu": {
+          "edit": "Cuir in eagar",
+          "decide": "Taifead cinneadh an chliaint",
+          "duplicate": "Dúbail",
+          "delete": "Scrios",
+          "deleteDecided": "Riarthóir nó bainisteoir amháin"
+        },
+        "banner": {
+          "counts": "{approved} as {total} ceadaithe · {awaiting} ag fanacht leis an gcliant · {changes} le hathruithe iarrtha",
+          "allApproved": "Gach coincheap ceadaithe ({total})",
+          "record": "Taifead cinneadh an chliaint"
+        },
+        "card": {
+          "number": "Coincheap {n}",
+          "menu": "Gníomhartha do choincheap {n}",
+          "stage": "Céim an mhogaill",
+          "stageNone": "Céim an mhogaill",
+          "approvedBy": "Ceadaithe ag {name} · {date}"
+        },
+        "field": {
+          "product": "Táirge",
+          "angle": "Dearcadh",
+          "primary_message": "Príomhtheachtaireacht",
+          "hypothesis": "Hipitéis",
+          "hook": "Hook",
+          "format_visual": "Formáid / amhairc",
+          "key_points": "Príomhphointí",
+          "payoff": "Beart scoir",
+          "cta": "CTA"
+        },
+        "dialog": {
+          "addTitle": "Cuir coincheap leis · {market}",
+          "editTitle": "Cuir an coincheap in eagar",
+          "persona": "Pearsa",
+          "stage": "Céim an mhogaill",
+          "stageNote": "Nóta an mhogaill",
+          "title": "Teideal an choincheapa",
+          "usps": "USPanna",
+          "uspsHint": "Ó mhaitrís na pearsan: Tosaíocht ar dtús, ansin Tacaíocht.",
+          "uspMode": "Athraíodh an phearsa. Cad ba cheart a tharlú do na USPanna?",
+          "uspModeRefill": "Cuir USPanna mhaitrís na pearsan nua ina n-ionad",
+          "uspModeKeep": "Coinnigh na USPanna reatha",
+          "fixFields": "Ceartaigh na réimsí atá marcáilte thíos."
+        },
+        "decision": {
+          "title": "Taifead cinneadh an chliaint",
+          "concept": "Coincheap",
+          "clientName": "Ainm an chliaint",
+          "note": "Nóta (roghnach)",
+          "comment": "Cad ba cheart a athrú",
+          "replaces": "Cuireann cinneadh nua an stádas ina ionad. Fanann cinntí roimhe sin sa taifead."
+        },
+        "delete": {
+          "title": "An scriosfar an coincheap {title}?",
+          "body": "Scriosfar an coincheap, a íomhánna agus a naisc. Ní féidir é seo a chealú.",
+          "bodyDecided": "Scriostar cinneadh an chliaint leis."
+        },
+        "reset": {
+          "title": "An gcealófar ceadú an chliaint?",
+          "body": "Tá an coincheap seo ceadaithe. Má athraíonn tú é, filleann sé ar “Ag fanacht leis an gcliant” agus cealaítear ceadú an chliaint.",
+          "confirm": "Athraigh agus cealaigh an ceadú"
+        },
+        "images": {
+          "label": "Íomhánna",
+          "count": "{count} as {max} íomhá · {used} as {total} MB",
+          "add": "Cuir íomhánna leis",
+          "full": "Sroichte an uastáth de {max} íomhá",
+          "open": "Oscail {name}",
+          "remove": "Bain {name}",
+          "close": "Dún",
+          "loadFailed": "Níorbh fhéidir an íomhá a luchtú."
+        },
+        "links": {
+          "label": "Naisc",
+          "add": "Cuir nasc leis",
+          "full": "Sroichte an uastáth de {max} nasc",
+          "edit": "Cuir {title} in eagar",
+          "remove": "Bain {title}"
+        },
+        "link": {
+          "addTitle": "Cuir nasc leis",
+          "editTitle": "Cuir an nasc in eagar",
+          "titleLabel": "Teideal",
+          "urlLabel": "Seoladh",
+          "urlPlaceholder": "https://sampla.ie/leathanach",
+          "problem": {
+            "empty": "Cuir seoladh isteach.",
+            "scheme": "Ní cheadaítear ach naisc https.",
+            "invalid": "Ní seoladh poiblí https bailí é seo."
+          }
+        },
+        "upload": {
+          "refusedType": "{name}: ní ghlactar ach le híomhánna JPG, PNG agus WebP.",
+          "refusedEmpty": "{name}: tá an comhad folamh.",
+          "refusedCount": "{name}: tá {max} íomhá ar a mhéad i gcoincheap.",
+          "refusedBytes": "{name}: ní fhéadann íomhánna coincheapa a bheith os cionn {max} MB le chéile.",
+          "failed": "Theip ar an uaslódáil.",
+          "progress": "Ag uaslódáil {name}",
+          "retry": "Bain triail eile as",
+          "dismiss": "Ruaig"
+        },
+        "emptyState": {
+          "title": "Níl coincheapa ann do {market} go fóill",
+          "body": "Cuir coincheap leis do phearsa den mhargadh seo. Molaimid {min} nó níos mó.",
+          "noPersonasTitle": "Níl pearsana ag {market} go fóill",
+          "noPersonasBody": "Tá coincheap bunaithe ar phearsa. Cuir pearsana leis don mhargadh seo ar dtús.",
+          "toPersonas": "Téigh chuig na pearsana"
         }
       }
     }

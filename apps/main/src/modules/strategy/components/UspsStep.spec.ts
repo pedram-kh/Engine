@@ -11,6 +11,7 @@ vi.mock('../api/strategy.api', () => ({
   strategyApi: {
     listUsps: vi.fn(),
     listPersonas: vi.fn(),
+    listConcepts: vi.fn(),
     createUsp: vi.fn(),
     updateUsp: vi.fn(),
     reorderUsps: vi.fn(),
@@ -69,7 +70,10 @@ async function click(selector: string): Promise<void> {
 }
 
 describe('UspsStep (PL-2.1)', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.mocked(strategyApi.listConcepts).mockResolvedValue({ data: [], meta: { market: null } })
+  })
   afterEach(() => {
     document.body.innerHTML = ''
   })

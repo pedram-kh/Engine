@@ -1482,7 +1482,8 @@
         "brandArchived": "Ta marka jest zarchiwizowana. Przywróć ją, aby zmieniać jej fale.",
         "saveFailed": "Nie udało się zapisać fali. Spróbuj ponownie.",
         "waveNotAvailable": "Tej fali nie można powiązać z tą kampanią.",
-        "marketHasPersonas": "Najpierw usuń persony z tych rynków: {markets}."
+        "marketHasPersonas": "Najpierw usuń persony z tych rynków: {markets}.",
+        "marketHasConcepts": "Koncepty istnieją w: {markets}."
       },
       "dialog": {
         "createTitle": "Nowa fala",
@@ -1706,9 +1707,12 @@
         "personaNone": "Brak person",
         "statusPersonas": "{count} persona · {covered} z {markets} rynków | {count} person · {covered} z {markets} rynków",
         "notAvailable": "Jeszcze niedostępne",
-        "locked": "Zablokowane do zatwierdzenia wszystkich koncepcji",
         "matrixStatus": "Ustawiono {set} z {total} komórki | Ustawiono {set} z {total} komórek",
-        "matrixNone": "Najpierw dodaj USP i persony"
+        "matrixNone": "Najpierw dodaj USP i persony",
+        "conceptsNone": "Brak konceptów",
+        "conceptsStatus": "{approved} z {total} zatwierdzonych",
+        "conceptsWarning": "Koncepty: {approved} z {total} zatwierdzonych",
+        "conceptsWarningNone": "Brak konceptów"
       },
       "audience": {
         "label": "Tytuł grupy docelowej",
@@ -1754,7 +1758,9 @@
           "refreshed": "Lista zmieniła się, gdy to okno było otwarte. Sprawdź ją i potwierdź ponownie.",
           "bodyInUseCells": "{count} miejsce używa tego USP i zostanie z nim wyczyszczone: | {count} miejsc używa tego USP i zostanie z nim wyczyszczonych:",
           "confirmInUseCells": "Usuń i wyczyść {count} element | Usuń i wyczyść {count} elementów",
-          "itemCell": "Komórka: {level}"
+          "itemCell": "Komórka: {level}",
+          "itemConcept": "Usunięto chip konceptu",
+          "conceptsNote": "Koncepty z tym USP tracą chip. Zatwierdzony koncept wraca do „Czeka na klienta”."
         },
         "usedByBoth": "Używane przez {angles} i {cells}"
       },
@@ -1852,7 +1858,8 @@
         "synced": "{count} zsynchronizowany kąt nie jest kopiowany. Wypełnij macierz dla: {market}. | {count} zsynchronizowanych kątów nie jest kopiowanych. Wypełnij macierz dla: {market}."
       },
       "validation": {
-        "tooLong": "Najwyżej {max} znaków."
+        "tooLong": "Najwyżej {max} znaków.",
+        "required": "To pole jest wymagane."
       },
       "errors": {
         "loadFailed": "Nie udało się wczytać. Spróbuj ponownie.",
@@ -1872,7 +1879,23 @@
         "conflict": "Ktoś zmienił to w tej samej chwili. Wczytaj ponownie i spróbuj jeszcze raz.",
         "brandArchived": "Zarchiwizowana marka jest tylko do odczytu. Najpierw ją przywróć.",
         "forbidden": "Może to zrobić tylko admin lub manager.",
-        "angleSyncedReadOnly": "Zmień to w macierzy komunikatów."
+        "angleSyncedReadOnly": "Zmień to w macierzy komunikatów.",
+        "personaInUseByConcepts": "Z tej persony korzystają koncepty ({count}). Najpierw przenieś je do innej persony lub usuń.",
+        "conceptPersonaInvalid": "Wybierz personę z tego rynku.",
+        "conceptUspModeRequired": "Wybierz, czy zachować, czy zastąpić USP.",
+        "conceptUspInvalid": "Chip USP musi być USP tej fali.",
+        "decisionInvalid": "Sprawdź imię i nazwisko klienta oraz notatkę lub komentarz.",
+        "conceptDeleteFailed": "Nie udało się usunąć zapisanego obrazu. Nic nie usunięto. Spróbuj ponownie.",
+        "conceptDuplicateFailed": "Nie udało się skopiować obrazów. Nie utworzono kopii. Spróbuj ponownie.",
+        "conceptMarketFull": "Rynek ma najwyżej {max} konceptów.",
+        "imageInvalid": "Ten plik nie jest prawidłowym obrazem JPG, PNG ani WebP.",
+        "imageUnknownUpload": "To przesyłanie wygasło. Dodaj obraz ponownie.",
+        "imageAlreadyCompleted": "To przesyłanie zostało już zakończone.",
+        "imageDeleteFailed": "Nie udało się usunąć obrazu. Spróbuj ponownie.",
+        "imageLimitCount": "Koncept może mieć najwyżej {max} obrazów (teraz {used}).",
+        "imageLimitBytes": "Obrazy konceptu mogą razem mieć najwyżej {max} MB (teraz {used} MB).",
+        "linkInvalidUrl": "To nie jest prawidłowy publiczny adres https.",
+        "linkLimitCount": "Osiągnięto limit linków tego konceptu."
       },
       "counts": {
         "angles": "{count} kąt | {count} kątów",
@@ -1922,6 +1945,133 @@
         "emptyPersonas": {
           "body": "W kroku 2 dodaj persony dla tego rynku, a potem wypełnij jego macierz.",
           "cta": "Dodaj persony"
+        }
+      },
+      "concepts": {
+        "title": "Koncepty · {market}",
+        "subtitle": "Do {max} konceptów na rynek. Każdy opiera się na jednej personie.",
+        "add": "Dodaj koncept",
+        "tile": "{count} z {max} konceptów",
+        "tileMax": "Osiągnięto maksimum: {count} z {max} konceptów",
+        "underMinimum": "{market} ma {count} z zalecanych {min} lub więcej konceptów.",
+        "status": {
+          "awaiting": "Czeka na klienta",
+          "approved": "Zatwierdzony",
+          "changes_requested": "Poproszono o zmiany"
+        },
+        "stage": {
+          "tofu": "Góra lejka (TOFU)",
+          "mofu": "Środek lejka (MOFU)",
+          "bofu": "Dół lejka (BOFU)",
+          "none": "Bez etapu"
+        },
+        "menu": {
+          "edit": "Edytuj",
+          "decide": "Zapisz decyzję klienta",
+          "duplicate": "Duplikuj",
+          "delete": "Usuń",
+          "deleteDecided": "Tylko admin lub manager"
+        },
+        "banner": {
+          "counts": "{approved} z {total} zatwierdzonych · {awaiting} czeka na klienta · {changes} z prośbą o zmiany",
+          "allApproved": "Wszystkie koncepty zatwierdzone ({total})",
+          "record": "Zapisz decyzję klienta"
+        },
+        "card": {
+          "number": "Koncept {n}",
+          "menu": "Działania dla konceptu {n}",
+          "stage": "Etap lejka",
+          "stageNone": "Etap lejka",
+          "approvedBy": "Zatwierdził {name} · {date}"
+        },
+        "field": {
+          "product": "Produkt",
+          "angle": "Kąt",
+          "primary_message": "Główny przekaz",
+          "hypothesis": "Hipoteza",
+          "hook": "Hook",
+          "format_visual": "Format / wizual",
+          "key_points": "Kluczowe punkty",
+          "payoff": "Puenta",
+          "cta": "CTA"
+        },
+        "dialog": {
+          "addTitle": "Dodaj koncept · {market}",
+          "editTitle": "Edytuj koncept",
+          "persona": "Persona",
+          "stage": "Etap lejka",
+          "stageNote": "Notatka do lejka",
+          "title": "Tytuł konceptu",
+          "usps": "USP",
+          "uspsHint": "Z macierzy persony: najpierw Priorytet, potem Wsparcie.",
+          "uspMode": "Persona została zmieniona. Co zrobić z USP?",
+          "uspModeRefill": "Zastąp je USP z macierzy nowej persony",
+          "uspModeKeep": "Zachowaj obecne USP",
+          "fixFields": "Popraw pola zaznaczone poniżej."
+        },
+        "decision": {
+          "title": "Zapisz decyzję klienta",
+          "concept": "Koncept",
+          "clientName": "Imię i nazwisko klienta",
+          "note": "Notatka (opcjonalnie)",
+          "comment": "Co należy zmienić",
+          "replaces": "Nowa decyzja zastępuje status. Wcześniejsze decyzje pozostają w historii."
+        },
+        "delete": {
+          "title": "Usunąć koncept {title}?",
+          "body": "Koncept, jego obrazy i linki zostaną usunięte. Tej operacji nie można cofnąć.",
+          "bodyDecided": "Decyzja klienta zostanie usunięta razem z nim."
+        },
+        "reset": {
+          "title": "Cofnąć zatwierdzenie klienta?",
+          "body": "Ten koncept jest zatwierdzony. Zmiana przeniesie go z powrotem do „Czeka na klienta” i cofnie zatwierdzenie klienta.",
+          "confirm": "Zmień i cofnij zatwierdzenie"
+        },
+        "images": {
+          "label": "Obrazy",
+          "count": "{count} z {max} obrazów · {used} z {total} MB",
+          "add": "Dodaj obrazy",
+          "full": "Osiągnięto maksimum {max} obrazów",
+          "open": "Otwórz {name}",
+          "remove": "Usuń {name}",
+          "close": "Zamknij",
+          "loadFailed": "Nie udało się wczytać obrazu."
+        },
+        "links": {
+          "label": "Linki",
+          "add": "Dodaj link",
+          "full": "Osiągnięto maksimum {max} linków",
+          "edit": "Edytuj {title}",
+          "remove": "Usuń {title}"
+        },
+        "link": {
+          "addTitle": "Dodaj link",
+          "editTitle": "Edytuj link",
+          "titleLabel": "Tytuł",
+          "urlLabel": "Adres",
+          "urlPlaceholder": "https://example.com/strona",
+          "problem": {
+            "empty": "Wpisz adres.",
+            "scheme": "Dozwolone są tylko linki https.",
+            "invalid": "To nie jest prawidłowy publiczny adres https."
+          }
+        },
+        "upload": {
+          "refusedType": "{name}: akceptowane są tylko obrazy JPG, PNG i WebP.",
+          "refusedEmpty": "{name}: plik jest pusty.",
+          "refusedCount": "{name}: koncept może mieć najwyżej {max} obrazów.",
+          "refusedBytes": "{name}: obrazy konceptu mogą razem mieć najwyżej {max} MB.",
+          "failed": "Przesyłanie nie powiodło się.",
+          "progress": "Przesyłanie: {name}",
+          "retry": "Spróbuj ponownie",
+          "dismiss": "Odrzuć"
+        },
+        "emptyState": {
+          "title": "Brak konceptów dla {market}",
+          "body": "Dodaj koncept dla persony z tego rynku. Zalecamy {min} lub więcej.",
+          "noPersonasTitle": "{market} nie ma jeszcze person",
+          "noPersonasBody": "Koncept opiera się na personie. Najpierw dodaj persony dla tego rynku.",
+          "toPersonas": "Przejdź do person"
         }
       }
     }

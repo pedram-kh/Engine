@@ -142,6 +142,11 @@ export async function mountWithApp(
         name: 'strategy.matrix',
         component: page,
       },
+      {
+        path: '/brands/:ulid/waves/:waveUlid/strategy/concepts',
+        name: 'strategy.concepts',
+        component: page,
+      },
     ],
   })
   await router.push(options.route ?? `/brands/${BRAND_ULID}/waves/${WAVE_ULID}`)

@@ -20,6 +20,7 @@ export {
   deletionPendingMeta,
   extractFieldErrors,
   marketHasPersonasMeta,
+  personaInUseByConceptsMeta,
   uspInUseMeta,
   type ApiErrorDetail,
   type ApiErrorOptions,

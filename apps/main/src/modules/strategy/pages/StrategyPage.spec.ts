@@ -14,6 +14,7 @@ vi.mock('../api/strategy.api', () => ({
     listUsps: vi.fn(),
     listPersonas: vi.fn(),
     matrix: vi.fn(),
+    listConcepts: vi.fn(),
   },
 }))
 
@@ -43,6 +44,7 @@ function prime(): void {
   })
   vi.mocked(strategyApi.listUsps).mockResolvedValue({ data: makeUsps(3) })
   vi.mocked(strategyApi.listPersonas).mockResolvedValue({ data: [] })
+  vi.mocked(strategyApi.listConcepts).mockResolvedValue({ data: [], meta: { market: null } })
 }
 
 describe('StrategyPage (PL-2.1 W1-W3)', () => {
@@ -84,26 +86,27 @@ describe('StrategyPage (PL-2.1 W1-W3)', () => {
     w.unmount()
   })
 
-  it('W3: six steps; USPs, Personas and Matrix live, Concepts, Creators and Scripts locked', async () => {
+  it('W3 (PL-2.3): six steps; USPs, Personas, Matrix and Concepts are links, Creators and Scripts say "Not available yet" with no lock', async () => {
     prime()
     const w = await mountStrategy(StrategyPage, {})
     await flushPromises()
-    const live = ['usps', 'personas', 'matrix']
-    for (const key of live) {
+    for (const key of ['usps', 'personas', 'matrix', 'concepts']) {
       const step = w.get(`[data-test="strategy-step-${key}"]`)
       expect(step.element.tagName).toBe('A')
       expect(step.attributes('aria-disabled')).toBeUndefined()
     }
-    for (const key of ['concepts', 'creators', 'scripts']) {
+    for (const key of ['creators', 'scripts']) {
       const step = w.get(`[data-test="strategy-step-${key}"]`)
       expect(step.element.tagName).not.toBe('A')
       expect(step.attributes('aria-disabled')).toBe('true')
       expect(step.attributes('tabindex')).toBeUndefined()
+      expect(step.find('.mdi-lock-outline, .mdi-lock').exists()).toBe(false)
+      expect(w.get(`[data-test="strategy-step-${key}-status"]`).text()).toContain(
+        'Not available yet',
+      )
     }
+    expect(w.text()).not.toContain('Locked until all concepts are approved')
     expect(w.get('[data-test="strategy-step-matrix-status"]').text()).not.toBe('')
-    expect(w.get('[data-test="strategy-step-creators-status"]').text()).toBe(
-      'Locked until all concepts are approved',
-    )
     expect(w.get('[data-test="strategy-step-usps-status"]').text()).toBe('3 USPs')
     w.unmount()
   })

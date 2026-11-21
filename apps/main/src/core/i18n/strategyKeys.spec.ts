@@ -35,7 +35,6 @@ const KEYS = [
   'app.strategy.stepper.personaNone',
   'app.strategy.stepper.statusPersonas',
   'app.strategy.stepper.notAvailable',
-  'app.strategy.stepper.locked',
   'app.strategy.audience.label',
   'app.strategy.audience.placeholder',
   'app.strategy.audience.edit',
@@ -222,8 +221,8 @@ function tokens(text: string): string[] {
 }
 
 describe('PL-2.1 strategy strings', () => {
-  it('checks 142 keys across 24 locales', () => {
-    expect(KEYS).toHaveLength(142)
+  it('checks 141 keys across 24 locales', () => {
+    expect(KEYS).toHaveLength(141)
     expect(UI_LOCALES).toHaveLength(24)
   })
 

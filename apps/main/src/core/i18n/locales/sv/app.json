@@ -1482,7 +1482,8 @@
         "brandArchived": "Det här varumärket är arkiverat. Återställ det för att ändra dess vågor.",
         "saveFailed": "Vågen kunde inte sparas. Försök igen.",
         "waveNotAvailable": "Den vågen kan inte kopplas till den här kampanjen.",
-        "marketHasPersonas": "Ta först bort personorna för de här marknaderna: {markets}."
+        "marketHasPersonas": "Ta först bort personorna för de här marknaderna: {markets}.",
+        "marketHasConcepts": "Koncept finns i: {markets}."
       },
       "dialog": {
         "createTitle": "Ny våg",
@@ -1706,9 +1707,12 @@
         "personaNone": "Inga personor än",
         "statusPersonas": "{count} persona · {covered} av {markets} marknader | {count} personor · {covered} av {markets} marknader",
         "notAvailable": "Inte tillgängligt än",
-        "locked": "Låst tills alla koncept är godkända",
         "matrixStatus": "{set} av {total} cell inställd | {set} av {total} celler inställda",
-        "matrixNone": "Lägg först till USP:er och personor"
+        "matrixNone": "Lägg först till USP:er och personor",
+        "conceptsNone": "Inga koncept ännu",
+        "conceptsStatus": "{approved} av {total} godkända",
+        "conceptsWarning": "Koncept: {approved} av {total} godkända",
+        "conceptsWarningNone": "Inga koncept ännu"
       },
       "audience": {
         "label": "Målgruppstitel",
@@ -1754,7 +1758,9 @@
           "refreshed": "Listan ändrades medan det här var öppet. Kontrollera den och bekräfta igen.",
           "bodyInUseCells": "{count} ställe använder den här USP:n och rensas med den: | {count} ställen använder den här USP:n och rensas med den:",
           "confirmInUseCells": "Ta bort och rensa {count} post | Ta bort och rensa {count} poster",
-          "itemCell": "Cell: {level}"
+          "itemCell": "Cell: {level}",
+          "itemConcept": "Konceptchip borttaget",
+          "conceptsNote": "Koncept med den här USP:n förlorar chipet. Ett godkänt koncept går tillbaka till Väntar på kunden."
         },
         "usedByBoth": "Används av {angles} och {cells}"
       },
@@ -1852,7 +1858,8 @@
         "synced": "{count} synkroniserad vinkel kopieras inte. Fyll i matrisen för {market}. | {count} synkroniserade vinklar kopieras inte. Fyll i matrisen för {market}."
       },
       "validation": {
-        "tooLong": "Högst {max} tecken."
+        "tooLong": "Högst {max} tecken.",
+        "required": "Det här fältet är obligatoriskt."
       },
       "errors": {
         "loadFailed": "Det gick inte att läsa in. Försök igen.",
@@ -1872,7 +1879,23 @@
         "conflict": "Någon ändrade det här samtidigt. Läs in på nytt och försök igen.",
         "brandArchived": "Ett arkiverat varumärke är skrivskyddat. Återställ det först.",
         "forbidden": "Bara en admin eller manager kan göra det här.",
-        "angleSyncedReadOnly": "Ändra det i budskapsmatrisen."
+        "angleSyncedReadOnly": "Ändra det i budskapsmatrisen.",
+        "personaInUseByConcepts": "Koncept använder den här personan ({count}). Flytta dem till en annan persona eller ta bort dem först.",
+        "conceptPersonaInvalid": "Välj en persona på den här marknaden.",
+        "conceptUspModeRequired": "Välj om USP:erna ska behållas eller ersättas.",
+        "conceptUspInvalid": "Ett USP-chip måste vara en USP i den här vågen.",
+        "decisionInvalid": "Kontrollera kundens namn och anteckningen eller kommentaren.",
+        "conceptDeleteFailed": "En sparad bild kunde inte tas bort. Inget har tagits bort. Försök igen.",
+        "conceptDuplicateFailed": "Bilderna kunde inte kopieras. Ingen kopia skapades. Försök igen.",
+        "conceptMarketFull": "En marknad har högst {max} koncept.",
+        "imageInvalid": "Den här filen är inte en giltig JPG-, PNG- eller WebP-bild.",
+        "imageUnknownUpload": "Den här uppladdningen har gått ut. Lägg till bilden igen.",
+        "imageAlreadyCompleted": "Den här uppladdningen är redan slutförd.",
+        "imageDeleteFailed": "Bilden kunde inte tas bort. Försök igen.",
+        "imageLimitCount": "Ett koncept rymmer högst {max} bilder (nu {used}).",
+        "imageLimitBytes": "Bilderna i ett koncept får tillsammans vara högst {max} MB (nu {used} MB).",
+        "linkInvalidUrl": "Det här är inte en giltig offentlig https-adress.",
+        "linkLimitCount": "Gränsen för länkar i det här konceptet är nådd."
       },
       "counts": {
         "angles": "{count} vinkel | {count} vinklar",
@@ -1922,6 +1945,133 @@
         "emptyPersonas": {
           "body": "Lägg till personor för den här marknaden i steg 2 och fyll sedan i dess matris.",
           "cta": "Lägg till personor"
+        }
+      },
+      "concepts": {
+        "title": "Koncept · {market}",
+        "subtitle": "Upp till {max} koncept per marknad. Varje koncept bygger på en persona.",
+        "add": "Lägg till koncept",
+        "tile": "{count} av {max} koncept",
+        "tileMax": "Maxgränsen är nådd: {count} av {max} koncept",
+        "underMinimum": "{market} har {count} av de {min} eller fler koncept vi rekommenderar.",
+        "status": {
+          "awaiting": "Väntar på kunden",
+          "approved": "Godkänt",
+          "changes_requested": "Ändringar begärda"
+        },
+        "stage": {
+          "tofu": "Övre delen av tratten (TOFU)",
+          "mofu": "Mitten av tratten (MOFU)",
+          "bofu": "Nedre delen av tratten (BOFU)",
+          "none": "Inget steg"
+        },
+        "menu": {
+          "edit": "Redigera",
+          "decide": "Registrera kundens beslut",
+          "duplicate": "Duplicera",
+          "delete": "Ta bort",
+          "deleteDecided": "Endast admin eller manager"
+        },
+        "banner": {
+          "counts": "{approved} av {total} godkända · {awaiting} väntar på kunden · {changes} med begärda ändringar",
+          "allApproved": "Alla koncept är godkända ({total})",
+          "record": "Registrera kundens beslut"
+        },
+        "card": {
+          "number": "Koncept {n}",
+          "menu": "Åtgärder för koncept {n}",
+          "stage": "Tratsteg",
+          "stageNone": "Tratsteg",
+          "approvedBy": "Godkänt av {name} · {date}"
+        },
+        "field": {
+          "product": "Produkt",
+          "angle": "Vinkel",
+          "primary_message": "Huvudbudskap",
+          "hypothesis": "Hypotes",
+          "hook": "Hook",
+          "format_visual": "Format / visuellt",
+          "key_points": "Nyckelpunkter",
+          "payoff": "Poäng",
+          "cta": "CTA"
+        },
+        "dialog": {
+          "addTitle": "Lägg till koncept · {market}",
+          "editTitle": "Redigera koncept",
+          "persona": "Persona",
+          "stage": "Tratsteg",
+          "stageNote": "Tratanteckning",
+          "title": "Konceptets titel",
+          "usps": "USP:er",
+          "uspsHint": "Från personans matris: först Prioritet, sedan Stöd.",
+          "uspMode": "Personan har ändrats. Vad ska hända med USP:erna?",
+          "uspModeRefill": "Ersätt dem med USP:erna i den nya personans matris",
+          "uspModeKeep": "Behåll de nuvarande USP:erna",
+          "fixFields": "Rätta fälten som är markerade nedan."
+        },
+        "decision": {
+          "title": "Registrera kundens beslut",
+          "concept": "Koncept",
+          "clientName": "Kundens namn",
+          "note": "Anteckning (valfritt)",
+          "comment": "Vad som ska ändras",
+          "replaces": "Ett nytt beslut ersätter statusen. Tidigare beslut finns kvar i historiken."
+        },
+        "delete": {
+          "title": "Ta bort konceptet {title}?",
+          "body": "Konceptet, dess bilder och dess länkar tas bort. Det går inte att ångra.",
+          "bodyDecided": "Kundens beslut tas bort tillsammans med det."
+        },
+        "reset": {
+          "title": "Ta bort kundens godkännande?",
+          "body": "Det här konceptet är godkänt. Om du ändrar det går det tillbaka till Väntar på kunden och kundens godkännande tas bort.",
+          "confirm": "Ändra och ta bort godkännandet"
+        },
+        "images": {
+          "label": "Bilder",
+          "count": "{count} av {max} bilder · {used} av {total} MB",
+          "add": "Lägg till bilder",
+          "full": "Maxgränsen på {max} bilder är nådd",
+          "open": "Öppna {name}",
+          "remove": "Ta bort {name}",
+          "close": "Stäng",
+          "loadFailed": "Bilden kunde inte läsas in."
+        },
+        "links": {
+          "label": "Länkar",
+          "add": "Lägg till länk",
+          "full": "Maxgränsen på {max} länkar är nådd",
+          "edit": "Redigera {title}",
+          "remove": "Ta bort {title}"
+        },
+        "link": {
+          "addTitle": "Lägg till länk",
+          "editTitle": "Redigera länk",
+          "titleLabel": "Titel",
+          "urlLabel": "Adress",
+          "urlPlaceholder": "https://exempel.se/sida",
+          "problem": {
+            "empty": "Ange en adress.",
+            "scheme": "Endast https-länkar tillåts.",
+            "invalid": "Det här är inte en giltig offentlig https-adress."
+          }
+        },
+        "upload": {
+          "refusedType": "{name}: endast JPG-, PNG- och WebP-bilder accepteras.",
+          "refusedEmpty": "{name}: filen är tom.",
+          "refusedCount": "{name}: ett koncept rymmer högst {max} bilder.",
+          "refusedBytes": "{name}: bilderna i ett koncept får tillsammans vara högst {max} MB.",
+          "failed": "Uppladdningen misslyckades.",
+          "progress": "Laddar upp {name}",
+          "retry": "Försök igen",
+          "dismiss": "Avfärda"
+        },
+        "emptyState": {
+          "title": "Inga koncept för {market} ännu",
+          "body": "Lägg till ett koncept för en persona på den här marknaden. Vi rekommenderar {min} eller fler.",
+          "noPersonasTitle": "{market} har inga personor ännu",
+          "noPersonasBody": "Ett koncept bygger på en persona. Lägg först till personor för den här marknaden.",
+          "toPersonas": "Gå till personor"
         }
       }
     }

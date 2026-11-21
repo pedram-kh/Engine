@@ -1482,7 +1482,8 @@
         "brandArchived": "Diese Marke ist archiviert. Stellen Sie sie wieder her, um ihre Wellen zu ändern.",
         "saveFailed": "Die Welle konnte nicht gespeichert werden. Versuchen Sie es erneut.",
         "waveNotAvailable": "Diese Welle kann nicht mit dieser Kampagne verknüpft werden.",
-        "marketHasPersonas": "Entferne zuerst die Personas dieser Märkte: {markets}."
+        "marketHasPersonas": "Entferne zuerst die Personas dieser Märkte: {markets}.",
+        "marketHasConcepts": "Konzepte gibt es in: {markets}."
       },
       "dialog": {
         "createTitle": "Neue Welle",
@@ -1706,9 +1707,12 @@
         "personaNone": "Noch keine Personas",
         "statusPersonas": "{count} Persona · {covered} von {markets} Märkten | {count} Personas · {covered} von {markets} Märkten",
         "notAvailable": "Noch nicht verfügbar",
-        "locked": "Gesperrt, bis alle Konzepte freigegeben sind",
         "matrixStatus": "{set} von {total} Zelle gesetzt | {set} von {total} Zellen gesetzt",
-        "matrixNone": "Zuerst USPs und Personas hinzufügen"
+        "matrixNone": "Zuerst USPs und Personas hinzufügen",
+        "conceptsNone": "Noch keine Konzepte",
+        "conceptsStatus": "{approved} von {total} genehmigt",
+        "conceptsWarning": "Konzepte: {approved} von {total} genehmigt",
+        "conceptsWarningNone": "Noch keine Konzepte"
       },
       "audience": {
         "label": "Zielgruppentitel",
@@ -1754,7 +1758,9 @@
           "refreshed": "Die Liste hat sich geändert, während dieser Dialog offen war. Prüfe sie und bestätige erneut.",
           "bodyInUseCells": "{count} Stelle verwendet diesen USP und wird mit ihm geleert: | {count} Stellen verwenden diesen USP und werden mit ihm geleert:",
           "confirmInUseCells": "Löschen und {count} Eintrag leeren | Löschen und {count} Einträge leeren",
-          "itemCell": "Zelle {level}"
+          "itemCell": "Zelle {level}",
+          "itemConcept": "Konzept-Chip entfernt",
+          "conceptsNote": "Konzepte mit diesem USP verlieren den Chip. Ein genehmigtes Konzept wird auf „Wartet auf den Kunden“ zurückgesetzt."
         },
         "usedByBoth": "Verwendet von {angles} und {cells}"
       },
@@ -1852,7 +1858,8 @@
         "synced": "{count} synchronisierter Ansatz wird nicht kopiert. Fülle die Matrix für {market}. | {count} synchronisierte Ansätze werden nicht kopiert. Fülle die Matrix für {market}."
       },
       "validation": {
-        "tooLong": "Höchstens {max} Zeichen."
+        "tooLong": "Höchstens {max} Zeichen.",
+        "required": "Dieses Feld ist erforderlich."
       },
       "errors": {
         "loadFailed": "Laden fehlgeschlagen. Versuche es erneut.",
@@ -1872,7 +1879,23 @@
         "conflict": "Jemand hat das gleichzeitig geändert. Neu laden und erneut versuchen.",
         "brandArchived": "Eine archivierte Marke ist schreibgeschützt. Stelle sie zuerst wieder her.",
         "forbidden": "Das können nur Admins oder Manager.",
-        "angleSyncedReadOnly": "Ändere das in der Messaging-Matrix."
+        "angleSyncedReadOnly": "Ändere das in der Messaging-Matrix.",
+        "personaInUseByConcepts": "Konzepte nutzen diese Persona ({count}). Verschiebe sie zuerst zu einer anderen Persona oder lösche sie.",
+        "conceptPersonaInvalid": "Wähle eine Persona dieses Marktes.",
+        "conceptUspModeRequired": "Wähle, ob die USPs behalten oder ersetzt werden.",
+        "conceptUspInvalid": "Ein USP-Chip muss ein USP dieser Welle sein.",
+        "decisionInvalid": "Prüfe den Namen des Kunden und die Notiz oder den Kommentar.",
+        "conceptDeleteFailed": "Ein gespeichertes Bild konnte nicht gelöscht werden. Es wurde nichts entfernt. Versuche es erneut.",
+        "conceptDuplicateFailed": "Die Bilder konnten nicht kopiert werden. Es wurde keine Kopie erstellt. Versuche es erneut.",
+        "conceptMarketFull": "Ein Markt hat höchstens {max} Konzepte.",
+        "imageInvalid": "Diese Datei ist kein gültiges JPG-, PNG- oder WebP-Bild.",
+        "imageUnknownUpload": "Dieser Upload ist abgelaufen. Füge das Bild erneut hinzu.",
+        "imageAlreadyCompleted": "Dieser Upload wurde bereits abgeschlossen.",
+        "imageDeleteFailed": "Das Bild konnte nicht gelöscht werden. Versuche es erneut.",
+        "imageLimitCount": "Ein Konzept enthält höchstens {max} Bilder (derzeit {used}).",
+        "imageLimitBytes": "Die Bilder eines Konzepts dürfen zusammen höchstens {max} MB groß sein (derzeit {used} MB).",
+        "linkInvalidUrl": "Das ist keine gültige öffentliche https-Adresse.",
+        "linkLimitCount": "Das Linklimit dieses Konzepts ist erreicht."
       },
       "counts": {
         "angles": "{count} Ansatz | {count} Ansätze",
@@ -1922,6 +1945,133 @@
         "emptyPersonas": {
           "body": "Füge in Schritt 2 Personas für diesen Markt hinzu und fülle dann dessen Matrix.",
           "cta": "Personas hinzufügen"
+        }
+      },
+      "concepts": {
+        "title": "Konzepte · {market}",
+        "subtitle": "Bis zu {max} Konzepte pro Markt. Jedes basiert auf einer Persona.",
+        "add": "Konzept hinzufügen",
+        "tile": "{count} von {max} Konzepten",
+        "tileMax": "Maximum erreicht: {count} von {max} Konzepten",
+        "underMinimum": "{market} hat {count} der empfohlenen {min} oder mehr Konzepte.",
+        "status": {
+          "awaiting": "Wartet auf den Kunden",
+          "approved": "Genehmigt",
+          "changes_requested": "Änderungen gewünscht"
+        },
+        "stage": {
+          "tofu": "Oberer Funnel (TOFU)",
+          "mofu": "Mittlerer Funnel (MOFU)",
+          "bofu": "Unterer Funnel (BOFU)",
+          "none": "Keine Stufe"
+        },
+        "menu": {
+          "edit": "Bearbeiten",
+          "decide": "Entscheidung des Kunden erfassen",
+          "duplicate": "Duplizieren",
+          "delete": "Löschen",
+          "deleteDecided": "Nur Admin oder Manager"
+        },
+        "banner": {
+          "counts": "{approved} von {total} genehmigt · {awaiting} warten auf den Kunden · {changes} mit Änderungswünschen",
+          "allApproved": "Alle Konzepte genehmigt ({total})",
+          "record": "Entscheidung des Kunden erfassen"
+        },
+        "card": {
+          "number": "Konzept {n}",
+          "menu": "Aktionen für Konzept {n}",
+          "stage": "Funnel-Stufe",
+          "stageNone": "Funnel-Stufe",
+          "approvedBy": "Genehmigt von {name} · {date}"
+        },
+        "field": {
+          "product": "Produkt",
+          "angle": "Blickwinkel",
+          "primary_message": "Kernbotschaft",
+          "hypothesis": "Hypothese",
+          "hook": "Hook",
+          "format_visual": "Format / Visual",
+          "key_points": "Kernpunkte",
+          "payoff": "Auflösung",
+          "cta": "CTA"
+        },
+        "dialog": {
+          "addTitle": "Konzept hinzufügen · {market}",
+          "editTitle": "Konzept bearbeiten",
+          "persona": "Persona",
+          "stage": "Funnel-Stufe",
+          "stageNote": "Funnel-Notiz",
+          "title": "Konzepttitel",
+          "usps": "USPs",
+          "uspsHint": "Aus der Matrix der Persona: zuerst Priorität, dann Unterstützung.",
+          "uspMode": "Die Persona wurde geändert. Was soll mit den USPs geschehen?",
+          "uspModeRefill": "Durch die USPs der Matrix der neuen Persona ersetzen",
+          "uspModeKeep": "Aktuelle USPs behalten",
+          "fixFields": "Korrigiere die unten markierten Felder."
+        },
+        "decision": {
+          "title": "Entscheidung des Kunden erfassen",
+          "concept": "Konzept",
+          "clientName": "Name des Kunden",
+          "note": "Notiz (optional)",
+          "comment": "Was soll geändert werden",
+          "replaces": "Eine neue Entscheidung ersetzt den Status. Frühere Entscheidungen bleiben erhalten."
+        },
+        "delete": {
+          "title": "Konzept {title} löschen?",
+          "body": "Das Konzept, seine Bilder und seine Links werden gelöscht. Das lässt sich nicht rückgängig machen.",
+          "bodyDecided": "Die Entscheidung des Kunden wird mitgelöscht."
+        },
+        "reset": {
+          "title": "Genehmigung des Kunden aufheben?",
+          "body": "Dieses Konzept ist genehmigt. Eine Änderung setzt es auf „Wartet auf den Kunden“ zurück und hebt die Genehmigung des Kunden auf.",
+          "confirm": "Ändern und Genehmigung aufheben"
+        },
+        "images": {
+          "label": "Bilder",
+          "count": "{count} von {max} Bildern · {used} von {total} MB",
+          "add": "Bilder hinzufügen",
+          "full": "Maximal {max} Bilder erreicht",
+          "open": "{name} öffnen",
+          "remove": "{name} entfernen",
+          "close": "Schließen",
+          "loadFailed": "Das Bild konnte nicht geladen werden."
+        },
+        "links": {
+          "label": "Links",
+          "add": "Link hinzufügen",
+          "full": "Maximal {max} Links erreicht",
+          "edit": "{title} bearbeiten",
+          "remove": "{title} entfernen"
+        },
+        "link": {
+          "addTitle": "Link hinzufügen",
+          "editTitle": "Link bearbeiten",
+          "titleLabel": "Titel",
+          "urlLabel": "Adresse",
+          "urlPlaceholder": "https://example.com/seite",
+          "problem": {
+            "empty": "Gib eine Adresse ein.",
+            "scheme": "Nur https-Links sind erlaubt.",
+            "invalid": "Das ist keine gültige öffentliche https-Adresse."
+          }
+        },
+        "upload": {
+          "refusedType": "{name}: Nur JPG-, PNG- und WebP-Bilder werden akzeptiert.",
+          "refusedEmpty": "{name}: Die Datei ist leer.",
+          "refusedCount": "{name}: Ein Konzept enthält höchstens {max} Bilder.",
+          "refusedBytes": "{name}: Die Bilder eines Konzepts dürfen zusammen höchstens {max} MB groß sein.",
+          "failed": "Der Upload ist fehlgeschlagen.",
+          "progress": "{name} wird hochgeladen",
+          "retry": "Erneut versuchen",
+          "dismiss": "Verwerfen"
+        },
+        "emptyState": {
+          "title": "Noch keine Konzepte für {market}",
+          "body": "Füge ein Konzept für eine Persona dieses Marktes hinzu. Wir empfehlen {min} oder mehr.",
+          "noPersonasTitle": "{market} hat noch keine Personas",
+          "noPersonasBody": "Ein Konzept basiert auf einer Persona. Lege zuerst Personas für diesen Markt an.",
+          "toPersonas": "Zu den Personas"
         }
       }
     }

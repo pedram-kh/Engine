@@ -1482,7 +1482,8 @@
         "brandArchived": "Esta marca está archivada. Restáurala para cambiar sus oleadas.",
         "saveFailed": "No se pudo guardar la oleada. Inténtalo de nuevo.",
         "waveNotAvailable": "Esa oleada no se puede vincular a esta campaña.",
-        "marketHasPersonas": "Quita primero las personas de estos mercados: {markets}."
+        "marketHasPersonas": "Quita primero las personas de estos mercados: {markets}.",
+        "marketHasConcepts": "Hay conceptos en: {markets}."
       },
       "dialog": {
         "createTitle": "Nueva oleada",
@@ -1706,9 +1707,12 @@
         "personaNone": "Aún no hay personas",
         "statusPersonas": "{count} persona · {covered} de {markets} mercados | {count} personas · {covered} de {markets} mercados",
         "notAvailable": "Aún no disponible",
-        "locked": "Bloqueado hasta que se aprueben todos los conceptos",
         "matrixStatus": "{set} de {total} celda definida | {set} de {total} celdas definidas",
-        "matrixNone": "Añade primero USP y personas"
+        "matrixNone": "Añade primero USP y personas",
+        "conceptsNone": "Aún no hay conceptos",
+        "conceptsStatus": "{approved} de {total} aprobados",
+        "conceptsWarning": "Conceptos: {approved} de {total} aprobados",
+        "conceptsWarningNone": "Aún no hay conceptos"
       },
       "audience": {
         "label": "Título de la audiencia",
@@ -1754,7 +1758,9 @@
           "refreshed": "La lista cambió mientras esto estaba abierto. Revísala y confirma de nuevo.",
           "bodyInUseCells": "{count} lugar usa este USP y se vacía con él: | {count} lugares usan este USP y se vacían con él:",
           "confirmInUseCells": "Eliminar y vaciar {count} elemento | Eliminar y vaciar {count} elementos",
-          "itemCell": "Celda: {level}"
+          "itemCell": "Celda: {level}",
+          "itemConcept": "Chip de concepto quitado",
+          "conceptsNote": "Los conceptos que llevan este USP pierden el chip. Un concepto aprobado vuelve a «Pendiente del cliente»."
         },
         "usedByBoth": "Usado por {angles} y {cells}"
       },
@@ -1852,7 +1858,8 @@
         "synced": "{count} ángulo sincronizado no se copia. Rellena la matriz de {market}. | {count} ángulos sincronizados no se copian. Rellena la matriz de {market}."
       },
       "validation": {
-        "tooLong": "Máximo {max} caracteres."
+        "tooLong": "Máximo {max} caracteres.",
+        "required": "Este campo es obligatorio."
       },
       "errors": {
         "loadFailed": "No se pudo cargar. Inténtalo de nuevo.",
@@ -1872,7 +1879,23 @@
         "conflict": "Alguien cambió esto al mismo tiempo. Recarga e inténtalo de nuevo.",
         "brandArchived": "Una marca archivada es de solo lectura. Restáurala primero.",
         "forbidden": "Solo un admin o un manager puede hacer esto.",
-        "angleSyncedReadOnly": "Cámbialo en la matriz de mensajes."
+        "angleSyncedReadOnly": "Cámbialo en la matriz de mensajes.",
+        "personaInUseByConcepts": "Hay conceptos que usan esta persona ({count}). Muévelos a otra persona o elimínalos primero.",
+        "conceptPersonaInvalid": "Elige una persona de este mercado.",
+        "conceptUspModeRequired": "Elige si mantener o sustituir los USP.",
+        "conceptUspInvalid": "Un chip de USP debe ser un USP de esta oleada.",
+        "decisionInvalid": "Revisa el nombre del cliente y la nota o el comentario.",
+        "conceptDeleteFailed": "No se pudo eliminar una imagen almacenada. No se quitó nada. Inténtalo de nuevo.",
+        "conceptDuplicateFailed": "No se pudieron copiar las imágenes. No se creó ninguna copia. Inténtalo de nuevo.",
+        "conceptMarketFull": "Un mercado tiene como máximo {max} conceptos.",
+        "imageInvalid": "Este archivo no es una imagen JPG, PNG o WebP válida.",
+        "imageUnknownUpload": "Esta subida ha caducado. Añade la imagen de nuevo.",
+        "imageAlreadyCompleted": "Esta subida ya se completó.",
+        "imageDeleteFailed": "No se pudo eliminar la imagen. Inténtalo de nuevo.",
+        "imageLimitCount": "Un concepto admite como máximo {max} imágenes (ahora {used}).",
+        "imageLimitBytes": "Las imágenes de un concepto suman como máximo {max} MB (ahora {used} MB).",
+        "linkInvalidUrl": "No es una dirección https pública válida.",
+        "linkLimitCount": "Se alcanzó el límite de enlaces de este concepto."
       },
       "counts": {
         "angles": "{count} ángulo | {count} ángulos",
@@ -1922,6 +1945,133 @@
         "emptyPersonas": {
           "body": "Añade en el paso 2 personas para este mercado y luego rellena su matriz.",
           "cta": "Añadir personas"
+        }
+      },
+      "concepts": {
+        "title": "Conceptos · {market}",
+        "subtitle": "Hasta {max} conceptos por mercado. Cada uno se basa en una persona.",
+        "add": "Añadir concepto",
+        "tile": "{count} de {max} conceptos",
+        "tileMax": "Máximo alcanzado: {count} de {max} conceptos",
+        "underMinimum": "{market} tiene {count} de los {min} o más conceptos que recomendamos.",
+        "status": {
+          "awaiting": "Pendiente del cliente",
+          "approved": "Aprobado",
+          "changes_requested": "Cambios solicitados"
+        },
+        "stage": {
+          "tofu": "Parte alta del embudo (TOFU)",
+          "mofu": "Parte media del embudo (MOFU)",
+          "bofu": "Parte baja del embudo (BOFU)",
+          "none": "Sin fase"
+        },
+        "menu": {
+          "edit": "Editar",
+          "decide": "Registrar la decisión del cliente",
+          "duplicate": "Duplicar",
+          "delete": "Eliminar",
+          "deleteDecided": "Solo administrador o manager"
+        },
+        "banner": {
+          "counts": "{approved} de {total} aprobados · {awaiting} pendientes del cliente · {changes} con cambios solicitados",
+          "allApproved": "Todos los conceptos aprobados ({total})",
+          "record": "Registrar la decisión del cliente"
+        },
+        "card": {
+          "number": "Concepto {n}",
+          "menu": "Acciones del concepto {n}",
+          "stage": "Fase del embudo",
+          "stageNone": "Fase del embudo",
+          "approvedBy": "Aprobado por {name} · {date}"
+        },
+        "field": {
+          "product": "Producto",
+          "angle": "Ángulo",
+          "primary_message": "Mensaje principal",
+          "hypothesis": "Hipótesis",
+          "hook": "Gancho",
+          "format_visual": "Formato / visual",
+          "key_points": "Puntos clave",
+          "payoff": "Remate",
+          "cta": "CTA"
+        },
+        "dialog": {
+          "addTitle": "Añadir concepto · {market}",
+          "editTitle": "Editar concepto",
+          "persona": "Persona",
+          "stage": "Fase del embudo",
+          "stageNote": "Nota del embudo",
+          "title": "Título del concepto",
+          "usps": "USP",
+          "uspsHint": "De la matriz de la persona: primero Prioridad, luego Apoyo.",
+          "uspMode": "La persona ha cambiado. ¿Qué hacemos con los USP?",
+          "uspModeRefill": "Sustituirlos por los USP de la matriz de la nueva persona",
+          "uspModeKeep": "Mantener los USP actuales",
+          "fixFields": "Corrige los campos marcados abajo."
+        },
+        "decision": {
+          "title": "Registrar la decisión del cliente",
+          "concept": "Concepto",
+          "clientName": "Nombre del cliente",
+          "note": "Nota (opcional)",
+          "comment": "Qué debe cambiar",
+          "replaces": "Una nueva decisión sustituye al estado. Las decisiones anteriores quedan en el registro."
+        },
+        "delete": {
+          "title": "¿Eliminar el concepto {title}?",
+          "body": "Se eliminan el concepto, sus imágenes y sus enlaces. No se puede deshacer.",
+          "bodyDecided": "La decisión del cliente se elimina con él."
+        },
+        "reset": {
+          "title": "¿Anular la aprobación del cliente?",
+          "body": "Este concepto está aprobado. Si lo cambias, vuelve a «Pendiente del cliente» y se anula la aprobación del cliente.",
+          "confirm": "Cambiar y anular la aprobación"
+        },
+        "images": {
+          "label": "Imágenes",
+          "count": "{count} de {max} imágenes · {used} de {total} MB",
+          "add": "Añadir imágenes",
+          "full": "Máximo de {max} imágenes alcanzado",
+          "open": "Abrir {name}",
+          "remove": "Quitar {name}",
+          "close": "Cerrar",
+          "loadFailed": "No se pudo cargar la imagen."
+        },
+        "links": {
+          "label": "Enlaces",
+          "add": "Añadir enlace",
+          "full": "Máximo de {max} enlaces alcanzado",
+          "edit": "Editar {title}",
+          "remove": "Quitar {title}"
+        },
+        "link": {
+          "addTitle": "Añadir enlace",
+          "editTitle": "Editar enlace",
+          "titleLabel": "Título",
+          "urlLabel": "Dirección",
+          "urlPlaceholder": "https://ejemplo.com/pagina",
+          "problem": {
+            "empty": "Introduce una dirección.",
+            "scheme": "Solo se permiten enlaces https.",
+            "invalid": "No es una dirección https pública válida."
+          }
+        },
+        "upload": {
+          "refusedType": "{name}: solo se aceptan imágenes JPG, PNG y WebP.",
+          "refusedEmpty": "{name}: el archivo está vacío.",
+          "refusedCount": "{name}: un concepto admite como máximo {max} imágenes.",
+          "refusedBytes": "{name}: las imágenes de un concepto suman como máximo {max} MB.",
+          "failed": "La subida ha fallado.",
+          "progress": "Subiendo {name}",
+          "retry": "Reintentar",
+          "dismiss": "Descartar"
+        },
+        "emptyState": {
+          "title": "Aún no hay conceptos para {market}",
+          "body": "Añade un concepto para una persona de este mercado. Recomendamos {min} o más.",
+          "noPersonasTitle": "{market} aún no tiene personas",
+          "noPersonasBody": "Un concepto se basa en una persona. Añade primero personas para este mercado.",
+          "toPersonas": "Ir a las personas"
         }
       }
     }

@@ -1482,7 +1482,8 @@
         "brandArchived": "Táto značka je archivovaná. Obnovte ju, aby ste mohli meniť jej vlny.",
         "saveFailed": "Vlnu sa nepodarilo uložiť. Skúste to znova.",
         "waveNotAvailable": "Túto vlnu nemožno prepojiť s touto kampaňou.",
-        "marketHasPersonas": "Najprv odstráňte persóny z týchto trhov: {markets}."
+        "marketHasPersonas": "Najprv odstráňte persóny z týchto trhov: {markets}.",
+        "marketHasConcepts": "Koncepty existujú na trhoch: {markets}."
       },
       "dialog": {
         "createTitle": "Nová vlna",
@@ -1706,9 +1707,12 @@
         "personaNone": "Zatiaľ žiadne persóny",
         "statusPersonas": "{count} persóna · {covered} z {markets} trhov | {count} persón · {covered} z {markets} trhov",
         "notAvailable": "Zatiaľ nedostupné",
-        "locked": "Zamknuté, kým nie sú schválené všetky koncepty",
         "matrixStatus": "Nastavená {set} z {total} bunky | Nastavených {set} z {total} buniek",
-        "matrixNone": "Najprv pridajte USP a persóny"
+        "matrixNone": "Najprv pridajte USP a persóny",
+        "conceptsNone": "Zatiaľ žiadne koncepty",
+        "conceptsStatus": "Schválené {approved} z {total}",
+        "conceptsWarning": "Koncepty: schválené {approved} z {total}",
+        "conceptsWarningNone": "Zatiaľ žiadne koncepty"
       },
       "audience": {
         "label": "Názov cieľovej skupiny",
@@ -1754,7 +1758,9 @@
           "refreshed": "Zoznam sa zmenil, kým bolo okno otvorené. Skontrolujte ho a potvrďte znova.",
           "bodyInUseCells": "{count} miesto používa toto USP a vymaže sa s ním: | {count} miest používa toto USP a vymaže sa s ním:",
           "confirmInUseCells": "Odstrániť a vymazať {count} položku | Odstrániť a vymazať {count} položiek",
-          "itemCell": "Bunka: {level}"
+          "itemCell": "Bunka: {level}",
+          "itemConcept": "Čip konceptu odstránený",
+          "conceptsNote": "Koncepty s týmto USP o čip prídu. Schválený koncept sa vráti do stavu Čaká na klienta."
         },
         "usedByBoth": "Používa {angles} a {cells}"
       },
@@ -1852,7 +1858,8 @@
         "synced": "{count} synchronizovaný uhol sa nekopíruje. Vyplňte maticu trhu {market}. | {count} synchronizovaných uhlov sa nekopíruje. Vyplňte maticu trhu {market}."
       },
       "validation": {
-        "tooLong": "Najviac {max} znakov."
+        "tooLong": "Najviac {max} znakov.",
+        "required": "Toto pole je povinné."
       },
       "errors": {
         "loadFailed": "Načítanie sa nepodarilo. Skúste to znova.",
@@ -1872,7 +1879,23 @@
         "conflict": "Niekto to zmenil v rovnakej chvíli. Načítajte znova a skúste to ešte raz.",
         "brandArchived": "Archivovaná značka je len na čítanie. Najprv ju obnovte.",
         "forbidden": "Môže to urobiť len admin alebo manažér.",
-        "angleSyncedReadOnly": "Zmeňte to v matici odkazov."
+        "angleSyncedReadOnly": "Zmeňte to v matici odkazov.",
+        "personaInUseByConcepts": "Túto personu používajú koncepty ({count}). Najprv ich presuňte k inej persóne alebo odstráňte.",
+        "conceptPersonaInvalid": "Vyberte personu z tohto trhu.",
+        "conceptUspModeRequired": "Vyberte, či USP ponechať, alebo nahradiť.",
+        "conceptUspInvalid": "Čip USP musí byť USP tejto vlny.",
+        "decisionInvalid": "Skontrolujte meno klienta a poznámku alebo komentár.",
+        "conceptDeleteFailed": "Uložený obrázok sa nepodarilo odstrániť. Nič sa neodstránilo. Skúste to znova.",
+        "conceptDuplicateFailed": "Obrázky sa nepodarilo skopírovať. Kópia nevznikla. Skúste to znova.",
+        "conceptMarketFull": "Trh má najviac {max} konceptov.",
+        "imageInvalid": "Tento súbor nie je platný obrázok JPG, PNG ani WebP.",
+        "imageUnknownUpload": "Toto nahrávanie vypršalo. Pridajte obrázok znova.",
+        "imageAlreadyCompleted": "Toto nahrávanie už bolo dokončené.",
+        "imageDeleteFailed": "Obrázok sa nepodarilo odstrániť. Skúste to znova.",
+        "imageLimitCount": "Koncept môže mať najviac {max} obrázkov (teraz {used}).",
+        "imageLimitBytes": "Obrázky konceptu môžu mať spolu najviac {max} MB (teraz {used} MB).",
+        "linkInvalidUrl": "Toto nie je platná verejná adresa https.",
+        "linkLimitCount": "Limit odkazov tohto konceptu je dosiahnutý."
       },
       "counts": {
         "angles": "{count} uhol | {count} uhlov",
@@ -1922,6 +1945,133 @@
         "emptyPersonas": {
           "body": "V kroku 2 pridajte persóny pre tento trh a potom vyplňte jeho maticu.",
           "cta": "Pridať persóny"
+        }
+      },
+      "concepts": {
+        "title": "Koncepty · {market}",
+        "subtitle": "Až {max} konceptov na trh. Každý stojí na jednej persóne.",
+        "add": "Pridať koncept",
+        "tile": "{count} z {max} konceptov",
+        "tileMax": "Dosiahnuté maximum: {count} z {max} konceptov",
+        "underMinimum": "Trh {market} má {count} z odporúčaných {min} a viac konceptov.",
+        "status": {
+          "awaiting": "Čaká na klienta",
+          "approved": "Schválené",
+          "changes_requested": "Požadované zmeny"
+        },
+        "stage": {
+          "tofu": "Horná časť lievika (TOFU)",
+          "mofu": "Stred lievika (MOFU)",
+          "bofu": "Spodná časť lievika (BOFU)",
+          "none": "Žiadna fáza"
+        },
+        "menu": {
+          "edit": "Upraviť",
+          "decide": "Zaznamenať rozhodnutie klienta",
+          "duplicate": "Duplikovať",
+          "delete": "Odstrániť",
+          "deleteDecided": "Iba admin alebo manažér"
+        },
+        "banner": {
+          "counts": "Schválené {approved} z {total} · {awaiting} čaká na klienta · {changes} s požadovanými zmenami",
+          "allApproved": "Všetky koncepty sú schválené ({total})",
+          "record": "Zaznamenať rozhodnutie klienta"
+        },
+        "card": {
+          "number": "Koncept {n}",
+          "menu": "Akcie pre koncept {n}",
+          "stage": "Fáza lievika",
+          "stageNone": "Fáza lievika",
+          "approvedBy": "Schválil {name} · {date}"
+        },
+        "field": {
+          "product": "Produkt",
+          "angle": "Uhol",
+          "primary_message": "Hlavné posolstvo",
+          "hypothesis": "Hypotéza",
+          "hook": "Hook",
+          "format_visual": "Formát / vizuál",
+          "key_points": "Kľúčové body",
+          "payoff": "Pointa",
+          "cta": "CTA"
+        },
+        "dialog": {
+          "addTitle": "Pridať koncept · {market}",
+          "editTitle": "Upraviť koncept",
+          "persona": "Persóna",
+          "stage": "Fáza lievika",
+          "stageNote": "Poznámka k lieviku",
+          "title": "Názov konceptu",
+          "usps": "USP",
+          "uspsHint": "Z matice persóny: najprv Priorita, potom Podpora.",
+          "uspMode": "Persóna sa zmenila. Čo sa má stať s USP?",
+          "uspModeRefill": "Nahradiť ich USP z matice novej persóny",
+          "uspModeKeep": "Ponechať súčasné USP",
+          "fixFields": "Opravte polia označené nižšie."
+        },
+        "decision": {
+          "title": "Zaznamenať rozhodnutie klienta",
+          "concept": "Koncept",
+          "clientName": "Meno klienta",
+          "note": "Poznámka (voliteľná)",
+          "comment": "Čo sa má zmeniť",
+          "replaces": "Nové rozhodnutie nahradí stav. Predchádzajúce rozhodnutia ostávajú v histórii."
+        },
+        "delete": {
+          "title": "Odstrániť koncept {title}?",
+          "body": "Koncept, jeho obrázky a odkazy sa odstránia. Nedá sa to vrátiť späť.",
+          "bodyDecided": "Rozhodnutie klienta sa odstráni spolu s ním."
+        },
+        "reset": {
+          "title": "Zrušiť schválenie klienta?",
+          "body": "Tento koncept je schválený. Zmena ho vráti do stavu Čaká na klienta a zruší schválenie klienta.",
+          "confirm": "Zmeniť a zrušiť schválenie"
+        },
+        "images": {
+          "label": "Obrázky",
+          "count": "{count} z {max} obrázkov · {used} z {total} MB",
+          "add": "Pridať obrázky",
+          "full": "Dosiahnuté maximum {max} obrázkov",
+          "open": "Otvoriť {name}",
+          "remove": "Odstrániť {name}",
+          "close": "Zavrieť",
+          "loadFailed": "Obrázok sa nepodarilo načítať."
+        },
+        "links": {
+          "label": "Odkazy",
+          "add": "Pridať odkaz",
+          "full": "Dosiahnuté maximum {max} odkazov",
+          "edit": "Upraviť {title}",
+          "remove": "Odstrániť {title}"
+        },
+        "link": {
+          "addTitle": "Pridať odkaz",
+          "editTitle": "Upraviť odkaz",
+          "titleLabel": "Názov",
+          "urlLabel": "Adresa",
+          "urlPlaceholder": "https://example.com/stranka",
+          "problem": {
+            "empty": "Zadajte adresu.",
+            "scheme": "Povolené sú iba odkazy https.",
+            "invalid": "Toto nie je platná verejná adresa https."
+          }
+        },
+        "upload": {
+          "refusedType": "{name}: prijímajú sa iba obrázky JPG, PNG a WebP.",
+          "refusedEmpty": "{name}: súbor je prázdny.",
+          "refusedCount": "{name}: koncept môže mať najviac {max} obrázkov.",
+          "refusedBytes": "{name}: obrázky konceptu môžu mať spolu najviac {max} MB.",
+          "failed": "Nahrávanie zlyhalo.",
+          "progress": "Nahráva sa {name}",
+          "retry": "Skúsiť znova",
+          "dismiss": "Zavrhnúť"
+        },
+        "emptyState": {
+          "title": "Zatiaľ žiadne koncepty pre {market}",
+          "body": "Pridajte koncept pre personu z tohto trhu. Odporúčame {min} a viac.",
+          "noPersonasTitle": "{market} zatiaľ nemá žiadne persóny",
+          "noPersonasBody": "Koncept stojí na persóne. Najprv pridajte persóny pre tento trh.",
+          "toPersonas": "Prejsť na persóny"
         }
       }
     }

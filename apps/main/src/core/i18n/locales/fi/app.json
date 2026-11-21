@@ -1482,7 +1482,8 @@
         "brandArchived": "Tämä brändi on arkistoitu. Palauta se muuttaaksesi sen aaltoja.",
         "saveFailed": "Aallon tallentaminen epäonnistui. Yritä uudelleen.",
         "waveNotAvailable": "Tätä aaltoa ei voi liittää tähän kampanjaan.",
-        "marketHasPersonas": "Poista ensin näiden markkinoiden personat: {markets}."
+        "marketHasPersonas": "Poista ensin näiden markkinoiden personat: {markets}.",
+        "marketHasConcepts": "Konsepteja on markkinoilla: {markets}."
       },
       "dialog": {
         "createTitle": "Uusi aalto",
@@ -1706,9 +1707,12 @@
         "personaNone": "Ei vielä personia",
         "statusPersonas": "{count} persona · {covered} / {markets} markkinaa | {count} personaa · {covered} / {markets} markkinaa",
         "notAvailable": "Ei vielä saatavilla",
-        "locked": "Lukittu, kunnes kaikki konseptit on hyväksytty",
         "matrixStatus": "{set} / {total} solua asetettu | {set} / {total} solua asetettu",
-        "matrixNone": "Lisää ensin USP:t ja personat"
+        "matrixNone": "Lisää ensin USP:t ja personat",
+        "conceptsNone": "Ei vielä konsepteja",
+        "conceptsStatus": "{approved}/{total} hyväksytty",
+        "conceptsWarning": "Konseptit: {approved}/{total} hyväksytty",
+        "conceptsWarningNone": "Ei vielä konsepteja"
       },
       "audience": {
         "label": "Kohderyhmän otsikko",
@@ -1754,7 +1758,9 @@
           "refreshed": "Luettelo muuttui ikkunan ollessa auki. Tarkista se ja vahvista uudelleen.",
           "bodyInUseCells": "{count} paikka käyttää tätä USP:tä ja tyhjennetään sen mukana: | {count} paikkaa käyttää tätä USP:tä ja tyhjennetään sen mukana:",
           "confirmInUseCells": "Poista ja tyhjennä {count} kohde | Poista ja tyhjennä {count} kohdetta",
-          "itemCell": "Solu: {level}"
+          "itemCell": "Solu: {level}",
+          "itemConcept": "Konseptin siru poistettu",
+          "conceptsNote": "Konseptit, joilla on tämä USP, menettävät sirun. Hyväksytty konsepti palaa tilaan Odottaa asiakasta."
         },
         "usedByBoth": "Käytössä: {angles} ja {cells}"
       },
@@ -1852,7 +1858,8 @@
         "synced": "{count} synkronoitua näkökulmaa ei kopioida. Täytä markkinan {market} matriisi. | {count} synkronoitua näkökulmaa ei kopioida. Täytä markkinan {market} matriisi."
       },
       "validation": {
-        "tooLong": "Enintään {max} merkkiä."
+        "tooLong": "Enintään {max} merkkiä.",
+        "required": "Tämä kenttä on pakollinen."
       },
       "errors": {
         "loadFailed": "Lataus epäonnistui. Yritä uudelleen.",
@@ -1872,7 +1879,23 @@
         "conflict": "Joku muutti tätä samaan aikaan. Lataa uudelleen ja yritä uudelleen.",
         "brandArchived": "Arkistoitu brändi on vain luettavissa. Palauta se ensin.",
         "forbidden": "Vain admin tai manageri voi tehdä tämän.",
-        "angleSyncedReadOnly": "Muuta tämä viestimatriisissa."
+        "angleSyncedReadOnly": "Muuta tämä viestimatriisissa.",
+        "personaInUseByConcepts": "Konseptit käyttävät tätä persoonaa ({count}). Siirrä ne toiselle persoonalle tai poista ne ensin.",
+        "conceptPersonaInvalid": "Valitse tämän markkinan persoona.",
+        "conceptUspModeRequired": "Valitse, säilytetäänkö vai korvataanko USP:t.",
+        "conceptUspInvalid": "USP-sirun on oltava tämän aallon USP.",
+        "decisionInvalid": "Tarkista asiakkaan nimi sekä muistiinpano tai kommentti.",
+        "conceptDeleteFailed": "Tallennettua kuvaa ei voitu poistaa. Mitään ei poistettu. Yritä uudelleen.",
+        "conceptDuplicateFailed": "Kuvia ei voitu kopioida. Kopiota ei luotu. Yritä uudelleen.",
+        "conceptMarketFull": "Markkinalla voi olla enintään {max} konseptia.",
+        "imageInvalid": "Tämä tiedosto ei ole kelvollinen JPG-, PNG- tai WebP-kuva.",
+        "imageUnknownUpload": "Tämä lataus vanheni. Lisää kuva uudelleen.",
+        "imageAlreadyCompleted": "Tämä lataus on jo valmis.",
+        "imageDeleteFailed": "Kuvaa ei voitu poistaa. Yritä uudelleen.",
+        "imageLimitCount": "Konseptissa voi olla enintään {max} kuvaa (nyt {used}).",
+        "imageLimitBytes": "Konseptin kuvat saavat yhteensä olla enintään {max} Mt (nyt {used} Mt).",
+        "linkInvalidUrl": "Tämä ei ole kelvollinen julkinen https-osoite.",
+        "linkLimitCount": "Tämän konseptin linkkiraja on täynnä."
       },
       "counts": {
         "angles": "{count} näkökulma | {count} näkökulmaa",
@@ -1922,6 +1945,133 @@
         "emptyPersonas": {
           "body": "Lisää tälle markkinalle personat vaiheessa 2 ja täytä sitten sen matriisi.",
           "cta": "Lisää personat"
+        }
+      },
+      "concepts": {
+        "title": "Konseptit · {market}",
+        "subtitle": "Enintään {max} konseptia markkinaa kohti. Jokainen perustuu yhteen persoonaan.",
+        "add": "Lisää konsepti",
+        "tile": "{count}/{max} konseptia",
+        "tileMax": "Enimmäismäärä saavutettu: {count}/{max} konseptia",
+        "underMinimum": "Markkinalla {market} on {count} suositellusta {min} tai useammasta konseptista.",
+        "status": {
+          "awaiting": "Odottaa asiakasta",
+          "approved": "Hyväksytty",
+          "changes_requested": "Muutoksia pyydetty"
+        },
+        "stage": {
+          "tofu": "Suppilon yläosa (TOFU)",
+          "mofu": "Suppilon keskiosa (MOFU)",
+          "bofu": "Suppilon alaosa (BOFU)",
+          "none": "Ei vaihetta"
+        },
+        "menu": {
+          "edit": "Muokkaa",
+          "decide": "Kirjaa asiakkaan päätös",
+          "duplicate": "Monista",
+          "delete": "Poista",
+          "deleteDecided": "Vain ylläpitäjä tai manager"
+        },
+        "banner": {
+          "counts": "{approved}/{total} hyväksytty · {awaiting} odottaa asiakasta · {changes} muutospyyntöä",
+          "allApproved": "Kaikki konseptit hyväksytty ({total})",
+          "record": "Kirjaa asiakkaan päätös"
+        },
+        "card": {
+          "number": "Konsepti {n}",
+          "menu": "Konseptin {n} toiminnot",
+          "stage": "Suppilon vaihe",
+          "stageNone": "Suppilon vaihe",
+          "approvedBy": "Hyväksynyt {name} · {date}"
+        },
+        "field": {
+          "product": "Tuote",
+          "angle": "Näkökulma",
+          "primary_message": "Pääviesti",
+          "hypothesis": "Hypoteesi",
+          "hook": "Koukku",
+          "format_visual": "Muoto / visuaali",
+          "key_points": "Keskeiset kohdat",
+          "payoff": "Kärki",
+          "cta": "CTA"
+        },
+        "dialog": {
+          "addTitle": "Lisää konsepti · {market}",
+          "editTitle": "Muokkaa konseptia",
+          "persona": "Persoona",
+          "stage": "Suppilon vaihe",
+          "stageNote": "Suppilon muistiinpano",
+          "title": "Konseptin otsikko",
+          "usps": "USP:t",
+          "uspsHint": "Persoonan matriisista: ensin Ensisijainen, sitten Tukeva.",
+          "uspMode": "Persoona vaihtui. Mitä USP:ille tehdään?",
+          "uspModeRefill": "Korvaa ne uuden persoonan matriisin USP:illä",
+          "uspModeKeep": "Säilytä nykyiset USP:t",
+          "fixFields": "Korjaa alla merkityt kentät."
+        },
+        "decision": {
+          "title": "Kirjaa asiakkaan päätös",
+          "concept": "Konsepti",
+          "clientName": "Asiakkaan nimi",
+          "note": "Muistiinpano (valinnainen)",
+          "comment": "Mitä pitäisi muuttaa",
+          "replaces": "Uusi päätös korvaa tilan. Aiemmat päätökset säilyvät historiassa."
+        },
+        "delete": {
+          "title": "Poistetaanko konsepti {title}?",
+          "body": "Konsepti, sen kuvat ja linkit poistetaan. Tätä ei voi perua.",
+          "bodyDecided": "Asiakkaan päätös poistetaan sen mukana."
+        },
+        "reset": {
+          "title": "Perutaanko asiakkaan hyväksyntä?",
+          "body": "Tämä konsepti on hyväksytty. Muutos palauttaa sen tilaan Odottaa asiakasta ja peruu asiakkaan hyväksynnän.",
+          "confirm": "Muuta ja peru hyväksyntä"
+        },
+        "images": {
+          "label": "Kuvat",
+          "count": "{count}/{max} kuvaa · {used}/{total} Mt",
+          "add": "Lisää kuvia",
+          "full": "Enimmäismäärä {max} kuvaa saavutettu",
+          "open": "Avaa {name}",
+          "remove": "Poista {name}",
+          "close": "Sulje",
+          "loadFailed": "Kuvaa ei voitu ladata."
+        },
+        "links": {
+          "label": "Linkit",
+          "add": "Lisää linkki",
+          "full": "Enimmäismäärä {max} linkkiä saavutettu",
+          "edit": "Muokkaa: {title}",
+          "remove": "Poista: {title}"
+        },
+        "link": {
+          "addTitle": "Lisää linkki",
+          "editTitle": "Muokkaa linkkiä",
+          "titleLabel": "Otsikko",
+          "urlLabel": "Osoite",
+          "urlPlaceholder": "https://esimerkki.fi/sivu",
+          "problem": {
+            "empty": "Anna osoite.",
+            "scheme": "Vain https-linkit sallitaan.",
+            "invalid": "Tämä ei ole kelvollinen julkinen https-osoite."
+          }
+        },
+        "upload": {
+          "refusedType": "{name}: vain JPG-, PNG- ja WebP-kuvat hyväksytään.",
+          "refusedEmpty": "{name}: tiedosto on tyhjä.",
+          "refusedCount": "{name}: konseptissa voi olla enintään {max} kuvaa.",
+          "refusedBytes": "{name}: konseptin kuvat saavat yhteensä olla enintään {max} Mt.",
+          "failed": "Lataus epäonnistui.",
+          "progress": "Ladataan: {name}",
+          "retry": "Yritä uudelleen",
+          "dismiss": "Hylkää"
+        },
+        "emptyState": {
+          "title": "Ei vielä konsepteja markkinalle {market}",
+          "body": "Lisää konsepti tämän markkinan persoonalle. Suosittelemme {min} tai useampaa.",
+          "noPersonasTitle": "Markkinalla {market} ei ole vielä persoonia",
+          "noPersonasBody": "Konsepti perustuu persoonaan. Lisää ensin persoonia tälle markkinalle.",
+          "toPersonas": "Siirry persooniin"
         }
       }
     }

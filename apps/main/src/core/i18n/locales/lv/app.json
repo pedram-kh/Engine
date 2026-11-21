@@ -1482,7 +1482,8 @@
         "brandArchived": "Šī preču zīme ir arhivēta. Atjaunojiet to, lai mainītu tās vilņus.",
         "saveFailed": "Neizdevās saglabāt vilni. Mēģiniet vēlreiz.",
         "waveNotAvailable": "Šo vilni nevar saistīt ar šo kampaņu.",
-        "marketHasPersonas": "Vispirms noņemiet šo tirgu personas: {markets}."
+        "marketHasPersonas": "Vispirms noņemiet šo tirgu personas: {markets}.",
+        "marketHasConcepts": "Koncepti ir tirgos: {markets}."
       },
       "dialog": {
         "createTitle": "Jauns vilnis",
@@ -1706,9 +1707,12 @@
         "personaNone": "Personu vēl nav",
         "statusPersonas": "{count} persona · {covered} no {markets} tirgiem | {count} personas · {covered} no {markets} tirgiem",
         "notAvailable": "Vēl nav pieejams",
-        "locked": "Bloķēts, līdz tiek apstiprinātas visas koncepcijas",
         "matrixStatus": "Iestatīta {set} šūna no {total} | Iestatītas {set} šūnas no {total}",
-        "matrixNone": "Vispirms pievienojiet USP un personas"
+        "matrixNone": "Vispirms pievienojiet USP un personas",
+        "conceptsNone": "Konceptu vēl nav",
+        "conceptsStatus": "Apstiprināti {approved} no {total}",
+        "conceptsWarning": "Koncepti: apstiprināti {approved} no {total}",
+        "conceptsWarningNone": "Konceptu vēl nav"
       },
       "audience": {
         "label": "Mērķauditorijas nosaukums",
@@ -1754,7 +1758,9 @@
           "refreshed": "Saraksts mainījās, kamēr logs bija atvērts. Pārbaudiet to un apstipriniet vēlreiz.",
           "bodyInUseCells": "{count} vieta izmanto šo USP un tiek notīrīta kopā ar to: | {count} vietas izmanto šo USP un tiek notīrītas kopā ar to:",
           "confirmInUseCells": "Dzēst un notīrīt {count} vienumu | Dzēst un notīrīt {count} vienumus",
-          "itemCell": "Šūna: {level}"
+          "itemCell": "Šūna: {level}",
+          "itemConcept": "Koncepta žetons noņemts",
+          "conceptsNote": "Koncepti ar šo USP zaudē žetonu. Apstiprināts koncepts atgriežas statusā „Gaida klientu”."
         },
         "usedByBoth": "Izmanto {angles} un {cells}"
       },
@@ -1852,7 +1858,8 @@
         "synced": "{count} sinhronizēts leņķis netiek kopēts. Aizpildiet tirgus {market} matricu. | {count} sinhronizēti leņķi netiek kopēti. Aizpildiet tirgus {market} matricu."
       },
       "validation": {
-        "tooLong": "Ne vairāk kā {max} rakstzīmes."
+        "tooLong": "Ne vairāk kā {max} rakstzīmes.",
+        "required": "Šis lauks ir obligāts."
       },
       "errors": {
         "loadFailed": "Neizdevās ielādēt. Mēģiniet vēlreiz.",
@@ -1872,7 +1879,23 @@
         "conflict": "Kāds to mainīja tajā pašā brīdī. Ielādējiet no jauna un mēģiniet vēlreiz.",
         "brandArchived": "Arhivēts zīmols ir tikai lasāms. Vispirms atjaunojiet to.",
         "forbidden": "To var izdarīt tikai administrators vai vadītājs.",
-        "angleSyncedReadOnly": "Mainiet to Ziņojumu matricā."
+        "angleSyncedReadOnly": "Mainiet to Ziņojumu matricā.",
+        "personaInUseByConcepts": "Šo personu izmanto koncepti ({count}). Vispirms pārvietojiet tos uz citu personu vai dzēsiet.",
+        "conceptPersonaInvalid": "Izvēlieties šī tirgus personu.",
+        "conceptUspModeRequired": "Izvēlieties, vai USP paturēt vai aizstāt.",
+        "conceptUspInvalid": "USP žetonam jābūt šī viļņa USP.",
+        "decisionInvalid": "Pārbaudiet klienta vārdu un piezīmi vai komentāru.",
+        "conceptDeleteFailed": "Saglabāto attēlu neizdevās dzēst. Nekas nav noņemts. Mēģiniet vēlreiz.",
+        "conceptDuplicateFailed": "Attēlus neizdevās nokopēt. Kopija netika izveidota. Mēģiniet vēlreiz.",
+        "conceptMarketFull": "Tirgū var būt ne vairāk kā {max} konceptu.",
+        "imageInvalid": "Šis fails nav derīgs JPG, PNG vai WebP attēls.",
+        "imageUnknownUpload": "Šī augšupielāde ir beigusies. Pievienojiet attēlu vēlreiz.",
+        "imageAlreadyCompleted": "Šī augšupielāde jau ir pabeigta.",
+        "imageDeleteFailed": "Attēlu neizdevās dzēst. Mēģiniet vēlreiz.",
+        "imageLimitCount": "Konceptā var būt ne vairāk kā {max} attēli (pašlaik {used}).",
+        "imageLimitBytes": "Koncepta attēli kopā drīkst būt ne lielāki par {max} MB (pašlaik {used} MB).",
+        "linkInvalidUrl": "Šī nav derīga publiska https adrese.",
+        "linkLimitCount": "Šī koncepta saišu limits ir sasniegts."
       },
       "counts": {
         "angles": "{count} leņķis | {count} leņķi",
@@ -1922,6 +1945,133 @@
         "emptyPersonas": {
           "body": "2. solī pievienojiet šī tirgus personas, pēc tam aizpildiet tā matricu.",
           "cta": "Pievienot personas"
+        }
+      },
+      "concepts": {
+        "title": "Koncepti · {market}",
+        "subtitle": "Līdz {max} konceptiem katrā tirgū. Katrs balstās uz vienu personu.",
+        "add": "Pievienot konceptu",
+        "tile": "{count} no {max} konceptiem",
+        "tileMax": "Sasniegts maksimums: {count} no {max} konceptiem",
+        "underMinimum": "Tirgū {market} ir {count} no ieteiktajiem {min} vai vairāk konceptiem.",
+        "status": {
+          "awaiting": "Gaida klientu",
+          "approved": "Apstiprināts",
+          "changes_requested": "Pieprasītas izmaiņas"
+        },
+        "stage": {
+          "tofu": "Piltuves augšdaļa (TOFU)",
+          "mofu": "Piltuves vidusdaļa (MOFU)",
+          "bofu": "Piltuves apakšdaļa (BOFU)",
+          "none": "Bez posma"
+        },
+        "menu": {
+          "edit": "Rediģēt",
+          "decide": "Ierakstīt klienta lēmumu",
+          "duplicate": "Dublēt",
+          "delete": "Dzēst",
+          "deleteDecided": "Tikai administrators vai vadītājs"
+        },
+        "banner": {
+          "counts": "Apstiprināti {approved} no {total} · {awaiting} gaida klientu · {changes} ar pieprasītām izmaiņām",
+          "allApproved": "Visi koncepti apstiprināti ({total})",
+          "record": "Ierakstīt klienta lēmumu"
+        },
+        "card": {
+          "number": "Koncepts {n}",
+          "menu": "Darbības konceptam {n}",
+          "stage": "Piltuves posms",
+          "stageNone": "Piltuves posms",
+          "approvedBy": "Apstiprināja {name} · {date}"
+        },
+        "field": {
+          "product": "Produkts",
+          "angle": "Leņķis",
+          "primary_message": "Galvenais vēstījums",
+          "hypothesis": "Hipotēze",
+          "hook": "Āķis",
+          "format_visual": "Formāts / vizuālais",
+          "key_points": "Galvenie punkti",
+          "payoff": "Pointe",
+          "cta": "CTA"
+        },
+        "dialog": {
+          "addTitle": "Pievienot konceptu · {market}",
+          "editTitle": "Rediģēt konceptu",
+          "persona": "Persona",
+          "stage": "Piltuves posms",
+          "stageNote": "Piltuves piezīme",
+          "title": "Koncepta nosaukums",
+          "usps": "USP",
+          "uspsHint": "No personas matricas: vispirms Prioritāte, tad Atbalsts.",
+          "uspMode": "Persona ir mainīta. Ko darīt ar USP?",
+          "uspModeRefill": "Aizstāt tos ar jaunās personas matricas USP",
+          "uspModeKeep": "Paturēt pašreizējos USP",
+          "fixFields": "Izlabojiet zemāk atzīmētos laukus."
+        },
+        "decision": {
+          "title": "Ierakstīt klienta lēmumu",
+          "concept": "Koncepts",
+          "clientName": "Klienta vārds",
+          "note": "Piezīme (nav obligāta)",
+          "comment": "Kas jāmaina",
+          "replaces": "Jauns lēmums aizstāj statusu. Iepriekšējie lēmumi paliek vēsturē."
+        },
+        "delete": {
+          "title": "Dzēst konceptu {title}?",
+          "body": "Koncepts, tā attēli un saites tiks dzēsti. Šo darbību nevar atsaukt.",
+          "bodyDecided": "Klienta lēmums tiek dzēsts kopā ar to."
+        },
+        "reset": {
+          "title": "Atcelt klienta apstiprinājumu?",
+          "body": "Šis koncepts ir apstiprināts. Mainot to, tas atgriežas statusā „Gaida klientu”, un klienta apstiprinājums tiek atcelts.",
+          "confirm": "Mainīt un atcelt apstiprinājumu"
+        },
+        "images": {
+          "label": "Attēli",
+          "count": "{count} no {max} attēliem · {used} no {total} MB",
+          "add": "Pievienot attēlus",
+          "full": "Sasniegts maksimums — {max} attēli",
+          "open": "Atvērt {name}",
+          "remove": "Noņemt {name}",
+          "close": "Aizvērt",
+          "loadFailed": "Attēlu neizdevās ielādēt."
+        },
+        "links": {
+          "label": "Saites",
+          "add": "Pievienot saiti",
+          "full": "Sasniegts maksimums — {max} saites",
+          "edit": "Rediģēt {title}",
+          "remove": "Noņemt {title}"
+        },
+        "link": {
+          "addTitle": "Pievienot saiti",
+          "editTitle": "Rediģēt saiti",
+          "titleLabel": "Nosaukums",
+          "urlLabel": "Adrese",
+          "urlPlaceholder": "https://piemers.lv/lapa",
+          "problem": {
+            "empty": "Ievadiet adresi.",
+            "scheme": "Atļautas tikai https saites.",
+            "invalid": "Šī nav derīga publiska https adrese."
+          }
+        },
+        "upload": {
+          "refusedType": "{name}: tiek pieņemti tikai JPG, PNG un WebP attēli.",
+          "refusedEmpty": "{name}: fails ir tukšs.",
+          "refusedCount": "{name}: konceptā var būt ne vairāk kā {max} attēli.",
+          "refusedBytes": "{name}: koncepta attēli kopā drīkst būt ne lielāki par {max} MB.",
+          "failed": "Augšupielāde neizdevās.",
+          "progress": "Augšupielādē: {name}",
+          "retry": "Mēģināt vēlreiz",
+          "dismiss": "Noraidīt"
+        },
+        "emptyState": {
+          "title": "Tirgum {market} konceptu vēl nav",
+          "body": "Pievienojiet konceptu šī tirgus personai. Iesakām {min} vai vairāk.",
+          "noPersonasTitle": "Tirgum {market} personu vēl nav",
+          "noPersonasBody": "Koncepts balstās uz personu. Vispirms pievienojiet šī tirgus personas.",
+          "toPersonas": "Doties uz personām"
         }
       }
     }

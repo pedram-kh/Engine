@@ -22,6 +22,8 @@ const props = defineProps<{
   modelValue: boolean
   scope: WaveScope
   usp: WaveUspResource | null
+  /** PL-2.3: the wave's markets, to find the concepts that carry the USP as a chip. */
+  markets?: string[]
   /** Admin or manager. Staff cannot delete a USP that is in use (ruling Q12). */
   canDeleteInUse: boolean
 }>()
@@ -82,6 +84,26 @@ async function loadAffected(usp: WaveUspResource, id: number): Promise<void> {
         }
       }
     }
+    // PL-2.3: a concept that carries the USP as a chip loses the chip (an Approved one goes back to Awaiting client).
+    const lists = await Promise.all(
+      (props.markets ?? []).map((m) => strategyApi.listConcepts(props.scope, m)),
+    )
+    if (id !== openId) return
+    for (const l of lists) {
+      for (const c of l.data) {
+        if (c.attributes.usps.some((u) => u.id === usp.id)) {
+          out.push({
+            kind: 'concept',
+            level: null,
+            persona: c.attributes.persona.id,
+            market: c.attributes.market,
+            code: t('app.strategy.concepts.card.number', { n: c.attributes.number }),
+            title: c.attributes.title,
+            explanation: '',
+          })
+        }
+      }
+    }
     affected.value = out
   } catch (err) {
     if (id === openId) error.value = strategyErrorMessage(err, t)
@@ -113,6 +135,7 @@ watch(
 const inUse = computed(() => affected.value.length > 0)
 /** Staff may not delete a USP that is in use: the dialog says why and offers only Close (the server refuses too). */
 const staffBlocked = computed(() => inUse.value && !props.canDeleteInUse)
+const hasConcepts = computed(() => affected.value.some((i) => i.kind === 'concept'))
 const hasCells = computed(() => affected.value.some((i) => i.kind === 'cell'))
 const title = computed(() =>
   t('app.strategy.usp.deleteDialog.title', { title: props.usp?.attributes.title ?? '' }),
@@ -219,10 +242,13 @@ async function confirm(): Promise<void> {
       >
         {{ t('app.strategy.usp.deleteStaffReason') }}
       </v-alert>
+      <p v-if="hasConcepts" class="mb-3" data-test="usp-delete-concepts-note">
+        {{ t('app.strategy.usp.deleteDialog.conceptsNote') }}
+      </p>
       <ul v-if="inUse" class="usp-delete-list" data-test="usp-delete-affected">
         <li
-          v-for="item in affected"
-          :key="`${item.kind}-${item.persona}-${item.explanation}`"
+          v-for="(item, i) in affected"
+          :key="`${item.kind}-${item.persona}-${item.explanation}-${i}`"
           class="usp-delete-list__row"
         >
           <span class="usp-delete-list__who"
@@ -235,6 +261,9 @@ async function confirm(): Promise<void> {
                   level: t(`app.strategy.matrix.level.${item.level}`),
                 })
               }}<template v-if="item.explanation"> · </template></template
+            ><template v-if="item.kind === 'concept'">{{
+              t('app.strategy.usp.deleteDialog.itemConcept')
+            }}</template
             >{{ item.explanation }}</span
           >
         </li>

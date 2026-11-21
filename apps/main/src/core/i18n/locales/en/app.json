@@ -1482,7 +1482,8 @@
         "brandArchived": "This brand is archived. Restore it to change its waves.",
         "saveFailed": "The wave could not be saved. Try again.",
         "waveNotAvailable": "That wave cannot be linked to this campaign.",
-        "marketHasPersonas": "Remove the personas of these markets first: {markets}."
+        "marketHasPersonas": "Remove the personas of these markets first: {markets}.",
+        "marketHasConcepts": "Concepts exist in: {markets}."
       },
       "dialog": {
         "createTitle": "New wave",
@@ -1706,9 +1707,12 @@
         "personaNone": "No personas yet",
         "statusPersonas": "{count} persona · {covered} of {markets} markets | {count} personas · {covered} of {markets} markets",
         "notAvailable": "Not available yet",
-        "locked": "Locked until all concepts are approved",
         "matrixStatus": "{set} of {total} cell set | {set} of {total} cells set",
-        "matrixNone": "Add USPs and personas first"
+        "matrixNone": "Add USPs and personas first",
+        "conceptsNone": "No concepts yet",
+        "conceptsStatus": "{approved} of {total} approved",
+        "conceptsWarning": "Concepts: {approved} of {total} approved",
+        "conceptsWarningNone": "No concepts yet"
       },
       "audience": {
         "label": "Audience title",
@@ -1754,7 +1758,9 @@
           "refreshed": "The list changed while this was open. Check it and confirm again.",
           "bodyInUseCells": "{count} place uses this USP and is cleared with it: | {count} places use this USP and are cleared with it:",
           "confirmInUseCells": "Delete and clear {count} item | Delete and clear {count} items",
-          "itemCell": "{level} cell"
+          "itemCell": "{level} cell",
+          "itemConcept": "Concept chip removed",
+          "conceptsNote": "Concepts that carry this USP lose the chip. An approved concept goes back to Awaiting client."
         },
         "usedByBoth": "Used by {angles} and {cells}"
       },
@@ -1852,7 +1858,8 @@
         "synced": "{count} synced angle is not copied. Fill the matrix of {market}. | {count} synced angles are not copied. Fill the matrix of {market}."
       },
       "validation": {
-        "tooLong": "Use at most {max} characters."
+        "tooLong": "Use at most {max} characters.",
+        "required": "This field is required."
       },
       "errors": {
         "loadFailed": "Could not load this. Try again.",
@@ -1872,7 +1879,23 @@
         "conflict": "Someone changed this at the same moment. Reload and try again.",
         "brandArchived": "An archived brand is read-only. Restore it first.",
         "forbidden": "Only an admin or manager can do this.",
-        "angleSyncedReadOnly": "Change this on the Messaging matrix."
+        "angleSyncedReadOnly": "Change this on the Messaging matrix.",
+        "personaInUseByConcepts": "Concepts use this persona ({count}). Move them to another persona or delete them first.",
+        "conceptPersonaInvalid": "Choose a persona of this market.",
+        "conceptUspModeRequired": "Choose whether to keep or replace the USPs.",
+        "conceptUspInvalid": "A USP chip must be a USP of this wave.",
+        "decisionInvalid": "Check the client's name and the note or comment.",
+        "conceptDeleteFailed": "A stored image could not be deleted. Nothing was removed. Try again.",
+        "conceptDuplicateFailed": "The images could not be copied. No copy was made. Try again.",
+        "conceptMarketFull": "A market has at most {max} concepts.",
+        "imageInvalid": "This file is not a valid JPG, PNG or WebP image.",
+        "imageUnknownUpload": "This upload expired. Add the image again.",
+        "imageAlreadyCompleted": "This upload was already completed.",
+        "imageDeleteFailed": "The image could not be deleted. Try again.",
+        "imageLimitCount": "A concept holds at most {max} images ({used} now).",
+        "imageLimitBytes": "The images of a concept add up to at most {max} MB ({used} MB now).",
+        "linkInvalidUrl": "This is not a valid public https address.",
+        "linkLimitCount": "The link limit of this concept is reached."
       },
       "counts": {
         "angles": "{count} angle | {count} angles",
@@ -1922,6 +1945,133 @@
         "emptyPersonas": {
           "body": "Add personas for this market in step 2, then fill its matrix.",
           "cta": "Add personas"
+        }
+      },
+      "concepts": {
+        "title": "Concepts · {market}",
+        "subtitle": "Up to {max} concepts per market. Each is built on one persona.",
+        "add": "Add concept",
+        "tile": "{count} of {max} concepts",
+        "tileMax": "Maximum reached: {count} of {max} concepts",
+        "underMinimum": "{market} has {count} of the {min} or more concepts we recommend.",
+        "status": {
+          "awaiting": "Awaiting client",
+          "approved": "Approved",
+          "changes_requested": "Changes requested"
+        },
+        "stage": {
+          "tofu": "Top of funnel (TOFU)",
+          "mofu": "Middle of funnel (MOFU)",
+          "bofu": "Bottom of funnel (BOFU)",
+          "none": "No stage"
+        },
+        "menu": {
+          "edit": "Edit",
+          "decide": "Record client's decision",
+          "duplicate": "Duplicate",
+          "delete": "Delete",
+          "deleteDecided": "Admin or manager only"
+        },
+        "banner": {
+          "counts": "{approved} of {total} approved · {awaiting} awaiting client · {changes} changes requested",
+          "allApproved": "Every concept approved ({total})",
+          "record": "Record client's decision"
+        },
+        "card": {
+          "number": "Concept {n}",
+          "menu": "Actions for concept {n}",
+          "stage": "Funnel stage",
+          "stageNone": "Funnel stage",
+          "approvedBy": "Approved by {name} · {date}"
+        },
+        "field": {
+          "product": "Product",
+          "angle": "Angle",
+          "primary_message": "Primary message",
+          "hypothesis": "Hypothesis",
+          "hook": "Hook",
+          "format_visual": "Format / visual",
+          "key_points": "Key points",
+          "payoff": "Payoff",
+          "cta": "CTA"
+        },
+        "dialog": {
+          "addTitle": "Add concept · {market}",
+          "editTitle": "Edit concept",
+          "persona": "Persona",
+          "stage": "Funnel stage",
+          "stageNote": "Funnel note",
+          "title": "Concept title",
+          "usps": "USPs",
+          "uspsHint": "From the persona's matrix: Priority first, then Support.",
+          "uspMode": "The persona changed. What should happen to the USPs?",
+          "uspModeRefill": "Replace them with the new persona's matrix USPs",
+          "uspModeKeep": "Keep the current USPs",
+          "fixFields": "Fix the fields marked below."
+        },
+        "decision": {
+          "title": "Record client's decision",
+          "concept": "Concept",
+          "clientName": "Client's name",
+          "note": "Note (optional)",
+          "comment": "What should change",
+          "replaces": "A new decision replaces the status. Earlier decisions stay in the record."
+        },
+        "delete": {
+          "title": "Delete concept {title}?",
+          "body": "The concept, its images and its links are deleted. This cannot be undone.",
+          "bodyDecided": "The client's decision is deleted with it."
+        },
+        "reset": {
+          "title": "Clear the client's approval?",
+          "body": "This concept is approved. Changing it sends it back to Awaiting client and clears the client's approval.",
+          "confirm": "Change and clear approval"
+        },
+        "images": {
+          "label": "Images",
+          "count": "{count} of {max} images · {used} of {total} MB",
+          "add": "Add images",
+          "full": "Maximum of {max} images reached",
+          "open": "Open {name}",
+          "remove": "Remove {name}",
+          "close": "Close",
+          "loadFailed": "The image could not be loaded."
+        },
+        "links": {
+          "label": "Links",
+          "add": "Add link",
+          "full": "Maximum of {max} links reached",
+          "edit": "Edit {title}",
+          "remove": "Remove {title}"
+        },
+        "link": {
+          "addTitle": "Add link",
+          "editTitle": "Edit link",
+          "titleLabel": "Title",
+          "urlLabel": "Address",
+          "urlPlaceholder": "https://example.com/page",
+          "problem": {
+            "empty": "Enter an address.",
+            "scheme": "Only https links are allowed.",
+            "invalid": "This is not a valid public https address."
+          }
+        },
+        "upload": {
+          "refusedType": "{name}: only JPG, PNG and WebP images are accepted.",
+          "refusedEmpty": "{name}: the file is empty.",
+          "refusedCount": "{name}: a concept holds at most {max} images.",
+          "refusedBytes": "{name}: the images of a concept add up to at most {max} MB.",
+          "failed": "The upload failed.",
+          "progress": "Uploading {name}",
+          "retry": "Retry",
+          "dismiss": "Dismiss"
+        },
+        "emptyState": {
+          "title": "No concepts for {market} yet",
+          "body": "Add a concept for a persona of this market. We recommend {min} or more.",
+          "noPersonasTitle": "{market} has no personas yet",
+          "noPersonasBody": "A concept is built on a persona. Add personas for this market first.",
+          "toPersonas": "Go to personas"
         }
       }
     }

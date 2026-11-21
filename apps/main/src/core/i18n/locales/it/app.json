@@ -1482,7 +1482,8 @@
         "brandArchived": "Questo marchio è archiviato. Ripristinalo per modificarne le ondate.",
         "saveFailed": "Impossibile salvare l'ondata. Riprova.",
         "waveNotAvailable": "Quell'ondata non può essere collegata a questa campagna.",
-        "marketHasPersonas": "Rimuovi prima le persone di questi mercati: {markets}."
+        "marketHasPersonas": "Rimuovi prima le persone di questi mercati: {markets}.",
+        "marketHasConcepts": "Esistono concept in: {markets}."
       },
       "dialog": {
         "createTitle": "Nuova ondata",
@@ -1706,9 +1707,12 @@
         "personaNone": "Ancora nessuna persona",
         "statusPersonas": "{count} persona · {covered} mercati su {markets} | {count} persone · {covered} mercati su {markets}",
         "notAvailable": "Non ancora disponibile",
-        "locked": "Bloccato finché tutti i concept non sono approvati",
         "matrixStatus": "{set} cella impostata su {total} | {set} celle impostate su {total}",
-        "matrixNone": "Aggiungi prima USP e persona"
+        "matrixNone": "Aggiungi prima USP e persona",
+        "conceptsNone": "Ancora nessun concept",
+        "conceptsStatus": "{approved} su {total} approvati",
+        "conceptsWarning": "Concept: {approved} su {total} approvati",
+        "conceptsWarningNone": "Ancora nessun concept"
       },
       "audience": {
         "label": "Titolo del pubblico",
@@ -1754,7 +1758,9 @@
           "refreshed": "L'elenco è cambiato mentre questa finestra era aperta. Controllalo e conferma di nuovo.",
           "bodyInUseCells": "{count} punto usa questo USP e viene svuotato con esso: | {count} punti usano questo USP e vengono svuotati con esso:",
           "confirmInUseCells": "Elimina e svuota {count} elemento | Elimina e svuota {count} elementi",
-          "itemCell": "Cella {level}"
+          "itemCell": "Cella {level}",
+          "itemConcept": "Chip del concept rimosso",
+          "conceptsNote": "I concept che hanno questo USP perdono il chip. Un concept approvato torna in attesa del cliente."
         },
         "usedByBoth": "Usato da {angles} e {cells}"
       },
@@ -1852,7 +1858,8 @@
         "synced": "{count} angolo sincronizzato non viene copiato. Compila la matrice di {market}. | {count} angoli sincronizzati non vengono copiati. Compila la matrice di {market}."
       },
       "validation": {
-        "tooLong": "Al massimo {max} caratteri."
+        "tooLong": "Al massimo {max} caratteri.",
+        "required": "Questo campo è obbligatorio."
       },
       "errors": {
         "loadFailed": "Impossibile caricare. Riprova.",
@@ -1872,7 +1879,23 @@
         "conflict": "Qualcuno ha modificato questo elemento nello stesso momento. Ricarica e riprova.",
         "brandArchived": "Un brand archiviato è in sola lettura. Ripristinalo prima.",
         "forbidden": "Solo un admin o un manager può farlo.",
-        "angleSyncedReadOnly": "Modificalo nella matrice dei messaggi."
+        "angleSyncedReadOnly": "Modificalo nella matrice dei messaggi.",
+        "personaInUseByConcepts": "Alcuni concept usano questa persona ({count}). Spostali su un'altra persona o eliminali prima.",
+        "conceptPersonaInvalid": "Scegli una persona di questo mercato.",
+        "conceptUspModeRequired": "Scegli se mantenere o sostituire gli USP.",
+        "conceptUspInvalid": "Un chip USP deve essere un USP di questa wave.",
+        "decisionInvalid": "Controlla il nome del cliente e la nota o il commento.",
+        "conceptDeleteFailed": "Non è stato possibile eliminare un'immagine salvata. Non è stato rimosso nulla. Riprova.",
+        "conceptDuplicateFailed": "Non è stato possibile copiare le immagini. Nessuna copia creata. Riprova.",
+        "conceptMarketFull": "Un mercato ha al massimo {max} concept.",
+        "imageInvalid": "Questo file non è un'immagine JPG, PNG o WebP valida.",
+        "imageUnknownUpload": "Questo caricamento è scaduto. Aggiungi di nuovo l'immagine.",
+        "imageAlreadyCompleted": "Questo caricamento è già stato completato.",
+        "imageDeleteFailed": "Impossibile eliminare l'immagine. Riprova.",
+        "imageLimitCount": "Un concept contiene al massimo {max} immagini (ora {used}).",
+        "imageLimitBytes": "Le immagini di un concept non possono superare {max} MB in totale (ora {used} MB).",
+        "linkInvalidUrl": "Non è un indirizzo https pubblico valido.",
+        "linkLimitCount": "Il limite di link di questo concept è stato raggiunto."
       },
       "counts": {
         "angles": "{count} angolo | {count} angoli",
@@ -1922,6 +1945,133 @@
         "emptyPersonas": {
           "body": "Nel passo 2 aggiungi persone per questo mercato, poi compila la sua matrice.",
           "cta": "Aggiungi persone"
+        }
+      },
+      "concepts": {
+        "title": "Concept · {market}",
+        "subtitle": "Fino a {max} concept per mercato. Ognuno si basa su una persona.",
+        "add": "Aggiungi concept",
+        "tile": "{count} concept su {max}",
+        "tileMax": "Massimo raggiunto: {count} concept su {max}",
+        "underMinimum": "{market} ha {count} dei {min} o più concept consigliati.",
+        "status": {
+          "awaiting": "In attesa del cliente",
+          "approved": "Approvato",
+          "changes_requested": "Modifiche richieste"
+        },
+        "stage": {
+          "tofu": "Parte alta del funnel (TOFU)",
+          "mofu": "Parte centrale del funnel (MOFU)",
+          "bofu": "Parte bassa del funnel (BOFU)",
+          "none": "Nessuna fase"
+        },
+        "menu": {
+          "edit": "Modifica",
+          "decide": "Registra la decisione del cliente",
+          "duplicate": "Duplica",
+          "delete": "Elimina",
+          "deleteDecided": "Solo admin o manager"
+        },
+        "banner": {
+          "counts": "{approved} su {total} approvati · {awaiting} in attesa del cliente · {changes} con modifiche richieste",
+          "allApproved": "Tutti i concept approvati ({total})",
+          "record": "Registra la decisione del cliente"
+        },
+        "card": {
+          "number": "Concept {n}",
+          "menu": "Azioni per il concept {n}",
+          "stage": "Fase del funnel",
+          "stageNone": "Fase del funnel",
+          "approvedBy": "Approvato da {name} · {date}"
+        },
+        "field": {
+          "product": "Prodotto",
+          "angle": "Angolo",
+          "primary_message": "Messaggio principale",
+          "hypothesis": "Ipotesi",
+          "hook": "Hook",
+          "format_visual": "Formato / visual",
+          "key_points": "Punti chiave",
+          "payoff": "Chiusura",
+          "cta": "CTA"
+        },
+        "dialog": {
+          "addTitle": "Aggiungi concept · {market}",
+          "editTitle": "Modifica concept",
+          "persona": "Persona",
+          "stage": "Fase del funnel",
+          "stageNote": "Nota sul funnel",
+          "title": "Titolo del concept",
+          "usps": "USP",
+          "uspsHint": "Dalla matrice della persona: prima Priorità, poi Supporto.",
+          "uspMode": "La persona è cambiata. Cosa fare con gli USP?",
+          "uspModeRefill": "Sostituiscili con gli USP della matrice della nuova persona",
+          "uspModeKeep": "Mantieni gli USP attuali",
+          "fixFields": "Correggi i campi segnalati qui sotto."
+        },
+        "decision": {
+          "title": "Registra la decisione del cliente",
+          "concept": "Concept",
+          "clientName": "Nome del cliente",
+          "note": "Nota (facoltativa)",
+          "comment": "Cosa deve cambiare",
+          "replaces": "Una nuova decisione sostituisce lo stato. Le decisioni precedenti restano nello storico."
+        },
+        "delete": {
+          "title": "Eliminare il concept {title}?",
+          "body": "Il concept, le sue immagini e i suoi link vengono eliminati. L'operazione non si può annullare.",
+          "bodyDecided": "Anche la decisione del cliente viene eliminata."
+        },
+        "reset": {
+          "title": "Annullare l'approvazione del cliente?",
+          "body": "Questo concept è approvato. Modificarlo lo riporta in attesa del cliente e annulla l'approvazione del cliente.",
+          "confirm": "Modifica e annulla l'approvazione"
+        },
+        "images": {
+          "label": "Immagini",
+          "count": "{count} di {max} immagini · {used} di {total} MB",
+          "add": "Aggiungi immagini",
+          "full": "Raggiunto il massimo di {max} immagini",
+          "open": "Apri {name}",
+          "remove": "Rimuovi {name}",
+          "close": "Chiudi",
+          "loadFailed": "Impossibile caricare l'immagine."
+        },
+        "links": {
+          "label": "Link",
+          "add": "Aggiungi link",
+          "full": "Raggiunto il massimo di {max} link",
+          "edit": "Modifica {title}",
+          "remove": "Rimuovi {title}"
+        },
+        "link": {
+          "addTitle": "Aggiungi link",
+          "editTitle": "Modifica link",
+          "titleLabel": "Titolo",
+          "urlLabel": "Indirizzo",
+          "urlPlaceholder": "https://esempio.com/pagina",
+          "problem": {
+            "empty": "Inserisci un indirizzo.",
+            "scheme": "Sono consentiti solo link https.",
+            "invalid": "Non è un indirizzo https pubblico valido."
+          }
+        },
+        "upload": {
+          "refusedType": "{name}: sono accettate solo immagini JPG, PNG e WebP.",
+          "refusedEmpty": "{name}: il file è vuoto.",
+          "refusedCount": "{name}: un concept contiene al massimo {max} immagini.",
+          "refusedBytes": "{name}: le immagini di un concept non possono superare {max} MB in totale.",
+          "failed": "Caricamento non riuscito.",
+          "progress": "Caricamento di {name}",
+          "retry": "Riprova",
+          "dismiss": "Ignora"
+        },
+        "emptyState": {
+          "title": "Ancora nessun concept per {market}",
+          "body": "Aggiungi un concept per una persona di questo mercato. Ne consigliamo {min} o più.",
+          "noPersonasTitle": "{market} non ha ancora persone",
+          "noPersonasBody": "Un concept si basa su una persona. Aggiungi prima le persone per questo mercato.",
+          "toPersonas": "Vai alle persone"
         }
       }
     }

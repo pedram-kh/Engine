@@ -1482,7 +1482,8 @@
         "brandArchived": "Αυτό το brand είναι αρχειοθετημένο. Επαναφέρετέ το για να αλλάξετε τα κύματά του.",
         "saveFailed": "Το κύμα δεν μπόρεσε να αποθηκευτεί. Δοκιμάστε ξανά.",
         "waveNotAvailable": "Αυτό το κύμα δεν μπορεί να συνδεθεί με αυτή την καμπάνια.",
-        "marketHasPersonas": "Αφαιρέστε πρώτα τις περσόνες αυτών των αγορών: {markets}."
+        "marketHasPersonas": "Αφαιρέστε πρώτα τις περσόνες αυτών των αγορών: {markets}.",
+        "marketHasConcepts": "Υπάρχουν concepts στις αγορές: {markets}."
       },
       "dialog": {
         "createTitle": "Νέο κύμα",
@@ -1706,9 +1707,12 @@
         "personaNone": "Δεν υπάρχουν ακόμη περσόνες",
         "statusPersonas": "{count} περσόνα · {covered} από {markets} αγορές | {count} περσόνες · {covered} από {markets} αγορές",
         "notAvailable": "Δεν είναι ακόμη διαθέσιμο",
-        "locked": "Κλειδωμένο μέχρι να εγκριθούν όλες οι ιδέες",
         "matrixStatus": "{set} από {total} κελί ορίστηκε | {set} από {total} κελιά ορίστηκαν",
-        "matrixNone": "Προσθέστε πρώτα USP και περσόνες"
+        "matrixNone": "Προσθέστε πρώτα USP και περσόνες",
+        "conceptsNone": "Δεν υπάρχουν ακόμη concepts",
+        "conceptsStatus": "{approved} από {total} εγκεκριμένα",
+        "conceptsWarning": "Concepts: {approved} από {total} εγκεκριμένα",
+        "conceptsWarningNone": "Δεν υπάρχουν ακόμη concepts"
       },
       "audience": {
         "label": "Τίτλος κοινού",
@@ -1754,7 +1758,9 @@
           "refreshed": "Η λίστα άλλαξε ενώ το παράθυρο ήταν ανοιχτό. Ελέγξτε την και επιβεβαιώστε ξανά.",
           "bodyInUseCells": "{count} θέση χρησιμοποιεί αυτό το USP και καθαρίζεται μαζί του: | {count} θέσεις χρησιμοποιούν αυτό το USP και καθαρίζονται μαζί του:",
           "confirmInUseCells": "Διαγραφή και εκκαθάριση {count} στοιχείου | Διαγραφή και εκκαθάριση {count} στοιχείων",
-          "itemCell": "Κελί: {level}"
+          "itemCell": "Κελί: {level}",
+          "itemConcept": "Το chip του concept αφαιρέθηκε",
+          "conceptsNote": "Τα concepts που φέρουν αυτό το USP χάνουν το chip. Ένα εγκεκριμένο concept επιστρέφει σε «Αναμονή πελάτη»."
         },
         "usedByBoth": "Χρησιμοποιείται από {angles} και {cells}"
       },
@@ -1852,7 +1858,8 @@
         "synced": "{count} συγχρονισμένη γωνία δεν αντιγράφεται. Συμπληρώστε τη μήτρα για {market}. | {count} συγχρονισμένες γωνίες δεν αντιγράφονται. Συμπληρώστε τη μήτρα για {market}."
       },
       "validation": {
-        "tooLong": "Το πολύ {max} χαρακτήρες."
+        "tooLong": "Το πολύ {max} χαρακτήρες.",
+        "required": "Αυτό το πεδίο είναι υποχρεωτικό."
       },
       "errors": {
         "loadFailed": "Η φόρτωση απέτυχε. Δοκιμάστε ξανά.",
@@ -1872,7 +1879,23 @@
         "conflict": "Κάποιος το άλλαξε την ίδια στιγμή. Φορτώστε ξανά και δοκιμάστε πάλι.",
         "brandArchived": "Μια αρχειοθετημένη μάρκα είναι μόνο για ανάγνωση. Επαναφέρετέ την πρώτα.",
         "forbidden": "Μόνο διαχειριστής ή μάνατζερ μπορεί να το κάνει αυτό.",
-        "angleSyncedReadOnly": "Αλλάξτε το στη Μήτρα μηνυμάτων."
+        "angleSyncedReadOnly": "Αλλάξτε το στη Μήτρα μηνυμάτων.",
+        "personaInUseByConcepts": "Concepts χρησιμοποιούν αυτή την περσόνα ({count}). Μετακινήστε τα πρώτα σε άλλη περσόνα ή διαγράψτε τα.",
+        "conceptPersonaInvalid": "Επιλέξτε μια περσόνα αυτής της αγοράς.",
+        "conceptUspModeRequired": "Επιλέξτε αν τα USP θα διατηρηθούν ή θα αντικατασταθούν.",
+        "conceptUspInvalid": "Ένα chip USP πρέπει να είναι USP αυτού του κύματος.",
+        "decisionInvalid": "Ελέγξτε το όνομα του πελάτη και τη σημείωση ή το σχόλιο.",
+        "conceptDeleteFailed": "Μια αποθηκευμένη εικόνα δεν διαγράφηκε. Δεν αφαιρέθηκε τίποτα. Δοκιμάστε ξανά.",
+        "conceptDuplicateFailed": "Οι εικόνες δεν αντιγράφηκαν. Δεν δημιουργήθηκε αντίγραφο. Δοκιμάστε ξανά.",
+        "conceptMarketFull": "Μια αγορά έχει το πολύ {max} concepts.",
+        "imageInvalid": "Αυτό το αρχείο δεν είναι έγκυρη εικόνα JPG, PNG ή WebP.",
+        "imageUnknownUpload": "Αυτή η μεταφόρτωση έληξε. Προσθέστε ξανά την εικόνα.",
+        "imageAlreadyCompleted": "Αυτή η μεταφόρτωση έχει ήδη ολοκληρωθεί.",
+        "imageDeleteFailed": "Η εικόνα δεν διαγράφηκε. Δοκιμάστε ξανά.",
+        "imageLimitCount": "Ένα concept χωράει το πολύ {max} εικόνες (τώρα {used}).",
+        "imageLimitBytes": "Οι εικόνες ενός concept δεν μπορούν να ξεπερνούν συνολικά τα {max} MB (τώρα {used} MB).",
+        "linkInvalidUrl": "Αυτή δεν είναι έγκυρη δημόσια διεύθυνση https.",
+        "linkLimitCount": "Συμπληρώθηκε το όριο συνδέσμων αυτού του concept."
       },
       "counts": {
         "angles": "{count} γωνία | {count} γωνίες",
@@ -1922,6 +1945,133 @@
         "emptyPersonas": {
           "body": "Προσθέστε περσόνες για αυτή την αγορά στο βήμα 2 και μετά συμπληρώστε τη μήτρα της.",
           "cta": "Προσθήκη περσόνων"
+        }
+      },
+      "concepts": {
+        "title": "Concepts · {market}",
+        "subtitle": "Έως {max} concepts ανά αγορά. Κάθε ένα βασίζεται σε μία περσόνα.",
+        "add": "Προσθήκη concept",
+        "tile": "{count} από {max} concepts",
+        "tileMax": "Έφτασε το μέγιστο: {count} από {max} concepts",
+        "underMinimum": "Η αγορά {market} έχει {count} από τα {min} ή περισσότερα προτεινόμενα concepts.",
+        "status": {
+          "awaiting": "Αναμονή πελάτη",
+          "approved": "Εγκρίθηκε",
+          "changes_requested": "Ζητήθηκαν αλλαγές"
+        },
+        "stage": {
+          "tofu": "Κορυφή χοάνης (TOFU)",
+          "mofu": "Μέση της χοάνης (MOFU)",
+          "bofu": "Βάση της χοάνης (BOFU)",
+          "none": "Χωρίς στάδιο"
+        },
+        "menu": {
+          "edit": "Επεξεργασία",
+          "decide": "Καταγραφή απόφασης πελάτη",
+          "duplicate": "Αναπαραγωγή",
+          "delete": "Διαγραφή",
+          "deleteDecided": "Μόνο διαχειριστής ή manager"
+        },
+        "banner": {
+          "counts": "{approved} από {total} εγκεκριμένα · {awaiting} σε αναμονή πελάτη · {changes} με ζητούμενες αλλαγές",
+          "allApproved": "Όλα τα concepts εγκρίθηκαν ({total})",
+          "record": "Καταγραφή απόφασης πελάτη"
+        },
+        "card": {
+          "number": "Concept {n}",
+          "menu": "Ενέργειες για το concept {n}",
+          "stage": "Στάδιο χοάνης",
+          "stageNone": "Στάδιο χοάνης",
+          "approvedBy": "Εγκρίθηκε από {name} · {date}"
+        },
+        "field": {
+          "product": "Προϊόν",
+          "angle": "Οπτική γωνία",
+          "primary_message": "Βασικό μήνυμα",
+          "hypothesis": "Υπόθεση",
+          "hook": "Hook",
+          "format_visual": "Μορφή / οπτικό",
+          "key_points": "Βασικά σημεία",
+          "payoff": "Κατακλείδα",
+          "cta": "CTA"
+        },
+        "dialog": {
+          "addTitle": "Προσθήκη concept · {market}",
+          "editTitle": "Επεξεργασία concept",
+          "persona": "Περσόνα",
+          "stage": "Στάδιο χοάνης",
+          "stageNote": "Σημείωση χοάνης",
+          "title": "Τίτλος concept",
+          "usps": "USP",
+          "uspsHint": "Από τον πίνακα της περσόνας: πρώτα Προτεραιότητα, μετά Υποστήριξη.",
+          "uspMode": "Η περσόνα άλλαξε. Τι θα γίνει με τα USP;",
+          "uspModeRefill": "Αντικατάστασή τους με τα USP του πίνακα της νέας περσόνας",
+          "uspModeKeep": "Διατήρηση των τρεχόντων USP",
+          "fixFields": "Διορθώστε τα πεδία που επισημαίνονται παρακάτω."
+        },
+        "decision": {
+          "title": "Καταγραφή απόφασης πελάτη",
+          "concept": "Concept",
+          "clientName": "Όνομα πελάτη",
+          "note": "Σημείωση (προαιρετική)",
+          "comment": "Τι πρέπει να αλλάξει",
+          "replaces": "Μια νέα απόφαση αντικαθιστά την κατάσταση. Οι προηγούμενες αποφάσεις παραμένουν στο ιστορικό."
+        },
+        "delete": {
+          "title": "Διαγραφή του concept {title};",
+          "body": "Το concept, οι εικόνες και οι σύνδεσμοί του διαγράφονται. Η ενέργεια δεν αναιρείται.",
+          "bodyDecided": "Η απόφαση του πελάτη διαγράφεται μαζί του."
+        },
+        "reset": {
+          "title": "Ακύρωση της έγκρισης του πελάτη;",
+          "body": "Αυτό το concept είναι εγκεκριμένο. Αν το αλλάξετε, επιστρέφει σε «Αναμονή πελάτη» και η έγκριση του πελάτη ακυρώνεται.",
+          "confirm": "Αλλαγή και ακύρωση έγκρισης"
+        },
+        "images": {
+          "label": "Εικόνες",
+          "count": "{count} από {max} εικόνες · {used} από {total} MB",
+          "add": "Προσθήκη εικόνων",
+          "full": "Έφτασε το μέγιστο των {max} εικόνων",
+          "open": "Άνοιγμα {name}",
+          "remove": "Αφαίρεση {name}",
+          "close": "Κλείσιμο",
+          "loadFailed": "Η εικόνα δεν φορτώθηκε."
+        },
+        "links": {
+          "label": "Σύνδεσμοι",
+          "add": "Προσθήκη συνδέσμου",
+          "full": "Έφτασε το μέγιστο των {max} συνδέσμων",
+          "edit": "Επεξεργασία {title}",
+          "remove": "Αφαίρεση {title}"
+        },
+        "link": {
+          "addTitle": "Προσθήκη συνδέσμου",
+          "editTitle": "Επεξεργασία συνδέσμου",
+          "titleLabel": "Τίτλος",
+          "urlLabel": "Διεύθυνση",
+          "urlPlaceholder": "https://example.com/selida",
+          "problem": {
+            "empty": "Εισαγάγετε μια διεύθυνση.",
+            "scheme": "Επιτρέπονται μόνο σύνδεσμοι https.",
+            "invalid": "Αυτή δεν είναι έγκυρη δημόσια διεύθυνση https."
+          }
+        },
+        "upload": {
+          "refusedType": "{name}: γίνονται δεκτές μόνο εικόνες JPG, PNG και WebP.",
+          "refusedEmpty": "{name}: το αρχείο είναι κενό.",
+          "refusedCount": "{name}: ένα concept χωράει το πολύ {max} εικόνες.",
+          "refusedBytes": "{name}: οι εικόνες ενός concept δεν μπορούν να ξεπερνούν συνολικά τα {max} MB.",
+          "failed": "Η μεταφόρτωση απέτυχε.",
+          "progress": "Μεταφόρτωση {name}",
+          "retry": "Επανάληψη",
+          "dismiss": "Παράβλεψη"
+        },
+        "emptyState": {
+          "title": "Δεν υπάρχουν ακόμη concepts για {market}",
+          "body": "Προσθέστε ένα concept για μια περσόνα αυτής της αγοράς. Προτείνουμε {min} ή περισσότερα.",
+          "noPersonasTitle": "Η αγορά {market} δεν έχει ακόμη περσόνες",
+          "noPersonasBody": "Ένα concept βασίζεται σε μια περσόνα. Προσθέστε πρώτα περσόνες για αυτή την αγορά.",
+          "toPersonas": "Μετάβαση στις περσόνες"
         }
       }
     }

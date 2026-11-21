@@ -1482,7 +1482,8 @@
         "brandArchived": "Din il-marka hija arkivjata. Irkuprah biex tbiddel il-mewġ tagħha.",
         "saveFailed": "Il-mewġa ma setgħetx tiġi ssejvjata. Erġa' pprova.",
         "waveNotAvailable": "Dik il-mewġa ma tistax tiġi marbuta ma' din il-kampanja.",
-        "marketHasPersonas": "Neħħi l-ewwel il-persunaġġi ta' dawn is-swieq: {markets}."
+        "marketHasPersonas": "Neħħi l-ewwel il-persunaġġi ta' dawn is-swieq: {markets}.",
+        "marketHasConcepts": "Hemm kunċetti f'dawn is-swieq: {markets}."
       },
       "dialog": {
         "createTitle": "Mewġa ġdida",
@@ -1706,9 +1707,12 @@
         "personaNone": "Għad m'hemm l-ebda persunaġġ",
         "statusPersonas": "{count} persunaġġ · {covered} minn {markets} swieq | {count} persunaġġi · {covered} minn {markets} swieq",
         "notAvailable": "Għadu mhux disponibbli",
-        "locked": "Imsakkar sakemm jiġu approvati l-kunċetti kollha",
         "matrixStatus": "{set} minn {total} ċellola ssettjata | {set} minn {total} ċelloli ssettjati",
-        "matrixNone": "Żid l-ewwel USPs u persunaġġi"
+        "matrixNone": "Żid l-ewwel USPs u persunaġġi",
+        "conceptsNone": "Għad m'hemmx kunċetti",
+        "conceptsStatus": "{approved} minn {total} approvati",
+        "conceptsWarning": "Kunċetti: {approved} minn {total} approvati",
+        "conceptsWarningNone": "Għad m'hemmx kunċetti"
       },
       "audience": {
         "label": "Titlu tal-udjenza",
@@ -1754,7 +1758,9 @@
           "refreshed": "Il-lista nbidlet waqt li t-tieqa kienet miftuħa. Iċċekkjaha u kkonferma mill-ġdid.",
           "bodyInUseCells": "{count} post juża dan l-USP u jitnaddaf miegħu: | {count} postijiet jużaw dan l-USP u jitnaddfu miegħu:",
           "confirmInUseCells": "Neħħi u naddaf {count} element | Neħħi u naddaf {count} elementi",
-          "itemCell": "Ċellola: {level}"
+          "itemCell": "Ċellola: {level}",
+          "itemConcept": "Chip tal-kunċett tneħħa",
+          "conceptsNote": "Kunċetti b'dan l-USP jitilfu ċ-chip. Kunċett approvat jirritorna għal “Qed jistenna lill-klijent”."
         },
         "usedByBoth": "Użat minn {angles} u {cells}"
       },
@@ -1852,7 +1858,8 @@
         "synced": "{count} angolu sinkronizzat ma jiġix ikkopjat. Imla l-matriċi ta' {market}. | {count} angoli sinkronizzati ma jiġux ikkopjati. Imla l-matriċi ta' {market}."
       },
       "validation": {
-        "tooLong": "L-aktar {max} karattri."
+        "tooLong": "L-aktar {max} karattri.",
+        "required": "Dan il-qasam huwa obbligatorju."
       },
       "errors": {
         "loadFailed": "Ma setax jitgħabba. Erġa' pprova.",
@@ -1872,7 +1879,23 @@
         "conflict": "Xi ħadd biddel dan fl-istess ħin. Erġa' tgħabbi u pprova mill-ġdid.",
         "brandArchived": "Marka arkivjata hija read-only. Irrestawraha l-ewwel.",
         "forbidden": "Admin jew maniġer biss jista' jagħmel dan.",
-        "angleSyncedReadOnly": "Biddel dan fil-Matriċi tal-messaġġi."
+        "angleSyncedReadOnly": "Biddel dan fil-Matriċi tal-messaġġi.",
+        "personaInUseByConcepts": "Kunċetti qed jużaw din il-persuna ({count}). Mexxihom l-ewwel lejn persuna oħra jew ħassarhom.",
+        "conceptPersonaInvalid": "Agħżel persuna ta' dan is-suq.",
+        "conceptUspModeRequired": "Agħżel jekk l-USPs jinżammux jew jinbidlux.",
+        "conceptUspInvalid": "Chip tal-USP irid ikun USP ta' din il-mewġa.",
+        "decisionInvalid": "Iċċekkja l-isem tal-klijent u n-nota jew il-kumment.",
+        "conceptDeleteFailed": "Immaġni maħżuna ma setgħetx titħassar. Ma tneħħa xejn. Erġa' pprova.",
+        "conceptDuplicateFailed": "L-immaġnijiet ma setgħux jiġu kkupjati. Ma saret l-ebda kopja. Erġa' pprova.",
+        "conceptMarketFull": "Suq jista' jkollu l-aktar {max} kunċetti.",
+        "imageInvalid": "Dan il-fajl mhuwiex immaġni JPG, PNG jew WebP valida.",
+        "imageUnknownUpload": "Din it-tagħbija skadiet. Żid l-immaġni mill-ġdid.",
+        "imageAlreadyCompleted": "Din it-tagħbija diġà tlestiet.",
+        "imageDeleteFailed": "L-immaġni ma setgħetx titħassar. Erġa' pprova.",
+        "imageLimitCount": "Kunċett jista' jkollu l-aktar {max} immaġnijiet (issa {used}).",
+        "imageLimitBytes": "L-immaġnijiet ta' kunċett flimkien ma jistgħux jaqbżu {max} MB (issa {used} MB).",
+        "linkInvalidUrl": "Dan mhuwiex indirizz https pubbliku validu.",
+        "linkLimitCount": "Intlaħaq il-limitu tar-rabtiet ta' dan il-kunċett."
       },
       "counts": {
         "angles": "{count} angolu | {count} angoli",
@@ -1922,6 +1945,133 @@
         "emptyPersonas": {
           "body": "Fil-pass 2 żid persunaġġi għal dan is-suq, imbagħad imla l-matriċi tiegħu.",
           "cta": "Żid persunaġġi"
+        }
+      },
+      "concepts": {
+        "title": "Kunċetti · {market}",
+        "subtitle": "Sa {max} kunċetti għal kull suq. Kull wieħed huwa bbażat fuq persuna waħda.",
+        "add": "Żid kunċett",
+        "tile": "{count} minn {max} kunċetti",
+        "tileMax": "Intlaħaq il-massimu: {count} minn {max} kunċetti",
+        "underMinimum": "{market} għandu {count} mill-{min} kunċetti jew aktar rakkomandati.",
+        "status": {
+          "awaiting": "Qed jistenna lill-klijent",
+          "approved": "Approvat",
+          "changes_requested": "Intalbu bidliet"
+        },
+        "stage": {
+          "tofu": "Parti ta' fuq tal-funnel (TOFU)",
+          "mofu": "Nofs il-funnel (MOFU)",
+          "bofu": "Parti t'isfel tal-funnel (BOFU)",
+          "none": "L-ebda stadju"
+        },
+        "menu": {
+          "edit": "Editja",
+          "decide": "Irreġistra d-deċiżjoni tal-klijent",
+          "duplicate": "Iddupplika",
+          "delete": "Ħassar",
+          "deleteDecided": "Amministratur jew maniġer biss"
+        },
+        "banner": {
+          "counts": "{approved} minn {total} approvati · {awaiting} jistennew lill-klijent · {changes} b'bidliet mitluba",
+          "allApproved": "Kull kunċett huwa approvat ({total})",
+          "record": "Irreġistra d-deċiżjoni tal-klijent"
+        },
+        "card": {
+          "number": "Kunċett {n}",
+          "menu": "Azzjonijiet għall-kunċett {n}",
+          "stage": "Stadju tal-funnel",
+          "stageNone": "Stadju tal-funnel",
+          "approvedBy": "Approvat minn {name} · {date}"
+        },
+        "field": {
+          "product": "Prodott",
+          "angle": "Angolu",
+          "primary_message": "Messaġġ prinċipali",
+          "hypothesis": "Ipoteżi",
+          "hook": "Hook",
+          "format_visual": "Format / viżiv",
+          "key_points": "Punti ewlenin",
+          "payoff": "Konklużjoni",
+          "cta": "CTA"
+        },
+        "dialog": {
+          "addTitle": "Żid kunċett · {market}",
+          "editTitle": "Editja l-kunċett",
+          "persona": "Persuna",
+          "stage": "Stadju tal-funnel",
+          "stageNote": "Nota tal-funnel",
+          "title": "Titlu tal-kunċett",
+          "usps": "USPs",
+          "uspsHint": "Mill-matriċi tal-persuna: l-ewwel Prijorità, imbagħad Appoġġ.",
+          "uspMode": "Il-persuna nbidlet. X'għandu jiġri bl-USPs?",
+          "uspModeRefill": "Ibdilhom bl-USPs tal-matriċi tal-persuna l-ġdida",
+          "uspModeKeep": "Żomm l-USPs attwali",
+          "fixFields": "Irranġa l-oqsma mmarkati hawn taħt."
+        },
+        "decision": {
+          "title": "Irreġistra d-deċiżjoni tal-klijent",
+          "concept": "Kunċett",
+          "clientName": "Isem il-klijent",
+          "note": "Nota (mhux obbligatorja)",
+          "comment": "X'għandu jinbidel",
+          "replaces": "Deċiżjoni ġdida tieħu post l-istatus. Id-deċiżjonijiet ta' qabel jibqgħu fl-istorja."
+        },
+        "delete": {
+          "title": "Tħassar il-kunċett {title}?",
+          "body": "Il-kunċett, l-immaġnijiet u r-rabtiet tiegħu jitħassru. Dan ma jistax jiġi mreġġa' lura.",
+          "bodyDecided": "Id-deċiżjoni tal-klijent titħassar miegħu."
+        },
+        "reset": {
+          "title": "Tħassar l-approvazzjoni tal-klijent?",
+          "body": "Dan il-kunċett huwa approvat. Jekk tibdlu, jirritorna għal “Qed jistenna lill-klijent” u l-approvazzjoni tal-klijent titħassar.",
+          "confirm": "Biddel u ħassar l-approvazzjoni"
+        },
+        "images": {
+          "label": "Immaġnijiet",
+          "count": "{count} minn {max} immaġnijiet · {used} minn {total} MB",
+          "add": "Żid immaġnijiet",
+          "full": "Intlaħaq il-massimu ta' {max} immaġnijiet",
+          "open": "Iftaħ {name}",
+          "remove": "Neħħi {name}",
+          "close": "Agħlaq",
+          "loadFailed": "L-immaġni ma setgħetx titgħabba."
+        },
+        "links": {
+          "label": "Rabtiet",
+          "add": "Żid rabta",
+          "full": "Intlaħaq il-massimu ta' {max} rabtiet",
+          "edit": "Editja {title}",
+          "remove": "Neħħi {title}"
+        },
+        "link": {
+          "addTitle": "Żid rabta",
+          "editTitle": "Editja r-rabta",
+          "titleLabel": "Titlu",
+          "urlLabel": "Indirizz",
+          "urlPlaceholder": "https://eżempju.mt/paġna",
+          "problem": {
+            "empty": "Daħħal indirizz.",
+            "scheme": "Ir-rabtiet https biss huma permessi.",
+            "invalid": "Dan mhuwiex indirizz https pubbliku validu."
+          }
+        },
+        "upload": {
+          "refusedType": "{name}: jiġu aċċettati biss immaġnijiet JPG, PNG u WebP.",
+          "refusedEmpty": "{name}: il-fajl huwa vojt.",
+          "refusedCount": "{name}: kunċett jista' jkollu l-aktar {max} immaġnijiet.",
+          "refusedBytes": "{name}: l-immaġnijiet ta' kunċett flimkien ma jistgħux jaqbżu {max} MB.",
+          "failed": "It-tagħbija falliet.",
+          "progress": "Qed titgħabba {name}",
+          "retry": "Erġa' pprova",
+          "dismiss": "Ċaħad"
+        },
+        "emptyState": {
+          "title": "Għad m'hemmx kunċetti għal {market}",
+          "body": "Żid kunċett għal persuna ta' dan is-suq. Nirrakkomandaw {min} jew aktar.",
+          "noPersonasTitle": "{market} għad m'għandux persuni",
+          "noPersonasBody": "Kunċett huwa bbażat fuq persuna. Żid l-ewwel persuni għal dan is-suq.",
+          "toPersonas": "Mur għall-persuni"
         }
       }
     }

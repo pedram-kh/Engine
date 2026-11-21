@@ -1482,7 +1482,8 @@
         "brandArchived": "Ez a márka archivált. Állítsa vissza, hogy módosíthassa a hullámait.",
         "saveFailed": "A hullámot nem sikerült menteni. Próbálja újra.",
         "waveNotAvailable": "Ez a hullám nem kapcsolható ehhez a kampányhoz.",
-        "marketHasPersonas": "Előbb távolítsd el a perszónákat ezekről a piacokról: {markets}."
+        "marketHasPersonas": "Előbb távolítsd el a perszónákat ezekről a piacokról: {markets}.",
+        "marketHasConcepts": "Koncepciók vannak itt: {markets}."
       },
       "dialog": {
         "createTitle": "Új hullám",
@@ -1706,9 +1707,12 @@
         "personaNone": "Még nincs perszóna",
         "statusPersonas": "{count} perszóna · {covered} / {markets} piac | {count} perszóna · {covered} / {markets} piac",
         "notAvailable": "Még nem elérhető",
-        "locked": "Zárolva, amíg az összes koncepciót el nem fogadják",
         "matrixStatus": "{set} / {total} cella beállítva | {set} / {total} cella beállítva",
-        "matrixNone": "Először adjon hozzá USP-ket és perszónákat"
+        "matrixNone": "Először adjon hozzá USP-ket és perszónákat",
+        "conceptsNone": "Még nincs koncepció",
+        "conceptsStatus": "{approved} / {total} jóváhagyva",
+        "conceptsWarning": "Koncepciók: {approved} / {total} jóváhagyva",
+        "conceptsWarningNone": "Még nincs koncepció"
       },
       "audience": {
         "label": "Célközönség címe",
@@ -1754,7 +1758,9 @@
           "refreshed": "A lista megváltozott, amíg az ablak nyitva volt. Nézd át, és erősítsd meg újra.",
           "bodyInUseCells": "{count} hely használja ezt az USP-t, és vele együtt törlődik: | {count} hely használja ezt az USP-t, és vele együtt törlődik:",
           "confirmInUseCells": "Törlés és {count} elem kiürítése | Törlés és {count} elem kiürítése",
-          "itemCell": "Cella: {level}"
+          "itemCell": "Cella: {level}",
+          "itemConcept": "Koncepciócsip eltávolítva",
+          "conceptsNote": "Az ezt az USP-t használó koncepciók elveszítik a chipet. A jóváhagyott koncepció visszakerül az „Az ügyfélre vár” állapotba."
         },
         "usedByBoth": "Használja: {angles} és {cells}"
       },
@@ -1852,7 +1858,8 @@
         "synced": "{count} szinkronizált szög nem másolódik. Töltse ki a(z) {market} mátrixát. | {count} szinkronizált szög nem másolódik. Töltse ki a(z) {market} mátrixát."
       },
       "validation": {
-        "tooLong": "Legfeljebb {max} karakter."
+        "tooLong": "Legfeljebb {max} karakter.",
+        "required": "Ez a mező kötelező."
       },
       "errors": {
         "loadFailed": "Nem sikerült betölteni. Próbáld újra.",
@@ -1872,7 +1879,23 @@
         "conflict": "Valaki ugyanekkor módosította ezt. Töltsd újra, és próbáld újra.",
         "brandArchived": "Az archivált márka csak olvasható. Előbb állítsd vissza.",
         "forbidden": "Ezt csak admin vagy menedzser teheti meg.",
-        "angleSyncedReadOnly": "Ezt az Üzenetmátrixban módosítsa."
+        "angleSyncedReadOnly": "Ezt az Üzenetmátrixban módosítsa.",
+        "personaInUseByConcepts": "Koncepciók használják ezt a perszónát ({count}). Előbb helyezd át őket másik perszónára, vagy töröld őket.",
+        "conceptPersonaInvalid": "Válassz a piac perszónái közül.",
+        "conceptUspModeRequired": "Válaszd ki, hogy az USP-k maradjanak vagy cserélődjenek.",
+        "conceptUspInvalid": "Az USP-chipnek ennek a hullámnak az USP-jének kell lennie.",
+        "decisionInvalid": "Ellenőrizd az ügyfél nevét és a megjegyzést vagy a hozzászólást.",
+        "conceptDeleteFailed": "Egy tárolt képet nem sikerült törölni. Semmi sem lett eltávolítva. Próbáld újra.",
+        "conceptDuplicateFailed": "A képeket nem sikerült másolni. Másolat nem készült. Próbáld újra.",
+        "conceptMarketFull": "Egy piacon legfeljebb {max} koncepció lehet.",
+        "imageInvalid": "Ez a fájl nem érvényes JPG, PNG vagy WebP kép.",
+        "imageUnknownUpload": "Ez a feltöltés lejárt. Add hozzá újra a képet.",
+        "imageAlreadyCompleted": "Ez a feltöltés már befejeződött.",
+        "imageDeleteFailed": "A képet nem sikerült törölni. Próbáld újra.",
+        "imageLimitCount": "Egy koncepció legfeljebb {max} képet tartalmazhat (most {used}).",
+        "imageLimitBytes": "Egy koncepció képei együtt legfeljebb {max} MB méretűek lehetnek (most {used} MB).",
+        "linkInvalidUrl": "Ez nem érvényes nyilvános https cím.",
+        "linkLimitCount": "Elérted a koncepció hivatkozásainak korlátját."
       },
       "counts": {
         "angles": "{count} szög | {count} szög",
@@ -1922,6 +1945,133 @@
         "emptyPersonas": {
           "body": "A 2. lépésben adjon hozzá perszónákat ehhez a piachoz, majd töltse ki a mátrixát.",
           "cta": "Perszónák hozzáadása"
+        }
+      },
+      "concepts": {
+        "title": "Koncepciók · {market}",
+        "subtitle": "Piaconként legfeljebb {max} koncepció. Mindegyik egy perszónára épül.",
+        "add": "Koncepció hozzáadása",
+        "tile": "{count} / {max} koncepció",
+        "tileMax": "Elérted a maximumot: {count} / {max} koncepció",
+        "underMinimum": "{market} piacon {count} van az ajánlott {min} vagy több koncepcióból.",
+        "status": {
+          "awaiting": "Az ügyfélre vár",
+          "approved": "Jóváhagyva",
+          "changes_requested": "Változtatást kért"
+        },
+        "stage": {
+          "tofu": "Tölcsér teteje (TOFU)",
+          "mofu": "Tölcsér közepe (MOFU)",
+          "bofu": "Tölcsér alja (BOFU)",
+          "none": "Nincs szakasz"
+        },
+        "menu": {
+          "edit": "Szerkesztés",
+          "decide": "Az ügyfél döntésének rögzítése",
+          "duplicate": "Duplikálás",
+          "delete": "Törlés",
+          "deleteDecided": "Csak adminisztrátor vagy manager"
+        },
+        "banner": {
+          "counts": "{approved} / {total} jóváhagyva · {awaiting} az ügyfélre vár · {changes} változtatást kért",
+          "allApproved": "Minden koncepció jóváhagyva ({total})",
+          "record": "Az ügyfél döntésének rögzítése"
+        },
+        "card": {
+          "number": "{n}. koncepció",
+          "menu": "Műveletek a(z) {n}. koncepcióhoz",
+          "stage": "Tölcsér szakasza",
+          "stageNone": "Tölcsér szakasza",
+          "approvedBy": "Jóváhagyta: {name} · {date}"
+        },
+        "field": {
+          "product": "Termék",
+          "angle": "Szög",
+          "primary_message": "Fő üzenet",
+          "hypothesis": "Hipotézis",
+          "hook": "Hook",
+          "format_visual": "Formátum / vizuális",
+          "key_points": "Kulcspontok",
+          "payoff": "Csattanó",
+          "cta": "CTA"
+        },
+        "dialog": {
+          "addTitle": "Koncepció hozzáadása · {market}",
+          "editTitle": "Koncepció szerkesztése",
+          "persona": "Perszóna",
+          "stage": "Tölcsér szakasza",
+          "stageNote": "Tölcsérjegyzet",
+          "title": "A koncepció címe",
+          "usps": "USP-k",
+          "uspsHint": "A perszóna mátrixából: előbb Prioritás, aztán Támogató.",
+          "uspMode": "A perszóna megváltozott. Mi legyen az USP-kkel?",
+          "uspModeRefill": "Cseréld le őket az új perszóna mátrixának USP-ire",
+          "uspModeKeep": "Maradjanak a jelenlegi USP-k",
+          "fixFields": "Javítsd az alább megjelölt mezőket."
+        },
+        "decision": {
+          "title": "Az ügyfél döntésének rögzítése",
+          "concept": "Koncepció",
+          "clientName": "Az ügyfél neve",
+          "note": "Megjegyzés (nem kötelező)",
+          "comment": "Mit kell megváltoztatni",
+          "replaces": "Az új döntés felváltja az állapotot. A korábbi döntések megmaradnak az előzményekben."
+        },
+        "delete": {
+          "title": "Törlöd a(z) {title} koncepciót?",
+          "body": "A koncepció, a képei és a hivatkozásai törlődnek. Ez nem vonható vissza.",
+          "bodyDecided": "Az ügyfél döntése is törlődik vele együtt."
+        },
+        "reset": {
+          "title": "Visszavonod az ügyfél jóváhagyását?",
+          "body": "Ez a koncepció jóvá van hagyva. Ha módosítod, visszakerül az „Az ügyfélre vár” állapotba, és az ügyfél jóváhagyása törlődik.",
+          "confirm": "Módosítás és jóváhagyás törlése"
+        },
+        "images": {
+          "label": "Képek",
+          "count": "{count} / {max} kép · {used} / {total} MB",
+          "add": "Képek hozzáadása",
+          "full": "Elérted a(z) {max} képes maximumot",
+          "open": "{name} megnyitása",
+          "remove": "{name} eltávolítása",
+          "close": "Bezárás",
+          "loadFailed": "A képet nem sikerült betölteni."
+        },
+        "links": {
+          "label": "Hivatkozások",
+          "add": "Hivatkozás hozzáadása",
+          "full": "Elérted a(z) {max} hivatkozásos maximumot",
+          "edit": "{title} szerkesztése",
+          "remove": "{title} eltávolítása"
+        },
+        "link": {
+          "addTitle": "Hivatkozás hozzáadása",
+          "editTitle": "Hivatkozás szerkesztése",
+          "titleLabel": "Cím",
+          "urlLabel": "Webcím",
+          "urlPlaceholder": "https://pelda.hu/oldal",
+          "problem": {
+            "empty": "Add meg a webcímet.",
+            "scheme": "Csak https hivatkozások engedélyezettek.",
+            "invalid": "Ez nem érvényes nyilvános https cím."
+          }
+        },
+        "upload": {
+          "refusedType": "{name}: csak JPG, PNG és WebP képek fogadhatók el.",
+          "refusedEmpty": "{name}: a fájl üres.",
+          "refusedCount": "{name}: egy koncepció legfeljebb {max} képet tartalmazhat.",
+          "refusedBytes": "{name}: egy koncepció képei együtt legfeljebb {max} MB méretűek lehetnek.",
+          "failed": "A feltöltés nem sikerült.",
+          "progress": "Feltöltés: {name}",
+          "retry": "Újra",
+          "dismiss": "Elvetés"
+        },
+        "emptyState": {
+          "title": "{market} piacra még nincs koncepció",
+          "body": "Adj hozzá koncepciót a piac egy perszónájához. {min} vagy több ajánlott.",
+          "noPersonasTitle": "{market} piacon még nincs perszóna",
+          "noPersonasBody": "A koncepció perszónára épül. Előbb adj hozzá perszónákat a piachoz.",
+          "toPersonas": "Ugrás a perszónákhoz"
         }
       }
     }

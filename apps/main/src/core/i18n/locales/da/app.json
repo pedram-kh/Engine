@@ -1482,7 +1482,8 @@
         "brandArchived": "Dette brand er arkiveret. Gendan det for at ændre dets bølger.",
         "saveFailed": "Bølgen kunne ikke gemmes. Prøv igen.",
         "waveNotAvailable": "Den bølge kan ikke knyttes til denne kampagne.",
-        "marketHasPersonas": "Fjern først personaerne for disse markeder: {markets}."
+        "marketHasPersonas": "Fjern først personaerne for disse markeder: {markets}.",
+        "marketHasConcepts": "Der findes koncepter i: {markets}."
       },
       "dialog": {
         "createTitle": "Ny bølge",
@@ -1706,9 +1707,12 @@
         "personaNone": "Ingen personaer endnu",
         "statusPersonas": "{count} persona · {covered} af {markets} markeder | {count} personaer · {covered} af {markets} markeder",
         "notAvailable": "Ikke tilgængelig endnu",
-        "locked": "Låst, indtil alle koncepter er godkendt",
         "matrixStatus": "{set} af {total} celle sat | {set} af {total} celler sat",
-        "matrixNone": "Tilføj først USP'er og personaer"
+        "matrixNone": "Tilføj først USP'er og personaer",
+        "conceptsNone": "Ingen koncepter endnu",
+        "conceptsStatus": "{approved} af {total} godkendt",
+        "conceptsWarning": "Koncepter: {approved} af {total} godkendt",
+        "conceptsWarningNone": "Ingen koncepter endnu"
       },
       "audience": {
         "label": "Målgruppetitel",
@@ -1754,7 +1758,9 @@
           "refreshed": "Listen er ændret, mens dette var åbent. Tjek den, og bekræft igen.",
           "bodyInUseCells": "{count} sted bruger denne USP og ryddes med den: | {count} steder bruger denne USP og ryddes med den:",
           "confirmInUseCells": "Slet og ryd {count} element | Slet og ryd {count} elementer",
-          "itemCell": "Celle: {level}"
+          "itemCell": "Celle: {level}",
+          "itemConcept": "Konceptchip fjernet",
+          "conceptsNote": "Koncepter med denne USP mister chippet. Et godkendt koncept går tilbage til Afventer kunden."
         },
         "usedByBoth": "Brugt af {angles} og {cells}"
       },
@@ -1852,7 +1858,8 @@
         "synced": "{count} synkroniseret vinkel kopieres ikke. Udfyld matrixen for {market}. | {count} synkroniserede vinkler kopieres ikke. Udfyld matrixen for {market}."
       },
       "validation": {
-        "tooLong": "Højst {max} tegn."
+        "tooLong": "Højst {max} tegn.",
+        "required": "Dette felt er påkrævet."
       },
       "errors": {
         "loadFailed": "Kunne ikke indlæses. Prøv igen.",
@@ -1872,7 +1879,23 @@
         "conflict": "Nogen ændrede dette på samme tid. Indlæs igen og prøv igen.",
         "brandArchived": "Et arkiveret brand er skrivebeskyttet. Gendan det først.",
         "forbidden": "Kun en admin eller manager kan gøre dette.",
-        "angleSyncedReadOnly": "Ret det i budskabsmatrixen."
+        "angleSyncedReadOnly": "Ret det i budskabsmatrixen.",
+        "personaInUseByConcepts": "Koncepter bruger denne persona ({count}). Flyt dem til en anden persona, eller slet dem først.",
+        "conceptPersonaInvalid": "Vælg en persona på dette marked.",
+        "conceptUspModeRequired": "Vælg, om USP'erne skal beholdes eller erstattes.",
+        "conceptUspInvalid": "Et USP-chip skal være en USP i denne bølge.",
+        "decisionInvalid": "Tjek kundens navn og noten eller kommentaren.",
+        "conceptDeleteFailed": "Et gemt billede kunne ikke slettes. Intet blev fjernet. Prøv igen.",
+        "conceptDuplicateFailed": "Billederne kunne ikke kopieres. Der blev ikke oprettet en kopi. Prøv igen.",
+        "conceptMarketFull": "Et marked har højst {max} koncepter.",
+        "imageInvalid": "Denne fil er ikke et gyldigt JPG-, PNG- eller WebP-billede.",
+        "imageUnknownUpload": "Denne upload er udløbet. Tilføj billedet igen.",
+        "imageAlreadyCompleted": "Denne upload er allerede gennemført.",
+        "imageDeleteFailed": "Billedet kunne ikke slettes. Prøv igen.",
+        "imageLimitCount": "Et koncept rummer højst {max} billeder (nu {used}).",
+        "imageLimitBytes": "Billederne i et koncept må tilsammen højst fylde {max} MB (nu {used} MB).",
+        "linkInvalidUrl": "Det er ikke en gyldig offentlig https-adresse.",
+        "linkLimitCount": "Grænsen for links i dette koncept er nået."
       },
       "counts": {
         "angles": "{count} vinkel | {count} vinkler",
@@ -1922,6 +1945,133 @@
         "emptyPersonas": {
           "body": "Tilføj personaer for dette marked i trin 2, og udfyld derefter dets matrix.",
           "cta": "Tilføj personaer"
+        }
+      },
+      "concepts": {
+        "title": "Koncepter · {market}",
+        "subtitle": "Op til {max} koncepter pr. marked. Hvert koncept bygger på én persona.",
+        "add": "Tilføj koncept",
+        "tile": "{count} af {max} koncepter",
+        "tileMax": "Maksimum nået: {count} af {max} koncepter",
+        "underMinimum": "{market} har {count} af de {min} eller flere koncepter, vi anbefaler.",
+        "status": {
+          "awaiting": "Afventer kunden",
+          "approved": "Godkendt",
+          "changes_requested": "Ændringer ønsket"
+        },
+        "stage": {
+          "tofu": "Øverst i tragten (TOFU)",
+          "mofu": "Midt i tragten (MOFU)",
+          "bofu": "Nederst i tragten (BOFU)",
+          "none": "Intet trin"
+        },
+        "menu": {
+          "edit": "Rediger",
+          "decide": "Registrer kundens beslutning",
+          "duplicate": "Dupliker",
+          "delete": "Slet",
+          "deleteDecided": "Kun admin eller manager"
+        },
+        "banner": {
+          "counts": "{approved} af {total} godkendt · {awaiting} afventer kunden · {changes} med ønskede ændringer",
+          "allApproved": "Alle koncepter er godkendt ({total})",
+          "record": "Registrer kundens beslutning"
+        },
+        "card": {
+          "number": "Koncept {n}",
+          "menu": "Handlinger for koncept {n}",
+          "stage": "Tragttrin",
+          "stageNone": "Tragttrin",
+          "approvedBy": "Godkendt af {name} · {date}"
+        },
+        "field": {
+          "product": "Produkt",
+          "angle": "Vinkel",
+          "primary_message": "Hovedbudskab",
+          "hypothesis": "Hypotese",
+          "hook": "Hook",
+          "format_visual": "Format / visuelt",
+          "key_points": "Nøglepunkter",
+          "payoff": "Pointe",
+          "cta": "CTA"
+        },
+        "dialog": {
+          "addTitle": "Tilføj koncept · {market}",
+          "editTitle": "Rediger koncept",
+          "persona": "Persona",
+          "stage": "Tragttrin",
+          "stageNote": "Tragtnote",
+          "title": "Konceptets titel",
+          "usps": "USP'er",
+          "uspsHint": "Fra personaens matrix: først Prioritet, derefter Støtte.",
+          "uspMode": "Personaen er ændret. Hvad skal der ske med USP'erne?",
+          "uspModeRefill": "Erstat dem med USP'erne fra den nye personas matrix",
+          "uspModeKeep": "Behold de nuværende USP'er",
+          "fixFields": "Ret felterne markeret nedenfor."
+        },
+        "decision": {
+          "title": "Registrer kundens beslutning",
+          "concept": "Koncept",
+          "clientName": "Kundens navn",
+          "note": "Note (valgfri)",
+          "comment": "Hvad skal ændres",
+          "replaces": "En ny beslutning erstatter status. Tidligere beslutninger bliver i historikken."
+        },
+        "delete": {
+          "title": "Slet konceptet {title}?",
+          "body": "Konceptet, dets billeder og dets links slettes. Det kan ikke fortrydes.",
+          "bodyDecided": "Kundens beslutning slettes sammen med det."
+        },
+        "reset": {
+          "title": "Ryd kundens godkendelse?",
+          "body": "Dette koncept er godkendt. Hvis du ændrer det, går det tilbage til Afventer kunden, og kundens godkendelse ryddes.",
+          "confirm": "Ændr og ryd godkendelsen"
+        },
+        "images": {
+          "label": "Billeder",
+          "count": "{count} af {max} billeder · {used} af {total} MB",
+          "add": "Tilføj billeder",
+          "full": "Maksimum på {max} billeder er nået",
+          "open": "Åbn {name}",
+          "remove": "Fjern {name}",
+          "close": "Luk",
+          "loadFailed": "Billedet kunne ikke indlæses."
+        },
+        "links": {
+          "label": "Links",
+          "add": "Tilføj link",
+          "full": "Maksimum på {max} links er nået",
+          "edit": "Rediger {title}",
+          "remove": "Fjern {title}"
+        },
+        "link": {
+          "addTitle": "Tilføj link",
+          "editTitle": "Rediger link",
+          "titleLabel": "Titel",
+          "urlLabel": "Adresse",
+          "urlPlaceholder": "https://eksempel.dk/side",
+          "problem": {
+            "empty": "Indtast en adresse.",
+            "scheme": "Kun https-links er tilladt.",
+            "invalid": "Det er ikke en gyldig offentlig https-adresse."
+          }
+        },
+        "upload": {
+          "refusedType": "{name}: kun JPG-, PNG- og WebP-billeder accepteres.",
+          "refusedEmpty": "{name}: filen er tom.",
+          "refusedCount": "{name}: et koncept rummer højst {max} billeder.",
+          "refusedBytes": "{name}: billederne i et koncept må tilsammen højst fylde {max} MB.",
+          "failed": "Uploaden mislykkedes.",
+          "progress": "Uploader {name}",
+          "retry": "Prøv igen",
+          "dismiss": "Afvis"
+        },
+        "emptyState": {
+          "title": "Ingen koncepter for {market} endnu",
+          "body": "Tilføj et koncept for en persona på dette marked. Vi anbefaler {min} eller flere.",
+          "noPersonasTitle": "{market} har ingen personaer endnu",
+          "noPersonasBody": "Et koncept bygger på en persona. Tilføj først personaer for dette marked.",
+          "toPersonas": "Gå til personaer"
         }
       }
     }
