@@ -141,23 +141,24 @@ Every batch close-out demands **evidence, not assertion**:
   in the flaky 10** — real MT baseline at merge time (the AH-028/AH-046/047
   ruling; "match the surrounding English" is rejected — surroundings are debt).
 
-### 4.1 Local-run rules (standing; a full-board run froze the machine)
+### 4.1 Local-run rules (standing; a full-board run froze the machine, twice)
 
-A run with ~16 Vitest workers plus Playwright/Chrome and Docker forced a
-reboot. From now on, for every agent and developer, on a local machine:
+Incidents: a run with ~16 Vitest workers plus Playwright/Chrome and Docker forced a reboot. On 2026-11-22 an uncapped full
+`apps/main` Vitest run (the third in a row) most likely exhausted CPU and memory and Pedram force-quit Cursor (cause inferred, not
+measured). Binding for every agent and developer, on Pedram's Mac, from 2026-11-22 (this replaces every earlier "run the full suite
+locally" instruction in chunk prompts):
 
-1. **Clean slate first.** Before any test run: `pkill -f vitest; pkill -f playwright`
-   (also any walk, `pkill -f walk.mjs`). No leftovers.
-2. **One suite at a time.** Never run two suites at once: no Vitest while
-   Playwright, Pest or a walk is running. Start the next only after the
-   previous has exited.
-3. **Cap Vitest at 4 workers:** `VITEST_MAX_WORKERS=4 npx vitest run ...`
-   (read in `apps/main/vitest.config.ts`; unset in CI, so CI is unchanged). The
-   bare `--maxWorkers=4` flag errors on Vitest 2.x (min/max conflict); use the variable.
-4. **Pest full suite serial** (as in § 4). **Playwright `--workers=2`** locally.
-5. **No background-then-another.** If a run is backgrounded, wait for its
-   exit before starting anything else.
-6. **Erasure folder before a push.** Any chunk that adds an audit call
+1. **The full Pest, Vitest and Playwright suites are never run locally.** CI runs them on every push to `pl`. A chunk closes only on a
+   green run at the pushed tip.
+2. **Locally, only** the test files for the code being built, plus the `Audit`, `Erasure` and `Tenancy` folders.
+3. **One run at a time. Never start a run in the background.** Before a run, check that no earlier run is alive
+   (`ps -axo pid,command | rg 'pest|phpunit|vitest|playwright|walk.mjs|artisan'`); after it, confirm its processes have exited.
+4. **Pest serial with `-d memory_limit=1G`.** **Vitest only by file or folder, through pnpm, with `VITEST_MAX_WORKERS=2`**; never
+   `npx vitest run` on a whole app. **Playwright serial, one browser, by spec.**
+5. **PostgreSQL locally only by file**, for tests that need locks, unique indexes or transactions (see item 8).
+6. If a run looks stuck or the machine slows, stop it and report; never start another on top of it.
+
+7. **Erasure folder before a push.** Any chunk that adds an audit call
    (`Audit::log`, an `Audited` model), a table or a column runs the whole
    Erasure test folder locally before the push:
    `php -d memory_limit=1G vendor/bin/pest tests/Feature/Modules/Erasure`.
@@ -166,20 +167,19 @@ reboot. From now on, for every agent and developer, on a local machine:
    column is classified). A new audit payload is written as a literal array with
    literal keys; a variable or `toArray()` is a last resort and needs a
    tech-debt row. PL-1.1 reached CI red by skipping this step.
-7. **PostgreSQL before a push, when the chunk relies on the database.** Local
+8. **PostgreSQL before a push, when the chunk relies on the database.** Local
    Pest runs on SQLite, which ignores row locks and reports unique violations
    differently from the production database (PostgreSQL aborts the surrounding
    transaction, SQLite does not). A test that depends on a unique index, a row
    lock (`FOR UPDATE`) or a transaction is also run locally on PostgreSQL before
    the push: create a **throwaway** database in the local container
-   (`CREATE DATABASE pl12_test`), run the Waves, Campaigns, Boards and Erasure
-   folders (or the folders of the chunk) with `DB_CONNECTION=pgsql` and that
+   (`CREATE DATABASE pl12_test`), run the FILES of the chunk that need it (not whole folders) with `DB_CONNECTION=pgsql` and that
    database name, then drop it. A lock test asserts that the SQL contains
    `for update` (it cannot go red on SQLite; mark it to skip there). **Never the
    dev database**, and unset the `DB_*` variables afterwards so the next SQLite
    run does not point at a dropped database. PL-1.1 reached CI red a second
    time (run 449) because an unique-violation test was only run on SQLite.
-8. **Audit, Erasure and Tenancy folders, on SQLite and PostgreSQL, before every
+9. **Audit, Erasure and Tenancy folders, on SQLite (PostgreSQL only by file, rule 5), before every
    push (added 2026-11-18).** Every chunk, not only chunks that add an audit
    call, runs `tests/Feature/Modules/Audit`, `tests/Feature/Modules/Erasure`
    and `tests/Feature/Tenancy` locally on SQLite **and** on PostgreSQL before a

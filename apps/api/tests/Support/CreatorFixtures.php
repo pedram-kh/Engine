@@ -92,8 +92,18 @@ final class CreatorFixtures
         return StrategyFixtures::u($w, 'creators'.($suffix !== '' ? '/'.$suffix : ''));
     }
 
-    public static function lastAudit(string $action): ?AuditLog
+    public static function lastAudit(string $action): AuditLog
     {
-        return AuditLog::query()->where('action', $action)->latest('id')->first();
+        return AuditLog::query()->where('action', $action)->latest('id')->firstOrFail();
+    }
+
+    public static function meta(string $action, string $key): mixed
+    {
+        return (self::lastAudit($action)->metadata ?? [])[$key] ?? null;
+    }
+
+    public static function fresh(WaveCreator $slot): WaveCreator
+    {
+        return WaveCreator::query()->findOrFail($slot->id);
     }
 }

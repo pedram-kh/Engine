@@ -128,9 +128,9 @@ it('B6: excluded from the picker and from add: not approved, erased, scheduled f
     $hidden = F::applicant($camp, creator: ['is_discoverable' => false]);
     $good = F::applicant($camp);
 
-    $listed = collect(S::call($w['admin'], 'GET', F::url($w, 'candidates'))->assertOk()->json('data'))->pluck('id')->all();
-    expect($listed)->toContain($good->ulid, $hidden->ulid, $softBrand->ulid)
-        ->not->toContain($pending->ulid, $erased->ulid, $leaving->ulid, $hardAgency->ulid, $hardBrand->ulid);
+    $listed = array_column(S::call($w['admin'], 'GET', F::url($w, 'candidates'))->assertOk()->json('data'), 'id');
+    expect($listed)->toContain($good->ulid, $hidden->ulid, $softBrand->ulid);
+    expect(array_intersect($listed, [$pending->ulid, $erased->ulid, $leaving->ulid, $hardAgency->ulid, $hardBrand->ulid]))->toBe([]);
 
     foreach ([$pending, $erased, $leaving, $hardAgency, $hardBrand] as $creator) {
         S::call($w['admin'], 'POST', F::url($w), ['market' => $w['mk']['SK'], 'creators' => [$creator->ulid]])->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_creator.not_eligible');
@@ -146,7 +146,7 @@ it('B7: the picker: filters, country[] chips, already_in_wave with the market, e
 
     $all = S::call($w['admin'], 'GET', F::url($w, 'candidates')."?market={$w['mk']['SK']}")->assertOk();
     expect($all->json('meta.market_countries'))->toBe(['SK'])->and($all->json('meta.total'))->toBe(2);
-    $row = collect($all->json('data'))->firstWhere('id', $ro->ulid);
+    $row = (array) Arr::first($all->json('data'), static fn (array $r): bool => $r['id'] === $ro->ulid);
     expect($row['already_in_wave'])->toBeTrue()->and($row['in_market'])->toBe($w['mk']['RO'])->and(array_key_exists('exclusive_elsewhere', $row))->toBeTrue();
 
     $only = S::call($w['admin'], 'GET', F::url($w, 'candidates').'?country[]=SK')->assertOk()->json('data');
@@ -212,13 +212,13 @@ it('B10: edit the slot code (upper-cased, unique in the market) and the persona;
     $persona = WavePersona::factory()->create(['wave_id' => $w['wave']->id, 'agency_id' => $w['agency']->id, 'market_id' => $w['mkid']['SK']]);
 
     S::call($w['staff'], 'PATCH', F::url($w, $sa->ulid), ['slot_code' => ' lucia ', 'persona' => $persona->ulid])->assertOk();
-    expect($sa->fresh()->slot_code)->toBe('LUCIA')->and($sa->fresh()->persona_id)->toBe($persona->id)
-        ->and(F::lastAudit('wave_creator.updated')->metadata['fields'])->toBe(['slot_code', 'persona']);
+    expect(F::fresh($sa)->slot_code)->toBe('LUCIA')->and(F::fresh($sa)->persona_id)->toBe($persona->id)
+        ->and(F::meta('wave_creator.updated', 'fields'))->toBe(['slot_code', 'persona']);
 
     S::call($w['staff'], 'PATCH', F::url($w, $sa->ulid), ['slot_code' => 'SK-C2'])->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_creator.slot_code_taken');
     S::call($w['staff'], 'PATCH', F::url($w, $sa->ulid), ['slot_code' => 'X'])->assertStatus(422);
     S::call($w['staff'], 'PATCH', F::url($w, $sa->ulid), ['persona' => null])->assertOk();
-    expect($sa->fresh()->persona_id)->toBeNull();
+    expect(F::fresh($sa)->persona_id)->toBeNull();
 });
 
 it('B11: replace keeps the slot, code and persona; the old creator\'s decisions go; same creator and an ineligible one are refused', function (): void {
@@ -233,10 +233,10 @@ it('B11: replace keeps the slot, code and persona; the old creator\'s decisions 
     S::call($w['admin'], 'POST', F::url($w, "{$slot->ulid}/replace"), ['creator' => '01HZZZZZZZZZZZZZZZZZZZZZZZ'])->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_creator.not_eligible');
     S::call($w['staff'], 'POST', F::url($w, "{$slot->ulid}/replace"), ['creator' => $new->ulid])->assertOk();
 
-    $fresh = $slot->fresh();
+    $fresh = F::fresh($slot);
     expect($fresh->creator_id)->toBe($new->id)->and($fresh->slot_code)->toBe('LUCIA')->and($fresh->persona_id)->toBe($persona->id)
         ->and(WaveCreatorDecision::query()->count())->toBe(0)
-        ->and(F::lastAudit('wave_creator.replaced')->metadata['decisions_removed'])->toBe(2);
+        ->and(F::meta('wave_creator.replaced', 'decisions_removed'))->toBe(2);
 });
 
 it('B12: remove deletes the slot and its decisions, frees the number, audits the count, and changes nothing on the campaign', function (): void {
@@ -249,7 +249,7 @@ it('B12: remove deletes the slot and its decisions, frees the number, audits the
     S::call($w['staff'], 'DELETE', F::url($w, $slot->ulid))->assertOk();
 
     expect(slotCount($w))->toBe(0)->and(WaveCreatorDecision::query()->count())->toBe(0)
-        ->and(F::lastAudit('wave_creator.removed')->metadata['decisions_removed'])->toBe(3)
+        ->and(F::meta('wave_creator.removed', 'decisions_removed'))->toBe(3)
         ->and([CampaignApplication::query()->get()->toArray(), CampaignAssignment::query()->get()->makeHidden('updated_at')->toArray()])->toBe($before);
 
     $d = F::applicant($w['campaign']);
@@ -288,8 +288,11 @@ it('B14: no audit row holds a client name, note or comment, or a creator name', 
     S::call($w['admin'], 'DELETE', F::url($w, $slot->ulid))->assertOk();
 
     $blob = AuditLog::query()->where('action', 'like', 'wave_creator.%')->get()->map(fn ($a) => json_encode([$a->metadata, $a->before, $a->after]))->implode(' ');
-    expect(AuditLog::query()->where('action', 'like', 'wave_creator.%')->count())->toBeGreaterThanOrEqual(4)
-        ->and($blob)->not->toContain('Quirina')->not->toContain('secret')->not->toContain('Zora');
+    $blob = (string) $blob;
+    expect(AuditLog::query()->where('action', 'like', 'wave_creator.%')->count())->toBeGreaterThanOrEqual(4);
+    foreach (['Quirina', 'secret', 'Zora'] as $needle) {
+        expect(str_contains($blob, $needle))->toBeFalse();
+    }
 });
 
 it('B15: the list: derived status per slot, summary counts, persona warning, step state, campaign link', function (): void {
@@ -390,7 +393,7 @@ it('B20: a wave that has creators is not deleted (model guard); one without is',
     $slot->decisions()->delete();
     $slot->delete();
     $w['wave']->delete();
-    expect(Wave::withTrashed()->find($w['wave']->id)->trashed())->toBeTrue();
+    expect(Wave::withTrashed()->where('id', $w['wave']->id)->firstOrFail()->trashed())->toBeTrue();
 });
 
 it('B21: the campaign link is locked while the wave has creators and unlocks when the last one is removed', function (): void {

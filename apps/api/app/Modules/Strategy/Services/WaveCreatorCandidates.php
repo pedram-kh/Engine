@@ -60,7 +60,7 @@ final class WaveCreatorCandidates
         ['applications' => $applications, 'assignments' => $assignments] = WaveCreatorSource::maps($wave, $campaign);
         $inWave = $ids === [] ? new Collection : WaveCreator::query()->where('wave_id', $wave->id)->whereIn('creator_id', $ids)->get(['creator_id', 'market_id'])->keyBy('creator_id');
         $marketUlids = $inWave->isEmpty() ? [] : WaveMarket::query()->where('wave_id', $wave->id)->pluck('ulid', 'id')->all();
-        $exclusive = app(BrandExclusivity::class)->conflictsFor($campaign, $ids);
+        $exclusive = app(BrandExclusivity::class)->conflictsFor($campaign, array_values($ids));
 
         $rows = [];
         foreach ($creators as $creator) {

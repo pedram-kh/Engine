@@ -54,10 +54,10 @@ final class WaveCreatorService
             }
 
             $creators = WaveCreatorSource::require($locked, $campaign, $creatorUlids);
-            $this->assertNotInWave($locked, $creators->pluck('id')->all());
+            $this->assertNotInWave($locked, array_values($creators->pluck('id')->all()));
 
-            $slots = $inMarket->pluck('slot')->map(static fn (mixed $s): int => (int) $s)->all();
-            $codes = $inMarket->pluck('slot_code')->all();
+            $slots = array_values($inMarket->pluck('slot')->map(static fn (mixed $s): int => (int) $s)->all());
+            $codes = array_values(array_map('strval', $inMarket->pluck('slot_code')->all()));
             $created = new Collection;
             try {
                 foreach ($creatorUlids as $ulid) {

@@ -20,6 +20,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\TestResponse;
 use Laravel\Pennant\Feature;
+use Symfony\Component\HttpFoundation\Response;
 use Tests\Support\CreatorFixtures as F;
 use Tests\Support\SentryRecording;
 use Tests\Support\StrategyFixtures as S;
@@ -31,6 +32,10 @@ uses(TestCase::class, RefreshDatabase::class);
  * PL-3.1 — the derived status table, the board rules (plan table rows), and the production listener's six conditions.
  */
 
+/**
+ * @param  array<string, mixed>  $w
+ * @return TestResponse<Response>
+ */
 function decide(array $w, WaveCreator $slot, string $status = 'approved'): TestResponse
 {
     $body = $status === 'approved' ? ['status' => 'approved', 'client_name' => 'Anna'] : ['status' => 'suggest_another', 'client_name' => 'Anna', 'comment' => 'someone else'];
@@ -40,7 +45,7 @@ function decide(array $w, WaveCreator $slot, string $status = 'approved'): TestR
 
 function stageOf(CampaignAssignment $a): string
 {
-    return (string) F::card($a)->column->stage_key;
+    return (string) F::card($a)->column?->stage_key;
 }
 
 function putInStage(CampaignAssignment $a, string $stage): void
@@ -139,14 +144,13 @@ it('BR6: a rule move writes ONE movement row (triggered by an event, no user tex
     $moves = BoardCardMovement::query()->count();
     decide($w, $slot)->assertCreated();
 
-    $row = BoardCardMovement::query()->latest('id')->first();
+    $row = BoardCardMovement::query()->latest('id')->firstOrFail();
     $audit = F::lastAudit('wave_creator.card_moved');
     expect(BoardCardMovement::query()->count())->toBe($moves + 1)
         ->and($row->triggered_by)->toBe(MovementTrigger::Event)
         ->and($row->triggered_event_key)->toBe('wave_creator.selected')
-        ->and($audit)->not->toBeNull()
         ->and(json_encode($audit->metadata))->not->toContain('Anna')
-        ->and($audit->metadata['trigger'])->toBe('decision');
+        ->and(F::meta('wave_creator.card_moved', 'trigger'))->toBe('decision');
 });
 
 it('L1: flags off: the listener runs ZERO queries, for the accept event and for any other', function (): void {
@@ -260,7 +264,7 @@ it('L5: the listener needs no agency tenancy context (the creator accepts on the
 it('B37: every write to wave_creators and wave_creator_decisions in the Strategy module is inside WaveCreatorGuard::transaction (source check)', function (): void {
     $allowed = ['WaveCreatorService.php', 'WaveCreatorDecisionService.php'];
     $writers = [];
-    foreach (glob(app_path('Modules/Strategy/*/*.php')) as $file) {
+    foreach (glob(app_path('Modules/Strategy/*/*.php')) ?: [] as $file) {
         $src = (string) file_get_contents($file);
         if (preg_match('/WaveCreator(Decision)?::(query\(\)->)?(create|insert|upsert|updateOrCreate)|WaveCreator(Decision)?::query\(\)->[^;]*->(delete|update)\(/', $src) === 1) {
             $writers[] = basename($file);
