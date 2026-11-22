@@ -1513,7 +1513,9 @@
           "new": "Nu een campagne voor deze golf maken"
         },
         "newCampaignName": "Campagnenaam",
-        "newCampaignHint": "Wordt aangemaakt als concept zonder budget. Stel het budget in op de campagnepagina voordat het live kan."
+        "newCampaignHint": "Wordt aangemaakt als concept zonder budget. Stel het budget in op de campagnepagina voordat het live kan.",
+        "notesWarning": "Als je {markets} verwijdert, verdwijnt {count} interne notitie. Dit kan niet ongedaan worden gemaakt. | Als je {markets} verwijdert, verdwijnen {count} interne notities. Dit kan niet ongedaan worden gemaakt.",
+        "notesConfirm": "Notities verwijderen en opslaan"
       },
       "validation": {
         "nameRequired": "Voer een naam voor de golf in.",
@@ -1656,6 +1658,16 @@
           "streamNotRemovable": "De UGC-videostroom kan niet worden verwijderd: de voortgang op de merkpagina hangt ervan af.",
           "streamDefaultsExist": "Alle standaardstappen van deze stroom staan al in de wave, in een andere stroom. Verplaats ze terug of voeg een stap toe.",
           "brandArchived": "Dit merk is gearchiveerd. Herstel het om de waves te wijzigen."
+        },
+        "incomplete": {
+          "title": "“{step}” is niet voltooid",
+          "body": "De strategiestap staat op “{state}”. Deze rij toch op “{status}” zetten?",
+          "bodyMarkets": "De strategiestap staat op “{state}” ({done} van {total} markten voltooid). Deze rij toch op “{status}” zetten?",
+          "confirm": "Toch instellen"
+        },
+        "handSet": {
+          "plain": "Handmatig ingesteld · de stap staat op “{state}”",
+          "markets": "Handmatig ingesteld · de stap staat op “{state}” ({done} van {total} markten)"
         }
       },
       "markets": {
@@ -1743,7 +1755,13 @@
         "conceptsNone": "Nog geen concepten",
         "conceptsStatus": "{approved} van {total} goedgekeurd",
         "conceptsWarning": "Concepten: {approved} van {total} goedgekeurd",
-        "conceptsWarningNone": "Nog geen concepten"
+        "conceptsWarningNone": "Nog geen concepten",
+        "marketsOf": "{done} van {total} markt | {done} van {total} markten",
+        "state": {
+          "not_started": "Niet begonnen",
+          "in_progress": "Bezig",
+          "done": "Klaar"
+        }
       },
       "audience": {
         "label": "Doelgroeptitel",
@@ -1929,7 +1947,11 @@
         "imageLimitCount": "Een concept bevat maximaal {max} afbeeldingen (nu {used}).",
         "imageLimitBytes": "De afbeeldingen van een concept zijn samen maximaal {max} MB (nu {used} MB).",
         "linkInvalidUrl": "Dit is geen geldig openbaar https-adres.",
-        "linkLimitCount": "De limiet voor links van dit concept is bereikt."
+        "linkLimitCount": "De limiet voor links van dit concept is bereikt.",
+        "nothingToComplete": "Er is nog niets om als voltooid te markeren.",
+        "noteThreadFull": "Deze thread bevat al het maximale aantal notities (100). Verwijder er een om een nieuwe toe te voegen.",
+        "noteForbidden": "Je kunt deze notitie niet wijzigen.",
+        "noteBodyInvalid": "Een notitie bestaat uit 1 tot 2000 tekens platte tekst."
       },
       "counts": {
         "angles": "{count} invalshoek | {count} invalshoeken",
@@ -2128,6 +2150,45 @@
         },
         "personaFilter": "Alleen de concepten van {persona} worden getoond.",
         "showAll": "Alles tonen"
+      },
+      "completion": {
+        "complete": "Voltooid",
+        "auto": "Automatisch: voltooid zodra elk concept in deze markt is goedgekeurd",
+        "markedBy": "Als voltooid gemarkeerd door {name} · {date}",
+        "markedByFormer": "Als voltooid gemarkeerd door een voormalig lid · {date}",
+        "mark": "Markeer als voltooid",
+        "reopen": "Heropenen",
+        "confirmTitle": "{scope} als voltooid markeren?",
+        "confirmBody": "Sommige dingen lijken onaf. Je kunt het toch als voltooid markeren.",
+        "anyway": "Toch als voltooid markeren",
+        "nothingTitle": "Nog niets om te markeren",
+        "nothing": {
+          "usps": "Voeg minstens één USP toe voordat je deze stap als voltooid markeert.",
+          "personas": "Voeg minstens één persona toe voor {market} voordat je deze stap als voltooid markeert.",
+          "matrix": "Stel minstens één cel in voor {market} voordat je deze stap als voltooid markeert."
+        },
+        "warnUsps": "Tot nu toe {count} USP; minstens {recommended} aanbevolen | Tot nu toe {count} USP’s; minstens {recommended} aanbevolen",
+        "warnPersonas": "{count} persona in deze markt; minstens {recommended} aanbevolen | {count} persona’s in deze markt; minstens {recommended} aanbevolen",
+        "warnCells": "{missing} van {total} cellen zijn niet ingesteld."
+      },
+      "notes": {
+        "title": "Notities",
+        "internal": "Intern",
+        "empty": "Nog geen notities.",
+        "placeholder": "Notitie toevoegen…",
+        "add": "Notitie toevoegen",
+        "edit": "Bewerken",
+        "delete": "Verwijderen",
+        "editLabel": "Notitie bewerken",
+        "edited": "bewerkt",
+        "former": "Voormalig lid",
+        "deleteTitle": "Deze notitie verwijderen?",
+        "deleteBody": "De notitie wordt voor iedereen verwijderd. Dit kan niet ongedaan worden gemaakt.",
+        "loadFailed": "De notities konden niet worden geladen.",
+        "retry": "Opnieuw proberen",
+        "tooLong": "Een notitie mag maximaal {max} tekens bevatten.",
+        "open": "Notities ({count})",
+        "sheetTitle": "Notities · {market}"
       }
     }
   },

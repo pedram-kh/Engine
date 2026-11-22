@@ -20,6 +20,7 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { MENU_ABOVE_DIALOG_Z } from '../constants'
+import { SaveCancelled } from '../saveCancelled'
 import { STREAM_ORDER } from '../trackerFormat'
 
 export interface MemberOption {
@@ -209,6 +210,7 @@ async function submit(): Promise<void> {
     emit('update:modelValue', false)
   } catch (err) {
     saving.value = false
+    if (err instanceof SaveCancelled) return
     formError.value = messageFor(err)
   }
 }

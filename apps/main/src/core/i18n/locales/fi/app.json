@@ -1513,7 +1513,9 @@
           "new": "Luo tälle aallolle kampanja nyt"
         },
         "newCampaignName": "Kampanjan nimi",
-        "newCampaignHint": "Luodaan luonnoksena ilman budjettia. Aseta budjetti kampanjan sivulla ennen julkaisua."
+        "newCampaignHint": "Luodaan luonnoksena ilman budjettia. Aseta budjetti kampanjan sivulla ennen julkaisua.",
+        "notesWarning": "Kohteen {markets} poistaminen poistaa {count} sisäisen muistiinpanon. Tätä ei voi perua. | Kohteen {markets} poistaminen poistaa {count} sisäistä muistiinpanoa. Tätä ei voi perua.",
+        "notesConfirm": "Poista muistiinpanot ja tallenna"
       },
       "validation": {
         "nameRequired": "Anna aallolle nimi.",
@@ -1656,6 +1658,16 @@
           "streamNotRemovable": "UGC-videokanavaa ei voi poistaa: brändisivun eteneminen riippuu siitä.",
           "streamDefaultsExist": "Kaikki tämän virran oletusvaiheet ovat jo aallossa, toisessa virrassa. Siirrä ne takaisin tai lisää vaihe.",
           "brandArchived": "Tämä brändi on arkistoitu. Palauta se muokataksesi sen aaltoja."
+        },
+        "incomplete": {
+          "title": "”{step}” ei ole valmis",
+          "body": "Strategiavaiheen tila on ”{state}”. Asetetaanko tämä rivi silti tilaan ”{status}”?",
+          "bodyMarkets": "Strategiavaiheen tila on ”{state}” ({done} / {total} markkinaa valmiina). Asetetaanko tämä rivi silti tilaan ”{status}”?",
+          "confirm": "Aseta silti"
+        },
+        "handSet": {
+          "plain": "Asetettu käsin · vaiheen tila on ”{state}”",
+          "markets": "Asetettu käsin · vaiheen tila on ”{state}” ({done} / {total} markkinaa)"
         }
       },
       "markets": {
@@ -1743,7 +1755,13 @@
         "conceptsNone": "Ei vielä konsepteja",
         "conceptsStatus": "{approved}/{total} hyväksytty",
         "conceptsWarning": "Konseptit: {approved}/{total} hyväksytty",
-        "conceptsWarningNone": "Ei vielä konsepteja"
+        "conceptsWarningNone": "Ei vielä konsepteja",
+        "marketsOf": "{done} / {total} markkinasta | {done} / {total} markkinasta",
+        "state": {
+          "not_started": "Ei aloitettu",
+          "in_progress": "Kesken",
+          "done": "Valmis"
+        }
       },
       "audience": {
         "label": "Kohderyhmän otsikko",
@@ -1929,7 +1947,11 @@
         "imageLimitCount": "Konseptissa voi olla enintään {max} kuvaa (nyt {used}).",
         "imageLimitBytes": "Konseptin kuvat saavat yhteensä olla enintään {max} Mt (nyt {used} Mt).",
         "linkInvalidUrl": "Tämä ei ole kelvollinen julkinen https-osoite.",
-        "linkLimitCount": "Tämän konseptin linkkiraja on täynnä."
+        "linkLimitCount": "Tämän konseptin linkkiraja on täynnä.",
+        "nothingToComplete": "Valmiiksi merkittävää ei vielä ole.",
+        "noteThreadFull": "Tässä ketjussa on jo suurin sallittu määrä muistiinpanoja (100). Poista yksi, jotta voit lisätä uuden.",
+        "noteForbidden": "Et voi muuttaa tätä muistiinpanoa.",
+        "noteBodyInvalid": "Muistiinpano on 1–2000 merkkiä pelkkää tekstiä."
       },
       "counts": {
         "angles": "{count} näkökulma | {count} näkökulmaa",
@@ -2128,6 +2150,45 @@
         },
         "personaFilter": "Näytetään vain persoonan {persona} konseptit.",
         "showAll": "Näytä kaikki"
+      },
+      "completion": {
+        "complete": "Valmis",
+        "auto": "Automaattinen: valmis, kun jokainen tämän markkinan konsepti on hyväksytty",
+        "markedBy": "Merkitsi valmiiksi {name} · {date}",
+        "markedByFormer": "Merkitsi valmiiksi entinen jäsen · {date}",
+        "mark": "Merkitse valmiiksi",
+        "reopen": "Avaa uudelleen",
+        "confirmTitle": "Merkitäänkö {scope} valmiiksi?",
+        "confirmBody": "Jokin näyttää vielä keskeneräiseltä. Voit silti merkitä sen valmiiksi.",
+        "anyway": "Merkitse silti valmiiksi",
+        "nothingTitle": "Ei vielä mitään merkittävää",
+        "nothing": {
+          "usps": "Lisää vähintään yksi USP, ennen kuin merkitset tämän vaiheen valmiiksi.",
+          "personas": "Lisää vähintään yksi persoona markkinalle {market}, ennen kuin merkitset tämän vaiheen valmiiksi.",
+          "matrix": "Aseta vähintään yksi solu markkinalle {market}, ennen kuin merkitset tämän vaiheen valmiiksi."
+        },
+        "warnUsps": "Toistaiseksi {count} USP; suositus on vähintään {recommended} | Toistaiseksi {count} USP:tä; suositus on vähintään {recommended}",
+        "warnPersonas": "{count} persoona tällä markkinalla; suositus on vähintään {recommended} | {count} persoonaa tällä markkinalla; suositus on vähintään {recommended}",
+        "warnCells": "{total} solusta {missing} on asettamatta."
+      },
+      "notes": {
+        "title": "Muistiinpanot",
+        "internal": "Sisäinen",
+        "empty": "Ei vielä muistiinpanoja.",
+        "placeholder": "Lisää muistiinpano…",
+        "add": "Lisää muistiinpano",
+        "edit": "Muokkaa",
+        "delete": "Poista",
+        "editLabel": "Muokkaa muistiinpanoa",
+        "edited": "muokattu",
+        "former": "Entinen jäsen",
+        "deleteTitle": "Poistetaanko tämä muistiinpano?",
+        "deleteBody": "Muistiinpano poistetaan kaikilta. Tätä ei voi perua.",
+        "loadFailed": "Muistiinpanoja ei voitu ladata.",
+        "retry": "Yritä uudelleen",
+        "tooLong": "Muistiinpano voi olla enintään {max} merkkiä pitkä.",
+        "open": "Muistiinpanot ({count})",
+        "sheetTitle": "Muistiinpanot · {market}"
       }
     }
   },

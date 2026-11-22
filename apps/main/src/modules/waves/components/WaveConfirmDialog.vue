@@ -13,6 +13,9 @@ const props = defineProps<{
   confirmLabel: string
   busy: boolean
   error: string | null
+  /** The confirm button's colour: `error` for a removal (the default), `primary` for anything else. */
+  confirmColor?: string
+  testId?: string
 }>()
 
 const emit = defineEmits<{ 'update:modelValue': [value: boolean]; confirm: [] }>()
@@ -33,7 +36,7 @@ watch(
     :model-value="modelValue"
     max-width="440"
     persistent
-    data-test="confirm-dialog"
+    :data-test="testId ?? 'confirm-dialog'"
     @update:model-value="(v: boolean) => !busy && emit('update:modelValue', v)"
   >
     <v-card :key="session">
@@ -62,7 +65,7 @@ watch(
           {{ t('app.waves.tracker.dialog.cancel') }}
         </v-btn>
         <v-btn
-          color="error"
+          :color="confirmColor ?? 'error'"
           variant="flat"
           :loading="busy"
           data-test="confirm-ok"

@@ -1513,7 +1513,9 @@
           "new": "Skapa en kampanj för den här vågen nu"
         },
         "newCampaignName": "Kampanjnamn",
-        "newCampaignHint": "Skapas som utkast utan budget. Ange budgeten på kampanjsidan innan den kan gå live."
+        "newCampaignHint": "Skapas som utkast utan budget. Ange budgeten på kampanjsidan innan den kan gå live.",
+        "notesWarning": "Om du tar bort {markets} raderas {count} intern anteckning. Det går inte att ångra. | Om du tar bort {markets} raderas {count} interna anteckningar. Det går inte att ångra.",
+        "notesConfirm": "Ta bort anteckningar och spara"
       },
       "validation": {
         "nameRequired": "Ange ett namn på vågen.",
@@ -1656,6 +1658,16 @@
           "streamNotRemovable": "UGC-videospåret kan inte tas bort: förloppet på varumärkessidan beror på det.",
           "streamDefaultsExist": "Alla standardsteg i det här spåret finns redan i vågen, i ett annat spår. Flytta tillbaka dem eller lägg till ett steg.",
           "brandArchived": "Det här varumärket är arkiverat. Återställ det för att ändra dess vågor."
+        },
+        "incomplete": {
+          "title": "”{step}” är inte slutfört",
+          "body": "Strategisteget står som ”{state}”. Vill du ändå ställa in den här raden på ”{status}”?",
+          "bodyMarkets": "Strategisteget står som ”{state}” ({done} av {total} marknader slutförda). Vill du ändå ställa in den här raden på ”{status}”?",
+          "confirm": "Ställ in ändå"
+        },
+        "handSet": {
+          "plain": "Inställd för hand · steget står som ”{state}”",
+          "markets": "Inställd för hand · steget står som ”{state}” ({done} av {total} marknader)"
         }
       },
       "markets": {
@@ -1743,7 +1755,13 @@
         "conceptsNone": "Inga koncept ännu",
         "conceptsStatus": "{approved} av {total} godkända",
         "conceptsWarning": "Koncept: {approved} av {total} godkända",
-        "conceptsWarningNone": "Inga koncept ännu"
+        "conceptsWarningNone": "Inga koncept ännu",
+        "marketsOf": "{done} av {total} marknad | {done} av {total} marknader",
+        "state": {
+          "not_started": "Inte påbörjad",
+          "in_progress": "Pågår",
+          "done": "Klar"
+        }
       },
       "audience": {
         "label": "Målgruppstitel",
@@ -1929,7 +1947,11 @@
         "imageLimitCount": "Ett koncept rymmer högst {max} bilder (nu {used}).",
         "imageLimitBytes": "Bilderna i ett koncept får tillsammans vara högst {max} MB (nu {used} MB).",
         "linkInvalidUrl": "Det här är inte en giltig offentlig https-adress.",
-        "linkLimitCount": "Gränsen för länkar i det här konceptet är nådd."
+        "linkLimitCount": "Gränsen för länkar i det här konceptet är nådd.",
+        "nothingToComplete": "Det finns inget att markera som slutfört ännu.",
+        "noteThreadFull": "Den här tråden har redan det högsta antalet anteckningar (100). Ta bort en för att lägga till en ny.",
+        "noteForbidden": "Du kan inte ändra den här anteckningen.",
+        "noteBodyInvalid": "En anteckning är 1 till 2000 tecken ren text."
       },
       "counts": {
         "angles": "{count} vinkel | {count} vinklar",
@@ -2128,6 +2150,45 @@
         },
         "personaFilter": "Visar bara koncept för {persona}.",
         "showAll": "Visa alla"
+      },
+      "completion": {
+        "complete": "Slutförd",
+        "auto": "Automatiskt: slutförd när varje koncept på den här marknaden är godkänt",
+        "markedBy": "Markerad som slutförd av {name} · {date}",
+        "markedByFormer": "Markerad som slutförd av en tidigare medlem · {date}",
+        "mark": "Markera som slutförd",
+        "reopen": "Öppna igen",
+        "confirmTitle": "Markera {scope} som slutförd?",
+        "confirmBody": "Vissa saker verkar oavslutade. Du kan ändå markera den som slutförd.",
+        "anyway": "Markera som slutförd ändå",
+        "nothingTitle": "Inget att markera ännu",
+        "nothing": {
+          "usps": "Lägg till minst en USP innan du markerar det här steget som slutfört.",
+          "personas": "Lägg till minst en persona för {market} innan du markerar det här steget som slutfört.",
+          "matrix": "Ange minst en cell för {market} innan du markerar det här steget som slutfört."
+        },
+        "warnUsps": "Hittills {count} USP; minst {recommended} rekommenderas | Hittills {count} USP:er; minst {recommended} rekommenderas",
+        "warnPersonas": "{count} persona på den här marknaden; minst {recommended} rekommenderas | {count} personor på den här marknaden; minst {recommended} rekommenderas",
+        "warnCells": "{missing} av {total} celler är inte angivna."
+      },
+      "notes": {
+        "title": "Anteckningar",
+        "internal": "Intern",
+        "empty": "Inga anteckningar ännu.",
+        "placeholder": "Lägg till en anteckning …",
+        "add": "Lägg till anteckning",
+        "edit": "Redigera",
+        "delete": "Ta bort",
+        "editLabel": "Redigera anteckning",
+        "edited": "redigerad",
+        "former": "Tidigare medlem",
+        "deleteTitle": "Ta bort den här anteckningen?",
+        "deleteBody": "Anteckningen tas bort för alla. Det går inte att ångra.",
+        "loadFailed": "Anteckningarna kunde inte läsas in.",
+        "retry": "Försök igen",
+        "tooLong": "En anteckning får vara högst {max} tecken.",
+        "open": "Anteckningar ({count})",
+        "sheetTitle": "Anteckningar · {market}"
       }
     }
   },

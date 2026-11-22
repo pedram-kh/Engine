@@ -5,7 +5,7 @@
  * Steps 1 to 4 are real links with a counts-only status line (step 4: "{approved} of {total} approved"). Steps 5 and 6
  * are plain elements: not links, not buttons, not in the tab order, `aria-disabled`, no hover state, no pointer
  * cursor, NO lock icon: they say "Not available yet" and, while any market has concepts that are not all approved,
- * carry the warning with the counts (PL-2.3, C6: a message, never a block). No tick is ever drawn: there is no "done" rule (S7). On a narrow screen the bar
+ * carry the warning with the counts (PL-2.3, C6: a message, never a block). PL-2.5: every live step carries its REAL state from the server: not started (an empty circle with the number), in progress (an amber circle with the number) or done (a green circle with a check); a per-market step in progress says "n of m markets". Creators and Scripts stay "Not available yet". On a narrow screen the bar
  * scrolls sideways inside itself and step names never wrap.
  */
 import type { StrategySummaryResource } from '@catalyst/api-client'
@@ -13,6 +13,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { stepFourLine, stepWarning } from '../conceptsLogic'
+import { stateFor, type StepName } from '../completionLogic'
 import { STEPS, type StepKey } from '../constants'
 
 const props = defineProps<{
@@ -24,7 +25,15 @@ const props = defineProps<{
 
 const { t } = useI18n()
 
-const statusLine = computed<Record<'usps' | 'personas' | 'matrix' | 'concepts', string>>(() => {
+type LiveKey = StepName
+
+function stateOf(key: StepKey): 'not_started' | 'in_progress' | 'done' {
+  const a = props.summary?.attributes
+  if (!a || key === 'creators' || key === 'scripts') return 'not_started'
+  return stateFor(a, key, null)
+}
+
+const baseLine = computed<Record<LiveKey, string>>(() => {
   const a = props.summary?.attributes
   if (!a) return { usps: '', personas: '', matrix: '', concepts: '' }
   const four = stepFourLine(a.concepts)
@@ -56,6 +65,27 @@ const statusLine = computed<Record<'usps' | 'personas' | 'matrix' | 'concepts', 
             a.persona_count,
           ),
   }
+})
+
+/** The line under a step's name: the real state first ("Complete", "n of m markets"), else the counts line. */
+const statusLine = computed<Record<LiveKey, string>>(() => {
+  const a = props.summary?.attributes
+  const out = { ...baseLine.value }
+  if (!a) return out
+  for (const key of ['usps', 'personas', 'matrix', 'concepts'] as const) {
+    const st = a.steps[key]
+    if (st.state === 'done') {
+      out[key] = t('app.strategy.completion.complete')
+    } else if (st.state === 'in_progress' && key !== 'usps') {
+      const m = a.steps[key]
+      out[key] = t(
+        'app.strategy.stepper.marketsOf',
+        { done: m.markets_done, total: m.markets_total },
+        m.markets_total,
+      )
+    }
+  }
+  return out
 })
 
 /** The warning steps 5 and 6 carry: the wave's counts while any market is not complete, else nothing. */
@@ -97,13 +127,27 @@ function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUli
           :class="{ 'strategy-step--active': active === step.key }"
           :aria-current="active === step.key ? 'step' : undefined"
           :data-test="`strategy-step-${step.key}`"
+          :data-state="stateOf(step.key)"
         >
-          <span class="strategy-step__circle">{{ step.n }}</span>
+          <span
+            class="strategy-step__circle"
+            :class="`strategy-step__circle--${stateOf(step.key)}`"
+            :data-test="`strategy-step-${step.key}-circle`"
+          >
+            <v-icon
+              v-if="stateOf(step.key) === 'done'"
+              icon="mdi-check"
+              size="14"
+              aria-hidden="true"
+            />
+            <template v-else>{{ step.n }}</template>
+          </span>
           <span class="strategy-step__text">
             <span class="strategy-step__name">{{ t(`app.strategy.stepper.${step.key}`) }}</span>
             <span class="strategy-step__status" :data-test="`strategy-step-${step.key}-status`">
-              {{ statusLine[step.key] }}
+              {{ statusLine[step.key as LiveKey] }}
             </span>
+            <span class="sr-only">{{ t(`app.strategy.stepper.state.${stateOf(step.key)}`) }}</span>
           </span>
         </router-link>
         <div
@@ -160,6 +204,7 @@ function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUli
   display: flex;
 }
 .strategy-step {
+  position: relative;
   flex: 1 1 auto;
   display: flex;
   align-items: center;
@@ -183,7 +228,27 @@ function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUli
   font-weight: 600;
   line-height: normal;
   color: rgb(var(--v-theme-on-surface-variant));
-  background: rgb(var(--v-theme-surface-bright));
+  background: transparent;
+  border: 1.5px solid rgb(var(--v-theme-border-color));
+}
+/* PL-2.5: in progress is amber with its number, done is green with a check (frame 13:547). */
+.strategy-step__circle--in_progress {
+  background: rgb(var(--v-theme-warning));
+  border-color: rgb(var(--v-theme-warning));
+  color: rgb(var(--v-theme-on-warning, 11 11 12));
+}
+.strategy-step__circle--done {
+  background: rgb(var(--v-theme-primary));
+  border-color: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary));
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 .strategy-step__text {
   display: flex;
@@ -220,10 +285,6 @@ function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUli
 .strategy-step--active .strategy-step__name {
   font-weight: 600;
   color: rgb(var(--v-theme-on-surface));
-}
-.strategy-step--active .strategy-step__circle {
-  background: rgb(var(--v-theme-primary));
-  color: rgb(var(--v-theme-on-primary));
 }
 /* Wide enough for six steps: share the width and let the status wrap, so no step is clipped. Narrower, the bar
    keeps its natural width and scrolls inside itself. */

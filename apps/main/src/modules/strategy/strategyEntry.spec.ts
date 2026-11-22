@@ -68,13 +68,13 @@ describe('wave page entry to the strategy workspace (PL-2.1 W-OFF)', () => {
     w.unmount()
   })
 
-  it('strategy on: the button is there for admin, manager and staff, and goes to the USPs step', async () => {
+  it('strategy on: the button is there for admin, manager and staff, and goes to the landing address', async () => {
     for (const role of ['agency_admin', 'agency_manager', 'agency_staff'] as const) {
       const w = await mountWithApp(WaveDetailPage, {}, { strategy: true, role })
       await flushPromises()
       const btn = w.get('[data-test="wave-strategy-btn"]')
       expect(btn.text()).toBe('Strategy & Scripts')
-      expect(btn.attributes('href')).toBe(`/brands/${BRAND_ULID}/waves/${WAVE_ULID}/strategy/usps`)
+      expect(btn.attributes('href')).toBe(`/brands/${BRAND_ULID}/waves/${WAVE_ULID}/strategy`)
       expect(w.find('[data-test="wave-edit-btn"]').exists()).toBe(role !== 'agency_staff')
       w.unmount()
     }

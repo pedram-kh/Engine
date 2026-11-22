@@ -1513,7 +1513,9 @@
           "new": "Opret en kampagne til denne bølge nu"
         },
         "newCampaignName": "Kampagnenavn",
-        "newCampaignHint": "Oprettes som kladde uden budget. Angiv budgettet på kampagnesiden, før den kan gå live."
+        "newCampaignHint": "Oprettes som kladde uden budget. Angiv budgettet på kampagnesiden, før den kan gå live.",
+        "notesWarning": "Hvis du fjerner {markets}, slettes {count} intern note. Det kan ikke fortrydes. | Hvis du fjerner {markets}, slettes {count} interne noter. Det kan ikke fortrydes.",
+        "notesConfirm": "Slet noter og gem"
       },
       "validation": {
         "nameRequired": "Angiv et navn til bølgen.",
@@ -1656,6 +1658,16 @@
           "streamNotRemovable": "UGC-videosporet kan ikke fjernes: Fremdriften på brandsiden afhænger af det.",
           "streamDefaultsExist": "Alle standardtrin i dette spor er allerede i bølgen, i et andet spor. Flyt dem tilbage, eller tilføj et trin.",
           "brandArchived": "Dette brand er arkiveret. Gendan det for at ændre dets bølger."
+        },
+        "incomplete": {
+          "title": "”{step}” er ikke gennemført",
+          "body": "Strategitrinnet står som ”{state}”. Vil du alligevel sætte denne række til ”{status}”?",
+          "bodyMarkets": "Strategitrinnet står som ”{state}” ({done} af {total} markeder gennemført). Vil du alligevel sætte denne række til ”{status}”?",
+          "confirm": "Sæt alligevel"
+        },
+        "handSet": {
+          "plain": "Sat manuelt · trinnet står som ”{state}”",
+          "markets": "Sat manuelt · trinnet står som ”{state}” ({done} af {total} markeder)"
         }
       },
       "markets": {
@@ -1743,7 +1755,13 @@
         "conceptsNone": "Ingen koncepter endnu",
         "conceptsStatus": "{approved} af {total} godkendt",
         "conceptsWarning": "Koncepter: {approved} af {total} godkendt",
-        "conceptsWarningNone": "Ingen koncepter endnu"
+        "conceptsWarningNone": "Ingen koncepter endnu",
+        "marketsOf": "{done} af {total} marked | {done} af {total} markeder",
+        "state": {
+          "not_started": "Ikke startet",
+          "in_progress": "I gang",
+          "done": "Færdig"
+        }
       },
       "audience": {
         "label": "Målgruppetitel",
@@ -1929,7 +1947,11 @@
         "imageLimitCount": "Et koncept rummer højst {max} billeder (nu {used}).",
         "imageLimitBytes": "Billederne i et koncept må tilsammen højst fylde {max} MB (nu {used} MB).",
         "linkInvalidUrl": "Det er ikke en gyldig offentlig https-adresse.",
-        "linkLimitCount": "Grænsen for links i dette koncept er nået."
+        "linkLimitCount": "Grænsen for links i dette koncept er nået.",
+        "nothingToComplete": "Der er endnu intet at markere som gennemført.",
+        "noteThreadFull": "Denne tråd har allerede det højeste antal noter (100). Slet én for at tilføje en ny.",
+        "noteForbidden": "Du kan ikke ændre denne note.",
+        "noteBodyInvalid": "En note er på 1 til 2000 tegn almindelig tekst."
       },
       "counts": {
         "angles": "{count} vinkel | {count} vinkler",
@@ -2128,6 +2150,45 @@
         },
         "personaFilter": "Viser kun koncepter for {persona}.",
         "showAll": "Vis alle"
+      },
+      "completion": {
+        "complete": "Gennemført",
+        "auto": "Automatisk: gennemført, når hvert koncept på dette marked er godkendt",
+        "markedBy": "Markeret som gennemført af {name} · {date}",
+        "markedByFormer": "Markeret som gennemført af et tidligere medlem · {date}",
+        "mark": "Markér som gennemført",
+        "reopen": "Åbn igen",
+        "confirmTitle": "Markér {scope} som gennemført?",
+        "confirmBody": "Nogle ting ser uafsluttede ud. Du kan stadig markere det som gennemført.",
+        "anyway": "Markér som gennemført alligevel",
+        "nothingTitle": "Intet at markere endnu",
+        "nothing": {
+          "usps": "Tilføj mindst én USP, før du markerer dette trin som gennemført.",
+          "personas": "Tilføj mindst én persona til {market}, før du markerer dette trin som gennemført.",
+          "matrix": "Angiv mindst én celle for {market}, før du markerer dette trin som gennemført."
+        },
+        "warnUsps": "Indtil videre {count} USP; mindst {recommended} anbefales | Indtil videre {count} USP’er; mindst {recommended} anbefales",
+        "warnPersonas": "{count} persona på dette marked; mindst {recommended} anbefales | {count} personaer på dette marked; mindst {recommended} anbefales",
+        "warnCells": "{missing} af {total} celler er ikke angivet."
+      },
+      "notes": {
+        "title": "Noter",
+        "internal": "Intern",
+        "empty": "Ingen noter endnu.",
+        "placeholder": "Tilføj en note …",
+        "add": "Tilføj note",
+        "edit": "Rediger",
+        "delete": "Slet",
+        "editLabel": "Rediger note",
+        "edited": "redigeret",
+        "former": "Tidligere medlem",
+        "deleteTitle": "Slet denne note?",
+        "deleteBody": "Noten fjernes for alle. Det kan ikke fortrydes.",
+        "loadFailed": "Noterne kunne ikke indlæses.",
+        "retry": "Prøv igen",
+        "tooLong": "En note må højst være på {max} tegn.",
+        "open": "Noter ({count})",
+        "sheetTitle": "Noter · {market}"
       }
     }
   },

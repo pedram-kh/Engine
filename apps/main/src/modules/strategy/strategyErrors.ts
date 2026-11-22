@@ -32,6 +32,10 @@ const CODE_KEYS: Record<string, string> = {
   'link.invalid_url': 'app.strategy.errors.linkInvalidUrl',
   'concept_link.limit_count': 'app.strategy.errors.linkLimitCount',
   'wave.brand_archived': 'app.strategy.errors.brandArchived',
+  'strategy.nothing_to_complete': 'app.strategy.errors.nothingToComplete',
+  'note.thread_full': 'app.strategy.errors.noteThreadFull',
+  'note.forbidden': 'app.strategy.errors.noteForbidden',
+  'note.body_invalid': 'app.strategy.errors.noteBodyInvalid',
   forbidden: 'app.strategy.errors.forbidden',
 }
 

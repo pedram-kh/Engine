@@ -20,6 +20,7 @@ import { useI18n } from 'vue-i18n'
 
 import { membersApi } from '@/modules/agency-users/api/members.api'
 import { wavesApi } from '../api/waves.api'
+import { SaveCancelled } from '../saveCancelled'
 import WaveConfirmDialog from './WaveConfirmDialog.vue'
 import WaveStepDialog, { type MemberOption } from './WaveStepDialog.vue'
 import WaveStepsPanel from './WaveStepsPanel.vue'
@@ -56,6 +57,62 @@ const confirm = ref<Confirm | null>(null)
 const confirmOpen = ref(false)
 const confirmBusy = ref(false)
 const confirmError = ref<string | null>(null)
+
+// PL-2.5: a status set by hand beyond what the real strategy step has reached is asked about first (409
+// `step.incomplete`); the person confirms and the same request goes again with `confirm_incomplete`.
+interface IncompleteAsk {
+  stepName: string
+  status: string
+  realState: string
+  done: number
+  total: number
+}
+const incomplete = ref<IncompleteAsk | null>(null)
+const incompleteOpen = ref(false)
+let incompleteResolve: ((ok: boolean) => void) | null = null
+
+function incompleteMeta(err: unknown): IncompleteAsk | null {
+  if (!(err instanceof ApiError) || err.status !== 409 || err.code !== 'step.incomplete')
+    return null
+  const m = err.details[0]?.meta
+  const n = (k: string): number => (typeof m?.[k] === 'number' ? (m[k] as number) : 0)
+  return {
+    stepName: '',
+    status: '',
+    realState: typeof m?.real_state === 'string' ? m.real_state : 'not_started',
+    done: n('markets_done'),
+    total: n('markets_total'),
+  }
+}
+
+function askIncomplete(base: IncompleteAsk): Promise<boolean> {
+  incompleteResolve?.(false)
+  incomplete.value = base
+  incompleteOpen.value = true
+  return new Promise((resolve) => {
+    incompleteResolve = resolve
+  })
+}
+
+function settleIncomplete(ok: boolean): void {
+  incompleteOpen.value = false
+  incompleteResolve?.(ok)
+  incompleteResolve = null
+}
+
+const incompleteBody = computed(() => {
+  const a = incomplete.value
+  if (a === null) return ''
+  const named = {
+    state: t(`app.waves.tracker.stepStatus.${a.realState}`),
+    status: t(`app.waves.tracker.stepStatus.${a.status}`),
+    done: a.done,
+    total: a.total,
+  }
+  return a.total > 0
+    ? t('app.waves.tracker.incomplete.bodyMarkets', named)
+    : t('app.waves.tracker.incomplete.body', named)
+})
 
 const streams = computed(() => tracker.value?.attributes.streams ?? [])
 const presentStreams = computed(() => streams.value.map((s) => s.stream))
@@ -131,7 +188,13 @@ async function toggle(step: WaveStepResource): Promise<void> {
     })
     await load(true)
   } catch (err) {
-    if (isNotFound(err)) {
+    const ask = incompleteMeta(err)
+    if (ask !== null) {
+      apply(snapshot)
+      ask.stepName = step.attributes.name
+      ask.status = markDone ? 'done' : 'not_started'
+      if (await askIncomplete(ask)) await toggleConfirmed(step, markDone)
+    } else if (isNotFound(err)) {
       await removedByOther()
     } else {
       apply(snapshot)
@@ -139,6 +202,20 @@ async function toggle(step: WaveStepResource): Promise<void> {
     }
   } finally {
     setBusy(step.id, false)
+  }
+}
+
+async function toggleConfirmed(step: WaveStepResource, markDone: boolean): Promise<void> {
+  try {
+    await wavesApi.updateStep(props.agencyId, props.brandId, props.waveId, step.id, {
+      status: markDone ? 'done' : 'not_started',
+      confirm_incomplete: true,
+    })
+    await load(true)
+  } catch (err) {
+    if (isNotFound(err)) await removedByOther()
+    else
+      rowErrors.value = { ...rowErrors.value, [step.id]: t('app.waves.tracker.errors.saveFailed') }
   }
 }
 
@@ -171,7 +248,23 @@ async function saveStep(payload: WaveStepUpdatePayload): Promise<void> {
       await removedByOther()
       return
     }
-    throw err
+    const ask = incompleteMeta(err)
+    if (step === null || ask === null || payload.status === undefined) throw err
+    ask.stepName = step.attributes.name
+    ask.status = payload.status
+    if (!(await askIncomplete(ask))) throw new SaveCancelled()
+    try {
+      await wavesApi.updateStep(props.agencyId, props.brandId, props.waveId, step.id, {
+        ...payload,
+        confirm_incomplete: true,
+      })
+    } catch (again) {
+      if (isNotFound(again)) {
+        await removedByOther()
+        return
+      }
+      throw again
+    }
   }
   await load(true)
 }
@@ -338,6 +431,18 @@ defineExpose({ reload: () => load(true) })
       :busy="confirmBusy"
       :error="confirmError"
       @confirm="doConfirm"
+    />
+    <WaveConfirmDialog
+      :model-value="incompleteOpen"
+      :title="t('app.waves.tracker.incomplete.title', { step: incomplete?.stepName ?? '' })"
+      :body="incompleteBody"
+      :confirm-label="t('app.waves.tracker.incomplete.confirm')"
+      confirm-color="primary"
+      test-id="incomplete-dialog"
+      :busy="false"
+      :error="null"
+      @update:model-value="(v: boolean) => !v && settleIncomplete(false)"
+      @confirm="settleIncomplete(true)"
     />
     <v-snackbar v-model="snackbar" :timeout="5000" data-test="step-removed-snackbar">
       {{ t('app.waves.tracker.removedByOther') }}

@@ -121,7 +121,7 @@ onMounted(async () => {
           variant="flat"
           color="primary"
           prepend-icon="mdi-lightbulb-on-outline"
-          :to="{ name: 'strategy.usps', params: { ulid: brandUlid, waveUlid: waveUlid } }"
+          :to="{ name: 'strategy.index', params: { ulid: brandUlid, waveUlid: waveUlid } }"
           data-test="wave-strategy-btn"
         >
           {{ t('app.strategy.entry') }}

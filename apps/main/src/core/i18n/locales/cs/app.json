@@ -1513,7 +1513,9 @@
           "new": "Vytvořit kampaň pro tuto vlnu hned"
         },
         "newCampaignName": "Název kampaně",
-        "newCampaignHint": "Vytvoří se jako návrh bez rozpočtu. Rozpočet nastavte na stránce kampaně, než půjde živě."
+        "newCampaignHint": "Vytvoří se jako návrh bez rozpočtu. Rozpočet nastavte na stránce kampaně, než půjde živě.",
+        "notesWarning": "Odebráním {markets} se smaže {count} interní poznámka. Nelze to vrátit zpět. | Odebráním {markets} se smaže {count} interních poznámek. Nelze to vrátit zpět.",
+        "notesConfirm": "Smazat poznámky a uložit"
       },
       "validation": {
         "nameRequired": "Zadejte název vlny.",
@@ -1656,6 +1658,16 @@
           "streamNotRemovable": "Větev UGC videa nelze odebrat: závisí na ní postup na stránce značky.",
           "streamDefaultsExist": "Všechny výchozí kroky tohoto proudu už jsou ve vlně, v jiném proudu. Přesuňte je zpět, nebo přidejte krok.",
           "brandArchived": "Tato značka je archivována. Obnovte ji, abyste mohli měnit její vlny."
+        },
+        "incomplete": {
+          "title": "„{step}“ není dokončeno",
+          "body": "Krok strategie je ve stavu „{state}“. Přesto nastavit tento řádek na „{status}“?",
+          "bodyMarkets": "Krok strategie je ve stavu „{state}“ (dokončeno trhů: {done} z {total}). Přesto nastavit tento řádek na „{status}“?",
+          "confirm": "Přesto nastavit"
+        },
+        "handSet": {
+          "plain": "Nastaveno ručně · krok je ve stavu „{state}“",
+          "markets": "Nastaveno ručně · krok je ve stavu „{state}“ (trhy: {done} z {total})"
         }
       },
       "markets": {
@@ -1743,7 +1755,13 @@
         "conceptsNone": "Zatím žádné koncepty",
         "conceptsStatus": "Schváleno {approved} z {total}",
         "conceptsWarning": "Koncepty: schváleno {approved} z {total}",
-        "conceptsWarningNone": "Zatím žádné koncepty"
+        "conceptsWarningNone": "Zatím žádné koncepty",
+        "marketsOf": "{done} z {total} trhu | {done} z {total} trhů",
+        "state": {
+          "not_started": "Nezačato",
+          "in_progress": "Rozpracováno",
+          "done": "Hotovo"
+        }
       },
       "audience": {
         "label": "Název cílové skupiny",
@@ -1929,7 +1947,11 @@
         "imageLimitCount": "Koncept může mít nejvýše {max} obrázků (nyní {used}).",
         "imageLimitBytes": "Obrázky konceptu mohou mít dohromady nejvýše {max} MB (nyní {used} MB).",
         "linkInvalidUrl": "Toto není platná veřejná adresa https.",
-        "linkLimitCount": "Limit odkazů tohoto konceptu je dosažen."
+        "linkLimitCount": "Limit odkazů tohoto konceptu je dosažen.",
+        "nothingToComplete": "Zatím není co označit jako dokončené.",
+        "noteThreadFull": "Toto vlákno už obsahuje nejvyšší možný počet poznámek (100). Smažte jednu, abyste mohli přidat další.",
+        "noteForbidden": "Tuto poznámku nemůžete změnit.",
+        "noteBodyInvalid": "Poznámka má 1 až 2000 znaků prostého textu."
       },
       "counts": {
         "angles": "{count} úhel | {count} úhlů",
@@ -2128,6 +2150,45 @@
         },
         "personaFilter": "Zobrazeny jsou jen koncepce persony {persona}.",
         "showAll": "Zobrazit vše"
+      },
+      "completion": {
+        "complete": "Dokončeno",
+        "auto": "Automaticky: dokončeno, když je schválen každý koncept na tomto trhu",
+        "markedBy": "Označil(a) jako dokončené {name} · {date}",
+        "markedByFormer": "Označil(a) jako dokončené bývalý člen · {date}",
+        "mark": "Označit jako dokončené",
+        "reopen": "Znovu otevřít",
+        "confirmTitle": "Označit {scope} jako dokončené?",
+        "confirmBody": "Něco vypadá nedokončené. Přesto to můžete označit jako dokončené.",
+        "anyway": "Přesto označit jako dokončené",
+        "nothingTitle": "Zatím není co označit",
+        "nothing": {
+          "usps": "Než tento krok označíte jako dokončený, přidejte alespoň jedno USP.",
+          "personas": "Než tento krok označíte jako dokončený, přidejte alespoň jednu personu pro trh {market}.",
+          "matrix": "Než tento krok označíte jako dokončený, nastavte alespoň jednu buňku pro trh {market}."
+        },
+        "warnUsps": "Zatím {count} USP; doporučeno je alespoň {recommended} | Zatím {count} USP; doporučeno je alespoň {recommended}",
+        "warnPersonas": "{count} persona na tomto trhu; doporučeno je alespoň {recommended} | {count} person na tomto trhu; doporučeno je alespoň {recommended}",
+        "warnCells": "Nenastaveno {missing} z {total} buněk."
+      },
+      "notes": {
+        "title": "Poznámky",
+        "internal": "Interní",
+        "empty": "Zatím žádné poznámky.",
+        "placeholder": "Přidat poznámku…",
+        "add": "Přidat poznámku",
+        "edit": "Upravit",
+        "delete": "Smazat",
+        "editLabel": "Upravit poznámku",
+        "edited": "upraveno",
+        "former": "Bývalý člen",
+        "deleteTitle": "Smazat tuto poznámku?",
+        "deleteBody": "Poznámka bude smazána pro všechny. Nelze to vrátit zpět.",
+        "loadFailed": "Poznámky se nepodařilo načíst.",
+        "retry": "Zkusit znovu",
+        "tooLong": "Poznámka může mít nejvýše {max} znaků.",
+        "open": "Poznámky ({count})",
+        "sheetTitle": "Poznámky · {market}"
       }
     }
   },

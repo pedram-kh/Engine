@@ -20,6 +20,7 @@ export {
   countryInTwoMarketsMeta,
   deletionPendingMeta,
   extractFieldErrors,
+  marketHasNotesMeta,
   marketHasPersonasMeta,
   personaInUseByConceptsMeta,
   uspInUseMeta,

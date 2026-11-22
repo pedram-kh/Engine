@@ -333,12 +333,8 @@ export const appRoutes: RouteRecordRaw[] = [
   {
     path: '/brands/:ulid/waves/:waveUlid/strategy',
     name: 'strategy.index',
-    // A path, not a route-name key: the route-pin arch test reads the file with a regex and a second key would
-    // be taken for a second route.
-    redirect: (to) => ({
-      path: `/brands/${String(to.params.ulid)}/waves/${String(to.params.waveUlid)}/strategy/usps`,
-      query: to.query,
-    }),
+    // PL-2.5: opens the first step not done (and its first market not done); a direct address to a step is unchanged.
+    component: () => import('@/modules/strategy/pages/StrategyEntryPage.vue'),
     meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
   {

@@ -1513,7 +1513,9 @@
           "new": "Kampány létrehozása ehhez a hullámhoz most"
         },
         "newCampaignName": "Kampány neve",
-        "newCampaignHint": "Vázlatként jön létre, költségvetés nélkül. Az indulás előtt állítsa be a költségvetést a kampány oldalán."
+        "newCampaignHint": "Vázlatként jön létre, költségvetés nélkül. Az indulás előtt állítsa be a költségvetést a kampány oldalán.",
+        "notesWarning": "A(z) {markets} eltávolítása {count} belső jegyzetet töröl. Ez nem vonható vissza. | A(z) {markets} eltávolítása {count} belső jegyzetet töröl. Ez nem vonható vissza.",
+        "notesConfirm": "Jegyzetek törlése és mentés"
       },
       "validation": {
         "nameRequired": "Adja meg a hullám nevét.",
@@ -1656,6 +1658,16 @@
           "streamNotRemovable": "Az UGC videócsatorna nem távolítható el: a márkaoldal haladása ettől függ.",
           "streamDefaultsExist": "Ennek a folyamnak minden alapértelmezett lépése már a hullámban van, egy másik folyamatban. Mozgasd vissza őket, vagy adj hozzá egy lépést.",
           "brandArchived": "Ez a márka archivált. Állítsd vissza, hogy módosíthasd a hullámait."
+        },
+        "incomplete": {
+          "title": "A(z) „{step}” nincs befejezve",
+          "body": "A stratégiai lépés állapota: „{state}”. Mégis „{status}” állapotra állítod ezt a sort?",
+          "bodyMarkets": "A stratégiai lépés állapota: „{state}” ({total} piacból {done} kész). Mégis „{status}” állapotra állítod ezt a sort?",
+          "confirm": "Beállítás így is"
+        },
+        "handSet": {
+          "plain": "Kézzel beállítva · a lépés állapota: „{state}”",
+          "markets": "Kézzel beállítva · a lépés állapota: „{state}” ({total} piacból {done})"
         }
       },
       "markets": {
@@ -1743,7 +1755,13 @@
         "conceptsNone": "Még nincs koncepció",
         "conceptsStatus": "{approved} / {total} jóváhagyva",
         "conceptsWarning": "Koncepciók: {approved} / {total} jóváhagyva",
-        "conceptsWarningNone": "Még nincs koncepció"
+        "conceptsWarningNone": "Még nincs koncepció",
+        "marketsOf": "{done} / {total} piac | {done} / {total} piac",
+        "state": {
+          "not_started": "Nincs elkezdve",
+          "in_progress": "Folyamatban",
+          "done": "Kész"
+        }
       },
       "audience": {
         "label": "Célközönség címe",
@@ -1929,7 +1947,11 @@
         "imageLimitCount": "Egy koncepció legfeljebb {max} képet tartalmazhat (most {used}).",
         "imageLimitBytes": "Egy koncepció képei együtt legfeljebb {max} MB méretűek lehetnek (most {used} MB).",
         "linkInvalidUrl": "Ez nem érvényes nyilvános https cím.",
-        "linkLimitCount": "Elérted a koncepció hivatkozásainak korlátját."
+        "linkLimitCount": "Elérted a koncepció hivatkozásainak korlátját.",
+        "nothingToComplete": "Még nincs mit befejezettként megjelölni.",
+        "noteThreadFull": "Ebben a szálban már a legtöbb jegyzet van (100). Törölj egyet, hogy újat adhass hozzá.",
+        "noteForbidden": "Ezt a jegyzetet nem módosíthatod.",
+        "noteBodyInvalid": "Egy jegyzet 1–2000 karakter egyszerű szöveg."
       },
       "counts": {
         "angles": "{count} szög | {count} szög",
@@ -2128,6 +2150,45 @@
         },
         "personaFilter": "Csak {persona} koncepciói láthatók.",
         "showAll": "Összes megjelenítése"
+      },
+      "completion": {
+        "complete": "Befejezett",
+        "auto": "Automatikus: befejezett, ha ezen a piacon minden koncepció jóvá van hagyva",
+        "markedBy": "Befejezettnek jelölte: {name} · {date}",
+        "markedByFormer": "Befejezettnek jelölte egy korábbi tag · {date}",
+        "mark": "Megjelölés befejezettként",
+        "reopen": "Újranyitás",
+        "confirmTitle": "Megjelölöd befejezettként: {scope}?",
+        "confirmBody": "Néhány dolog befejezetlennek tűnik. Ettől még megjelölheted befejezettként.",
+        "anyway": "Megjelölés befejezettként így is",
+        "nothingTitle": "Még nincs mit megjelölni",
+        "nothing": {
+          "usps": "Adj hozzá legalább egy USP-t, mielőtt ezt a lépést befejezettnek jelölöd.",
+          "personas": "Adj hozzá legalább egy perszónát a(z) {market} piachoz, mielőtt ezt a lépést befejezettnek jelölöd.",
+          "matrix": "Állíts be legalább egy cellát a(z) {market} piachoz, mielőtt ezt a lépést befejezettnek jelölöd."
+        },
+        "warnUsps": "Eddig {count} USP; legalább {recommended} ajánlott | Eddig {count} USP; legalább {recommended} ajánlott",
+        "warnPersonas": "{count} perszóna ezen a piacon; legalább {recommended} ajánlott | {count} perszóna ezen a piacon; legalább {recommended} ajánlott",
+        "warnCells": "{total} cellából {missing} nincs beállítva."
+      },
+      "notes": {
+        "title": "Jegyzetek",
+        "internal": "Belső",
+        "empty": "Még nincs jegyzet.",
+        "placeholder": "Jegyzet hozzáadása…",
+        "add": "Jegyzet hozzáadása",
+        "edit": "Szerkesztés",
+        "delete": "Törlés",
+        "editLabel": "Jegyzet szerkesztése",
+        "edited": "szerkesztve",
+        "former": "Korábbi tag",
+        "deleteTitle": "Törlöd ezt a jegyzetet?",
+        "deleteBody": "A jegyzet mindenki számára törlődik. Ez nem vonható vissza.",
+        "loadFailed": "A jegyzeteket nem sikerült betölteni.",
+        "retry": "Újrapróbálás",
+        "tooLong": "Egy jegyzet legfeljebb {max} karakter lehet.",
+        "open": "Jegyzetek ({count})",
+        "sheetTitle": "Jegyzetek · {market}"
       }
     }
   },

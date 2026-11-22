@@ -1513,7 +1513,9 @@
           "new": "Sukurti šiai bangai kampaniją dabar"
         },
         "newCampaignName": "Kampanijos pavadinimas",
-        "newCampaignHint": "Sukuriama kaip juodraštis be biudžeto. Prieš paleidimą nustatykite biudžetą kampanijos puslapyje."
+        "newCampaignHint": "Sukuriama kaip juodraštis be biudžeto. Prieš paleidimą nustatykite biudžetą kampanijos puslapyje.",
+        "notesWarning": "Pašalinus {markets} bus ištrinta {count} vidinė pastaba. To negalima atšaukti. | Pašalinus {markets} bus ištrinta {count} vidinių pastabų. To negalima atšaukti.",
+        "notesConfirm": "Ištrinti pastabas ir išsaugoti"
       },
       "validation": {
         "nameRequired": "Įveskite bangos pavadinimą.",
@@ -1656,6 +1658,16 @@
           "streamNotRemovable": "UGC vaizdo kanalo pašalinti negalima: nuo jo priklauso pažanga prekės ženklo puslapyje.",
           "streamDefaultsExist": "Visi šio srauto numatytieji žingsniai jau yra bangoje, kitame sraute. Perkelkite juos atgal arba pridėkite žingsnį.",
           "brandArchived": "Šis prekės ženklas suarchyvuotas. Atkurkite jį, kad pakeistumėte jo bangas."
+        },
+        "incomplete": {
+          "title": "„{step}“ neužbaigta",
+          "body": "Strategijos žingsnio būsena: „{state}“. Vis tiek nustatyti šią eilutę į „{status}“?",
+          "bodyMarkets": "Strategijos žingsnio būsena: „{state}“ (užbaigta rinkų: {done} iš {total}). Vis tiek nustatyti šią eilutę į „{status}“?",
+          "confirm": "Vis tiek nustatyti"
+        },
+        "handSet": {
+          "plain": "Nustatyta rankiniu būdu · žingsnio būsena: „{state}“",
+          "markets": "Nustatyta rankiniu būdu · žingsnio būsena: „{state}“ (rinkos: {done} iš {total})"
         }
       },
       "markets": {
@@ -1743,7 +1755,13 @@
         "conceptsNone": "Konceptų dar nėra",
         "conceptsStatus": "Patvirtinta {approved} iš {total}",
         "conceptsWarning": "Konceptai: patvirtinta {approved} iš {total}",
-        "conceptsWarningNone": "Konceptų dar nėra"
+        "conceptsWarningNone": "Konceptų dar nėra",
+        "marketsOf": "{done} iš {total} rinkos | {done} iš {total} rinkų",
+        "state": {
+          "not_started": "Nepradėta",
+          "in_progress": "Vykdoma",
+          "done": "Atlikta"
+        }
       },
       "audience": {
         "label": "Auditorijos pavadinimas",
@@ -1929,7 +1947,11 @@
         "imageLimitCount": "Konceptą gali sudaryti ne daugiau kaip {max} paveikslėlių (dabar {used}).",
         "imageLimitBytes": "Koncepto paveikslėliai kartu gali užimti ne daugiau kaip {max} MB (dabar {used} MB).",
         "linkInvalidUrl": "Tai nėra tinkamas viešas https adresas.",
-        "linkLimitCount": "Pasiektas šio koncepto nuorodų limitas."
+        "linkLimitCount": "Pasiektas šio koncepto nuorodų limitas.",
+        "nothingToComplete": "Dar nėra ką pažymėti kaip užbaigtą.",
+        "noteThreadFull": "Šioje gijoje jau yra didžiausias leistinas pastabų skaičius (100). Ištrinkite vieną, kad pridėtumėte kitą.",
+        "noteForbidden": "Šios pastabos keisti negalite.",
+        "noteBodyInvalid": "Pastabą sudaro nuo 1 iki 2000 paprasto teksto simbolių."
       },
       "counts": {
         "angles": "{count} kampas | {count} kampai",
@@ -2128,6 +2150,45 @@
         },
         "personaFilter": "Rodomos tik {persona} koncepcijos.",
         "showAll": "Rodyti visas"
+      },
+      "completion": {
+        "complete": "Užbaigta",
+        "auto": "Automatiškai: užbaigta, kai patvirtinta kiekviena šios rinkos koncepcija",
+        "markedBy": "Kaip užbaigtą pažymėjo {name} · {date}",
+        "markedByFormer": "Kaip užbaigtą pažymėjo buvęs narys · {date}",
+        "mark": "Pažymėti kaip užbaigtą",
+        "reopen": "Atidaryti iš naujo",
+        "confirmTitle": "Pažymėti {scope} kaip užbaigtą?",
+        "confirmBody": "Kai kas atrodo nebaigta. Vis tiek galite pažymėti kaip užbaigtą.",
+        "anyway": "Vis tiek pažymėti kaip užbaigtą",
+        "nothingTitle": "Dar nėra ką pažymėti",
+        "nothing": {
+          "usps": "Prieš pažymėdami šį žingsnį kaip užbaigtą, pridėkite bent vieną USP.",
+          "personas": "Prieš pažymėdami šį žingsnį kaip užbaigtą, pridėkite bent vieną personą rinkai {market}.",
+          "matrix": "Prieš pažymėdami šį žingsnį kaip užbaigtą, nustatykite bent vieną langelį rinkai {market}."
+        },
+        "warnUsps": "Kol kas {count} USP; rekomenduojama bent {recommended} | Kol kas {count} USP; rekomenduojama bent {recommended}",
+        "warnPersonas": "{count} persona šioje rinkoje; rekomenduojama bent {recommended} | {count} personų šioje rinkoje; rekomenduojama bent {recommended}",
+        "warnCells": "Nenustatyta langelių: {missing} iš {total}."
+      },
+      "notes": {
+        "title": "Pastabos",
+        "internal": "Vidinė",
+        "empty": "Pastabų dar nėra.",
+        "placeholder": "Pridėti pastabą…",
+        "add": "Pridėti pastabą",
+        "edit": "Redaguoti",
+        "delete": "Ištrinti",
+        "editLabel": "Redaguoti pastabą",
+        "edited": "redaguota",
+        "former": "Buvęs narys",
+        "deleteTitle": "Ištrinti šią pastabą?",
+        "deleteBody": "Pastaba bus pašalinta visiems. To negalima atšaukti.",
+        "loadFailed": "Nepavyko įkelti pastabų.",
+        "retry": "Bandyti dar kartą",
+        "tooLong": "Pastabą gali sudaryti daugiausia {max} simbolių.",
+        "open": "Pastabos ({count})",
+        "sheetTitle": "Pastabos · {market}"
       }
     }
   },

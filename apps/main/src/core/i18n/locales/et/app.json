@@ -1513,7 +1513,9 @@
           "new": "Loo sellele lainele kampaania kohe"
         },
         "newCampaignName": "Kampaania nimi",
-        "newCampaignHint": "Luuakse mustandina ilma eelarveta. Määra eelarve kampaania lehel enne avalikustamist."
+        "newCampaignHint": "Luuakse mustandina ilma eelarveta. Määra eelarve kampaania lehel enne avalikustamist.",
+        "notesWarning": "Turu(d) {markets} eemaldamine kustutab {count} sisemise märke. Seda ei saa tagasi võtta. | Turu(d) {markets} eemaldamine kustutab {count} sisemist märget. Seda ei saa tagasi võtta.",
+        "notesConfirm": "Kustuta märkmed ja salvesta"
       },
       "validation": {
         "nameRequired": "Sisestage laine nimi.",
@@ -1656,6 +1658,16 @@
           "streamNotRemovable": "UGC-videokanalit ei saa eemaldada: brändi lehe edenemine sõltub sellest.",
           "streamDefaultsExist": "Selle voo kõik vaikesammud on juba lainel, teises voos. Liiguta need tagasi või lisa samm.",
           "brandArchived": "See bränd on arhiveeritud. Taasta see, et selle laineid muuta."
+        },
+        "incomplete": {
+          "title": "„{step}“ ei ole lõpetatud",
+          "body": "Strateegiasamm on olekus „{state}“. Kas seada see rida siiski olekusse „{status}“?",
+          "bodyMarkets": "Strateegiasamm on olekus „{state}“ ({total} turust {done} on lõpetatud). Kas seada see rida siiski olekusse „{status}“?",
+          "confirm": "Sea siiski"
+        },
+        "handSet": {
+          "plain": "Seatud käsitsi · samm on olekus „{state}“",
+          "markets": "Seatud käsitsi · samm on olekus „{state}“ ({total} turust {done})"
         }
       },
       "markets": {
@@ -1743,7 +1755,13 @@
         "conceptsNone": "Kontseptsioone veel pole",
         "conceptsStatus": "{approved}/{total} kinnitatud",
         "conceptsWarning": "Kontseptsioonid: {approved}/{total} kinnitatud",
-        "conceptsWarningNone": "Kontseptsioone veel pole"
+        "conceptsWarningNone": "Kontseptsioone veel pole",
+        "marketsOf": "{done} turust {total}-st | {done} turgu {total}-st",
+        "state": {
+          "not_started": "Alustamata",
+          "in_progress": "Pooleli",
+          "done": "Valmis"
+        }
       },
       "audience": {
         "label": "Sihtrühma pealkiri",
@@ -1929,7 +1947,11 @@
         "imageLimitCount": "Kontseptsioonis võib olla kuni {max} pilti (praegu {used}).",
         "imageLimitBytes": "Kontseptsiooni pildid võivad kokku olla kuni {max} MB (praegu {used} MB).",
         "linkInvalidUrl": "See ei ole kehtiv avalik https-aadress.",
-        "linkLimitCount": "Selle kontseptsiooni linkide piir on täis."
+        "linkLimitCount": "Selle kontseptsiooni linkide piir on täis.",
+        "nothingToComplete": "Lõpetatuks märkida pole veel midagi.",
+        "noteThreadFull": "Selles lõimes on juba märkmete maksimaalne arv (100). Kustuta üks, et lisada uus.",
+        "noteForbidden": "Sa ei saa seda märget muuta.",
+        "noteBodyInvalid": "Märge on 1 kuni 2000 tähemärki lihttekstina."
       },
       "counts": {
         "angles": "{count} nurk | {count} nurka",
@@ -2128,6 +2150,45 @@
         },
         "personaFilter": "Kuvatakse ainult persoona {persona} kontseptsioonid.",
         "showAll": "Näita kõiki"
+      },
+      "completion": {
+        "complete": "Lõpetatud",
+        "auto": "Automaatne: lõpetatud, kui kõik selle turu kontseptsioonid on heaks kiidetud",
+        "markedBy": "Lõpetatuks märkis {name} · {date}",
+        "markedByFormer": "Lõpetatuks märkis endine liige · {date}",
+        "mark": "Märgi lõpetatuks",
+        "reopen": "Ava uuesti",
+        "confirmTitle": "Kas märkida {scope} lõpetatuks?",
+        "confirmBody": "Mõni asi tundub pooleli olevat. Võid selle siiski lõpetatuks märkida.",
+        "anyway": "Märgi siiski lõpetatuks",
+        "nothingTitle": "Märkida pole veel midagi",
+        "nothing": {
+          "usps": "Lisa vähemalt üks USP, enne kui märgid selle sammu lõpetatuks.",
+          "personas": "Lisa turule {market} vähemalt üks persoona, enne kui märgid selle sammu lõpetatuks.",
+          "matrix": "Sea turule {market} vähemalt üks lahter, enne kui märgid selle sammu lõpetatuks."
+        },
+        "warnUsps": "Seni {count} USP; soovitatav on vähemalt {recommended} | Seni {count} USP-d; soovitatav on vähemalt {recommended}",
+        "warnPersonas": "{count} persoona sellel turul; soovitatav on vähemalt {recommended} | {count} persoonat sellel turul; soovitatav on vähemalt {recommended}",
+        "warnCells": "{total} lahtrist {missing} on seadmata."
+      },
+      "notes": {
+        "title": "Märkmed",
+        "internal": "Sisemine",
+        "empty": "Märkmeid veel pole.",
+        "placeholder": "Lisa märge…",
+        "add": "Lisa märge",
+        "edit": "Muuda",
+        "delete": "Kustuta",
+        "editLabel": "Muuda märget",
+        "edited": "muudetud",
+        "former": "Endine liige",
+        "deleteTitle": "Kas kustutada see märge?",
+        "deleteBody": "Märge eemaldatakse kõigilt. Seda ei saa tagasi võtta.",
+        "loadFailed": "Märkmeid ei õnnestunud laadida.",
+        "retry": "Proovi uuesti",
+        "tooLong": "Märge võib olla kuni {max} tähemärki pikk.",
+        "open": "Märkmed ({count})",
+        "sheetTitle": "Märkmed · {market}"
       }
     }
   },

@@ -1513,7 +1513,9 @@
           "new": "Creează acum o campanie pentru acest val"
         },
         "newCampaignName": "Numele campaniei",
-        "newCampaignHint": "Se creează ca ciornă, fără buget. Setați bugetul pe pagina campaniei înainte de lansare."
+        "newCampaignHint": "Se creează ca ciornă, fără buget. Setați bugetul pe pagina campaniei înainte de lansare.",
+        "notesWarning": "Eliminarea {markets} șterge {count} notiță internă. Acțiunea nu poate fi anulată. | Eliminarea {markets} șterge {count} notițe interne. Acțiunea nu poate fi anulată.",
+        "notesConfirm": "Șterge notițele și salvează"
       },
       "validation": {
         "nameRequired": "Introduceți un nume pentru val.",
@@ -1656,6 +1658,16 @@
           "streamNotRemovable": "Fluxul video UGC nu poate fi eliminat: progresul de pe pagina mărcii depinde de el.",
           "streamDefaultsExist": "Toți pașii impliciți ai acestui flux sunt deja în val, într-un alt flux. Mută-i înapoi sau adaugă un pas.",
           "brandArchived": "Această marcă este arhivată. Restaureaz-o pentru a-i modifica valurile."
+        },
+        "incomplete": {
+          "title": "„{step}” nu este finalizat",
+          "body": "Pasul de strategie indică „{state}”. Setezi totuși acest rând pe „{status}”?",
+          "bodyMarkets": "Pasul de strategie indică „{state}” ({done} din {total} piețe finalizate). Setezi totuși acest rând pe „{status}”?",
+          "confirm": "Setează totuși"
+        },
+        "handSet": {
+          "plain": "Setat manual · pasul indică „{state}”",
+          "markets": "Setat manual · pasul indică „{state}” ({done} din {total} piețe)"
         }
       },
       "markets": {
@@ -1743,7 +1755,13 @@
         "conceptsNone": "Încă nu există concepte",
         "conceptsStatus": "{approved} din {total} aprobate",
         "conceptsWarning": "Concepte: {approved} din {total} aprobate",
-        "conceptsWarningNone": "Încă nu există concepte"
+        "conceptsWarningNone": "Încă nu există concepte",
+        "marketsOf": "{done} din {total} piață | {done} din {total} piețe",
+        "state": {
+          "not_started": "Neînceput",
+          "in_progress": "În desfășurare",
+          "done": "Gata"
+        }
       },
       "audience": {
         "label": "Titlul audienței",
@@ -1929,7 +1947,11 @@
         "imageLimitCount": "Un concept conține cel mult {max} imagini (acum {used}).",
         "imageLimitBytes": "Imaginile unui concept însumează cel mult {max} MB (acum {used} MB).",
         "linkInvalidUrl": "Aceasta nu este o adresă https publică validă.",
-        "linkLimitCount": "Limita de linkuri a acestui concept a fost atinsă."
+        "linkLimitCount": "Limita de linkuri a acestui concept a fost atinsă.",
+        "nothingToComplete": "Încă nu există nimic de marcat ca finalizat.",
+        "noteThreadFull": "Acest fir conține deja numărul maxim de notițe (100). Șterge una pentru a adăuga alta.",
+        "noteForbidden": "Nu poți modifica această notiță.",
+        "noteBodyInvalid": "O notiță are între 1 și 2000 de caractere de text simplu."
       },
       "counts": {
         "angles": "{count} unghi | {count} unghiuri",
@@ -2128,6 +2150,45 @@
         },
         "personaFilter": "Sunt afișate doar conceptele persoanei {persona}.",
         "showAll": "Afișează tot"
+      },
+      "completion": {
+        "complete": "Finalizat",
+        "auto": "Automat: finalizat când fiecare concept din această piață este aprobat",
+        "markedBy": "Marcat ca finalizat de {name} · {date}",
+        "markedByFormer": "Marcat ca finalizat de un fost membru · {date}",
+        "mark": "Marchează ca finalizat",
+        "reopen": "Redeschide",
+        "confirmTitle": "Marchezi {scope} ca finalizat?",
+        "confirmBody": "Unele lucruri par neterminate. Îl poți marca totuși ca finalizat.",
+        "anyway": "Marchează totuși ca finalizat",
+        "nothingTitle": "Încă nu e nimic de marcat",
+        "nothing": {
+          "usps": "Adaugă cel puțin un USP înainte de a marca acest pas ca finalizat.",
+          "personas": "Adaugă cel puțin o persona pentru {market} înainte de a marca acest pas ca finalizat.",
+          "matrix": "Setează cel puțin o celulă pentru {market} înainte de a marca acest pas ca finalizat."
+        },
+        "warnUsps": "Deocamdată {count} USP; se recomandă cel puțin {recommended} | Deocamdată {count} USP-uri; se recomandă cel puțin {recommended}",
+        "warnPersonas": "{count} persona în această piață; se recomandă cel puțin {recommended} | {count} persone în această piață; se recomandă cel puțin {recommended}",
+        "warnCells": "{missing} din {total} celule nu sunt setate."
+      },
+      "notes": {
+        "title": "Notițe",
+        "internal": "Intern",
+        "empty": "Încă nu există notițe.",
+        "placeholder": "Adaugă o notiță…",
+        "add": "Adaugă notița",
+        "edit": "Editează",
+        "delete": "Șterge",
+        "editLabel": "Editează notița",
+        "edited": "editată",
+        "former": "Fost membru",
+        "deleteTitle": "Ștergi această notiță?",
+        "deleteBody": "Notița este ștearsă pentru toți. Acțiunea nu poate fi anulată.",
+        "loadFailed": "Notițele nu au putut fi încărcate.",
+        "retry": "Încearcă din nou",
+        "tooLong": "O notiță poate avea cel mult {max} de caractere.",
+        "open": "Notițe ({count})",
+        "sheetTitle": "Notițe · {market}"
       }
     }
   },

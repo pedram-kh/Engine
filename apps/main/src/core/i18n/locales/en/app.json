@@ -1513,7 +1513,9 @@
           "new": "Create a campaign for this wave now"
         },
         "newCampaignName": "Campaign name",
-        "newCampaignHint": "Created as a draft with no budget. Set the budget on the campaign page before it can go live."
+        "newCampaignHint": "Created as a draft with no budget. Set the budget on the campaign page before it can go live.",
+        "notesWarning": "Removing {markets} deletes {count} internal note. This cannot be undone. | Removing {markets} deletes {count} internal notes. This cannot be undone.",
+        "notesConfirm": "Delete notes and save"
       },
       "validation": {
         "nameRequired": "Enter a wave name.",
@@ -1656,6 +1658,16 @@
           "streamNotRemovable": "The UGC video stream cannot be removed: the Brand page progress depends on it.",
           "streamDefaultsExist": "Every default step of this stream is already on the wave, in another stream. Move them back, or add a step.",
           "brandArchived": "This brand is archived. Restore it to change its waves."
+        },
+        "incomplete": {
+          "title": "“{step}” is not complete",
+          "body": "The strategy step says {state}. Set this row to {status} anyway?",
+          "bodyMarkets": "The strategy step says {state} ({done} of {total} markets complete). Set this row to {status} anyway?",
+          "confirm": "Set anyway"
+        },
+        "handSet": {
+          "plain": "Set by hand · the step says {state}",
+          "markets": "Set by hand · the step says {state} ({done} of {total} markets)"
         }
       },
       "markets": {
@@ -1743,7 +1755,13 @@
         "conceptsNone": "No concepts yet",
         "conceptsStatus": "{approved} of {total} approved",
         "conceptsWarning": "Concepts: {approved} of {total} approved",
-        "conceptsWarningNone": "No concepts yet"
+        "conceptsWarningNone": "No concepts yet",
+        "marketsOf": "{done} of {total} market | {done} of {total} markets",
+        "state": {
+          "not_started": "Not started",
+          "in_progress": "In progress",
+          "done": "Done"
+        }
       },
       "audience": {
         "label": "Audience title",
@@ -1929,7 +1947,11 @@
         "imageLimitCount": "A concept holds at most {max} images ({used} now).",
         "imageLimitBytes": "The images of a concept add up to at most {max} MB ({used} MB now).",
         "linkInvalidUrl": "This is not a valid public https address.",
-        "linkLimitCount": "The link limit of this concept is reached."
+        "linkLimitCount": "The link limit of this concept is reached.",
+        "nothingToComplete": "There is nothing to mark as complete yet.",
+        "noteThreadFull": "This thread already holds the most notes it can (100). Delete one to add another.",
+        "noteForbidden": "You cannot change this note.",
+        "noteBodyInvalid": "A note is 1 to 2000 characters of plain text."
       },
       "counts": {
         "angles": "{count} angle | {count} angles",
@@ -2128,6 +2150,45 @@
         },
         "personaFilter": "Showing only the concepts of {persona}.",
         "showAll": "Show all"
+      },
+      "completion": {
+        "complete": "Complete",
+        "auto": "Automatic: complete when every concept in this market is approved",
+        "markedBy": "Marked complete by {name} · {date}",
+        "markedByFormer": "Marked complete by a former member · {date}",
+        "mark": "Mark as complete",
+        "reopen": "Reopen",
+        "confirmTitle": "Mark {scope} as complete?",
+        "confirmBody": "Some things look unfinished. You can still mark it as complete.",
+        "anyway": "Mark as complete anyway",
+        "nothingTitle": "Nothing to mark yet",
+        "nothing": {
+          "usps": "Add at least one USP before marking this step as complete.",
+          "personas": "Add at least one persona for {market} before marking this step as complete.",
+          "matrix": "Set at least one cell for {market} before marking this step as complete."
+        },
+        "warnUsps": "{count} USP so far; at least {recommended} are recommended | {count} USPs so far; at least {recommended} are recommended",
+        "warnPersonas": "{count} persona in this market; at least {recommended} are recommended | {count} personas in this market; at least {recommended} are recommended",
+        "warnCells": "{missing} of {total} cells are not set."
+      },
+      "notes": {
+        "title": "Notes",
+        "internal": "Internal",
+        "empty": "No notes yet.",
+        "placeholder": "Add a note…",
+        "add": "Add note",
+        "edit": "Edit",
+        "delete": "Delete",
+        "editLabel": "Edit note",
+        "edited": "edited",
+        "former": "Former member",
+        "deleteTitle": "Delete this note?",
+        "deleteBody": "The note is removed for everyone. This cannot be undone.",
+        "loadFailed": "Notes could not be loaded.",
+        "retry": "Try again",
+        "tooLong": "A note can be at most {max} characters.",
+        "open": "Notes ({count})",
+        "sheetTitle": "Notes · {market}"
       }
     }
   },

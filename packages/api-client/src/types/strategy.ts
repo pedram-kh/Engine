@@ -148,6 +148,38 @@ export interface StrategyLanding {
   market_id: string | null
 }
 
+export interface StrategyNoteResource {
+  id: string
+  type: 'wave_strategy_notes'
+  attributes: {
+    step: 'usps' | 'personas' | 'matrix' | 'concepts'
+    /** The market's ulid; null for USPs. */
+    market: string | null
+    body: string
+    /** Null when the author has left: `author_is_former` is then true and no name is sent. */
+    author: { id: string; name: string } | null
+    author_is_former: boolean
+    created_at: string
+    edited: boolean
+    edited_at: string | null
+    can_edit: boolean
+    can_delete: boolean
+  }
+}
+
+export interface StrategyNoteListResponse {
+  data: StrategyNoteResource[]
+}
+export interface StrategyNoteEnvelope {
+  data: StrategyNoteResource
+}
+
+/** The answer to a mark or a reopen: the new steps block (and landing, counts), the live warnings on a mark. */
+export interface StrategyCompletionResponse {
+  data: Pick<StrategySummaryResource['attributes'], 'steps' | 'landing' | 'note_counts'>
+  meta?: { warnings: StrategyWarning[] }
+}
+
 export interface StrategyNoteCounts {
   usps: number
   personas: Record<string, number>
@@ -323,6 +355,13 @@ export interface MarketHasPersonasMeta {
     persona_count: number
     concept_count?: number
   }[]
+}
+
+/** What a 422 `wave.market_has_notes` carries, read through {@link marketHasNotesMeta}. */
+export interface MarketHasNotesMeta {
+  markets: { market: string; name: string; code: string; note_count: number }[]
+  /** The total to send back as `confirm_notes_deleted`. */
+  note_count: number
 }
 
 /** What a 422 `persona.in_use_by_concepts` carries, read through {@link personaInUseByConceptsMeta}. */

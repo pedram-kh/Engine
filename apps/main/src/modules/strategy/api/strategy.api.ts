@@ -20,6 +20,9 @@ import type {
   MatrixEnvelope,
   MatrixSaveEnvelope,
   PersonaCopyPayload,
+  StrategyCompletionResponse,
+  StrategyNoteEnvelope,
+  StrategyNoteListResponse,
   StrategySummaryEnvelope,
   WaveAngleEnvelope,
   WavePersonaEnvelope,
@@ -41,7 +44,62 @@ function base(s: WaveScope): string {
   return `/agencies/${s.agencyId}/brands/${s.brandId}/waves/${s.waveId}/strategy`
 }
 
+export type MarkableStep = 'usps' | 'personas' | 'matrix'
+export type NoteStep = MarkableStep | 'concepts'
+
+function marketQuery(market: string | null): string {
+  return market === null ? '' : `?market=${encodeURIComponent(market)}`
+}
+
 export const strategyApi = {
+  /** PL-2.5: "Mark as complete". `market` is the market's ulid (none for USPs). Idempotent. */
+  markComplete(
+    s: WaveScope,
+    step: MarkableStep,
+    market: string | null,
+  ): Promise<StrategyCompletionResponse> {
+    return http.put<StrategyCompletionResponse>(
+      `${base(s)}/completions/${step}${marketQuery(market)}`,
+    )
+  },
+
+  reopen(
+    s: WaveScope,
+    step: MarkableStep,
+    market: string | null,
+  ): Promise<StrategyCompletionResponse> {
+    return http.delete<StrategyCompletionResponse>(
+      `${base(s)}/completions/${step}${marketQuery(market)}`,
+    )
+  },
+
+  listNotes(
+    s: WaveScope,
+    step: NoteStep,
+    market: string | null,
+  ): Promise<StrategyNoteListResponse> {
+    return http.get<StrategyNoteListResponse>(
+      `${base(s)}/notes?step=${step}${market === null ? '' : `&market=${encodeURIComponent(market)}`}`,
+    )
+  },
+
+  addNote(
+    s: WaveScope,
+    step: NoteStep,
+    market: string | null,
+    body: string,
+  ): Promise<StrategyNoteEnvelope> {
+    return http.post<StrategyNoteEnvelope>(`${base(s)}/notes`, { step, market, body })
+  },
+
+  editNote(s: WaveScope, noteId: string, body: string): Promise<StrategyNoteEnvelope> {
+    return http.patch<StrategyNoteEnvelope>(`${base(s)}/notes/${noteId}`, { body })
+  },
+
+  deleteNote(s: WaveScope, noteId: string): Promise<void> {
+    return http.delete<void>(`${base(s)}/notes/${noteId}`)
+  },
+
   summary(s: WaveScope): Promise<StrategySummaryEnvelope> {
     return http.get<StrategySummaryEnvelope>(base(s))
   },

@@ -1513,7 +1513,9 @@
           "new": "Criar agora uma campanha para esta onda"
         },
         "newCampaignName": "Nome da campanha",
-        "newCampaignHint": "É criada como rascunho sem orçamento. Defina o orçamento na página da campanha antes de poder entrar em produção."
+        "newCampaignHint": "É criada como rascunho sem orçamento. Defina o orçamento na página da campanha antes de poder entrar em produção.",
+        "notesWarning": "Remover {markets} elimina {count} nota interna. Não é possível anular. | Remover {markets} elimina {count} notas internas. Não é possível anular.",
+        "notesConfirm": "Eliminar notas e guardar"
       },
       "validation": {
         "nameRequired": "Introduza um nome para a onda.",
@@ -1656,6 +1658,16 @@
           "streamNotRemovable": "O fluxo de vídeo UGC não pode ser removido: o progresso na página da marca depende dele.",
           "streamDefaultsExist": "Todos os passos predefinidos deste fluxo já estão na vaga, noutro fluxo. Mova-os de volta ou adicione um passo.",
           "brandArchived": "Esta marca está arquivada. Restaure-a para alterar as suas vagas."
+        },
+        "incomplete": {
+          "title": "“{step}” não está completo",
+          "body": "O passo da estratégia indica «{state}». Definir mesmo assim esta linha como «{status}»?",
+          "bodyMarkets": "O passo da estratégia indica «{state}» ({done} de {total} mercados completos). Definir mesmo assim esta linha como «{status}»?",
+          "confirm": "Definir mesmo assim"
+        },
+        "handSet": {
+          "plain": "Definido à mão · o passo indica «{state}»",
+          "markets": "Definido à mão · o passo indica «{state}» ({done} de {total} mercados)"
         }
       },
       "markets": {
@@ -1743,7 +1755,13 @@
         "conceptsNone": "Ainda não há conceitos",
         "conceptsStatus": "{approved} de {total} aprovados",
         "conceptsWarning": "Conceitos: {approved} de {total} aprovados",
-        "conceptsWarningNone": "Ainda não há conceitos"
+        "conceptsWarningNone": "Ainda não há conceitos",
+        "marketsOf": "{done} de {total} mercado | {done} de {total} mercados",
+        "state": {
+          "not_started": "Não iniciado",
+          "in_progress": "Em curso",
+          "done": "Concluído"
+        }
       },
       "audience": {
         "label": "Título do público",
@@ -1929,7 +1947,11 @@
         "imageLimitCount": "Um conceito tem no máximo {max} imagens (agora {used}).",
         "imageLimitBytes": "As imagens de um conceito somam no máximo {max} MB (agora {used} MB).",
         "linkInvalidUrl": "Não é um endereço https público válido.",
-        "linkLimitCount": "O limite de ligações deste conceito foi atingido."
+        "linkLimitCount": "O limite de ligações deste conceito foi atingido.",
+        "nothingToComplete": "Ainda não há nada para marcar como completo.",
+        "noteThreadFull": "Este tópico já tem o máximo de notas (100). Elimine uma para adicionar outra.",
+        "noteForbidden": "Não pode alterar esta nota.",
+        "noteBodyInvalid": "Uma nota tem de 1 a 2000 caracteres de texto simples."
       },
       "counts": {
         "angles": "{count} ângulo | {count} ângulos",
@@ -2128,6 +2150,45 @@
         },
         "personaFilter": "Só são mostrados os conceitos de {persona}.",
         "showAll": "Mostrar todos"
+      },
+      "completion": {
+        "complete": "Completo",
+        "auto": "Automático: fica completo quando todos os conceitos deste mercado estiverem aprovados",
+        "markedBy": "Marcado como completo por {name} · {date}",
+        "markedByFormer": "Marcado como completo por um antigo membro · {date}",
+        "mark": "Marcar como completo",
+        "reopen": "Reabrir",
+        "confirmTitle": "Marcar {scope} como completo?",
+        "confirmBody": "Algumas coisas parecem por terminar. Ainda pode marcá-lo como completo.",
+        "anyway": "Marcar como completo mesmo assim",
+        "nothingTitle": "Ainda nada para marcar",
+        "nothing": {
+          "usps": "Adicione pelo menos uma USP antes de marcar este passo como completo.",
+          "personas": "Adicione pelo menos uma persona para {market} antes de marcar este passo como completo.",
+          "matrix": "Defina pelo menos uma célula para {market} antes de marcar este passo como completo."
+        },
+        "warnUsps": "{count} USP até agora; recomendam-se pelo menos {recommended} | {count} USPs até agora; recomendam-se pelo menos {recommended}",
+        "warnPersonas": "{count} persona neste mercado; recomendam-se pelo menos {recommended} | {count} personas neste mercado; recomendam-se pelo menos {recommended}",
+        "warnCells": "{missing} de {total} células não estão definidas."
+      },
+      "notes": {
+        "title": "Notas",
+        "internal": "Interno",
+        "empty": "Ainda sem notas.",
+        "placeholder": "Adicionar uma nota…",
+        "add": "Adicionar nota",
+        "edit": "Editar",
+        "delete": "Eliminar",
+        "editLabel": "Editar nota",
+        "edited": "editada",
+        "former": "Antigo membro",
+        "deleteTitle": "Eliminar esta nota?",
+        "deleteBody": "A nota é removida para todos. Não é possível anular.",
+        "loadFailed": "Não foi possível carregar as notas.",
+        "retry": "Tentar novamente",
+        "tooLong": "Uma nota pode ter no máximo {max} caracteres.",
+        "open": "Notas ({count})",
+        "sheetTitle": "Notas · {market}"
       }
     }
   },

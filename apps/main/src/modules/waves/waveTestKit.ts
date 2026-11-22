@@ -142,6 +142,7 @@ export async function mountWithApp(
       { path: '/brands/:ulid/edit', name: 'brands.edit', component: page },
       { path: '/brands/:ulid/waves/:waveUlid', name: 'waves.detail', component: page },
       { path: '/campaigns/:ulid', name: 'campaigns.detail', component: page },
+      { path: '/brands/:ulid/waves/:waveUlid/strategy', name: 'strategy.index', component: page },
       {
         path: '/brands/:ulid/waves/:waveUlid/strategy/usps',
         name: 'strategy.usps',

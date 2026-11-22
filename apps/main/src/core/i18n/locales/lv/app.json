@@ -1513,7 +1513,9 @@
           "new": "Izveidot kampaņu šim vilnim tagad"
         },
         "newCampaignName": "Kampaņas nosaukums",
-        "newCampaignHint": "Tiek izveidota kā melnraksts bez budžeta. Iestatiet budžetu kampaņas lapā pirms palaišanas."
+        "newCampaignHint": "Tiek izveidota kā melnraksts bez budžeta. Iestatiet budžetu kampaņas lapā pirms palaišanas.",
+        "notesWarning": "Noņemot {markets}, tiks izdzēsta {count} iekšējā piezīme. To nevar atsaukt. | Noņemot {markets}, tiks izdzēstas {count} iekšējās piezīmes. To nevar atsaukt.",
+        "notesConfirm": "Dzēst piezīmes un saglabāt"
       },
       "validation": {
         "nameRequired": "Ievadiet viļņa nosaukumu.",
@@ -1656,6 +1658,16 @@
           "streamNotRemovable": "UGC video kanālu nevar noņemt: no tā ir atkarīgs progress zīmola lapā.",
           "streamDefaultsExist": "Visi šīs plūsmas noklusējuma soļi jau ir vilnī, citā plūsmā. Pārvietojiet tos atpakaļ vai pievienojiet soli.",
           "brandArchived": "Šis zīmols ir arhivēts. Atjaunojiet to, lai mainītu tā viļņus."
+        },
+        "incomplete": {
+          "title": "“{step}” nav pabeigts",
+          "body": "Stratēģijas soļa stāvoklis: “{state}”. Vai tomēr iestatīt šo rindu uz “{status}”?",
+          "bodyMarkets": "Stratēģijas soļa stāvoklis: “{state}” (pabeigti tirgi: {done} no {total}). Vai tomēr iestatīt šo rindu uz “{status}”?",
+          "confirm": "Tomēr iestatīt"
+        },
+        "handSet": {
+          "plain": "Iestatīts manuāli · soļa stāvoklis: “{state}”",
+          "markets": "Iestatīts manuāli · soļa stāvoklis: “{state}” (tirgi: {done} no {total})"
         }
       },
       "markets": {
@@ -1743,7 +1755,13 @@
         "conceptsNone": "Konceptu vēl nav",
         "conceptsStatus": "Apstiprināti {approved} no {total}",
         "conceptsWarning": "Koncepti: apstiprināti {approved} no {total}",
-        "conceptsWarningNone": "Konceptu vēl nav"
+        "conceptsWarningNone": "Konceptu vēl nav",
+        "marketsOf": "{done} no {total} tirgus | {done} no {total} tirgiem",
+        "state": {
+          "not_started": "Nav sākts",
+          "in_progress": "Procesā",
+          "done": "Gatavs"
+        }
       },
       "audience": {
         "label": "Mērķauditorijas nosaukums",
@@ -1929,7 +1947,11 @@
         "imageLimitCount": "Konceptā var būt ne vairāk kā {max} attēli (pašlaik {used}).",
         "imageLimitBytes": "Koncepta attēli kopā drīkst būt ne lielāki par {max} MB (pašlaik {used} MB).",
         "linkInvalidUrl": "Šī nav derīga publiska https adrese.",
-        "linkLimitCount": "Šī koncepta saišu limits ir sasniegts."
+        "linkLimitCount": "Šī koncepta saišu limits ir sasniegts.",
+        "nothingToComplete": "Vēl nav nekā, ko atzīmēt kā pabeigtu.",
+        "noteThreadFull": "Šajā pavedienā jau ir lielākais atļautais piezīmju skaits (100). Izdzēsiet vienu, lai pievienotu citu.",
+        "noteForbidden": "Jūs nevarat mainīt šo piezīmi.",
+        "noteBodyInvalid": "Piezīme ir no 1 līdz 2000 vienkārša teksta rakstzīmēm."
       },
       "counts": {
         "angles": "{count} leņķis | {count} leņķi",
@@ -2128,6 +2150,45 @@
         },
         "personaFilter": "Tiek rādītas tikai personas {persona} koncepcijas.",
         "showAll": "Rādīt visas"
+      },
+      "completion": {
+        "complete": "Pabeigts",
+        "auto": "Automātiski: pabeigts, kad ir apstiprināts katrs šī tirgus koncepts",
+        "markedBy": "Kā pabeigtu atzīmēja {name} · {date}",
+        "markedByFormer": "Kā pabeigtu atzīmēja bijušais dalībnieks · {date}",
+        "mark": "Atzīmēt kā pabeigtu",
+        "reopen": "Atvērt vēlreiz",
+        "confirmTitle": "Vai atzīmēt {scope} kā pabeigtu?",
+        "confirmBody": "Dažas lietas šķiet nepabeigtas. Tomēr varat to atzīmēt kā pabeigtu.",
+        "anyway": "Tomēr atzīmēt kā pabeigtu",
+        "nothingTitle": "Vēl nav ko atzīmēt",
+        "nothing": {
+          "usps": "Pirms šī soļa atzīmēšanas kā pabeigta pievienojiet vismaz vienu USP.",
+          "personas": "Pirms šī soļa atzīmēšanas kā pabeigta pievienojiet vismaz vienu personu tirgum {market}.",
+          "matrix": "Pirms šī soļa atzīmēšanas kā pabeigta iestatiet vismaz vienu šūnu tirgum {market}."
+        },
+        "warnUsps": "Pagaidām {count} USP; ieteicami vismaz {recommended} | Pagaidām {count} USP; ieteicami vismaz {recommended}",
+        "warnPersonas": "{count} persona šajā tirgū; ieteicamas vismaz {recommended} | {count} personas šajā tirgū; ieteicamas vismaz {recommended}",
+        "warnCells": "Neiestatītas šūnas: {missing} no {total}."
+      },
+      "notes": {
+        "title": "Piezīmes",
+        "internal": "Iekšēja",
+        "empty": "Piezīmju vēl nav.",
+        "placeholder": "Pievienot piezīmi…",
+        "add": "Pievienot piezīmi",
+        "edit": "Rediģēt",
+        "delete": "Dzēst",
+        "editLabel": "Rediģēt piezīmi",
+        "edited": "rediģēta",
+        "former": "Bijušais dalībnieks",
+        "deleteTitle": "Vai dzēst šo piezīmi?",
+        "deleteBody": "Piezīme tiks noņemta visiem. To nevar atsaukt.",
+        "loadFailed": "Piezīmes neizdevās ielādēt.",
+        "retry": "Mēģināt vēlreiz",
+        "tooLong": "Piezīmē var būt ne vairāk kā {max} rakstzīmes.",
+        "open": "Piezīmes ({count})",
+        "sheetTitle": "Piezīmes · {market}"
       }
     }
   },

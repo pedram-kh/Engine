@@ -1513,7 +1513,9 @@
           "new": "Utwórz teraz kampanię dla tej fali"
         },
         "newCampaignName": "Nazwa kampanii",
-        "newCampaignHint": "Powstaje jako szkic bez budżetu. Ustaw budżet na stronie kampanii, zanim wystartuje."
+        "newCampaignHint": "Powstaje jako szkic bez budżetu. Ustaw budżet na stronie kampanii, zanim wystartuje.",
+        "notesWarning": "Usunięcie {markets} skasuje {count} notatkę wewnętrzną. Nie można tego cofnąć. | Usunięcie {markets} skasuje {count} notatek wewnętrznych. Nie można tego cofnąć.",
+        "notesConfirm": "Usuń notatki i zapisz"
       },
       "validation": {
         "nameRequired": "Wpisz nazwę fali.",
@@ -1656,6 +1658,16 @@
           "streamNotRemovable": "Ścieżki wideo UGC nie można usunąć: zależy od niej postęp na stronie marki.",
           "streamDefaultsExist": "Wszystkie domyślne kroki tego strumienia są już w fali, w innym strumieniu. Przenieś je z powrotem lub dodaj krok.",
           "brandArchived": "Ta marka jest zarchiwizowana. Przywróć ją, aby zmieniać jej fale."
+        },
+        "incomplete": {
+          "title": "„{step}” nie jest ukończone",
+          "body": "Krok strategii ma stan „{state}”. Ustawić ten wiersz mimo to na „{status}”?",
+          "bodyMarkets": "Krok strategii ma stan „{state}” (ukończone rynki: {done} z {total}). Ustawić ten wiersz mimo to na „{status}”?",
+          "confirm": "Ustaw mimo to"
+        },
+        "handSet": {
+          "plain": "Ustawione ręcznie · krok ma stan „{state}”",
+          "markets": "Ustawione ręcznie · krok ma stan „{state}” (rynki: {done} z {total})"
         }
       },
       "markets": {
@@ -1743,7 +1755,13 @@
         "conceptsNone": "Brak konceptów",
         "conceptsStatus": "{approved} z {total} zatwierdzonych",
         "conceptsWarning": "Koncepty: {approved} z {total} zatwierdzonych",
-        "conceptsWarningNone": "Brak konceptów"
+        "conceptsWarningNone": "Brak konceptów",
+        "marketsOf": "{done} z {total} rynku | {done} z {total} rynków",
+        "state": {
+          "not_started": "Nierozpoczęte",
+          "in_progress": "W toku",
+          "done": "Gotowe"
+        }
       },
       "audience": {
         "label": "Tytuł grupy docelowej",
@@ -1929,7 +1947,11 @@
         "imageLimitCount": "Koncept może mieć najwyżej {max} obrazów (teraz {used}).",
         "imageLimitBytes": "Obrazy konceptu mogą razem mieć najwyżej {max} MB (teraz {used} MB).",
         "linkInvalidUrl": "To nie jest prawidłowy publiczny adres https.",
-        "linkLimitCount": "Osiągnięto limit linków tego konceptu."
+        "linkLimitCount": "Osiągnięto limit linków tego konceptu.",
+        "nothingToComplete": "Nie ma jeszcze czego oznaczać jako ukończone.",
+        "noteThreadFull": "W tym wątku jest już maksymalna liczba notatek (100). Usuń jedną, aby dodać kolejną.",
+        "noteForbidden": "Nie możesz zmienić tej notatki.",
+        "noteBodyInvalid": "Notatka to od 1 do 2000 znaków zwykłego tekstu."
       },
       "counts": {
         "angles": "{count} kąt | {count} kątów",
@@ -2128,6 +2150,45 @@
         },
         "personaFilter": "Wyświetlane są tylko koncepcje persony {persona}.",
         "showAll": "Pokaż wszystkie"
+      },
+      "completion": {
+        "complete": "Ukończone",
+        "auto": "Automatycznie: ukończone, gdy każdy koncept na tym rynku jest zatwierdzony",
+        "markedBy": "Oznaczone jako ukończone przez {name} · {date}",
+        "markedByFormer": "Oznaczone jako ukończone przez byłego członka · {date}",
+        "mark": "Oznacz jako ukończone",
+        "reopen": "Otwórz ponownie",
+        "confirmTitle": "Oznaczyć {scope} jako ukończone?",
+        "confirmBody": "Niektóre rzeczy wyglądają na niedokończone. Nadal możesz oznaczyć to jako ukończone.",
+        "anyway": "Oznacz jako ukończone mimo to",
+        "nothingTitle": "Nie ma jeszcze czego oznaczać",
+        "nothing": {
+          "usps": "Dodaj co najmniej jedno USP, zanim oznaczysz ten krok jako ukończony.",
+          "personas": "Dodaj co najmniej jedną personę dla rynku {market}, zanim oznaczysz ten krok jako ukończony.",
+          "matrix": "Ustaw co najmniej jedną komórkę dla rynku {market}, zanim oznaczysz ten krok jako ukończony."
+        },
+        "warnUsps": "Na razie {count} USP; zalecane jest co najmniej {recommended} | Na razie {count} USP; zalecane jest co najmniej {recommended}",
+        "warnPersonas": "{count} persona na tym rynku; zalecane jest co najmniej {recommended} | {count} person na tym rynku; zalecane jest co najmniej {recommended}",
+        "warnCells": "Nieustawionych komórek: {missing} z {total}."
+      },
+      "notes": {
+        "title": "Notatki",
+        "internal": "Wewnętrzne",
+        "empty": "Brak notatek.",
+        "placeholder": "Dodaj notatkę…",
+        "add": "Dodaj notatkę",
+        "edit": "Edytuj",
+        "delete": "Usuń",
+        "editLabel": "Edytuj notatkę",
+        "edited": "edytowano",
+        "former": "Były członek",
+        "deleteTitle": "Usunąć tę notatkę?",
+        "deleteBody": "Notatka zostanie usunięta dla wszystkich. Nie można tego cofnąć.",
+        "loadFailed": "Nie udało się wczytać notatek.",
+        "retry": "Spróbuj ponownie",
+        "tooLong": "Notatka może mieć najwyżej {max} znaków.",
+        "open": "Notatki ({count})",
+        "sheetTitle": "Notatki · {market}"
       }
     }
   },

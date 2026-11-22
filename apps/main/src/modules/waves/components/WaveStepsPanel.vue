@@ -101,6 +101,20 @@ function completedLine(steps: readonly WaveStepResource[]): string {
   return `${count} · ${names}${range}`
 }
 
+/** PL-2.5: what the real strategy step says next to a row somebody set by hand beyond it. */
+function handLine(step: WaveStepResource): string {
+  const st = step.attributes.strategy
+  if (st === undefined) return ''
+  const named = {
+    state: t(`app.waves.tracker.stepStatus.${st.state}`),
+    done: st.markets_done,
+    total: st.markets_total,
+  }
+  return st.markets_total > 0
+    ? t('app.waves.tracker.handSet.markets', named)
+    : t('app.waves.tracker.handSet.plain', named)
+}
+
 function ownerLabel(step: WaveStepResource): { text: string; muted: boolean } {
   const a = step.attributes
   if (a.owner !== null) return { text: firstName(a.owner.name), muted: false }
@@ -268,6 +282,14 @@ function canRemove(step: WaveStepResource): boolean {
               :status="step.attributes.display_status"
               :data-test="`step-status-${step.id}`"
             />
+            <span
+              v-if="step.attributes.strategy?.hand_set_beyond"
+              class="steps__hand"
+              :data-test="`step-hand-${step.id}`"
+            >
+              <v-icon icon="mdi-hand-back-right-outline" size="12" aria-hidden="true" />
+              {{ handLine(step) }}
+            </span>
             <span
               v-if="
                 step.attributes.display_status === 'delayed' && step.attributes.days_overdue > 0
@@ -479,6 +501,15 @@ function canRemove(step: WaveStepResource): boolean {
   gap: 10px;
 }
 
+.steps__hand {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 14px;
+  color: rgb(var(--v-theme-warning));
+}
 .steps__cell--status {
   display: flex;
   align-items: center;

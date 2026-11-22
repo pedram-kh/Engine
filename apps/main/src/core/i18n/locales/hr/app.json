@@ -1513,7 +1513,9 @@
           "new": "Stvori kampanju za ovaj val sada"
         },
         "newCampaignName": "Naziv kampanje",
-        "newCampaignHint": "Stvara se kao nacrt bez proračuna. Postavite proračun na stranici kampanje prije objave."
+        "newCampaignHint": "Stvara se kao nacrt bez proračuna. Postavite proračun na stranici kampanje prije objave.",
+        "notesWarning": "Uklanjanjem {markets} briše se {count} interna bilješka. To se ne može poništiti. | Uklanjanjem {markets} briše se {count} internih bilješki. To se ne može poništiti.",
+        "notesConfirm": "Izbriši bilješke i spremi"
       },
       "validation": {
         "nameRequired": "Unesite naziv vala.",
@@ -1656,6 +1658,16 @@
           "streamNotRemovable": "Tok UGC videa nije moguće ukloniti: o njemu ovisi napredak na stranici branda.",
           "streamDefaultsExist": "Svi zadani koraci ovog toka već su u valu, u drugom toku. Premjestite ih natrag ili dodajte korak.",
           "brandArchived": "Ovaj brand je arhiviran. Vratite ga da biste mijenjali njegove valove."
+        },
+        "incomplete": {
+          "title": "„{step}” nije dovršeno",
+          "body": "Korak strategije ima stanje „{state}”. Svejedno postaviti ovaj redak na „{status}”?",
+          "bodyMarkets": "Korak strategije ima stanje „{state}” (dovršenih tržišta: {done} od {total}). Svejedno postaviti ovaj redak na „{status}”?",
+          "confirm": "Svejedno postavi"
+        },
+        "handSet": {
+          "plain": "Postavljeno ručno · korak ima stanje „{state}”",
+          "markets": "Postavljeno ručno · korak ima stanje „{state}” (tržišta: {done} od {total})"
         }
       },
       "markets": {
@@ -1743,7 +1755,13 @@
         "conceptsNone": "Još nema koncepata",
         "conceptsStatus": "Odobreno {approved} od {total}",
         "conceptsWarning": "Koncepti: odobreno {approved} od {total}",
-        "conceptsWarningNone": "Još nema koncepata"
+        "conceptsWarningNone": "Još nema koncepata",
+        "marketsOf": "{done} od {total} tržišta | {done} od {total} tržišta",
+        "state": {
+          "not_started": "Nije započeto",
+          "in_progress": "U tijeku",
+          "done": "Gotovo"
+        }
       },
       "audience": {
         "label": "Naslov ciljne skupine",
@@ -1929,7 +1947,11 @@
         "imageLimitCount": "Koncept može imati najviše {max} slika (trenutno {used}).",
         "imageLimitBytes": "Slike koncepta zajedno smiju imati najviše {max} MB (trenutno {used} MB).",
         "linkInvalidUrl": "Ovo nije valjana javna https adresa.",
-        "linkLimitCount": "Dosegnuto je ograničenje poveznica ovog koncepta."
+        "linkLimitCount": "Dosegnuto je ograničenje poveznica ovog koncepta.",
+        "nothingToComplete": "Još nema ničega što bi se moglo označiti kao dovršeno.",
+        "noteThreadFull": "Ova je nit već dosegla najveći broj bilješki (100). Izbrišite jednu da biste dodali novu.",
+        "noteForbidden": "Ne možete promijeniti ovu bilješku.",
+        "noteBodyInvalid": "Bilješka ima od 1 do 2000 znakova običnog teksta."
       },
       "counts": {
         "angles": "{count} kut | {count} kutova",
@@ -2128,6 +2150,45 @@
         },
         "personaFilter": "Prikazani su samo koncepti persone {persona}.",
         "showAll": "Prikaži sve"
+      },
+      "completion": {
+        "complete": "Dovršeno",
+        "auto": "Automatski: dovršeno kada je svaki koncept na ovom tržištu odobren",
+        "markedBy": "Kao dovršeno označio/la je {name} · {date}",
+        "markedByFormer": "Kao dovršeno označio je bivši član · {date}",
+        "mark": "Označi kao dovršeno",
+        "reopen": "Ponovno otvori",
+        "confirmTitle": "Označiti {scope} kao dovršeno?",
+        "confirmBody": "Neke stvari izgledaju nedovršeno. Svejedno možete označiti kao dovršeno.",
+        "anyway": "Svejedno označi kao dovršeno",
+        "nothingTitle": "Još nema što označiti",
+        "nothing": {
+          "usps": "Dodajte barem jedan USP prije nego ovaj korak označite kao dovršen.",
+          "personas": "Dodajte barem jednu personu za tržište {market} prije nego ovaj korak označite kao dovršen.",
+          "matrix": "Postavite barem jednu ćeliju za tržište {market} prije nego ovaj korak označite kao dovršen."
+        },
+        "warnUsps": "Za sada {count} USP; preporučuje se barem {recommended} | Za sada {count} USP-a; preporučuje se barem {recommended}",
+        "warnPersonas": "{count} persona na ovom tržištu; preporučuje se barem {recommended} | {count} persone na ovom tržištu; preporučuje se barem {recommended}",
+        "warnCells": "Nepostavljenih ćelija: {missing} od {total}."
+      },
+      "notes": {
+        "title": "Bilješke",
+        "internal": "Interno",
+        "empty": "Još nema bilješki.",
+        "placeholder": "Dodaj bilješku…",
+        "add": "Dodaj bilješku",
+        "edit": "Uredi",
+        "delete": "Izbriši",
+        "editLabel": "Uredi bilješku",
+        "edited": "uređeno",
+        "former": "Bivši član",
+        "deleteTitle": "Izbrisati ovu bilješku?",
+        "deleteBody": "Bilješka će biti izbrisana za sve. To se ne može poništiti.",
+        "loadFailed": "Bilješke nije moguće učitati.",
+        "retry": "Pokušaj ponovno",
+        "tooLong": "Bilješka može imati najviše {max} znakova.",
+        "open": "Bilješke ({count})",
+        "sheetTitle": "Bilješke · {market}"
       }
     }
   },

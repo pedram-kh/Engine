@@ -1513,7 +1513,9 @@
           "new": "Jetzt eine Kampagne für diese Welle erstellen"
         },
         "newCampaignName": "Kampagnenname",
-        "newCampaignHint": "Wird als Entwurf ohne Budget angelegt. Legen Sie das Budget auf der Kampagnenseite fest, bevor sie live gehen kann."
+        "newCampaignHint": "Wird als Entwurf ohne Budget angelegt. Legen Sie das Budget auf der Kampagnenseite fest, bevor sie live gehen kann.",
+        "notesWarning": "Das Entfernen von {markets} löscht {count} interne Notiz. Das lässt sich nicht rückgängig machen. | Das Entfernen von {markets} löscht {count} interne Notizen. Das lässt sich nicht rückgängig machen.",
+        "notesConfirm": "Notizen löschen und speichern"
       },
       "validation": {
         "nameRequired": "Geben Sie einen Namen für die Welle ein.",
@@ -1656,6 +1658,16 @@
           "streamNotRemovable": "Der UGC-Video-Strang kann nicht entfernt werden: Der Fortschritt auf der Markenseite hängt davon ab.",
           "streamDefaultsExist": "Alle Standardschritte dieses Streams sind bereits in der Welle, in einem anderen Stream. Verschiebe sie zurück oder füge einen Schritt hinzu.",
           "brandArchived": "Diese Marke ist archiviert. Stelle sie wieder her, um ihre Wellen zu ändern."
+        },
+        "incomplete": {
+          "title": "„{step}“ ist nicht abgeschlossen",
+          "body": "Der Strategieschritt steht auf „{state}“. Diese Zeile trotzdem auf „{status}“ setzen?",
+          "bodyMarkets": "Der Strategieschritt steht auf „{state}“ ({done} von {total} Märkten abgeschlossen). Diese Zeile trotzdem auf „{status}“ setzen?",
+          "confirm": "Trotzdem setzen"
+        },
+        "handSet": {
+          "plain": "Von Hand gesetzt · der Schritt steht auf „{state}“",
+          "markets": "Von Hand gesetzt · der Schritt steht auf „{state}“ ({done} von {total} Märkten)"
         }
       },
       "markets": {
@@ -1743,7 +1755,13 @@
         "conceptsNone": "Noch keine Konzepte",
         "conceptsStatus": "{approved} von {total} genehmigt",
         "conceptsWarning": "Konzepte: {approved} von {total} genehmigt",
-        "conceptsWarningNone": "Noch keine Konzepte"
+        "conceptsWarningNone": "Noch keine Konzepte",
+        "marketsOf": "{done} von {total} Markt | {done} von {total} Märkten",
+        "state": {
+          "not_started": "Nicht begonnen",
+          "in_progress": "In Arbeit",
+          "done": "Erledigt"
+        }
       },
       "audience": {
         "label": "Zielgruppentitel",
@@ -1929,7 +1947,11 @@
         "imageLimitCount": "Ein Konzept enthält höchstens {max} Bilder (derzeit {used}).",
         "imageLimitBytes": "Die Bilder eines Konzepts dürfen zusammen höchstens {max} MB groß sein (derzeit {used} MB).",
         "linkInvalidUrl": "Das ist keine gültige öffentliche https-Adresse.",
-        "linkLimitCount": "Das Linklimit dieses Konzepts ist erreicht."
+        "linkLimitCount": "Das Linklimit dieses Konzepts ist erreicht.",
+        "nothingToComplete": "Es gibt noch nichts, das sich als abgeschlossen markieren lässt.",
+        "noteThreadFull": "Dieser Thread enthält bereits die maximale Zahl an Notizen (100). Lösche eine, um eine neue hinzuzufügen.",
+        "noteForbidden": "Du kannst diese Notiz nicht ändern.",
+        "noteBodyInvalid": "Eine Notiz besteht aus 1 bis 2000 Zeichen reinem Text."
       },
       "counts": {
         "angles": "{count} Ansatz | {count} Ansätze",
@@ -2128,6 +2150,45 @@
         },
         "personaFilter": "Es werden nur die Konzepte von {persona} angezeigt.",
         "showAll": "Alle anzeigen"
+      },
+      "completion": {
+        "complete": "Abgeschlossen",
+        "auto": "Automatisch: abgeschlossen, wenn jedes Konzept in diesem Markt genehmigt ist",
+        "markedBy": "Abgeschlossen von {name} · {date}",
+        "markedByFormer": "Abgeschlossen von einem ehemaligen Mitglied · {date}",
+        "mark": "Als abgeschlossen markieren",
+        "reopen": "Wieder öffnen",
+        "confirmTitle": "{scope} als abgeschlossen markieren?",
+        "confirmBody": "Einiges wirkt noch unfertig. Du kannst es trotzdem als abgeschlossen markieren.",
+        "anyway": "Trotzdem als abgeschlossen markieren",
+        "nothingTitle": "Noch nichts zu markieren",
+        "nothing": {
+          "usps": "Füge mindestens eine USP hinzu, bevor du diesen Schritt als abgeschlossen markierst.",
+          "personas": "Füge mindestens eine Persona für {market} hinzu, bevor du diesen Schritt als abgeschlossen markierst.",
+          "matrix": "Setze mindestens eine Zelle für {market}, bevor du diesen Schritt als abgeschlossen markierst."
+        },
+        "warnUsps": "Bisher {count} USP; empfohlen sind mindestens {recommended} | Bisher {count} USPs; empfohlen sind mindestens {recommended}",
+        "warnPersonas": "{count} Persona in diesem Markt; empfohlen sind mindestens {recommended} | {count} Personas in diesem Markt; empfohlen sind mindestens {recommended}",
+        "warnCells": "{missing} von {total} Zellen sind nicht gesetzt."
+      },
+      "notes": {
+        "title": "Notizen",
+        "internal": "Intern",
+        "empty": "Noch keine Notizen.",
+        "placeholder": "Notiz hinzufügen …",
+        "add": "Notiz hinzufügen",
+        "edit": "Bearbeiten",
+        "delete": "Löschen",
+        "editLabel": "Notiz bearbeiten",
+        "edited": "bearbeitet",
+        "former": "Ehemaliges Mitglied",
+        "deleteTitle": "Diese Notiz löschen?",
+        "deleteBody": "Die Notiz wird für alle entfernt. Das lässt sich nicht rückgängig machen.",
+        "loadFailed": "Die Notizen konnten nicht geladen werden.",
+        "retry": "Erneut versuchen",
+        "tooLong": "Eine Notiz darf höchstens {max} Zeichen lang sein.",
+        "open": "Notizen ({count})",
+        "sheetTitle": "Notizen · {market}"
       }
     }
   },

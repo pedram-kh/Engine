@@ -1513,7 +1513,9 @@
           "new": "Ustvari kampanjo za ta val zdaj"
         },
         "newCampaignName": "Ime kampanje",
-        "newCampaignHint": "Ustvari se kot osnutek brez proračuna. Proračun nastavite na strani kampanje, preden gre v živo."
+        "newCampaignHint": "Ustvari se kot osnutek brez proračuna. Proračun nastavite na strani kampanje, preden gre v živo.",
+        "notesWarning": "Z odstranitvijo {markets} se izbriše {count} interna opomba. Tega ni mogoče razveljaviti. | Z odstranitvijo {markets} se izbriše {count} internih opomb. Tega ni mogoče razveljaviti.",
+        "notesConfirm": "Izbriši opombe in shrani"
       },
       "validation": {
         "nameRequired": "Vnesite ime vala.",
@@ -1656,6 +1658,16 @@
           "streamNotRemovable": "Toka UGC videa ni mogoče odstraniti: od njega je odvisen napredek na strani blagovne znamke.",
           "streamDefaultsExist": "Vsi privzeti koraki tega toka so že v valu, v drugem toku. Premaknite jih nazaj ali dodajte korak.",
           "brandArchived": "Ta blagovna znamka je arhivirana. Obnovite jo, da boste lahko spreminjali njene vale."
+        },
+        "incomplete": {
+          "title": "»{step}« ni dokončano",
+          "body": "Korak strategije je v stanju »{state}«. Vrstico vseeno nastaviti na »{status}«?",
+          "bodyMarkets": "Korak strategije je v stanju »{state}« (dokončanih trgov: {done} od {total}). Vrstico vseeno nastaviti na »{status}«?",
+          "confirm": "Vseeno nastavi"
+        },
+        "handSet": {
+          "plain": "Nastavljeno ročno · korak je v stanju »{state}«",
+          "markets": "Nastavljeno ročno · korak je v stanju »{state}« (trgi: {done} od {total})"
         }
       },
       "markets": {
@@ -1743,7 +1755,13 @@
         "conceptsNone": "Konceptov še ni",
         "conceptsStatus": "Odobreno: {approved} od {total}",
         "conceptsWarning": "Koncepti: odobreno {approved} od {total}",
-        "conceptsWarningNone": "Konceptov še ni"
+        "conceptsWarningNone": "Konceptov še ni",
+        "marketsOf": "{done} od {total} trga | {done} od {total} trgov",
+        "state": {
+          "not_started": "Ni začeto",
+          "in_progress": "V teku",
+          "done": "Končano"
+        }
       },
       "audience": {
         "label": "Naslov ciljne skupine",
@@ -1929,7 +1947,11 @@
         "imageLimitCount": "Koncept lahko vsebuje največ {max} slik (zdaj {used}).",
         "imageLimitBytes": "Slike koncepta skupaj ne smejo presegati {max} MB (zdaj {used} MB).",
         "linkInvalidUrl": "To ni veljaven javni naslov https.",
-        "linkLimitCount": "Omejitev povezav tega koncepta je dosežena."
+        "linkLimitCount": "Omejitev povezav tega koncepta je dosežena.",
+        "nothingToComplete": "Še ni ničesar, kar bi lahko označili kot dokončano.",
+        "noteThreadFull": "Ta nit že vsebuje največje možno število opomb (100). Izbrišite eno, da dodate novo.",
+        "noteForbidden": "Te opombe ne morete spremeniti.",
+        "noteBodyInvalid": "Opomba ima od 1 do 2000 znakov navadnega besedila."
       },
       "counts": {
         "angles": "{count} kot | {count} kotov",
@@ -2128,6 +2150,45 @@
         },
         "personaFilter": "Prikazani so samo koncepti persone {persona}.",
         "showAll": "Pokaži vse"
+      },
+      "completion": {
+        "complete": "Dokončano",
+        "auto": "Samodejno: dokončano, ko je odobren vsak koncept na tem trgu",
+        "markedBy": "Kot dokončano je označil(a) {name} · {date}",
+        "markedByFormer": "Kot dokončano je označil nekdanji član · {date}",
+        "mark": "Označi kot dokončano",
+        "reopen": "Znova odpri",
+        "confirmTitle": "Označiti {scope} kot dokončano?",
+        "confirmBody": "Nekatere stvari so videti nedokončane. Še vedno lahko označite kot dokončano.",
+        "anyway": "Vseeno označi kot dokončano",
+        "nothingTitle": "Še ni ničesar za označiti",
+        "nothing": {
+          "usps": "Preden ta korak označite kot dokončan, dodajte vsaj en USP.",
+          "personas": "Preden ta korak označite kot dokončan, dodajte vsaj eno personu za trg {market}.",
+          "matrix": "Preden ta korak označite kot dokončan, nastavite vsaj eno celico za trg {market}."
+        },
+        "warnUsps": "Zaenkrat {count} USP; priporočeno je vsaj {recommended} | Zaenkrat {count} USP-jev; priporočeno je vsaj {recommended}",
+        "warnPersonas": "{count} persona na tem trgu; priporočeno je vsaj {recommended} | {count} person na tem trgu; priporočeno je vsaj {recommended}",
+        "warnCells": "Nenastavljenih celic: {missing} od {total}."
+      },
+      "notes": {
+        "title": "Opombe",
+        "internal": "Interno",
+        "empty": "Še ni opomb.",
+        "placeholder": "Dodaj opombo …",
+        "add": "Dodaj opombo",
+        "edit": "Uredi",
+        "delete": "Izbriši",
+        "editLabel": "Uredi opombo",
+        "edited": "urejeno",
+        "former": "Nekdanji član",
+        "deleteTitle": "Izbrisati to opombo?",
+        "deleteBody": "Opomba bo izbrisana za vse. Tega ni mogoče razveljaviti.",
+        "loadFailed": "Opomb ni bilo mogoče naložiti.",
+        "retry": "Poskusi znova",
+        "tooLong": "Opomba ima lahko največ {max} znakov.",
+        "open": "Opombe ({count})",
+        "sheetTitle": "Opombe · {market}"
       }
     }
   },

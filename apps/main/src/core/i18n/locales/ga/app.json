@@ -1513,7 +1513,9 @@
           "new": "Cruthaigh feachtas don tonn seo anois"
         },
         "newCampaignName": "Ainm an fheachtais",
-        "newCampaignHint": "Cruthaítear mar dhréacht gan buiséad é. Socraigh an buiséad ar leathanach an fheachtais sula féidir leis dul beo."
+        "newCampaignHint": "Cruthaítear mar dhréacht gan buiséad é. Socraigh an buiséad ar leathanach an fheachtais sula féidir leis dul beo.",
+        "notesWarning": "Scriosann baint {markets} {count} nóta inmheánach. Ní féidir é seo a chealú. | Scriosann baint {markets} {count} nóta inmheánacha. Ní féidir é seo a chealú.",
+        "notesConfirm": "Scrios nótaí agus sábháil"
       },
       "validation": {
         "nameRequired": "Cuir isteach ainm toinn.",
@@ -1656,6 +1658,16 @@
           "streamNotRemovable": "Ní féidir sruth físeán UGC a bhaint: braitheann dul chun cinn leathanach an bhrandála air.",
           "streamDefaultsExist": "Tá gach céim réamhshocraithe den sruth seo sa tonn cheana féin, i sruth eile. Bog ar ais iad nó cuir céim leis.",
           "brandArchived": "Tá an brandáil seo cartlannaithe. Athchóirigh í chun a tonnta a athrú."
+        },
+        "incomplete": {
+          "title": "Níl “{step}” críochnaithe",
+          "body": "Deir céim na straitéise “{state}”. An socrófar an tsraith seo go “{status}” mar sin féin?",
+          "bodyMarkets": "Deir céim na straitéise “{state}” ({done} as {total} margadh críochnaithe). An socrófar an tsraith seo go “{status}” mar sin féin?",
+          "confirm": "Socraigh mar sin féin"
+        },
+        "handSet": {
+          "plain": "Socraithe de láimh · deir an chéim “{state}”",
+          "markets": "Socraithe de láimh · deir an chéim “{state}” ({done} as {total} margadh)"
         }
       },
       "markets": {
@@ -1743,7 +1755,13 @@
         "conceptsNone": "Níl coincheapa ann go fóill",
         "conceptsStatus": "{approved} as {total} ceadaithe",
         "conceptsWarning": "Coincheapa: {approved} as {total} ceadaithe",
-        "conceptsWarningNone": "Níl coincheapa ann go fóill"
+        "conceptsWarningNone": "Níl coincheapa ann go fóill",
+        "marketsOf": "{done} as {total} margadh | {done} as {total} margadh",
+        "state": {
+          "not_started": "Gan tosú",
+          "in_progress": "Ar siúl",
+          "done": "Déanta"
+        }
       },
       "audience": {
         "label": "Teideal an lucht féachana",
@@ -1929,7 +1947,11 @@
         "imageLimitCount": "Tá {max} íomhá ar a mhéad i gcoincheap ({used} anois).",
         "imageLimitBytes": "Ní fhéadann íomhánna coincheapa a bheith os cionn {max} MB le chéile ({used} MB anois).",
         "linkInvalidUrl": "Ní seoladh poiblí https bailí é seo.",
-        "linkLimitCount": "Sroichte teorainn nasc an choincheapa seo."
+        "linkLimitCount": "Sroichte teorainn nasc an choincheapa seo.",
+        "nothingToComplete": "Níl aon rud le marcáil mar chríochnaithe go fóill.",
+        "noteThreadFull": "Tá an líon uasta nótaí (100) sa snáithe seo cheana. Scrios ceann chun ceann eile a chur leis.",
+        "noteForbidden": "Ní féidir leat an nóta seo a athrú.",
+        "noteBodyInvalid": "Is é atá i nóta ná 1 go 2000 carachtar de ghnáth-théacs."
       },
       "counts": {
         "angles": "{count} uillinn | {count} uillinn",
@@ -2128,6 +2150,45 @@
         },
         "personaFilter": "Ní thaispeántar ach coincheapa {persona}.",
         "showAll": "Taispeáin gach ceann"
+      },
+      "completion": {
+        "complete": "Críochnaithe",
+        "auto": "Uathoibríoch: críochnaithe nuair a bhíonn gach coincheap sa mhargadh seo formheasta",
+        "markedBy": "Marcáilte mar chríochnaithe ag {name} · {date}",
+        "markedByFormer": "Marcáilte mar chríochnaithe ag iarchomhalta · {date}",
+        "mark": "Marcáil mar chríochnaithe",
+        "reopen": "Athoscail",
+        "confirmTitle": "Marcáil {scope} mar chríochnaithe?",
+        "confirmBody": "Tá cuma neamhchríochnaithe ar roinnt rudaí. Is féidir leat é a mharcáil mar chríochnaithe fós.",
+        "anyway": "Marcáil mar chríochnaithe mar sin féin",
+        "nothingTitle": "Níl aon rud le marcáil go fóill",
+        "nothing": {
+          "usps": "Cuir USP amháin ar a laghad leis sula marcálann tú an chéim seo mar chríochnaithe.",
+          "personas": "Cuir pearsa amháin ar a laghad leis don mhargadh {market} sula marcálann tú an chéim seo mar chríochnaithe.",
+          "matrix": "Socraigh cill amháin ar a laghad don mhargadh {market} sula marcálann tú an chéim seo mar chríochnaithe."
+        },
+        "warnUsps": "{count} USP go dtí seo; moltar {recommended} ar a laghad | {count} USP go dtí seo; moltar {recommended} ar a laghad",
+        "warnPersonas": "{count} phearsa sa mhargadh seo; moltar {recommended} ar a laghad | {count} pearsa sa mhargadh seo; moltar {recommended} ar a laghad",
+        "warnCells": "Níl {missing} as {total} cill socraithe."
+      },
+      "notes": {
+        "title": "Nótaí",
+        "internal": "Inmheánach",
+        "empty": "Níl aon nóta ann go fóill.",
+        "placeholder": "Cuir nóta leis…",
+        "add": "Cuir nóta leis",
+        "edit": "Cuir in eagar",
+        "delete": "Scrios",
+        "editLabel": "Cuir nóta in eagar",
+        "edited": "curtha in eagar",
+        "former": "Iarchomhalta",
+        "deleteTitle": "Scrios an nóta seo?",
+        "deleteBody": "Baintear an nóta do chách. Ní féidir é seo a chealú.",
+        "loadFailed": "Níorbh fhéidir na nótaí a luchtú.",
+        "retry": "Triail arís",
+        "tooLong": "Is féidir uasmhéid {max} carachtar a bheith i nóta.",
+        "open": "Nótaí ({count})",
+        "sheetTitle": "Nótaí · {market}"
       }
     }
   },

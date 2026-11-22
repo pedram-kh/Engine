@@ -12,7 +12,13 @@
  * No design frame exists for this dialog; it is built from the design system's dialog and field styles.
  * Server codes map to strings; anything else is the generic save error.
  */
-import { ApiError, countryInTwoMarketsMeta, marketHasPersonasMeta } from '@catalyst/api-client'
+import {
+  ApiError,
+  countryInTwoMarketsMeta,
+  marketHasNotesMeta,
+  marketHasPersonasMeta,
+} from '@catalyst/api-client'
+import type { MarketHasNotesMeta } from '@catalyst/api-client'
 import type {
   PersonaCodesResult,
   UpdateWavePayload,
@@ -94,6 +100,21 @@ const options = ref<WaveCampaignOption[]>([])
 const saving = ref(false)
 const submitted = ref(false)
 const formError = ref<string | null>(null)
+// PL-2.5: removing a market that carries internal notes asks first (422 `wave.market_has_notes`); the same save then
+// goes again with the count the person saw.
+const notesAsk = ref<MarketHasNotesMeta | null>(null)
+const notesWarning = computed(() => {
+  const a = notesAsk.value
+  if (a === null) return ''
+  return t(
+    'app.waves.dialog.notesWarning',
+    {
+      markets: a.markets.map((m) => `${m.name} (${m.note_count})`).join(', '),
+      count: a.note_count,
+    },
+    a.note_count,
+  )
+})
 
 const nameError = computed(() =>
   submitted.value && name.value.trim() === '' ? t('app.waves.validation.nameRequired') : null,
@@ -164,6 +185,7 @@ watch(
     goLiveOn.value = props.wave?.attributes.go_live_on ?? ''
     baseline.value = props.wave ?? null
     staleMarkets.value = false
+    notesAsk.value = null
     drafts.value = props.wave ? draftsFromWave(props.wave.attributes.markets) : [emptyDraft()]
     campaignId.value = props.wave?.relationships.campaign?.data.id ?? null
     campaignChoice.value = 'none'
@@ -172,6 +194,8 @@ watch(
   },
   { immediate: true },
 )
+
+watch(drafts, () => (notesAsk.value = null), { deep: true })
 
 const CODE_KEYS: Record<string, string> = {
   'wave.campaign_not_available': 'app.waves.errors.campaignNotAvailable',
@@ -271,6 +295,7 @@ async function submit(): Promise<void> {
         // PL-2.4: the whole list, each existing market with its ulid; the version says what the list was built from.
         body.markets = inputs
         body.markets_version = was.attributes.markets_version
+        if (notesAsk.value !== null) body.confirm_notes_deleted = notesAsk.value.note_count
       }
       // Set, change or remove (null) the link, but only when it differs from what is saved.
       const savedCampaignId = props.wave.relationships.campaign?.data.id ?? null
@@ -292,6 +317,11 @@ async function submit(): Promise<void> {
     else emit('saved', res.data)
     emit('update:modelValue', false)
   } catch (err) {
+    const notes = marketHasNotesMeta(err)
+    if (notes !== null) {
+      notesAsk.value = notes
+      return
+    }
     if (err instanceof ApiError && err.code === 'wave.markets_changed') {
       staleMarkets.value = true
       formError.value = t('app.waves.errors.marketsChanged')
@@ -449,6 +479,9 @@ async function submit(): Promise<void> {
           />
         </template>
 
+        <v-alert v-if="notesAsk" type="warning" variant="tonal" data-test="wave-notes-warning">
+          {{ notesWarning }}
+        </v-alert>
         <v-alert v-if="formError" type="error" variant="tonal" data-test="wave-form-error">
           {{ formError }}
           <template v-if="staleMarkets" #append>
@@ -469,13 +502,19 @@ async function submit(): Promise<void> {
           {{ t('app.brands.archive.cancel') }}
         </v-btn>
         <v-btn
-          color="primary"
+          :color="notesAsk ? 'error' : 'primary'"
           variant="flat"
           :loading="saving"
           data-test="wave-submit"
           @click="submit"
         >
-          {{ isEdit ? t('app.waves.dialog.save') : t('app.waves.dialog.create') }}
+          {{
+            notesAsk
+              ? t('app.waves.dialog.notesConfirm')
+              : isEdit
+                ? t('app.waves.dialog.save')
+                : t('app.waves.dialog.create')
+          }}
         </v-btn>
       </div>
     </v-card>

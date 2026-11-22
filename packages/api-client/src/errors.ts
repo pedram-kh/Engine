@@ -35,6 +35,7 @@ import type { DeletionPendingMeta } from './types/auth'
 import type {
   CopyExceedsCapMeta,
   PersonaInUseByConceptsMeta,
+  MarketHasNotesMeta,
   MarketHasPersonasMeta,
   UspInUseAffected,
   UspInUseMeta,
@@ -288,6 +289,33 @@ export function marketHasPersonasMeta(error: unknown): MarketHasPersonasMeta | n
       : []
   })
   return markets.length === 0 ? null : { markets }
+}
+
+/**
+ * PL-2.5 — the typed `meta` of a 422 `wave.market_has_notes` (a wave edit that would remove markets that carry internal
+ * notes), or `null` when the error is anything else or the server sent no usable list. Never throws.
+ */
+export function marketHasNotesMeta(error: unknown): MarketHasNotesMeta | null {
+  if (!(error instanceof ApiError) || error.code !== 'wave.market_has_notes') {
+    return null
+  }
+  const meta = error.details[0]?.meta
+  const raw = meta?.['markets']
+  const total = meta?.['note_count']
+  if (!Array.isArray(raw) || typeof total !== 'number') {
+    return null
+  }
+  const markets = raw.flatMap((entry: unknown) => {
+    if (!isObjectRecord(entry)) return []
+    const { market, name, code, note_count: count } = entry
+    return typeof market === 'string' &&
+      typeof name === 'string' &&
+      typeof code === 'string' &&
+      typeof count === 'number'
+      ? [{ market, name, code, note_count: count }]
+      : []
+  })
+  return markets.length === 0 ? null : { markets, note_count: total }
 }
 
 /**

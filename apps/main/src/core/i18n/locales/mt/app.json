@@ -1513,7 +1513,9 @@
           "new": "Oħloq kampanja għal din il-mewġa issa"
         },
         "newCampaignName": "Isem il-kampanja",
-        "newCampaignHint": "Tinħoloq bħala abbozz mingħajr baġit. Issettja l-baġit fil-paġna tal-kampanja qabel ma tkun tista' tmur live."
+        "newCampaignHint": "Tinħoloq bħala abbozz mingħajr baġit. Issettja l-baġit fil-paġna tal-kampanja qabel ma tkun tista' tmur live.",
+        "notesWarning": "It-tneħħija ta’ {markets} thassar {count} nota interna. Dan ma jistax jiġi mreġġa’ lura. | It-tneħħija ta’ {markets} thassar {count} noti interni. Dan ma jistax jiġi mreġġa’ lura.",
+        "notesConfirm": "Ħassar in-noti u salva"
       },
       "validation": {
         "nameRequired": "Daħħal isem għall-mewġa.",
@@ -1656,6 +1658,16 @@
           "streamNotRemovable": "Il-fluss tal-vidjo UGC ma jistax jitneħħa: il-progress fil-paġna tal-marka jiddependi minnu.",
           "streamDefaultsExist": "Il-passi default kollha ta’ dan il-fluss diġà jinsabu fil-mewġa, f’fluss ieħor. Erġa’ qiegħedhom lura jew żid pass.",
           "brandArchived": "Din il-marka hija arkivjata. Irrestawraha biex tbiddel il-mewġ tagħha."
+        },
+        "incomplete": {
+          "title": "“{step}” mhuwiex komplut",
+          "body": "Il-pass tal-istrateġija jgħid “{state}”. Tissettja din ir-ringiela għal “{status}” xorta waħda?",
+          "bodyMarkets": "Il-pass tal-istrateġija jgħid “{state}” ({done} minn {total} swieq kompluti). Tissettja din ir-ringiela għal “{status}” xorta waħda?",
+          "confirm": "Issettja xorta waħda"
+        },
+        "handSet": {
+          "plain": "Issettjat bl-idejn · il-pass jgħid “{state}”",
+          "markets": "Issettjat bl-idejn · il-pass jgħid “{state}” ({done} minn {total} swieq)"
         }
       },
       "markets": {
@@ -1743,7 +1755,13 @@
         "conceptsNone": "Għad m'hemmx kunċetti",
         "conceptsStatus": "{approved} minn {total} approvati",
         "conceptsWarning": "Kunċetti: {approved} minn {total} approvati",
-        "conceptsWarningNone": "Għad m'hemmx kunċetti"
+        "conceptsWarningNone": "Għad m'hemmx kunċetti",
+        "marketsOf": "{done} minn {total} suq | {done} minn {total} swieq",
+        "state": {
+          "not_started": "Ma nbediex",
+          "in_progress": "Għaddej",
+          "done": "Magħmul"
+        }
       },
       "audience": {
         "label": "Titlu tal-udjenza",
@@ -1929,7 +1947,11 @@
         "imageLimitCount": "Kunċett jista' jkollu l-aktar {max} immaġnijiet (issa {used}).",
         "imageLimitBytes": "L-immaġnijiet ta' kunċett flimkien ma jistgħux jaqbżu {max} MB (issa {used} MB).",
         "linkInvalidUrl": "Dan mhuwiex indirizz https pubbliku validu.",
-        "linkLimitCount": "Intlaħaq il-limitu tar-rabtiet ta' dan il-kunċett."
+        "linkLimitCount": "Intlaħaq il-limitu tar-rabtiet ta' dan il-kunċett.",
+        "nothingToComplete": "Għad m’hemm xejn x’timmarka bħala komplut.",
+        "noteThreadFull": "Dan il-ħajt diġà fih in-numru massimu ta’ noti (100). Ħassar waħda biex iżżid oħra.",
+        "noteForbidden": "Ma tistax tibdel din in-nota.",
+        "noteBodyInvalid": "Nota hija ta’ 1 sa 2000 karattru ta’ test sempliċi."
       },
       "counts": {
         "angles": "{count} angolu | {count} angoli",
@@ -2128,6 +2150,45 @@
         },
         "personaFilter": "Qed jintwerew biss il-kunċetti ta' {persona}.",
         "showAll": "Uri kollha"
+      },
+      "completion": {
+        "complete": "Komplut",
+        "auto": "Awtomatiku: komplut meta kull kunċett f’dan is-suq ikun approvat",
+        "markedBy": "Immarkat bħala komplut minn {name} · {date}",
+        "markedByFormer": "Immarkat bħala komplut minn eks membru · {date}",
+        "mark": "Immarka bħala komplut",
+        "reopen": "Iftaħ mill-ġdid",
+        "confirmTitle": "Timmarka {scope} bħala komplut?",
+        "confirmBody": "Xi affarijiet jidhru mhux kompluti. Xorta tista’ timmarkah bħala komplut.",
+        "anyway": "Immarka bħala komplut xorta waħda",
+        "nothingTitle": "Għad m’hemm xejn x’timmarka",
+        "nothing": {
+          "usps": "Żid mill-inqas USP wieħed qabel ma timmarka din il-pass bħala kompluta.",
+          "personas": "Żid mill-inqas persuna waħda għas-suq {market} qabel ma timmarka din il-pass bħala kompluta.",
+          "matrix": "Issettja mill-inqas ċellola waħda għas-suq {market} qabel ma timmarka din il-pass bħala kompluta."
+        },
+        "warnUsps": "{count} USP s’issa; huma rakkomandati mill-inqas {recommended} | {count} USPs s’issa; huma rakkomandati mill-inqas {recommended}",
+        "warnPersonas": "{count} persuna f’dan is-suq; huma rakkomandati mill-inqas {recommended} | {count} persuni f’dan is-suq; huma rakkomandati mill-inqas {recommended}",
+        "warnCells": "{missing} minn {total} ċelloli mhumiex issettjati."
+      },
+      "notes": {
+        "title": "Noti",
+        "internal": "Intern",
+        "empty": "Għad m’hemm l-ebda nota.",
+        "placeholder": "Żid nota…",
+        "add": "Żid nota",
+        "edit": "Editja",
+        "delete": "Ħassar",
+        "editLabel": "Editja n-nota",
+        "edited": "editjata",
+        "former": "Eks membru",
+        "deleteTitle": "Tħassar din in-nota?",
+        "deleteBody": "In-nota titneħħa għal kulħadd. Dan ma jistax jiġi mreġġa’ lura.",
+        "loadFailed": "In-noti ma setgħux jitgħabbew.",
+        "retry": "Erġa’ pprova",
+        "tooLong": "Nota tista’ jkollha massimu ta’ {max} karattru.",
+        "open": "Noti ({count})",
+        "sheetTitle": "Noti · {market}"
       }
     }
   },
