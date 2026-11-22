@@ -220,3 +220,21 @@ This amends Q6 (an edited short code left existing persona codes alone). That st
   rename shares the transaction by construction; no test pins it).
 - A1 is not offered in the New wave dialog, the Brand page or any other place; only the wave edit.
 - Production: nothing read, nothing run. No PL migration has been run there (read-back not seen by Cursor).
+
+## Closed (2026-11-22)
+
+Pedram checked the persona-code tick box on 2026-11-22: **it works**. **PL-2.4 is closed.**
+
+Follow-ups done the same day (tip after `6e85e8f5`):
+
+- **The missing rollback test (A1-9).** A decorated guard runs the real persona rename inside the wave edit and then throws.
+  The test shows the persona codes, the markets (name and short code) and the audit log are exactly as before. It passes on
+  SQLite and on PostgreSQL (throwaway `pl25_hk_test`). Break-revert: removing both transactions together (the edit's and
+  the markets replace's own) turns it red on both; each alone stays green, because each one protects the renames by itself.
+- **The flaky `strategy-matrix` strategy-off test:** read, not fixed; tech-debt row 52.
+- **Clean-up of the walk environment:** the cleanup seeder was run on `pl24_walk` (database name printed first), then the
+  throwaway databases `pl24_walk`, `pl24_test`, `pl25_hk_test`, `pl12_test` and `pl13_test` were dropped, the servers on 8004
+  and 5186 were stopped and `apps/main/vite.pl24.tmp.mjs` was deleted. `catalyst`, `catalyst_e2e`, `catalyst_rehearsal`,
+  `catalyst_test` and `postgres` were not touched. `pl12_test` and `pl13_test` are named like the throwaways of the PL-1.2
+  and PL-1.3 chunks; this chat did not create them (inferred from the name, not proved).
+- **WORKING-PROCESS.md:** "before any test run, print the database the run will use" added to section 4.1.

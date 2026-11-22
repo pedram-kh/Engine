@@ -194,6 +194,12 @@ reboot. From now on, for every agent and developer, on a local machine:
 - Never write a feature flag by tinker, SQL or any command in a database Pedram uses. Only Pedram flips flags, in the admin app.
 - Any command against a throwaway database must name its connection explicitly and first print the database name it is connected to; if the name is the dev or walk database, stop. (`tinker` ignored `DB_DATABASE` here; `migrate`, `db:seed` and `serve` honour it. Check the printed name, do not trust the variable.)
 
+**Before any test run, print the database the run will use (standing rule, Pedram, 2026-11-22, after the PL-2.4 A1 gates).** A `DB_*` variable exported by an earlier command stayed in the shell, so a "SQLite" Pest run in the PL-2.4 A1 chunk went to a PostgreSQL throwaway database (`pl12_test`) and nobody saw it until the totals matched. From now on, for Pest, Vitest-with-API, Playwright and the walk tool alike:
+
+- The command that starts the run first prints the connection and database name it will use, and the run does not start if the name is not the one meant. For SQLite the answer is `sqlite :memory:` and `env | rg '^DB_'` finds nothing. For PostgreSQL it is the throwaway name, which must end in `_test` or `_e2e` (`tests/TestCase.php` refuses anything else).
+- Set `DB_*` for one command only (a subshell, or `VAR=value command`), never `export` them in the session. If one is exported anyway, unset every `DB_*` variable straight after the run.
+- Report the database each run used next to its totals.
+
 ### 4.2 Stacking, width and overlay defects (lesson, PL-1.2 walk, 2026-11-18)
 
 Stacking, width and overlay defects are invisible to unit tests: a menu behind a dialog, a pill stretched to its column and a list outside the window all passed Vitest and Pest. Any new dialog, menu or board is opened in a real browser, including a quick close and reopen, before a walk is offered to Pedram.

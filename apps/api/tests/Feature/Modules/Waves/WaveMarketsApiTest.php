@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\Core\Tenancy\TenancyContext;
 use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Strategy\Models\WavePersona;
+use App\Modules\Strategy\Services\StrategyWaveMarketGuard;
+use App\Modules\Waves\Contracts\WaveMarketGuard;
 use App\Modules\Waves\Database\Factories\WaveFactory;
 use App\Modules\Waves\Features\WavesEnabled;
 use App\Modules\Waves\Models\Wave;
@@ -453,4 +455,48 @@ it('A1-8: the flag must be a boolean and cannot be sent on create', function ():
     mkPatch($w, $r['markets'], $r['markets_version'])->assertUnprocessable();
 
     mkCreate($w, [['name' => 'X', 'countries' => ['SE'], 'rename_persona_codes' => true]])->assertUnprocessable();
+});
+
+it('A1-9: a failure after the persona renames rolls the market edit back with them', function (): void {
+    $w = mkWorld();
+    a1Personas($w, 'SK', [1 => 'SK1', 2 => 'SK2']);
+    $before = mkRead($w);
+
+    // The real guard renames the personas inside the wave edit's transaction, then something fails afterwards.
+    $this->app->bind(WaveMarketGuard::class, static fn (): WaveMarketGuard => new class(new StrategyWaveMarketGuard) implements WaveMarketGuard
+    {
+        public function __construct(private readonly StrategyWaveMarketGuard $real) {}
+
+        public function personaCountsByMarket(Wave $locked, array $removedIds): array
+        {
+            return $this->real->personaCountsByMarket($locked, $removedIds);
+        }
+
+        public function conceptCountsByMarket(Wave $locked, array $removedIds): array
+        {
+            return $this->real->conceptCountsByMarket($locked, $removedIds);
+        }
+
+        public function renamePersonaCodes(Wave $locked, int $marketId, string $oldCode, string $newCode): array
+        {
+            $done = $this->real->renamePersonaCodes($locked, $marketId, $oldCode, $newCode);
+            if ($done['renamed'] !== 2) {
+                throw new LogicException('the renames did not happen before the failure');
+            }
+
+            throw new RuntimeException('forced failure after the persona renames');
+        }
+    });
+
+    $this->withoutExceptionHandling();
+    $edit = $before['markets'];
+    $edit[0]['code'] = 'SVK';
+    $edit[0]['name'] = 'Slovakia renamed';
+    $edit[0]['rename_persona_codes'] = true;
+
+    expect(fn () => mkPatch($w, $edit, $before['markets_version']))->toThrow(RuntimeException::class, 'forced failure');
+
+    expect(a1Codes($w, 'SK'))->toBe(['SK1', 'SK2'])
+        ->and(mkRead($w))->toBe($before)
+        ->and(AuditLog::query()->where('action', 'wave.updated')->count())->toBe(0);
 });

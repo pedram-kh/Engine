@@ -176,3 +176,13 @@ Same method: mutate, run, red, restore in a `finally`, run, green. Pest gates ra
   one alone stays green, so the gate removes both together.
 - **A6 first stayed green** with a test that gave the other market a code that could not match; the test now gives it
   `SK2` in slot 2, and the mutation is red.
+
+## A1-9 (rollback after the persona renames), 2026-11-22
+
+| Gate | What it pins                                                                                               | Runner          | Mutated result | Restored result |
+| ---- | ---------------------------------------------------------------------------------------------------------- | --------------- | -------------- | --------------- |
+| A19  | a failure after the persona renames rolls back the market edit and the renames (both transactions removed) | Pest SQLite     | red            | green           |
+| A19  | the same                                                                                                   | Pest PostgreSQL | red            | green           |
+
+Either transaction alone is enough to protect the renames (the markets replace has its own, nested as a savepoint inside the
+wave edit's), so the mutation removes both together. A PostgreSQL throwaway database must end in `_test`.
