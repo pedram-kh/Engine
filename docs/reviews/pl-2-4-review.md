@@ -238,3 +238,6 @@ Follow-ups done the same day (tip after `6e85e8f5`):
   `catalyst_test` and `postgres` were not touched. `pl12_test` and `pl13_test` are named like the throwaways of the PL-1.2
   and PL-1.3 chunks; this chat did not create them (inferred from the name, not proved).
 - **WORKING-PROCESS.md:** "before any test run, print the database the run will use" added to section 4.1.
+- **CI on the first push of these follow-ups (run `45010805283`, tip `9f710020`) was red:** Larastan rejected `$this->app->bind` in
+  the new test (`property.notFound`), because Larastan was not rerun after the test was added. Fixed with `app()->bind`;
+  Pint, Larastan and the file on SQLite and PostgreSQL rerun green. Lesson: Larastan runs after every test edit too.

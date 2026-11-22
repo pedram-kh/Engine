@@ -463,7 +463,7 @@ it('A1-9: a failure after the persona renames rolls the market edit back with th
     $before = mkRead($w);
 
     // The real guard renames the personas inside the wave edit's transaction, then something fails afterwards.
-    $this->app->bind(WaveMarketGuard::class, static fn (): WaveMarketGuard => new class(new StrategyWaveMarketGuard) implements WaveMarketGuard
+    app()->bind(WaveMarketGuard::class, static fn (): WaveMarketGuard => new class(new StrategyWaveMarketGuard) implements WaveMarketGuard
     {
         public function __construct(private readonly StrategyWaveMarketGuard $real) {}
 
