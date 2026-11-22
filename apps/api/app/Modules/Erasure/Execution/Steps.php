@@ -62,6 +62,7 @@ final class Steps
             // 4c rows an agency holds
             'agency_creator_relations.invitation' => $anon,
             'campaign_applications.note' => $anon,
+            'wave_creator_decisions.free_text' => $anon,
             'messages.attachments' => fn (Selection $sel, SubjectSet $s, ConnectionInterface $db, string $now): int => self::updateEach($sel, $s, $db, fn (stdClass $row): array => ['attachments' => null]),
             'relationship_messages.attachments' => fn (Selection $sel, SubjectSet $s, ConnectionInterface $db, string $now): int => self::updateEach($sel, $s, $db, fn (stdClass $row): array => ['attachments' => null]),
             // 4c AH-119 B4: the subject's withdrawn text (body stays, D-C)

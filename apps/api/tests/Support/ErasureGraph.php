@@ -33,6 +33,9 @@ use App\Modules\Notifications\Models\Notification;
 use App\Modules\Notifications\Models\NotificationPreference;
 use App\Modules\Notifications\Models\PushDelivery;
 use App\Modules\Notifications\Models\UserPushToken;
+use App\Modules\Strategy\Enums\CreatorDecisionStatus;
+use App\Modules\Strategy\Models\WaveCreator;
+use App\Modules\Strategy\Models\WaveCreatorDecision;
 use App\Modules\TalentPools\Models\TalentPoolMembership;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -103,6 +106,8 @@ final class ErasureGraph
             'message_email_debounces' => 1,
             'agency_creator_relations.invitation' => 1,
             'campaign_applications.note' => 1,
+            // PL-3.1 (Q6): the subject's decision rows that hold a note or comment; the already-scrubbed twin is not counted.
+            'wave_creator_decisions.free_text' => 1,
             // The graph's open assignment; its terminal twin (seeded below) is deliberately not counted.
             'campaign_assignments.cancel' => 1,
             'messages.attachments' => 1,
@@ -190,6 +195,10 @@ final class ErasureGraph
         AgencyCreatorRelation::factory()->pendingRequest()->createOne(['creator_id' => $creator->id]);
         CampaignApplication::factory()->withNote("pitch {$tag}")->createOne(['creator_id' => $creator->id, 'campaign_id' => $campaign->id]);
         CampaignApplication::factory()->createOne(['creator_id' => $creator->id]);
+        // PL-3.1 (Q6): a wave slot for the subject with one decision holding a comment, and an already-scrubbed one.
+        $slot = WaveCreator::factory()->createOne(['creator_id' => $creator->id]);
+        WaveCreatorDecision::factory()->createOne(['wave_creator_id' => $slot->id, 'status' => CreatorDecisionStatus::SuggestAnother, 'comment' => "swap {$tag}"]);
+        WaveCreatorDecision::factory()->createOne(['wave_creator_id' => $slot->id, 'status' => CreatorDecisionStatus::Approved]);
         $ownAttachment = [['s3_path' => "messages/{$thread->ulid}/{$tag}-own.pdf", 'name' => 'file.pdf']];
         $agencyAttachment = [['s3_path' => "messages/{$thread->ulid}/{$tag}-agency.pdf", 'name' => 'brief.pdf']];
         $ownRelationshipAttachment = [['s3_path' => "relationship-messages/{$relationshipThread->ulid}/{$tag}-own.pdf", 'name' => 'file.pdf']];

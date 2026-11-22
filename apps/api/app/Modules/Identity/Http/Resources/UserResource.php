@@ -13,6 +13,7 @@ use App\Modules\Identity\Models\User;
 use App\Modules\Messaging\Features\MessagesV2CreatorInboxEnabled;
 use App\Modules\Messaging\Features\MessagesV2EditSearchEnabled;
 use App\Modules\Messaging\Features\MessagesV2InboxEnabled;
+use App\Modules\Strategy\Features\CreatorsScriptsEnabled;
 use App\Modules\Strategy\Features\StrategyEnabled;
 use App\Modules\Waves\Features\WavesEnabled;
 use Illuminate\Http\Request;
@@ -86,6 +87,9 @@ final class UserResource extends JsonResource
                     'waves' => $this->isAgencySide($user) && Feature::active(WavesEnabled::NAME),
                     // PL-2 — the Strategy workspace. Needs BOTH flags (strategy work hangs off a wave); agency side only.
                     'strategy' => $this->isAgencySide($user) && StrategyEnabled::active(),
+                    // PL-3 — Creators and scripts. Needs all three flags; agency side only; `false` without reading the other two
+                    // flags when this one is off. UI gate only; the API enforces the flag (404).
+                    'creators_scripts' => $this->isAgencySide($user) && CreatorsScriptsEnabled::active(),
                     'messages_v2_edit_search' => ! $user->isPlatformAdmin() && Feature::active(MessagesV2EditSearchEnabled::NAME),
                 ],
             ],

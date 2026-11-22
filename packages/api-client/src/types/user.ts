@@ -145,6 +145,8 @@ export interface UserAttributes {
     waves?: boolean
     /** PL-2.1: agency-side only; true while strategy_enabled AND waves_enabled are on. */
     strategy?: boolean
+    /** PL-3: agency-side only; true while creators_scripts_enabled AND strategy_enabled AND waves_enabled are on. */
+    creators_scripts?: boolean
   }
 }
 

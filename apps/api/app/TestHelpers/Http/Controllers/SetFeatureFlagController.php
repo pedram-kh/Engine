@@ -11,6 +11,7 @@ use App\Modules\Identity\Features\AccountDeletionEnabled;
 use App\Modules\Messaging\Features\MessagesV2CreatorInboxEnabled;
 use App\Modules\Messaging\Features\MessagesV2EditSearchEnabled;
 use App\Modules\Messaging\Features\MessagesV2InboxEnabled;
+use App\Modules\Strategy\Features\CreatorsScriptsEnabled;
 use App\Modules\Strategy\Features\StrategyEnabled;
 use App\Modules\Waves\Features\WavesEnabled;
 use Illuminate\Http\JsonResponse;
@@ -65,6 +66,8 @@ final class SetFeatureFlagController
         // PL-1.2 — OFF at deploy; the New wave dialog E2E leg drives it on, then off.
         WavesEnabled::NAME,
         StrategyEnabled::NAME,
+        // PL-3 — OFF at deploy.
+        CreatorsScriptsEnabled::NAME,
     ];
 
     public function store(Request $request, string $name): JsonResponse

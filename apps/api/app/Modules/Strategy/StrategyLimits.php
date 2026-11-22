@@ -85,6 +85,15 @@ final class StrategyLimits
 
     public const DECISION_NOTE = 500;
 
+    /** PL-3.1 (Q10): creators per market and per wave; (Q1) the slot code. */
+    public const CREATORS_PER_MARKET = 30;
+
+    public const CREATORS_PER_WAVE = 100;
+
+    public const CREATOR_SLOT_CODE_MIN = 2;
+
+    public const CREATOR_SLOT_CODE_MAX = 10;
+
     public const DECISION_COMMENT = 1000;
 
     public const LINK_TITLE = 120;
@@ -139,6 +148,8 @@ final class StrategyLimits
             'concept_key_points' => self::CONCEPT_KEY_POINTS,
             'concept_key_point' => self::CONCEPT_KEY_POINT,
             'client_name' => self::CLIENT_NAME,
+            'creators_per_market' => self::CREATORS_PER_MARKET,
+            'creators_per_wave' => self::CREATORS_PER_WAVE,
             'decision_note' => self::DECISION_NOTE,
             'decision_comment' => self::DECISION_COMMENT,
             'link_title' => self::LINK_TITLE,

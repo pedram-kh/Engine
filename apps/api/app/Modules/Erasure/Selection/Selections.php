@@ -156,6 +156,12 @@ final class Selections
                 })),
             new Selection('campaign_applications.note', 'campaign_applications', Disposition::Anon, '4c', 'applications still holding the creator\'s pitch',
                 fn (SubjectSet $s, ConnectionInterface $db): Builder => $db->table('campaign_applications')->where('creator_id', $s->creatorId)->whereNotNull('note')),
+            new Selection('wave_creator_decisions.free_text', 'wave_creator_decisions', Disposition::Anon, '4c', 'client decisions on the creator that still hold a note or a comment',
+                fn (SubjectSet $s, ConnectionInterface $db): Builder => $db->table('wave_creator_decisions')
+                    ->whereIn('wave_creator_id', fn (Builder $q) => $q->select('id')->from('wave_creators')->where('creator_id', $s->creatorId))
+                    ->where(function (Builder $q): void {
+                        $q->whereNotNull('note')->orWhereNotNull('comment');
+                    })),
             new Selection('messages.attachments', 'messages', Disposition::ScrubJson, '4c', 'campaign messages sent by the subject user that still carry attachments',
                 fn (SubjectSet $s, ConnectionInterface $db): Builder => $db->table('messages')->where('sender_user_id', $s->userId)->whereNotNull('attachments'),
                 static fn (stdClass $row, SubjectSet $s): bool => self::jsonHasContent($row->attachments ?? null)),

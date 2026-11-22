@@ -9,6 +9,7 @@ use App\Modules\Identity\Features\AccountDeletionEnabled;
 use App\Modules\Messaging\Features\MessagesV2CreatorInboxEnabled;
 use App\Modules\Messaging\Features\MessagesV2EditSearchEnabled;
 use App\Modules\Messaging\Features\MessagesV2InboxEnabled;
+use App\Modules\Strategy\Features\CreatorsScriptsEnabled;
 use App\Modules\Strategy\Features\StrategyEnabled;
 use App\Modules\Waves\Features\WavesEnabled;
 use App\TestHelpers\Http\Controllers\SetFeatureFlagController;
@@ -92,6 +93,7 @@ it('allows exactly the flags the E2E legs need (a new entry is a reviewed change
         CampaignBrandExclusivityEnabled::NAME,
         WavesEnabled::NAME,
         StrategyEnabled::NAME, // PL-2.1: the Stage 2 web E2E arms it (a reviewed entry).
+        CreatorsScriptsEnabled::NAME, // PL-3.1: the Stage 2 web E2E arms it (a reviewed entry).
     ]);
 });
 

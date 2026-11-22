@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Strategy;
 
 use App\Modules\Strategy\Console\SweepPendingConceptImages;
+use App\Modules\Strategy\Features\CreatorsScriptsEnabled;
 use App\Modules\Strategy\Features\StrategyEnabled;
 use App\Modules\Strategy\Models\WaveConcept;
 use App\Modules\Strategy\Models\WaveConceptDecision;
@@ -39,6 +40,7 @@ final class StrategyServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Feature::define(StrategyEnabled::NAME, StrategyEnabled::default());
+        Feature::define(CreatorsScriptsEnabled::NAME, CreatorsScriptsEnabled::default());
         Gate::policy(WaveUsp::class, WaveStrategyPolicy::class);
         Gate::policy(WavePersona::class, WaveStrategyPolicy::class);
         Gate::policy(WavePersonaAngle::class, WaveStrategyPolicy::class);

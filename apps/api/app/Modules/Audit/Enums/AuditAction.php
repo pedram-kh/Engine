@@ -588,6 +588,17 @@ enum AuditAction: string
     case WaveStrategyNoteUpdated = 'wave_strategy_note.updated';
     case WaveStrategyNoteDeleted = 'wave_strategy_note.deleted';
 
+    // PL-3.1 — a wave's creators. One row per request (an add of several creators writes one row per creator); LITERAL payload
+    // keys: ids (ulids), the market ulid, the slot, counts, an enum value and a list of changed FIELD NAMES. NEVER the client's
+    // name, note or comment (`has_note`, `has_comment` only) and never a creator's name. Erasure: ids and counts only; both
+    // tables are decided in the ErasureRegistry (the decision's note and comment are scrubbed when the creator is erased).
+    case WaveCreatorAdded = 'wave_creator.added';
+    case WaveCreatorUpdated = 'wave_creator.updated';
+    case WaveCreatorReplaced = 'wave_creator.replaced';
+    case WaveCreatorRemoved = 'wave_creator.removed';
+    case WaveCreatorDecided = 'wave_creator.decided';
+    case WaveCreatorCardMoved = 'wave_creator.card_moved';
+
     // Campaign attachments from the Files library, chunk B (AH-092). A
     // linkage action on the campaign, not a library action on the file — the
     // file's own audit trail (above) is unaffected by any of these. No

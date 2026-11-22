@@ -28,6 +28,7 @@ use App\Modules\Identity\Features\AccountDeletionEnabled;
 use App\Modules\Messaging\Features\MessagesV2CreatorInboxEnabled;
 use App\Modules\Messaging\Features\MessagesV2EditSearchEnabled;
 use App\Modules\Messaging\Features\MessagesV2InboxEnabled;
+use App\Modules\Strategy\Features\CreatorsScriptsEnabled;
 use App\Modules\Strategy\Features\StrategyEnabled;
 use App\Modules\Waves\Features\WavesEnabled;
 use Illuminate\Http\JsonResponse;
@@ -150,6 +151,10 @@ final class AdminFeatureFlagController
         StrategyEnabled::NAME => [
             'label' => 'Strategy workspace',
             'description' => 'PL-2: the Strategy & Scripts workspace on a wave (USPs and personas first) and the endpoints behind it. Needs the Waves flag: with Waves off nothing shows. Off: the endpoints answer 404 and the wave page is exactly as PL-1 left it. Arm after the web deploy.',
+        ],
+        CreatorsScriptsEnabled::NAME => [
+            'label' => 'Creators and scripts',
+            'description' => 'PL-3: the Creators step of the Strategy workspace (picking, matching and recording the client\'s decision on a wave\'s creators) and the endpoints behind it. Needs the Waves flag and the Strategy flag. Off: the endpoints answer 404, the board shows no "In wave" marker and the wave and campaign pages are exactly as PL-2 left them. Arm after the web deploy.',
         ],
         AccountErasureExecuteEnabled::NAME => [
             'label' => 'Account erasure (admin Erase button)',
