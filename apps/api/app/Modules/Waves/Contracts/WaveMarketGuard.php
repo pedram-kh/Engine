@@ -64,4 +64,13 @@ interface WaveMarketGuard
      * @return array{completions: int, notes: int}
      */
     public function forgetMarkets(Wave $locked, array $removedIds): array;
+
+    /**
+     * PL-3.1 (Q16): the creators of those markets, so a removal can be refused. Read-only.
+     *
+     * @param  Wave  $locked  the wave, already locked FOR UPDATE by the caller
+     * @param  list<int>  $removedIds
+     * @return array<int, int> market id => number of creators, only for markets with at least one
+     */
+    public function creatorCountsByMarket(Wave $locked, array $removedIds): array;
 }

@@ -93,4 +93,43 @@ final class BoardCardMoveService
 
         return $card;
     }
+
+    /**
+     * PL-3.1 (plan 1.6, P8) — the RULE-DRIVEN move of a wave board's card: no acting `User`, a movement row with
+     * `triggered_by = event` and the rule's own event key (`wave_creator.selected`, `wave_creator.reverted`). Called ONLY by
+     * the Strategy module's `WaveCreatorBoardRules`, which holds the wave row lock; that is ASSERTED (a transaction must be
+     * open) rather than assumed, and the move itself takes no lock. The Q4 acceptance rule is enforced here exactly as in
+     * {@see self::move()}: only a creator who has Accepted enters a working column. {@see self::move()} is untouched.
+     *
+     * No audit row is written here: the caller records the fact (`wave_creator.card_moved`), the movement row records the event.
+     */
+    public function moveByRule(BoardCard $card, BoardColumn $targetColumn, string $eventKey, ?int $triggeredByUserId = null): BoardCard
+    {
+        if (DB::transactionLevel() < 1) {
+            throw new \LogicException('A rule-driven card move runs inside the wave-locked transaction of its caller.');
+        }
+        if ($card->column_id === $targetColumn->id) {
+            return $card;
+        }
+
+        $toWorking = $targetColumn->stage_key !== null && in_array($targetColumn->stage_key, BoardDefaults::waveWorkingStages(), true);
+        if ($toWorking && $card->assignment?->status->countsAsSelected() !== true) {
+            throw BoardRuleViolation::selectionRequiresAcceptance();
+        }
+
+        $fromColumnId = $card->column_id;
+        $card->update(['column_id' => $targetColumn->id]);
+
+        BoardCardMovement::query()->create([
+            'card_id' => $card->id,
+            'from_column_id' => $fromColumnId,
+            'to_column_id' => $targetColumn->id,
+            'triggered_by' => MovementTrigger::Event,
+            'triggered_event_key' => $eventKey,
+            'triggered_by_user_id' => $triggeredByUserId,
+            'reason' => null,
+        ]);
+
+        return $card;
+    }
 }

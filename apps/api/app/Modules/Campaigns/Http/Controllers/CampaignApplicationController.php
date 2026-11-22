@@ -9,6 +9,7 @@ use App\Modules\Agencies\Models\Agency;
 use App\Modules\Campaigns\Enums\ApplicationRejectionCause;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Campaigns\Enums\CampaignApplicationStatus;
+use App\Modules\Campaigns\Enums\CampaignType;
 use App\Modules\Campaigns\Http\Requests\AcceptApplicationRequest;
 use App\Modules\Campaigns\Http\Resources\CampaignApplicationListItemResource;
 use App\Modules\Campaigns\Http\Resources\CampaignAssignmentResource;
@@ -26,6 +27,7 @@ use App\Modules\Campaigns\ValueObjects\AssignmentOffer;
 use App\Modules\Creators\Enums\ApplicationStatus;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
+use App\Modules\Strategy\Services\WaveCreatorMarker;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -113,6 +115,17 @@ final class CampaignApplicationController
 
         foreach ($pending as $application) {
             $application->setAttribute('exclusivity_conflict', $conflicts[$application->creator_id] ?? null);
+        }
+
+        // PL-3.1 — the "In wave" marker on the Applied items of a wave board: a for-a-wave campaign with the sprint flag on
+        // only (the type is compared first, so a normal campaign costs nothing here). One query for the page.
+        if ($campaign->campaign_type === CampaignType::ForWave) {
+            $inWave = WaveCreatorMarker::forCampaign($campaign->agency_id, $campaign->id);
+            if ($inWave !== null) {
+                foreach ($paginator->items() as $application) {
+                    $application->setAttribute('in_wave', in_array($application->creator_id, $inWave, true));
+                }
+            }
         }
 
         return response()->json([

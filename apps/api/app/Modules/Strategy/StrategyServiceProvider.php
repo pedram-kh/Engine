@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace App\Modules\Strategy;
 
+use App\Modules\Campaigns\Events\AssignmentTransitioned;
 use App\Modules\Strategy\Console\SweepPendingConceptImages;
 use App\Modules\Strategy\Features\CreatorsScriptsEnabled;
 use App\Modules\Strategy\Features\StrategyEnabled;
+use App\Modules\Strategy\Listeners\ReconcileWaveCreatorOnAccept;
 use App\Modules\Strategy\Models\WaveConcept;
 use App\Modules\Strategy\Models\WaveConceptDecision;
 use App\Modules\Strategy\Models\WaveConceptImage;
 use App\Modules\Strategy\Models\WaveConceptLink;
+use App\Modules\Strategy\Models\WaveCreator;
 use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WavePersonaAngle;
 use App\Modules\Strategy\Models\WaveStrategyNote;
@@ -22,6 +25,7 @@ use App\Modules\Strategy\Services\StrategyWaveState;
 use App\Modules\Waves\Contracts\WaveMarketGuard;
 use App\Modules\Waves\Contracts\WaveStrategyState;
 use Illuminate\Contracts\Foundation\CachesRoutes;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -45,10 +49,13 @@ final class StrategyServiceProvider extends ServiceProvider
         Gate::policy(WavePersona::class, WaveStrategyPolicy::class);
         Gate::policy(WavePersonaAngle::class, WaveStrategyPolicy::class);
         Gate::policy(WaveStrategyNote::class, WaveStrategyPolicy::class);
+        Gate::policy(WaveCreator::class, WaveStrategyPolicy::class);
         Gate::policy(WaveConcept::class, WaveConceptPolicy::class);
         Gate::policy(WaveConceptImage::class, WaveConceptPolicy::class);
         Gate::policy(WaveConceptLink::class, WaveConceptPolicy::class);
         Gate::policy(WaveConceptDecision::class, WaveConceptPolicy::class);
+        // PL-3.1: the one listener on a path every campaign runs; six binding conditions, see the class.
+        Event::listen(AssignmentTransitioned::class, [ReconcileWaveCreatorOnAccept::class, 'handle']);
         if ($this->app->runningInConsole()) {
             $this->commands([SweepPendingConceptImages::class]);
         }

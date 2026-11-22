@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Strategy\Services;
 
 use App\Modules\Strategy\Models\WaveConcept;
+use App\Modules\Strategy\Models\WaveCreator;
 use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WaveStrategyCompletion;
 use App\Modules\Strategy\Notes\NoteService;
@@ -42,6 +43,26 @@ final class StrategyWaveMarketGuard implements WaveMarketGuard
 
         /** @var array<int, int> $counts */
         $counts = WaveConcept::query()
+            ->where('wave_id', $locked->id)
+            ->whereIn('market_id', $removedIds)
+            ->selectRaw('market_id, count(*) as n')
+            ->groupBy('market_id')
+            ->orderBy('market_id')
+            ->pluck('n', 'market_id')
+            ->map(static fn (mixed $n): int => (int) $n)
+            ->all();
+
+        return $counts;
+    }
+
+    public function creatorCountsByMarket(Wave $locked, array $removedIds): array
+    {
+        if ($removedIds === []) {
+            return [];
+        }
+
+        /** @var array<int, int> $counts */
+        $counts = WaveCreator::query()
             ->where('wave_id', $locked->id)
             ->whereIn('market_id', $removedIds)
             ->selectRaw('market_id, count(*) as n')

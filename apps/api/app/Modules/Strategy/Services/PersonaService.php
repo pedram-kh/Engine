@@ -11,6 +11,7 @@ use App\Modules\Identity\Models\User;
 use App\Modules\Strategy\Enums\AngleOrigin;
 use App\Modules\Strategy\Enums\PersonaPronoun;
 use App\Modules\Strategy\Models\WaveConcept;
+use App\Modules\Strategy\Models\WaveCreator;
 use App\Modules\Strategy\Models\WaveMatrixCell;
 use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WavePersonaAngle;
@@ -168,6 +169,12 @@ final class PersonaService
                 throw StrategyRuleViolation::personaInUseByConcepts(
                     $concepts->map(static fn (WaveConcept $c): array => ['concept' => $c->ulid, 'number' => $c->position, 'title' => $c->title, 'status' => $c->status->value])->all(),
                 );
+            }
+
+            // PL-3.1: a persona that creators are matched to cannot be deleted either (the composite foreign key is RESTRICT).
+            $matched = WaveCreator::query()->where('persona_id', $persona->id)->count();
+            if ($matched > 0) {
+                throw StrategyRuleViolation::personaInUseByCreators($matched);
             }
 
             // Angles (hand-written and synced) and the matrix cells go with the persona; every foreign key is RESTRICT.

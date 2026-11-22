@@ -77,6 +77,8 @@ final class CampaignApplicationListItemResource extends JsonResource
                     'id' => $conflict['campaign_ulid'],
                     'name' => $conflict['campaign_name'],
                 ] : null,
+                // PL-3.1 — present ONLY when the controller set it (a wave campaign with the sprint flag on).
+                ...(is_bool($application->getAttribute('in_wave')) ? ['in_wave' => $application->getAttribute('in_wave')] : []),
                 'creator' => $creator instanceof Creator ? [
                     'id' => $creator->ulid,
                     'display_name' => $creator->display_name,

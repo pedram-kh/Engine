@@ -166,6 +166,19 @@ final class WaveMarketService
                 throw WaveRuleViolation::marketHasPersonas($rows);
             }
 
+            // PL-3.1 (Q16): a market that still has creators is not removed; remove or replace them first.
+            $creators = $this->guard->creatorCountsByMarket($locked, $ids);
+            if ($creators !== []) {
+                $rows = [];
+                foreach ($current as $market) {
+                    if (isset($creators[$market->id])) {
+                        $rows[] = ['market' => $market->ulid, 'name' => $market->name, 'code' => $market->code, 'creator_count' => $creators[$market->id]];
+                    }
+                }
+
+                throw WaveRuleViolation::marketHasCreators($rows);
+            }
+
             // PL-2.5 (Q5): internal notes go with the market, but the person is told how many first (confirm = the total).
             $notes = $this->guard->noteCountsByMarket($locked, $ids);
             $noteTotal = array_sum($notes);

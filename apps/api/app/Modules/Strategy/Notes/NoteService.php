@@ -9,12 +9,14 @@ use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Facades\Audit;
 use App\Modules\Brands\Models\Brand;
 use App\Modules\Identity\Models\User;
+use App\Modules\Strategy\Features\CreatorsScriptsEnabled;
 use App\Modules\Strategy\Models\WaveStrategyNote;
 use App\Modules\Strategy\Services\PersonaService;
 use App\Modules\Strategy\Services\StrategyGuard;
 use App\Modules\Strategy\Services\StrategyRuleViolation;
 use App\Modules\Strategy\Services\StrategyStepState;
 use App\Modules\Strategy\Services\StrategyText;
+use App\Modules\Strategy\Services\WaveCreatorStepState;
 use App\Modules\Waves\Models\Wave;
 use App\Modules\Waves\Models\WaveMarket;
 use Illuminate\Database\Eloquent\Builder;
@@ -168,6 +170,26 @@ final class NoteService
     }
 
     /**
+     * PL-3.1: the notes of the `creators` step per market ulid (the step's "Notes (n)" button). A separate read, so the
+     * PL-2.5 summary keeps its key set.
+     *
+     * @return array<string, int>
+     */
+    public static function creatorCounts(Wave $wave): array
+    {
+        $ulids = WaveMarket::query()->where('wave_id', $wave->id)->pluck('ulid', 'id')->all();
+        $out = [];
+        foreach (WaveStrategyNote::query()->where('wave_id', $wave->id)->where('step', WaveCreatorStepState::STEP)->selectRaw('market_id, count(*) as n')->groupBy('market_id')->get() as $row) {
+            $ulid = $ulids[(int) $row->getAttribute('market_id')] ?? null;
+            if ($ulid !== null) {
+                $out[(string) $ulid] = (int) $row->getAttribute('n');
+            }
+        }
+
+        return $out;
+    }
+
+    /**
      * @param  list<int>  $marketIds
      * @return array<int, int> market id => notes, only markets with at least one
      */
@@ -216,7 +238,9 @@ final class NoteService
     /** The thread's market: none for USPs (and a market is refused there), a market of this wave for the others. */
     private function scope(Wave $wave, string $step, ?string $marketUlid): ?WaveMarket
     {
-        if (! in_array($step, StrategyStepState::STEPS, true)) {
+        // PL-3.1: the per-market `creators` thread exists only while the sprint flag is on; off, it is a 404 like any other name.
+        $steps = CreatorsScriptsEnabled::active() ? [...StrategyStepState::STEPS, WaveCreatorStepState::STEP] : StrategyStepState::STEPS;
+        if (! in_array($step, $steps, true)) {
             throw StrategyRuleViolation::conflict404();
         }
         if ($step === StrategyStepState::USPS) {

@@ -58,6 +58,22 @@ final class WaveRuleViolation extends RuntimeException
         return new self('wave.market_has_personas', 'Remove the personas of those markets before removing the markets from the wave.', ['markets' => $markets]);
     }
 
+    /**
+     * PL-3.1 (Q16) — a wave edit would remove a market that still has creators (422). Remove or replace them first.
+     *
+     * @param  list<array{market: string, name: string, code: string, creator_count: int}>  $markets
+     */
+    public static function marketHasCreators(array $markets): self
+    {
+        return new self('wave.market_has_creators', 'Remove the creators of those markets before removing the markets from the wave.', ['markets' => $markets]);
+    }
+
+    /** PL-3.1 (Q9) — a wave that has creators is not deleted (422). */
+    public static function hasCreators(): self
+    {
+        return new self('wave.has_creators', 'A wave that has creators cannot be deleted.');
+    }
+
     /** PL-2.4 (M2) — a country is in two markets of the request (422). Names are for the message, never an audit field. */
     public static function countryInTwoMarkets(string $country, string $first, string $second): self
     {

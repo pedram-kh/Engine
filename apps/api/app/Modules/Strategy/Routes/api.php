@@ -11,6 +11,7 @@ use App\Modules\Strategy\Http\Controllers\MatrixController;
 use App\Modules\Strategy\Http\Controllers\PersonaController;
 use App\Modules\Strategy\Http\Controllers\StrategyController;
 use App\Modules\Strategy\Http\Controllers\UspController;
+use App\Modules\Strategy\Http\Controllers\WaveCreatorController;
 use App\Modules\Strategy\Notes\NoteController;
 use Illuminate\Support\Facades\Route;
 
@@ -39,6 +40,16 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         Route::post('notes', [NoteController::class, 'store'])->withTrashed()->name('waves.strategy.notes.store');
         Route::patch('notes/{note}', [NoteController::class, 'update'])->withTrashed()->name('waves.strategy.notes.update');
         Route::delete('notes/{note}', [NoteController::class, 'destroy'])->withTrashed()->name('waves.strategy.notes.destroy');
+
+        // PL-3.1 — the creators of the wave (step 5). Literal `candidates` BEFORE `{slot}`. ALL THREE flags (404).
+        Route::get('creators', [WaveCreatorController::class, 'index'])->withTrashed()->name('waves.strategy.creators.index');
+        Route::get('creators/candidates', [WaveCreatorController::class, 'candidates'])->withTrashed()->name('waves.strategy.creators.candidates');
+        Route::post('creators', [WaveCreatorController::class, 'store'])->withTrashed()->name('waves.strategy.creators.store');
+        Route::patch('creators/{slot}', [WaveCreatorController::class, 'update'])->withTrashed()->name('waves.strategy.creators.update');
+        Route::post('creators/{slot}/replace', [WaveCreatorController::class, 'replace'])->withTrashed()->name('waves.strategy.creators.replace');
+        Route::delete('creators/{slot}', [WaveCreatorController::class, 'destroy'])->withTrashed()->name('waves.strategy.creators.destroy');
+        Route::get('creators/{slot}/decisions', [WaveCreatorController::class, 'decisionHistory'])->withTrashed()->name('waves.strategy.creators.decisions');
+        Route::post('creators/{slot}/decisions', [WaveCreatorController::class, 'decide'])->withTrashed()->name('waves.strategy.creators.decide');
 
         Route::get('usps', [UspController::class, 'index'])->withTrashed()->name('waves.strategy.usps.index');
         Route::post('usps', [UspController::class, 'store'])->withTrashed()->name('waves.strategy.usps.store');

@@ -256,4 +256,61 @@ final class StrategyRuleViolation extends RuntimeException
     {
         return new self('note.body_invalid', 'A note is 1 to 2000 characters.');
     }
+
+    // ── PL-3.1 creators ──────────────────────────────────────────────────────────────────────────────────────────────
+
+    public static function creatorCampaignRequired(): self
+    {
+        return new self('wave_creator.campaign_required', 'This wave has no campaign yet. Link or create one first.');
+    }
+
+    /** One body for "does not exist", "not eligible" and "erased": the endpoint must not probe the creators table. */
+    public static function creatorNotEligible(): self
+    {
+        return new self('wave_creator.not_eligible', 'That creator cannot be added to this wave.');
+    }
+
+    /**
+     * @param  string|null  $market  the ulid of the market the creator is already in
+     */
+    public static function creatorAlreadyInWave(?string $market): self
+    {
+        return new self('wave_creator.already_in_wave', 'That creator is already in this wave.', 422, $market === null ? null : ['market' => $market]);
+    }
+
+    public static function creatorCapReached(string $scope, int $max): self
+    {
+        return new self('wave_creator.cap_reached', $scope === 'market' ? "A market has at most {$max} creators." : "A wave has at most {$max} creators.", 422, ['scope' => $scope, 'max' => $max]);
+    }
+
+    public static function creatorPersonaMarketMismatch(): self
+    {
+        return new self('wave_creator.persona_market_mismatch', 'That persona does not belong to this market of the wave.');
+    }
+
+    public static function creatorSlotCodeTaken(string $code): self
+    {
+        return new self('wave_creator.slot_code_taken', "The code {$code} is already used in this market.", 422, ['code' => $code]);
+    }
+
+    public static function creatorRemoveBlockedInWork(): self
+    {
+        return new self('wave_creator.remove_blocked_in_work', 'This creator\'s card is in Filming or later. Move the card back first.');
+    }
+
+    public static function creatorReplaceSame(): self
+    {
+        return new self('wave_creator.replace_same_creator', 'Pick a different creator to replace this one.');
+    }
+
+    public static function creatorDecisionInvalid(string $message): self
+    {
+        return new self('wave_creator.decision_invalid', $message);
+    }
+
+    /** A persona that creators are matched to cannot be deleted (the same rule as concepts: unmatch them first). */
+    public static function personaInUseByCreators(int $count): self
+    {
+        return new self('persona.in_use_by_creators', 'Creators are matched to this persona. Match them to another persona or none first.', 422, ['count' => $count]);
+    }
 }

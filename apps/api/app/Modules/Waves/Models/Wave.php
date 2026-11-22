@@ -11,6 +11,7 @@ use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Identity\Models\User;
 use App\Modules\Waves\Database\Factories\WaveFactory;
 use App\Modules\Waves\Enums\WaveStatus;
+use App\Modules\Waves\Services\WaveRuleViolation;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -18,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /**
  * One wave of a brand (PL-1.1). The campaign link is optional; one live wave per campaign is held by the
@@ -125,6 +127,19 @@ final class Wave extends Model
             'status' => WaveStatus::class,
             'steps_provisioned_at' => 'datetime',
         ];
+    }
+
+    /**
+     * PL-3.1 (Q9): a wave that has creators is not deleted. No route deletes a wave today; this guard is on the model so any
+     * future path inherits it. A raw lookup keeps the Waves module free of a Strategy import.
+     */
+    protected static function booted(): void
+    {
+        self::deleting(static function (Wave $wave): void {
+            if (DB::table('wave_creators')->where('wave_id', $wave->id)->exists()) {
+                throw WaveRuleViolation::hasCreators();
+            }
+        });
     }
 
     protected static function newFactory(): WaveFactory

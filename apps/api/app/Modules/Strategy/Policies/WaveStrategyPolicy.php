@@ -16,6 +16,8 @@ use Illuminate\Auth\Access\HandlesAuthorization;
  *   create, update  admin, manager, staff: USPs, personas, angles, audience title, reorder, copy
  *   delete          admin, manager, staff: a persona, an angle, a USP no angle uses
  *   deleteInUse     admin, manager only: a USP an angle uses (decided in the service, under the wave lock)
+ *   manageCreators  admin, manager, staff (PL-3.1, P12): add, edit, replace and remove a wave's creators; the picker
+ *   decideCreators  admin, manager only (PL-3.1, S4): record the client's decision on a creator
  */
 final class WaveStrategyPolicy
 {
@@ -42,6 +44,16 @@ final class WaveStrategyPolicy
     }
 
     public function deleteInUse(User $user): bool
+    {
+        return CurrentAgencyRole::canManage($user);
+    }
+
+    public function manageCreators(User $user): bool
+    {
+        return CurrentAgencyRole::for($user) !== null;
+    }
+
+    public function decideCreators(User $user): bool
     {
         return CurrentAgencyRole::canManage($user);
     }

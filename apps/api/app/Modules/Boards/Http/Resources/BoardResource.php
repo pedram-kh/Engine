@@ -9,6 +9,7 @@ use App\Modules\Boards\Models\BoardAutomation;
 use App\Modules\Boards\Models\BoardColumn;
 use App\Modules\Boards\Services\WaveInviteOrigin;
 use App\Modules\Boards\Support\BoardDefaults;
+use App\Modules\Strategy\Services\WaveCreatorMarker;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
@@ -84,6 +85,8 @@ final class BoardResource extends JsonResource
         // PL-1.2 (D3): only a wave board's cards carry an invite label, so only a wave board reads the origin.
         if ($board->columns->contains(static fn (BoardColumn $c): bool => $c->stage_key !== null)) {
             WaveInviteOrigin::remember($request, $board);
+            // PL-3.1: the "In wave" marker's one query, only on a wave board and only with the sprint flag on.
+            WaveCreatorMarker::remember($request, $board);
         }
 
         return BoardCardResource::collection($board->cards)->resolve($request);

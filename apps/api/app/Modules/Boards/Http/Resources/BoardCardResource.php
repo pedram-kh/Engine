@@ -9,6 +9,7 @@ use App\Modules\Boards\Models\BoardCard;
 use App\Modules\Boards\Services\WaveInviteOrigin;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
 use App\Modules\Creators\Concerns\EmitsErasedState;
+use App\Modules\Strategy\Services\WaveCreatorMarker;
 use Illuminate\Filesystem\AwsS3V3Adapter;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -55,6 +56,9 @@ final class BoardCardResource extends JsonResource
                 'position' => $card->position,
                 'created_at' => $card->created_at->toIso8601String(),
                 'updated_at' => $card->updated_at->toIso8601String(),
+                // PL-3.1 — present ONLY on a wave board with the sprint flag on (the id list is remembered for the request);
+                // absent everywhere else, so a normal board's JSON is byte-for-byte what it was.
+                ...($this->inWave($request, $card) === null ? [] : ['in_wave' => $this->inWave($request, $card)]),
             ],
             // PL-1.2 — the label on a wave board's cards: present ONLY when the card's column is a wave column
             // (it carries a stage key) and the assignment is still at the invite stage. Absent on a normal board and
@@ -129,6 +133,14 @@ final class BoardCardResource extends JsonResource
             $accepted => 'accepted',
             default => null,
         };
+    }
+
+    private function inWave(Request $request, BoardCard $card): ?bool
+    {
+        $ids = WaveCreatorMarker::creatorIdsFor($request);
+        $creatorId = $card->assignment?->creator_id;
+
+        return $ids === null || $creatorId === null ? null : in_array($creatorId, $ids, true);
     }
 
     private function inInvitedColumn(BoardCard $card): bool

@@ -22,11 +22,23 @@ final class WaveCampaignLink
 {
     public function isLocked(int $campaignId): bool
     {
-        return DB::table('board_cards as c')
+        $cardInWork = DB::table('board_cards as c')
             ->join('boards as b', 'b.id', '=', 'c.board_id')
             ->join('board_columns as col', 'col.id', '=', 'c.column_id')
             ->where('b.campaign_id', $campaignId)
             ->whereIn('col.stage_key', BoardDefaults::waveWorkingStages())
+            ->exists();
+        if ($cardInWork) {
+            return true;
+        }
+
+        // PL-3.1 (P10): also locked while the campaign's wave has at least one creator in its Creators step. Read NOW, so
+        // removing the last creator unlocks. Evaluated only after the card check above, and the join starts at `waves`, so a
+        // campaign no wave uses answers from one indexed lookup of `waves.campaign_id`.
+        return DB::table('wave_creators as wc')
+            ->join('waves as w', 'w.id', '=', 'wc.wave_id')
+            ->where('w.campaign_id', $campaignId)
+            ->whereNull('w.deleted_at')
             ->exists();
     }
 
