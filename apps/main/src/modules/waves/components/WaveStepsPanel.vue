@@ -102,6 +102,8 @@ function completedLine(steps: readonly WaveStepResource[]): string {
 }
 
 /** PL-2.5: what the real strategy step says next to a row somebody set by hand beyond it. */
+// The "set by hand" line (PL-2.5) is drawn by a v-for over 0 or 1, not a v-if: a v-if that is false leaves a comment node in
+// every row, and with strategy off the row's markup must stay exactly PL-1's.
 function handLine(step: WaveStepResource): string {
   const st = step.attributes.strategy
   if (st === undefined) return ''
@@ -301,9 +303,9 @@ function canRemove(step: WaveStepResource): boolean {
             </span>
           </div>
 
-          <!-- PL-2.5: the "set by hand" line takes the row's full width under the step name, not the narrow status cell. -->
           <div
-            v-if="step.attributes.strategy?.hand_set_beyond"
+            v-for="once in step.attributes.strategy?.hand_set_beyond ? 1 : 0"
+            :key="once"
             class="steps__hand-row"
             data-test="step-handline"
           >

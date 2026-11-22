@@ -1,7 +1,7 @@
 # PL-2.5 "Connecting it up" — review
 
-Branch `pl`. Stage 1 (API) was reviewed and accepted. This file records what was accepted, then Stage 2 (web).
-**Nothing of Stage 2 is pushed.** Pedram walks first.
+Branch `pl`. Stage 1 (API) was reviewed and accepted. This file records what was accepted, then Stage 2 (web), the walk and the improvements after it.
+Pedram walked it (18 steps, all passed), the four improvements were built, and he re-checked them on 2026-11-22 (passed). **The sprint close-out has not been run. Not merged, not deployed.**
 
 ## 1. Accepted differences from the plan (Stage 1, recorded as Pedram ruled)
 
@@ -53,9 +53,23 @@ The table is filled in `pl-2-5-plan.md` section 4.5. Summary:
 - Frames read with `get_design_context`: 13:428, 13:828, 13:1375, 13:4412 (saved frame files).
 - Dialogs, menus, the notes panel and the side sheet were opened, closed and quickly reopened at three speeds (0, 60, 150 ms) in `strategy-completion.spec.ts`: the warning confirm, the refusal, the note delete confirm, the tracker confirm, and the matrix sheet. The completion bar, the panel and the sheet were also checked at 390 (no sideways scroll with the sidebar closed).
 
-## 5a. Walk improvements (N1 to N4)
+## 5a. Walk improvements (N1 to N4) and the single-market tweak
 
-Built after the walk; the choices and the measured numbers are in `pl-2-5-plan.md` 4.5a. The sticky and scrolling behaviour, the expanded view, the "Set by hand" line and the market progress in the stepper line have **no frame**; they are recorded as built. Gates are in `pl-2-5-break-reverts.md` (W1 to W5, X1 to X3, H1, P1, each red then green). Replies to a note are recorded under PL-5 in `production-line-sprints.md`.
+Choices and measured numbers are in `pl-2-5-plan.md` 4.5a. The sticky and scrolling behaviour, the expanded view, the "Set by hand" line and the market progress in the stepper line have **no frame**; they are recorded as built.
+
+- **N1 notes scroll.** Header on top, list scrolls inside, composer pinned, panel sticky 81 px from the top (wide); below the step, static and capped at 560 px or 80% of the window (under 1100). Opens on the newest note and scrolls to one just added. Same for the matrix sheet. Checked with 0, 4, 30 and 100 notes and one 1,700-character note.
+- **N2 expand and collapse.** The existing side sheet widened to 720 px. A collapse button, Escape and the close button return; focus returns to "Expand notes"; the draft is kept both ways; one composer at a time. Screenshots of the expanded sheet at 1600 and 390 (`/tmp/pl25/shots/wide-sheet-expanded.png`, `n390-sheet-expanded.png`) were looked at: header with title, "Internal" pill and collapse icon; list scrolled to the newest note and scrolling inside (scroll top 1697 and 1829, back to 0 by script); composer and "Add note" pinned at the bottom (composer bottom 882 of 900, 826 of 844); at 390 the sheet is full width.
+- **N3 "Set by hand"** has its own line under the step name (1198 px wide at 1600, 794 at 900, 284 at 390 where it wraps to two lines). Wording unchanged.
+- **N4 stepper line**: counts and markets while in progress; "Complete · what it shows" when done; empty wording when not started; USPs keeps its count.
+- **Single-market tweak (2026-11-22).** With exactly one market the "n of m market(s)" part is left out: "3 of 12 cells set", "1 of 2 approved", "2 personas". Two or more markets show it as before. The completion rule is unchanged (the rule reads `markets_total < 2` only to decide what the line says). Checked in a real browser on the walk data: single market "3 of 12 cells set", "1 of 2 approved" (Connect Wave 1); two markets, a new wave with Slovakia and UK & Ireland and one persona in Slovakia: "1 persona · 0 of 2 markets", "0 of 6 cells set". A single-market in-progress Personas line ("2 personas") is covered by the Vitest spec only; it was not shown in a browser.
+- **Replies to a note** are deferred to PL-5 (recorded in `production-line-sprints.md`): built once with the client comments, then applied to the internal notes. Notes stay a flat list until then.
+
+**Two bugs found while building the improvements (both fixed):**
+
+1. A CSS rule for the tracker row's menu cell was more specific than its 390 px override, so at 390 the menu landed in the name column and squeezed the row to 52 px.
+2. The panel's height was measured from its place on screen, so a taller panel made a taller page, which let it scroll further and grow again. It is now measured from its place in the document and does not change while scrolling.
+
+A third thing the flag-off compare found: the new "set by hand" line (a `v-if`) left a comment node in every tracker row with strategy off. It is now a `v-for` over 0 or 1, so the row's markup is PL-1's.
 
 ## 6. FUNCTIONAL differences for Pedram (not built; ruled or out of this stage)
 
@@ -63,25 +77,36 @@ Built after the walk; the choices and the measured numbers are in `pl-2-5-plan.m
 2. **Steps 5 and 6** stay unlocked, plain elements (no lock, "Not available yet"); ruling C6.
 3. **Matrix notes** open in a side sheet because the frame (13:1375) has no notes column; the sheet itself is an assumption (Q3).
 4. **Not-started stepper step** has no frame; an empty outlined circle is assumed.
-5. **Stepper status line**: while a per-market step is in progress, the line reads "n of m markets" instead of the earlier counts ("3 personas · 1 of 2 markets covered", Concepts "n of m approved"). The counts line still shows for a step that is not started. Say if you want both.
+5. **Stepper status line**: superseded by the walk improvement N4 and the single-market tweak (section 5a): counts and markets while in progress, counts alone with one market.
 6. **Agency shell at 390**: the permanent 280 px sidebar is open on load and leaves the content 62 px wide until the menu button is pressed. This is the existing shell (every agency page), not this stage.
 
-## 7. Flag-off check
+## 7. Flag-off check (final tree)
 
 - Walk compare, with the comment-node check: agency **126 targets identical**, 0 page errors; creator **146 targets identical** (the 32 onboarding `HTTP 503` rejects are in the baseline too).
-- Waves ON, strategy OFF: the wave page and the tracker are exactly PL-1 (payload without the `strategy` key, no chip, no marker, no entry button, no hand-set confirm); `strategyEntry.spec` (the actions DOM and the comment nodes), the PL-1 tracker and steps-panel specs, and the `wave-tracker` Playwright spec pass.
+- **Waves ON, strategy OFF, compared against PL-1 in a real browser.** PL-1 tip `d790eb12` checked out as a separate working copy and served against the same API; the current build served the same way; both on the walk data, 1600 wide. Strategy was switched off in the browser by rewriting the answers the way the server answers with the flag off (no `features.strategy`, no `strategy` block in the tracker); no flag was written anywhere. The wave page's main area was captured as normalised markup for Waves 1, 2 and 4 and the Brand page, with screenshots (`/tmp/pl25/cmp/`).
+  - Tracker steps: identical to PL-1 (Wave 4 included, which holds a hand-set row). The first pass found one difference of mine, a comment node per row from the new "set by hand" line; fixed (section 5a) and re-captured.
+  - What still differs from PL-1 is PL-2.4's recorded change only: the market chip on the wave page (name in a chip with a countries button; PL-1 printed the market object as text with the new answer shape) and the market info buttons on the Brand page, plus an image address that carries a signing time.
+  - No chip, no entry button, no hand-set marker (0 of each on every page).
+  - Not compared: the server side of this check (the payload without the `strategy` key) is covered by Pest (Pl25GatesTest), not by this capture.
+- Specs: `strategyEntry.spec` (the actions DOM and the comment nodes), the PL-1 tracker and steps-panel specs, and the `wave-tracker` Playwright spec pass.
 
-## 8. Gates
+## 8. Gates (final tree)
 
-| Gate                                                                          | Result                                                                                                                                                                   |
-| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Vitest, whole `apps/main`                                                     | 5489 passed, 2 failed: only the **two appIconAssets failures (tech-debt row 43)**. (A hard-coded-colour gate failure of mine was found by the first full run and fixed.) |
-| `packages/api-client` Vitest                                                  | 236 passed.                                                                                                                                                              |
-| Pest, whole suite, **SQLite** (`:memory:`)                                    | 5302 passed, 58 skipped.                                                                                                                                                 |
-| Pest, whole suite, **PostgreSQL** (`catalyst_test`, port 5435, printed first) | 5360 passed, 0 failed.                                                                                                                                                   |
-| Playwright wave and strategy specs                                            | green, see L3.                                                                                                                                                           |
-| `vue-tsc`, ESLint (0 errors; 14 warnings, none in this stage), Pint, Larastan | clean.                                                                                                                                                                   |
-| Break-reverts (web)                                                           | 16 of 16 red then green; one weak gate strengthened (L3). `pl-2-5-break-reverts.md`.                                                                                     |
+| Gate                                                                          | Result                                                                                                                                                                     |
+| ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Vitest, whole `apps/main`                                                     | 5494 passed, 2 failed: only the **two appIconAssets failures (tech-debt row 43)**.                                                                                         |
+| Vitest, whole `apps/admin`                                                    | 754 passed.                                                                                                                                                                |
+| Vitest, `packages/api-client`                                                 | 236 passed.                                                                                                                                                                |
+| Pest, whole suite, **SQLite** (`:memory:`, printed first)                     | 5302 passed, 58 skipped.                                                                                                                                                   |
+| Pest, whole suite, **PostgreSQL** (`catalyst_test`, port 5435, printed first) | 5360 passed, 0 failed.                                                                                                                                                     |
+| Pint, Larastan                                                                | pass; no errors.                                                                                                                                                           |
+| Playwright wave and strategy specs, chromium, serial                          | 32 of 32 passed (3.1 min). One test over 15 s: `strategy-workspace` "at 390: entry, USPs, dialogs and menus, hostile text", 15.1 s (an existing PL-2.1 test, not changed). |
+| `vue-tsc` (`apps/main`, `apps/admin`), ESLint                                 | clean; ESLint 0 errors, 2 old `v-html` warnings in untouched files.                                                                                                        |
+| Break-reverts (web)                                                           | 27 gates, each red then green: 16 from Stage 2 and 11 from the improvements (W1 to W5, X1 to X3, H1, P1, P2). `pl-2-5-break-reverts.md`.                                   |
+
+Pest, Pint and Larastan were run once, on the final tree; no PHP changed after that run.
+
+**Not run:** Pest, Pint and Larastan were not re-run after the last web-only edits (none touch PHP). Playwright and Vitest were. A server-side waves-ON strategy-OFF compare (payload) was not run beyond the Pest gates. The in-progress single-market Personas line was not shown in a browser. No deploy, no CI run before the push.
 
 ## 9. The walk
 
@@ -96,3 +121,9 @@ Stack on the throwaway database `pl25_walk` (both flags ON there; no flag writte
   - **Connect Wave 3**: nothing started (lands on USPs).
   - **Connect Wave 4**: a Personas row set by hand beyond the real step, so the marker and the confirm show on the wave page.
   - Agency B (**Glovo**, Glovo Wave 1) holds a note Agency A must not see.
+
+## 10. The walk result and the re-check
+
+- **Walk (Pedram, 2026-11-22, local on `pl25_walk`, 18 steps): all passed.** Four improvements came out of it (N1 to N4, section 5a).
+- **Re-check (Pedram, 2026-11-22): passed.** One tweak after it: the single-market stepper line (section 5a).
+- **Clean-up done after the re-check:** `Pl25WalkCleanupSeeder` run on `pl25_walk` (agencies, users and everything under them removed); `pl25_walk` dropped (the only throwaway database created in this chunk that still existed; `pl25_rehearse_test` was dropped earlier); the servers on 8005, 5195 and 5196 stopped; the temporary Vite configs and helper scripts removed; no `DB_*` variable exported. `catalyst`, `catalyst_test`, `catalyst_e2e` and `catalyst_rehearsal` were not created in this chunk and were not touched (`catalyst_test` was written by the Pest run, as always). The two walk flags were never written by this chunk outside `pl25_walk`. `/tmp/pl25` is kept until Pedram says.

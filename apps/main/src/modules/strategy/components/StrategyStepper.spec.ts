@@ -283,6 +283,35 @@ describe('StrategyStepper (PL-2.3)', () => {
     expect(d('concepts')).toBe('Complete · 2 of 3 approved')
     done.unmount()
 
+    // One market: the "n of m market" part is left out; the counts stand alone.
+    for (const k of ['personas', 'matrix', 'concepts'] as const) {
+      summary.attributes.steps[k] = {
+        state: 'in_progress',
+        markets_done: 0,
+        markets_total: 1,
+        markets: [],
+      }
+    }
+    const single = await mountStrategy(StrategyStepper, {
+      summary,
+      brandId: BRAND_ULID,
+      waveId: WAVE_ULID,
+      active: 'usps',
+    })
+    const sg = (k: string) => single.get(`[data-test="strategy-step-${k}-status"]`).text()
+    expect(sg('personas')).toBe('3 personas')
+    expect(sg('matrix')).toBe('12 of 24 cells set')
+    expect(sg('concepts')).toBe('2 of 3 approved')
+    single.unmount()
+    for (const k of ['personas', 'matrix', 'concepts'] as const) {
+      summary.attributes.steps[k] = {
+        state: 'done',
+        markets_done: 2,
+        markets_total: 2,
+        markets: [],
+      }
+    }
+
     const empty = await mountStrategy(StrategyStepper, {
       summary: makeSummary(),
       brandId: BRAND_ULID,

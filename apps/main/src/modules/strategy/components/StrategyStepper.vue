@@ -92,6 +92,16 @@ const statusLine = computed<Record<LiveKey, string>>(() => {
           : baseLine.value[key]
       out[key] = joined(t('app.strategy.completion.complete'), counts)
     } else if (state === 'in_progress' && key !== 'usps') {
+      // One market: "1 of 1 market" says nothing, so the counts stand alone. Two or more: counts and markets.
+      if (a.steps[key].markets_total < 2) {
+        if (key === 'personas')
+          out[key] = t(
+            'app.strategy.stepper.personasCount',
+            { count: a.persona_count },
+            a.persona_count,
+          )
+        continue
+      }
       out[key] =
         key === 'personas'
           ? t(
