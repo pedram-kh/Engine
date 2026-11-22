@@ -4,15 +4,38 @@
  * "Notes (n)" button. The thread inside is mounted only while the sheet is open, so every open starts from a fresh
  * load and a quick close and reopen leaves nothing behind.
  */
+import { onBeforeUnmount, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { NoteStep } from '../api/strategy.api'
 
 import NotesThread from './NotesThread.vue'
 
-defineProps<{ modelValue: boolean; step: NoteStep; market: string | null; marketName: string }>()
+const props = defineProps<{
+  modelValue: boolean
+  step: NoteStep
+  market: string | null
+  marketName: string
+}>()
 const emit = defineEmits<{ 'update:modelValue': [value: boolean]; changed: [] }>()
 const { t } = useI18n()
+
+// A temporary drawer closes on its scrim but not on Escape; the sheet must close from the keyboard too. An open
+// dialog (the delete confirm) takes the key first.
+function onKey(e: KeyboardEvent): void {
+  if (e.key !== 'Escape' || e.defaultPrevented) return
+  if (document.querySelector('.v-dialog.v-overlay--active') !== null) return
+  emit('update:modelValue', false)
+}
+watch(
+  () => props.modelValue,
+  (open) => {
+    if (open) document.addEventListener('keydown', onKey)
+    else document.removeEventListener('keydown', onKey)
+  },
+  { immediate: true },
+)
+onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
 </script>
 
 <template>

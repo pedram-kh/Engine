@@ -189,4 +189,53 @@ describe('WaveStepsPanel (PL-1.3)', () => {
     expect(w.find('[data-test="stream-menu-statics"]').exists()).toBe(true)
     w.unmount()
   })
+
+  it('PL-2.5: a row set by hand beyond the real step shows the marker and what the step says; a row the system holds shows none', async () => {
+    const hand = makeStep(
+      {
+        name: 'Personas',
+        key: 'ugc.personas',
+        is_strategy: true,
+        status: 'done',
+        status_source: 'manual',
+        display_status: 'done',
+        strategy: {
+          state: 'in_progress',
+          markets_done: 1,
+          markets_total: 2,
+          hand_set_beyond: true,
+        },
+      },
+      'hand',
+    )
+    const sys = makeStep(
+      {
+        name: 'Matrix',
+        key: 'ugc.matrix',
+        is_strategy: true,
+        status: 'in_progress',
+        display_status: 'in_progress',
+        strategy: {
+          state: 'in_progress',
+          markets_done: 1,
+          markets_total: 2,
+          hand_set_beyond: false,
+        },
+      },
+      'sys',
+    )
+    const w = await mountWithApp(WaveStepsPanel, {
+      tracker: makeTracker([hand, sys]),
+      canManage: true,
+      meUlid: ME,
+      busy: new Set<string>(),
+      rowErrors: {},
+    })
+    await flushPromises()
+    expect(w.get('[data-test="step-hand-hand"]').text()).toBe(
+      'Set by hand · the step says In progress (1 of 2 markets)',
+    )
+    expect(w.find('[data-test="step-hand-sys"]').exists()).toBe(false)
+    w.unmount()
+  })
 })

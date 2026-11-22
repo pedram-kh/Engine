@@ -86,8 +86,10 @@ final class StrategyController
         $counts = WavePersona::query()->where('wave_id', $model->id)
             ->selectRaw('market_id, count(*) as n')->groupBy('market_id')->pluck('n', 'market_id')->map(static fn (mixed $n): int => (int) $n)->all();
 
-        return response()->json([
-            'data' => StrategyPresenter::summary($model->refresh(), $uspCount = WaveUsp::query()->where('wave_id', $model->id)->count(), $counts, $this->matrix->progress($model, $uspCount), ConceptService::summary($model)),
-        ]);
+        // The answer is the same summary the GET gives, steps block included: the screen replaces its summary with it.
+        $data = StrategyPresenter::summary($model->refresh(), $uspCount = WaveUsp::query()->where('wave_id', $model->id)->count(), $counts, $this->matrix->progress($model, $uspCount), ConceptService::summary($model));
+        $data['attributes'] += StepsPresenter::build($model);
+
+        return response()->json(['data' => $data]);
     }
 }

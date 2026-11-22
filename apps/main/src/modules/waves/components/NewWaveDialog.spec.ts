@@ -296,6 +296,47 @@ describe('NewWaveDialog (PL-1.1 W3)', () => {
     w.unmount()
   })
 
+  // ── PL-2.5 ────────────────────────────────────────────────────────────────────────────────────────────
+  it('PL-2.5: wave.market_has_notes names the notes to be deleted; the button changes, and the same save goes again with the count', async () => {
+    vi.mocked(wavesApi.update)
+      .mockRejectedValueOnce(
+        new ApiError({
+          status: 422,
+          code: 'wave.market_has_notes',
+          message: 'x',
+          details: [
+            {
+              code: 'wave.market_has_notes',
+              meta: {
+                markets: [{ market: '01JSK', name: 'Slovakia', code: 'SK', note_count: 3 }],
+                note_count: 3,
+              },
+            },
+          ],
+          raw: null,
+        } as never),
+      )
+      .mockResolvedValueOnce({ data: makeWave() })
+    const w = await mountWithApp(NewWaveDialog, props(makeWave()))
+    ;(
+      (body('[data-test="market-card-1"]') as HTMLElement).querySelector(
+        '[data-test="market-remove"]',
+      ) as HTMLElement
+    ).click()
+    await flushPromises()
+    await submit()
+    expect(body('[data-test="wave-notes-warning"]')?.textContent).toContain('Slovakia (3)')
+    expect(body('[data-test="wave-submit"]')?.textContent).toContain('Delete notes and save')
+    expect(vi.mocked(wavesApi.update).mock.calls[0]?.[3]).not.toHaveProperty(
+      'confirm_notes_deleted',
+    )
+    await submit()
+    expect(vi.mocked(wavesApi.update).mock.calls[1]?.[3]).toMatchObject({
+      confirm_notes_deleted: 3,
+    })
+    w.unmount()
+  })
+
   // ── PL-2.4 ────────────────────────────────────────────────────────────────────────────────────────────
   it('PL-2.4: a market that is already there goes back as it is (ulid, name, code, countries), a new country as a one-country market, with the version', async () => {
     vi.mocked(wavesApi.update).mockResolvedValue({ data: makeWave() })

@@ -186,6 +186,7 @@ it('B13: two writers one after the other end consistent (a decision, then a hand
     expect(P::st($w, 'ugc.concepts'))->toBe(['done', 'system']);
 });
 
+// Measured on the Pl25 walk data (wave 1, SQLite): summary 34, tracker 23, wave list 11 queries.
 it('B14: the wave list stays one grouped query on wave_steps and touches no strategy table; the summary and tracker stay under a stated maximum', function (): void {
     $w = S::world();
     P::usps($w, 2);
@@ -197,7 +198,7 @@ it('B14: the wave list stays one grouped query on wave_steps and touches no stra
 
     $summary = p25Recorded(fn () => S::call($w['admin'], 'GET', S::u($w))->assertOk());
     $tracker = p25Recorded(fn () => S::call($w['admin'], 'GET', WaveFixtures::wavesUrl($w['agency'], $w['brand'], $w['wave']->ulid).'/tracker')->assertOk());
-    expect(count($summary))->toBeLessThanOrEqual(60)->and(count($tracker))->toBeLessThanOrEqual(45);
+    expect(count($summary))->toBeLessThanOrEqual(40)->and(count($tracker))->toBeLessThanOrEqual(28);
 });
 
 it('B18: both tables are created and dropped; the database refuses a mark with a market of another wave and a second mark of one scope', function (): void {
@@ -246,4 +247,17 @@ it('B18: both tables are created and dropped; the database refuses a mark with a
         $m->up();
     }
     expect(Schema::hasTable('wave_strategy_completions'))->toBeTrue()->and(WaveStrategyCompletion::query()->count())->toBe(0)->and(WaveStrategyNote::query()->count())->toBe(0);
+});
+
+it('B21: the audience-title answer carries the same steps, landing and note counts as the summary (the screen replaces its summary with it)', function (): void {
+    $w = S::world();
+    P::usps($w, 2);
+
+    $answer = S::call($w['admin'], 'PATCH', S::u($w, 'audience-title'), ['usp_audience_title' => 'Lunch crowd'])->assertOk()->json('data.attributes');
+    $summary = S::call($w['admin'], 'GET', S::u($w))->assertOk()->json('data.attributes');
+
+    expect($answer['audience_title'])->toBe('Lunch crowd')
+        ->and($answer)->toHaveKeys(['steps', 'landing', 'note_counts'])
+        ->and($answer['steps'])->toBe($summary['steps'])
+        ->and($answer['landing'])->toBe($summary['landing']);
 });

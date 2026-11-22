@@ -92,7 +92,7 @@ async function startWave(
   const base = `/agencies/${agencyUlid}/brands/${brand.data.id}/waves/${wave.data.id}/strategy`
   const closeDrawer = async (): Promise<void> => {
     if (size.width >= 768) return
-    const drawer = page.locator('.v-navigation-drawer')
+    const drawer = page.locator('[data-test="agency-sidebar"]')
     // The drawer settles after a load or reload; closing it while it still moves can leave it open and the page 70 px wide.
     await expect(async () => {
       if ((await drawer.getAttribute('inert')) === null)
@@ -169,7 +169,7 @@ test.describe('Strategy workspace', () => {
 
       const closeDrawer = async (): Promise<void> => {
         if (size.width >= 768) return
-        const drawer = page.locator('.v-navigation-drawer')
+        const drawer = page.locator('[data-test="agency-sidebar"]')
         // The drawer settles after a load or reload; closing it while it still moves can leave it open and the page 70 px wide.
         await expect(async () => {
           if ((await drawer.getAttribute('inert')) === null)

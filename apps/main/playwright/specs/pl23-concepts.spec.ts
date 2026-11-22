@@ -97,7 +97,7 @@ async function setup(
   })
   const closeDrawer = async (): Promise<void> => {
     if (size.width >= 768) return
-    const drawer = page.locator('.v-navigation-drawer')
+    const drawer = page.locator('[data-test="agency-sidebar"]')
     await expect(async () => {
       if ((await drawer.getAttribute('inert')) === null)
         await page.locator('.v-app-bar-nav-icon').click()
@@ -267,7 +267,10 @@ test.describe('Concepts step', () => {
       await expect(page.locator('[data-test="concept-decision-dialog"]')).toHaveCount(0)
 
       // D1: everything approved - steps 5 and 6 show "Not available yet" and nothing else.
-      await expect(stepper).toContainText('1 of 1 approved')
+      // PL-2.5: a market with every concept approved is Complete (the status line is the real state).
+      await expect(page.locator('[data-test="strategy-step-concepts-status"]')).toHaveText(
+        'Complete',
+      )
       await expect(stepper).not.toContainText('Concepts: ')
       expect(only.data.id).not.toBe('')
 

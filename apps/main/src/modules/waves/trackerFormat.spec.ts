@@ -81,3 +81,19 @@ describe('completedSummary', () => {
     })
   })
 })
+
+describe('groupSteps (PL-2.5)', () => {
+  it('keeps a Done row that was set by hand beyond its strategy step in the open list, not in the folded completed line', () => {
+    const hand = makeStep({
+      status: 'done',
+      strategy: { state: 'in_progress', markets_done: 1, markets_total: 2, hand_set_beyond: true },
+    })
+    const real = makeStep({
+      status: 'done',
+      strategy: { state: 'done', markets_done: 2, markets_total: 2, hand_set_beyond: false },
+    })
+    const [g] = groupSteps([hand, real], 'all', null)
+    expect(g?.open).toEqual([hand])
+    expect(g?.completed).toEqual([real])
+  })
+})

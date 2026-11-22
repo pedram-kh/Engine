@@ -123,7 +123,21 @@ async function refreshSummary(): Promise<void> {
 }
 
 function onSummary(next: StrategySummaryResource): void {
-  summary.value = next
+  // An answer without the PL-2.5 blocks must never blank them: keep what the screen has.
+  const prev = summary.value?.attributes
+  const got: Partial<StrategySummaryResource['attributes']> = next.attributes
+  summary.value =
+    prev === undefined
+      ? next
+      : {
+          ...next,
+          attributes: {
+            ...next.attributes,
+            steps: got.steps ?? prev.steps,
+            landing: got.landing ?? prev.landing,
+            note_counts: got.note_counts ?? prev.note_counts,
+          },
+        }
 }
 
 onMounted(async () => {

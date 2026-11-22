@@ -130,7 +130,7 @@ test.describe('Messaging matrix', () => {
 
       await page.goto(`/brands/${brand.data.id}/waves/${wave.data.id}/strategy/matrix`)
       if (size.width < 768) {
-        const drawer = page.locator('.v-navigation-drawer')
+        const drawer = page.locator('[data-test="agency-sidebar"]')
         // The drawer settles after a load; closing it while it still moves can leave it open and the page 70 px wide.
         await expect(async () => {
           if ((await drawer.getAttribute('inert')) === null) {

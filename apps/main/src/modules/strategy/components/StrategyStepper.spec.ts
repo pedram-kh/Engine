@@ -180,4 +180,41 @@ describe('StrategyStepper (PL-2.3)', () => {
       w.unmount()
     })
   }
+
+  it('PL-2.5: each step shows its real state (done with a check, in progress with its number, not started empty) and its status line', async () => {
+    const summary = makeSummary({ concepts: concepts([0, 0, 0]) })
+    summary.attributes.steps = {
+      usps: {
+        state: 'done',
+        count: 5,
+        marked: true,
+        warnings: [],
+        completed_by: null,
+        completed_at: null,
+      },
+      personas: { state: 'in_progress', markets_done: 1, markets_total: 2, markets: [] },
+      matrix: { state: 'not_started', markets_done: 0, markets_total: 2, markets: [] },
+      concepts: { state: 'not_started', markets_done: 0, markets_total: 2, markets: [] },
+    }
+    const w = await mountStrategy(StrategyStepper, {
+      summary,
+      brandId: BRAND_ULID,
+      waveId: WAVE_ULID,
+      active: 'usps',
+    })
+    const state = (k: string) => w.get(`[data-test="strategy-step-${k}"]`).attributes('data-state')
+    expect([state('usps'), state('personas'), state('matrix')]).toEqual([
+      'done',
+      'in_progress',
+      'not_started',
+    ])
+    expect(w.find('[data-test="strategy-step-usps"] .strategy-step__circle i').exists()).toBe(true)
+    expect(w.get('[data-test="strategy-step-personas"] .strategy-step__circle').text()).toBe('2')
+    expect(w.find('[data-test="strategy-step-matrix"] .strategy-step__circle i').exists()).toBe(
+      false,
+    )
+    expect(w.get('[data-test="strategy-step-usps-status"]').text()).toBe('Complete')
+    expect(w.get('[data-test="strategy-step-personas-status"]').text()).toBe('1 of 2 markets')
+    w.unmount()
+  })
 })

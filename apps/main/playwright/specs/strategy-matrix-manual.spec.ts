@@ -60,7 +60,7 @@ async function signIn(page: Page, email: string, password: string): Promise<void
 
 async function closeDrawer(page: Page, width: number): Promise<void> {
   if (width >= 768) return
-  const drawer = page.locator('.v-navigation-drawer')
+  const drawer = page.locator('[data-test="agency-sidebar"]')
   await expect(async () => {
     if ((await drawer.getAttribute('inert')) === null) {
       await page.locator('.v-app-bar-nav-icon').click()

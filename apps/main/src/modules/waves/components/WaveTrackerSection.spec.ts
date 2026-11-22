@@ -121,6 +121,47 @@ describe('WaveTrackerSection (PL-1.3)', () => {
     w.unmount()
   })
 
+  it('PL-2.5: a hand-set beyond the real step asks first; nothing is sent twice until the person confirms, and Cancel changes nothing', async () => {
+    const incomplete = () =>
+      new ApiError({
+        status: 409,
+        code: 'step.incomplete',
+        message: 'x',
+        details: [
+          {
+            code: 'step.incomplete',
+            meta: { real_state: 'in_progress', markets_done: 1, markets_total: 2 },
+          },
+        ],
+        raw: null,
+      } as never)
+    api.updateStep.mockRejectedValueOnce(incomplete())
+    const w = await mountSection()
+    await w.get('[data-test="step-check-personas"]').trigger('click')
+    await flushPromises()
+    const dlg = body('[data-test="incomplete-dialog"]')
+    expect(dlg?.textContent).toContain('The strategy step says In progress (1 of 2 markets)')
+    expect(api.updateStep).toHaveBeenCalledTimes(1)
+    body('[data-test="confirm-cancel"]')?.click()
+    await flushPromises()
+    expect(api.updateStep).toHaveBeenCalledTimes(1)
+    expect(w.find('[data-test="step-row-personas"]').exists()).toBe(true)
+
+    api.updateStep.mockRejectedValueOnce(incomplete()).mockResolvedValueOnce({ data: makeStep() })
+    await w.get('[data-test="step-check-personas"]').trigger('click')
+    await flushPromises()
+    body('[data-test="confirm-ok"]')?.click()
+    await flushPromises()
+    expect(api.updateStep).toHaveBeenLastCalledWith(
+      AGENCY_ULID,
+      BRAND_ULID,
+      WAVE_ULID,
+      'personas',
+      { status: 'done', confirm_incomplete: true },
+    )
+    w.unmount()
+  })
+
   it('W5: a failed save puts the step back and says so on the row', async () => {
     api.updateStep.mockRejectedValue(
       new ApiError({ status: 500, code: 'server_error', message: 'x' } as never),

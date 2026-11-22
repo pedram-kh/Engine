@@ -107,7 +107,7 @@ test.describe('Wave tracker', () => {
       const closeDrawer = async (): Promise<void> => {
         if (size.width >= 768) return
         await page.locator('.v-app-bar-nav-icon').click()
-        await expect(page.locator('.v-navigation-drawer')).toHaveAttribute('inert', '')
+        await expect(page.locator('[data-test="agency-sidebar"]')).toHaveAttribute('inert', '')
       }
       await closeDrawer()
 
