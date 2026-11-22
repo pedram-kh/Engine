@@ -7,6 +7,7 @@ namespace App\Modules\Waves\Http\Controllers;
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Brands\Models\Brand;
 use App\Modules\Identity\Models\User;
+use App\Modules\Waves\Contracts\WaveStrategyState;
 use App\Modules\Waves\Http\Controllers\Concerns\ResolvesWaveRoute;
 use App\Modules\Waves\Models\WaveStep;
 use App\Modules\Waves\Services\WaveStepProvisioner;
@@ -24,7 +25,7 @@ final class WaveTrackerController
 {
     use ResolvesWaveRoute;
 
-    public function __construct(private readonly WaveStepProvisioner $provisioner) {}
+    public function __construct(private readonly WaveStepProvisioner $provisioner, private readonly WaveStrategyState $strategy) {}
 
     public function show(Request $request, Agency $agency, Brand $brand, string $wave): JsonResponse
     {
@@ -38,6 +39,8 @@ final class WaveTrackerController
         /** @var User $viewer */
         $viewer = $request->user();
         $this->provisioner->ensure($model);
+        // PL-2.5: with strategy ON the four rows are brought in line with the real steps on open (idempotent; a no-op OFF).
+        $this->strategy->catchUp($model, $viewer);
 
         return response()->json(['data' => WaveTrackerPresenter::tracker($model->refresh(), $viewer)]);
     }

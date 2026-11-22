@@ -383,6 +383,10 @@ final class ErasureRegistry
                 'note' => 'The agency\'s note on an approval, about a client contact. Tech-debt 48.',
                 'comment' => 'What the client contact asked to change, as the agency typed it. Tech-debt 48.',
             ]),
+            'wave_strategy_completions' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); the strategist\'s mark that a USP, persona or matrix step is complete (PL-2.5). A state flag with who and when: no free text, no creator or client data. `completed_by_user_id` is an agency member (nulled when the user row is hard-deleted; the screen then says "Former member").', ['completed_by_user_id']),
+            'wave_strategy_notes' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); INTERNAL working notes on a strategy step (PL-2.5), never shown to a client or a creator. The body is free text an agency user typed and it may name a person (a creator, a client contact, a colleague): it is not scanned, and erasing a creator does not touch it (the same class as `wave_concept_decisions`, tech-debt 48). `author_user_id` is an agency member (nulled when the user row is hard-deleted; the screen then says "Former member").', ['author_user_id'], [], null, [
+                'body' => 'Plain text typed by an agency user; may name a creator, a client contact or a colleague. Internal only. Tech-debt 48 (privacy documents need the sentence).',
+            ]),
             'brand_files' => new TableRule(Disposition::NotApplicable, 'Agency-authored (§3.7); client files on a brand.', ['uploaded_by_user_id']),
             'talent_pools' => new TableRule(Disposition::NotApplicable, 'Agency-authored; membership is talent_pool_creators (§3.7).', ['created_by_user_id'], [], null, [
                 'name' => 'A pool title.',

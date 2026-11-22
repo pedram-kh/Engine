@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Strategy\Http\Controllers\AngleController;
+use App\Modules\Strategy\Http\Controllers\CompletionController;
 use App\Modules\Strategy\Http\Controllers\ConceptController;
 use App\Modules\Strategy\Http\Controllers\ConceptImageController;
 use App\Modules\Strategy\Http\Controllers\ConceptLinkController;
@@ -10,6 +11,7 @@ use App\Modules\Strategy\Http\Controllers\MatrixController;
 use App\Modules\Strategy\Http\Controllers\PersonaController;
 use App\Modules\Strategy\Http\Controllers\StrategyController;
 use App\Modules\Strategy\Http\Controllers\UspController;
+use App\Modules\Strategy\Notes\NoteController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,6 +31,14 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
     ->group(function (): void {
         Route::get('/', [StrategyController::class, 'show'])->withTrashed()->name('waves.strategy.show');
         Route::patch('audience-title', [StrategyController::class, 'audienceTitle'])->withTrashed()->name('waves.strategy.audience-title');
+
+        // PL-2.5 — "Mark as complete" and "Reopen" (USPs, Personas, Matrix; Concepts is automatic) and internal notes.
+        Route::put('completions/{step}', [CompletionController::class, 'mark'])->whereIn('step', ['usps', 'personas', 'matrix'])->withTrashed()->name('waves.strategy.completions.mark');
+        Route::delete('completions/{step}', [CompletionController::class, 'reopen'])->whereIn('step', ['usps', 'personas', 'matrix'])->withTrashed()->name('waves.strategy.completions.reopen');
+        Route::get('notes', [NoteController::class, 'index'])->withTrashed()->name('waves.strategy.notes.index');
+        Route::post('notes', [NoteController::class, 'store'])->withTrashed()->name('waves.strategy.notes.store');
+        Route::patch('notes/{note}', [NoteController::class, 'update'])->withTrashed()->name('waves.strategy.notes.update');
+        Route::delete('notes/{note}', [NoteController::class, 'destroy'])->withTrashed()->name('waves.strategy.notes.destroy');
 
         Route::get('usps', [UspController::class, 'index'])->withTrashed()->name('waves.strategy.usps.index');
         Route::post('usps', [UspController::class, 'store'])->withTrashed()->name('waves.strategy.usps.store');

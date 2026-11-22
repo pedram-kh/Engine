@@ -578,6 +578,16 @@ enum AuditAction: string
     case WaveConceptLinkUpdated = 'wave_concept_link.updated';
     case WaveConceptLinkRemoved = 'wave_concept_link.removed';
 
+    // PL-2.5 — strategy completion marks and internal notes. One row per request, literal payload keys: ids (ulids), the
+    // step name, a market ulid, a reason word and counts. NEVER a note body: a note row carries only its length.
+    // `wave_strategy.reopened` is written for a person's Reopen (`reason` manual) and for a mark dropped because the step's
+    // last record went (`reason` emptied). Erasure: ids and counts only; both tables are decided in the ErasureRegistry.
+    case WaveStrategyCompleted = 'wave_strategy.completed';
+    case WaveStrategyReopened = 'wave_strategy.reopened';
+    case WaveStrategyNoteCreated = 'wave_strategy_note.created';
+    case WaveStrategyNoteUpdated = 'wave_strategy_note.updated';
+    case WaveStrategyNoteDeleted = 'wave_strategy_note.deleted';
+
     // Campaign attachments from the Files library, chunk B (AH-092). A
     // linkage action on the campaign, not a library action on the file — the
     // file's own audit trail (above) is unaffected by any of these. No

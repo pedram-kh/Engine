@@ -17,7 +17,6 @@ use App\Modules\Strategy\Models\WaveUsp;
 use App\Modules\Waves\Models\Wave;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -98,7 +97,7 @@ final class MatrixService
     {
         StrategyGuard::assertBrandWritable($brand);
 
-        return StrategyGuard::retryOnClash(fn (): array => DB::transaction(function () use ($wave, $actor, $marketUlid, $changes): array {
+        return StrategyGuard::retryOnClash(fn (): array => StrategyTrackerSync::transaction($wave, $actor, [StrategyStepState::MATRIX], function () use ($wave, $actor, $marketUlid, $changes): array {
             $locked = StrategyGuard::lockWave($wave);
             $market = PersonaService::assertMarketInWave($locked, $marketUlid);
 

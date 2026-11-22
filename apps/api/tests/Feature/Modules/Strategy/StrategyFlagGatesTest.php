@@ -52,15 +52,24 @@ it('K2: every strategy route is 404 not_found while waves_enabled is OFF even wi
     }
 });
 
-it('K1: the strategy flag changes nothing in the wave detail or the tracker answers (PL-2.1 does not touch them)', function (): void {
+it('K1: the strategy flag changes nothing in the wave detail; in the tracker it adds only the strategy block on strategy rows (PL-2.5)', function (): void {
     $w = S::world();
     $detail = WaveFixtures::wavesUrl($w['agency'], $w['brand'], $w['wave']->ulid);
 
     Feature::deactivate(StrategyEnabled::NAME);
     $offDetail = S::call($w['admin'], 'GET', $detail)->assertOk()->json();
     $offTracker = S::call($w['admin'], 'GET', $detail.'/tracker')->assertOk()->json();
+    foreach ($offTracker['data']['attributes']['steps'] as $step) {
+        expect($step['attributes'])->not->toHaveKey('strategy');
+    }
 
     Feature::activate(StrategyEnabled::NAME);
+    $onTracker = S::call($w['admin'], 'GET', $detail.'/tracker')->assertOk()->json();
+    foreach ($onTracker['data']['attributes']['steps'] as $i => $step) {
+        unset($step['attributes']['strategy']);
+        $onTracker['data']['attributes']['steps'][$i] = $step;
+    }
+
     expect(S::call($w['admin'], 'GET', $detail)->assertOk()->json())->toBe($offDetail)
-        ->and(S::call($w['admin'], 'GET', $detail.'/tracker')->assertOk()->json())->toBe($offTracker);
+        ->and($onTracker)->toBe($offTracker);
 });

@@ -12,11 +12,14 @@ use App\Modules\Strategy\Models\WaveConceptImage;
 use App\Modules\Strategy\Models\WaveConceptLink;
 use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WavePersonaAngle;
+use App\Modules\Strategy\Models\WaveStrategyNote;
 use App\Modules\Strategy\Models\WaveUsp;
 use App\Modules\Strategy\Policies\WaveConceptPolicy;
 use App\Modules\Strategy\Policies\WaveStrategyPolicy;
 use App\Modules\Strategy\Services\StrategyWaveMarketGuard;
+use App\Modules\Strategy\Services\StrategyWaveState;
 use App\Modules\Waves\Contracts\WaveMarketGuard;
+use App\Modules\Waves\Contracts\WaveStrategyState;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +32,8 @@ final class StrategyServiceProvider extends ServiceProvider
     {
         // Bound whether or not the flag is on: a wave edit that removes a market with personas is refused either way.
         $this->app->bind(WaveMarketGuard::class, StrategyWaveMarketGuard::class);
+        // PL-2.5: what the tracker and the wave edit may ask of Strategy; inert while the flag is OFF.
+        $this->app->bind(WaveStrategyState::class, StrategyWaveState::class);
     }
 
     public function boot(): void
@@ -37,6 +42,7 @@ final class StrategyServiceProvider extends ServiceProvider
         Gate::policy(WaveUsp::class, WaveStrategyPolicy::class);
         Gate::policy(WavePersona::class, WaveStrategyPolicy::class);
         Gate::policy(WavePersonaAngle::class, WaveStrategyPolicy::class);
+        Gate::policy(WaveStrategyNote::class, WaveStrategyPolicy::class);
         Gate::policy(WaveConcept::class, WaveConceptPolicy::class);
         Gate::policy(WaveConceptImage::class, WaveConceptPolicy::class);
         Gate::policy(WaveConceptLink::class, WaveConceptPolicy::class);

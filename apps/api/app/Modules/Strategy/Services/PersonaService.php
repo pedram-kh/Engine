@@ -65,7 +65,7 @@ final class PersonaService
         StrategyGuard::assertBrandWritable($brand);
         $marketUlid = (string) $data['market'];
 
-        return StrategyGuard::retryOnClash(fn (): WavePersona => DB::transaction(function () use ($wave, $actor, $data, $marketUlid): WavePersona {
+        return StrategyGuard::retryOnClash(fn (): WavePersona => StrategyTrackerSync::transaction($wave, $actor, [StrategyStepState::PERSONAS], function () use ($wave, $actor, $data, $marketUlid): WavePersona {
             $locked = StrategyGuard::lockWave($wave);
             $market = self::assertMarketInWave($locked, $marketUlid);
 
@@ -157,7 +157,7 @@ final class PersonaService
     {
         StrategyGuard::assertBrandWritable($brand);
 
-        DB::transaction(function () use ($wave, $personaUlid, $actor): void {
+        StrategyTrackerSync::transaction($wave, $actor, [StrategyStepState::PERSONAS, StrategyStepState::MATRIX], function () use ($wave, $personaUlid, $actor): void {
             $locked = StrategyGuard::lockWave($wave);
             $persona = $this->find($locked, $personaUlid);
 
@@ -197,7 +197,7 @@ final class PersonaService
     {
         StrategyGuard::assertBrandWritable($brand);
 
-        return StrategyGuard::retryOnClash(fn (): array => DB::transaction(function () use ($wave, $actor, $from, $to, $personaUlids): array {
+        return StrategyGuard::retryOnClash(fn (): array => StrategyTrackerSync::transaction($wave, $actor, [StrategyStepState::PERSONAS], function () use ($wave, $actor, $from, $to, $personaUlids): array {
             $locked = StrategyGuard::lockWave($wave);
             $fromMarket = self::assertMarketInWave($locked, $from);
             $toMarket = self::assertMarketInWave($locked, $to);

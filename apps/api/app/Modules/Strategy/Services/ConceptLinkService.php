@@ -11,7 +11,6 @@ use App\Modules\Identity\Models\User;
 use App\Modules\Strategy\Models\WaveConceptLink;
 use App\Modules\Strategy\StrategyLimits;
 use App\Modules\Waves\Models\Wave;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Reference links of a concept (PL-2.3, ruling C4). The server never fetches the URL: see {@see ConceptLinkRules}. At most
@@ -28,7 +27,7 @@ final class ConceptLinkService
         StrategyGuard::assertBrandWritable($brand);
         $url = ConceptLinkRules::validate($url);
 
-        return DB::transaction(function () use ($wave, $conceptUlid, $actor, $url, $title): array {
+        return StrategyTrackerSync::transaction($wave, $actor, [StrategyStepState::CONCEPTS], function () use ($wave, $conceptUlid, $actor, $url, $title): array {
             $locked = StrategyGuard::lockWave($wave);
             $concept = $this->concepts->lockedConcept($locked, $conceptUlid);
 
@@ -70,7 +69,7 @@ final class ConceptLinkService
             $data['url'] = ConceptLinkRules::validate((string) $data['url']);
         }
 
-        return DB::transaction(function () use ($wave, $conceptUlid, $linkUlid, $actor, $data): array {
+        return StrategyTrackerSync::transaction($wave, $actor, [StrategyStepState::CONCEPTS], function () use ($wave, $conceptUlid, $linkUlid, $actor, $data): array {
             $locked = StrategyGuard::lockWave($wave);
             $concept = $this->concepts->lockedConcept($locked, $conceptUlid);
             $link = $this->find($concept->id, $linkUlid);
@@ -104,7 +103,7 @@ final class ConceptLinkService
     {
         StrategyGuard::assertBrandWritable($brand);
 
-        return DB::transaction(function () use ($wave, $conceptUlid, $linkUlid, $actor): bool {
+        return StrategyTrackerSync::transaction($wave, $actor, [StrategyStepState::CONCEPTS], function () use ($wave, $conceptUlid, $linkUlid, $actor): bool {
             $locked = StrategyGuard::lockWave($wave);
             $concept = $this->concepts->lockedConcept($locked, $conceptUlid);
             $link = $this->find($concept->id, $linkUlid);

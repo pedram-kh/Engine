@@ -216,7 +216,7 @@ final class WaveController
                 }
             }],
             'markets.*.countries.*' => ['string', 'size:2', 'regex:/^[A-Z]{2}$/'],
-            ...($creating ? [] : ['markets_version' => ['required_with:markets', 'string', 'max:64']]),
+            ...($creating ? [] : ['markets_version' => ['required_with:markets', 'string', 'max:64'], 'confirm_notes_deleted' => ['sometimes', 'integer', 'min:0', 'max:100000']]),
             'campaign_id' => ['sometimes', 'nullable', 'string', 'size:26', Rule::prohibitedIf(static fn (): bool => $request !== null && is_array($request->input('new_campaign')))],
         ];
     }

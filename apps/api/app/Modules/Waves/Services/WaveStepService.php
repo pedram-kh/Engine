@@ -10,12 +10,14 @@ use App\Modules\Audit\Facades\Audit;
 use App\Modules\Brands\Enums\BrandStatus;
 use App\Modules\Brands\Models\Brand;
 use App\Modules\Identity\Models\User;
+use App\Modules\Waves\Contracts\WaveStrategyState;
 use App\Modules\Waves\Enums\WaveStepSource;
 use App\Modules\Waves\Enums\WaveStepStatus;
 use App\Modules\Waves\Enums\WaveStream;
 use App\Modules\Waves\Models\Wave;
 use App\Modules\Waves\Models\WaveStep;
 use App\Modules\Waves\Steps\WaveStepDefaults;
+use App\Modules\Waves\Steps\WaveStrategyRowRules;
 use App\Modules\Waves\Steps\WaveTrackerCalculator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -38,7 +40,10 @@ use Illuminate\Support\Str;
  */
 final class WaveStepService
 {
-    public function __construct(private readonly WaveStepProvisioner $provisioner) {}
+    /** @var list<string> the tracker rows that have a real strategy step (PL-2.5) */
+    private const REAL_KEYS = ['ugc.usps', 'ugc.personas', 'ugc.matrix', 'ugc.concepts'];
+
+    public function __construct(private readonly WaveStepProvisioner $provisioner, private readonly WaveStrategyState $strategy) {}
 
     /**
      * @param  array<string, mixed>  $data  stream, name, owner (ulid|null), owner_client, starts_on, due_on
@@ -110,7 +115,9 @@ final class WaveStepService
             return DB::transaction(function () use ($wave, $stepUlid, $actor, $data): WaveStep {
                 // A move appends to another stream, so it takes the wave lock BEFORE the step lock (the order every
                 // stream operation uses); a plain edit takes the step row lock only.
-                $locked = array_key_exists('stream', $data)
+                // PL-2.5: a status change on a row that has a real strategy step also takes the wave lock FIRST (the order
+                // every strategy write uses), so it cannot interleave with the choke point that writes the same row.
+                $locked = (array_key_exists('stream', $data) || $this->needsRealState($wave, $stepUlid, $data))
                     ? Wave::query()->whereKey($wave->id)->lockForUpdate()->firstOrFail()
                     : $wave;
 
@@ -134,7 +141,7 @@ final class WaveStepService
                 }
 
                 if (array_key_exists('status', $data)) {
-                    $this->applyStatus($step, WaveStepStatus::from((string) $data['status']), $actor);
+                    $this->applyStatus($step, WaveStepStatus::from((string) $data['status']), $actor, $locked, ($data['confirm_incomplete'] ?? false) === true);
                 }
 
                 if (array_key_exists('owner', $data) || array_key_exists('owner_client', $data)) {
@@ -341,14 +348,53 @@ final class WaveStepService
             ->firstOrFail();
     }
 
-    private function applyStatus(WaveStep $step, WaveStepStatus $new, User $actor): void
+    /**
+     * PL-2.5: does this request set the status of a row that has a real strategy step (strategy ON)? Read without a lock;
+     * the answer only decides whether the wave lock is taken first.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    private function needsRealState(Wave $wave, string $stepUlid, array $data): bool
+    {
+        if (! array_key_exists('status', $data) || ! $this->strategy->active()) {
+            return false;
+        }
+        $key = WaveStep::query()->where('wave_id', $wave->id)->where('ulid', $stepUlid)->value('step_key');
+
+        return is_string($key) && in_array($key, self::REAL_KEYS, true);
+    }
+
+    private function applyStatus(WaveStep $step, WaveStepStatus $new, User $actor, Wave $wave, bool $confirmed): void
     {
         if ($new === $step->status) {
             return;
         }
 
+        // PL-2.5 (F1): with strategy ON a row that has a real step compares the hand-set status with the real one, under
+        // the wave lock. Beyond it: refused 409 until confirmed (then "set by hand"); equal: the system owns the row;
+        // below it: set by hand. Without strategy ON, or for a row with no real step, nothing changes (PL-1.3).
+        $source = WaveStepSource::Manual;
+        $key = $step->step_key;
+        if ($key !== null && in_array($key, self::REAL_KEYS, true) && $this->strategy->active()) {
+            $real = $this->strategy->real($wave)[$key] ?? null;
+            if ($real !== null) {
+                if (WaveStrategyRowRules::beyond($new->value, $real['state'])) {
+                    if (! $confirmed) {
+                        throw WaveRuleViolation::stepIncomplete([
+                            'step' => $key,
+                            'real_state' => $real['state'],
+                            'markets_done' => $real['markets_done'],
+                            'markets_total' => $real['markets_total'],
+                        ]);
+                    }
+                } elseif ($new->value === $real['state']) {
+                    $source = WaveStepSource::System;
+                }
+            }
+        }
+
         $step->status = $new;
-        $step->status_source = WaveStepSource::Manual;
+        $step->status_source = $source;
         // `completed_on` is the actor's today when the step becomes done, cleared when it leaves done.
         $step->completed_on = $new === WaveStepStatus::Done
             ? Carbon::parse(WaveTrackerCalculator::todayFor($actor->timezone))

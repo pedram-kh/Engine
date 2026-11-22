@@ -8,6 +8,7 @@ use App\Modules\Agencies\Models\Agency;
 use App\Modules\Brands\Models\Brand;
 use App\Modules\Identity\Models\User;
 use App\Modules\Strategy\Http\Controllers\Concerns\ResolvesStrategyRoute;
+use App\Modules\Strategy\Http\Resources\StepsPresenter;
 use App\Modules\Strategy\Http\Resources\StrategyPresenter;
 use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WaveUsp;
@@ -15,6 +16,7 @@ use App\Modules\Strategy\Services\ConceptService;
 use App\Modules\Strategy\Services\MatrixService;
 use App\Modules\Strategy\Services\StrategyRuleViolation;
 use App\Modules\Strategy\Services\StrategyText;
+use App\Modules\Strategy\Services\StrategyTrackerSync;
 use App\Modules\Strategy\Services\UspService;
 use App\Modules\Strategy\StrategyLimits;
 use Illuminate\Http\JsonResponse;
@@ -45,9 +47,16 @@ final class StrategyController
         $counts = WavePersona::query()->where('wave_id', $model->id)
             ->selectRaw('market_id, count(*) as n')->groupBy('market_id')->pluck('n', 'market_id')->map(static fn (mixed $n): int => (int) $n)->all();
 
-        return response()->json([
-            'data' => StrategyPresenter::summary($model, $uspCount = WaveUsp::query()->where('wave_id', $model->id)->count(), $counts, $this->matrix->progress($model, $uspCount), ConceptService::summary($model)),
-        ]);
+        // PL-2.5: bring the four tracker rows in line with the real steps on open (idempotent; a write on a GET, as the
+        // tracker's first open is), then answer with the real states, the marks, the landing and the note counts.
+        /** @var User $viewer */
+        $viewer = $request->user();
+        StrategyTrackerSync::catchUp($model, $viewer);
+
+        $data = StrategyPresenter::summary($model, $uspCount = WaveUsp::query()->where('wave_id', $model->id)->count(), $counts, $this->matrix->progress($model, $uspCount), ConceptService::summary($model));
+        $data['attributes'] += StepsPresenter::build($model);
+
+        return response()->json(['data' => $data]);
     }
 
     public function audienceTitle(Request $request, Agency $agency, Brand $brand, string $wave): JsonResponse

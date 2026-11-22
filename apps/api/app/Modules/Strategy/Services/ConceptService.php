@@ -98,7 +98,7 @@ final class ConceptService
         StrategyGuard::assertBrandWritable($brand);
         $market = PersonaService::assertMarketInWave($wave, (string) $data['market']);
 
-        return DB::transaction(function () use ($wave, $actor, $data, $market): WaveConcept {
+        return StrategyTrackerSync::transaction($wave, $actor, [StrategyStepState::CONCEPTS], function () use ($wave, $actor, $data, $market): WaveConcept {
             $locked = StrategyGuard::lockWave($wave);
 
             $persona = $this->persona($locked, $market->id, (string) $data['persona']);
@@ -154,7 +154,7 @@ final class ConceptService
     {
         StrategyGuard::assertBrandWritable($brand);
 
-        return DB::transaction(function () use ($wave, $conceptUlid, $actor, $data): array {
+        return StrategyTrackerSync::transaction($wave, $actor, [StrategyStepState::CONCEPTS], function () use ($wave, $conceptUlid, $actor, $data): array {
             $locked = StrategyGuard::lockWave($wave);
             $concept = $this->lockedConcept($locked, $conceptUlid);
 
@@ -274,7 +274,7 @@ final class ConceptService
                 throw StrategyRuleViolation::conceptDeleteFailed();
             }
 
-            $done = DB::transaction(function () use ($wave, $conceptUlid, $actor, $mayDeleteDecided, $keys): bool {
+            $done = StrategyTrackerSync::transaction($wave, $actor, [StrategyStepState::CONCEPTS], function () use ($wave, $conceptUlid, $actor, $mayDeleteDecided, $keys): bool {
                 $locked = StrategyGuard::lockWave($wave);
                 $concept = $this->lockedConcept($locked, $conceptUlid);
                 if ($concept->status !== ConceptStatus::Awaiting && ! $mayDeleteDecided) {
@@ -318,7 +318,7 @@ final class ConceptService
         /** @var list<array{image: WaveConceptImage, from: string, thumbFrom: string|null}> $plan */
         $plan = [];
 
-        $copy = DB::transaction(function () use ($wave, $conceptUlid, $actor, &$plan): WaveConcept {
+        $copy = StrategyTrackerSync::transaction($wave, $actor, [StrategyStepState::CONCEPTS], function () use ($wave, $conceptUlid, $actor, &$plan): WaveConcept {
             $locked = StrategyGuard::lockWave($wave);
             $source = $this->lockedConcept($locked, $conceptUlid);
 
@@ -407,7 +407,7 @@ final class ConceptService
             }
             $gone = ConceptImageStorage::deleteAll($keys);
             if ($gone) {
-                DB::transaction(function () use ($copy, $wave): void {
+                StrategyTrackerSync::transaction($wave, $actor, [StrategyStepState::CONCEPTS], function () use ($copy, $wave): void {
                     StrategyGuard::lockWave($wave);
                     $fresh = WaveConcept::query()->whereKey($copy->id)->lockForUpdate()->first();
                     if ($fresh !== null) {

@@ -87,6 +87,7 @@ final class WaveStepController
             'owner_client' => ['sometimes', 'boolean'],
             'starts_on' => ['sometimes', 'nullable', 'date_format:Y-m-d'],
             'due_on' => ['sometimes', 'nullable', 'date_format:Y-m-d'],
+            'confirm_incomplete' => ['sometimes', 'boolean'],
         ])->validate();
 
         /** @var User $actor */
@@ -95,7 +96,7 @@ final class WaveStepController
         try {
             $updated = $this->steps->update($brand, $model, $step, $actor, $data);
         } catch (WaveRuleViolation $e) {
-            return ErrorResponse::single($request, Response::HTTP_UNPROCESSABLE_ENTITY, $e->errorCode, $e->getMessage());
+            return ErrorResponse::single($request, $e->status, $e->errorCode, $e->getMessage(), meta: $e->meta);
         }
 
         return response()->json(['data' => WaveTrackerPresenter::stepResponse($updated, $actor)]);

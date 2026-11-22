@@ -477,6 +477,16 @@ it('A1-9: a failure after the persona renames rolls the market edit back with th
             return $this->real->conceptCountsByMarket($locked, $removedIds);
         }
 
+        public function noteCountsByMarket(Wave $locked, array $removedIds): array
+        {
+            return $this->real->noteCountsByMarket($locked, $removedIds);
+        }
+
+        public function forgetMarkets(Wave $locked, array $removedIds): array
+        {
+            return $this->real->forgetMarkets($locked, $removedIds);
+        }
+
         public function renamePersonaCodes(Wave $locked, int $marketId, string $oldCode, string $newCode): array
         {
             $done = $this->real->renamePersonaCodes($locked, $marketId, $oldCode, $newCode);

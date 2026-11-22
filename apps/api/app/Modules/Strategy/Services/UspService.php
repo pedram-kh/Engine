@@ -50,7 +50,7 @@ final class UspService
     {
         StrategyGuard::assertBrandWritable($brand);
 
-        return StrategyGuard::retryOnClash(fn (): WaveUsp => DB::transaction(function () use ($wave, $actor, $data): WaveUsp {
+        return StrategyGuard::retryOnClash(fn (): WaveUsp => StrategyTrackerSync::transaction($wave, $actor, [StrategyStepState::USPS], function () use ($wave, $actor, $data): WaveUsp {
             $locked = StrategyGuard::lockWave($wave);
 
             $existing = WaveUsp::query()->where('wave_id', $locked->id)->get(['id', 'color_key', 'position']);
@@ -187,7 +187,7 @@ final class UspService
     {
         StrategyGuard::assertBrandWritable($brand);
 
-        DB::transaction(function () use ($wave, $uspUlid, $actor, $mayDeleteInUse, $confirmCount): void {
+        StrategyTrackerSync::transaction($wave, $actor, [StrategyStepState::USPS, StrategyStepState::MATRIX, StrategyStepState::CONCEPTS], function () use ($wave, $uspUlid, $actor, $mayDeleteInUse, $confirmCount): void {
             $locked = StrategyGuard::lockWave($wave);
             $usp = $this->find($locked, $uspUlid);
 

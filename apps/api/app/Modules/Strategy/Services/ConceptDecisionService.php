@@ -13,7 +13,6 @@ use App\Modules\Strategy\Models\WaveConcept;
 use App\Modules\Strategy\Models\WaveConceptDecision;
 use App\Modules\Waves\Models\Wave;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 
 /**
  * The client's decision on a concept, recorded by an admin or manager on the client's behalf (PL-2.3, ruling C5, Q13).
@@ -52,7 +51,7 @@ final class ConceptDecisionService
             $note = null;
         }
 
-        return DB::transaction(function () use ($wave, $conceptUlid, $actor, $status, $name, $note, $comment): WaveConceptDecision {
+        return StrategyTrackerSync::transaction($wave, $actor, [StrategyStepState::CONCEPTS], function () use ($wave, $conceptUlid, $actor, $status, $name, $note, $comment): WaveConceptDecision {
             $locked = StrategyGuard::lockWave($wave);
             $concept = $this->concepts->lockedConcept($locked, $conceptUlid);
 

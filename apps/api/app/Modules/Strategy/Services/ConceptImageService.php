@@ -118,7 +118,7 @@ final class ConceptImageService
         }
 
         $reset = false;
-        DB::transaction(function () use ($wave, $conceptUlid, $actor, $image, $verified, &$reset): void {
+        StrategyTrackerSync::transaction($wave, $actor, [StrategyStepState::CONCEPTS], function () use ($wave, $conceptUlid, $actor, $image, $verified, &$reset): void {
             $locked = $this->concepts->lockedConcept($wave, $conceptUlid);
             $fresh = WaveConceptImage::query()->whereKey($image->id)->first();
             if ($fresh === null) {
@@ -167,7 +167,7 @@ final class ConceptImageService
             throw StrategyRuleViolation::imageDeleteFailed();
         }
 
-        return DB::transaction(function () use ($wave, $conceptUlid, $image, $actor): bool {
+        return StrategyTrackerSync::transaction($wave, $actor, [StrategyStepState::CONCEPTS], function () use ($wave, $conceptUlid, $image, $actor): bool {
             StrategyGuard::lockWave($wave);
             $locked = $this->concepts->lockedConcept($wave, $conceptUlid);
             $size = (int) ($image->size_bytes ?? 0);

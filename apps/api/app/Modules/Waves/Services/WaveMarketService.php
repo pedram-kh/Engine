@@ -116,9 +116,9 @@ final class WaveMarketService
      * without creates, an existing market missing from the list is removed (refused if it has personas).
      *
      * @param  list<array<string, mixed>>  $specs  `id?`, `name`, `code?`, `countries`, `rename_persona_codes?`
-     * @return array{changed: bool, before: array{markets: list<string>, market_countries: array<string, list<string>>}, after: array{markets: list<string>, market_countries: array<string, list<string>>, markets_renamed: list<string>}, persona_codes: array{renamed: int, skipped: int, kept_custom: int, markets: list<string>}}
+     * @return array{changed: bool, before: array{markets: list<string>, market_countries: array<string, list<string>>}, after: array{markets: list<string>, market_countries: array<string, list<string>>, markets_renamed: list<string>}, persona_codes: array{renamed: int, skipped: int, kept_custom: int, markets: list<string>}, removed: array{completions: int, notes: int}}
      */
-    public function replace(Wave $locked, array $specs, string $version): array
+    public function replace(Wave $locked, array $specs, string $version, ?int $confirmNotes = null): array
     {
         $current = $this->load($locked);
 
@@ -165,16 +165,31 @@ final class WaveMarketService
 
                 throw WaveRuleViolation::marketHasPersonas($rows);
             }
+
+            // PL-2.5 (Q5): internal notes go with the market, but the person is told how many first (confirm = the total).
+            $notes = $this->guard->noteCountsByMarket($locked, $ids);
+            $noteTotal = array_sum($notes);
+            if ($noteTotal > 0 && $confirmNotes !== $noteTotal) {
+                $rows = [];
+                foreach ($current as $market) {
+                    if (isset($notes[$market->id])) {
+                        $rows[] = ['market' => $market->ulid, 'name' => $market->name, 'code' => $market->code, 'note_count' => $notes[$market->id]];
+                    }
+                }
+
+                throw WaveRuleViolation::marketHasNotes($rows, $noteTotal);
+            }
         }
 
         $before = $this->summary($current);
         $renamed = [];
         $personaCodes = ['renamed' => 0, 'skipped' => 0, 'kept_custom' => 0, 'markets' => []];
+        $forgotten = ['completions' => 0, 'notes' => 0];
 
         try {
             // A nested transaction is a savepoint: a key violation that still gets through (it cannot under the wave
             // lock) must not abort the caller's whole PostgreSQL transaction before it is mapped to a 422.
-            DB::transaction(function () use ($locked, $byUlid, $norm, $removed, &$renamed, &$personaCodes): void {
+            DB::transaction(function () use ($locked, $byUlid, $norm, $removed, &$renamed, &$personaCodes, &$forgotten): void {
                 // 1. Country rows of removed markets and of markets whose country set changes, so a country can move
                 //    between markets in one request without tripping `unique (wave_id, country)` mid-statement.
                 $dropFor = $removed->pluck('id')->map(static fn (mixed $id): int => (int) $id)->all();
@@ -200,6 +215,8 @@ final class WaveMarketService
 
                 // 2. Removed markets.
                 if ($removed->isNotEmpty()) {
+                    // PL-2.5 (Q5): the marks and notes of a removed market go first (every foreign key is RESTRICT).
+                    $forgotten = $this->guard->forgetMarkets($locked, array_values($removed->pluck('id')->map(static fn (mixed $id): int => (int) $id)->all()));
                     WaveMarket::query()->where('wave_id', $locked->id)->whereIn('id', $removed->pluck('id')->all())->delete();
                 }
 
@@ -264,6 +281,7 @@ final class WaveMarketService
             'before' => $before,
             'after' => $after + ['markets_renamed' => $renamed],
             'persona_codes' => $personaCodes,
+            'removed' => $forgotten,
         ];
     }
 

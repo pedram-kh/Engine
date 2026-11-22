@@ -19,6 +19,28 @@ final class WaveRuleViolation extends RuntimeException
         parent::__construct($title);
     }
 
+    /**
+     * PL-2.5 (F1 row 2) — a status set by hand beyond what the real strategy step has reached (409). Not a block: the same
+     * request with `confirm_incomplete: true` is saved. `meta` says where the real step stands.
+     *
+     * @param  array{step: string, real_state: string, markets_done: int, markets_total: int}  $meta
+     */
+    public static function stepIncomplete(array $meta): self
+    {
+        return new self('step.incomplete', 'This step is not complete yet. Confirm to set it anyway.', $meta, 409);
+    }
+
+    /**
+     * PL-2.5 (Q5) — a wave edit would remove a market that has internal notes (422). Not a block: the same request with
+     * `confirm_notes_deleted` equal to the total deletes them with the market. `meta.markets` lists the markets and counts.
+     *
+     * @param  list<array{market: string, name: string, code: string, note_count: int}>  $markets
+     */
+    public static function marketHasNotes(array $markets, int $total): self
+    {
+        return new self('wave.market_has_notes', 'Those markets have internal notes. Confirm to delete them with the markets.', ['markets' => $markets, 'note_count' => $total]);
+    }
+
     public static function brandArchived(): self
     {
         return new self('wave.brand_archived', 'An archived brand is read-only; restore it before changing its waves.');

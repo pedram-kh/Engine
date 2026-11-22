@@ -6,6 +6,8 @@ namespace App\Modules\Strategy\Services;
 
 use App\Modules\Strategy\Models\WaveConcept;
 use App\Modules\Strategy\Models\WavePersona;
+use App\Modules\Strategy\Models\WaveStrategyCompletion;
+use App\Modules\Strategy\Notes\NoteService;
 use App\Modules\Waves\Contracts\WaveMarketGuard;
 use App\Modules\Waves\Models\Wave;
 
@@ -85,5 +87,22 @@ final class StrategyWaveMarketGuard implements WaveMarketGuard
         }
 
         return ['renamed' => $renamed, 'skipped' => $skipped, 'kept_custom' => $custom];
+    }
+
+    public function noteCountsByMarket(Wave $locked, array $removedIds): array
+    {
+        return NoteService::countsByMarket($locked, $removedIds);
+    }
+
+    public function forgetMarkets(Wave $locked, array $removedIds): array
+    {
+        if ($removedIds === []) {
+            return ['completions' => 0, 'notes' => 0];
+        }
+
+        return [
+            'completions' => WaveStrategyCompletion::query()->where('wave_id', $locked->id)->whereIn('market_id', $removedIds)->delete(),
+            'notes' => NoteService::purgeMarkets($locked, $removedIds),
+        ];
     }
 }

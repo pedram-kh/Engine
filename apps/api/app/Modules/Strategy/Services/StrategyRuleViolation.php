@@ -224,4 +224,36 @@ final class StrategyRuleViolation extends RuntimeException
     {
         return new self('concept_image.delete_failed', 'The stored image could not be deleted; nothing was removed. Try again.', 500);
     }
+
+    /** PL-2.5 (Q1): marking a step that has no data at all (no USP, no persona in the market, no cell set) is refused. */
+    public static function nothingToComplete(): self
+    {
+        return new self('strategy.nothing_to_complete', 'There is nothing to mark as complete yet.');
+    }
+
+    /** PL-2.5: a per-market step needs its market; USPs are per wave and refuse one. */
+    public static function stepMarket(bool $required): self
+    {
+        return $required
+            ? new self('strategy.market_required', 'This step is per market: say which market.')
+            : new self('strategy.market_not_allowed', 'USPs are per wave, not per market.');
+    }
+
+    /** PL-2.5: a thread holds at most 100 notes. */
+    public static function noteThreadFull(): self
+    {
+        return new self('note.thread_full', 'A thread holds at most 100 notes.');
+    }
+
+    /** PL-2.5 (K4): only the author edits a note; only the author, an admin or a manager deletes it. */
+    public static function noteForbidden(): self
+    {
+        return new self('note.forbidden', 'You cannot change this note.', 403);
+    }
+
+    /** PL-2.5: a note body is 1 to 2000 characters of plain text. */
+    public static function noteBodyInvalid(): self
+    {
+        return new self('note.body_invalid', 'A note is 1 to 2000 characters.');
+    }
 }

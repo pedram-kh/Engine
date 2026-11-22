@@ -15,9 +15,11 @@ use App\Modules\Campaigns\Enums\CampaignStatus;
 use App\Modules\Campaigns\Enums\CampaignType;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Identity\Models\User;
+use App\Modules\Waves\Contracts\WaveStrategyState;
 use App\Modules\Waves\Enums\WaveStatus;
 use App\Modules\Waves\Models\Wave;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -40,6 +42,7 @@ final class WaveService
         private readonly WaveCampaignLink $links,
         private readonly WaveStepProvisioner $provisioner,
         private readonly WaveMarketService $markets,
+        private readonly WaveStrategyState $strategy,
     ) {}
 
     /**
@@ -146,7 +149,14 @@ final class WaveService
                     // PL-2.4: the markets are rows. The replacement runs HERE, on the locked row, so it is serialised
                     // with every strategy write (they lock this same row first): version check (Q12), the rules, the
                     // PL-2.1 refusal of a market that still has personas, then the writes.
-                    $marketsResult = $this->markets->replace($locked, array_values((array) $data['markets']), (string) ($data['markets_version'] ?? ''));
+                    // PL-2.5: inside the strategy choke point, so a market added or removed moves the wave-level state of the
+                    // per-market steps in the same transaction (a plain closure run while strategy is OFF).
+                    $marketsResult = $this->strategy->around($locked, Auth::user(), fn (): array => $this->markets->replace(
+                        $locked,
+                        array_values((array) $data['markets']),
+                        (string) ($data['markets_version'] ?? ''),
+                        isset($data['confirm_notes_deleted']) ? (int) $data['confirm_notes_deleted'] : null,
+                    ));
                 }
 
                 $changed = $locked->isDirty() || ($marketsResult['changed'] ?? false);
@@ -352,7 +362,7 @@ final class WaveService
 
     /**
      * @param  array<string, mixed>  $before
-     * @param  array{changed: bool, before: array{markets: list<string>, market_countries: array<string, list<string>>}, after: array{markets: list<string>, market_countries: array<string, list<string>>, markets_renamed: list<string>}, persona_codes: array{renamed: int, skipped: int, kept_custom: int, markets: list<string>}}|null  $marketsResult  null when the markets were not part of the edit
+     * @param  array{changed: bool, before: array{markets: list<string>, market_countries: array<string, list<string>>}, after: array{markets: list<string>, market_countries: array<string, list<string>>, markets_renamed: list<string>}, persona_codes: array{renamed: int, skipped: int, kept_custom: int, markets: list<string>}, removed: array{completions: int, notes: int}}|null  $marketsResult  null when the markets were not part of the edit
      */
     private function logUpdated(Wave $wave, array $before, ?string $afterCampaignUlid, ?array $marketsResult = null): void
     {
@@ -361,8 +371,10 @@ final class WaveService
             $marketsBefore = $current;
             $marketsAfter = $current + ['markets_renamed' => []];
             $personaCodes = ['renamed' => 0, 'skipped' => 0, 'kept_custom' => 0, 'markets' => []];
+            $removed = ['completions' => 0, 'notes' => 0];
         } else {
             $personaCodes = $marketsResult['persona_codes'];
+            $removed = $marketsResult['removed'];
             $marketsBefore = $marketsResult['before'];
             $marketsAfter = $marketsResult['after'];
         }
@@ -389,6 +401,8 @@ final class WaveService
                 'persona_codes_renamed' => $personaCodes['renamed'],
                 'persona_codes_skipped' => $personaCodes['skipped'],
                 'persona_codes_markets' => $personaCodes['markets'],
+                'completions_removed' => $removed['completions'],
+                'notes_removed' => $removed['notes'],
                 'campaign_id' => $afterCampaignUlid,
                 'status' => $wave->status->value,
             ],

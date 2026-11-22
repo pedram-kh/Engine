@@ -251,6 +251,11 @@ it('AuditAction catalogue lists every Sprint 1-6 auth + user + mfa + brand + inv
         'wave_concept_link.added',
         'wave_concept_link.updated',
         'wave_concept_link.removed',
+        'wave_strategy.completed',
+        'wave_strategy.reopened',
+        'wave_strategy_note.created',
+        'wave_strategy_note.updated',
+        'wave_strategy_note.deleted',
         // AH-092, chunk B — campaign attachments (linking a Files-library
         // file to a campaign). Audit-only; no NotificationType tie.
         'campaign_attachment.added',

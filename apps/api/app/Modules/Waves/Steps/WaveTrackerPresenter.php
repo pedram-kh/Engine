@@ -6,6 +6,8 @@ namespace App\Modules\Waves\Steps;
 
 use App\Modules\Agencies\Models\AgencyMembership;
 use App\Modules\Identity\Models\User;
+use App\Modules\Waves\Contracts\WaveStrategyState;
+use App\Modules\Waves\Enums\WaveStepSource;
 use App\Modules\Waves\Enums\WaveStream;
 use App\Modules\Waves\Models\Wave;
 use App\Modules\Waves\Models\WaveStep;
@@ -30,6 +32,8 @@ final class WaveTrackerPresenter
             ->sortBy([['position', 'asc'], ['id', 'asc']])->values();
 
         $owners = self::owners($steps, $wave->agency_id);
+        // PL-2.5: empty while strategy is OFF, so the payload is exactly PL-1.3's.
+        $real = app(WaveStrategyState::class)->real($wave);
         $streams = WaveTrackerCalculator::streams($steps, $today);
 
         $present = array_column($streams, 'stream');
@@ -55,7 +59,7 @@ final class WaveTrackerPresenter
                 'today' => $today,
                 'streams' => $streamsOut,
                 'absent_streams' => array_values(array_filter($order, static fn (string $s): bool => ! in_array($s, $present, true))),
-                'steps' => $sorted->map(static fn (WaveStep $s): array => self::step($s, $today, $owners))->all(),
+                'steps' => $sorted->map(static fn (WaveStep $s): array => self::step($s, $today, $owners, $real))->all(),
                 'health' => WaveTrackerCalculator::health($streams),
                 'progress' => WaveTrackerCalculator::progress($steps),
             ],
@@ -71,22 +75,37 @@ final class WaveTrackerPresenter
     {
         $today = WaveTrackerCalculator::todayFor($viewer->timezone);
 
-        return self::step($step, $today, self::owners(collect([$step]), $step->agency_id));
+        $real = $step->isStrategy() ? app(WaveStrategyState::class)->real($step->wave) : [];
+
+        return self::step($step, $today, self::owners(collect([$step]), $step->agency_id), $real);
     }
 
     /**
      * @param  array<int, array{id: string, name: string, active: bool}>  $owners
+     * @param  array<string, array{state: string, markets_done: int, markets_total: int}>  $real  the real strategy states by step key (empty while strategy is OFF)
      * @return array<string, mixed>
      */
-    private static function step(WaveStep $step, string $today, array $owners): array
+    private static function step(WaveStep $step, string $today, array $owners, array $real = []): array
     {
         $owner = $step->owner_user_id === null ? null : ($owners[$step->owner_user_id] ?? null);
         $active = $owner !== null && $owner['active'];
 
+        $strategy = [];
+        if ($step->step_key !== null && isset($real[$step->step_key])) {
+            $r = $real[$step->step_key];
+            $strategy = ['strategy' => [
+                'state' => $r['state'],
+                'markets_done' => $r['markets_done'],
+                'markets_total' => $r['markets_total'],
+                // F1 rows 2, 5 and 7: set by hand beyond the real step; the warning line is live.
+                'hand_set_beyond' => $step->status_source === WaveStepSource::Manual && WaveStrategyRowRules::beyond($step->status->value, $r['state']),
+            ]];
+        }
+
         return [
             'id' => $step->ulid,
             'type' => 'wave_steps',
-            'attributes' => [
+            'attributes' => $strategy + [
                 'stream' => $step->stream->value,
                 'key' => $step->step_key,
                 'is_strategy' => $step->isStrategy(),
