@@ -1,5 +1,7 @@
 # PL-3.1 inventory: Creators (step 5 of the Strategy workspace)
 
+> **Corrections of 2026-11-22 (see `pl-3-1-plan.md` section 11).** Release is out of PL-3.1 (PL-3.4); section 4 stays as the finding that justifies it. The persona chip is **not always violet**: Martin's persona (SK2) is green (`rgba(52,199,123,.08)` fill, `#34c77b` chip), Contacted is `rgba(76,141,255,.12)` / `#4c8dff`. Wave deletion has no code path; `commit()` has no concurrency guard; nothing soft-deletes an assignment; cancelling a campaign cancels no assignments (plan G1 to G4).
+
 Status: **inventory only.** No code, no migration, no push. Branch `pl`, from tip `4b0f0bad`. Read with `pl-3-1-plan.md` (the plan answers every "must be decided" below) and `production-line-sprints.md` ("PL-3: the sprint's new shape").
 
 **Date:** 2026-11-22. **Figma file** `lYy90qzKk029vjoVCPExs2`, page "STRATEGY & SCRIPT WRITING", frames `13:1953` and `13:2572`.
