@@ -40,7 +40,9 @@ final class WaveTrackerController
         $viewer = $request->user();
         $this->provisioner->ensure($model);
         // PL-2.5: with strategy ON the four rows are brought in line with the real steps on open (idempotent; a no-op OFF).
-        $this->strategy->catchUp($model, $viewer);
+        if ($this->strategy->active()) {
+            $this->strategy->catchUp($model, $viewer);
+        }
 
         return response()->json(['data' => WaveTrackerPresenter::tracker($model->refresh(), $viewer)]);
     }
