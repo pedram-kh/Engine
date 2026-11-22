@@ -86,9 +86,14 @@ final class Pl25Fixtures
     /** @param  array<string, mixed>  $w */
     public static function row(array $w, string $key): WaveStep
     {
-        app(WaveStepProvisioner::class)->ensure($w['wave']);
+        $find = static fn (): ?WaveStep => WaveStep::query()->where('wave_id', $w['wave']->id)->where('step_key', $key)->first();
+        // Provision only when the rows are missing, so a recorded request never carries the provisioner's own lock.
+        if (($row = $find()) === null) {
+            app(WaveStepProvisioner::class)->ensure($w['wave']);
+            $row = $find();
+        }
 
-        return WaveStep::query()->where('wave_id', $w['wave']->id)->where('step_key', $key)->firstOrFail();
+        return $row ?? throw new RuntimeException("no tracker row {$key}");
     }
 
     /**

@@ -62,10 +62,13 @@ it('F1 row 2: a hand-set beyond the real step is refused 409 step.incomplete unt
     expect($row['attributes']['strategy'])->toMatchArray(['state' => 'in_progress', 'markets_done' => 1, 'markets_total' => 3, 'hand_set_beyond' => true]);
 });
 
-it('F1 row 3: a hand-set equal to the real step is recorded as system', function (): void {
+it('F1 row 3: a hand-set equal to the real step is recorded as system (a manual row set equal to the data goes back to system)', function (): void {
     $w = S::world();
     P::usps($w, 1);
-    P::hand($w, 'ugc.usps', 'in_progress')->assertOk();
+    P::hand($w, 'ugc.usps', 'done', true)->assertOk();
+    expect(P::st($w, 'ugc.usps'))->toBe(['done', 'manual']);
+
+    P::hand($w, 'ugc.usps', 'in_progress')->assertOk();   // equal to the real state (one USP, not marked)
 
     expect(P::st($w, 'ugc.usps'))->toBe(['in_progress', 'system']);
 });
