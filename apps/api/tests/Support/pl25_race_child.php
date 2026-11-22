@@ -30,7 +30,7 @@ $args = json_decode((string) base64_decode((string) ($argv[1] ?? ''), true), tru
 
 $database = (string) DB::connection()->getDatabaseName();
 if (! str_ends_with($database, '_test')) {
-    fwrite(STDOUT, json_encode(['error' => 'refusing a database that is not a throwaway _test database']));
+    fwrite(STDOUT, (string) json_encode(['error' => 'refusing a database that is not a throwaway _test database']));
     exit(2);
 }
 
@@ -38,9 +38,9 @@ Feature::activate(WavesEnabled::NAME);
 Feature::activate(StrategyEnabled::NAME);
 app(TenancyContext::class)->setAgencyId((int) $args['agency_id']);
 
-$brand = Brand::withoutGlobalScopes()->findOrFail($args['brand_id']);
-$wave = Wave::withoutGlobalScopes()->findOrFail($args['wave_id']);
-$actor = User::query()->findOrFail($args['user_id']);
+$brand = Brand::withoutGlobalScopes()->whereKey($args['brand_id'])->firstOrFail();
+$wave = Wave::withoutGlobalScopes()->whereKey($args['wave_id'])->firstOrFail();
+$actor = User::query()->whereKey($args['user_id'])->firstOrFail();
 
 // The barrier: block until the parent releases it, so both children start their transaction together.
 if ((int) $args['barrier'] > 0) {
@@ -60,4 +60,4 @@ try {
 } catch (WaveRuleViolation $e) {
     $out['result'] = $e->errorCode;
 }
-fwrite(STDOUT, json_encode($out));
+fwrite(STDOUT, (string) json_encode($out));

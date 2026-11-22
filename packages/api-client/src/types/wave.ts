@@ -111,6 +111,8 @@ export interface CreateWavePayload {
 export type UpdateWavePayload = Partial<CreateWavePayload> & {
   /** Required whenever `markets` is sent. */
   markets_version?: string
+  /** PL-2.5: the count the person confirmed when removed markets carry notes (422 `wave.market_has_notes` otherwise). */
+  confirm_notes_deleted?: number
 }
 
 /** One row of `GET brands/{brand}/waves/campaign-options`. Cancelled campaigns are never offered. */
@@ -183,7 +185,18 @@ export interface WaveStepResource {
     owner_client: boolean
     /** True when the owner is no longer an active member. */
     owner_is_former: boolean
+    /** PL-2.5: only on the four strategy rows and only while strategy is ON; absent otherwise. */
+    strategy?: WaveStepStrategy
   }
+}
+
+/** The real state of a strategy step (never stored; the stored row is `status`). */
+export interface WaveStepStrategy {
+  state: WaveStepStatus
+  markets_done: number
+  markets_total: number
+  /** Set by hand beyond the real state: the warning line is live. */
+  hand_set_beyond: boolean
 }
 
 export interface WaveStreamSummary {
@@ -232,4 +245,8 @@ export interface WaveStepCreatePayload {
 }
 
 /** A partial body. `name` and `stream` are admin and manager only (a staff request that includes one is 403). */
-export type WaveStepUpdatePayload = Partial<WaveStepCreatePayload> & { status?: WaveStepStatus }
+/** `confirm_incomplete`: a status beyond the real state of a strategy step is refused 409 `step.incomplete` without it. */
+export type WaveStepUpdatePayload = Partial<WaveStepCreatePayload> & {
+  status?: WaveStepStatus
+  confirm_incomplete?: boolean
+}

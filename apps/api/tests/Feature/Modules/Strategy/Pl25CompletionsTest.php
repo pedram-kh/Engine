@@ -43,7 +43,7 @@ it('B6 / Q1: the minimum warnings are returned and never block; mark is idempote
     P::usps($w, 2);
 
     $res = P::mark($w, 'usps')->assertOk();
-    expect(collect($res->json('meta.warnings'))->pluck('code')->all())->toContain('usps_under_recommended');
+    expect(P::codes((array) $res->json('meta.warnings')))->toContain('usps_under_recommended');
     P::mark($w, 'usps')->assertOk();
     expect(WaveStrategyCompletion::query()->count())->toBe(1)->and(p25Audits('wave_strategy.completed'))->toHaveCount(1)
         ->and(p25Audits('wave_strategy.completed')[0])->toBe(['wave' => $w['wave']->ulid, 'step' => 'usps', 'market' => null]);
@@ -144,7 +144,7 @@ it('B7 rule A: deleting a USP below the recommendation leaves the mark; the warn
     S::call($w['admin'], 'DELETE', S::u($w, "usps/{$usps[0]}"))->assertStatus(204);
 
     $usp = p25Summary($w)['steps']['usps'];
-    expect($usp['state'])->toBe('done')->and(collect($usp['warnings'])->pluck('code')->all())->toContain('usps_under_recommended')
+    expect($usp['state'])->toBe('done')->and(P::codes($usp['warnings']))->toContain('usps_under_recommended')
         ->and(P::st($w, 'ugc.usps'))->toBe(['done', 'system']);
 });
 
@@ -159,10 +159,10 @@ it('B7 rule B: a persona added to a marked market leaves the personas mark; the 
     P::personas($w, 'SK');
 
     $steps = p25Summary($w)['steps'];
-    $personas = collect($steps['personas']['markets'])->firstWhere('code', 'SK');
-    $matrix = collect($steps['matrix']['markets'])->firstWhere('code', 'SK');
+    $personas = P::where($steps['personas']['markets'], 'code', 'SK');
+    $matrix = P::where($steps['matrix']['markets'], 'code', 'SK');
     expect($personas['marked'])->toBeTrue()->and($matrix['marked'])->toBeTrue()
-        ->and(collect($matrix['warnings'])->pluck('code')->all())->toContain('cells_not_set');
+        ->and(P::codes($matrix['warnings']))->toContain('cells_not_set');
 });
 
 it('B7 rule E: the last record going drops the mark, audited wave_strategy.reopened with reason emptied', function (): void {

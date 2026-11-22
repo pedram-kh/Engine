@@ -111,6 +111,22 @@ export function makeSummary(
         markets_complete: 0,
         by_market: [],
       },
+      // PL-2.5 (contract only; the screens read these in Stage 2): an empty wave, nothing started, landing on USPs.
+      steps: {
+        usps: {
+          state: 'not_started',
+          count: 0,
+          marked: false,
+          warnings: [],
+          completed_by: null,
+          completed_at: null,
+        },
+        personas: { state: 'not_started', markets_done: 0, markets_total: 2, markets: [] },
+        matrix: { state: 'not_started', markets_done: 0, markets_total: 2, markets: [] },
+        concepts: { state: 'not_started', markets_done: 0, markets_total: 2, markets: [] },
+      },
+      landing: { step: 'usps', market: null, market_id: null },
+      note_counts: { usps: 0, personas: {}, matrix: {}, concepts: {} },
       ...over,
     },
   }

@@ -82,7 +82,77 @@ export interface StrategySummaryResource {
     matrix: MatrixProgress
     /** PL-2.3: step 4. Derived from the concept rows; nothing here ever locks a step. */
     concepts: ConceptsSummary
+    /** PL-2.5: the real state of each step, its mark, its live warnings. */
+    steps: StrategySteps
+    /** PL-2.5: where "Strategy & Scripts" opens (the first step not done, the first market not done). */
+    landing: StrategyLanding
+    /** PL-2.5: internal note counts (never a body). */
+    note_counts: StrategyNoteCounts
   }
+}
+
+export type StrategyStepState = 'not_started' | 'in_progress' | 'done'
+
+export interface StrategyWarning {
+  code: 'usps_under_recommended' | 'personas_under_minimum' | 'cells_not_set'
+  [key: string]: unknown
+}
+
+export interface StrategyMark {
+  /** Null when not marked; `name` is null and `former` true when the member has left. */
+  completed_by: { name: string | null; former: boolean } | null
+  completed_at: string | null
+}
+
+export interface StrategyMarketStep extends StrategyMark {
+  market: string
+  code: string
+  state: StrategyStepState
+  count: number
+  marked: boolean
+  warnings: StrategyWarning[]
+}
+
+export interface StrategySteps {
+  usps: StrategyMark & {
+    state: StrategyStepState
+    count: number
+    marked: boolean
+    warnings: StrategyWarning[]
+  }
+  personas: {
+    state: StrategyStepState
+    markets_done: number
+    markets_total: number
+    markets: StrategyMarketStep[]
+  }
+  matrix: {
+    state: StrategyStepState
+    markets_done: number
+    markets_total: number
+    markets: StrategyMarketStep[]
+  }
+  concepts: {
+    state: StrategyStepState
+    markets_done: number
+    markets_total: number
+    markets: StrategyMarketStep[]
+  }
+}
+
+export interface StrategyLanding {
+  step: 'usps' | 'personas' | 'matrix' | 'concepts'
+  /** Short code of the market, null for USPs. */
+  market: string | null
+  /** The market's ulid, null for USPs. */
+  market_id: string | null
+}
+
+export interface StrategyNoteCounts {
+  usps: number
+  personas: Record<string, number>
+  matrix: Record<string, number>
+  concepts: Record<string, number>
 }
 
 export interface ConceptMarketCounts {

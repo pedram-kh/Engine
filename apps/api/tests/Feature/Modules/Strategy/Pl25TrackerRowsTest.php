@@ -40,7 +40,7 @@ it('F1 row 1: a row nobody set follows the real step on every change, source sys
     expect(P::st($w, 'ugc.usps'))->toBe(['in_progress', 'system']);
 
     $audit = AuditLog::query()->where('action', 'wave_step.updated')->orderByDesc('id')->first();
-    expect($audit?->actor_id)->toBe($w['staff']->id)->and(($audit?->metadata ?? [])['reason'] ?? null)->toBe('system');
+    expect($audit?->actor_id)->toBe($w['staff']->id)->and(P::meta($audit)['reason'] ?? null)->toBe('system');
 });
 
 it('F1 row 2: a hand-set beyond the real step is refused 409 step.incomplete until confirmed, then manual, with the live figures', function (): void {
@@ -58,8 +58,8 @@ it('F1 row 2: a hand-set beyond the real step is refused 409 step.incomplete unt
     expect(P::st($w, 'ugc.personas'))->toBe(['done', 'manual']);
 
     $tracker = S::call($w['admin'], 'GET', WaveFixtures::wavesUrl($w['agency'], $w['brand'], $w['wave']->ulid.'/tracker'))->assertOk();
-    $row = collect($tracker->json('data.attributes.steps'))->firstWhere('attributes.key', 'ugc.personas');
-    expect($row['attributes']['strategy'])->toMatchArray(['state' => 'in_progress', 'markets_done' => 1, 'markets_total' => 3, 'hand_set_beyond' => true]);
+    $row = P::where(array_map(fn (array $r): array => $r['attributes'] + ['id' => $r['id']], (array) $tracker->json('data.attributes.steps')), 'key', 'ugc.personas');
+    expect($row['strategy'])->toMatchArray(['state' => 'in_progress', 'markets_done' => 1, 'markets_total' => 3, 'hand_set_beyond' => true]);
 });
 
 it('F1 row 3: a hand-set equal to the real step is recorded as system (a manual row set equal to the data goes back to system)', function (): void {
@@ -96,8 +96,8 @@ it('F1 row 5: a manual row beyond the real step stays manual while the real step
 
     expect(P::st($w, 'ugc.personas'))->toBe(['done', 'manual']);
     $tracker = S::call($w['admin'], 'GET', WaveFixtures::wavesUrl($w['agency'], $w['brand'], $w['wave']->ulid.'/tracker'))->assertOk();
-    $row = collect($tracker->json('data.attributes.steps'))->firstWhere('attributes.key', 'ugc.personas');
-    expect($row['attributes']['strategy']['markets_done'])->toBe(2);
+    $row = P::where(array_map(fn (array $r): array => $r['attributes'] + ['id' => $r['id']], (array) $tracker->json('data.attributes.steps')), 'key', 'ugc.personas');
+    expect($row['strategy']['markets_done'])->toBe(2);
 });
 
 it('F1 row 6: a manual row is taken back to system when the real step reaches the hand-set status, audited system_took_back', function (): void {

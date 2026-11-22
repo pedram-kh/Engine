@@ -9,12 +9,15 @@ use App\Modules\Strategy\Models\WaveStrategyNote;
 use App\Modules\Strategy\Notes\NoteService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Tests\Support\Pl25Fixtures as P;
 use Tests\Support\StrategyFixtures as S;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
 
 /** PL-2.5 B15: internal notes, per step and per market: ownership, isolation, limits, plain text, audit. */
+/** @return TestResponse<Response> */
 function p25Note(array $w, string $who, array $body): TestResponse
 {
     return S::call($w[$who], 'POST', S::u($w, 'notes'), $body);
@@ -105,8 +108,8 @@ it('B15: a note by someone who has left shows as a former member with no name; t
     $id = p25Note($w, 'staff', ['step' => 'usps', 'body' => 'Secret-text-123'])->json('data.id');
 
     $log = AuditLog::query()->where('action', 'wave_strategy_note.created')->get();
-    expect($log)->toHaveCount(1)->and(json_encode($log[0]->metadata))->not->toContain('Secret-text-123')
-        ->and($log[0]->metadata)->toMatchArray(['length' => 15, 'step' => 'usps']);
+    expect($log)->toHaveCount(1)->and(json_encode(P::meta($log[0])))->not->toContain('Secret-text-123')
+        ->and(P::meta($log[0]))->toMatchArray(['length' => 15, 'step' => 'usps']);
 
     AgencyMembership::query()->where('user_id', $w['staff']->id)->where('agency_id', $w['agency']->id)->delete();
     $attrs = collect(p25Thread($w, 'usps', null, 'admin'))->firstWhere('id', $id)['attributes'];
@@ -121,7 +124,7 @@ it('B15: update and delete are audited with a length only; a note of another wav
     $id = p25Note($w, 'staff', ['step' => 'usps', 'body' => 'abc'])->json('data.id');
     S::call($w['staff'], 'PATCH', S::u($w, "notes/{$id}"), ['body' => 'abcdef'])->assertOk();
 
-    expect(AuditLog::query()->where('action', 'wave_strategy_note.updated')->first()->metadata)->toMatchArray(['length' => 6]);
+    expect(P::meta(AuditLog::query()->where('action', 'wave_strategy_note.updated')->first()))->toMatchArray(['length' => 6]);
 
     S::call($w['otherAdmin'], 'GET', S::u($w, 'notes').'?step=usps')->assertNotFound();
     S::call($w['admin'], 'PATCH', S::url($w['agency'], $w['brand'], $w['otherWave'], "notes/{$id}"), ['body' => 'x'])->assertStatus(404);

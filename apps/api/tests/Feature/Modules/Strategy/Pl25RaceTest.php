@@ -60,7 +60,7 @@ it('B19 / A2: a concept decision and a hand-set of the same row, on two connecti
         $env = array_merge(getenv(), ['DB_DATABASE' => $race, 'PENNANT_STORE' => 'array', 'APP_ENV' => 'testing']);
         foreach ($jobs as $name => $job) {
             $pipes = [];
-            $proc = proc_open([PHP_BINARY, base_path('tests/Support/pl25_race_child.php'), base64_encode(json_encode($job))], [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, base_path(), $env);
+            $proc = proc_open([PHP_BINARY, base_path('tests/Support/pl25_race_child.php'), base64_encode((string) json_encode($job))], [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, base_path(), $env);
             $children[$name] = [$proc, $pipes];
         }
 
@@ -76,11 +76,13 @@ it('B19 / A2: a concept decision and a hand-set of the same row, on two connecti
         $out = [];
         foreach ($children as $name => [$proc, $pipes]) {
             $out[$name] = json_decode((string) stream_get_contents($pipes[1]), true) ?? ['error' => stream_get_contents($pipes[2])];
-            proc_close($proc);
+            if (is_resource($proc)) {
+                proc_close($proc);
+            }
         }
         $children = [];
 
-        $row = WaveStep::query()->whereKey($step->id)->first();
+        $row = WaveStep::query()->whereKey($step->id)->firstOrFail();
         expect($out['decide']['result'] ?? null)->toBe('ok');
         $hand = $out['hand']['result'] ?? null;
         expect($hand)->toBeIn(['ok', 'step.incomplete']);
@@ -89,8 +91,10 @@ it('B19 / A2: a concept decision and a hand-set of the same row, on two connecti
         // then the decision set the row as system. Both end done and system; never done/manual, never in_progress.
         expect([$row->status->value, $row->status_source->value])->toBe(['done', 'system']);
     } finally {
-        foreach ($children as [$proc]) {
-            @proc_terminate($proc);
+        foreach ($children as [$child]) {
+            if (is_resource($child)) {
+                proc_terminate($child);
+            }
         }
         Config::set('database.connections.pgsql.database', $original);
         DB::purge('pgsql');
@@ -136,28 +140,29 @@ it('B19 / A2: a hand-set waits for an uncommitted decision on the same wave, the
         $job = ['agency_id' => $w['agency']->id, 'brand_id' => $w['brand']->id, 'wave_id' => $w['wave']->id, 'barrier' => 0, 'action' => 'hand', 'user_id' => $w['admin']->id, 'step' => $step->ulid];
         $env = array_merge(getenv(), ['DB_DATABASE' => $race, 'PENNANT_STORE' => 'array', 'APP_ENV' => 'testing']);
         $pipes = [];
-        $proc = proc_open([PHP_BINARY, base_path('tests/Support/pl25_race_child.php'), base64_encode(json_encode($job))], [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, base_path(), $env);
+        $proc = proc_open([PHP_BINARY, base_path('tests/Support/pl25_race_child.php'), base64_encode((string) json_encode($job))], [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, base_path(), $env);
 
         // Give the child time to boot and reach the lock: it must still be running (waiting) while we hold it.
         sleep(4);
-        $status = proc_get_status($proc);
-        expect($status['running'])->toBeTrue('the hand-set must wait for the wave lock held by the uncommitted decision');
+        expect(is_resource($proc) && proc_get_status($proc)['running'])->toBeTrue('the hand-set must wait for the wave lock held by the uncommitted decision');
 
         DB::commit();
         $open = false;
 
         $out = json_decode((string) stream_get_contents($pipes[1]), true) ?? ['error' => stream_get_contents($pipes[2])];
-        proc_close($proc);
+        if (is_resource($proc)) {
+            proc_close($proc);
+        }
         $proc = null;
 
-        $row = WaveStep::query()->whereKey($step->id)->first();
+        $row = WaveStep::query()->whereKey($step->id)->firstOrFail();
         expect($out['result'] ?? null)->toBe('ok')->and([$row->status->value, $row->status_source->value])->toBe(['done', 'system']);
     } finally {
         if ($open) {
             DB::rollBack();
         }
         if (is_resource($proc)) {
-            @proc_terminate($proc);
+            proc_terminate($proc);
         }
         Config::set('database.connections.pgsql.database', $original);
         DB::purge('pgsql');

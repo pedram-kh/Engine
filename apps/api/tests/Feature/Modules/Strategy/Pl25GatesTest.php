@@ -210,7 +210,9 @@ it('B18: both tables are created and dropped; the database refuses a mark with a
     ], $o);
     $refuse = function (Closure $fn): void {
         try {
-            DB::transaction($fn);
+            DB::transaction(static function () use ($fn): void {
+                $fn();
+            });
             $failed = false;
         } catch (QueryException) {
             $failed = true;

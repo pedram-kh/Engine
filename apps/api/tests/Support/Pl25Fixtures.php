@@ -93,7 +93,7 @@ final class Pl25Fixtures
             $row = $find();
         }
 
-        return $row ?? throw new RuntimeException("no tracker row {$key}");
+        return $row ?? throw new \RuntimeException("no tracker row {$key}");
     }
 
     /**
@@ -122,8 +122,47 @@ final class Pl25Fixtures
     /** @return list<array<string, mixed>> */
     public static function stepAudits(string $reason = ''): array
     {
-        return AuditLog::query()->where('action', 'wave_step.updated')->orderBy('id')->get()
+        $rows = AuditLog::query()->where('action', 'wave_step.updated')->orderBy('id')->get()
             ->map(static fn (AuditLog $r): array => (array) $r->metadata)
-            ->filter(static fn (array $m): bool => $reason === '' || ($m['reason'] ?? null) === $reason)->values()->all();
+            ->filter(static fn (array $m): bool => $reason === '' || ($m['reason'] ?? null) === $reason)->all();
+
+        return array_values($rows);
+    }
+
+    /**
+     * @param  array<int, mixed>  $warnings
+     * @return list<string>
+     */
+    public static function codes(array $warnings): array
+    {
+        $out = [];
+        foreach ($warnings as $w) {
+            if (is_array($w) && isset($w['code'])) {
+                $out[] = (string) $w['code'];
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * @param  array<int, mixed>  $rows
+     * @return array<string, mixed>
+     */
+    public static function where(array $rows, string $key, string $value): array
+    {
+        foreach ($rows as $r) {
+            if (is_array($r) && ($r[$key] ?? null) === $value) {
+                return $r;
+            }
+        }
+
+        return [];
+    }
+
+    /** @return array<string, mixed> */
+    public static function meta(?AuditLog $log): array
+    {
+        return $log === null ? [] : (array) $log->metadata;
     }
 }
