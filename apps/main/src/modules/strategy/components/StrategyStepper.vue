@@ -182,7 +182,7 @@ function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUli
  * Values from frame 13:828 / 13:428 (stepper): a bar of surface fill, 1px border, 10px radius, 6px padding and
  * 6px gaps; steps of 10px 14px with a 12px gap and 8px radius; a 28px circle; the current step on the raised fill
  * with a 60% primary border; names 14px (600 and on-surface for the current step, 500 and on-surface-variant for the
- * others); status 12px.
+ * others); status 11.5px (green when done, amber in progress).
  */
 .strategy-stepper {
   overflow-x: auto;
@@ -262,10 +262,17 @@ function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUli
   color: rgb(var(--v-theme-on-surface-variant));
 }
 .strategy-step__status {
-  font-size: 12px;
+  font-size: 11.5px;
   line-height: normal;
   color: rgb(var(--v-theme-on-surface-variant));
   min-height: 1.2em;
+}
+/* Status text takes the state's colour (frame 13:4538, 13:4558): green when done, amber while in progress. */
+.strategy-step[data-state='done'] .strategy-step__status {
+  color: rgb(var(--v-theme-success));
+}
+.strategy-step[data-state='in_progress'] .strategy-step__status {
+  color: rgb(var(--v-theme-warning));
 }
 .strategy-step__warn {
   display: inline-flex;

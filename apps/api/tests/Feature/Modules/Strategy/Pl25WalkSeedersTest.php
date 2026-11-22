@@ -95,7 +95,8 @@ it('N6: every earlier walk cleanup seeder deletes the notes and the completions 
 
         expect($notes)->not->toBeFalse(basename($file))
             ->and($done)->not->toBeFalse(basename($file))
-            ->and($notes)->toBeLessThan($markets)
-            ->and($done)->toBeLessThan($markets);
+            ->and($markets)->not->toBeFalse(basename($file));
+        expect((int) $notes < (int) $markets)->toBeTrue(basename($file))
+            ->and((int) $done < (int) $markets)->toBeTrue(basename($file));
     }
 });

@@ -179,12 +179,15 @@ test.describe('Strategy completion, notes and landing', () => {
     const { brandId, waveId } = await startWave(page, request, SIZE, 'Empty', ['SK'])
     await page.goto(`/brands/${brandId}/waves/${waveId}/strategy/personas`)
 
-    await page.locator('[data-test="completion-mark"]').click()
-    await expect(page.locator('[data-test="completion-dialog"]')).toContainText(
-      'Add at least one persona for Slovakia',
-    )
-    await expect(page.locator('[data-test="confirm-ok"]')).toHaveCount(0)
-    await page.locator('[data-test="confirm-cancel"]').click()
+    for (const delay of [0, 60, 150]) {
+      await page.locator('[data-test="completion-mark"]').click()
+      await expect(page.locator('[data-test="completion-dialog"]')).toContainText(
+        'Add at least one persona for Slovakia',
+      )
+      await expect(page.locator('[data-test="confirm-ok"]')).toHaveCount(0)
+      await page.locator('[data-test="confirm-cancel"]').click()
+      await page.waitForTimeout(delay)
+    }
     await expect(page.locator('[data-test="strategy-step-personas"]')).toHaveAttribute(
       'data-state',
       'not_started',
@@ -200,7 +203,13 @@ test.describe('Strategy completion, notes and landing', () => {
     expect(
       await page.evaluate(() => (window as unknown as { __pwn?: number }).__pwn),
     ).toBeUndefined()
-    // Gone after a reload only if deleted: delete it, confirm, and the thread is empty.
+    // The delete confirm opens above the page and survives a quick close and reopen; then delete for real.
+    for (const delay of [0, 60, 150]) {
+      await page.locator('[data-test="note-delete"]').click()
+      await expect(page.locator('[data-test="note-delete-dialog"]')).toBeVisible()
+      await page.locator('[data-test="confirm-cancel"]').click()
+      await page.waitForTimeout(delay)
+    }
     await page.locator('[data-test="note-delete"]').click()
     await page.locator('[data-test="confirm-ok"]').click()
     await expect(page.locator('[data-test="note-body"]')).toHaveCount(0)
@@ -245,6 +254,12 @@ test.describe('Strategy completion, notes and landing', () => {
     )
     await page.locator('[data-test="confirm-cancel"]').click()
     await expect(page.locator('[data-test="incomplete-dialog"]')).toHaveCount(0)
+    for (const delay of [0, 60, 150]) {
+      await row.locator('[data-test^="step-check-"]').click()
+      await expect(page.locator('[data-test="incomplete-dialog"]')).toBeVisible()
+      await page.locator('[data-test="confirm-cancel"]').click()
+      await page.waitForTimeout(delay)
+    }
     await expect(page.locator('[data-test^="step-hand-"]')).toHaveCount(0)
 
     await row.locator('[data-test^="step-check-"]').click()

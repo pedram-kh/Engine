@@ -38,9 +38,9 @@ const { t } = useI18n()
   flex-direction: column;
   gap: 10px;
   padding: 18px;
-  border: 1px solid rgba(245, 165, 36, 0.35);
+  border: 1px solid color-mix(in srgb, rgb(var(--v-theme-warning)) 35%, transparent);
   border-radius: 10px;
-  background: rgba(245, 165, 36, 0.07);
+  background: color-mix(in srgb, rgb(var(--v-theme-warning)) 7%, transparent);
   min-width: 0;
 }
 .notes-panel__head {
@@ -65,7 +65,7 @@ const { t } = useI18n()
   gap: 6px;
   padding: 2px 8px;
   border-radius: 9999px;
-  background: rgba(160, 160, 168, 0.15);
+  background: color-mix(in srgb, rgb(var(--v-theme-on-surface-variant)) 15%, transparent);
   font-size: 11px;
   font-weight: 500;
   line-height: normal;

@@ -102,7 +102,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
   gap: 6px;
   padding: 2px 8px;
   border-radius: 9999px;
-  background: rgba(160, 160, 168, 0.15);
+  background: color-mix(in srgb, rgb(var(--v-theme-on-surface-variant)) 15%, transparent);
   font-size: 11px;
   font-weight: 500;
   color: rgb(var(--v-theme-on-surface-variant));

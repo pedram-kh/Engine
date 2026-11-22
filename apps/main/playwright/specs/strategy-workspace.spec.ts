@@ -504,8 +504,15 @@ test.describe('Strategy workspace', () => {
     await expect(page).toHaveURL(new RegExp(`/brands/${brand.data.id}/waves/${wave.data.id}$`))
     await expect(page.locator('[data-test="strategy-page"]')).toHaveCount(0)
 
-    // The bare address goes to the USPs step and then, flag off, to the wave.
+    // The bare address goes to the USPs step and then, flag off, to the wave. PL-2.5: nothing under /strategy is asked
+    // of the server first (the landing is read only with the flag on).
+    const asked: string[] = []
+    page.on('request', (r) => {
+      if (/^\/api\/.*\/waves\/[^/]+\/strategy(\/|$)/.test(new URL(r.url()).pathname))
+        asked.push(r.url())
+    })
     await page.goto(`/brands/${brand.data.id}/waves/${wave.data.id}/strategy`)
     await expect(page).toHaveURL(new RegExp(`/brands/${brand.data.id}/waves/${wave.data.id}$`))
+    expect(asked).toEqual([])
   })
 })

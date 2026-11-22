@@ -56,3 +56,39 @@ log has to show the wave `FOR UPDATE` before any write, and the first `FOR UPDAT
 The free-running race (two children released by an advisory lock) ended with the decision first and the hand-set
 accepted in 6 of 6 runs; the other consistent outcome (hand-set refused 409) was not observed. The forced test
 (decision uncommitted, hand-set starts, waits, then sees the committed state) covers the ordering the free run does not reach.
+
+# Stage 2 (web) break-reverts
+
+Each row: the source file is mutated, the named test is run and must go red, the file is restored in a `finally`, the
+test is run again and must go green. Run by `/tmp/pl25/breaks.py` (kept outside the repo); the results below are its
+output. Vitest tests run under `apps/main`, Playwright under `--project=chromium --workers=1`, Pest on SQLite.
+
+| Gate                                                                                      | Break                                       | Test                                           | Broken | Restored |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------- | ---------------------------------------------- | ------ | -------- |
+| N1 a note is drawn as text, never HTML                                                    | `{{ body }}` becomes `v-html`               | `NotesThread.spec`, `noVHtml.spec`             | red    | green    |
+| N2 a late answer for the market you left does not paint into the one you are on           | drop the sequence check on the success path | `NotesThread.spec`                             | red    | green    |
+| C1 warnings are shown in a confirm and never block                                        | the warnings branch never opens             | `StepCompletionBar.spec`                       | red    | green    |
+| C2 an empty step is refused, with no confirm button                                       | the empty branch never opens                | `StepCompletionBar.spec`                       | red    | green    |
+| C3 Concepts has no Mark / Reopen button (automatic)                                       | Concepts counts as markable                 | `StepCompletionBar.spec`                       | red    | green    |
+| S1 the stepper shows the real state                                                       | every step reads "not started"              | `StrategyStepper.spec`                         | red    | green    |
+| T1 a hand-set beyond the real step does nothing until confirmed (Cancel changes nothing)  | the confirm result is ignored               | `WaveTrackerSection.spec`                      | red    | green    |
+| T2 the "set by hand" marker with what the step says                                       | marker never rendered                       | `WaveStepsPanel.spec`                          | red    | green    |
+| T3 a hand-set Done row stays in the open list (its marker stays in sight)                 | the row is folded into the completed line   | `trackerFormat.spec`                           | red    | green    |
+| M1 removing a market with notes sends the count the person saw                            | `confirm_notes_deleted` is not sent         | `NewWaveDialog.spec`                           | red    | green    |
+| E1 the matrix side sheet closes on Escape                                                 | the Escape handler returns at once          | `NotesSheet.spec`                              | red    | green    |
+| E2 same, in a real browser                                                                | same                                        | Playwright `strategy-completion` "side sheet"  | red    | green    |
+| L1 the landing carries the market                                                         | the market query is dropped                 | `completionLogic.spec`                         | red    | green    |
+| L2 "Strategy & Scripts" opens the server's landing                                        | always replace to USPs                      | Playwright `strategy-completion` "USPs: mark"  | red    | green    |
+| L3 with the flag off nothing under `/strategy` is asked of the server                     | the entry page skips its flag check         | Playwright `strategy-workspace` "strategy off" | red    | green    |
+| A1 the audience-title answer carries steps, landing and note counts (found in this stage) | the controller leaves the steps block out   | Pest `Pl25GatesTest` B21                       | red    | green    |
+
+## What the first pass found weak (fixed, then re-run red)
+
+| Gate | What the first pass showed                                                                                                                                                                                                                                                                                                                                                          |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| L3   | Stayed green: the workspace page redirects on a flag that is off by itself, so the entry page's own check changed nothing anyone could see. The Playwright test now records every request to `/api/.../waves/{wave}/strategy...` made while the flag is off and expects none (the entry page's check exists so that nothing is requested first). Red after the fix, green restored. |
+
+## Not separately gated
+
+`StrategyPage.onSummary` keeps `steps`, `landing` and `note_counts` when an answer arrives without them. It is a guard
+behind the server fix (A1) and has no test of its own; A1 is the gate that matters.
