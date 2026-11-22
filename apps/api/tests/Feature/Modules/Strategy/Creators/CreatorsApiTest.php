@@ -35,7 +35,7 @@ uses(TestCase::class, RefreshDatabase::class);
  * PL-3.1 — the creators API: flag gates and roles, add / edit / replace / remove, the eligible set, decisions, the board rules.
  */
 
-function slotCount(array $w): int
+function pl31SlotCount(array $w): int
 {
     return WaveCreator::query()->where('wave_id', $w['wave']->id)->count();
 }
@@ -61,7 +61,7 @@ it('B2: every creators route answers 404 not_found with the sprint flag off, and
     Feature::deactivate('waves_enabled');
     S::call($w['admin'], 'GET', F::url($w))->assertNotFound();
 
-    expect(slotCount($w))->toBe(0);
+    expect(pl31SlotCount($w))->toBe(0);
 });
 
 it('B3: roles: all three agency roles manage and see; only admin and manager decide; another agency and a creator get 404', function (): void {
@@ -109,7 +109,7 @@ it('B5: the eligible set: only applicants and invitees; anyone else gets ONE ref
 
     expect(array_unique(array_column($bodies, 'code')))->toBe(['wave_creator.not_eligible'])
         ->and(count(array_unique(array_map('json_encode', $bodies))))->toBe(1)
-        ->and(slotCount($w))->toBe(0);
+        ->and(pl31SlotCount($w))->toBe(0);
 });
 
 it('B6: excluded from the picker and from add: not approved, erased, scheduled for deletion, hard-blacklisted (agency-wide and brand-scoped); a soft blacklist and a non-discoverable applicant stay', function (): void {
@@ -135,7 +135,7 @@ it('B6: excluded from the picker and from add: not approved, erased, scheduled f
     foreach ([$pending, $erased, $leaving, $hardAgency, $hardBrand] as $creator) {
         S::call($w['admin'], 'POST', F::url($w), ['market' => $w['mk']['SK'], 'creators' => [$creator->ulid]])->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_creator.not_eligible');
     }
-    expect(slotCount($w))->toBe(0);
+    expect(pl31SlotCount($w))->toBe(0);
 });
 
 it('B7: the picker: filters, country[] chips, already_in_wave with the market, exclusivity hint field present, campaign required', function (): void {
@@ -171,7 +171,7 @@ it('B8: one creator per wave; the refusal names the market; a persona of another
     $roPersona = WavePersona::factory()->create(['wave_id' => $w['wave']->id, 'agency_id' => $w['agency']->id, 'market_id' => $w['mkid']['RO']]);
     S::call($w['admin'], 'POST', F::url($w), ['market' => $w['mk']['SK'], 'creators' => [$d->ulid], 'persona' => $roPersona->ulid])
         ->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_creator.persona_market_mismatch');
-    expect(slotCount($w))->toBe(1);
+    expect(pl31SlotCount($w))->toBe(1);
 });
 
 it('B9: caps: 30 per market, 100 per wave; a refused add writes nothing (all or nothing)', function (): void {
@@ -182,7 +182,7 @@ it('B9: caps: 30 per market, 100 per wave; a refused add writes nothing (all or 
 
     S::call($w['admin'], 'POST', F::url($w), ['market' => $w['mk']['SK'], 'creators' => [$c->ulid, $d->ulid]])
         ->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_creator.cap_reached')->assertJsonPath('errors.0.meta.scope', 'market');
-    expect(slotCount($w))->toBe(29);
+    expect(pl31SlotCount($w))->toBe(29);
     S::call($w['admin'], 'POST', F::url($w), ['market' => $w['mk']['SK'], 'creators' => [$c->ulid]])->assertCreated();
 });
 
@@ -197,10 +197,10 @@ it('B9b: a wave holds at most 100 creators', function (): void {
     F::slots($w, 10, 'HU');
     $e = F::applicant($w['campaign']);
 
-    expect(slotCount($w))->toBe(100);
+    expect(pl31SlotCount($w))->toBe(100);
     S::call($w['admin'], 'POST', F::url($w), ['market' => $w['mk']['HU'], 'creators' => [$e->ulid]])
         ->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_creator.cap_reached')->assertJsonPath('errors.0.meta.scope', 'wave');
-    expect(slotCount($w))->toBe(100);
+    expect(pl31SlotCount($w))->toBe(100);
 });
 
 it('B10: edit the slot code (upper-cased, unique in the market) and the persona; audit lists field names only', function (): void {
@@ -248,7 +248,7 @@ it('B12: remove deletes the slot and its decisions, frees the number, audits the
 
     S::call($w['staff'], 'DELETE', F::url($w, $slot->ulid))->assertOk();
 
-    expect(slotCount($w))->toBe(0)->and(WaveCreatorDecision::query()->count())->toBe(0)
+    expect(pl31SlotCount($w))->toBe(0)->and(WaveCreatorDecision::query()->count())->toBe(0)
         ->and(F::meta('wave_creator.removed', 'decisions_removed'))->toBe(3)
         ->and([CampaignApplication::query()->get()->toArray(), CampaignAssignment::query()->get()->makeHidden('updated_at')->toArray()])->toBe($before);
 

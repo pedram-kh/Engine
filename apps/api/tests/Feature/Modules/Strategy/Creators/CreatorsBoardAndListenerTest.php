@@ -36,31 +36,31 @@ uses(TestCase::class, RefreshDatabase::class);
  * @param  array<string, mixed>  $w
  * @return TestResponse<Response>
  */
-function decide(array $w, WaveCreator $slot, string $status = 'approved'): TestResponse
+function pl31Decide(array $w, WaveCreator $slot, string $status = 'approved'): TestResponse
 {
     $body = $status === 'approved' ? ['status' => 'approved', 'client_name' => 'Anna'] : ['status' => 'suggest_another', 'client_name' => 'Anna', 'comment' => 'someone else'];
 
     return S::call($w['admin'], 'POST', F::url($w, "{$slot->ulid}/decisions"), $body);
 }
 
-function stageOf(CampaignAssignment $a): string
+function pl31StageOf(CampaignAssignment $a): string
 {
     return (string) F::card($a)->column?->stage_key;
 }
 
-function putInStage(CampaignAssignment $a, string $stage): void
+function pl31PutInStage(CampaignAssignment $a, string $stage): void
 {
     $card = F::card($a);
     $card->forceFill(['column_id' => BoardColumn::query()->withoutGlobalScopes()->where('board_id', $card->board_id)->where('stage_key', $stage)->value('id')])->save();
 }
 
-function accept(CampaignAssignment $a): void
+function pl31Accept(CampaignAssignment $a): void
 {
     app(CampaignAssignmentStateMachine::class)->accept($a->refresh());
 }
 
 /** @return array{0: array<string, mixed>, 1: CampaignAssignment, 2: WaveCreator} */
-function invitedSlot(): array
+function pl31InvitedSlot(): array
 {
     $w = F::world();
     $c = F::invitee($w['campaign']);
@@ -76,73 +76,73 @@ it('ST1: the status table has a row for EVERY assignment status and EVERY applic
 });
 
 it('BR1: approved first, accepted later: the accept moves the card Invited to Selected (row 3)', function (): void {
-    [$w, $a, $slot] = invitedSlot();
+    [$w, $a, $slot] = pl31InvitedSlot();
 
-    decide($w, $slot)->assertCreated()->assertJsonPath('meta.card_moved', false);
-    expect(stageOf($a))->toBe('invited');
+    pl31Decide($w, $slot)->assertCreated()->assertJsonPath('meta.card_moved', false);
+    expect(pl31StageOf($a))->toBe('invited');
 
-    accept($a);
-    expect(stageOf($a))->toBe('selected');
+    pl31Accept($a);
+    expect(pl31StageOf($a))->toBe('selected');
 });
 
 it('BR2: accepted first, approved later: the decision moves the card to Selected (row 7)', function (): void {
-    [$w, $a, $slot] = invitedSlot();
-    accept($a);
-    $before = stageOf($a);
+    [$w, $a, $slot] = pl31InvitedSlot();
+    pl31Accept($a);
+    $before = pl31StageOf($a);
 
-    decide($w, $slot)->assertCreated()->assertJsonPath('meta.card_moved', true);
-    expect(stageOf($a))->toBe('selected')->and($before)->not->toBe('selected');
+    pl31Decide($w, $slot)->assertCreated()->assertJsonPath('meta.card_moved', true);
+    expect(pl31StageOf($a))->toBe('selected')->and($before)->not->toBe('selected');
 });
 
 it('BR3: Suggest another sends a Selected card back to Invited (row 8) and an accept over it does nothing', function (): void {
-    [$w, $a, $slot] = invitedSlot();
-    accept($a);
-    decide($w, $slot)->assertCreated();
-    decide($w, $slot, 'suggest_another')->assertCreated()->assertJsonPath('meta.card_moved', true);
-    expect(stageOf($a))->toBe('invited');
+    [$w, $a, $slot] = pl31InvitedSlot();
+    pl31Accept($a);
+    pl31Decide($w, $slot)->assertCreated();
+    pl31Decide($w, $slot, 'suggest_another')->assertCreated()->assertJsonPath('meta.card_moved', true);
+    expect(pl31StageOf($a))->toBe('invited');
 
     $assignment = $a->refresh();
     event(new AssignmentTransitioned($assignment, AssignmentStatus::Invited, AssignmentStatus::Accepted, AuditAction::AssignmentAccepted));
-    expect(stageOf($a))->toBe('invited');
+    expect(pl31StageOf($a))->toBe('invited');
 
     // Events, not a schedule: a card the agency put in Selected by hand stays there when an accept event arrives.
-    putInStage($a, 'selected');
+    pl31PutInStage($a, 'selected');
     event(new AssignmentTransitioned($assignment, AssignmentStatus::Invited, AssignmentStatus::Accepted, AuditAction::AssignmentAccepted));
-    expect(stageOf($a))->toBe('selected');
+    expect(pl31StageOf($a))->toBe('selected');
 });
 
 it('BR4: Filming or later: the card is NOT moved by a decision, which says so (beyond_selected)', function (): void {
-    [$w, $a, $slot] = invitedSlot();
-    accept($a);
-    putInStage($a, 'filming');
+    [$w, $a, $slot] = pl31InvitedSlot();
+    pl31Accept($a);
+    pl31PutInStage($a, 'filming');
 
-    decide($w, $slot, 'suggest_another')->assertCreated()->assertJsonPath('meta.card_moved', false)->assertJsonPath('meta.card_not_moved', 'beyond_selected');
-    expect(stageOf($a))->toBe('filming');
-    decide($w, $slot)->assertCreated();
-    expect(stageOf($a))->toBe('filming');
+    pl31Decide($w, $slot, 'suggest_another')->assertCreated()->assertJsonPath('meta.card_moved', false)->assertJsonPath('meta.card_not_moved', 'beyond_selected');
+    expect(pl31StageOf($a))->toBe('filming');
+    pl31Decide($w, $slot)->assertCreated();
+    expect(pl31StageOf($a))->toBe('filming');
 });
 
 it('BR5: Remove from Selected sends the card back to Invited; from Filming or later it is refused and nothing changes', function (): void {
-    [$w, $a, $slot] = invitedSlot();
-    accept($a);
-    decide($w, $slot)->assertCreated();
-    expect(stageOf($a))->toBe('selected');
+    [$w, $a, $slot] = pl31InvitedSlot();
+    pl31Accept($a);
+    pl31Decide($w, $slot)->assertCreated();
+    expect(pl31StageOf($a))->toBe('selected');
 
-    putInStage($a, 'filming');
+    pl31PutInStage($a, 'filming');
     S::call($w['admin'], 'DELETE', F::url($w, $slot->ulid))->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_creator.remove_blocked_in_work');
     S::call($w['admin'], 'POST', F::url($w, "{$slot->ulid}/replace"), ['creator' => F::applicant($w['campaign'])->ulid])->assertStatus(422);
-    expect(WaveCreator::query()->whereKey($slot->id)->exists())->toBeTrue()->and(stageOf($a))->toBe('filming');
+    expect(WaveCreator::query()->whereKey($slot->id)->exists())->toBeTrue()->and(pl31StageOf($a))->toBe('filming');
 
-    putInStage($a, 'selected');
+    pl31PutInStage($a, 'selected');
     S::call($w['admin'], 'DELETE', F::url($w, $slot->ulid))->assertOk();
-    expect(stageOf($a))->toBe('invited')->and(WaveCreator::query()->whereKey($slot->id)->exists())->toBeFalse();
+    expect(pl31StageOf($a))->toBe('invited')->and(WaveCreator::query()->whereKey($slot->id)->exists())->toBeFalse();
 });
 
 it('BR6: a rule move writes ONE movement row (triggered by an event, no user text) and one card_moved audit row with ids only', function (): void {
-    [$w, $a, $slot] = invitedSlot();
-    accept($a);
+    [$w, $a, $slot] = pl31InvitedSlot();
+    pl31Accept($a);
     $moves = BoardCardMovement::query()->count();
-    decide($w, $slot)->assertCreated();
+    pl31Decide($w, $slot)->assertCreated();
 
     $row = BoardCardMovement::query()->latest('id')->firstOrFail();
     $audit = F::lastAudit('wave_creator.card_moved');
@@ -154,7 +154,7 @@ it('BR6: a rule move writes ONE movement row (triggered by an event, no user tex
 });
 
 it('L1: flags off: the listener runs ZERO queries, for the accept event and for any other', function (): void {
-    [$w, $a] = invitedSlot();
+    [$w, $a] = pl31InvitedSlot();
     $queries = [];
     foreach ([[], ['strategy_enabled'], ['waves_enabled']] as $off) {
         Feature::activate('strategy_enabled');
@@ -206,14 +206,14 @@ it('L2: a normal campaign: with all three flags on, the accept writes exactly th
 });
 
 it('L3: an exception inside the listener leaves the accept committed and is reported with ids only', function (): void {
-    [$w, $a, $slot] = invitedSlot();
-    decide($w, $slot)->assertCreated();
+    [$w, $a, $slot] = pl31InvitedSlot();
+    pl31Decide($w, $slot)->assertCreated();
     $sentry = SentryRecording::install();
 
     try {
         // Break the deferred work: the lookup it runs under the wave lock fails.
         DB::statement('ALTER TABLE wave_creators RENAME TO wave_creators_gone');
-        accept($a);
+        pl31Accept($a);
         DB::statement('ALTER TABLE wave_creators_gone RENAME TO wave_creators');
         $sentry->flush();
 
@@ -228,8 +228,8 @@ it('L3: an exception inside the listener leaves the accept committed and is repo
 });
 
 it('L4: the work runs only AFTER the accept transaction commits, inside the accept never', function (): void {
-    [$w, $a, $slot] = invitedSlot();
-    decide($w, $slot)->assertCreated();
+    [$w, $a, $slot] = pl31InvitedSlot();
+    pl31Decide($w, $slot)->assertCreated();
     $a->refresh();
 
     $seen = null;
@@ -242,23 +242,23 @@ it('L4: the work runs only AFTER the accept transaction commits, inside the acce
     try {
         app(CampaignAssignmentStateMachine::class)->accept($a);
         // Still inside the caller's own transaction: nothing may have moved the card yet.
-        expect(stageOf($a))->not->toBe('selected');
+        expect(pl31StageOf($a))->not->toBe('selected');
     } finally {
         DB::commit();
     }
-    expect(stageOf($a))->toBe('selected');
+    expect(pl31StageOf($a))->toBe('selected');
 });
 
 it('L5: the listener needs no agency tenancy context (the creator accepts on their own request)', function (): void {
-    [$w, $a, $slot] = invitedSlot();
-    decide($w, $slot)->assertCreated();
+    [$w, $a, $slot] = pl31InvitedSlot();
+    pl31Decide($w, $slot)->assertCreated();
     app()->forgetInstance('tenancy.agency');
     if (class_exists(TenancyContext::class)) {
         app(TenancyContext::class)->forget();
     }
 
-    accept($a);
-    expect(stageOf($a))->toBe('selected');
+    pl31Accept($a);
+    expect(pl31StageOf($a))->toBe('selected');
 });
 
 it('B37: every write to wave_creators and wave_creator_decisions in the Strategy module is inside WaveCreatorGuard::transaction (source check)', function (): void {
