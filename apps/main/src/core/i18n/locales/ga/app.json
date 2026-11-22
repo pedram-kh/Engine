@@ -1761,7 +1761,8 @@
           "not_started": "Gan tosú",
           "in_progress": "Ar siúl",
           "done": "Déanta"
-        }
+        },
+        "personasCount": "{count} phearsa | {count} pearsa"
       },
       "audience": {
         "label": "Teideal an lucht féachana",
@@ -2188,7 +2189,9 @@
         "retry": "Triail arís",
         "tooLong": "Is féidir uasmhéid {max} carachtar a bheith i nóta.",
         "open": "Nótaí ({count})",
-        "sheetTitle": "Nótaí · {market}"
+        "sheetTitle": "Nótaí · {market}",
+        "expand": "Leathnaigh na nótaí",
+        "collapse": "Laghdaigh na nótaí"
       }
     }
   },

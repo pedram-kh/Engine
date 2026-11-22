@@ -1761,7 +1761,8 @@
           "not_started": "Не е започнато",
           "in_progress": "В процес",
           "done": "Готово"
-        }
+        },
+        "personasCount": "{count} персона | {count} персони"
       },
       "audience": {
         "label": "Заглавие на аудиторията",
@@ -2188,7 +2189,9 @@
         "retry": "Опитай отново",
         "tooLong": "Една бележка може да е най-много {max} знака.",
         "open": "Бележки ({count})",
-        "sheetTitle": "Бележки · {market}"
+        "sheetTitle": "Бележки · {market}",
+        "expand": "Разгъни бележките",
+        "collapse": "Свий бележките"
       }
     }
   },

@@ -41,6 +41,7 @@ Total: 48 chunks (PL-1 is 3 chunks since 2026-11-17; **PL-2 is 5 chunks since 20
 **Missing designs that block a sprint**
 
 - The client screens for USPs, personas and the matrix (blocks PL-5).
+- **PL-5 carry-over (agreed 2026-11-22, PL-2.5 walk): replies to a note.** Build replies once, with the client comments, and apply the same component to the internal notes. Until then the internal notes stay a flat list.
 - The frame 13 "Send to client" change (blocks PL-6).
 - The editor access path (blocks PL-7).
 

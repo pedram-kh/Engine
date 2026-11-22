@@ -1761,7 +1761,8 @@
           "not_started": "Ikke startet",
           "in_progress": "I gang",
           "done": "Færdig"
-        }
+        },
+        "personasCount": "{count} persona | {count} personaer"
       },
       "audience": {
         "label": "Målgruppetitel",
@@ -2188,7 +2189,9 @@
         "retry": "Prøv igen",
         "tooLong": "En note må højst være på {max} tegn.",
         "open": "Noter ({count})",
-        "sheetTitle": "Noter · {market}"
+        "sheetTitle": "Noter · {market}",
+        "expand": "Udvid noter",
+        "collapse": "Skjul udvidet visning af noter"
       }
     }
   },

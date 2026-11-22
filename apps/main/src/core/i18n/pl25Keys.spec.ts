@@ -65,6 +65,9 @@ const KEYS = [
   'app.waves.tracker.handSet.markets',
   'app.waves.dialog.notesWarning',
   'app.waves.dialog.notesConfirm',
+  'app.strategy.notes.expand',
+  'app.strategy.notes.collapse',
+  'app.strategy.stepper.personasCount',
 ]
 
 /** Keys whose value is a plural pair ("one | other"). */
@@ -73,6 +76,7 @@ const PLURAL_KEYS = [
   'app.strategy.completion.warnUsps',
   'app.strategy.completion.warnPersonas',
   'app.waves.dialog.notesWarning',
+  'app.strategy.stepper.personasCount',
 ]
 
 /** `locale:key` pairs that are the same word as English on purpose, checked by hand. */
@@ -81,6 +85,11 @@ const SAME_AS_ENGLISH_BY_DESIGN = new Set<string>([
   'fr:app.strategy.notes.title',
   'fr:app.strategy.notes.open',
   'fr:app.strategy.notes.sheetTitle',
+  // "{count} persona | {count} personas" is the same word in these languages.
+  'fr:app.strategy.stepper.personasCount',
+  'lv:app.strategy.stepper.personasCount',
+  'pt:app.strategy.stepper.personasCount',
+  'es:app.strategy.stepper.personasCount',
 ])
 
 type Bundle = Record<string, unknown>
@@ -103,8 +112,8 @@ function tokens(text: string): string[] {
 }
 
 describe('PL-2.5 completion, notes and tracker strings', () => {
-  it('checks 49 keys across 24 locales', () => {
-    expect(KEYS).toHaveLength(49)
+  it('checks 52 keys across 24 locales', () => {
+    expect(KEYS).toHaveLength(52)
     expect(UI_LOCALES).toHaveLength(24)
   })
 

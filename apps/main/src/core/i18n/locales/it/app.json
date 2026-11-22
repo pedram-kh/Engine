@@ -1761,7 +1761,8 @@
           "not_started": "Non iniziato",
           "in_progress": "In corso",
           "done": "Fatto"
-        }
+        },
+        "personasCount": "{count} persona | {count} persone"
       },
       "audience": {
         "label": "Titolo del pubblico",
@@ -2188,7 +2189,9 @@
         "retry": "Riprova",
         "tooLong": "Una nota può avere al massimo {max} caratteri.",
         "open": "Note ({count})",
-        "sheetTitle": "Note · {market}"
+        "sheetTitle": "Note · {market}",
+        "expand": "Espandi le note",
+        "collapse": "Riduci le note"
       }
     }
   },

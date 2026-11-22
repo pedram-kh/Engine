@@ -236,6 +236,11 @@ describe('WaveStepsPanel (PL-1.3)', () => {
       'Set by hand · the step says In progress (1 of 2 markets)',
     )
     expect(w.find('[data-test="step-hand-sys"]').exists()).toBe(false)
+    // N3: the marker has a line of its own across the row, under the step name - not inside the status cell.
+    const line = w.get('[data-test="step-handline"]')
+    expect(line.classes()).toContain('steps__hand-row')
+    expect(w.get('[data-test="step-hand-hand"]').element.closest('.steps__cell--status')).toBeNull()
+    expect(w.findAll('[data-test="step-handline"]')).toHaveLength(1)
     w.unmount()
   })
 })

@@ -1761,7 +1761,8 @@
           "not_started": "Nincs elkezdve",
           "in_progress": "Folyamatban",
           "done": "Kész"
-        }
+        },
+        "personasCount": "{count} perszóna | {count} perszóna"
       },
       "audience": {
         "label": "Célközönség címe",
@@ -2188,7 +2189,9 @@
         "retry": "Újrapróbálás",
         "tooLong": "Egy jegyzet legfeljebb {max} karakter lehet.",
         "open": "Jegyzetek ({count})",
-        "sheetTitle": "Jegyzetek · {market}"
+        "sheetTitle": "Jegyzetek · {market}",
+        "expand": "Jegyzetek kibontása",
+        "collapse": "Jegyzetek összecsukása"
       }
     }
   },

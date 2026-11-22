@@ -67,22 +67,43 @@ const baseLine = computed<Record<LiveKey, string>>(() => {
   }
 })
 
-/** The line under a step's name: the real state first ("Complete", "n of m markets"), else the counts line. */
+/**
+ * The line under a step's name (PL-2.5 walk, N4): the counts the step always showed, then the market progress while a
+ * per-market step is in progress ("12 of 24 cells set · 1 of 2 markets"); done keeps the check and says "Complete" and
+ * what it shows ("Complete · 3 personas"); not started keeps the empty-step wording. USPs is per wave and keeps its count.
+ */
 const statusLine = computed<Record<LiveKey, string>>(() => {
   const a = props.summary?.attributes
   const out = { ...baseLine.value }
   if (!a) return out
+  const progress = (key: 'personas' | 'matrix' | 'concepts'): string =>
+    t(
+      'app.strategy.stepper.marketsOf',
+      { done: a.steps[key].markets_done, total: a.steps[key].markets_total },
+      a.steps[key].markets_total,
+    )
+  const joined = (...parts: string[]): string => parts.join(' · ')
   for (const key of ['usps', 'personas', 'matrix', 'concepts'] as const) {
-    const st = a.steps[key]
-    if (st.state === 'done') {
-      out[key] = t('app.strategy.completion.complete')
-    } else if (st.state === 'in_progress' && key !== 'usps') {
-      const m = a.steps[key]
-      out[key] = t(
-        'app.strategy.stepper.marketsOf',
-        { done: m.markets_done, total: m.markets_total },
-        m.markets_total,
-      )
+    const state = a.steps[key].state
+    if (state === 'done') {
+      const counts =
+        key === 'personas'
+          ? t('app.strategy.stepper.personasCount', { count: a.persona_count }, a.persona_count)
+          : baseLine.value[key]
+      out[key] = joined(t('app.strategy.completion.complete'), counts)
+    } else if (state === 'in_progress' && key !== 'usps') {
+      out[key] =
+        key === 'personas'
+          ? t(
+              'app.strategy.stepper.statusPersonas',
+              {
+                count: a.persona_count,
+                covered: a.steps.personas.markets_done,
+                markets: a.steps.personas.markets_total,
+              },
+              a.persona_count,
+            )
+          : joined(baseLine.value[key], progress(key))
     }
   }
   return out
@@ -144,7 +165,11 @@ function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUli
           </span>
           <span class="strategy-step__text">
             <span class="strategy-step__name">{{ t(`app.strategy.stepper.${step.key}`) }}</span>
-            <span class="strategy-step__status" :data-test="`strategy-step-${step.key}-status`">
+            <span
+              class="strategy-step__status"
+              :title="statusLine[step.key as LiveKey]"
+              :data-test="`strategy-step-${step.key}-status`"
+            >
               {{ statusLine[step.key as LiveKey] }}
             </span>
             <span class="sr-only">{{ t(`app.strategy.stepper.state.${stateOf(step.key)}`) }}</span>
@@ -266,6 +291,11 @@ function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUli
   line-height: normal;
   color: rgb(var(--v-theme-on-surface-variant));
   min-height: 1.2em;
+  /* Narrow: one line that ends in an ellipsis (the full text is the tooltip). */
+  max-width: 230px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 /* Status text takes the state's colour (frame 13:4538, 13:4558): green when done, amber while in progress. */
 .strategy-step[data-state='done'] .strategy-step__status {
@@ -299,12 +329,22 @@ function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUli
   .strategy-stepper__list {
     min-width: 0;
   }
+  /* The four live steps carry the longer lines; steps 5 and 6 only say "Not available yet". */
   .strategy-stepper__item {
-    flex: 1 1 0;
+    flex: 1.5 1 0;
     min-width: 0;
+  }
+  .strategy-stepper__item:nth-child(n + 5) {
+    flex: 1 1 0;
   }
   .strategy-step {
     white-space: normal;
+  }
+  .strategy-step__text {
+    min-width: 0;
+  }
+  .strategy-step__status {
+    max-width: none;
   }
 }
 .strategy-step--off {

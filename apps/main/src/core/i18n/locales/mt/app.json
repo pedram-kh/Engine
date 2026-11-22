@@ -1761,7 +1761,8 @@
           "not_started": "Ma nbediex",
           "in_progress": "Għaddej",
           "done": "Magħmul"
-        }
+        },
+        "personasCount": "{count} persunaġġ | {count} persunaġġi"
       },
       "audience": {
         "label": "Titlu tal-udjenza",
@@ -2188,7 +2189,9 @@
         "retry": "Erġa’ pprova",
         "tooLong": "Nota tista’ jkollha massimu ta’ {max} karattru.",
         "open": "Noti ({count})",
-        "sheetTitle": "Noti · {market}"
+        "sheetTitle": "Noti · {market}",
+        "expand": "Kabbar in-noti",
+        "collapse": "Naqqas in-noti"
       }
     }
   },

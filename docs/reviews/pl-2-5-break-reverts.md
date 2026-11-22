@@ -36,6 +36,21 @@ never the `catalyst` database), the rest on SQLite.
 | B13 (PostgreSQL)      | a hand-set on a strategy row no longer takes the wave lock first                       | `Pl25GatesTest`                        | red              | green        |
 | B19 / A2 (PostgreSQL) | `StrategyGuard::lockWave` takes no `FOR UPDATE`                                        | `Pl25RaceTest`                         | **stayed green** | green        |
 
+## Walk improvements (N1 to N4), each gate red then green
+
+| Gate                                              | Break                                            | Caught by                                                                                                            | Broken | Restored |
+| ------------------------------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- | ------ | -------- |
+| W1 a note just added scrolls into view            | the scroll after an add is removed               | `NotesThread.spec`                                                                                                   | red    | green    |
+| W2 the list scrolls inside the panel              | `overflow-y: visible` on the list                | Playwright "30 notes scroll"                                                                                         | red    | green    |
+| W3 the panel stays in view while the page scrolls | `position: static`                               | Playwright "30 notes scroll" (first pass stayed green: it only checked "not below the bar"; now also "not above it") | red    | green    |
+| W4 never taller than the window, composer in view | the measured max-height is not applied           | Playwright "30 notes scroll"                                                                                         | red    | green    |
+| W5 at 390 the panel is static and capped          | sticky and no cap at 390                         | Playwright "at 390"                                                                                                  | red    | green    |
+| X1 one composer at a time                         | the thread is drawn while the large view is open | `NotesPanel.spec`                                                                                                    | red    | green    |
+| X2 the draft is kept between panel and large view | the sheet no longer shares the draft             | Playwright "expanded view"                                                                                           | red    | green    |
+| X3 focus returns to the expand control            | the focus call is removed                        | Playwright "expanded view"                                                                                           | red    | green    |
+| H1 "Set by hand" has its own line under the name  | the line goes back into the status cell          | `WaveStepsPanel.spec`                                                                                                | red    | green    |
+| P1 the stepper line carries the markets           | the joined line shows only the count             | `StrategyStepper.spec`                                                                                               | red    | green    |
+
 ## What the first pass found weak (fixed, then re-run red)
 
 | Gate         | What the first pass showed                                                                                                                                                                                                       |

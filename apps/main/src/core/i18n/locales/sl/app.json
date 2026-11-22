@@ -1761,7 +1761,8 @@
           "not_started": "Ni začeto",
           "in_progress": "V teku",
           "done": "Končano"
-        }
+        },
+        "personasCount": "{count} persona | {count} person"
       },
       "audience": {
         "label": "Naslov ciljne skupine",
@@ -2188,7 +2189,9 @@
         "retry": "Poskusi znova",
         "tooLong": "Opomba ima lahko največ {max} znakov.",
         "open": "Opombe ({count})",
-        "sheetTitle": "Opombe · {market}"
+        "sheetTitle": "Opombe · {market}",
+        "expand": "Razširi opombe",
+        "collapse": "Skrči opombe"
       }
     }
   },

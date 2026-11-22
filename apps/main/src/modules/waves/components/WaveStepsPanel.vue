@@ -286,14 +286,6 @@ function canRemove(step: WaveStepResource): boolean {
               :data-test="`step-status-${step.id}`"
             />
             <span
-              v-if="step.attributes.strategy?.hand_set_beyond"
-              class="steps__hand"
-              :data-test="`step-hand-${step.id}`"
-            >
-              <v-icon icon="mdi-hand-back-right-outline" size="12" aria-hidden="true" />
-              {{ handLine(step) }}
-            </span>
-            <span
               v-if="
                 step.attributes.display_status === 'delayed' && step.attributes.days_overdue > 0
               "
@@ -306,6 +298,18 @@ function canRemove(step: WaveStepResource): boolean {
                   step.attributes.days_overdue,
                 )
               }}
+            </span>
+          </div>
+
+          <!-- PL-2.5: the "set by hand" line takes the row's full width under the step name, not the narrow status cell. -->
+          <div
+            v-if="step.attributes.strategy?.hand_set_beyond"
+            class="steps__hand-row"
+            data-test="step-handline"
+          >
+            <span class="steps__hand" :data-test="`step-hand-${step.id}`">
+              <v-icon icon="mdi-hand-back-right-outline" size="12" aria-hidden="true" />
+              {{ handLine(step) }}
             </span>
           </div>
 
@@ -504,11 +508,19 @@ function canRemove(step: WaveStepResource): boolean {
   gap: 10px;
 }
 
+.steps__row > .steps__cell--menu {
+  grid-column: -2;
+  grid-row: 1;
+}
+.steps__hand-row {
+  grid-column: 1 / -1;
+  padding-inline-start: 30px;
+  min-width: 0;
+}
 .steps__hand {
   display: inline-flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 4px;
-  margin-top: 2px;
   font-size: 11px;
   line-height: 14px;
   color: rgb(var(--v-theme-warning));
@@ -619,9 +631,14 @@ function canRemove(step: WaveStepResource): boolean {
     grid-column: 1;
   }
 
-  .steps__cell--menu {
+  .steps__row > .steps__cell--menu {
     grid-column: 2;
     grid-row: 1;
+  }
+
+  /* Right under the name, before owner, due and status. */
+  .steps__hand-row {
+    grid-row: 2;
   }
 
   .steps__cell--owner,

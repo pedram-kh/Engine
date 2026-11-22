@@ -1761,7 +1761,8 @@
           "not_started": "Nierozpoczęte",
           "in_progress": "W toku",
           "done": "Gotowe"
-        }
+        },
+        "personasCount": "{count} persona | {count} person"
       },
       "audience": {
         "label": "Tytuł grupy docelowej",
@@ -2188,7 +2189,9 @@
         "retry": "Spróbuj ponownie",
         "tooLong": "Notatka może mieć najwyżej {max} znaków.",
         "open": "Notatki ({count})",
-        "sheetTitle": "Notatki · {market}"
+        "sheetTitle": "Notatki · {market}",
+        "expand": "Rozwiń notatki",
+        "collapse": "Zwiń notatki"
       }
     }
   },

@@ -149,4 +149,37 @@ describe('NotesThread (PL-2.5)', () => {
     expect(w.findAll('[data-test="note-body"]').map((b) => b.text())).toEqual(['Romania note'])
     w.unmount()
   })
+
+  it('PL-2.5 N1: opens scrolled to the newest note, and scrolls to a note just added', async () => {
+    const heights = vi.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(900)
+    try {
+      const w = await mountThread([note(1), note(2), note(3)])
+      const list = w.get('[data-test="notes-scroll"]').element as HTMLElement
+      expect(list.scrollTop).toBe(900)
+      list.scrollTop = 0
+      heights.mockReturnValue(1200)
+      vi.mocked(strategyApi.addNote).mockResolvedValue({ data: note(4) })
+      await type(w, 'Another')
+      await w.get('[data-test="note-add"]').trigger('click')
+      await flushPromises()
+      expect(list.scrollTop).toBe(1200)
+      // The composer is outside the scrolling list, so it stays pinned at the bottom of the panel.
+      expect(w.get('[data-test="notes-scroll"]').find('[data-test="note-input"]').exists()).toBe(
+        false,
+      )
+      w.unmount()
+    } finally {
+      heights.mockRestore()
+    }
+  })
+
+  it('PL-2.5 N2: the draft is a model the parent owns, so it survives the thread being replaced', async () => {
+    vi.mocked(strategyApi.listNotes).mockResolvedValue({ data: [note(1)] })
+    const w = await mountStrategy(NotesThread, { step: 'usps', market: null, draft: 'kept' })
+    await flushPromises()
+    expect((w.get('[data-test="note-input"] textarea').element as HTMLTextAreaElement).value).toBe(
+      'kept',
+    )
+    w.unmount()
+  })
 })

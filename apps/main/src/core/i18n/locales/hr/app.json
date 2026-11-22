@@ -1761,7 +1761,8 @@
           "not_started": "Nije započeto",
           "in_progress": "U tijeku",
           "done": "Gotovo"
-        }
+        },
+        "personasCount": "{count} persona | {count} persona"
       },
       "audience": {
         "label": "Naslov ciljne skupine",
@@ -2188,7 +2189,9 @@
         "retry": "Pokušaj ponovno",
         "tooLong": "Bilješka može imati najviše {max} znakova.",
         "open": "Bilješke ({count})",
-        "sheetTitle": "Bilješke · {market}"
+        "sheetTitle": "Bilješke · {market}",
+        "expand": "Proširi bilješke",
+        "collapse": "Suzi bilješke"
       }
     }
   },

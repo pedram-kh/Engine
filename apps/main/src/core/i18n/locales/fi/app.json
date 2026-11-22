@@ -1761,7 +1761,8 @@
           "not_started": "Ei aloitettu",
           "in_progress": "Kesken",
           "done": "Valmis"
-        }
+        },
+        "personasCount": "{count} persona | {count} personaa"
       },
       "audience": {
         "label": "Kohderyhmän otsikko",
@@ -2188,7 +2189,9 @@
         "retry": "Yritä uudelleen",
         "tooLong": "Muistiinpano voi olla enintään {max} merkkiä pitkä.",
         "open": "Muistiinpanot ({count})",
-        "sheetTitle": "Muistiinpanot · {market}"
+        "sheetTitle": "Muistiinpanot · {market}",
+        "expand": "Laajenna muistiinpanot",
+        "collapse": "Pienennä muistiinpanot"
       }
     }
   },

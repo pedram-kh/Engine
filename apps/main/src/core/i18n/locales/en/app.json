@@ -1761,7 +1761,8 @@
           "not_started": "Not started",
           "in_progress": "In progress",
           "done": "Done"
-        }
+        },
+        "personasCount": "{count} persona | {count} personas"
       },
       "audience": {
         "label": "Audience title",
@@ -2188,7 +2189,9 @@
         "retry": "Try again",
         "tooLong": "A note can be at most {max} characters.",
         "open": "Notes ({count})",
-        "sheetTitle": "Notes · {market}"
+        "sheetTitle": "Notes · {market}",
+        "expand": "Expand notes",
+        "collapse": "Collapse notes"
       }
     }
   },

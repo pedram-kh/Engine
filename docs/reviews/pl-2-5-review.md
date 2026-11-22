@@ -53,6 +53,10 @@ The table is filled in `pl-2-5-plan.md` section 4.5. Summary:
 - Frames read with `get_design_context`: 13:428, 13:828, 13:1375, 13:4412 (saved frame files).
 - Dialogs, menus, the notes panel and the side sheet were opened, closed and quickly reopened at three speeds (0, 60, 150 ms) in `strategy-completion.spec.ts`: the warning confirm, the refusal, the note delete confirm, the tracker confirm, and the matrix sheet. The completion bar, the panel and the sheet were also checked at 390 (no sideways scroll with the sidebar closed).
 
+## 5a. Walk improvements (N1 to N4)
+
+Built after the walk; the choices and the measured numbers are in `pl-2-5-plan.md` 4.5a. The sticky and scrolling behaviour, the expanded view, the "Set by hand" line and the market progress in the stepper line have **no frame**; they are recorded as built. Gates are in `pl-2-5-break-reverts.md` (W1 to W5, X1 to X3, H1, P1, each red then green). Replies to a note are recorded under PL-5 in `production-line-sprints.md`.
+
 ## 6. FUNCTIONAL differences for Pedram (not built; ruled or out of this stage)
 
 1. **Comments**: the frame's Comments card, "Comments (n)" and the approval title-row actions, "Client review" statuses, "Preview as client", "Share with client" (PL-5).

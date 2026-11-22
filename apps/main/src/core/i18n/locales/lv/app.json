@@ -1761,7 +1761,8 @@
           "not_started": "Nav sākts",
           "in_progress": "Procesā",
           "done": "Gatavs"
-        }
+        },
+        "personasCount": "{count} persona | {count} personas"
       },
       "audience": {
         "label": "Mērķauditorijas nosaukums",
@@ -2188,7 +2189,9 @@
         "retry": "Mēģināt vēlreiz",
         "tooLong": "Piezīmē var būt ne vairāk kā {max} rakstzīmes.",
         "open": "Piezīmes ({count})",
-        "sheetTitle": "Piezīmes · {market}"
+        "sheetTitle": "Piezīmes · {market}",
+        "expand": "Izvērst piezīmes",
+        "collapse": "Sakļaut piezīmes"
       }
     }
   },

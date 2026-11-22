@@ -150,7 +150,9 @@ test.describe('Strategy completion, notes and landing', () => {
     await expect(page.locator('[data-test="completion-warnings"]')).toContainText('2 USPs so far')
     await page.locator('[data-test="confirm-ok"]').click()
     await expect(step).toHaveAttribute('data-state', 'done')
-    await expect(page.locator('[data-test="strategy-step-usps-status"]')).toHaveText('Complete')
+    await expect(page.locator('[data-test="strategy-step-usps-status"]')).toHaveText(
+      'Complete · 2 USPs',
+    )
     await expect(page.locator('[data-test="completion-reopen"]')).toBeVisible()
     expect(await sideways(page)).toBeLessThanOrEqual(1)
 
@@ -265,5 +267,172 @@ test.describe('Strategy completion, notes and landing', () => {
     await row.locator('[data-test^="step-check-"]').click()
     await page.locator('[data-test="confirm-ok"]').click()
     await expect(page.locator('[data-test^="step-hand-"]')).toContainText('Set by hand')
+  })
+
+  /** Thirty notes through the API, the last one long, so the list has to scroll. */
+  async function manyNotes(page: Page, base: string, n: number): Promise<void> {
+    await page.evaluate(
+      async ({ base, n }) => {
+        const token = decodeURIComponent(
+          document.cookie
+            .split('; ')
+            .find((row) => row.startsWith('XSRF-TOKEN='))
+            ?.slice('XSRF-TOKEN='.length) ?? '',
+        )
+        for (let i = 1; i <= n; i++) {
+          await fetch(`/api/v1${base}/notes`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+              'X-XSRF-TOKEN': token,
+            },
+            body: JSON.stringify({
+              step: 'usps',
+              market: null,
+              body: i === n ? `Note ${i}. ${'long words '.repeat(60)}` : `Note ${i}`,
+            }),
+          })
+        }
+      },
+      { base, n },
+    )
+  }
+
+  const panelBox = (page: Page) =>
+    page.evaluate(() => {
+      const p = document.querySelector('[data-test="notes-panel"]') as HTMLElement
+      const list = p.querySelector('[data-test="notes-scroll"]') as HTMLElement
+      const c = p.querySelector('.notes-composer') as HTMLElement
+      const pb = p.getBoundingClientRect()
+      return {
+        vh: window.innerHeight,
+        top: Math.round(pb.top),
+        bottom: Math.round(pb.bottom),
+        composerBottom: Math.round(c.getBoundingClientRect().bottom),
+        atEnd: Math.abs(list.scrollHeight - list.clientHeight - list.scrollTop) <= 2,
+        scrolls: list.scrollHeight > list.clientHeight,
+      }
+    })
+
+  test('Notes panel: 30 notes scroll inside the panel, the composer stays in view, it opens on the newest and stays in view while the page scrolls', async ({
+    page,
+    request,
+  }) => {
+    const { brandId, waveId, base } = await startWave(page, request, SIZE, 'Scroll', ['SK'])
+    await manyNotes(page, base, 30)
+    await page.goto(`/brands/${brandId}/waves/${waveId}/strategy/usps`)
+    await expect(page.locator('[data-test="note-body"]')).toHaveCount(30)
+
+    const a = await panelBox(page)
+    expect(a.scrolls).toBe(true)
+    expect(a.atEnd).toBe(true)
+    expect(a.bottom).toBeLessThanOrEqual(a.vh)
+    expect(a.composerBottom).toBeLessThanOrEqual(a.vh)
+
+    // A note just added scrolls into view.
+    await page.locator('[data-test="note-input"] textarea:not([aria-hidden])').fill('Newest of all')
+    await page.locator('[data-test="note-add"]').click()
+    await expect(page.locator('[data-test="note-body"]').last()).toHaveText('Newest of all')
+    await expect(page.locator('[data-test="note-body"]').last()).toBeInViewport()
+    expect((await panelBox(page)).atEnd).toBe(true)
+
+    // Stays in view while the page scrolls (a tall left column makes the page scroll).
+    await page.evaluate(() => {
+      const d = document.createElement('div')
+      d.style.height = '3000px'
+      document.querySelector('.strategy-grid__main')?.appendChild(d)
+    })
+    await page.evaluate(() => window.scrollTo(0, 1500))
+    await expect.poll(async () => (await panelBox(page)).top).toBeLessThanOrEqual(90)
+    const b = await panelBox(page)
+    // Stuck just under the app bar (65 px), not scrolled away above it.
+    expect(b.top).toBeGreaterThanOrEqual(65)
+    expect(b.bottom).toBeLessThanOrEqual(b.vh)
+    expect(b.composerBottom).toBeLessThanOrEqual(b.vh)
+  })
+
+  test('Notes panel at 390: below the step, not sticky, capped in height, the list scrolls inside and the composer stays in the panel', async ({
+    page,
+    request,
+  }) => {
+    const narrow = { name: '390', width: 390, height: 844 }
+    const { brandId, waveId, base, closeDrawer } = await startWave(
+      page,
+      request,
+      narrow,
+      'Narrow',
+      ['SK'],
+    )
+    await manyNotes(page, base, 30)
+    await page.goto(`/brands/${brandId}/waves/${waveId}/strategy/usps`)
+    await closeDrawer()
+    await expect(page.locator('[data-test="note-body"]')).toHaveCount(30)
+    const r = await page.evaluate(() => {
+      const p = document.querySelector('[data-test="notes-panel"]') as HTMLElement
+      const main = document.querySelector('.strategy-grid__main') as HTMLElement
+      const list = p.querySelector('[data-test="notes-scroll"]') as HTMLElement
+      return {
+        position: getComputedStyle(p).position,
+        height: p.getBoundingClientRect().height,
+        below: p.getBoundingClientRect().top >= main.getBoundingClientRect().bottom - 1,
+        vh: window.innerHeight,
+        scrolls: list.scrollHeight > list.clientHeight,
+        sideways: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      }
+    })
+    expect(r.position).toBe('static')
+    expect(r.below).toBe(true)
+    expect(r.height).toBeLessThanOrEqual(r.vh * 0.8 + 1)
+    expect(r.scrolls).toBe(true)
+    expect(r.sideways).toBeLessThanOrEqual(1)
+  })
+
+  test('Notes expanded view: opens from the panel, keeps the draft both ways, Escape closes it, focus returns to the control, quick reopen is clean', async ({
+    page,
+    request,
+  }) => {
+    const { brandId, waveId, base } = await startWave(page, request, SIZE, 'Expand', ['SK'])
+    await manyNotes(page, base, 5)
+    await page.goto(`/brands/${brandId}/waves/${waveId}/strategy/usps`)
+    await expect(page.locator('[data-test="note-body"]')).toHaveCount(5)
+    const expand = page.locator('[data-test="notes-expand"]')
+    const input = page.locator('[data-test="note-input"] textarea:not([aria-hidden])')
+
+    await input.fill('half a thought')
+    await expand.click()
+    const sheet = page.locator('[data-test="notes-sheet"]')
+    await expect(sheet).toBeVisible()
+    await expect(page.locator('[data-test="notes-sheet-title"]')).toHaveText('Notes')
+    expect((await sheet.boundingBox())?.width).toBe(720)
+    // One composer at a time, with the draft in it, and the same actions on the notes.
+    await expect(input).toHaveCount(1)
+    await expect(input).toHaveValue('half a thought')
+    await expect(sheet.locator('[data-test="note-delete"]').first()).toBeVisible()
+    await input.fill('half a thought, finished')
+
+    // Escape closes it; focus is back on the expand control; the draft is in the panel again.
+    await page.keyboard.press('Escape')
+    await expect(sheet).toHaveCount(0)
+    await expect(expand).toBeFocused()
+    await expect(input).toHaveValue('half a thought, finished')
+
+    // The collapse button does the same.
+    await expand.click()
+    await expect(sheet).toBeVisible()
+    await page.locator('[data-test="notes-sheet-toggle"]').click()
+    await expect(sheet).toHaveCount(0)
+    await expect(expand).toBeFocused()
+
+    // Quick open and close at three speeds.
+    for (const delay of [0, 60, 150]) {
+      await expand.click()
+      await expect(sheet).toBeVisible()
+      await page.keyboard.press('Escape')
+      await page.waitForTimeout(delay)
+    }
+    await expect(sheet).toHaveCount(0)
+    await expect(input).toHaveValue('half a thought, finished')
   })
 })

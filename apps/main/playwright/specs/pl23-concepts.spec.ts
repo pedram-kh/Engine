@@ -269,7 +269,7 @@ test.describe('Concepts step', () => {
       // D1: everything approved - steps 5 and 6 show "Not available yet" and nothing else.
       // PL-2.5: a market with every concept approved is Complete (the status line is the real state).
       await expect(page.locator('[data-test="strategy-step-concepts-status"]')).toHaveText(
-        'Complete',
+        'Complete · 1 of 1 approved',
       )
       await expect(stepper).not.toContainText('Concepts: ')
       expect(only.data.id).not.toBe('')

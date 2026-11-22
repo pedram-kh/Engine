@@ -8,7 +8,7 @@
  * reopened) is dropped.
  */
 import type { StrategyNoteResource } from '@catalyst/api-client'
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { strategyApi, type NoteStep } from '../api/strategy.api'
@@ -28,7 +28,15 @@ const { scope } = useStrategyContext()
 const notes = ref<StrategyNoteResource[]>([])
 const loading = ref(true)
 const loadFailed = ref(false)
-const draft = ref('')
+// The draft lives with the parent when it binds one, so it survives the panel and the expanded view swapping places.
+const draft = defineModel<string>('draft', { default: '' })
+const listEl = ref<HTMLElement | null>(null)
+
+/** Scroll the list to its newest note (the last one): on open and after an add. */
+async function toBottom(): Promise<void> {
+  await nextTick()
+  if (listEl.value !== null) listEl.value.scrollTop = listEl.value.scrollHeight
+}
 const adding = ref(false)
 const addError = ref<string | null>(null)
 const editingId = ref<string | null>(null)
@@ -54,7 +62,6 @@ async function load(): Promise<void> {
   loadFailed.value = false
   notes.value = []
   editingId.value = null
-  draft.value = ''
   addError.value = null
   try {
     const r = await strategyApi.listNotes(s, props.step, props.market)
@@ -64,7 +71,11 @@ async function load(): Promise<void> {
     if (!alive || mine !== seq) return
     loadFailed.value = true
   } finally {
-    if (alive && mine === seq) loading.value = false
+    if (alive && mine === seq) {
+      loading.value = false
+      // The list is drawn only once loading is off: open on the newest note.
+      void toBottom()
+    }
   }
 }
 
@@ -89,6 +100,7 @@ async function add(): Promise<void> {
     if (!alive || mine !== seq) return
     notes.value = [...notes.value, r.data]
     draft.value = ''
+    void toBottom()
     emit('changed')
   } catch (e) {
     if (alive && mine === seq) addError.value = strategyErrorMessage(e, t)
@@ -179,79 +191,81 @@ function authorName(n: StrategyNoteResource): string {
       }}</a>
     </p>
     <template v-else>
-      <p v-if="notes.length === 0" class="notes-thread__msg" data-test="notes-empty">
-        {{ t('app.strategy.notes.empty') }}
-      </p>
-      <ul v-else class="notes-list">
-        <li v-for="n in notes" :key="n.id" class="note" :data-test="`note-${n.id}`">
-          <div class="note__meta">
-            <span
-              class="note__author"
-              :class="{ 'note__author--former': n.attributes.author_is_former }"
-              >{{ authorName(n) }}</span
-            >
-            <span class="note__time">{{ when(n.attributes.created_at) }}</span>
-            <span v-if="n.attributes.edited" class="note__edited" data-test="note-edited">{{
-              t('app.strategy.notes.edited')
-            }}</span>
-          </div>
-          <template v-if="editingId === n.id">
-            <v-textarea
-              v-model="editDraft"
-              variant="outlined"
-              density="compact"
-              rows="2"
-              auto-grow
-              max-rows="8"
-              hide-details="auto"
-              :counter="NOTE_MAX"
-              :error-messages="editError ? [editError] : []"
-              :aria-label="t('app.strategy.notes.editLabel')"
-              data-test="note-edit-input"
-            />
-            <div class="note__actions note__actions--end">
-              <a
-                href="#"
-                class="notes-link"
-                data-test="note-edit-cancel"
-                @click.prevent="editingId = null"
-                >{{ t('app.strategy.cancel') }}</a
+      <div ref="listEl" class="notes-scroll" data-test="notes-scroll">
+        <p v-if="notes.length === 0" class="notes-thread__msg" data-test="notes-empty">
+          {{ t('app.strategy.notes.empty') }}
+        </p>
+        <ul v-else class="notes-list">
+          <li v-for="n in notes" :key="n.id" class="note" :data-test="`note-${n.id}`">
+            <div class="note__meta">
+              <span
+                class="note__author"
+                :class="{ 'note__author--former': n.attributes.author_is_former }"
+                >{{ authorName(n) }}</span
               >
-              <v-btn
-                size="small"
-                color="primary"
-                variant="flat"
-                :disabled="!editValid"
-                :loading="editBusy"
-                data-test="note-edit-save"
-                @click="saveEdit"
-                >{{ t('app.strategy.save') }}</v-btn
-              >
+              <span class="note__time">{{ when(n.attributes.created_at) }}</span>
+              <span v-if="n.attributes.edited" class="note__edited" data-test="note-edited">{{
+                t('app.strategy.notes.edited')
+              }}</span>
             </div>
-          </template>
-          <template v-else>
-            <p class="note__body" data-test="note-body">{{ n.attributes.body }}</p>
-            <div v-if="n.attributes.can_edit || n.attributes.can_delete" class="note__actions">
-              <a
-                v-if="n.attributes.can_edit"
-                href="#"
-                class="notes-link"
-                data-test="note-edit"
-                @click.prevent="startEdit(n)"
-                >{{ t('app.strategy.notes.edit') }}</a
-              >
-              <a
-                v-if="n.attributes.can_delete"
-                href="#"
-                class="notes-link notes-link--muted"
-                data-test="note-delete"
-                @click.prevent="askDelete(n)"
-                >{{ t('app.strategy.notes.delete') }}</a
-              >
-            </div>
-          </template>
-        </li>
-      </ul>
+            <template v-if="editingId === n.id">
+              <v-textarea
+                v-model="editDraft"
+                variant="outlined"
+                density="compact"
+                rows="2"
+                auto-grow
+                max-rows="8"
+                hide-details="auto"
+                :counter="NOTE_MAX"
+                :error-messages="editError ? [editError] : []"
+                :aria-label="t('app.strategy.notes.editLabel')"
+                data-test="note-edit-input"
+              />
+              <div class="note__actions note__actions--end">
+                <a
+                  href="#"
+                  class="notes-link"
+                  data-test="note-edit-cancel"
+                  @click.prevent="editingId = null"
+                  >{{ t('app.strategy.cancel') }}</a
+                >
+                <v-btn
+                  size="small"
+                  color="primary"
+                  variant="flat"
+                  :disabled="!editValid"
+                  :loading="editBusy"
+                  data-test="note-edit-save"
+                  @click="saveEdit"
+                  >{{ t('app.strategy.save') }}</v-btn
+                >
+              </div>
+            </template>
+            <template v-else>
+              <p class="note__body" data-test="note-body">{{ n.attributes.body }}</p>
+              <div v-if="n.attributes.can_edit || n.attributes.can_delete" class="note__actions">
+                <a
+                  v-if="n.attributes.can_edit"
+                  href="#"
+                  class="notes-link"
+                  data-test="note-edit"
+                  @click.prevent="startEdit(n)"
+                  >{{ t('app.strategy.notes.edit') }}</a
+                >
+                <a
+                  v-if="n.attributes.can_delete"
+                  href="#"
+                  class="notes-link notes-link--muted"
+                  data-test="note-delete"
+                  @click.prevent="askDelete(n)"
+                  >{{ t('app.strategy.notes.delete') }}</a
+                >
+              </div>
+            </template>
+          </li>
+        </ul>
+      </div>
 
       <div class="notes-composer">
         <v-textarea
@@ -307,6 +321,19 @@ function authorName(n: StrategyNoteResource): string {
   flex-direction: column;
   gap: 10px;
   min-width: 0;
+  min-height: 0;
+}
+/* The list is the only part that scrolls; the composer below it stays where it is. The thread fills whatever height
+   its container gives it (the panel's cap, the sheet's full height) and never grows past it. */
+.notes-scroll {
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-inline-end: 4px;
+}
+.notes-composer {
+  flex: none;
 }
 .notes-thread__msg {
   margin: 0;

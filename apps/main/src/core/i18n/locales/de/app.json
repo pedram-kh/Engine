@@ -1761,7 +1761,8 @@
           "not_started": "Nicht begonnen",
           "in_progress": "In Arbeit",
           "done": "Erledigt"
-        }
+        },
+        "personasCount": "{count} Persona | {count} Personas"
       },
       "audience": {
         "label": "Zielgruppentitel",
@@ -2188,7 +2189,9 @@
         "retry": "Erneut versuchen",
         "tooLong": "Eine Notiz darf höchstens {max} Zeichen lang sein.",
         "open": "Notizen ({count})",
-        "sheetTitle": "Notizen · {market}"
+        "sheetTitle": "Notizen · {market}",
+        "expand": "Notizen erweitern",
+        "collapse": "Notizen verkleinern"
       }
     }
   },

@@ -1761,7 +1761,8 @@
           "not_started": "Alustamata",
           "in_progress": "Pooleli",
           "done": "Valmis"
-        }
+        },
+        "personasCount": "{count} persona | {count} persooni"
       },
       "audience": {
         "label": "Sihtrühma pealkiri",
@@ -2188,7 +2189,9 @@
         "retry": "Proovi uuesti",
         "tooLong": "Märge võib olla kuni {max} tähemärki pikk.",
         "open": "Märkmed ({count})",
-        "sheetTitle": "Märkmed · {market}"
+        "sheetTitle": "Märkmed · {market}",
+        "expand": "Laienda märkmed",
+        "collapse": "Ahenda märkmed"
       }
     }
   },

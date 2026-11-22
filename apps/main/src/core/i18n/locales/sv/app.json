@@ -1761,7 +1761,8 @@
           "not_started": "Inte påbörjad",
           "in_progress": "Pågår",
           "done": "Klar"
-        }
+        },
+        "personasCount": "{count} persona | {count} personor"
       },
       "audience": {
         "label": "Målgruppstitel",
@@ -2188,7 +2189,9 @@
         "retry": "Försök igen",
         "tooLong": "En anteckning får vara högst {max} tecken.",
         "open": "Anteckningar ({count})",
-        "sheetTitle": "Anteckningar · {market}"
+        "sheetTitle": "Anteckningar · {market}",
+        "expand": "Utöka anteckningar",
+        "collapse": "Förminska anteckningar"
       }
     }
   },

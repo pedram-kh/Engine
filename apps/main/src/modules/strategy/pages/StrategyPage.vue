@@ -13,14 +13,14 @@ import type {
   StrategySummaryResource,
   WaveResource,
 } from '@catalyst/api-client'
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
 import AgencyPageHeader from '@/modules/agency/components/AgencyPageHeader.vue'
 import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { wavesApi } from '@/modules/waves/api/waves.api'
-import { strategyApi } from '../api/strategy.api'
+import { strategyApi, type NoteStep } from '../api/strategy.api'
 import ConceptsStep from '../components/ConceptsStep.vue'
 import MatrixStep from '../components/MatrixStep.vue'
 import NotesPanel from '../components/NotesPanel.vue'
@@ -79,6 +79,30 @@ const panelOn = computed(
   () => step.value !== 'matrix' && (step.value === 'usps' || market.value !== null),
 )
 const sheetOpen = ref(false)
+// The panel's expanded view (a large side sheet) and the one draft shared by the panel, the expanded view and the matrix
+// sheet; the draft belongs to the step and market it was typed on.
+const expanded = ref(false)
+const noteDraft = ref('')
+const panelRef = ref<{ focusExpand: () => void } | null>(null)
+const notesOpenBtn = ref<{ $el: HTMLElement } | null>(null)
+watch([step, market], () => {
+  noteDraft.value = ''
+  expanded.value = false
+  sheetOpen.value = false
+})
+// Focus goes back to the control that opened the larger view.
+watch(expanded, async (open, was) => {
+  if (was && !open) {
+    await nextTick()
+    panelRef.value?.focusExpand()
+  }
+})
+watch(sheetOpen, async (open, was) => {
+  if (was && !open) {
+    await nextTick()
+    notesOpenBtn.value?.$el.focus()
+  }
+})
 
 function onCompleted(data: StrategyCompletionResponse['data']): void {
   if (summary.value === null) return
@@ -196,6 +220,7 @@ onMounted(async () => {
       >
         <template v-if="step === 'matrix' && market !== null" #extra>
           <v-btn
+            ref="notesOpenBtn"
             variant="outlined"
             size="small"
             prepend-icon="mdi-note-text-outline"
@@ -231,16 +256,31 @@ onMounted(async () => {
         </div>
         <div v-if="panelOn" class="strategy-grid__notes">
           <NotesPanel
+            ref="panelRef"
             :key="`${step}:${market ?? ''}`"
+            v-model:draft="noteDraft"
             :step="step"
             :market="market"
+            :expanded="expanded"
+            @expand="expanded = true"
             @changed="refreshSummary"
           />
         </div>
       </div>
       <NotesSheet
+        v-if="panelOn && expanded"
+        v-model="expanded"
+        v-model:draft="noteDraft"
+        from-panel
+        :step="step as NoteStep"
+        :market="market"
+        :market-name="step === 'usps' ? '' : marketName"
+        @changed="refreshSummary"
+      />
+      <NotesSheet
         v-if="step === 'matrix' && market !== null"
         v-model="sheetOpen"
+        v-model:draft="noteDraft"
         step="matrix"
         :market="market"
         :market-name="marketName"
@@ -270,6 +310,10 @@ onMounted(async () => {
 .strategy-grid__main,
 .strategy-grid__notes {
   min-width: 0;
+}
+/* The notes cell is as tall as the step so the panel inside it can stay in view (sticky) while the cards scroll. */
+.strategy-grid__notes {
+  align-self: stretch;
 }
 @media (max-width: 1099px) {
   .strategy-grid--notes {

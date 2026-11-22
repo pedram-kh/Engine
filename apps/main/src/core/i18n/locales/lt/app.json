@@ -1761,7 +1761,8 @@
           "not_started": "Nepradėta",
           "in_progress": "Vykdoma",
           "done": "Atlikta"
-        }
+        },
+        "personasCount": "{count} persona | {count} personos"
       },
       "audience": {
         "label": "Auditorijos pavadinimas",
@@ -2188,7 +2189,9 @@
         "retry": "Bandyti dar kartą",
         "tooLong": "Pastabą gali sudaryti daugiausia {max} simbolių.",
         "open": "Pastabos ({count})",
-        "sheetTitle": "Pastabos · {market}"
+        "sheetTitle": "Pastabos · {market}",
+        "expand": "Išskleisti pastabas",
+        "collapse": "Sutraukti pastabas"
       }
     }
   },

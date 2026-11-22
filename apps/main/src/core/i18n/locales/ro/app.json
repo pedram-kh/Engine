@@ -1761,7 +1761,8 @@
           "not_started": "Neînceput",
           "in_progress": "În desfășurare",
           "done": "Gata"
-        }
+        },
+        "personasCount": "{count} persona | {count} persona"
       },
       "audience": {
         "label": "Titlul audienței",
@@ -2188,7 +2189,9 @@
         "retry": "Încearcă din nou",
         "tooLong": "O notiță poate avea cel mult {max} de caractere.",
         "open": "Notițe ({count})",
-        "sheetTitle": "Notițe · {market}"
+        "sheetTitle": "Notițe · {market}",
+        "expand": "Extinde notele",
+        "collapse": "Restrânge notele"
       }
     }
   },

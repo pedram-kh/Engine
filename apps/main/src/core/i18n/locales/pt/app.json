@@ -1761,7 +1761,8 @@
           "not_started": "Não iniciado",
           "in_progress": "Em curso",
           "done": "Concluído"
-        }
+        },
+        "personasCount": "{count} persona | {count} personas"
       },
       "audience": {
         "label": "Título do público",
@@ -2188,7 +2189,9 @@
         "retry": "Tentar novamente",
         "tooLong": "Uma nota pode ter no máximo {max} caracteres.",
         "open": "Notas ({count})",
-        "sheetTitle": "Notas · {market}"
+        "sheetTitle": "Notas · {market}",
+        "expand": "Expandir notas",
+        "collapse": "Reduzir notas"
       }
     }
   },

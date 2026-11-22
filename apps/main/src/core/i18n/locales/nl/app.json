@@ -1761,7 +1761,8 @@
           "not_started": "Niet begonnen",
           "in_progress": "Bezig",
           "done": "Klaar"
-        }
+        },
+        "personasCount": "{count} persona | {count} persona's"
       },
       "audience": {
         "label": "Doelgroeptitel",
@@ -2188,7 +2189,9 @@
         "retry": "Opnieuw proberen",
         "tooLong": "Een notitie mag maximaal {max} tekens bevatten.",
         "open": "Notities ({count})",
-        "sheetTitle": "Notities · {market}"
+        "sheetTitle": "Notities · {market}",
+        "expand": "Notities uitbreiden",
+        "collapse": "Notities verkleinen"
       }
     }
   },

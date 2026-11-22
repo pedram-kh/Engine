@@ -1761,7 +1761,8 @@
           "not_started": "Nezačaté",
           "in_progress": "Rozpracované",
           "done": "Hotovo"
-        }
+        },
+        "personasCount": "{count} persóna | {count} persón"
       },
       "audience": {
         "label": "Názov cieľovej skupiny",
@@ -2188,7 +2189,9 @@
         "retry": "Skúsiť znova",
         "tooLong": "Poznámka môže mať najviac {max} znakov.",
         "open": "Poznámky ({count})",
-        "sheetTitle": "Poznámky · {market}"
+        "sheetTitle": "Poznámky · {market}",
+        "expand": "Rozbaliť poznámky",
+        "collapse": "Zbaliť poznámky"
       }
     }
   },
