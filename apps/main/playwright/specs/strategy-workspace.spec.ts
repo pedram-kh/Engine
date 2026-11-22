@@ -128,7 +128,7 @@ test.describe('Strategy workspace', () => {
   })
 
   for (const size of WIDTHS) {
-    test(`at ${size.name}: entry, USPs, dialogs and menus, hostile text`, async ({
+    test(`at ${size.name}: entry, stepper, Add USP dialog, hostile text`, async ({
       page,
       request,
     }) => {
@@ -165,8 +165,6 @@ test.describe('Strategy workspace', () => {
           campaign_id: null,
         },
       )
-      const base = `/agencies/${agencyUlid}/brands/${brand.data.id}/waves/${wave.data.id}/strategy`
-
       const closeDrawer = async (): Promise<void> => {
         if (size.width >= 768) return
         const drawer = page.locator('[data-test="agency-sidebar"]')
@@ -235,11 +233,28 @@ test.describe('Strategy workspace', () => {
       await expect(page.locator('[data-test="usp-explainer"]').first()).toContainText(HOSTILE)
       await expect(page.locator('img[src="x"]')).toHaveCount(0)
 
-      // Five more through the API, then the maximum.
-      for (const title of ['Fast', 'Cheap', 'Local', 'Open late', 'Tracked']) {
+      expect(alerts).toEqual([])
+    })
+
+    // The rest of the USPs step: the maximum, card menu, order, edit, audience title and delete. Its own test and wave
+    // (the hostile USP and five more through the API) so that neither half nears the time limit.
+    test(`at ${size.name}: USPs at the maximum, card menu, order, edit, audience title, delete`, async ({
+      page,
+      request,
+    }) => {
+      const alerts: string[] = []
+      page.on('dialog', async (dialog) => {
+        alerts.push(dialog.message())
+        await dialog.dismiss()
+      })
+      const { brandId, waveId, base, closeDrawer } = await startWave(page, request, size, 'Usp', [
+        'SK',
+        'RO',
+      ])
+      for (const title of [HOSTILE, 'Fast', 'Cheap', 'Local', 'Open late', 'Tracked']) {
         await api(page, 'POST', `${base}/usps`, { title })
       }
-      await page.reload()
+      await page.goto(`/brands/${brandId}/waves/${waveId}/strategy/usps`)
       await closeDrawer()
       await expect(page.locator('[data-test="usp-card"]')).toHaveCount(6)
       await expect(page.locator('[data-test="usp-counter"]')).toHaveText(
