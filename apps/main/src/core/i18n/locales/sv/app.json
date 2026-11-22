@@ -1662,12 +1662,12 @@
         "incomplete": {
           "title": "”{step}” är inte slutfört",
           "body": "Strategisteget står som ”{state}”. Vill du ändå ställa in den här raden på ”{status}”?",
-          "bodyMarkets": "Strategisteget står som ”{state}” ({done} av {total} marknader slutförda). Vill du ändå ställa in den här raden på ”{status}”?",
+          "bodyMarkets": "Strategisteget står som ”{state}” ({progress}). Vill du ändå ställa in den här raden på ”{status}”?",
           "confirm": "Ställ in ändå"
         },
         "handSet": {
           "plain": "Inställd för hand · steget står som ”{state}”",
-          "markets": "Inställd för hand · steget står som ”{state}” ({done} av {total} marknader)"
+          "markets": "Inställd för hand · steget står som ”{state}” ({progress})"
         }
       },
       "markets": {

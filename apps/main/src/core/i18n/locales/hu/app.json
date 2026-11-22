@@ -1662,12 +1662,12 @@
         "incomplete": {
           "title": "A(z) „{step}” nincs befejezve",
           "body": "A stratégiai lépés állapota: „{state}”. Mégis „{status}” állapotra állítod ezt a sort?",
-          "bodyMarkets": "A stratégiai lépés állapota: „{state}” ({total} piacból {done} kész). Mégis „{status}” állapotra állítod ezt a sort?",
+          "bodyMarkets": "A stratégiai lépés állapota: „{state}” ({progress}). Mégis „{status}” állapotra állítod ezt a sort?",
           "confirm": "Beállítás így is"
         },
         "handSet": {
           "plain": "Kézzel beállítva · a lépés állapota: „{state}”",
-          "markets": "Kézzel beállítva · a lépés állapota: „{state}” ({total} piacból {done})"
+          "markets": "Kézzel beállítva · a lépés állapota: „{state}” ({progress})"
         }
       },
       "markets": {

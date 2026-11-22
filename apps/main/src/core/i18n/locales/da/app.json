@@ -1662,12 +1662,12 @@
         "incomplete": {
           "title": "”{step}” er ikke gennemført",
           "body": "Strategitrinnet står som ”{state}”. Vil du alligevel sætte denne række til ”{status}”?",
-          "bodyMarkets": "Strategitrinnet står som ”{state}” ({done} af {total} markeder gennemført). Vil du alligevel sætte denne række til ”{status}”?",
+          "bodyMarkets": "Strategitrinnet står som ”{state}” ({progress}). Vil du alligevel sætte denne række til ”{status}”?",
           "confirm": "Sæt alligevel"
         },
         "handSet": {
           "plain": "Sat manuelt · trinnet står som ”{state}”",
-          "markets": "Sat manuelt · trinnet står som ”{state}” ({done} af {total} markeder)"
+          "markets": "Sat manuelt · trinnet står som ”{state}” ({progress})"
         }
       },
       "markets": {

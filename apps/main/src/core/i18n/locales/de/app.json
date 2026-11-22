@@ -1662,12 +1662,12 @@
         "incomplete": {
           "title": "„{step}“ ist nicht abgeschlossen",
           "body": "Der Strategieschritt steht auf „{state}“. Diese Zeile trotzdem auf „{status}“ setzen?",
-          "bodyMarkets": "Der Strategieschritt steht auf „{state}“ ({done} von {total} Märkten abgeschlossen). Diese Zeile trotzdem auf „{status}“ setzen?",
+          "bodyMarkets": "Der Strategieschritt steht auf „{state}“ ({progress}). Diese Zeile trotzdem auf „{status}“ setzen?",
           "confirm": "Trotzdem setzen"
         },
         "handSet": {
           "plain": "Von Hand gesetzt · der Schritt steht auf „{state}“",
-          "markets": "Von Hand gesetzt · der Schritt steht auf „{state}“ ({done} von {total} Märkten)"
+          "markets": "Von Hand gesetzt · der Schritt steht auf „{state}“ ({progress})"
         }
       },
       "markets": {

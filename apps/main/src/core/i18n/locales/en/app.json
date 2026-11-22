@@ -1662,12 +1662,12 @@
         "incomplete": {
           "title": "“{step}” is not complete",
           "body": "The strategy step says {state}. Set this row to {status} anyway?",
-          "bodyMarkets": "The strategy step says {state} ({done} of {total} markets complete). Set this row to {status} anyway?",
+          "bodyMarkets": "The strategy step says {state} ({progress}). Set this row to {status} anyway?",
           "confirm": "Set anyway"
         },
         "handSet": {
           "plain": "Set by hand · the step says {state}",
-          "markets": "Set by hand · the step says {state} ({done} of {total} markets)"
+          "markets": "Set by hand · the step says {state} ({progress})"
         }
       },
       "markets": {

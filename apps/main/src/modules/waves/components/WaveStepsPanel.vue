@@ -107,8 +107,11 @@ function handLine(step: WaveStepResource): string {
   if (st === undefined) return ''
   const named = {
     state: t(`app.waves.tracker.stepStatus.${st.state}`),
-    done: st.markets_done,
-    total: st.markets_total,
+    progress: t(
+      'app.strategy.stepper.marketsOf',
+      { done: st.markets_done, total: st.markets_total },
+      st.markets_total,
+    ),
   }
   return st.markets_total > 0
     ? t('app.waves.tracker.handSet.markets', named)

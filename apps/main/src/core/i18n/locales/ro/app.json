@@ -1662,12 +1662,12 @@
         "incomplete": {
           "title": "„{step}” nu este finalizat",
           "body": "Pasul de strategie indică „{state}”. Setezi totuși acest rând pe „{status}”?",
-          "bodyMarkets": "Pasul de strategie indică „{state}” ({done} din {total} piețe finalizate). Setezi totuși acest rând pe „{status}”?",
+          "bodyMarkets": "Pasul de strategie indică „{state}” ({progress}). Setezi totuși acest rând pe „{status}”?",
           "confirm": "Setează totuși"
         },
         "handSet": {
           "plain": "Setat manual · pasul indică „{state}”",
-          "markets": "Setat manual · pasul indică „{state}” ({done} din {total} piețe)"
+          "markets": "Setat manual · pasul indică „{state}” ({progress})"
         }
       },
       "markets": {

@@ -1662,12 +1662,12 @@
         "incomplete": {
           "title": "“{step}” mhuwiex komplut",
           "body": "Il-pass tal-istrateġija jgħid “{state}”. Tissettja din ir-ringiela għal “{status}” xorta waħda?",
-          "bodyMarkets": "Il-pass tal-istrateġija jgħid “{state}” ({done} minn {total} swieq kompluti). Tissettja din ir-ringiela għal “{status}” xorta waħda?",
+          "bodyMarkets": "Il-pass tal-istrateġija jgħid “{state}” ({progress}). Tissettja din ir-ringiela għal “{status}” xorta waħda?",
           "confirm": "Issettja xorta waħda"
         },
         "handSet": {
           "plain": "Issettjat bl-idejn · il-pass jgħid “{state}”",
-          "markets": "Issettjat bl-idejn · il-pass jgħid “{state}” ({done} minn {total} swieq)"
+          "markets": "Issettjat bl-idejn · il-pass jgħid “{state}” ({progress})"
         }
       },
       "markets": {

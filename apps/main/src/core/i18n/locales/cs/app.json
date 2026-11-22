@@ -1662,12 +1662,12 @@
         "incomplete": {
           "title": "„{step}“ není dokončeno",
           "body": "Krok strategie je ve stavu „{state}“. Přesto nastavit tento řádek na „{status}“?",
-          "bodyMarkets": "Krok strategie je ve stavu „{state}“ (dokončeno trhů: {done} z {total}). Přesto nastavit tento řádek na „{status}“?",
+          "bodyMarkets": "Krok strategie je ve stavu „{state}“ ({progress}). Přesto nastavit tento řádek na „{status}“?",
           "confirm": "Přesto nastavit"
         },
         "handSet": {
           "plain": "Nastaveno ručně · krok je ve stavu „{state}“",
-          "markets": "Nastaveno ručně · krok je ve stavu „{state}“ (trhy: {done} z {total})"
+          "markets": "Nastaveno ručně · krok je ve stavu „{state}“ ({progress})"
         }
       },
       "markets": {

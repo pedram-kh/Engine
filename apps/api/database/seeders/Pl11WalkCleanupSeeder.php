@@ -35,6 +35,9 @@ final class Pl11WalkCleanupSeeder extends Seeder
             $userIds = DB::table('users')->where('email', 'like', '%'.Pl11WalkSeeder::DOMAIN)->pluck('id')->all();
 
             DB::table('wave_market_countries')->whereIn('agency_id', $agencyIds)->delete();
+            // PL-2.5: the completions and notes reference the markets, so they go first.
+            DB::table('wave_strategy_notes')->whereIn('agency_id', $agencyIds)->delete();
+            DB::table('wave_strategy_completions')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('wave_markets')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('waves')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('brand_files')->whereIn('agency_id', $agencyIds)->delete();

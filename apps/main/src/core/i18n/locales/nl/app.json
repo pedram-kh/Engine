@@ -1662,12 +1662,12 @@
         "incomplete": {
           "title": "“{step}” is niet voltooid",
           "body": "De strategiestap staat op “{state}”. Deze rij toch op “{status}” zetten?",
-          "bodyMarkets": "De strategiestap staat op “{state}” ({done} van {total} markten voltooid). Deze rij toch op “{status}” zetten?",
+          "bodyMarkets": "De strategiestap staat op “{state}” ({progress}). Deze rij toch op “{status}” zetten?",
           "confirm": "Toch instellen"
         },
         "handSet": {
           "plain": "Handmatig ingesteld · de stap staat op “{state}”",
-          "markets": "Handmatig ingesteld · de stap staat op “{state}” ({done} van {total} markten)"
+          "markets": "Handmatig ingesteld · de stap staat op “{state}” ({progress})"
         }
       },
       "markets": {

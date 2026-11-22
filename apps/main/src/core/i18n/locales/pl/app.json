@@ -1662,12 +1662,12 @@
         "incomplete": {
           "title": "„{step}” nie jest ukończone",
           "body": "Krok strategii ma stan „{state}”. Ustawić ten wiersz mimo to na „{status}”?",
-          "bodyMarkets": "Krok strategii ma stan „{state}” (ukończone rynki: {done} z {total}). Ustawić ten wiersz mimo to na „{status}”?",
+          "bodyMarkets": "Krok strategii ma stan „{state}” ({progress}). Ustawić ten wiersz mimo to na „{status}”?",
           "confirm": "Ustaw mimo to"
         },
         "handSet": {
           "plain": "Ustawione ręcznie · krok ma stan „{state}”",
-          "markets": "Ustawione ręcznie · krok ma stan „{state}” (rynki: {done} z {total})"
+          "markets": "Ustawione ręcznie · krok ma stan „{state}” ({progress})"
         }
       },
       "markets": {

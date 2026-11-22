@@ -1662,12 +1662,12 @@
         "incomplete": {
           "title": "»{step}« ni dokončano",
           "body": "Korak strategije je v stanju »{state}«. Vrstico vseeno nastaviti na »{status}«?",
-          "bodyMarkets": "Korak strategije je v stanju »{state}« (dokončanih trgov: {done} od {total}). Vrstico vseeno nastaviti na »{status}«?",
+          "bodyMarkets": "Korak strategije je v stanju »{state}« ({progress}). Vrstico vseeno nastaviti na »{status}«?",
           "confirm": "Vseeno nastavi"
         },
         "handSet": {
           "plain": "Nastavljeno ročno · korak je v stanju »{state}«",
-          "markets": "Nastavljeno ročno · korak je v stanju »{state}« (trgi: {done} od {total})"
+          "markets": "Nastavljeno ročno · korak je v stanju »{state}« ({progress})"
         }
       },
       "markets": {

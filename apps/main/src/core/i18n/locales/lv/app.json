@@ -1662,12 +1662,12 @@
         "incomplete": {
           "title": "“{step}” nav pabeigts",
           "body": "Stratēģijas soļa stāvoklis: “{state}”. Vai tomēr iestatīt šo rindu uz “{status}”?",
-          "bodyMarkets": "Stratēģijas soļa stāvoklis: “{state}” (pabeigti tirgi: {done} no {total}). Vai tomēr iestatīt šo rindu uz “{status}”?",
+          "bodyMarkets": "Stratēģijas soļa stāvoklis: “{state}” ({progress}). Vai tomēr iestatīt šo rindu uz “{status}”?",
           "confirm": "Tomēr iestatīt"
         },
         "handSet": {
           "plain": "Iestatīts manuāli · soļa stāvoklis: “{state}”",
-          "markets": "Iestatīts manuāli · soļa stāvoklis: “{state}” (tirgi: {done} no {total})"
+          "markets": "Iestatīts manuāli · soļa stāvoklis: “{state}” ({progress})"
         }
       },
       "markets": {

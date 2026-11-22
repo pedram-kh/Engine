@@ -395,6 +395,12 @@ function move(usp: WaveUspResource, by: -1 | 1): void {
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr));
   gap: 16px;
 }
+/* PL-2.5: with the notes column beside it the cards return to the frame's width (frame 13:428: 290 px). */
+@media (min-width: 1100px) {
+  .usps-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 290px));
+  }
+}
 .usps-empty {
   text-align: center;
 }

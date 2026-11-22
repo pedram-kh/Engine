@@ -1662,12 +1662,12 @@
         "incomplete": {
           "title": "„{step}“ ei ole lõpetatud",
           "body": "Strateegiasamm on olekus „{state}“. Kas seada see rida siiski olekusse „{status}“?",
-          "bodyMarkets": "Strateegiasamm on olekus „{state}“ ({total} turust {done} on lõpetatud). Kas seada see rida siiski olekusse „{status}“?",
+          "bodyMarkets": "Strateegiasamm on olekus „{state}“ ({progress}). Kas seada see rida siiski olekusse „{status}“?",
           "confirm": "Sea siiski"
         },
         "handSet": {
           "plain": "Seatud käsitsi · samm on olekus „{state}“",
-          "markets": "Seatud käsitsi · samm on olekus „{state}“ ({total} turust {done})"
+          "markets": "Seatud käsitsi · samm on olekus „{state}“ ({progress})"
         }
       },
       "markets": {

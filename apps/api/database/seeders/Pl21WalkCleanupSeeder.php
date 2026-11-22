@@ -42,6 +42,9 @@ final class Pl21WalkCleanupSeeder extends Seeder
             DB::table('wave_usps')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('wave_steps')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('wave_market_countries')->whereIn('agency_id', $agencyIds)->delete();
+            // PL-2.5: the completions and notes reference the markets, so they go first.
+            DB::table('wave_strategy_notes')->whereIn('agency_id', $agencyIds)->delete();
+            DB::table('wave_strategy_completions')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('wave_markets')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('waves')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('campaigns')->whereIn('agency_id', $agencyIds)->delete();

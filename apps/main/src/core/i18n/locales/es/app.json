@@ -1662,12 +1662,12 @@
         "incomplete": {
           "title": "«{step}» no está completado",
           "body": "El paso de estrategia indica «{state}». ¿Poner esta fila en «{status}» de todos modos?",
-          "bodyMarkets": "El paso de estrategia indica «{state}» ({done} de {total} mercados completados). ¿Poner esta fila en «{status}» de todos modos?",
+          "bodyMarkets": "El paso de estrategia indica «{state}» ({progress}). ¿Poner esta fila en «{status}» de todos modos?",
           "confirm": "Establecer de todos modos"
         },
         "handSet": {
           "plain": "Establecido a mano · el paso indica «{state}»",
-          "markets": "Establecido a mano · el paso indica «{state}» ({done} de {total} mercados)"
+          "markets": "Establecido a mano · el paso indica «{state}» ({progress})"
         }
       },
       "markets": {

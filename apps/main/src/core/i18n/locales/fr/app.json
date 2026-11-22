@@ -1662,12 +1662,12 @@
         "incomplete": {
           "title": "« {step} » n’est pas terminé",
           "body": "L’étape de stratégie indique « {state} ». Définir quand même cette ligne sur « {status} » ?",
-          "bodyMarkets": "L’étape de stratégie indique « {state} » ({done} marchés sur {total} terminés). Définir quand même cette ligne sur « {status} » ?",
+          "bodyMarkets": "L’étape de stratégie indique « {state} » ({progress}). Définir quand même cette ligne sur « {status} » ?",
           "confirm": "Définir quand même"
         },
         "handSet": {
           "plain": "Défini à la main · l’étape indique « {state} »",
-          "markets": "Défini à la main · l’étape indique « {state} » ({done} marchés sur {total})"
+          "markets": "Défini à la main · l’étape indique « {state} » ({progress})"
         }
       },
       "markets": {

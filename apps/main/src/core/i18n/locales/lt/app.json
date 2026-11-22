@@ -1662,12 +1662,12 @@
         "incomplete": {
           "title": "„{step}“ neužbaigta",
           "body": "Strategijos žingsnio būsena: „{state}“. Vis tiek nustatyti šią eilutę į „{status}“?",
-          "bodyMarkets": "Strategijos žingsnio būsena: „{state}“ (užbaigta rinkų: {done} iš {total}). Vis tiek nustatyti šią eilutę į „{status}“?",
+          "bodyMarkets": "Strategijos žingsnio būsena: „{state}“ ({progress}). Vis tiek nustatyti šią eilutę į „{status}“?",
           "confirm": "Vis tiek nustatyti"
         },
         "handSet": {
           "plain": "Nustatyta rankiniu būdu · žingsnio būsena: „{state}“",
-          "markets": "Nustatyta rankiniu būdu · žingsnio būsena: „{state}“ (rinkos: {done} iš {total})"
+          "markets": "Nustatyta rankiniu būdu · žingsnio būsena: „{state}“ ({progress})"
         }
       },
       "markets": {

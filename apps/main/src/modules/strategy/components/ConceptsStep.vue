@@ -649,6 +649,13 @@ const deleteBody = computed(() => {
   gap: 16px;
   align-items: start;
 }
+/* PL-2.5: frame 13:4412 draws two 444 px cards with a 24 px gap beside the 300 px notes column. */
+@media (min-width: 1100px) {
+  .concepts-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 444px));
+    gap: 24px;
+  }
+}
 .concept-tile {
   display: flex;
   flex-direction: column;

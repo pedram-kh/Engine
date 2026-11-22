@@ -473,6 +473,12 @@ const deletingCells = computed(() =>
   gap: 16px;
   align-items: start;
 }
+/* PL-2.5: frame 13:828 draws two 448 px cards beside the 300 px notes column. */
+@media (min-width: 1100px) {
+  .personas-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 448px));
+  }
+}
 .persona-tile {
   display: flex;
   flex-direction: column;

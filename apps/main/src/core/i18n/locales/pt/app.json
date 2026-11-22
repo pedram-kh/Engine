@@ -1662,12 +1662,12 @@
         "incomplete": {
           "title": "“{step}” não está completo",
           "body": "O passo da estratégia indica «{state}». Definir mesmo assim esta linha como «{status}»?",
-          "bodyMarkets": "O passo da estratégia indica «{state}» ({done} de {total} mercados completos). Definir mesmo assim esta linha como «{status}»?",
+          "bodyMarkets": "O passo da estratégia indica «{state}» ({progress}). Definir mesmo assim esta linha como «{status}»?",
           "confirm": "Definir mesmo assim"
         },
         "handSet": {
           "plain": "Definido à mão · o passo indica «{state}»",
-          "markets": "Definido à mão · o passo indica «{state}» ({done} de {total} mercados)"
+          "markets": "Definido à mão · o passo indica «{state}» ({progress})"
         }
       },
       "markets": {

@@ -1662,12 +1662,12 @@
         "incomplete": {
           "title": "«{step}» non è completato",
           "body": "Il passaggio della strategia indica «{state}». Impostare comunque questa riga su «{status}»?",
-          "bodyMarkets": "Il passaggio della strategia indica «{state}» ({done} mercati su {total} completati). Impostare comunque questa riga su «{status}»?",
+          "bodyMarkets": "Il passaggio della strategia indica «{state}» ({progress}). Impostare comunque questa riga su «{status}»?",
           "confirm": "Imposta comunque"
         },
         "handSet": {
           "plain": "Impostato a mano · il passaggio indica «{state}»",
-          "markets": "Impostato a mano · il passaggio indica «{state}» ({done} mercati su {total})"
+          "markets": "Impostato a mano · il passaggio indica «{state}» ({progress})"
         }
       },
       "markets": {

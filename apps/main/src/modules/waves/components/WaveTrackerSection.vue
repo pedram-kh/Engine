@@ -106,8 +106,7 @@ const incompleteBody = computed(() => {
   const named = {
     state: t(`app.waves.tracker.stepStatus.${a.realState}`),
     status: t(`app.waves.tracker.stepStatus.${a.status}`),
-    done: a.done,
-    total: a.total,
+    progress: t('app.strategy.stepper.marketsOf', { done: a.done, total: a.total }, a.total),
   }
   return a.total > 0
     ? t('app.waves.tracker.incomplete.bodyMarkets', named)

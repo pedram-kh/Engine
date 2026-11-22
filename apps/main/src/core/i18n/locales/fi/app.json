@@ -1662,12 +1662,12 @@
         "incomplete": {
           "title": "”{step}” ei ole valmis",
           "body": "Strategiavaiheen tila on ”{state}”. Asetetaanko tämä rivi silti tilaan ”{status}”?",
-          "bodyMarkets": "Strategiavaiheen tila on ”{state}” ({done} / {total} markkinaa valmiina). Asetetaanko tämä rivi silti tilaan ”{status}”?",
+          "bodyMarkets": "Strategiavaiheen tila on ”{state}” ({progress}). Asetetaanko tämä rivi silti tilaan ”{status}”?",
           "confirm": "Aseta silti"
         },
         "handSet": {
           "plain": "Asetettu käsin · vaiheen tila on ”{state}”",
-          "markets": "Asetettu käsin · vaiheen tila on ”{state}” ({done} / {total} markkinaa)"
+          "markets": "Asetettu käsin · vaiheen tila on ”{state}” ({progress})"
         }
       },
       "markets": {

@@ -83,6 +83,10 @@ export function firstName(name: string): string {
   return name.trim().split(/\s+/)[0] ?? name
 }
 
+function isHandBeyond(s: WaveStepResource): boolean {
+  return s.attributes.strategy?.hand_set_beyond === true
+}
+
 export interface StreamGroup {
   stream: WaveStream
   open: WaveStepResource[]
@@ -107,8 +111,10 @@ export function groupSteps(
     if (filter === 'mine' && shown.length === 0) continue
     groups.push({
       stream,
-      open: shown.filter((s) => s.attributes.status !== 'done'),
-      completed: shown.filter((s) => s.attributes.status === 'done'),
+      // PL-2.5: a row set to Done by hand beyond what its strategy step has reached is not folded away: its
+      // "set by hand" marker has to stay in sight. (`strategy` exists only while strategy is on.)
+      open: shown.filter((s) => s.attributes.status !== 'done' || isHandBeyond(s)),
+      completed: shown.filter((s) => s.attributes.status === 'done' && !isHandBeyond(s)),
     })
   }
   return groups
