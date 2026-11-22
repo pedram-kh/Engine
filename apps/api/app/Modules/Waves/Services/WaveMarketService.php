@@ -115,8 +115,8 @@ final class WaveMarketService
      * Replace the markets of a LOCKED wave with the given full list. A body entry with `id` updates that market, one
      * without creates, an existing market missing from the list is removed (refused if it has personas).
      *
-     * @param  list<array<string, mixed>>  $specs  `id?`, `name`, `code?`, `countries`
-     * @return array{changed: bool, before: array{markets: list<string>, market_countries: array<string, list<string>>}, after: array{markets: list<string>, market_countries: array<string, list<string>>, markets_renamed: list<string>}}
+     * @param  list<array<string, mixed>>  $specs  `id?`, `name`, `code?`, `countries`, `rename_persona_codes?`
+     * @return array{changed: bool, before: array{markets: list<string>, market_countries: array<string, list<string>>}, after: array{markets: list<string>, market_countries: array<string, list<string>>, markets_renamed: list<string>}, persona_codes: array{renamed: int, skipped: int, kept_custom: int, markets: list<string>}}
      */
     public function replace(Wave $locked, array $specs, string $version): array
     {
@@ -169,11 +169,12 @@ final class WaveMarketService
 
         $before = $this->summary($current);
         $renamed = [];
+        $personaCodes = ['renamed' => 0, 'skipped' => 0, 'kept_custom' => 0, 'markets' => []];
 
         try {
             // A nested transaction is a savepoint: a key violation that still gets through (it cannot under the wave
             // lock) must not abort the caller's whole PostgreSQL transaction before it is mapped to a 422.
-            DB::transaction(function () use ($locked, $byUlid, $norm, $removed, &$renamed): void {
+            DB::transaction(function () use ($locked, $byUlid, $norm, $removed, &$renamed, &$personaCodes): void {
                 // 1. Country rows of removed markets and of markets whose country set changes, so a country can move
                 //    between markets in one request without tripping `unique (wave_id, country)` mid-statement.
                 $dropFor = $removed->pluck('id')->map(static fn (mixed $id): int => (int) $id)->all();
@@ -218,6 +219,18 @@ final class WaveMarketService
                     $renamed[] = $existing->ulid;
                 }
 
+                // 3b. A1: personas follow a short-code change when (and only when) the edit asked for it for that market.
+                foreach ($changing as [$existing, $n]) {
+                    if (($n['rename_persona_codes'] ?? false) !== true || $existing->code === $n['code']) {
+                        continue;
+                    }
+                    $done = $this->guard->renamePersonaCodes($locked, $existing->id, $existing->code, $n['code']);
+                    $personaCodes['renamed'] += $done['renamed'];
+                    $personaCodes['skipped'] += $done['skipped'];
+                    $personaCodes['kept_custom'] += $done['kept_custom'];
+                    $personaCodes['markets'][] = $existing->ulid;
+                }
+
                 // 4. New markets and the countries of every changed or new market, then the tab order.
                 $position = 0;
                 $positions = [];
@@ -250,6 +263,7 @@ final class WaveMarketService
             'changed' => $changed,
             'before' => $before,
             'after' => $after + ['markets_renamed' => $renamed],
+            'persona_codes' => $personaCodes,
         ];
     }
 
@@ -281,7 +295,7 @@ final class WaveMarketService
      * Validate the cross-market rules and give every market a name, a code and a list of unique countries.
      *
      * @param  list<array<string, mixed>>  $specs
-     * @return list<array{id: string|null, name: string, code: string, countries: list<string>}>
+     * @return list<array{id: string|null, name: string, code: string, countries: list<string>, rename_persona_codes?: bool}>
      */
     private function normalise(array $specs): array
     {
@@ -314,7 +328,7 @@ final class WaveMarketService
                 $explicit[$code] = true;
             }
 
-            $rows[] = ['id' => isset($spec['id']) ? (string) $spec['id'] : null, 'name' => $name, 'code' => $code, 'countries' => $countries];
+            $rows[] = ['id' => isset($spec['id']) ? (string) $spec['id'] : null, 'name' => $name, 'code' => $code, 'countries' => $countries, 'rename_persona_codes' => filter_var($spec['rename_persona_codes'] ?? false, FILTER_VALIDATE_BOOLEAN)];
         }
 
         $taken = array_keys($explicit);
@@ -325,12 +339,12 @@ final class WaveMarketService
             }
         }
 
-        /** @var list<array{id: string|null, name: string, code: string, countries: list<string>}> $rows */
+        /** @var list<array{id: string|null, name: string, code: string, countries: list<string>, rename_persona_codes?: bool}> $rows */
         return $rows;
     }
 
     /**
-     * @param  list<array{id: string|null, name: string, code: string, countries: list<string>}>  $norm
+     * @param  list<array{id: string|null, name: string, code: string, countries: list<string>, rename_persona_codes?: bool}>  $norm
      */
     private function insertMarkets(Wave $wave, array $norm, int $firstPosition): void
     {

@@ -96,6 +96,9 @@ const KEYS = [
   'app.waves.markets.name',
   'app.waves.markets.code',
   'app.waves.markets.codeHint',
+  'app.waves.markets.renamePersonaCodes',
+  'app.waves.markets.renamePersonaCodesHint',
+  'app.waves.markets.personaCodesResult',
   'app.waves.markets.addCountry',
   'app.waves.markets.searchCountry',
   'app.waves.markets.removeCountry',
@@ -323,8 +326,8 @@ function tokens(value: string): string[] {
 }
 
 describe('PL-1.1 wave and client-file i18n keys', () => {
-  it('checks 212 keys across 24 locales', () => {
-    expect(KEYS).toHaveLength(212)
+  it('checks 215 keys across 24 locales', () => {
+    expect(KEYS).toHaveLength(215)
     expect(UI_LOCALES).toHaveLength(24)
   })
 

@@ -53,6 +53,14 @@ final class Wave extends Model
     use SoftDeletes;
 
     /**
+     * PL-2.4 (A1): what an edit that asked for persona codes to follow a short-code change did. Set by
+     * `WaveService::update` on the returned model for the response only; never stored.
+     *
+     * @var array{renamed: int, skipped: int, kept_custom: int}|null
+     */
+    public ?array $personaCodes = null;
+
+    /**
      * @var list<string>
      */
     protected $fillable = [

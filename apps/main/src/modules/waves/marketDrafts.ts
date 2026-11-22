@@ -25,6 +25,10 @@ export interface MarketDraft {
   nameTouched: boolean
   /** The user typed the code (or the market already has one): it no longer follows the name. */
   codeTouched: boolean
+  /** The short code the market has on the server (an existing market only). */
+  savedCode?: string
+  /** A1: the user ticked "also update the codes of this market's personas". Only meaningful while the code differs. */
+  renamePersonaCodes: boolean
 }
 
 export interface MarketDraftErrors {
@@ -48,6 +52,8 @@ export function draftsFromWave(markets: WaveMarket[]): MarketDraft[] {
     countries: [...m.countries],
     nameTouched: true,
     codeTouched: true,
+    savedCode: m.code,
+    renamePersonaCodes: false,
   }))
 }
 
@@ -59,7 +65,18 @@ export function emptyDraft(): MarketDraft {
     countries: [],
     nameTouched: false,
     codeTouched: false,
+    renamePersonaCodes: false,
   }
+}
+
+/** A1: an existing market whose short code the user has changed to a valid one: the tick box applies. */
+export function codeChanged(d: MarketDraft): boolean {
+  return (
+    d.id !== undefined &&
+    d.savedCode !== undefined &&
+    d.code !== d.savedCode &&
+    CODE_PATTERN.test(d.code)
+  )
 }
 
 /** What goes in a create or edit body. An empty code is left out so the server derives one. */
@@ -69,6 +86,7 @@ export function toInput(d: MarketDraft): WaveMarketInput {
     name: d.name.trim().replace(/\s+/g, ' '),
     ...(d.code === '' ? {} : { code: d.code }),
     countries: d.countries,
+    ...(d.renamePersonaCodes && codeChanged(d) ? { rename_persona_codes: true } : {}),
   }
 }
 

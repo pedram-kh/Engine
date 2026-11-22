@@ -172,7 +172,15 @@ final class WaveController
             return ErrorResponse::single($request, $e->status, $e->errorCode, $e->getMessage(), meta: $e->meta);
         }
 
-        return (new WaveResource($updated->load(['brand', 'campaign', 'createdBy', 'markets.countries'])))->response();
+        $resource = (new WaveResource($updated->load(['brand', 'campaign', 'createdBy', 'markets.countries'])))->response();
+        if ($updated->personaCodes !== null) {
+            // PL-2.4 (A1): what the "also update persona codes" tick did, counts only.
+            $payload = $resource->getData(true);
+            $payload['meta'] = ['persona_codes' => $updated->personaCodes];
+            $resource->setData($payload);
+        }
+
+        return $resource;
     }
 
     /**
@@ -195,9 +203,10 @@ final class WaveController
             // ("SK") is refused: `markets.*` must be an object with only these keys. `id` (a market ulid) is for an edit.
             // `markets_version` (from the wave resource) is required whenever an edit carries `markets`.
             'markets' => [$presence, 'array', 'min:1', 'max:'.WaveMarketService::MAX_MARKETS],
-            'markets.*' => ['array:'.($creating ? 'name,code,countries' : 'id,name,code,countries')],
+            'markets.*' => ['array:'.($creating ? 'name,code,countries' : 'id,name,code,countries,rename_persona_codes')],
             'markets.*.id' => $creating ? ['prohibited'] : ['sometimes', 'string', 'size:26', 'distinct'],
             'markets.*.name' => ['required', 'string', 'min:1', 'max:60'],
+            'markets.*.rename_persona_codes' => $creating ? ['prohibited'] : ['sometimes', 'boolean'],
             'markets.*.code' => ['sometimes', 'nullable', 'string', 'regex:/^[A-Z0-9]{2,6}$/'],
             // A country twice in ONE market is a validation error here; a country in TWO markets is the rule the service
             // enforces (`wave.country_in_two_markets`), so `distinct` must not run across markets.

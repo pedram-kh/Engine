@@ -333,3 +333,124 @@ it('W17: the wave resource lists markets in tab order with ulid, name, code and 
     $after = mkRead($w);
     expect(array_column($after['markets'], 'code'))->toBe(['CZ', 'SK', 'RO'])->and($after['markets_version'])->not->toBe($r['markets_version']);
 });
+
+/** A1: personas of a market with the given slot => code, made straight in the table. */
+function a1Personas(array $w, string $market, array $codes): void
+{
+    foreach ($codes as $slot => $code) {
+        WavePersona::factory()->create(['wave_id' => $w['wave']->id, 'agency_id' => $w['agency']->id, 'market_id' => $w['mkid'][$market], 'slot' => $slot, 'code' => $code]);
+    }
+}
+
+/** A1: the persona codes of a market in slot order. */
+function a1Codes(array $w, string $market): array
+{
+    return WavePersona::query()->where('market_id', $w['mkid'][$market])->orderBy('slot')->pluck('code')->all();
+}
+
+/**
+ * A1: edit the short code of the first market (SK), ticked or not.
+ *
+ * @return TestResponse<Response>
+ */
+function a1Edit(array $w, string $code, ?bool $tick, string $who = 'admin'): TestResponse
+{
+    $r = mkRead($w);
+    $r['markets'][0]['code'] = $code;
+    if ($tick !== null) {
+        $r['markets'][0]['rename_persona_codes'] = $tick;
+    }
+
+    return mkPatch($w, $r['markets'], $r['markets_version'], $who);
+}
+
+it('A1-1: ticked, personas with the standard code follow the new short code, same number', function (): void {
+    $w = mkWorld();
+    a1Personas($w, 'SK', [1 => 'SK1', 2 => 'SK2', 3 => 'SK3']);
+
+    $res = a1Edit($w, 'SVK', true)->assertOk();
+
+    expect(a1Codes($w, 'SK'))->toBe(['SVK1', 'SVK2', 'SVK3'])
+        ->and($res->json('meta.persona_codes'))->toBe(['renamed' => 3, 'skipped' => 0, 'kept_custom' => 0]);
+});
+
+it('A1-2: a code typed by hand is never changed', function (): void {
+    $w = mkWorld();
+    a1Personas($w, 'SK', [1 => 'SK1', 2 => 'MYBOY', 3 => 'SK3A', 4 => 'SK9']);
+
+    $res = a1Edit($w, 'SVK', true)->assertOk();
+
+    expect(a1Codes($w, 'SK'))->toBe(['SVK1', 'MYBOY', 'SK3A', 'SK9'])
+        ->and($res->json('meta.persona_codes'))->toBe(['renamed' => 1, 'skipped' => 0, 'kept_custom' => 3]);
+});
+
+it('A1-3: a rename that would collide with a code of the market is skipped and counted', function (): void {
+    $w = mkWorld();
+    a1Personas($w, 'SK', [1 => 'SK1', 2 => 'SK2', 3 => 'SVK2']);
+
+    $res = a1Edit($w, 'SVK', true)->assertOk();
+
+    expect(a1Codes($w, 'SK'))->toBe(['SVK1', 'SK2', 'SVK2'])
+        ->and($res->json('meta.persona_codes'))->toBe(['renamed' => 1, 'skipped' => 1, 'kept_custom' => 1]);
+});
+
+it('A1-4: unticked (or not sent), the codes stay and no result is returned', function (): void {
+    $w = mkWorld();
+    a1Personas($w, 'SK', [1 => 'SK1', 2 => 'SK2']);
+
+    expect(a1Edit($w, 'SVK', false)->assertOk()->json('meta'))->toBeNull();
+    expect(a1Codes($w, 'SK'))->toBe(['SK1', 'SK2']);
+
+    $w2 = mkWorld();
+    a1Personas($w2, 'SK', [1 => 'SK1']);
+    expect(a1Edit($w2, 'SVX', null)->assertOk()->json('meta'))->toBeNull();
+    expect(a1Codes($w2, 'SK'))->toBe(['SK1']);
+});
+
+it('A1-5: ticked but the short code did not change, nothing happens; other markets are never touched', function (): void {
+    $w = mkWorld();
+    a1Personas($w, 'SK', [1 => 'SK1']);
+    a1Personas($w, 'RO', [1 => 'RO1', 2 => 'SK2']);
+
+    $r = mkRead($w);
+    $r['markets'][0]['rename_persona_codes'] = true;
+    $r['markets'][0]['name'] = 'Slovakia renamed';
+    $res = mkPatch($w, $r['markets'], $r['markets_version'])->assertOk();
+    expect($res->json('meta'))->toBeNull()->and(a1Codes($w, 'SK'))->toBe(['SK1']);
+
+    a1Edit($w, 'SVK', true)->assertOk();
+    expect(a1Codes($w, 'RO'))->toBe(['RO1', 'SK2']);
+});
+
+it('A1-6: staff are refused and another agency cannot see the wave; nothing changes', function (): void {
+    $w = mkWorld();
+    a1Personas($w, 'SK', [1 => 'SK1']);
+
+    a1Edit($w, 'SVK', true, 'staff')->assertForbidden();
+    a1Edit($w, 'SVK', true, 'otherAdmin')->assertNotFound();
+
+    expect(a1Codes($w, 'SK'))->toBe(['SK1'])->and(WaveMarket::query()->where('code', 'SK')->exists())->toBeTrue();
+});
+
+it('A1-7: the audit carries ids and counts only, in one wave.updated entry', function (): void {
+    $w = mkWorld();
+    a1Personas($w, 'SK', [1 => 'SK1', 2 => 'MINE']);
+
+    a1Edit($w, 'SVK', true)->assertOk();
+
+    $updated = AuditLog::query()->where('action', 'wave.updated')->latest('id')->firstOrFail();
+    expect($updated->after)->toMatchArray(['persona_codes_renamed' => 1, 'persona_codes_skipped' => 0, 'persona_codes_markets' => [$w['mk']['SK']]]);
+    $dump = json_encode($updated->after, JSON_THROW_ON_ERROR);
+    foreach (['SVK1', 'MINE', 'SK1'] as $code) {
+        expect($dump)->not->toContain($code);
+    }
+});
+
+it('A1-8: the flag must be a boolean and cannot be sent on create', function (): void {
+    $w = mkWorld();
+    $r = mkRead($w);
+    $r['markets'][0]['rename_persona_codes'] = 'maybe';
+    mkPatch($w, $r['markets'], $r['markets_version'])->assertUnprocessable();
+
+    mkCreate($w, [['name' => 'X', 'countries' => ['SE'], 'rename_persona_codes' => true]])->assertUnprocessable();
+});

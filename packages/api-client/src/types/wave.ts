@@ -41,6 +41,8 @@ export interface WaveMarketInput {
   name: string
   code?: string | null
   countries: string[]
+  /** Edit only (PL-2.4 A1): make this market's personas with the standard code follow a changed short code. */
+  rename_persona_codes?: boolean
 }
 
 export interface WaveResource {
@@ -75,8 +77,19 @@ export interface WaveListResponse {
   meta: { total: number; page: number; per_page: number; last_page: number }
 }
 
+/** What an edit that asked for persona codes to follow a short-code change did (counts only). */
+export interface PersonaCodesResult {
+  renamed: number
+  /** Left because the new code was already used in the market. */
+  skipped: number
+  /** Left because the code is not the standard one (typed by hand). */
+  kept_custom: number
+}
+
 export interface WaveEnvelope {
   data: WaveResource
+  /** Present only on an edit that carried `rename_persona_codes` for a market whose short code changed. */
+  meta?: { persona_codes?: PersonaCodesResult }
 }
 
 export interface WaveListParams {

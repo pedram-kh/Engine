@@ -14,6 +14,7 @@ import { useI18n } from 'vue-i18n'
 
 import { MAX_MARKETS, MENU_ABOVE_DIALOG_Z } from '../constants'
 import {
+  codeChanged,
   emptyDraft,
   MAX_COUNTRIES,
   MAX_NAME,
@@ -28,6 +29,8 @@ const props = defineProps<{
   errors: Record<string, MarketDraftErrors>
   /** The overall message above the list (no market, too many, or the markets problem line). */
   errorMessage?: string | null
+  /** A1: offer the "also update the codes of this market's personas" tick on an existing market whose code changed. */
+  offerPersonaCodes?: boolean
 }>()
 
 const emit = defineEmits<{ 'update:modelValue': [value: MarketDraft[]] }>()
@@ -73,6 +76,13 @@ function setCode(index: number, value: string): void {
       .replace(/[^A-Z0-9]/g, '')
       .slice(0, 6)
     m.codeTouched = true
+  })
+}
+
+function setRenamePersonaCodes(index: number, value: boolean | null): void {
+  mutate((d) => {
+    const m = d[index]
+    if (m !== undefined) m.renamePersonaCodes = value === true
   })
 }
 
@@ -179,6 +189,24 @@ function codeError(d: MarketDraft): string[] {
       <p class="market-card__hint" data-test="market-code-hint">
         {{ t('app.waves.markets.codeHint', { example: `${d.code || 'UKI'}1` }) }}
       </p>
+
+      <div
+        v-if="offerPersonaCodes && codeChanged(d)"
+        class="market-card__rename"
+        data-test="market-rename-codes"
+      >
+        <v-checkbox
+          :model-value="d.renamePersonaCodes"
+          :label="t('app.waves.markets.renamePersonaCodes')"
+          density="compact"
+          hide-details
+          data-test="market-rename-codes-box"
+          @update:model-value="(v: boolean | null) => setRenamePersonaCodes(i, v)"
+        />
+        <p class="market-card__hint market-card__hint--tight">
+          {{ t('app.waves.markets.renamePersonaCodesHint', { old: d.savedCode }) }}
+        </p>
+      </div>
 
       <div class="market-card__countries">
         <v-chip
@@ -336,6 +364,12 @@ function codeError(d: MarketDraft): string[] {
   font-size: 12px;
   line-height: 1.3;
   color: rgb(var(--v-theme-on-surface-variant));
+}
+.market-card__rename {
+  margin: 0 0 10px;
+}
+.market-card__hint--tight {
+  margin: 0 0 0 38px;
 }
 .market-card__countries {
   display: flex;

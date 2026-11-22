@@ -311,6 +311,62 @@ describe('NewWaveDialog (PL-1.1 W3)', () => {
     w.unmount()
   })
 
+  async function editFirstCode(
+    w: Awaited<ReturnType<typeof mountWithApp>>,
+    code: string,
+  ): Promise<void> {
+    await setInput('[data-test="market-card-0"] [data-test="market-code-input"]', code)
+    void w
+  }
+
+  it('A1: ticked, the market carries rename_persona_codes and the result reaches the parent', async () => {
+    const result = { renamed: 2, skipped: 1, kept_custom: 0 }
+    vi.mocked(wavesApi.update).mockResolvedValue({
+      data: makeWave(),
+      meta: { persona_codes: result },
+    })
+    const wave = makeWave()
+    const w = await mountWithApp(NewWaveDialog, { ...props(wave), offerPersonaCodes: true })
+    await editFirstCode(w, 'SVK')
+    ;(body('[data-test="market-rename-codes-box"] input') as HTMLInputElement).click()
+    await flushPromises()
+    await submit()
+    const sent = vi.mocked(wavesApi.update).mock.calls[0]![3].markets![0]!
+    expect(sent).toMatchObject({
+      id: wave.attributes.markets[0]!.id,
+      code: 'SVK',
+      rename_persona_codes: true,
+    })
+    expect(w.emitted('saved')![0]![1]).toEqual(result)
+    w.unmount()
+  })
+
+  it('A1: unticked by default, the flag is not sent and saved carries no result', async () => {
+    vi.mocked(wavesApi.update).mockResolvedValue({ data: makeWave() })
+    const w = await mountWithApp(NewWaveDialog, { ...props(makeWave()), offerPersonaCodes: true })
+    await editFirstCode(w, 'SVK')
+    expect((body('[data-test="market-rename-codes-box"] input') as HTMLInputElement).checked).toBe(
+      false,
+    )
+    await submit()
+    expect(vi.mocked(wavesApi.update).mock.calls[0]![3].markets![0]).not.toHaveProperty(
+      'rename_persona_codes',
+    )
+    expect(w.emitted('saved')![0]).toHaveLength(1)
+    w.unmount()
+  })
+
+  it('A1: with strategy off (not offered) and on create there is no tick', async () => {
+    const off = await mountWithApp(NewWaveDialog, props(makeWave()))
+    await editFirstCode(off, 'SVK')
+    expect(body('[data-test="market-rename-codes"]')).toBeNull()
+    off.unmount()
+    document.body.innerHTML = ''
+    const create = await mountWithApp(NewWaveDialog, { ...props(), offerPersonaCodes: true })
+    expect(body('[data-test="market-rename-codes"]')).toBeNull()
+    create.unmount()
+  })
+
   it('PL-2.4: an edit that leaves the markets alone sends neither markets nor the version', async () => {
     vi.mocked(wavesApi.update).mockResolvedValue({ data: makeWave({ name: 'Renamed' }) })
     const w = await mountWithApp(NewWaveDialog, props(makeWave()))

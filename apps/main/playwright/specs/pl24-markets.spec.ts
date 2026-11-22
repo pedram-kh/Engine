@@ -186,4 +186,67 @@ test.describe('Market builder and tabs (PL-2.4)', () => {
     await page.locator('[data-test="wave-market-UKI"] [data-test="market-info-UKI"]').click()
     await expect(page.locator('[data-test="market-countries"]')).toContainText('Ireland')
   })
+
+  test('A1: changing a short code offers the tick; unticked keeps the persona codes, ticked renames the standard ones', async ({
+    page,
+    request,
+  }) => {
+    const { agencyUlid, brandId } = await signedInBrand(page, request, 'mk-codes')
+    const wavePath = `/agencies/${agencyUlid}/brands/${brandId}/waves`
+    const wave = await api(page, 'POST', wavePath, {
+      name: 'Codes wave',
+      go_live_on: '2027-05-01',
+      markets: [{ name: 'UK & Ireland', code: 'UKI', countries: ['GB', 'IE'] }],
+      campaign_id: null,
+    })
+    const shown = await api(page, 'GET', `${wavePath}/${wave.data.id}`)
+    const market = shown.data.attributes!.markets![0]!.id
+    for (const title of ['One', 'Two']) {
+      await api(page, 'POST', `${wavePath}/${wave.data.id}/strategy/personas`, {
+        market,
+        title,
+        name: title,
+      })
+    }
+    const codes = async (): Promise<string[]> => {
+      const res = (await api(
+        page,
+        'GET',
+        `${wavePath}/${wave.data.id}/strategy/personas?market=${market}`,
+      )) as unknown as { data: { attributes: { code: string; slot: number } }[] }
+      return res.data
+        .map((p) => p.attributes)
+        .sort((a, b) => a.slot - b.slot)
+        .map((a) => a.code)
+    }
+    expect(await codes()).toEqual(['UKI1', 'UKI2'])
+
+    const editCode = async (code: string, tick: boolean): Promise<void> => {
+      await page.goto(`/brands/${brandId}/waves/${wave.data.id}`)
+      await page.locator('[data-test="wave-edit-btn"]').click()
+      await expect(page.locator('[data-test="market-rename-codes"]')).toHaveCount(0)
+      await page.locator('[data-test="market-code-input"] input').fill(code)
+      const box = page.locator('[data-test="market-rename-codes-box"] input')
+      await expect(box).not.toBeChecked()
+      if (tick) await box.check()
+      await page.locator('[data-test="wave-submit"]').click()
+      await expect(page.locator('[data-test="wave-dialog"]')).toBeHidden()
+    }
+
+    await editCode('UKX', false)
+    expect(await codes()).toEqual(['UKI1', 'UKI2'])
+    await expect(page.locator('[data-test="persona-codes-result"]')).toHaveCount(0)
+
+    await editCode('BRI', true)
+    // UKI1 and UKI2 no longer follow the short code (now BRI): nothing standard to rename, so both are kept.
+    const result = page.locator('[data-test="persona-codes-result"]')
+    await expect(result).toContainText('0 renamed')
+    expect(await codes()).toEqual(['UKI1', 'UKI2'])
+
+    // Back to the code the personas follow, then change it with the tick: both follow.
+    await editCode('UKI', false)
+    await editCode('IRL', true)
+    await expect(result).toContainText('2 renamed')
+    expect(await codes()).toEqual(['IRL1', 'IRL2'])
+  })
 })

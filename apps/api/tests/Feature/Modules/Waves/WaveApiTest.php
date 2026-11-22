@@ -211,7 +211,7 @@ it('B10: audits wave.created and wave.updated with actor, agency and subject, an
     $keys = ['go_live_on', 'campaign_id', 'markets', 'market_countries', 'name', 'status'];
     expect(array_keys($created->after ?? []))->toEqualCanonicalizing($keys)
         ->and(array_keys($updated->before ?? []))->toEqualCanonicalizing($keys)
-        ->and(array_keys($updated->after ?? []))->toEqualCanonicalizing([...$keys, 'markets_renamed'])
+        ->and(array_keys($updated->after ?? []))->toEqualCanonicalizing([...$keys, 'markets_renamed', 'persona_codes_renamed', 'persona_codes_skipped', 'persona_codes_markets'])
         ->and($updated->before['name'] ?? null)->not->toBe($updated->after['name'] ?? null);
 
     // A refused request audits nothing.

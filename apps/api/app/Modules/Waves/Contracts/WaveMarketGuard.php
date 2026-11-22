@@ -34,4 +34,15 @@ interface WaveMarketGuard
      * @return array<int, int> market id => number of concepts, only for markets with at least one
      */
     public function conceptCountsByMarket(Wave $locked, array $removedIds): array;
+
+    /**
+     * PL-2.4 (A1): make the personas of one market follow a short-code change. Only a persona whose code is exactly the
+     * standard one for the OLD short code (old code followed by its slot number) is renamed, to the new code followed
+     * by the same number. A code typed by hand is never touched. A rename that would equal another code of the market
+     * is skipped. Runs on the locked wave, inside the caller's transaction.
+     *
+     * @param  Wave  $locked  the wave, already locked FOR UPDATE by the caller
+     * @return array{renamed: int, skipped: int, kept_custom: int}
+     */
+    public function renamePersonaCodes(Wave $locked, int $marketId, string $oldCode, string $newCode): array;
 }

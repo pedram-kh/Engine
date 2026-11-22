@@ -13,7 +13,12 @@
  * Server codes map to strings; anything else is the generic save error.
  */
 import { ApiError, countryInTwoMarketsMeta, marketHasPersonasMeta } from '@catalyst/api-client'
-import type { UpdateWavePayload, WaveCampaignOption, WaveResource } from '@catalyst/api-client'
+import type {
+  PersonaCodesResult,
+  UpdateWavePayload,
+  WaveCampaignOption,
+  WaveResource,
+} from '@catalyst/api-client'
 import { labelForCountryCode } from '@catalyst/api-client'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -35,11 +40,14 @@ const props = defineProps<{
   brandId: string
   brandName: string
   wave?: WaveResource | null
+  /** A1: offer "also update the codes of this market's personas" when a short code is changed (strategy is on). */
+  offerPersonaCodes?: boolean
 }>()
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
-  saved: [wave: WaveResource]
+  /** `personaCodes` only when an edit asked for persona codes to follow a short-code change. */
+  saved: [wave: WaveResource, personaCodes?: PersonaCodesResult]
   /** The markets were reloaded after a 409 (someone else changed them): the wave as the server has it now. */
   refreshed: [wave: WaveResource]
 }>()
@@ -279,7 +287,9 @@ async function submit(): Promise<void> {
           : { campaign_id: campaignChoice.value === 'existing' ? campaignId.value : null }),
       })
     }
-    emit('saved', res.data)
+    const personaCodes = res.meta?.persona_codes
+    if (personaCodes) emit('saved', res.data, personaCodes)
+    else emit('saved', res.data)
     emit('update:modelValue', false)
   } catch (err) {
     if (err instanceof ApiError && err.code === 'wave.markets_changed') {
@@ -349,7 +359,12 @@ async function submit(): Promise<void> {
         </div>
         <div>
           <div class="wave-dialog__label">{{ t('app.waves.dialog.markets') }}</div>
-          <MarketBuilder v-model="drafts" :errors="marketErrors" :error-message="marketsError" />
+          <MarketBuilder
+            v-model="drafts"
+            :errors="marketErrors"
+            :error-message="marketsError"
+            :offer-persona-codes="isEdit && offerPersonaCodes"
+          />
         </div>
 
         <template v-if="linkLocked">

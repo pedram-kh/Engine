@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  codeChanged,
   draftsFromWave,
   emptyDraft,
   ownerOf,
@@ -115,5 +116,41 @@ describe('helpers', () => {
     n.name = '  A   B '
     n.countries = ['SE']
     expect(toInput(n)).toEqual({ name: 'A B', countries: ['SE'] })
+  })
+})
+
+describe('A1: persona codes follow a changed short code', () => {
+  const wave = [{ id: '01ABC', name: 'UK', code: 'UK', countries: ['GB'] }] as never
+
+  it('is not offered until an existing market has a different, valid code', () => {
+    const [d] = draftsFromWave(wave)
+    expect(codeChanged(d!)).toBe(false)
+    d!.code = 'UKX'
+    expect(codeChanged(d!)).toBe(true)
+    d!.code = 'U'
+    expect(codeChanged(d!)).toBe(false)
+    expect(codeChanged(emptyDraft())).toBe(false)
+  })
+
+  it('goes in the body only when ticked and the code differs from the saved one', () => {
+    const [d] = draftsFromWave(wave)
+    d!.code = 'UKX'
+    expect(toInput(d!)).not.toHaveProperty('rename_persona_codes')
+    d!.renamePersonaCodes = true
+    expect(toInput(d!)).toEqual({
+      id: '01ABC',
+      name: 'UK',
+      code: 'UKX',
+      countries: ['GB'],
+      rename_persona_codes: true,
+    })
+    d!.code = 'UK'
+    expect(toInput(d!)).not.toHaveProperty('rename_persona_codes')
+  })
+
+  it('is never sent for a market that does not exist yet', () => {
+    const n = emptyDraft()
+    Object.assign(n, { name: 'New', code: 'NEW', countries: ['SE'], renamePersonaCodes: true })
+    expect(toInput(n)).not.toHaveProperty('rename_persona_codes')
   })
 })

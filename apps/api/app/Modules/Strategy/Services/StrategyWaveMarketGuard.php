@@ -51,4 +51,39 @@ final class StrategyWaveMarketGuard implements WaveMarketGuard
 
         return $counts;
     }
+
+    public function renamePersonaCodes(Wave $locked, int $marketId, string $oldCode, string $newCode): array
+    {
+        $personas = WavePersona::query()
+            ->where('wave_id', $locked->id)->where('market_id', $marketId)
+            ->orderBy('slot')->get(['id', 'slot', 'code']);
+
+        $taken = [];
+        foreach ($personas as $persona) {
+            $taken[$persona->code] = true;
+        }
+
+        $renamed = 0;
+        $skipped = 0;
+        $custom = 0;
+        foreach ($personas as $persona) {
+            if ($persona->code !== $oldCode.$persona->slot) {
+                $custom++;
+
+                continue;
+            }
+            $target = $newCode.$persona->slot;
+            if (isset($taken[$target])) {
+                $skipped++;
+
+                continue;
+            }
+            WavePersona::query()->whereKey($persona->id)->update(['code' => $target, 'updated_at' => now()]);
+            unset($taken[$persona->code]);
+            $taken[$target] = true;
+            $renamed++;
+        }
+
+        return ['renamed' => $renamed, 'skipped' => $skipped, 'kept_custom' => $custom];
+    }
 }

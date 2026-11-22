@@ -139,3 +139,40 @@ added on purpose. Drivers: `/tmp/pl24/br.py` (Vitest) and `/tmp/pl24/br2.py` (Pl
 | S2   | seeder: personas in the multi-country markets              | Pest (SQLite)         | red             | green            |
 | S3   | seeder: wave 2 is the minimum (one market)                 | Pest (SQLite)         | red             | green            |
 | S4   | seeder: a second agency                                    | Pest (SQLite)         | red             | green            |
+
+## A1 (persona codes follow a short-code change), 2026-11-22
+
+Same method: mutate, run, red, restore in a `finally`, run, green. Pest gates ran on a PostgreSQL throwaway database
+(see the review's gates section); the Vitest and Playwright gates on their usual runners.
+
+| Gate | What it pins                                                           | Runner                | Mutated result | Restored result |
+| ---- | ---------------------------------------------------------------------- | --------------------- | -------------- | --------------- |
+| A1   | a standard code is renamed to the new prefix with the same slot number | Pest                  | red            | green           |
+| A2   | a hand-typed code is never changed                                     | Pest                  | red            | green           |
+| A3   | a rename that collides with a code of the market is skipped            | Pest                  | red            | green           |
+| A4   | unticked: nothing is renamed                                           | Pest                  | red            | green           |
+| A5   | ticked with an unchanged short code: nothing happens                   | Pest                  | red            | green           |
+| A6   | only the edited market's personas are touched                          | Pest                  | red            | green           |
+| A7   | the counts reach the response (`meta.persona_codes`)                   | Pest                  | red            | green           |
+| A8   | the audit carries the counts                                           | Pest                  | red            | green           |
+| A9   | the flag must be a boolean                                             | Pest                  | red            | green           |
+| A10  | the flag is refused on create (both guards removed together)           | Pest                  | red            | green           |
+| A11  | the flag reaches the service for its own market                        | Pest                  | red            | green           |
+| A12  | web: the tick is offered only when the code changed                    | Vitest                | red            | green           |
+| A13  | web: the flag goes in the body only when ticked                        | Vitest                | red            | green           |
+| A14  | web: the tick is unticked by default                                   | Vitest                | red            | green           |
+| A15  | web: not offered when strategy is off                                  | Vitest                | red            | green           |
+| A17  | web: the result reaches the parent                                     | Vitest                | red            | green           |
+| A18  | 24 locales carry the three keys                                        | Vitest                | red            | green           |
+| P5   | the tick shows in the browser on a changed code                        | Playwright (chromium) | red            | green           |
+| P6   | the result is shown on the wave page                                   | Playwright (chromium) | red            | green           |
+| P7   | a ticked rename reaches the server                                     | Playwright (chromium) | red            | green           |
+
+**Not a gate, and why.**
+
+- **A16** (the dialog passes the offer only on edit): the mutation stayed green. On create no draft has a saved code, so
+  `codeChanged` is false anyway. The `isEdit` check is a second guard behind it; nothing observable depends on it alone.
+- **A10 alone:** on create the request is refused twice (the allowed-keys list and a `prohibited` rule). Removing either
+  one alone stays green, so the gate removes both together.
+- **A6 first stayed green** with a test that gave the other market a code that could not match; the test now gives it
+  `SK2` in slot 2, and the mutation is red.

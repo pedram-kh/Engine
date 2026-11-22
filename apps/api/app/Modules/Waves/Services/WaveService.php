@@ -167,6 +167,13 @@ final class WaveService
         }
 
         $this->logUpdated($wave, $before, $afterCampaignUlid, $marketsResult);
+        if ($marketsResult !== null && $marketsResult['persona_codes']['markets'] !== []) {
+            $wave->personaCodes = [
+                'renamed' => $marketsResult['persona_codes']['renamed'],
+                'skipped' => $marketsResult['persona_codes']['skipped'],
+                'kept_custom' => $marketsResult['persona_codes']['kept_custom'],
+            ];
+        }
 
         return $wave;
     }
@@ -345,7 +352,7 @@ final class WaveService
 
     /**
      * @param  array<string, mixed>  $before
-     * @param  array{changed: bool, before: array{markets: list<string>, market_countries: array<string, list<string>>}, after: array{markets: list<string>, market_countries: array<string, list<string>>, markets_renamed: list<string>}}|null  $marketsResult  null when the markets were not part of the edit
+     * @param  array{changed: bool, before: array{markets: list<string>, market_countries: array<string, list<string>>}, after: array{markets: list<string>, market_countries: array<string, list<string>>, markets_renamed: list<string>}, persona_codes: array{renamed: int, skipped: int, kept_custom: int, markets: list<string>}}|null  $marketsResult  null when the markets were not part of the edit
      */
     private function logUpdated(Wave $wave, array $before, ?string $afterCampaignUlid, ?array $marketsResult = null): void
     {
@@ -353,7 +360,9 @@ final class WaveService
             $current = $this->markets->currentSummary($wave);
             $marketsBefore = $current;
             $marketsAfter = $current + ['markets_renamed' => []];
+            $personaCodes = ['renamed' => 0, 'skipped' => 0, 'kept_custom' => 0, 'markets' => []];
         } else {
+            $personaCodes = $marketsResult['persona_codes'];
             $marketsBefore = $marketsResult['before'];
             $marketsAfter = $marketsResult['after'];
         }
@@ -377,6 +386,9 @@ final class WaveService
                 'markets' => $marketsAfter['markets'],
                 'market_countries' => $marketsAfter['market_countries'],
                 'markets_renamed' => $marketsAfter['markets_renamed'],
+                'persona_codes_renamed' => $personaCodes['renamed'],
+                'persona_codes_skipped' => $personaCodes['skipped'],
+                'persona_codes_markets' => $personaCodes['markets'],
                 'campaign_id' => $afterCampaignUlid,
                 'status' => $wave->status->value,
             ],

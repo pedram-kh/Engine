@@ -8,7 +8,7 @@
  * the not-found state, since the server answers 404 for both.
  */
 import { formatDateTime } from '@catalyst/api-client'
-import type { WaveResource, WaveTrackerResource } from '@catalyst/api-client'
+import type { PersonaCodesResult, WaveResource, WaveTrackerResource } from '@catalyst/api-client'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -46,6 +46,11 @@ const wave = ref<WaveResource | null>(null)
 const loading = ref(true)
 const failed = ref(false)
 const editOpen = ref(false)
+/**
+ * A1: what the last edit did to persona codes, kept on the page until closed. The alert is drawn with a v-for over
+ * zero or one entries, not a v-if, so with nothing to say no node at all (not even a comment) is left in the page.
+ */
+const personaCodes = ref<PersonaCodesResult | null>(null)
 const tracker = ref<WaveTrackerResource | null>(null)
 
 const health = computed(() => tracker.value?.attributes.health ?? null)
@@ -131,6 +136,25 @@ onMounted(async () => {
         </v-btn>
       </template>
     </AgencyPageHeader>
+
+    <v-alert
+      v-for="codes in personaCodes ? [personaCodes] : []"
+      :key="`${codes.renamed}-${codes.skipped}-${codes.kept_custom}`"
+      type="success"
+      variant="tonal"
+      closable
+      class="mb-4"
+      data-test="persona-codes-result"
+      @click:close="personaCodes = null"
+    >
+      {{
+        t('app.waves.markets.personaCodesResult', {
+          renamed: codes.renamed,
+          skipped: codes.skipped,
+          kept: codes.kept_custom,
+        })
+      }}
+    </v-alert>
 
     <v-skeleton-loader v-if="loading" type="article" data-test="wave-detail-skeleton" />
     <v-alert v-else-if="failed" type="error" variant="tonal" data-test="wave-detail-error">
@@ -240,7 +264,13 @@ onMounted(async () => {
       :brand-id="brandUlid"
       :brand-name="wave.relationships.brand.data.attributes.name"
       :wave="wave"
-      @saved="(w: WaveResource) => (wave = w)"
+      :offer-persona-codes="strategyOn"
+      @saved="
+        (w: WaveResource, codes?: PersonaCodesResult) => {
+          wave = w
+          personaCodes = codes ?? null
+        }
+      "
       @refreshed="(w: WaveResource) => (wave = w)"
     />
   </div>
