@@ -69,8 +69,8 @@ it('P3: the picker lists applicants and invitees, never the blacklisted or the e
     $url = "/api/v1/agencies/{$agency->ulid}/brands/{$brand->ulid}/waves/{$w1->ulid}/strategy/creators/candidates?market={$mk}&per_page=50";
     $names = array_column(S::call($admin, 'GET', $url)->assertOk()->json('data'), 'display_name');
 
-    expect($names)->toContain('Astrid Lindqvist', 'Hana Skrytá', 'Pia Kollárová')
-        ->and($names)->not->toContain('Maya Marcinková')->not->toContain('Blake Blocked')->not->toContain('Brandon Barred')->not->toContain('Exo Exclusive');
+    expect($names)->toContain('Astrid Lindqvist', 'Hana Skrytá', 'Pia Kollárová');
+    expect(array_intersect($names, ['Maya Marcinková', 'Blake Blocked', 'Brandon Barred', 'Exo Exclusive']))->toBe([]);
 });
 
 it('P4: three creators are in the wave, one with the client approval; the board carries the In wave marker data', function (): void {
