@@ -77,44 +77,44 @@ final class WaveService
         $this->assertBrandWritable($brand);
 
         [$wave, $campaign] = DB::transaction(function () use ($agency, $brand, $actor, $data): array {
-            $campaign = Campaign::query()->create([
-                'agency_id' => $agency->id,
-                'brand_id' => $brand->id,
-                'created_by_user_id' => $actor->id,
-                'name' => trim($data['new_campaign']['name']),
-                'objective' => CampaignObjective::Ugc,
-                'status' => CampaignStatus::Draft,
-                'budget_minor_units' => 0,
-                'budget_currency' => strtoupper($agency->default_currency),
-                'creator_posts_content' => false,
-                'campaign_type' => CampaignType::ForWave,
-            ]);
-
-            app(BoardService::class)->ensureBoard($campaign);
+            $campaign = $this->makeWaveCampaign($agency, $brand, $actor, (string) $data['new_campaign']['name']);
 
             return [$this->insertWave($agency, $brand, $actor, $data, $campaign), $campaign];
         });
 
-        Audit::log(
-            action: AuditAction::CampaignCreated,
-            subject: $campaign,
-            // Literal keys on purpose (AuditPayloadKeysGuardTest reads them statically).
-            after: [
-                'name' => $campaign->name,
-                'objective' => $campaign->objective->value,
-                'status' => $campaign->status->value,
-                'budget_minor_units' => $campaign->budget_minor_units,
-                'budget_currency' => $campaign->budget_currency,
-                'brand_id' => $campaign->brand_id,
-                'agency_id' => $campaign->agency_id,
-                'creator_posts_content' => $campaign->creator_posts_content,
-                'campaign_type' => $campaign->campaign_type->value,
-                'listed_on_jobs_board' => $campaign->listed_on_jobs_board,
-            ],
-        );
+        $this->logCampaignCreated($campaign);
         $this->logCreated($wave, $campaign->ulid);
 
         return $wave;
+    }
+
+    /**
+     * PL-3.1 (A1) — "Create a campaign for this wave" from the Creators step, for a wave that already exists and has no
+     * campaign. The SAME campaign rules as {@see self::createWithNewCampaign()} (one {@see self::makeWaveCampaign()}, one
+     * audit), in one transaction on the row-locked wave: the for-a-wave campaign, its nine-column board, and the link.
+     * Refused when the wave already has a campaign.
+     */
+    public function createCampaignForWave(Agency $agency, Brand $brand, User $actor, Wave $wave, string $name): Wave
+    {
+        $this->assertBrandWritable($brand);
+
+        [$locked, $before, $campaign] = DB::transaction(function () use ($agency, $brand, $actor, $wave, $name): array {
+            $locked = Wave::query()->whereKey($wave->id)->lockForUpdate()->firstOrFail();
+            if ($locked->campaign_id !== null) {
+                throw WaveRuleViolation::campaignAlreadyLinked();
+            }
+            $before = $this->snapshot($locked);
+            $campaign = $this->makeWaveCampaign($agency, $brand, $actor, $name);
+            $locked->campaign_id = $campaign->id;
+            $locked->save();
+
+            return [$locked, $before, $campaign];
+        });
+
+        $this->logCampaignCreated($campaign);
+        $this->logUpdated($locked, $before, $campaign->ulid);
+
+        return $locked;
     }
 
     /**
@@ -262,6 +262,48 @@ final class WaveService
         if ($audit !== null) {
             $this->logUpdated($audit[0], $audit[1], $audit[2]);
         }
+    }
+
+    /** The for-a-wave campaign (draft, posting off, objective ugc, budget 0 in the agency's currency) and its board. Call inside a transaction. */
+    private function makeWaveCampaign(Agency $agency, Brand $brand, User $actor, string $name): Campaign
+    {
+        $campaign = Campaign::query()->create([
+            'agency_id' => $agency->id,
+            'brand_id' => $brand->id,
+            'created_by_user_id' => $actor->id,
+            'name' => trim($name),
+            'objective' => CampaignObjective::Ugc,
+            'status' => CampaignStatus::Draft,
+            'budget_minor_units' => 0,
+            'budget_currency' => strtoupper($agency->default_currency),
+            'creator_posts_content' => false,
+            'campaign_type' => CampaignType::ForWave,
+        ]);
+
+        app(BoardService::class)->ensureBoard($campaign);
+
+        return $campaign;
+    }
+
+    private function logCampaignCreated(Campaign $campaign): void
+    {
+        Audit::log(
+            action: AuditAction::CampaignCreated,
+            subject: $campaign,
+            // Literal keys on purpose (AuditPayloadKeysGuardTest reads them statically).
+            after: [
+                'name' => $campaign->name,
+                'objective' => $campaign->objective->value,
+                'status' => $campaign->status->value,
+                'budget_minor_units' => $campaign->budget_minor_units,
+                'budget_currency' => $campaign->budget_currency,
+                'brand_id' => $campaign->brand_id,
+                'agency_id' => $campaign->agency_id,
+                'creator_posts_content' => $campaign->creator_posts_content,
+                'campaign_type' => $campaign->campaign_type->value,
+                'listed_on_jobs_board' => $campaign->listed_on_jobs_board,
+            ],
+        );
     }
 
     /**

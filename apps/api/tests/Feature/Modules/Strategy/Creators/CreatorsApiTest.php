@@ -5,10 +5,13 @@ declare(strict_types=1);
 use App\Modules\Agencies\Models\AgencyCreatorRelation;
 use App\Modules\Agencies\Models\BrandCreatorBlacklist;
 use App\Modules\Audit\Models\AuditLog;
+use App\Modules\Brands\Models\Brand;
 use App\Modules\Campaigns\Enums\AssignmentStatus;
+use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignApplication;
 use App\Modules\Campaigns\Models\CampaignAssignment;
 use App\Modules\Creators\Enums\ApplicationStatus;
+use App\Modules\Creators\Features\CampaignBrandExclusivityEnabled;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Strategy\Enums\CreatorDecisionStatus;
 use App\Modules\Strategy\Features\CreatorsScriptsEnabled;
@@ -126,19 +129,26 @@ it('B6: excluded from the picker and from add: not approved, erased, scheduled f
     $softBrand = F::applicant($camp);
     BrandCreatorBlacklist::factory()->soft()->create(['brand_id' => $w['brand']->id, 'creator_id' => $softBrand->id]);
     $hidden = F::applicant($camp, creator: ['is_discoverable' => false]);
+    // Exclusive elsewhere: selected on another brand's campaign that blocks THIS brand (the apply-time rule, G2).
+    Feature::activate(CampaignBrandExclusivityEnabled::NAME);
+    $exclusive = F::applicant($camp);
+    $other = Brand::factory()->create(['agency_id' => $w['agency']->id]);
+    $zed = Campaign::factory()->create(['agency_id' => $w['agency']->id, 'brand_id' => $other->id]);
+    $zed->exclusiveBrands()->sync([$w['brand']->id]);
+    CampaignAssignment::factory()->create(['agency_id' => $w['agency']->id, 'campaign_id' => $zed->id, 'creator_id' => $exclusive->id, 'status' => AssignmentStatus::Accepted]);
     $good = F::applicant($camp);
 
     $listed = array_column(S::call($w['admin'], 'GET', F::url($w, 'candidates'))->assertOk()->json('data'), 'id');
     expect($listed)->toContain($good->ulid, $hidden->ulid, $softBrand->ulid);
-    expect(array_intersect($listed, [$pending->ulid, $erased->ulid, $leaving->ulid, $hardAgency->ulid, $hardBrand->ulid]))->toBe([]);
+    expect(array_intersect($listed, [$pending->ulid, $erased->ulid, $leaving->ulid, $hardAgency->ulid, $hardBrand->ulid, $exclusive->ulid]))->toBe([]);
 
-    foreach ([$pending, $erased, $leaving, $hardAgency, $hardBrand] as $creator) {
+    foreach ([$pending, $erased, $leaving, $hardAgency, $hardBrand, $exclusive] as $creator) {
         S::call($w['admin'], 'POST', F::url($w), ['market' => $w['mk']['SK'], 'creators' => [$creator->ulid]])->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_creator.not_eligible');
     }
     expect(pl31SlotCount($w))->toBe(0);
 });
 
-it('B7: the picker: filters, country[] chips, already_in_wave with the market, exclusivity hint field present, campaign required', function (): void {
+it('B7: the picker: filters, country[] chips, already_in_wave with the market, campaign required', function (): void {
     $w = F::world();
     $sk = F::applicant($w['campaign'], creator: ['country_code' => 'SK', 'display_name' => 'Lucia Horvathova']);
     $ro = F::applicant($w['campaign'], creator: ['country_code' => 'RO', 'display_name' => 'Maria Popescu']);
@@ -147,7 +157,7 @@ it('B7: the picker: filters, country[] chips, already_in_wave with the market, e
     $all = S::call($w['admin'], 'GET', F::url($w, 'candidates')."?market={$w['mk']['SK']}")->assertOk();
     expect($all->json('meta.market_countries'))->toBe(['SK'])->and($all->json('meta.total'))->toBe(2);
     $row = (array) Arr::first($all->json('data'), static fn (array $r): bool => $r['id'] === $ro->ulid);
-    expect($row['already_in_wave'])->toBeTrue()->and($row['in_market'])->toBe($w['mk']['RO'])->and(array_key_exists('exclusive_elsewhere', $row))->toBeTrue();
+    expect($row['already_in_wave'])->toBeTrue()->and($row['in_market'])->toBe($w['mk']['RO']);
 
     $only = S::call($w['admin'], 'GET', F::url($w, 'candidates').'?country[]=SK')->assertOk()->json('data');
     expect(array_column($only, 'id'))->toBe([$sk->ulid]);

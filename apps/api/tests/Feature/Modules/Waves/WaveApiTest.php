@@ -45,7 +45,8 @@ it('B1: route table: every route in the waves route file is covered by the flag 
     // remove, stream remove and add) are exercised by F1 in WaveTrackerAccessTest. A twelfth route fails here until it
     // is added to one of the two. The PL-2.1 strategy routes (`/waves/{wave}/strategy/...`) have their own table and gate
     // test (Strategy/StrategyFlagGatesTest).
-    expect($routes)->toHaveCount(11);
+    // PL-3.1 A1 adds the twelfth: `POST .../waves/{wave}/campaign` (flag gate and roles in Strategy/Creators/CreatorsLinkTest).
+    expect($routes)->toHaveCount(12);
 });
 
 it('creates a wave, lists it, shows it', function (): void {

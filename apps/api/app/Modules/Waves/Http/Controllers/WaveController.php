@@ -115,6 +115,36 @@ final class WaveController
             ->setStatusCode(Response::HTTP_CREATED);
     }
 
+    /**
+     * PL-3.1 (A1): create a for-a-wave campaign for a wave that has none, from the Creators step. Same rules and audit as
+     * "create a campaign for this wave now" at wave creation (one service path).
+     */
+    public function createCampaign(Request $request, Agency $agency, Brand $brand, string $wave): JsonResponse
+    {
+        if ($off = $this->flagOff($request)) {
+            return $off;
+        }
+        $this->assertBrand($brand, $agency);
+        $model = $this->findWave($wave, $agency, $brand);
+        Gate::authorize('update', $model);
+        Gate::authorize('create', Campaign::class);
+
+        /** @var array{name: string} $data */
+        $data = Validator::make($request->all(), ['name' => ['required', 'string', 'min:1', 'max:255']])->validate();
+        /** @var User $actor */
+        $actor = $request->user();
+
+        try {
+            $updated = $this->waves->createCampaignForWave($agency, $brand, $actor, $model, $data['name']);
+        } catch (WaveRuleViolation $e) {
+            return ErrorResponse::single($request, $e->status, $e->errorCode, $e->getMessage(), meta: $e->meta);
+        }
+
+        return (new WaveResource($updated->load(['brand', 'campaign', 'createdBy', 'markets.countries'])))
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
+    }
+
     public function campaignOptions(Request $request, Agency $agency, Brand $brand): JsonResponse
     {
         if ($off = $this->flagOff($request)) {

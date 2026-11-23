@@ -9,6 +9,7 @@ use App\Modules\Agencies\Enums\BlacklistType;
 use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Campaigns\Models\CampaignApplication;
 use App\Modules\Campaigns\Models\CampaignAssignment;
+use App\Modules\Campaigns\Services\BrandExclusivity;
 use App\Modules\Creators\Enums\ApplicationStatus;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Waves\Models\Wave;
@@ -22,9 +23,11 @@ use Illuminate\Support\Facades\DB;
  *
  * Excluded: a creator who is not approved, who is erased or scheduled for deletion (`visibleToAgencies`), or who is
  * hard-blacklisted by EITHER predicate of `AssignmentInviteGate::isHardBlacklisted` (agency-wide hard, or brand-scoped hard
- * for the campaign's brand), written here as set predicates. NOT excluded: a creator who is not discoverable (Q4: they applied;
- * this picker invites nobody) and a creator who is exclusive to another brand (the invite gate does not check exclusivity;
- * the list only carries a read-only hint).
+ * for the campaign's brand), written here as set predicates, and a creator BLOCKED from the campaign's brand by another
+ * brand's exclusivity (the same predicate that refuses an apply, `BrandExclusivity::isBlocked`, and drops the creator from the
+ * job fan-out, `excludeBlockedCreators`; a no-op while `campaign_brand_exclusivity` is off). The invitation gate itself does NOT
+ * check exclusivity (G2), so this leg is the exclusivity rule's own, not the gate's. NOT excluded: a creator who is not
+ * discoverable (Q4: they applied; this picker invites nobody).
  *
  * Tenancy: the creators table is global, so tenant safety comes from the campaign; every campaign-side lookup names the agency
  * explicitly and drops the global scope, so the same code runs in a creator's request (the accept listener) with no agency
@@ -47,33 +50,10 @@ final class WaveCreatorSource
      */
     public static function eligible(Wave $wave, Campaign $campaign): Builder
     {
-        $applied = DB::table('campaign_applications')->select('creator_id')
-            ->where('agency_id', $wave->agency_id)->where('campaign_id', $campaign->id);
-        $assigned = DB::table('campaign_assignments')->select('creator_id')
-            ->where('agency_id', $wave->agency_id)->where('campaign_id', $campaign->id)->whereNull('deleted_at');
+        $query = self::base($wave, $campaign);
+        app(BrandExclusivity::class)->excludeBlockedCreators($query, $campaign);
 
-        return Creator::query()
-            ->where('creators.application_status', ApplicationStatus::Approved->value)
-            ->visibleToAgencies()
-            ->where(function (Builder $q) use ($applied, $assigned): void {
-                $q->whereIn('creators.id', $applied)->orWhereIn('creators.id', $assigned);
-            })
-            // Agency-wide hard blacklist.
-            ->whereNotExists(function ($sub) use ($wave): void {
-                $sub->from('agency_creator_relations')->selectRaw('1')
-                    ->whereColumn('agency_creator_relations.creator_id', 'creators.id')
-                    ->where('agency_creator_relations.agency_id', $wave->agency_id)
-                    ->where('agency_creator_relations.is_blacklisted', true)
-                    ->where('agency_creator_relations.blacklist_type', BlacklistType::Hard->value);
-            })
-            // Brand-scoped hard blacklist, for THIS campaign's brand only.
-            ->whereNotExists(function ($sub) use ($campaign): void {
-                $sub->from('brand_creator_blacklists')->selectRaw('1')
-                    ->whereColumn('brand_creator_blacklists.creator_id', 'creators.id')
-                    ->where('brand_creator_blacklists.brand_id', $campaign->brand_id)
-                    ->where('brand_creator_blacklists.blacklist_type', BlacklistType::Hard->value)
-                    ->whereNull('brand_creator_blacklists.deleted_at');
-            });
+        return $query;
     }
 
     /**
@@ -113,5 +93,39 @@ final class WaveCreatorSource
                 ->where('agency_id', $wave->agency_id)->where('campaign_id', $campaign->id)
                 ->orderBy('id')->get()->keyBy('creator_id'),
         ];
+    }
+
+    /**
+     * @return Builder<Creator>
+     */
+    private static function base(Wave $wave, Campaign $campaign): Builder
+    {
+        $applied = DB::table('campaign_applications')->select('creator_id')
+            ->where('agency_id', $wave->agency_id)->where('campaign_id', $campaign->id);
+        $assigned = DB::table('campaign_assignments')->select('creator_id')
+            ->where('agency_id', $wave->agency_id)->where('campaign_id', $campaign->id)->whereNull('deleted_at');
+
+        return Creator::query()
+            ->where('creators.application_status', ApplicationStatus::Approved->value)
+            ->visibleToAgencies()
+            ->where(function (Builder $q) use ($applied, $assigned): void {
+                $q->whereIn('creators.id', $applied)->orWhereIn('creators.id', $assigned);
+            })
+            // Agency-wide hard blacklist.
+            ->whereNotExists(function ($sub) use ($wave): void {
+                $sub->from('agency_creator_relations')->selectRaw('1')
+                    ->whereColumn('agency_creator_relations.creator_id', 'creators.id')
+                    ->where('agency_creator_relations.agency_id', $wave->agency_id)
+                    ->where('agency_creator_relations.is_blacklisted', true)
+                    ->where('agency_creator_relations.blacklist_type', BlacklistType::Hard->value);
+            })
+            // Brand-scoped hard blacklist, for THIS campaign's brand only.
+            ->whereNotExists(function ($sub) use ($campaign): void {
+                $sub->from('brand_creator_blacklists')->selectRaw('1')
+                    ->whereColumn('brand_creator_blacklists.creator_id', 'creators.id')
+                    ->where('brand_creator_blacklists.brand_id', $campaign->brand_id)
+                    ->where('brand_creator_blacklists.blacklist_type', BlacklistType::Hard->value)
+                    ->whereNull('brand_creator_blacklists.deleted_at');
+            });
     }
 }

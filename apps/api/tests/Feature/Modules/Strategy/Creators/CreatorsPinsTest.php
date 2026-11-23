@@ -59,8 +59,10 @@ it('B32: the creators payload key sets are pinned', function (): void {
         ->and(pl31KeysOf($row['board']))->toBe(['column', 'stage']);
 
     $candidates = S::call($w['admin'], 'GET', F::url($w, 'candidates'))->assertOk();
-    expect(pl31KeysOf($candidates->json('data.0')))->toContain('already_in_wave', 'in_market', 'exclusive_elsewhere')
+    expect(pl31KeysOf($candidates->json('data.0')))->toContain('already_in_wave', 'in_market')
         ->and(pl31KeysOf($candidates->json('meta')))->toContain('market_countries', 'total');
+
+    expect(in_array('exclusive_elsewhere', pl31KeysOf($candidates->json('data.0')), true))->toBeFalse();
 
     $history = S::call($w['admin'], 'GET', F::url($w, "{$slot->ulid}/decisions"))->assertOk()->json('data.0');
     expect(array_intersect(pl31KeysOf($history), ['creator_id', 'wave_creator_id']))->toBe([]);

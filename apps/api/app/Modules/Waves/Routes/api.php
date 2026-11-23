@@ -28,6 +28,7 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         Route::post('brands/{brand}/waves', [WaveController::class, 'store'])->withTrashed()->name('waves.store');
         // Literal route BEFORE `{wave}`.
         Route::get('brands/{brand}/waves/campaign-options', [WaveController::class, 'campaignOptions'])->withTrashed()->name('waves.campaign-options');
+        Route::post('brands/{brand}/waves/{wave}/campaign', [WaveController::class, 'createCampaign'])->withTrashed()->name('waves.campaign.create');
         Route::get('brands/{brand}/waves/{wave}', [WaveController::class, 'show'])->withTrashed()->name('waves.show');
         Route::patch('brands/{brand}/waves/{wave}', [WaveController::class, 'update'])->withTrashed()->name('waves.update');
 

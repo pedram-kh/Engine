@@ -38,3 +38,10 @@ Run on SQLite unless noted. A row is written the moment its check is done.
 | 31  | F2 accept flag off           | a flag-off accept runs no creators query                                                   | removed the flag check in the listener                                         | F2                                          | 1 red / restored green                                          |
 
 Note: B20's first test (two processes released together by an advisory lock) passed even with the lock removed, because the race is not forced; the forced test (a held, uncommitted wave lock) is the one that goes red. The row for the unforced test is deliberately not claimed.
+| 32 | A2 exclusivity | a creator blocked from this brand by another brand's exclusivity never appears and is refused | removed `excludeBlockedCreators` from `WaveCreatorSource::eligible` | B6 | 1 red / restored green |
+| 33 | A2 approved | not-approved creators excluded | removed the `approved` predicate | B6 | 1 red / restored green |
+| 34 | A2 erased | erased and deletion-scheduled creators excluded | removed `visibleToAgencies()` | B6 | 1 red / restored green |
+| 35 | A2 hard blacklist, agency | agency-wide hard blacklist excluded | `is_blacklisted` predicate broken | B6 | 1 red / restored green |
+| 36 | A2 hard blacklist, brand | brand-scoped hard blacklist excluded | brand id predicate set to -1 | B6 | 1 red / restored green |
+| 37 | A1 one campaign | create-campaign refused when linked | removed the already-linked check | `CreatorsLinkTest` | 1 red / restored green |
+| 38 | A1 board | the created campaign has its board in the same transaction | removed `ensureBoard` from `makeWaveCampaign` | `CreatorsLinkTest` | 1 red / restored green |

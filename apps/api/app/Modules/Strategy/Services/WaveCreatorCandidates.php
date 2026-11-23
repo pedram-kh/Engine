@@ -6,7 +6,6 @@ namespace App\Modules\Strategy\Services;
 
 use App\Modules\Agencies\Concerns\FiltersCreatorColumns;
 use App\Modules\Campaigns\Models\Campaign;
-use App\Modules\Campaigns\Services\BrandExclusivity;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Strategy\Http\Resources\WaveCreatorCard;
 use App\Modules\Strategy\Models\WaveCreator;
@@ -60,7 +59,6 @@ final class WaveCreatorCandidates
         ['applications' => $applications, 'assignments' => $assignments] = WaveCreatorSource::maps($wave, $campaign);
         $inWave = $ids === [] ? new Collection : WaveCreator::query()->where('wave_id', $wave->id)->whereIn('creator_id', $ids)->get(['creator_id', 'market_id'])->keyBy('creator_id');
         $marketUlids = $inWave->isEmpty() ? [] : WaveMarket::query()->where('wave_id', $wave->id)->pluck('ulid', 'id')->all();
-        $exclusive = app(BrandExclusivity::class)->conflictsFor($campaign, array_values($ids));
 
         $rows = [];
         foreach ($creators as $creator) {
@@ -73,7 +71,6 @@ final class WaveCreatorCandidates
                 'invited' => $assignments->has($creator->id),
                 'already_in_wave' => $slot !== null,
                 'in_market' => $slot === null ? null : ($marketUlids[$slot->market_id] ?? null),
-                'exclusive_elsewhere' => isset($exclusive[$creator->id]) ? ['campaign' => $exclusive[$creator->id]['campaign_ulid'], 'name' => $exclusive[$creator->id]['campaign_name']] : null,
             ];
         }
 
