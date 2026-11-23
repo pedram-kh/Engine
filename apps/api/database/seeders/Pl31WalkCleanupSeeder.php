@@ -67,6 +67,7 @@ final class Pl31WalkCleanupSeeder extends Seeder
             DB::table('agency_creator_relations')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('agency_creator_relations')->whereIn('creator_id', $creatorIds)->delete();
 
+            DB::table('admin_profiles')->whereIn('user_id', $userIds)->delete();
             DB::table('notifications')->whereIn('recipient_user_id', $userIds)->delete();
             DB::table('agency_users')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('agency_users')->whereIn('user_id', $userIds)->delete();

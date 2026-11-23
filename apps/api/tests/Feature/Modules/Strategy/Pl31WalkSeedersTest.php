@@ -30,7 +30,7 @@ function pl31WalkWave(string $name): Wave
 it('P1: seeds the logins and the second agency, leaves ALL flags off, and is idempotent', function (): void {
     $this->seed(Pl31WalkSeeder::class);
 
-    expect(User::query()->where('email', 'like', '%'.Pl31WalkSeeder::DOMAIN)->count())->toBe(3 + 13)
+    expect(User::query()->where('email', 'like', '%'.Pl31WalkSeeder::DOMAIN)->count())->toBe(3 + 1 + 13)
         ->and(User::query()->where('email', 'like', '%'.Pl31WalkSeeder::DOMAIN_B)->count())->toBe(1)
         ->and(Feature::active(WavesEnabled::NAME))->toBeFalse()
         ->and(Feature::active(StrategyEnabled::NAME))->toBeFalse()

@@ -395,6 +395,16 @@ function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUli
   .strategy-step__status {
     max-width: none;
   }
+  /* Only while step 5 is live (PL-3.1): its line ("Creators: 3 · 0 of 2 markets") wraps instead of running under
+     the next step. With the flag off nothing here applies, so the bar is the PL-2 bar. */
+  .strategy-stepper__list:has(.strategy-stepper__item:nth-child(5) .strategy-step--live)
+    .strategy-step {
+    min-width: 0;
+  }
+  .strategy-stepper__list:has(.strategy-stepper__item:nth-child(5) .strategy-step--live)
+    .strategy-step__status {
+    white-space: normal;
+  }
 }
 .strategy-step--off {
   cursor: default;

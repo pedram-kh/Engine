@@ -37,7 +37,7 @@ use RuntimeException;
 /**
  * PL-3.1 — local data for the Creators-step walk. Self-contained.
  *
- * Agency A "PL-3.1 Walk Agency A": admin@, manager@, staff@ (all `@pl31-walk.local`). Brands Bolt Food and Glovo.
+ * Agency A "PL-3.1 Walk Agency A": admin@, manager@, staff@ (all `@pl31-walk.local`), and platform@ (a platform admin). Brands Bolt Food and Glovo.
  *   - Wave "Creators Wave 1": two markets (Slovakia, and Nordics with SE, NO, DK, FI), linked to the for-a-wave campaign
  *       "Bolt Creators Campaign" (active and listed). Personas and approved concepts in both markets. The campaign has
  *       creators who applied, were invited, accepted and declined (see below); three are already in the wave (Slovakia).
@@ -78,6 +78,8 @@ final class Pl31WalkSeeder extends Seeder
     public const string MANAGER_EMAIL = 'manager'.self::DOMAIN;
 
     public const string STAFF_EMAIL = 'staff'.self::DOMAIN;
+
+    public const string PLATFORM_EMAIL = 'platform'.self::DOMAIN;
 
     public const string B_ADMIN_EMAIL = 'admin'.self::DOMAIN_B;
 
@@ -122,6 +124,9 @@ final class Pl31WalkSeeder extends Seeder
         $admin = User::factory()->agencyAdmin($agency)->create(['email' => self::ADMIN_EMAIL, 'name' => 'Ada Admin', 'password' => self::PASSWORD]);
         User::factory()->agencyManager($agency)->create(['email' => self::MANAGER_EMAIL, 'name' => 'Max Manager', 'password' => self::PASSWORD]);
         User::factory()->agencyStaff($agency)->create(['email' => self::STAFF_EMAIL, 'name' => 'Sam Staff', 'password' => self::PASSWORD]);
+
+        // A platform admin for the admin app (MFA is mandatory for them: the first sign-in walks the enrolment).
+        User::factory()->platformAdmin()->create(['email' => self::PLATFORM_EMAIL, 'name' => 'Pat Platform', 'password' => self::PASSWORD]);
 
         $bolt = Brand::factory()->forAgency($agency->id)->create(['name' => 'Bolt Food', 'slug' => 'pl31-bolt-food', 'color' => 'green']);
         $glovo = Brand::factory()->forAgency($agency->id)->create(['name' => 'Glovo', 'slug' => 'pl31-glovo', 'color' => 'amber']);
