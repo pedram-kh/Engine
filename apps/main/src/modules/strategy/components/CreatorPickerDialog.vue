@@ -71,8 +71,10 @@ let timer: ReturnType<typeof setTimeout> | null = null
 
 const single = computed(() => props.mode === 'replace')
 const initialCountries = computed(() => props.market?.countries ?? [])
+/** True when the campaign itself has nobody (found by a probe without the chips), so the empty state is "no applicants yet". */
+const campaignEmpty = ref(false)
 const filtered = computed(
-  () => q.value.trim() !== '' || countries.value.length !== initialCountries.value.length,
+  () => !campaignEmpty.value && (q.value.trim() !== '' || countries.value.length > 0),
 )
 const room = computed(() => Math.min(props.roomMarket, props.roomWave))
 const overCap = computed(() => !single.value && selected.value.length > room.value)
@@ -133,6 +135,23 @@ async function load(reset: boolean): Promise<void> {
     total.value = res.meta.total
     page.value = res.meta.page
     lastPage.value = res.meta.last_page
+    campaignEmpty.value = false
+    if (reset && res.meta.total === 0) {
+      if (q.value.trim() === '' && countries.value.length === 0) {
+        campaignEmpty.value = true
+      } else if (q.value.trim() === '') {
+        // Nobody under the market's countries: is the campaign empty, or is it the filter? One cheap look without the chips.
+        const probe = await strategyApi.creatorCandidates(props.scope, {
+          market: m.id,
+          q: '',
+          countries: [],
+          page: 1,
+          per_page: 1,
+        })
+        if (mine !== ticket) return
+        campaignEmpty.value = probe.meta.total === 0
+      }
+    }
   } catch (err) {
     if (mine === ticket) loadError.value = strategyErrorMessage(err, t)
   } finally {
@@ -153,6 +172,7 @@ watch(
     page.value = 1
     lastPage.value = 1
     selected.value = []
+    campaignEmpty.value = false
     personaId.value = null
     saving.value = false
     submitError.value = null

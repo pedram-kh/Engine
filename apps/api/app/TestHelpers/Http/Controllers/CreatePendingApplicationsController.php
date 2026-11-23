@@ -49,6 +49,9 @@ use Illuminate\Validation\ValidationException;
  *   - `applicants.*.note`           — string|null, optional (the applicant's note).
  *   - `campaign_name`               — string|null, optional.
  *   - `brand_name`                  — string|null, optional.
+ *   - `campaign_ulid`               — string|null, optional (PL-3.1): apply to THIS campaign of the agency (a for-a-wave
+ *                                     campaign the spec made) instead of creating a listed one; then `brand_name` and
+ *                                     `campaign_name` are ignored.
  *
  * Response (201):
  *   { "data": { "agency_ulid", "campaign_ulid", "campaign_name", "brand_name",
@@ -65,6 +68,7 @@ final class CreatePendingApplicationsController
                 'applicants.*.note' => ['nullable', 'string', 'max:1000'],
                 'campaign_name' => ['nullable', 'string', 'max:255'],
                 'brand_name' => ['nullable', 'string', 'max:255'],
+                'campaign_ulid' => ['nullable', 'string', 'size:26'],
             ]);
         } catch (ValidationException $e) {
             return new JsonResponse([
@@ -73,30 +77,42 @@ final class CreatePendingApplicationsController
             ], 422);
         }
 
-        /** @var Brand $brand */
-        $brand = Brand::factory()->forAgency($agency->id)->create([
-            'name' => $this->text($validated, 'brand_name', 'Northwind Coffee'),
-        ]);
+        $existing = is_string($validated['campaign_ulid'] ?? null)
+            ? Campaign::query()->withoutGlobalScopes()->where('agency_id', $agency->id)->where('ulid', $validated['campaign_ulid'])->first()
+            : null;
+        if (is_string($validated['campaign_ulid'] ?? null) && $existing === null) {
+            return new JsonResponse(['error' => 'unknown campaign for this agency'], 404);
+        }
 
-        /** @var Campaign $campaign */
-        $campaign = Campaign::factory()->create([
-            'agency_id' => $agency->id,
-            'brand_id' => $brand->id,
-            'name' => $this->text($validated, 'campaign_name', 'Autumn UGC push'),
-            'status' => CampaignStatus::Active,
-            'listed_on_jobs_board' => true,
-            // Stamped directly: this helper never routes through
-            // CampaignController::update(), which is where the flip detector
-            // normally stamps it.
-            'listed_at' => now(),
-            'listing_fee' => '€300 per video',
-            'listing_duration' => '4 weeks',
-            'listing_languages' => ['en', 'pt'],
-            'listing_regions' => ['PT', 'ES'],
-            // Never expires, so a long-lived branch cannot start failing the
-            // spec on a date rollover.
-            'ends_at' => null,
-        ]);
+        if ($existing !== null) {
+            $campaign = $existing;
+            $brand = Brand::query()->withoutGlobalScopes()->findOrFail($campaign->brand_id);
+        } else {
+            /** @var Brand $brand */
+            $brand = Brand::factory()->forAgency($agency->id)->create([
+                'name' => $this->text($validated, 'brand_name', 'Northwind Coffee'),
+            ]);
+
+            /** @var Campaign $campaign */
+            $campaign = Campaign::factory()->create([
+                'agency_id' => $agency->id,
+                'brand_id' => $brand->id,
+                'name' => $this->text($validated, 'campaign_name', 'Autumn UGC push'),
+                'status' => CampaignStatus::Active,
+                'listed_on_jobs_board' => true,
+                // Stamped directly: this helper never routes through
+                // CampaignController::update(), which is where the flip detector
+                // normally stamps it.
+                'listed_at' => now(),
+                'listing_fee' => '€300 per video',
+                'listing_duration' => '4 weeks',
+                'listing_languages' => ['en', 'pt'],
+                'listing_regions' => ['PT', 'ES'],
+                // Never expires, so a long-lived branch cannot start failing the
+                // spec on a date rollover.
+                'ends_at' => null,
+            ]);
+        }
 
         /** @var list<array<string, mixed>> $applicantsInput */
         $applicantsInput = $validated['applicants'];

@@ -408,6 +408,20 @@ describe('CreatorsStep (PL-3.1)', () => {
       expect(overlay('[data-test="creator-picker-campaign-link"]')).not.toBeNull()
     })
 
+    it('empty under the market chips: says "no creators match" when the campaign has people elsewhere, "no applicants" when it has none', async () => {
+      vi.mocked(strategyApi.creatorCandidates)
+        .mockResolvedValueOnce({ data: [], meta: meta(0) })
+        .mockResolvedValueOnce({ data: [makeCandidate(1)], meta: meta(1) })
+      await openPicker(makeCreatorsData([sk(1), makeCreatorMarket('RO', [])]))
+      expect(overlay('[data-test="creator-picker-empty"]')?.textContent).toContain(
+        'No creators match',
+      )
+      expect(vi.mocked(strategyApi.creatorCandidates).mock.calls[1]?.[1]).toMatchObject({
+        countries: [],
+        per_page: 1,
+      })
+    })
+
     it('replace: single select, one creator, the replace call and not the add call', async () => {
       vi.mocked(strategyApi.creatorCandidates).mockResolvedValue({
         data: [makeCandidate(1), makeCandidate(2)],

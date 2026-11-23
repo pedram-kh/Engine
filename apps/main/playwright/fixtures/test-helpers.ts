@@ -780,7 +780,7 @@ export async function seedPendingApplications(
   request: APIRequestContext,
   agencyUlid: string,
   applicants: SeedPendingApplicantInput[],
-  options: { campaignName?: string; brandName?: string } = {},
+  options: { campaignName?: string; brandName?: string; campaignUlid?: string } = {},
 ): Promise<SeedPendingApplicationsResult> {
   const response = await request.post(
     `http://127.0.0.1:8000/api/v1/_test/agencies/${agencyUlid}/pending-applications`,
@@ -793,6 +793,7 @@ export async function seedPendingApplications(
         })),
         campaign_name: options.campaignName ?? null,
         brand_name: options.brandName ?? null,
+        campaign_ulid: options.campaignUlid ?? null,
       },
     },
   )
