@@ -404,8 +404,8 @@ function onLinked(w: WaveResource): void {
       >
         {{
           roomMkt === 0
-            ? t('app.strategy.creators.errors.capMarket', { max: perMarket })
-            : t('app.strategy.creators.errors.capWave', { max: perWave })
+            ? t('app.strategy.creators.picker.maxMarket', { max: perMarket, market: marketName })
+            : t('app.strategy.creators.picker.maxWave', { max: perWave })
         }}
       </v-alert>
 

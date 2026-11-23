@@ -2009,8 +2009,8 @@
         "title": "Koncepti · {market}",
         "subtitle": "Do {max} koncepata po tržištu. Svaki se temelji na jednoj personi.",
         "add": "Dodaj koncept",
-        "tile": "{count} od {max} koncepata",
-        "tileMax": "Dosegnut maksimum: {count} od {max} koncepata",
+        "tile": "Koncepata: {count} | Koncepata: {count}",
+        "tileMax": "Dosegnut maksimum od {max} koncepata",
         "underMinimum": "Tržište {market} ima {count} od preporučenih {min} ili više koncepata.",
         "status": {
           "awaiting": "Čeka klijenta",
@@ -2151,7 +2151,8 @@
           "heading": "Kutovi persone {persona}"
         },
         "personaFilter": "Prikazani su samo koncepti persone {persona}.",
-        "showAll": "Prikaži sve"
+        "showAll": "Prikaži sve",
+        "upTo": "Do {max} koncepata po tržištu"
       },
       "completion": {
         "complete": "Dovršeno",
@@ -2310,10 +2311,13 @@
           "selected": "Odabrano: {count}",
           "assignPersona": "Dodijeli personu",
           "choosePerCreator": "Odaberi kasnije za svakog kreatora",
-          "add": "Dodaj kreatore ({count})",
+          "add": "Dodaj {count} kreatora | Dodaj {count} kreatora",
           "replaceWith": "Zamijeni",
-          "roomMarket": "Preostalo je {left} od {max} mjesta na ovom tržištu",
-          "roomWave": "Preostalo je {left} od {max} mjesta u ovom valu"
+          "inMarket": "Kreatora na tržištu {market}: {count} | Kreatora na tržištu {market}: {count}",
+          "upToMarket": "Do {max} kreatora po tržištu",
+          "upToWave": "Do {max} kreatora po valu",
+          "maxMarket": "Dosegnut je maksimum od {max} kreatora na tržištu {market}",
+          "maxWave": "Dosegnut je maksimum od {max} kreatora u ovom valu"
         },
         "errors": {
           "campaignRequired": "Ovaj val još nema kampanju. Prvo je povežite ili izradite.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "Kod {code} već se koristi na ovom tržištu.",
           "removeBlockedInWork": "Kartica ovog kreatora na ploči je već u produkciji. Prvo vratite karticu natrag."
         }
+      },
+      "limit": {
+        "placesLeft": "Preostalo mjesta: {count} | Preostalo mjesta: {count}"
       }
     }
   },

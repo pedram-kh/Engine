@@ -2009,8 +2009,8 @@
         "title": "Concepts · {market}",
         "subtitle": "Jusqu'à {max} concepts par marché. Chacun repose sur une persona.",
         "add": "Ajouter un concept",
-        "tile": "{count} concepts sur {max}",
-        "tileMax": "Maximum atteint : {count} concepts sur {max}",
+        "tile": "{count} concept | {count} concepts",
+        "tileMax": "Maximum de {max} concepts atteint",
         "underMinimum": "{market} compte {count} concepts sur les {min} ou plus que nous recommandons.",
         "status": {
           "awaiting": "En attente du client",
@@ -2151,7 +2151,8 @@
           "heading": "Angles de {persona}"
         },
         "personaFilter": "Seuls les concepts de {persona} sont affichés.",
-        "showAll": "Tout afficher"
+        "showAll": "Tout afficher",
+        "upTo": "Jusqu'à {max} concepts par marché"
       },
       "completion": {
         "complete": "Terminé",
@@ -2310,10 +2311,13 @@
           "selected": "Sélectionnés : {count}",
           "assignPersona": "Assigner un persona",
           "choosePerCreator": "Choisir plus tard par créateur",
-          "add": "Ajouter des créateurs ({count})",
+          "add": "Ajouter {count} créateur | Ajouter {count} créateurs",
           "replaceWith": "Remplacer",
-          "roomMarket": "Il reste {left} places sur {max} dans ce marché",
-          "roomWave": "Il reste {left} places sur {max} dans cette vague"
+          "inMarket": "{count} créateur sur {market} | {count} créateurs sur {market}",
+          "upToMarket": "Jusqu'à {max} créateurs par marché",
+          "upToWave": "Jusqu'à {max} créateurs par vague",
+          "maxMarket": "Maximum de {max} créateurs atteint sur {market}",
+          "maxWave": "Maximum de {max} créateurs atteint dans cette vague"
         },
         "errors": {
           "campaignRequired": "Cette vague n'a pas encore de campagne. Associe-en ou crées-en une d'abord.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "Le code {code} est déjà utilisé dans ce marché.",
           "removeBlockedInWork": "La carte de ce créateur est déjà en production sur le tableau. Replace d'abord la carte en arrière."
         }
+      },
+      "limit": {
+        "placesLeft": "{count} place restante | {count} places restantes"
       }
     }
   },

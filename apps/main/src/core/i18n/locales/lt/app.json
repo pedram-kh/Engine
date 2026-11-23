@@ -2009,8 +2009,8 @@
         "title": "Konceptai · {market}",
         "subtitle": "Iki {max} konceptų vienai rinkai. Kiekvienas grindžiamas viena persona.",
         "add": "Pridėti konceptą",
-        "tile": "{count} iš {max} konceptų",
-        "tileMax": "Pasiektas maksimumas: {count} iš {max} konceptų",
+        "tile": "Konceptų: {count} | Konceptų: {count}",
+        "tileMax": "Pasiektas {max} konceptų maksimumas",
         "underMinimum": "Rinkoje {market} yra {count} iš rekomenduojamų {min} ar daugiau konceptų.",
         "status": {
           "awaiting": "Laukiama kliento",
@@ -2151,7 +2151,8 @@
           "heading": "{persona} kampai"
         },
         "personaFilter": "Rodomos tik {persona} koncepcijos.",
-        "showAll": "Rodyti visas"
+        "showAll": "Rodyti visas",
+        "upTo": "Iki {max} konceptų vienai rinkai"
       },
       "completion": {
         "complete": "Užbaigta",
@@ -2310,10 +2311,13 @@
           "selected": "Pasirinkta: {count}",
           "assignPersona": "Priskirti personą",
           "choosePerCreator": "Pasirinkti vėliau kiekvienam kūrėjui",
-          "add": "Pridėti kūrėjų ({count})",
+          "add": "Pridėti kūrėjų: {count} | Pridėti kūrėjų: {count}",
           "replaceWith": "Pakeisti",
-          "roomMarket": "Šioje rinkoje liko {left} iš {max} vietų",
-          "roomWave": "Šioje bangoje liko {left} iš {max} vietų"
+          "inMarket": "Kūrėjų rinkoje {market}: {count} | Kūrėjų rinkoje {market}: {count}",
+          "upToMarket": "Iki {max} kūrėjų vienai rinkai",
+          "upToWave": "Iki {max} kūrėjų vienai bangai",
+          "maxMarket": "Rinkoje {market} pasiektas {max} kūrėjų maksimumas",
+          "maxWave": "Šioje bangoje pasiektas {max} kūrėjų maksimumas"
         },
         "errors": {
           "campaignRequired": "Ši banga dar neturi kampanijos. Pirmiausia susiekite arba sukurkite kampaniją.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "Kodas {code} šioje rinkoje jau naudojamas.",
           "removeBlockedInWork": "Šio kūrėjo kortelė lentoje jau gaminama. Pirmiausia grąžinkite kortelę atgal."
         }
+      },
+      "limit": {
+        "placesLeft": "Liko vietų: {count} | Liko vietų: {count}"
       }
     }
   },

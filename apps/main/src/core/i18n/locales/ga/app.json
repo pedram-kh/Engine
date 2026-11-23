@@ -2009,8 +2009,8 @@
         "title": "Coincheapa · {market}",
         "subtitle": "Suas le {max} coincheap in aghaidh an mhargaidh. Tá gach ceann bunaithe ar phearsa amháin.",
         "add": "Cuir coincheap leis",
-        "tile": "{count} as {max} coincheap",
-        "tileMax": "Sroichte an uastáth: {count} as {max} coincheap",
+        "tile": "Coincheapa: {count} | Coincheapa: {count}",
+        "tileMax": "Sroichte an uastáth de {max} coincheap",
         "underMinimum": "Tá {count} de na {min} coincheap nó níos mó molta ag {market}.",
         "status": {
           "awaiting": "Ag fanacht leis an gcliant",
@@ -2151,7 +2151,8 @@
           "heading": "Uillinneacha {persona}"
         },
         "personaFilter": "Ní thaispeántar ach coincheapa {persona}.",
-        "showAll": "Taispeáin gach ceann"
+        "showAll": "Taispeáin gach ceann",
+        "upTo": "Suas le {max} coincheap in aghaidh an mhargaidh"
       },
       "completion": {
         "complete": "Críochnaithe",
@@ -2307,13 +2308,16 @@
           "alreadyInMarket": "Sa tonn cheana · {market}",
           "applied": "Chuir sé iarratas isteach",
           "invited": "Tugtha cuireadh",
-          "selected": "Roghnaithe: {count}",
+          "selected": "{count} roghnaithe",
           "assignPersona": "Sann pearsa",
           "choosePerCreator": "Roghnaigh ina dhiaidh seo do gach cruthaitheoir",
-          "add": "Cuir cruthaitheoirí leis ({count})",
+          "add": "Cuir cruthaitheoirí leis: {count} | Cuir cruthaitheoirí leis: {count}",
           "replaceWith": "Ionadaigh",
-          "roomMarket": "Tá {left} as {max} áit fágtha sa mhargadh seo",
-          "roomWave": "Tá {left} as {max} áit fágtha sa tonn seo"
+          "inMarket": "Cruthaitheoirí i {market}: {count} | Cruthaitheoirí i {market}: {count}",
+          "upToMarket": "Suas le {max} cruthaitheoir in aghaidh an mhargaidh",
+          "upToWave": "Suas le {max} cruthaitheoir in aghaidh an tonn",
+          "maxMarket": "Sroichte an uastáth de {max} cruthaitheoir i {market}",
+          "maxWave": "Sroichte an uastáth de {max} cruthaitheoir sa tonn seo"
         },
         "errors": {
           "campaignRequired": "Níl feachtas ag an tonn seo fós. Nasc nó cruthaigh ceann ar dtús.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "Úsáidtear an cód {code} sa mhargadh seo cheana.",
           "removeBlockedInWork": "Tá cárta an chruthaitheora seo i léiriú cheana ar an mbord. Cuir an cárta ar ais ar dtús."
         }
+      },
+      "limit": {
+        "placesLeft": "Áiteanna fágtha: {count} | Áiteanna fágtha: {count}"
       }
     }
   },

@@ -6,7 +6,8 @@
  * is "Replace": one creator takes the slot, which keeps its code and persona and loses the old creator's decisions.
  *
  * What is eligible is the SERVER's rule (plan 1.5): a creator who is blacklisted, exclusive to another brand or erased is not
- * in this list, and the server refuses them again on add. The caps are shown before the request: "n left in this market".
+ * in this list, and the server refuses them again on add. The caps are shown before the request, but never as a target: the
+ * line says "n creators in <market>", and the ceiling only from 5 below it ("Up to 30 per market · n places left").
  * The dialog is rebuilt on every open (a counter keys the card), so a quick close and reopen leaves nothing behind.
  */
 import type {
@@ -22,6 +23,7 @@ import { creatorLabel } from '@/core/creators/creatorLabel'
 import { strategyApi, type WaveScope } from '../api/strategy.api'
 import { MENU_PROPS } from '../constants'
 import { selectable } from '../creatorsLogic'
+import { nearLimit } from '../limitLogic'
 import { strategyErrorMessage } from '../strategyErrors'
 import type { StrategyMarket } from '../useMarkets'
 import WaveCreatorCard from './WaveCreatorCard.vue'
@@ -78,15 +80,39 @@ const filtered = computed(
 )
 const room = computed(() => Math.min(props.roomMarket, props.roomWave))
 const overCap = computed(() => !single.value && selected.value.length > room.value)
-const capText = computed(() => {
-  if (single.value) return ''
-  if (props.roomMarket <= props.roomWave)
-    return t('app.strategy.creators.picker.roomMarket', {
-      left: props.roomMarket,
-      max: props.perMarket,
-    })
-  return t('app.strategy.creators.picker.roomWave', { left: props.roomWave, max: props.perWave })
+/** The line under the list. A ceiling is never shown as a target: normally the count, the ceiling only near it (F2). */
+const capLine = computed<{ text: string; state: 'normal' | 'near' | 'max' }>(() => {
+  const marketName = props.market?.name ?? ''
+  const used = props.perMarket - props.roomMarket
+  if (props.roomMarket === 0)
+    return {
+      text: t('app.strategy.creators.picker.maxMarket', {
+        max: props.perMarket,
+        market: marketName,
+      }),
+      state: 'max',
+    }
+  if (props.roomWave === 0)
+    return {
+      text: t('app.strategy.creators.picker.maxWave', { max: props.perWave }),
+      state: 'max',
+    }
+  if (nearLimit(props.roomWave) && props.roomWave < props.roomMarket)
+    return {
+      text: `${t('app.strategy.creators.picker.upToWave', { max: props.perWave })} · ${t('app.strategy.limit.placesLeft', { count: props.roomWave })}`,
+      state: 'near',
+    }
+  if (nearLimit(props.roomMarket))
+    return {
+      text: `${t('app.strategy.creators.picker.upToMarket', { max: props.perMarket })} · ${t('app.strategy.limit.placesLeft', { count: props.roomMarket })}`,
+      state: 'near',
+    }
+  return {
+    text: t('app.strategy.creators.picker.inMarket', { count: used, market: marketName }),
+    state: 'normal',
+  }
 })
+const capText = computed(() => (single.value ? '' : capLine.value.text))
 const names = computed(() => {
   const list = selected.value.map((c) =>
     creatorLabel(c, t, t('app.strategy.creators.card.unnamed')),
@@ -415,7 +441,8 @@ const title = computed(() =>
           <p
             v-if="capText"
             class="picker__cap"
-            :class="{ 'picker__cap--over': overCap }"
+            :class="{ 'picker__cap--over': overCap || capLine.state === 'max' }"
+            :data-state="capLine.state"
             role="status"
             data-test="creator-picker-cap"
           >
@@ -445,7 +472,9 @@ const title = computed(() =>
               {{
                 single
                   ? t('app.strategy.creators.picker.replaceWith')
-                  : t('app.strategy.creators.picker.add', { count: selected.length })
+                  : selected.length === 0
+                    ? t('app.strategy.creators.add')
+                    : t('app.strategy.creators.picker.add', { count: selected.length })
               }}
             </v-btn>
           </div>
@@ -456,7 +485,7 @@ const title = computed(() =>
 </template>
 
 <style scoped>
-/* Frame 13:2572: modal 1180 wide on #151516, 1 px border, radius 14; header padding 22 x 24; body padding 0 24 20, gap 14;
+/* Frame 13:2572: modal 1180 wide on the dark surface, 1 px border, radius 14; header padding 22 x 24; body padding 0 24 20, gap 14;
    footer 72 high, padding 16 x 24, a 1 px line above. */
 .picker {
   display: flex;

@@ -2009,8 +2009,8 @@
         "title": "Concepts · {market}",
         "subtitle": "Έως {max} concepts ανά αγορά. Κάθε ένα βασίζεται σε μία περσόνα.",
         "add": "Προσθήκη concept",
-        "tile": "{count} από {max} concepts",
-        "tileMax": "Έφτασε το μέγιστο: {count} από {max} concepts",
+        "tile": "{count} concept | {count} concepts",
+        "tileMax": "Έφτασε το μέγιστο των {max} concepts",
         "underMinimum": "Η αγορά {market} έχει {count} από τα {min} ή περισσότερα προτεινόμενα concepts.",
         "status": {
           "awaiting": "Αναμονή πελάτη",
@@ -2151,7 +2151,8 @@
           "heading": "Γωνίες του {persona}"
         },
         "personaFilter": "Εμφανίζονται μόνο οι ιδέες του {persona}.",
-        "showAll": "Εμφάνιση όλων"
+        "showAll": "Εμφάνιση όλων",
+        "upTo": "Έως {max} concepts ανά αγορά"
       },
       "completion": {
         "complete": "Ολοκληρωμένο",
@@ -2307,13 +2308,16 @@
           "alreadyInMarket": "Ήδη στο κύμα · {market}",
           "applied": "Υπέβαλε αίτηση",
           "invited": "Προσκεκλημένος",
-          "selected": "Επιλεγμένοι: {count}",
+          "selected": "{count} επιλεγμένοι",
           "assignPersona": "Ανάθεση περσόνας",
           "choosePerCreator": "Επιλογή αργότερα ανά δημιουργό",
-          "add": "Προσθήκη δημιουργών ({count})",
+          "add": "Προσθήκη {count} δημιουργού | Προσθήκη {count} δημιουργών",
           "replaceWith": "Αντικατάσταση",
-          "roomMarket": "Απομένουν {left} από {max} θέσεις σε αυτή την αγορά",
-          "roomWave": "Απομένουν {left} από {max} θέσεις σε αυτό το κύμα"
+          "inMarket": "{count} δημιουργός στην αγορά {market} | {count} δημιουργοί στην αγορά {market}",
+          "upToMarket": "Έως {max} δημιουργοί ανά αγορά",
+          "upToWave": "Έως {max} δημιουργοί ανά κύμα",
+          "maxMarket": "Έφτασε το μέγιστο των {max} δημιουργών στην αγορά {market}",
+          "maxWave": "Έφτασε το μέγιστο των {max} δημιουργών σε αυτό το κύμα"
         },
         "errors": {
           "campaignRequired": "Αυτό το κύμα δεν έχει ακόμη καμπάνια. Συνδέστε ή δημιουργήστε πρώτα μία.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "Ο κωδικός {code} χρησιμοποιείται ήδη σε αυτή την αγορά.",
           "removeBlockedInWork": "Η κάρτα αυτού του δημιουργού είναι ήδη σε παραγωγή στον πίνακα. Επαναφέρετε πρώτα την κάρτα."
         }
+      },
+      "limit": {
+        "placesLeft": "{count} θέση απομένει | {count} θέσεις απομένουν"
       }
     }
   },

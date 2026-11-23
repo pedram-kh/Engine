@@ -2009,8 +2009,8 @@
         "title": "Conceitos · {market}",
         "subtitle": "Até {max} conceitos por mercado. Cada um assenta numa persona.",
         "add": "Adicionar conceito",
-        "tile": "{count} de {max} conceitos",
-        "tileMax": "Máximo atingido: {count} de {max} conceitos",
+        "tile": "{count} conceito | {count} conceitos",
+        "tileMax": "Máximo de {max} conceitos atingido",
         "underMinimum": "{market} tem {count} dos {min} ou mais conceitos recomendados.",
         "status": {
           "awaiting": "A aguardar o cliente",
@@ -2151,7 +2151,8 @@
           "heading": "Ângulos de {persona}"
         },
         "personaFilter": "Só são mostrados os conceitos de {persona}.",
-        "showAll": "Mostrar todos"
+        "showAll": "Mostrar todos",
+        "upTo": "Até {max} conceitos por mercado"
       },
       "completion": {
         "complete": "Completo",
@@ -2310,10 +2311,13 @@
           "selected": "Selecionados: {count}",
           "assignPersona": "Atribuir persona",
           "choosePerCreator": "Escolher depois por criador",
-          "add": "Adicionar criadores ({count})",
+          "add": "Adicionar {count} criador | Adicionar {count} criadores",
           "replaceWith": "Substituir",
-          "roomMarket": "Restam {left} de {max} lugares neste mercado",
-          "roomWave": "Restam {left} de {max} lugares nesta onda"
+          "inMarket": "{count} criador em {market} | {count} criadores em {market}",
+          "upToMarket": "Até {max} criadores por mercado",
+          "upToWave": "Até {max} criadores por onda",
+          "maxMarket": "Máximo de {max} criadores atingido em {market}",
+          "maxWave": "Máximo de {max} criadores atingido nesta onda"
         },
         "errors": {
           "campaignRequired": "Esta onda ainda não tem campanha. Associa ou cria uma primeiro.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "O código {code} já é usado neste mercado.",
           "removeBlockedInWork": "O cartão deste criador já está em produção no quadro. Recua primeiro o cartão."
         }
+      },
+      "limit": {
+        "placesLeft": "Resta {count} lugar | Restam {count} lugares"
       }
     }
   },

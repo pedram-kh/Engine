@@ -16,6 +16,9 @@ const LOCALE_ROOT = path.resolve(__dirname, 'locales')
 const SOT = 'en'
 const TARGETS = UI_LOCALES.filter((locale) => locale !== SOT)
 
+/** F2: the count under the Add slot is a singular|plural pair (two forms, as en). */
+const PLURAL_KEYS = ['app.strategy.concepts.tile']
+
 const KEYS = [
   'app.strategy.stepper.conceptsNone',
   'app.strategy.stepper.conceptsStatus',
@@ -26,6 +29,7 @@ const KEYS = [
   'app.strategy.concepts.add',
   'app.strategy.concepts.tile',
   'app.strategy.concepts.tileMax',
+  'app.strategy.concepts.upTo',
   'app.strategy.concepts.underMinimum',
   'app.strategy.concepts.status.awaiting',
   'app.strategy.concepts.status.approved',
@@ -156,6 +160,8 @@ const KEYS = [
 
 /** `locale:key` pairs that are the same text as English on purpose (a product term, an address example), checked by hand. */
 const SAME_AS_ENGLISH_BY_DESIGN = new Set<string>([
+  'fr:app.strategy.concepts.tile',
+  'el:app.strategy.concepts.tile',
   'da:app.strategy.concepts.images.download', // "Download" is the Danish word too
   'bg:app.strategy.concepts.field.cta',
   'cs:app.strategy.concepts.field.hook',
@@ -264,8 +270,8 @@ function tokens(text: string): string[] {
 }
 
 describe('PL-2.3 concepts strings', () => {
-  it('checks 122 keys across 24 locales', () => {
-    expect(KEYS).toHaveLength(135)
+  it('checks 136 keys across 24 locales', () => {
+    expect(KEYS).toHaveLength(136)
     expect(new Set(KEYS).size).toBe(KEYS.length)
     expect(UI_LOCALES).toHaveLength(24)
   })
@@ -298,12 +304,13 @@ describe('PL-2.3 concepts strings', () => {
     expect(offenders).toEqual([])
   })
 
-  it('no key is a plural pair in any locale (the counts are not pluralised)', () => {
+  it('only the concept count is a plural pair (two forms) in any locale', () => {
     const offenders: string[] = []
     for (const locale of UI_LOCALES) {
       const bundle = load(locale)
       for (const key of KEYS) {
-        if ((valueAt(bundle, key) as string).includes('|')) offenders.push(`${locale}:${key}`)
+        const forms = (valueAt(bundle, key) as string).split('|').length
+        if (forms !== (PLURAL_KEYS.includes(key) ? 2 : 1)) offenders.push(`${locale}:${key}`)
       }
     }
     expect(offenders).toEqual([])

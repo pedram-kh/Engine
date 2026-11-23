@@ -2009,8 +2009,8 @@
         "title": "Koncepty · {market}",
         "subtitle": "Až {max} konceptů na trh. Každý stojí na jedné persóně.",
         "add": "Přidat koncept",
-        "tile": "{count} z {max} konceptů",
-        "tileMax": "Dosaženo maxima: {count} z {max} konceptů",
+        "tile": "Konceptů: {count} | Konceptů: {count}",
+        "tileMax": "Dosaženo maxima {max} konceptů",
         "underMinimum": "Trh {market} má {count} z doporučených {min} a více konceptů.",
         "status": {
           "awaiting": "Čeká na klienta",
@@ -2151,7 +2151,8 @@
           "heading": "Úhly persony {persona}"
         },
         "personaFilter": "Zobrazeny jsou jen koncepce persony {persona}.",
-        "showAll": "Zobrazit vše"
+        "showAll": "Zobrazit vše",
+        "upTo": "Až {max} konceptů na trh"
       },
       "completion": {
         "complete": "Dokončeno",
@@ -2307,13 +2308,16 @@
           "alreadyInMarket": "Už ve vlně · {market}",
           "applied": "Přihlášen",
           "invited": "Pozván",
-          "selected": "Vybráno: {count}",
+          "selected": "{count} vybráno",
           "assignPersona": "Přiřadit personu",
           "choosePerCreator": "Zvolit později u každého tvůrce",
-          "add": "Přidat tvůrce ({count})",
+          "add": "Přidat tvůrce: {count} | Přidat tvůrce: {count}",
           "replaceWith": "Nahradit",
-          "roomMarket": "Zbývá {left} z {max} míst na tomto trhu",
-          "roomWave": "Zbývá {left} z {max} míst v této vlně"
+          "inMarket": "Tvůrců na trhu {market}: {count} | Tvůrců na trhu {market}: {count}",
+          "upToMarket": "Až {max} tvůrců na trh",
+          "upToWave": "Až {max} tvůrců na vlnu",
+          "maxMarket": "Na trhu {market} je dosaženo maxima {max} tvůrců",
+          "maxWave": "V této vlně je dosaženo maxima {max} tvůrců"
         },
         "errors": {
           "campaignRequired": "Tato vlna zatím nemá kampaň. Nejprve nějakou propojte nebo vytvořte.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "Kód {code} se na tomto trhu už používá.",
           "removeBlockedInWork": "Karta tohoto tvůrce je na nástěnce už ve výrobě. Nejprve kartu vraťte zpět."
         }
+      },
+      "limit": {
+        "placesLeft": "Volných míst: {count} | Volných míst: {count}"
       }
     }
   },

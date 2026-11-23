@@ -2009,8 +2009,8 @@
         "title": "Koncepciók · {market}",
         "subtitle": "Piaconként legfeljebb {max} koncepció. Mindegyik egy perszónára épül.",
         "add": "Koncepció hozzáadása",
-        "tile": "{count} / {max} koncepció",
-        "tileMax": "Elérted a maximumot: {count} / {max} koncepció",
+        "tile": "{count} koncepció | {count} koncepció",
+        "tileMax": "Elérted a(z) {max} koncepciós maximumot",
         "underMinimum": "{market} piacon {count} van az ajánlott {min} vagy több koncepcióból.",
         "status": {
           "awaiting": "Az ügyfélre vár",
@@ -2151,7 +2151,8 @@
           "heading": "{persona} szögei"
         },
         "personaFilter": "Csak {persona} koncepciói láthatók.",
-        "showAll": "Összes megjelenítése"
+        "showAll": "Összes megjelenítése",
+        "upTo": "Piaconként legfeljebb {max} koncepció"
       },
       "completion": {
         "complete": "Befejezett",
@@ -2307,13 +2308,16 @@
           "alreadyInMarket": "Már a hullámban van · {market}",
           "applied": "Jelentkezett",
           "invited": "Meghívva",
-          "selected": "Kiválasztva: {count}",
+          "selected": "{count} kiválasztva",
           "assignPersona": "Perszóna hozzárendelése",
           "choosePerCreator": "Később, alkotónként választok",
-          "add": "Alkotók hozzáadása ({count})",
+          "add": "{count} alkotó hozzáadása | {count} alkotó hozzáadása",
           "replaceWith": "Csere",
-          "roomMarket": "Ezen a piacon {left} / {max} hely maradt",
-          "roomWave": "Ebben a hullámban {left} / {max} hely maradt"
+          "inMarket": "{count} alkotó itt: {market} | {count} alkotó itt: {market}",
+          "upToMarket": "Piaconként legfeljebb {max} alkotó",
+          "upToWave": "Hullámonként legfeljebb {max} alkotó",
+          "maxMarket": "Elérted a(z) {max} alkotós maximumot itt: {market}",
+          "maxWave": "Elérted a(z) {max} alkotós maximumot ebben a hullámban"
         },
         "errors": {
           "campaignRequired": "Ennek a hullámnak még nincs kampánya. Előbb kapcsolj hozzá vagy hozz létre egyet.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "A(z) {code} kód már használatban van ezen a piacon.",
           "removeBlockedInWork": "Ennek az alkotónak a kártyája a táblán már gyártásban van. Előbb vidd vissza a kártyát."
         }
+      },
+      "limit": {
+        "placesLeft": "{count} hely maradt | {count} hely maradt"
       }
     }
   },

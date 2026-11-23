@@ -2009,8 +2009,8 @@
         "title": "Koncepty · {market}",
         "subtitle": "Až {max} konceptov na trh. Každý stojí na jednej persóne.",
         "add": "Pridať koncept",
-        "tile": "{count} z {max} konceptov",
-        "tileMax": "Dosiahnuté maximum: {count} z {max} konceptov",
+        "tile": "Konceptov: {count} | Konceptov: {count}",
+        "tileMax": "Dosiahnuté maximum {max} konceptov",
         "underMinimum": "Trh {market} má {count} z odporúčaných {min} a viac konceptov.",
         "status": {
           "awaiting": "Čaká na klienta",
@@ -2151,7 +2151,8 @@
           "heading": "Uhly persóny {persona}"
         },
         "personaFilter": "Zobrazené sú len koncepcie persóny {persona}.",
-        "showAll": "Zobraziť všetko"
+        "showAll": "Zobraziť všetko",
+        "upTo": "Až {max} konceptov na trh"
       },
       "completion": {
         "complete": "Dokončené",
@@ -2310,10 +2311,13 @@
           "selected": "Vybrané: {count}",
           "assignPersona": "Priradiť personu",
           "choosePerCreator": "Vybrať neskôr pri každom tvorcovi",
-          "add": "Pridať tvorcov ({count})",
+          "add": "Pridať tvorcov: {count} | Pridať tvorcov: {count}",
           "replaceWith": "Nahradiť",
-          "roomMarket": "Zostáva {left} z {max} miest na tomto trhu",
-          "roomWave": "Zostáva {left} z {max} miest v tejto vlne"
+          "inMarket": "Tvorcov na trhu {market}: {count} | Tvorcov na trhu {market}: {count}",
+          "upToMarket": "Až {max} tvorcov na trh",
+          "upToWave": "Až {max} tvorcov na vlnu",
+          "maxMarket": "Na trhu {market} je dosiahnuté maximum {max} tvorcov",
+          "maxWave": "V tejto vlne je dosiahnuté maximum {max} tvorcov"
         },
         "errors": {
           "campaignRequired": "Táto vlna zatiaľ nemá kampaň. Najprv nejakú prepojte alebo vytvorte.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "Kód {code} sa na tomto trhu už používa.",
           "removeBlockedInWork": "Karta tohto tvorcu je na nástenke už vo výrobe. Najprv kartu vráťte späť."
         }
+      },
+      "limit": {
+        "placesLeft": "Voľných miest: {count} | Voľných miest: {count}"
       }
     }
   },

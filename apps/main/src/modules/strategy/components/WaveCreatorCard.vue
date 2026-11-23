@@ -418,6 +418,13 @@ const stamp = (iso: string): string => new Date(iso).toLocaleDateString()
         <span v-for="tag in tags" :key="tag" class="wcc__tag wcc__tag--sm">{{ tag }}</span>
         <span v-if="moreTags > 0" class="wcp__more">+{{ moreTags }}</span>
       </div>
+      <div class="wcp__status">
+        <AgencyStatusPill
+          :tone="statusTone(candidate.status)"
+          :label="t(`app.strategy.creators.status.${candidate.status}`)"
+          :data-test="`picker-status-${candidate.id}`"
+        />
+      </div>
       <div class="wcp__source">
         <span v-if="candidate.applied" class="wcp__src">{{
           t('app.strategy.creators.picker.applied')
@@ -431,7 +438,7 @@ const stamp = (iso: string): string => new Date(iso).toLocaleDateString()
 </template>
 
 <style scoped>
-/* Frame 13:2178: card 291 wide on #1b1b1d (surface), 1 px border, radius 10; photo 200; body padding 16, gap 10. */
+/* Frame 13:2178: card 291 wide on the surface fill, 1 px border, radius 10; photo 200; body padding 16, gap 10. */
 .wcc {
   display: flex;
   flex-direction: column;
@@ -783,11 +790,15 @@ const stamp = (iso: string): string => new Date(iso).toLocaleDateString()
   flex-wrap: wrap;
   gap: 5px;
 }
+.wcp__status {
+  display: flex;
+}
+/* The origin (how the creator joined the campaign) is secondary to the status pill: small, neutral. */
 .wcp__src {
-  padding: 2px 7px;
+  padding: 1px 6px;
+  border: 1px solid rgb(var(--v-theme-border-color));
   border-radius: 5px;
-  background: color-mix(in srgb, rgb(var(--v-theme-success)) 12%, transparent);
-  font-size: 11px;
-  color: rgb(var(--v-theme-success));
+  font-size: 10.5px;
+  color: rgb(var(--v-theme-on-surface-variant));
 }
 </style>

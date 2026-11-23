@@ -2009,8 +2009,8 @@
         "title": "Concepten · {market}",
         "subtitle": "Maximaal {max} concepten per markt. Elk is gebaseerd op één persona.",
         "add": "Concept toevoegen",
-        "tile": "{count} van {max} concepten",
-        "tileMax": "Maximum bereikt: {count} van {max} concepten",
+        "tile": "{count} concept | {count} concepten",
+        "tileMax": "Maximum van {max} concepten bereikt",
         "underMinimum": "{market} heeft {count} van de {min} of meer aanbevolen concepten.",
         "status": {
           "awaiting": "Wacht op klant",
@@ -2151,7 +2151,8 @@
           "heading": "Hoeken van {persona}"
         },
         "personaFilter": "Alleen de concepten van {persona} worden getoond.",
-        "showAll": "Alles tonen"
+        "showAll": "Alles tonen",
+        "upTo": "Maximaal {max} concepten per markt"
       },
       "completion": {
         "complete": "Voltooid",
@@ -2307,13 +2308,16 @@
           "alreadyInMarket": "Al in de golf · {market}",
           "applied": "Aangemeld",
           "invited": "Uitgenodigd",
-          "selected": "Geselecteerd: {count}",
+          "selected": "{count} geselecteerd",
           "assignPersona": "Persona toewijzen",
           "choosePerCreator": "Later per creator kiezen",
-          "add": "Creators toevoegen ({count})",
+          "add": "{count} creator toevoegen | {count} creators toevoegen",
           "replaceWith": "Vervangen",
-          "roomMarket": "Nog {left} van {max} plekken vrij in deze markt",
-          "roomWave": "Nog {left} van {max} plekken vrij in deze golf"
+          "inMarket": "{count} creator in {market} | {count} creators in {market}",
+          "upToMarket": "Maximaal {max} creators per markt",
+          "upToWave": "Maximaal {max} creators per golf",
+          "maxMarket": "Maximum van {max} creators bereikt in {market}",
+          "maxWave": "Maximum van {max} creators bereikt in deze golf"
         },
         "errors": {
           "campaignRequired": "Deze golf heeft nog geen campagne. Koppel of maak er eerst een.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "De code {code} wordt al gebruikt in deze markt.",
           "removeBlockedInWork": "De kaart van deze creator staat op het bord al in productie. Zet de kaart eerst terug."
         }
+      },
+      "limit": {
+        "placesLeft": "{count} plek vrij | {count} plekken vrij"
       }
     }
   },

@@ -2009,8 +2009,8 @@
         "title": "Concepts · {market}",
         "subtitle": "Up to {max} concepts per market. Each is built on one persona.",
         "add": "Add concept",
-        "tile": "{count} of {max} concepts",
-        "tileMax": "Maximum reached: {count} of {max} concepts",
+        "tile": "{count} concept | {count} concepts",
+        "tileMax": "Maximum of {max} concepts reached",
         "underMinimum": "{market} has {count} of the {min} or more concepts we recommend.",
         "status": {
           "awaiting": "Awaiting client",
@@ -2151,7 +2151,8 @@
           "heading": "Angles of {persona}"
         },
         "personaFilter": "Showing only the concepts of {persona}.",
-        "showAll": "Show all"
+        "showAll": "Show all",
+        "upTo": "Up to {max} concepts per market"
       },
       "completion": {
         "complete": "Complete",
@@ -2307,13 +2308,16 @@
           "alreadyInMarket": "Already in wave · {market}",
           "applied": "Applied",
           "invited": "Invited",
-          "selected": "Selected: {count}",
+          "selected": "{count} selected",
           "assignPersona": "Assign persona",
           "choosePerCreator": "Choose per creator later",
-          "add": "Add creators ({count})",
+          "add": "Add {count} creator | Add {count} creators",
           "replaceWith": "Replace",
-          "roomMarket": "{left} of {max} places left in this market",
-          "roomWave": "{left} of {max} places left in this wave"
+          "inMarket": "{count} creator in {market} | {count} creators in {market}",
+          "upToMarket": "Up to {max} creators per market",
+          "upToWave": "Up to {max} creators per wave",
+          "maxMarket": "Maximum of {max} creators reached in {market}",
+          "maxWave": "Maximum of {max} creators reached in this wave"
         },
         "errors": {
           "campaignRequired": "This wave has no campaign yet. Link or create one first.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "The code {code} is already used in this market.",
           "removeBlockedInWork": "This creator's card is already in production on the board. Move the card back first."
         }
+      },
+      "limit": {
+        "placesLeft": "{count} place left | {count} places left"
       }
     }
   },

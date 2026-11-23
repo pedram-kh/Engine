@@ -2009,8 +2009,8 @@
         "title": "Koncepti · {market}",
         "subtitle": "Do {max} konceptov na trg. Vsak temelji na eni personi.",
         "add": "Dodaj koncept",
-        "tile": "{count} od {max} konceptov",
-        "tileMax": "Dosežena omejitev: {count} od {max} konceptov",
+        "tile": "Konceptov: {count} | Konceptov: {count}",
+        "tileMax": "Dosežena omejitev {max} konceptov",
         "underMinimum": "Trg {market} ima {count} od priporočenih {min} ali več konceptov.",
         "status": {
           "awaiting": "Čaka na stranko",
@@ -2151,7 +2151,8 @@
           "heading": "Koti persone {persona}"
         },
         "personaFilter": "Prikazani so samo koncepti persone {persona}.",
-        "showAll": "Pokaži vse"
+        "showAll": "Pokaži vse",
+        "upTo": "Do {max} konceptov na trg"
       },
       "completion": {
         "complete": "Dokončano",
@@ -2310,10 +2311,13 @@
           "selected": "Izbrano: {count}",
           "assignPersona": "Dodeli persono",
           "choosePerCreator": "Izberi pozneje za vsakega ustvarjalca",
-          "add": "Dodaj ustvarjalce ({count})",
+          "add": "Dodaj ustvarjalce: {count} | Dodaj ustvarjalce: {count}",
           "replaceWith": "Zamenjaj",
-          "roomMarket": "Še {left} od {max} mest na tem trgu",
-          "roomWave": "Še {left} od {max} mest v tem valu"
+          "inMarket": "Ustvarjalcev na trgu {market}: {count} | Ustvarjalcev na trgu {market}: {count}",
+          "upToMarket": "Do {max} ustvarjalcev na trg",
+          "upToWave": "Do {max} ustvarjalcev na val",
+          "maxMarket": "Na trgu {market} je dosežena omejitev {max} ustvarjalcev",
+          "maxWave": "V tem valu je dosežena omejitev {max} ustvarjalcev"
         },
         "errors": {
           "campaignRequired": "Ta val še nima kampanje. Najprej jo povežite ali ustvarite.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "Koda {code} se na tem trgu že uporablja.",
           "removeBlockedInWork": "Kartica tega ustvarjalca je na tabli že v produkciji. Kartico najprej vrnite nazaj."
         }
+      },
+      "limit": {
+        "placesLeft": "Prostih mest: {count} | Prostih mest: {count}"
       }
     }
   },

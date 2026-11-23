@@ -2009,8 +2009,8 @@
         "title": "Konzepte · {market}",
         "subtitle": "Bis zu {max} Konzepte pro Markt. Jedes basiert auf einer Persona.",
         "add": "Konzept hinzufügen",
-        "tile": "{count} von {max} Konzepten",
-        "tileMax": "Maximum erreicht: {count} von {max} Konzepten",
+        "tile": "{count} Konzept | {count} Konzepte",
+        "tileMax": "Maximal {max} Konzepte erreicht",
         "underMinimum": "{market} hat {count} der empfohlenen {min} oder mehr Konzepte.",
         "status": {
           "awaiting": "Wartet auf den Kunden",
@@ -2151,7 +2151,8 @@
           "heading": "Winkel von {persona}"
         },
         "personaFilter": "Es werden nur die Konzepte von {persona} angezeigt.",
-        "showAll": "Alle anzeigen"
+        "showAll": "Alle anzeigen",
+        "upTo": "Bis zu {max} Konzepte pro Markt"
       },
       "completion": {
         "complete": "Abgeschlossen",
@@ -2307,13 +2308,16 @@
           "alreadyInMarket": "Bereits in der Welle · {market}",
           "applied": "Beworben",
           "invited": "Eingeladen",
-          "selected": "Ausgewählt: {count}",
+          "selected": "{count} ausgewählt",
           "assignPersona": "Persona zuordnen",
           "choosePerCreator": "Später pro Creator wählen",
-          "add": "Creator hinzufügen ({count})",
+          "add": "{count} Creator hinzufügen | {count} Creator hinzufügen",
           "replaceWith": "Ersetzen",
-          "roomMarket": "Noch {left} von {max} Plätzen in diesem Markt frei",
-          "roomWave": "Noch {left} von {max} Plätzen in dieser Welle frei"
+          "inMarket": "{count} Creator in {market} | {count} Creator in {market}",
+          "upToMarket": "Bis zu {max} Creator pro Markt",
+          "upToWave": "Bis zu {max} Creator pro Welle",
+          "maxMarket": "Maximal {max} Creator in {market} erreicht",
+          "maxWave": "Maximal {max} Creator in dieser Welle erreicht"
         },
         "errors": {
           "campaignRequired": "Diese Welle hat noch keine Kampagne. Verknüpfe oder erstelle zuerst eine.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "Der Code {code} wird in diesem Markt bereits verwendet.",
           "removeBlockedInWork": "Die Karte dieses Creators ist im Board bereits in Produktion. Verschiebe die Karte zuerst zurück."
         }
+      },
+      "limit": {
+        "placesLeft": "{count} Platz frei | {count} Plätze frei"
       }
     }
   },

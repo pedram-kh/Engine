@@ -2009,8 +2009,8 @@
         "title": "Koncepter · {market}",
         "subtitle": "Op til {max} koncepter pr. marked. Hvert koncept bygger på én persona.",
         "add": "Tilføj koncept",
-        "tile": "{count} af {max} koncepter",
-        "tileMax": "Maksimum nået: {count} af {max} koncepter",
+        "tile": "{count} koncept | {count} koncepter",
+        "tileMax": "Maksimum på {max} koncepter er nået",
         "underMinimum": "{market} har {count} af de {min} eller flere koncepter, vi anbefaler.",
         "status": {
           "awaiting": "Afventer kunden",
@@ -2151,7 +2151,8 @@
           "heading": "Vinkler for {persona}"
         },
         "personaFilter": "Viser kun koncepter for {persona}.",
-        "showAll": "Vis alle"
+        "showAll": "Vis alle",
+        "upTo": "Op til {max} koncepter pr. marked"
       },
       "completion": {
         "complete": "Gennemført",
@@ -2307,13 +2308,16 @@
           "alreadyInMarket": "Allerede i bølgen · {market}",
           "applied": "Ansøgt",
           "invited": "Inviteret",
-          "selected": "Valgt: {count}",
+          "selected": "{count} valgt",
           "assignPersona": "Tildel persona",
           "choosePerCreator": "Vælg pr. creator senere",
-          "add": "Tilføj creators ({count})",
+          "add": "Tilføj {count} creator | Tilføj {count} creators",
           "replaceWith": "Udskift",
-          "roomMarket": "{left} af {max} pladser tilbage på dette marked",
-          "roomWave": "{left} af {max} pladser tilbage i denne bølge"
+          "inMarket": "{count} creator på {market} | {count} creators på {market}",
+          "upToMarket": "Op til {max} creators pr. marked",
+          "upToWave": "Op til {max} creators pr. bølge",
+          "maxMarket": "Maksimum på {max} creators er nået på {market}",
+          "maxWave": "Maksimum på {max} creators er nået i denne bølge"
         },
         "errors": {
           "campaignRequired": "Denne bølge har ingen kampagne endnu. Knyt eller opret en først.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "Koden {code} bruges allerede på dette marked.",
           "removeBlockedInWork": "Denne creators kort er allerede i produktion på tavlen. Flyt først kortet tilbage."
         }
+      },
+      "limit": {
+        "placesLeft": "{count} plads tilbage | {count} pladser tilbage"
       }
     }
   },

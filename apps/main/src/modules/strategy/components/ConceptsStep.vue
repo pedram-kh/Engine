@@ -31,6 +31,7 @@ import { strategyApi } from '../api/strategy.api'
 import { bannerState, marketCounts, nextFunnelNote, showUnderMinimum } from '../conceptsLogic'
 import { provideConfirmReset } from '../composables/confirmReset'
 import { useStrategyContext } from '../composables/useStrategyContext'
+import { nearLimit } from '../limitLogic'
 import { isGone, strategyErrorMessage } from '../strategyErrors'
 import ConceptCard from './ConceptCard.vue'
 import ConceptDecisionDialog from './ConceptDecisionDialog.vue'
@@ -78,6 +79,14 @@ const counts = computed(
 )
 const total = computed(() => concepts.value.length)
 const atMax = computed(() => total.value >= limits.value.concept_max_per_market)
+/** The line under the Add slot. The ceiling is not a target: the count alone, the ceiling only from 25 of 30 (PL-3.1 F2). */
+const tileText = computed(() => {
+  const max = limits.value.concept_max_per_market
+  if (atMax.value) return t('app.strategy.concepts.tileMax', { max })
+  if (nearLimit(max - total.value))
+    return `${t('app.strategy.concepts.upTo', { max })} · ${t('app.strategy.limit.placesLeft', { count: max - total.value })}`
+  return t('app.strategy.concepts.tile', { count: total.value })
+})
 const banner = computed(() => bannerState(counts.value))
 const underMinimum = computed(() =>
   showUnderMinimum(counts.value, limits.value.concept_min_recommended),
@@ -473,17 +482,7 @@ const deleteBody = computed(() => {
           /></span>
           <span class="concept-tile__title">{{ t('app.strategy.concepts.add') }}</span>
           <span class="concept-tile__count" data-test="concept-tile-text">
-            {{
-              atMax
-                ? t('app.strategy.concepts.tileMax', {
-                    count: total,
-                    max: limits.concept_max_per_market,
-                  })
-                : t('app.strategy.concepts.tile', {
-                    count: total,
-                    max: limits.concept_max_per_market,
-                  })
-            }}
+            {{ tileText }}
           </span>
         </button>
       </div>

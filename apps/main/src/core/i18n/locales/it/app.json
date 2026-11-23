@@ -2009,8 +2009,8 @@
         "title": "Concept · {market}",
         "subtitle": "Fino a {max} concept per mercato. Ognuno si basa su una persona.",
         "add": "Aggiungi concept",
-        "tile": "{count} concept su {max}",
-        "tileMax": "Massimo raggiunto: {count} concept su {max}",
+        "tile": "{count} concept | {count} concept",
+        "tileMax": "Raggiunto il massimo di {max} concept",
         "underMinimum": "{market} ha {count} dei {min} o più concept consigliati.",
         "status": {
           "awaiting": "In attesa del cliente",
@@ -2151,7 +2151,8 @@
           "heading": "Angoli di {persona}"
         },
         "personaFilter": "Sono mostrati solo i concept di {persona}.",
-        "showAll": "Mostra tutti"
+        "showAll": "Mostra tutti",
+        "upTo": "Fino a {max} concept per mercato"
       },
       "completion": {
         "complete": "Completato",
@@ -2310,10 +2311,13 @@
           "selected": "Selezionati: {count}",
           "assignPersona": "Assegna persona",
           "choosePerCreator": "Scegli più tardi per creator",
-          "add": "Aggiungi creator ({count})",
+          "add": "Aggiungi {count} creator | Aggiungi {count} creator",
           "replaceWith": "Sostituisci",
-          "roomMarket": "Restano {left} posti su {max} in questo mercato",
-          "roomWave": "Restano {left} posti su {max} in questa ondata"
+          "inMarket": "{count} creator in {market} | {count} creator in {market}",
+          "upToMarket": "Fino a {max} creator per mercato",
+          "upToWave": "Fino a {max} creator per ondata",
+          "maxMarket": "Raggiunto il massimo di {max} creator in {market}",
+          "maxWave": "Raggiunto il massimo di {max} creator in questa ondata"
         },
         "errors": {
           "campaignRequired": "Questa ondata non ha ancora una campagna. Collegane o creane una prima.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "Il codice {code} è già usato in questo mercato.",
           "removeBlockedInWork": "La scheda di questo creator è già in produzione sulla bacheca. Riporta prima indietro la scheda."
         }
+      },
+      "limit": {
+        "placesLeft": "{count} posto rimasto | {count} posti rimasti"
       }
     }
   },

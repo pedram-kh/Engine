@@ -196,10 +196,22 @@ describe('ConceptsStep (PL-2.3)', () => {
     const w = await mountStep(list)
     expect(w.get('[data-test="concept-add"]').attributes('disabled')).toBeDefined()
     expect(w.get('[data-test="concept-tile"]').attributes('disabled')).toBeDefined()
-    expect(w.get('[data-test="concept-tile-text"]').text()).toBe(
-      'Maximum reached: 30 of 30 concepts',
-    )
+    expect(w.get('[data-test="concept-tile-text"]').text()).toBe('Maximum of 30 concepts reached')
     w.unmount()
+  })
+
+  it('F2: the tile shows the count without a ceiling until 25, then the ceiling and the places left', async () => {
+    const tile = async (n: number): Promise<string> => {
+      const list = Array.from({ length: n }, (_, i) => makeConcept(i + 1, persona))
+      const w = await mountStep(list)
+      const text = w.get('[data-test="concept-tile-text"]').text()
+      w.unmount()
+      return text
+    }
+    expect(await tile(1)).toBe('1 concept')
+    expect(await tile(24)).toBe('24 concepts')
+    expect(await tile(25)).toBe('Up to 30 concepts per market · 5 places left')
+    expect(await tile(29)).toBe('Up to 30 concepts per market · 1 place left')
   })
 
   it('cards: Approved shows who and when; Changes requested shows the comment and is marked; both draw text, never HTML', async () => {

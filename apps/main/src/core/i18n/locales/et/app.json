@@ -2009,8 +2009,8 @@
         "title": "Kontseptsioonid · {market}",
         "subtitle": "Kuni {max} kontseptsiooni turu kohta. Igaüks põhineb ühel personal.",
         "add": "Lisa kontseptsioon",
-        "tile": "{count}/{max} kontseptsiooni",
-        "tileMax": "Maksimum täis: {count}/{max} kontseptsiooni",
+        "tile": "{count} kontseptsioon | {count} kontseptsiooni",
+        "tileMax": "Maksimum {max} kontseptsiooni täis",
         "underMinimum": "Turul {market} on {count} soovitatud {min} või enamast kontseptsioonist.",
         "status": {
           "awaiting": "Ootab klienti",
@@ -2151,7 +2151,8 @@
           "heading": "Persoona {persona} nurgad"
         },
         "personaFilter": "Kuvatakse ainult persoona {persona} kontseptsioonid.",
-        "showAll": "Näita kõiki"
+        "showAll": "Näita kõiki",
+        "upTo": "Kuni {max} kontseptsiooni turu kohta"
       },
       "completion": {
         "complete": "Lõpetatud",
@@ -2307,13 +2308,16 @@
           "alreadyInMarket": "Juba lainel · {market}",
           "applied": "Taotles",
           "invited": "Kutsutud",
-          "selected": "Valitud: {count}",
+          "selected": "{count} valitud",
           "assignPersona": "Määra persona",
           "choosePerCreator": "Vali hiljem looja kaupa",
-          "add": "Lisa loojaid ({count})",
+          "add": "Lisa {count} looja | Lisa {count} loojat",
           "replaceWith": "Asenda",
-          "roomMarket": "Sellel turul on {left} / {max} kohta vaba",
-          "roomWave": "Sellel lainel on {left} / {max} kohta vaba"
+          "inMarket": "{count} looja turul {market} | {count} loojat turul {market}",
+          "upToMarket": "Kuni {max} loojat turu kohta",
+          "upToWave": "Kuni {max} loojat laine kohta",
+          "maxMarket": "Turul {market} on maksimum {max} loojat täis",
+          "maxWave": "Sellel lainel on maksimum {max} loojat täis"
         },
         "errors": {
           "campaignRequired": "Sellel lainel pole veel kampaaniat. Seo või loo see kõigepealt.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "Kood {code} on sellel turul juba kasutusel.",
           "removeBlockedInWork": "Selle looja kaart on tahvlil juba tootmises. Liiguta kaart kõigepealt tagasi."
         }
+      },
+      "limit": {
+        "placesLeft": "{count} koht vaba | {count} kohta vaba"
       }
     }
   },

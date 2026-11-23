@@ -2009,8 +2009,8 @@
         "title": "Konseptit · {market}",
         "subtitle": "Enintään {max} konseptia markkinaa kohti. Jokainen perustuu yhteen persoonaan.",
         "add": "Lisää konsepti",
-        "tile": "{count}/{max} konseptia",
-        "tileMax": "Enimmäismäärä saavutettu: {count}/{max} konseptia",
+        "tile": "{count} konsepti | {count} konseptia",
+        "tileMax": "Enimmäismäärä {max} konseptia saavutettu",
         "underMinimum": "Markkinalla {market} on {count} suositellusta {min} tai useammasta konseptista.",
         "status": {
           "awaiting": "Odottaa asiakasta",
@@ -2151,7 +2151,8 @@
           "heading": "Persoonan {persona} kulmat"
         },
         "personaFilter": "Näytetään vain persoonan {persona} konseptit.",
-        "showAll": "Näytä kaikki"
+        "showAll": "Näytä kaikki",
+        "upTo": "Enintään {max} konseptia markkinaa kohti"
       },
       "completion": {
         "complete": "Valmis",
@@ -2307,13 +2308,16 @@
           "alreadyInMarket": "Jo aallossa · {market}",
           "applied": "Hakenut",
           "invited": "Kutsuttu",
-          "selected": "Valittu: {count}",
+          "selected": "{count} valittu",
           "assignPersona": "Määritä persoona",
           "choosePerCreator": "Valitse myöhemmin tekijäkohtaisesti",
-          "add": "Lisää tekijöitä ({count})",
+          "add": "Lisää {count} tekijä | Lisää {count} tekijää",
           "replaceWith": "Vaihda",
-          "roomMarket": "Tällä markkinalla on {left} / {max} paikkaa jäljellä",
-          "roomWave": "Tässä aallossa on {left} / {max} paikkaa jäljellä"
+          "inMarket": "{count} tekijä markkinalla {market} | {count} tekijää markkinalla {market}",
+          "upToMarket": "Enintään {max} tekijää markkinaa kohti",
+          "upToWave": "Enintään {max} tekijää aaltoa kohti",
+          "maxMarket": "Markkinalla {market} on enimmäismäärä {max} tekijää saavutettu",
+          "maxWave": "Tässä aallossa on enimmäismäärä {max} tekijää saavutettu"
         },
         "errors": {
           "campaignRequired": "Tällä aallolla ei ole vielä kampanjaa. Yhdistä tai luo ensin kampanja.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "Koodi {code} on jo käytössä tällä markkinalla.",
           "removeBlockedInWork": "Tämän tekijän kortti on taulussa jo tuotannossa. Siirrä kortti ensin takaisin."
         }
+      },
+      "limit": {
+        "placesLeft": "{count} paikka jäljellä | {count} paikkaa jäljellä"
       }
     }
   },

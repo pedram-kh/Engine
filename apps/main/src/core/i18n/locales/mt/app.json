@@ -2009,8 +2009,8 @@
         "title": "Kunċetti · {market}",
         "subtitle": "Sa {max} kunċetti għal kull suq. Kull wieħed huwa bbażat fuq persuna waħda.",
         "add": "Żid kunċett",
-        "tile": "{count} minn {max} kunċetti",
-        "tileMax": "Intlaħaq il-massimu: {count} minn {max} kunċetti",
+        "tile": "Kunċetti: {count} | Kunċetti: {count}",
+        "tileMax": "Intlaħaq il-massimu ta' {max} kunċetti",
         "underMinimum": "{market} għandu {count} mill-{min} kunċetti jew aktar rakkomandati.",
         "status": {
           "awaiting": "Qed jistenna lill-klijent",
@@ -2151,7 +2151,8 @@
           "heading": "Angoli ta' {persona}"
         },
         "personaFilter": "Qed jintwerew biss il-kunċetti ta' {persona}.",
-        "showAll": "Uri kollha"
+        "showAll": "Uri kollha",
+        "upTo": "Sa {max} kunċetti għal kull suq"
       },
       "completion": {
         "complete": "Komplut",
@@ -2310,10 +2311,13 @@
           "selected": "Magħżula: {count}",
           "assignPersona": "Assenja persunaġġ",
           "choosePerCreator": "Agħżel aktar tard għal kull kreatur",
-          "add": "Żid kreaturi ({count})",
+          "add": "Żid kreaturi: {count} | Żid kreaturi: {count}",
           "replaceWith": "Ibdel",
-          "roomMarket": "Fadal {left} minn {max} postijiet f'dan is-suq",
-          "roomWave": "Fadal {left} minn {max} postijiet f'din il-mewġa"
+          "inMarket": "Kreaturi f'{market}: {count} | Kreaturi f'{market}: {count}",
+          "upToMarket": "Sa {max} kreaturi għal kull suq",
+          "upToWave": "Sa {max} kreaturi għal kull mewġa",
+          "maxMarket": "Intlaħaq il-massimu ta' {max} kreaturi f'{market}",
+          "maxWave": "Intlaħaq il-massimu ta' {max} kreaturi f'din il-mewġa"
         },
         "errors": {
           "campaignRequired": "Din il-mewġa għad m'għandhiex kampanja. Qabbad jew oħloq waħda l-ewwel.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "Il-kodiċi {code} diġà jintuża f'dan is-suq.",
           "removeBlockedInWork": "Il-karta ta' dan il-kreatur diġà qiegħda fil-produzzjoni fuq il-bord. Erġa' l-karta lura l-ewwel."
         }
+      },
+      "limit": {
+        "placesLeft": "Postijiet li fadal: {count} | Postijiet li fadal: {count}"
       }
     }
   },

@@ -2009,8 +2009,8 @@
         "title": "Concepte · {market}",
         "subtitle": "Până la {max} concepte pe piață. Fiecare se bazează pe o persona.",
         "add": "Adaugă concept",
-        "tile": "{count} din {max} concepte",
-        "tileMax": "Maximum atins: {count} din {max} concepte",
+        "tile": "Concepte: {count} | Concepte: {count}",
+        "tileMax": "Maximum de {max} concepte atins",
         "underMinimum": "{market} are {count} din cele {min} sau mai multe concepte recomandate.",
         "status": {
           "awaiting": "În așteptarea clientului",
@@ -2151,7 +2151,8 @@
           "heading": "Unghiurile persoanei {persona}"
         },
         "personaFilter": "Sunt afișate doar conceptele persoanei {persona}.",
-        "showAll": "Afișează tot"
+        "showAll": "Afișează tot",
+        "upTo": "Până la {max} concepte pe piață"
       },
       "completion": {
         "complete": "Finalizat",
@@ -2310,10 +2311,13 @@
           "selected": "Selectați: {count}",
           "assignPersona": "Atribuie persona",
           "choosePerCreator": "Alege mai târziu pentru fiecare creator",
-          "add": "Adaugă creatori ({count})",
+          "add": "Adaugă creatori: {count} | Adaugă creatori: {count}",
           "replaceWith": "Înlocuiește",
-          "roomMarket": "Au rămas {left} din {max} locuri pe această piață",
-          "roomWave": "Au rămas {left} din {max} locuri în acest val"
+          "inMarket": "Creatori pe piața {market}: {count} | Creatori pe piața {market}: {count}",
+          "upToMarket": "Până la {max} creatori pe piață",
+          "upToWave": "Până la {max} creatori pe val",
+          "maxMarket": "Maximum de {max} creatori atins pe piața {market}",
+          "maxWave": "Maximum de {max} creatori atins în acest val"
         },
         "errors": {
           "campaignRequired": "Acest val nu are încă o campanie. Asociază sau creează mai întâi una.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "Codul {code} este deja folosit pe această piață.",
           "removeBlockedInWork": "Cardul acestui creator este deja în producție pe tablă. Mută mai întâi cardul înapoi."
         }
+      },
+      "limit": {
+        "placesLeft": "Locuri rămase: {count} | Locuri rămase: {count}"
       }
     }
   },

@@ -2009,8 +2009,8 @@
         "title": "Koncept · {market}",
         "subtitle": "Upp till {max} koncept per marknad. Varje koncept bygger på en persona.",
         "add": "Lägg till koncept",
-        "tile": "{count} av {max} koncept",
-        "tileMax": "Maxgränsen är nådd: {count} av {max} koncept",
+        "tile": "{count} koncept | {count} koncept",
+        "tileMax": "Maxgränsen på {max} koncept är nådd",
         "underMinimum": "{market} har {count} av de {min} eller fler koncept vi rekommenderar.",
         "status": {
           "awaiting": "Väntar på kunden",
@@ -2151,7 +2151,8 @@
           "heading": "Vinklar för {persona}"
         },
         "personaFilter": "Visar bara koncept för {persona}.",
-        "showAll": "Visa alla"
+        "showAll": "Visa alla",
+        "upTo": "Upp till {max} koncept per marknad"
       },
       "completion": {
         "complete": "Slutförd",
@@ -2310,10 +2311,13 @@
           "selected": "Valda: {count}",
           "assignPersona": "Tilldela persona",
           "choosePerCreator": "Välj per creator senare",
-          "add": "Lägg till creators ({count})",
+          "add": "Lägg till {count} creator | Lägg till {count} creators",
           "replaceWith": "Byt ut",
-          "roomMarket": "{left} av {max} platser kvar på den här marknaden",
-          "roomWave": "{left} av {max} platser kvar i den här vågen"
+          "inMarket": "{count} creator i {market} | {count} creators i {market}",
+          "upToMarket": "Upp till {max} creators per marknad",
+          "upToWave": "Upp till {max} creators per våg",
+          "maxMarket": "Maxgränsen på {max} creators är nådd i {market}",
+          "maxWave": "Maxgränsen på {max} creators är nådd i den här vågen"
         },
         "errors": {
           "campaignRequired": "Den här vågen har ingen kampanj än. Koppla eller skapa en först.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "Koden {code} används redan på den här marknaden.",
           "removeBlockedInWork": "Den här creatorns kort är redan i produktion på tavlan. Flytta först tillbaka kortet."
         }
+      },
+      "limit": {
+        "placesLeft": "{count} plats kvar | {count} platser kvar"
       }
     }
   },

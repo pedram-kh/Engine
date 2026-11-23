@@ -64,3 +64,76 @@ worktree on the same API and data, then removed) against the built tip, five pag
 Normalised HTML of `main` **byte-identical on all five**, full-page screenshots **byte-identical on all five**.
 The first pass found one difference: the first stepper CSS fix wrapped the status line of steps 5 and 6 while the flag was off (the
 notes panel's `max-height` moved by 28px). The rule is now scoped with `:has()` to a live step 5; the second pass is the identical result above.
+
+## Stage 2 (web): the walk result (Pedram, 2026-11-23 and 24)
+
+Walked locally on `pl31_walk`, steps 1 to 20: **all passed.** Three improvements asked (F1 to F3), rulings recorded, close-out.
+Walk-script corrections for the record: **Pia and Tomáš are not seeded in the wave and must be added first** (they are invitees on the
+campaign, not wave creators); **"hidden" is the creator Hana Skrytá** (applied, not discoverable, and she does appear).
+
+## Stage 2 (web): the improvements
+
+- **F1, the picker card shows the creator's current status.** The candidate payload already carried the derived status (the same four as
+  the wave cards: Shortlisted, Contacted, Confirmed, Declined, from the same rule), so this is a card change only. The pill is the first
+  line under the tags; **kept:** the origin (Applied, Invited) as a smaller neutral tag under it (it was green and competed with the
+  pill). **A declined creator can still be picked:** `selectable()` (`creatorsLogic.ts`) refuses only a creator already in the wave or an
+  erased account, never a declined one; that is unchanged, and a test pins it (W26).
+- **F2, a ceiling is not shown as a target.** The picker's line under the list: normally **"n creators in <market>"** (no number of
+  places); from **25 of 30** (5 places or fewer) **"Up to 30 creators per market · n places left"**; at 30 **"Maximum of 30 creators
+  reached in <market>"** and Add is off. The wave cap of 100 follows the same pattern when it is the nearer ceiling (**95 or more**
+  of 100, "Up to 100 creators per wave · n places left"; at 100 "Maximum of 100 creators reached in this wave"). The step's own
+  notice at the cap says the same words. The margin is one constant (`limitLogic.ts`, 5). **Concepts:** the line under the Add concept
+  slot is "n concepts" until 25, then "Up to 30 concepts per market · n places left", at 30 "Maximum of 30 concepts reached".
+  USPs ("n of 6") and personas ("n of 8") are unchanged. **Not changed, for Pedram:** the concepts step subtitle still reads "Up to 30
+  concepts per market. Each is built on one persona." (a ceiling stated once, as a description, not under the slot); say if it should go.
+- **F3, picker wording to the frame.** The footer "n selected", the button "Add n creators" ("Add creators" with none ticked), in all 24
+  locales. The count lines are singular|plural pairs of two forms (as en, which the locale-parity test requires). **Locales whose
+  plural has more than two categories (cs, sk, pl, sl, hr, lt, lv, ro, ga, mt) use a count-neutral wording** ("Pridať tvorcov: {count}")
+  because a two-form pair would render a wrong form for some numbers; they are native-quality for a translator's review, like every
+  locale of this sprint. New keys: `picker.inMarket`, `picker.upToMarket`, `picker.upToWave`, `picker.maxMarket`, `picker.maxWave`,
+  `limit.placesLeft`, `concepts.upTo`; changed: `picker.selected`, `picker.add`, `concepts.tile`, `concepts.tileMax`; removed:
+  `picker.roomMarket`, `picker.roomWave`.
+
+## Stage 2 (web): rulings (Pedram, 2026-11-24)
+
+- The picker keeps **Country as its only filter**; Language, Category and Talent pool are not built. FUNCTIONAL, accepted.
+- The summary row stays as built.
+- **Exclusivity:** the picker applies the exclusivity check itself, because the invitation gate does not check exclusivity. Accepted.
+  Tech-debt row 54 (`docs/tech-debt.md`): `AssignmentInviteGate.php`, the blacklist predicate at line 47, has no exclusivity axis;
+  exclusivity is enforced at apply (`CreatorJobBoardController.php:268`) and in the job fan-out (`BrandExclusivity.php:136`). **Whether
+  that is intended is not stated anywhere in the code**; recorded as open.
+- **The board shows every applicant and invitee; the wave shows only creators added to it; blacklisted and exclusive creators appear
+  on the board and never in the picker.** Accepted.
+
+## Stage 2 (web): verification of F1 to F3
+
+Real browser on the walk stack, 1440 and 390 wide: the picker on Creators Wave 1 (the pills Confirmed, Declined, Shortlisted with the
+small origin tags; Pia, who accepted, reads Confirmed), "2 selected" and "Add 2 creators", and a throwaway wave (**Cap Wave
+(throwaway)**, seeded in `pl31_walk` only, its own campaign, 55 extra creators) with a market of **25** ("Up to 30 creators per market ·
+5 places left") and a market of **30** (the step's notice "Maximum of 30 creators reached in Nordics", Add disabled). Screenshots:
+`/tmp/pl31/shots-f` (`tools/walk/shots-pl31-f.mjs`). 9 break-reverts (W20 to W28 in `pl-3-1-break-reverts.md`).
+
+**Two failures found only by running the architecture folder, fixed:** `tests/unit/architecture/agency-routes-agency-user-guard.spec.ts`
+did not list `strategy.creators`, and `no-hard-coded-colors.spec.ts` found two hex values in comments of `CreatorPickerDialog.vue` and
+`WaveCreatorCard.vue`. Both were Stage 2 defects that the earlier local runs (touched folders only) did not reach; they would have been
+red on CI. The local-run list now includes `tests/unit/architecture`.
+
+Local results, this pass: Vitest `src/modules/strategy` + `src/core/i18n` + `tests/unit/architecture` (102 files, 1225 tests) passed;
+Pest, the Creators files (not the PostgreSQL file) and the Concepts files, SQLite `:memory:` (135 passed, 9 skipped); Pest Audit,
+Erasure, Tenancy (403 passed, 1 skipped); the creators Playwright spec, serial, on `catalyst_e2e` (4 passed); walk compare, with the
+comment-node check: **agency 126 and creator 146 targets identical**; `vue-tsc` and ESLint clean; Prettier applied.
+**Not run locally:** Pint and Larastan (no PHP file changed in this pass); the PostgreSQL Pest file; the full Pest, Vitest and
+Playwright suites (CI); the admin app and `packages/api-client` Vitest (untouched).
+
+**Flag-off, real browser.** `creators_scripts` OFF, `waves` and `strategy` ON, in `pl31_walk` only (restored to ON after), PL-2
+(`4b0f0bad`, a temporary worktree, removed) against this build, normalised `main` HTML and full-page screenshots, five pages: the board,
+the wave's campaign page, the Evergreen campaign page, the strategy workspace (USPs) and the concepts step. **Board, both campaign
+pages and the strategy workspace: HTML and pixels identical. The concepts step differs in exactly one text node:** PL-2 "2 of 30
+concepts", now "2 concepts" (F2). Nothing else. (A first pair of captures that looked identical was invalid: the page arguments had not
+reached the script and every page was blank; it was found by looking at the images, and redone.)
+
+## Stage 2 (web): what was not run
+
+The full suites, locally (CI runs them at the push). Pint and Larastan this pass (no PHP changed). The Pest PostgreSQL leg (by file
+only). A concepts market filled to 25 and 30 in the real browser (the tile's three states are tested in Vitest, rows W24 and W25, and
+the flag-off page was compared at 2 concepts). A native speaker's check of the 24 locales. Nothing was run on `main`; nothing deployed.

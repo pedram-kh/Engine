@@ -427,3 +427,12 @@ Recorded in full, with where each lands, in `pl-3-1-plan.md` section "Rulings". 
 - **For PL-6 (P8):** hand-off moves the creator's card to **Filming**. The one function that moves a card for the wave (`pl-3-1-plan.md` section 1.6) is where it joins.
 - **For PL-3.3 (P13):** `ugc.creators` stays hand-set in PL-3.1; `pl-3-1-plan.md` section 1.8 says what the data model holds so connecting it is additive.
 - **Finding of the PL-3.1 inventory (2026-11-22), for Pedram:** the PL-1.2 plan said "Cancel and Reject stay the real actions", but **no HTTP route cancels an assignment today**; `CampaignAssignmentStateMachine::cancel()` exists and its only caller is the creator-erasure job. Release is therefore **not built in PL-3.1** (Q5, 2026-11-22); it is PL-3.4. Details and consequences: `pl-3-1-inventory.md` section 4.
+
+### PL-3.1 status (2026-11-24)
+
+**Built and walked locally. Not merged into `main`, not deployed; no deploy-log entry.** Stage 1 (backend) was accepted on 2026-11-23
+(tip `b097c62b`). Stage 2 (web) was walked by Pedram on 2026-11-23 and 24 on `pl31_walk`, **20 steps, all passed**, with three
+improvements (F1 the picker shows the current status, F2 a ceiling is not shown as a target, for creators and concepts, F3 the picker
+wording) and the rulings in `pl-3-1-review.md`. **PL-3 is four chunks: PL-3.1 Creators (done), PL-3.2 Script editor, PL-3.3 Workflow,
+connecting and copy, PL-3.4 "Release a creator".** The sprint close-out has not been run. New tech-debt row: 54 (the invitation gate
+has no exclusivity axis).

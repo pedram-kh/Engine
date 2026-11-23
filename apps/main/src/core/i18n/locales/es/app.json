@@ -2009,8 +2009,8 @@
         "title": "Conceptos · {market}",
         "subtitle": "Hasta {max} conceptos por mercado. Cada uno se basa en una persona.",
         "add": "Añadir concepto",
-        "tile": "{count} de {max} conceptos",
-        "tileMax": "Máximo alcanzado: {count} de {max} conceptos",
+        "tile": "{count} concepto | {count} conceptos",
+        "tileMax": "Máximo de {max} conceptos alcanzado",
         "underMinimum": "{market} tiene {count} de los {min} o más conceptos que recomendamos.",
         "status": {
           "awaiting": "Pendiente del cliente",
@@ -2151,7 +2151,8 @@
           "heading": "Ángulos de {persona}"
         },
         "personaFilter": "Se muestran solo los conceptos de {persona}.",
-        "showAll": "Mostrar todos"
+        "showAll": "Mostrar todos",
+        "upTo": "Hasta {max} conceptos por mercado"
       },
       "completion": {
         "complete": "Completado",
@@ -2310,10 +2311,13 @@
           "selected": "Seleccionados: {count}",
           "assignPersona": "Asignar persona",
           "choosePerCreator": "Elegir después por creador",
-          "add": "Añadir creadores ({count})",
+          "add": "Añadir {count} creador | Añadir {count} creadores",
           "replaceWith": "Reemplazar",
-          "roomMarket": "Quedan {left} de {max} plazas en este mercado",
-          "roomWave": "Quedan {left} de {max} plazas en esta oleada"
+          "inMarket": "{count} creador en {market} | {count} creadores en {market}",
+          "upToMarket": "Hasta {max} creadores por mercado",
+          "upToWave": "Hasta {max} creadores por oleada",
+          "maxMarket": "Máximo de {max} creadores alcanzado en {market}",
+          "maxWave": "Máximo de {max} creadores alcanzado en esta oleada"
         },
         "errors": {
           "campaignRequired": "Esta oleada aún no tiene campaña. Vincula o crea una primero.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "El código {code} ya se usa en este mercado.",
           "removeBlockedInWork": "La tarjeta de este creador ya está en producción en el tablero. Devuelve antes la tarjeta atrás."
         }
+      },
+      "limit": {
+        "placesLeft": "Queda {count} plaza | Quedan {count} plazas"
       }
     }
   },

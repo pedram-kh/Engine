@@ -108,6 +108,7 @@ describe('agency-shell routes — requireAgencyUser guard registration (Sprint 6
       'settings',
       // PL-2.1 — the Strategy & Scripts workspace of a wave (the bare address redirects to USPs).
       'strategy.concepts',
+      'strategy.creators',
       'strategy.index',
       'strategy.matrix',
       'strategy.personas',

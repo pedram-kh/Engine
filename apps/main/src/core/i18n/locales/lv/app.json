@@ -2009,8 +2009,8 @@
         "title": "Koncepti · {market}",
         "subtitle": "Līdz {max} konceptiem katrā tirgū. Katrs balstās uz vienu personu.",
         "add": "Pievienot konceptu",
-        "tile": "{count} no {max} konceptiem",
-        "tileMax": "Sasniegts maksimums: {count} no {max} konceptiem",
+        "tile": "Koncepti: {count} | Koncepti: {count}",
+        "tileMax": "Sasniegts maksimums — {max} koncepti",
         "underMinimum": "Tirgū {market} ir {count} no ieteiktajiem {min} vai vairāk konceptiem.",
         "status": {
           "awaiting": "Gaida klientu",
@@ -2151,7 +2151,8 @@
           "heading": "{persona} leņķi"
         },
         "personaFilter": "Tiek rādītas tikai personas {persona} koncepcijas.",
-        "showAll": "Rādīt visas"
+        "showAll": "Rādīt visas",
+        "upTo": "Līdz {max} konceptiem katrā tirgū"
       },
       "completion": {
         "complete": "Pabeigts",
@@ -2310,10 +2311,13 @@
           "selected": "Izvēlēti: {count}",
           "assignPersona": "Piešķirt personu",
           "choosePerCreator": "Izvēlēties vēlāk katram veidotājam",
-          "add": "Pievienot veidotājus ({count})",
+          "add": "Pievienot veidotājus: {count} | Pievienot veidotājus: {count}",
           "replaceWith": "Aizstāt",
-          "roomMarket": "Šajā tirgū atlikušas {left} no {max} vietām",
-          "roomWave": "Šajā vilnī atlikušas {left} no {max} vietām"
+          "inMarket": "Veidotāji tirgū {market}: {count} | Veidotāji tirgū {market}: {count}",
+          "upToMarket": "Līdz {max} veidotājiem katrā tirgū",
+          "upToWave": "Līdz {max} veidotājiem katrā vilnī",
+          "maxMarket": "Tirgū {market} sasniegts maksimums — {max} veidotāji",
+          "maxWave": "Šajā vilnī sasniegts maksimums — {max} veidotāji"
         },
         "errors": {
           "campaignRequired": "Šim vilnim vēl nav kampaņas. Vispirms sasaisti vai izveido kampaņu.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "Kods {code} šajā tirgū jau tiek izmantots.",
           "removeBlockedInWork": "Šī veidotāja kartīte tāfelē jau ir ražošanā. Vispirms atgriez kartīti atpakaļ."
         }
+      },
+      "limit": {
+        "placesLeft": "Atlikušās vietas: {count} | Atlikušās vietas: {count}"
       }
     }
   },

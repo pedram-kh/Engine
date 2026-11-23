@@ -50,6 +50,7 @@ import {
   overlayText,
   WAVE_ULID,
 } from '../strategyTestKit'
+import CreatorPickerDialog from './CreatorPickerDialog.vue'
 import CreatorsStep from './CreatorsStep.vue'
 
 const ROUTE = `/brands/${BRAND_ULID}/waves/${WAVE_ULID}/strategy/creators`
@@ -299,7 +300,9 @@ describe('CreatorsStep (PL-3.1)', () => {
       Array.from({ length: 30 }, (_, i) => makeSlot(i + 1)),
     )
     const w = await mountStep(makeCreatorsData([full, makeCreatorMarket('RO', [])]))
-    expect(w.get('[data-test="creators-at-cap"]').text()).toContain('30')
+    expect(w.get('[data-test="creators-at-cap"]').text()).toBe(
+      'Maximum of 30 creators reached in Slovakia',
+    )
     expect(w.get('[data-test="creators-add"]').attributes('disabled')).toBeDefined()
     expect(w.get('[data-test="creators-add-slot"]').attributes('disabled')).toBeDefined()
   })
@@ -400,6 +403,137 @@ describe('CreatorsStep (PL-3.1)', () => {
       submit.click()
       await flushPromises()
       expect(strategyApi.addCreators).not.toHaveBeenCalled()
+    })
+
+    it.each([
+      [3, '3 creators in Slovakia', 'normal'],
+      [1, '1 creator in Slovakia', 'normal'],
+      [24, '24 creators in Slovakia', 'normal'],
+      [25, 'Up to 30 creators per market · 5 places left', 'near'],
+      [29, 'Up to 30 creators per market · 1 place left', 'near'],
+    ])(
+      'F2: with %i in the market the line under the list reads "%s" (a count, never a quota)',
+      async (n, text, state) => {
+        vi.mocked(strategyApi.creatorCandidates).mockResolvedValue({
+          data: [makeCandidate(1)],
+          meta: meta(1),
+        })
+        const market = makeCreatorMarket(
+          'SK',
+          Array.from({ length: n }, (_, i) => makeSlot(i + 1)),
+        )
+        await openPicker(makeCreatorsData([market, makeCreatorMarket('RO', [])]))
+        const el = overlay('[data-test="creator-picker-cap"]')
+        expect(el?.textContent?.trim()).toBe(text)
+        expect(el?.getAttribute('data-state')).toBe(state)
+      },
+    )
+
+    it('F2: at 30 the maximum is said for the market and the submit is off (the dialog opened on a stale count)', async () => {
+      vi.mocked(strategyApi.creatorCandidates).mockResolvedValue({
+        data: [makeCandidate(1)],
+        meta: meta(1),
+      })
+      const w = await mountStrategy(
+        CreatorPickerDialog,
+        {
+          modelValue: true,
+          scope: { brandUlid: 'b', waveUlid: 'w' },
+          market: { id: 'SK', name: 'Slovakia', code: 'SK', countries: ['SK'] },
+          marketName: () => 'Slovakia',
+          personas: [],
+          campaignId: 'c',
+          campaignName: 'Camp',
+          mode: 'add',
+          replacing: null,
+          roomMarket: 0,
+          roomWave: 70,
+          perMarket: 30,
+          perWave: 100,
+        },
+        { role: 'agency_admin', route: ROUTE },
+      )
+      await flushPromises()
+      const el = overlay('[data-test="creator-picker-cap"]')
+      expect(el?.textContent?.trim()).toBe('Maximum of 30 creators reached in Slovakia')
+      expect(el?.getAttribute('data-state')).toBe('max')
+      expect((overlay('[data-test="creator-picker-submit"]') as HTMLButtonElement).disabled).toBe(
+        true,
+      )
+      w.unmount()
+    })
+
+    it('F2: the wave ceiling follows the same pattern when it is the nearer one', async () => {
+      vi.mocked(strategyApi.creatorCandidates).mockResolvedValue({
+        data: [makeCandidate(1)],
+        meta: meta(1),
+      })
+      const markets = ['SK', 'RO', 'CZ', 'PL'].map((code, i) =>
+        makeCreatorMarket(
+          code,
+          Array.from({ length: i === 0 ? 12 : 28 }, (_, k) => makeSlot(i * 40 + k + 1)),
+        ),
+      )
+      // 12 + 28 + 28 + 28 = 96 of 100 in the wave: the wave is the nearer ceiling for the 12-creator market.
+      await openPicker(makeCreatorsData(markets))
+      const el = overlay('[data-test="creator-picker-cap"]')
+      expect(el?.textContent?.trim()).toBe('Up to 100 creators per wave · 4 places left')
+      expect(el?.getAttribute('data-state')).toBe('near')
+    })
+
+    it('F1: a card shows the creator CURRENT status as the pill, the origin only as a small tag; a declined creator can still be ticked', async () => {
+      vi.mocked(strategyApi.creatorCandidates).mockResolvedValue({
+        data: [
+          makeCandidate(1, {
+            status: 'confirmed',
+            detail: 'accepted',
+            applied: false,
+            invited: true,
+          }),
+          makeCandidate(2, { status: 'declined', detail: 'declined', applied: true }),
+          makeCandidate(3),
+        ],
+        meta: meta(3),
+      })
+      await openPicker(makeCreatorsData([sk(1), makeCreatorMarket('RO', [])]))
+      expect(overlay(`[data-test="picker-status-${CREATOR_ID(101)}"]`)?.textContent).toContain(
+        'Confirmed',
+      )
+      expect(overlay(`[data-test="picker-status-${CREATOR_ID(102)}"]`)?.textContent).toContain(
+        'Declined',
+      )
+      expect(overlay(`[data-test="picker-status-${CREATOR_ID(103)}"]`)?.textContent).toContain(
+        'Shortlisted',
+      )
+      // The origin stays, as a secondary tag.
+      expect(overlay(`[data-test="picker-card-${CREATOR_ID(101)}"]`)?.textContent).toContain(
+        'Invited',
+      )
+      // Today's rule, kept: a declined creator is not blocked from being picked.
+      await click(`[data-test="picker-card-${CREATOR_ID(102)}"]`)
+      expect(overlay('[data-test="creator-picker-selected"]')?.textContent).toContain('1')
+    })
+
+    it('F3: the footer reads "n selected" and the button "Add n creators" (singular for one)', async () => {
+      vi.mocked(strategyApi.creatorCandidates).mockResolvedValue({
+        data: [makeCandidate(1), makeCandidate(2)],
+        meta: meta(2),
+      })
+      await openPicker(makeCreatorsData([sk(1), makeCreatorMarket('RO', [])]))
+      await click(`[data-test="picker-card-${CREATOR_ID(101)}"]`)
+      expect(overlay('[data-test="creator-picker-selected"]')?.textContent?.trim()).toBe(
+        '1 selected',
+      )
+      expect(overlay('[data-test="creator-picker-submit"]')?.textContent?.trim()).toBe(
+        'Add 1 creator',
+      )
+      await click(`[data-test="picker-card-${CREATOR_ID(102)}"]`)
+      expect(overlay('[data-test="creator-picker-selected"]')?.textContent?.trim()).toBe(
+        '2 selected',
+      )
+      expect(overlay('[data-test="creator-picker-submit"]')?.textContent?.trim()).toBe(
+        'Add 2 creators',
+      )
     })
 
     it('empty: a campaign with no applicants or invitees says so and links to the campaign', async () => {

@@ -15,6 +15,13 @@ const LOCALE_ROOT = path.resolve(__dirname, 'locales')
 const SOT = 'en'
 const TARGETS = UI_LOCALES.filter((locale) => locale !== SOT)
 
+/** F1-F3: the count lines are singular|plural pairs (two forms, as en); every other key is count-neutral. */
+const PLURAL_KEYS = [
+  'app.strategy.creators.picker.add',
+  'app.strategy.creators.picker.inMarket',
+  'app.strategy.limit.placesLeft',
+]
+
 const KEYS = [
   'app.strategy.creators.title',
   'app.strategy.creators.subtitle',
@@ -108,8 +115,12 @@ const KEYS = [
   'app.strategy.creators.picker.choosePerCreator',
   'app.strategy.creators.picker.add',
   'app.strategy.creators.picker.replaceWith',
-  'app.strategy.creators.picker.roomMarket',
-  'app.strategy.creators.picker.roomWave',
+  'app.strategy.creators.picker.inMarket',
+  'app.strategy.creators.picker.upToMarket',
+  'app.strategy.creators.picker.upToWave',
+  'app.strategy.creators.picker.maxMarket',
+  'app.strategy.creators.picker.maxWave',
+  'app.strategy.limit.placesLeft',
   'app.strategy.creators.errors.campaignRequired',
   'app.strategy.creators.errors.notEligible',
   'app.strategy.creators.errors.alreadyInWave',
@@ -125,6 +136,7 @@ const KEYS = [
 const SAME_AS_ENGLISH_BY_DESIGN = new Set<string>([
   'cs:app.strategy.creators.card.persona',
   'da:app.strategy.creators.title',
+  'nl:app.strategy.creators.picker.inMarket',
   'da:app.strategy.creators.stepper.count',
   'da:app.strategy.creators.summary.total',
   'da:app.strategy.creators.card.persona',
@@ -178,8 +190,8 @@ function tokens(text: string): string[] {
 }
 
 describe('PL-3.1 creators strings', () => {
-  it('checks 103 keys across 24 locales', () => {
-    expect(KEYS).toHaveLength(103)
+  it('checks 107 keys across 24 locales', () => {
+    expect(KEYS).toHaveLength(107)
     expect(UI_LOCALES).toHaveLength(24)
   })
 
@@ -209,12 +221,14 @@ describe('PL-3.1 creators strings', () => {
     expect(offenders).toEqual([])
   })
 
-  it('no key is a plural pair (the strings are count-neutral)', () => {
+  it('only the count lines are plural pairs (two forms); every other key is count-neutral', () => {
     const offenders: string[] = []
     for (const locale of UI_LOCALES) {
       const bundle = load(locale)
       for (const key of KEYS) {
-        if ((valueAt(bundle, key) as string).includes('|')) offenders.push(`${locale}:${key}`)
+        const forms = (valueAt(bundle, key) as string).split('|').length
+        const want = PLURAL_KEYS.includes(key) ? 2 : 1
+        if (forms !== want) offenders.push(`${locale}:${key}`)
       }
     }
     expect(offenders).toEqual([])

@@ -2009,8 +2009,8 @@
         "title": "Koncepty · {market}",
         "subtitle": "Do {max} konceptów na rynek. Każdy opiera się na jednej personie.",
         "add": "Dodaj koncept",
-        "tile": "{count} z {max} konceptów",
-        "tileMax": "Osiągnięto maksimum: {count} z {max} konceptów",
+        "tile": "Konceptów: {count} | Konceptów: {count}",
+        "tileMax": "Osiągnięto maksimum {max} konceptów",
         "underMinimum": "{market} ma {count} z zalecanych {min} lub więcej konceptów.",
         "status": {
           "awaiting": "Czeka na klienta",
@@ -2151,7 +2151,8 @@
           "heading": "Kąty persony {persona}"
         },
         "personaFilter": "Wyświetlane są tylko koncepcje persony {persona}.",
-        "showAll": "Pokaż wszystkie"
+        "showAll": "Pokaż wszystkie",
+        "upTo": "Do {max} konceptów na rynek"
       },
       "completion": {
         "complete": "Ukończone",
@@ -2307,13 +2308,16 @@
           "alreadyInMarket": "Już w fali · {market}",
           "applied": "Zgłosił się",
           "invited": "Zaproszony",
-          "selected": "Wybrano: {count}",
+          "selected": "Wybrano {count}",
           "assignPersona": "Przypisz personę",
           "choosePerCreator": "Wybiorę później dla każdego twórcy",
-          "add": "Dodaj twórców ({count})",
+          "add": "Dodaj {count} twórcę | Dodaj {count} twórców",
           "replaceWith": "Zamień",
-          "roomMarket": "Zostało {left} z {max} miejsc na tym rynku",
-          "roomWave": "Zostało {left} z {max} miejsc w tej fali"
+          "inMarket": "Twórców na rynku {market}: {count} | Twórców na rynku {market}: {count}",
+          "upToMarket": "Do {max} twórców na rynek",
+          "upToWave": "Do {max} twórców na falę",
+          "maxMarket": "Na rynku {market} osiągnięto maksimum {max} twórców",
+          "maxWave": "W tej fali osiągnięto maksimum {max} twórców"
         },
         "errors": {
           "campaignRequired": "Ta fala nie ma jeszcze kampanii. Najpierw połącz lub utwórz kampanię.",
@@ -2325,6 +2329,9 @@
           "slotCodeTaken": "Kod {code} jest już używany na tym rynku.",
           "removeBlockedInWork": "Karta tego twórcy jest już w produkcji na tablicy. Najpierw cofnij kartę."
         }
+      },
+      "limit": {
+        "placesLeft": "Wolnych miejsc: {count} | Wolnych miejsc: {count}"
       }
     }
   },
