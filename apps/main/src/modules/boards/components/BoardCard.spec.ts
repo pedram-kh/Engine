@@ -169,4 +169,20 @@ describe('BoardCard', () => {
     )
     expect(declined.find('[data-test="board-card-declined-history-k1"]').exists()).toBe(false)
   })
+
+  it('PL-3.1: the "In wave" marker shows only when the server says in_wave, and never otherwise', () => {
+    const on = card(assignmentData())
+    on.attributes.in_wave = true
+    expect(mountCard(on).find('[data-test="board-card-in-wave-k1"]').exists()).toBe(true)
+
+    const off = card(assignmentData())
+    off.attributes.in_wave = false
+    expect(mountCard(off).find('[data-test="board-card-in-wave-k1"]').exists()).toBe(false)
+
+    // Flag off: the field is absent, and no marker and no comment node are left behind.
+    const absent = mountCard(card(assignmentData()))
+    expect(absent.find('[data-test="board-card-in-wave-k1"]').exists()).toBe(false)
+    // The PL-2 card (4b0f0bad) renders exactly 19 comment nodes here; the marker adds none when off.
+    expect((absent.html().match(/<!--/g) ?? []).length).toBe(19)
+  })
 })

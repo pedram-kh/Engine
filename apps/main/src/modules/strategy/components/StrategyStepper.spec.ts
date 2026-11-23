@@ -324,4 +324,55 @@ describe('StrategyStepper (PL-2.3)', () => {
     )
     empty.unmount()
   })
+
+  it('PL-3.1: step 5 is a live link with its own state and "n of m markets" while the flag is on; step 6 stays as PL-2', async () => {
+    const w = await mountStrategy(StrategyStepper, {
+      summary: makeSummary(),
+      brandId: BRAND_ULID,
+      waveId: WAVE_ULID,
+      active: 'creators',
+      creatorsOn: true,
+      creators: { state: 'in_progress', markets_done: 1, markets_total: 2, count: 4 },
+    })
+    const step = w.get('[data-test="strategy-step-creators"]')
+    expect(step.attributes('aria-disabled')).not.toBe('true')
+    expect(step.attributes('data-state')).toBe('in_progress')
+    expect(step.attributes('href') ?? '').toContain('/strategy/creators')
+    const line = w.get('[data-test="strategy-step-creators-status"]').text()
+    expect(line).toContain('4')
+    expect(line).toContain('1 of 2')
+    expect(w.get('[data-test="strategy-step-scripts-status"]').text()).toContain(
+      'Not available yet',
+    )
+    expect(w.get('[data-test="strategy-step-scripts"]').attributes('aria-disabled')).toBe('true')
+    w.unmount()
+  })
+
+  it('PL-3.1: step 5 shows the concepts warning (never a lock) and no creators and no flag is unchanged from PL-2', async () => {
+    const warned = await mountStrategy(StrategyStepper, {
+      summary: makeSummary({ concepts: concepts([2, 1, 0]) }),
+      brandId: BRAND_ULID,
+      waveId: WAVE_ULID,
+      active: 'creators',
+      creatorsOn: true,
+      creators: null,
+    })
+    expect(warned.get('[data-test="strategy-step-creators-warning"]').text()).toBe(
+      'Concepts: 1 of 2 approved',
+    )
+    expect(warned.find('.mdi-lock-outline, .mdi-lock').exists()).toBe(false)
+    warned.unmount()
+
+    const off = await mountStrategy(StrategyStepper, {
+      summary: makeSummary({ concepts: concepts([2, 1, 0]) }),
+      brandId: BRAND_ULID,
+      waveId: WAVE_ULID,
+      active: 'concepts',
+    })
+    expect(off.get('[data-test="strategy-step-creators"]').attributes('aria-disabled')).toBe('true')
+    expect(off.get('[data-test="strategy-step-creators-status"]').text()).toContain(
+      'Not available yet',
+    )
+    off.unmount()
+  })
 })

@@ -45,3 +45,27 @@ Note: B20's first test (two processes released together by an advisory lock) pas
 | 36 | A2 hard blacklist, brand | brand-scoped hard blacklist excluded | brand id predicate set to -1 | B6 | 1 red / restored green |
 | 37 | A1 one campaign | create-campaign refused when linked | removed the already-linked check | `CreatorsLinkTest` | 1 red / restored green |
 | 38 | A1 board | the created campaign has its board in the same transaction | removed `ensureBoard` from `makeWaveCampaign` | `CreatorsLinkTest` | 1 red / restored green |
+
+## Stage 2 (web)
+
+| #   | Gate                       | Claim                                                           | Break                                        | Test                 | Result                 |
+| --- | -------------------------- | --------------------------------------------------------------- | -------------------------------------------- | -------------------- | ---------------------- |
+| 39  | W1 picker: already in wave | an 'Already in wave' creator cannot be ticked                   | removed `!c.already_in_wave` in `selectable` | creatorsLogic.spec   | 1 red / restored green |
+| 40  | W2 summary pills           | a pill only for statuses that have a creator                    | `count > 0` filter removed in `statusPills`  | creatorsLogic.spec   | 1 red / restored green |
+| 41  | W3 room                    | room never below zero                                           | `Math.max(0, ...)` removed in `roomInMarket` | creatorsLogic.spec   | 1 red / restored green |
+| 42  | W4 persona warning         | the warning shows when a persona has no creator                 | `v-if="missing.length > 0"` made false       | CreatorsStep.spec    | 1 red / restored green |
+| 43  | W5 erased creator          | an erased creator's Profile button is disabled                  | `:disabled="erased"` made false              | CreatorsStep.spec    | 1 red / restored green |
+| 44  | W6 picker over cap         | ticking more than the room disables the submit; nothing is sent | `overCap` comparison made false              | CreatorsStep.spec    | 1 red / restored green |
+| 45  | W7 picker countries        | the market's countries open as chips                            | initial countries set to empty               | CreatorsStep.spec    | 2 red / restored green |
+| 46  | W8 picker reopen           | a reopened picker starts with nothing ticked                    | removed the selection reset on open          | CreatorsStep.spec    | 1 red / restored green |
+| 47  | W9 replace single          | Replace is single select                                        | single branch made multi                     | CreatorsStep.spec    | 1 red / restored green |
+| 48  | W10 decision by role       | staff do not get the Record decision link                       | `:can-decide` forced true in `CreatorsStep`  | CreatorsStep.spec    | 1 red / restored green |
+| 49  | W11 decision name          | a decision needs the client's name                              | empty-name check removed in the dialog       | CreatorsStep.spec    | 1 red / restored green |
+| 50  | W12 remove confirmation    | Remove asks first and sends nothing on Cancel                   | `removeOpen` set false in `askRemove`        | CreatorsStep.spec    | 1 red / restored green |
+| 51  | W13 stepper step 5 live    | step 5 is a link only with the flag on                          | `creatorsOn` branch of `isLive` made false   | StrategyStepper.spec | 1 red / restored green |
+| 52  | W14 stepper step 5 state   | step 5 reads its own state                                      | creators branch of `stateOf` removed         | StrategyStepper.spec | 1 red / restored green |
+| 53  | W15 board marker           | the 'In wave' chip shows only when `in_wave` is true            | list forced to `[1]`                         | BoardCard.spec       | 1 red / restored green |
+| 54  | W16 applications marker    | the 'In wave' pill shows only on a marked row                   | list forced to `[1]`                         | ApplicationsTab.spec | 1 red / restored green |
+| 55  | W17 slot code Esc          | Escape cancels the slot-code edit                               | `@keydown.esc` removed                       | CreatorsStep.spec    | 1 red / restored green |
+| 56  | W18 example link           | the Example link needs http(s)                                  | scheme check removed                         | CreatorsStep.spec    | 1 red / restored green |
+| 57  | W19 link panel by role     | staff get no Link or Create                                     | `:can-link` forced true                      | CreatorsStep.spec    | 1 red / restored green |

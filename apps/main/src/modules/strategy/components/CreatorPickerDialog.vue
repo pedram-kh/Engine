@@ -110,6 +110,7 @@ function toggle(c: WaveCreatorCandidate): void {
 }
 function removeCountry(code: string): void {
   countries.value = countries.value.filter((c) => c !== code)
+  void load(true)
 }
 
 async function load(reset: boolean): Promise<void> {
@@ -161,9 +162,6 @@ watch(
   { immediate: true },
 )
 
-watch(countries, () => {
-  if (props.modelValue) void load(true)
-})
 watch(q, () => {
   if (!props.modelValue) return
   if (timer !== null) clearTimeout(timer)

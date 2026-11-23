@@ -590,4 +590,16 @@ describe('ApplicationsTab — brand exclusivity conflict (AH-120)', () => {
     expect(wrapper.find('[data-test^="applications-conflict-"]').exists()).toBe(false)
     wrapper.unmount()
   })
+
+  it('PL-3.1: the "In wave" pill shows only on a row the server marks in_wave; flag off leaves no field and no pill', async () => {
+    const marked = makeRow()
+    marked.attributes.in_wave = true
+    const plain = makeRow(ANSWERED_ID, 'rejected')
+    vi.mocked(campaignsApi.listApplications).mockResolvedValue(listResponse([marked, plain], 1))
+    const wrapper = await mountTab()
+
+    expect(wrapper.find(`[data-test="applications-in-wave-${PENDING_ID}"]`).exists()).toBe(true)
+    expect(wrapper.find(`[data-test="applications-in-wave-${ANSWERED_ID}"]`).exists()).toBe(false)
+    wrapper.unmount()
+  })
 })
