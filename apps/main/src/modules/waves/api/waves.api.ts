@@ -42,6 +42,16 @@ export const wavesApi = {
     return http.get<WaveCampaignOptionsResponse>(`${base(agencyId, brandId)}/campaign-options`)
   },
 
+  /** PL-3.1 (A1): create a for-a-wave campaign for a wave that has none, from the Creators step. */
+  createCampaign(
+    agencyId: string,
+    brandId: string,
+    waveId: string,
+    name: string,
+  ): Promise<WaveEnvelope> {
+    return http.post<WaveEnvelope>(`${base(agencyId, brandId)}/${waveId}/campaign`, { name })
+  },
+
   show(agencyId: string, brandId: string, waveId: string): Promise<WaveEnvelope> {
     return http.get<WaveEnvelope>(`${base(agencyId, brandId)}/${waveId}`)
   },

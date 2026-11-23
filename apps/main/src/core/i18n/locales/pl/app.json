@@ -1489,7 +1489,8 @@
         "marketCodeTaken": "Dwa rynki tej fali mają ten sam krótki kod.",
         "marketUnknown": "Jeden z rynków nie należy już do tej fali. Wczytaj rynki ponownie.",
         "marketConflict": "Rynki zmieniły się podczas zapisywania. Wczytaj rynki ponownie i spróbuj jeszcze raz.",
-        "countryInTwoMarkets": "{country} jest w rynkach {first} i {second}. Kraj może należeć tylko do jednego rynku."
+        "countryInTwoMarkets": "{country} jest w rynkach {first} i {second}. Kraj może należeć tylko do jednego rynku.",
+        "marketHasCreators": "Najpierw usuń twórców z tych rynków: {markets}."
       },
       "dialog": {
         "createTitle": "Nowa fala",
@@ -2192,6 +2193,138 @@
         "sheetTitle": "Notatki · {market}",
         "expand": "Rozwiń notatki",
         "collapse": "Zwiń notatki"
+      },
+      "creators": {
+        "title": "Twórcy · {market}",
+        "subtitle": "Wybrani spośród kandydatów i zaproszonych do kampanii. Przypisz każdego twórcę do persony, aby jego skrypt korzystał z właściwego przekazu.",
+        "add": "Dodaj twórców",
+        "close": "Zamknij",
+        "inWave": "W fali",
+        "addSlotCaption": "Otwiera twórców kampanii, przefiltrowanych do rynku {market}",
+        "stepper": {
+          "none": "Brak twórców",
+          "count": "Twórcy: {count}"
+        },
+        "summary": {
+          "total": "Twórcy: {count}",
+          "coverage": "Pokrycie person:",
+          "personaWarning": "Brak aktywnego twórcy dla: {personas}"
+        },
+        "status": {
+          "shortlisted": "Na krótkiej liście",
+          "contacted": "Skontaktowano się",
+          "confirmed": "Potwierdzony",
+          "declined": "Odrzucił"
+        },
+        "detail": {
+          "applied": "Zgłosił się do kampanii",
+          "invited": "Zaproszony",
+          "offer_sent": "Oferta wysłana",
+          "countered": "Złożył kontrofertę",
+          "in_work": "W produkcji",
+          "delivered": "Dostarczone",
+          "draft_rejected": "Szkic odrzucony",
+          "cancelled": "Anulowane",
+          "application_rejected": "Zgłoszenie odrzucone"
+        },
+        "card": {
+          "unnamed": "Twórca bez nazwy",
+          "notAssigned": "Nieprzypisana",
+          "persona": "Persona",
+          "status": "Status",
+          "statusHint": "Podąża za kampanią. Zmień go na tablicy kampanii.",
+          "slotCode": "Kod miejsca",
+          "editCode": "Edytuj kod miejsca",
+          "verified": "Zweryfikowany",
+          "example": "Przykładowa treść",
+          "profile": "Profil",
+          "replace": "Zamień",
+          "remove": "Usuń"
+        },
+        "decision": {
+          "title": "Zapisz decyzję klienta",
+          "choice": "Decyzja",
+          "choices": {
+            "approved": "Zatwierdzony",
+            "suggest_another": "Zaproponuj innego"
+          },
+          "clientName": "Nazwa klienta",
+          "note": "Notatka (opcjonalnie)",
+          "comment": "Komentarz",
+          "replaces": "Nowa decyzja staje się obecną. Wcześniejsze decyzje zostają w historii.",
+          "why": {
+            "name": "Wpisz nazwę klienta.",
+            "comment": "Wpisz komentarz.",
+            "nameAndComment": "Wpisz nazwę klienta i komentarz."
+          },
+          "status": {
+            "approved": "Zatwierdził: {name}",
+            "suggest_another": "{name} proponuje innego twórcę"
+          },
+          "record": "Zapisz decyzję",
+          "history": "Historia ({count})",
+          "historyTitle": "Decyzje klienta",
+          "cardMoved": "Karta twórcy została przeniesiona do Wybrani na tablicy.",
+          "cardNotMoved": "Karta nie została przeniesiona: nie jest jeszcze we właściwym miejscu na tablicy."
+        },
+        "remove": {
+          "title": "Usunąć tego twórcę z fali?",
+          "body": "Karta twórcy wraca na tablicy tam, gdzie była, a miejsce zostaje usunięte. Sama kampania się nie zmienia.",
+          "bodyDecisions": "Decyzje klienta dotyczące tego twórcy również zostają usunięte."
+        },
+        "empty": {
+          "title": "Brak twórców na rynku {market}",
+          "body": "Wybierz twórców z kampanii {campaign}: tych, którzy się zgłosili lub zostali zaproszeni."
+        },
+        "noCampaign": {
+          "title": "Ta fala nie ma jeszcze kampanii",
+          "body": "Twórcy pochodzą z kampanii: tych, którzy się zgłaszają lub są zapraszani. Połącz istniejącą kampanię tej marki albo utwórz nową.",
+          "askAdmin": "Poproś administratora lub menedżera agencji o połączenie lub utworzenie kampanii.",
+          "linkTitle": "Połącz kampanię",
+          "linkLabel": "Kampania",
+          "linkNone": "Ta marka nie ma niepołączonej kampanii dla fali.",
+          "link": "Połącz kampanię",
+          "createTitle": "Utwórz kampanię",
+          "createLabel": "Nazwa kampanii",
+          "create": "Utwórz i połącz"
+        },
+        "picker": {
+          "title": "Dodaj twórców do rynku {market}",
+          "titleReplace": "Zamień twórcę {creator}",
+          "subtitle": "Spośród kandydatów i zaproszonych do kampanii {campaign}",
+          "search": "Szukaj twórców",
+          "country": "Kraj",
+          "removeCountry": "Usuń filtr {country}",
+          "prefiltered": "Wstępnie przefiltrowano do tego rynku",
+          "results": "Wyniki: {count}",
+          "emptyTitle": "Brak kandydatów i zaproszonych",
+          "emptyBody": "Twórcy pojawią się tutaj, gdy zgłoszą się do kampanii lub ich zaprosisz.",
+          "emptyFilteredTitle": "Nic nie pasuje",
+          "emptyFilteredBody": "Usuń kraj lub zmień wyszukiwanie, aby zobaczyć więcej.",
+          "openCampaign": "Otwórz kampanię",
+          "more": "Pokaż więcej",
+          "alreadyInWave": "Już w fali",
+          "alreadyInMarket": "Już w fali · {market}",
+          "applied": "Zgłosił się",
+          "invited": "Zaproszony",
+          "selected": "Wybrano: {count}",
+          "assignPersona": "Przypisz personę",
+          "choosePerCreator": "Wybiorę później dla każdego twórcy",
+          "add": "Dodaj twórców ({count})",
+          "replaceWith": "Zamień",
+          "roomMarket": "Zostało {left} z {max} miejsc na tym rynku",
+          "roomWave": "Zostało {left} z {max} miejsc w tej fali"
+        },
+        "errors": {
+          "campaignRequired": "Ta fala nie ma jeszcze kampanii. Najpierw połącz lub utwórz kampanię.",
+          "notEligible": "Tego twórcy nie można dodać do tej fali.",
+          "alreadyInWave": "Ten twórca jest już w tej fali.",
+          "capMarket": "Rynek ma co najwyżej {max} twórców.",
+          "capWave": "Fala ma co najwyżej {max} twórców.",
+          "personaInUse": "Do tej persony przypisani są twórcy ({count}). Najpierw przypisz ich do innej persony lub do żadnej.",
+          "slotCodeTaken": "Kod {code} jest już używany na tym rynku.",
+          "removeBlockedInWork": "Karta tego twórcy jest już w produkcji na tablicy. Najpierw cofnij kartę."
+        }
       }
     }
   },

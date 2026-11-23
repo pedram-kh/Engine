@@ -114,6 +114,8 @@ export interface BoardCardResource {
     position: number
     created_at: string
     updated_at: string
+    /** PL-3.1: present only on a wave board with the creators flag on; true when the creator is in the wave's Creators step. */
+    in_wave?: boolean
   }
   relationships: {
     column: {

@@ -1489,7 +1489,8 @@
         "marketCodeTaken": "To markeder i denne bølge har samme korte kode.",
         "marketUnknown": "Et af markederne er ikke længere en del af denne bølge. Genindlæs markederne.",
         "marketConflict": "Markederne ændrede sig, mens du gemte. Genindlæs markederne og prøv igen.",
-        "countryInTwoMarkets": "{country} er i både {first} og {second}. Et land kan kun høre til ét marked."
+        "countryInTwoMarkets": "{country} er i både {first} og {second}. Et land kan kun høre til ét marked.",
+        "marketHasCreators": "Fjern først creators fra disse markeder: {markets}."
       },
       "dialog": {
         "createTitle": "Ny bølge",
@@ -2192,6 +2193,138 @@
         "sheetTitle": "Noter · {market}",
         "expand": "Udvid noter",
         "collapse": "Skjul udvidet visning af noter"
+      },
+      "creators": {
+        "title": "Creators · {market}",
+        "subtitle": "Valgt blandt kampagnens ansøgere og inviterede. Knyt hver creator til en persona, så scriptet bruger det rigtige budskab.",
+        "add": "Tilføj creators",
+        "close": "Luk",
+        "inWave": "I bølgen",
+        "addSlotCaption": "Åbner kampagnens creators, forfiltreret på {market}",
+        "stepper": {
+          "none": "Ingen creators endnu",
+          "count": "Creators: {count}"
+        },
+        "summary": {
+          "total": "Creators: {count}",
+          "coverage": "Persona-dækning:",
+          "personaWarning": "Ingen aktiv creator for: {personas}"
+        },
+        "status": {
+          "shortlisted": "På shortlisten",
+          "contacted": "Kontaktet",
+          "confirmed": "Bekræftet",
+          "declined": "Afslog"
+        },
+        "detail": {
+          "applied": "Har ansøgt om kampagnen",
+          "invited": "Inviteret",
+          "offer_sent": "Tilbud sendt",
+          "countered": "Kom med et modbud",
+          "in_work": "I produktion",
+          "delivered": "Leveret",
+          "draft_rejected": "Udkast afvist",
+          "cancelled": "Annulleret",
+          "application_rejected": "Ansøgning afvist"
+        },
+        "card": {
+          "unnamed": "Creator uden navn",
+          "notAssigned": "Ikke tildelt",
+          "persona": "Persona",
+          "status": "Status",
+          "statusHint": "Følger kampagnen. Ændr den på kampagnetavlen.",
+          "slotCode": "Pladskode",
+          "editCode": "Rediger pladskode",
+          "verified": "Verificeret",
+          "example": "Eksempelindhold",
+          "profile": "Profil",
+          "replace": "Udskift",
+          "remove": "Fjern"
+        },
+        "decision": {
+          "title": "Registrer kundens beslutning",
+          "choice": "Beslutning",
+          "choices": {
+            "approved": "Godkendt",
+            "suggest_another": "Foreslå en anden"
+          },
+          "clientName": "Kundens navn",
+          "note": "Note (valgfri)",
+          "comment": "Kommentar",
+          "replaces": "En ny beslutning bliver den gældende. Tidligere beslutninger bliver i historikken.",
+          "why": {
+            "name": "Angiv kundens navn.",
+            "comment": "Skriv en kommentar.",
+            "nameAndComment": "Angiv kundens navn og skriv en kommentar."
+          },
+          "status": {
+            "approved": "Godkendt af {name}",
+            "suggest_another": "{name} foreslår en anden creator"
+          },
+          "record": "Registrer beslutning",
+          "history": "Historik ({count})",
+          "historyTitle": "Kundens beslutninger",
+          "cardMoved": "Creatorens kort blev flyttet til Valgt på tavlen.",
+          "cardNotMoved": "Kortet blev ikke flyttet: Det er endnu ikke det rigtige sted på tavlen."
+        },
+        "remove": {
+          "title": "Fjern denne creator fra bølgen?",
+          "body": "Creatorens kort på tavlen går tilbage til, hvor det var, og pladsen slettes. Selve kampagnen ændres ikke.",
+          "bodyDecisions": "Kundens beslutninger om denne creator slettes også."
+        },
+        "empty": {
+          "title": "Ingen creators i {market} endnu",
+          "body": "Vælg creators fra {campaign}: dem, der har ansøgt eller er inviteret."
+        },
+        "noCampaign": {
+          "title": "Denne bølge har ingen kampagne endnu",
+          "body": "Creators kommer fra en kampagne: dem, der ansøger eller bliver inviteret. Knyt en eksisterende kampagne for brandet, eller opret en.",
+          "askAdmin": "Bed en administrator eller manager i bureauet om at knytte eller oprette kampagnen.",
+          "linkTitle": "Knyt en kampagne",
+          "linkLabel": "Kampagne",
+          "linkNone": "Dette brand har ingen uknyttet kampagne til en bølge.",
+          "link": "Knyt kampagne",
+          "createTitle": "Opret en kampagne",
+          "createLabel": "Kampagnens navn",
+          "create": "Opret og knyt"
+        },
+        "picker": {
+          "title": "Tilføj creators til {market}",
+          "titleReplace": "Udskift {creator}",
+          "subtitle": "Blandt ansøgere og inviterede til {campaign}",
+          "search": "Søg efter creators",
+          "country": "Land",
+          "removeCountry": "Fjern filteret {country}",
+          "prefiltered": "Forfiltreret på dette marked",
+          "results": "Resultater: {count}",
+          "emptyTitle": "Ingen ansøgere eller inviterede endnu",
+          "emptyBody": "Creators vises her, når de ansøger om kampagnen, eller du inviterer dem.",
+          "emptyFilteredTitle": "Ingen creators matcher",
+          "emptyFilteredBody": "Fjern et land, eller ændr søgningen for at se flere.",
+          "openCampaign": "Åbn kampagnen",
+          "more": "Vis flere",
+          "alreadyInWave": "Allerede i bølgen",
+          "alreadyInMarket": "Allerede i bølgen · {market}",
+          "applied": "Ansøgt",
+          "invited": "Inviteret",
+          "selected": "Valgt: {count}",
+          "assignPersona": "Tildel persona",
+          "choosePerCreator": "Vælg pr. creator senere",
+          "add": "Tilføj creators ({count})",
+          "replaceWith": "Udskift",
+          "roomMarket": "{left} af {max} pladser tilbage på dette marked",
+          "roomWave": "{left} af {max} pladser tilbage i denne bølge"
+        },
+        "errors": {
+          "campaignRequired": "Denne bølge har ingen kampagne endnu. Knyt eller opret en først.",
+          "notEligible": "Den creator kan ikke føjes til denne bølge.",
+          "alreadyInWave": "Den creator er allerede i denne bølge.",
+          "capMarket": "Et marked har højst {max} creators.",
+          "capWave": "En bølge har højst {max} creators.",
+          "personaInUse": "Creators er knyttet til denne persona ({count}). Knyt dem først til en anden persona eller ingen.",
+          "slotCodeTaken": "Koden {code} bruges allerede på dette marked.",
+          "removeBlockedInWork": "Denne creators kort er allerede i produktion på tavlen. Flyt først kortet tilbage."
+        }
       }
     }
   },

@@ -1489,7 +1489,8 @@
         "marketCodeTaken": "Twee markten van deze wave hebben dezelfde korte code.",
         "marketUnknown": "Een van de markten hoort niet meer bij deze wave. Laad de markten opnieuw.",
         "marketConflict": "De markten zijn veranderd terwijl je opsloeg. Laad de markten opnieuw en probeer het nog eens.",
-        "countryInTwoMarkets": "{country} staat in {first} en in {second}. Een land kan maar bij één markt horen."
+        "countryInTwoMarkets": "{country} staat in {first} en in {second}. Een land kan maar bij één markt horen.",
+        "marketHasCreators": "Verwijder eerst de creators van deze markten: {markets}."
       },
       "dialog": {
         "createTitle": "Nieuwe golf",
@@ -2192,6 +2193,138 @@
         "sheetTitle": "Notities · {market}",
         "expand": "Notities uitbreiden",
         "collapse": "Notities verkleinen"
+      },
+      "creators": {
+        "title": "Creators · {market}",
+        "subtitle": "Gekozen uit de aanmelders en uitgenodigden van de campagne. Koppel elke creator aan een persona zodat zijn script de juiste boodschap gebruikt.",
+        "add": "Creators toevoegen",
+        "close": "Sluiten",
+        "inWave": "In de golf",
+        "addSlotCaption": "Opent de creators van de campagne, vooraf gefilterd op {market}",
+        "stepper": {
+          "none": "Nog geen creators",
+          "count": "Creators: {count}"
+        },
+        "summary": {
+          "total": "Creators: {count}",
+          "coverage": "Persona-dekking:",
+          "personaWarning": "Geen actieve creator voor: {personas}"
+        },
+        "status": {
+          "shortlisted": "Op de shortlist",
+          "contacted": "Benaderd",
+          "confirmed": "Bevestigd",
+          "declined": "Afgewezen"
+        },
+        "detail": {
+          "applied": "Heeft zich aangemeld voor de campagne",
+          "invited": "Uitgenodigd",
+          "offer_sent": "Aanbod verstuurd",
+          "countered": "Deed een tegenbod",
+          "in_work": "In productie",
+          "delivered": "Geleverd",
+          "draft_rejected": "Concept afgewezen",
+          "cancelled": "Geannuleerd",
+          "application_rejected": "Aanmelding afgewezen"
+        },
+        "card": {
+          "unnamed": "Creator zonder naam",
+          "notAssigned": "Niet toegewezen",
+          "persona": "Persona",
+          "status": "Status",
+          "statusHint": "Volgt de campagne. Wijzig dit op het campagnebord.",
+          "slotCode": "Slotcode",
+          "editCode": "Slotcode bewerken",
+          "verified": "Geverifieerd",
+          "example": "Voorbeeldcontent",
+          "profile": "Profiel",
+          "replace": "Vervangen",
+          "remove": "Verwijderen"
+        },
+        "decision": {
+          "title": "Beslissing van de klant vastleggen",
+          "choice": "Beslissing",
+          "choices": {
+            "approved": "Goedgekeurd",
+            "suggest_another": "Andere voorstellen"
+          },
+          "clientName": "Naam van de klant",
+          "note": "Notitie (optioneel)",
+          "comment": "Opmerking",
+          "replaces": "Een nieuwe beslissing wordt de huidige. Eerdere beslissingen blijven in de geschiedenis.",
+          "why": {
+            "name": "Vul de naam van de klant in.",
+            "comment": "Vul een opmerking in.",
+            "nameAndComment": "Vul de naam van de klant en een opmerking in."
+          },
+          "status": {
+            "approved": "Goedgekeurd door {name}",
+            "suggest_another": "{name} stelt een andere creator voor"
+          },
+          "record": "Beslissing vastleggen",
+          "history": "Geschiedenis ({count})",
+          "historyTitle": "Beslissingen van de klant",
+          "cardMoved": "De kaart van de creator is op het bord naar Geselecteerd verplaatst.",
+          "cardNotMoved": "De kaart is niet verplaatst: hij staat nog niet op de juiste plek op het bord."
+        },
+        "remove": {
+          "title": "Deze creator uit de golf verwijderen?",
+          "body": "De bordkaart van de creator gaat terug naar waar hij was en de slot wordt verwijderd. De campagne zelf verandert niet.",
+          "bodyDecisions": "De beslissingen van de klant over deze creator worden ook verwijderd."
+        },
+        "empty": {
+          "title": "Nog geen creators in {market}",
+          "body": "Kies creators uit {campaign}: degenen die zich aanmeldden of werden uitgenodigd."
+        },
+        "noCampaign": {
+          "title": "Deze golf heeft nog geen campagne",
+          "body": "Creators komen uit een campagne: de creators die zich aanmelden of worden uitgenodigd. Koppel een bestaande campagne van dit merk of maak er een.",
+          "askAdmin": "Vraag een beheerder of manager van het bureau om de campagne te koppelen of te maken.",
+          "linkTitle": "Een campagne koppelen",
+          "linkLabel": "Campagne",
+          "linkNone": "Dit merk heeft geen niet-gekoppelde campagne voor een golf.",
+          "link": "Campagne koppelen",
+          "createTitle": "Een campagne maken",
+          "createLabel": "Naam van de campagne",
+          "create": "Maken en koppelen"
+        },
+        "picker": {
+          "title": "Creators toevoegen aan {market}",
+          "titleReplace": "{creator} vervangen",
+          "subtitle": "Uit de aanmelders en uitgenodigden van {campaign}",
+          "search": "Creators zoeken",
+          "country": "Land",
+          "removeCountry": "Filter {country} verwijderen",
+          "prefiltered": "Vooraf gefilterd op deze markt",
+          "results": "Resultaten: {count}",
+          "emptyTitle": "Nog geen aanmelders of uitgenodigden",
+          "emptyBody": "Creators verschijnen hier zodra ze zich aanmelden voor de campagne of jij ze uitnodigt.",
+          "emptyFilteredTitle": "Geen creators gevonden",
+          "emptyFilteredBody": "Verwijder een land of wijzig de zoekopdracht om meer te zien.",
+          "openCampaign": "De campagne openen",
+          "more": "Meer tonen",
+          "alreadyInWave": "Al in de golf",
+          "alreadyInMarket": "Al in de golf · {market}",
+          "applied": "Aangemeld",
+          "invited": "Uitgenodigd",
+          "selected": "Geselecteerd: {count}",
+          "assignPersona": "Persona toewijzen",
+          "choosePerCreator": "Later per creator kiezen",
+          "add": "Creators toevoegen ({count})",
+          "replaceWith": "Vervangen",
+          "roomMarket": "Nog {left} van {max} plekken vrij in deze markt",
+          "roomWave": "Nog {left} van {max} plekken vrij in deze golf"
+        },
+        "errors": {
+          "campaignRequired": "Deze golf heeft nog geen campagne. Koppel of maak er eerst een.",
+          "notEligible": "Die creator kan niet aan deze golf worden toegevoegd.",
+          "alreadyInWave": "Die creator zit al in deze golf.",
+          "capMarket": "Een markt heeft maximaal {max} creators.",
+          "capWave": "Een golf heeft maximaal {max} creators.",
+          "personaInUse": "Er zijn creators aan deze persona gekoppeld ({count}). Koppel ze eerst aan een andere persona of aan geen.",
+          "slotCodeTaken": "De code {code} wordt al gebruikt in deze markt.",
+          "removeBlockedInWork": "De kaart van deze creator staat op het bord al in productie. Zet de kaart eerst terug."
+        }
       }
     }
   },

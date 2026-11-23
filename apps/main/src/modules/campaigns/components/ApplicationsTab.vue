@@ -102,6 +102,12 @@ function hasConflict(row: CampaignApplicationListItemResource): boolean {
   return isPending(row) && row.attributes.has_exclusivity_conflict === true
 }
 
+// PL-3.1 — "In wave": the server sends `in_wave` only for a wave campaign with the creators flag on. A zero-or-one list, not
+// `v-if`, so the flag-off DOM has no comment node.
+function inWaveItems(row: CampaignApplicationListItemResource): number[] {
+  return row.attributes.in_wave === true ? [1] : []
+}
+
 function canMessage(row: CampaignApplicationListItemResource): boolean {
   const creator = row.attributes.creator
   return creator !== null && !creatorIsErased(creator) && messageable.canMessage(creator.id)
@@ -284,6 +290,13 @@ defineExpose({
               kind="application"
               :status="row.attributes.status"
               :data-test="`applications-status-${row.id}`"
+            />
+            <AgencyStatusPill
+              v-for="n in inWaveItems(row)"
+              :key="n"
+              tone="info"
+              :label="t('app.strategy.creators.inWave')"
+              :data-test="`applications-in-wave-${row.id}`"
             />
             <!-- AH-120: a pending applicant already selected on a campaign that blocks this
                  brand. A warning only: Accept stays enabled (agency invites are never blocked). -->

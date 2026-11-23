@@ -1489,7 +1489,8 @@
         "marketCodeTaken": "Dos mercados de esta oleada tienen el mismo código corto.",
         "marketUnknown": "Uno de los mercados ya no forma parte de esta oleada. Recarga los mercados.",
         "marketConflict": "Los mercados cambiaron mientras guardabas. Recarga los mercados e inténtalo de nuevo.",
-        "countryInTwoMarkets": "{country} está en {first} y en {second}. Un país solo puede pertenecer a un mercado."
+        "countryInTwoMarkets": "{country} está en {first} y en {second}. Un país solo puede pertenecer a un mercado.",
+        "marketHasCreators": "Quita antes los creadores de estos mercados: {markets}."
       },
       "dialog": {
         "createTitle": "Nueva oleada",
@@ -2192,6 +2193,138 @@
         "sheetTitle": "Notas · {market}",
         "expand": "Ampliar notas",
         "collapse": "Reducir notas"
+      },
+      "creators": {
+        "title": "Creadores · {market}",
+        "subtitle": "Elegidos entre los solicitantes e invitados de la campaña. Asigna cada creador a un persona para que su guion use el mensaje adecuado.",
+        "add": "Añadir creadores",
+        "close": "Cerrar",
+        "inWave": "En la oleada",
+        "addSlotCaption": "Abre los creadores de la campaña, filtrados por {market}",
+        "stepper": {
+          "none": "Aún no hay creadores",
+          "count": "Creadores: {count}"
+        },
+        "summary": {
+          "total": "Creadores: {count}",
+          "coverage": "Cobertura de personas:",
+          "personaWarning": "Ningún creador activo para: {personas}"
+        },
+        "status": {
+          "shortlisted": "Preseleccionado",
+          "contacted": "Contactado",
+          "confirmed": "Confirmado",
+          "declined": "Rechazado"
+        },
+        "detail": {
+          "applied": "Se postuló a la campaña",
+          "invited": "Invitado",
+          "offer_sent": "Oferta enviada",
+          "countered": "Hizo una contraoferta",
+          "in_work": "En producción",
+          "delivered": "Entregado",
+          "draft_rejected": "Borrador rechazado",
+          "cancelled": "Cancelado",
+          "application_rejected": "Solicitud rechazada"
+        },
+        "card": {
+          "unnamed": "Creador sin nombre",
+          "notAssigned": "Sin asignar",
+          "persona": "Persona",
+          "status": "Estado",
+          "statusHint": "Sigue a la campaña. Cámbialo en el tablero de la campaña.",
+          "slotCode": "Código de hueco",
+          "editCode": "Editar el código de hueco",
+          "verified": "Verificado",
+          "example": "Contenido de ejemplo",
+          "profile": "Perfil",
+          "replace": "Reemplazar",
+          "remove": "Quitar"
+        },
+        "decision": {
+          "title": "Registrar la decisión del cliente",
+          "choice": "Decisión",
+          "choices": {
+            "approved": "Aprobado",
+            "suggest_another": "Sugerir otro"
+          },
+          "clientName": "Nombre del cliente",
+          "note": "Nota (opcional)",
+          "comment": "Comentario",
+          "replaces": "Una nueva decisión pasa a ser la actual. Las anteriores quedan en el historial.",
+          "why": {
+            "name": "Escribe el nombre del cliente.",
+            "comment": "Escribe un comentario.",
+            "nameAndComment": "Escribe el nombre del cliente y un comentario."
+          },
+          "status": {
+            "approved": "Aprobado por {name}",
+            "suggest_another": "{name} sugiere otro creador"
+          },
+          "record": "Registrar decisión",
+          "history": "Historial ({count})",
+          "historyTitle": "Decisiones del cliente",
+          "cardMoved": "La tarjeta del creador pasó a Seleccionado en el tablero.",
+          "cardNotMoved": "La tarjeta no se movió: todavía no está en el lugar correcto del tablero."
+        },
+        "remove": {
+          "title": "¿Quitar a este creador de la oleada?",
+          "body": "La tarjeta del creador vuelve a donde estaba y el hueco se elimina. La campaña no cambia.",
+          "bodyDecisions": "Las decisiones del cliente sobre este creador también se eliminan."
+        },
+        "empty": {
+          "title": "Aún no hay creadores en {market}",
+          "body": "Elige creadores de {campaign}: los que se postularon o fueron invitados."
+        },
+        "noCampaign": {
+          "title": "Esta oleada aún no tiene campaña",
+          "body": "Los creadores salen de una campaña: los que se postulan o son invitados. Vincula una campaña existente de esta marca o crea una.",
+          "askAdmin": "Pide a un administrador o gestor de la agencia que vincule o cree la campaña.",
+          "linkTitle": "Vincular una campaña",
+          "linkLabel": "Campaña",
+          "linkNone": "Esta marca no tiene ninguna campaña de oleada sin vincular.",
+          "link": "Vincular campaña",
+          "createTitle": "Crear una campaña",
+          "createLabel": "Nombre de la campaña",
+          "create": "Crear y vincular"
+        },
+        "picker": {
+          "title": "Añadir creadores a {market}",
+          "titleReplace": "Reemplazar a {creator}",
+          "subtitle": "Entre los solicitantes e invitados de {campaign}",
+          "search": "Buscar creadores",
+          "country": "País",
+          "removeCountry": "Quitar el filtro {country}",
+          "prefiltered": "Prefiltrado por este mercado",
+          "results": "Resultados: {count}",
+          "emptyTitle": "Aún no hay solicitantes ni invitados",
+          "emptyBody": "Los creadores aparecen aquí cuando se postulan a la campaña o los invitas.",
+          "emptyFilteredTitle": "Ningún creador coincide",
+          "emptyFilteredBody": "Quita un país o cambia la búsqueda para ver más.",
+          "openCampaign": "Abrir la campaña",
+          "more": "Mostrar más",
+          "alreadyInWave": "Ya está en la oleada",
+          "alreadyInMarket": "Ya está en la oleada · {market}",
+          "applied": "Postulado",
+          "invited": "Invitado",
+          "selected": "Seleccionados: {count}",
+          "assignPersona": "Asignar persona",
+          "choosePerCreator": "Elegir después por creador",
+          "add": "Añadir creadores ({count})",
+          "replaceWith": "Reemplazar",
+          "roomMarket": "Quedan {left} de {max} plazas en este mercado",
+          "roomWave": "Quedan {left} de {max} plazas en esta oleada"
+        },
+        "errors": {
+          "campaignRequired": "Esta oleada aún no tiene campaña. Vincula o crea una primero.",
+          "notEligible": "Ese creador no se puede añadir a esta oleada.",
+          "alreadyInWave": "Ese creador ya está en esta oleada.",
+          "capMarket": "Un mercado tiene como máximo {max} creadores.",
+          "capWave": "Una oleada tiene como máximo {max} creadores.",
+          "personaInUse": "Hay creadores asignados a este persona ({count}). Asígnalos antes a otro persona o a ninguno.",
+          "slotCodeTaken": "El código {code} ya se usa en este mercado.",
+          "removeBlockedInWork": "La tarjeta de este creador ya está en producción en el tablero. Devuelve antes la tarjeta atrás."
+        }
       }
     }
   },

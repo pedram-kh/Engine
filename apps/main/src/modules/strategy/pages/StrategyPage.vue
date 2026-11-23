@@ -11,6 +11,7 @@
 import type {
   StrategyCompletionResponse,
   StrategySummaryResource,
+  WaveCreatorsData,
   WaveResource,
 } from '@catalyst/api-client'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
@@ -22,6 +23,7 @@ import { useAuthStore } from '@/modules/auth/stores/useAuthStore'
 import { wavesApi } from '@/modules/waves/api/waves.api'
 import { strategyApi, type NoteStep } from '../api/strategy.api'
 import ConceptsStep from '../components/ConceptsStep.vue'
+import CreatorsStep from '../components/CreatorsStep.vue'
 import MatrixStep from '../components/MatrixStep.vue'
 import NotesPanel from '../components/NotesPanel.vue'
 import NotesSheet from '../components/NotesSheet.vue'
@@ -45,6 +47,11 @@ const wave = ref<WaveResource | null>(null)
 const summary = ref<StrategySummaryResource | null>(null)
 const loading = ref(true)
 const failed = ref(false)
+
+/** PL-3.1: step 5 exists only while `features.creators_scripts` is on; the address is refused to the wave otherwise. */
+const creatorsOn = computed(() => features.value?.creators_scripts === true)
+const onCreators = computed(() => route.name === 'strategy.creators')
+const creatorsState = ref<WaveCreatorsData['state'] | null>(null)
 
 const step = computed<StepName>(() =>
   route.name === 'strategy.personas'
@@ -76,7 +83,10 @@ const noteCount = computed(() => {
 })
 /** USPs, Personas and Concepts carry the notes panel beside the step; the matrix opens them in a side sheet. */
 const panelOn = computed(
-  () => step.value !== 'matrix' && (step.value === 'usps' || market.value !== null),
+  () =>
+    !onCreators.value &&
+    step.value !== 'matrix' &&
+    (step.value === 'usps' || market.value !== null),
 )
 const sheetOpen = ref(false)
 // The panel's expanded view (a large side sheet) and the one draft shared by the panel, the expanded view and the matrix
@@ -129,10 +139,22 @@ async function load(): Promise<void> {
     ])
     wave.value = w.data
     summary.value = sum.data
+    await refreshCreatorsState()
   } catch {
     failed.value = true
   } finally {
     loading.value = false
+  }
+}
+
+/** PL-3.1: the stepper's step 5 reads its state from the creators payload (flag on only; nothing is asked otherwise). */
+async function refreshCreatorsState(): Promise<void> {
+  const s = scope.value
+  if (s === null || !creatorsOn.value) return
+  try {
+    creatorsState.value = (await strategyApi.creators(s)).data.state
+  } catch {
+    creatorsState.value = null
   }
 }
 
@@ -141,6 +163,7 @@ async function refreshSummary(): Promise<void> {
   if (s === null) return
   try {
     summary.value = (await strategyApi.summary(s)).data
+    await refreshCreatorsState()
   } catch {
     // The step's own list is the truth on screen; a failed refresh only leaves the stepper counts one step behind.
   }
@@ -170,6 +193,10 @@ onMounted(async () => {
     return
   }
   if (features.value.strategy !== true) {
+    await router.replace({ name: 'waves.detail', params: { ulid: brandId, waveUlid: waveId } })
+    return
+  }
+  if (onCreators.value && features.value.creators_scripts !== true) {
     await router.replace({ name: 'waves.detail', params: { ulid: brandId, waveUlid: waveId } })
     return
   }
@@ -210,8 +237,25 @@ onMounted(async () => {
       {{ t('app.strategy.errors.workspaceGone') }}
     </v-alert>
     <template v-else>
-      <StrategyStepper :summary="summary" :brand-id="brandId" :wave-id="waveId" :active="step" />
+      <StrategyStepper
+        :summary="summary"
+        :brand-id="brandId"
+        :wave-id="waveId"
+        :active="onCreators ? 'creators' : step"
+        :creators-on="creatorsOn"
+        :creators="creatorsState"
+      />
+      <CreatorsStep
+        v-for="n in onCreators ? [1] : []"
+        :key="`creators-${n}`"
+        :summary="summary"
+        :wave="wave"
+        @changed="refreshSummary"
+        @wave="(w) => (wave = w)"
+      />
       <StepCompletionBar
+        v-for="n in onCreators ? [] : [1]"
+        :key="n"
         :summary="summary"
         :step="step"
         :market="market"
@@ -230,7 +274,12 @@ onMounted(async () => {
           >
         </template>
       </StepCompletionBar>
-      <div class="strategy-grid" :class="{ 'strategy-grid--notes': panelOn }">
+      <div
+        v-for="n in onCreators ? [] : [1]"
+        :key="n"
+        class="strategy-grid"
+        :class="{ 'strategy-grid--notes': panelOn }"
+      >
         <div class="strategy-grid__main">
           <UspsStep
             v-if="step === 'usps'"

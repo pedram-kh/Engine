@@ -8,7 +8,7 @@
  * carry the warning with the counts (PL-2.3, C6: a message, never a block). PL-2.5: every live step carries its REAL state from the server: not started (an empty circle with the number), in progress (an amber circle with the number) or done (a green circle with a check); a per-market step in progress says "n of m markets". Creators and Scripts stay "Not available yet". On a narrow screen the bar
  * scrolls sideways inside itself and step names never wrap.
  */
-import type { StrategySummaryResource } from '@catalyst/api-client'
+import type { StrategySummaryResource, WaveCreatorsData } from '@catalyst/api-client'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -21,14 +21,25 @@ const props = defineProps<{
   brandId: string
   waveId: string
   active: StepKey
+  /**
+   * PL-3.1: step 5 is a real step only while `features.creators_scripts` is on (then true); its state comes from the creators
+   * payload (`null` until read). Unset keeps steps 5 and 6 exactly as PL-2 drew them.
+   */
+  creatorsOn?: boolean
+  creators?: WaveCreatorsData['state'] | null
 }>()
 
 const { t } = useI18n()
 
 type LiveKey = StepName
 
+function isLive(key: StepKey, state: string): boolean {
+  return state === 'live' || (key === 'creators' && props.creatorsOn === true)
+}
+
 function stateOf(key: StepKey): 'not_started' | 'in_progress' | 'done' {
   const a = props.summary?.attributes
+  if (key === 'creators' && props.creatorsOn === true) return props.creators?.state ?? 'not_started'
   if (!a || key === 'creators' || key === 'scripts') return 'not_started'
   return stateFor(a, key, null)
 }
@@ -121,6 +132,23 @@ const statusLine = computed<Record<LiveKey, string>>(() => {
 
 /** The warning steps 5 and 6 carry: the wave's counts while any market is not complete, else nothing. */
 const warning = computed(() => stepWarning(props.summary?.attributes.concepts))
+/** PL-3.1: the line under "5. Creators" ("3 creators", "Complete · 3 creators", plus "1 of 2 markets" while in progress). */
+const creatorsLine = computed(() => {
+  const c = props.creators
+  if (c === null || c === undefined || c.count === 0) return t('app.strategy.creators.stepper.none')
+  const count = t('app.strategy.creators.stepper.count', { count: c.count })
+  if (c.state === 'done') return `${t('app.strategy.completion.complete')} · ${count}`
+  if (c.state === 'in_progress' && c.markets_total >= 2)
+    return `${count} · ${t('app.strategy.stepper.marketsOf', { done: c.markets_done, total: c.markets_total }, c.markets_total)}`
+  return count
+})
+function lineFor(key: StepKey): string {
+  return key === 'creators' ? creatorsLine.value : statusLine.value[key as LiveKey]
+}
+/** The concepts warning on a live step 5 (never a lock): a zero-or-one list so the other steps gain no comment node. */
+function warnItems(key: StepKey): number[] {
+  return key === 'creators' && warningText.value !== '' ? [1] : []
+}
 const warningText = computed(() => {
   const w = warning.value
   if (w.kind === 'counts')
@@ -137,7 +165,9 @@ function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUli
           ? 'strategy.matrix'
           : key === 'concepts'
             ? 'strategy.concepts'
-            : 'strategy.personas',
+            : key === 'creators'
+              ? 'strategy.creators'
+              : 'strategy.personas',
     params: { ulid: props.brandId, waveUlid: props.waveId },
   }
 }
@@ -152,7 +182,7 @@ function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUli
     <ol class="strategy-stepper__list">
       <li v-for="step in STEPS" :key="step.key" class="strategy-stepper__item">
         <router-link
-          v-if="step.state === 'live'"
+          v-if="isLive(step.key, step.state)"
           :to="routeFor(step.key)"
           class="strategy-step strategy-step--live"
           :class="{ 'strategy-step--active': active === step.key }"
@@ -177,10 +207,19 @@ function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUli
             <span class="strategy-step__name">{{ t(`app.strategy.stepper.${step.key}`) }}</span>
             <span
               class="strategy-step__status"
-              :title="statusLine[step.key as LiveKey]"
+              :title="lineFor(step.key)"
               :data-test="`strategy-step-${step.key}-status`"
             >
-              {{ statusLine[step.key as LiveKey] }}
+              {{ lineFor(step.key) }}
+            </span>
+            <span
+              v-for="n in warnItems(step.key)"
+              :key="n"
+              class="strategy-step__warn"
+              :data-test="`strategy-step-${step.key}-warning`"
+            >
+              <v-icon icon="mdi-alert-outline" size="13" aria-hidden="true" />
+              {{ warningText }}
             </span>
             <span class="sr-only">{{ t(`app.strategy.stepper.state.${stateOf(step.key)}`) }}</span>
           </span>

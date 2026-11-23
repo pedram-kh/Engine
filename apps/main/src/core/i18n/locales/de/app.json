@@ -1489,7 +1489,8 @@
         "marketCodeTaken": "Zwei Märkte dieser Welle haben denselben Kurzcode.",
         "marketUnknown": "Einer der Märkte gehört nicht mehr zu dieser Welle. Lade die Märkte neu.",
         "marketConflict": "Die Märkte haben sich beim Speichern geändert. Lade die Märkte neu und versuche es erneut.",
-        "countryInTwoMarkets": "{country} steht in {first} und in {second}. Ein Land kann nur zu einem Markt gehören."
+        "countryInTwoMarkets": "{country} steht in {first} und in {second}. Ein Land kann nur zu einem Markt gehören.",
+        "marketHasCreators": "Entferne zuerst die Creator dieser Märkte: {markets}."
       },
       "dialog": {
         "createTitle": "Neue Welle",
@@ -2192,6 +2193,138 @@
         "sheetTitle": "Notizen · {market}",
         "expand": "Notizen erweitern",
         "collapse": "Notizen verkleinern"
+      },
+      "creators": {
+        "title": "Creator · {market}",
+        "subtitle": "Aus den Bewerbern und Eingeladenen der Kampagne ausgewählt. Ordne jeden Creator einer Persona zu, damit sein Skript die passende Botschaft nutzt.",
+        "add": "Creator hinzufügen",
+        "close": "Schließen",
+        "inWave": "In der Welle",
+        "addSlotCaption": "Öffnet die Creator der Kampagne, vorgefiltert auf {market}",
+        "stepper": {
+          "none": "Noch keine Creator",
+          "count": "Creator: {count}"
+        },
+        "summary": {
+          "total": "Creator: {count}",
+          "coverage": "Persona-Abdeckung:",
+          "personaWarning": "Kein aktiver Creator für: {personas}"
+        },
+        "status": {
+          "shortlisted": "Vorgemerkt",
+          "contacted": "Kontaktiert",
+          "confirmed": "Bestätigt",
+          "declined": "Abgelehnt"
+        },
+        "detail": {
+          "applied": "Hat sich auf die Kampagne beworben",
+          "invited": "Eingeladen",
+          "offer_sent": "Angebot gesendet",
+          "countered": "Hat ein Gegenangebot gemacht",
+          "in_work": "In Produktion",
+          "delivered": "Geliefert",
+          "draft_rejected": "Entwurf abgelehnt",
+          "cancelled": "Storniert",
+          "application_rejected": "Bewerbung abgelehnt"
+        },
+        "card": {
+          "unnamed": "Creator ohne Namen",
+          "notAssigned": "Nicht zugeordnet",
+          "persona": "Persona",
+          "status": "Status",
+          "statusHint": "Folgt der Kampagne. Ändere ihn im Kampagnen-Board.",
+          "slotCode": "Slot-Code",
+          "editCode": "Slot-Code bearbeiten",
+          "verified": "Verifiziert",
+          "example": "Beispielinhalt",
+          "profile": "Profil",
+          "replace": "Ersetzen",
+          "remove": "Entfernen"
+        },
+        "decision": {
+          "title": "Entscheidung des Kunden erfassen",
+          "choice": "Entscheidung",
+          "choices": {
+            "approved": "Freigegeben",
+            "suggest_another": "Anderen vorschlagen"
+          },
+          "clientName": "Name des Kunden",
+          "note": "Notiz (optional)",
+          "comment": "Kommentar",
+          "replaces": "Eine neue Entscheidung wird zur aktuellen. Frühere Entscheidungen bleiben im Verlauf.",
+          "why": {
+            "name": "Gib den Namen des Kunden ein.",
+            "comment": "Gib einen Kommentar ein.",
+            "nameAndComment": "Gib den Namen des Kunden und einen Kommentar ein."
+          },
+          "status": {
+            "approved": "Freigegeben von {name}",
+            "suggest_another": "{name} schlägt einen anderen Creator vor"
+          },
+          "record": "Entscheidung erfassen",
+          "history": "Verlauf ({count})",
+          "historyTitle": "Entscheidungen des Kunden",
+          "cardMoved": "Die Karte des Creators wurde im Board nach „Ausgewählt“ verschoben.",
+          "cardNotMoved": "Die Karte wurde nicht verschoben: Sie ist im Board noch nicht an der richtigen Stelle."
+        },
+        "remove": {
+          "title": "Diesen Creator aus der Welle entfernen?",
+          "body": "Die Board-Karte des Creators geht an ihren früheren Platz zurück und der Slot wird gelöscht. Die Kampagne selbst bleibt unverändert.",
+          "bodyDecisions": "Die Entscheidungen des Kunden zu diesem Creator werden ebenfalls gelöscht."
+        },
+        "empty": {
+          "title": "Noch keine Creator in {market}",
+          "body": "Wähle Creator aus {campaign}: die, die sich beworben haben oder eingeladen wurden."
+        },
+        "noCampaign": {
+          "title": "Diese Welle hat noch keine Kampagne",
+          "body": "Creator stammen aus einer Kampagne: aus den Creatorn, die sich bewerben oder eingeladen werden. Verknüpfe eine bestehende Kampagne dieser Marke oder erstelle eine.",
+          "askAdmin": "Bitte einen Admin oder Manager der Agentur, die Kampagne zu verknüpfen oder zu erstellen.",
+          "linkTitle": "Kampagne verknüpfen",
+          "linkLabel": "Kampagne",
+          "linkNone": "Diese Marke hat keine nicht verknüpfte Kampagne für eine Welle.",
+          "link": "Kampagne verknüpfen",
+          "createTitle": "Kampagne erstellen",
+          "createLabel": "Kampagnenname",
+          "create": "Erstellen und verknüpfen"
+        },
+        "picker": {
+          "title": "Creator zu {market} hinzufügen",
+          "titleReplace": "{creator} ersetzen",
+          "subtitle": "Aus den Bewerbern und Eingeladenen von {campaign}",
+          "search": "Creator suchen",
+          "country": "Land",
+          "removeCountry": "Filter {country} entfernen",
+          "prefiltered": "Auf diesen Markt vorgefiltert",
+          "results": "Ergebnisse: {count}",
+          "emptyTitle": "Noch keine Bewerber oder Eingeladenen",
+          "emptyBody": "Creator erscheinen hier, sobald sie sich auf die Kampagne bewerben oder du sie einlädst.",
+          "emptyFilteredTitle": "Kein Creator passt",
+          "emptyFilteredBody": "Entferne ein Land oder ändere die Suche, um mehr zu sehen.",
+          "openCampaign": "Kampagne öffnen",
+          "more": "Mehr anzeigen",
+          "alreadyInWave": "Bereits in der Welle",
+          "alreadyInMarket": "Bereits in der Welle · {market}",
+          "applied": "Beworben",
+          "invited": "Eingeladen",
+          "selected": "Ausgewählt: {count}",
+          "assignPersona": "Persona zuordnen",
+          "choosePerCreator": "Später pro Creator wählen",
+          "add": "Creator hinzufügen ({count})",
+          "replaceWith": "Ersetzen",
+          "roomMarket": "Noch {left} von {max} Plätzen in diesem Markt frei",
+          "roomWave": "Noch {left} von {max} Plätzen in dieser Welle frei"
+        },
+        "errors": {
+          "campaignRequired": "Diese Welle hat noch keine Kampagne. Verknüpfe oder erstelle zuerst eine.",
+          "notEligible": "Dieser Creator kann dieser Welle nicht hinzugefügt werden.",
+          "alreadyInWave": "Dieser Creator ist bereits in dieser Welle.",
+          "capMarket": "Ein Markt hat höchstens {max} Creator.",
+          "capWave": "Eine Welle hat höchstens {max} Creator.",
+          "personaInUse": "Dieser Persona sind Creator zugeordnet ({count}). Ordne sie zuerst einer anderen Persona oder keiner zu.",
+          "slotCodeTaken": "Der Code {code} wird in diesem Markt bereits verwendet.",
+          "removeBlockedInWork": "Die Karte dieses Creators ist im Board bereits in Produktion. Verschiebe die Karte zuerst zurück."
+        }
       }
     }
   },

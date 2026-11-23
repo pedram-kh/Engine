@@ -1489,7 +1489,8 @@
         "marketCodeTaken": "A hullám két piacának ugyanaz a rövid kódja.",
         "marketUnknown": "Az egyik piac már nem tartozik ehhez a hullámhoz. Töltsd újra a piacokat.",
         "marketConflict": "A piacok megváltoztak mentés közben. Töltsd újra a piacokat, és próbáld újra.",
-        "countryInTwoMarkets": "{country} a(z) {first} és a(z) {second} piacon is szerepel. Egy ország csak egy piachoz tartozhat."
+        "countryInTwoMarkets": "{country} a(z) {first} és a(z) {second} piacon is szerepel. Egy ország csak egy piachoz tartozhat.",
+        "marketHasCreators": "Előbb távolítsd el az alkotókat ezekről a piacokról: {markets}."
       },
       "dialog": {
         "createTitle": "Új hullám",
@@ -2192,6 +2193,138 @@
         "sheetTitle": "Jegyzetek · {market}",
         "expand": "Jegyzetek kibontása",
         "collapse": "Jegyzetek összecsukása"
+      },
+      "creators": {
+        "title": "Alkotók · {market}",
+        "subtitle": "A kampány jelentkezői és meghívottai közül kiválasztva. Rendeld minden alkotót egy perszónához, hogy a forgatókönyve a megfelelő üzenetet használja.",
+        "add": "Alkotók hozzáadása",
+        "close": "Bezárás",
+        "inWave": "A hullámban",
+        "addSlotCaption": "Megnyitja a kampány alkotóit, előszűrve erre: {market}",
+        "stepper": {
+          "none": "Még nincsenek alkotók",
+          "count": "Alkotók: {count}"
+        },
+        "summary": {
+          "total": "Alkotók: {count}",
+          "coverage": "Perszónalefedettség:",
+          "personaWarning": "Nincs aktív alkotó ehhez: {personas}"
+        },
+        "status": {
+          "shortlisted": "Szűk listán",
+          "contacted": "Megkeresve",
+          "confirmed": "Megerősítve",
+          "declined": "Elutasította"
+        },
+        "detail": {
+          "applied": "Jelentkezett a kampányra",
+          "invited": "Meghívva",
+          "offer_sent": "Ajánlat elküldve",
+          "countered": "Ellenajánlatot tett",
+          "in_work": "Gyártásban",
+          "delivered": "Leszállítva",
+          "draft_rejected": "Vázlat elutasítva",
+          "cancelled": "Lemondva",
+          "application_rejected": "Jelentkezés elutasítva"
+        },
+        "card": {
+          "unnamed": "Névtelen alkotó",
+          "notAssigned": "Nincs hozzárendelve",
+          "persona": "Perszóna",
+          "status": "Állapot",
+          "statusHint": "Követi a kampányt. A kampánytáblán módosíthatod.",
+          "slotCode": "Hely kódja",
+          "editCode": "Hely kódjának szerkesztése",
+          "verified": "Ellenőrzött",
+          "example": "Példatartalom",
+          "profile": "Profil",
+          "replace": "Csere",
+          "remove": "Eltávolítás"
+        },
+        "decision": {
+          "title": "Az ügyfél döntésének rögzítése",
+          "choice": "Döntés",
+          "choices": {
+            "approved": "Jóváhagyva",
+            "suggest_another": "Másikat javasol"
+          },
+          "clientName": "Az ügyfél neve",
+          "note": "Megjegyzés (nem kötelező)",
+          "comment": "Hozzászólás",
+          "replaces": "Az új döntés lesz az érvényes. A korábbi döntések az előzményekben maradnak.",
+          "why": {
+            "name": "Add meg az ügyfél nevét.",
+            "comment": "Írj egy hozzászólást.",
+            "nameAndComment": "Add meg az ügyfél nevét, és írj egy hozzászólást."
+          },
+          "status": {
+            "approved": "Jóváhagyta: {name}",
+            "suggest_another": "{name} másik alkotót javasol"
+          },
+          "record": "Döntés rögzítése",
+          "history": "Előzmények ({count})",
+          "historyTitle": "Az ügyfél döntései",
+          "cardMoved": "Az alkotó kártyája a táblán átkerült a Kiválasztva oszlopba.",
+          "cardNotMoved": "A kártya nem lett áthelyezve: még nincs a megfelelő helyen a táblán."
+        },
+        "remove": {
+          "title": "Eltávolítod ezt az alkotót a hullámból?",
+          "body": "Az alkotó kártyája a táblán visszakerül az eredeti helyére, a hely törlődik. Maga a kampány nem változik.",
+          "bodyDecisions": "Az ügyfél erre az alkotóra vonatkozó döntései is törlődnek."
+        },
+        "empty": {
+          "title": "Még nincsenek alkotók ezen a piacon: {market}",
+          "body": "Válassz alkotókat a(z) {campaign} kampányból: azokat, akik jelentkeztek vagy meghívást kaptak."
+        },
+        "noCampaign": {
+          "title": "Ennek a hullámnak még nincs kampánya",
+          "body": "Az alkotók egy kampányból jönnek: azok közül, akik jelentkeznek vagy meghívást kapnak. Kapcsold hozzá a márka egy meglévő kampányát, vagy hozz létre egyet.",
+          "askAdmin": "Kérd az ügynökség egy adminisztrátorát vagy menedzserét, hogy kapcsolja hozzá vagy hozza létre a kampányt.",
+          "linkTitle": "Kampány hozzákapcsolása",
+          "linkLabel": "Kampány",
+          "linkNone": "Ennek a márkának nincs hozzá nem kapcsolt hullámkampánya.",
+          "link": "Kampány hozzákapcsolása",
+          "createTitle": "Kampány létrehozása",
+          "createLabel": "A kampány neve",
+          "create": "Létrehozás és hozzákapcsolás"
+        },
+        "picker": {
+          "title": "Alkotók hozzáadása ehhez a piachoz: {market}",
+          "titleReplace": "{creator} cseréje",
+          "subtitle": "A(z) {campaign} kampány jelentkezői és meghívottai közül",
+          "search": "Alkotók keresése",
+          "country": "Ország",
+          "removeCountry": "A(z) {country} szűrő eltávolítása",
+          "prefiltered": "Erre a piacra előszűrve",
+          "results": "Találatok: {count}",
+          "emptyTitle": "Még nincsenek jelentkezők vagy meghívottak",
+          "emptyBody": "Az alkotók itt jelennek meg, amint jelentkeznek a kampányra, vagy meghívod őket.",
+          "emptyFilteredTitle": "Nincs találat",
+          "emptyFilteredBody": "Távolíts el egy országot, vagy módosítsd a keresést, hogy többet láss.",
+          "openCampaign": "A kampány megnyitása",
+          "more": "Továbbiak megjelenítése",
+          "alreadyInWave": "Már a hullámban van",
+          "alreadyInMarket": "Már a hullámban van · {market}",
+          "applied": "Jelentkezett",
+          "invited": "Meghívva",
+          "selected": "Kiválasztva: {count}",
+          "assignPersona": "Perszóna hozzárendelése",
+          "choosePerCreator": "Később, alkotónként választok",
+          "add": "Alkotók hozzáadása ({count})",
+          "replaceWith": "Csere",
+          "roomMarket": "Ezen a piacon {left} / {max} hely maradt",
+          "roomWave": "Ebben a hullámban {left} / {max} hely maradt"
+        },
+        "errors": {
+          "campaignRequired": "Ennek a hullámnak még nincs kampánya. Előbb kapcsolj hozzá vagy hozz létre egyet.",
+          "notEligible": "Ez az alkotó nem adható hozzá ehhez a hullámhoz.",
+          "alreadyInWave": "Ez az alkotó már ebben a hullámban van.",
+          "capMarket": "Egy piacon legfeljebb {max} alkotó lehet.",
+          "capWave": "Egy hullámban legfeljebb {max} alkotó lehet.",
+          "personaInUse": "Ehhez a perszónához alkotók vannak rendelve ({count}). Előbb rendeld őket másik perszónához vagy egyikhez sem.",
+          "slotCodeTaken": "A(z) {code} kód már használatban van ezen a piacon.",
+          "removeBlockedInWork": "Ennek az alkotónak a kártyája a táblán már gyártásban van. Előbb vidd vissza a kártyát."
+        }
       }
     }
   },

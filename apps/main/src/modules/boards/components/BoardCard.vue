@@ -104,6 +104,10 @@ const inviteColor = computed(() => {
 // The `scripts` slot is PL-1.3's seam: empty today, drawn on a wave board only, and it renders no element of its own.
 // (An HTML comment in the template would show up in the dev DOM of every board, so the note lives here.)
 const slimItems = computed<number[]>(() => (props.slim === true ? [1] : []))
+// PL-3.1 — the "In wave" marker: the server sends `in_wave` only on a wave board with the sprint flag on, and true only for
+// a creator who has a place in the wave's Creators step. A zero-or-one list (not `v-if`) so the flag-off DOM has no extra
+// comment node.
+const inWaveItems = computed<number[]>(() => (props.card.attributes.in_wave === true ? [1] : []))
 
 interface DueInfo {
   label: string
@@ -187,6 +191,16 @@ const dueInfo = computed<DueInfo | null>(() => {
             :data-test="`board-card-status-${card.id}`"
           >
             {{ statusLabel }}
+          </v-chip>
+          <v-chip
+            v-for="n in inWaveItems"
+            :key="n"
+            size="x-small"
+            variant="tonal"
+            color="primary"
+            :data-test="`board-card-in-wave-${card.id}`"
+          >
+            {{ t('app.strategy.creators.inWave') }}
           </v-chip>
           <v-spacer />
           <span

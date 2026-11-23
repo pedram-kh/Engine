@@ -36,6 +36,12 @@ const CODE_KEYS: Record<string, string> = {
   'note.thread_full': 'app.strategy.errors.noteThreadFull',
   'note.forbidden': 'app.strategy.errors.noteForbidden',
   'note.body_invalid': 'app.strategy.errors.noteBodyInvalid',
+  'wave_creator.campaign_required': 'app.strategy.creators.errors.campaignRequired',
+  'wave_creator.not_eligible': 'app.strategy.creators.errors.notEligible',
+  'wave_creator.already_in_wave': 'app.strategy.creators.errors.alreadyInWave',
+  'wave_creator.remove_blocked_in_work': 'app.strategy.creators.errors.removeBlockedInWork',
+  'wave.campaign_already_linked': 'app.waves.errors.campaignAlreadyLinked',
+  'wave.campaign_not_available': 'app.waves.errors.campaignNotAvailable',
   forbidden: 'app.strategy.errors.forbidden',
 }
 
@@ -73,6 +79,27 @@ export function strategyErrorMessage(err: unknown, t: Translate): string {
         { count: num('count') ?? 0 },
         num('count') ?? 0,
       )
+    }
+    if (err.code === 'persona.in_use_by_creators') {
+      return t(
+        'app.strategy.creators.errors.personaInUse',
+        { count: num('count') ?? 0 },
+        num('count') ?? 0,
+      )
+    }
+    if (err.code === 'wave_creator.cap_reached') {
+      return t(
+        meta?.['scope'] === 'wave'
+          ? 'app.strategy.creators.errors.capWave'
+          : 'app.strategy.creators.errors.capMarket',
+        { max: num('max') ?? 30 },
+      )
+    }
+    if (err.code === 'wave_creator.slot_code_taken') {
+      const code = meta?.['code']
+      return t('app.strategy.creators.errors.slotCodeTaken', {
+        code: typeof code === 'string' ? code : '',
+      })
     }
     if (err.code === 'concept.market_full') {
       return t('app.strategy.errors.conceptMarketFull', { max: num('max') ?? 30 })

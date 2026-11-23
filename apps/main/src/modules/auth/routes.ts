@@ -363,6 +363,13 @@ export const appRoutes: RouteRecordRaw[] = [
     component: () => import('@/modules/strategy/pages/StrategyPage.vue'),
     meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
+  // PL-3.1 — step 5, the creators. Same page; it leaves for the wave unless `features.creators_scripts` is true.
+  {
+    path: '/brands/:ulid/waves/:waveUlid/strategy/creators',
+    name: 'strategy.creators',
+    component: () => import('@/modules/strategy/pages/StrategyPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
 
   // ── Campaigns ──────────────────────────────────────────────────────────────
   // Sprint 8 Chunk 1. Any agency member may view (list/detail); create + the

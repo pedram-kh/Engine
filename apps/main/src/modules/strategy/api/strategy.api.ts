@@ -21,6 +21,13 @@ import type {
   MatrixSaveEnvelope,
   PersonaCopyPayload,
   StrategyCompletionResponse,
+  WaveCreatorAddPayload,
+  WaveCreatorCandidatesResponse,
+  WaveCreatorDecideResponse,
+  WaveCreatorDecisionHistoryResponse,
+  WaveCreatorDecisionPayload,
+  WaveCreatorUpdatePayload,
+  WaveCreatorsResponse,
   StrategyNoteEnvelope,
   StrategyNoteListResponse,
   StrategySummaryEnvelope,
@@ -45,7 +52,7 @@ function base(s: WaveScope): string {
 }
 
 export type MarkableStep = 'usps' | 'personas' | 'matrix'
-export type NoteStep = MarkableStep | 'concepts'
+export type NoteStep = MarkableStep | 'concepts' | 'creators'
 
 function marketQuery(market: string | null): string {
   return market === null ? '' : `?market=${encodeURIComponent(market)}`
@@ -303,5 +310,58 @@ export const strategyApi = {
 
   removeLink(s: WaveScope, conceptId: string, linkId: string): Promise<ConceptResetResponse> {
     return http.delete<ConceptResetResponse>(`${base(s)}/concepts/${conceptId}/links/${linkId}`)
+  },
+
+  // PL-3.1 — the creators step. `creators_scripts_enabled` (404 while off).
+  creators(s: WaveScope): Promise<WaveCreatorsResponse> {
+    return http.get<WaveCreatorsResponse>(`${base(s)}/creators`)
+  },
+
+  /** The picker: the campaign's applicants and invitees, pre-filtered to the market's countries by the caller. */
+  creatorCandidates(
+    s: WaveScope,
+    params: { market: string; q?: string; countries?: string[]; page?: number; per_page?: number },
+  ): Promise<WaveCreatorCandidatesResponse> {
+    const qs = new URLSearchParams()
+    qs.set('market', params.market)
+    if (params.q !== undefined && params.q.trim() !== '') qs.set('q', params.q.trim())
+    for (const c of params.countries ?? []) qs.append('country[]', c)
+    if (params.page !== undefined) qs.set('page', String(params.page))
+    if (params.per_page !== undefined) qs.set('per_page', String(params.per_page))
+    return http.get<WaveCreatorCandidatesResponse>(
+      `${base(s)}/creators/candidates?${qs.toString()}`,
+    )
+  },
+
+  addCreators(s: WaveScope, payload: WaveCreatorAddPayload): Promise<WaveCreatorsResponse> {
+    return http.post<WaveCreatorsResponse>(`${base(s)}/creators`, payload)
+  },
+
+  updateCreator(
+    s: WaveScope,
+    slotId: string,
+    payload: WaveCreatorUpdatePayload,
+  ): Promise<WaveCreatorsResponse> {
+    return http.patch<WaveCreatorsResponse>(`${base(s)}/creators/${slotId}`, payload)
+  },
+
+  replaceCreator(s: WaveScope, slotId: string, creator: string): Promise<WaveCreatorsResponse> {
+    return http.post<WaveCreatorsResponse>(`${base(s)}/creators/${slotId}/replace`, { creator })
+  },
+
+  removeCreator(s: WaveScope, slotId: string): Promise<WaveCreatorsResponse> {
+    return http.delete<WaveCreatorsResponse>(`${base(s)}/creators/${slotId}`)
+  },
+
+  creatorDecisions(s: WaveScope, slotId: string): Promise<WaveCreatorDecisionHistoryResponse> {
+    return http.get<WaveCreatorDecisionHistoryResponse>(`${base(s)}/creators/${slotId}/decisions`)
+  },
+
+  decideCreator(
+    s: WaveScope,
+    slotId: string,
+    payload: WaveCreatorDecisionPayload,
+  ): Promise<WaveCreatorDecideResponse> {
+    return http.post<WaveCreatorDecideResponse>(`${base(s)}/creators/${slotId}/decisions`, payload)
   },
 }

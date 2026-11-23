@@ -1489,7 +1489,8 @@
         "marketCodeTaken": "Due mercati di questa ondata hanno lo stesso codice breve.",
         "marketUnknown": "Uno dei mercati non fa più parte di questa ondata. Ricarica i mercati.",
         "marketConflict": "I mercati sono cambiati durante il salvataggio. Ricarica i mercati e riprova.",
-        "countryInTwoMarkets": "{country} è in {first} e in {second}. Un paese può appartenere a un solo mercato."
+        "countryInTwoMarkets": "{country} è in {first} e in {second}. Un paese può appartenere a un solo mercato.",
+        "marketHasCreators": "Rimuovi prima i creator di questi mercati: {markets}."
       },
       "dialog": {
         "createTitle": "Nuova ondata",
@@ -2192,6 +2193,138 @@
         "sheetTitle": "Note · {market}",
         "expand": "Espandi le note",
         "collapse": "Riduci le note"
+      },
+      "creators": {
+        "title": "Creator · {market}",
+        "subtitle": "Scelti tra i candidati e gli invitati della campagna. Abbina ogni creator a una persona così il suo script usa il messaggio giusto.",
+        "add": "Aggiungi creator",
+        "close": "Chiudi",
+        "inWave": "Nell'ondata",
+        "addSlotCaption": "Apre i creator della campagna, filtrati su {market}",
+        "stepper": {
+          "none": "Ancora nessun creator",
+          "count": "Creator: {count}"
+        },
+        "summary": {
+          "total": "Creator: {count}",
+          "coverage": "Copertura delle persone:",
+          "personaWarning": "Nessun creator in gioco per: {personas}"
+        },
+        "status": {
+          "shortlisted": "Preselezionato",
+          "contacted": "Contattato",
+          "confirmed": "Confermato",
+          "declined": "Rifiutato"
+        },
+        "detail": {
+          "applied": "Ha fatto domanda per la campagna",
+          "invited": "Invitato",
+          "offer_sent": "Offerta inviata",
+          "countered": "Ha fatto una controproposta",
+          "in_work": "In produzione",
+          "delivered": "Consegnato",
+          "draft_rejected": "Bozza respinta",
+          "cancelled": "Annullato",
+          "application_rejected": "Candidatura respinta"
+        },
+        "card": {
+          "unnamed": "Creator senza nome",
+          "notAssigned": "Non assegnato",
+          "persona": "Persona",
+          "status": "Stato",
+          "statusHint": "Segue la campagna. Modificalo sulla bacheca della campagna.",
+          "slotCode": "Codice slot",
+          "editCode": "Modifica il codice slot",
+          "verified": "Verificato",
+          "example": "Contenuto di esempio",
+          "profile": "Profilo",
+          "replace": "Sostituisci",
+          "remove": "Rimuovi"
+        },
+        "decision": {
+          "title": "Registra la decisione del cliente",
+          "choice": "Decisione",
+          "choices": {
+            "approved": "Approvato",
+            "suggest_another": "Suggerisci un altro"
+          },
+          "clientName": "Nome del cliente",
+          "note": "Nota (facoltativa)",
+          "comment": "Commento",
+          "replaces": "Una nuova decisione diventa quella attuale. Le precedenti restano nella cronologia.",
+          "why": {
+            "name": "Inserisci il nome del cliente.",
+            "comment": "Inserisci un commento.",
+            "nameAndComment": "Inserisci il nome del cliente e un commento."
+          },
+          "status": {
+            "approved": "Approvato da {name}",
+            "suggest_another": "{name} suggerisce un altro creator"
+          },
+          "record": "Registra la decisione",
+          "history": "Cronologia ({count})",
+          "historyTitle": "Decisioni del cliente",
+          "cardMoved": "La scheda del creator è passata a Selezionato sulla bacheca.",
+          "cardNotMoved": "La scheda non è stata spostata: non è ancora al posto giusto sulla bacheca."
+        },
+        "remove": {
+          "title": "Rimuovere questo creator dall'ondata?",
+          "body": "La scheda del creator torna dov'era e lo slot viene eliminato. La campagna non cambia.",
+          "bodyDecisions": "Vengono eliminate anche le decisioni del cliente su questo creator."
+        },
+        "empty": {
+          "title": "Ancora nessun creator in {market}",
+          "body": "Scegli i creator di {campaign}: quelli che hanno fatto domanda o sono stati invitati."
+        },
+        "noCampaign": {
+          "title": "Questa ondata non ha ancora una campagna",
+          "body": "I creator arrivano da una campagna: quelli che fanno domanda o vengono invitati. Collega una campagna esistente di questo marchio o creane una.",
+          "askAdmin": "Chiedi a un amministratore o manager dell'agenzia di collegare o creare la campagna.",
+          "linkTitle": "Collega una campagna",
+          "linkLabel": "Campagna",
+          "linkNone": "Questo marchio non ha campagne per ondata non collegate.",
+          "link": "Collega la campagna",
+          "createTitle": "Crea una campagna",
+          "createLabel": "Nome della campagna",
+          "create": "Crea e collega"
+        },
+        "picker": {
+          "title": "Aggiungi creator a {market}",
+          "titleReplace": "Sostituisci {creator}",
+          "subtitle": "Tra i candidati e gli invitati di {campaign}",
+          "search": "Cerca creator",
+          "country": "Paese",
+          "removeCountry": "Rimuovi il filtro {country}",
+          "prefiltered": "Prefiltrato su questo mercato",
+          "results": "Risultati: {count}",
+          "emptyTitle": "Ancora nessun candidato o invitato",
+          "emptyBody": "I creator compaiono qui quando fanno domanda per la campagna o li inviti.",
+          "emptyFilteredTitle": "Nessun creator corrisponde",
+          "emptyFilteredBody": "Rimuovi un paese o cambia la ricerca per vederne altri.",
+          "openCampaign": "Apri la campagna",
+          "more": "Mostra altri",
+          "alreadyInWave": "Già nell'ondata",
+          "alreadyInMarket": "Già nell'ondata · {market}",
+          "applied": "Candidato",
+          "invited": "Invitato",
+          "selected": "Selezionati: {count}",
+          "assignPersona": "Assegna persona",
+          "choosePerCreator": "Scegli più tardi per creator",
+          "add": "Aggiungi creator ({count})",
+          "replaceWith": "Sostituisci",
+          "roomMarket": "Restano {left} posti su {max} in questo mercato",
+          "roomWave": "Restano {left} posti su {max} in questa ondata"
+        },
+        "errors": {
+          "campaignRequired": "Questa ondata non ha ancora una campagna. Collegane o creane una prima.",
+          "notEligible": "Questo creator non può essere aggiunto a questa ondata.",
+          "alreadyInWave": "Questo creator è già in questa ondata.",
+          "capMarket": "Un mercato ha al massimo {max} creator.",
+          "capWave": "Un'ondata ha al massimo {max} creator.",
+          "personaInUse": "Ci sono creator abbinati a questa persona ({count}). Abbinali prima a un'altra persona o a nessuna.",
+          "slotCodeTaken": "Il codice {code} è già usato in questo mercato.",
+          "removeBlockedInWork": "La scheda di questo creator è già in produzione sulla bacheca. Riporta prima indietro la scheda."
+        }
       }
     }
   },

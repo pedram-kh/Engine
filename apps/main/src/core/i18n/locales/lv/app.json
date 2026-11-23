@@ -1489,7 +1489,8 @@
         "marketCodeTaken": "Diviem šī viļņa tirgiem ir viens un tas pats īskods.",
         "marketUnknown": "Viens no tirgiem vairs nav šī viļņa daļa. Pārlādējiet tirgus.",
         "marketConflict": "Tirgi mainījās saglabāšanas laikā. Pārlādējiet tirgus un mēģiniet vēlreiz.",
-        "countryInTwoMarkets": "{country} ir gan tirgū {first}, gan tirgū {second}. Valsts var piederēt tikai vienam tirgum."
+        "countryInTwoMarkets": "{country} ir gan tirgū {first}, gan tirgū {second}. Valsts var piederēt tikai vienam tirgum.",
+        "marketHasCreators": "Vispirms noņem šo tirgu veidotājus: {markets}."
       },
       "dialog": {
         "createTitle": "Jauns vilnis",
@@ -2192,6 +2193,138 @@
         "sheetTitle": "Piezīmes · {market}",
         "expand": "Izvērst piezīmes",
         "collapse": "Sakļaut piezīmes"
+      },
+      "creators": {
+        "title": "Veidotāji · {market}",
+        "subtitle": "Izvēlēti no kampaņas pieteicējiem un uzaicinātajiem. Piesaisti katru veidotāju personai, lai viņa scenārijs izmantotu pareizo vēstījumu.",
+        "add": "Pievienot veidotājus",
+        "close": "Aizvērt",
+        "inWave": "Vilnī",
+        "addSlotCaption": "Atver kampaņas veidotājus, iepriekš filtrētus pēc tirgus {market}",
+        "stepper": {
+          "none": "Veidotāju vēl nav",
+          "count": "Veidotāji: {count}"
+        },
+        "summary": {
+          "total": "Veidotāji: {count}",
+          "coverage": "Personu aptvērums:",
+          "personaWarning": "Nav aktīva veidotāja: {personas}"
+        },
+        "status": {
+          "shortlisted": "Īsajā sarakstā",
+          "contacted": "Sazināts",
+          "confirmed": "Apstiprināts",
+          "declined": "Atteicās"
+        },
+        "detail": {
+          "applied": "Pieteicās kampaņai",
+          "invited": "Uzaicināts",
+          "offer_sent": "Piedāvājums nosūtīts",
+          "countered": "Iesniedza pretpiedāvājumu",
+          "in_work": "Ražošanā",
+          "delivered": "Piegādāts",
+          "draft_rejected": "Melnraksts noraidīts",
+          "cancelled": "Atcelts",
+          "application_rejected": "Pieteikums noraidīts"
+        },
+        "card": {
+          "unnamed": "Veidotājs bez vārda",
+          "notAssigned": "Nav piešķirts",
+          "persona": "Persona",
+          "status": "Statuss",
+          "statusHint": "Seko kampaņai. Maini to kampaņas tāfelē.",
+          "slotCode": "Vietas kods",
+          "editCode": "Rediģēt vietas kodu",
+          "verified": "Pārbaudīts",
+          "example": "Parauga saturs",
+          "profile": "Profils",
+          "replace": "Aizstāt",
+          "remove": "Noņemt"
+        },
+        "decision": {
+          "title": "Reģistrēt klienta lēmumu",
+          "choice": "Lēmums",
+          "choices": {
+            "approved": "Apstiprināts",
+            "suggest_another": "Ieteikt citu"
+          },
+          "clientName": "Klienta vārds",
+          "note": "Piezīme (neobligāta)",
+          "comment": "Komentārs",
+          "replaces": "Jauns lēmums kļūst par spēkā esošo. Iepriekšējie lēmumi paliek vēsturē.",
+          "why": {
+            "name": "Ievadi klienta vārdu.",
+            "comment": "Ievadi komentāru.",
+            "nameAndComment": "Ievadi klienta vārdu un komentāru."
+          },
+          "status": {
+            "approved": "Apstiprināja: {name}",
+            "suggest_another": "{name} iesaka citu veidotāju"
+          },
+          "record": "Reģistrēt lēmumu",
+          "history": "Vēsture ({count})",
+          "historyTitle": "Klienta lēmumi",
+          "cardMoved": "Veidotāja kartīte tāfelē pārvietota uz Izvēlētie.",
+          "cardNotMoved": "Kartīte netika pārvietota: tā tāfelē vēl nav īstajā vietā."
+        },
+        "remove": {
+          "title": "Vai noņemt šo veidotāju no viļņa?",
+          "body": "Veidotāja kartīte tāfelē atgriežas, kur bija, un vieta tiek dzēsta. Pati kampaņa nemainās.",
+          "bodyDecisions": "Tiek dzēsti arī klienta lēmumi par šo veidotāju."
+        },
+        "empty": {
+          "title": "Tirgū {market} veidotāju vēl nav",
+          "body": "Izvēlies veidotājus no kampaņas {campaign}: tos, kas pieteicās vai tika uzaicināti."
+        },
+        "noCampaign": {
+          "title": "Šim vilnim vēl nav kampaņas",
+          "body": "Veidotāji nāk no kampaņas: no tiem, kas piesakās vai tiek uzaicināti. Sasaisti esošu šīs markas kampaņu vai izveido jaunu.",
+          "askAdmin": "Palūdz aģentūras administratoram vai vadītājam sasaistīt vai izveidot kampaņu.",
+          "linkTitle": "Sasaistīt kampaņu",
+          "linkLabel": "Kampaņa",
+          "linkNone": "Šai markai nav nesasaistītas viļņa kampaņas.",
+          "link": "Sasaistīt kampaņu",
+          "createTitle": "Izveidot kampaņu",
+          "createLabel": "Kampaņas nosaukums",
+          "create": "Izveidot un sasaistīt"
+        },
+        "picker": {
+          "title": "Pievienot veidotājus tirgum {market}",
+          "titleReplace": "Aizstāt veidotāju {creator}",
+          "subtitle": "No kampaņas {campaign} pieteicējiem un uzaicinātajiem",
+          "search": "Meklēt veidotājus",
+          "country": "Valsts",
+          "removeCountry": "Noņemt filtru {country}",
+          "prefiltered": "Iepriekš filtrēts pēc šī tirgus",
+          "results": "Rezultāti: {count}",
+          "emptyTitle": "Pieteicēju vai uzaicināto vēl nav",
+          "emptyBody": "Veidotāji parādīsies šeit, tiklīdz pieteiksies kampaņai vai tu viņus uzaicināsi.",
+          "emptyFilteredTitle": "Neviens veidotājs neatbilst",
+          "emptyFilteredBody": "Noņem valsti vai maini meklēšanu, lai redzētu vairāk.",
+          "openCampaign": "Atvērt kampaņu",
+          "more": "Rādīt vairāk",
+          "alreadyInWave": "Jau vilnī",
+          "alreadyInMarket": "Jau vilnī · {market}",
+          "applied": "Pieteicās",
+          "invited": "Uzaicināts",
+          "selected": "Izvēlēti: {count}",
+          "assignPersona": "Piešķirt personu",
+          "choosePerCreator": "Izvēlēties vēlāk katram veidotājam",
+          "add": "Pievienot veidotājus ({count})",
+          "replaceWith": "Aizstāt",
+          "roomMarket": "Šajā tirgū atlikušas {left} no {max} vietām",
+          "roomWave": "Šajā vilnī atlikušas {left} no {max} vietām"
+        },
+        "errors": {
+          "campaignRequired": "Šim vilnim vēl nav kampaņas. Vispirms sasaisti vai izveido kampaņu.",
+          "notEligible": "Šo veidotāju nevar pievienot šim vilnim.",
+          "alreadyInWave": "Šis veidotājs jau ir šajā vilnī.",
+          "capMarket": "Tirgū var būt ne vairāk kā {max} veidotāju.",
+          "capWave": "Vilnī var būt ne vairāk kā {max} veidotāju.",
+          "personaInUse": "Ar šo personu ir sasaistīti veidotāji ({count}). Vispirms sasaisti viņus ar citu personu vai nevienu.",
+          "slotCodeTaken": "Kods {code} šajā tirgū jau tiek izmantots.",
+          "removeBlockedInWork": "Šī veidotāja kartīte tāfelē jau ir ražošanā. Vispirms atgriez kartīti atpakaļ."
+        }
       }
     }
   },

@@ -1489,7 +1489,8 @@
         "marketCodeTaken": "Kahdella tämän aallon markkinalla on sama lyhyt koodi.",
         "marketUnknown": "Yksi markkinoista ei enää kuulu tähän aaltoon. Lataa markkinat uudelleen.",
         "marketConflict": "Markkinat muuttuivat tallennuksen aikana. Lataa markkinat uudelleen ja yritä uudestaan.",
-        "countryInTwoMarkets": "{country} on sekä markkinassa {first} että markkinassa {second}. Maa voi kuulua vain yhteen markkinaan."
+        "countryInTwoMarkets": "{country} on sekä markkinassa {first} että markkinassa {second}. Maa voi kuulua vain yhteen markkinaan.",
+        "marketHasCreators": "Poista ensin näiden markkinoiden tekijät: {markets}."
       },
       "dialog": {
         "createTitle": "Uusi aalto",
@@ -2192,6 +2193,138 @@
         "sheetTitle": "Muistiinpanot · {market}",
         "expand": "Laajenna muistiinpanot",
         "collapse": "Pienennä muistiinpanot"
+      },
+      "creators": {
+        "title": "Tekijät · {market}",
+        "subtitle": "Valittu kampanjan hakijoista ja kutsutuista. Yhdistä jokainen tekijä persoonaan, jotta hänen käsikirjoituksensa käyttää oikeaa viestiä.",
+        "add": "Lisää tekijöitä",
+        "close": "Sulje",
+        "inWave": "Aallossa",
+        "addSlotCaption": "Avaa kampanjan tekijät esisuodatettuna markkinalle {market}",
+        "stepper": {
+          "none": "Ei vielä tekijöitä",
+          "count": "Tekijät: {count}"
+        },
+        "summary": {
+          "total": "Tekijät: {count}",
+          "coverage": "Persoonien kattavuus:",
+          "personaWarning": "Ei aktiivista tekijää: {personas}"
+        },
+        "status": {
+          "shortlisted": "Lyhytlistalla",
+          "contacted": "Yhteydessä",
+          "confirmed": "Vahvistettu",
+          "declined": "Kieltäytyi"
+        },
+        "detail": {
+          "applied": "Haki kampanjaan",
+          "invited": "Kutsuttu",
+          "offer_sent": "Tarjous lähetetty",
+          "countered": "Teki vastatarjouksen",
+          "in_work": "Tuotannossa",
+          "delivered": "Toimitettu",
+          "draft_rejected": "Luonnos hylätty",
+          "cancelled": "Peruutettu",
+          "application_rejected": "Hakemus hylätty"
+        },
+        "card": {
+          "unnamed": "Nimetön tekijä",
+          "notAssigned": "Ei määritetty",
+          "persona": "Persoona",
+          "status": "Tila",
+          "statusHint": "Seuraa kampanjaa. Muuta sitä kampanjataulussa.",
+          "slotCode": "Paikan koodi",
+          "editCode": "Muokkaa paikan koodia",
+          "verified": "Vahvistettu",
+          "example": "Esimerkkisisältö",
+          "profile": "Profiili",
+          "replace": "Vaihda",
+          "remove": "Poista"
+        },
+        "decision": {
+          "title": "Kirjaa asiakkaan päätös",
+          "choice": "Päätös",
+          "choices": {
+            "approved": "Hyväksytty",
+            "suggest_another": "Ehdota toista"
+          },
+          "clientName": "Asiakkaan nimi",
+          "note": "Muistiinpano (valinnainen)",
+          "comment": "Kommentti",
+          "replaces": "Uusi päätös tulee voimaan. Aiemmat päätökset säilyvät historiassa.",
+          "why": {
+            "name": "Kirjoita asiakkaan nimi.",
+            "comment": "Kirjoita kommentti.",
+            "nameAndComment": "Kirjoita asiakkaan nimi ja kommentti."
+          },
+          "status": {
+            "approved": "Hyväksynyt: {name}",
+            "suggest_another": "{name} ehdottaa toista tekijää"
+          },
+          "record": "Kirjaa päätös",
+          "history": "Historia ({count})",
+          "historyTitle": "Asiakkaan päätökset",
+          "cardMoved": "Tekijän kortti siirrettiin taulussa kohtaan Valitut.",
+          "cardNotMoved": "Korttia ei siirretty: se ei ole vielä oikeassa paikassa taulussa."
+        },
+        "remove": {
+          "title": "Poistetaanko tämä tekijä aallosta?",
+          "body": "Tekijän kortti palaa taulussa entiseen paikkaansa ja paikka poistetaan. Itse kampanja ei muutu.",
+          "bodyDecisions": "Myös asiakkaan päätökset tästä tekijästä poistetaan."
+        },
+        "empty": {
+          "title": "Ei vielä tekijöitä markkinalla {market}",
+          "body": "Valitse tekijöitä kampanjasta {campaign}: ne, jotka hakivat tai kutsuttiin."
+        },
+        "noCampaign": {
+          "title": "Tällä aallolla ei ole vielä kampanjaa",
+          "body": "Tekijät tulevat kampanjasta: niistä, jotka hakevat tai kutsutaan. Yhdistä brändin olemassa oleva kampanja tai luo uusi.",
+          "askAdmin": "Pyydä toimiston ylläpitäjää tai managerta yhdistämään tai luomaan kampanja.",
+          "linkTitle": "Yhdistä kampanja",
+          "linkLabel": "Kampanja",
+          "linkNone": "Tällä brändillä ei ole yhdistämätöntä aaltokampanjaa.",
+          "link": "Yhdistä kampanja",
+          "createTitle": "Luo kampanja",
+          "createLabel": "Kampanjan nimi",
+          "create": "Luo ja yhdistä"
+        },
+        "picker": {
+          "title": "Lisää tekijöitä markkinalle {market}",
+          "titleReplace": "Vaihda tekijä {creator}",
+          "subtitle": "Kampanjan {campaign} hakijoista ja kutsutuista",
+          "search": "Hae tekijöitä",
+          "country": "Maa",
+          "removeCountry": "Poista suodatin {country}",
+          "prefiltered": "Esisuodatettu tälle markkinalle",
+          "results": "Tulokset: {count}",
+          "emptyTitle": "Ei vielä hakijoita eikä kutsuttuja",
+          "emptyBody": "Tekijät näkyvät tässä, kun he hakevat kampanjaan tai kutsut heidät.",
+          "emptyFilteredTitle": "Ei osumia",
+          "emptyFilteredBody": "Poista maa tai muuta hakua nähdäksesi lisää.",
+          "openCampaign": "Avaa kampanja",
+          "more": "Näytä lisää",
+          "alreadyInWave": "Jo aallossa",
+          "alreadyInMarket": "Jo aallossa · {market}",
+          "applied": "Hakenut",
+          "invited": "Kutsuttu",
+          "selected": "Valittu: {count}",
+          "assignPersona": "Määritä persoona",
+          "choosePerCreator": "Valitse myöhemmin tekijäkohtaisesti",
+          "add": "Lisää tekijöitä ({count})",
+          "replaceWith": "Vaihda",
+          "roomMarket": "Tällä markkinalla on {left} / {max} paikkaa jäljellä",
+          "roomWave": "Tässä aallossa on {left} / {max} paikkaa jäljellä"
+        },
+        "errors": {
+          "campaignRequired": "Tällä aallolla ei ole vielä kampanjaa. Yhdistä tai luo ensin kampanja.",
+          "notEligible": "Tätä tekijää ei voi lisätä tähän aaltoon.",
+          "alreadyInWave": "Tämä tekijä on jo tässä aallossa.",
+          "capMarket": "Markkinalla on enintään {max} tekijää.",
+          "capWave": "Aallossa on enintään {max} tekijää.",
+          "personaInUse": "Tähän persoonaan on yhdistetty tekijöitä ({count}). Yhdistä heidät ensin toiseen persoonaan tai ei mihinkään.",
+          "slotCodeTaken": "Koodi {code} on jo käytössä tällä markkinalla.",
+          "removeBlockedInWork": "Tämän tekijän kortti on taulussa jo tuotannossa. Siirrä kortti ensin takaisin."
+        }
       }
     }
   },

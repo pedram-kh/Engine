@@ -1489,7 +1489,8 @@
         "marketCodeTaken": "Două piețe ale acestui val au același cod scurt.",
         "marketUnknown": "Una dintre piețe nu mai face parte din acest val. Reîncărcați piețele.",
         "marketConflict": "Piețele s-au schimbat în timp ce salvați. Reîncărcați piețele și încercați din nou.",
-        "countryInTwoMarkets": "{country} este și în {first}, și în {second}. O țară poate aparține unei singure piețe."
+        "countryInTwoMarkets": "{country} este și în {first}, și în {second}. O țară poate aparține unei singure piețe.",
+        "marketHasCreators": "Elimină mai întâi creatorii din aceste piețe: {markets}."
       },
       "dialog": {
         "createTitle": "Val nou",
@@ -2192,6 +2193,138 @@
         "sheetTitle": "Notițe · {market}",
         "expand": "Extinde notele",
         "collapse": "Restrânge notele"
+      },
+      "creators": {
+        "title": "Creatori · {market}",
+        "subtitle": "Aleși dintre solicitanții și invitații campaniei. Asociază fiecare creator unui persona, ca scriptul lui să folosească mesajul potrivit.",
+        "add": "Adaugă creatori",
+        "close": "Închide",
+        "inWave": "În val",
+        "addSlotCaption": "Deschide creatorii campaniei, prefiltrați pe {market}",
+        "stepper": {
+          "none": "Încă niciun creator",
+          "count": "Creatori: {count}"
+        },
+        "summary": {
+          "total": "Creatori: {count}",
+          "coverage": "Acoperirea persona:",
+          "personaWarning": "Niciun creator activ pentru: {personas}"
+        },
+        "status": {
+          "shortlisted": "Pe lista scurtă",
+          "contacted": "Contactat",
+          "confirmed": "Confirmat",
+          "declined": "Refuzat"
+        },
+        "detail": {
+          "applied": "S-a înscris în campanie",
+          "invited": "Invitat",
+          "offer_sent": "Ofertă trimisă",
+          "countered": "A făcut o contraofertă",
+          "in_work": "În producție",
+          "delivered": "Livrat",
+          "draft_rejected": "Ciornă respinsă",
+          "cancelled": "Anulat",
+          "application_rejected": "Cerere respinsă"
+        },
+        "card": {
+          "unnamed": "Creator fără nume",
+          "notAssigned": "Neatribuit",
+          "persona": "Persona",
+          "status": "Stare",
+          "statusHint": "Urmează campania. Schimbă-o pe tabla campaniei.",
+          "slotCode": "Codul locului",
+          "editCode": "Editează codul locului",
+          "verified": "Verificat",
+          "example": "Conținut-exemplu",
+          "profile": "Profil",
+          "replace": "Înlocuiește",
+          "remove": "Elimină"
+        },
+        "decision": {
+          "title": "Înregistrează decizia clientului",
+          "choice": "Decizie",
+          "choices": {
+            "approved": "Aprobat",
+            "suggest_another": "Sugerează altul"
+          },
+          "clientName": "Numele clientului",
+          "note": "Notă (opțional)",
+          "comment": "Comentariu",
+          "replaces": "O decizie nouă devine cea curentă. Deciziile anterioare rămân în istoric.",
+          "why": {
+            "name": "Introdu numele clientului.",
+            "comment": "Introdu un comentariu.",
+            "nameAndComment": "Introdu numele clientului și un comentariu."
+          },
+          "status": {
+            "approved": "Aprobat de {name}",
+            "suggest_another": "{name} sugerează alt creator"
+          },
+          "record": "Înregistrează decizia",
+          "history": "Istoric ({count})",
+          "historyTitle": "Deciziile clientului",
+          "cardMoved": "Cardul creatorului a fost mutat în Selectați pe tablă.",
+          "cardNotMoved": "Cardul nu a fost mutat: nu se află încă în locul potrivit pe tablă."
+        },
+        "remove": {
+          "title": "Elimini acest creator din val?",
+          "body": "Cardul creatorului de pe tablă revine unde era, iar locul este șters. Campania în sine nu se schimbă.",
+          "bodyDecisions": "Deciziile clientului despre acest creator se șterg și ele."
+        },
+        "empty": {
+          "title": "Încă niciun creator în {market}",
+          "body": "Alege creatori din {campaign}: cei care s-au înscris sau au fost invitați."
+        },
+        "noCampaign": {
+          "title": "Acest val nu are încă o campanie",
+          "body": "Creatorii vin dintr-o campanie: cei care se înscriu sau sunt invitați. Asociază o campanie existentă a acestui brand sau creează una.",
+          "askAdmin": "Roagă un administrator sau manager al agenției să asocieze sau să creeze campania.",
+          "linkTitle": "Asociază o campanie",
+          "linkLabel": "Campanie",
+          "linkNone": "Acest brand nu are nicio campanie de val neasociată.",
+          "link": "Asociază campania",
+          "createTitle": "Creează o campanie",
+          "createLabel": "Numele campaniei",
+          "create": "Creează și asociază"
+        },
+        "picker": {
+          "title": "Adaugă creatori în {market}",
+          "titleReplace": "Înlocuiește {creator}",
+          "subtitle": "Dintre solicitanții și invitații campaniei {campaign}",
+          "search": "Caută creatori",
+          "country": "Țară",
+          "removeCountry": "Elimină filtrul {country}",
+          "prefiltered": "Prefiltrat pe această piață",
+          "results": "Rezultate: {count}",
+          "emptyTitle": "Încă niciun solicitant sau invitat",
+          "emptyBody": "Creatorii apar aici când se înscriu în campanie sau când îi inviți.",
+          "emptyFilteredTitle": "Niciun creator nu se potrivește",
+          "emptyFilteredBody": "Elimină o țară sau schimbă căutarea ca să vezi mai mulți.",
+          "openCampaign": "Deschide campania",
+          "more": "Arată mai mulți",
+          "alreadyInWave": "Deja în val",
+          "alreadyInMarket": "Deja în val · {market}",
+          "applied": "S-a înscris",
+          "invited": "Invitat",
+          "selected": "Selectați: {count}",
+          "assignPersona": "Atribuie persona",
+          "choosePerCreator": "Alege mai târziu pentru fiecare creator",
+          "add": "Adaugă creatori ({count})",
+          "replaceWith": "Înlocuiește",
+          "roomMarket": "Au rămas {left} din {max} locuri pe această piață",
+          "roomWave": "Au rămas {left} din {max} locuri în acest val"
+        },
+        "errors": {
+          "campaignRequired": "Acest val nu are încă o campanie. Asociază sau creează mai întâi una.",
+          "notEligible": "Acest creator nu poate fi adăugat în acest val.",
+          "alreadyInWave": "Acest creator este deja în acest val.",
+          "capMarket": "O piață are cel mult {max} creatori.",
+          "capWave": "Un val are cel mult {max} creatori.",
+          "personaInUse": "Unei persona i-au fost asociați creatori ({count}). Asociază-i mai întâi altei persona sau niciuneia.",
+          "slotCodeTaken": "Codul {code} este deja folosit pe această piață.",
+          "removeBlockedInWork": "Cardul acestui creator este deja în producție pe tablă. Mută mai întâi cardul înapoi."
+        }
       }
     }
   },

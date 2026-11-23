@@ -1489,7 +1489,8 @@
         "marketCodeTaken": "Żewġ swieq ta' din il-mewġa għandhom l-istess kodiċi qasir.",
         "marketUnknown": "Wieħed mis-swieq m'għadux parti minn din il-mewġa. Erġa' tgħabbi s-swieq.",
         "marketConflict": "Is-swieq inbidlu waqt li kont qed issejvja. Erġa' tgħabbi s-swieq u erġa' pprova.",
-        "countryInTwoMarkets": "{country} qiegħed kemm f'{first} kif ukoll f'{second}. Pajjiż jista' jappartjeni għal suq wieħed biss."
+        "countryInTwoMarkets": "{country} qiegħed kemm f'{first} kif ukoll f'{second}. Pajjiż jista' jappartjeni għal suq wieħed biss.",
+        "marketHasCreators": "Neħħi l-ewwel il-kreaturi ta' dawn is-swieq: {markets}."
       },
       "dialog": {
         "createTitle": "Mewġa ġdida",
@@ -2192,6 +2193,138 @@
         "sheetTitle": "Noti · {market}",
         "expand": "Kabbar in-noti",
         "collapse": "Naqqas in-noti"
+      },
+      "creators": {
+        "title": "Kreaturi · {market}",
+        "subtitle": "Magħżula minn fost l-applikanti u l-mistednin tal-kampanja. Qabbad kull kreatur ma' persunaġġ biex l-iskript tiegħu juża l-messaġġ it-tajjeb.",
+        "add": "Żid kreaturi",
+        "close": "Agħlaq",
+        "inWave": "Fil-mewġa",
+        "addSlotCaption": "Jiftaħ il-kreaturi tal-kampanja, ippreflitrati għal {market}",
+        "stepper": {
+          "none": "Għad m'hemm l-ebda kreatur",
+          "count": "Kreaturi: {count}"
+        },
+        "summary": {
+          "total": "Kreaturi: {count}",
+          "coverage": "Kopertura tal-persunaġġi:",
+          "personaWarning": "L-ebda kreatur attiv għal: {personas}"
+        },
+        "status": {
+          "shortlisted": "Fil-lista qasira",
+          "contacted": "Ġie kkuntattjat",
+          "confirmed": "Ikkonfermat",
+          "declined": "Irrifjuta"
+        },
+        "detail": {
+          "applied": "Applika għall-kampanja",
+          "invited": "Mistieden",
+          "offer_sent": "Offerta mibgħuta",
+          "countered": "Għamel kontroffertà",
+          "in_work": "Fil-produzzjoni",
+          "delivered": "Impenjat",
+          "draft_rejected": "Abbozz miċħud",
+          "cancelled": "Ikkanċellat",
+          "application_rejected": "Applikazzjoni miċħuda"
+        },
+        "card": {
+          "unnamed": "Kreatur bla isem",
+          "notAssigned": "Mhux assenjat",
+          "persona": "Persunaġġ",
+          "status": "Stat",
+          "statusHint": "Isegwi l-kampanja. Biddlu fuq il-bord tal-kampanja.",
+          "slotCode": "Kodiċi tal-post",
+          "editCode": "Editja l-kodiċi tal-post",
+          "verified": "Ivverifikat",
+          "example": "Kontenut ta' eżempju",
+          "profile": "Profil",
+          "replace": "Ibdel",
+          "remove": "Neħħi"
+        },
+        "decision": {
+          "title": "Irreġistra d-deċiżjoni tal-klijent",
+          "choice": "Deċiżjoni",
+          "choices": {
+            "approved": "Approvat",
+            "suggest_another": "Issuġġerixxi ieħor"
+          },
+          "clientName": "Isem il-klijent",
+          "note": "Nota (mhux obbligatorja)",
+          "comment": "Kumment",
+          "replaces": "Deċiżjoni ġdida ssir id-deċiżjoni kurrenti. Id-deċiżjonijiet preċedenti jibqgħu fl-istorja.",
+          "why": {
+            "name": "Daħħal l-isem tal-klijent.",
+            "comment": "Daħħal kumment.",
+            "nameAndComment": "Daħħal l-isem tal-klijent u kumment."
+          },
+          "status": {
+            "approved": "Approvat minn {name}",
+            "suggest_another": "{name} jissuġġerixxi kreatur ieħor"
+          },
+          "record": "Irreġistra d-deċiżjoni",
+          "history": "Storja ({count})",
+          "historyTitle": "Deċiżjonijiet tal-klijent",
+          "cardMoved": "Il-karta tal-kreatur ġiet imċaqalqa għal Magħżula fuq il-bord.",
+          "cardNotMoved": "Il-karta ma ġietx imċaqalqa: għadha mhijiex fil-post it-tajjeb fuq il-bord."
+        },
+        "remove": {
+          "title": "Tneħħi dan il-kreatur mill-mewġa?",
+          "body": "Il-karta tal-kreatur fuq il-bord terġa' lura fejn kienet u l-post jitħassar. Il-kampanja nnifisha ma tinbidilx.",
+          "bodyDecisions": "Id-deċiżjonijiet tal-klijent dwar dan il-kreatur jitħassru wkoll."
+        },
+        "empty": {
+          "title": "Għad m'hemm l-ebda kreatur f'{market}",
+          "body": "Agħżel kreaturi minn {campaign}: dawk li applikaw jew ġew mistiedna."
+        },
+        "noCampaign": {
+          "title": "Din il-mewġa għad m'għandhiex kampanja",
+          "body": "Il-kreaturi jiġu minn kampanja: minn dawk li japplikaw jew jiġu mistiedna. Qabbad kampanja eżistenti ta' dan il-brand jew oħloq waħda.",
+          "askAdmin": "Itlob lil amministratur jew maniġer tal-aġenzija biex iqabbad jew joħloq il-kampanja.",
+          "linkTitle": "Qabbad kampanja",
+          "linkLabel": "Kampanja",
+          "linkNone": "Dan il-brand m'għandu l-ebda kampanja ta' mewġa mhux imqabbda.",
+          "link": "Qabbad il-kampanja",
+          "createTitle": "Oħloq kampanja",
+          "createLabel": "Isem il-kampanja",
+          "create": "Oħloq u qabbad"
+        },
+        "picker": {
+          "title": "Żid kreaturi ma' {market}",
+          "titleReplace": "Ibdel {creator}",
+          "subtitle": "Minn fost l-applikanti u l-mistednin ta' {campaign}",
+          "search": "Fittex kreaturi",
+          "country": "Pajjiż",
+          "removeCountry": "Neħħi l-filtru {country}",
+          "prefiltered": "Ippreflitrat għal dan is-suq",
+          "results": "Riżultati: {count}",
+          "emptyTitle": "Għad m'hemm l-ebda applikant jew mistieden",
+          "emptyBody": "Il-kreaturi jidhru hawn hekk kif japplikaw għall-kampanja jew int tistiedinhom.",
+          "emptyFilteredTitle": "Ebda kreatur ma jaqbel",
+          "emptyFilteredBody": "Neħħi pajjiż jew biddel it-tfittxija biex tara aktar.",
+          "openCampaign": "Iftaħ il-kampanja",
+          "more": "Uri aktar",
+          "alreadyInWave": "Diġà fil-mewġa",
+          "alreadyInMarket": "Diġà fil-mewġa · {market}",
+          "applied": "Applika",
+          "invited": "Mistieden",
+          "selected": "Magħżula: {count}",
+          "assignPersona": "Assenja persunaġġ",
+          "choosePerCreator": "Agħżel aktar tard għal kull kreatur",
+          "add": "Żid kreaturi ({count})",
+          "replaceWith": "Ibdel",
+          "roomMarket": "Fadal {left} minn {max} postijiet f'dan is-suq",
+          "roomWave": "Fadal {left} minn {max} postijiet f'din il-mewġa"
+        },
+        "errors": {
+          "campaignRequired": "Din il-mewġa għad m'għandhiex kampanja. Qabbad jew oħloq waħda l-ewwel.",
+          "notEligible": "Dak il-kreatur ma jistax jiżdied ma' din il-mewġa.",
+          "alreadyInWave": "Dak il-kreatur diġà qiegħed f'din il-mewġa.",
+          "capMarket": "Suq għandu l-aktar {max} kreaturi.",
+          "capWave": "Mewġa għandha l-aktar {max} kreaturi.",
+          "personaInUse": "Kreaturi huma mqabbdin ma' dan il-persunaġġ ({count}). Qabbadhom l-ewwel ma' persunaġġ ieħor jew mal-ebda wieħed.",
+          "slotCodeTaken": "Il-kodiċi {code} diġà jintuża f'dan is-suq.",
+          "removeBlockedInWork": "Il-karta ta' dan il-kreatur diġà qiegħda fil-produzzjoni fuq il-bord. Erġa' l-karta lura l-ewwel."
+        }
       }
     }
   },

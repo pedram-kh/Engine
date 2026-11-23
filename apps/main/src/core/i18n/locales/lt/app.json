@@ -1489,7 +1489,8 @@
         "marketCodeTaken": "Dvi šios bangos rinkos turi tą patį trumpąjį kodą.",
         "marketUnknown": "Viena iš rinkų nebėra šios bangos dalis. Iš naujo įkelkite rinkas.",
         "marketConflict": "Rinkos pasikeitė jums išsaugant. Iš naujo įkelkite rinkas ir bandykite dar kartą.",
-        "countryInTwoMarkets": "{country} yra ir rinkoje {first}, ir rinkoje {second}. Šalis gali priklausyti tik vienai rinkai."
+        "countryInTwoMarkets": "{country} yra ir rinkoje {first}, ir rinkoje {second}. Šalis gali priklausyti tik vienai rinkai.",
+        "marketHasCreators": "Pirmiausia pašalinkite šių rinkų kūrėjus: {markets}."
       },
       "dialog": {
         "createTitle": "Nauja banga",
@@ -2192,6 +2193,138 @@
         "sheetTitle": "Pastabos · {market}",
         "expand": "Išskleisti pastabas",
         "collapse": "Sutraukti pastabas"
+      },
+      "creators": {
+        "title": "Kūrėjai · {market}",
+        "subtitle": "Atrinkti iš kampanijos pareiškėjų ir pakviestųjų. Priskirkite kiekvieną kūrėją personai, kad jo scenarijus naudotų tinkamą žinutę.",
+        "add": "Pridėti kūrėjų",
+        "close": "Uždaryti",
+        "inWave": "Bangoje",
+        "addSlotCaption": "Atidaro kampanijos kūrėjus, iš anksto filtruotus pagal rinką {market}",
+        "stepper": {
+          "none": "Kūrėjų dar nėra",
+          "count": "Kūrėjai: {count}"
+        },
+        "summary": {
+          "total": "Kūrėjai: {count}",
+          "coverage": "Personų aprėptis:",
+          "personaWarning": "Nėra aktyvaus kūrėjo: {personas}"
+        },
+        "status": {
+          "shortlisted": "Trumpajame sąraše",
+          "contacted": "Susisiekta",
+          "confirmed": "Patvirtintas",
+          "declined": "Atsisakė"
+        },
+        "detail": {
+          "applied": "Kreipėsi į kampaniją",
+          "invited": "Pakviestas",
+          "offer_sent": "Pasiūlymas išsiųstas",
+          "countered": "Pateikė priešpasiūlymą",
+          "in_work": "Gaminama",
+          "delivered": "Pristatyta",
+          "draft_rejected": "Juodraštis atmestas",
+          "cancelled": "Atšaukta",
+          "application_rejected": "Paraiška atmesta"
+        },
+        "card": {
+          "unnamed": "Kūrėjas be vardo",
+          "notAssigned": "Nepriskirta",
+          "persona": "Persona",
+          "status": "Būsena",
+          "statusHint": "Seka kampaniją. Pakeiskite ją kampanijos lentoje.",
+          "slotCode": "Vietos kodas",
+          "editCode": "Redaguoti vietos kodą",
+          "verified": "Patikrintas",
+          "example": "Pavyzdinis turinys",
+          "profile": "Profilis",
+          "replace": "Pakeisti",
+          "remove": "Pašalinti"
+        },
+        "decision": {
+          "title": "Užfiksuoti kliento sprendimą",
+          "choice": "Sprendimas",
+          "choices": {
+            "approved": "Patvirtinta",
+            "suggest_another": "Siūlyti kitą"
+          },
+          "clientName": "Kliento vardas",
+          "note": "Pastaba (neprivaloma)",
+          "comment": "Komentaras",
+          "replaces": "Naujas sprendimas tampa galiojančiu. Ankstesni sprendimai lieka istorijoje.",
+          "why": {
+            "name": "Įveskite kliento vardą.",
+            "comment": "Įveskite komentarą.",
+            "nameAndComment": "Įveskite kliento vardą ir komentarą."
+          },
+          "status": {
+            "approved": "Patvirtino: {name}",
+            "suggest_another": "{name} siūlo kitą kūrėją"
+          },
+          "record": "Užfiksuoti sprendimą",
+          "history": "Istorija ({count})",
+          "historyTitle": "Kliento sprendimai",
+          "cardMoved": "Kūrėjo kortelė lentoje perkelta į Pasirinkti.",
+          "cardNotMoved": "Kortelė nebuvo perkelta: lentoje ji dar ne tinkamoje vietoje."
+        },
+        "remove": {
+          "title": "Pašalinti šį kūrėją iš bangos?",
+          "body": "Kūrėjo kortelė lentoje grįžta ten, kur buvo, o vieta ištrinama. Pati kampanija nesikeičia.",
+          "bodyDecisions": "Ištrinami ir kliento sprendimai dėl šio kūrėjo."
+        },
+        "empty": {
+          "title": "Rinkoje {market} kūrėjų dar nėra",
+          "body": "Pasirinkite kūrėjų iš kampanijos {campaign}: tuos, kurie kreipėsi arba buvo pakviesti."
+        },
+        "noCampaign": {
+          "title": "Ši banga dar neturi kampanijos",
+          "body": "Kūrėjai ateina iš kampanijos: iš tų, kurie kreipiasi arba yra pakviesti. Susiekite esamą šio prekės ženklo kampaniją arba sukurkite naują.",
+          "askAdmin": "Paprašykite agentūros administratoriaus ar vadovo susieti arba sukurti kampaniją.",
+          "linkTitle": "Susieti kampaniją",
+          "linkLabel": "Kampanija",
+          "linkNone": "Šis prekės ženklas neturi nesusietos bangos kampanijos.",
+          "link": "Susieti kampaniją",
+          "createTitle": "Sukurti kampaniją",
+          "createLabel": "Kampanijos pavadinimas",
+          "create": "Sukurti ir susieti"
+        },
+        "picker": {
+          "title": "Pridėti kūrėjų į rinką {market}",
+          "titleReplace": "Pakeisti kūrėją {creator}",
+          "subtitle": "Iš kampanijos {campaign} pareiškėjų ir pakviestųjų",
+          "search": "Ieškoti kūrėjų",
+          "country": "Šalis",
+          "removeCountry": "Pašalinti filtrą {country}",
+          "prefiltered": "Iš anksto filtruota pagal šią rinką",
+          "results": "Rezultatai: {count}",
+          "emptyTitle": "Pareiškėjų ar pakviestųjų dar nėra",
+          "emptyBody": "Kūrėjai čia atsiras, kai kreipsis į kampaniją arba jūs juos pakviesite.",
+          "emptyFilteredTitle": "Nė vienas kūrėjas netinka",
+          "emptyFilteredBody": "Pašalinkite šalį arba pakeiskite paiešką, kad matytumėte daugiau.",
+          "openCampaign": "Atidaryti kampaniją",
+          "more": "Rodyti daugiau",
+          "alreadyInWave": "Jau bangoje",
+          "alreadyInMarket": "Jau bangoje · {market}",
+          "applied": "Kreipėsi",
+          "invited": "Pakviestas",
+          "selected": "Pasirinkta: {count}",
+          "assignPersona": "Priskirti personą",
+          "choosePerCreator": "Pasirinkti vėliau kiekvienam kūrėjui",
+          "add": "Pridėti kūrėjų ({count})",
+          "replaceWith": "Pakeisti",
+          "roomMarket": "Šioje rinkoje liko {left} iš {max} vietų",
+          "roomWave": "Šioje bangoje liko {left} iš {max} vietų"
+        },
+        "errors": {
+          "campaignRequired": "Ši banga dar neturi kampanijos. Pirmiausia susiekite arba sukurkite kampaniją.",
+          "notEligible": "Šio kūrėjo negalima pridėti į šią bangą.",
+          "alreadyInWave": "Šis kūrėjas jau yra šioje bangoje.",
+          "capMarket": "Rinkoje gali būti ne daugiau kaip {max} kūrėjų.",
+          "capWave": "Bangoje gali būti ne daugiau kaip {max} kūrėjų.",
+          "personaInUse": "Su šia persona susieti kūrėjai ({count}). Pirmiausia susiekite juos su kita persona arba su jokia.",
+          "slotCodeTaken": "Kodas {code} šioje rinkoje jau naudojamas.",
+          "removeBlockedInWork": "Šio kūrėjo kortelė lentoje jau gaminama. Pirmiausia grąžinkite kortelę atgal."
+        }
       }
     }
   },

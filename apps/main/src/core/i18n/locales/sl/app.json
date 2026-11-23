@@ -1489,7 +1489,8 @@
         "marketCodeTaken": "Dva trga tega vala imata isto kratko kodo.",
         "marketUnknown": "Eden od trgov ni več del tega vala. Znova naložite trge.",
         "marketConflict": "Trgi so se med shranjevanjem spremenili. Znova naložite trge in poskusite znova.",
-        "countryInTwoMarkets": "{country} je na trgih {first} in {second}. Država lahko spada samo na en trg."
+        "countryInTwoMarkets": "{country} je na trgih {first} in {second}. Država lahko spada samo na en trg.",
+        "marketHasCreators": "Najprej odstranite ustvarjalce teh trgov: {markets}."
       },
       "dialog": {
         "createTitle": "Nov val",
@@ -2192,6 +2193,138 @@
         "sheetTitle": "Opombe · {market}",
         "expand": "Razširi opombe",
         "collapse": "Skrči opombe"
+      },
+      "creators": {
+        "title": "Ustvarjalci · {market}",
+        "subtitle": "Izbrani med prijavljenimi in povabljenimi v kampanjo. Vsakega ustvarjalca povežite s persono, da bo njegov skript uporabil pravo sporočilo.",
+        "add": "Dodaj ustvarjalce",
+        "close": "Zapri",
+        "inWave": "V valu",
+        "addSlotCaption": "Odpre ustvarjalce kampanje, predfiltrirane na {market}",
+        "stepper": {
+          "none": "Še ni ustvarjalcev",
+          "count": "Ustvarjalci: {count}"
+        },
+        "summary": {
+          "total": "Ustvarjalci: {count}",
+          "coverage": "Pokritost person:",
+          "personaWarning": "Noben aktiven ustvarjalec za: {personas}"
+        },
+        "status": {
+          "shortlisted": "V ožjem izboru",
+          "contacted": "Kontaktiran",
+          "confirmed": "Potrjen",
+          "declined": "Zavrnil"
+        },
+        "detail": {
+          "applied": "Prijavil se je v kampanjo",
+          "invited": "Povabljen",
+          "offer_sent": "Ponudba poslana",
+          "countered": "Podal je protiponudbo",
+          "in_work": "V produkciji",
+          "delivered": "Dostavljeno",
+          "draft_rejected": "Osnutek zavrnjen",
+          "cancelled": "Preklicano",
+          "application_rejected": "Prijava zavrnjena"
+        },
+        "card": {
+          "unnamed": "Ustvarjalec brez imena",
+          "notAssigned": "Ni dodeljeno",
+          "persona": "Persona",
+          "status": "Stanje",
+          "statusHint": "Sledi kampanji. Spremenite ga na tabli kampanje.",
+          "slotCode": "Koda mesta",
+          "editCode": "Uredi kodo mesta",
+          "verified": "Preverjeno",
+          "example": "Primer vsebine",
+          "profile": "Profil",
+          "replace": "Zamenjaj",
+          "remove": "Odstrani"
+        },
+        "decision": {
+          "title": "Zabeleži odločitev stranke",
+          "choice": "Odločitev",
+          "choices": {
+            "approved": "Odobreno",
+            "suggest_another": "Predlagaj drugega"
+          },
+          "clientName": "Ime stranke",
+          "note": "Opomba (neobvezno)",
+          "comment": "Komentar",
+          "replaces": "Nova odločitev postane trenutna. Prejšnje odločitve ostanejo v zgodovini.",
+          "why": {
+            "name": "Vnesite ime stranke.",
+            "comment": "Vnesite komentar.",
+            "nameAndComment": "Vnesite ime stranke in komentar."
+          },
+          "status": {
+            "approved": "Odobril(a): {name}",
+            "suggest_another": "{name} predlaga drugega ustvarjalca"
+          },
+          "record": "Zabeleži odločitev",
+          "history": "Zgodovina ({count})",
+          "historyTitle": "Odločitve stranke",
+          "cardMoved": "Kartica ustvarjalca je bila na tabli premaknjena v Izbrani.",
+          "cardNotMoved": "Kartica ni bila premaknjena: na tabli še ni na pravem mestu."
+        },
+        "remove": {
+          "title": "Odstranim tega ustvarjalca iz vala?",
+          "body": "Kartica ustvarjalca se na tabli vrne tja, kjer je bila, mesto pa se izbriše. Kampanja se ne spremeni.",
+          "bodyDecisions": "Izbrišejo se tudi odločitve stranke o tem ustvarjalcu."
+        },
+        "empty": {
+          "title": "Na trgu {market} še ni ustvarjalcev",
+          "body": "Izberite ustvarjalce iz kampanje {campaign}: tiste, ki so se prijavili ali bili povabljeni."
+        },
+        "noCampaign": {
+          "title": "Ta val še nima kampanje",
+          "body": "Ustvarjalci prihajajo iz kampanje: iz tistih, ki se prijavijo ali so povabljeni. Povežite obstoječo kampanjo te blagovne znamke ali ustvarite novo.",
+          "askAdmin": "Prosite skrbnika ali vodjo agencije, naj kampanjo poveže ali ustvari.",
+          "linkTitle": "Poveži kampanjo",
+          "linkLabel": "Kampanja",
+          "linkNone": "Ta blagovna znamka nima nepovezane kampanje za val.",
+          "link": "Poveži kampanjo",
+          "createTitle": "Ustvari kampanjo",
+          "createLabel": "Ime kampanje",
+          "create": "Ustvari in poveži"
+        },
+        "picker": {
+          "title": "Dodaj ustvarjalce na trg {market}",
+          "titleReplace": "Zamenjaj ustvarjalca {creator}",
+          "subtitle": "Med prijavljenimi in povabljenimi v kampanji {campaign}",
+          "search": "Išči ustvarjalce",
+          "country": "Država",
+          "removeCountry": "Odstrani filter {country}",
+          "prefiltered": "Predfiltrirano na ta trg",
+          "results": "Rezultati: {count}",
+          "emptyTitle": "Še ni prijavljenih ali povabljenih",
+          "emptyBody": "Ustvarjalci se bodo pojavili tukaj, ko se prijavijo v kampanjo ali jih povabite.",
+          "emptyFilteredTitle": "Nič ne ustreza",
+          "emptyFilteredBody": "Odstranite državo ali spremenite iskanje, da vidite več.",
+          "openCampaign": "Odpri kampanjo",
+          "more": "Pokaži več",
+          "alreadyInWave": "Že v valu",
+          "alreadyInMarket": "Že v valu · {market}",
+          "applied": "Prijavljen",
+          "invited": "Povabljen",
+          "selected": "Izbrano: {count}",
+          "assignPersona": "Dodeli persono",
+          "choosePerCreator": "Izberi pozneje za vsakega ustvarjalca",
+          "add": "Dodaj ustvarjalce ({count})",
+          "replaceWith": "Zamenjaj",
+          "roomMarket": "Še {left} od {max} mest na tem trgu",
+          "roomWave": "Še {left} od {max} mest v tem valu"
+        },
+        "errors": {
+          "campaignRequired": "Ta val še nima kampanje. Najprej jo povežite ali ustvarite.",
+          "notEligible": "Tega ustvarjalca ni mogoče dodati v ta val.",
+          "alreadyInWave": "Ta ustvarjalec je že v tem valu.",
+          "capMarket": "Trg ima največ {max} ustvarjalcev.",
+          "capWave": "Val ima največ {max} ustvarjalcev.",
+          "personaInUse": "S to persono so povezani ustvarjalci ({count}). Najprej jih povežite z drugo persono ali z nobeno.",
+          "slotCodeTaken": "Koda {code} se na tem trgu že uporablja.",
+          "removeBlockedInWork": "Kartica tega ustvarjalca je na tabli že v produkciji. Kartico najprej vrnite nazaj."
+        }
       }
     }
   },

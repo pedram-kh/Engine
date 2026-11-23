@@ -1260,6 +1260,8 @@ export interface CampaignApplicationListItemResource {
     has_exclusivity_conflict?: boolean
     /** AH-120: the blocking campaign, named to the agency. Null unless flagged. */
     exclusivity_conflict?: { id: string; name: string } | null
+    /** PL-3.1: present only on a wave campaign with the creators flag on; true when the creator is in the wave's Creators step. */
+    in_wave?: boolean
     creator: {
       id: string
       display_name: string | null

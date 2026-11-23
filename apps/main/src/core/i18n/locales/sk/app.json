@@ -1489,7 +1489,8 @@
         "marketCodeTaken": "Dva trhy tejto vlny majú rovnaký krátky kód.",
         "marketUnknown": "Jeden z trhov už k tejto vlne nepatrí. Znova načítajte trhy.",
         "marketConflict": "Trhy sa počas ukladania zmenili. Znova načítajte trhy a skúste to znova.",
-        "countryInTwoMarkets": "{country} je v trhoch {first} aj {second}. Krajina môže patriť len k jednému trhu."
+        "countryInTwoMarkets": "{country} je v trhoch {first} aj {second}. Krajina môže patriť len k jednému trhu.",
+        "marketHasCreators": "Najprv odstráňte tvorcov z týchto trhov: {markets}."
       },
       "dialog": {
         "createTitle": "Nová vlna",
@@ -2192,6 +2193,138 @@
         "sheetTitle": "Poznámky · {market}",
         "expand": "Rozbaliť poznámky",
         "collapse": "Zbaliť poznámky"
+      },
+      "creators": {
+        "title": "Tvorcovia · {market}",
+        "subtitle": "Vybraní spomedzi uchádzačov a pozvaných do kampane. Priraďte každého tvorcu k persóne, aby jeho skript použil správne posolstvo.",
+        "add": "Pridať tvorcov",
+        "close": "Zavrieť",
+        "inWave": "Vo vlne",
+        "addSlotCaption": "Otvorí tvorcov kampane predfiltrovaných na {market}",
+        "stepper": {
+          "none": "Zatiaľ žiadni tvorcovia",
+          "count": "Tvorcovia: {count}"
+        },
+        "summary": {
+          "total": "Tvorcovia: {count}",
+          "coverage": "Pokrytie person:",
+          "personaWarning": "Žiadny aktívny tvorca pre: {personas}"
+        },
+        "status": {
+          "shortlisted": "Vo výbere",
+          "contacted": "Oslovený",
+          "confirmed": "Potvrdený",
+          "declined": "Odmietol"
+        },
+        "detail": {
+          "applied": "Prihlásil sa do kampane",
+          "invited": "Pozvaný",
+          "offer_sent": "Ponuka odoslaná",
+          "countered": "Podal protinávrh",
+          "in_work": "Vo výrobe",
+          "delivered": "Doručené",
+          "draft_rejected": "Koncept zamietnutý",
+          "cancelled": "Zrušené",
+          "application_rejected": "Prihláška zamietnutá"
+        },
+        "card": {
+          "unnamed": "Tvorca bez mena",
+          "notAssigned": "Nepriradené",
+          "persona": "Persóna",
+          "status": "Stav",
+          "statusHint": "Sleduje kampaň. Zmeňte ho na nástenke kampane.",
+          "slotCode": "Kód miesta",
+          "editCode": "Upraviť kód miesta",
+          "verified": "Overené",
+          "example": "Ukážkový obsah",
+          "profile": "Profil",
+          "replace": "Nahradiť",
+          "remove": "Odstrániť"
+        },
+        "decision": {
+          "title": "Zaznamenať rozhodnutie klienta",
+          "choice": "Rozhodnutie",
+          "choices": {
+            "approved": "Schválené",
+            "suggest_another": "Navrhnúť iného"
+          },
+          "clientName": "Meno klienta",
+          "note": "Poznámka (voliteľná)",
+          "comment": "Komentár",
+          "replaces": "Nové rozhodnutie sa stane aktuálnym. Predchádzajúce rozhodnutia zostávajú v histórii.",
+          "why": {
+            "name": "Zadajte meno klienta.",
+            "comment": "Zadajte komentár.",
+            "nameAndComment": "Zadajte meno klienta a komentár."
+          },
+          "status": {
+            "approved": "Schválil(a): {name}",
+            "suggest_another": "{name} navrhuje iného tvorcu"
+          },
+          "record": "Zaznamenať rozhodnutie",
+          "history": "História ({count})",
+          "historyTitle": "Rozhodnutia klienta",
+          "cardMoved": "Karta tvorcu bola na nástenke presunutá do Vybraní.",
+          "cardNotMoved": "Karta nebola presunutá: na nástenke ešte nie je na správnom mieste."
+        },
+        "remove": {
+          "title": "Odstrániť tohto tvorcu z vlny?",
+          "body": "Karta tvorcu sa na nástenke vráti tam, kde bola, a miesto sa vymaže. Samotná kampaň sa nemení.",
+          "bodyDecisions": "Vymažú sa aj rozhodnutia klienta o tomto tvorcovi."
+        },
+        "empty": {
+          "title": "Zatiaľ žiadni tvorcovia na trhu {market}",
+          "body": "Vyberte tvorcov z kampane {campaign}: tých, ktorí sa prihlásili alebo boli pozvaní."
+        },
+        "noCampaign": {
+          "title": "Táto vlna zatiaľ nemá kampaň",
+          "body": "Tvorcovia pochádzajú z kampane: z tých, ktorí sa prihlásia alebo sú pozvaní. Prepojte existujúcu kampaň tejto značky alebo vytvorte novú.",
+          "askAdmin": "Požiadajte administrátora alebo manažéra agentúry, aby kampaň prepojil alebo vytvoril.",
+          "linkTitle": "Prepojiť kampaň",
+          "linkLabel": "Kampaň",
+          "linkNone": "Táto značka nemá žiadnu neprepojenú kampaň pre vlnu.",
+          "link": "Prepojiť kampaň",
+          "createTitle": "Vytvoriť kampaň",
+          "createLabel": "Názov kampane",
+          "create": "Vytvoriť a prepojiť"
+        },
+        "picker": {
+          "title": "Pridať tvorcov na trh {market}",
+          "titleReplace": "Nahradiť tvorcu {creator}",
+          "subtitle": "Spomedzi uchádzačov a pozvaných kampane {campaign}",
+          "search": "Hľadať tvorcov",
+          "country": "Krajina",
+          "removeCountry": "Odstrániť filter {country}",
+          "prefiltered": "Predfiltrované na tento trh",
+          "results": "Výsledky: {count}",
+          "emptyTitle": "Zatiaľ žiadni uchádzači ani pozvaní",
+          "emptyBody": "Tvorcovia sa tu zobrazia, keď sa prihlásia do kampane alebo ich pozvete.",
+          "emptyFilteredTitle": "Nič nezodpovedá",
+          "emptyFilteredBody": "Odstráňte krajinu alebo zmeňte hľadanie, aby ste videli viac.",
+          "openCampaign": "Otvoriť kampaň",
+          "more": "Zobraziť viac",
+          "alreadyInWave": "Už vo vlne",
+          "alreadyInMarket": "Už vo vlne · {market}",
+          "applied": "Prihlásený",
+          "invited": "Pozvaný",
+          "selected": "Vybrané: {count}",
+          "assignPersona": "Priradiť personu",
+          "choosePerCreator": "Vybrať neskôr pri každom tvorcovi",
+          "add": "Pridať tvorcov ({count})",
+          "replaceWith": "Nahradiť",
+          "roomMarket": "Zostáva {left} z {max} miest na tomto trhu",
+          "roomWave": "Zostáva {left} z {max} miest v tejto vlne"
+        },
+        "errors": {
+          "campaignRequired": "Táto vlna zatiaľ nemá kampaň. Najprv nejakú prepojte alebo vytvorte.",
+          "notEligible": "Tohto tvorcu nemožno pridať do tejto vlny.",
+          "alreadyInWave": "Tento tvorca už v tejto vlne je.",
+          "capMarket": "Trh má najviac {max} tvorcov.",
+          "capWave": "Vlna má najviac {max} tvorcov.",
+          "personaInUse": "K tejto persóne sú priradení tvorcovia ({count}). Najprv ich priraďte k inej persóne alebo k žiadnej.",
+          "slotCodeTaken": "Kód {code} sa na tomto trhu už používa.",
+          "removeBlockedInWork": "Karta tohto tvorcu je na nástenke už vo výrobe. Najprv kartu vráťte späť."
+        }
       }
     }
   },

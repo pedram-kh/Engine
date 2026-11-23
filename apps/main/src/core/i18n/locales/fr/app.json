@@ -1489,7 +1489,8 @@
         "marketCodeTaken": "Deux marchés de cette vague ont le même code court.",
         "marketUnknown": "L'un des marchés ne fait plus partie de cette vague. Rechargez les marchés.",
         "marketConflict": "Les marchés ont changé pendant l'enregistrement. Rechargez les marchés et réessayez.",
-        "countryInTwoMarkets": "{country} figure dans {first} et dans {second}. Un pays ne peut appartenir qu'à un seul marché."
+        "countryInTwoMarkets": "{country} figure dans {first} et dans {second}. Un pays ne peut appartenir qu'à un seul marché.",
+        "marketHasCreators": "Retire d'abord les créateurs de ces marchés : {markets}."
       },
       "dialog": {
         "createTitle": "Nouvelle vague",
@@ -2192,6 +2193,138 @@
         "sheetTitle": "Notes · {market}",
         "expand": "Agrandir les notes",
         "collapse": "Réduire les notes"
+      },
+      "creators": {
+        "title": "Créateurs · {market}",
+        "subtitle": "Choisis parmi les candidats et les invités de la campagne. Associe chaque créateur à un persona pour que son script reprenne le bon message.",
+        "add": "Ajouter des créateurs",
+        "close": "Fermer",
+        "inWave": "Dans la vague",
+        "addSlotCaption": "Ouvre les créateurs de la campagne, filtrés sur {market}",
+        "stepper": {
+          "none": "Aucun créateur pour l'instant",
+          "count": "Créateurs : {count}"
+        },
+        "summary": {
+          "total": "Créateurs : {count}",
+          "coverage": "Couverture des personas :",
+          "personaWarning": "Aucun créateur en jeu pour : {personas}"
+        },
+        "status": {
+          "shortlisted": "Présélectionné",
+          "contacted": "Contacté",
+          "confirmed": "Confirmé",
+          "declined": "Refusé"
+        },
+        "detail": {
+          "applied": "A postulé à la campagne",
+          "invited": "Invité",
+          "offer_sent": "Offre envoyée",
+          "countered": "A fait une contre-proposition",
+          "in_work": "En production",
+          "delivered": "Livré",
+          "draft_rejected": "Brouillon rejeté",
+          "cancelled": "Annulé",
+          "application_rejected": "Candidature rejetée"
+        },
+        "card": {
+          "unnamed": "Créateur sans nom",
+          "notAssigned": "Non assigné",
+          "persona": "Persona",
+          "status": "Statut",
+          "statusHint": "Suit la campagne. Modifie-le sur le tableau de la campagne.",
+          "slotCode": "Code d'emplacement",
+          "editCode": "Modifier le code d'emplacement",
+          "verified": "Vérifié",
+          "example": "Contenu exemple",
+          "profile": "Profil",
+          "replace": "Remplacer",
+          "remove": "Retirer"
+        },
+        "decision": {
+          "title": "Enregistrer la décision du client",
+          "choice": "Décision",
+          "choices": {
+            "approved": "Approuvé",
+            "suggest_another": "Proposer un autre"
+          },
+          "clientName": "Nom du client",
+          "note": "Note (facultatif)",
+          "comment": "Commentaire",
+          "replaces": "Une nouvelle décision devient la décision actuelle. Les précédentes restent dans l'historique.",
+          "why": {
+            "name": "Saisis le nom du client.",
+            "comment": "Saisis un commentaire.",
+            "nameAndComment": "Saisis le nom du client et un commentaire."
+          },
+          "status": {
+            "approved": "Approuvé par {name}",
+            "suggest_another": "{name} propose un autre créateur"
+          },
+          "record": "Enregistrer la décision",
+          "history": "Historique ({count})",
+          "historyTitle": "Décisions du client",
+          "cardMoved": "La carte du créateur a été déplacée vers Sélectionné sur le tableau.",
+          "cardNotMoved": "La carte n'a pas été déplacée : elle n'est pas encore au bon endroit sur le tableau."
+        },
+        "remove": {
+          "title": "Retirer ce créateur de la vague ?",
+          "body": "La carte du créateur revient où elle était et l'emplacement est supprimé. La campagne elle-même n'est pas modifiée.",
+          "bodyDecisions": "Les décisions du client sur ce créateur sont aussi supprimées."
+        },
+        "empty": {
+          "title": "Aucun créateur dans {market} pour l'instant",
+          "body": "Choisis des créateurs de {campaign} : ceux qui ont postulé ou ont été invités."
+        },
+        "noCampaign": {
+          "title": "Cette vague n'a pas encore de campagne",
+          "body": "Les créateurs viennent d'une campagne : ceux qui postulent ou sont invités. Associe une campagne existante de cette marque ou crées-en une.",
+          "askAdmin": "Demande à un administrateur ou un manager de l'agence d'associer ou de créer la campagne.",
+          "linkTitle": "Associer une campagne",
+          "linkLabel": "Campagne",
+          "linkNone": "Cette marque n'a aucune campagne de vague non associée.",
+          "link": "Associer la campagne",
+          "createTitle": "Créer une campagne",
+          "createLabel": "Nom de la campagne",
+          "create": "Créer et associer"
+        },
+        "picker": {
+          "title": "Ajouter des créateurs à {market}",
+          "titleReplace": "Remplacer {creator}",
+          "subtitle": "Parmi les candidats et les invités de {campaign}",
+          "search": "Rechercher des créateurs",
+          "country": "Pays",
+          "removeCountry": "Retirer le filtre {country}",
+          "prefiltered": "Pré-filtré sur ce marché",
+          "results": "Résultats : {count}",
+          "emptyTitle": "Aucun candidat ni invité pour l'instant",
+          "emptyBody": "Les créateurs apparaissent ici dès qu'ils postulent à la campagne ou que tu les invites.",
+          "emptyFilteredTitle": "Aucun créateur ne correspond",
+          "emptyFilteredBody": "Retire un pays ou modifie la recherche pour en voir plus.",
+          "openCampaign": "Ouvrir la campagne",
+          "more": "Afficher plus",
+          "alreadyInWave": "Déjà dans la vague",
+          "alreadyInMarket": "Déjà dans la vague · {market}",
+          "applied": "A postulé",
+          "invited": "Invité",
+          "selected": "Sélectionnés : {count}",
+          "assignPersona": "Assigner un persona",
+          "choosePerCreator": "Choisir plus tard par créateur",
+          "add": "Ajouter des créateurs ({count})",
+          "replaceWith": "Remplacer",
+          "roomMarket": "Il reste {left} places sur {max} dans ce marché",
+          "roomWave": "Il reste {left} places sur {max} dans cette vague"
+        },
+        "errors": {
+          "campaignRequired": "Cette vague n'a pas encore de campagne. Associe-en ou crées-en une d'abord.",
+          "notEligible": "Ce créateur ne peut pas être ajouté à cette vague.",
+          "alreadyInWave": "Ce créateur est déjà dans cette vague.",
+          "capMarket": "Un marché compte au plus {max} créateurs.",
+          "capWave": "Une vague compte au plus {max} créateurs.",
+          "personaInUse": "Des créateurs sont associés à ce persona ({count}). Associe-les d'abord à un autre persona ou à aucun.",
+          "slotCodeTaken": "Le code {code} est déjà utilisé dans ce marché.",
+          "removeBlockedInWork": "La carte de ce créateur est déjà en production sur le tableau. Replace d'abord la carte en arrière."
+        }
       }
     }
   },

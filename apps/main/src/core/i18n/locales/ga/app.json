@@ -1489,7 +1489,8 @@
         "marketCodeTaken": "Tá an cód gearr céanna ag dhá mhargadh den tonn seo.",
         "marketUnknown": "Níl ceann de na margaí mar chuid den tonn seo a thuilleadh. Athlódáil na margaí.",
         "marketConflict": "Athraíodh na margaí agus tú ag sábháil. Athlódáil na margaí agus triail arís.",
-        "countryInTwoMarkets": "Tá {country} i {first} agus i {second} araon. Ní féidir le tír a bheith i níos mó ná margadh amháin."
+        "countryInTwoMarkets": "Tá {country} i {first} agus i {second} araon. Ní féidir le tír a bheith i níos mó ná margadh amháin.",
+        "marketHasCreators": "Bain cruthaitheoirí na margaí seo ar dtús: {markets}."
       },
       "dialog": {
         "createTitle": "Tonn nua",
@@ -2192,6 +2193,138 @@
         "sheetTitle": "Nótaí · {market}",
         "expand": "Leathnaigh na nótaí",
         "collapse": "Laghdaigh na nótaí"
+      },
+      "creators": {
+        "title": "Cruthaitheoirí · {market}",
+        "subtitle": "Roghnaithe as iarratasóirí agus cuairteoirí an fheachtais. Cuir gach cruthaitheoir le pearsa ionas go n-úsáidfidh a script an teachtaireacht cheart.",
+        "add": "Cuir cruthaitheoirí leis",
+        "close": "Dún",
+        "inWave": "Sa tonn",
+        "addSlotCaption": "Osclaíonn sé cruthaitheoirí an fheachtais, réamhscagtha go {market}",
+        "stepper": {
+          "none": "Níl aon chruthaitheoir ann fós",
+          "count": "Cruthaitheoirí: {count}"
+        },
+        "summary": {
+          "total": "Cruthaitheoirí: {count}",
+          "coverage": "Clúdach pearsan:",
+          "personaWarning": "Níl aon chruthaitheoir gníomhach ann do: {personas}"
+        },
+        "status": {
+          "shortlisted": "Ar an ngearrliosta",
+          "contacted": "Déanta teagmháil",
+          "confirmed": "Deimhnithe",
+          "declined": "Dhiúltaigh"
+        },
+        "detail": {
+          "applied": "Chuir sé iarratas isteach ar an bhfeachtas",
+          "invited": "Tugtha cuireadh",
+          "offer_sent": "Seolta an tairiscint",
+          "countered": "Rinne sé frithtairiscint",
+          "in_work": "I léiriú",
+          "delivered": "Seachadta",
+          "draft_rejected": "Dréacht diúltaithe",
+          "cancelled": "Cealaithe",
+          "application_rejected": "Iarratas diúltaithe"
+        },
+        "card": {
+          "unnamed": "Cruthaitheoir gan ainm",
+          "notAssigned": "Gan sannadh",
+          "persona": "Pearsa",
+          "status": "Stádas",
+          "statusHint": "Leanann sé an feachtas. Athraigh é ar bhord an fheachtais.",
+          "slotCode": "Cód an láithreáin",
+          "editCode": "Cuir cód an láithreáin in eagar",
+          "verified": "Fíoraithe",
+          "example": "Ábhar samplach",
+          "profile": "Próifíl",
+          "replace": "Ionadaigh",
+          "remove": "Bain"
+        },
+        "decision": {
+          "title": "Taifead cinneadh an chliaint",
+          "choice": "Cinneadh",
+          "choices": {
+            "approved": "Ceadaithe",
+            "suggest_another": "Mol duine eile"
+          },
+          "clientName": "Ainm an chliaint",
+          "note": "Nóta (roghnach)",
+          "comment": "Trácht",
+          "replaces": "Éiríonn cinneadh nua mar an cinneadh reatha. Fanann cinntí níos luaithe sa stair.",
+          "why": {
+            "name": "Cuir isteach ainm an chliaint.",
+            "comment": "Cuir isteach trácht.",
+            "nameAndComment": "Cuir isteach ainm an chliaint agus trácht."
+          },
+          "status": {
+            "approved": "Ceadaithe ag {name}",
+            "suggest_another": "Molann {name} cruthaitheoir eile"
+          },
+          "record": "Taifead an cinneadh",
+          "history": "Stair ({count})",
+          "historyTitle": "Cinntí an chliaint",
+          "cardMoved": "Aistríodh cárta an chruthaitheora go Roghnaithe ar an mbord.",
+          "cardNotMoved": "Níor aistríodh an cárta: níl sé ag an áit cheart ar an mbord fós."
+        },
+        "remove": {
+          "title": "An mbainfear an cruthaitheoir seo den tonn?",
+          "body": "Filleann cárta an chruthaitheora ar an mbord ar an áit a raibh sé agus scriostar an láithreán. Ní athraítear an feachtas féin.",
+          "bodyDecisions": "Scriostar cinntí an chliaint faoin gcruthaitheoir seo freisin."
+        },
+        "empty": {
+          "title": "Níl aon chruthaitheoir i {market} fós",
+          "body": "Roghnaigh cruthaitheoirí ó {campaign}: iad siúd a chuir iarratas isteach nó a fuair cuireadh."
+        },
+        "noCampaign": {
+          "title": "Níl feachtas ag an tonn seo fós",
+          "body": "Tagann cruthaitheoirí ó fheachtas: iad siúd a chuireann iarratas isteach nó a fhaigheann cuireadh. Nasc feachtas atá ann cheana den bhranda seo nó cruthaigh ceann.",
+          "askAdmin": "Iarr ar riarthóir nó bainisteoir na gníomhaireachta an feachtas a nascadh nó a chruthú.",
+          "linkTitle": "Nasc feachtas",
+          "linkLabel": "Feachtas",
+          "linkNone": "Níl aon fheachtas tonn gan nasc ag an mbranda seo.",
+          "link": "Nasc an feachtas",
+          "createTitle": "Cruthaigh feachtas",
+          "createLabel": "Ainm an fheachtais",
+          "create": "Cruthaigh agus nasc"
+        },
+        "picker": {
+          "title": "Cuir cruthaitheoirí le {market}",
+          "titleReplace": "Ionadaigh {creator}",
+          "subtitle": "As iarratasóirí agus cuairteoirí {campaign}",
+          "search": "Cuardaigh cruthaitheoirí",
+          "country": "Tír",
+          "removeCountry": "Bain an scagaire {country}",
+          "prefiltered": "Réamhscagtha don mhargadh seo",
+          "results": "Torthaí: {count}",
+          "emptyTitle": "Níl aon iarratasóir ná cuairteoir ann fós",
+          "emptyBody": "Taispeánfar cruthaitheoirí anseo nuair a chuireann siad iarratas isteach ar an bhfeachtas nó nuair a thugann tú cuireadh dóibh.",
+          "emptyFilteredTitle": "Níl aon chruthaitheoir ag teacht leis",
+          "emptyFilteredBody": "Bain tír nó athraigh an cuardach le tuilleadh a fheiceáil.",
+          "openCampaign": "Oscail an feachtas",
+          "more": "Taispeáin tuilleadh",
+          "alreadyInWave": "Sa tonn cheana",
+          "alreadyInMarket": "Sa tonn cheana · {market}",
+          "applied": "Chuir sé iarratas isteach",
+          "invited": "Tugtha cuireadh",
+          "selected": "Roghnaithe: {count}",
+          "assignPersona": "Sann pearsa",
+          "choosePerCreator": "Roghnaigh ina dhiaidh seo do gach cruthaitheoir",
+          "add": "Cuir cruthaitheoirí leis ({count})",
+          "replaceWith": "Ionadaigh",
+          "roomMarket": "Tá {left} as {max} áit fágtha sa mhargadh seo",
+          "roomWave": "Tá {left} as {max} áit fágtha sa tonn seo"
+        },
+        "errors": {
+          "campaignRequired": "Níl feachtas ag an tonn seo fós. Nasc nó cruthaigh ceann ar dtús.",
+          "notEligible": "Ní féidir an cruthaitheoir sin a chur leis an tonn seo.",
+          "alreadyInWave": "Tá an cruthaitheoir sin sa tonn seo cheana.",
+          "capMarket": "Tá {max} cruthaitheoir ar a mhéad i margadh.",
+          "capWave": "Tá {max} cruthaitheoir ar a mhéad i dtonn.",
+          "personaInUse": "Tá cruthaitheoirí nasctha leis an bpearsa seo ({count}). Nasc iad le pearsa eile nó le haon cheann ar dtús.",
+          "slotCodeTaken": "Úsáidtear an cód {code} sa mhargadh seo cheana.",
+          "removeBlockedInWork": "Tá cárta an chruthaitheora seo i léiriú cheana ar an mbord. Cuir an cárta ar ais ar dtús."
+        }
       }
     }
   },

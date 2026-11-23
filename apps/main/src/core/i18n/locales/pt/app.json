@@ -1489,7 +1489,8 @@
         "marketCodeTaken": "Dois mercados desta vaga têm o mesmo código curto.",
         "marketUnknown": "Um dos mercados já não faz parte desta vaga. Recarregue os mercados.",
         "marketConflict": "Os mercados mudaram enquanto guardava. Recarregue os mercados e tente novamente.",
-        "countryInTwoMarkets": "{country} está em {first} e em {second}. Um país só pode pertencer a um mercado."
+        "countryInTwoMarkets": "{country} está em {first} e em {second}. Um país só pode pertencer a um mercado.",
+        "marketHasCreators": "Remove primeiro os criadores destes mercados: {markets}."
       },
       "dialog": {
         "createTitle": "Nova onda",
@@ -2192,6 +2193,138 @@
         "sheetTitle": "Notas · {market}",
         "expand": "Expandir notas",
         "collapse": "Reduzir notas"
+      },
+      "creators": {
+        "title": "Criadores · {market}",
+        "subtitle": "Escolhidos entre os candidatos e convidados da campanha. Associa cada criador a uma persona para que o seu guião use a mensagem certa.",
+        "add": "Adicionar criadores",
+        "close": "Fechar",
+        "inWave": "Na onda",
+        "addSlotCaption": "Abre os criadores da campanha, filtrados por {market}",
+        "stepper": {
+          "none": "Ainda sem criadores",
+          "count": "Criadores: {count}"
+        },
+        "summary": {
+          "total": "Criadores: {count}",
+          "coverage": "Cobertura de personas:",
+          "personaWarning": "Nenhum criador ativo para: {personas}"
+        },
+        "status": {
+          "shortlisted": "Pré-selecionado",
+          "contacted": "Contactado",
+          "confirmed": "Confirmado",
+          "declined": "Recusado"
+        },
+        "detail": {
+          "applied": "Candidatou-se à campanha",
+          "invited": "Convidado",
+          "offer_sent": "Oferta enviada",
+          "countered": "Fez uma contraproposta",
+          "in_work": "Em produção",
+          "delivered": "Entregue",
+          "draft_rejected": "Rascunho rejeitado",
+          "cancelled": "Cancelado",
+          "application_rejected": "Candidatura rejeitada"
+        },
+        "card": {
+          "unnamed": "Criador sem nome",
+          "notAssigned": "Não atribuído",
+          "persona": "Persona",
+          "status": "Estado",
+          "statusHint": "Acompanha a campanha. Altera-o no quadro da campanha.",
+          "slotCode": "Código da posição",
+          "editCode": "Editar o código da posição",
+          "verified": "Verificado",
+          "example": "Conteúdo de exemplo",
+          "profile": "Perfil",
+          "replace": "Substituir",
+          "remove": "Remover"
+        },
+        "decision": {
+          "title": "Registar a decisão do cliente",
+          "choice": "Decisão",
+          "choices": {
+            "approved": "Aprovado",
+            "suggest_another": "Sugerir outro"
+          },
+          "clientName": "Nome do cliente",
+          "note": "Nota (opcional)",
+          "comment": "Comentário",
+          "replaces": "Uma nova decisão passa a ser a atual. As anteriores ficam no histórico.",
+          "why": {
+            "name": "Indica o nome do cliente.",
+            "comment": "Escreve um comentário.",
+            "nameAndComment": "Indica o nome do cliente e escreve um comentário."
+          },
+          "status": {
+            "approved": "Aprovado por {name}",
+            "suggest_another": "{name} sugere outro criador"
+          },
+          "record": "Registar decisão",
+          "history": "Histórico ({count})",
+          "historyTitle": "Decisões do cliente",
+          "cardMoved": "O cartão do criador passou para Selecionado no quadro.",
+          "cardNotMoved": "O cartão não foi movido: ainda não está no sítio certo do quadro."
+        },
+        "remove": {
+          "title": "Remover este criador da onda?",
+          "body": "O cartão do criador volta para onde estava e a posição é eliminada. A campanha em si não muda.",
+          "bodyDecisions": "As decisões do cliente sobre este criador também são eliminadas."
+        },
+        "empty": {
+          "title": "Ainda sem criadores em {market}",
+          "body": "Escolhe criadores de {campaign}: os que se candidataram ou foram convidados."
+        },
+        "noCampaign": {
+          "title": "Esta onda ainda não tem campanha",
+          "body": "Os criadores vêm de uma campanha: os que se candidatam ou são convidados. Associa uma campanha existente desta marca ou cria uma.",
+          "askAdmin": "Pede a um administrador ou gestor da agência para associar ou criar a campanha.",
+          "linkTitle": "Associar uma campanha",
+          "linkLabel": "Campanha",
+          "linkNone": "Esta marca não tem nenhuma campanha de onda por associar.",
+          "link": "Associar campanha",
+          "createTitle": "Criar uma campanha",
+          "createLabel": "Nome da campanha",
+          "create": "Criar e associar"
+        },
+        "picker": {
+          "title": "Adicionar criadores a {market}",
+          "titleReplace": "Substituir {creator}",
+          "subtitle": "Entre os candidatos e convidados de {campaign}",
+          "search": "Pesquisar criadores",
+          "country": "País",
+          "removeCountry": "Remover o filtro {country}",
+          "prefiltered": "Pré-filtrado por este mercado",
+          "results": "Resultados: {count}",
+          "emptyTitle": "Ainda sem candidatos nem convidados",
+          "emptyBody": "Os criadores aparecem aqui quando se candidatam à campanha ou os convidas.",
+          "emptyFilteredTitle": "Nenhum criador corresponde",
+          "emptyFilteredBody": "Remove um país ou altera a pesquisa para ver mais.",
+          "openCampaign": "Abrir a campanha",
+          "more": "Mostrar mais",
+          "alreadyInWave": "Já está na onda",
+          "alreadyInMarket": "Já está na onda · {market}",
+          "applied": "Candidatou-se",
+          "invited": "Convidado",
+          "selected": "Selecionados: {count}",
+          "assignPersona": "Atribuir persona",
+          "choosePerCreator": "Escolher depois por criador",
+          "add": "Adicionar criadores ({count})",
+          "replaceWith": "Substituir",
+          "roomMarket": "Restam {left} de {max} lugares neste mercado",
+          "roomWave": "Restam {left} de {max} lugares nesta onda"
+        },
+        "errors": {
+          "campaignRequired": "Esta onda ainda não tem campanha. Associa ou cria uma primeiro.",
+          "notEligible": "Esse criador não pode ser adicionado a esta onda.",
+          "alreadyInWave": "Esse criador já está nesta onda.",
+          "capMarket": "Um mercado tem no máximo {max} criadores.",
+          "capWave": "Uma onda tem no máximo {max} criadores.",
+          "personaInUse": "Há criadores associados a esta persona ({count}). Associa-os primeiro a outra persona ou a nenhuma.",
+          "slotCodeTaken": "O código {code} já é usado neste mercado.",
+          "removeBlockedInWork": "O cartão deste criador já está em produção no quadro. Recua primeiro o cartão."
+        }
       }
     }
   },

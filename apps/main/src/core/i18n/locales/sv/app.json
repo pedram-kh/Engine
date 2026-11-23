@@ -1489,7 +1489,8 @@
         "marketCodeTaken": "Två marknader i den här vågen har samma korta kod.",
         "marketUnknown": "En av marknaderna ingår inte längre i den här vågen. Ladda om marknaderna.",
         "marketConflict": "Marknaderna ändrades medan du sparade. Ladda om marknaderna och försök igen.",
-        "countryInTwoMarkets": "{country} finns i både {first} och {second}. Ett land kan bara tillhöra en marknad."
+        "countryInTwoMarkets": "{country} finns i både {first} och {second}. Ett land kan bara tillhöra en marknad.",
+        "marketHasCreators": "Ta först bort creatorna på de här marknaderna: {markets}."
       },
       "dialog": {
         "createTitle": "Ny våg",
@@ -2192,6 +2193,138 @@
         "sheetTitle": "Anteckningar · {market}",
         "expand": "Utöka anteckningar",
         "collapse": "Förminska anteckningar"
+      },
+      "creators": {
+        "title": "Creators · {market}",
+        "subtitle": "Utvalda bland kampanjens sökande och inbjudna. Koppla varje creator till en persona så att manuset använder rätt budskap.",
+        "add": "Lägg till creators",
+        "close": "Stäng",
+        "inWave": "I vågen",
+        "addSlotCaption": "Öppnar kampanjens creators, förfiltrerade på {market}",
+        "stepper": {
+          "none": "Inga creators än",
+          "count": "Creators: {count}"
+        },
+        "summary": {
+          "total": "Creators: {count}",
+          "coverage": "Personatäckning:",
+          "personaWarning": "Ingen aktiv creator för: {personas}"
+        },
+        "status": {
+          "shortlisted": "Kortlistad",
+          "contacted": "Kontaktad",
+          "confirmed": "Bekräftad",
+          "declined": "Tackade nej"
+        },
+        "detail": {
+          "applied": "Har sökt till kampanjen",
+          "invited": "Inbjuden",
+          "offer_sent": "Erbjudande skickat",
+          "countered": "Lade ett motbud",
+          "in_work": "I produktion",
+          "delivered": "Levererat",
+          "draft_rejected": "Utkast avvisat",
+          "cancelled": "Avbrutet",
+          "application_rejected": "Ansökan avslagen"
+        },
+        "card": {
+          "unnamed": "Creator utan namn",
+          "notAssigned": "Inte tilldelad",
+          "persona": "Persona",
+          "status": "Status",
+          "statusHint": "Följer kampanjen. Ändra den på kampanjens tavla.",
+          "slotCode": "Platskod",
+          "editCode": "Redigera platskod",
+          "verified": "Verifierad",
+          "example": "Exempelinnehåll",
+          "profile": "Profil",
+          "replace": "Byt ut",
+          "remove": "Ta bort"
+        },
+        "decision": {
+          "title": "Registrera kundens beslut",
+          "choice": "Beslut",
+          "choices": {
+            "approved": "Godkänt",
+            "suggest_another": "Föreslå en annan"
+          },
+          "clientName": "Kundens namn",
+          "note": "Anteckning (valfri)",
+          "comment": "Kommentar",
+          "replaces": "Ett nytt beslut blir det gällande. Tidigare beslut finns kvar i historiken.",
+          "why": {
+            "name": "Ange kundens namn.",
+            "comment": "Skriv en kommentar.",
+            "nameAndComment": "Ange kundens namn och skriv en kommentar."
+          },
+          "status": {
+            "approved": "Godkänt av {name}",
+            "suggest_another": "{name} föreslår en annan creator"
+          },
+          "record": "Registrera beslut",
+          "history": "Historik ({count})",
+          "historyTitle": "Kundens beslut",
+          "cardMoved": "Creatorns kort flyttades till Utvalda på tavlan.",
+          "cardNotMoved": "Kortet flyttades inte: det ligger ännu inte på rätt plats på tavlan."
+        },
+        "remove": {
+          "title": "Ta bort den här creatorn från vågen?",
+          "body": "Creatorns kort på tavlan går tillbaka dit det var och platsen raderas. Själva kampanjen ändras inte.",
+          "bodyDecisions": "Kundens beslut om den här creatorn raderas också."
+        },
+        "empty": {
+          "title": "Inga creators i {market} än",
+          "body": "Välj creators från {campaign}: de som har sökt eller blivit inbjudna."
+        },
+        "noCampaign": {
+          "title": "Den här vågen har ingen kampanj än",
+          "body": "Creators kommer från en kampanj: de som söker eller blir inbjudna. Koppla en befintlig kampanj för varumärket eller skapa en.",
+          "askAdmin": "Be en administratör eller chef på byrån att koppla eller skapa kampanjen.",
+          "linkTitle": "Koppla en kampanj",
+          "linkLabel": "Kampanj",
+          "linkNone": "Det här varumärket har ingen okopplad kampanj för en våg.",
+          "link": "Koppla kampanjen",
+          "createTitle": "Skapa en kampanj",
+          "createLabel": "Kampanjens namn",
+          "create": "Skapa och koppla"
+        },
+        "picker": {
+          "title": "Lägg till creators i {market}",
+          "titleReplace": "Byt ut {creator}",
+          "subtitle": "Bland sökande och inbjudna till {campaign}",
+          "search": "Sök creators",
+          "country": "Land",
+          "removeCountry": "Ta bort filtret {country}",
+          "prefiltered": "Förfiltrerat på den här marknaden",
+          "results": "Resultat: {count}",
+          "emptyTitle": "Inga sökande eller inbjudna än",
+          "emptyBody": "Creators visas här när de söker till kampanjen eller du bjuder in dem.",
+          "emptyFilteredTitle": "Inga creators matchar",
+          "emptyFilteredBody": "Ta bort ett land eller ändra sökningen för att se fler.",
+          "openCampaign": "Öppna kampanjen",
+          "more": "Visa fler",
+          "alreadyInWave": "Redan i vågen",
+          "alreadyInMarket": "Redan i vågen · {market}",
+          "applied": "Sökt",
+          "invited": "Inbjuden",
+          "selected": "Valda: {count}",
+          "assignPersona": "Tilldela persona",
+          "choosePerCreator": "Välj per creator senare",
+          "add": "Lägg till creators ({count})",
+          "replaceWith": "Byt ut",
+          "roomMarket": "{left} av {max} platser kvar på den här marknaden",
+          "roomWave": "{left} av {max} platser kvar i den här vågen"
+        },
+        "errors": {
+          "campaignRequired": "Den här vågen har ingen kampanj än. Koppla eller skapa en först.",
+          "notEligible": "Den creatorn kan inte läggas till i den här vågen.",
+          "alreadyInWave": "Den creatorn finns redan i den här vågen.",
+          "capMarket": "En marknad har högst {max} creators.",
+          "capWave": "En våg har högst {max} creators.",
+          "personaInUse": "Creators är kopplade till den här personan ({count}). Koppla dem först till en annan persona eller till ingen.",
+          "slotCodeTaken": "Koden {code} används redan på den här marknaden.",
+          "removeBlockedInWork": "Den här creatorns kort är redan i produktion på tavlan. Flytta först tillbaka kortet."
+        }
       }
     }
   },

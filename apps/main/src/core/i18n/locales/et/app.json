@@ -1489,7 +1489,8 @@
         "marketCodeTaken": "Selle laine kahel turul on sama lühikood.",
         "marketUnknown": "Üks turgudest ei kuulu enam sellesse lainesse. Laadi turud uuesti.",
         "marketConflict": "Turud muutusid salvestamise ajal. Laadi turud uuesti ja proovi uuesti.",
-        "countryInTwoMarkets": "{country} on nii turul {first} kui ka turul {second}. Riik võib kuuluda ainult ühele turule."
+        "countryInTwoMarkets": "{country} on nii turul {first} kui ka turul {second}. Riik võib kuuluda ainult ühele turule.",
+        "marketHasCreators": "Eemalda kõigepealt nende turgude loojad: {markets}."
       },
       "dialog": {
         "createTitle": "Uus laine",
@@ -2192,6 +2193,138 @@
         "sheetTitle": "Märkmed · {market}",
         "expand": "Laienda märkmed",
         "collapse": "Ahenda märkmed"
+      },
+      "creators": {
+        "title": "Loojad · {market}",
+        "subtitle": "Valitud kampaania taotlejate ja kutsutute seast. Seo iga looja personaga, et tema skript kasutaks õiget sõnumit.",
+        "add": "Lisa loojaid",
+        "close": "Sulge",
+        "inWave": "Lainel",
+        "addSlotCaption": "Avab kampaania loojad, eelfiltreeritud turule {market}",
+        "stepper": {
+          "none": "Loojaid veel pole",
+          "count": "Loojad: {count}"
+        },
+        "summary": {
+          "total": "Loojad: {count}",
+          "coverage": "Personade kate:",
+          "personaWarning": "Aktiivset loojat pole: {personas}"
+        },
+        "status": {
+          "shortlisted": "Lühinimekirjas",
+          "contacted": "Kontakteeritud",
+          "confirmed": "Kinnitatud",
+          "declined": "Keeldus"
+        },
+        "detail": {
+          "applied": "Taotles kampaaniasse",
+          "invited": "Kutsutud",
+          "offer_sent": "Pakkumine saadetud",
+          "countered": "Tegi vastupakkumise",
+          "in_work": "Tootmises",
+          "delivered": "Üle antud",
+          "draft_rejected": "Mustand tagasi lükatud",
+          "cancelled": "Tühistatud",
+          "application_rejected": "Taotlus tagasi lükatud"
+        },
+        "card": {
+          "unnamed": "Nimeta looja",
+          "notAssigned": "Määramata",
+          "persona": "Persona",
+          "status": "Olek",
+          "statusHint": "Järgib kampaaniat. Muuda seda kampaania tahvlil.",
+          "slotCode": "Koha kood",
+          "editCode": "Muuda koha koodi",
+          "verified": "Kinnitatud",
+          "example": "Näidissisu",
+          "profile": "Profiil",
+          "replace": "Asenda",
+          "remove": "Eemalda"
+        },
+        "decision": {
+          "title": "Salvesta kliendi otsus",
+          "choice": "Otsus",
+          "choices": {
+            "approved": "Heaks kiidetud",
+            "suggest_another": "Paku teist"
+          },
+          "clientName": "Kliendi nimi",
+          "note": "Märkus (valikuline)",
+          "comment": "Kommentaar",
+          "replaces": "Uus otsus muutub kehtivaks. Varasemad otsused jäävad ajalukku.",
+          "why": {
+            "name": "Sisesta kliendi nimi.",
+            "comment": "Sisesta kommentaar.",
+            "nameAndComment": "Sisesta kliendi nimi ja kommentaar."
+          },
+          "status": {
+            "approved": "Kiitis heaks: {name}",
+            "suggest_another": "{name} pakub teist loojat"
+          },
+          "record": "Salvesta otsus",
+          "history": "Ajalugu ({count})",
+          "historyTitle": "Kliendi otsused",
+          "cardMoved": "Looja kaart liigutati tahvlil rühma Valitud.",
+          "cardNotMoved": "Kaarti ei liigutatud: see pole tahvlil veel õiges kohas."
+        },
+        "remove": {
+          "title": "Kas eemaldada see looja lainest?",
+          "body": "Looja kaart läheb tahvlil tagasi oma endisele kohale ja koht kustutatakse. Kampaania ise ei muutu.",
+          "bodyDecisions": "Kustutatakse ka kliendi otsused selle looja kohta."
+        },
+        "empty": {
+          "title": "Turul {market} pole veel loojaid",
+          "body": "Vali loojad kampaaniast {campaign}: need, kes taotlesid või kutsuti."
+        },
+        "noCampaign": {
+          "title": "Sellel lainel pole veel kampaaniat",
+          "body": "Loojad tulevad kampaaniast: nende seast, kes taotlevad või kutsutakse. Seo selle brändi olemasolev kampaania või loo uus.",
+          "askAdmin": "Palu agentuuri administraatoril või juhil kampaania siduda või luua.",
+          "linkTitle": "Seo kampaania",
+          "linkLabel": "Kampaania",
+          "linkNone": "Sellel brändil pole sidumata laine kampaaniat.",
+          "link": "Seo kampaania",
+          "createTitle": "Loo kampaania",
+          "createLabel": "Kampaania nimi",
+          "create": "Loo ja seo"
+        },
+        "picker": {
+          "title": "Lisa loojaid turule {market}",
+          "titleReplace": "Asenda {creator}",
+          "subtitle": "Kampaania {campaign} taotlejate ja kutsutute seast",
+          "search": "Otsi loojaid",
+          "country": "Riik",
+          "removeCountry": "Eemalda filter {country}",
+          "prefiltered": "Eelfiltreeritud sellele turule",
+          "results": "Tulemusi: {count}",
+          "emptyTitle": "Taotlejaid ega kutsutuid veel pole",
+          "emptyBody": "Loojad ilmuvad siia, kui nad kampaaniasse taotlevad või sa nad kutsud.",
+          "emptyFilteredTitle": "Ühtegi loojat ei leitud",
+          "emptyFilteredBody": "Eemalda riik või muuda otsingut, et näha rohkem.",
+          "openCampaign": "Ava kampaania",
+          "more": "Näita rohkem",
+          "alreadyInWave": "Juba lainel",
+          "alreadyInMarket": "Juba lainel · {market}",
+          "applied": "Taotles",
+          "invited": "Kutsutud",
+          "selected": "Valitud: {count}",
+          "assignPersona": "Määra persona",
+          "choosePerCreator": "Vali hiljem looja kaupa",
+          "add": "Lisa loojaid ({count})",
+          "replaceWith": "Asenda",
+          "roomMarket": "Sellel turul on {left} / {max} kohta vaba",
+          "roomWave": "Sellel lainel on {left} / {max} kohta vaba"
+        },
+        "errors": {
+          "campaignRequired": "Sellel lainel pole veel kampaaniat. Seo või loo see kõigepealt.",
+          "notEligible": "Seda loojat ei saa sellele lainele lisada.",
+          "alreadyInWave": "See looja on juba sellel lainel.",
+          "capMarket": "Turul on kuni {max} loojat.",
+          "capWave": "Lainel on kuni {max} loojat.",
+          "personaInUse": "Selle personaga on seotud loojaid ({count}). Seo nad kõigepealt teise personaga või mitte ühegagi.",
+          "slotCodeTaken": "Kood {code} on sellel turul juba kasutusel.",
+          "removeBlockedInWork": "Selle looja kaart on tahvlil juba tootmises. Liiguta kaart kõigepealt tagasi."
+        }
       }
     }
   },

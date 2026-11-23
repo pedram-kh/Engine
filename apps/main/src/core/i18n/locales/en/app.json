@@ -1489,7 +1489,8 @@
         "marketCodeTaken": "Two markets of this wave have the same short code.",
         "marketUnknown": "One of the markets is no longer part of this wave. Reload the markets.",
         "marketConflict": "The markets changed while you were saving. Reload the markets and try again.",
-        "countryInTwoMarkets": "{country} is in both {first} and {second}. A country can belong to one market only."
+        "countryInTwoMarkets": "{country} is in both {first} and {second}. A country can belong to one market only.",
+        "marketHasCreators": "Remove the creators of these markets first: {markets}."
       },
       "dialog": {
         "createTitle": "New wave",
@@ -2192,6 +2193,138 @@
         "sheetTitle": "Notes · {market}",
         "expand": "Expand notes",
         "collapse": "Collapse notes"
+      },
+      "creators": {
+        "title": "Creators · {market}",
+        "subtitle": "Selected from the campaign's applicants and invitees. Match each creator to a persona so their script pulls the right messaging.",
+        "add": "Add creators",
+        "close": "Close",
+        "inWave": "In wave",
+        "addSlotCaption": "Opens the campaign's creators, pre-filtered to {market}",
+        "stepper": {
+          "none": "No creators yet",
+          "count": "Creators: {count}"
+        },
+        "summary": {
+          "total": "Creators: {count}",
+          "coverage": "Persona coverage:",
+          "personaWarning": "No creator in play for: {personas}"
+        },
+        "status": {
+          "shortlisted": "Shortlisted",
+          "contacted": "Contacted",
+          "confirmed": "Confirmed",
+          "declined": "Declined"
+        },
+        "detail": {
+          "applied": "Applied to the campaign",
+          "invited": "Invited",
+          "offer_sent": "Offer sent",
+          "countered": "Countered the offer",
+          "in_work": "In production",
+          "delivered": "Delivered",
+          "draft_rejected": "Draft rejected",
+          "cancelled": "Cancelled",
+          "application_rejected": "Application rejected"
+        },
+        "card": {
+          "unnamed": "Unnamed creator",
+          "notAssigned": "Not assigned",
+          "persona": "Persona",
+          "status": "Status",
+          "statusHint": "Follows the campaign. Change it on the campaign board.",
+          "slotCode": "Slot code",
+          "editCode": "Edit slot code",
+          "verified": "Verified",
+          "example": "Example content",
+          "profile": "Profile",
+          "replace": "Replace",
+          "remove": "Remove"
+        },
+        "decision": {
+          "title": "Record the client's decision",
+          "choice": "Decision",
+          "choices": {
+            "approved": "Approved",
+            "suggest_another": "Suggest another"
+          },
+          "clientName": "Client's name",
+          "note": "Note (optional)",
+          "comment": "Comment",
+          "replaces": "A new decision becomes the current one. Earlier decisions stay in the history.",
+          "why": {
+            "name": "Enter the client's name.",
+            "comment": "Enter a comment.",
+            "nameAndComment": "Enter the client's name and a comment."
+          },
+          "status": {
+            "approved": "Approved by {name}",
+            "suggest_another": "{name} suggests another creator"
+          },
+          "record": "Record decision",
+          "history": "History ({count})",
+          "historyTitle": "Client decisions",
+          "cardMoved": "The creator's card moved to Selected on the board.",
+          "cardNotMoved": "The card was not moved: it is not in the right place on the board yet."
+        },
+        "remove": {
+          "title": "Remove this creator from the wave?",
+          "body": "The creator's board card goes back to where it was and the slot is deleted. The campaign itself is not changed.",
+          "bodyDecisions": "The client's decisions on this creator are deleted too."
+        },
+        "empty": {
+          "title": "No creators in {market} yet",
+          "body": "Pick creators from {campaign}: the ones who applied or were invited."
+        },
+        "noCampaign": {
+          "title": "This wave has no campaign yet",
+          "body": "Creators come from a campaign: the creators who apply or are invited. Link an existing campaign of this brand or create one.",
+          "askAdmin": "Ask an admin or manager of the agency to link or create the campaign.",
+          "linkTitle": "Link a campaign",
+          "linkLabel": "Campaign",
+          "linkNone": "This brand has no unlinked for-a-wave campaign.",
+          "link": "Link campaign",
+          "createTitle": "Create a campaign",
+          "createLabel": "Campaign name",
+          "create": "Create and link"
+        },
+        "picker": {
+          "title": "Add creators to {market}",
+          "titleReplace": "Replace {creator}",
+          "subtitle": "From the applicants and invitees of {campaign}",
+          "search": "Search creators",
+          "country": "Country",
+          "removeCountry": "Remove the filter {country}",
+          "prefiltered": "Pre-filtered to this market",
+          "results": "Results: {count}",
+          "emptyTitle": "No applicants or invitees yet",
+          "emptyBody": "Creators appear here once they apply to the campaign or you invite them.",
+          "emptyFilteredTitle": "No creators match",
+          "emptyFilteredBody": "Remove a country or change the search to see more.",
+          "openCampaign": "Open the campaign",
+          "more": "Show more",
+          "alreadyInWave": "Already in wave",
+          "alreadyInMarket": "Already in wave · {market}",
+          "applied": "Applied",
+          "invited": "Invited",
+          "selected": "Selected: {count}",
+          "assignPersona": "Assign persona",
+          "choosePerCreator": "Choose per creator later",
+          "add": "Add creators ({count})",
+          "replaceWith": "Replace",
+          "roomMarket": "{left} of {max} places left in this market",
+          "roomWave": "{left} of {max} places left in this wave"
+        },
+        "errors": {
+          "campaignRequired": "This wave has no campaign yet. Link or create one first.",
+          "notEligible": "That creator cannot be added to this wave.",
+          "alreadyInWave": "That creator is already in this wave.",
+          "capMarket": "A market has at most {max} creators.",
+          "capWave": "A wave has at most {max} creators.",
+          "personaInUse": "Creators are matched to this persona ({count}). Match them to another persona or none first.",
+          "slotCodeTaken": "The code {code} is already used in this market.",
+          "removeBlockedInWork": "This creator's card is already in production on the board. Move the card back first."
+        }
       }
     }
   },

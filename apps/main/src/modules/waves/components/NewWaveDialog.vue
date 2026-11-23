@@ -223,6 +223,21 @@ function messageFor(err: unknown): string {
           markets: withConcepts.map((m) => `${m.name ?? m.market} (${m.concept_count})`).join(', '),
         })}`
   }
+  // PL-3.1: removing a market that still has creators is refused with the markets and their counts in the meta.
+  if (err instanceof ApiError && err.code === 'wave.market_has_creators') {
+    const raw = err.details[0]?.meta?.['markets']
+    const list = Array.isArray(raw)
+      ? raw.flatMap((m: unknown) => {
+          const r = m as { name?: unknown; market?: unknown; creator_count?: unknown }
+          const label =
+            typeof r.name === 'string' ? r.name : typeof r.market === 'string' ? r.market : ''
+          return label === ''
+            ? []
+            : [`${label} (${typeof r.creator_count === 'number' ? r.creator_count : 0})`]
+        })
+      : []
+    return t('app.waves.errors.marketHasCreators', { markets: list.join(', ') })
+  }
   const twice = countryInTwoMarketsMeta(err)
   if (twice !== null) {
     return t('app.waves.errors.countryInTwoMarkets', {
