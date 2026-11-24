@@ -434,5 +434,7 @@ Recorded in full, with where each lands, in `pl-3-1-plan.md` section "Rulings". 
 (tip `b097c62b`). Stage 2 (web) was walked by Pedram on 2026-11-23 and 24 on `pl31_walk`, **20 steps, all passed**, with three
 improvements (F1 the picker shows the current status, F2 a ceiling is not shown as a target, for creators and concepts, F3 the picker
 wording) and the rulings in `pl-3-1-review.md`. **PL-3 is four chunks: PL-3.1 Creators (done), PL-3.2 Script editor, PL-3.3 Workflow,
-connecting and copy, PL-3.4 "Release a creator".** The sprint close-out has not been run. New tech-debt row: 54 (the invitation gate
-has no exclusivity axis).
+connecting and copy, PL-3.4 "Release a creator".** **PL-3.1 is closed: built and walked (Pedram re-checked F1 to F3 on 2026-11-24, all passed), CI green on the pushed tip; not merged into
+`main`, not deployed; no deploy-log entry.** The sprint close-out has not been run. New tech-debt row: 54 (the invitation gate has no
+exclusivity axis). CI was red once at `17b8b185` (run 45292155710, a notes focus regression from Stage 2); fixed at `8aad8c3b`
+(see `pl-3-1-review.md`).

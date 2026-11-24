@@ -251,4 +251,29 @@ test.describe('Creators step', () => {
       'Created from the step',
     )
   })
+
+  for (const size of WIDTHS) {
+    test(`at ${size.name}: Notes (n) opens the sheet; Escape and its close control return focus to the button`, async ({
+      page,
+      request,
+    }) => {
+      const s = await setup(page, request, size, { campaign: true })
+      await s.open()
+      const button = page.locator('[data-test="creators-notes-open"]')
+      const sheet = page.locator('[data-test="notes-sheet"]')
+      await expect(button).toContainText('Notes (0)')
+
+      await button.click()
+      await expect(sheet).toHaveClass(/v-navigation-drawer--active/)
+      await page.keyboard.press('Escape')
+      await expect(sheet).not.toHaveClass(/v-navigation-drawer--active/)
+      await expect(button).toBeFocused()
+
+      await button.click()
+      await expect(sheet).toHaveClass(/v-navigation-drawer--active/)
+      await page.locator('[data-test="notes-sheet-close"]').click()
+      await expect(sheet).not.toHaveClass(/v-navigation-drawer--active/)
+      await expect(button).toBeFocused()
+    })
+  }
 })

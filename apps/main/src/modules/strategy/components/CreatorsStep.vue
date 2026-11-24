@@ -17,7 +17,7 @@ import type {
   WaveResource,
 } from '@catalyst/api-client'
 import { CEmptyState } from '@catalyst/ui'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -267,9 +267,22 @@ function openProfile(row: WaveCreatorSlot): void {
 const notesOpen = ref(false)
 const noteDraft = ref('')
 const noteCount = computed(() => current.value?.notes_count ?? 0)
+let closedByMarket = false
 watch(market, () => {
   noteDraft.value = ''
+  closedByMarket = notesOpen.value
   notesOpen.value = false
+})
+// Focus goes back to the control that opened the sheet, however it was closed (Escape, its close control, the scrim).
+// The ref is not inside a v-for: there it would be an array and nothing would be focused.
+const notesOpenBtn = ref<{ $el: HTMLElement } | null>(null)
+watch(notesOpen, async (open, was) => {
+  if (was && !open) {
+    const byMarket = closedByMarket
+    closedByMarket = false
+    await nextTick()
+    if (!byMarket) notesOpenBtn.value?.$el.focus()
+  }
 })
 
 function onLinked(w: WaveResource): void {
@@ -299,6 +312,7 @@ function onLinked(w: WaveResource): void {
       <div class="step-head__actions">
         <v-btn
           v-if="linked && market !== ''"
+          ref="notesOpenBtn"
           variant="outlined"
           size="small"
           class="step-btn"

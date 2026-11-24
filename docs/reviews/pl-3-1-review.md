@@ -152,3 +152,42 @@ the flag-off page was compared at 2 concepts). A native speaker's check of the 2
   step keeps its `v-for` (it holds no ref).
 - Tests: Vitest W4 in `StrategyPage.spec.ts` (breaks when the grid goes back to `v-for`); the matrix Playwright test now asserts
   `notes-open` is focused after Escape (breaks when the bar goes back to `v-for`). Narrow-width Playwright run: not run.
+
+## Pedram's re-check, the closing checks and the clean-up (2026-11-24)
+
+**Re-check.** Pedram re-checked F1 (current status pill on picker cards), F2 (ceilings shown only near the limit) and F3 (picker
+footer wording): **all passed.** Accepted as built.
+
+**Red CI.** Run 45292155710 at `17b8b185`: `E2E — main SPA` failed (notes focus), the other three jobs passed. Cause and fix are in the
+section above (refs inside a `v-for` on `StrategyPage.vue`, `df9f0eda`); the fix `8aad8c3b` ran green on all four jobs (run 45300621016).
+
+**Flag-off after the focus fix (real browser).** `creators_scripts` OFF, `waves` and `strategy` ON, `pl31_walk` only. PL-2 (`4b0f0bad`,
+a temporary worktree) against this build, normalised `main` HTML (comment nodes included, counts compared too) and full-page
+screenshots at 1440, as `admin@pl31-walk.local`: the board, the wave's campaign page, the Evergreen campaign page, USPs, personas,
+matrix and concepts. Comment-node counts equal on all seven (216, 103, 95, 84, 98, 52, 101). **HTML identical on six; the concepts page
+differs in exactly one text node: PL-2 "2 of 30 concepts", now "2 concepts" (F2).** Pixels identical on board, both campaign pages and
+USPs. Personas and matrix pixels differ between two runs of PL-2 itself (an unstable animation or timing, not the build); their HTML
+is identical. Concepts pixels differ only through that one text. (Invalid passes found and discarded: PL-2 served from a worktree
+lost its icon font until the Vite allow list was widened for that temporary copy; two runs passed their arguments through an unsplit
+zsh variable and captured a blank page.) Walk compares, each run alone: agency **126 targets identical** to the baseline; creator
+**146 targets identical** (the 32 page errors are the baseline's own 503 answers from the mock API).
+
+**Notes on the Creators step.** Pedram's finding was right: the "Notes (n)" button on the Creators step did not get focus back when
+the sheet was closed with its close control (Escape did). `CreatorsStep.vue` now returns focus to the button after any close, with a
+template ref outside any `v-for` (a close caused by switching market does not take focus). New Playwright test in
+`pl31-creators.spec.ts` at 1440 and 390: open, Escape, button focused; open, close control, button focused; it failed before the fix at
+1440 (close control) and passes three times in a row after it. **Refs in `v-for`, search of the strategy and waves modules:** no other
+case. The refs are `NotesPanel` (`root`, `expandBtn`), `NotesThread` `listEl`, `ConceptReferences` `picker`, `WaveCreatorCard`
+`codeInput`, the two dialogs' `card`, and the two on `StrategyPage` / one on `CreatorsStep` named above; none has a `v-for` ancestor
+(the `v-for` elements in those files are siblings or children). The waves module declares none.
+
+**Narrow width.** The `mobile` Playwright project only matches `creator-shell-mobile.spec.ts`, so it cannot run these specs; both
+specs set their own viewport. `strategy-completion` and `pl31-creators` ran whole in the `chromium` project (13 tests, all passed),
+which includes the 390-wide legs of the creators spec and the new notes-focus test at 390. **Not run:** the notes expanded view and
+the matrix sheet at 390 (the expanded view's 720px width assertion is a desktop one), and a break-revert of the Creators focus fix at 390.
+
+**Clean-up.** `Pl31WalkCleanupSeeder` ran on `pl31_walk` (named first); afterwards the database held 0 agencies, 0 wave creators and 0
+walk users, so the throwaway Cap Wave data went with it. `pl31_walk` was then dropped; it was the only throwaway database of this
+chunk (`catalyst`, `catalyst_e2e`, `catalyst_rehearsal`, `catalyst_test` were not touched). The servers on 8000, 5173 and 5174 are
+stopped, the temporary PL-2 worktree and the CI artifact copies are removed, no process of mine is left, no `DB_*` variable is
+exported. `/tmp/pl31` is left until Pedram says.
