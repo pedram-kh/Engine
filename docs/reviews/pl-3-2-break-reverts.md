@@ -101,7 +101,7 @@ writers) stands, and I left it for Pedram to decide whether it is worth the seco
 
 Same rule as above: break the source, run the named spec, see it red, restore the file, run again and see it green. Each run was alone, by spec file (`VITEST_MAX_WORKERS=2`; the api-client spec from `packages/api-client`; the G30 test with Pest on SQLite). `git status` showed no source change left behind after the last run.
 
-**35 breaks. 34 red, 1 stayed green (row 22, explained). Every restore went back to green.**
+**38 breaks. 37 red, 1 stayed green at first (row 22, then fixed: see the second table). Every restore went back to green.**
 
 | #   | Gate                                              | Break                                    | Spec                                                        | Result                                                                                                                                                                                                     |
 | --- | ------------------------------------------------- | ---------------------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -143,4 +143,12 @@ Same rule as above: break the source, run the named spec, see it red, restore th
 
 Found while doing this, and fixed with tests before the rows above: nothing set `creators_scripts` in the page-level kit, so the page's flag redirect and its step-6 rendering had no test (now two `StrategyPage` tests); the hook cap and last-hook rule had no test (now one); the stepper had no flag-off test with a scripts overview passed in (now one).
 
-**Not covered by a test, said plainly:** the rail chip colour on the web (only the server side of `color_key` is asserted, G30); "no template ref inside a `v-for`" (a code rule, no test); two Playwright break rows (leave guard, 409), **not run**.
+**Not covered by a test, said plainly:** the rail chip colour on the web (only the server side of `color_key` is asserted, G30); "no template ref inside a `v-for`" (a code rule, no test).
+
+### Added after the first pass
+
+| #   | Gate                                                                  | Break                                    | Spec                                                                                                   | Result                                                                                                                              |
+| --- | --------------------------------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| 22b | Replace question only in replace mode (the surviving break of row 22) | drop the `single` check                  | `CreatorsStepScripts.spec`, new direct mount of `CreatorPickerDialog` in add mode with `scriptCount` 2 | red; green restored. **Decision: kept the check and wrote the direct-mount test** (the check is a real guard, the test reaches it). |
+| 36  | Leave guard on route change, in a real browser                        | the guard no longer saves before leaving | `pl32-scripts`, "type and leave at once"                                                               | red (field empty on return); green restored                                                                                         |
+| 37  | A 409 keeps my text, in a real browser                                | the draft is replaced by their text      | `pl32-scripts`, "two tabs on the same hook"                                                            | red (expected "tab two wrote this", got "tab one wrote this"); green restored                                                       |

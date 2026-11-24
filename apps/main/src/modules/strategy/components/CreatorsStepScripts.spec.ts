@@ -49,6 +49,7 @@ import {
   overlay,
   WAVE_ULID,
 } from '../strategyTestKit'
+import CreatorPickerDialog from './CreatorPickerDialog.vue'
 import CreatorsStep from './CreatorsStep.vue'
 
 const ROUTE = `/brands/${BRAND_ULID}/waves/${WAVE_ULID}/strategy/creators`
@@ -203,6 +204,31 @@ describe('CreatorsStep — scripts choices (PL-3.2a)', () => {
         SLOT_ID(1),
         'archive',
       )
+    })
+  })
+
+  describe('The picker in add mode', () => {
+    it('never asks about scripts, even when it is handed a script count (the question belongs to Replace only)', async () => {
+      await mountStrategy(CreatorPickerDialog, {
+        modelValue: true,
+        scope: { agencyId: 'A', brandId: BRAND_ULID, waveId: WAVE_ULID },
+        market: { id: 'SK', market: 'SK', name: 'Slovakia', countries: ['SK'] } as never,
+        marketName: () => 'Slovakia',
+        personas: [],
+        campaignId: null,
+        campaignName: null,
+        mode: 'add',
+        replacing: null,
+        roomMarket: 5,
+        roomWave: 5,
+        perMarket: 5,
+        perWave: 5,
+        scriptCount: 2,
+      })
+      await flushPromises()
+      await click(`[data-test="picker-card-${CREATOR_ID(101)}"]`)
+      expect(overlay('[data-test="creator-picker-names"]')).not.toBeNull()
+      expect(overlay('[data-test="creator-picker-scripts"]')).toBeNull()
     })
   })
 
