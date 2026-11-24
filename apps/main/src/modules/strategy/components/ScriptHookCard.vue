@@ -525,6 +525,25 @@ const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(b
 }
 .hcard__shots {
   min-width: 210px;
+  padding: 6px;
+  border-radius: 8px;
+  background: rgb(var(--v-theme-surface-bright));
+}
+.hcard__shots :deep(.v-list-item) {
+  min-height: 0;
+  padding: 6px 10px;
+  border-radius: 5px;
+}
+.hcard__shots :deep(.v-list-item-title) {
+  font-size: 12px;
+  line-height: normal;
+}
+.hcard__shots :deep(.v-list-item--active) {
+  background: color-mix(in srgb, rgb(var(--v-theme-primary)) 10%, transparent);
+  color: rgb(var(--v-theme-primary));
+}
+.hcard__shots :deep(.v-list-item--active .v-list-item__overlay) {
+  opacity: 0;
 }
 .hcard__add-overlay {
   align-self: flex-start;
