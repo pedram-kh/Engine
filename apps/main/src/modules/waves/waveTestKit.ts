@@ -105,6 +105,8 @@ export interface MountKitOptions {
   flag?: boolean | 'absent'
   /** PL-2.1: `features.strategy`. Left out (undefined) the key is absent, exactly as before PL-2.1. */
   strategy?: boolean
+  /** PL-3.2a: `features.creators_scripts`. Left out the key is absent. */
+  creatorsScripts?: boolean
   route?: string
 }
 
@@ -127,9 +129,13 @@ export async function mountWithApp(
       features:
         flag === 'absent'
           ? {}
-          : options.strategy === undefined
-            ? { waves: flag }
-            : { waves: flag, strategy: options.strategy },
+          : {
+              waves: flag,
+              ...(options.strategy === undefined ? {} : { strategy: options.strategy }),
+              ...(options.creatorsScripts === undefined
+                ? {}
+                : { creators_scripts: options.creatorsScripts }),
+            },
     },
   } as never
 

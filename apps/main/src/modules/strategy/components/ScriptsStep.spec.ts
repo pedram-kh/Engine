@@ -623,6 +623,35 @@ describe('ScriptsStep (PL-3.2a)', () => {
       expect(strategyApi.deleteHook).toHaveBeenCalledTimes(1)
     })
 
+    it('at six hooks the add button is disabled and duplicate is off; the last hook cannot be deleted', async () => {
+      const six = makeScript(1)
+      six.hooks = [1, 2, 3, 4, 5, 6].map((n) => makeHook(n))
+      const w = await mountStep(undefined, { script: six })
+      expect(w.get('[data-test="script-add-hook"]').attributes('disabled')).toBeDefined()
+      await w.get(`[data-test="script-hook-menu-${HOOK_ID(1)}"]`).trigger('click')
+      await flushPromises()
+      expect(
+        q(`[data-test="script-hook-duplicate-${HOOK_ID(1)}"]`)?.classList.contains(
+          'v-list-item--disabled',
+        ),
+      ).toBe(true)
+      document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+      await flushPromises()
+      w.unmount()
+      document.body.innerHTML = ''
+
+      const one = makeScript(1)
+      one.hooks = [makeHook(1)]
+      const w2 = await mountStep(undefined, { script: one })
+      await w2.get(`[data-test="script-hook-menu-${HOOK_ID(1)}"]`).trigger('click')
+      await flushPromises()
+      expect(
+        q(`[data-test="script-hook-delete-${HOOK_ID(1)}"]`)?.classList.contains(
+          'v-list-item--disabled',
+        ),
+      ).toBe(true)
+    })
+
     it('add hook calls the API; the shot-type menu lists the ten and picking one saves it', async () => {
       fakeNext = true
       const s = makeScript(1)

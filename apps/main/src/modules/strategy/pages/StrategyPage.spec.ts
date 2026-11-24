@@ -17,6 +17,9 @@ vi.mock('../api/strategy.api', () => ({
     matrix: vi.fn(),
     listConcepts: vi.fn(),
     listNotes: vi.fn(),
+    scripts: vi.fn(),
+    script: vi.fn(),
+    creators: vi.fn(),
   },
 }))
 
@@ -41,6 +44,8 @@ import {
   mkt,
 } from '../strategyTestKit'
 import NotesSheet from '../components/NotesSheet.vue'
+import { makeCreatorMarket, makeCreatorsData } from '../creatorsTestKit'
+import { makeOverview, makeRailCreator, makeScript } from '../scriptsTestKit'
 import StrategyPage from './StrategyPage.vue'
 
 function prime(): void {
@@ -149,6 +154,56 @@ describe('StrategyPage (PL-2.1 W1-W3)', () => {
     expect(gone.find('[data-test="strategy-stepper"]').exists()).toBe(false)
     gone.unmount()
   })
+  it('PL-3.2a: the scripts address is refused to the wave while creators_scripts is off, and requests nothing', async () => {
+    for (const creatorsScripts of [false, undefined]) {
+      const w = await mountStrategy(
+        StrategyPage,
+        {},
+        {
+          strategy: true,
+          creatorsScripts,
+          route: `/brands/${BRAND_ULID}/waves/${WAVE_ULID}/strategy/scripts`,
+        },
+      )
+      await flushPromises()
+      expect(strategyApi.summary).not.toHaveBeenCalled()
+      expect(strategyApi.scripts).not.toHaveBeenCalled()
+      expect(w.vm.$router.currentRoute.value.name).toBe('waves.detail')
+      expect(w.find('[data-test="scripts-step"]').exists()).toBe(false)
+      w.unmount()
+    }
+  })
+
+  it('PL-3.2a: with the flag on the scripts address shows step 6 as the active step, with the scripts step in place of the completion bar and the page notes', async () => {
+    prime()
+    vi.mocked(strategyApi.scripts).mockResolvedValue({
+      data: makeOverview('SK', [makeRailCreator(1, [1])]),
+    })
+    vi.mocked(strategyApi.script).mockResolvedValue({ data: makeScript(1) })
+    vi.mocked(strategyApi.creators).mockResolvedValue({
+      data: makeCreatorsData([makeCreatorMarket('SK', []), makeCreatorMarket('RO', [])]),
+    })
+    const w = await mountStrategy(
+      StrategyPage,
+      {},
+      {
+        strategy: true,
+        creatorsScripts: true,
+        route: `/brands/${BRAND_ULID}/waves/${WAVE_ULID}/strategy/scripts`,
+      },
+    )
+    await flushPromises()
+    expect(w.find('[data-test="scripts-step"]').exists()).toBe(true)
+    expect(w.get('[data-test="strategy-step-scripts"]').attributes('aria-current')).toBe('step')
+    expect(w.find('[data-test="completion-bar"]').exists()).toBe(false)
+    expect(w.find('[data-test="usps-step"]').exists()).toBe(false)
+    // The stepper reads the overview without a market; the step reads its own rail with one.
+    const markets = vi.mocked(strategyApi.scripts).mock.calls.map((c) => c[1])
+    expect(markets).toContain(null)
+    expect(markets).toContain('SK')
+    w.unmount()
+  })
+
   it('W4 (PL-3.1 CI fix): closing the notes expanded view returns focus to the expand control', async () => {
     prime()
     vi.mocked(strategyApi.listNotes).mockResolvedValue({ data: [], meta: {} } as never)
