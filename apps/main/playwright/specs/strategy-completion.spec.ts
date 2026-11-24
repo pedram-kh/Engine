@@ -238,6 +238,8 @@ test.describe('Strategy completion, notes and landing', () => {
     await expect(page.locator('[data-test="note-body"]')).toHaveText('Slovak note')
     await page.keyboard.press('Escape')
     await expect(open).toContainText('Notes (1)')
+    // Focus goes back to the control that opened the sheet (PL-3.1: a template ref in a v-for had lost it).
+    await expect(open).toBeFocused()
     // The other market has its own thread.
     await page.locator('[data-test="market-tab-RO"]').click()
     await expect(open).toContainText('Notes (0)')

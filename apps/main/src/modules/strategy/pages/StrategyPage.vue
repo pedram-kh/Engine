@@ -254,8 +254,7 @@ onMounted(async () => {
         @wave="(w) => (wave = w)"
       />
       <StepCompletionBar
-        v-for="n in onCreators ? [] : [1]"
-        :key="n"
+        v-if="!onCreators"
         :summary="summary"
         :step="step"
         :market="market"
@@ -274,12 +273,7 @@ onMounted(async () => {
           >
         </template>
       </StepCompletionBar>
-      <div
-        v-for="n in onCreators ? [] : [1]"
-        :key="n"
-        class="strategy-grid"
-        :class="{ 'strategy-grid--notes': panelOn }"
-      >
+      <div v-if="!onCreators" class="strategy-grid" :class="{ 'strategy-grid--notes': panelOn }">
         <div class="strategy-grid__main">
           <UspsStep
             v-if="step === 'usps'"

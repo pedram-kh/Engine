@@ -137,3 +137,18 @@ reached the script and every page was blank; it was found by looking at the imag
 The full suites, locally (CI runs them at the push). Pint and Larastan this pass (no PHP changed). The Pest PostgreSQL leg (by file
 only). A concepts market filled to 25 and 30 in the real browser (the tile's three states are tested in Vitest, rows W24 and W25, and
 the flag-off page was compared at 2 concepts). A native speaker's check of the 24 locales. Nothing was run on `main`; nothing deployed.
+
+## CI red at 17b8b185 and its fix (2026-11-24)
+
+- Run 45292155710: `E2E — main SPA` failed on `strategy-completion.spec.ts:392` (notes expanded view: focus did not return to
+  `notes-expand`); three attempts, same result. The CI trace shows the sheet gone at once and `document.activeElement` on the
+  body for the full 5 s (not a timing problem).
+- Cause (product regression from Stage 2, commit `df9f0eda`): `StrategyPage.vue` wrapped the completion bar and the step grid
+  in `v-for="n in onCreators ? [] : [1]"` to leave the flag-off DOM unchanged. A template ref inside a `v-for` is an array, so
+  `panelRef.value?.focusExpand()` and `notesOpenBtn.value?.$el.focus()` found nothing: focus was lost for the notes panel's
+  expanded view and for the matrix "Notes (n)" sheet. Bisected locally: `ccec02f5` passes, `df9f0eda` fails, `b097c62b` 3/3 pass,
+  `17b8b185` 3/3 fail.
+- Fix: both wrappers are `v-if="!onCreators"` (no extra node is rendered when true, so the flag-off DOM is the same). The Creators
+  step keeps its `v-for` (it holds no ref).
+- Tests: Vitest W4 in `StrategyPage.spec.ts` (breaks when the grid goes back to `v-for`); the matrix Playwright test now asserts
+  `notes-open` is focused after Escape (breaks when the bar goes back to `v-for`). Narrow-width Playwright run: not run.

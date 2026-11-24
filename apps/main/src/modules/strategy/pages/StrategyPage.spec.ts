@@ -4,6 +4,7 @@
  */
 import { flushPromises } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { defineComponent } from 'vue'
 
 vi.mock('@/modules/waves/api/waves.api', () => ({
   wavesApi: { show: vi.fn(), list: vi.fn(), create: vi.fn(), update: vi.fn() },
@@ -15,7 +16,17 @@ vi.mock('../api/strategy.api', () => ({
     listPersonas: vi.fn(),
     matrix: vi.fn(),
     listConcepts: vi.fn(),
+    listNotes: vi.fn(),
   },
+}))
+
+// The real sheet is a Vuetify drawer that needs a layout; only its open/closed state matters to the page's focus handling.
+vi.mock('../components/NotesSheet.vue', () => ({
+  default: defineComponent({
+    props: { modelValue: { type: Boolean, default: false } },
+    emits: ['update:modelValue'],
+    template: '<div data-test="notes-sheet-stub" />',
+  }),
 }))
 
 import { wavesApi } from '@/modules/waves/api/waves.api'
@@ -29,6 +40,7 @@ import {
   WAVE_ULID,
   mkt,
 } from '../strategyTestKit'
+import NotesSheet from '../components/NotesSheet.vue'
 import StrategyPage from './StrategyPage.vue'
 
 function prime(): void {
@@ -136,5 +148,23 @@ describe('StrategyPage (PL-2.1 W1-W3)', () => {
     )
     expect(gone.find('[data-test="strategy-stepper"]').exists()).toBe(false)
     gone.unmount()
+  })
+  it('W4 (PL-3.1 CI fix): closing the notes expanded view returns focus to the expand control', async () => {
+    prime()
+    vi.mocked(strategyApi.listNotes).mockResolvedValue({ data: [], meta: {} } as never)
+    const w = await mountStrategy(StrategyPage, {})
+    // jsdom only focuses connected elements.
+    document.body.appendChild(w.element.parentElement as HTMLElement)
+    await flushPromises()
+    // The step grid is not inside a v-for: a template ref in one is an array and the focus call finds nothing.
+    await w.get('[data-test="notes-expand"]').trigger('click')
+    await flushPromises()
+    const sheet = w.findComponent(NotesSheet)
+    expect(sheet.exists()).toBe(true)
+    sheet.vm.$emit('update:modelValue', false)
+    await flushPromises()
+    expect(w.findComponent(NotesSheet).exists()).toBe(false)
+    expect(document.activeElement).toBe(w.get('[data-test="notes-expand"]').element)
+    w.unmount()
   })
 })

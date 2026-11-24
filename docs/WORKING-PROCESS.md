@@ -200,6 +200,8 @@ locally" instruction in chunk prompts):
 - Set `DB_*` for one command only (a subshell, or `VAR=value command`), never `export` them in the session. If one is exported anyway, unset every `DB_*` variable straight after the run.
 - Report the database each run used next to its totals.
 
+**Stage 2 of a chunk is not run through CI before the walk (standing rule, Pedram, 2026-11-24, after PL-3.1).** Its first CI run can find failures the local, by-file runs did not: PL-3.1 Stage 2 put a notes-panel template ref inside a `v-for` (a ref there is an array), so closing the notes sheet no longer returned focus, and only the existing Playwright spec for the notes panel (`strategy-completion.spec.ts`) saw it, in CI. When a chunk's web work touches a shared part of the workspace (the stepper, the page header, the notes panel), run the existing Playwright specs for that shared part locally, by spec, before offering the walk. Never put a template `ref` under a `v-for`; use `v-if` where the element's DOM must stay as it was.
+
 ### 4.2 Stacking, width and overlay defects (lesson, PL-1.2 walk, 2026-11-18)
 
 Stacking, width and overlay defects are invisible to unit tests: a menu behind a dialog, a pill stretched to its column and a list outside the window all passed Vitest and Pest. Any new dialog, menu or board is opened in a real browser, including a quick close and reopen, before a walk is offered to Pedram.
