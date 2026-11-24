@@ -145,13 +145,17 @@ final class WaveCreatorController
         $model = $this->findWave($wave, $agency, $brand);
         Gate::authorize('manageCreators', WaveCreator::class);
 
-        /** @var array{creator: string} $data */
-        $data = Validator::make($request->all(), ['creator' => ['required', 'string', 'max:26']])->validate();
+        /** @var array{creator: string, scripts?: string} $data */
+        $data = Validator::make($request->all(), [
+            'creator' => ['required', 'string', 'max:26'],
+            // PL-3.2a (Q8): what happens to the old creator's scripts. Absent = the default, carry over.
+            'scripts' => ['sometimes', 'string', Rule::in([WaveCreatorService::CARRY_OVER, WaveCreatorService::ARCHIVE])],
+        ])->validate();
         /** @var User $actor */
         $actor = $request->user();
 
         try {
-            $this->creators->replace($brand, $model, $actor, $slot, $data['creator']);
+            $this->creators->replace($brand, $model, $actor, $slot, $data['creator'], $data['scripts'] ?? WaveCreatorService::CARRY_OVER);
         } catch (StrategyRuleViolation $e) {
             return $this->refuse($request, $e);
         }
@@ -167,11 +171,13 @@ final class WaveCreatorController
         $this->assertBrand($brand, $agency);
         $model = $this->findWave($wave, $agency, $brand);
         Gate::authorize('manageCreators', WaveCreator::class);
+        /** @var array{scripts?: string} $data */
+        $data = Validator::make($request->all(), ['scripts' => ['sometimes', 'nullable', 'string', Rule::in([WaveCreatorService::ARCHIVE, WaveCreatorService::DELETE])]])->validate();
         /** @var User $actor */
         $actor = $request->user();
 
         try {
-            $this->creators->remove($brand, $model, $actor, $slot);
+            $this->creators->remove($brand, $model, $actor, $slot, $data['scripts'] ?? null);
         } catch (StrategyRuleViolation $e) {
             return $this->refuse($request, $e);
         }

@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace App\Modules\Strategy\Services;
 
+use App\Modules\Identity\Models\User;
 use App\Modules\Strategy\Models\WaveConcept;
 use App\Modules\Strategy\Models\WaveCreator;
 use App\Modules\Strategy\Models\WavePersona;
+use App\Modules\Strategy\Models\WaveScript;
 use App\Modules\Strategy\Models\WaveStrategyCompletion;
 use App\Modules\Strategy\Notes\NoteService;
 use App\Modules\Waves\Contracts\WaveMarketGuard;
 use App\Modules\Waves\Models\Wave;
+use App\Modules\Waves\Models\WaveMarket;
+use Illuminate\Support\Facades\Auth;
 
 /** The Strategy side of {@see WaveMarketGuard}: personas per market of a wave. Read-only, no lock of its own. */
 final class StrategyWaveMarketGuard implements WaveMarketGuard
@@ -118,12 +122,51 @@ final class StrategyWaveMarketGuard implements WaveMarketGuard
     public function forgetMarkets(Wave $locked, array $removedIds): array
     {
         if ($removedIds === []) {
-            return ['completions' => 0, 'notes' => 0];
+            return ['completions' => 0, 'notes' => 0, 'scripts' => 0];
         }
 
         return [
             'completions' => WaveStrategyCompletion::query()->where('wave_id', $locked->id)->whereIn('market_id', $removedIds)->delete(),
             'notes' => NoteService::purgeMarkets($locked, $removedIds),
+            'scripts' => $this->purgeScripts($locked, $removedIds),
         ];
+    }
+
+    public function scriptCountsByMarket(Wave $locked, array $removedIds): array
+    {
+        if ($removedIds === []) {
+            return [];
+        }
+
+        /** @var array<int, int> $counts */
+        $counts = WaveScript::query()
+            ->where('wave_id', $locked->id)
+            ->whereIn('market_id', $removedIds)
+            ->selectRaw('market_id, count(*) as n')
+            ->groupBy('market_id')
+            ->orderBy('market_id')
+            ->pluck('n', 'market_id')
+            ->map(static fn (mixed $n): int => (int) $n)
+            ->all();
+
+        return $counts;
+    }
+
+    /**
+     * Delete the scripts (archived: a market with creators is refused first) of the removed markets, each with its hooks, texts and
+     * audit row, in number order so the run is the same every time. The wave lock is already held.
+     *
+     * @param  list<int>  $removedIds
+     */
+    private function purgeScripts(Wave $locked, array $removedIds): int
+    {
+        $markets = WaveMarket::query()->where('wave_id', $locked->id)->whereIn('id', $removedIds)->pluck('ulid', 'id')->all();
+        $actor = Auth::user();
+        $scripts = WaveScript::query()->where('wave_id', $locked->id)->whereIn('market_id', $removedIds)->orderBy('market_id')->orderBy('id')->lockForUpdate()->get();
+        foreach ($scripts as $script) {
+            ScriptArchive::deleteOne($locked, $script, (string) ($markets[$script->market_id] ?? ''), $actor instanceof User ? $actor : null);
+        }
+
+        return $scripts->count();
     }
 }

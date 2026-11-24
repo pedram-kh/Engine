@@ -116,9 +116,9 @@ final class WaveMarketService
      * without creates, an existing market missing from the list is removed (refused if it has personas).
      *
      * @param  list<array<string, mixed>>  $specs  `id?`, `name`, `code?`, `countries`, `rename_persona_codes?`
-     * @return array{changed: bool, before: array{markets: list<string>, market_countries: array<string, list<string>>}, after: array{markets: list<string>, market_countries: array<string, list<string>>, markets_renamed: list<string>}, persona_codes: array{renamed: int, skipped: int, kept_custom: int, markets: list<string>}, removed: array{completions: int, notes: int}}
+     * @return array{changed: bool, before: array{markets: list<string>, market_countries: array<string, list<string>>}, after: array{markets: list<string>, market_countries: array<string, list<string>>, markets_renamed: list<string>}, persona_codes: array{renamed: int, skipped: int, kept_custom: int, markets: list<string>}, removed: array{completions: int, notes: int, scripts: int}}
      */
-    public function replace(Wave $locked, array $specs, string $version, ?int $confirmNotes = null): array
+    public function replace(Wave $locked, array $specs, string $version, ?int $confirmNotes = null, ?int $confirmScripts = null): array
     {
         $current = $this->load($locked);
 
@@ -192,12 +192,26 @@ final class WaveMarketService
 
                 throw WaveRuleViolation::marketHasNotes($rows, $noteTotal);
             }
+
+            // PL-3.2a (Q14): ARCHIVED scripts go with the market, but the person is told how many first (confirm = the total).
+            $scripts = $this->guard->scriptCountsByMarket($locked, $ids);
+            $scriptTotal = array_sum($scripts);
+            if ($scriptTotal > 0 && $confirmScripts !== $scriptTotal) {
+                $rows = [];
+                foreach ($current as $market) {
+                    if (isset($scripts[$market->id])) {
+                        $rows[] = ['market' => $market->ulid, 'name' => $market->name, 'code' => $market->code, 'script_count' => $scripts[$market->id]];
+                    }
+                }
+
+                throw WaveRuleViolation::marketHasScripts($rows, $scriptTotal);
+            }
         }
 
         $before = $this->summary($current);
         $renamed = [];
         $personaCodes = ['renamed' => 0, 'skipped' => 0, 'kept_custom' => 0, 'markets' => []];
-        $forgotten = ['completions' => 0, 'notes' => 0];
+        $forgotten = ['completions' => 0, 'notes' => 0, 'scripts' => 0];
 
         try {
             // A nested transaction is a savepoint: a key violation that still gets through (it cannot under the wave

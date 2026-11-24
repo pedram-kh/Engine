@@ -17,6 +17,7 @@ use App\Modules\Strategy\Services\StrategyRuleViolation;
 use App\Modules\Strategy\Services\StrategyStepState;
 use App\Modules\Strategy\Services\StrategyText;
 use App\Modules\Strategy\Services\WaveCreatorStepState;
+use App\Modules\Strategy\Services\WaveScriptStepState;
 use App\Modules\Waves\Models\Wave;
 use App\Modules\Waves\Models\WaveMarket;
 use Illuminate\Database\Eloquent\Builder;
@@ -239,7 +240,8 @@ final class NoteService
     private function scope(Wave $wave, string $step, ?string $marketUlid): ?WaveMarket
     {
         // PL-3.1: the per-market `creators` thread exists only while the sprint flag is on; off, it is a 404 like any other name.
-        $steps = CreatorsScriptsEnabled::active() ? [...StrategyStepState::STEPS, WaveCreatorStepState::STEP] : StrategyStepState::STEPS;
+        // PL-3.2a: the same for the per-market `scripts` thread (step 6).
+        $steps = CreatorsScriptsEnabled::active() ? [...StrategyStepState::STEPS, WaveCreatorStepState::STEP, WaveScriptStepState::STEP] : StrategyStepState::STEPS;
         if (! in_array($step, $steps, true)) {
             throw StrategyRuleViolation::conflict404();
         }

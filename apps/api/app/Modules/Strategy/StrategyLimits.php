@@ -109,6 +109,27 @@ final class StrategyLimits
 
     public const IMAGE_FILENAME = 255;
 
+    /** PL-3.2a: scripts per creator per wave (a database fact: CHECK and unique key on `wave_scripts`). */
+    public const SCRIPTS_PER_CREATOR = 3;
+
+    /** PL-3.2a: hooks per script (a new script starts with three: A, B, C). */
+    public const HOOKS_PER_SCRIPT = 6;
+
+    public const HOOKS_ON_CREATE = 3;
+
+    public const SCRIPT_ANGLE = 300;
+
+    public const HOOK_AUDIO = 300;
+
+    public const HOOK_OVERLAY = 100;
+
+    public const HOOK_VISUAL = 400;
+
+    /** PL-3.2a: the durations a script can have, in seconds (the default is the first one marked below). */
+    public const SCRIPT_DURATIONS = [15, 20, 30, 45, 60];
+
+    public const SCRIPT_DURATION_DEFAULT = 30;
+
     /** @return array<string, int> */
     public static function all(): array
     {
@@ -156,6 +177,12 @@ final class StrategyLimits
             'links_per_concept' => self::LINKS_PER_CONCEPT,
             'images_per_concept' => self::IMAGES_PER_CONCEPT,
             'image_total_bytes' => self::IMAGE_TOTAL_BYTES,
+            'scripts_per_creator' => self::SCRIPTS_PER_CREATOR,
+            'hooks_per_script' => self::HOOKS_PER_SCRIPT,
+            'script_angle' => self::SCRIPT_ANGLE,
+            'hook_audio' => self::HOOK_AUDIO,
+            'hook_overlay' => self::HOOK_OVERLAY,
+            'hook_visual' => self::HOOK_VISUAL,
         ];
     }
 }

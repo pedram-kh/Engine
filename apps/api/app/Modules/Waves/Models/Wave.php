@@ -136,7 +136,7 @@ final class Wave extends Model
     protected static function booted(): void
     {
         self::deleting(static function (Wave $wave): void {
-            if (DB::table('wave_creators')->where('wave_id', $wave->id)->exists()) {
+            if (DB::table('wave_creators')->where('wave_id', $wave->id)->exists() || DB::table('wave_scripts')->where('wave_id', $wave->id)->exists()) {
                 throw WaveRuleViolation::hasCreators();
             }
         });

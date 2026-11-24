@@ -57,4 +57,16 @@ final class WaveStrategyPolicy
     {
         return CurrentAgencyRole::canManage($user);
     }
+
+    /** PL-3.2a: write scripts (create, edit the brief and hooks, delete one of their own): every agency role. */
+    public function manageScripts(User $user): bool
+    {
+        return CurrentAgencyRole::for($user) !== null;
+    }
+
+    /** PL-3.2a: delete scripts that are archived or that go with a removed creator: admin and manager only. */
+    public function deleteScriptsInUse(User $user): bool
+    {
+        return CurrentAgencyRole::canManage($user);
+    }
 }

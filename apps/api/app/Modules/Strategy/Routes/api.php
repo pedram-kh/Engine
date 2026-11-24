@@ -9,6 +9,7 @@ use App\Modules\Strategy\Http\Controllers\ConceptImageController;
 use App\Modules\Strategy\Http\Controllers\ConceptLinkController;
 use App\Modules\Strategy\Http\Controllers\MatrixController;
 use App\Modules\Strategy\Http\Controllers\PersonaController;
+use App\Modules\Strategy\Http\Controllers\ScriptController;
 use App\Modules\Strategy\Http\Controllers\StrategyController;
 use App\Modules\Strategy\Http\Controllers\UspController;
 use App\Modules\Strategy\Http\Controllers\WaveCreatorController;
@@ -50,6 +51,19 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         Route::delete('creators/{slot}', [WaveCreatorController::class, 'destroy'])->withTrashed()->name('waves.strategy.creators.destroy');
         Route::get('creators/{slot}/decisions', [WaveCreatorController::class, 'decisionHistory'])->withTrashed()->name('waves.strategy.creators.decisions');
         Route::post('creators/{slot}/decisions', [WaveCreatorController::class, 'decide'])->withTrashed()->name('waves.strategy.creators.decide');
+
+        // PL-3.2a — the scripts of the wave (step 6). Literal `archived` BEFORE `{script}`. ALL THREE flags (404).
+        Route::get('scripts', [ScriptController::class, 'index'])->withTrashed()->name('waves.strategy.scripts.index');
+        Route::get('scripts/archived', [ScriptController::class, 'archived'])->withTrashed()->name('waves.strategy.scripts.archived');
+        Route::delete('scripts/archived/{script}', [ScriptController::class, 'destroyArchived'])->withTrashed()->name('waves.strategy.scripts.archived.destroy');
+        Route::post('scripts', [ScriptController::class, 'store'])->withTrashed()->name('waves.strategy.scripts.store');
+        Route::get('scripts/{script}', [ScriptController::class, 'show'])->withTrashed()->name('waves.strategy.scripts.show');
+        Route::put('scripts/{script}/brief', [ScriptController::class, 'brief'])->withTrashed()->name('waves.strategy.scripts.brief');
+        Route::delete('scripts/{script}', [ScriptController::class, 'destroy'])->withTrashed()->name('waves.strategy.scripts.destroy');
+        Route::post('scripts/{script}/hooks', [ScriptController::class, 'hookStore'])->withTrashed()->name('waves.strategy.scripts.hooks.store');
+        Route::put('scripts/{script}/hooks/{hook}', [ScriptController::class, 'hookUpdate'])->withTrashed()->name('waves.strategy.scripts.hooks.update');
+        Route::post('scripts/{script}/hooks/{hook}/duplicate', [ScriptController::class, 'hookDuplicate'])->withTrashed()->name('waves.strategy.scripts.hooks.duplicate');
+        Route::delete('scripts/{script}/hooks/{hook}', [ScriptController::class, 'hookDestroy'])->withTrashed()->name('waves.strategy.scripts.hooks.destroy');
 
         Route::get('usps', [UspController::class, 'index'])->withTrashed()->name('waves.strategy.usps.index');
         Route::post('usps', [UspController::class, 'store'])->withTrashed()->name('waves.strategy.usps.store');

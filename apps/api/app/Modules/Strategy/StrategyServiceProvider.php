@@ -16,6 +16,7 @@ use App\Modules\Strategy\Models\WaveConceptLink;
 use App\Modules\Strategy\Models\WaveCreator;
 use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WavePersonaAngle;
+use App\Modules\Strategy\Models\WaveScript;
 use App\Modules\Strategy\Models\WaveStrategyNote;
 use App\Modules\Strategy\Models\WaveUsp;
 use App\Modules\Strategy\Policies\WaveConceptPolicy;
@@ -50,6 +51,7 @@ final class StrategyServiceProvider extends ServiceProvider
         Gate::policy(WavePersonaAngle::class, WaveStrategyPolicy::class);
         Gate::policy(WaveStrategyNote::class, WaveStrategyPolicy::class);
         Gate::policy(WaveCreator::class, WaveStrategyPolicy::class);
+        Gate::policy(WaveScript::class, WaveStrategyPolicy::class);
         Gate::policy(WaveConcept::class, WaveConceptPolicy::class);
         Gate::policy(WaveConceptImage::class, WaveConceptPolicy::class);
         Gate::policy(WaveConceptLink::class, WaveConceptPolicy::class);

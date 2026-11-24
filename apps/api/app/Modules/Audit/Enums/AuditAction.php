@@ -599,6 +599,19 @@ enum AuditAction: string
     case WaveCreatorDecided = 'wave_creator.decided';
     case WaveCreatorCardMoved = 'wave_creator.card_moved';
 
+    // PL-3.2a — a creator's scripts. LITERAL payload keys: the wave, market and script ulids, the script number, the creator id,
+    // counts and a list of changed FIELD NAMES. NEVER the angle, a hook's text or a description (no script text in any audit
+    // row). Erasure: ids and counts only; the three tables are decided in the ErasureRegistry.
+    case WaveScriptCreated = 'wave_script.created';
+    case WaveScriptUpdated = 'wave_script.updated';
+    case WaveScriptDeleted = 'wave_script.deleted';
+    case WaveScriptArchived = 'wave_script.archived';
+    case WaveScriptRestored = 'wave_script.restored';
+    case WaveScriptHookCreated = 'wave_script_hook.created';
+    case WaveScriptHookUpdated = 'wave_script_hook.updated';
+    case WaveScriptHookDuplicated = 'wave_script_hook.duplicated';
+    case WaveScriptHookDeleted = 'wave_script_hook.deleted';
+
     // Campaign attachments from the Files library, chunk B (AH-092). A
     // linkage action on the campaign, not a library action on the file — the
     // file's own audit trail (above) is unaffected by any of these. No

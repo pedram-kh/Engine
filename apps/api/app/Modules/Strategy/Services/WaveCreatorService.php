@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Strategy\Services;
 
+use App\Core\Tenancy\CurrentAgencyRole;
 use App\Modules\Audit\Enums\AuditAction;
 use App\Modules\Audit\Facades\Audit;
 use App\Modules\Brands\Models\Brand;
@@ -29,6 +30,13 @@ use Illuminate\Support\Collection;
  */
 final class WaveCreatorService
 {
+    /** PL-3.2a: what happens to a slot's scripts on Replace / Remove. */
+    public const CARRY_OVER = 'carry_over';
+
+    public const ARCHIVE = 'archive';
+
+    public const DELETE = 'delete';
+
     /**
      * Add creators to a market, all or nothing.
      *
@@ -77,12 +85,14 @@ final class WaveCreatorService
                         'added_by_user_id' => $actor->id,
                     ]);
                     $created->push($row);
+                    // PL-3.2a (Q8): a creator who comes back to the SAME market of this wave gets their archived scripts back.
+                    $restored = ScriptArchive::restore($locked, $row, $market, $actor);
 
                     Audit::log(
                         action: AuditAction::WaveCreatorAdded,
                         actor: $actor,
                         subject: $row,
-                        metadata: ['wave' => $locked->ulid, 'market' => $market->ulid, 'slot' => $slot, 'creator_id' => $creator?->id, 'persona' => $persona?->ulid],
+                        metadata: ['wave' => $locked->ulid, 'market' => $market->ulid, 'slot' => $slot, 'creator_id' => $creator?->id, 'persona' => $persona?->ulid, 'scripts_restored' => $restored],
                         agencyId: $locked->agency_id,
                     );
                 }
@@ -142,12 +152,19 @@ final class WaveCreatorService
         });
     }
 
-    /** Replace the creator of a slot: the slot, its code and its persona stay; the old creator's decisions go with the old creator. */
-    public function replace(Brand $brand, Wave $wave, User $actor, string $slotUlid, string $creatorUlid): WaveCreator
+    /**
+     * Replace the creator of a slot: the slot, its code and its persona stay; the old creator's decisions go with the old creator.
+     * PL-3.2a (Q8): the old creator's scripts CARRY OVER to the new creator by default (`carry_over`; the slot row is updated in
+     * place and the composite key moves them), or are archived (`archive`). The new creator's own archived scripts of this market
+     * come back either way. Carrying more than three scripts in all is refused and nothing is written.
+     *
+     * @param  string  $scripts  `carry_over` or `archive`
+     */
+    public function replace(Brand $brand, Wave $wave, User $actor, string $slotUlid, string $creatorUlid, string $scripts = self::CARRY_OVER): WaveCreator
     {
         StrategyGuard::assertBrandWritable($brand);
 
-        return WaveCreatorGuard::transaction($wave, function (Wave $locked) use ($actor, $slotUlid, $creatorUlid): WaveCreator {
+        return WaveCreatorGuard::transaction($wave, function (Wave $locked) use ($actor, $slotUlid, $creatorUlid, $scripts): WaveCreator {
             $campaign = $this->campaignOrRefuse($locked);
             $slot = $this->lockedSlot($locked, $slotUlid);
             $market = WaveMarket::query()->findOrFail($slot->market_id);
@@ -162,18 +179,28 @@ final class WaveCreatorService
             $this->assertNotInWave($locked, [$new->id]);
 
             WaveCreatorBoardRules::assertRemovable($locked, $slot);
+
+            // Check the cap BEFORE anything is written: a refusal leaves the slot, the card and the scripts as they were.
+            $live = ScriptArchive::liveOf($slot);
+            $carried = 0;
+            if ($live->isNotEmpty() && $scripts === self::CARRY_OVER) {
+                ScriptArchive::renumberForCarryOver($locked, $live, $new->id);
+                $carried = $live->count();
+            }
             WaveCreatorBoardRules::release($locked, $slot, $actor);
 
             $previous = $slot->creator_id;
+            $archived = $live->isNotEmpty() && $scripts !== self::CARRY_OVER ? ScriptArchive::archive($locked, $slot, $market, $actor) : 0;
             $removed = WaveCreatorDecision::query()->where('wave_creator_id', $slot->id)->delete();
             $slot->creator_id = $new->id;
             $slot->save();
+            $restored = ScriptArchive::restore($locked, $slot, $market, $actor);
 
             Audit::log(
                 action: AuditAction::WaveCreatorReplaced,
                 actor: $actor,
                 subject: $slot,
-                metadata: ['wave' => $locked->ulid, 'market' => $market->ulid, 'slot' => $slot->slot, 'creator_id' => $new->id, 'previous_creator_id' => $previous, 'decisions_removed' => $removed],
+                metadata: ['wave' => $locked->ulid, 'market' => $market->ulid, 'slot' => $slot->slot, 'creator_id' => $new->id, 'previous_creator_id' => $previous, 'decisions_removed' => $removed, 'scripts_carried' => $carried, 'scripts_archived' => $archived, 'scripts_restored' => $restored],
                 agencyId: $locked->agency_id,
             );
 
@@ -181,18 +208,35 @@ final class WaveCreatorService
         });
     }
 
-    /** Remove a creator from the wave: the card goes back, the decisions and the slot are deleted, the campaign is untouched. */
-    public function remove(Brand $brand, Wave $wave, User $actor, string $slotUlid): void
+    /**
+     * Remove a creator from the wave: the card goes back, the decisions and the slot are deleted, the campaign is untouched.
+     * PL-3.2a (Q8): a creator with scripts needs the choice `archive` (kept, restored if the creator is added to this market
+     * again) or `delete` (admin and manager only); without it the request is refused and nothing is written.
+     *
+     * @param  string|null  $scripts  `archive`, `delete` or null
+     */
+    public function remove(Brand $brand, Wave $wave, User $actor, string $slotUlid, ?string $scripts = null): void
     {
         StrategyGuard::assertBrandWritable($brand);
 
-        WaveCreatorGuard::transaction($wave, function (Wave $locked) use ($actor, $slotUlid): void {
+        WaveCreatorGuard::transaction($wave, function (Wave $locked) use ($actor, $slotUlid, $scripts): void {
             $slot = $this->lockedSlot($locked, $slotUlid);
             $market = WaveMarket::query()->findOrFail($slot->market_id);
 
             WaveCreatorBoardRules::assertRemovable($locked, $slot);
+            $live = ScriptArchive::liveOf($slot);
+            if ($live->isNotEmpty()) {
+                if ($scripts === null) {
+                    throw StrategyRuleViolation::scriptsChoiceRequired($live->count());
+                }
+                if ($scripts === self::DELETE && ! CurrentAgencyRole::canManage($actor)) {
+                    throw StrategyRuleViolation::scriptsDeleteForbidden();
+                }
+            }
             WaveCreatorBoardRules::release($locked, $slot, $actor);
 
+            $archived = $live->isNotEmpty() && $scripts === self::ARCHIVE ? ScriptArchive::archive($locked, $slot, $market, $actor) : 0;
+            $deleted = $live->isNotEmpty() && $scripts === self::DELETE ? ScriptArchive::deleteLive($locked, $slot, $market, $actor) : 0;
             $removed = WaveCreatorDecision::query()->where('wave_creator_id', $slot->id)->delete();
             $slot->delete();
 
@@ -200,7 +244,7 @@ final class WaveCreatorService
                 action: AuditAction::WaveCreatorRemoved,
                 actor: $actor,
                 subject: $slot,
-                metadata: ['wave' => $locked->ulid, 'market' => $market->ulid, 'slot' => $slot->slot, 'creator_id' => $slot->creator_id, 'decisions_removed' => $removed],
+                metadata: ['wave' => $locked->ulid, 'market' => $market->ulid, 'slot' => $slot->slot, 'creator_id' => $slot->creator_id, 'decisions_removed' => $removed, 'scripts_archived' => $archived, 'scripts_deleted' => $deleted],
                 agencyId: $locked->agency_id,
             );
         });

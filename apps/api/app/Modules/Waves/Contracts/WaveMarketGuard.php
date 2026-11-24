@@ -61,7 +61,9 @@ interface WaveMarketGuard
      *
      * @param  Wave  $locked  the wave, already locked FOR UPDATE by the caller
      * @param  list<int>  $removedIds
-     * @return array{completions: int, notes: int}
+     *                                 PL-3.2a (Q14): it also deletes the ARCHIVED scripts of those markets (live scripts cannot be there: a market with creators is
+     *                                 refused first), with their hooks and texts, one audit row per script; the count is `scripts`.
+     * @return array{completions: int, notes: int, scripts: int}
      */
     public function forgetMarkets(Wave $locked, array $removedIds): array;
 
@@ -73,4 +75,14 @@ interface WaveMarketGuard
      * @return array<int, int> market id => number of creators, only for markets with at least one
      */
     public function creatorCountsByMarket(Wave $locked, array $removedIds): array;
+
+    /**
+     * PL-3.2a (Q14): the ARCHIVED scripts of those markets, so a removal can say how many will be deleted. Read-only. A market
+     * with live scripts always has creators and is refused before this is asked.
+     *
+     * @param  Wave  $locked  the wave, already locked FOR UPDATE by the caller
+     * @param  list<int>  $removedIds
+     * @return array<int, int> market id => number of scripts, only for markets with at least one
+     */
+    public function scriptCountsByMarket(Wave $locked, array $removedIds): array;
 }

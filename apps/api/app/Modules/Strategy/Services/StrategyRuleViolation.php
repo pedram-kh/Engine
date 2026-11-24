@@ -313,4 +313,62 @@ final class StrategyRuleViolation extends RuntimeException
     {
         return new self('persona.in_use_by_creators', 'Creators are matched to this persona. Match them to another persona or none first.', 422, ['count' => $count]);
     }
+
+    // ── PL-3.2a scripts ──────────────────────────────────────────────────────────────────────────────────────────────
+
+    /** @param  int  $archived  how many of the creator's three scripts are archived (a cap that archived scripts still fill) */
+    public static function scriptLimitReached(int $archived): self
+    {
+        $max = StrategyLimits::SCRIPTS_PER_CREATOR;
+
+        return new self('wave_script.limit_reached', "A creator has at most {$max} scripts in a wave.", 422, ['max' => $max, 'archived' => $archived]);
+    }
+
+    public static function scriptHooksLimit(): self
+    {
+        $max = StrategyLimits::HOOKS_PER_SCRIPT;
+
+        return new self('wave_script.hooks_limit', "A script has at most {$max} hooks.", 422, ['max' => $max]);
+    }
+
+    public static function scriptLastHook(): self
+    {
+        return new self('wave_script.last_hook', 'A script keeps at least one hook.');
+    }
+
+    /** A hook text in a language other than English: the market languages arrive with PL-3.2b. */
+    public static function scriptLanguageNotAvailable(string $language): self
+    {
+        return new self('wave_script.language_not_available', 'Only English text can be written for now.', 422, ['language' => $language]);
+    }
+
+    /**
+     * 409: the block was changed by someone else since it was read. Nothing was written; `current` is the block as it is now.
+     *
+     * @param  array<string, mixed>  $current
+     */
+    public static function scriptConflict(string $block, array $current): self
+    {
+        return new self('wave_script.conflict', 'This was changed by someone else. Review the latest version.', 409, ['block' => $block, 'current' => $current]);
+    }
+
+    /** Remove a creator who has scripts without saying what happens to them. */
+    public static function scriptsChoiceRequired(int $count): self
+    {
+        return new self('wave_creator.scripts_choice_required', 'This creator has scripts. Choose to archive them or delete them.', 422, ['scripts' => $count]);
+    }
+
+    /** Deleting scripts together with a slot, or deleting an archived script: admin and manager only. */
+    public static function scriptsDeleteForbidden(): self
+    {
+        return new self('forbidden', 'Only an admin or manager can delete scripts.', 403);
+    }
+
+    /** Carry-over on Replace would give the new creator more than three scripts in this wave. */
+    public static function scriptCarryOverExceedsLimit(int $count): self
+    {
+        $max = StrategyLimits::SCRIPTS_PER_CREATOR;
+
+        return new self('wave_script.carry_over_exceeds_limit', "The new creator would have more than {$max} scripts. Archive the scripts instead, or delete some first.", 422, ['count' => $count, 'max' => $max]);
+    }
 }

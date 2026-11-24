@@ -41,6 +41,17 @@ final class WaveRuleViolation extends RuntimeException
         return new self('wave.market_has_notes', 'Those markets have internal notes. Confirm to delete them with the markets.', ['markets' => $markets, 'note_count' => $total]);
     }
 
+    /**
+     * PL-3.2a (Q14) — a wave edit would remove a market that has ARCHIVED scripts (422). Not a block: the same request with
+     * `confirm_scripts_deleted` equal to the total deletes them with the market. `meta.markets` lists the markets and counts.
+     *
+     * @param  list<array{market: string, name: string, code: string, script_count: int}>  $markets
+     */
+    public static function marketHasScripts(array $markets, int $total): self
+    {
+        return new self('wave.market_has_scripts', 'Those markets have archived scripts. Confirm to delete them with the markets.', ['markets' => $markets, 'script_count' => $total]);
+    }
+
     public static function brandArchived(): self
     {
         return new self('wave.brand_archived', 'An archived brand is read-only; restore it before changing its waves.');
