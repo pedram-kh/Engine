@@ -10,7 +10,7 @@ use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WaveScript;
 use App\Modules\Strategy\Models\WaveScriptHook;
 use App\Modules\Strategy\Models\WaveScriptHookText;
-use App\Modules\Strategy\Models\WaveStrategyNote;
+use App\Modules\Strategy\Notes\NoteService;
 use App\Modules\Strategy\Services\ScriptBriefReader;
 use App\Modules\Strategy\Services\ScriptEstimate;
 use App\Modules\Strategy\Services\WaveScriptStepState;
@@ -69,7 +69,7 @@ final class ScriptPresenter
         $scripts = $creatorIds === [] ? new Collection : WaveScript::query()
             ->where('wave_id', $wave->id)->whereIn('creator_id', $creatorIds)
             ->withCount('hooks')->orderBy('number')->get();
-        $notes = WaveStrategyNote::query()->where('wave_id', $wave->id)->where('step', WaveScriptStepState::STEP)->where('market_id', $market->id)->count();
+        $notes = NoteService::countForMarketStep($wave, WaveScriptStepState::STEP, $market->id);
 
         $out = [];
         foreach ($slots as $slot) {
@@ -186,7 +186,7 @@ final class ScriptPresenter
         $inMarket = WaveCreator::query()->where('wave_id', $wave->id)->where('market_id', $market->id)
             ->whereIn('creator_id', $scripts->pluck('creator_id')->all())->pluck('creator_id')->all();
 
-        return $scripts->map(static fn (WaveScript $s): array => [
+        return array_values($scripts->map(static fn (WaveScript $s): array => [
             'id' => $s->ulid,
             'number' => $s->number,
             'hooks' => (int) $s->getAttribute('hooks_count'),
@@ -194,7 +194,7 @@ final class ScriptPresenter
             'archived_at' => $s->archived_at?->toIso8601String(),
             // Archived scripts come back on their own when this creator is added to this market again.
             'creator_in_market' => in_array($s->creator_id, $inMarket, true),
-        ])->values()->all();
+        ])->all());
     }
 
     /**

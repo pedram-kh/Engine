@@ -43,6 +43,11 @@ it('G1: every scripts route answers 404 not_found with the sprint flag off, and 
         ['GET', ''], ['GET', 'archived'], ['DELETE', "archived/{$u}"], ['POST', ''], ['GET', $u], ['PUT', "{$u}/brief"], ['DELETE', $u],
         ['POST', "{$u}/hooks"], ['PUT', "{$u}/hooks/{$u}"], ['POST', "{$u}/hooks/{$u}/duplicate"], ['DELETE', "{$u}/hooks/{$u}"],
     ];
+    // The table is checked against the router: a new scripts route fails here until it is added.
+    $registered = collect(app('router')->getRoutes()->getRoutes())->filter(static fn ($r): bool => str_contains($r->uri(), '/strategy/scripts'))
+        ->flatMap(static fn ($r): array => collect($r->methods())->reject(fn ($m) => $m === 'HEAD')->all())->count();
+    expect($registered)->toBe(count($routes));
+
     $body = ['slot' => $u, 'revision' => 1];
     foreach ($routes as [$method, $suffix]) {
         S::call($w['admin'], $method, SF::url($w, $suffix), $body)->assertNotFound()->assertJsonPath('errors.0.code', 'not_found');
@@ -366,9 +371,11 @@ it('G15: audit rows: literal payloads with ids, number, counts and field names; 
         'wave_script.created', 'wave_script_hook.updated', 'wave_script.updated', 'wave_script_hook.created', 'wave_script_hook.duplicated', 'wave_script_hook.deleted', 'wave_script.deleted',
     ]);
     expect(json_encode($rows->map(fn ($r) => $r->metadata)->all()))->not->toContain('SECRET');
-    expect($rows[0]->metadata)->toMatchArray(['wave' => $w['wave']->ulid, 'market' => $w['mk']['SK'], 'script' => $id, 'number' => 1, 'creator_id' => $slot->creator_id, 'hooks' => 3]);
-    expect($rows[1]->metadata['fields'])->toBe(['visual_description', 'audio'])->and($rows[2]->metadata['fields'])->toBe(['angle', 'duration_seconds']);
-    expect($rows[6]->metadata['hooks'])->toBe(4)->and(WaveScriptHook::query()->count())->toBe(0)->and(WaveScriptHookText::query()->count())->toBe(0);
+    $meta = $rows->map(fn ($r) => $r->metadata)->values()->all();
+    expect(data_get($meta, '0.wave'))->toBe($w['wave']->ulid)->and(data_get($meta, '0.market'))->toBe($w['mk']['SK'])->and(data_get($meta, '0.script'))->toBe($id)
+        ->and(data_get($meta, '0.number'))->toBe(1)->and(data_get($meta, '0.creator_id'))->toBe($slot->creator_id)->and(data_get($meta, '0.hooks'))->toBe(3);
+    expect(data_get($meta, '1.fields'))->toBe(['visual_description', 'audio'])->and(data_get($meta, '2.fields'))->toBe(['angle', 'duration_seconds']);
+    expect(data_get($meta, '6.hooks'))->toBe(4)->and(WaveScriptHook::query()->count())->toBe(0)->and(WaveScriptHookText::query()->count())->toBe(0);
 });
 
 it('G16: notes: step=scripts needs a market, is one thread per market, is 404 with the sprint flag off', function (): void {

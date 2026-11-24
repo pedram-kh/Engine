@@ -45,7 +45,7 @@ final class WaveScriptFactory extends Factory
     /** @param  array<string, mixed>  $a */
     private static function slot(array $a): WaveCreator
     {
-        return WaveCreator::withoutGlobalScopes()->findOrFail($a['wave_creator_id']);
+        return WaveCreator::withoutGlobalScopes()->whereKey((int) $a['wave_creator_id'])->firstOrFail();
     }
 
     private static function freeNumber(WaveCreator $slot): int

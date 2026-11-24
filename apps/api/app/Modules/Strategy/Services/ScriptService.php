@@ -91,11 +91,15 @@ final class ScriptService
             $script = ScriptGuard::lockedScript($locked, $scriptUlid);
 
             $fields = [];
+            $angle = null;
+            $duration = null;
             if (array_key_exists('angle', $changes) && $changes['angle'] !== $script->angle) {
                 $fields[] = 'angle';
+                $angle = $changes['angle'];
             }
             if (array_key_exists('duration_seconds', $changes) && $changes['duration_seconds'] !== $script->duration_seconds) {
                 $fields[] = 'duration_seconds';
+                $duration = $changes['duration_seconds'];
             }
             if ($fields === []) {
                 return $script;
@@ -105,10 +109,10 @@ final class ScriptService
             }
 
             if (in_array('angle', $fields, true)) {
-                $script->angle = $changes['angle'];
+                $script->angle = $angle;
             }
-            if (in_array('duration_seconds', $fields, true)) {
-                $script->duration_seconds = (int) $changes['duration_seconds'];
+            if ($duration !== null) {
+                $script->duration_seconds = $duration;
             }
             $script->brief_revision++;
             $script->revision++;

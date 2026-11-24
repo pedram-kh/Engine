@@ -191,6 +191,14 @@ final class NoteService
     }
 
     /**
+     * PL-3.2a: the notes of one per-market step in one market (the scripts rail's "Notes (n)" button). A count only.
+     */
+    public static function countForMarketStep(Wave $wave, string $step, int $marketId): int
+    {
+        return WaveStrategyNote::query()->where('wave_id', $wave->id)->where('step', $step)->where('market_id', $marketId)->count();
+    }
+
+    /**
      * @param  list<int>  $marketIds
      * @return array<int, int> market id => notes, only markets with at least one
      */

@@ -61,6 +61,6 @@ final class ScriptFixtures
     /** @return list<WaveScriptHook> */
     public static function hooksOf(WaveScript $script): array
     {
-        return WaveScriptHook::query()->where('script_id', $script->id)->orderBy('position')->get()->all();
+        return array_values(WaveScriptHook::query()->where('script_id', $script->id)->orderBy('position')->get()->all());
     }
 }

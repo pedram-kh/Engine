@@ -70,17 +70,23 @@ final class ScriptHookService
             }
 
             $existing = WaveScriptHookText::query()->where('hook_id', $hook->id)->where('language', self::EN)->get()->keyBy('field');
+            // What really changes, by field name: the scalars, and the English body per text field (null removes the row).
             $fields = [];
+            $scalars = [];
+            $bodies = [];
             if (array_key_exists('shot_type', $changes) && $changes['shot_type'] !== $hook->shot_type) {
                 $fields[] = 'shot_type';
+                $scalars['shot_type'] = $changes['shot_type'];
             }
             if (array_key_exists('visual_description', $changes) && $changes['visual_description'] !== $hook->visual_description) {
                 $fields[] = 'visual_description';
+                $scalars['visual_description'] = $changes['visual_description'];
             }
             foreach ([WaveScriptHookText::AUDIO, WaveScriptHookText::OVERLAY] as $field) {
-                if (isset($changes['texts'][$field]) && array_key_exists(self::EN, $changes['texts'][$field])
-                    && $changes['texts'][$field][self::EN] !== $existing->get($field)?->body) {
+                $sent = $changes['texts'][$field] ?? null;
+                if ($sent !== null && array_key_exists(self::EN, $sent) && $sent[self::EN] !== $existing->get($field)?->body) {
                     $fields[] = $field;
+                    $bodies[$field] = $sent[self::EN];
                 }
             }
             if ($fields === []) {
@@ -90,17 +96,13 @@ final class ScriptHookService
                 throw StrategyRuleViolation::scriptConflict('hook', ScriptPresenter::hook($hook, $existing->map(static fn (WaveScriptHookText $t): array => [$t->language => $t->body])->all()));
             }
 
-            if (in_array('shot_type', $fields, true)) {
-                $hook->shot_type = $changes['shot_type'];
+            if (array_key_exists('shot_type', $scalars)) {
+                $hook->shot_type = $scalars['shot_type'];
             }
-            if (in_array('visual_description', $fields, true)) {
-                $hook->visual_description = $changes['visual_description'];
+            if (array_key_exists('visual_description', $scalars)) {
+                $hook->visual_description = $scalars['visual_description'];
             }
-            foreach ([WaveScriptHookText::AUDIO, WaveScriptHookText::OVERLAY] as $field) {
-                if (! in_array($field, $fields, true)) {
-                    continue;
-                }
-                $body = $changes['texts'][$field][self::EN];
+            foreach ($bodies as $field => $body) {
                 $row = $existing->get($field);
                 if ($body === null) {
                     $row?->delete();
@@ -191,7 +193,7 @@ final class ScriptHookService
         $script->save();
     }
 
-    /** @param  list<string>|null  $fields  the changed FIELD NAMES of an edit, null for the other actions */
+    /** @param  array<int, string>|null  $fields  the changed FIELD NAMES of an edit, null for the other actions */
     private function audit(AuditAction $action, Wave $locked, WaveScript $script, User $actor, string $hook, ?array $fields = null): void
     {
         $market = (string) WaveMarket::query()->whereKey($script->market_id)->value('ulid');
