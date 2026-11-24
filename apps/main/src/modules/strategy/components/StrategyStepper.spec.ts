@@ -394,6 +394,26 @@ describe('StrategyStepper (PL-2.3)', () => {
     none.unmount()
   })
 
+  it('PL-3.2a: with the flag off, a scripts overview that is passed in anyway changes nothing: step 6 stays the PL-2 line, not a link', async () => {
+    const w = await mountStrategy(StrategyStepper, {
+      summary: makeSummary({ concepts: concepts([2, 2, 0]) }),
+      brandId: BRAND_ULID,
+      waveId: WAVE_ULID,
+      active: 'concepts',
+      creatorsOn: false,
+      scripts: {
+        step: { state: 'done', markets_total: 1, markets_started: 1 },
+        markets: [{ id: 'SK', state: 'done', scripts: 5, archived_scripts: 0 }],
+        rail: null,
+        limits: { scripts_per_creator: 3, hooks_per_script: 6 },
+      },
+    })
+    const six = w.get('[data-test="strategy-step-scripts"]')
+    expect(six.attributes('aria-disabled')).toBe('true')
+    expect(w.get('[data-test="strategy-step-scripts-status"]').text()).toBe('Not available yet')
+    w.unmount()
+  })
+
   it('PL-3.1: step 5 shows the concepts warning (never a lock) and no creators and no flag is unchanged from PL-2', async () => {
     const warned = await mountStrategy(StrategyStepper, {
       summary: makeSummary({ concepts: concepts([2, 1, 0]) }),
