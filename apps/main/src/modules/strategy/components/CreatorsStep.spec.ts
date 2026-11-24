@@ -232,7 +232,8 @@ describe('CreatorsStep (PL-3.1)', () => {
       new ApiError({ status: 422, code: 'wave_creator.remove_blocked_in_work', message: 'x' }),
     )
     await click('[data-test="creator-remove-dialog"] [data-test="confirm-ok"]')
-    expect(strategyApi.removeCreator).toHaveBeenCalledWith(expect.anything(), SLOT_ID(1))
+    // PL-3.2a: no scripts, no choice: the third argument is undefined.
+    expect(strategyApi.removeCreator).toHaveBeenCalledWith(expect.anything(), SLOT_ID(1), undefined)
     expect(overlayText()).toContain('already in production')
   })
 
@@ -578,6 +579,7 @@ describe('CreatorsStep (PL-3.1)', () => {
         expect.anything(),
         SLOT_ID(1),
         CREATOR_ID(102),
+        undefined,
       )
       expect(strategyApi.addCreators).not.toHaveBeenCalled()
     })

@@ -341,11 +341,57 @@ describe('StrategyStepper (PL-2.3)', () => {
     const line = w.get('[data-test="strategy-step-creators-status"]').text()
     expect(line).toContain('4')
     expect(line).toContain('1 of 2')
-    expect(w.get('[data-test="strategy-step-scripts-status"]').text()).toContain(
-      'Not available yet',
-    )
-    expect(w.get('[data-test="strategy-step-scripts"]').attributes('aria-disabled')).toBe('true')
+    // PL-3.2a: with the flag on, step 6 is a live link too (its own state, from the scripts overview).
+    const six = w.get('[data-test="strategy-step-scripts"]')
+    expect(six.attributes('aria-disabled')).not.toBe('true')
+    expect(six.attributes('href') ?? '').toContain('/strategy/scripts')
+    expect(w.get('[data-test="strategy-step-scripts-status"]').text()).toBe('No scripts yet')
     w.unmount()
+  })
+
+  it('PL-3.2a: step 6 shows its own state and counts, "Complete · n" when done, "n of m markets" in progress, and the concepts warning, never a lock', async () => {
+    const overview = (
+      state: 'not_started' | 'in_progress' | 'done',
+      scripts: number,
+      started: number,
+    ) => ({
+      step: { state, markets_total: 2, markets_started: started },
+      markets: [
+        { id: 'SK', state, scripts, archived_scripts: 0 },
+        { id: 'RO', state: 'not_started' as const, scripts: 0, archived_scripts: 0 },
+      ],
+      rail: null,
+      limits: { scripts_per_creator: 3, hooks_per_script: 6 },
+    })
+    const mount = (scripts: ReturnType<typeof overview> | null) =>
+      mountStrategy(StrategyStepper, {
+        summary: makeSummary({ concepts: concepts([2, 1, 0]) }),
+        brandId: BRAND_ULID,
+        waveId: WAVE_ULID,
+        active: 'scripts',
+        creatorsOn: true,
+        scripts,
+      })
+    const prog = await mount(overview('in_progress', 4, 1))
+    expect(prog.get('[data-test="strategy-step-scripts"]').attributes('data-state')).toBe(
+      'in_progress',
+    )
+    const line = prog.get('[data-test="strategy-step-scripts-status"]').text()
+    expect(line).toContain('4')
+    expect(line).toContain('1 of 2')
+    expect(prog.get('[data-test="strategy-step-scripts-warning"]').text()).toBe(
+      'Concepts: 1 of 2 approved',
+    )
+    expect(prog.find('.mdi-lock-outline, .mdi-lock').exists()).toBe(false)
+    prog.unmount()
+
+    const done = await mount(overview('done', 6, 2))
+    expect(done.get('[data-test="strategy-step-scripts-status"]').text()).toContain('Complete · ')
+    done.unmount()
+
+    const none = await mount(null)
+    expect(none.get('[data-test="strategy-step-scripts-status"]').text()).toBe('No scripts yet')
+    none.unmount()
   })
 
   it('PL-3.1: step 5 shows the concepts warning (never a lock) and no creators and no flag is unchanged from PL-2', async () => {

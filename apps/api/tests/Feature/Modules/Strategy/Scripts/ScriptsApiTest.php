@@ -427,3 +427,18 @@ it('G22: the rail: the creators of a market in slot order with their scripts, th
     S::call($w['admin'], 'GET', SF::url($w, "archived?market={$w['mk']['SK']}"))->assertOk()->assertJsonPath('data', []);
     expect($s1)->not->toBe('');
 });
+
+it('G30: the persona ref carries the persona colour key of its slot, on the script and on the rail', function (): void {
+    $w = SF::world();
+    $persona = WavePersona::query()->create(['agency_id' => $w['agency']->id, 'wave_id' => $w['wave']->id, 'market_id' => $w['mkid']['SK'], 'slot' => 2, 'code' => 'PSK2', 'title' => 'Student', 'name' => 'Ben']);
+    [$slot] = SF::slot($w, 'SK', ['persona_id' => $persona->id]);
+
+    $created = S::call($w['admin'], 'POST', SF::url($w), ['slot' => $slot->ulid])->assertCreated();
+    $expected = $persona->colorKey()->value;
+
+    expect($expected)->not->toBe('')
+        ->and($created->json('data.brief.persona.color_key'))->toBe($expected);
+    // The rail carries the same key for the chip.
+    $rail = S::call($w['admin'], 'GET', SF::url($w)."?market={$w['mk']['SK']}")->assertOk();
+    expect($rail->json('data.rail.creators.0.persona.color_key'))->toBe($expected);
+});
