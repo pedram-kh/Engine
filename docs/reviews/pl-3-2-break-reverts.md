@@ -90,8 +90,9 @@ run twice. Measured from the start of `select ... from waves ... for update` to 
 This is a local measurement on one machine, with one writer and no other traffic; it says how long the lock is held, not
 how it behaves under load. It does not include the commit itself.
 
-A text autosave could take only the script-row lock without risking a deadlock: the other writers take the wave lock and then
-script locks in id order, never the reverse, so a writer holding only a script lock never waits for the wave lock. It would
+A text autosave could take only the script-row lock without risking a deadlock, by analysis (not tested, and I did not check
+that every multi-script writer locks its scripts in one fixed order): the other writers take the wave lock and then script
+locks, never the reverse, so a writer holding only a script lock never waits for the wave lock. It would
 then not wait behind a Replace or a market removal for the wave, but it must re-check `archived_at` and the slot after the
 script lock (as `lockedScript` already does). I did not build this; at about 8 ms per save the plan's choice (wave lock for all
 writers) stands, and I left it for Pedram to decide whether it is worth the second lock path.
