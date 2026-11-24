@@ -82,7 +82,7 @@ jobs:
       - name: Prove hermeticity — Pest with NO apps/api/.env present (AH-070)
         run: |
           test ! -f .env || { echo "::error::.env exists before it should — something upstream created it, defeating this check"; exit 1; }
-          php -d memory_limit=512M vendor/bin/pest --colors=always
+          php -d memory_limit=1G vendor/bin/pest --colors=always
 
       # An EMPTY .env, deliberately — not a copy of .env.example.
       #

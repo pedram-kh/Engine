@@ -65,10 +65,10 @@
       "@php artisan key:generate --ansi"
     ],
     "test": [
-      "@php -d memory_limit=512M vendor/bin/pest --colors=always"
+      "@php -d memory_limit=1G vendor/bin/pest --colors=always"
     ],
     "test:pg": [
-      "@php -d memory_limit=512M vendor/bin/pest --colors=always --configuration=phpunit.pgsql.xml"
+      "@php -d memory_limit=1G vendor/bin/pest --colors=always --configuration=phpunit.pgsql.xml"
     ],
     "test:coverage": [
       "@php -d memory_limit=512M vendor/bin/pest --coverage --min=80"
