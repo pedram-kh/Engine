@@ -154,6 +154,17 @@ it('G4b: the cap of three counts ARCHIVED scripts of the creator too', function 
     $slot = WaveCreator::query()->where('creator_id', $creator->id)->firstOrFail();
     pl32Create($w, $slot->ulid);
     S::call($w['admin'], 'POST', SF::url($w), ['slot' => $slot->ulid])->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_script.limit_reached');
+
+    // archived scripts of ANOTHER market hold their numbers: two archived in SK leave one number for the same creator in RO
+    S::call($w['admin'], 'DELETE', F::url($w, $slot->ulid), ['scripts' => 'archive'])->assertOk();
+    expect(WaveScript::query()->whereNotNull('archived_at')->count())->toBe(3);
+    S::call($w['admin'], 'DELETE', SF::url($w, 'archived/'.WaveScript::query()->where('number', 3)->firstOrFail()->ulid))->assertOk();
+    S::call($w['admin'], 'POST', F::url($w), ['market' => $w['mk']['RO'], 'creators' => [$creator->ulid]])->assertCreated();
+    $ro = WaveCreator::query()->where('creator_id', $creator->id)->firstOrFail();
+    $new = S::call($w['admin'], 'POST', SF::url($w), ['slot' => $ro->ulid])->assertCreated();
+    $new->assertJsonPath('data.number', 3);
+    S::call($w['admin'], 'POST', SF::url($w), ['slot' => $ro->ulid])
+        ->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_script.limit_reached')->assertJsonPath('errors.0.meta.archived', 2);
 });
 
 it('G11: text limits: exactly at the limit saves, one over is 422; control characters are stripped; a blank text removes the row', function (): void {
