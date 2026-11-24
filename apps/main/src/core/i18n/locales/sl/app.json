@@ -2351,7 +2351,7 @@
           "archived": "Arhivirani scenariji ({count})"
         },
         "editor": {
-          "title": "{name} · Scenarij {n}",
+          "title": "{name} — Scenarij {n}",
           "lastEdited": "Nazadnje urejeno: {when}",
           "delete": "Izbriši scenarij",
           "deleteTitle": "Izbrišem scenarij {n} ustvarjalca {name}?",
@@ -2391,6 +2391,7 @@
           "noEstimate": "Dodajte zvočno besedilo, da vidite oceno"
         },
         "hooks": {
+          "title": "Kavlji",
           "hook": "Kavelj {letter}",
           "menu": "Možnosti kavlja {letter}",
           "collapse": "Skrči kavelj",

@@ -2351,7 +2351,7 @@
           "archived": "Archivované skripty ({count})"
         },
         "editor": {
-          "title": "{name} · Skript {n}",
+          "title": "{name} — Skript {n}",
           "lastEdited": "Naposledy upravené: {when}",
           "delete": "Odstrániť skript",
           "deleteTitle": "Odstrániť skript {n} tvorcu {name}?",
@@ -2391,6 +2391,7 @@
           "noEstimate": "Pridajte zvukový text a uvidíte odhad"
         },
         "hooks": {
+          "title": "Hooky",
           "hook": "Hook {letter}",
           "menu": "Možnosti hooku {letter}",
           "collapse": "Zbaliť hook",

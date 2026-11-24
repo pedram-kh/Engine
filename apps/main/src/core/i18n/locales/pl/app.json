@@ -2351,7 +2351,7 @@
           "archived": "Zarchiwizowane skrypty ({count})"
         },
         "editor": {
-          "title": "{name} · Skrypt {n}",
+          "title": "{name} — Skrypt {n}",
           "lastEdited": "Ostatnia edycja: {when}",
           "delete": "Usuń skrypt",
           "deleteTitle": "Usunąć skrypt {n} twórcy {name}?",
@@ -2391,6 +2391,7 @@
           "noEstimate": "Dodaj tekst audio, aby zobaczyć szacunek"
         },
         "hooks": {
+          "title": "Hooki",
           "hook": "Hook {letter}",
           "menu": "Opcje hooka {letter}",
           "collapse": "Zwiń hook",

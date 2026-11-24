@@ -2351,7 +2351,7 @@
           "archived": "Scripteanna cartlannaithe ({count})"
         },
         "editor": {
-          "title": "{name} · Script {n}",
+          "title": "{name} — Script {n}",
           "lastEdited": "Curtha in eagar go deireanach: {when}",
           "delete": "Scrios an script",
           "deleteTitle": "An scriosfar script {n} de chuid {name}?",
@@ -2391,6 +2391,7 @@
           "noEstimate": "Cuir téacs fuaime leis chun meastachán a fheiceáil"
         },
         "hooks": {
+          "title": "Amhráin ghreamaitheacha",
           "hook": "Amhrán greamaitheach {letter}",
           "menu": "Roghanna don amhrán ghreamaitheach {letter}",
           "collapse": "Laghdaigh an t-amhrán greamaitheach",

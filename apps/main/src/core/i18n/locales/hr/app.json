@@ -2351,7 +2351,7 @@
           "archived": "Arhivirane skripte ({count})"
         },
         "editor": {
-          "title": "{name} · Skripta {n}",
+          "title": "{name} — Skripta {n}",
           "lastEdited": "Zadnje uređivanje: {when}",
           "delete": "Izbriši skriptu",
           "deleteTitle": "Izbrisati skriptu {n} kreatora {name}?",
@@ -2391,6 +2391,7 @@
           "noEstimate": "Dodajte audio tekst da vidite procjenu"
         },
         "hooks": {
+          "title": "Hookovi",
           "hook": "Hook {letter}",
           "menu": "Opcije za hook {letter}",
           "collapse": "Sažmi hook",

@@ -2351,7 +2351,7 @@
           "archived": "Gearchiveerde scripts ({count})"
         },
         "editor": {
-          "title": "{name} · Script {n}",
+          "title": "{name} — Script {n}",
           "lastEdited": "Laatst bewerkt: {when}",
           "delete": "Script verwijderen",
           "deleteTitle": "Script {n} van {name} verwijderen?",
@@ -2391,6 +2391,7 @@
           "noEstimate": "Voeg audiotekst toe voor een schatting"
         },
         "hooks": {
+          "title": "Hooks",
           "hook": "Hook {letter}",
           "menu": "Opties voor hook {letter}",
           "collapse": "Hook inklappen",

@@ -2351,7 +2351,7 @@
           "archived": "Guiones archivados ({count})"
         },
         "editor": {
-          "title": "{name} · Guion {n}",
+          "title": "{name} — Guion {n}",
           "lastEdited": "Última edición: {when}",
           "delete": "Eliminar guion",
           "deleteTitle": "¿Eliminar el guion {n} de {name}?",
@@ -2391,6 +2391,7 @@
           "noEstimate": "Añade texto de audio para ver una estimación"
         },
         "hooks": {
+          "title": "Ganchos",
           "hook": "Gancho {letter}",
           "menu": "Opciones del gancho {letter}",
           "collapse": "Contraer gancho",

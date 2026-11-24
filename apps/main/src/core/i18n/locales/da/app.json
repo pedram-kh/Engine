@@ -2351,7 +2351,7 @@
           "archived": "Arkiverede scripts ({count})"
         },
         "editor": {
-          "title": "{name} · Script {n}",
+          "title": "{name} — Script {n}",
           "lastEdited": "Sidst redigeret: {when}",
           "delete": "Slet script",
           "deleteTitle": "Slet script {n} for {name}?",
@@ -2391,6 +2391,7 @@
           "noEstimate": "Tilføj lydtekst for at se et estimat"
         },
         "hooks": {
+          "title": "Hooks",
           "hook": "Hook {letter}",
           "menu": "Muligheder for hook {letter}",
           "collapse": "Skjul hook",

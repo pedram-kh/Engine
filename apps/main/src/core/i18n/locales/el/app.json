@@ -2351,7 +2351,7 @@
           "archived": "Αρχειοθετημένα σενάρια ({count})"
         },
         "editor": {
-          "title": "{name} · Σενάριο {n}",
+          "title": "{name} — Σενάριο {n}",
           "lastEdited": "Τελευταία επεξεργασία: {when}",
           "delete": "Διαγραφή σεναρίου",
           "deleteTitle": "Να διαγραφεί το σενάριο {n} του δημιουργού {name};",
@@ -2391,6 +2391,7 @@
           "noEstimate": "Προσθέστε κείμενο ήχου για να δείτε εκτίμηση"
         },
         "hooks": {
+          "title": "Hooks",
           "hook": "Hook {letter}",
           "menu": "Επιλογές για το hook {letter}",
           "collapse": "Σύμπτυξη hook",

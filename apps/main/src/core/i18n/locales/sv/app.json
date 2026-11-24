@@ -2351,7 +2351,7 @@
           "archived": "Arkiverade manus ({count})"
         },
         "editor": {
-          "title": "{name} · Manus {n}",
+          "title": "{name} — Manus {n}",
           "lastEdited": "Senast redigerad: {when}",
           "delete": "Ta bort manus",
           "deleteTitle": "Ta bort manus {n} för {name}?",
@@ -2391,6 +2391,7 @@
           "noEstimate": "Lägg till ljudtext för att se en uppskattning"
         },
         "hooks": {
+          "title": "Hooks",
           "hook": "Hook {letter}",
           "menu": "Alternativ för hook {letter}",
           "collapse": "Fäll ihop hook",

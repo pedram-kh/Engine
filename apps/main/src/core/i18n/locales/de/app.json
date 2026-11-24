@@ -2351,7 +2351,7 @@
           "archived": "Archivierte Skripte ({count})"
         },
         "editor": {
-          "title": "{name} · Skript {n}",
+          "title": "{name} — Skript {n}",
           "lastEdited": "Zuletzt bearbeitet: {when}",
           "delete": "Skript löschen",
           "deleteTitle": "Skript {n} von {name} löschen?",
@@ -2391,6 +2391,7 @@
           "noEstimate": "Füge Audiotext hinzu, um eine Schätzung zu sehen"
         },
         "hooks": {
+          "title": "Hooks",
           "hook": "Hook {letter}",
           "menu": "Optionen für Hook {letter}",
           "collapse": "Hook einklappen",

@@ -61,6 +61,7 @@ const KEYS = [
   'app.strategy.scripts.brief.seconds',
   'app.strategy.scripts.brief.estimate',
   'app.strategy.scripts.brief.noEstimate',
+  'app.strategy.scripts.hooks.title',
   'app.strategy.scripts.hooks.hook',
   'app.strategy.scripts.hooks.menu',
   'app.strategy.scripts.hooks.collapse',
@@ -141,6 +142,12 @@ const KEYS = [
 
 /** `locale:key` pairs that are the same word as English on purpose (a loan word such as Persona, Overlay, Hook, POV, or a pattern of names and numbers). */
 const SAME_AS_ENGLISH_BY_DESIGN = new Set<string>([
+  'da:app.strategy.scripts.hooks.title',
+  'de:app.strategy.scripts.hooks.title',
+  'el:app.strategy.scripts.hooks.title',
+  'mt:app.strategy.scripts.hooks.title',
+  'nl:app.strategy.scripts.hooks.title',
+  'sv:app.strategy.scripts.hooks.title',
   'cs:app.strategy.scripts.brief.title',
   'cs:app.strategy.scripts.brief.persona',
   'cs:app.strategy.scripts.hooks.hook',
@@ -259,8 +266,8 @@ function tokens(text: string): string[] {
 }
 
 describe('PL-3.2a scripts strings', () => {
-  it('checks 120 keys across 24 locales', () => {
-    expect(KEYS).toHaveLength(120)
+  it('checks 121 keys across 24 locales', () => {
+    expect(KEYS).toHaveLength(121)
     expect(UI_LOCALES).toHaveLength(24)
   })
 

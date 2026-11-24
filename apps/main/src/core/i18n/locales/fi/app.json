@@ -2351,7 +2351,7 @@
           "archived": "Arkistoidut käsikirjoitukset ({count})"
         },
         "editor": {
-          "title": "{name} · Käsikirjoitus {n}",
+          "title": "{name} — Käsikirjoitus {n}",
           "lastEdited": "Viimeksi muokattu: {when}",
           "delete": "Poista käsikirjoitus",
           "deleteTitle": "Poistetaanko tekijän {name} käsikirjoitus {n}?",
@@ -2391,6 +2391,7 @@
           "noEstimate": "Lisää äänitekstiä nähdäksesi arvion"
         },
         "hooks": {
+          "title": "Koukut",
           "hook": "Koukku {letter}",
           "menu": "Koukun {letter} asetukset",
           "collapse": "Tiivistä koukku",

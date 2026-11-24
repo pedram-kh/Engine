@@ -2351,7 +2351,7 @@
           "archived": "Archivált forgatókönyvek ({count})"
         },
         "editor": {
-          "title": "{name} · {n}. forgatókönyv",
+          "title": "{name} — {n}. forgatókönyv",
           "lastEdited": "Utoljára szerkesztve: {when}",
           "delete": "Forgatókönyv törlése",
           "deleteTitle": "Törlöd {name} {n}. forgatókönyvét?",
@@ -2391,6 +2391,7 @@
           "noEstimate": "Adj hozzá hangszöveget a becsléshez"
         },
         "hooks": {
+          "title": "Hookok",
           "hook": "{letter} hook",
           "menu": "A(z) {letter} hook beállításai",
           "collapse": "Hook összecsukása",

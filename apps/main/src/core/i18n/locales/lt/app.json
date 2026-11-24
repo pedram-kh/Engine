@@ -2351,7 +2351,7 @@
           "archived": "Suarchyvuoti scenarijai ({count})"
         },
         "editor": {
-          "title": "{name} · Scenarijus {n}",
+          "title": "{name} — Scenarijus {n}",
           "lastEdited": "Paskutinį kartą redaguota: {when}",
           "delete": "Ištrinti scenarijų",
           "deleteTitle": "Ištrinti kūrėjo {name} scenarijų {n}?",
@@ -2391,6 +2391,7 @@
           "noEstimate": "Pridėkite garso tekstą, kad pamatytumėte įvertį"
         },
         "hooks": {
+          "title": "Kabliukai",
           "hook": "Kabliukas {letter}",
           "menu": "Kabliuko {letter} parinktys",
           "collapse": "Sutraukti kabliuką",

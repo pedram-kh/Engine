@@ -2351,7 +2351,7 @@
           "archived": "Arhivētie scenāriji ({count})"
         },
         "editor": {
-          "title": "{name} · Scenārijs {n}",
+          "title": "{name} — Scenārijs {n}",
           "lastEdited": "Pēdējoreiz rediģēts: {when}",
           "delete": "Dzēst scenāriju",
           "deleteTitle": "Vai dzēst veidotāja {name} scenāriju {n}?",
@@ -2391,6 +2391,7 @@
           "noEstimate": "Pievienojiet audio tekstu, lai redzētu aprēķinu"
         },
         "hooks": {
+          "title": "Āķi",
           "hook": "Āķis {letter}",
           "menu": "Āķa {letter} opcijas",
           "collapse": "Sakļaut āķi",

@@ -2351,7 +2351,7 @@
           "archived": "Archived scripts ({count})"
         },
         "editor": {
-          "title": "{name} · Script {n}",
+          "title": "{name} — Script {n}",
           "lastEdited": "Last edited {when}",
           "delete": "Delete script",
           "deleteTitle": "Delete script {n} of {name}?",
@@ -2391,6 +2391,7 @@
           "noEstimate": "Add audio text to see an estimate"
         },
         "hooks": {
+          "title": "Hooks",
           "hook": "Hook {letter}",
           "menu": "Options for hook {letter}",
           "collapse": "Collapse hook",

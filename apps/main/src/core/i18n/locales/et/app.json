@@ -2351,7 +2351,7 @@
           "archived": "Arhiveeritud skriptid ({count})"
         },
         "editor": {
-          "title": "{name} · Skript {n}",
+          "title": "{name} — Skript {n}",
           "lastEdited": "Viimati muudetud: {when}",
           "delete": "Kustuta skript",
           "deleteTitle": "Kas kustutada skript {n} (looja {name})?",
@@ -2391,6 +2391,7 @@
           "noEstimate": "Hinnangu nägemiseks lisa helitekst"
         },
         "hooks": {
+          "title": "Konksud",
           "hook": "Konks {letter}",
           "menu": "Konksu {letter} valikud",
           "collapse": "Ahenda konks",

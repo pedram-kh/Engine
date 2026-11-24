@@ -263,6 +263,25 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll })
         @saved="onBriefSaved"
       />
 
+      <div class="sed__section">
+        <h3 class="sed__section-title">{{ t('app.strategy.scripts.hooks.title') }}</h3>
+        <v-btn
+          variant="outlined"
+          class="sed__add"
+          size="small"
+          prepend-icon="mdi-plus"
+          :disabled="script.hooks.length >= hooksMax || addingHook"
+          :loading="addingHook"
+          data-test="script-add-hook"
+          @click="addHook"
+          >{{
+            script.hooks.length >= hooksMax
+              ? t('app.strategy.scripts.hooks.limit', { max: hooksMax })
+              : t('app.strategy.scripts.hooks.add', { n: script.hooks.length, max: hooksMax })
+          }}</v-btn
+        >
+      </div>
+
       <div class="sed__hooks" data-test="script-hooks">
         <ScriptHookCard
           v-for="h in script.hooks"
@@ -278,20 +297,6 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll })
           @saved="onHookSaved"
           @duplicate="duplicateHook(h.id)"
         />
-        <v-btn
-          variant="outlined"
-          class="sed__add"
-          prepend-icon="mdi-plus"
-          :disabled="script.hooks.length >= hooksMax || addingHook"
-          :loading="addingHook"
-          data-test="script-add-hook"
-          @click="addHook"
-          >{{
-            script.hooks.length >= hooksMax
-              ? t('app.strategy.scripts.hooks.limit', { max: hooksMax })
-              : t('app.strategy.scripts.hooks.add', { n: script.hooks.length, max: hooksMax })
-          }}</v-btn
-        >
       </div>
 
       <StrategyConfirmDialog
@@ -344,15 +349,15 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll })
 .sed__who {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   min-width: 0;
 }
 .sed__chip {
   flex: none;
-  padding: 3px 8px;
+  padding: 2px 6px;
   border: 1px solid color-mix(in srgb, var(--chip) 70%, transparent);
-  border-radius: 6px;
-  font-size: 12px;
+  border-radius: 4px;
+  font-size: 11px;
   font-weight: 700;
   line-height: normal;
   color: var(--chip);
@@ -362,14 +367,14 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll })
 }
 .sed__title {
   margin: 0;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   line-height: normal;
   color: rgb(var(--v-theme-on-surface));
   overflow-wrap: anywhere;
 }
 .sed__edited {
-  margin: 2px 0 0;
+  margin: 4px 0 0;
   font-size: 12px;
   line-height: normal;
   color: rgb(var(--v-theme-text-tertiary, var(--v-theme-on-surface-variant)));
@@ -395,13 +400,13 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll })
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
+  padding: 10px;
   border: 1px solid rgb(var(--v-theme-border-color));
   border-radius: 10px;
   background: rgb(var(--v-theme-surface));
 }
 .sed__pill {
-  padding: 3px 12px;
+  padding: 5px 6px;
   border-radius: 9999px;
   background: rgb(var(--v-theme-surface-bright));
   font-size: 12px;
@@ -414,10 +419,39 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll })
   flex-direction: column;
   gap: 12px;
 }
+.sed__section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 6px;
+}
+.sed__section-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: normal;
+  color: rgb(var(--v-theme-on-surface));
+}
 .sed__add {
-  align-self: flex-start;
+  flex: none;
+  height: auto !important;
+  padding: 6px 12px !important;
+  border-color: rgb(var(--v-theme-border-color)) !important;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: normal;
   text-transform: none;
   letter-spacing: normal;
+}
+.sed__add :deep(.v-btn__prepend) {
+  margin-inline: 0 8px;
+}
+.sed__add :deep(.v-icon) {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
 }
 @media (max-width: 599px) {
   .sed__head {
