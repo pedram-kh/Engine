@@ -74,6 +74,11 @@ it('P1: the eleven migrations run down and up again', function (): void {
         // PL-3.1: the creator slots reference wave_personas (composite foreign key), the decisions reference the slots.
         '2026_11_23_100000_create_wave_creators_table',
         '2026_11_23_100001_create_wave_creator_decisions_table',
+        // PL-3.2a: the scripts reference the slots (composite foreign key, which needs the new unique key), the hooks the scripts, the texts the hooks.
+        '2026_11_24_100000_add_creator_key_to_wave_creators',
+        '2026_11_24_100002_create_wave_scripts_table',
+        '2026_11_24_100003_create_wave_script_hooks_table',
+        '2026_11_24_100004_create_wave_script_hook_texts_table',
     ];
     foreach (array_reverse($names) as $name) {
         (require database_path("migrations/{$name}.php"))->down();
