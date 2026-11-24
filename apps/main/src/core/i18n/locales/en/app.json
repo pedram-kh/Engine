@@ -1516,7 +1516,9 @@
         "newCampaignName": "Campaign name",
         "newCampaignHint": "Created as a draft with no budget. Set the budget on the campaign page before it can go live.",
         "notesWarning": "Removing {markets} deletes {count} internal note. This cannot be undone. | Removing {markets} deletes {count} internal notes. This cannot be undone.",
-        "notesConfirm": "Delete notes and save"
+        "notesConfirm": "Delete notes and save",
+        "scriptsWarning": "These markets have archived scripts: {markets}. They are deleted with the markets (scripts: {count}).",
+        "scriptsConfirm": "Delete scripts and save"
       },
       "validation": {
         "nameRequired": "Enter a wave name.",
@@ -2332,6 +2334,158 @@
       },
       "limit": {
         "placesLeft": "{count} place left | {count} places left"
+      },
+      "scripts": {
+        "stepper": {
+          "none": "No scripts yet",
+          "count": "Scripts: {count}"
+        },
+        "rail": {
+          "title": "Scripts · {market}",
+          "script": "Script {n}",
+          "draft": "Draft",
+          "add": "Add script ({n}/{max})",
+          "limit": "Script limit reached",
+          "limitHint": "This creator already has {max} scripts, archived ones included.",
+          "footnote": "Up to {max} scripts per creator",
+          "archived": "Archived scripts ({count})"
+        },
+        "editor": {
+          "title": "{name} · Script {n}",
+          "lastEdited": "Last edited {when}",
+          "delete": "Delete script",
+          "deleteTitle": "Delete script {n} of {name}?",
+          "deleteBody": "This deletes the script and its hooks (hooks: {count}). This cannot be undone.",
+          "deleteConfirm": "Delete script",
+          "loadFailed": "This script could not be loaded."
+        },
+        "save": {
+          "saving": "Saving…",
+          "saved": "Saved",
+          "failed": "Could not save",
+          "refused": "Not accepted",
+          "retry": "Retry",
+          "gone": "Removed by someone else",
+          "allSaved": "All changes saved",
+          "stuck": "Changes not saved: {n}"
+        },
+        "brief": {
+          "title": "Brief",
+          "editInStep3": "Edit in step 3",
+          "persona": "Persona",
+          "usps": "USPs",
+          "priority": "Priority",
+          "support": "Support",
+          "noUsps": "No USPs are set for this persona",
+          "noPersona": "This creator has no persona, so there is no brief to pull. Choose a persona in step 5.",
+          "openStep5": "Open step 5",
+          "angle": "Angle",
+          "anglePlaceholder": "Write the angle of this script",
+          "angleFromPersona": "From the persona's angle",
+          "angleFromMatrix": "From the messaging matrix",
+          "angleOwn": "Your own angle",
+          "useLive": "Use the persona's angle",
+          "duration": "Duration",
+          "seconds": "{n} seconds",
+          "estimate": "Estimated length: about {n} s",
+          "noEstimate": "Add audio text to see an estimate"
+        },
+        "hooks": {
+          "hook": "Hook {letter}",
+          "menu": "Options for hook {letter}",
+          "collapse": "Collapse hook",
+          "expand": "Expand hook",
+          "duplicate": "Duplicate",
+          "delete": "Delete",
+          "audio": "Audio hook",
+          "visual": "Visual hook",
+          "overlay": "Overlay",
+          "optional": "optional",
+          "audioPlaceholder": "What the creator says in the first seconds",
+          "visualPlaceholder": "What the viewer sees",
+          "overlayPlaceholder": "Text shown on screen",
+          "addOverlay": "Add overlay (optional)",
+          "noShot": "Shot type",
+          "empty": "No text yet",
+          "add": "Add hook ({n}/{max})",
+          "limit": "Hook limit reached",
+          "deleteTitle": "Delete hook {letter}?",
+          "deleteBody": "This hook and its text will be deleted.",
+          "deleteConfirm": "Delete hook"
+        },
+        "shot": {
+          "wide": "Wide",
+          "medium": "Medium",
+          "close_up": "Close-up",
+          "detail": "Detail",
+          "pov": "POV",
+          "over_the_shoulder": "Over the shoulder",
+          "top_down": "Top-down",
+          "screen_recording": "Screen recording",
+          "reaction": "Reaction",
+          "creator_to_camera": "Creator to camera"
+        },
+        "conflict": {
+          "title": "Someone else changed this",
+          "hint": "Your text is still here. Choose what to keep.",
+          "theirs": "Their version",
+          "empty": "(empty)",
+          "copy": "Copy my text",
+          "copied": "Copied",
+          "copyFailed": "Could not copy. Select your text in the fields above and copy it by hand.",
+          "useTheirs": "Use their version",
+          "keepMine": "Keep mine"
+        },
+        "leave": {
+          "title": "Leave without saving?",
+          "body": "Some changes could not be saved. If you leave now, they are lost.",
+          "stay": "Stay",
+          "retry": "Try saving again",
+          "leave": "Leave and lose changes"
+        },
+        "archived": {
+          "title": "Archived scripts · {market}",
+          "info": "A script is archived when its creator leaves this market. It comes back on its own if the creator is added to the market again.",
+          "empty": "No archived scripts in this market.",
+          "row": "{name} · Script {n}",
+          "hooks": "Hooks: {count}",
+          "on": "Archived {date}",
+          "inMarket": "This creator is in this market again.",
+          "delete": "Delete for good",
+          "deleteTitle": "Delete this script for good?",
+          "deleteBody": "Script {n} of {name} and its hooks (hooks: {count}) will be deleted. This cannot be undone.",
+          "deleteConfirm": "Delete for good"
+        },
+        "replace": {
+          "label": "This slot has scripts ({count}). What happens to them?",
+          "carry": "Carry the scripts over to the new creator",
+          "archive": "Archive them and start fresh"
+        },
+        "remove": {
+          "label": "This creator has scripts ({count}). What happens to them?",
+          "archive": "Archive them (kept, and back if the creator returns)",
+          "delete": "Delete them for good"
+        },
+        "empty": {
+          "noCreators": {
+            "title": "No creators in {market} yet",
+            "body": "Scripts are written per creator. Add creators to this market first.",
+            "action": "Open step 5"
+          },
+          "noScripts": {
+            "title": "No scripts yet",
+            "body": "Choose “Add script” under a creator in the list to start."
+          }
+        },
+        "errors": {
+          "limitReached": "A creator has at most {max} scripts.",
+          "limitReachedArchived": "A creator has at most {max} scripts, archived ones included.",
+          "hooksLimit": "A script has at most {max} hooks.",
+          "lastHook": "A script keeps at least one hook.",
+          "languageNotAvailable": "Only English can be written for now.",
+          "carryOverExceeds": "The new creator would have more than {max} scripts. Archive them instead.",
+          "choiceRequired": "This creator has scripts. Choose what happens to them."
+        }
       }
     }
   },

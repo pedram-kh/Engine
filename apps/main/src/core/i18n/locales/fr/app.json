@@ -1516,7 +1516,9 @@
         "newCampaignName": "Nom de la campagne",
         "newCampaignHint": "Créée en brouillon sans budget. Définissez le budget sur la page de la campagne avant sa mise en ligne.",
         "notesWarning": "Retirer {markets} supprime {count} note interne. Cette action est irréversible. | Retirer {markets} supprime {count} notes internes. Cette action est irréversible.",
-        "notesConfirm": "Supprimer les notes et enregistrer"
+        "notesConfirm": "Supprimer les notes et enregistrer",
+        "scriptsWarning": "Ces marchés ont des scripts archivés : {markets}. Ils seront supprimés avec les marchés (scripts : {count}).",
+        "scriptsConfirm": "Supprimer les scripts et enregistrer"
       },
       "validation": {
         "nameRequired": "Saisissez un nom de vague.",
@@ -2332,6 +2334,158 @@
       },
       "limit": {
         "placesLeft": "{count} place restante | {count} places restantes"
+      },
+      "scripts": {
+        "stepper": {
+          "none": "Aucun script pour l'instant",
+          "count": "Scripts : {count}"
+        },
+        "rail": {
+          "title": "Scripts · {market}",
+          "script": "Script {n}",
+          "draft": "Brouillon",
+          "add": "Ajouter un script ({n}/{max})",
+          "limit": "Limite de scripts atteinte",
+          "limitHint": "Ce créateur a déjà {max} scripts, archivés compris.",
+          "footnote": "Jusqu'à {max} scripts par créateur",
+          "archived": "Scripts archivés ({count})"
+        },
+        "editor": {
+          "title": "{name} · Script {n}",
+          "lastEdited": "Dernière modification : {when}",
+          "delete": "Supprimer le script",
+          "deleteTitle": "Supprimer le script {n} de {name} ?",
+          "deleteBody": "Le script et ses accroches seront supprimés (accroches : {count}). Cette action est irréversible.",
+          "deleteConfirm": "Supprimer le script",
+          "loadFailed": "Impossible de charger ce script."
+        },
+        "save": {
+          "saving": "Enregistrement…",
+          "saved": "Enregistré",
+          "failed": "Échec de l'enregistrement",
+          "refused": "Non accepté",
+          "retry": "Réessayer",
+          "gone": "Supprimé par quelqu'un d'autre",
+          "allSaved": "Toutes les modifications sont enregistrées",
+          "stuck": "Modifications non enregistrées : {n}"
+        },
+        "brief": {
+          "title": "Brief",
+          "editInStep3": "Modifier à l'étape 3",
+          "persona": "Persona",
+          "usps": "USP",
+          "priority": "Priorité",
+          "support": "Soutien",
+          "noUsps": "Aucun USP n'est défini pour ce persona",
+          "noPersona": "Ce créateur n'a pas de persona, il n'y a donc pas de brief à reprendre. Choisissez un persona à l'étape 5.",
+          "openStep5": "Ouvrir l'étape 5",
+          "angle": "Angle",
+          "anglePlaceholder": "Écrivez l'angle de ce script",
+          "angleFromPersona": "Depuis l'angle du persona",
+          "angleFromMatrix": "Depuis la matrice de messages",
+          "angleOwn": "Votre propre angle",
+          "useLive": "Utiliser l'angle du persona",
+          "duration": "Durée",
+          "seconds": "{n} secondes",
+          "estimate": "Durée estimée : environ {n} s",
+          "noEstimate": "Ajoutez du texte audio pour voir une estimation"
+        },
+        "hooks": {
+          "hook": "Accroche {letter}",
+          "menu": "Options de l'accroche {letter}",
+          "collapse": "Réduire l'accroche",
+          "expand": "Développer l'accroche",
+          "duplicate": "Dupliquer",
+          "delete": "Supprimer",
+          "audio": "Accroche audio",
+          "visual": "Accroche visuelle",
+          "overlay": "Incrustation",
+          "optional": "facultatif",
+          "audioPlaceholder": "Ce que dit le créateur dans les premières secondes",
+          "visualPlaceholder": "Ce que voit le spectateur",
+          "overlayPlaceholder": "Texte affiché à l'écran",
+          "addOverlay": "Ajouter une incrustation (facultatif)",
+          "noShot": "Type de plan",
+          "empty": "Pas encore de texte",
+          "add": "Ajouter une accroche ({n}/{max})",
+          "limit": "Limite d'accroches atteinte",
+          "deleteTitle": "Supprimer l'accroche {letter} ?",
+          "deleteBody": "Cette accroche et son texte seront supprimés.",
+          "deleteConfirm": "Supprimer l'accroche"
+        },
+        "shot": {
+          "wide": "Plan large",
+          "medium": "Plan moyen",
+          "close_up": "Gros plan",
+          "detail": "Détail",
+          "pov": "Vue subjective",
+          "over_the_shoulder": "Par-dessus l'épaule",
+          "top_down": "Vue du dessus",
+          "screen_recording": "Capture d'écran",
+          "reaction": "Réaction",
+          "creator_to_camera": "Créateur face caméra"
+        },
+        "conflict": {
+          "title": "Quelqu'un d'autre a modifié ceci",
+          "hint": "Votre texte est toujours là. Choisissez ce qu'il faut garder.",
+          "theirs": "Leur version",
+          "empty": "(vide)",
+          "copy": "Copier mon texte",
+          "copied": "Copié",
+          "copyFailed": "Copie impossible. Sélectionnez votre texte dans les champs ci-dessus et copiez-le à la main.",
+          "useTheirs": "Utiliser leur version",
+          "keepMine": "Garder la mienne"
+        },
+        "leave": {
+          "title": "Quitter sans enregistrer ?",
+          "body": "Certaines modifications n'ont pas pu être enregistrées. Si vous partez maintenant, elles seront perdues.",
+          "stay": "Rester",
+          "retry": "Réessayer d'enregistrer",
+          "leave": "Quitter et perdre les modifications"
+        },
+        "archived": {
+          "title": "Scripts archivés · {market}",
+          "info": "Un script est archivé lorsque son créateur quitte ce marché. Il revient tout seul si le créateur est de nouveau ajouté au marché.",
+          "empty": "Aucun script archivé sur ce marché.",
+          "row": "{name} · Script {n}",
+          "hooks": "Accroches : {count}",
+          "on": "Archivé le {date}",
+          "inMarket": "Ce créateur est de nouveau sur ce marché.",
+          "delete": "Supprimer définitivement",
+          "deleteTitle": "Supprimer définitivement ce script ?",
+          "deleteBody": "Le script {n} de {name} et ses accroches (accroches : {count}) seront supprimés. Cette action est irréversible.",
+          "deleteConfirm": "Supprimer définitivement"
+        },
+        "replace": {
+          "label": "Cet emplacement a des scripts ({count}). Que doivent-ils devenir ?",
+          "carry": "Reporter les scripts sur le nouveau créateur",
+          "archive": "Les archiver et repartir de zéro"
+        },
+        "remove": {
+          "label": "Ce créateur a des scripts ({count}). Que doivent-ils devenir ?",
+          "archive": "Les archiver (conservés, et de retour si le créateur revient)",
+          "delete": "Les supprimer définitivement"
+        },
+        "empty": {
+          "noCreators": {
+            "title": "Aucun créateur dans {market} pour l'instant",
+            "body": "Les scripts s'écrivent par créateur. Ajoutez d'abord des créateurs à ce marché.",
+            "action": "Ouvrir l'étape 5"
+          },
+          "noScripts": {
+            "title": "Aucun script pour l'instant",
+            "body": "Choisissez « Ajouter un script » sous un créateur de la liste pour commencer."
+          }
+        },
+        "errors": {
+          "limitReached": "Un créateur a au plus {max} scripts.",
+          "limitReachedArchived": "Un créateur a au plus {max} scripts, archivés compris.",
+          "hooksLimit": "Un script a au plus {max} accroches.",
+          "lastHook": "Un script garde au moins une accroche.",
+          "languageNotAvailable": "Seul l'anglais peut être rédigé pour le moment.",
+          "carryOverExceeds": "Le nouveau créateur aurait plus de {max} scripts. Archivez-les plutôt.",
+          "choiceRequired": "Ce créateur a des scripts. Choisissez ce qu'ils deviennent."
+        }
       }
     }
   },

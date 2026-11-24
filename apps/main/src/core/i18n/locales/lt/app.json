@@ -1516,7 +1516,9 @@
         "newCampaignName": "Kampanijos pavadinimas",
         "newCampaignHint": "Sukuriama kaip juodraštis be biudžeto. Prieš paleidimą nustatykite biudžetą kampanijos puslapyje.",
         "notesWarning": "Pašalinus {markets} bus ištrinta {count} vidinė pastaba. To negalima atšaukti. | Pašalinus {markets} bus ištrinta {count} vidinių pastabų. To negalima atšaukti.",
-        "notesConfirm": "Ištrinti pastabas ir išsaugoti"
+        "notesConfirm": "Ištrinti pastabas ir išsaugoti",
+        "scriptsWarning": "Šiose rinkose yra suarchyvuotų scenarijų: {markets}. Jie bus ištrinti kartu su rinkomis (scenarijų: {count}).",
+        "scriptsConfirm": "Ištrinti scenarijus ir išsaugoti"
       },
       "validation": {
         "nameRequired": "Įveskite bangos pavadinimą.",
@@ -2332,6 +2334,158 @@
       },
       "limit": {
         "placesLeft": "Liko vietų: {count} | Liko vietų: {count}"
+      },
+      "scripts": {
+        "stepper": {
+          "none": "Scenarijų dar nėra",
+          "count": "Scenarijai: {count}"
+        },
+        "rail": {
+          "title": "Scenarijai · {market}",
+          "script": "Scenarijus {n}",
+          "draft": "Juodraštis",
+          "add": "Pridėti scenarijų ({n}/{max})",
+          "limit": "Pasiektas scenarijų limitas",
+          "limitHint": "Šis kūrėjas jau turi {max} scenarijus, įskaitant suarchyvuotus.",
+          "footnote": "Iki {max} scenarijų vienam kūrėjui",
+          "archived": "Suarchyvuoti scenarijai ({count})"
+        },
+        "editor": {
+          "title": "{name} · Scenarijus {n}",
+          "lastEdited": "Paskutinį kartą redaguota: {when}",
+          "delete": "Ištrinti scenarijų",
+          "deleteTitle": "Ištrinti kūrėjo {name} scenarijų {n}?",
+          "deleteBody": "Scenarijus ir jo kabliukai bus ištrinti (kabliukų: {count}). Šio veiksmo atšaukti negalima.",
+          "deleteConfirm": "Ištrinti scenarijų",
+          "loadFailed": "Šio scenarijaus nepavyko įkelti."
+        },
+        "save": {
+          "saving": "Saugoma…",
+          "saved": "Išsaugota",
+          "failed": "Nepavyko išsaugoti",
+          "refused": "Nepriimta",
+          "retry": "Bandyti dar kartą",
+          "gone": "Pašalino kitas asmuo",
+          "allSaved": "Visi pakeitimai išsaugoti",
+          "stuck": "Neišsaugotų pakeitimų: {n}"
+        },
+        "brief": {
+          "title": "Trumpa užduotis",
+          "editInStep3": "Redaguoti 3 žingsnyje",
+          "persona": "Persona",
+          "usps": "USP",
+          "priority": "Prioritetas",
+          "support": "Papildomas",
+          "noUsps": "Šiai personai USP nenustatyti",
+          "noPersona": "Šis kūrėjas neturi personos, todėl nėra trumpos užduoties, kurią galima paimti. Pasirinkite personą 5 žingsnyje.",
+          "openStep5": "Atidaryti 5 žingsnį",
+          "angle": "Kampas",
+          "anglePlaceholder": "Parašykite šio scenarijaus kampą",
+          "angleFromPersona": "Iš personos kampo",
+          "angleFromMatrix": "Iš žinučių matricos",
+          "angleOwn": "Jūsų pačių kampas",
+          "useLive": "Naudoti personos kampą",
+          "duration": "Trukmė",
+          "seconds": "{n} sek.",
+          "estimate": "Numatoma trukmė: apie {n} s",
+          "noEstimate": "Pridėkite garso tekstą, kad pamatytumėte įvertį"
+        },
+        "hooks": {
+          "hook": "Kabliukas {letter}",
+          "menu": "Kabliuko {letter} parinktys",
+          "collapse": "Sutraukti kabliuką",
+          "expand": "Išskleisti kabliuką",
+          "duplicate": "Dubliuoti",
+          "delete": "Ištrinti",
+          "audio": "Garso kabliukas",
+          "visual": "Vaizdo kabliukas",
+          "overlay": "Uždanga",
+          "optional": "neprivaloma",
+          "audioPlaceholder": "Ką kūrėjas sako per pirmąsias sekundes",
+          "visualPlaceholder": "Ką mato žiūrovas",
+          "overlayPlaceholder": "Ekrane rodomas tekstas",
+          "addOverlay": "Pridėti uždangą (neprivaloma)",
+          "noShot": "Kadro tipas",
+          "empty": "Teksto dar nėra",
+          "add": "Pridėti kabliuką ({n}/{max})",
+          "limit": "Pasiektas kabliukų limitas",
+          "deleteTitle": "Ištrinti kabliuką {letter}?",
+          "deleteBody": "Šis kabliukas ir jo tekstas bus ištrinti.",
+          "deleteConfirm": "Ištrinti kabliuką"
+        },
+        "shot": {
+          "wide": "Bendras planas",
+          "medium": "Vidutinis planas",
+          "close_up": "Stambus planas",
+          "detail": "Detalė",
+          "pov": "Pirmojo asmens vaizdas",
+          "over_the_shoulder": "Per petį",
+          "top_down": "Iš viršaus",
+          "screen_recording": "Ekrano įrašas",
+          "reaction": "Reakcija",
+          "creator_to_camera": "Kūrėjas į kamerą"
+        },
+        "conflict": {
+          "title": "Kažkas kitas tai pakeitė",
+          "hint": "Jūsų tekstas vis dar čia. Pasirinkite, ką palikti.",
+          "theirs": "Jų versija",
+          "empty": "(tuščia)",
+          "copy": "Kopijuoti mano tekstą",
+          "copied": "Nukopijuota",
+          "copyFailed": "Nepavyko nukopijuoti. Pažymėkite savo tekstą aukščiau esančiuose laukuose ir nukopijuokite rankiniu būdu.",
+          "useTheirs": "Naudoti jų versiją",
+          "keepMine": "Palikti mano"
+        },
+        "leave": {
+          "title": "Išeiti neišsaugojus?",
+          "body": "Kai kurių pakeitimų nepavyko išsaugoti. Jei išeisite dabar, jie bus prarasti.",
+          "stay": "Likti",
+          "retry": "Bandyti išsaugoti dar kartą",
+          "leave": "Išeiti ir prarasti pakeitimus"
+        },
+        "archived": {
+          "title": "Suarchyvuoti scenarijai · {market}",
+          "info": "Scenarijus archyvuojamas, kai jo kūrėjas palieka šią rinką. Jis grįžta pats, jei kūrėjas vėl pridedamas prie rinkos.",
+          "empty": "Šioje rinkoje suarchyvuotų scenarijų nėra.",
+          "row": "{name} · Scenarijus {n}",
+          "hooks": "Kabliukų: {count}",
+          "on": "Suarchyvuota {date}",
+          "inMarket": "Šis kūrėjas vėl yra šioje rinkoje.",
+          "delete": "Ištrinti visam laikui",
+          "deleteTitle": "Ištrinti šį scenarijų visam laikui?",
+          "deleteBody": "Kūrėjo {name} scenarijus {n} ir jo kabliukai (kabliukų: {count}) bus ištrinti. Šio veiksmo atšaukti negalima.",
+          "deleteConfirm": "Ištrinti visam laikui"
+        },
+        "replace": {
+          "label": "Šioje vietoje yra scenarijų ({count}). Ką su jais daryti?",
+          "carry": "Perkelti scenarijus naujam kūrėjui",
+          "archive": "Suarchyvuoti juos ir pradėti iš naujo"
+        },
+        "remove": {
+          "label": "Šis kūrėjas turi scenarijų ({count}). Ką su jais daryti?",
+          "archive": "Suarchyvuoti (išsaugomi ir grįžta, jei kūrėjas sugrįžta)",
+          "delete": "Ištrinti juos visam laikui"
+        },
+        "empty": {
+          "noCreators": {
+            "title": "Rinkoje {market} kūrėjų dar nėra",
+            "body": "Scenarijai rašomi kiekvienam kūrėjui. Pirmiausia pridėkite kūrėjų prie šios rinkos.",
+            "action": "Atidaryti 5 žingsnį"
+          },
+          "noScripts": {
+            "title": "Scenarijų dar nėra",
+            "body": "Norėdami pradėti, sąraše po kūrėju pasirinkite „Pridėti scenarijų“."
+          }
+        },
+        "errors": {
+          "limitReached": "Kūrėjas turi daugiausia {max} scenarijus.",
+          "limitReachedArchived": "Kūrėjas turi daugiausia {max} scenarijus, įskaitant suarchyvuotus.",
+          "hooksLimit": "Scenarijus turi daugiausia {max} kabliukus.",
+          "lastHook": "Scenarijuje lieka bent vienas kabliukas.",
+          "languageNotAvailable": "Kol kas galima rašyti tik angliškai.",
+          "carryOverExceeds": "Naujas kūrėjas turėtų daugiau nei {max} scenarijus. Geriau juos suarchyvuokite.",
+          "choiceRequired": "Šis kūrėjas turi scenarijų. Pasirinkite, ką su jais daryti."
+        }
       }
     }
   },

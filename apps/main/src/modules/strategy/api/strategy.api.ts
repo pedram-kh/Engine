@@ -21,7 +21,14 @@ import type {
   MatrixSaveEnvelope,
   PersonaCopyPayload,
   StrategyCompletionResponse,
+  ArchivedScript,
+  ScriptBriefPayload,
+  ScriptHookPayload,
+  ScriptsOnRemove,
+  ScriptsOnReplace,
+  ScriptsOverview,
   WaveCreatorAddPayload,
+  WaveScript,
   WaveCreatorCandidatesResponse,
   WaveCreatorDecideResponse,
   WaveCreatorDecisionHistoryResponse,
@@ -52,7 +59,7 @@ function base(s: WaveScope): string {
 }
 
 export type MarkableStep = 'usps' | 'personas' | 'matrix'
-export type NoteStep = MarkableStep | 'concepts' | 'creators'
+export type NoteStep = MarkableStep | 'concepts' | 'creators' | 'scripts'
 
 function marketQuery(market: string | null): string {
   return market === null ? '' : `?market=${encodeURIComponent(market)}`
@@ -345,12 +352,29 @@ export const strategyApi = {
     return http.patch<WaveCreatorsResponse>(`${base(s)}/creators/${slotId}`, payload)
   },
 
-  replaceCreator(s: WaveScope, slotId: string, creator: string): Promise<WaveCreatorsResponse> {
-    return http.post<WaveCreatorsResponse>(`${base(s)}/creators/${slotId}/replace`, { creator })
+  /** `scripts` says what happens to the slot's scripts: carried to the new creator (the default) or archived. */
+  replaceCreator(
+    s: WaveScope,
+    slotId: string,
+    creator: string,
+    scripts?: ScriptsOnReplace,
+  ): Promise<WaveCreatorsResponse> {
+    return http.post<WaveCreatorsResponse>(`${base(s)}/creators/${slotId}/replace`, {
+      creator,
+      ...(scripts === undefined ? {} : { scripts }),
+    })
   },
 
-  removeCreator(s: WaveScope, slotId: string): Promise<WaveCreatorsResponse> {
-    return http.delete<WaveCreatorsResponse>(`${base(s)}/creators/${slotId}`)
+  /** `scripts` is needed when the creator has scripts (422 `wave_creator.scripts_choice_required` without it). */
+  removeCreator(
+    s: WaveScope,
+    slotId: string,
+    scripts?: ScriptsOnRemove,
+  ): Promise<WaveCreatorsResponse> {
+    return http.delete<WaveCreatorsResponse>(
+      `${base(s)}/creators/${slotId}`,
+      scripts === undefined ? undefined : { scripts },
+    )
   },
 
   creatorDecisions(s: WaveScope, slotId: string): Promise<WaveCreatorDecisionHistoryResponse> {
@@ -363,5 +387,63 @@ export const strategyApi = {
     payload: WaveCreatorDecisionPayload,
   ): Promise<WaveCreatorDecideResponse> {
     return http.post<WaveCreatorDecideResponse>(`${base(s)}/creators/${slotId}/decisions`, payload)
+  },
+
+  // PL-3.2a — the scripts step. `creators_scripts_enabled` (404 while off).
+  /** The step's state for the wave and, with a market, that market's rail. */
+  scripts(s: WaveScope, market: string | null): Promise<{ data: ScriptsOverview }> {
+    return http.get<{ data: ScriptsOverview }>(`${base(s)}/scripts${marketQuery(market)}`)
+  },
+
+  archivedScripts(s: WaveScope, market: string): Promise<{ data: ArchivedScript[] }> {
+    return http.get<{ data: ArchivedScript[] }>(`${base(s)}/scripts/archived${marketQuery(market)}`)
+  },
+
+  script(s: WaveScope, scriptId: string): Promise<{ data: WaveScript }> {
+    return http.get<{ data: WaveScript }>(`${base(s)}/scripts/${scriptId}`)
+  },
+
+  createScript(s: WaveScope, slot: string): Promise<{ data: WaveScript }> {
+    return http.post<{ data: WaveScript }>(`${base(s)}/scripts`, { slot })
+  },
+
+  saveBrief(
+    s: WaveScope,
+    scriptId: string,
+    payload: ScriptBriefPayload,
+  ): Promise<{ data: WaveScript }> {
+    return http.put<{ data: WaveScript }>(`${base(s)}/scripts/${scriptId}/brief`, payload)
+  },
+
+  deleteScript(s: WaveScope, scriptId: string): Promise<{ data: ScriptsOverview }> {
+    return http.delete<{ data: ScriptsOverview }>(`${base(s)}/scripts/${scriptId}`)
+  },
+
+  /** Admin and manager only (403 `forbidden`). */
+  deleteArchivedScript(s: WaveScope, scriptId: string): Promise<{ data: ScriptsOverview }> {
+    return http.delete<{ data: ScriptsOverview }>(`${base(s)}/scripts/archived/${scriptId}`)
+  },
+
+  addHook(s: WaveScope, scriptId: string): Promise<{ data: WaveScript }> {
+    return http.post<{ data: WaveScript }>(`${base(s)}/scripts/${scriptId}/hooks`)
+  },
+
+  saveHook(
+    s: WaveScope,
+    scriptId: string,
+    hookId: string,
+    payload: ScriptHookPayload,
+  ): Promise<{ data: WaveScript }> {
+    return http.put<{ data: WaveScript }>(`${base(s)}/scripts/${scriptId}/hooks/${hookId}`, payload)
+  },
+
+  duplicateHook(s: WaveScope, scriptId: string, hookId: string): Promise<{ data: WaveScript }> {
+    return http.post<{ data: WaveScript }>(
+      `${base(s)}/scripts/${scriptId}/hooks/${hookId}/duplicate`,
+    )
+  },
+
+  deleteHook(s: WaveScope, scriptId: string, hookId: string): Promise<{ data: WaveScript }> {
+    return http.delete<{ data: WaveScript }>(`${base(s)}/scripts/${scriptId}/hooks/${hookId}`)
   },
 }

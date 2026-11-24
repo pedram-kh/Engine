@@ -1516,7 +1516,9 @@
         "newCampaignName": "Campagnenaam",
         "newCampaignHint": "Wordt aangemaakt als concept zonder budget. Stel het budget in op de campagnepagina voordat het live kan.",
         "notesWarning": "Als je {markets} verwijdert, verdwijnt {count} interne notitie. Dit kan niet ongedaan worden gemaakt. | Als je {markets} verwijdert, verdwijnen {count} interne notities. Dit kan niet ongedaan worden gemaakt.",
-        "notesConfirm": "Notities verwijderen en opslaan"
+        "notesConfirm": "Notities verwijderen en opslaan",
+        "scriptsWarning": "Deze markten hebben gearchiveerde scripts: {markets}. Ze worden samen met de markten verwijderd (scripts: {count}).",
+        "scriptsConfirm": "Scripts verwijderen en opslaan"
       },
       "validation": {
         "nameRequired": "Voer een naam voor de golf in.",
@@ -2332,6 +2334,158 @@
       },
       "limit": {
         "placesLeft": "{count} plek vrij | {count} plekken vrij"
+      },
+      "scripts": {
+        "stepper": {
+          "none": "Nog geen scripts",
+          "count": "Scripts: {count}"
+        },
+        "rail": {
+          "title": "Scripts · {market}",
+          "script": "Script {n}",
+          "draft": "Concept",
+          "add": "Script toevoegen ({n}/{max})",
+          "limit": "Scriptlimiet bereikt",
+          "limitHint": "Deze creator heeft al {max} scripts, gearchiveerde meegerekend.",
+          "footnote": "Maximaal {max} scripts per creator",
+          "archived": "Gearchiveerde scripts ({count})"
+        },
+        "editor": {
+          "title": "{name} · Script {n}",
+          "lastEdited": "Laatst bewerkt: {when}",
+          "delete": "Script verwijderen",
+          "deleteTitle": "Script {n} van {name} verwijderen?",
+          "deleteBody": "Het script en de bijbehorende hooks worden verwijderd (hooks: {count}). Dit kan niet ongedaan worden gemaakt.",
+          "deleteConfirm": "Script verwijderen",
+          "loadFailed": "Dit script kon niet worden geladen."
+        },
+        "save": {
+          "saving": "Opslaan…",
+          "saved": "Opgeslagen",
+          "failed": "Opslaan mislukt",
+          "refused": "Niet geaccepteerd",
+          "retry": "Opnieuw proberen",
+          "gone": "Door iemand anders verwijderd",
+          "allSaved": "Alle wijzigingen opgeslagen",
+          "stuck": "Niet opgeslagen wijzigingen: {n}"
+        },
+        "brief": {
+          "title": "Briefing",
+          "editInStep3": "Bewerken in stap 3",
+          "persona": "Persona",
+          "usps": "USP's",
+          "priority": "Prioriteit",
+          "support": "Ondersteunend",
+          "noUsps": "Voor deze persona zijn geen USP's ingesteld",
+          "noPersona": "Deze creator heeft geen persona, dus er is geen briefing om uit te putten. Kies een persona in stap 5.",
+          "openStep5": "Stap 5 openen",
+          "angle": "Invalshoek",
+          "anglePlaceholder": "Schrijf de invalshoek van dit script",
+          "angleFromPersona": "Uit de invalshoek van de persona",
+          "angleFromMatrix": "Uit de berichtenmatrix",
+          "angleOwn": "Je eigen invalshoek",
+          "useLive": "Invalshoek van de persona gebruiken",
+          "duration": "Duur",
+          "seconds": "{n} seconden",
+          "estimate": "Geschatte lengte: ongeveer {n} s",
+          "noEstimate": "Voeg audiotekst toe voor een schatting"
+        },
+        "hooks": {
+          "hook": "Hook {letter}",
+          "menu": "Opties voor hook {letter}",
+          "collapse": "Hook inklappen",
+          "expand": "Hook uitklappen",
+          "duplicate": "Dupliceren",
+          "delete": "Verwijderen",
+          "audio": "Audiohook",
+          "visual": "Visuele hook",
+          "overlay": "Overlay",
+          "optional": "optioneel",
+          "audioPlaceholder": "Wat de creator in de eerste seconden zegt",
+          "visualPlaceholder": "Wat de kijker ziet",
+          "overlayPlaceholder": "Tekst die op het scherm staat",
+          "addOverlay": "Overlay toevoegen (optioneel)",
+          "noShot": "Shottype",
+          "empty": "Nog geen tekst",
+          "add": "Hook toevoegen ({n}/{max})",
+          "limit": "Hooklimiet bereikt",
+          "deleteTitle": "Hook {letter} verwijderen?",
+          "deleteBody": "Deze hook en de tekst ervan worden verwijderd.",
+          "deleteConfirm": "Hook verwijderen"
+        },
+        "shot": {
+          "wide": "Totaal",
+          "medium": "Halftotaal",
+          "close_up": "Close-up",
+          "detail": "Detail",
+          "pov": "POV",
+          "over_the_shoulder": "Over de schouder",
+          "top_down": "Van bovenaf",
+          "screen_recording": "Schermopname",
+          "reaction": "Reactie",
+          "creator_to_camera": "Creator naar camera"
+        },
+        "conflict": {
+          "title": "Iemand anders heeft dit gewijzigd",
+          "hint": "Je tekst staat er nog. Kies wat je wilt houden.",
+          "theirs": "Hun versie",
+          "empty": "(leeg)",
+          "copy": "Mijn tekst kopiëren",
+          "copied": "Gekopieerd",
+          "copyFailed": "Kopiëren mislukt. Selecteer je tekst in de velden hierboven en kopieer hem met de hand.",
+          "useTheirs": "Hun versie gebruiken",
+          "keepMine": "Mijn versie houden"
+        },
+        "leave": {
+          "title": "Verlaten zonder op te slaan?",
+          "body": "Sommige wijzigingen konden niet worden opgeslagen. Als je nu weggaat, gaan ze verloren.",
+          "stay": "Blijven",
+          "retry": "Opnieuw opslaan",
+          "leave": "Verlaten en wijzigingen kwijtraken"
+        },
+        "archived": {
+          "title": "Gearchiveerde scripts · {market}",
+          "info": "Een script wordt gearchiveerd als de creator deze markt verlaat. Het komt vanzelf terug als de creator opnieuw aan de markt wordt toegevoegd.",
+          "empty": "Geen gearchiveerde scripts in deze markt.",
+          "row": "{name} · Script {n}",
+          "hooks": "Hooks: {count}",
+          "on": "Gearchiveerd op {date}",
+          "inMarket": "Deze creator zit weer in deze markt.",
+          "delete": "Definitief verwijderen",
+          "deleteTitle": "Dit script definitief verwijderen?",
+          "deleteBody": "Script {n} van {name} en de bijbehorende hooks (hooks: {count}) worden verwijderd. Dit kan niet ongedaan worden gemaakt.",
+          "deleteConfirm": "Definitief verwijderen"
+        },
+        "replace": {
+          "label": "Deze plek heeft scripts ({count}). Wat gebeurt ermee?",
+          "carry": "De scripts overzetten naar de nieuwe creator",
+          "archive": "Archiveren en opnieuw beginnen"
+        },
+        "remove": {
+          "label": "Deze creator heeft scripts ({count}). Wat gebeurt ermee?",
+          "archive": "Archiveren (bewaard, en terug als de creator terugkomt)",
+          "delete": "Definitief verwijderen"
+        },
+        "empty": {
+          "noCreators": {
+            "title": "Nog geen creators in {market}",
+            "body": "Scripts worden per creator geschreven. Voeg eerst creators toe aan deze markt.",
+            "action": "Stap 5 openen"
+          },
+          "noScripts": {
+            "title": "Nog geen scripts",
+            "body": "Kies in de lijst onder een creator 'Script toevoegen' om te beginnen."
+          }
+        },
+        "errors": {
+          "limitReached": "Een creator heeft maximaal {max} scripts.",
+          "limitReachedArchived": "Een creator heeft maximaal {max} scripts, gearchiveerde meegerekend.",
+          "hooksLimit": "Een script heeft maximaal {max} hooks.",
+          "lastHook": "Een script houdt minstens één hook.",
+          "languageNotAvailable": "Voorlopig kan alleen Engels worden geschreven.",
+          "carryOverExceeds": "De nieuwe creator zou meer dan {max} scripts hebben. Archiveer ze in plaats daarvan.",
+          "choiceRequired": "Deze creator heeft scripts. Kies wat ermee gebeurt."
+        }
       }
     }
   },

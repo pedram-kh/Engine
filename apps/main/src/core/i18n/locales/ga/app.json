@@ -1516,7 +1516,9 @@
         "newCampaignName": "Ainm an fheachtais",
         "newCampaignHint": "Cruthaítear mar dhréacht gan buiséad é. Socraigh an buiséad ar leathanach an fheachtais sula féidir leis dul beo.",
         "notesWarning": "Scriosann baint {markets} {count} nóta inmheánach. Ní féidir é seo a chealú. | Scriosann baint {markets} {count} nóta inmheánacha. Ní féidir é seo a chealú.",
-        "notesConfirm": "Scrios nótaí agus sábháil"
+        "notesConfirm": "Scrios nótaí agus sábháil",
+        "scriptsWarning": "Tá scripteanna cartlannaithe ag na margaí seo: {markets}. Scriosfar iad leis na margaí (scripteanna: {count}).",
+        "scriptsConfirm": "Scrios scripteanna agus sábháil"
       },
       "validation": {
         "nameRequired": "Cuir isteach ainm toinn.",
@@ -2332,6 +2334,158 @@
       },
       "limit": {
         "placesLeft": "Áiteanna fágtha: {count} | Áiteanna fágtha: {count}"
+      },
+      "scripts": {
+        "stepper": {
+          "none": "Níl aon script ann go fóill",
+          "count": "Scripteanna: {count}"
+        },
+        "rail": {
+          "title": "Scripteanna · {market}",
+          "script": "Script {n}",
+          "draft": "Dréacht",
+          "add": "Cuir script leis ({n}/{max})",
+          "limit": "Sroicheadh teorainn na scripteanna",
+          "limitHint": "Tá {max} script ag an gcruthaitheoir seo cheana, lena n-áirítear na cinn cartlannaithe.",
+          "footnote": "Suas le {max} script an cruthaitheoir",
+          "archived": "Scripteanna cartlannaithe ({count})"
+        },
+        "editor": {
+          "title": "{name} · Script {n}",
+          "lastEdited": "Curtha in eagar go deireanach: {when}",
+          "delete": "Scrios an script",
+          "deleteTitle": "An scriosfar script {n} de chuid {name}?",
+          "deleteBody": "Scriosfar an script agus a hamhráin ghreamaithe (amhráin ghreamaithe: {count}). Ní féidir é seo a chealú.",
+          "deleteConfirm": "Scrios an script",
+          "loadFailed": "Níorbh fhéidir an script seo a luchtú."
+        },
+        "save": {
+          "saving": "Á shábháil…",
+          "saved": "Sábháilte",
+          "failed": "Níorbh fhéidir a shábháil",
+          "refused": "Níor glacadh leis",
+          "retry": "Triail arís",
+          "gone": "Bhain duine éigin eile é",
+          "allSaved": "Sábháladh na hathruithe go léir",
+          "stuck": "Athruithe nár sábháladh: {n}"
+        },
+        "brief": {
+          "title": "Giorrchlár",
+          "editInStep3": "Cuir in eagar i gcéim 3",
+          "persona": "Pearsa",
+          "usps": "USPanna",
+          "priority": "Tosaíocht",
+          "support": "Tacaíocht",
+          "noUsps": "Níl aon USP socraithe don phearsa seo",
+          "noPersona": "Níl pearsa ag an gcruthaitheoir seo, mar sin níl aon ghiorrchlár le tarraingt. Roghnaigh pearsa i gcéim 5.",
+          "openStep5": "Oscail céim 5",
+          "angle": "Dearcadh",
+          "anglePlaceholder": "Scríobh dearcadh an script seo",
+          "angleFromPersona": "Ó dhearcadh na pearsan",
+          "angleFromMatrix": "Ó mhaitrís na dteachtaireachtaí",
+          "angleOwn": "Do dhearcadh féin",
+          "useLive": "Úsáid dearcadh na pearsan",
+          "duration": "Fad",
+          "seconds": "{n} soicind",
+          "estimate": "Fad measta: thart ar {n} s",
+          "noEstimate": "Cuir téacs fuaime leis chun meastachán a fheiceáil"
+        },
+        "hooks": {
+          "hook": "Amhrán greamaitheach {letter}",
+          "menu": "Roghanna don amhrán ghreamaitheach {letter}",
+          "collapse": "Laghdaigh an t-amhrán greamaitheach",
+          "expand": "Leathnaigh an t-amhrán greamaitheach",
+          "duplicate": "Dúbail",
+          "delete": "Scrios",
+          "audio": "Amhrán greamaitheach fuaime",
+          "visual": "Amhrán greamaitheach amhairc",
+          "overlay": "Forleagan",
+          "optional": "roghnach",
+          "audioPlaceholder": "Cad a deir an cruthaitheoir sna chéad soicindí",
+          "visualPlaceholder": "Cad a fheiceann an breathnóir",
+          "overlayPlaceholder": "Téacs a thaispeántar ar an scáileán",
+          "addOverlay": "Cuir forleagan leis (roghnach)",
+          "noShot": "Cineál lámhaigh",
+          "empty": "Níl aon téacs ann go fóill",
+          "add": "Cuir amhrán greamaitheach leis ({n}/{max})",
+          "limit": "Sroicheadh teorainn na n-amhrán greamaitheach",
+          "deleteTitle": "An scriosfar amhrán greamaitheach {letter}?",
+          "deleteBody": "Scriosfar an t-amhrán greamaitheach seo agus a théacs.",
+          "deleteConfirm": "Scrios an t-amhrán greamaitheach"
+        },
+        "shot": {
+          "wide": "Lámhaigh leathan",
+          "medium": "Lámhaigh meánach",
+          "close_up": "Gar-ghrianghraf",
+          "detail": "Mionsonra",
+          "pov": "Radharc céad phearsa",
+          "over_the_shoulder": "Thar an ghualainn",
+          "top_down": "Ón taobh thuas",
+          "screen_recording": "Taifeadadh scáileáin",
+          "reaction": "Frithghníomh",
+          "creator_to_camera": "Cruthaitheoir chuig an gceamara"
+        },
+        "conflict": {
+          "title": "D'athraigh duine éigin eile é seo",
+          "hint": "Tá do théacs fós anseo. Roghnaigh cad atá le coinneáil.",
+          "theirs": "A leagan siúd",
+          "empty": "(folamh)",
+          "copy": "Cóipeáil mo théacs",
+          "copied": "Cóipeáilte",
+          "copyFailed": "Níorbh fhéidir cóipeáil. Roghnaigh do théacs sna réimsí thuas agus cóipeáil de láimh é.",
+          "useTheirs": "Úsáid a leagan siúd",
+          "keepMine": "Coinnigh mo cheann"
+        },
+        "leave": {
+          "title": "Imigh gan sábháil?",
+          "body": "Níorbh fhéidir roinnt athruithe a shábháil. Má imíonn tú anois, caillfear iad.",
+          "stay": "Fan",
+          "retry": "Triail an sábháil arís",
+          "leave": "Imigh agus caill na hathruithe"
+        },
+        "archived": {
+          "title": "Scripteanna cartlannaithe · {market}",
+          "info": "Cartlannaítear script nuair a fhágann a chruthaitheoir an margadh seo. Filleann sé ar ais as féin má chuirtear an cruthaitheoir leis an margadh arís.",
+          "empty": "Níl aon scripteanna cartlannaithe sa mhargadh seo.",
+          "row": "{name} · Script {n}",
+          "hooks": "Amhráin ghreamaithe: {count}",
+          "on": "Cartlannaithe ar {date}",
+          "inMarket": "Tá an cruthaitheoir seo sa mhargadh seo arís.",
+          "delete": "Scrios go deo",
+          "deleteTitle": "An scriosfar an script seo go deo?",
+          "deleteBody": "Scriosfar script {n} de chuid {name} agus a hamhráin ghreamaithe (amhráin ghreamaithe: {count}). Ní féidir é seo a chealú.",
+          "deleteConfirm": "Scrios go deo"
+        },
+        "replace": {
+          "label": "Tá scripteanna ag an sliotán seo ({count}). Cad a tharlóidh dóibh?",
+          "carry": "Aistrigh na scripteanna chuig an gcruthaitheoir nua",
+          "archive": "Cartlannaigh iad agus tosaigh as an nua"
+        },
+        "remove": {
+          "label": "Tá scripteanna ag an gcruthaitheoir seo ({count}). Cad a tharlóidh dóibh?",
+          "archive": "Cartlannaigh iad (coinnítear iad agus filleann siad má fhilleann an cruthaitheoir)",
+          "delete": "Scrios iad go deo"
+        },
+        "empty": {
+          "noCreators": {
+            "title": "Níl aon chruthaitheoir i {market} go fóill",
+            "body": "Scríobhtar scripteanna do gach cruthaitheoir. Cuir cruthaitheoirí leis an margadh seo ar dtús.",
+            "action": "Oscail céim 5"
+          },
+          "noScripts": {
+            "title": "Níl aon script ann go fóill",
+            "body": "Chun tosú, roghnaigh “Cuir script leis” faoi chruthaitheoir sa liosta."
+          }
+        },
+        "errors": {
+          "limitReached": "Tá uasmhéid de {max} script ag cruthaitheoir.",
+          "limitReachedArchived": "Tá uasmhéid de {max} script ag cruthaitheoir, lena n-áirítear na cinn cartlannaithe.",
+          "hooksLimit": "Tá uasmhéid de {max} amhrán greamaitheach ag script.",
+          "lastHook": "Coinníonn script amhrán greamaitheach amháin ar a laghad.",
+          "languageNotAvailable": "Is féidir Béarla amháin a scríobh faoi láthair.",
+          "carryOverExceeds": "Bheadh níos mó ná {max} script ag an gcruthaitheoir nua. Cartlannaigh iad ina ionad.",
+          "choiceRequired": "Tá scripteanna ag an gcruthaitheoir seo. Roghnaigh cad a tharlóidh dóibh."
+        }
       }
     }
   },

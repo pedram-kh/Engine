@@ -1516,7 +1516,9 @@
         "newCampaignName": "Kampanjnamn",
         "newCampaignHint": "Skapas som utkast utan budget. Ange budgeten på kampanjsidan innan den kan gå live.",
         "notesWarning": "Om du tar bort {markets} raderas {count} intern anteckning. Det går inte att ångra. | Om du tar bort {markets} raderas {count} interna anteckningar. Det går inte att ångra.",
-        "notesConfirm": "Ta bort anteckningar och spara"
+        "notesConfirm": "Ta bort anteckningar och spara",
+        "scriptsWarning": "De här marknaderna har arkiverade manus: {markets}. De tas bort tillsammans med marknaderna (manus: {count}).",
+        "scriptsConfirm": "Ta bort manus och spara"
       },
       "validation": {
         "nameRequired": "Ange ett namn på vågen.",
@@ -2332,6 +2334,158 @@
       },
       "limit": {
         "placesLeft": "{count} plats kvar | {count} platser kvar"
+      },
+      "scripts": {
+        "stepper": {
+          "none": "Inga manus ännu",
+          "count": "Manus: {count}"
+        },
+        "rail": {
+          "title": "Manus · {market}",
+          "script": "Manus {n}",
+          "draft": "Utkast",
+          "add": "Lägg till manus ({n}/{max})",
+          "limit": "Gränsen för manus är nådd",
+          "limitHint": "Den här creatorn har redan {max} manus, arkiverade inräknade.",
+          "footnote": "Upp till {max} manus per creator",
+          "archived": "Arkiverade manus ({count})"
+        },
+        "editor": {
+          "title": "{name} · Manus {n}",
+          "lastEdited": "Senast redigerad: {when}",
+          "delete": "Ta bort manus",
+          "deleteTitle": "Ta bort manus {n} för {name}?",
+          "deleteBody": "Manuset och dess hooks tas bort (hooks: {count}). Det går inte att ångra.",
+          "deleteConfirm": "Ta bort manus",
+          "loadFailed": "Det här manuset kunde inte läsas in."
+        },
+        "save": {
+          "saving": "Sparar…",
+          "saved": "Sparat",
+          "failed": "Kunde inte sparas",
+          "refused": "Godtogs inte",
+          "retry": "Försök igen",
+          "gone": "Borttaget av någon annan",
+          "allSaved": "Alla ändringar sparade",
+          "stuck": "Ändringar som inte sparats: {n}"
+        },
+        "brief": {
+          "title": "Brief",
+          "editInStep3": "Redigera i steg 3",
+          "persona": "Persona",
+          "usps": "USP:er",
+          "priority": "Prioritet",
+          "support": "Stöd",
+          "noUsps": "Inga USP:er är satta för den här personan",
+          "noPersona": "Den här creatorn har ingen persona, så det finns ingen brief att hämta. Välj en persona i steg 5.",
+          "openStep5": "Öppna steg 5",
+          "angle": "Vinkel",
+          "anglePlaceholder": "Skriv vinkeln för det här manuset",
+          "angleFromPersona": "Från personans vinkel",
+          "angleFromMatrix": "Från budskapsmatrisen",
+          "angleOwn": "Din egen vinkel",
+          "useLive": "Använd personans vinkel",
+          "duration": "Längd",
+          "seconds": "{n} sekunder",
+          "estimate": "Beräknad längd: cirka {n} s",
+          "noEstimate": "Lägg till ljudtext för att se en uppskattning"
+        },
+        "hooks": {
+          "hook": "Hook {letter}",
+          "menu": "Alternativ för hook {letter}",
+          "collapse": "Fäll ihop hook",
+          "expand": "Fäll ut hook",
+          "duplicate": "Duplicera",
+          "delete": "Ta bort",
+          "audio": "Ljudhook",
+          "visual": "Visuell hook",
+          "overlay": "Overlay",
+          "optional": "valfritt",
+          "audioPlaceholder": "Vad creatorn säger de första sekunderna",
+          "visualPlaceholder": "Vad tittaren ser",
+          "overlayPlaceholder": "Text som visas på skärmen",
+          "addOverlay": "Lägg till overlay (valfritt)",
+          "noShot": "Bildutsnitt",
+          "empty": "Ingen text ännu",
+          "add": "Lägg till hook ({n}/{max})",
+          "limit": "Gränsen för hooks är nådd",
+          "deleteTitle": "Ta bort hook {letter}?",
+          "deleteBody": "Den här hooken och dess text tas bort.",
+          "deleteConfirm": "Ta bort hook"
+        },
+        "shot": {
+          "wide": "Helbild",
+          "medium": "Halvbild",
+          "close_up": "Närbild",
+          "detail": "Detalj",
+          "pov": "POV",
+          "over_the_shoulder": "Över axeln",
+          "top_down": "Uppifrån",
+          "screen_recording": "Skärminspelning",
+          "reaction": "Reaktion",
+          "creator_to_camera": "Creator mot kameran"
+        },
+        "conflict": {
+          "title": "Någon annan har ändrat detta",
+          "hint": "Din text finns kvar. Välj vad som ska behållas.",
+          "theirs": "Deras version",
+          "empty": "(tom)",
+          "copy": "Kopiera min text",
+          "copied": "Kopierat",
+          "copyFailed": "Det gick inte att kopiera. Markera din text i fälten ovan och kopiera den för hand.",
+          "useTheirs": "Använd deras version",
+          "keepMine": "Behåll min"
+        },
+        "leave": {
+          "title": "Lämna utan att spara?",
+          "body": "Vissa ändringar kunde inte sparas. Om du lämnar nu går de förlorade.",
+          "stay": "Stanna",
+          "retry": "Försök spara igen",
+          "leave": "Lämna och förlora ändringarna"
+        },
+        "archived": {
+          "title": "Arkiverade manus · {market}",
+          "info": "Ett manus arkiveras när dess creator lämnar den här marknaden. Det kommer tillbaka av sig självt om creatorn läggs till på marknaden igen.",
+          "empty": "Inga arkiverade manus på den här marknaden.",
+          "row": "{name} · Manus {n}",
+          "hooks": "Hooks: {count}",
+          "on": "Arkiverat {date}",
+          "inMarket": "Den här creatorn är på den här marknaden igen.",
+          "delete": "Ta bort för gott",
+          "deleteTitle": "Ta bort det här manuset för gott?",
+          "deleteBody": "Manus {n} för {name} och dess hooks (hooks: {count}) tas bort. Det går inte att ångra.",
+          "deleteConfirm": "Ta bort för gott"
+        },
+        "replace": {
+          "label": "Den här platsen har manus ({count}). Vad ska hända med dem?",
+          "carry": "Flytta manusen till den nya creatorn",
+          "archive": "Arkivera dem och börja om"
+        },
+        "remove": {
+          "label": "Den här creatorn har manus ({count}). Vad ska hända med dem?",
+          "archive": "Arkivera dem (sparas, och kommer tillbaka om creatorn återvänder)",
+          "delete": "Ta bort dem för gott"
+        },
+        "empty": {
+          "noCreators": {
+            "title": "Inga creators i {market} ännu",
+            "body": "Manus skrivs per creator. Lägg först till creators på den här marknaden.",
+            "action": "Öppna steg 5"
+          },
+          "noScripts": {
+            "title": "Inga manus ännu",
+            "body": "Välj ”Lägg till manus” under en creator i listan för att börja."
+          }
+        },
+        "errors": {
+          "limitReached": "En creator har högst {max} manus.",
+          "limitReachedArchived": "En creator har högst {max} manus, arkiverade inräknade.",
+          "hooksLimit": "Ett manus har högst {max} hooks.",
+          "lastHook": "Ett manus behåller minst en hook.",
+          "languageNotAvailable": "Än så länge kan bara engelska skrivas.",
+          "carryOverExceeds": "Den nya creatorn skulle få fler än {max} manus. Arkivera dem i stället.",
+          "choiceRequired": "Den här creatorn har manus. Välj vad som ska hända med dem."
+        }
       }
     }
   },

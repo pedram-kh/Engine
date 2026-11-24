@@ -370,6 +370,13 @@ export const appRoutes: RouteRecordRaw[] = [
     component: () => import('@/modules/strategy/pages/StrategyPage.vue'),
     meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
   },
+  // PL-3.2a — step 6, the scripts. Same page and the same flag rule as step 5.
+  {
+    path: '/brands/:ulid/waves/:waveUlid/strategy/scripts',
+    name: 'strategy.scripts',
+    component: () => import('@/modules/strategy/pages/StrategyPage.vue'),
+    meta: { layout: 'agency', guards: ['requireAuth', 'requireAgencyUser'] },
+  },
 
   // ── Campaigns ──────────────────────────────────────────────────────────────
   // Sprint 8 Chunk 1. Any agency member may view (list/detail); create + the

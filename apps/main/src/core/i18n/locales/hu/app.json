@@ -1516,7 +1516,9 @@
         "newCampaignName": "Kampány neve",
         "newCampaignHint": "Vázlatként jön létre, költségvetés nélkül. Az indulás előtt állítsa be a költségvetést a kampány oldalán.",
         "notesWarning": "A(z) {markets} eltávolítása {count} belső jegyzetet töröl. Ez nem vonható vissza. | A(z) {markets} eltávolítása {count} belső jegyzetet töröl. Ez nem vonható vissza.",
-        "notesConfirm": "Jegyzetek törlése és mentés"
+        "notesConfirm": "Jegyzetek törlése és mentés",
+        "scriptsWarning": "Ezeken a piacokon archivált forgatókönyvek vannak: {markets}. A piacokkal együtt törlődnek (forgatókönyvek: {count}).",
+        "scriptsConfirm": "Forgatókönyvek törlése és mentés"
       },
       "validation": {
         "nameRequired": "Adja meg a hullám nevét.",
@@ -2332,6 +2334,158 @@
       },
       "limit": {
         "placesLeft": "{count} hely maradt | {count} hely maradt"
+      },
+      "scripts": {
+        "stepper": {
+          "none": "Még nincs forgatókönyv",
+          "count": "Forgatókönyvek: {count}"
+        },
+        "rail": {
+          "title": "Forgatókönyvek · {market}",
+          "script": "{n}. forgatókönyv",
+          "draft": "Vázlat",
+          "add": "Forgatókönyv hozzáadása ({n}/{max})",
+          "limit": "Elérted a forgatókönyvek korlátját",
+          "limitHint": "Ennek az alkotónak már {max} forgatókönyve van, az archiváltakat is beleértve.",
+          "footnote": "Alkotónként legfeljebb {max} forgatókönyv",
+          "archived": "Archivált forgatókönyvek ({count})"
+        },
+        "editor": {
+          "title": "{name} · {n}. forgatókönyv",
+          "lastEdited": "Utoljára szerkesztve: {when}",
+          "delete": "Forgatókönyv törlése",
+          "deleteTitle": "Törlöd {name} {n}. forgatókönyvét?",
+          "deleteBody": "A forgatókönyv és a hozzá tartozó hookok törlődnek (hookok: {count}). Ez nem vonható vissza.",
+          "deleteConfirm": "Forgatókönyv törlése",
+          "loadFailed": "Ezt a forgatókönyvet nem sikerült betölteni."
+        },
+        "save": {
+          "saving": "Mentés…",
+          "saved": "Mentve",
+          "failed": "Nem sikerült menteni",
+          "refused": "Nem fogadta el",
+          "retry": "Újra",
+          "gone": "Valaki más eltávolította",
+          "allSaved": "Minden módosítás mentve",
+          "stuck": "Nem mentett módosítások: {n}"
+        },
+        "brief": {
+          "title": "Brief",
+          "editInStep3": "Szerkesztés a 3. lépésben",
+          "persona": "Persona",
+          "usps": "USP-k",
+          "priority": "Elsődleges",
+          "support": "Támogató",
+          "noUsps": "Ehhez a personához nincs USP beállítva",
+          "noPersona": "Ennek az alkotónak nincs personája, így nincs mit átvenni a briefből. Válassz personát az 5. lépésben.",
+          "openStep5": "5. lépés megnyitása",
+          "angle": "Szög",
+          "anglePlaceholder": "Írd meg a forgatókönyv szögét",
+          "angleFromPersona": "A persona szögéből",
+          "angleFromMatrix": "Az üzenetmátrixból",
+          "angleOwn": "Saját szög",
+          "useLive": "A persona szögének használata",
+          "duration": "Időtartam",
+          "seconds": "{n} másodperc",
+          "estimate": "Becsült hossz: kb. {n} mp",
+          "noEstimate": "Adj hozzá hangszöveget a becsléshez"
+        },
+        "hooks": {
+          "hook": "{letter} hook",
+          "menu": "A(z) {letter} hook beállításai",
+          "collapse": "Hook összecsukása",
+          "expand": "Hook kinyitása",
+          "duplicate": "Másolat",
+          "delete": "Törlés",
+          "audio": "Hang hook",
+          "visual": "Vizuális hook",
+          "overlay": "Átfedés",
+          "optional": "nem kötelező",
+          "audioPlaceholder": "Amit az alkotó az első másodpercekben mond",
+          "visualPlaceholder": "Amit a néző lát",
+          "overlayPlaceholder": "A képernyőn megjelenő szöveg",
+          "addOverlay": "Átfedés hozzáadása (nem kötelező)",
+          "noShot": "Képtípus",
+          "empty": "Még nincs szöveg",
+          "add": "Hook hozzáadása ({n}/{max})",
+          "limit": "Elérted a hookok korlátját",
+          "deleteTitle": "Törlöd a(z) {letter} hookot?",
+          "deleteBody": "Ez a hook és a szövege törlődik.",
+          "deleteConfirm": "Hook törlése"
+        },
+        "shot": {
+          "wide": "Totál",
+          "medium": "Félközeli",
+          "close_up": "Közeli",
+          "detail": "Részlet",
+          "pov": "Első személyű nézet",
+          "over_the_shoulder": "Vállon át",
+          "top_down": "Felülről",
+          "screen_recording": "Képernyőfelvétel",
+          "reaction": "Reakció",
+          "creator_to_camera": "Alkotó kamerába"
+        },
+        "conflict": {
+          "title": "Valaki más módosította ezt",
+          "hint": "A szöveged még itt van. Válaszd ki, mit tartsunk meg.",
+          "theirs": "Az ő változatuk",
+          "empty": "(üres)",
+          "copy": "Szövegem másolása",
+          "copied": "Másolva",
+          "copyFailed": "Nem sikerült másolni. Jelöld ki a szövegedet a fenti mezőkben, és másold kézzel.",
+          "useTheirs": "Az ő változatuk használata",
+          "keepMine": "Az enyém marad"
+        },
+        "leave": {
+          "title": "Mentés nélkül kilépsz?",
+          "body": "Néhány módosítást nem sikerült menteni. Ha most kilépsz, elvesznek.",
+          "stay": "Maradok",
+          "retry": "Mentés újra",
+          "leave": "Kilépés a módosítások elvesztésével"
+        },
+        "archived": {
+          "title": "Archivált forgatókönyvek · {market}",
+          "info": "A forgatókönyv archiválódik, amikor az alkotója elhagyja ezt a piacot. Magától visszatér, ha az alkotót újra hozzáadják a piachoz.",
+          "empty": "Ezen a piacon nincs archivált forgatókönyv.",
+          "row": "{name} · {n}. forgatókönyv",
+          "hooks": "Hookok: {count}",
+          "on": "Archiválva: {date}",
+          "inMarket": "Ez az alkotó újra ezen a piacon van.",
+          "delete": "Végleges törlés",
+          "deleteTitle": "Véglegesen törlöd ezt a forgatókönyvet?",
+          "deleteBody": "{name} {n}. forgatókönyve és a hozzá tartozó hookok (hookok: {count}) törlődnek. Ez nem vonható vissza.",
+          "deleteConfirm": "Végleges törlés"
+        },
+        "replace": {
+          "label": "Ennek a helynek forgatókönyvei vannak ({count}). Mi legyen velük?",
+          "carry": "Forgatókönyvek átvitele az új alkotóra",
+          "archive": "Archiválás és újrakezdés"
+        },
+        "remove": {
+          "label": "Ennek az alkotónak forgatókönyvei vannak ({count}). Mi legyen velük?",
+          "archive": "Archiválás (megmaradnak, és visszatérnek, ha az alkotó visszatér)",
+          "delete": "Végleges törlés"
+        },
+        "empty": {
+          "noCreators": {
+            "title": "A(z) {market} piacon még nincs alkotó",
+            "body": "A forgatókönyveket alkotónként írják. Előbb adj alkotókat ehhez a piachoz.",
+            "action": "5. lépés megnyitása"
+          },
+          "noScripts": {
+            "title": "Még nincs forgatókönyv",
+            "body": "A kezdéshez válaszd a listában egy alkotó alatt a „Forgatókönyv hozzáadása” gombot."
+          }
+        },
+        "errors": {
+          "limitReached": "Egy alkotónak legfeljebb {max} forgatókönyve lehet.",
+          "limitReachedArchived": "Egy alkotónak legfeljebb {max} forgatókönyve lehet, az archiváltakat is beleértve.",
+          "hooksLimit": "Egy forgatókönyvnek legfeljebb {max} hookja lehet.",
+          "lastHook": "Egy forgatókönyvnek legalább egy hookja marad.",
+          "languageNotAvailable": "Egyelőre csak angolul lehet írni.",
+          "carryOverExceeds": "Az új alkotónak több mint {max} forgatókönyve lenne. Inkább archiváld őket.",
+          "choiceRequired": "Ennek az alkotónak forgatókönyvei vannak. Válaszd ki, mi legyen velük."
+        }
       }
     }
   },

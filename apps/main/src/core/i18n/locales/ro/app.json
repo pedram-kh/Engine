@@ -1516,7 +1516,9 @@
         "newCampaignName": "Numele campaniei",
         "newCampaignHint": "Se creează ca ciornă, fără buget. Setați bugetul pe pagina campaniei înainte de lansare.",
         "notesWarning": "Eliminarea {markets} șterge {count} notiță internă. Acțiunea nu poate fi anulată. | Eliminarea {markets} șterge {count} notițe interne. Acțiunea nu poate fi anulată.",
-        "notesConfirm": "Șterge notițele și salvează"
+        "notesConfirm": "Șterge notițele și salvează",
+        "scriptsWarning": "Aceste piețe au scripturi arhivate: {markets}. Vor fi șterse odată cu piețele (scripturi: {count}).",
+        "scriptsConfirm": "Șterge scripturile și salvează"
       },
       "validation": {
         "nameRequired": "Introduceți un nume pentru val.",
@@ -2332,6 +2334,158 @@
       },
       "limit": {
         "placesLeft": "Locuri rămase: {count} | Locuri rămase: {count}"
+      },
+      "scripts": {
+        "stepper": {
+          "none": "Încă nu există scripturi",
+          "count": "Scripturi: {count}"
+        },
+        "rail": {
+          "title": "Scripturi · {market}",
+          "script": "Scriptul {n}",
+          "draft": "Ciornă",
+          "add": "Adaugă script ({n}/{max})",
+          "limit": "Limita de scripturi a fost atinsă",
+          "limitHint": "Acest creator are deja {max} scripturi, inclusiv cele arhivate.",
+          "footnote": "Până la {max} scripturi per creator",
+          "archived": "Scripturi arhivate ({count})"
+        },
+        "editor": {
+          "title": "{name} · Scriptul {n}",
+          "lastEdited": "Ultima modificare: {when}",
+          "delete": "Șterge scriptul",
+          "deleteTitle": "Ștergi scriptul {n} al lui {name}?",
+          "deleteBody": "Scriptul și hook-urile lui vor fi șterse (hook-uri: {count}). Acțiunea nu poate fi anulată.",
+          "deleteConfirm": "Șterge scriptul",
+          "loadFailed": "Acest script nu a putut fi încărcat."
+        },
+        "save": {
+          "saving": "Se salvează…",
+          "saved": "Salvat",
+          "failed": "Nu s-a putut salva",
+          "refused": "Neacceptat",
+          "retry": "Reîncearcă",
+          "gone": "Eliminat de altcineva",
+          "allSaved": "Toate modificările sunt salvate",
+          "stuck": "Modificări nesalvate: {n}"
+        },
+        "brief": {
+          "title": "Brief",
+          "editInStep3": "Editează la pasul 3",
+          "persona": "Persona",
+          "usps": "USP-uri",
+          "priority": "Prioritate",
+          "support": "Suport",
+          "noUsps": "Nu există USP-uri setate pentru această persona",
+          "noPersona": "Acest creator nu are persona, deci nu există un brief de preluat. Alege o persona la pasul 5.",
+          "openStep5": "Deschide pasul 5",
+          "angle": "Unghi",
+          "anglePlaceholder": "Scrie unghiul acestui script",
+          "angleFromPersona": "Din unghiul personei",
+          "angleFromMatrix": "Din matricea mesajelor",
+          "angleOwn": "Unghiul tău propriu",
+          "useLive": "Folosește unghiul personei",
+          "duration": "Durată",
+          "seconds": "{n} secunde",
+          "estimate": "Durată estimată: aproximativ {n} s",
+          "noEstimate": "Adaugă text audio ca să vezi o estimare"
+        },
+        "hooks": {
+          "hook": "Hook {letter}",
+          "menu": "Opțiuni pentru hook-ul {letter}",
+          "collapse": "Restrânge hook-ul",
+          "expand": "Extinde hook-ul",
+          "duplicate": "Duplică",
+          "delete": "Șterge",
+          "audio": "Hook audio",
+          "visual": "Hook vizual",
+          "overlay": "Suprapunere",
+          "optional": "opțional",
+          "audioPlaceholder": "Ce spune creatorul în primele secunde",
+          "visualPlaceholder": "Ce vede spectatorul",
+          "overlayPlaceholder": "Text afișat pe ecran",
+          "addOverlay": "Adaugă suprapunere (opțional)",
+          "noShot": "Tip de cadru",
+          "empty": "Încă nu există text",
+          "add": "Adaugă hook ({n}/{max})",
+          "limit": "Limita de hook-uri a fost atinsă",
+          "deleteTitle": "Ștergi hook-ul {letter}?",
+          "deleteBody": "Acest hook și textul lui vor fi șterse.",
+          "deleteConfirm": "Șterge hook-ul"
+        },
+        "shot": {
+          "wide": "Plan general",
+          "medium": "Plan mediu",
+          "close_up": "Prim-plan",
+          "detail": "Detaliu",
+          "pov": "Vedere subiectivă",
+          "over_the_shoulder": "Peste umăr",
+          "top_down": "De sus",
+          "screen_recording": "Înregistrare de ecran",
+          "reaction": "Reacție",
+          "creator_to_camera": "Creator spre cameră"
+        },
+        "conflict": {
+          "title": "Altcineva a modificat acest conținut",
+          "hint": "Textul tău este încă aici. Alege ce păstrezi.",
+          "theirs": "Versiunea lor",
+          "empty": "(gol)",
+          "copy": "Copiază textul meu",
+          "copied": "Copiat",
+          "copyFailed": "Nu s-a putut copia. Selectează textul tău din câmpurile de mai sus și copiază-l manual.",
+          "useTheirs": "Folosește versiunea lor",
+          "keepMine": "Păstrează versiunea mea"
+        },
+        "leave": {
+          "title": "Pleci fără să salvezi?",
+          "body": "Unele modificări nu au putut fi salvate. Dacă pleci acum, se pierd.",
+          "stay": "Rămân",
+          "retry": "Încearcă să salvezi din nou",
+          "leave": "Plec și pierd modificările"
+        },
+        "archived": {
+          "title": "Scripturi arhivate · {market}",
+          "info": "Un script este arhivat când creatorul lui părăsește această piață. Revine singur dacă creatorul este adăugat din nou pe piață.",
+          "empty": "Nu există scripturi arhivate pe această piață.",
+          "row": "{name} · Scriptul {n}",
+          "hooks": "Hook-uri: {count}",
+          "on": "Arhivat la {date}",
+          "inMarket": "Acest creator este din nou pe această piață.",
+          "delete": "Șterge definitiv",
+          "deleteTitle": "Ștergi definitiv acest script?",
+          "deleteBody": "Scriptul {n} al lui {name} și hook-urile lui (hook-uri: {count}) vor fi șterse. Acțiunea nu poate fi anulată.",
+          "deleteConfirm": "Șterge definitiv"
+        },
+        "replace": {
+          "label": "Acest loc are scripturi ({count}). Ce se întâmplă cu ele?",
+          "carry": "Transferă scripturile la noul creator",
+          "archive": "Arhivează-le și începe de la zero"
+        },
+        "remove": {
+          "label": "Acest creator are scripturi ({count}). Ce se întâmplă cu ele?",
+          "archive": "Arhivează-le (sunt păstrate și revin dacă creatorul se întoarce)",
+          "delete": "Șterge-le definitiv"
+        },
+        "empty": {
+          "noCreators": {
+            "title": "Încă nu există creatori în {market}",
+            "body": "Scripturile se scriu pentru fiecare creator. Adaugă mai întâi creatori pe această piață.",
+            "action": "Deschide pasul 5"
+          },
+          "noScripts": {
+            "title": "Încă nu există scripturi",
+            "body": "Pentru a începe, alege „Adaugă script” sub un creator din listă."
+          }
+        },
+        "errors": {
+          "limitReached": "Un creator are cel mult {max} scripturi.",
+          "limitReachedArchived": "Un creator are cel mult {max} scripturi, inclusiv cele arhivate.",
+          "hooksLimit": "Un script are cel mult {max} hook-uri.",
+          "lastHook": "Un script păstrează cel puțin un hook.",
+          "languageNotAvailable": "Deocamdată se poate scrie doar în engleză.",
+          "carryOverExceeds": "Noul creator ar avea mai mult de {max} scripturi. Arhivează-le în schimb.",
+          "choiceRequired": "Acest creator are scripturi. Alege ce se întâmplă cu ele."
+        }
       }
     }
   },

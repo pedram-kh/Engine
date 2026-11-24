@@ -22,7 +22,7 @@ use App\Modules\Strategy\Models\WaveScript;
 final class ScriptBriefReader
 {
     /**
-     * @return array{persona: array{id: string, code: string, title: string, slot: int}|null, usps: list<array{id: string, title: string, color_key: string, level: string}>, angle: array{value: string|null, source: string, custom: bool}, duration_seconds: int, revision: int}
+     * @return array{persona: array{id: string, code: string, title: string, slot: int, color_key: string}|null, usps: list<array{id: string, title: string, color_key: string, level: string}>, angle: array{value: string|null, source: string, custom: bool}, duration_seconds: int, revision: int}
      */
     public static function read(WaveScript $script, ?int $personaId): array
     {
@@ -63,7 +63,7 @@ final class ScriptBriefReader
         $custom = $script->angle !== null;
 
         return [
-            'persona' => $persona === null ? null : ['id' => $persona->ulid, 'code' => $persona->code, 'title' => $persona->title, 'slot' => $persona->slot],
+            'persona' => $persona === null ? null : ['id' => $persona->ulid, 'code' => $persona->code, 'title' => $persona->title, 'slot' => $persona->slot, 'color_key' => $persona->colorKey()->value],
             'usps' => $usps,
             'angle' => ['value' => $custom ? $script->angle : $liveAngle, 'source' => $custom ? 'script' : $liveSource, 'custom' => $custom],
             'duration_seconds' => $script->duration_seconds,

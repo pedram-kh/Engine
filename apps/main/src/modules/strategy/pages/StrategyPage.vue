@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * PL-2.1 — the Strategy & Scripts workspace of a wave: header, six-step stepper, and the working step (1 USPs,
- * 2 Personas, 3 Messaging matrix (PL-2.2) or 4 Concepts (PL-2.3); all four routes render this page). Behind two flags: `features.strategy` is true only while waves AND
+ * 2 Personas, 3 Messaging matrix (PL-2.2), 4 Concepts (PL-2.3), 5 Creators (PL-3.1) or 6 Scripts (PL-3.2a); all routes render this page). Behind two flags: `features.strategy` is true only while waves AND
  * strategy are on. With waves off the page goes to the brand; with waves on and strategy off it goes to the wave
  * page, which is then exactly as PL-1 left it. Nothing is requested before that check.
  *
@@ -9,6 +9,7 @@
  * card and field styles.
  */
 import type {
+  ScriptsOverview,
   StrategyCompletionResponse,
   StrategySummaryResource,
   WaveCreatorsData,
@@ -28,6 +29,7 @@ import MatrixStep from '../components/MatrixStep.vue'
 import NotesPanel from '../components/NotesPanel.vue'
 import NotesSheet from '../components/NotesSheet.vue'
 import PersonasStep from '../components/PersonasStep.vue'
+import ScriptsStep from '../components/ScriptsStep.vue'
 import StepCompletionBar from '../components/StepCompletionBar.vue'
 import StrategyStepper from '../components/StrategyStepper.vue'
 import UspsStep from '../components/UspsStep.vue'
@@ -52,6 +54,9 @@ const failed = ref(false)
 const creatorsOn = computed(() => features.value?.creators_scripts === true)
 const onCreators = computed(() => route.name === 'strategy.creators')
 const creatorsState = ref<WaveCreatorsData['state'] | null>(null)
+/** PL-3.2a: step 6 shares the flag and the page; its stepper state and counts come from the scripts overview. */
+const onScripts = computed(() => route.name === 'strategy.scripts')
+const scriptsOverview = ref<ScriptsOverview | null>(null)
 
 const step = computed<StepName>(() =>
   route.name === 'strategy.personas'
@@ -85,6 +90,7 @@ const noteCount = computed(() => {
 const panelOn = computed(
   () =>
     !onCreators.value &&
+    !onScripts.value &&
     step.value !== 'matrix' &&
     (step.value === 'usps' || market.value !== null),
 )
@@ -151,11 +157,16 @@ async function load(): Promise<void> {
 async function refreshCreatorsState(): Promise<void> {
   const s = scope.value
   if (s === null || !creatorsOn.value) return
-  try {
-    creatorsState.value = (await strategyApi.creators(s)).data.state
-  } catch {
-    creatorsState.value = null
-  }
+  await Promise.all([
+    strategyApi.creators(s).then(
+      (r) => (creatorsState.value = r.data.state),
+      () => (creatorsState.value = null),
+    ),
+    strategyApi.scripts(s, null).then(
+      (r) => (scriptsOverview.value = r.data),
+      () => (scriptsOverview.value = null),
+    ),
+  ])
 }
 
 async function refreshSummary(): Promise<void> {
@@ -196,7 +207,7 @@ onMounted(async () => {
     await router.replace({ name: 'waves.detail', params: { ulid: brandId, waveUlid: waveId } })
     return
   }
-  if (onCreators.value && features.value.creators_scripts !== true) {
+  if ((onCreators.value || onScripts.value) && features.value.creators_scripts !== true) {
     await router.replace({ name: 'waves.detail', params: { ulid: brandId, waveUlid: waveId } })
     return
   }
@@ -241,9 +252,16 @@ onMounted(async () => {
         :summary="summary"
         :brand-id="brandId"
         :wave-id="waveId"
-        :active="onCreators ? 'creators' : step"
+        :active="onScripts ? 'scripts' : onCreators ? 'creators' : step"
         :creators-on="creatorsOn"
         :creators="creatorsState"
+        :scripts="scriptsOverview"
+      />
+      <ScriptsStep
+        v-for="n in onScripts ? [1] : []"
+        :key="`scripts-${n}`"
+        :summary="summary"
+        @changed="refreshSummary"
       />
       <CreatorsStep
         v-for="n in onCreators ? [1] : []"
@@ -254,7 +272,7 @@ onMounted(async () => {
         @wave="(w) => (wave = w)"
       />
       <StepCompletionBar
-        v-if="!onCreators"
+        v-if="!onCreators && !onScripts"
         :summary="summary"
         :step="step"
         :market="market"
@@ -273,7 +291,11 @@ onMounted(async () => {
           >
         </template>
       </StepCompletionBar>
-      <div v-if="!onCreators" class="strategy-grid" :class="{ 'strategy-grid--notes': panelOn }">
+      <div
+        v-if="!onCreators && !onScripts"
+        class="strategy-grid"
+        :class="{ 'strategy-grid--notes': panelOn }"
+      >
         <div class="strategy-grid__main">
           <UspsStep
             v-if="step === 'usps'"

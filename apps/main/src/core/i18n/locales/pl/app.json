@@ -1516,7 +1516,9 @@
         "newCampaignName": "Nazwa kampanii",
         "newCampaignHint": "Powstaje jako szkic bez budżetu. Ustaw budżet na stronie kampanii, zanim wystartuje.",
         "notesWarning": "Usunięcie {markets} skasuje {count} notatkę wewnętrzną. Nie można tego cofnąć. | Usunięcie {markets} skasuje {count} notatek wewnętrznych. Nie można tego cofnąć.",
-        "notesConfirm": "Usuń notatki i zapisz"
+        "notesConfirm": "Usuń notatki i zapisz",
+        "scriptsWarning": "Te rynki mają zarchiwizowane skrypty: {markets}. Zostaną usunięte razem z rynkami (skryptów: {count}).",
+        "scriptsConfirm": "Usuń skrypty i zapisz"
       },
       "validation": {
         "nameRequired": "Wpisz nazwę fali.",
@@ -2332,6 +2334,158 @@
       },
       "limit": {
         "placesLeft": "Wolnych miejsc: {count} | Wolnych miejsc: {count}"
+      },
+      "scripts": {
+        "stepper": {
+          "none": "Nie ma jeszcze skryptów",
+          "count": "Skrypty: {count}"
+        },
+        "rail": {
+          "title": "Skrypty · {market}",
+          "script": "Skrypt {n}",
+          "draft": "Wersja robocza",
+          "add": "Dodaj skrypt ({n}/{max})",
+          "limit": "Osiągnięto limit skryptów",
+          "limitHint": "Ten twórca ma już {max} skrypty, wliczając zarchiwizowane.",
+          "footnote": "Do {max} skryptów na twórcę",
+          "archived": "Zarchiwizowane skrypty ({count})"
+        },
+        "editor": {
+          "title": "{name} · Skrypt {n}",
+          "lastEdited": "Ostatnia edycja: {when}",
+          "delete": "Usuń skrypt",
+          "deleteTitle": "Usunąć skrypt {n} twórcy {name}?",
+          "deleteBody": "Skrypt i jego hooki zostaną usunięte (hooków: {count}). Tej operacji nie można cofnąć.",
+          "deleteConfirm": "Usuń skrypt",
+          "loadFailed": "Nie udało się wczytać tego skryptu."
+        },
+        "save": {
+          "saving": "Zapisywanie…",
+          "saved": "Zapisano",
+          "failed": "Nie udało się zapisać",
+          "refused": "Nie przyjęto",
+          "retry": "Spróbuj ponownie",
+          "gone": "Usunięte przez kogoś innego",
+          "allSaved": "Wszystkie zmiany zapisane",
+          "stuck": "Niezapisane zmiany: {n}"
+        },
+        "brief": {
+          "title": "Brief",
+          "editInStep3": "Edytuj w kroku 3",
+          "persona": "Persona",
+          "usps": "USP",
+          "priority": "Priorytet",
+          "support": "Wsparcie",
+          "noUsps": "Dla tej persony nie ustawiono USP",
+          "noPersona": "Ten twórca nie ma persony, więc nie ma briefu do pobrania. Wybierz personę w kroku 5.",
+          "openStep5": "Otwórz krok 5",
+          "angle": "Kąt",
+          "anglePlaceholder": "Napisz kąt tego skryptu",
+          "angleFromPersona": "Z kąta persony",
+          "angleFromMatrix": "Z macierzy komunikatów",
+          "angleOwn": "Twój własny kąt",
+          "useLive": "Użyj kąta persony",
+          "duration": "Czas trwania",
+          "seconds": "{n} sekund",
+          "estimate": "Szacowana długość: około {n} s",
+          "noEstimate": "Dodaj tekst audio, aby zobaczyć szacunek"
+        },
+        "hooks": {
+          "hook": "Hook {letter}",
+          "menu": "Opcje hooka {letter}",
+          "collapse": "Zwiń hook",
+          "expand": "Rozwiń hook",
+          "duplicate": "Duplikuj",
+          "delete": "Usuń",
+          "audio": "Hook audio",
+          "visual": "Hook wizualny",
+          "overlay": "Nakładka",
+          "optional": "opcjonalnie",
+          "audioPlaceholder": "Co twórca mówi w pierwszych sekundach",
+          "visualPlaceholder": "Co widzi widz",
+          "overlayPlaceholder": "Tekst wyświetlany na ekranie",
+          "addOverlay": "Dodaj nakładkę (opcjonalnie)",
+          "noShot": "Rodzaj ujęcia",
+          "empty": "Brak tekstu",
+          "add": "Dodaj hook ({n}/{max})",
+          "limit": "Osiągnięto limit hooków",
+          "deleteTitle": "Usunąć hook {letter}?",
+          "deleteBody": "Ten hook i jego tekst zostaną usunięte.",
+          "deleteConfirm": "Usuń hook"
+        },
+        "shot": {
+          "wide": "Ujęcie ogólne",
+          "medium": "Ujęcie średnie",
+          "close_up": "Zbliżenie",
+          "detail": "Detal",
+          "pov": "Widok z perspektywy twórcy",
+          "over_the_shoulder": "Zza ramienia",
+          "top_down": "Z góry",
+          "screen_recording": "Nagranie ekranu",
+          "reaction": "Reakcja",
+          "creator_to_camera": "Twórca do kamery"
+        },
+        "conflict": {
+          "title": "Ktoś inny zmienił to w międzyczasie",
+          "hint": "Twój tekst nadal tu jest. Wybierz, co zachować.",
+          "theirs": "Ich wersja",
+          "empty": "(puste)",
+          "copy": "Kopiuj mój tekst",
+          "copied": "Skopiowano",
+          "copyFailed": "Nie udało się skopiować. Zaznacz swój tekst w polach powyżej i skopiuj go ręcznie.",
+          "useTheirs": "Użyj ich wersji",
+          "keepMine": "Zachowaj moją"
+        },
+        "leave": {
+          "title": "Wyjść bez zapisywania?",
+          "body": "Nie udało się zapisać niektórych zmian. Jeśli wyjdziesz teraz, zostaną utracone.",
+          "stay": "Zostań",
+          "retry": "Spróbuj zapisać ponownie",
+          "leave": "Wyjdź i utrać zmiany"
+        },
+        "archived": {
+          "title": "Zarchiwizowane skrypty · {market}",
+          "info": "Skrypt jest archiwizowany, gdy jego twórca opuszcza ten rynek. Wraca sam, jeśli twórca zostanie ponownie dodany do rynku.",
+          "empty": "Brak zarchiwizowanych skryptów na tym rynku.",
+          "row": "{name} · Skrypt {n}",
+          "hooks": "Hooków: {count}",
+          "on": "Zarchiwizowano {date}",
+          "inMarket": "Ten twórca jest znowu na tym rynku.",
+          "delete": "Usuń na stałe",
+          "deleteTitle": "Usunąć ten skrypt na stałe?",
+          "deleteBody": "Skrypt {n} twórcy {name} i jego hooki (hooków: {count}) zostaną usunięte. Tej operacji nie można cofnąć.",
+          "deleteConfirm": "Usuń na stałe"
+        },
+        "replace": {
+          "label": "To miejsce ma skrypty ({count}). Co z nimi zrobić?",
+          "carry": "Przenieś skrypty do nowego twórcy",
+          "archive": "Zarchiwizuj je i zacznij od nowa"
+        },
+        "remove": {
+          "label": "Ten twórca ma skrypty ({count}). Co z nimi zrobić?",
+          "archive": "Zarchiwizuj (zostaną zachowane i wrócą, jeśli twórca wróci)",
+          "delete": "Usuń je na stałe"
+        },
+        "empty": {
+          "noCreators": {
+            "title": "Brak twórców na rynku {market}",
+            "body": "Skrypty pisze się dla każdego twórcy. Najpierw dodaj twórców do tego rynku.",
+            "action": "Otwórz krok 5"
+          },
+          "noScripts": {
+            "title": "Nie ma jeszcze skryptów",
+            "body": "Aby zacząć, wybierz na liście „Dodaj skrypt” pod twórcą."
+          }
+        },
+        "errors": {
+          "limitReached": "Twórca może mieć co najwyżej {max} skrypty.",
+          "limitReachedArchived": "Twórca może mieć co najwyżej {max} skrypty, wliczając zarchiwizowane.",
+          "hooksLimit": "Skrypt może mieć co najwyżej {max} hooków.",
+          "lastHook": "Skrypt zachowuje co najmniej jeden hook.",
+          "languageNotAvailable": "Na razie można pisać tylko po angielsku.",
+          "carryOverExceeds": "Nowy twórca miałby więcej niż {max} skrypty. Zarchiwizuj je zamiast tego.",
+          "choiceRequired": "Ten twórca ma skrypty. Wybierz, co z nimi zrobić."
+        }
       }
     }
   },

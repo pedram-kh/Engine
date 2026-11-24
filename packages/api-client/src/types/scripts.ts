@@ -22,6 +22,9 @@ export type ShotType = (typeof SHOT_TYPES)[number]
 export const SCRIPT_DURATIONS = [15, 20, 30, 45, 60] as const
 export type ScriptDuration = (typeof SCRIPT_DURATIONS)[number]
 
+/** The longest angle, audio hook, overlay and visual description (characters). `StrategyLimits.php` is the source. */
+export const SCRIPT_TEXT_LIMITS = { angle: 300, audio: 300, overlay: 100, visual: 400 } as const
+
 export type ScriptStepState = 'not_started' | 'in_progress' | 'done'
 
 export interface ScriptCreatorRef {
@@ -38,6 +41,8 @@ export interface ScriptPersonaRef {
   code: string
   title: string
   slot: number
+  /** The persona's palette key: the colour of the slot chip. */
+  color_key: string
 }
 
 export interface ScriptRailScript {

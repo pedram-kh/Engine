@@ -1516,7 +1516,9 @@
         "newCampaignName": "Kampanjan nimi",
         "newCampaignHint": "Luodaan luonnoksena ilman budjettia. Aseta budjetti kampanjan sivulla ennen julkaisua.",
         "notesWarning": "Kohteen {markets} poistaminen poistaa {count} sisäisen muistiinpanon. Tätä ei voi perua. | Kohteen {markets} poistaminen poistaa {count} sisäistä muistiinpanoa. Tätä ei voi perua.",
-        "notesConfirm": "Poista muistiinpanot ja tallenna"
+        "notesConfirm": "Poista muistiinpanot ja tallenna",
+        "scriptsWarning": "Näillä markkinoilla on arkistoituja käsikirjoituksia: {markets}. Ne poistetaan markkinoiden mukana (käsikirjoituksia: {count}).",
+        "scriptsConfirm": "Poista käsikirjoitukset ja tallenna"
       },
       "validation": {
         "nameRequired": "Anna aallolle nimi.",
@@ -2332,6 +2334,158 @@
       },
       "limit": {
         "placesLeft": "{count} paikka jäljellä | {count} paikkaa jäljellä"
+      },
+      "scripts": {
+        "stepper": {
+          "none": "Ei vielä käsikirjoituksia",
+          "count": "Käsikirjoitukset: {count}"
+        },
+        "rail": {
+          "title": "Käsikirjoitukset · {market}",
+          "script": "Käsikirjoitus {n}",
+          "draft": "Luonnos",
+          "add": "Lisää käsikirjoitus ({n}/{max})",
+          "limit": "Käsikirjoitusten raja saavutettu",
+          "limitHint": "Tällä tekijällä on jo {max} käsikirjoitusta, arkistoidut mukaan lukien.",
+          "footnote": "Enintään {max} käsikirjoitusta tekijää kohden",
+          "archived": "Arkistoidut käsikirjoitukset ({count})"
+        },
+        "editor": {
+          "title": "{name} · Käsikirjoitus {n}",
+          "lastEdited": "Viimeksi muokattu: {when}",
+          "delete": "Poista käsikirjoitus",
+          "deleteTitle": "Poistetaanko tekijän {name} käsikirjoitus {n}?",
+          "deleteBody": "Käsikirjoitus ja sen koukut poistetaan (koukkuja: {count}). Tätä ei voi perua.",
+          "deleteConfirm": "Poista käsikirjoitus",
+          "loadFailed": "Käsikirjoitusta ei voitu ladata."
+        },
+        "save": {
+          "saving": "Tallennetaan…",
+          "saved": "Tallennettu",
+          "failed": "Tallennus epäonnistui",
+          "refused": "Ei hyväksytty",
+          "retry": "Yritä uudelleen",
+          "gone": "Joku muu poisti tämän",
+          "allSaved": "Kaikki muutokset tallennettu",
+          "stuck": "Tallentamattomia muutoksia: {n}"
+        },
+        "brief": {
+          "title": "Brief",
+          "editInStep3": "Muokkaa vaiheessa 3",
+          "persona": "Persoona",
+          "usps": "USP:t",
+          "priority": "Ensisijainen",
+          "support": "Tukeva",
+          "noUsps": "Tälle persoonalle ei ole asetettu USP:itä",
+          "noPersona": "Tällä tekijällä ei ole persoonaa, joten briefiä ei voi hakea. Valitse persoona vaiheessa 5.",
+          "openStep5": "Avaa vaihe 5",
+          "angle": "Näkökulma",
+          "anglePlaceholder": "Kirjoita tämän käsikirjoituksen näkökulma",
+          "angleFromPersona": "Persoonan näkökulmasta",
+          "angleFromMatrix": "Viestimatriisista",
+          "angleOwn": "Oma näkökulmasi",
+          "useLive": "Käytä persoonan näkökulmaa",
+          "duration": "Kesto",
+          "seconds": "{n} sekuntia",
+          "estimate": "Arvioitu pituus: noin {n} s",
+          "noEstimate": "Lisää äänitekstiä nähdäksesi arvion"
+        },
+        "hooks": {
+          "hook": "Koukku {letter}",
+          "menu": "Koukun {letter} asetukset",
+          "collapse": "Tiivistä koukku",
+          "expand": "Laajenna koukku",
+          "duplicate": "Monista",
+          "delete": "Poista",
+          "audio": "Äänikoukku",
+          "visual": "Visuaalinen koukku",
+          "overlay": "Peiteteksti",
+          "optional": "valinnainen",
+          "audioPlaceholder": "Mitä tekijä sanoo ensimmäisten sekuntien aikana",
+          "visualPlaceholder": "Mitä katsoja näkee",
+          "overlayPlaceholder": "Ruudulla näkyvä teksti",
+          "addOverlay": "Lisää peiteteksti (valinnainen)",
+          "noShot": "Kuvakoko",
+          "empty": "Ei vielä tekstiä",
+          "add": "Lisää koukku ({n}/{max})",
+          "limit": "Koukkujen raja saavutettu",
+          "deleteTitle": "Poistetaanko koukku {letter}?",
+          "deleteBody": "Tämä koukku ja sen teksti poistetaan.",
+          "deleteConfirm": "Poista koukku"
+        },
+        "shot": {
+          "wide": "Laaja kuva",
+          "medium": "Puolikuva",
+          "close_up": "Lähikuva",
+          "detail": "Yksityiskohta",
+          "pov": "Subjektiivinen näkymä",
+          "over_the_shoulder": "Olan yli",
+          "top_down": "Ylhäältä",
+          "screen_recording": "Näytön tallennus",
+          "reaction": "Reaktio",
+          "creator_to_camera": "Tekijä kameralle"
+        },
+        "conflict": {
+          "title": "Joku muu on muuttanut tätä",
+          "hint": "Tekstisi on yhä tallessa. Valitse, mikä säilytetään.",
+          "theirs": "Heidän versionsa",
+          "empty": "(tyhjä)",
+          "copy": "Kopioi tekstini",
+          "copied": "Kopioitu",
+          "copyFailed": "Kopiointi epäonnistui. Valitse tekstisi yllä olevista kentistä ja kopioi se käsin.",
+          "useTheirs": "Käytä heidän versiotaan",
+          "keepMine": "Säilytä omani"
+        },
+        "leave": {
+          "title": "Poistutaanko tallentamatta?",
+          "body": "Joitakin muutoksia ei voitu tallentaa. Jos poistut nyt, ne menetetään.",
+          "stay": "Pysy",
+          "retry": "Yritä tallentaa uudelleen",
+          "leave": "Poistu ja menetä muutokset"
+        },
+        "archived": {
+          "title": "Arkistoidut käsikirjoitukset · {market}",
+          "info": "Käsikirjoitus arkistoidaan, kun sen tekijä poistuu tältä markkinalta. Se palaa itsestään, jos tekijä lisätään markkinalle uudelleen.",
+          "empty": "Tällä markkinalla ei ole arkistoituja käsikirjoituksia.",
+          "row": "{name} · Käsikirjoitus {n}",
+          "hooks": "Koukkuja: {count}",
+          "on": "Arkistoitu {date}",
+          "inMarket": "Tämä tekijä on taas tällä markkinalla.",
+          "delete": "Poista pysyvästi",
+          "deleteTitle": "Poistetaanko tämä käsikirjoitus pysyvästi?",
+          "deleteBody": "Tekijän {name} käsikirjoitus {n} ja sen koukut (koukkuja: {count}) poistetaan. Tätä ei voi perua.",
+          "deleteConfirm": "Poista pysyvästi"
+        },
+        "replace": {
+          "label": "Tässä paikassa on käsikirjoituksia ({count}). Mitä niille tehdään?",
+          "carry": "Siirrä käsikirjoitukset uudelle tekijälle",
+          "archive": "Arkistoi ne ja aloita alusta"
+        },
+        "remove": {
+          "label": "Tällä tekijällä on käsikirjoituksia ({count}). Mitä niille tehdään?",
+          "archive": "Arkistoi ne (säilyvät ja palaavat, jos tekijä palaa)",
+          "delete": "Poista ne pysyvästi"
+        },
+        "empty": {
+          "noCreators": {
+            "title": "Ei vielä tekijöitä markkinalla {market}",
+            "body": "Käsikirjoitukset kirjoitetaan tekijäkohtaisesti. Lisää ensin tekijöitä tälle markkinalle.",
+            "action": "Avaa vaihe 5"
+          },
+          "noScripts": {
+            "title": "Ei vielä käsikirjoituksia",
+            "body": "Aloita valitsemalla luettelossa tekijän alta ”Lisää käsikirjoitus”."
+          }
+        },
+        "errors": {
+          "limitReached": "Tekijällä on enintään {max} käsikirjoitusta.",
+          "limitReachedArchived": "Tekijällä on enintään {max} käsikirjoitusta, arkistoidut mukaan lukien.",
+          "hooksLimit": "Käsikirjoituksessa on enintään {max} koukkua.",
+          "lastHook": "Käsikirjoituksessa säilyy vähintään yksi koukku.",
+          "languageNotAvailable": "Toistaiseksi voi kirjoittaa vain englanniksi.",
+          "carryOverExceeds": "Uudella tekijällä olisi yli {max} käsikirjoitusta. Arkistoi ne sen sijaan.",
+          "choiceRequired": "Tällä tekijällä on käsikirjoituksia. Valitse, mitä niille tehdään."
+        }
       }
     }
   },

@@ -113,6 +113,8 @@ export type UpdateWavePayload = Partial<CreateWavePayload> & {
   markets_version?: string
   /** PL-2.5: the count the person confirmed when removed markets carry notes (422 `wave.market_has_notes` otherwise). */
   confirm_notes_deleted?: number
+  /** PL-3.2a: the count the person confirmed when removed markets carry archived scripts (422 `wave.market_has_scripts` otherwise). */
+  confirm_scripts_deleted?: number
 }
 
 /** One row of `GET brands/{brand}/waves/campaign-options`. Cancelled campaigns are never offered. */

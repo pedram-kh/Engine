@@ -364,6 +364,13 @@ export interface MarketHasNotesMeta {
   note_count: number
 }
 
+/** What a 422 `wave.market_has_scripts` carries (PL-3.2a), read through {@link marketHasScriptsMeta}. */
+export interface MarketHasScriptsMeta {
+  markets: { market: string; name: string; code: string; script_count: number }[]
+  /** The total to send back as `confirm_scripts_deleted`. */
+  script_count: number
+}
+
 /** What a 422 `persona.in_use_by_concepts` carries, read through {@link personaInUseByConceptsMeta}. */
 export interface PersonaInUseByConceptsMeta {
   count: number

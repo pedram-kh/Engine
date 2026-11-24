@@ -1516,7 +1516,9 @@
         "newCampaignName": "Ime kampanje",
         "newCampaignHint": "Ustvari se kot osnutek brez proračuna. Proračun nastavite na strani kampanje, preden gre v živo.",
         "notesWarning": "Z odstranitvijo {markets} se izbriše {count} interna opomba. Tega ni mogoče razveljaviti. | Z odstranitvijo {markets} se izbriše {count} internih opomb. Tega ni mogoče razveljaviti.",
-        "notesConfirm": "Izbriši opombe in shrani"
+        "notesConfirm": "Izbriši opombe in shrani",
+        "scriptsWarning": "Ti trgi imajo arhivirane scenarije: {markets}. Izbrisani bodo skupaj s trgi (scenarijev: {count}).",
+        "scriptsConfirm": "Izbriši scenarije in shrani"
       },
       "validation": {
         "nameRequired": "Vnesite ime vala.",
@@ -2332,6 +2334,158 @@
       },
       "limit": {
         "placesLeft": "Prostih mest: {count} | Prostih mest: {count}"
+      },
+      "scripts": {
+        "stepper": {
+          "none": "Skriptov še ni",
+          "count": "Scenariji: {count}"
+        },
+        "rail": {
+          "title": "Scenariji · {market}",
+          "script": "Scenarij {n}",
+          "draft": "Osnutek",
+          "add": "Dodaj scenarij ({n}/{max})",
+          "limit": "Dosežena omejitev scenarijev",
+          "limitHint": "Ta ustvarjalec že ima {max} scenarije, vključno z arhiviranimi.",
+          "footnote": "Do {max} scenarije na ustvarjalca",
+          "archived": "Arhivirani scenariji ({count})"
+        },
+        "editor": {
+          "title": "{name} · Scenarij {n}",
+          "lastEdited": "Nazadnje urejeno: {when}",
+          "delete": "Izbriši scenarij",
+          "deleteTitle": "Izbrišem scenarij {n} ustvarjalca {name}?",
+          "deleteBody": "Scenarij in njegovi kavlji bodo izbrisani (kavljev: {count}). Tega ni mogoče razveljaviti.",
+          "deleteConfirm": "Izbriši scenarij",
+          "loadFailed": "Tega scenarija ni bilo mogoče naložiti."
+        },
+        "save": {
+          "saving": "Shranjevanje…",
+          "saved": "Shranjeno",
+          "failed": "Shranjevanje ni uspelo",
+          "refused": "Ni sprejeto",
+          "retry": "Poskusi znova",
+          "gone": "Odstranil nekdo drug",
+          "allSaved": "Vse spremembe so shranjene",
+          "stuck": "Neshranjene spremembe: {n}"
+        },
+        "brief": {
+          "title": "Povzetek",
+          "editInStep3": "Uredi v 3. koraku",
+          "persona": "Persona",
+          "usps": "USP",
+          "priority": "Prednost",
+          "support": "Podpora",
+          "noUsps": "Za to persono ni nastavljenih USP",
+          "noPersona": "Ta ustvarjalec nima persone, zato ni povzetka za prevzem. Izberite persono v 5. koraku.",
+          "openStep5": "Odpri 5. korak",
+          "angle": "Kot",
+          "anglePlaceholder": "Napišite kot tega scenarija",
+          "angleFromPersona": "Iz kota persone",
+          "angleFromMatrix": "Iz matrike sporočil",
+          "angleOwn": "Vaš lastni kot",
+          "useLive": "Uporabi kot persone",
+          "duration": "Trajanje",
+          "seconds": "{n} sekund",
+          "estimate": "Ocenjena dolžina: približno {n} s",
+          "noEstimate": "Dodajte zvočno besedilo, da vidite oceno"
+        },
+        "hooks": {
+          "hook": "Kavelj {letter}",
+          "menu": "Možnosti kavlja {letter}",
+          "collapse": "Skrči kavelj",
+          "expand": "Razširi kavelj",
+          "duplicate": "Podvoji",
+          "delete": "Izbriši",
+          "audio": "Zvočni kavelj",
+          "visual": "Vizualni kavelj",
+          "overlay": "Prekrivanje",
+          "optional": "neobvezno",
+          "audioPlaceholder": "Kaj ustvarjalec reče v prvih sekundah",
+          "visualPlaceholder": "Kaj gledalec vidi",
+          "overlayPlaceholder": "Besedilo, prikazano na zaslonu",
+          "addOverlay": "Dodaj prekrivanje (neobvezno)",
+          "noShot": "Vrsta kadra",
+          "empty": "Še ni besedila",
+          "add": "Dodaj kavelj ({n}/{max})",
+          "limit": "Dosežena omejitev kavljev",
+          "deleteTitle": "Izbrišem kavelj {letter}?",
+          "deleteBody": "Ta kavelj in njegovo besedilo bosta izbrisana.",
+          "deleteConfirm": "Izbriši kavelj"
+        },
+        "shot": {
+          "wide": "Total",
+          "medium": "Poltotal",
+          "close_up": "Bližnji posnetek",
+          "detail": "Detajl",
+          "pov": "Pogled prve osebe",
+          "over_the_shoulder": "Čez ramo",
+          "top_down": "Od zgoraj",
+          "screen_recording": "Posnetek zaslona",
+          "reaction": "Odziv",
+          "creator_to_camera": "Ustvarjalec v kamero"
+        },
+        "conflict": {
+          "title": "Nekdo drug je to spremenil",
+          "hint": "Vaše besedilo je še vedno tu. Izberite, kaj obdržati.",
+          "theirs": "Njihova različica",
+          "empty": "(prazno)",
+          "copy": "Kopiraj moje besedilo",
+          "copied": "Kopirano",
+          "copyFailed": "Kopiranje ni uspelo. Izberite svoje besedilo v zgornjih poljih in ga kopirajte ročno.",
+          "useTheirs": "Uporabi njihovo različico",
+          "keepMine": "Obdrži mojo"
+        },
+        "leave": {
+          "title": "Zapustim brez shranjevanja?",
+          "body": "Nekaterih sprememb ni bilo mogoče shraniti. Če zdaj odidete, bodo izgubljene.",
+          "stay": "Ostani",
+          "retry": "Poskusi znova shraniti",
+          "leave": "Zapusti in izgubi spremembe"
+        },
+        "archived": {
+          "title": "Arhivirani scenariji · {market}",
+          "info": "Scenarij se arhivira, ko njegov ustvarjalec zapusti ta trg. Vrne se sam, če je ustvarjalec na trg ponovno dodan.",
+          "empty": "Na tem trgu ni arhiviranih scenarijev.",
+          "row": "{name} · Scenarij {n}",
+          "hooks": "Kavljev: {count}",
+          "on": "Arhivirano {date}",
+          "inMarket": "Ta ustvarjalec je spet na tem trgu.",
+          "delete": "Izbriši za vedno",
+          "deleteTitle": "Izbrišem ta scenarij za vedno?",
+          "deleteBody": "Scenarij {n} ustvarjalca {name} in njegovi kavlji (kavljev: {count}) bodo izbrisani. Tega ni mogoče razveljaviti.",
+          "deleteConfirm": "Izbriši za vedno"
+        },
+        "replace": {
+          "label": "To mesto ima scenarije ({count}). Kaj naj se zgodi z njimi?",
+          "carry": "Prenesi scenarije na novega ustvarjalca",
+          "archive": "Arhiviraj jih in začni znova"
+        },
+        "remove": {
+          "label": "Ta ustvarjalec ima scenarije ({count}). Kaj naj se zgodi z njimi?",
+          "archive": "Arhiviraj (ostanejo shranjeni in se vrnejo, če se ustvarjalec vrne)",
+          "delete": "Izbriši jih za vedno"
+        },
+        "empty": {
+          "noCreators": {
+            "title": "Na trgu {market} še ni ustvarjalcev",
+            "body": "Scenariji se pišejo za vsakega ustvarjalca posebej. Najprej dodajte ustvarjalce na ta trg.",
+            "action": "Odpri 5. korak"
+          },
+          "noScripts": {
+            "title": "Scenarijev še ni",
+            "body": "Za začetek izberite »Dodaj scenarij« pod ustvarjalcem na seznamu."
+          }
+        },
+        "errors": {
+          "limitReached": "Ustvarjalec ima lahko največ {max} scenarije.",
+          "limitReachedArchived": "Ustvarjalec ima lahko največ {max} scenarije, vključno z arhiviranimi.",
+          "hooksLimit": "Scenarij ima lahko največ {max} kavljev.",
+          "lastHook": "Scenarij obdrži vsaj en kavelj.",
+          "languageNotAvailable": "Zaenkrat je mogoče pisati samo v angleščini.",
+          "carryOverExceeds": "Novi ustvarjalec bi imel več kot {max} scenarije. Raje jih arhivirajte.",
+          "choiceRequired": "Ta ustvarjalec ima scenarije. Izberite, kaj naj se zgodi z njimi."
+        }
       }
     }
   },

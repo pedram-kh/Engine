@@ -1516,7 +1516,9 @@
         "newCampaignName": "Kampagnenavn",
         "newCampaignHint": "Oprettes som kladde uden budget. Angiv budgettet på kampagnesiden, før den kan gå live.",
         "notesWarning": "Hvis du fjerner {markets}, slettes {count} intern note. Det kan ikke fortrydes. | Hvis du fjerner {markets}, slettes {count} interne noter. Det kan ikke fortrydes.",
-        "notesConfirm": "Slet noter og gem"
+        "notesConfirm": "Slet noter og gem",
+        "scriptsWarning": "Disse markeder har arkiverede scripts: {markets}. De slettes sammen med markederne (scripts: {count}).",
+        "scriptsConfirm": "Slet scripts og gem"
       },
       "validation": {
         "nameRequired": "Angiv et navn til bølgen.",
@@ -2332,6 +2334,158 @@
       },
       "limit": {
         "placesLeft": "{count} plads tilbage | {count} pladser tilbage"
+      },
+      "scripts": {
+        "stepper": {
+          "none": "Ingen scripts endnu",
+          "count": "Scripts: {count}"
+        },
+        "rail": {
+          "title": "Scripts · {market}",
+          "script": "Script {n}",
+          "draft": "Kladde",
+          "add": "Tilføj script ({n}/{max})",
+          "limit": "Grænsen for scripts er nået",
+          "limitHint": "Denne creator har allerede {max} scripts, arkiverede medregnet.",
+          "footnote": "Op til {max} scripts pr. creator",
+          "archived": "Arkiverede scripts ({count})"
+        },
+        "editor": {
+          "title": "{name} · Script {n}",
+          "lastEdited": "Sidst redigeret: {when}",
+          "delete": "Slet script",
+          "deleteTitle": "Slet script {n} for {name}?",
+          "deleteBody": "Scriptet og dets hooks slettes (hooks: {count}). Det kan ikke fortrydes.",
+          "deleteConfirm": "Slet script",
+          "loadFailed": "Dette script kunne ikke indlæses."
+        },
+        "save": {
+          "saving": "Gemmer…",
+          "saved": "Gemt",
+          "failed": "Kunne ikke gemme",
+          "refused": "Ikke accepteret",
+          "retry": "Prøv igen",
+          "gone": "Fjernet af en anden",
+          "allSaved": "Alle ændringer er gemt",
+          "stuck": "Ændringer, der ikke er gemt: {n}"
+        },
+        "brief": {
+          "title": "Brief",
+          "editInStep3": "Rediger i trin 3",
+          "persona": "Persona",
+          "usps": "USP'er",
+          "priority": "Prioritet",
+          "support": "Støtte",
+          "noUsps": "Der er ingen USP'er for denne persona",
+          "noPersona": "Denne creator har ingen persona, så der er ingen brief at hente. Vælg en persona i trin 5.",
+          "openStep5": "Åbn trin 5",
+          "angle": "Vinkel",
+          "anglePlaceholder": "Skriv vinklen for dette script",
+          "angleFromPersona": "Fra personaens vinkel",
+          "angleFromMatrix": "Fra budskabsmatrixen",
+          "angleOwn": "Din egen vinkel",
+          "useLive": "Brug personaens vinkel",
+          "duration": "Varighed",
+          "seconds": "{n} sekunder",
+          "estimate": "Anslået længde: ca. {n} s",
+          "noEstimate": "Tilføj lydtekst for at se et estimat"
+        },
+        "hooks": {
+          "hook": "Hook {letter}",
+          "menu": "Muligheder for hook {letter}",
+          "collapse": "Skjul hook",
+          "expand": "Vis hook",
+          "duplicate": "Dupliker",
+          "delete": "Slet",
+          "audio": "Lydhook",
+          "visual": "Visuel hook",
+          "overlay": "Overlay",
+          "optional": "valgfrit",
+          "audioPlaceholder": "Hvad creatoren siger i de første sekunder",
+          "visualPlaceholder": "Hvad seeren ser",
+          "overlayPlaceholder": "Tekst, der vises på skærmen",
+          "addOverlay": "Tilføj overlay (valgfrit)",
+          "noShot": "Billedtype",
+          "empty": "Ingen tekst endnu",
+          "add": "Tilføj hook ({n}/{max})",
+          "limit": "Grænsen for hooks er nået",
+          "deleteTitle": "Slet hook {letter}?",
+          "deleteBody": "Denne hook og dens tekst slettes.",
+          "deleteConfirm": "Slet hook"
+        },
+        "shot": {
+          "wide": "Total",
+          "medium": "Halvtotal",
+          "close_up": "Close-up",
+          "detail": "Detalje",
+          "pov": "POV",
+          "over_the_shoulder": "Over skulderen",
+          "top_down": "Oppefra",
+          "screen_recording": "Skærmoptagelse",
+          "reaction": "Reaktion",
+          "creator_to_camera": "Creator mod kameraet"
+        },
+        "conflict": {
+          "title": "En anden har ændret dette",
+          "hint": "Din tekst er her stadig. Vælg, hvad der skal beholdes.",
+          "theirs": "Deres version",
+          "empty": "(tom)",
+          "copy": "Kopier min tekst",
+          "copied": "Kopieret",
+          "copyFailed": "Kunne ikke kopiere. Markér din tekst i felterne ovenfor, og kopiér den manuelt.",
+          "useTheirs": "Brug deres version",
+          "keepMine": "Behold min"
+        },
+        "leave": {
+          "title": "Forlade siden uden at gemme?",
+          "body": "Nogle ændringer kunne ikke gemmes. Hvis du forlader siden nu, går de tabt.",
+          "stay": "Bliv",
+          "retry": "Prøv at gemme igen",
+          "leave": "Forlad og mist ændringer"
+        },
+        "archived": {
+          "title": "Arkiverede scripts · {market}",
+          "info": "Et script arkiveres, når dets creator forlader dette marked. Det kommer tilbage af sig selv, hvis creatoren tilføjes markedet igen.",
+          "empty": "Ingen arkiverede scripts på dette marked.",
+          "row": "{name} · Script {n}",
+          "hooks": "Hooks: {count}",
+          "on": "Arkiveret {date}",
+          "inMarket": "Denne creator er på dette marked igen.",
+          "delete": "Slet permanent",
+          "deleteTitle": "Slet dette script permanent?",
+          "deleteBody": "Script {n} for {name} og dets hooks (hooks: {count}) slettes. Det kan ikke fortrydes.",
+          "deleteConfirm": "Slet permanent"
+        },
+        "replace": {
+          "label": "Denne plads har scripts ({count}). Hvad skal der ske med dem?",
+          "carry": "Overfør scripts til den nye creator",
+          "archive": "Arkivér dem, og start forfra"
+        },
+        "remove": {
+          "label": "Denne creator har scripts ({count}). Hvad skal der ske med dem?",
+          "archive": "Arkivér dem (de gemmes og vender tilbage, hvis creatoren kommer tilbage)",
+          "delete": "Slet dem permanent"
+        },
+        "empty": {
+          "noCreators": {
+            "title": "Ingen creators i {market} endnu",
+            "body": "Scripts skrives pr. creator. Tilføj først creators til dette marked.",
+            "action": "Åbn trin 5"
+          },
+          "noScripts": {
+            "title": "Ingen scripts endnu",
+            "body": "Vælg “Tilføj script” under en creator på listen for at begynde."
+          }
+        },
+        "errors": {
+          "limitReached": "En creator har højst {max} scripts.",
+          "limitReachedArchived": "En creator har højst {max} scripts, arkiverede medregnet.",
+          "hooksLimit": "Et script har højst {max} hooks.",
+          "lastHook": "Et script beholder mindst én hook.",
+          "languageNotAvailable": "Indtil videre kan der kun skrives på engelsk.",
+          "carryOverExceeds": "Den nye creator ville få mere end {max} scripts. Arkivér dem i stedet.",
+          "choiceRequired": "Denne creator har scripts. Vælg, hvad der skal ske med dem."
+        }
       }
     }
   },

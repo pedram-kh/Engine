@@ -1516,7 +1516,9 @@
         "newCampaignName": "Nome campagna",
         "newCampaignHint": "Viene creata come bozza senza budget. Imposta il budget nella pagina della campagna prima di pubblicarla.",
         "notesWarning": "Rimuovere {markets} elimina {count} nota interna. L’azione non può essere annullata. | Rimuovere {markets} elimina {count} note interne. L’azione non può essere annullata.",
-        "notesConfirm": "Elimina le note e salva"
+        "notesConfirm": "Elimina le note e salva",
+        "scriptsWarning": "Questi mercati hanno script archiviati: {markets}. Verranno eliminati insieme ai mercati (script: {count}).",
+        "scriptsConfirm": "Elimina gli script e salva"
       },
       "validation": {
         "nameRequired": "Inserisci un nome per l'ondata.",
@@ -2332,6 +2334,158 @@
       },
       "limit": {
         "placesLeft": "{count} posto rimasto | {count} posti rimasti"
+      },
+      "scripts": {
+        "stepper": {
+          "none": "Ancora nessuno script",
+          "count": "Script: {count}"
+        },
+        "rail": {
+          "title": "Script · {market}",
+          "script": "Script {n}",
+          "draft": "Bozza",
+          "add": "Aggiungi script ({n}/{max})",
+          "limit": "Limite di script raggiunto",
+          "limitHint": "Questo creator ha già {max} script, inclusi quelli archiviati.",
+          "footnote": "Fino a {max} script per creator",
+          "archived": "Script archiviati ({count})"
+        },
+        "editor": {
+          "title": "{name} · Script {n}",
+          "lastEdited": "Ultima modifica: {when}",
+          "delete": "Elimina script",
+          "deleteTitle": "Eliminare lo script {n} di {name}?",
+          "deleteBody": "Lo script e i suoi hook verranno eliminati (hook: {count}). L'operazione non può essere annullata.",
+          "deleteConfirm": "Elimina script",
+          "loadFailed": "Impossibile caricare questo script."
+        },
+        "save": {
+          "saving": "Salvataggio…",
+          "saved": "Salvato",
+          "failed": "Impossibile salvare",
+          "refused": "Non accettato",
+          "retry": "Riprova",
+          "gone": "Rimosso da qualcun altro",
+          "allSaved": "Tutte le modifiche sono salvate",
+          "stuck": "Modifiche non salvate: {n}"
+        },
+        "brief": {
+          "title": "Brief",
+          "editInStep3": "Modifica nel passaggio 3",
+          "persona": "Persona",
+          "usps": "USP",
+          "priority": "Priorità",
+          "support": "Supporto",
+          "noUsps": "Nessuna USP impostata per questa persona",
+          "noPersona": "Questo creator non ha una persona, quindi non c'è un brief da riprendere. Scegli una persona nel passaggio 5.",
+          "openStep5": "Apri il passaggio 5",
+          "angle": "Angolo",
+          "anglePlaceholder": "Scrivi l'angolo di questo script",
+          "angleFromPersona": "Dall'angolo della persona",
+          "angleFromMatrix": "Dalla matrice dei messaggi",
+          "angleOwn": "Il tuo angolo",
+          "useLive": "Usa l'angolo della persona",
+          "duration": "Durata",
+          "seconds": "{n} secondi",
+          "estimate": "Durata stimata: circa {n} s",
+          "noEstimate": "Aggiungi il testo audio per vedere una stima"
+        },
+        "hooks": {
+          "hook": "Hook {letter}",
+          "menu": "Opzioni per l'hook {letter}",
+          "collapse": "Comprimi hook",
+          "expand": "Espandi hook",
+          "duplicate": "Duplica",
+          "delete": "Elimina",
+          "audio": "Hook audio",
+          "visual": "Hook visivo",
+          "overlay": "Overlay",
+          "optional": "facoltativo",
+          "audioPlaceholder": "Cosa dice il creator nei primi secondi",
+          "visualPlaceholder": "Cosa vede lo spettatore",
+          "overlayPlaceholder": "Testo mostrato sullo schermo",
+          "addOverlay": "Aggiungi overlay (facoltativo)",
+          "noShot": "Tipo di inquadratura",
+          "empty": "Ancora nessun testo",
+          "add": "Aggiungi hook ({n}/{max})",
+          "limit": "Limite di hook raggiunto",
+          "deleteTitle": "Eliminare l'hook {letter}?",
+          "deleteBody": "Questo hook e il suo testo verranno eliminati.",
+          "deleteConfirm": "Elimina hook"
+        },
+        "shot": {
+          "wide": "Campo lungo",
+          "medium": "Piano medio",
+          "close_up": "Primo piano",
+          "detail": "Dettaglio",
+          "pov": "Soggettiva",
+          "over_the_shoulder": "Sopra la spalla",
+          "top_down": "Dall'alto",
+          "screen_recording": "Registrazione dello schermo",
+          "reaction": "Reazione",
+          "creator_to_camera": "Creator in camera"
+        },
+        "conflict": {
+          "title": "Qualcun altro ha modificato questo contenuto",
+          "hint": "Il tuo testo è ancora qui. Scegli cosa tenere.",
+          "theirs": "La loro versione",
+          "empty": "(vuoto)",
+          "copy": "Copia il mio testo",
+          "copied": "Copiato",
+          "copyFailed": "Impossibile copiare. Seleziona il tuo testo nei campi qui sopra e copialo a mano.",
+          "useTheirs": "Usa la loro versione",
+          "keepMine": "Tieni la mia"
+        },
+        "leave": {
+          "title": "Uscire senza salvare?",
+          "body": "Alcune modifiche non sono state salvate. Se esci ora, andranno perse.",
+          "stay": "Resta",
+          "retry": "Riprova a salvare",
+          "leave": "Esci e perdi le modifiche"
+        },
+        "archived": {
+          "title": "Script archiviati · {market}",
+          "info": "Uno script viene archiviato quando il suo creator lascia questo mercato. Torna da solo se il creator viene aggiunto di nuovo al mercato.",
+          "empty": "Nessuno script archiviato in questo mercato.",
+          "row": "{name} · Script {n}",
+          "hooks": "Hook: {count}",
+          "on": "Archiviato il {date}",
+          "inMarket": "Questo creator è di nuovo in questo mercato.",
+          "delete": "Elimina definitivamente",
+          "deleteTitle": "Eliminare definitivamente questo script?",
+          "deleteBody": "Lo script {n} di {name} e i suoi hook (hook: {count}) verranno eliminati. L'operazione non può essere annullata.",
+          "deleteConfirm": "Elimina definitivamente"
+        },
+        "replace": {
+          "label": "Questa posizione ha degli script ({count}). Cosa ne facciamo?",
+          "carry": "Trasferisci gli script al nuovo creator",
+          "archive": "Archiviali e ricomincia da zero"
+        },
+        "remove": {
+          "label": "Questo creator ha degli script ({count}). Cosa ne facciamo?",
+          "archive": "Archiviali (restano e tornano se il creator ritorna)",
+          "delete": "Eliminali definitivamente"
+        },
+        "empty": {
+          "noCreators": {
+            "title": "Ancora nessun creator in {market}",
+            "body": "Gli script si scrivono per creator. Aggiungi prima dei creator a questo mercato.",
+            "action": "Apri il passaggio 5"
+          },
+          "noScripts": {
+            "title": "Ancora nessuno script",
+            "body": "Scegli «Aggiungi script» sotto un creator nell'elenco per iniziare."
+          }
+        },
+        "errors": {
+          "limitReached": "Un creator ha al massimo {max} script.",
+          "limitReachedArchived": "Un creator ha al massimo {max} script, inclusi quelli archiviati.",
+          "hooksLimit": "Uno script ha al massimo {max} hook.",
+          "lastHook": "Uno script mantiene almeno un hook.",
+          "languageNotAvailable": "Per ora si può scrivere solo in inglese.",
+          "carryOverExceeds": "Il nuovo creator avrebbe più di {max} script. Archiviali invece.",
+          "choiceRequired": "Questo creator ha degli script. Scegli cosa farne."
+        }
       }
     }
   },

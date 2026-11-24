@@ -1516,7 +1516,9 @@
         "newCampaignName": "Kampagnenname",
         "newCampaignHint": "Wird als Entwurf ohne Budget angelegt. Legen Sie das Budget auf der Kampagnenseite fest, bevor sie live gehen kann.",
         "notesWarning": "Das Entfernen von {markets} löscht {count} interne Notiz. Das lässt sich nicht rückgängig machen. | Das Entfernen von {markets} löscht {count} interne Notizen. Das lässt sich nicht rückgängig machen.",
-        "notesConfirm": "Notizen löschen und speichern"
+        "notesConfirm": "Notizen löschen und speichern",
+        "scriptsWarning": "Diese Märkte haben archivierte Skripte: {markets}. Sie werden mit den Märkten gelöscht (Skripte: {count}).",
+        "scriptsConfirm": "Skripte löschen und speichern"
       },
       "validation": {
         "nameRequired": "Geben Sie einen Namen für die Welle ein.",
@@ -2332,6 +2334,158 @@
       },
       "limit": {
         "placesLeft": "{count} Platz frei | {count} Plätze frei"
+      },
+      "scripts": {
+        "stepper": {
+          "none": "Noch keine Skripte",
+          "count": "Skripte: {count}"
+        },
+        "rail": {
+          "title": "Skripte · {market}",
+          "script": "Skript {n}",
+          "draft": "Entwurf",
+          "add": "Skript hinzufügen ({n}/{max})",
+          "limit": "Skriptlimit erreicht",
+          "limitHint": "Dieser Creator hat bereits {max} Skripte, archivierte eingeschlossen.",
+          "footnote": "Bis zu {max} Skripte pro Creator",
+          "archived": "Archivierte Skripte ({count})"
+        },
+        "editor": {
+          "title": "{name} · Skript {n}",
+          "lastEdited": "Zuletzt bearbeitet: {when}",
+          "delete": "Skript löschen",
+          "deleteTitle": "Skript {n} von {name} löschen?",
+          "deleteBody": "Das Skript und seine Hooks werden gelöscht (Hooks: {count}). Das lässt sich nicht rückgängig machen.",
+          "deleteConfirm": "Skript löschen",
+          "loadFailed": "Dieses Skript konnte nicht geladen werden."
+        },
+        "save": {
+          "saving": "Speichern…",
+          "saved": "Gespeichert",
+          "failed": "Konnte nicht gespeichert werden",
+          "refused": "Nicht akzeptiert",
+          "retry": "Erneut versuchen",
+          "gone": "Von jemand anderem entfernt",
+          "allSaved": "Alle Änderungen gespeichert",
+          "stuck": "Nicht gespeicherte Änderungen: {n}"
+        },
+        "brief": {
+          "title": "Briefing",
+          "editInStep3": "In Schritt 3 bearbeiten",
+          "persona": "Persona",
+          "usps": "USPs",
+          "priority": "Priorität",
+          "support": "Unterstützend",
+          "noUsps": "Für diese Persona sind keine USPs festgelegt",
+          "noPersona": "Dieser Creator hat keine Persona, daher gibt es kein Briefing. Wähle in Schritt 5 eine Persona.",
+          "openStep5": "Schritt 5 öffnen",
+          "angle": "Winkel",
+          "anglePlaceholder": "Schreibe den Winkel dieses Skripts",
+          "angleFromPersona": "Aus dem Winkel der Persona",
+          "angleFromMatrix": "Aus der Messaging-Matrix",
+          "angleOwn": "Dein eigener Winkel",
+          "useLive": "Winkel der Persona verwenden",
+          "duration": "Dauer",
+          "seconds": "{n} Sekunden",
+          "estimate": "Geschätzte Länge: etwa {n} s",
+          "noEstimate": "Füge Audiotext hinzu, um eine Schätzung zu sehen"
+        },
+        "hooks": {
+          "hook": "Hook {letter}",
+          "menu": "Optionen für Hook {letter}",
+          "collapse": "Hook einklappen",
+          "expand": "Hook ausklappen",
+          "duplicate": "Duplizieren",
+          "delete": "Löschen",
+          "audio": "Audio-Hook",
+          "visual": "Visueller Hook",
+          "overlay": "Overlay",
+          "optional": "optional",
+          "audioPlaceholder": "Was der Creator in den ersten Sekunden sagt",
+          "visualPlaceholder": "Was die Zuschauer sehen",
+          "overlayPlaceholder": "Text auf dem Bildschirm",
+          "addOverlay": "Overlay hinzufügen (optional)",
+          "noShot": "Einstellungsgröße",
+          "empty": "Noch kein Text",
+          "add": "Hook hinzufügen ({n}/{max})",
+          "limit": "Hook-Limit erreicht",
+          "deleteTitle": "Hook {letter} löschen?",
+          "deleteBody": "Dieser Hook und sein Text werden gelöscht.",
+          "deleteConfirm": "Hook löschen"
+        },
+        "shot": {
+          "wide": "Totale",
+          "medium": "Halbnah",
+          "close_up": "Nahaufnahme",
+          "detail": "Detail",
+          "pov": "POV",
+          "over_the_shoulder": "Über die Schulter",
+          "top_down": "Draufsicht",
+          "screen_recording": "Bildschirmaufnahme",
+          "reaction": "Reaktion",
+          "creator_to_camera": "Creator zur Kamera"
+        },
+        "conflict": {
+          "title": "Jemand anderes hat das geändert",
+          "hint": "Dein Text ist noch da. Wähle, was bleiben soll.",
+          "theirs": "Die andere Version",
+          "empty": "(leer)",
+          "copy": "Meinen Text kopieren",
+          "copied": "Kopiert",
+          "copyFailed": "Kopieren nicht möglich. Markiere deinen Text in den Feldern oben und kopiere ihn von Hand.",
+          "useTheirs": "Die andere Version übernehmen",
+          "keepMine": "Meine behalten"
+        },
+        "leave": {
+          "title": "Ohne Speichern verlassen?",
+          "body": "Einige Änderungen konnten nicht gespeichert werden. Wenn du jetzt gehst, gehen sie verloren.",
+          "stay": "Bleiben",
+          "retry": "Erneut speichern",
+          "leave": "Verlassen und Änderungen verlieren"
+        },
+        "archived": {
+          "title": "Archivierte Skripte · {market}",
+          "info": "Ein Skript wird archiviert, wenn sein Creator diesen Markt verlässt. Es kommt von selbst zurück, wenn der Creator dem Markt wieder hinzugefügt wird.",
+          "empty": "Keine archivierten Skripte in diesem Markt.",
+          "row": "{name} · Skript {n}",
+          "hooks": "Hooks: {count}",
+          "on": "Archiviert am {date}",
+          "inMarket": "Dieser Creator ist wieder in diesem Markt.",
+          "delete": "Endgültig löschen",
+          "deleteTitle": "Dieses Skript endgültig löschen?",
+          "deleteBody": "Skript {n} von {name} und seine Hooks (Hooks: {count}) werden gelöscht. Das lässt sich nicht rückgängig machen.",
+          "deleteConfirm": "Endgültig löschen"
+        },
+        "replace": {
+          "label": "Dieser Platz hat Skripte ({count}). Was soll mit ihnen geschehen?",
+          "carry": "Skripte auf den neuen Creator übertragen",
+          "archive": "Archivieren und neu beginnen"
+        },
+        "remove": {
+          "label": "Dieser Creator hat Skripte ({count}). Was soll mit ihnen geschehen?",
+          "archive": "Archivieren (bleiben erhalten und kommen zurück, wenn der Creator zurückkehrt)",
+          "delete": "Endgültig löschen"
+        },
+        "empty": {
+          "noCreators": {
+            "title": "Noch keine Creator in {market}",
+            "body": "Skripte werden pro Creator geschrieben. Füge diesem Markt zuerst Creator hinzu.",
+            "action": "Schritt 5 öffnen"
+          },
+          "noScripts": {
+            "title": "Noch keine Skripte",
+            "body": "Wähle in der Liste unter einem Creator „Skript hinzufügen“, um zu beginnen."
+          }
+        },
+        "errors": {
+          "limitReached": "Ein Creator hat höchstens {max} Skripte.",
+          "limitReachedArchived": "Ein Creator hat höchstens {max} Skripte, archivierte eingeschlossen.",
+          "hooksLimit": "Ein Skript hat höchstens {max} Hooks.",
+          "lastHook": "Ein Skript behält mindestens einen Hook.",
+          "languageNotAvailable": "Vorerst kann nur Englisch geschrieben werden.",
+          "carryOverExceeds": "Der neue Creator hätte mehr als {max} Skripte. Archiviere sie stattdessen.",
+          "choiceRequired": "Dieser Creator hat Skripte. Wähle, was mit ihnen geschehen soll."
+        }
       }
     }
   },

@@ -42,6 +42,12 @@ const CODE_KEYS: Record<string, string> = {
   'wave_creator.remove_blocked_in_work': 'app.strategy.creators.errors.removeBlockedInWork',
   'wave.campaign_already_linked': 'app.waves.errors.campaignAlreadyLinked',
   'wave.campaign_not_available': 'app.waves.errors.campaignNotAvailable',
+  'wave_script.limit_reached': 'app.strategy.scripts.errors.limitReached',
+  'wave_script.hooks_limit': 'app.strategy.scripts.errors.hooksLimit',
+  'wave_script.carry_over_exceeds_limit': 'app.strategy.scripts.errors.carryOverExceeds',
+  'wave_script.last_hook': 'app.strategy.scripts.errors.lastHook',
+  'wave_script.language_not_available': 'app.strategy.scripts.errors.languageNotAvailable',
+  'wave_creator.scripts_choice_required': 'app.strategy.scripts.errors.choiceRequired',
   forbidden: 'app.strategy.errors.forbidden',
 }
 
@@ -100,6 +106,26 @@ export function strategyErrorMessage(err: unknown, t: Translate): string {
       return t('app.strategy.creators.errors.slotCodeTaken', {
         code: typeof code === 'string' ? code : '',
       })
+    }
+    if (err.code === 'wave_script.limit_reached') {
+      return t(
+        num('archived') !== null && (num('archived') ?? 0) > 0
+          ? 'app.strategy.scripts.errors.limitReachedArchived'
+          : 'app.strategy.scripts.errors.limitReached',
+        { max: num('max') ?? 3, archived: num('archived') ?? 0 },
+      )
+    }
+    if (err.code === 'wave_script.hooks_limit') {
+      return t('app.strategy.scripts.errors.hooksLimit', { max: num('max') ?? 6 })
+    }
+    if (err.code === 'wave_script.carry_over_exceeds_limit') {
+      return t('app.strategy.scripts.errors.carryOverExceeds', {
+        count: num('count') ?? 0,
+        max: num('max') ?? 3,
+      })
+    }
+    if (err.code === 'wave_creator.scripts_choice_required') {
+      return t('app.strategy.scripts.errors.choiceRequired', { count: num('scripts') ?? 0 })
     }
     if (err.code === 'concept.market_full') {
       return t('app.strategy.errors.conceptMarketFull', { max: num('max') ?? 30 })

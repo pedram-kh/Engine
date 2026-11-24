@@ -16,9 +16,10 @@ import {
   ApiError,
   countryInTwoMarketsMeta,
   marketHasNotesMeta,
+  marketHasScriptsMeta,
   marketHasPersonasMeta,
 } from '@catalyst/api-client'
-import type { MarketHasNotesMeta } from '@catalyst/api-client'
+import type { MarketHasNotesMeta, MarketHasScriptsMeta } from '@catalyst/api-client'
 import type {
   PersonaCodesResult,
   UpdateWavePayload,
@@ -116,6 +117,21 @@ const notesWarning = computed(() => {
   )
 })
 
+// PL-3.2a: the same for archived scripts (422 `wave.market_has_scripts`); both asks can stand together.
+const scriptsAsk = ref<MarketHasScriptsMeta | null>(null)
+const scriptsWarning = computed(() => {
+  const a = scriptsAsk.value
+  if (a === null) return ''
+  return t(
+    'app.waves.dialog.scriptsWarning',
+    {
+      markets: a.markets.map((m) => `${m.name} (${m.script_count})`).join(', '),
+      count: a.script_count,
+    },
+    a.script_count,
+  )
+})
+
 const nameError = computed(() =>
   submitted.value && name.value.trim() === '' ? t('app.waves.validation.nameRequired') : null,
 )
@@ -186,6 +202,7 @@ watch(
     baseline.value = props.wave ?? null
     staleMarkets.value = false
     notesAsk.value = null
+    scriptsAsk.value = null
     drafts.value = props.wave ? draftsFromWave(props.wave.attributes.markets) : [emptyDraft()]
     campaignId.value = props.wave?.relationships.campaign?.data.id ?? null
     campaignChoice.value = 'none'
@@ -195,7 +212,14 @@ watch(
   { immediate: true },
 )
 
-watch(drafts, () => (notesAsk.value = null), { deep: true })
+watch(
+  drafts,
+  () => {
+    notesAsk.value = null
+    scriptsAsk.value = null
+  },
+  { deep: true },
+)
 
 const CODE_KEYS: Record<string, string> = {
   'wave.campaign_not_available': 'app.waves.errors.campaignNotAvailable',
@@ -311,6 +335,7 @@ async function submit(): Promise<void> {
         body.markets = inputs
         body.markets_version = was.attributes.markets_version
         if (notesAsk.value !== null) body.confirm_notes_deleted = notesAsk.value.note_count
+        if (scriptsAsk.value !== null) body.confirm_scripts_deleted = scriptsAsk.value.script_count
       }
       // Set, change or remove (null) the link, but only when it differs from what is saved.
       const savedCampaignId = props.wave.relationships.campaign?.data.id ?? null
@@ -335,6 +360,11 @@ async function submit(): Promise<void> {
     const notes = marketHasNotesMeta(err)
     if (notes !== null) {
       notesAsk.value = notes
+      return
+    }
+    const scripts = marketHasScriptsMeta(err)
+    if (scripts !== null) {
+      scriptsAsk.value = scripts
       return
     }
     if (err instanceof ApiError && err.code === 'wave.markets_changed') {
@@ -497,6 +527,9 @@ async function submit(): Promise<void> {
         <v-alert v-if="notesAsk" type="warning" variant="tonal" data-test="wave-notes-warning">
           {{ notesWarning }}
         </v-alert>
+        <v-alert v-if="scriptsAsk" type="warning" variant="tonal" data-test="wave-scripts-warning">
+          {{ scriptsWarning }}
+        </v-alert>
         <v-alert v-if="formError" type="error" variant="tonal" data-test="wave-form-error">
           {{ formError }}
           <template v-if="staleMarkets" #append>
@@ -517,18 +550,20 @@ async function submit(): Promise<void> {
           {{ t('app.brands.archive.cancel') }}
         </v-btn>
         <v-btn
-          :color="notesAsk ? 'error' : 'primary'"
+          :color="notesAsk || scriptsAsk ? 'error' : 'primary'"
           variant="flat"
           :loading="saving"
           data-test="wave-submit"
           @click="submit"
         >
           {{
-            notesAsk
-              ? t('app.waves.dialog.notesConfirm')
-              : isEdit
-                ? t('app.waves.dialog.save')
-                : t('app.waves.dialog.create')
+            scriptsAsk
+              ? t('app.waves.dialog.scriptsConfirm')
+              : notesAsk
+                ? t('app.waves.dialog.notesConfirm')
+                : isEdit
+                  ? t('app.waves.dialog.save')
+                  : t('app.waves.dialog.create')
           }}
         </v-btn>
       </div>

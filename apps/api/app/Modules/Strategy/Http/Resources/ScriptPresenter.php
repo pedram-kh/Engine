@@ -81,7 +81,7 @@ final class ScriptPresenter
                 'slot' => $slot->slot,
                 'slot_code' => $slot->slot_code,
                 'creator' => self::creator($slot->creator),
-                'persona' => $persona === null ? null : ['id' => $persona->ulid, 'code' => $persona->code, 'title' => $persona->title, 'slot' => $persona->slot],
+                'persona' => $persona === null ? null : ['id' => $persona->ulid, 'code' => $persona->code, 'title' => $persona->title, 'slot' => $persona->slot, 'color_key' => $persona->colorKey()->value],
                 'scripts' => $live->map(static fn (WaveScript $s): array => [
                     'id' => $s->ulid,
                     'number' => $s->number,

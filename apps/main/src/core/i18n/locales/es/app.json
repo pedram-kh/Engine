@@ -1516,7 +1516,9 @@
         "newCampaignName": "Nombre de la campaña",
         "newCampaignHint": "Se crea como borrador sin presupuesto. Define el presupuesto en la página de la campaña antes de que pueda publicarse.",
         "notesWarning": "Quitar {markets} elimina {count} nota interna. No se puede deshacer. | Quitar {markets} elimina {count} notas internas. No se puede deshacer.",
-        "notesConfirm": "Eliminar notas y guardar"
+        "notesConfirm": "Eliminar notas y guardar",
+        "scriptsWarning": "Estos mercados tienen guiones archivados: {markets}. Se eliminarán con los mercados (guiones: {count}).",
+        "scriptsConfirm": "Eliminar guiones y guardar"
       },
       "validation": {
         "nameRequired": "Introduce un nombre para la oleada.",
@@ -2332,6 +2334,158 @@
       },
       "limit": {
         "placesLeft": "Queda {count} plaza | Quedan {count} plazas"
+      },
+      "scripts": {
+        "stepper": {
+          "none": "Aún no hay guiones",
+          "count": "Guiones: {count}"
+        },
+        "rail": {
+          "title": "Guiones · {market}",
+          "script": "Guion {n}",
+          "draft": "Borrador",
+          "add": "Añadir guion ({n}/{max})",
+          "limit": "Límite de guiones alcanzado",
+          "limitHint": "Este creador ya tiene {max} guiones, incluidos los archivados.",
+          "footnote": "Hasta {max} guiones por creador",
+          "archived": "Guiones archivados ({count})"
+        },
+        "editor": {
+          "title": "{name} · Guion {n}",
+          "lastEdited": "Última edición: {when}",
+          "delete": "Eliminar guion",
+          "deleteTitle": "¿Eliminar el guion {n} de {name}?",
+          "deleteBody": "Se eliminarán el guion y sus ganchos (ganchos: {count}). Esta acción no se puede deshacer.",
+          "deleteConfirm": "Eliminar guion",
+          "loadFailed": "No se pudo cargar este guion."
+        },
+        "save": {
+          "saving": "Guardando…",
+          "saved": "Guardado",
+          "failed": "No se pudo guardar",
+          "refused": "No aceptado",
+          "retry": "Reintentar",
+          "gone": "Eliminado por otra persona",
+          "allSaved": "Todos los cambios guardados",
+          "stuck": "Cambios sin guardar: {n}"
+        },
+        "brief": {
+          "title": "Brief",
+          "editInStep3": "Editar en el paso 3",
+          "persona": "Persona",
+          "usps": "USP",
+          "priority": "Prioridad",
+          "support": "Apoyo",
+          "noUsps": "No hay USP definidos para esta persona",
+          "noPersona": "Este creador no tiene persona, así que no hay brief del que partir. Elige una persona en el paso 5.",
+          "openStep5": "Abrir el paso 5",
+          "angle": "Enfoque",
+          "anglePlaceholder": "Escribe el enfoque de este guion",
+          "angleFromPersona": "Del enfoque de la persona",
+          "angleFromMatrix": "De la matriz de mensajes",
+          "angleOwn": "Tu propio enfoque",
+          "useLive": "Usar el enfoque de la persona",
+          "duration": "Duración",
+          "seconds": "{n} segundos",
+          "estimate": "Duración estimada: unos {n} s",
+          "noEstimate": "Añade texto de audio para ver una estimación"
+        },
+        "hooks": {
+          "hook": "Gancho {letter}",
+          "menu": "Opciones del gancho {letter}",
+          "collapse": "Contraer gancho",
+          "expand": "Expandir gancho",
+          "duplicate": "Duplicar",
+          "delete": "Eliminar",
+          "audio": "Gancho de audio",
+          "visual": "Gancho visual",
+          "overlay": "Superposición",
+          "optional": "opcional",
+          "audioPlaceholder": "Lo que dice el creador en los primeros segundos",
+          "visualPlaceholder": "Lo que ve el espectador",
+          "overlayPlaceholder": "Texto que aparece en pantalla",
+          "addOverlay": "Añadir superposición (opcional)",
+          "noShot": "Tipo de plano",
+          "empty": "Aún no hay texto",
+          "add": "Añadir gancho ({n}/{max})",
+          "limit": "Límite de ganchos alcanzado",
+          "deleteTitle": "¿Eliminar el gancho {letter}?",
+          "deleteBody": "Este gancho y su texto se eliminarán.",
+          "deleteConfirm": "Eliminar gancho"
+        },
+        "shot": {
+          "wide": "Plano general",
+          "medium": "Plano medio",
+          "close_up": "Primer plano",
+          "detail": "Plano detalle",
+          "pov": "Punto de vista",
+          "over_the_shoulder": "Sobre el hombro",
+          "top_down": "Plano cenital",
+          "screen_recording": "Grabación de pantalla",
+          "reaction": "Reacción",
+          "creator_to_camera": "Creador a cámara"
+        },
+        "conflict": {
+          "title": "Otra persona ha cambiado esto",
+          "hint": "Tu texto sigue aquí. Elige qué conservar.",
+          "theirs": "Su versión",
+          "empty": "(vacío)",
+          "copy": "Copiar mi texto",
+          "copied": "Copiado",
+          "copyFailed": "No se pudo copiar. Selecciona tu texto en los campos de arriba y cópialo a mano.",
+          "useTheirs": "Usar su versión",
+          "keepMine": "Conservar la mía"
+        },
+        "leave": {
+          "title": "¿Salir sin guardar?",
+          "body": "Algunos cambios no se pudieron guardar. Si sales ahora, se perderán.",
+          "stay": "Quedarme",
+          "retry": "Intentar guardar de nuevo",
+          "leave": "Salir y perder los cambios"
+        },
+        "archived": {
+          "title": "Guiones archivados · {market}",
+          "info": "Un guion se archiva cuando su creador sale de este mercado. Vuelve solo si el creador se añade de nuevo al mercado.",
+          "empty": "No hay guiones archivados en este mercado.",
+          "row": "{name} · Guion {n}",
+          "hooks": "Ganchos: {count}",
+          "on": "Archivado el {date}",
+          "inMarket": "Este creador vuelve a estar en este mercado.",
+          "delete": "Eliminar definitivamente",
+          "deleteTitle": "¿Eliminar este guion definitivamente?",
+          "deleteBody": "Se eliminarán el guion {n} de {name} y sus ganchos (ganchos: {count}). Esta acción no se puede deshacer.",
+          "deleteConfirm": "Eliminar definitivamente"
+        },
+        "replace": {
+          "label": "Este puesto tiene guiones ({count}). ¿Qué hacemos con ellos?",
+          "carry": "Pasar los guiones al nuevo creador",
+          "archive": "Archivarlos y empezar de cero"
+        },
+        "remove": {
+          "label": "Este creador tiene guiones ({count}). ¿Qué hacemos con ellos?",
+          "archive": "Archivarlos (se conservan y vuelven si el creador regresa)",
+          "delete": "Eliminarlos definitivamente"
+        },
+        "empty": {
+          "noCreators": {
+            "title": "Aún no hay creadores en {market}",
+            "body": "Los guiones se escriben por creador. Añade primero creadores a este mercado.",
+            "action": "Abrir el paso 5"
+          },
+          "noScripts": {
+            "title": "Aún no hay guiones",
+            "body": "Elige «Añadir guion» bajo un creador de la lista para empezar."
+          }
+        },
+        "errors": {
+          "limitReached": "Un creador tiene como máximo {max} guiones.",
+          "limitReachedArchived": "Un creador tiene como máximo {max} guiones, incluidos los archivados.",
+          "hooksLimit": "Un guion tiene como máximo {max} ganchos.",
+          "lastHook": "Un guion conserva al menos un gancho.",
+          "languageNotAvailable": "Por ahora solo se puede escribir en inglés.",
+          "carryOverExceeds": "El nuevo creador tendría más de {max} guiones. Archívalos en su lugar.",
+          "choiceRequired": "Este creador tiene guiones. Elige qué hacer con ellos."
+        }
       }
     }
   },

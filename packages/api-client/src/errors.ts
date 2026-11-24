@@ -36,6 +36,7 @@ import type {
   CopyExceedsCapMeta,
   PersonaInUseByConceptsMeta,
   MarketHasNotesMeta,
+  MarketHasScriptsMeta,
   MarketHasPersonasMeta,
   UspInUseAffected,
   UspInUseMeta,
@@ -316,6 +317,33 @@ export function marketHasNotesMeta(error: unknown): MarketHasNotesMeta | null {
       : []
   })
   return markets.length === 0 ? null : { markets, note_count: total }
+}
+
+/**
+ * PL-3.2a — the typed `meta` of a 422 `wave.market_has_scripts` (a wave edit that would remove markets that have archived scripts),
+ * or `null` when the error is anything else or the server sent no usable list. Never throws.
+ */
+export function marketHasScriptsMeta(error: unknown): MarketHasScriptsMeta | null {
+  if (!(error instanceof ApiError) || error.code !== 'wave.market_has_scripts') {
+    return null
+  }
+  const meta = error.details[0]?.meta
+  const raw = meta?.['markets']
+  const total = meta?.['script_count']
+  if (!Array.isArray(raw) || typeof total !== 'number') {
+    return null
+  }
+  const markets = raw.flatMap((entry: unknown) => {
+    if (!isObjectRecord(entry)) return []
+    const { market, name, code, script_count: count } = entry
+    return typeof market === 'string' &&
+      typeof name === 'string' &&
+      typeof code === 'string' &&
+      typeof count === 'number'
+      ? [{ market, name, code, script_count: count }]
+      : []
+  })
+  return markets.length === 0 ? null : { markets, script_count: total }
 }
 
 /**

@@ -1516,7 +1516,9 @@
         "newCampaignName": "Název kampaně",
         "newCampaignHint": "Vytvoří se jako návrh bez rozpočtu. Rozpočet nastavte na stránce kampaně, než půjde živě.",
         "notesWarning": "Odebráním {markets} se smaže {count} interní poznámka. Nelze to vrátit zpět. | Odebráním {markets} se smaže {count} interních poznámek. Nelze to vrátit zpět.",
-        "notesConfirm": "Smazat poznámky a uložit"
+        "notesConfirm": "Smazat poznámky a uložit",
+        "scriptsWarning": "Tyto trhy mají archivované skripty: {markets}. Budou smazány spolu s trhy (skriptů: {count}).",
+        "scriptsConfirm": "Smazat skripty a uložit"
       },
       "validation": {
         "nameRequired": "Zadejte název vlny.",
@@ -2332,6 +2334,158 @@
       },
       "limit": {
         "placesLeft": "Volných míst: {count} | Volných míst: {count}"
+      },
+      "scripts": {
+        "stepper": {
+          "none": "Zatím žádné skripty",
+          "count": "Skripty: {count}"
+        },
+        "rail": {
+          "title": "Skripty · {market}",
+          "script": "Skript {n}",
+          "draft": "Koncept",
+          "add": "Přidat skript ({n}/{max})",
+          "limit": "Dosažen limit skriptů",
+          "limitHint": "Tento tvůrce už má {max} skripty včetně archivovaných.",
+          "footnote": "Až {max} skripty na tvůrce",
+          "archived": "Archivované skripty ({count})"
+        },
+        "editor": {
+          "title": "{name} · Skript {n}",
+          "lastEdited": "Naposledy upraveno: {when}",
+          "delete": "Smazat skript",
+          "deleteTitle": "Smazat skript {n} tvůrce {name}?",
+          "deleteBody": "Skript a jeho hooky budou smazány (hooků: {count}). Tuto akci nelze vrátit zpět.",
+          "deleteConfirm": "Smazat skript",
+          "loadFailed": "Tento skript se nepodařilo načíst."
+        },
+        "save": {
+          "saving": "Ukládání…",
+          "saved": "Uloženo",
+          "failed": "Uložení se nezdařilo",
+          "refused": "Nepřijato",
+          "retry": "Zkusit znovu",
+          "gone": "Odebráno někým jiným",
+          "allSaved": "Všechny změny uloženy",
+          "stuck": "Neuložené změny: {n}"
+        },
+        "brief": {
+          "title": "Brief",
+          "editInStep3": "Upravit v kroku 3",
+          "persona": "Persona",
+          "usps": "USP",
+          "priority": "Priorita",
+          "support": "Podpora",
+          "noUsps": "Pro tuto personu nejsou nastaveny žádné USP",
+          "noPersona": "Tento tvůrce nemá personu, takže není z čeho brief převzít. Vyberte personu v kroku 5.",
+          "openStep5": "Otevřít krok 5",
+          "angle": "Úhel",
+          "anglePlaceholder": "Napište úhel tohoto skriptu",
+          "angleFromPersona": "Z úhlu persony",
+          "angleFromMatrix": "Z matice sdělení",
+          "angleOwn": "Váš vlastní úhel",
+          "useLive": "Použít úhel persony",
+          "duration": "Délka",
+          "seconds": "{n} sekund",
+          "estimate": "Odhadovaná délka: asi {n} s",
+          "noEstimate": "Přidejte zvukový text a uvidíte odhad"
+        },
+        "hooks": {
+          "hook": "Hook {letter}",
+          "menu": "Možnosti hooku {letter}",
+          "collapse": "Sbalit hook",
+          "expand": "Rozbalit hook",
+          "duplicate": "Duplikovat",
+          "delete": "Smazat",
+          "audio": "Zvukový hook",
+          "visual": "Vizuální hook",
+          "overlay": "Překryv",
+          "optional": "volitelné",
+          "audioPlaceholder": "Co tvůrce řekne v prvních sekundách",
+          "visualPlaceholder": "Co divák vidí",
+          "overlayPlaceholder": "Text zobrazený na obrazovce",
+          "addOverlay": "Přidat překryv (volitelné)",
+          "noShot": "Typ záběru",
+          "empty": "Zatím žádný text",
+          "add": "Přidat hook ({n}/{max})",
+          "limit": "Dosažen limit hooků",
+          "deleteTitle": "Smazat hook {letter}?",
+          "deleteBody": "Tento hook a jeho text budou smazány.",
+          "deleteConfirm": "Smazat hook"
+        },
+        "shot": {
+          "wide": "Celek",
+          "medium": "Polocelek",
+          "close_up": "Detailní záběr",
+          "detail": "Detail",
+          "pov": "Pohled z první osoby",
+          "over_the_shoulder": "Přes rameno",
+          "top_down": "Shora",
+          "screen_recording": "Záznam obrazovky",
+          "reaction": "Reakce",
+          "creator_to_camera": "Tvůrce do kamery"
+        },
+        "conflict": {
+          "title": "Někdo jiný to změnil",
+          "hint": "Váš text tu stále je. Vyberte, co ponechat.",
+          "theirs": "Jejich verze",
+          "empty": "(prázdné)",
+          "copy": "Kopírovat můj text",
+          "copied": "Zkopírováno",
+          "copyFailed": "Kopírování se nezdařilo. Označte svůj text v polích výše a zkopírujte ho ručně.",
+          "useTheirs": "Použít jejich verzi",
+          "keepMine": "Ponechat moji"
+        },
+        "leave": {
+          "title": "Odejít bez uložení?",
+          "body": "Některé změny se nepodařilo uložit. Pokud nyní odejdete, budou ztraceny.",
+          "stay": "Zůstat",
+          "retry": "Zkusit uložit znovu",
+          "leave": "Odejít a ztratit změny"
+        },
+        "archived": {
+          "title": "Archivované skripty · {market}",
+          "info": "Skript se archivuje, když jeho tvůrce opustí tento trh. Vrátí se sám, pokud je tvůrce na trh znovu přidán.",
+          "empty": "Na tomto trhu nejsou žádné archivované skripty.",
+          "row": "{name} · Skript {n}",
+          "hooks": "Hooků: {count}",
+          "on": "Archivováno {date}",
+          "inMarket": "Tento tvůrce je na tomto trhu znovu.",
+          "delete": "Smazat natrvalo",
+          "deleteTitle": "Smazat tento skript natrvalo?",
+          "deleteBody": "Skript {n} tvůrce {name} a jeho hooky (hooků: {count}) budou smazány. Tuto akci nelze vrátit zpět.",
+          "deleteConfirm": "Smazat natrvalo"
+        },
+        "replace": {
+          "label": "Toto místo má skripty ({count}). Co s nimi?",
+          "carry": "Převést skripty na nového tvůrce",
+          "archive": "Archivovat je a začít znovu"
+        },
+        "remove": {
+          "label": "Tento tvůrce má skripty ({count}). Co s nimi?",
+          "archive": "Archivovat (zůstanou zachovány a vrátí se, pokud se tvůrce vrátí)",
+          "delete": "Smazat je natrvalo"
+        },
+        "empty": {
+          "noCreators": {
+            "title": "Na trhu {market} zatím nejsou žádní tvůrci",
+            "body": "Skripty se píší pro každého tvůrce zvlášť. Nejprve na tento trh přidejte tvůrce.",
+            "action": "Otevřít krok 5"
+          },
+          "noScripts": {
+            "title": "Zatím žádné skripty",
+            "body": "Začněte volbou „Přidat skript“ pod tvůrcem v seznamu."
+          }
+        },
+        "errors": {
+          "limitReached": "Tvůrce může mít nejvýše {max} skripty.",
+          "limitReachedArchived": "Tvůrce může mít nejvýše {max} skripty včetně archivovaných.",
+          "hooksLimit": "Skript může mít nejvýše {max} hooků.",
+          "lastHook": "Skript si ponechá alespoň jeden hook.",
+          "languageNotAvailable": "Zatím lze psát pouze anglicky.",
+          "carryOverExceeds": "Nový tvůrce by měl více než {max} skripty. Archivujte je místo toho.",
+          "choiceRequired": "Tento tvůrce má skripty. Vyberte, co s nimi."
+        }
       }
     }
   },

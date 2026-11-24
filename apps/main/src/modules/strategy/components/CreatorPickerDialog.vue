@@ -11,6 +11,7 @@
  * The dialog is rebuilt on every open (a counter keys the card), so a quick close and reopen leaves nothing behind.
  */
 import type {
+  ScriptsOnReplace,
   WaveCreatorCandidate,
   WaveCreatorSlot,
   WavePersonaResource,
@@ -48,6 +49,8 @@ const props = defineProps<{
   roomWave: number
   perMarket: number
   perWave: number
+  /** PL-3.2a: how many scripts the slot being replaced has (live ones). Above 0 the dialog asks what happens to them. */
+  scriptCount?: number
 }>()
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
@@ -67,6 +70,9 @@ const loadError = ref<string | null>(null)
 const selected = ref<WaveCreatorCandidate[]>([])
 const personaId = ref<string | null>(null)
 const saving = ref(false)
+/** PL-3.2a: what happens to the slot's scripts on Replace. Carrying them over is the default; archiving starts fresh. */
+const scriptsChoice = ref<ScriptsOnReplace>('carry_over')
+const askScripts = computed(() => single.value && (props.scriptCount ?? 0) > 0)
 const submitError = ref<string | null>(null)
 let ticket = 0
 let timer: ReturnType<typeof setTimeout> | null = null
@@ -200,6 +206,7 @@ watch(
     selected.value = []
     campaignEmpty.value = false
     personaId.value = null
+    scriptsChoice.value = 'carry_over'
     saving.value = false
     submitError.value = null
     loadError.value = null
@@ -229,7 +236,12 @@ async function submit(): Promise<void> {
   try {
     const first = selected.value[0]
     if (single.value && props.replacing !== null && first !== undefined) {
-      await strategyApi.replaceCreator(props.scope, props.replacing.id, first.id)
+      await strategyApi.replaceCreator(
+        props.scope,
+        props.replacing.id,
+        first.id,
+        askScripts.value ? scriptsChoice.value : undefined,
+      )
     } else {
       await strategyApi.addCreators(props.scope, {
         market: props.market.id,
@@ -422,6 +434,40 @@ const title = computed(() =>
             {{ t('app.strategy.creators.picker.selected', { count: selected.length }) }}
           </span>
           <span class="picker__names" data-test="creator-picker-names">{{ names }}</span>
+          <v-radio-group
+            v-if="askScripts"
+            v-model="scriptsChoice"
+            density="compact"
+            hide-details
+            class="picker__scripts"
+            :label="
+              t('app.strategy.scripts.replace.label', { count: scriptCount ?? 0 }, scriptCount ?? 0)
+            "
+            data-test="creator-picker-scripts"
+          >
+            <v-radio
+              value="carry_over"
+              :label="
+                t(
+                  'app.strategy.scripts.replace.carry',
+                  { count: scriptCount ?? 0 },
+                  scriptCount ?? 0,
+                )
+              "
+              data-test="creator-picker-scripts-carry"
+            />
+            <v-radio
+              value="archive"
+              :label="
+                t(
+                  'app.strategy.scripts.replace.archive',
+                  { count: scriptCount ?? 0 },
+                  scriptCount ?? 0,
+                )
+              "
+              data-test="creator-picker-scripts-archive"
+            />
+          </v-radio-group>
           <v-select
             v-if="!single"
             v-model="personaId"
@@ -586,6 +632,10 @@ const title = computed(() =>
 .picker__count {
   font-size: 14px;
   font-weight: 600;
+}
+.picker__scripts {
+  flex: 1 1 320px;
+  min-width: 0;
 }
 .picker__names {
   max-width: 320px;

@@ -21,6 +21,7 @@ export {
   deletionPendingMeta,
   extractFieldErrors,
   marketHasNotesMeta,
+  marketHasScriptsMeta,
   marketHasPersonasMeta,
   personaInUseByConceptsMeta,
   uspInUseMeta,

@@ -1516,7 +1516,9 @@
         "newCampaignName": "Isem il-kampanja",
         "newCampaignHint": "Tinħoloq bħala abbozz mingħajr baġit. Issettja l-baġit fil-paġna tal-kampanja qabel ma tkun tista' tmur live.",
         "notesWarning": "It-tneħħija ta’ {markets} thassar {count} nota interna. Dan ma jistax jiġi mreġġa’ lura. | It-tneħħija ta’ {markets} thassar {count} noti interni. Dan ma jistax jiġi mreġġa’ lura.",
-        "notesConfirm": "Ħassar in-noti u salva"
+        "notesConfirm": "Ħassar in-noti u salva",
+        "scriptsWarning": "Dawn l-swieq għandhom skripts arkivjati: {markets}. Se jitħassru mal-swieq (skripts: {count}).",
+        "scriptsConfirm": "Ħassar l-iskripts u sejvja"
       },
       "validation": {
         "nameRequired": "Daħħal isem għall-mewġa.",
@@ -2332,6 +2334,158 @@
       },
       "limit": {
         "placesLeft": "Postijiet li fadal: {count} | Postijiet li fadal: {count}"
+      },
+      "scripts": {
+        "stepper": {
+          "none": "Għad m'hemm l-ebda skript",
+          "count": "Skripts: {count}"
+        },
+        "rail": {
+          "title": "Skripts · {market}",
+          "script": "Skript {n}",
+          "draft": "Abbozz",
+          "add": "Żid skript ({n}/{max})",
+          "limit": "Intlaħaq il-limitu tal-iskripts",
+          "limitHint": "Dan il-kreatur diġà għandu {max} skripts, inklużi dawk arkivjati.",
+          "footnote": "Sa {max} skripts għal kull kreatur",
+          "archived": "Skripts arkivjati ({count})"
+        },
+        "editor": {
+          "title": "{name} · Skript {n}",
+          "lastEdited": "L-aħħar modifika: {when}",
+          "delete": "Ħassar l-iskript",
+          "deleteTitle": "Tħassar l-iskript {n} ta' {name}?",
+          "deleteBody": "L-iskript u l-hooks tiegħu se jitħassru (hooks: {count}). Dan ma jistax jiġi mreġġa' lura.",
+          "deleteConfirm": "Ħassar l-iskript",
+          "loadFailed": "Dan l-iskript ma setax jitgħabba."
+        },
+        "save": {
+          "saving": "Qed jissejvja…",
+          "saved": "Issejvjat",
+          "failed": "Ma setax jissejvja",
+          "refused": "Mhux aċċettat",
+          "retry": "Erġa' pprova",
+          "gone": "Tneħħa minn xi ħadd ieħor",
+          "allSaved": "Il-bidliet kollha ssejvjaw",
+          "stuck": "Bidliet li ma ssejvjawx: {n}"
+        },
+        "brief": {
+          "title": "Brief",
+          "editInStep3": "Editja fil-pass 3",
+          "persona": "Persona",
+          "usps": "USPs",
+          "priority": "Prijorità",
+          "support": "Appoġġ",
+          "noUsps": "Ma hemm l-ebda USP stabbilit għal din il-persona",
+          "noPersona": "Dan il-kreatur m'għandux persona, għalhekk m'hemm l-ebda brief x'tieħu. Agħżel persona fil-pass 5.",
+          "openStep5": "Iftaħ il-pass 5",
+          "angle": "Angolu",
+          "anglePlaceholder": "Ikteb l-angolu ta' dan l-iskript",
+          "angleFromPersona": "Mill-angolu tal-persona",
+          "angleFromMatrix": "Mill-matriċi tal-messaġġi",
+          "angleOwn": "L-angolu tiegħek stess",
+          "useLive": "Uża l-angolu tal-persona",
+          "duration": "Tul",
+          "seconds": "{n} sekondi",
+          "estimate": "Tul stmat: madwar {n} s",
+          "noEstimate": "Żid test tal-awdjo biex tara stima"
+        },
+        "hooks": {
+          "hook": "Hook {letter}",
+          "menu": "Għażliet għall-hook {letter}",
+          "collapse": "Ikkollassa l-hook",
+          "expand": "Espandi l-hook",
+          "duplicate": "Duplika",
+          "delete": "Ħassar",
+          "audio": "Hook tal-awdjo",
+          "visual": "Hook viżwali",
+          "overlay": "Overlay",
+          "optional": "fakultattiv",
+          "audioPlaceholder": "Dak li jgħid il-kreatur fl-ewwel sekondi",
+          "visualPlaceholder": "Dak li jara l-ispettatur",
+          "overlayPlaceholder": "Test li jidher fuq l-iskrin",
+          "addOverlay": "Żid overlay (fakultattiv)",
+          "noShot": "Tip ta' shot",
+          "empty": "Għad m'hemm l-ebda test",
+          "add": "Żid hook ({n}/{max})",
+          "limit": "Intlaħaq il-limitu tal-hooks",
+          "deleteTitle": "Tħassar il-hook {letter}?",
+          "deleteBody": "Dan il-hook u t-test tiegħu se jitħassru.",
+          "deleteConfirm": "Ħassar il-hook"
+        },
+        "shot": {
+          "wide": "Shot wiesa'",
+          "medium": "Shot medju",
+          "close_up": "Close-up",
+          "detail": "Dettall",
+          "pov": "Veduta POV",
+          "over_the_shoulder": "Fuq l-ispalla",
+          "top_down": "Minn fuq",
+          "screen_recording": "Reġistrazzjoni tal-iskrin",
+          "reaction": "Reazzjoni",
+          "creator_to_camera": "Kreatur lejn il-kamera"
+        },
+        "conflict": {
+          "title": "Xi ħadd ieħor biddel dan",
+          "hint": "It-test tiegħek għadu hawn. Agħżel x'se żżomm.",
+          "theirs": "Il-verżjoni tagħhom",
+          "empty": "(vojt)",
+          "copy": "Ikkopja t-test tiegħi",
+          "copied": "Ikkupjat",
+          "copyFailed": "Ma setax jiġi kkupjat. Agħżel it-test tiegħek fl-oqsma ta' hawn fuq u ikkopjah bl-idejn.",
+          "useTheirs": "Uża l-verżjoni tagħhom",
+          "keepMine": "Żomm tiegħi"
+        },
+        "leave": {
+          "title": "Titlaq mingħajr ma tissejvja?",
+          "body": "Xi bidliet ma setgħux jissejvjaw. Jekk titlaq issa, jintilfu.",
+          "stay": "Ibqa'",
+          "retry": "Erġa' pprova sejvja",
+          "leave": "Itlaq u titlef il-bidliet"
+        },
+        "archived": {
+          "title": "Skripts arkivjati · {market}",
+          "info": "Skript jiġi arkivjat meta l-kreatur tiegħu jitlaq minn dan is-suq. Jirritorna weħdu jekk il-kreatur jiżdied mas-suq mill-ġdid.",
+          "empty": "M'hemm l-ebda skript arkivjat f'dan is-suq.",
+          "row": "{name} · Skript {n}",
+          "hooks": "Hooks: {count}",
+          "on": "Arkivjat fi {date}",
+          "inMarket": "Dan il-kreatur reġa' qiegħed f'dan is-suq.",
+          "delete": "Ħassar għal kollox",
+          "deleteTitle": "Tħassar dan l-iskript għal kollox?",
+          "deleteBody": "L-iskript {n} ta' {name} u l-hooks tiegħu (hooks: {count}) se jitħassru. Dan ma jistax jiġi mreġġa' lura.",
+          "deleteConfirm": "Ħassar għal kollox"
+        },
+        "replace": {
+          "label": "Din il-pożizzjoni għandha skripts ({count}). X'għandu jiġri minnhom?",
+          "carry": "Ittrasferixxi l-iskripts lill-kreatur il-ġdid",
+          "archive": "Arkivjahom u ibda mill-ġdid"
+        },
+        "remove": {
+          "label": "Dan il-kreatur għandu skripts ({count}). X'għandu jiġri minnhom?",
+          "archive": "Arkivjahom (jinżammu u jirritornaw jekk il-kreatur jerġa' lura)",
+          "delete": "Ħassarhom għal kollox"
+        },
+        "empty": {
+          "noCreators": {
+            "title": "Għad m'hemm l-ebda kreatur f'{market}",
+            "body": "L-iskripts jinkitbu għal kull kreatur. L-ewwel żid kreaturi ma' dan is-suq.",
+            "action": "Iftaħ il-pass 5"
+          },
+          "noScripts": {
+            "title": "Għad m'hemm l-ebda skript",
+            "body": "Biex tibda, agħżel “Żid skript” taħt kreatur fil-lista."
+          }
+        },
+        "errors": {
+          "limitReached": "Kreatur għandu massimu ta' {max} skripts.",
+          "limitReachedArchived": "Kreatur għandu massimu ta' {max} skripts, inklużi dawk arkivjati.",
+          "hooksLimit": "Skript għandu massimu ta' {max} hooks.",
+          "lastHook": "Skript iżomm mill-inqas hook wieħed.",
+          "languageNotAvailable": "Għalissa jista' jinkiteb biss bl-Ingliż.",
+          "carryOverExceeds": "Il-kreatur il-ġdid ikollu aktar minn {max} skripts. Arkivjahom minflok.",
+          "choiceRequired": "Dan il-kreatur għandu skripts. Agħżel x'għandu jiġri minnhom."
+        }
       }
     }
   },

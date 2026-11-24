@@ -1516,7 +1516,9 @@
         "newCampaignName": "Kampaņas nosaukums",
         "newCampaignHint": "Tiek izveidota kā melnraksts bez budžeta. Iestatiet budžetu kampaņas lapā pirms palaišanas.",
         "notesWarning": "Noņemot {markets}, tiks izdzēsta {count} iekšējā piezīme. To nevar atsaukt. | Noņemot {markets}, tiks izdzēstas {count} iekšējās piezīmes. To nevar atsaukt.",
-        "notesConfirm": "Dzēst piezīmes un saglabāt"
+        "notesConfirm": "Dzēst piezīmes un saglabāt",
+        "scriptsWarning": "Šajos tirgos ir arhivēti scenāriji: {markets}. Tie tiks dzēsti kopā ar tirgiem (scenāriji: {count}).",
+        "scriptsConfirm": "Dzēst scenārijus un saglabāt"
       },
       "validation": {
         "nameRequired": "Ievadiet viļņa nosaukumu.",
@@ -2332,6 +2334,158 @@
       },
       "limit": {
         "placesLeft": "Atlikušās vietas: {count} | Atlikušās vietas: {count}"
+      },
+      "scripts": {
+        "stepper": {
+          "none": "Vēl nav scenāriju",
+          "count": "Scenāriji: {count}"
+        },
+        "rail": {
+          "title": "Scenāriji · {market}",
+          "script": "Scenārijs {n}",
+          "draft": "Melnraksts",
+          "add": "Pievienot scenāriju ({n}/{max})",
+          "limit": "Scenāriju limits sasniegts",
+          "limitHint": "Šim veidotājam jau ir {max} scenāriji, ieskaitot arhivētos.",
+          "footnote": "Līdz {max} scenārijiem uz veidotāju",
+          "archived": "Arhivētie scenāriji ({count})"
+        },
+        "editor": {
+          "title": "{name} · Scenārijs {n}",
+          "lastEdited": "Pēdējoreiz rediģēts: {when}",
+          "delete": "Dzēst scenāriju",
+          "deleteTitle": "Vai dzēst veidotāja {name} scenāriju {n}?",
+          "deleteBody": "Scenārijs un tā āķi tiks dzēsti (āķi: {count}). To nevar atsaukt.",
+          "deleteConfirm": "Dzēst scenāriju",
+          "loadFailed": "Šo scenāriju neizdevās ielādēt."
+        },
+        "save": {
+          "saving": "Saglabā…",
+          "saved": "Saglabāts",
+          "failed": "Neizdevās saglabāt",
+          "refused": "Nav pieņemts",
+          "retry": "Mēģināt vēlreiz",
+          "gone": "Noņēma kāds cits",
+          "allSaved": "Visas izmaiņas saglabātas",
+          "stuck": "Nesaglabātas izmaiņas: {n}"
+        },
+        "brief": {
+          "title": "Īss apraksts",
+          "editInStep3": "Rediģēt 3. solī",
+          "persona": "Persona",
+          "usps": "USP",
+          "priority": "Prioritāte",
+          "support": "Atbalsts",
+          "noUsps": "Šai personai nav iestatītu USP",
+          "noPersona": "Šim veidotājam nav personas, tāpēc nav īsā apraksta, ko izmantot. Izvēlieties personu 5. solī.",
+          "openStep5": "Atvērt 5. soli",
+          "angle": "Leņķis",
+          "anglePlaceholder": "Uzrakstiet šī scenārija leņķi",
+          "angleFromPersona": "No personas leņķa",
+          "angleFromMatrix": "No ziņojumu matricas",
+          "angleOwn": "Jūsu pašu leņķis",
+          "useLive": "Izmantot personas leņķi",
+          "duration": "Ilgums",
+          "seconds": "{n} sekundes",
+          "estimate": "Aptuvenais garums: ap {n} s",
+          "noEstimate": "Pievienojiet audio tekstu, lai redzētu aprēķinu"
+        },
+        "hooks": {
+          "hook": "Āķis {letter}",
+          "menu": "Āķa {letter} opcijas",
+          "collapse": "Sakļaut āķi",
+          "expand": "Izvērst āķi",
+          "duplicate": "Dublēt",
+          "delete": "Dzēst",
+          "audio": "Audio āķis",
+          "visual": "Vizuālais āķis",
+          "overlay": "Pārklājums",
+          "optional": "neobligāti",
+          "audioPlaceholder": "Ko veidotājs saka pirmajās sekundēs",
+          "visualPlaceholder": "Ko skatītājs redz",
+          "overlayPlaceholder": "Ekrānā redzamais teksts",
+          "addOverlay": "Pievienot pārklājumu (neobligāti)",
+          "noShot": "Kadra veids",
+          "empty": "Vēl nav teksta",
+          "add": "Pievienot āķi ({n}/{max})",
+          "limit": "Āķu limits sasniegts",
+          "deleteTitle": "Vai dzēst āķi {letter}?",
+          "deleteBody": "Šis āķis un tā teksts tiks dzēsts.",
+          "deleteConfirm": "Dzēst āķi"
+        },
+        "shot": {
+          "wide": "Kopplāns",
+          "medium": "Vidējais plāns",
+          "close_up": "Tuvplāns",
+          "detail": "Detaļa",
+          "pov": "Pirmās personas skats",
+          "over_the_shoulder": "Pār plecu",
+          "top_down": "No augšas",
+          "screen_recording": "Ekrāna ieraksts",
+          "reaction": "Reakcija",
+          "creator_to_camera": "Veidotājs kamerā"
+        },
+        "conflict": {
+          "title": "Kāds cits to ir mainījis",
+          "hint": "Jūsu teksts joprojām ir šeit. Izvēlieties, ko paturēt.",
+          "theirs": "Viņu versija",
+          "empty": "(tukšs)",
+          "copy": "Kopēt manu tekstu",
+          "copied": "Nokopēts",
+          "copyFailed": "Neizdevās nokopēt. Atlasiet savu tekstu laukos augstāk un nokopējiet to pašrocīgi.",
+          "useTheirs": "Izmantot viņu versiju",
+          "keepMine": "Paturēt manu"
+        },
+        "leave": {
+          "title": "Vai iziet, nesaglabājot?",
+          "body": "Dažas izmaiņas neizdevās saglabāt. Ja izejat tagad, tās tiks zaudētas.",
+          "stay": "Palikt",
+          "retry": "Mēģināt saglabāt vēlreiz",
+          "leave": "Iziet un zaudēt izmaiņas"
+        },
+        "archived": {
+          "title": "Arhivētie scenāriji · {market}",
+          "info": "Scenārijs tiek arhivēts, kad tā veidotājs pamet šo tirgu. Tas atgriežas pats, ja veidotājs tirgum tiek pievienots atkal.",
+          "empty": "Šajā tirgū nav arhivētu scenāriju.",
+          "row": "{name} · Scenārijs {n}",
+          "hooks": "Āķi: {count}",
+          "on": "Arhivēts {date}",
+          "inMarket": "Šis veidotājs atkal ir šajā tirgū.",
+          "delete": "Dzēst pavisam",
+          "deleteTitle": "Vai dzēst šo scenāriju pavisam?",
+          "deleteBody": "Veidotāja {name} scenārijs {n} un tā āķi (āķi: {count}) tiks dzēsti. To nevar atsaukt.",
+          "deleteConfirm": "Dzēst pavisam"
+        },
+        "replace": {
+          "label": "Šai vietai ir scenāriji ({count}). Ko ar tiem darīt?",
+          "carry": "Pārnest scenārijus uz jauno veidotāju",
+          "archive": "Arhivēt tos un sākt no jauna"
+        },
+        "remove": {
+          "label": "Šim veidotājam ir scenāriji ({count}). Ko ar tiem darīt?",
+          "archive": "Arhivēt (tiek saglabāti un atgriežas, ja veidotājs atgriežas)",
+          "delete": "Dzēst tos pavisam"
+        },
+        "empty": {
+          "noCreators": {
+            "title": "Tirgū {market} vēl nav veidotāju",
+            "body": "Scenāriji tiek rakstīti katram veidotājam. Vispirms pievienojiet šim tirgum veidotājus.",
+            "action": "Atvērt 5. soli"
+          },
+          "noScripts": {
+            "title": "Vēl nav scenāriju",
+            "body": "Lai sāktu, sarakstā zem veidotāja izvēlieties “Pievienot scenāriju”."
+          }
+        },
+        "errors": {
+          "limitReached": "Veidotājam ir ne vairāk kā {max} scenāriji.",
+          "limitReachedArchived": "Veidotājam ir ne vairāk kā {max} scenāriji, ieskaitot arhivētos.",
+          "hooksLimit": "Scenārijā ir ne vairāk kā {max} āķi.",
+          "lastHook": "Scenārijā paliek vismaz viens āķis.",
+          "languageNotAvailable": "Pagaidām var rakstīt tikai angliski.",
+          "carryOverExceeds": "Jaunajam veidotājam būtu vairāk nekā {max} scenāriji. Tā vietā arhivējiet tos.",
+          "choiceRequired": "Šim veidotājam ir scenāriji. Izvēlieties, ko ar tiem darīt."
+        }
       }
     }
   },

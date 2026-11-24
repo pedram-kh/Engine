@@ -10,6 +10,7 @@
  */
 import type {
   StrategySummaryResource,
+  ScriptsOnRemove,
   WaveCreatorMarket,
   WaveCreatorSlot,
   WaveCreatorsData,
@@ -64,6 +65,21 @@ const pageError = ref<string | null>(null)
 const notice = ref<string | null>(null)
 const busyIds = ref<string[]>([])
 let ticket = 0
+/** PL-3.2a: live scripts per slot of the open market (slot id -> count), read from the scripts rail; empty until it answers. */
+const scriptCounts = ref<Record<string, number>>({})
+async function loadScriptCounts(): Promise<void> {
+  const s = scope.value
+  if (s === null || market.value === '') return
+  const wanted = market.value
+  try {
+    const rail = (await strategyApi.scripts(s, wanted)).data.rail
+    if (rail === null || wanted !== market.value) return
+    scriptCounts.value = Object.fromEntries(rail.creators.map((c) => [c.id, c.scripts.length]))
+  } catch {
+    // Without counts the dialogs ask nothing; the server answers 422 `scripts_choice_required` and the dialog then asks.
+    scriptCounts.value = {}
+  }
+}
 
 const agencyId = computed(() => agencyStore.currentAgencyId ?? '')
 const limits = computed(() => props.summary.attributes.limits)
@@ -121,6 +137,7 @@ async function load(first = false): Promise<void> {
     if (mine !== ticket) return
     data.value = res.data
     failed.value = false
+    void loadScriptCounts()
   } catch {
     if (mine === ticket && first) failed.value = true
   } finally {
@@ -135,6 +152,8 @@ onMounted(async () => {
 watch(market, () => {
   pageError.value = null
   notice.value = null
+  scriptCounts.value = {}
+  void loadScriptCounts()
 })
 
 function selectMarket(code: string): void {
@@ -200,9 +219,15 @@ const removeOpen = ref(false)
 const removing = ref<WaveCreatorSlot | null>(null)
 const removeBusy = ref(false)
 const removeError = ref<string | null>(null)
+/** PL-3.2a: what happens to the slot's scripts on Remove: archived (the default) or, for an admin or manager, deleted. */
+const removeScripts = ref<ScriptsOnRemove>('archive')
+const removeScriptCount = computed(() =>
+  removing.value === null ? 0 : (scriptCounts.value[removing.value.id] ?? 0),
+)
 function askRemove(row: WaveCreatorSlot): void {
   removing.value = row
   removeError.value = null
+  removeScripts.value = 'archive'
   removeOpen.value = true
 }
 async function confirmRemove(): Promise<void> {
@@ -212,7 +237,15 @@ async function confirmRemove(): Promise<void> {
   removeBusy.value = true
   removeError.value = null
   try {
-    apply((await strategyApi.removeCreator(s, row.id)).data)
+    apply(
+      (
+        await strategyApi.removeCreator(
+          s,
+          row.id,
+          removeScriptCount.value > 0 ? removeScripts.value : undefined,
+        )
+      ).data,
+    )
     removeOpen.value = false
   } catch (err) {
     if (isGone(err)) {
@@ -220,6 +253,8 @@ async function confirmRemove(): Promise<void> {
       await reload()
     } else {
       removeError.value = strategyErrorMessage(err, t)
+      // The slot got scripts since the counts were read: read them again so the dialog now asks.
+      await loadScriptCounts()
     }
   } finally {
     removeBusy.value = false
@@ -493,6 +528,7 @@ function onLinked(w: WaveResource): void {
         :replacing="replacing"
         :room-market="roomMkt"
         :room-wave="roomWv"
+        :script-count="replacing === null ? 0 : (scriptCounts[replacing.id] ?? 0)"
         :per-market="perMarket"
         :per-wave="perWave"
         @done="reload"
@@ -514,7 +550,42 @@ function onLinked(w: WaveResource): void {
         :error="removeError"
         test-id="creator-remove-dialog"
         @confirm="confirmRemove"
-      />
+      >
+        <v-radio-group
+          v-if="removeScriptCount > 0"
+          v-model="removeScripts"
+          density="compact"
+          hide-details
+          :label="
+            t('app.strategy.scripts.remove.label', { count: removeScriptCount }, removeScriptCount)
+          "
+          data-test="creator-remove-scripts"
+        >
+          <v-radio
+            value="archive"
+            :label="
+              t(
+                'app.strategy.scripts.remove.archive',
+                { count: removeScriptCount },
+                removeScriptCount,
+              )
+            "
+            data-test="creator-remove-scripts-archive"
+          />
+          <v-radio
+            v-if="canDecide"
+            value="delete"
+            :label="
+              t(
+                'app.strategy.scripts.remove.delete',
+                { count: removeScriptCount },
+                removeScriptCount,
+              )
+            "
+            data-test="creator-remove-scripts-delete"
+          />
+        </v-radio-group>
+      </StrategyConfirmDialog>
       <CreatorProfileDialog
         v-if="profileCreator !== ''"
         v-model="profileOpen"

@@ -8,7 +8,11 @@
  * carry the warning with the counts (PL-2.3, C6: a message, never a block). PL-2.5: every live step carries its REAL state from the server: not started (an empty circle with the number), in progress (an amber circle with the number) or done (a green circle with a check); a per-market step in progress says "n of m markets". Creators and Scripts stay "Not available yet". On a narrow screen the bar
  * scrolls sideways inside itself and step names never wrap.
  */
-import type { StrategySummaryResource, WaveCreatorsData } from '@catalyst/api-client'
+import type {
+  ScriptsOverview,
+  StrategySummaryResource,
+  WaveCreatorsData,
+} from '@catalyst/api-client'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -27,6 +31,8 @@ const props = defineProps<{
    */
   creatorsOn?: boolean
   creators?: WaveCreatorsData['state'] | null
+  /** PL-3.2a: step 6 is a real step under the same flag; its state and counts come from the scripts overview (`null` until read). */
+  scripts?: ScriptsOverview | null
 }>()
 
 const { t } = useI18n()
@@ -34,12 +40,16 @@ const { t } = useI18n()
 type LiveKey = StepName
 
 function isLive(key: StepKey, state: string): boolean {
-  return state === 'live' || (key === 'creators' && props.creatorsOn === true)
+  return (
+    state === 'live' || ((key === 'creators' || key === 'scripts') && props.creatorsOn === true)
+  )
 }
 
 function stateOf(key: StepKey): 'not_started' | 'in_progress' | 'done' {
   const a = props.summary?.attributes
   if (key === 'creators' && props.creatorsOn === true) return props.creators?.state ?? 'not_started'
+  if (key === 'scripts' && props.creatorsOn === true)
+    return props.scripts?.step.state ?? 'not_started'
   if (!a || key === 'creators' || key === 'scripts') return 'not_started'
   return stateFor(a, key, null)
 }
@@ -142,12 +152,27 @@ const creatorsLine = computed(() => {
     return `${count} · ${t('app.strategy.stepper.marketsOf', { done: c.markets_done, total: c.markets_total }, c.markets_total)}`
   return count
 })
+/** PL-3.2a: the line under "6. Scripts" ("No scripts yet", "4 scripts", "Complete · 4 scripts", plus "1 of 2 markets" while in progress). */
+const scriptsLine = computed(() => {
+  const o = props.scripts
+  const count = o === null || o === undefined ? 0 : o.markets.reduce((n, m) => n + m.scripts, 0)
+  if (o === null || o === undefined || count === 0) return t('app.strategy.scripts.stepper.none')
+  const counted = t('app.strategy.scripts.stepper.count', { count }, count)
+  if (o.step.state === 'done') return `${t('app.strategy.completion.complete')} · ${counted}`
+  if (o.step.state === 'in_progress' && o.step.markets_total >= 2)
+    return `${counted} · ${t('app.strategy.stepper.marketsOf', { done: o.step.markets_started, total: o.step.markets_total }, o.step.markets_total)}`
+  return counted
+})
 function lineFor(key: StepKey): string {
-  return key === 'creators' ? creatorsLine.value : statusLine.value[key as LiveKey]
+  return key === 'creators'
+    ? creatorsLine.value
+    : key === 'scripts' && props.creatorsOn === true
+      ? scriptsLine.value
+      : statusLine.value[key as LiveKey]
 }
-/** The concepts warning on a live step 5 (never a lock): a zero-or-one list so the other steps gain no comment node. */
+/** The concepts warning on a live step 5 and 6 (never a lock): a zero-or-one list so the other steps gain no comment node. */
 function warnItems(key: StepKey): number[] {
-  return key === 'creators' && warningText.value !== '' ? [1] : []
+  return (key === 'creators' || key === 'scripts') && warningText.value !== '' ? [1] : []
 }
 const warningText = computed(() => {
   const w = warning.value
@@ -167,7 +192,9 @@ function routeFor(key: StepKey): { name: string; params: { ulid: string; waveUli
             ? 'strategy.concepts'
             : key === 'creators'
               ? 'strategy.creators'
-              : 'strategy.personas',
+              : key === 'scripts'
+                ? 'strategy.scripts'
+                : 'strategy.personas',
     params: { ulid: props.brandId, waveUlid: props.waveId },
   }
 }

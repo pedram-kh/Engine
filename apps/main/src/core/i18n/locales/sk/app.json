@@ -1516,7 +1516,9 @@
         "newCampaignName": "Názov kampane",
         "newCampaignHint": "Vytvorí sa ako návrh bez rozpočtu. Rozpočet nastavte na stránke kampane, kým pôjde naživo.",
         "notesWarning": "Odobratím {markets} sa vymaže {count} interná poznámka. Nedá sa to vrátiť späť. | Odobratím {markets} sa vymaže {count} interných poznámok. Nedá sa to vrátiť späť.",
-        "notesConfirm": "Vymazať poznámky a uložiť"
+        "notesConfirm": "Vymazať poznámky a uložiť",
+        "scriptsWarning": "Tieto trhy majú archivované skripty: {markets}. Odstránia sa spolu s trhmi (skriptov: {count}).",
+        "scriptsConfirm": "Odstrániť skripty a uložiť"
       },
       "validation": {
         "nameRequired": "Zadajte názov vlny.",
@@ -2332,6 +2334,158 @@
       },
       "limit": {
         "placesLeft": "Voľných miest: {count} | Voľných miest: {count}"
+      },
+      "scripts": {
+        "stepper": {
+          "none": "Zatiaľ žiadne skripty",
+          "count": "Skripty: {count}"
+        },
+        "rail": {
+          "title": "Skripty · {market}",
+          "script": "Skript {n}",
+          "draft": "Koncept",
+          "add": "Pridať skript ({n}/{max})",
+          "limit": "Dosiahnutý limit skriptov",
+          "limitHint": "Tento tvorca už má {max} skripty vrátane archivovaných.",
+          "footnote": "Až {max} skripty na tvorcu",
+          "archived": "Archivované skripty ({count})"
+        },
+        "editor": {
+          "title": "{name} · Skript {n}",
+          "lastEdited": "Naposledy upravené: {when}",
+          "delete": "Odstrániť skript",
+          "deleteTitle": "Odstrániť skript {n} tvorcu {name}?",
+          "deleteBody": "Skript a jeho hooky sa odstránia (hookov: {count}). Túto akciu nemožno vrátiť späť.",
+          "deleteConfirm": "Odstrániť skript",
+          "loadFailed": "Tento skript sa nepodarilo načítať."
+        },
+        "save": {
+          "saving": "Ukladá sa…",
+          "saved": "Uložené",
+          "failed": "Uloženie zlyhalo",
+          "refused": "Neprijaté",
+          "retry": "Skúsiť znova",
+          "gone": "Odstránil niekto iný",
+          "allSaved": "Všetky zmeny sú uložené",
+          "stuck": "Neuložené zmeny: {n}"
+        },
+        "brief": {
+          "title": "Brief",
+          "editInStep3": "Upraviť v kroku 3",
+          "persona": "Persóna",
+          "usps": "USP",
+          "priority": "Priorita",
+          "support": "Podpora",
+          "noUsps": "Pre túto persónu nie sú nastavené žiadne USP",
+          "noPersona": "Tento tvorca nemá persónu, takže nie je z čoho brief prevziať. Vyberte persónu v kroku 5.",
+          "openStep5": "Otvoriť krok 5",
+          "angle": "Uhol",
+          "anglePlaceholder": "Napíšte uhol tohto skriptu",
+          "angleFromPersona": "Z uhla persóny",
+          "angleFromMatrix": "Z matice odkazov",
+          "angleOwn": "Váš vlastný uhol",
+          "useLive": "Použiť uhol persóny",
+          "duration": "Dĺžka",
+          "seconds": "{n} sekúnd",
+          "estimate": "Odhadovaná dĺžka: približne {n} s",
+          "noEstimate": "Pridajte zvukový text a uvidíte odhad"
+        },
+        "hooks": {
+          "hook": "Hook {letter}",
+          "menu": "Možnosti hooku {letter}",
+          "collapse": "Zbaliť hook",
+          "expand": "Rozbaliť hook",
+          "duplicate": "Duplikovať",
+          "delete": "Odstrániť",
+          "audio": "Zvukový hook",
+          "visual": "Vizuálny hook",
+          "overlay": "Prekrytie",
+          "optional": "voliteľné",
+          "audioPlaceholder": "Čo tvorca povie v prvých sekundách",
+          "visualPlaceholder": "Čo divák vidí",
+          "overlayPlaceholder": "Text zobrazený na obrazovke",
+          "addOverlay": "Pridať prekrytie (voliteľné)",
+          "noShot": "Typ záberu",
+          "empty": "Zatiaľ žiadny text",
+          "add": "Pridať hook ({n}/{max})",
+          "limit": "Dosiahnutý limit hookov",
+          "deleteTitle": "Odstrániť hook {letter}?",
+          "deleteBody": "Tento hook a jeho text sa odstránia.",
+          "deleteConfirm": "Odstrániť hook"
+        },
+        "shot": {
+          "wide": "Celok",
+          "medium": "Polocelok",
+          "close_up": "Detailný záber",
+          "detail": "Detail",
+          "pov": "Pohľad z prvej osoby",
+          "over_the_shoulder": "Cez plece",
+          "top_down": "Zhora",
+          "screen_recording": "Záznam obrazovky",
+          "reaction": "Reakcia",
+          "creator_to_camera": "Tvorca do kamery"
+        },
+        "conflict": {
+          "title": "Niekto iný to zmenil",
+          "hint": "Váš text tu stále je. Vyberte, čo ponechať.",
+          "theirs": "Ich verzia",
+          "empty": "(prázdne)",
+          "copy": "Kopírovať môj text",
+          "copied": "Skopírované",
+          "copyFailed": "Kopírovanie zlyhalo. Označte svoj text v poliach vyššie a skopírujte ho ručne.",
+          "useTheirs": "Použiť ich verziu",
+          "keepMine": "Ponechať moju"
+        },
+        "leave": {
+          "title": "Odísť bez uloženia?",
+          "body": "Niektoré zmeny sa nepodarilo uložiť. Ak teraz odídete, stratia sa.",
+          "stay": "Zostať",
+          "retry": "Skúsiť uložiť znova",
+          "leave": "Odísť a stratiť zmeny"
+        },
+        "archived": {
+          "title": "Archivované skripty · {market}",
+          "info": "Skript sa archivuje, keď jeho tvorca opustí tento trh. Vráti sa sám, ak sa tvorca na trh znova pridá.",
+          "empty": "Na tomto trhu nie sú žiadne archivované skripty.",
+          "row": "{name} · Skript {n}",
+          "hooks": "Hookov: {count}",
+          "on": "Archivované {date}",
+          "inMarket": "Tento tvorca je na tomto trhu znova.",
+          "delete": "Odstrániť natrvalo",
+          "deleteTitle": "Odstrániť tento skript natrvalo?",
+          "deleteBody": "Skript {n} tvorcu {name} a jeho hooky (hookov: {count}) sa odstránia. Túto akciu nemožno vrátiť späť.",
+          "deleteConfirm": "Odstrániť natrvalo"
+        },
+        "replace": {
+          "label": "Toto miesto má skripty ({count}). Čo s nimi?",
+          "carry": "Preniesť skripty na nového tvorcu",
+          "archive": "Archivovať ich a začať odznova"
+        },
+        "remove": {
+          "label": "Tento tvorca má skripty ({count}). Čo s nimi?",
+          "archive": "Archivovať (zostanú zachované a vrátia sa, ak sa tvorca vráti)",
+          "delete": "Odstrániť ich natrvalo"
+        },
+        "empty": {
+          "noCreators": {
+            "title": "Na trhu {market} zatiaľ nie sú žiadni tvorcovia",
+            "body": "Skripty sa píšu pre každého tvorcu zvlášť. Najprv na tento trh pridajte tvorcov.",
+            "action": "Otvoriť krok 5"
+          },
+          "noScripts": {
+            "title": "Zatiaľ žiadne skripty",
+            "body": "Začnite voľbou „Pridať skript“ pod tvorcom v zozname."
+          }
+        },
+        "errors": {
+          "limitReached": "Tvorca môže mať najviac {max} skripty.",
+          "limitReachedArchived": "Tvorca môže mať najviac {max} skripty vrátane archivovaných.",
+          "hooksLimit": "Skript môže mať najviac {max} hookov.",
+          "lastHook": "Skript si ponechá aspoň jeden hook.",
+          "languageNotAvailable": "Zatiaľ sa dá písať iba po anglicky.",
+          "carryOverExceeds": "Nový tvorca by mal viac ako {max} skripty. Archivujte ich radšej.",
+          "choiceRequired": "Tento tvorca má skripty. Vyberte, čo s nimi."
+        }
       }
     }
   },

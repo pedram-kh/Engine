@@ -1516,7 +1516,9 @@
         "newCampaignName": "Naziv kampanje",
         "newCampaignHint": "Stvara se kao nacrt bez proračuna. Postavite proračun na stranici kampanje prije objave.",
         "notesWarning": "Uklanjanjem {markets} briše se {count} interna bilješka. To se ne može poništiti. | Uklanjanjem {markets} briše se {count} internih bilješki. To se ne može poništiti.",
-        "notesConfirm": "Izbriši bilješke i spremi"
+        "notesConfirm": "Izbriši bilješke i spremi",
+        "scriptsWarning": "Ova tržišta imaju arhivirane skripte: {markets}. Bit će izbrisane zajedno s tržištima (skripti: {count}).",
+        "scriptsConfirm": "Izbriši skripte i spremi"
       },
       "validation": {
         "nameRequired": "Unesite naziv vala.",
@@ -2332,6 +2334,158 @@
       },
       "limit": {
         "placesLeft": "Preostalo mjesta: {count} | Preostalo mjesta: {count}"
+      },
+      "scripts": {
+        "stepper": {
+          "none": "Još nema skripti",
+          "count": "Skripte: {count}"
+        },
+        "rail": {
+          "title": "Skripte · {market}",
+          "script": "Skripta {n}",
+          "draft": "Skica",
+          "add": "Dodaj skriptu ({n}/{max})",
+          "limit": "Dosegnuto ograničenje skripti",
+          "limitHint": "Ovaj kreator već ima {max} skripte, uključujući arhivirane.",
+          "footnote": "Do {max} skripte po kreatoru",
+          "archived": "Arhivirane skripte ({count})"
+        },
+        "editor": {
+          "title": "{name} · Skripta {n}",
+          "lastEdited": "Zadnje uređivanje: {when}",
+          "delete": "Izbriši skriptu",
+          "deleteTitle": "Izbrisati skriptu {n} kreatora {name}?",
+          "deleteBody": "Skripta i njezini hookovi bit će izbrisani (hookova: {count}). Ovo se ne može poništiti.",
+          "deleteConfirm": "Izbriši skriptu",
+          "loadFailed": "Ova skripta nije se mogla učitati."
+        },
+        "save": {
+          "saving": "Spremanje…",
+          "saved": "Spremljeno",
+          "failed": "Spremanje nije uspjelo",
+          "refused": "Nije prihvaćeno",
+          "retry": "Pokušaj ponovno",
+          "gone": "Uklonila je druga osoba",
+          "allSaved": "Sve promjene su spremljene",
+          "stuck": "Nespremljene promjene: {n}"
+        },
+        "brief": {
+          "title": "Brief",
+          "editInStep3": "Uredi u koraku 3",
+          "persona": "Persona",
+          "usps": "USP",
+          "priority": "Prioritet",
+          "support": "Podrška",
+          "noUsps": "Za ovu personu nisu postavljeni USP-ovi",
+          "noPersona": "Ovaj kreator nema personu pa nema briefa koji bi se preuzeo. Odaberite personu u koraku 5.",
+          "openStep5": "Otvori korak 5",
+          "angle": "Kut",
+          "anglePlaceholder": "Napišite kut ove skripte",
+          "angleFromPersona": "Iz kuta persone",
+          "angleFromMatrix": "Iz matrice poruka",
+          "angleOwn": "Vaš vlastiti kut",
+          "useLive": "Koristi kut persone",
+          "duration": "Trajanje",
+          "seconds": "{n} sekundi",
+          "estimate": "Procijenjena duljina: oko {n} s",
+          "noEstimate": "Dodajte audio tekst da vidite procjenu"
+        },
+        "hooks": {
+          "hook": "Hook {letter}",
+          "menu": "Opcije za hook {letter}",
+          "collapse": "Sažmi hook",
+          "expand": "Proširi hook",
+          "duplicate": "Dupliciraj",
+          "delete": "Izbriši",
+          "audio": "Audio hook",
+          "visual": "Vizualni hook",
+          "overlay": "Preklapanje",
+          "optional": "neobavezno",
+          "audioPlaceholder": "Što kreator kaže u prvim sekundama",
+          "visualPlaceholder": "Što gledatelj vidi",
+          "overlayPlaceholder": "Tekst prikazan na zaslonu",
+          "addOverlay": "Dodaj preklapanje (neobavezno)",
+          "noShot": "Vrsta kadra",
+          "empty": "Još nema teksta",
+          "add": "Dodaj hook ({n}/{max})",
+          "limit": "Dosegnuto ograničenje hookova",
+          "deleteTitle": "Izbrisati hook {letter}?",
+          "deleteBody": "Ovaj hook i njegov tekst bit će izbrisani.",
+          "deleteConfirm": "Izbriši hook"
+        },
+        "shot": {
+          "wide": "Total",
+          "medium": "Polutotal",
+          "close_up": "Krupni plan",
+          "detail": "Detalj",
+          "pov": "Pogled iz prvog lica",
+          "over_the_shoulder": "Preko ramena",
+          "top_down": "Odozgo",
+          "screen_recording": "Snimka zaslona",
+          "reaction": "Reakcija",
+          "creator_to_camera": "Kreator u kameru"
+        },
+        "conflict": {
+          "title": "Netko drugi je ovo promijenio",
+          "hint": "Vaš tekst je i dalje ovdje. Odaberite što zadržati.",
+          "theirs": "Njihova verzija",
+          "empty": "(prazno)",
+          "copy": "Kopiraj moj tekst",
+          "copied": "Kopirano",
+          "copyFailed": "Kopiranje nije uspjelo. Označite svoj tekst u poljima iznad i kopirajte ga ručno.",
+          "useTheirs": "Koristi njihovu verziju",
+          "keepMine": "Zadrži moju"
+        },
+        "leave": {
+          "title": "Napustiti bez spremanja?",
+          "body": "Neke promjene nije bilo moguće spremiti. Ako sada odete, bit će izgubljene.",
+          "stay": "Ostani",
+          "retry": "Pokušaj ponovno spremiti",
+          "leave": "Napusti i izgubi promjene"
+        },
+        "archived": {
+          "title": "Arhivirane skripte · {market}",
+          "info": "Skripta se arhivira kada njezin kreator napusti ovo tržište. Vraća se sama ako se kreator ponovno doda na tržište.",
+          "empty": "Na ovom tržištu nema arhiviranih skripti.",
+          "row": "{name} · Skripta {n}",
+          "hooks": "Hookova: {count}",
+          "on": "Arhivirano {date}",
+          "inMarket": "Ovaj kreator ponovno je na ovom tržištu.",
+          "delete": "Izbriši zauvijek",
+          "deleteTitle": "Izbrisati ovu skriptu zauvijek?",
+          "deleteBody": "Skripta {n} kreatora {name} i njezini hookovi (hookova: {count}) bit će izbrisani. Ovo se ne može poništiti.",
+          "deleteConfirm": "Izbriši zauvijek"
+        },
+        "replace": {
+          "label": "Ovo mjesto ima skripte ({count}). Što će se dogoditi s njima?",
+          "carry": "Prenesi skripte na novog kreatora",
+          "archive": "Arhiviraj ih i počni ispočetka"
+        },
+        "remove": {
+          "label": "Ovaj kreator ima skripte ({count}). Što će se dogoditi s njima?",
+          "archive": "Arhiviraj (ostaju sačuvane i vraćaju se ako se kreator vrati)",
+          "delete": "Izbriši ih zauvijek"
+        },
+        "empty": {
+          "noCreators": {
+            "title": "Još nema kreatora na tržištu {market}",
+            "body": "Skripte se pišu po kreatoru. Prvo dodajte kreatore na ovo tržište.",
+            "action": "Otvori korak 5"
+          },
+          "noScripts": {
+            "title": "Još nema skripti",
+            "body": "Za početak odaberite „Dodaj skriptu” ispod kreatora na popisu."
+          }
+        },
+        "errors": {
+          "limitReached": "Kreator može imati najviše {max} skripte.",
+          "limitReachedArchived": "Kreator može imati najviše {max} skripte, uključujući arhivirane.",
+          "hooksLimit": "Skripta može imati najviše {max} hookova.",
+          "lastHook": "Skripta zadržava barem jedan hook.",
+          "languageNotAvailable": "Za sada se može pisati samo na engleskom.",
+          "carryOverExceeds": "Novi kreator imao bi više od {max} skripte. Umjesto toga ih arhivirajte.",
+          "choiceRequired": "Ovaj kreator ima skripte. Odaberite što će se dogoditi s njima."
+        }
       }
     }
   },

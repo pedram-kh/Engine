@@ -7,7 +7,7 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
-import { SCRIPT_DURATIONS, SHOT_TYPES } from './scripts'
+import { SCRIPT_DURATIONS, SCRIPT_TEXT_LIMITS, SHOT_TYPES } from './scripts'
 
 const API = resolve(
   dirname(fileURLToPath(import.meta.url)),
@@ -26,5 +26,17 @@ describe('scripts types parity with the backend', () => {
     const m = /SCRIPT_DURATIONS = \[([^\]]+)\]/.exec(php)
     expect(m).not.toBeNull()
     expect([...SCRIPT_DURATIONS]).toEqual((m?.[1] ?? '').split(',').map((n) => Number(n.trim())))
+  })
+
+  it('SCRIPT_TEXT_LIMITS equals the text limits of StrategyLimits', () => {
+    const php = readFileSync(resolve(API, 'StrategyLimits.php'), 'utf-8')
+    const read = (name: string): number =>
+      Number(new RegExp(`const ${name} = (\\d+);`).exec(php)?.[1])
+    expect({ ...SCRIPT_TEXT_LIMITS }).toEqual({
+      angle: read('SCRIPT_ANGLE'),
+      audio: read('HOOK_AUDIO'),
+      overlay: read('HOOK_OVERLAY'),
+      visual: read('HOOK_VISUAL'),
+    })
   })
 })

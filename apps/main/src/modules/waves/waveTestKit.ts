@@ -168,6 +168,11 @@ export async function mountWithApp(
         name: 'strategy.creators',
         component: page,
       },
+      {
+        path: '/brands/:ulid/waves/:waveUlid/strategy/scripts',
+        name: 'strategy.scripts',
+        component: page,
+      },
     ],
   })
   await router.push(options.route ?? `/brands/${BRAND_ULID}/waves/${WAVE_ULID}`)
