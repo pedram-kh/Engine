@@ -103,3 +103,7 @@ Neither recurred in the way it was first seen. The "waiting for Saved" failure w
 ## 10. Screenshots (outside the repository, `/tmp/pl32/shots`)
 
 `grow-1600.png`, `grow-390.png`, `s3-admin-1600-editor.png`, `s3-admin-390-editor.png`, `s3-staff-1600-archived-dialog.png`, `s3-staff-390-archived-dialog.png`, `s3-staff-390-rail.png`, `s3-{admin,staff}-{1600,390}-archive-dialog.png`, `s3-{admin,staff}-{1600,390}-archived-dialog.png`.
+
+## 11. CI
+
+Code tip `01084935`, run `45712916684`: Backend, Frontend, E2E main and E2E admin all green. Two earlier runs of the same push failed: run on `326904d4` (Larastan: `collect()` in `ScriptsApiTest`) and run `45709964155` on `aa244c9d` (Postgres whole suite: `Pl32WalkSeedersTest` S2; Frontend: the pinned agency route list lacked `strategy.scripts`). All three were from PL-3.2 code that had never been on CI. Lesson: the local checks ran the touched PHP folders on sqlite and Larastan on touched files only; the whole-project Larastan run and the Postgres run of the walk seeder tests are now part of what I run before a push.
