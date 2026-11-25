@@ -40,7 +40,7 @@ it('G1: every scripts route answers 404 not_found with the sprint flag off, and 
     $w = SF::world(armed: false);
     $u = '01HZZZZZZZZZZZZZZZZZZZZZZZ';
     $routes = [
-        ['GET', ''], ['GET', 'archived'], ['DELETE', "archived/{$u}"], ['POST', ''], ['GET', $u], ['PUT', "{$u}/brief"], ['DELETE', $u],
+        ['GET', ''], ['GET', 'archived'], ['DELETE', "archived/{$u}"], ['POST', "archived/{$u}/restore"], ['POST', ''], ['GET', $u], ['PUT', "{$u}/brief"], ['POST', "{$u}/archive"],
         ['POST', "{$u}/hooks"], ['PUT', "{$u}/hooks/{$u}"], ['POST', "{$u}/hooks/{$u}/duplicate"], ['DELETE', "{$u}/hooks/{$u}"],
     ];
     // The table is checked against the router: a new scripts route fails here until it is added.
@@ -83,7 +83,9 @@ it('G2: tenancy: another agency, brand or wave is 404 on every route; another wa
     S::call($w['admin'], 'GET', $otherUrl)->assertNotFound();
     S::call($w['admin'], 'PUT', "{$otherUrl}/brief", ['duration_seconds' => 45, 'revision' => 1])->assertNotFound();
     S::call($w['admin'], 'PUT', "{$otherUrl}/hooks/{$hook->ulid}", ['shot_type' => 'wide', 'revision' => 1])->assertNotFound();
-    S::call($w['admin'], 'DELETE', $otherUrl)->assertNotFound();
+    S::call($w['admin'], 'POST', "{$otherUrl}/archive")->assertNotFound();
+    S::call($w['admin'], 'POST', S::u(['agency' => $w['agency'], 'brand' => $w['brand'], 'wave' => $other], "scripts/archived/{$ulid}/restore"))->assertNotFound();
+    S::call($w['admin'], 'DELETE', S::u(['agency' => $w['agency'], 'brand' => $w['brand'], 'wave' => $other], "scripts/archived/{$ulid}"))->assertNotFound();
 
     // a hook ulid of another script
     [$slot2] = SF::slot($w, 'RO');
@@ -123,7 +125,7 @@ it('G3: roles: admin, manager and staff write; a creator user is refused; deleti
     expect(WaveScript::query()->where('ulid', $first)->exists())->toBeFalse();
 });
 
-it('G4: a new script takes the lowest free number and hooks A, B, C; the fourth is refused; deleting frees the number', function (): void {
+it('G4: a new script takes the lowest free number among the LIVE ones and hooks A, B, C; the fourth is refused; archiving frees the place', function (): void {
     $w = SF::world();
     [$slot] = SF::slot($w);
 
@@ -137,34 +139,119 @@ it('G4: a new script takes the lowest free number and hooks A, B, C; the fourth 
     S::call($w['admin'], 'POST', SF::url($w), ['slot' => $slot->ulid])
         ->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_script.limit_reached')->assertJsonPath('errors.0.meta.max', 3);
     expect(WaveScript::query()->count())->toBe(3);
+    $rail = fn () => S::call($w['admin'], 'GET', SF::url($w).'?market='.$w['mk']['SK'])->assertOk()->json('data.rail.creators.0');
+    expect($rail()['can_add_script'])->toBeFalse()->and($rail()['scripts'])->toHaveCount(3);
 
-    S::call($w['admin'], 'DELETE', SF::url($w, $b))->assertOk();
+    // Archive the second: nothing is destroyed, the place is free, the rail offers "Add script" again.
+    S::call($w['admin'], 'POST', SF::url($w, "{$b}/archive"))->assertOk();
+    expect($rail()['can_add_script'])->toBeTrue()->and($rail()['scripts'])->toHaveCount(2);
+    $archived = WaveScript::query()->where('ulid', $b)->firstOrFail();
+    expect($archived->archived_at)->not->toBeNull()->and($archived->wave_creator_id)->toBeNull()->and($archived->number)->toBe(2)
+        ->and(WaveScriptHook::query()->where('script_id', $archived->id)->count())->toBe(3);
     S::call($w['admin'], 'POST', SF::url($w), ['slot' => $slot->ulid])->assertCreated()->assertJsonPath('data.number', 2);
-    expect($c)->not->toBe('');
+    expect($c)->not->toBe('')
+        ->and(WaveScript::query()->whereNull('archived_at')->pluck('number')->sort()->values()->all())->toBe([1, 2, 3])
+        ->and(WaveScript::query()->whereNotNull('archived_at')->pluck('number')->all())->toBe([2]);
 });
 
-it('G4b: the cap of three counts ARCHIVED scripts of the creator too', function (): void {
+it('G4c: restore: the own number when free, otherwise the lowest free; refused with three live scripts; a creator who left stays archived', function (): void {
+    $w = SF::world();
+    [$slot, $creator] = SF::slot($w);
+    $one = pl32Create($w, $slot->ulid);
+    $two = pl32Create($w, $slot->ulid);
+    $three = pl32Create($w, $slot->ulid);
+
+    S::call($w['staff'], 'POST', SF::url($w, "{$two}/archive"))->assertOk();
+    $replacement = pl32Create($w, $slot->ulid);           // takes number 2
+    expect(WaveScript::query()->where('ulid', $replacement)->value('number'))->toBe(2);
+
+    // three live: the archived "2" cannot come back, and nothing is written
+    S::call($w['staff'], 'POST', SF::url($w, "archived/{$two}/restore"))->assertStatus(422)
+        ->assertJsonPath('errors.0.code', 'wave_script.restore_limit_reached')->assertJsonPath('errors.0.meta.max', 3);
+    expect(WaveScript::query()->where('ulid', $two)->value('archived_at'))->not->toBeNull();
+
+    // archive number 1: the archived "2" cannot keep 2 (taken by the replacement), so it takes the lowest free place, 1
+    S::call($w['staff'], 'POST', SF::url($w, "{$one}/archive"))->assertOk();
+    S::call($w['staff'], 'POST', SF::url($w, "archived/{$two}/restore"))->assertOk();
+    $back = WaveScript::query()->where('ulid', $two)->firstOrFail();
+    expect($back->archived_at)->toBeNull()->and($back->wave_creator_id)->toBe($slot->id)->and($back->number)->toBe(1);
+
+    // archive "3": the archived "1" (the old one) has number 1 taken by $two, 3 is free: lowest free is 3
+    S::call($w['staff'], 'POST', SF::url($w, "{$three}/archive"))->assertOk();
+    S::call($w['staff'], 'POST', SF::url($w, "archived/{$one}/restore"))->assertOk();
+    expect(WaveScript::query()->where('ulid', $one)->value('number'))->toBe(3);
+
+    // the live one is not an archived script: restore is a 404; the list marks who can come back
+    S::call($w['staff'], 'POST', SF::url($w, "archived/{$one}/restore"))->assertNotFound();
+    $list = S::call($w['staff'], 'GET', SF::url($w, 'archived?market='.$w['mk']['SK']))->assertOk()->json('data');
+    expect(array_column($list, 'id'))->toBe([$three])->and($list[0]['creator_in_market'])->toBeTrue()->and($list[0]['can_restore'])->toBeFalse();
+
+    // the creator leaves (archive choice): their scripts stay archived and cannot be restored until they are added again
+    S::call($w['admin'], 'DELETE', F::url($w, $slot->ulid), ['scripts' => 'archive'])->assertOk();
+    S::call($w['staff'], 'POST', SF::url($w, "archived/{$three}/restore"))->assertStatus(422)
+        ->assertJsonPath('errors.0.code', 'wave_script.restore_creator_missing');
+    $gone = S::call($w['staff'], 'GET', SF::url($w, 'archived?market='.$w['mk']['SK']))->json('data');
+    expect(collect($gone)->every(fn ($row) => $row['creator_in_market'] === false && $row['can_restore'] === false))->toBeTrue();
+
+    // added again: as many as fit under three come back, in number order, the rest stay archived
+    S::call($w['admin'], 'POST', F::url($w), ['market' => $w['mk']['SK'], 'creators' => [$creator->ulid]])->assertCreated();
+    expect(WaveScript::query()->whereNull('archived_at')->count())->toBe(3)->and(WaveScript::query()->whereNotNull('archived_at')->count())->toBe(1)
+        ->and(WaveScript::query()->whereNull('archived_at')->pluck('number')->sort()->values()->all())->toBe([1, 2, 3]);
+});
+
+it('G4d: permissions: staff archives and restores but gets 403 on the permanent delete; admin and manager delete from the archive; another agency gets 404; there is no way to delete a live script', function (): void {
+    $w = SF::world();
+    [$slot] = SF::slot($w);
+    $first = pl32Create($w, $slot->ulid);
+    $second = pl32Create($w, $slot->ulid);
+
+    // a live script cannot be deleted: no such route (405), whoever asks
+    foreach (['staff', 'manager', 'admin'] as $role) {
+        S::call($w[$role], 'DELETE', SF::url($w, $first))->assertStatus(405);
+    }
+    expect(WaveScript::query()->count())->toBe(2);
+
+    S::call($w['staff'], 'POST', SF::url($w, "{$first}/archive"))->assertOk();
+    S::call($w['staff'], 'POST', SF::url($w, "archived/{$first}/restore"))->assertOk();
+    S::call($w['staff'], 'POST', SF::url($w, "{$first}/archive"))->assertOk();
+    S::call($w['staff'], 'DELETE', SF::url($w, "archived/{$first}"))->assertForbidden();
+    expect(WaveScript::query()->where('ulid', $first)->exists())->toBeTrue();
+
+    // another agency: 404 on all three, nothing changes
+    foreach ([['POST', "{$second}/archive"], ['POST', "archived/{$first}/restore"], ['DELETE', "archived/{$first}"]] as [$method, $suffix]) {
+        S::call($w['otherAdmin'], $method, SF::url($w, $suffix))->assertNotFound();
+    }
+    expect(WaveScript::query()->where('ulid', $first)->value('archived_at'))->not->toBeNull()->and(WaveScript::query()->where('ulid', $second)->value('archived_at'))->toBeNull();
+
+    S::call($w['manager'], 'DELETE', SF::url($w, "archived/{$first}"))->assertOk();
+    expect(WaveScript::query()->where('ulid', $first)->exists())->toBeFalse()->and(WaveScriptHook::query()->where('wave_id', $w['wave']->id)->count())->toBe(3);
+    S::call($w['admin'], 'POST', SF::url($w, "{$second}/archive"))->assertOk();
+    S::call($w['admin'], 'DELETE', SF::url($w, "archived/{$second}"))->assertOk();
+    expect(WaveScript::query()->count())->toBe(0);
+});
+
+it('G4b: archived scripts do not count toward the three: a creator with archived scripts in another market still has three places', function (): void {
     $w = SF::world();
     [$slot, $creator] = SF::slot($w);
     pl32Create($w, $slot->ulid);
     pl32Create($w, $slot->ulid);
     S::call($w['admin'], 'DELETE', F::url($w, $slot->ulid), ['scripts' => 'archive'])->assertOk();
-    // the creator comes back: two scripts are restored on the new slot, the third number is free, a fourth is not
+    // the creator comes back to SK: both archived scripts return with their numbers, one number is free, a fourth is refused
     S::call($w['admin'], 'POST', F::url($w), ['market' => $w['mk']['SK'], 'creators' => [$creator->ulid]])->assertCreated();
     $slot = WaveCreator::query()->where('creator_id', $creator->id)->firstOrFail();
     pl32Create($w, $slot->ulid);
     S::call($w['admin'], 'POST', SF::url($w), ['slot' => $slot->ulid])->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_script.limit_reached');
 
-    // archived scripts of ANOTHER market hold their numbers: two archived in SK leave one number for the same creator in RO
+    // all three archived in SK, the creator added to RO: RO has three free places (archived scripts hold none)
     S::call($w['admin'], 'DELETE', F::url($w, $slot->ulid), ['scripts' => 'archive'])->assertOk();
     expect(WaveScript::query()->whereNotNull('archived_at')->count())->toBe(3);
-    S::call($w['admin'], 'DELETE', SF::url($w, 'archived/'.WaveScript::query()->where('number', 3)->firstOrFail()->ulid))->assertOk();
     S::call($w['admin'], 'POST', F::url($w), ['market' => $w['mk']['RO'], 'creators' => [$creator->ulid]])->assertCreated();
     $ro = WaveCreator::query()->where('creator_id', $creator->id)->firstOrFail();
-    $new = S::call($w['admin'], 'POST', SF::url($w), ['slot' => $ro->ulid])->assertCreated();
-    $new->assertJsonPath('data.number', 3);
-    S::call($w['admin'], 'POST', SF::url($w), ['slot' => $ro->ulid])
-        ->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_script.limit_reached')->assertJsonPath('errors.0.meta.archived', 2);
+    foreach ([1, 2, 3] as $n) {
+        S::call($w['admin'], 'POST', SF::url($w), ['slot' => $ro->ulid])->assertCreated()->assertJsonPath('data.number', $n);
+    }
+    S::call($w['admin'], 'POST', SF::url($w), ['slot' => $ro->ulid])->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_script.limit_reached');
+    expect(WaveScript::query()->whereNotNull('archived_at')->count())->toBe(3)->and(WaveScript::query()->whereNull('archived_at')->count())->toBe(3);
 });
 
 it('G11: text limits: exactly at the limit saves, one over is 422; control characters are stripped; a blank text removes the row', function (): void {
@@ -276,6 +363,31 @@ it('G13: revision: stale is 409 with the current block and writes nothing; the c
     expect(WaveScript::query()->where('ulid', $id)->value('duration_seconds'))->toBe(45);
 });
 
+it('G13c: a block save without a revision is refused and writes nothing; "keep mine" is one retry on the current revision, and a later stale save is a 409 again', function (): void {
+    $w = SF::world();
+    [$slot] = SF::slot($w);
+    $script = S::call($w['admin'], 'POST', SF::url($w), ['slot' => $slot->ulid])->assertCreated();
+    $id = $script->json('data.id');
+    $hookA = $script->json('data.hooks.0.id');
+
+    // No revision at all: refused (422 on the field), on the hook and on the brief; nothing is written, so there is no "force" save.
+    S::call($w['admin'], 'PUT', SF::url($w, "{$id}/hooks/{$hookA}"), ['texts' => ['audio' => ['en' => 'no revision']]])
+        ->assertStatus(422)->assertJsonPath('errors.0.meta.field', 'revision');
+    S::call($w['admin'], 'PUT', SF::url($w, "{$id}/brief"), ['duration_seconds' => 45])->assertStatus(422);
+    S::call($w['admin'], 'PUT', SF::url($w, "{$id}/hooks/{$hookA}"), ['texts' => ['audio' => ['en' => 'zero']], 'revision' => 0])->assertStatus(422);
+    expect(WaveScriptHookText::query()->whereIn('body', ['no revision', 'zero'])->exists())->toBeFalse()
+        ->and(WaveScript::query()->where('ulid', $id)->value('duration_seconds'))->toBe(30);
+
+    // Tab 1 saves (1 -> 2). Tab 2 still holds 1: 409. "Keep mine" in tab 2 is one more save carrying revision 2 (the one in the 409).
+    S::call($w['admin'], 'PUT', SF::url($w, "{$id}/hooks/{$hookA}"), ['texts' => ['audio' => ['en' => 'tab one']], 'revision' => 1])->assertOk();
+    S::call($w['manager'], 'PUT', SF::url($w, "{$id}/hooks/{$hookA}"), ['texts' => ['audio' => ['en' => 'tab two']], 'revision' => 1])->assertStatus(409);
+    S::call($w['manager'], 'PUT', SF::url($w, "{$id}/hooks/{$hookA}"), ['texts' => ['audio' => ['en' => 'tab two']], 'revision' => 2])->assertOk();
+    // Tab 1 (revision 2) and tab 2 (now 3) each save again; the one holding 2 is refused again: nothing remembers "keep mine".
+    S::call($w['admin'], 'PUT', SF::url($w, "{$id}/hooks/{$hookA}"), ['texts' => ['audio' => ['en' => 'tab one again']], 'revision' => 2])
+        ->assertStatus(409)->assertJsonPath('errors.0.meta.current.texts.audio.en', 'tab two')->assertJsonPath('errors.0.meta.current.revision', 3);
+    expect(WaveScriptHookText::query()->where('body', 'tab one again')->exists())->toBeFalse();
+});
+
 it('G13b: hooks: at most six, the last cannot be deleted, duplicate lands after the original with its texts, delete closes the gap', function (): void {
     $w = SF::world();
     [$slot] = SF::slot($w);
@@ -375,18 +487,26 @@ it('G15: audit rows: literal payloads with ids, number, counts and field names; 
     S::call($w['admin'], 'POST', SF::url($w, "{$id}/hooks"))->assertCreated();
     S::call($w['admin'], 'POST', SF::url($w, "{$id}/hooks/{$hook->ulid}/duplicate"))->assertCreated();
     S::call($w['admin'], 'DELETE', SF::url($w, "{$id}/hooks/{$hook->ulid}"))->assertOk();
-    S::call($w['admin'], 'DELETE', SF::url($w, $id))->assertOk();
+    S::call($w['admin'], 'POST', SF::url($w, "{$id}/archive"))->assertOk();
+    S::call($w['admin'], 'POST', SF::url($w, "archived/{$id}/restore"))->assertOk();
+    S::call($w['admin'], 'POST', SF::url($w, "{$id}/archive"))->assertOk();
+    S::call($w['admin'], 'DELETE', SF::url($w, "archived/{$id}"))->assertOk();
 
     $rows = AuditLog::query()->where('action', 'like', 'wave_script%')->orderBy('id')->get();
     expect($rows->pluck('action')->map(fn ($a) => $a->value)->all())->toBe([
-        'wave_script.created', 'wave_script_hook.updated', 'wave_script.updated', 'wave_script_hook.created', 'wave_script_hook.duplicated', 'wave_script_hook.deleted', 'wave_script.deleted',
+        'wave_script.created', 'wave_script_hook.updated', 'wave_script.updated', 'wave_script_hook.created', 'wave_script_hook.duplicated', 'wave_script_hook.deleted',
+        'wave_script.archived', 'wave_script.restored', 'wave_script.archived', 'wave_script.deleted',
     ]);
     expect(json_encode($rows->map(fn ($r) => $r->metadata)->all()))->not->toContain('SECRET');
     $meta = $rows->map(fn ($r) => $r->metadata)->values()->all();
     expect(data_get($meta, '0.wave'))->toBe($w['wave']->ulid)->and(data_get($meta, '0.market'))->toBe($w['mk']['SK'])->and(data_get($meta, '0.script'))->toBe($id)
         ->and(data_get($meta, '0.number'))->toBe(1)->and(data_get($meta, '0.creator_id'))->toBe($slot->creator_id)->and(data_get($meta, '0.hooks'))->toBe(3);
     expect(data_get($meta, '1.fields'))->toBe(['visual_description', 'audio'])->and(data_get($meta, '2.fields'))->toBe(['angle', 'duration_seconds']);
-    expect(data_get($meta, '6.hooks'))->toBe(4)->and(WaveScriptHook::query()->count())->toBe(0)->and(WaveScriptHookText::query()->count())->toBe(0);
+    // archive, restore, archive and delete: literal keys (wave, market, script, number, creator_id; hooks on the delete), no text
+    expect(data_get($meta, '6'))->toBe(['wave' => $w['wave']->ulid, 'market' => $w['mk']['SK'], 'script' => $id, 'number' => 1, 'creator_id' => $slot->creator_id])
+        ->and(data_get($meta, '7'))->toBe(['wave' => $w['wave']->ulid, 'market' => $w['mk']['SK'], 'script' => $id, 'number' => 1, 'creator_id' => $slot->creator_id])
+        ->and(data_get($meta, '9.hooks'))->toBe(4)->and(array_keys($meta[9]))->toBe(['wave', 'market', 'script', 'number', 'creator_id', 'hooks'])
+        ->and(WaveScriptHook::query()->count())->toBe(0)->and(WaveScriptHookText::query()->count())->toBe(0);
 });
 
 it('G16: notes: step=scripts needs a market, is one thread per market, is 404 with the sprint flag off', function (): void {

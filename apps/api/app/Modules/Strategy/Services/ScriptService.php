@@ -18,13 +18,13 @@ use App\Modules\Waves\Models\Wave;
 use App\Modules\Waves\Models\WaveMarket;
 
 /**
- * Create, edit the brief of, and delete scripts (PL-3.2a). EVERY write goes through {@see ScriptGuard::transaction()}: the wave
+ * Create, edit the brief of, archive, restore and (from the archive, admin and manager only) delete scripts (PL-3.2a). EVERY write goes through {@see ScriptGuard::transaction()}: the wave
  * row lock first, then the script row lock, then the checks. Archive, restore and carry-over live in {@see ScriptArchive} and
  * are called by the creators service inside its own guarded transaction. Audit rows have literal keys; never the angle.
  */
 final class ScriptService
 {
-    /** A new script for a slot: the lowest free number 1 to 3 (archived scripts of the creator hold theirs), hooks A, B and C. */
+    /** A new script for a slot: the lowest free number 1 to 3 among the creator's LIVE scripts, hooks A, B and C. */
     public function create(Brand $brand, Wave $wave, User $actor, string $slotUlid): WaveScript
     {
         StrategyGuard::assertBrandWritable($brand);
@@ -36,16 +36,10 @@ final class ScriptService
             }
             $market = WaveMarket::query()->findOrFail($slot->market_id);
 
-            $held = WaveScript::query()->where('wave_id', $locked->id)->where('creator_id', $slot->creator_id)->get(['number', 'archived_at']);
-            $number = null;
-            for ($n = 1; $n <= StrategyLimits::SCRIPTS_PER_CREATOR; $n++) {
-                if (! $held->contains('number', $n)) {
-                    $number = $n;
-                    break;
-                }
-            }
+            // Only LIVE scripts hold a number and count toward the three: an archived one has given its place up.
+            $number = ScriptArchive::numberFor(1, ScriptArchive::liveNumbers($locked, $slot->creator_id));
             if ($number === null) {
-                throw StrategyRuleViolation::scriptLimitReached($held->whereNotNull('archived_at')->count());
+                throw StrategyRuleViolation::scriptLimitReached();
             }
 
             $script = WaveScript::query()->create([
@@ -131,14 +125,30 @@ final class ScriptService
         });
     }
 
-    /** Delete a LIVE script for good: its hooks and texts go with it, and its number becomes free. */
-    public function delete(Brand $brand, Wave $wave, User $actor, string $scriptUlid): void
+    /**
+     * Archive a LIVE script (the editor's "Archive script", every agency role): it leaves the rail for the archived list with its
+     * hooks and texts untouched, and its place (the number) is free for a new script. Nothing is destroyed.
+     */
+    public function archive(Brand $brand, Wave $wave, User $actor, string $scriptUlid): void
     {
         StrategyGuard::assertBrandWritable($brand);
 
         ScriptGuard::transaction($wave, function (Wave $locked) use ($actor, $scriptUlid): void {
             $script = ScriptGuard::lockedScript($locked, $scriptUlid);
-            ScriptArchive::deleteOne($locked, $script, $this->marketUlid($script), $actor);
+            ScriptArchive::archiveOne($locked, $script, $this->marketUlid($script), $actor);
+        });
+    }
+
+    /**
+     * Restore an ARCHIVED script (every agency role): back on its creator's slot, with its own number when free, otherwise the
+     * lowest free one. Refused, writing nothing, when the creator already has three live scripts or is no longer in the market.
+     */
+    public function restore(Brand $brand, Wave $wave, User $actor, string $scriptUlid): void
+    {
+        StrategyGuard::assertBrandWritable($brand);
+
+        ScriptGuard::transaction($wave, function (Wave $locked) use ($actor, $scriptUlid): void {
+            ScriptArchive::restoreOne($locked, ScriptGuard::lockedArchivedScript($locked, $scriptUlid), $actor);
         });
     }
 

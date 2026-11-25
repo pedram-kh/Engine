@@ -180,13 +180,10 @@ final class WaveCreatorService
 
             WaveCreatorBoardRules::assertRemovable($locked, $slot);
 
-            // Check the cap BEFORE anything is written: a refusal leaves the slot, the card and the scripts as they were.
+            // The new creator is not in this wave, so they hold no LIVE script: the carried scripts keep their numbers (an archived
+            // script of theirs does not hold a number; it comes back below, as far as the cap of three allows).
             $live = ScriptArchive::liveOf($slot);
-            $carried = 0;
-            if ($live->isNotEmpty() && $scripts === self::CARRY_OVER) {
-                ScriptArchive::renumberForCarryOver($locked, $live, $new->id);
-                $carried = $live->count();
-            }
+            $carried = $live->isNotEmpty() && $scripts === self::CARRY_OVER ? $live->count() : 0;
             WaveCreatorBoardRules::release($locked, $slot, $actor);
 
             $previous = $slot->creator_id;

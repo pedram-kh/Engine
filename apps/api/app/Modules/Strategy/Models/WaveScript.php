@@ -17,8 +17,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
- * One script of one creator's slot (PL-3.2a). At most three per creator per wave (CHECK and unique key). Archived, not
- * deleted, when its slot is removed or replaced: `wave_creator_id` is then NULL and `archived_at` is set. `angle` null means
+ * One script of one creator's slot (PL-3.2a). At most three LIVE ones per creator per wave (CHECK and a partial unique index on the
+ * live rows). Archived, not deleted, when someone archives it or its slot is removed or replaced: `wave_creator_id` is then NULL and `archived_at` is set. `angle` null means
  * "live": the brief shows the persona's angle. `revision` moves on every change of the script or a block of it;
  * `brief_revision` only on a change of the brief.
  *

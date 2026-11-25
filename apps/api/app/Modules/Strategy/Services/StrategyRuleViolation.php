@@ -316,12 +316,26 @@ final class StrategyRuleViolation extends RuntimeException
 
     // ── PL-3.2a scripts ──────────────────────────────────────────────────────────────────────────────────────────────
 
-    /** @param  int  $archived  how many of the creator's three scripts are archived (a cap that archived scripts still fill) */
-    public static function scriptLimitReached(int $archived): self
+    /** The creator already has the most LIVE scripts a wave allows (archived scripts do not count). */
+    public static function scriptLimitReached(): self
     {
         $max = StrategyLimits::SCRIPTS_PER_CREATOR;
 
-        return new self('wave_script.limit_reached', "A creator has at most {$max} scripts in a wave.", 422, ['max' => $max, 'archived' => $archived]);
+        return new self('wave_script.limit_reached', "A creator has at most {$max} scripts in a wave.", 422, ['max' => $max]);
+    }
+
+    /** Restore an archived script of a creator who already has three live ones. */
+    public static function scriptRestoreLimitReached(): self
+    {
+        $max = StrategyLimits::SCRIPTS_PER_CREATOR;
+
+        return new self('wave_script.restore_limit_reached', "This creator already has {$max} scripts. Archive one of them first, then restore this one.", 422, ['max' => $max]);
+    }
+
+    /** Restore an archived script whose creator is no longer in its market: it comes back when the creator is added again. */
+    public static function scriptRestoreCreatorMissing(): self
+    {
+        return new self('wave_script.restore_creator_missing', 'This creator is not in the market any more. The script comes back when the creator is added again.');
     }
 
     public static function scriptHooksLimit(): self
@@ -362,13 +376,5 @@ final class StrategyRuleViolation extends RuntimeException
     public static function scriptsDeleteForbidden(): self
     {
         return new self('forbidden', 'Only an admin or manager can delete scripts.', 403);
-    }
-
-    /** Carry-over on Replace would give the new creator more than three scripts in this wave. */
-    public static function scriptCarryOverExceedsLimit(int $count): self
-    {
-        $max = StrategyLimits::SCRIPTS_PER_CREATOR;
-
-        return new self('wave_script.carry_over_exceeds_limit', "The new creator would have more than {$max} scripts. Archive the scripts instead, or delete some first.", 422, ['count' => $count, 'max' => $max]);
     }
 }

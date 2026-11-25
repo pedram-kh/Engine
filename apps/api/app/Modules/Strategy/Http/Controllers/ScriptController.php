@@ -153,7 +153,8 @@ final class ScriptController
         return response()->json(['data' => ScriptPresenter::script($row)]);
     }
 
-    public function destroy(Request $request, Agency $agency, Brand $brand, string $wave, string $script): JsonResponse
+    /** "Archive script": every agency role; nothing is destroyed. */
+    public function archive(Request $request, Agency $agency, Brand $brand, string $wave, string $script): JsonResponse
     {
         if ($off = $this->flagOff($request)) {
             return $off;
@@ -165,7 +166,28 @@ final class ScriptController
         $actor = $request->user();
 
         try {
-            $this->scripts->delete($brand, $model, $actor, $script);
+            $this->scripts->archive($brand, $model, $actor, $script);
+        } catch (StrategyRuleViolation $e) {
+            return $this->refuse($request, $e);
+        }
+
+        return response()->json(['data' => ScriptPresenter::overview($model, null)]);
+    }
+
+    /** "Restore" in the archived list: every agency role. */
+    public function restore(Request $request, Agency $agency, Brand $brand, string $wave, string $script): JsonResponse
+    {
+        if ($off = $this->flagOff($request)) {
+            return $off;
+        }
+        $this->assertBrand($brand, $agency);
+        $model = $this->findWave($wave, $agency, $brand);
+        Gate::authorize('manageScripts', WaveScript::class);
+        /** @var User $actor */
+        $actor = $request->user();
+
+        try {
+            $this->scripts->restore($brand, $model, $actor, $script);
         } catch (StrategyRuleViolation $e) {
             return $this->refuse($request, $e);
         }

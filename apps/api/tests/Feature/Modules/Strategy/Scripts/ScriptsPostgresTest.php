@@ -112,7 +112,12 @@ it('G14: every script write takes the WAVE lock first, then the SCRIPT row lock,
         'hook add' => [true, fn () => S::call($w['admin'], 'POST', SF::url($w, "{$script->ulid}/hooks"))->assertCreated()],
         'hook duplicate' => [true, fn () => S::call($w['admin'], 'POST', SF::url($w, "{$script->ulid}/hooks/{$hook->ulid}/duplicate"))->assertCreated()],
         'hook delete' => [true, fn () => S::call($w['admin'], 'DELETE', SF::url($w, "{$script->ulid}/hooks/{$hook->ulid}"))->assertOk()],
-        'script delete' => [true, fn () => S::call($w['admin'], 'DELETE', SF::url($w, $extra->ulid))->assertOk()],
+        'script archive' => [true, fn () => S::call($w['admin'], 'POST', SF::url($w, "{$extra->ulid}/archive"))->assertOk()],
+        'script restore' => [true, fn () => S::call($w['admin'], 'POST', SF::url($w, "archived/{$extra->ulid}/restore"))->assertOk()],
+        'script delete (from the archive)' => [true, function () use ($w, $extra): void {
+            DB::table('wave_scripts')->where('id', $extra->id)->update(['wave_creator_id' => null, 'archived_at' => now()]);
+            S::call($w['admin'], 'DELETE', SF::url($w, "archived/{$extra->ulid}"))->assertOk();
+        }],
     ];
 
     foreach ($calls as $name => [$locksScript, $act]) {
@@ -163,7 +168,7 @@ it('G4: two creates at the same moment for a creator with two scripts leave thre
         ->and(WaveScript::query()->where('creator_id', $slot->creator_id)->orderBy('number')->pluck('number')->all())->toBe([1, 2, 3]);
 });
 
-it('G4b: the database refuses a fourth number, number 0, a duplicate number and a duration outside the list', function (): void {
+it('G4b: the database refuses a fourth number, number 0, a duplicate live number and a duration outside the list', function (): void {
     $w = SF::world();
     [$slot] = SF::slot($w);
     SF::script($slot);
@@ -177,6 +182,28 @@ it('G4b: the database refuses a fourth number, number 0, a duplicate number and 
     expect(fn () => DB::transaction(fn () => $row(['number' => 1])))->toThrow(QueryException::class);
     expect(fn () => DB::transaction(fn () => $row(['duration_seconds' => 25])))->toThrow(QueryException::class);
     expect($row([]))->toBeTrue();
+});
+
+it('G4e: a number is unique among the LIVE scripts of a creator only: an archived script holds none, and a restore into a taken number is refused', function (): void {
+    $w = SF::world();
+    [$slot] = SF::slot($w);
+    $one = SF::script($slot);                         // live number 1
+    $row = fn (array $over) => DB::table('wave_scripts')->insert($over + [
+        'ulid' => (string) Str::ulid(), 'agency_id' => $w['agency']->id, 'wave_id' => $w['wave']->id, 'market_id' => $slot->market_id,
+        'creator_id' => $slot->creator_id, 'wave_creator_id' => null, 'archived_at' => now(), 'number' => 1, 'duration_seconds' => 30, 'created_at' => now(), 'updated_at' => now(),
+    ]);
+
+    // two archived scripts with the same number as a live one, and as each other: all fine
+    expect($row([]))->toBeTrue()->and($row([]))->toBeTrue();
+    expect(WaveScript::query()->where('creator_id', $slot->creator_id)->where('number', 1)->count())->toBe(3);
+
+    // a LIVE duplicate is still refused, and so is bringing an archived script back onto a number a live one holds
+    expect(fn () => DB::transaction(fn () => $row(['wave_creator_id' => $slot->id, 'archived_at' => null])))->toThrow(QueryException::class);
+    $archived = WaveScript::query()->whereNotNull('archived_at')->firstOrFail();
+    expect(fn () => DB::transaction(fn () => DB::table('wave_scripts')->where('id', $archived->id)->update(['wave_creator_id' => $slot->id, 'archived_at' => null])))->toThrow(QueryException::class);
+    // archiving the live one frees the number
+    DB::table('wave_scripts')->where('id', $one->id)->update(['wave_creator_id' => null, 'archived_at' => now()]);
+    expect(DB::table('wave_scripts')->where('id', $archived->id)->update(['wave_creator_id' => $slot->id, 'archived_at' => null]))->toBe(1);
 });
 
 it('G5: a script points at a slot of its own wave, market AND creator; the archived CHECK; the hook and text CHECKs', function (): void {
@@ -196,7 +223,7 @@ it('G5: a script points at a slot of its own wave, market AND creator; the archi
     expect(fn () => $row(['archived_at' => now()]))->toThrow(QueryException::class);
     expect(fn () => $row(['wave_creator_id' => null]))->toThrow(QueryException::class);
     expect($row([]))->toBeTrue();
-    expect($row(['wave_creator_id' => null, 'archived_at' => now(), 'number' => 2]))->toBeTrue();
+    expect($row(['wave_creator_id' => null, 'archived_at' => now(), 'number' => 1]))->toBeTrue();   // an archived duplicate of a live number is allowed
 
     $script = WaveScript::query()->where('number', 1)->firstOrFail();
     $hook = fn (array $over) => DB::transaction(fn () => DB::table('wave_script_hooks')->insert($over + [

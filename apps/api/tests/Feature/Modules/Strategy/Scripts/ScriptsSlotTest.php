@@ -9,7 +9,6 @@ use App\Modules\Strategy\Models\WaveScript;
 use App\Modules\Strategy\Models\WaveScriptHook;
 use App\Modules\Strategy\Models\WaveScriptHookText;
 use App\Modules\Strategy\Models\WaveStrategyNote;
-use App\Modules\Waves\Models\Wave;
 use App\Modules\Waves\Models\WaveMarket;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Support\CreatorFixtures as F;
@@ -60,7 +59,7 @@ it('G9a: Remove with scripts and no choice is refused with the count and writes 
     S::call($w['admin'], 'GET', SF::url($w, $id))->assertNotFound();
     S::call($w['admin'], 'PUT', SF::url($w, "{$id}/brief"), ['duration_seconds' => 45, 'revision' => 1])->assertNotFound();
     S::call($w['admin'], 'POST', SF::url($w, "{$id}/hooks"))->assertNotFound();
-    S::call($w['admin'], 'DELETE', SF::url($w, $id))->assertNotFound();
+    S::call($w['admin'], 'POST', SF::url($w, "{$id}/archive"))->assertNotFound();
 
     // the archived list (Q14) names them
     $list = S::call($w['admin'], 'GET', SF::url($w, 'archived?market='.$w['mk']['SK']))->assertOk()->json('data');
@@ -149,37 +148,26 @@ it('G9f: Replace with the archive choice archives the old creator\'s scripts and
     S::call($w['admin'], 'POST', F::url($w, "{$slot->ulid}/replace"), ['creator' => $new->ulid, 'scripts' => 'bogus'])->assertStatus(422);
 });
 
-it('G9g: Replace with carry-over that would give the new creator more than three scripts is refused and nothing moves', function (): void {
+it('G9g: Replace with carry-over keeps the numbers; the new creator\'s archived scripts hold no number and return only as far as three allow', function (): void {
     $w = SF::world();
-    [$slot, , $scripts] = pl32Slot($w, 2);
+    [$slot, , $scripts] = pl32Slot($w, 2);          // live numbers 1, 2
     $new = F::applicant($w['campaign']);
-    // the new creator already has two archived scripts in this wave (numbers 1 and 2)
-    $gone = F::slot($w, $new, 'RO');
-    SF::script($gone);
-    SF::script($gone);
+    // the new creator has two archived scripts in the SAME market (numbers 1 and 2) and one in another market
+    $gone = F::slot($w, $new, 'SK');
+    $mine = [SF::script($gone), SF::script($gone)];
     S::call($w['admin'], 'DELETE', F::url($w, $gone->ulid), ['scripts' => 'archive'])->assertOk();
-
-    S::call($w['admin'], 'POST', F::url($w, "{$slot->ulid}/replace"), ['creator' => $new->ulid])->assertStatus(422)
-        ->assertJsonPath('errors.0.code', 'wave_script.carry_over_exceeds_limit')->assertJsonPath('errors.0.meta.count', 4);
-    expect(WaveCreator::query()->whereKey($slot->id)->value('creator_id'))->not->toBe($new->id)
-        ->and(WaveScript::query()->whereIn('ulid', [$scripts[0]->ulid, $scripts[1]->ulid])->pluck('wave_creator_id')->unique()->all())->toBe([$slot->id]);
-
-    // archive instead works, and the new creator's archived scripts of the OTHER market stay archived
-    S::call($w['admin'], 'POST', F::url($w, "{$slot->ulid}/replace"), ['creator' => $new->ulid, 'scripts' => 'archive'])->assertOk();
-    expect(WaveScript::query()->whereNull('archived_at')->count())->toBe(0);
-});
-
-it('G9h: carry-over renumbers a moved script that would clash with the new creator\'s archived number, and keeps the cap', function (): void {
-    $w = SF::world();
-    [$slot, , $scripts] = pl32Slot($w, 2);          // numbers 1, 2
-    $new = F::applicant($w['campaign']);
-    $gone = F::slot($w, $new, 'RO');
-    SF::script($gone);                                // the new creator's archived number 1
-    S::call($w['admin'], 'DELETE', F::url($w, $gone->ulid), ['scripts' => 'archive'])->assertOk();
+    $other = F::slot($w, $new, 'RO');
+    SF::script($other);
+    S::call($w['admin'], 'DELETE', F::url($w, $other->ulid), ['scripts' => 'archive'])->assertOk();
 
     S::call($w['admin'], 'POST', F::url($w, "{$slot->ulid}/replace"), ['creator' => $new->ulid])->assertOk();
-    $numbers = WaveScript::query()->where('creator_id', $new->id)->orderBy('number')->pluck('number', 'ulid')->all();
-    expect(array_values($numbers))->toBe([1, 2, 3])->and($numbers[$scripts[1]->ulid])->toBe(2)->and($numbers[$scripts[0]->ulid])->toBe(3);
+    // the carried scripts keep 1 and 2 and their ids; one archived script returned as number 3; the rest stay archived
+    expect(WaveScript::query()->whereIn('ulid', [$scripts[0]->ulid, $scripts[1]->ulid])->orderBy('number')->pluck('number', 'ulid')->all())
+        ->toBe([$scripts[0]->ulid => 1, $scripts[1]->ulid => 2]);
+    $live = WaveScript::query()->whereNull('archived_at')->orderBy('number')->get();
+    expect($live->pluck('number')->all())->toBe([1, 2, 3])->and($live->every(fn ($s) => $s->creator_id === $new->id))->toBeTrue()
+        ->and($live->pluck('ulid')->contains($mine[0]->ulid))->toBeTrue()
+        ->and(WaveScript::query()->whereNotNull('archived_at')->count())->toBe(2);
 });
 
 it('G17: a market with archived scripts is removed only with confirm_scripts_deleted equal to the count; its scripts, hooks and texts go; one audit row per script; creators block first', function (): void {

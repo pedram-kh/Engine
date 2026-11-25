@@ -55,11 +55,12 @@ Route::middleware(['auth:web', 'tenancy.agency', 'tenancy'])
         // PL-3.2a — the scripts of the wave (step 6). Literal `archived` BEFORE `{script}`. ALL THREE flags (404).
         Route::get('scripts', [ScriptController::class, 'index'])->withTrashed()->name('waves.strategy.scripts.index');
         Route::get('scripts/archived', [ScriptController::class, 'archived'])->withTrashed()->name('waves.strategy.scripts.archived');
+        Route::post('scripts/archived/{script}/restore', [ScriptController::class, 'restore'])->withTrashed()->name('waves.strategy.scripts.archived.restore');
         Route::delete('scripts/archived/{script}', [ScriptController::class, 'destroyArchived'])->withTrashed()->name('waves.strategy.scripts.archived.destroy');
         Route::post('scripts', [ScriptController::class, 'store'])->withTrashed()->name('waves.strategy.scripts.store');
         Route::get('scripts/{script}', [ScriptController::class, 'show'])->withTrashed()->name('waves.strategy.scripts.show');
         Route::put('scripts/{script}/brief', [ScriptController::class, 'brief'])->withTrashed()->name('waves.strategy.scripts.brief');
-        Route::delete('scripts/{script}', [ScriptController::class, 'destroy'])->withTrashed()->name('waves.strategy.scripts.destroy');
+        Route::post('scripts/{script}/archive', [ScriptController::class, 'archive'])->withTrashed()->name('waves.strategy.scripts.archive');
         Route::post('scripts/{script}/hooks', [ScriptController::class, 'hookStore'])->withTrashed()->name('waves.strategy.scripts.hooks.store');
         Route::put('scripts/{script}/hooks/{hook}', [ScriptController::class, 'hookUpdate'])->withTrashed()->name('waves.strategy.scripts.hooks.update');
         Route::post('scripts/{script}/hooks/{hook}/duplicate', [ScriptController::class, 'hookDuplicate'])->withTrashed()->name('waves.strategy.scripts.hooks.duplicate');

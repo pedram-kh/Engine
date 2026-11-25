@@ -90,8 +90,8 @@ final class ScriptPresenter
                     'revision' => $s->revision,
                     'updated_at' => $s->updated_at->toIso8601String(),
                 ])->all(),
-                // The cap counts the creator's archived scripts too: they hold their numbers (CHECK and unique key).
-                'can_add_script' => $mine->count() < StrategyLimits::SCRIPTS_PER_CREATOR,
+                // The cap of three counts LIVE scripts only: archiving one frees its place.
+                'can_add_script' => $live->count() < StrategyLimits::SCRIPTS_PER_CREATOR,
             ];
         }
 
@@ -183,8 +183,10 @@ final class ScriptPresenter
     {
         $scripts = WaveScript::query()->where('wave_id', $wave->id)->where('market_id', $market->id)->whereNotNull('archived_at')
             ->with('creator')->withCount('hooks')->orderBy('archived_at')->orderBy('id')->get();
-        $inMarket = WaveCreator::query()->where('wave_id', $wave->id)->where('market_id', $market->id)
-            ->whereIn('creator_id', $scripts->pluck('creator_id')->all())->pluck('creator_id')->all();
+        $creatorIds = $scripts->pluck('creator_id')->unique()->all();
+        $inMarket = WaveCreator::query()->where('wave_id', $wave->id)->where('market_id', $market->id)->whereIn('creator_id', $creatorIds)->pluck('creator_id')->all();
+        $liveByCreator = WaveScript::query()->where('wave_id', $wave->id)->whereIn('creator_id', $creatorIds)->whereNull('archived_at')
+            ->selectRaw('creator_id, count(*) as n')->groupBy('creator_id')->pluck('n', 'creator_id')->all();
 
         return array_values($scripts->map(static fn (WaveScript $s): array => [
             'id' => $s->ulid,
@@ -194,6 +196,8 @@ final class ScriptPresenter
             'archived_at' => $s->archived_at?->toIso8601String(),
             // Archived scripts come back on their own when this creator is added to this market again.
             'creator_in_market' => in_array($s->creator_id, $inMarket, true),
+            // "Restore" works when the creator is in the market and has fewer than three live scripts.
+            'can_restore' => in_array($s->creator_id, $inMarket, true) && (int) ($liveByCreator[$s->creator_id] ?? 0) < StrategyLimits::SCRIPTS_PER_CREATOR,
         ])->all());
     }
 

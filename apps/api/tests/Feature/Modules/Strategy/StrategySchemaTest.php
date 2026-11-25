@@ -190,3 +190,17 @@ it('P1: a new persona defaults to pronoun they and no text; colours wrap the six
         ->and(UspColor::forSlot(7))->toBe(UspColor::Violet)
         ->and(UspColor::forSlot(8))->toBe(UspColor::Green);
 });
+
+it('L9: PL-3.2a: the live-number rule is a partial unique index on the scripts, and the old full unique key is gone', function (): void {
+    $indexes = collect(Schema::getIndexes('wave_scripts'))->keyBy('name');
+
+    expect($indexes->has('unique_wave_scripts_live_wave_creator_number'))->toBeTrue()
+        ->and($indexes->get('unique_wave_scripts_live_wave_creator_number')['unique'])->toBeTrue()
+        ->and($indexes->get('unique_wave_scripts_live_wave_creator_number')['columns'])->toBe(['wave_id', 'creator_id', 'number'])
+        ->and($indexes->has('unique_wave_scripts_wave_creator_number'))->toBeFalse();
+
+    $sql = DB::getDriverName() === 'pgsql'
+        ? (string) DB::table('pg_indexes')->where('indexname', 'unique_wave_scripts_live_wave_creator_number')->value('indexdef')
+        : (string) DB::table('sqlite_master')->where('name', 'unique_wave_scripts_live_wave_creator_number')->value('sql');
+    expect(strtolower($sql))->toContain('where')->and(strtolower($sql))->toContain('archived_at is null');
+});
