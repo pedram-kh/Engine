@@ -93,3 +93,25 @@ it('returns 404 when the helper gate is closed (no token header)', function (): 
         ])
         ->assertStatus(404);
 });
+
+it('PL-3.2a: with agency_ulid and role it adds an agency-side staff user to an existing agency and creates no agency', function (): void {
+    $first = $this->postJson('/api/v1/_test/agencies/setup', ['email' => 'owner@example.com', 'agency_name' => 'Owner Agency'])->assertStatus(201);
+    $agencies = Agency::query()->count();
+
+    $response = $this->postJson('/api/v1/_test/agencies/setup', [
+        'email' => 'staff@example.com',
+        'agency_ulid' => $first->json('data.agency_ulid'),
+        'role' => 'agency_staff',
+    ])->assertStatus(201);
+
+    expect(Agency::query()->count())->toBe($agencies)
+        ->and($response->json('data.agency_ulid'))->toBe($first->json('data.agency_ulid'))
+        ->and($response->json('data.agency_name'))->toBe('Owner Agency');
+    $user = User::query()->where('email', 'staff@example.com')->firstOrFail();
+    expect($user->type)->toBe(UserType::AgencyUser);
+    $membership = AgencyMembership::query()->where('user_id', $user->id)->firstOrFail();
+    expect($membership->role)->toBe(AgencyRole::AgencyStaff)->and($membership->accepted_at)->not->toBeNull();
+
+    $this->postJson('/api/v1/_test/agencies/setup', ['agency_ulid' => 'does-not-exist'])->assertStatus(422);
+    $this->postJson('/api/v1/_test/agencies/setup', ['role' => 'emperor'])->assertStatus(422);
+});

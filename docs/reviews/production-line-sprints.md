@@ -457,6 +457,8 @@ Full text and the gaps closed: `pl-3-2-plan.md` section 11. **Split:** PL-3.2a (
 - **Estimated length.** An ad uses one hook at a time: the estimate counts the spoken words of the LONGEST hook only (spoken lines are added in PL-3.2b), at 2.5 words per second, rounded up. Visual descriptions, overlays and the brief are not counted. (Replaces "longest hook plus all lines" in Q12 only in wording: the number was already built this way.)
 - **Left for the style guide work:** the platform's tertiary text colour (`#8a8a92`) differs from the frame's (`#6e6e76`). Not changed here.
 
+**PL-3.2a status: CLOSED 2026-11-25** after Pedram's walk (20 steps) and re-check (8 steps) passed. Tip and CI run id: _filled in after the run_. Records: `pl-3-2a-review.md`, `pl-3-2a-break-reverts.md`. New in the close-out: the archived button reachable at 390 px, the staff Playwright test, the difference table for the new rows, tech-debt rows 58 and 59. **Not run:** the creator walk baseline (146) does not reproduce on this Mac even on unchanged `main` (row 59); `cmp-pl32.mjs` not re-run. Add to the merge checklist: re-record the creator baseline (row 59).
+
 ### PL-3.2: must confirm before `pl` is merged (added 2026-11-24)
 
 | What                                                                                             | Why it matters                                                                                                                                                                        |

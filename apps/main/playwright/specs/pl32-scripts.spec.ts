@@ -4,6 +4,7 @@ import {
   neutralizeThrottle,
   restoreThrottle,
   seedAgencyAdmin,
+  seedAgencyStaff,
   seedPendingApplications,
   setFeatureFlag,
 } from '../fixtures/test-helpers'
@@ -124,7 +125,7 @@ async function setup(
     await expect(target.locator('[data-test="script-editor"]')).toBeVisible()
   }
   const hookIds = script.data.hooks.map((h: Json) => h.id as string)
-  return { base, open, url, hookIds, scriptId: script.data.id as string, page }
+  return { base, open, url, agencyUlid, hookIds, scriptId: script.data.id as string, page }
 }
 
 const audio = (page: Page, id: string) =>
@@ -308,6 +309,43 @@ test.describe('Scripts step', () => {
     await expect(audio(page, first)).toHaveValue('kept through archive and restore')
   })
 
+  test('staff: can archive and restore, sees no "Delete for good", and the permanent-delete endpoint answers 403', async ({
+    page,
+    request,
+    browser,
+  }) => {
+    test.setTimeout(45_000)
+    const s = await setup(page, request, DESKTOP)
+    const staff = await seedAgencyStaff(request, s.agencyUlid)
+    const ctx = await browser.newContext({ viewport: DESKTOP })
+    try {
+      const sp = await ctx.newPage()
+      await sp.goto('/sign-in')
+      await sp.locator(dt(testIds.signInEmail)).locator('input').fill(staff.email)
+      await sp.locator(dt(testIds.signInPassword)).locator('input').fill(staff.password)
+      await sp.locator(dt(testIds.signInSubmit)).click()
+      await expect(sp).not.toHaveURL(/\/sign-in/, { timeout: 10_000 })
+      await s.open(sp)
+      await expect(sp.locator('[data-test="script-delete"]')).toHaveCount(0)
+      await sp.locator('[data-test="script-archive"]').click()
+      await sp.locator('[data-test="script-archive-dialog"] [data-test="confirm-ok"]').click()
+      await expect(sp.locator('[data-test="scripts-none"]')).toBeVisible()
+
+      await sp.locator('[data-test="scripts-archived-open"]').click()
+      await expect(sp.locator(`[data-test="archived-${s.scriptId}"]`)).toBeVisible()
+      await expect(sp.locator(`[data-test="archived-delete-${s.scriptId}"]`)).toHaveCount(0)
+      await expect(async () => {
+        await api(sp, 'DELETE', `${s.base}/strategy/scripts/archived/${s.scriptId}`)
+      }).rejects.toThrow(/403/)
+
+      await sp.locator(`[data-test="archived-restore-${s.scriptId}"]`).click()
+      await sp.locator('[data-test="archived-close"]').click()
+      await s.open(sp)
+    } finally {
+      await ctx.close()
+    }
+  })
+
   test('the four text boxes grow with their text: long saved text on load, after a collapse and expand, and at a phone width', async ({
     page,
     request,
@@ -406,6 +444,29 @@ test.describe('Scripts step', () => {
       await expect(audio(page, hook)).toHaveValue('mine v1 and more added in the other tab')
     })
   }
+
+  test('at a phone width the "Archived scripts" button is on screen without sideways scrolling and opens the list', async ({
+    page,
+    request,
+  }) => {
+    const s = await setup(page, request, PHONE)
+    await s.open()
+    await page.locator('[data-test="script-archive"]').click()
+    await page.locator('[data-test="script-archive-dialog"] [data-test="confirm-ok"]').click()
+    await expect(page.locator('[data-test="scripts-none"]')).toBeVisible()
+    const btn = page.locator('[data-test="scripts-archived-open"]')
+    await expect(btn).toBeVisible()
+    const box = await btn.boundingBox()
+    expect(box).not.toBeNull()
+    expect(box!.x).toBeGreaterThanOrEqual(0)
+    expect(box!.x + box!.width).toBeLessThanOrEqual(PHONE.width)
+    const sideways = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    )
+    expect(sideways).toBeLessThanOrEqual(1)
+    await btn.click()
+    await expect(page.locator(`[data-test="archived-${s.scriptId}"]`)).toBeVisible()
+  })
 
   test('at a phone width: the rail is a row above the editor, Notes opens a sheet, no sideways scroll', async ({
     page,

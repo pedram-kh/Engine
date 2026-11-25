@@ -14,6 +14,7 @@ use App\Modules\Identity\Services\TwoFactorService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -54,6 +55,11 @@ use Illuminate\Validation\ValidationException;
  *                        works once `users.two_factor_secret` is persisted
  *                        — exactly the state this branch leaves the user in.
  *
+ *   - `agency_ulid`    — string, optional (PL-3.2a). Join THIS existing agency instead of creating one.
+ *   - `role`           — string, optional (PL-3.2a). The `AgencyRole` of the membership; defaults to `agency_admin`.
+ *                        With `agency_ulid` and `agency_staff` it gives a real agency-side staff user (a user made
+ *                        through sign-up is a creator and has none of the agency-side features).
+ *
  * Response (201):
  *   {
  *     "data": {
@@ -77,6 +83,8 @@ final class CreateAgencyWithAdminController
                 'name' => ['nullable', 'string', 'max:255'],
                 'agency_name' => ['nullable', 'string', 'max:255'],
                 'enroll_2fa' => ['nullable', 'boolean'],
+                'agency_ulid' => ['nullable', 'string', 'exists:agencies,ulid'],
+                'role' => ['nullable', 'string', Rule::in(array_map(static fn (AgencyRole $r): string => $r->value, AgencyRole::cases()))],
             ]);
         } catch (ValidationException $e) {
             return new JsonResponse([
@@ -141,15 +149,18 @@ final class CreateAgencyWithAdminController
         /** @var User $user */
         $user = User::query()->create($attributes);
 
-        // Create the agency.
+        // Create the agency, or join the one named by `agency_ulid`.
         /** @var Agency $agency */
-        $agency = AgencyFactory::new()->create(['name' => $agencyName]);
+        $agency = isset($validated['agency_ulid']) && is_string($validated['agency_ulid'])
+            ? Agency::query()->where('ulid', $validated['agency_ulid'])->firstOrFail()
+            : AgencyFactory::new()->create(['name' => $agencyName]);
+        $agencyName = $agency->name;
 
-        // Create an accepted agency_admin membership.
+        // Create an accepted membership (agency_admin unless `role` says otherwise).
         AgencyMembership::query()->create([
             'agency_id' => $agency->id,
             'user_id' => $user->id,
-            'role' => AgencyRole::AgencyAdmin,
+            'role' => isset($validated['role']) && is_string($validated['role']) ? AgencyRole::from($validated['role']) : AgencyRole::AgencyAdmin,
             'invited_at' => now(),
             'accepted_at' => now(),
         ]);

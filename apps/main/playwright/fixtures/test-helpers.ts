@@ -678,6 +678,28 @@ export async function seedAgencyInvitation(
   return { token, agencyUlid: agency_ulid, email, role, acceptUrl }
 }
 
+/**
+ * PL-3.2a — an agency-side STAFF user in an existing agency, through the same test-helper as `seedAgencyAdmin` (with `agency_ulid` and
+ * `role`). A user made through sign-up is a creator and has none of the agency-side features, so the invitation route would not do.
+ */
+export async function seedAgencyStaff(
+  request: APIRequestContext,
+  agencyUlid: string,
+): Promise<{ email: string; password: string }> {
+  const email = `staff-${Date.now()}-${Math.random().toString(36).slice(2, 6)}@catalyst-test.dev`
+  const password = 'Cata1yst-E2E-Staff!'
+  const response = await request.post('http://127.0.0.1:8000/api/v1/_test/agencies/setup', {
+    headers: defaultHeaders,
+    data: { email, password, name: 'Staff User', agency_ulid: agencyUlid, role: 'agency_staff' },
+  })
+  if (response.status() !== 201) {
+    throw new Error(
+      `seedAgencyStaff failed with status ${response.status()}: ${await response.text()}`,
+    )
+  }
+  return { email, password }
+}
+
 // ---------------------------------------------------------------------------
 // Sprint 6 Chunk 1 — roster creator provisioning
 // ---------------------------------------------------------------------------
