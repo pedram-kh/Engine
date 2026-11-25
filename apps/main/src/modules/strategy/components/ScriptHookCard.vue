@@ -3,7 +3,7 @@
  * PL-3.2a — one hook card (frame 13:3108, node 13:3457): header with "Hook A" and a menu (duplicate, delete) and a collapse
  * control; the audio hook, the visual hook (a shot type from the ten, plus a description) and the optional overlay. English only
  * until PL-3.2b; no reference images and no drag handle yet, so none is drawn. The card autosaves as one block with its own
- * revision. All text is plain text (textareas, and interpolations in the collapsed line and the conflict box).
+ * revision. All text is plain text (auto-growing text boxes, and interpolations in the collapsed line and the conflict box).
  */
 import type { ScriptHook, ShotType, WaveScript } from '@catalyst/api-client'
 import { SHOT_TYPES } from '@catalyst/api-client'
@@ -16,6 +16,7 @@ import { useRegisterBlock } from '../composables/useSaveRegistry'
 import { MENU_PROPS } from '../constants'
 import { hookPayload, hookValue, sameHook, type HookValue } from '../scriptsLogic'
 import StrategyConfirmDialog from './StrategyConfirmDialog.vue'
+import AutoGrowTextarea from './AutoGrowTextarea.vue'
 import BlockConflict from './BlockConflict.vue'
 import BlockStatusLine from './BlockStatusLine.vue'
 
@@ -220,13 +221,8 @@ const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(b
         </div>
         <div class="hcard__field">
           <span class="hcard__lang">EN</span>
-          <v-textarea
+          <AutoGrowTextarea
             :model-value="d.audio"
-            variant="plain"
-            density="compact"
-            auto-grow
-            rows="1"
-            hide-details
             class="hcard__input"
             :placeholder="t('app.strategy.scripts.hooks.audioPlaceholder')"
             :aria-label="t('app.strategy.scripts.hooks.audio')"
@@ -283,13 +279,8 @@ const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(b
               </v-list-item>
             </v-list>
           </v-menu>
-          <v-textarea
+          <AutoGrowTextarea
             :model-value="d.visual"
-            variant="plain"
-            density="compact"
-            auto-grow
-            rows="1"
-            hide-details
             class="hcard__input"
             :placeholder="t('app.strategy.scripts.hooks.visualPlaceholder')"
             :aria-label="t('app.strategy.scripts.hooks.visual')"
@@ -316,14 +307,9 @@ const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(b
         <div class="hcard__field">
           <template v-if="overlayShown || d.overlay !== ''">
             <span class="hcard__lang">EN</span>
-            <v-textarea
+            <AutoGrowTextarea
               :id="`hook-overlay-${hook.id}`"
               :model-value="d.overlay"
-              variant="plain"
-              density="compact"
-              auto-grow
-              rows="1"
-              hide-details
               class="hcard__input"
               :placeholder="t('app.strategy.scripts.hooks.overlayPlaceholder')"
               :aria-label="t('app.strategy.scripts.hooks.overlay')"
@@ -479,17 +465,6 @@ const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(b
 }
 .hcard__input {
   margin: 0;
-  padding: 0;
-}
-.hcard__input :deep(.v-field__input) {
-  padding: 0;
-  min-height: 0;
-  font-size: 13px;
-  line-height: 19px;
-  color: rgb(var(--v-theme-on-surface));
-}
-.hcard__input :deep(.v-field__field) {
-  align-items: flex-start;
 }
 .hcard__count {
   align-self: flex-end;
@@ -561,6 +536,7 @@ const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(b
 @media (max-width: 599px) {
   .hcard__row {
     flex-direction: column;
+    align-items: stretch;
     gap: 4px;
   }
   .hcard__label {

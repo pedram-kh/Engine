@@ -16,6 +16,7 @@ import { useBlockAutosave } from '../composables/useBlockAutosave'
 import { useRegisterBlock } from '../composables/useSaveRegistry'
 import { MENU_PROPS } from '../constants'
 import { briefPayload, briefValue, sameBrief, type BriefValue } from '../scriptsLogic'
+import AutoGrowTextarea from './AutoGrowTextarea.vue'
 import BlockConflict from './BlockConflict.vue'
 import BlockStatusLine from './BlockStatusLine.vue'
 
@@ -167,14 +168,9 @@ const theirsLines = computed(() => {
         t('app.strategy.scripts.brief.angle')
       }}</label>
       <div class="sbrief__angle">
-        <v-textarea
+        <AutoGrowTextarea
           :id="`angle-${script.id}`"
           :model-value="block.draft.value.angle"
-          variant="plain"
-          density="compact"
-          auto-grow
-          rows="1"
-          hide-details
           class="sbrief__field"
           :placeholder="t('app.strategy.scripts.brief.anglePlaceholder')"
           :error="angleOver"
@@ -397,18 +393,6 @@ const theirsLines = computed(() => {
 }
 .sbrief__field {
   margin: 0;
-  padding: 0;
-  font-size: 13px;
-}
-.sbrief__field :deep(.v-field__input) {
-  padding: 0;
-  min-height: 0;
-  line-height: 19px;
-  font-size: 13px;
-  color: rgb(var(--v-theme-on-surface));
-}
-.sbrief__field :deep(.v-field__field) {
-  align-items: flex-start;
 }
 .sbrief__meta {
   display: flex;
