@@ -191,7 +191,7 @@ it('G4c: restore: the own number when free, otherwise the lowest free; refused w
     S::call($w['staff'], 'POST', SF::url($w, "archived/{$three}/restore"))->assertStatus(422)
         ->assertJsonPath('errors.0.code', 'wave_script.restore_creator_missing');
     $gone = S::call($w['staff'], 'GET', SF::url($w, 'archived?market='.$w['mk']['SK']))->json('data');
-    expect(collect($gone)->every(fn ($row) => $row['creator_in_market'] === false && $row['can_restore'] === false))->toBeTrue();
+    expect(array_filter((array) $gone, fn ($row) => $row['creator_in_market'] !== false || $row['can_restore'] !== false))->toBe([]);
 
     // added again: as many as fit under three come back, in number order, the rest stay archived
     S::call($w['admin'], 'POST', F::url($w), ['market' => $w['mk']['SK'], 'creators' => [$creator->ulid]])->assertCreated();
