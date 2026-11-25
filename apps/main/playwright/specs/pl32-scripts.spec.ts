@@ -13,7 +13,7 @@ import { marketIds, wireMarkets } from '../helpers/markets'
 /**
  * PL-3.2a — the Scripts step in a real browser (WORKING-PROCESS §4.2): autosave (type and wait, type and leave at once, a stopped
  * API with the retry), two tabs on the same hook (the 409, the person's own text kept) and on different hooks (both kept), a
- * hostile string as plain text, delete script, and a phone width with no sideways scroll. Each test makes its own agency, brand,
+ * hostile string as plain text, text boxes that grow, "Keep mine" covering one conflict only, archive and restore, and a phone width with no sideways scroll. Each test makes its own agency, brand,
  * wave, campaign, creator and script through the API; serial; each under 15 seconds.
  */
 
@@ -272,24 +272,140 @@ test.describe('Scripts step', () => {
     await expect(audio(page, b)).toHaveValue('hook B from tab two')
   })
 
-  test('delete script asks and counts the hooks; Cancel keeps it; Confirm removes it and the page shows the empty state', async ({
+  test('archive script asks and counts the hooks; Cancel keeps it; Confirm archives it, it shows in Archived scripts and Restore brings it back with its texts', async ({
     page,
     request,
   }) => {
     const s = await setup(page, request, DESKTOP)
     await s.open()
+    const first = s.hookIds[0]
+    await audio(page, first).fill('kept through archive and restore')
+    await expect(page.locator(`[data-test="script-hook-status-${first}"]`)).toContainText('Saved', {
+      timeout: 8000,
+    })
+    await expect(page.locator('[data-test="script-delete"]')).toHaveCount(0)
     for (const delay of [0, 60]) {
-      await page.locator('[data-test="script-delete"]').click()
-      await expect(page.locator('[data-test="script-delete-dialog"]')).toBeVisible()
-      await page.locator('[data-test="script-delete-dialog"] [data-test="confirm-cancel"]').click()
+      await page.locator('[data-test="script-archive"]').click()
+      await expect(page.locator('[data-test="script-archive-dialog"]')).toBeVisible()
+      await page.locator('[data-test="script-archive-dialog"] [data-test="confirm-cancel"]').click()
       await page.waitForTimeout(delay)
     }
     await expect(page.locator('[data-test="script-editor"]')).toBeVisible()
-    await page.locator('[data-test="script-delete"]').click()
-    await expect(page.locator('[data-test="script-delete-dialog"]')).toContainText('3')
-    await page.locator('[data-test="script-delete-dialog"] [data-test="confirm-ok"]').click()
+    await page.locator('[data-test="script-archive"]').click()
+    await expect(page.locator('[data-test="script-archive-dialog"]')).toContainText('3')
+    await expect(page.locator('[data-test="script-archive-dialog"]')).toContainText('restore')
+    await page.locator('[data-test="script-archive-dialog"] [data-test="confirm-ok"]').click()
     await expect(page.locator('[data-test="scripts-none"]')).toBeVisible()
+
+    // The archived list: Restore is there, a permanent delete is there for the admin, and Restore puts the script back untouched.
+    const archivedBtn = page.locator('[data-test="scripts-archived-open"]')
+    await expect(archivedBtn).toBeVisible()
+    await archivedBtn.click()
+    await expect(page.locator(`[data-test="archived-delete-${s.scriptId}"]`)).toBeVisible()
+    await page.locator(`[data-test="archived-restore-${s.scriptId}"]`).click()
+    await page.locator('[data-test="archived-close"]').click()
+    await s.open()
+    await expect(audio(page, first)).toHaveValue('kept through archive and restore')
   })
+
+  test('the four text boxes grow with their text: long saved text on load, after a collapse and expand, and at a phone width', async ({
+    page,
+    request,
+  }) => {
+    test.setTimeout(45_000)
+    const LONG = 'First line.\nSecond line, long enough to wrap on a phone.\nThird line.'
+    const s = await setup(page, request, DESKTOP)
+    await s.open()
+    const first = s.hookIds[0]
+    const ids = [
+      `script-hook-audio-${first}`,
+      `script-hook-visual-${first}`,
+      `script-hook-overlay-${first}`,
+      'script-angle',
+    ]
+    const box = (id: string) => page.locator(`[data-test="${id}"] textarea:not([aria-hidden])`)
+    const clipped = (id: string) =>
+      box(id).evaluate((t) => ({
+        hidden: t.scrollHeight - t.clientHeight,
+        lines: t.clientHeight / parseFloat(getComputedStyle(t).lineHeight),
+      }))
+    const expectGrown = async (label: string): Promise<void> => {
+      for (const id of ids) {
+        await expect(async () => {
+          const m = await clipped(id)
+          expect(m.hidden, `${label}: ${id} clips ${m.hidden}px`).toBeLessThanOrEqual(1)
+          expect(m.lines, `${label}: ${id} shows ${m.lines} lines`).toBeGreaterThanOrEqual(3)
+        }).toPass({ timeout: 4000 })
+      }
+    }
+    await page.locator(`[data-test="script-hook-add-overlay-${first}"]`).click()
+    for (const id of ids) await box(id).fill(LONG)
+    await expectGrown('typed')
+    await expect(page.locator(`[data-test="script-hook-status-${first}"]`)).toContainText('Saved', {
+      timeout: 8000,
+    })
+
+    await page.locator(`[data-test="script-hook-toggle-${first}"]`).click()
+    await expect(box(ids[0])).toBeHidden()
+    await page.locator(`[data-test="script-hook-toggle-${first}"]`).click()
+    await expectGrown('after collapse and expand')
+
+    await page.reload()
+    await expect(page.locator('[data-test="script-editor"]')).toBeVisible()
+    await expectGrown('loaded with long saved text')
+
+    await page.setViewportSize(PHONE)
+    await expectGrown('phone width')
+    for (const id of ids) {
+      const overflow = await box(id).evaluate((t) => getComputedStyle(t).overflowY)
+      expect(overflow).toBe('hidden')
+    }
+  })
+
+  for (const order of ['tab one first', 'tab two first'] as const) {
+    test(`Keep mine covers one conflict only (${order}): a stale tab is asked again and the text added in the other tab survives`, async ({
+      page,
+      request,
+      context,
+    }) => {
+      test.setTimeout(60_000)
+      const s = await setup(page, request, DESKTOP)
+      await s.open()
+      const other = await context.newPage()
+      await other.setViewportSize(DESKTOP)
+      await s.open(other)
+      const [mine, theirs] = order === 'tab one first' ? [other, page] : [page, other]
+      const hook = s.hookIds[0]
+      const status = (p: Page) => p.locator(`[data-test="script-hook-status-${hook}"]`)
+      const conflict = (p: Page) => p.locator(`[data-test="script-hook-conflict-${hook}"]`)
+
+      // 1. One tab saves; the other, stale, gets the conflict and chooses Keep mine.
+      await audio(theirs, hook).fill('theirs v1')
+      await expect(status(theirs)).toContainText('Saved', { timeout: 8000 })
+      await audio(mine, hook).fill('mine v1')
+      await expect(conflict(mine)).toBeVisible({ timeout: 8000 })
+      await mine.locator(`[data-test="script-hook-conflict-${hook}-keep"]`).click()
+      await expect(conflict(mine)).toBeHidden()
+      await expect(status(mine)).toContainText('Saved', { timeout: 8000 })
+
+      // 2. The other tab (now stale, so it is asked too) makes the text equal to the saved one, adds more text and keeps its own.
+      await audio(theirs, hook).fill('mine v1')
+      await audio(theirs, hook).fill('mine v1 and more added in the other tab')
+      await expect(conflict(theirs)).toBeVisible({ timeout: 8000 })
+      await theirs.locator(`[data-test="script-hook-conflict-${hook}-keep"]`).click()
+      await expect(conflict(theirs)).toBeHidden()
+      await expect(status(theirs)).toContainText('Saved', { timeout: 8000 })
+
+      // 3. Back in the first tab: it changes and saves. It holds an old revision, so it must be asked again.
+      await audio(mine, hook).fill('mine v2')
+      await expect(conflict(mine)).toBeVisible({ timeout: 8000 })
+      await expect(conflict(mine)).toContainText('and more added in the other tab')
+
+      // The text added in the other tab is still the saved one.
+      await page.reload()
+      await expect(audio(page, hook)).toHaveValue('mine v1 and more added in the other tab')
+    })
+  }
 
   test('at a phone width: the rail is a row above the editor, Notes opens a sheet, no sideways scroll', async ({
     page,
