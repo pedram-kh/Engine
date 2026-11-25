@@ -112,6 +112,7 @@ describe('agency-shell routes — requireAgencyUser guard registration (Sprint 6
       'strategy.index',
       'strategy.matrix',
       'strategy.personas',
+      'strategy.scripts',
       'strategy.usps',
       // PL-1.1 — a wave of a brand.
       'waves.detail',

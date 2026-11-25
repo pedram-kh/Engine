@@ -44,7 +44,8 @@ it('S2: the scripts are as the walk describes: 2, 3, 0, 1 with no persona, one a
 
     $perCreator = DB::table('wave_scripts')->join('creators', 'creators.id', '=', 'wave_scripts.creator_id')
         ->where('wave_scripts.wave_id', $wave->id)->whereNull('wave_scripts.archived_at')
-        ->groupBy('creators.display_name')->pluck(DB::raw('count(*)'), 'creators.display_name')->all();
+        ->groupBy('creators.display_name')->select('creators.display_name', DB::raw('count(*) as n'))->get()
+        ->mapWithKeys(fn ($row): array => [(string) $row->display_name => (int) $row->n])->all();
 
     expect($perCreator)->toMatchArray(['Lucia Horváthová' => 2, 'Martin Kováč' => 3, 'Tomáš Baláž' => 1, 'Astrid Lindqvist' => 1])
         ->and($perCreator)->not->toHaveKey('Katarína Nagy')
