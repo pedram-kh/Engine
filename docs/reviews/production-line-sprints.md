@@ -449,6 +449,14 @@ Full text and the gaps closed: `pl-3-2-plan.md` section 11. **Split:** PL-3.2a (
 - **Erasure** accepted: eight agency-authored `N/A` tables, scripts kept, "Deleted creator"; added to tech-debt row 48.
 - **Sweepers stay two commands** (concept and script).
 
+### PL-3.2a rulings after Pedram's walk (2026-11-25)
+
+- **Archive replaces Delete (changes Q10 and Q14).** The editor action is **"Archive script"**, for every agency role. The script moves to "Archived scripts" with its hooks and texts untouched; the confirmation counts the hooks and says it can be restored. **Permanent deletion of one script exists only inside the archive, for admin and manager** (`deleteScriptsInUse`); no other path deletes a single script. Remove and Replace keep their choices and roles. **For PL-3.3: once a script has been sent for review or approved, archiving is the only way out, as before for delete.**
+- **The three per creator count LIVE scripts only.** A live number is unique per creator per wave among live scripts (a partial unique index); an archived script holds no place. **Restore** keeps the script's number when it is free, otherwise takes the lowest free one, is refused with a clear message when the creator already has three live scripts, and is not offered while the creator is not in the market (the script returns when the creator is added again, as far as three allow). Replace with carry-over keeps numbers; the carry-over refusal is gone.
+- **"Keep mine" resolves one conflict only.** Every later save carries the revision the tab actually holds; a stale tab gets the 409 and the notice again. Nothing persists a force or overwrite mode, and a block save without a current revision is refused.
+- **Estimated length.** An ad uses one hook at a time: the estimate counts the spoken words of the LONGEST hook only (spoken lines are added in PL-3.2b), at 2.5 words per second, rounded up. Visual descriptions, overlays and the brief are not counted. (Replaces "longest hook plus all lines" in Q12 only in wording: the number was already built this way.)
+- **Left for the style guide work:** the platform's tertiary text colour (`#8a8a92`) differs from the frame's (`#6e6e76`). Not changed here.
+
 ### PL-3.2: must confirm before `pl` is merged (added 2026-11-24)
 
 | What                                                                                             | Why it matters                                                                                                                                                                        |

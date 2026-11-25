@@ -30,3 +30,21 @@ What this means in production:
 - Not measured: timing on production-sized `users`, `creators` and `waves`. The foreign keys are on NEW tables, so their time does not
   grow with those tables' size, but it was not measured with large tables. Run the five migrations in a quiet window, together with
   PL-3.1's.
+
+## Rehearsal 2 (2026-11-25): migration M3 edited in place for the live-only number rule
+
+- Database: throwaway `pl32_rehearsal` (created for this run, dropped after), container `catalyst-postgres`, PostgreSQL. The `catalyst` database was not touched. The name was printed before the run.
+- Why: after Pedram's walk, M3 (`100002_create_wave_scripts_table`) changed in place (nothing but local and CI has run it): the full unique key on `(wave_id, creator_id, number)` is gone and a **partial unique index** `unique_wave_scripts_live_wave_creator_number ... WHERE archived_at IS NULL` replaces it. Still schema-only, still `SET LOCAL lock_timeout = '5s'`.
+- Method: a runner outside the repository called `artisan migrate` (`--path` per migration file): the 119 earlier migrations first, then each of the five on its own, a `TransactionCommitting` listener reading `pg_locks` for the migration's own backend (modes ShareRowExclusive, Share, Exclusive, AccessExclusive, relations in `public`). Then `migrate:rollback --step=5` and M1 forward again.
+
+| Migration             | Time (empty tables) | Locks held at commit                                                                                                                                                        |
+| --------------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `100000` (M1)         | 8.7 ms              | `AccessExclusive`, `Share` on `wave_creators`                                                                                                                               |
+| `100001` (M2)         | 8.4 ms              | `AccessExclusive` on `wave_strategy_notes`                                                                                                                                  |
+| `100002` (M3, edited) | 26.7 ms             | `AccessExclusive`, `Share`, `ShareRowExclusive` on the new `wave_scripts`; `ShareRowExclusive` on `agencies`, `creators`, `users`, `wave_creators`, `wave_markets`, `waves` |
+| `100003` (M4)         | 18.1 ms             | new `wave_script_hooks` (`AccessExclusive`, `Share`, `ShareRowExclusive`); `ShareRowExclusive` on `agencies`, `wave_scripts`, `waves`                                       |
+| `100004` (M5)         | 17.4 ms             | new `wave_script_hook_texts` (`AccessExclusive`, `Share`, `ShareRowExclusive`); `ShareRowExclusive` on `agencies`, `wave_script_hooks`, `wave_scripts`, `waves`             |
+
+- The lock set is the same as in the first rehearsal; M3 took 28.5 ms before and 26.7 ms now (noise), and the partial index adds no lock on an existing table (it is built on the new, empty `wave_scripts`). `pg_indexes` shows the index with its `WHERE (archived_at IS NULL)`.
+- All five `down()` methods ran clean in reverse order; the tables were gone afterwards and M1 ran forward again.
+- Not measured: production-sized `users`, `creators` and `waves` (same caveat as before).
