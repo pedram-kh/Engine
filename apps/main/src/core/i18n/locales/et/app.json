@@ -2346,17 +2346,17 @@
           "draft": "Mustand",
           "add": "Lisa skript ({n}/{max})",
           "limit": "Skriptide piir on täis",
-          "limitHint": "Sellel loojal on juba {max} skripti, arhiveeritud kaasa arvatud.",
+          "limitHint": "Sellel loojal on juba {max} skripti. Uue lisamiseks arhiveeri üks.",
           "footnote": "Kuni {max} skripti looja kohta",
           "archived": "Arhiveeritud skriptid ({count})"
         },
         "editor": {
           "title": "{name} — Skript {n}",
           "lastEdited": "Viimati muudetud: {when}",
-          "delete": "Kustuta skript",
-          "deleteTitle": "Kas kustutada skript {n} (looja {name})?",
-          "deleteBody": "Skript ja selle konksud kustutatakse (konkse: {count}). Seda ei saa tagasi võtta.",
-          "deleteConfirm": "Kustuta skript",
+          "archive": "Arhiveeri skript",
+          "archiveTitle": "Kas arhiveerida skript {n} ({name})?",
+          "archiveBody": "Skript ja selle konksud (konkse: {count}) liiguvad arhiveeritud skriptide hulka. Midagi ei kustutata. Sealt saab selle taastada.",
+          "archiveConfirm": "Arhiveeri skript",
           "loadFailed": "Seda skripti ei saanud laadida."
         },
         "save": {
@@ -2446,12 +2446,14 @@
         },
         "archived": {
           "title": "Arhiveeritud skriptid · {market}",
-          "info": "Skript arhiveeritakse, kui looja sellelt turult lahkub. See tuleb ise tagasi, kui looja lisatakse turule uuesti.",
+          "info": "Arhiveeritud skriptid säilivad koos konksudega. Taasta toob skripti tagasi. Turule uuesti lisatud looja saab oma skriptid ise tagasi.",
           "empty": "Sellel turul pole arhiveeritud skripte.",
           "row": "{name} · Skript {n}",
           "hooks": "Konkse: {count}",
           "on": "Arhiveeritud {date}",
-          "inMarket": "See looja on taas sellel turul.",
+          "restore": "Taasta",
+          "restoreFull": "Loojal {name} on juba {max} skripti. Selle taastamiseks arhiveeri esmalt üks.",
+          "creatorGone": "See looja ei ole sellel turul. Skript tuleb tagasi, kui looja uuesti lisatakse.",
           "delete": "Kustuta jäädavalt",
           "deleteTitle": "Kas kustutada see skript jäädavalt?",
           "deleteBody": "Skript {n} (looja {name}) ja selle konksud (konkse: {count}) kustutatakse. Seda ei saa tagasi võtta.",
@@ -2480,11 +2482,11 @@
         },
         "errors": {
           "limitReached": "Loojal on kuni {max} skripti.",
-          "limitReachedArchived": "Loojal on kuni {max} skripti, arhiveeritud kaasa arvatud.",
           "hooksLimit": "Skriptil on kuni {max} konksu.",
           "lastHook": "Skript säilitab vähemalt ühe konksu.",
           "languageNotAvailable": "Praegu saab kirjutada ainult inglise keeles.",
-          "carryOverExceeds": "Uuel loojal oleks üle {max} skripti. Arhiveeri need hoopis.",
+          "restoreLimit": "Sellel loojal on juba {max} skripti. Arhiveeri esmalt üks, siis taasta see.",
+          "restoreCreatorMissing": "See looja ei ole enam turul. Skript tuleb tagasi, kui looja uuesti lisatakse.",
           "choiceRequired": "Sellel loojal on skripte. Vali, mis nendega juhtub."
         }
       }

@@ -2346,17 +2346,17 @@
           "draft": "Kladde",
           "add": "Tilføj script ({n}/{max})",
           "limit": "Grænsen for scripts er nået",
-          "limitHint": "Denne creator har allerede {max} scripts, arkiverede medregnet.",
+          "limitHint": "Denne creator har allerede {max} scripts. Arkivér et for at tilføje et nyt.",
           "footnote": "Op til {max} scripts pr. creator",
           "archived": "Arkiverede scripts ({count})"
         },
         "editor": {
           "title": "{name} — Script {n}",
           "lastEdited": "Sidst redigeret: {when}",
-          "delete": "Slet script",
-          "deleteTitle": "Slet script {n} for {name}?",
-          "deleteBody": "Scriptet og dets hooks slettes (hooks: {count}). Det kan ikke fortrydes.",
-          "deleteConfirm": "Slet script",
+          "archive": "Arkivér script",
+          "archiveTitle": "Arkivér script {n} af {name}?",
+          "archiveBody": "Scriptet og dets hooks (hooks: {count}) flyttes til Arkiverede scripts. Intet slettes. Du kan gendanne det derfra.",
+          "archiveConfirm": "Arkivér script",
           "loadFailed": "Dette script kunne ikke indlæses."
         },
         "save": {
@@ -2446,12 +2446,14 @@
         },
         "archived": {
           "title": "Arkiverede scripts · {market}",
-          "info": "Et script arkiveres, når dets creator forlader dette marked. Det kommer tilbage af sig selv, hvis creatoren tilføjes markedet igen.",
+          "info": "Arkiverede scripts gemmes med deres hooks. Gendan sætter et script tilbage. En creator, der tilføjes markedet igen, får sine scripts tilbage af sig selv.",
           "empty": "Ingen arkiverede scripts på dette marked.",
           "row": "{name} · Script {n}",
           "hooks": "Hooks: {count}",
           "on": "Arkiveret {date}",
-          "inMarket": "Denne creator er på dette marked igen.",
+          "restore": "Gendan",
+          "restoreFull": "{name} har allerede {max} scripts. Arkivér et først for at gendanne dette.",
+          "creatorGone": "Denne creator er ikke på dette marked. Scriptet kommer tilbage, når creatoren tilføjes igen.",
           "delete": "Slet permanent",
           "deleteTitle": "Slet dette script permanent?",
           "deleteBody": "Script {n} for {name} og dets hooks (hooks: {count}) slettes. Det kan ikke fortrydes.",
@@ -2480,11 +2482,11 @@
         },
         "errors": {
           "limitReached": "En creator har højst {max} scripts.",
-          "limitReachedArchived": "En creator har højst {max} scripts, arkiverede medregnet.",
           "hooksLimit": "Et script har højst {max} hooks.",
           "lastHook": "Et script beholder mindst én hook.",
           "languageNotAvailable": "Indtil videre kan der kun skrives på engelsk.",
-          "carryOverExceeds": "Den nye creator ville få mere end {max} scripts. Arkivér dem i stedet.",
+          "restoreLimit": "Denne creator har allerede {max} scripts. Arkivér et af dem først, og gendan så dette.",
+          "restoreCreatorMissing": "Denne creator er ikke længere på markedet. Scriptet kommer tilbage, når creatoren tilføjes igen.",
           "choiceRequired": "Denne creator har scripts. Vælg, hvad der skal ske med dem."
         }
       }

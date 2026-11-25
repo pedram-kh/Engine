@@ -2346,17 +2346,17 @@
           "draft": "Concept",
           "add": "Script toevoegen ({n}/{max})",
           "limit": "Scriptlimiet bereikt",
-          "limitHint": "Deze creator heeft al {max} scripts, gearchiveerde meegerekend.",
+          "limitHint": "Deze creator heeft al {max} scripts. Archiveer een script om er een toe te voegen.",
           "footnote": "Maximaal {max} scripts per creator",
           "archived": "Gearchiveerde scripts ({count})"
         },
         "editor": {
           "title": "{name} — Script {n}",
           "lastEdited": "Laatst bewerkt: {when}",
-          "delete": "Script verwijderen",
-          "deleteTitle": "Script {n} van {name} verwijderen?",
-          "deleteBody": "Het script en de bijbehorende hooks worden verwijderd (hooks: {count}). Dit kan niet ongedaan worden gemaakt.",
-          "deleteConfirm": "Script verwijderen",
+          "archive": "Script archiveren",
+          "archiveTitle": "Script {n} van {name} archiveren?",
+          "archiveBody": "Het script en de bijbehorende hooks (hooks: {count}) gaan naar Gearchiveerde scripts. Er wordt niets verwijderd. Je kunt het daar terugzetten.",
+          "archiveConfirm": "Script archiveren",
           "loadFailed": "Dit script kon niet worden geladen."
         },
         "save": {
@@ -2446,12 +2446,14 @@
         },
         "archived": {
           "title": "Gearchiveerde scripts · {market}",
-          "info": "Een script wordt gearchiveerd als de creator deze markt verlaat. Het komt vanzelf terug als de creator opnieuw aan de markt wordt toegevoegd.",
+          "info": "Gearchiveerde scripts blijven bewaard met hun hooks. Met Terugzetten komt een script terug. Een creator die opnieuw aan de markt wordt toegevoegd, krijgt zijn scripts vanzelf terug.",
           "empty": "Geen gearchiveerde scripts in deze markt.",
           "row": "{name} · Script {n}",
           "hooks": "Hooks: {count}",
           "on": "Gearchiveerd op {date}",
-          "inMarket": "Deze creator zit weer in deze markt.",
+          "restore": "Terugzetten",
+          "restoreFull": "{name} heeft al {max} scripts. Archiveer eerst een script om dit terug te zetten.",
+          "creatorGone": "Deze creator zit niet in deze markt. Het script komt terug als de creator opnieuw wordt toegevoegd.",
           "delete": "Definitief verwijderen",
           "deleteTitle": "Dit script definitief verwijderen?",
           "deleteBody": "Script {n} van {name} en de bijbehorende hooks (hooks: {count}) worden verwijderd. Dit kan niet ongedaan worden gemaakt.",
@@ -2480,11 +2482,11 @@
         },
         "errors": {
           "limitReached": "Een creator heeft maximaal {max} scripts.",
-          "limitReachedArchived": "Een creator heeft maximaal {max} scripts, gearchiveerde meegerekend.",
           "hooksLimit": "Een script heeft maximaal {max} hooks.",
           "lastHook": "Een script houdt minstens één hook.",
           "languageNotAvailable": "Voorlopig kan alleen Engels worden geschreven.",
-          "carryOverExceeds": "De nieuwe creator zou meer dan {max} scripts hebben. Archiveer ze in plaats daarvan.",
+          "restoreLimit": "Deze creator heeft al {max} scripts. Archiveer eerst een script en zet dit daarna terug.",
+          "restoreCreatorMissing": "Deze creator zit niet meer in de markt. Het script komt terug als de creator opnieuw wordt toegevoegd.",
           "choiceRequired": "Deze creator heeft scripts. Kies wat ermee gebeurt."
         }
       }

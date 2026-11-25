@@ -2346,17 +2346,17 @@
           "draft": "Abbozz",
           "add": "Żid skript ({n}/{max})",
           "limit": "Intlaħaq il-limitu tal-iskripts",
-          "limitHint": "Dan il-kreatur diġà għandu {max} skripts, inklużi dawk arkivjati.",
+          "limitHint": "Dan il-kreatur diġà għandu {max} skripts. Arkivja wieħed biex iżżid ieħor.",
           "footnote": "Sa {max} skripts għal kull kreatur",
           "archived": "Skripts arkivjati ({count})"
         },
         "editor": {
           "title": "{name} — Skript {n}",
           "lastEdited": "L-aħħar modifika: {when}",
-          "delete": "Ħassar l-iskript",
-          "deleteTitle": "Tħassar l-iskript {n} ta' {name}?",
-          "deleteBody": "L-iskript u l-hooks tiegħu se jitħassru (hooks: {count}). Dan ma jistax jiġi mreġġa' lura.",
-          "deleteConfirm": "Ħassar l-iskript",
+          "archive": "Arkivja l-iskript",
+          "archiveTitle": "Tarkivja l-iskript {n} ta' {name}?",
+          "archiveBody": "L-iskript u l-hooks tiegħu (hooks: {count}) jiġu mċaqalqa fl-Iskripts arkivjati. Xejn ma jitħassar. Tista' terġa' tirrestawrah minn hemm.",
+          "archiveConfirm": "Arkivja l-iskript",
           "loadFailed": "Dan l-iskript ma setax jitgħabba."
         },
         "save": {
@@ -2446,12 +2446,14 @@
         },
         "archived": {
           "title": "Skripts arkivjati · {market}",
-          "info": "Skript jiġi arkivjat meta l-kreatur tiegħu jitlaq minn dan is-suq. Jirritorna weħdu jekk il-kreatur jiżdied mas-suq mill-ġdid.",
+          "info": "L-iskripts arkivjati jinżammu bil-hooks tagħhom. Irrestawra jerġa' jqiegħed wieħed lura. Kreatur li jerġa' jiżdied mas-suq jirċievi l-iskripts tiegħu lura weħidhom.",
           "empty": "M'hemm l-ebda skript arkivjat f'dan is-suq.",
           "row": "{name} · Skript {n}",
           "hooks": "Hooks: {count}",
           "on": "Arkivjat fi {date}",
-          "inMarket": "Dan il-kreatur reġa' qiegħed f'dan is-suq.",
+          "restore": "Irrestawra",
+          "restoreFull": "{name} diġà għandu {max} skripts. Arkivja wieħed l-ewwel biex tirrestawra dan.",
+          "creatorGone": "Dan il-kreatur mhuwiex f'dan is-suq. L-iskript jirritorna meta l-kreatur jerġa' jiżdied.",
           "delete": "Ħassar għal kollox",
           "deleteTitle": "Tħassar dan l-iskript għal kollox?",
           "deleteBody": "L-iskript {n} ta' {name} u l-hooks tiegħu (hooks: {count}) se jitħassru. Dan ma jistax jiġi mreġġa' lura.",
@@ -2480,11 +2482,11 @@
         },
         "errors": {
           "limitReached": "Kreatur għandu massimu ta' {max} skripts.",
-          "limitReachedArchived": "Kreatur għandu massimu ta' {max} skripts, inklużi dawk arkivjati.",
           "hooksLimit": "Skript għandu massimu ta' {max} hooks.",
           "lastHook": "Skript iżomm mill-inqas hook wieħed.",
           "languageNotAvailable": "Għalissa jista' jinkiteb biss bl-Ingliż.",
-          "carryOverExceeds": "Il-kreatur il-ġdid ikollu aktar minn {max} skripts. Arkivjahom minflok.",
+          "restoreLimit": "Dan il-kreatur diġà għandu {max} skripts. Arkivja wieħed minnhom l-ewwel, imbagħad irrestawra dan.",
+          "restoreCreatorMissing": "Dan il-kreatur m'għadux fis-suq. L-iskript jirritorna meta l-kreatur jerġa' jiżdied.",
           "choiceRequired": "Dan il-kreatur għandu skripts. Agħżel x'għandu jiġri minnhom."
         }
       }

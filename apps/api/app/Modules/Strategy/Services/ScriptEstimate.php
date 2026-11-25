@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Modules\Strategy\Services;
 
 /**
- * The duration estimate of a script (ruling Q12): spoken words divided by 2.5 per second, rounded up to a whole second, for the
- * LONGEST hook (any one hook may be chosen) plus all lines (PL-3.2b). Words are whitespace-separated. Never stored. The browser
- * computes the same number from the text on screen, so the two are pinned by the same cases (backend test and `scriptsLogic.spec.ts`).
+ * The duration estimate of a script (ruling Q12, restated after the PL-3.2a walk): an ad uses ONE hook at a time, so the estimate
+ * counts the spoken (audio) words of the LONGEST hook only, plus the spoken lines (none until PL-3.2b), divided by 2.5 per second
+ * and rounded up to a whole second. Hook texts that are not spoken (visual description, overlay) and the brief are never counted;
+ * the sum of all hooks is never taken. Words are whitespace-separated. Never stored. The browser shows the server's number, which
+ * is renewed by every save of a hook, so it follows the text once it has been saved.
  */
 final class ScriptEstimate
 {

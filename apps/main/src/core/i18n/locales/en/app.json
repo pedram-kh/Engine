@@ -2346,17 +2346,17 @@
           "draft": "Draft",
           "add": "Add script ({n}/{max})",
           "limit": "Script limit reached",
-          "limitHint": "This creator already has {max} scripts, archived ones included.",
+          "limitHint": "This creator already has {max} scripts. Archive one to add another.",
           "footnote": "Up to {max} scripts per creator",
           "archived": "Archived scripts ({count})"
         },
         "editor": {
           "title": "{name} — Script {n}",
           "lastEdited": "Last edited {when}",
-          "delete": "Delete script",
-          "deleteTitle": "Delete script {n} of {name}?",
-          "deleteBody": "This deletes the script and its hooks (hooks: {count}). This cannot be undone.",
-          "deleteConfirm": "Delete script",
+          "archive": "Archive script",
+          "archiveTitle": "Archive script {n} of {name}?",
+          "archiveBody": "The script and its hooks (hooks: {count}) move to Archived scripts. Nothing is deleted. You can restore it there.",
+          "archiveConfirm": "Archive script",
           "loadFailed": "This script could not be loaded."
         },
         "save": {
@@ -2446,12 +2446,14 @@
         },
         "archived": {
           "title": "Archived scripts · {market}",
-          "info": "A script is archived when its creator leaves this market. It comes back on its own if the creator is added to the market again.",
+          "info": "Archived scripts are kept with their hooks. Restore puts one back. A creator who is added to the market again gets their scripts back on their own.",
           "empty": "No archived scripts in this market.",
           "row": "{name} · Script {n}",
           "hooks": "Hooks: {count}",
           "on": "Archived {date}",
-          "inMarket": "This creator is in this market again.",
+          "restore": "Restore",
+          "restoreFull": "{name} already has {max} scripts. Archive one first to restore this one.",
+          "creatorGone": "This creator is not in this market. The script comes back when they are added again.",
           "delete": "Delete for good",
           "deleteTitle": "Delete this script for good?",
           "deleteBody": "Script {n} of {name} and its hooks (hooks: {count}) will be deleted. This cannot be undone.",
@@ -2480,11 +2482,11 @@
         },
         "errors": {
           "limitReached": "A creator has at most {max} scripts.",
-          "limitReachedArchived": "A creator has at most {max} scripts, archived ones included.",
           "hooksLimit": "A script has at most {max} hooks.",
           "lastHook": "A script keeps at least one hook.",
           "languageNotAvailable": "Only English can be written for now.",
-          "carryOverExceeds": "The new creator would have more than {max} scripts. Archive them instead.",
+          "restoreLimit": "This creator already has {max} scripts. Archive one of them first, then restore this one.",
+          "restoreCreatorMissing": "This creator is not in the market any more. The script comes back when the creator is added again.",
           "choiceRequired": "This creator has scripts. Choose what happens to them."
         }
       }

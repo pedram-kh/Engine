@@ -44,7 +44,8 @@ const CODE_KEYS: Record<string, string> = {
   'wave.campaign_not_available': 'app.waves.errors.campaignNotAvailable',
   'wave_script.limit_reached': 'app.strategy.scripts.errors.limitReached',
   'wave_script.hooks_limit': 'app.strategy.scripts.errors.hooksLimit',
-  'wave_script.carry_over_exceeds_limit': 'app.strategy.scripts.errors.carryOverExceeds',
+  'wave_script.restore_limit_reached': 'app.strategy.scripts.errors.restoreLimit',
+  'wave_script.restore_creator_missing': 'app.strategy.scripts.errors.restoreCreatorMissing',
   'wave_script.last_hook': 'app.strategy.scripts.errors.lastHook',
   'wave_script.language_not_available': 'app.strategy.scripts.errors.languageNotAvailable',
   'wave_creator.scripts_choice_required': 'app.strategy.scripts.errors.choiceRequired',
@@ -108,21 +109,13 @@ export function strategyErrorMessage(err: unknown, t: Translate): string {
       })
     }
     if (err.code === 'wave_script.limit_reached') {
-      return t(
-        num('archived') !== null && (num('archived') ?? 0) > 0
-          ? 'app.strategy.scripts.errors.limitReachedArchived'
-          : 'app.strategy.scripts.errors.limitReached',
-        { max: num('max') ?? 3, archived: num('archived') ?? 0 },
-      )
+      return t('app.strategy.scripts.errors.limitReached', { max: num('max') ?? 3 })
+    }
+    if (err.code === 'wave_script.restore_limit_reached') {
+      return t('app.strategy.scripts.errors.restoreLimit', { max: num('max') ?? 3 })
     }
     if (err.code === 'wave_script.hooks_limit') {
       return t('app.strategy.scripts.errors.hooksLimit', { max: num('max') ?? 6 })
-    }
-    if (err.code === 'wave_script.carry_over_exceeds_limit') {
-      return t('app.strategy.scripts.errors.carryOverExceeds', {
-        count: num('count') ?? 0,
-        max: num('max') ?? 3,
-      })
     }
     if (err.code === 'wave_creator.scripts_choice_required') {
       return t('app.strategy.scripts.errors.choiceRequired', { count: num('scripts') ?? 0 })

@@ -30,8 +30,8 @@ const props = defineProps<{
   debounceMs?: number
 }>()
 const emit = defineEmits<{
-  /** The script was deleted (the answer is the new overview of the market). */
-  deleted: [overview: ScriptsOverview]
+  /** The script was archived (the answer is the new overview of the wave). */
+  archived: [overview: ScriptsOverview]
   /** Somebody else removed it (404). */
   gone: []
 }>()
@@ -117,30 +117,30 @@ function removeHook(hookId: string): Promise<string | null> {
   return structural(() => strategyApi.deleteHook(props.scope, props.scriptId, hookId))
 }
 
-// Delete the script.
-const deleteOpen = ref(false)
-const deleting = ref(false)
-const deleteError = ref<string | null>(null)
-async function doDelete(): Promise<void> {
-  if (deleting.value) return
-  deleting.value = true
-  deleteError.value = null
+// Archive the script (every agency role): it moves to the archived list with its hooks and texts, and can be restored there.
+const archiveOpen = ref(false)
+const archiving = ref(false)
+const archiveError = ref<string | null>(null)
+async function doArchive(): Promise<void> {
+  if (archiving.value) return
+  archiving.value = true
+  archiveError.value = null
   try {
-    const res = await strategyApi.deleteScript(props.scope, props.scriptId)
-    deleteOpen.value = false
-    emit('deleted', res.data)
+    const res = await strategyApi.archiveScript(props.scope, props.scriptId)
+    archiveOpen.value = false
+    emit('archived', res.data)
   } catch (err) {
     if (isGone(err)) {
-      deleteOpen.value = false
+      archiveOpen.value = false
       emit('gone')
-    } else deleteError.value = strategyErrorMessage(err, t)
+    } else archiveError.value = strategyErrorMessage(err, t)
   } finally {
-    deleting.value = false
+    archiving.value = false
   }
 }
-function askDelete(): void {
-  deleteError.value = null
-  deleteOpen.value = true
+function askArchive(): void {
+  archiveError.value = null
+  archiveOpen.value = true
 }
 
 const chip = computed(() => registry.state.value)
@@ -227,10 +227,10 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll })
           <v-btn
             variant="text"
             size="small"
-            prepend-icon="mdi-delete-outline"
-            data-test="script-delete"
-            @click="askDelete"
-            >{{ t('app.strategy.scripts.editor.delete') }}</v-btn
+            prepend-icon="mdi-archive-outline"
+            data-test="script-archive"
+            @click="askArchive"
+            >{{ t('app.strategy.scripts.editor.archive') }}</v-btn
           >
         </div>
       </header>
@@ -300,22 +300,23 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll })
       </div>
 
       <StrategyConfirmDialog
-        v-model="deleteOpen"
+        v-model="archiveOpen"
         :title="
-          t('app.strategy.scripts.editor.deleteTitle', { name: creatorName, n: script.number })
+          t('app.strategy.scripts.editor.archiveTitle', { name: creatorName, n: script.number })
         "
         :body="
           t(
-            'app.strategy.scripts.editor.deleteBody',
+            'app.strategy.scripts.editor.archiveBody',
             { count: script.hooks.length },
             script.hooks.length,
           )
         "
-        :confirm-label="t('app.strategy.scripts.editor.deleteConfirm')"
-        :busy="deleting"
-        :error="deleteError"
-        test-id="script-delete-dialog"
-        @confirm="doDelete"
+        :confirm-label="t('app.strategy.scripts.editor.archiveConfirm')"
+        :busy="archiving"
+        :error="archiveError"
+        confirm-color="primary"
+        test-id="script-archive-dialog"
+        @confirm="doArchive"
       />
     </template>
   </div>

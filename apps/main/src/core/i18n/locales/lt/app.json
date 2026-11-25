@@ -2346,17 +2346,17 @@
           "draft": "Juodraštis",
           "add": "Pridėti scenarijų ({n}/{max})",
           "limit": "Pasiektas scenarijų limitas",
-          "limitHint": "Šis kūrėjas jau turi {max} scenarijus, įskaitant suarchyvuotus.",
+          "limitHint": "Šis kūrėjas jau turi {max} scenarijus. Norėdami pridėti kitą, suarchyvuokite vieną.",
           "footnote": "Iki {max} scenarijų vienam kūrėjui",
           "archived": "Suarchyvuoti scenarijai ({count})"
         },
         "editor": {
           "title": "{name} — Scenarijus {n}",
           "lastEdited": "Paskutinį kartą redaguota: {when}",
-          "delete": "Ištrinti scenarijų",
-          "deleteTitle": "Ištrinti kūrėjo {name} scenarijų {n}?",
-          "deleteBody": "Scenarijus ir jo kabliukai bus ištrinti (kabliukų: {count}). Šio veiksmo atšaukti negalima.",
-          "deleteConfirm": "Ištrinti scenarijų",
+          "archive": "Suarchyvuoti scenarijų",
+          "archiveTitle": "Suarchyvuoti {n} scenarijų ({name})?",
+          "archiveBody": "Scenarijus ir jo kabliukai (kabliukų: {count}) perkeliami į Suarchyvuotus scenarijus. Nieko neištrinama. Iš ten galite jį atkurti.",
+          "archiveConfirm": "Suarchyvuoti scenarijų",
           "loadFailed": "Šio scenarijaus nepavyko įkelti."
         },
         "save": {
@@ -2446,12 +2446,14 @@
         },
         "archived": {
           "title": "Suarchyvuoti scenarijai · {market}",
-          "info": "Scenarijus archyvuojamas, kai jo kūrėjas palieka šią rinką. Jis grįžta pats, jei kūrėjas vėl pridedamas prie rinkos.",
+          "info": "Suarchyvuoti scenarijai saugomi kartu su kabliukais. Atkurti grąžina scenarijų. Kūrėjas, vėl pridėtas prie rinkos, savo scenarijus atgauna pats.",
           "empty": "Šioje rinkoje suarchyvuotų scenarijų nėra.",
           "row": "{name} · Scenarijus {n}",
           "hooks": "Kabliukų: {count}",
           "on": "Suarchyvuota {date}",
-          "inMarket": "Šis kūrėjas vėl yra šioje rinkoje.",
+          "restore": "Atkurti",
+          "restoreFull": "{name} jau turi {max} scenarijus. Norėdami atkurti šį, pirmiausia suarchyvuokite vieną.",
+          "creatorGone": "Šio kūrėjo nėra šioje rinkoje. Scenarijus grįžta, kai kūrėjas vėl pridedamas.",
           "delete": "Ištrinti visam laikui",
           "deleteTitle": "Ištrinti šį scenarijų visam laikui?",
           "deleteBody": "Kūrėjo {name} scenarijus {n} ir jo kabliukai (kabliukų: {count}) bus ištrinti. Šio veiksmo atšaukti negalima.",
@@ -2480,11 +2482,11 @@
         },
         "errors": {
           "limitReached": "Kūrėjas turi daugiausia {max} scenarijus.",
-          "limitReachedArchived": "Kūrėjas turi daugiausia {max} scenarijus, įskaitant suarchyvuotus.",
           "hooksLimit": "Scenarijus turi daugiausia {max} kabliukus.",
           "lastHook": "Scenarijuje lieka bent vienas kabliukas.",
           "languageNotAvailable": "Kol kas galima rašyti tik angliškai.",
-          "carryOverExceeds": "Naujas kūrėjas turėtų daugiau nei {max} scenarijus. Geriau juos suarchyvuokite.",
+          "restoreLimit": "Šis kūrėjas jau turi {max} scenarijus. Pirmiausia suarchyvuokite vieną, tada atkurkite šį.",
+          "restoreCreatorMissing": "Šio kūrėjo nebėra rinkoje. Scenarijus grįžta, kai kūrėjas vėl pridedamas.",
           "choiceRequired": "Šis kūrėjas turi scenarijų. Pasirinkite, ką su jais daryti."
         }
       }

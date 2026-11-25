@@ -97,16 +97,17 @@ const { t } = useI18n()
     <p class="srail__foot" data-test="scripts-rail-foot">
       {{ t('app.strategy.scripts.rail.footnote', { max }) }}
     </p>
-    <button
+    <v-btn
       v-if="archivedCount > 0"
-      type="button"
+      variant="outlined"
+      size="small"
       class="srail__archived"
+      prepend-icon="mdi-archive-outline"
       data-test="scripts-archived-open"
       @click="emit('archived')"
     >
-      <v-icon icon="mdi-archive-outline" size="14" aria-hidden="true" />
       {{ t('app.strategy.scripts.rail.archived', { count: archivedCount }) }}
-    </button>
+    </v-btn>
   </aside>
 </template>
 
@@ -239,23 +240,27 @@ const { t } = useI18n()
   line-height: 16px;
   color: rgb(var(--v-theme-text-tertiary, var(--v-theme-on-surface-variant)));
 }
+/* A secondary action like "Add hook" in the editor: outlined, 13 / 500, 6 x 12, radius 8, the border colour of the cards. */
 .srail__archived {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
   align-self: flex-start;
-  padding: 4px 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  font-size: 12px;
-  color: rgb(var(--v-theme-on-surface-variant));
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  flex: none;
+  height: auto !important;
+  padding: 6px 12px !important;
+  border-color: rgb(var(--v-theme-border-color)) !important;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: normal;
+  text-transform: none;
 }
-.srail__archived:hover {
-  color: rgb(var(--v-theme-on-surface));
+.srail__archived :deep(.v-btn__prepend) {
+  margin-inline: 0 8px;
+}
+.srail__archived :deep(.v-icon) {
+  width: 14px;
+  height: 14px;
+  font-size: 14px;
 }
 
 /* Narrow: one row of creator cards above the editor, sideways scroll inside the rail. */

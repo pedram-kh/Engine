@@ -2346,17 +2346,17 @@
           "draft": "Brouillon",
           "add": "Ajouter un script ({n}/{max})",
           "limit": "Limite de scripts atteinte",
-          "limitHint": "Ce créateur a déjà {max} scripts, archivés compris.",
+          "limitHint": "Ce créateur a déjà {max} scripts. Archivez-en un pour en ajouter un autre.",
           "footnote": "Jusqu'à {max} scripts par créateur",
           "archived": "Scripts archivés ({count})"
         },
         "editor": {
           "title": "{name} — Script {n}",
           "lastEdited": "Dernière modification : {when}",
-          "delete": "Supprimer le script",
-          "deleteTitle": "Supprimer le script {n} de {name} ?",
-          "deleteBody": "Le script et ses accroches seront supprimés (accroches : {count}). Cette action est irréversible.",
-          "deleteConfirm": "Supprimer le script",
+          "archive": "Archiver le script",
+          "archiveTitle": "Archiver le script {n} de {name} ?",
+          "archiveBody": "Le script et ses accroches (accroches : {count}) passent dans les scripts archivés. Rien n'est supprimé. Vous pouvez le restaurer depuis là.",
+          "archiveConfirm": "Archiver le script",
           "loadFailed": "Impossible de charger ce script."
         },
         "save": {
@@ -2446,12 +2446,14 @@
         },
         "archived": {
           "title": "Scripts archivés · {market}",
-          "info": "Un script est archivé lorsque son créateur quitte ce marché. Il revient tout seul si le créateur est de nouveau ajouté au marché.",
+          "info": "Les scripts archivés sont conservés avec leurs accroches. « Restaurer » en remet un en place. Un créateur ajouté de nouveau au marché retrouve ses scripts tout seul.",
           "empty": "Aucun script archivé sur ce marché.",
           "row": "{name} · Script {n}",
           "hooks": "Accroches : {count}",
           "on": "Archivé le {date}",
-          "inMarket": "Ce créateur est de nouveau sur ce marché.",
+          "restore": "Restaurer",
+          "restoreFull": "{name} a déjà {max} scripts. Archivez-en un d'abord pour restaurer celui-ci.",
+          "creatorGone": "Ce créateur n'est pas sur ce marché. Le script revient quand le créateur est ajouté de nouveau.",
           "delete": "Supprimer définitivement",
           "deleteTitle": "Supprimer définitivement ce script ?",
           "deleteBody": "Le script {n} de {name} et ses accroches (accroches : {count}) seront supprimés. Cette action est irréversible.",
@@ -2480,11 +2482,11 @@
         },
         "errors": {
           "limitReached": "Un créateur a au plus {max} scripts.",
-          "limitReachedArchived": "Un créateur a au plus {max} scripts, archivés compris.",
           "hooksLimit": "Un script a au plus {max} accroches.",
           "lastHook": "Un script garde au moins une accroche.",
           "languageNotAvailable": "Seul l'anglais peut être rédigé pour le moment.",
-          "carryOverExceeds": "Le nouveau créateur aurait plus de {max} scripts. Archivez-les plutôt.",
+          "restoreLimit": "Ce créateur a déjà {max} scripts. Archivez-en un d'abord, puis restaurez celui-ci.",
+          "restoreCreatorMissing": "Ce créateur n'est plus sur le marché. Le script revient quand le créateur est ajouté de nouveau.",
           "choiceRequired": "Ce créateur a des scripts. Choisissez ce qu'ils deviennent."
         }
       }

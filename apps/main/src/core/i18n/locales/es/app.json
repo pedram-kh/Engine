@@ -2346,17 +2346,17 @@
           "draft": "Borrador",
           "add": "Añadir guion ({n}/{max})",
           "limit": "Límite de guiones alcanzado",
-          "limitHint": "Este creador ya tiene {max} guiones, incluidos los archivados.",
+          "limitHint": "Este creador ya tiene {max} guiones. Archiva uno para añadir otro.",
           "footnote": "Hasta {max} guiones por creador",
           "archived": "Guiones archivados ({count})"
         },
         "editor": {
           "title": "{name} — Guion {n}",
           "lastEdited": "Última edición: {when}",
-          "delete": "Eliminar guion",
-          "deleteTitle": "¿Eliminar el guion {n} de {name}?",
-          "deleteBody": "Se eliminarán el guion y sus ganchos (ganchos: {count}). Esta acción no se puede deshacer.",
-          "deleteConfirm": "Eliminar guion",
+          "archive": "Archivar guion",
+          "archiveTitle": "¿Archivar el guion {n} de {name}?",
+          "archiveBody": "El guion y sus ganchos (ganchos: {count}) pasan a Guiones archivados. No se elimina nada. Puedes restaurarlo desde allí.",
+          "archiveConfirm": "Archivar guion",
           "loadFailed": "No se pudo cargar este guion."
         },
         "save": {
@@ -2446,12 +2446,14 @@
         },
         "archived": {
           "title": "Guiones archivados · {market}",
-          "info": "Un guion se archiva cuando su creador sale de este mercado. Vuelve solo si el creador se añade de nuevo al mercado.",
+          "info": "Los guiones archivados se conservan con sus ganchos. Restaurar devuelve uno. Un creador que se añade de nuevo al mercado recupera sus guiones solo.",
           "empty": "No hay guiones archivados en este mercado.",
           "row": "{name} · Guion {n}",
           "hooks": "Ganchos: {count}",
           "on": "Archivado el {date}",
-          "inMarket": "Este creador vuelve a estar en este mercado.",
+          "restore": "Restaurar",
+          "restoreFull": "{name} ya tiene {max} guiones. Archiva uno primero para restaurar este.",
+          "creatorGone": "Este creador no está en este mercado. El guion vuelve cuando el creador se añada de nuevo.",
           "delete": "Eliminar definitivamente",
           "deleteTitle": "¿Eliminar este guion definitivamente?",
           "deleteBody": "Se eliminarán el guion {n} de {name} y sus ganchos (ganchos: {count}). Esta acción no se puede deshacer.",
@@ -2480,11 +2482,11 @@
         },
         "errors": {
           "limitReached": "Un creador tiene como máximo {max} guiones.",
-          "limitReachedArchived": "Un creador tiene como máximo {max} guiones, incluidos los archivados.",
           "hooksLimit": "Un guion tiene como máximo {max} ganchos.",
           "lastHook": "Un guion conserva al menos un gancho.",
           "languageNotAvailable": "Por ahora solo se puede escribir en inglés.",
-          "carryOverExceeds": "El nuevo creador tendría más de {max} guiones. Archívalos en su lugar.",
+          "restoreLimit": "Este creador ya tiene {max} guiones. Archiva uno primero y luego restaura este.",
+          "restoreCreatorMissing": "Este creador ya no está en el mercado. El guion vuelve cuando el creador se añada de nuevo.",
           "choiceRequired": "Este creador tiene guiones. Elige qué hacer con ellos."
         }
       }

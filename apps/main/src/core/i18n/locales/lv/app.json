@@ -2346,17 +2346,17 @@
           "draft": "Melnraksts",
           "add": "Pievienot scenāriju ({n}/{max})",
           "limit": "Scenāriju limits sasniegts",
-          "limitHint": "Šim veidotājam jau ir {max} scenāriji, ieskaitot arhivētos.",
+          "limitHint": "Šim veidotājam jau ir {max} scenāriji. Lai pievienotu citu, arhivējiet vienu.",
           "footnote": "Līdz {max} scenārijiem uz veidotāju",
           "archived": "Arhivētie scenāriji ({count})"
         },
         "editor": {
           "title": "{name} — Scenārijs {n}",
           "lastEdited": "Pēdējoreiz rediģēts: {when}",
-          "delete": "Dzēst scenāriju",
-          "deleteTitle": "Vai dzēst veidotāja {name} scenāriju {n}?",
-          "deleteBody": "Scenārijs un tā āķi tiks dzēsti (āķi: {count}). To nevar atsaukt.",
-          "deleteConfirm": "Dzēst scenāriju",
+          "archive": "Arhivēt scenāriju",
+          "archiveTitle": "Vai arhivēt scenāriju {n} ({name})?",
+          "archiveBody": "Scenārijs un tā āķi (āķi: {count}) tiek pārvietoti uz Arhivētajiem scenārijiem. Nekas netiek dzēsts. No turienes to var atjaunot.",
+          "archiveConfirm": "Arhivēt scenāriju",
           "loadFailed": "Šo scenāriju neizdevās ielādēt."
         },
         "save": {
@@ -2446,12 +2446,14 @@
         },
         "archived": {
           "title": "Arhivētie scenāriji · {market}",
-          "info": "Scenārijs tiek arhivēts, kad tā veidotājs pamet šo tirgu. Tas atgriežas pats, ja veidotājs tirgum tiek pievienots atkal.",
+          "info": "Arhivētie scenāriji tiek saglabāti kopā ar āķiem. Atjaunot atgriež scenāriju. Veidotājs, kas tirgum tiek pievienots atkal, savus scenārijus saņem atpakaļ pats.",
           "empty": "Šajā tirgū nav arhivētu scenāriju.",
           "row": "{name} · Scenārijs {n}",
           "hooks": "Āķi: {count}",
           "on": "Arhivēts {date}",
-          "inMarket": "Šis veidotājs atkal ir šajā tirgū.",
+          "restore": "Atjaunot",
+          "restoreFull": "Veidotājam {name} jau ir {max} scenāriji. Lai atjaunotu šo, vispirms arhivējiet vienu.",
+          "creatorGone": "Šī veidotāja nav šajā tirgū. Scenārijs atgriežas, kad veidotājs tiek pievienots atkal.",
           "delete": "Dzēst pavisam",
           "deleteTitle": "Vai dzēst šo scenāriju pavisam?",
           "deleteBody": "Veidotāja {name} scenārijs {n} un tā āķi (āķi: {count}) tiks dzēsti. To nevar atsaukt.",
@@ -2480,11 +2482,11 @@
         },
         "errors": {
           "limitReached": "Veidotājam ir ne vairāk kā {max} scenāriji.",
-          "limitReachedArchived": "Veidotājam ir ne vairāk kā {max} scenāriji, ieskaitot arhivētos.",
           "hooksLimit": "Scenārijā ir ne vairāk kā {max} āķi.",
           "lastHook": "Scenārijā paliek vismaz viens āķis.",
           "languageNotAvailable": "Pagaidām var rakstīt tikai angliski.",
-          "carryOverExceeds": "Jaunajam veidotājam būtu vairāk nekā {max} scenāriji. Tā vietā arhivējiet tos.",
+          "restoreLimit": "Šim veidotājam jau ir {max} scenāriji. Vispirms arhivējiet vienu, tad atjaunojiet šo.",
+          "restoreCreatorMissing": "Šī veidotāja vairs nav tirgū. Scenārijs atgriežas, kad veidotājs tiek pievienots atkal.",
           "choiceRequired": "Šim veidotājam ir scenāriji. Izvēlieties, ko ar tiem darīt."
         }
       }

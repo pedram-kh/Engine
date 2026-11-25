@@ -2346,17 +2346,17 @@
           "draft": "Ciornă",
           "add": "Adaugă script ({n}/{max})",
           "limit": "Limita de scripturi a fost atinsă",
-          "limitHint": "Acest creator are deja {max} scripturi, inclusiv cele arhivate.",
+          "limitHint": "Acest creator are deja {max} scripturi. Arhivează unul ca să adaugi altul.",
           "footnote": "Până la {max} scripturi per creator",
           "archived": "Scripturi arhivate ({count})"
         },
         "editor": {
           "title": "{name} — Scriptul {n}",
           "lastEdited": "Ultima modificare: {when}",
-          "delete": "Șterge scriptul",
-          "deleteTitle": "Ștergi scriptul {n} al lui {name}?",
-          "deleteBody": "Scriptul și hook-urile lui vor fi șterse (hook-uri: {count}). Acțiunea nu poate fi anulată.",
-          "deleteConfirm": "Șterge scriptul",
+          "archive": "Arhivează scriptul",
+          "archiveTitle": "Arhivezi scriptul {n} al lui {name}?",
+          "archiveBody": "Scriptul și hook-urile lui (hook-uri: {count}) trec în Scripturi arhivate. Nu se șterge nimic. Îl poți restaura de acolo.",
+          "archiveConfirm": "Arhivează scriptul",
           "loadFailed": "Acest script nu a putut fi încărcat."
         },
         "save": {
@@ -2446,12 +2446,14 @@
         },
         "archived": {
           "title": "Scripturi arhivate · {market}",
-          "info": "Un script este arhivat când creatorul lui părăsește această piață. Revine singur dacă creatorul este adăugat din nou pe piață.",
+          "info": "Scripturile arhivate se păstrează împreună cu hook-urile lor. Restaurează pune un script la loc. Un creator adăugat din nou pe piață își primește singur scripturile înapoi.",
           "empty": "Nu există scripturi arhivate pe această piață.",
           "row": "{name} · Scriptul {n}",
           "hooks": "Hook-uri: {count}",
           "on": "Arhivat la {date}",
-          "inMarket": "Acest creator este din nou pe această piață.",
+          "restore": "Restaurează",
+          "restoreFull": "{name} are deja {max} scripturi. Arhivează mai întâi unul ca să restaurezi acest script.",
+          "creatorGone": "Acest creator nu este pe această piață. Scriptul revine când creatorul este adăugat din nou.",
           "delete": "Șterge definitiv",
           "deleteTitle": "Ștergi definitiv acest script?",
           "deleteBody": "Scriptul {n} al lui {name} și hook-urile lui (hook-uri: {count}) vor fi șterse. Acțiunea nu poate fi anulată.",
@@ -2480,11 +2482,11 @@
         },
         "errors": {
           "limitReached": "Un creator are cel mult {max} scripturi.",
-          "limitReachedArchived": "Un creator are cel mult {max} scripturi, inclusiv cele arhivate.",
           "hooksLimit": "Un script are cel mult {max} hook-uri.",
           "lastHook": "Un script păstrează cel puțin un hook.",
           "languageNotAvailable": "Deocamdată se poate scrie doar în engleză.",
-          "carryOverExceeds": "Noul creator ar avea mai mult de {max} scripturi. Arhivează-le în schimb.",
+          "restoreLimit": "Acest creator are deja {max} scripturi. Arhivează mai întâi unul, apoi restaurează acest script.",
+          "restoreCreatorMissing": "Acest creator nu mai este pe piață. Scriptul revine când creatorul este adăugat din nou.",
           "choiceRequired": "Acest creator are scripturi. Alege ce se întâmplă cu ele."
         }
       }

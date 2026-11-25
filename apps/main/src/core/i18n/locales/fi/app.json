@@ -2346,17 +2346,17 @@
           "draft": "Luonnos",
           "add": "Lisää käsikirjoitus ({n}/{max})",
           "limit": "Käsikirjoitusten raja saavutettu",
-          "limitHint": "Tällä tekijällä on jo {max} käsikirjoitusta, arkistoidut mukaan lukien.",
+          "limitHint": "Tällä tekijällä on jo {max} käsikirjoitusta. Arkistoi yksi, jotta voit lisätä uuden.",
           "footnote": "Enintään {max} käsikirjoitusta tekijää kohden",
           "archived": "Arkistoidut käsikirjoitukset ({count})"
         },
         "editor": {
           "title": "{name} — Käsikirjoitus {n}",
           "lastEdited": "Viimeksi muokattu: {when}",
-          "delete": "Poista käsikirjoitus",
-          "deleteTitle": "Poistetaanko tekijän {name} käsikirjoitus {n}?",
-          "deleteBody": "Käsikirjoitus ja sen koukut poistetaan (koukkuja: {count}). Tätä ei voi perua.",
-          "deleteConfirm": "Poista käsikirjoitus",
+          "archive": "Arkistoi käsikirjoitus",
+          "archiveTitle": "Arkistoidaanko käsikirjoitus {n} ({name})?",
+          "archiveBody": "Käsikirjoitus ja sen koukut (koukkuja: {count}) siirtyvät arkistoituihin käsikirjoituksiin. Mitään ei poisteta. Voit palauttaa sen sieltä.",
+          "archiveConfirm": "Arkistoi käsikirjoitus",
           "loadFailed": "Käsikirjoitusta ei voitu ladata."
         },
         "save": {
@@ -2446,12 +2446,14 @@
         },
         "archived": {
           "title": "Arkistoidut käsikirjoitukset · {market}",
-          "info": "Käsikirjoitus arkistoidaan, kun sen tekijä poistuu tältä markkinalta. Se palaa itsestään, jos tekijä lisätään markkinalle uudelleen.",
+          "info": "Arkistoidut käsikirjoitukset säilyvät koukkuineen. Palauta tuo käsikirjoituksen takaisin. Markkinalle uudelleen lisätty tekijä saa omat käsikirjoituksensa takaisin itsestään.",
           "empty": "Tällä markkinalla ei ole arkistoituja käsikirjoituksia.",
           "row": "{name} · Käsikirjoitus {n}",
           "hooks": "Koukkuja: {count}",
           "on": "Arkistoitu {date}",
-          "inMarket": "Tämä tekijä on taas tällä markkinalla.",
+          "restore": "Palauta",
+          "restoreFull": "Tekijällä {name} on jo {max} käsikirjoitusta. Arkistoi ensin yksi, jotta voit palauttaa tämän.",
+          "creatorGone": "Tämä tekijä ei ole tällä markkinalla. Käsikirjoitus palaa, kun tekijä lisätään uudelleen.",
           "delete": "Poista pysyvästi",
           "deleteTitle": "Poistetaanko tämä käsikirjoitus pysyvästi?",
           "deleteBody": "Tekijän {name} käsikirjoitus {n} ja sen koukut (koukkuja: {count}) poistetaan. Tätä ei voi perua.",
@@ -2480,11 +2482,11 @@
         },
         "errors": {
           "limitReached": "Tekijällä on enintään {max} käsikirjoitusta.",
-          "limitReachedArchived": "Tekijällä on enintään {max} käsikirjoitusta, arkistoidut mukaan lukien.",
           "hooksLimit": "Käsikirjoituksessa on enintään {max} koukkua.",
           "lastHook": "Käsikirjoituksessa säilyy vähintään yksi koukku.",
           "languageNotAvailable": "Toistaiseksi voi kirjoittaa vain englanniksi.",
-          "carryOverExceeds": "Uudella tekijällä olisi yli {max} käsikirjoitusta. Arkistoi ne sen sijaan.",
+          "restoreLimit": "Tällä tekijällä on jo {max} käsikirjoitusta. Arkistoi ensin yksi ja palauta sitten tämä.",
+          "restoreCreatorMissing": "Tämä tekijä ei ole enää markkinalla. Käsikirjoitus palaa, kun tekijä lisätään uudelleen.",
           "choiceRequired": "Tällä tekijällä on käsikirjoituksia. Valitse, mitä niille tehdään."
         }
       }

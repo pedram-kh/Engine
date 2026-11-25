@@ -29,10 +29,10 @@ const KEYS = [
   'app.strategy.scripts.rail.archived',
   'app.strategy.scripts.editor.title',
   'app.strategy.scripts.editor.lastEdited',
-  'app.strategy.scripts.editor.delete',
-  'app.strategy.scripts.editor.deleteTitle',
-  'app.strategy.scripts.editor.deleteBody',
-  'app.strategy.scripts.editor.deleteConfirm',
+  'app.strategy.scripts.editor.archive',
+  'app.strategy.scripts.editor.archiveTitle',
+  'app.strategy.scripts.editor.archiveBody',
+  'app.strategy.scripts.editor.archiveConfirm',
   'app.strategy.scripts.editor.loadFailed',
   'app.strategy.scripts.save.saving',
   'app.strategy.scripts.save.saved',
@@ -113,7 +113,9 @@ const KEYS = [
   'app.strategy.scripts.archived.row',
   'app.strategy.scripts.archived.hooks',
   'app.strategy.scripts.archived.on',
-  'app.strategy.scripts.archived.inMarket',
+  'app.strategy.scripts.archived.restore',
+  'app.strategy.scripts.archived.restoreFull',
+  'app.strategy.scripts.archived.creatorGone',
   'app.strategy.scripts.archived.delete',
   'app.strategy.scripts.archived.deleteTitle',
   'app.strategy.scripts.archived.deleteBody',
@@ -130,11 +132,11 @@ const KEYS = [
   'app.strategy.scripts.empty.noScripts.title',
   'app.strategy.scripts.empty.noScripts.body',
   'app.strategy.scripts.errors.limitReached',
-  'app.strategy.scripts.errors.limitReachedArchived',
   'app.strategy.scripts.errors.hooksLimit',
   'app.strategy.scripts.errors.lastHook',
   'app.strategy.scripts.errors.languageNotAvailable',
-  'app.strategy.scripts.errors.carryOverExceeds',
+  'app.strategy.scripts.errors.restoreLimit',
+  'app.strategy.scripts.errors.restoreCreatorMissing',
   'app.strategy.scripts.errors.choiceRequired',
   'app.waves.dialog.scriptsWarning',
   'app.waves.dialog.scriptsConfirm',
@@ -266,8 +268,8 @@ function tokens(text: string): string[] {
 }
 
 describe('PL-3.2a scripts strings', () => {
-  it('checks 121 keys across 24 locales', () => {
-    expect(KEYS).toHaveLength(121)
+  it('checks 123 keys across 24 locales', () => {
+    expect(KEYS).toHaveLength(123)
     expect(UI_LOCALES).toHaveLength(24)
   })
 

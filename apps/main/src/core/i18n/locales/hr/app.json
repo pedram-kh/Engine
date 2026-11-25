@@ -2346,17 +2346,17 @@
           "draft": "Skica",
           "add": "Dodaj skriptu ({n}/{max})",
           "limit": "Dosegnuto ograničenje skripti",
-          "limitHint": "Ovaj kreator već ima {max} skripte, uključujući arhivirane.",
+          "limitHint": "Ovaj kreator već ima {max} skripte. Arhivirajte jednu da biste dodali drugu.",
           "footnote": "Do {max} skripte po kreatoru",
           "archived": "Arhivirane skripte ({count})"
         },
         "editor": {
           "title": "{name} — Skripta {n}",
           "lastEdited": "Zadnje uređivanje: {when}",
-          "delete": "Izbriši skriptu",
-          "deleteTitle": "Izbrisati skriptu {n} kreatora {name}?",
-          "deleteBody": "Skripta i njezini hookovi bit će izbrisani (hookova: {count}). Ovo se ne može poništiti.",
-          "deleteConfirm": "Izbriši skriptu",
+          "archive": "Arhiviraj skriptu",
+          "archiveTitle": "Arhivirati skriptu {n} – {name}?",
+          "archiveBody": "Skripta i njezini hookovi (hookova: {count}) premještaju se u Arhivirane skripte. Ništa se ne briše. Odande je možete vratiti.",
+          "archiveConfirm": "Arhiviraj skriptu",
           "loadFailed": "Ova skripta nije se mogla učitati."
         },
         "save": {
@@ -2446,12 +2446,14 @@
         },
         "archived": {
           "title": "Arhivirane skripte · {market}",
-          "info": "Skripta se arhivira kada njezin kreator napusti ovo tržište. Vraća se sama ako se kreator ponovno doda na tržište.",
+          "info": "Arhivirane skripte čuvaju se zajedno s hookovima. „Vrati“ vraća skriptu. Kreator koji se ponovno doda na tržište sam dobiva svoje skripte natrag.",
           "empty": "Na ovom tržištu nema arhiviranih skripti.",
           "row": "{name} · Skripta {n}",
           "hooks": "Hookova: {count}",
           "on": "Arhivirano {date}",
-          "inMarket": "Ovaj kreator ponovno je na ovom tržištu.",
+          "restore": "Vrati",
+          "restoreFull": "{name} već ima {max} skripte. Najprije arhivirajte jednu da biste vratili ovu.",
+          "creatorGone": "Ovaj kreator nije na ovom tržištu. Skripta se vraća kad se kreator ponovno doda.",
           "delete": "Izbriši zauvijek",
           "deleteTitle": "Izbrisati ovu skriptu zauvijek?",
           "deleteBody": "Skripta {n} kreatora {name} i njezini hookovi (hookova: {count}) bit će izbrisani. Ovo se ne može poništiti.",
@@ -2480,11 +2482,11 @@
         },
         "errors": {
           "limitReached": "Kreator može imati najviše {max} skripte.",
-          "limitReachedArchived": "Kreator može imati najviše {max} skripte, uključujući arhivirane.",
           "hooksLimit": "Skripta može imati najviše {max} hookova.",
           "lastHook": "Skripta zadržava barem jedan hook.",
           "languageNotAvailable": "Za sada se može pisati samo na engleskom.",
-          "carryOverExceeds": "Novi kreator imao bi više od {max} skripte. Umjesto toga ih arhivirajte.",
+          "restoreLimit": "Ovaj kreator već ima {max} skripte. Najprije arhivirajte jednu, pa vratite ovu.",
+          "restoreCreatorMissing": "Ovaj kreator više nije na tržištu. Skripta se vraća kad se kreator ponovno doda.",
           "choiceRequired": "Ovaj kreator ima skripte. Odaberite što će se dogoditi s njima."
         }
       }

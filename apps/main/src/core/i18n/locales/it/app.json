@@ -2346,17 +2346,17 @@
           "draft": "Bozza",
           "add": "Aggiungi script ({n}/{max})",
           "limit": "Limite di script raggiunto",
-          "limitHint": "Questo creator ha già {max} script, inclusi quelli archiviati.",
+          "limitHint": "Questo creator ha già {max} script. Archivia uno script per aggiungerne un altro.",
           "footnote": "Fino a {max} script per creator",
           "archived": "Script archiviati ({count})"
         },
         "editor": {
           "title": "{name} — Script {n}",
           "lastEdited": "Ultima modifica: {when}",
-          "delete": "Elimina script",
-          "deleteTitle": "Eliminare lo script {n} di {name}?",
-          "deleteBody": "Lo script e i suoi hook verranno eliminati (hook: {count}). L'operazione non può essere annullata.",
-          "deleteConfirm": "Elimina script",
+          "archive": "Archivia script",
+          "archiveTitle": "Archiviare lo script {n} di {name}?",
+          "archiveBody": "Lo script e i suoi hook (hook: {count}) passano agli script archiviati. Non viene eliminato nulla. Da lì puoi ripristinarlo.",
+          "archiveConfirm": "Archivia script",
           "loadFailed": "Impossibile caricare questo script."
         },
         "save": {
@@ -2446,12 +2446,14 @@
         },
         "archived": {
           "title": "Script archiviati · {market}",
-          "info": "Uno script viene archiviato quando il suo creator lascia questo mercato. Torna da solo se il creator viene aggiunto di nuovo al mercato.",
+          "info": "Gli script archiviati restano con i loro hook. Ripristina ne rimette uno al suo posto. Un creator aggiunto di nuovo al mercato ritrova i suoi script da solo.",
           "empty": "Nessuno script archiviato in questo mercato.",
           "row": "{name} · Script {n}",
           "hooks": "Hook: {count}",
           "on": "Archiviato il {date}",
-          "inMarket": "Questo creator è di nuovo in questo mercato.",
+          "restore": "Ripristina",
+          "restoreFull": "{name} ha già {max} script. Archivia prima uno script per ripristinare questo.",
+          "creatorGone": "Questo creator non è in questo mercato. Lo script torna quando il creator viene aggiunto di nuovo.",
           "delete": "Elimina definitivamente",
           "deleteTitle": "Eliminare definitivamente questo script?",
           "deleteBody": "Lo script {n} di {name} e i suoi hook (hook: {count}) verranno eliminati. L'operazione non può essere annullata.",
@@ -2480,11 +2482,11 @@
         },
         "errors": {
           "limitReached": "Un creator ha al massimo {max} script.",
-          "limitReachedArchived": "Un creator ha al massimo {max} script, inclusi quelli archiviati.",
           "hooksLimit": "Uno script ha al massimo {max} hook.",
           "lastHook": "Uno script mantiene almeno un hook.",
           "languageNotAvailable": "Per ora si può scrivere solo in inglese.",
-          "carryOverExceeds": "Il nuovo creator avrebbe più di {max} script. Archiviali invece.",
+          "restoreLimit": "Questo creator ha già {max} script. Archivia prima uno script, poi ripristina questo.",
+          "restoreCreatorMissing": "Questo creator non è più nel mercato. Lo script torna quando il creator viene aggiunto di nuovo.",
           "choiceRequired": "Questo creator ha degli script. Scegli cosa farne."
         }
       }

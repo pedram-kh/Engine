@@ -2346,17 +2346,17 @@
           "draft": "Utkast",
           "add": "Lägg till manus ({n}/{max})",
           "limit": "Gränsen för manus är nådd",
-          "limitHint": "Den här creatorn har redan {max} manus, arkiverade inräknade.",
+          "limitHint": "Den här creatorn har redan {max} manus. Arkivera ett för att lägga till ett nytt.",
           "footnote": "Upp till {max} manus per creator",
           "archived": "Arkiverade manus ({count})"
         },
         "editor": {
           "title": "{name} — Manus {n}",
           "lastEdited": "Senast redigerad: {when}",
-          "delete": "Ta bort manus",
-          "deleteTitle": "Ta bort manus {n} för {name}?",
-          "deleteBody": "Manuset och dess hooks tas bort (hooks: {count}). Det går inte att ångra.",
-          "deleteConfirm": "Ta bort manus",
+          "archive": "Arkivera manus",
+          "archiveTitle": "Arkivera manus {n} av {name}?",
+          "archiveBody": "Manuset och dess hooks (hooks: {count}) flyttas till Arkiverade manus. Inget tas bort. Du kan återställa det därifrån.",
+          "archiveConfirm": "Arkivera manus",
           "loadFailed": "Det här manuset kunde inte läsas in."
         },
         "save": {
@@ -2446,12 +2446,14 @@
         },
         "archived": {
           "title": "Arkiverade manus · {market}",
-          "info": "Ett manus arkiveras när dess creator lämnar den här marknaden. Det kommer tillbaka av sig självt om creatorn läggs till på marknaden igen.",
+          "info": "Arkiverade manus sparas med sina hooks. Återställ lägger tillbaka ett manus. En creator som läggs till på marknaden igen får tillbaka sina manus av sig själv.",
           "empty": "Inga arkiverade manus på den här marknaden.",
           "row": "{name} · Manus {n}",
           "hooks": "Hooks: {count}",
           "on": "Arkiverat {date}",
-          "inMarket": "Den här creatorn är på den här marknaden igen.",
+          "restore": "Återställ",
+          "restoreFull": "{name} har redan {max} manus. Arkivera ett först för att återställa det här.",
+          "creatorGone": "Den här creatorn finns inte på den här marknaden. Manuset kommer tillbaka när creatorn läggs till igen.",
           "delete": "Ta bort för gott",
           "deleteTitle": "Ta bort det här manuset för gott?",
           "deleteBody": "Manus {n} för {name} och dess hooks (hooks: {count}) tas bort. Det går inte att ångra.",
@@ -2480,11 +2482,11 @@
         },
         "errors": {
           "limitReached": "En creator har högst {max} manus.",
-          "limitReachedArchived": "En creator har högst {max} manus, arkiverade inräknade.",
           "hooksLimit": "Ett manus har högst {max} hooks.",
           "lastHook": "Ett manus behåller minst en hook.",
           "languageNotAvailable": "Än så länge kan bara engelska skrivas.",
-          "carryOverExceeds": "Den nya creatorn skulle få fler än {max} manus. Arkivera dem i stället.",
+          "restoreLimit": "Den här creatorn har redan {max} manus. Arkivera ett först och återställ sedan det här.",
+          "restoreCreatorMissing": "Den här creatorn finns inte längre på marknaden. Manuset kommer tillbaka när creatorn läggs till igen.",
           "choiceRequired": "Den här creatorn har manus. Välj vad som ska hända med dem."
         }
       }

@@ -1,12 +1,13 @@
 <script setup lang="ts">
 /**
- * PL-3.2a — the archived scripts of a market. A script is archived when its creator is removed from the market with "archive"
- * (or replaced with "archive and start fresh"); it is kept, and it comes back on its own when the creator is added to the market
- * again. There is no restore button: the way back is adding the creator. An admin or a manager can delete one for good (after a
- * confirm); staff see the list only. Names are text interpolations.
+ * PL-3.2a — the archived scripts of a market. A script is archived by "Archive script" in the editor (every role), or when its
+ * creator is removed from the market with "archive" (or replaced with "archive and start fresh"). Every role can Restore one while
+ * its creator is in the market and has fewer than three live scripts; otherwise the row says why. A creator who is added to the
+ * market again gets their scripts back on their own. Only an admin or a manager can delete one for good (after a confirm), and
+ * this list is the only place that can. Names are text interpolations.
  */
 import type { ArchivedScript } from '@catalyst/api-client'
-import { ref, watch } from 'vue'
+import { ref, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { creatorLabel } from '@/core/creators/creatorLabel'
@@ -20,9 +21,12 @@ const props = defineProps<{
   market: string
   marketName: string
   canPurge: boolean
+  /** The most live scripts a creator may have in a wave. */
+  max: number
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: boolean]; changed: [] }>()
 const { t, locale } = useI18n()
+const { max } = toRefs(props)
 
 const session = ref(0)
 const items = ref<ArchivedScript[]>([])
@@ -64,6 +68,27 @@ function when(iso: string | null): string {
   return iso === null
     ? ''
     : new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium' }).format(new Date(iso))
+}
+
+// Restore (every role): the server decides; a refusal is shown on the row.
+const restoring = ref<string | null>(null)
+const restoreErrors = ref<Record<string, string>>({})
+async function restore(a: ArchivedScript): Promise<void> {
+  if (restoring.value !== null) return
+  restoring.value = a.id
+  restoreErrors.value = {}
+  try {
+    await strategyApi.restoreScript(props.scope, a.id)
+    emit('changed')
+    await load()
+  } catch (err) {
+    if (isGone(err)) {
+      emit('changed')
+      await load()
+    } else restoreErrors.value = { [a.id]: strategyErrorMessage(err, t) }
+  } finally {
+    restoring.value = null
+  }
 }
 
 const purgeOpen = ref(false)
@@ -139,22 +164,49 @@ async function doPurge(): Promise<void> {
                 >
               </div>
               <div
-                v-if="a.creator_in_market"
-                class="arch__back"
-                :data-test="`archived-back-${a.id}`"
+                v-if="!a.creator_in_market"
+                class="arch__hint"
+                :data-test="`archived-gone-${a.id}`"
               >
-                {{ t('app.strategy.scripts.archived.inMarket') }}
+                {{ t('app.strategy.scripts.archived.creatorGone') }}
+              </div>
+              <div
+                v-else-if="!a.can_restore"
+                class="arch__hint"
+                :data-test="`archived-full-${a.id}`"
+              >
+                {{ t('app.strategy.scripts.archived.restoreFull', { name: label(a), max }) }}
+              </div>
+              <div
+                v-if="restoreErrors[a.id]"
+                class="arch__error"
+                role="alert"
+                :data-test="`archived-restore-error-${a.id}`"
+              >
+                {{ restoreErrors[a.id] }}
               </div>
             </div>
-            <v-btn
-              v-if="canPurge"
-              size="small"
-              variant="text"
-              color="error"
-              :data-test="`archived-delete-${a.id}`"
-              @click="askPurge(a)"
-              >{{ t('app.strategy.scripts.archived.delete') }}</v-btn
-            >
+            <div class="arch__actions">
+              <v-btn
+                size="small"
+                variant="outlined"
+                prepend-icon="mdi-restore"
+                :disabled="!a.can_restore || restoring !== null"
+                :loading="restoring === a.id"
+                :data-test="`archived-restore-${a.id}`"
+                @click="restore(a)"
+                >{{ t('app.strategy.scripts.archived.restore') }}</v-btn
+              >
+              <v-btn
+                v-if="canPurge"
+                size="small"
+                variant="text"
+                color="error"
+                :data-test="`archived-delete-${a.id}`"
+                @click="askPurge(a)"
+                >{{ t('app.strategy.scripts.archived.delete') }}</v-btn
+              >
+            </div>
           </li>
         </ul>
       </v-card-text>
@@ -216,12 +268,24 @@ async function doPurge(): Promise<void> {
   overflow-wrap: anywhere;
 }
 .arch__meta,
-.arch__back {
+.arch__hint {
   font-size: 12px;
   color: rgb(var(--v-theme-on-surface-variant));
 }
-.arch__back {
+.arch__hint {
   margin-top: 2px;
-  color: rgb(var(--v-theme-primary));
+}
+.arch__error {
+  margin-top: 4px;
+  font-size: 12px;
+  color: rgb(var(--v-theme-error));
+}
+.arch__actions {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
 }
 </style>

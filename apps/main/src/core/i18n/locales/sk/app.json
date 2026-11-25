@@ -2346,17 +2346,17 @@
           "draft": "Koncept",
           "add": "Pridať skript ({n}/{max})",
           "limit": "Dosiahnutý limit skriptov",
-          "limitHint": "Tento tvorca už má {max} skripty vrátane archivovaných.",
+          "limitHint": "Tento tvorca už má {max} skripty. Na pridanie ďalšieho jeden archivujte.",
           "footnote": "Až {max} skripty na tvorcu",
           "archived": "Archivované skripty ({count})"
         },
         "editor": {
           "title": "{name} — Skript {n}",
           "lastEdited": "Naposledy upravené: {when}",
-          "delete": "Odstrániť skript",
-          "deleteTitle": "Odstrániť skript {n} tvorcu {name}?",
-          "deleteBody": "Skript a jeho hooky sa odstránia (hookov: {count}). Túto akciu nemožno vrátiť späť.",
-          "deleteConfirm": "Odstrániť skript",
+          "archive": "Archivovať skript",
+          "archiveTitle": "Archivovať skript {n} od {name}?",
+          "archiveBody": "Skript a jeho hooky (hookov: {count}) sa presunú do Archivovaných skriptov. Nič sa nevymaže. Odtiaľ ho môžete obnoviť.",
+          "archiveConfirm": "Archivovať skript",
           "loadFailed": "Tento skript sa nepodarilo načítať."
         },
         "save": {
@@ -2446,12 +2446,14 @@
         },
         "archived": {
           "title": "Archivované skripty · {market}",
-          "info": "Skript sa archivuje, keď jeho tvorca opustí tento trh. Vráti sa sám, ak sa tvorca na trh znova pridá.",
+          "info": "Archivované skripty sa uchovávajú aj s hookmi. Obnoviť vráti skript späť. Tvorca, ktorý sa na trh znova pridá, dostane svoje skripty späť sám.",
           "empty": "Na tomto trhu nie sú žiadne archivované skripty.",
           "row": "{name} · Skript {n}",
           "hooks": "Hookov: {count}",
           "on": "Archivované {date}",
-          "inMarket": "Tento tvorca je na tomto trhu znova.",
+          "restore": "Obnoviť",
+          "restoreFull": "{name} už má {max} skripty. Najprv jeden archivujte, aby ste mohli obnoviť tento.",
+          "creatorGone": "Tento tvorca nie je na tomto trhu. Skript sa vráti, keď sa tvorca znova pridá.",
           "delete": "Odstrániť natrvalo",
           "deleteTitle": "Odstrániť tento skript natrvalo?",
           "deleteBody": "Skript {n} tvorcu {name} a jeho hooky (hookov: {count}) sa odstránia. Túto akciu nemožno vrátiť späť.",
@@ -2480,11 +2482,11 @@
         },
         "errors": {
           "limitReached": "Tvorca môže mať najviac {max} skripty.",
-          "limitReachedArchived": "Tvorca môže mať najviac {max} skripty vrátane archivovaných.",
           "hooksLimit": "Skript môže mať najviac {max} hookov.",
           "lastHook": "Skript si ponechá aspoň jeden hook.",
           "languageNotAvailable": "Zatiaľ sa dá písať iba po anglicky.",
-          "carryOverExceeds": "Nový tvorca by mal viac ako {max} skripty. Archivujte ich radšej.",
+          "restoreLimit": "Tento tvorca už má {max} skripty. Najprv jeden z nich archivujte a potom obnovte tento.",
+          "restoreCreatorMissing": "Tento tvorca už nie je na trhu. Skript sa vráti, keď sa tvorca znova pridá.",
           "choiceRequired": "Tento tvorca má skripty. Vyberte, čo s nimi."
         }
       }

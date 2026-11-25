@@ -147,6 +147,7 @@ export function makeArchived(n: number, over: Partial<ArchivedScript> = {}): Arc
     },
     archived_at: '2026-11-20T09:00:00.000000Z',
     creator_in_market: false,
+    can_restore: false,
     ...over,
   }
 }

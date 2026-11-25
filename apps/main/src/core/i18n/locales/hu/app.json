@@ -2346,17 +2346,17 @@
           "draft": "Vázlat",
           "add": "Forgatókönyv hozzáadása ({n}/{max})",
           "limit": "Elérted a forgatókönyvek korlátját",
-          "limitHint": "Ennek az alkotónak már {max} forgatókönyve van, az archiváltakat is beleértve.",
+          "limitHint": "Ennek az alkotónak már {max} forgatókönyve van. Egy újabb hozzáadásához archiváljon egyet.",
           "footnote": "Alkotónként legfeljebb {max} forgatókönyv",
           "archived": "Archivált forgatókönyvek ({count})"
         },
         "editor": {
           "title": "{name} — {n}. forgatókönyv",
           "lastEdited": "Utoljára szerkesztve: {when}",
-          "delete": "Forgatókönyv törlése",
-          "deleteTitle": "Törlöd {name} {n}. forgatókönyvét?",
-          "deleteBody": "A forgatókönyv és a hozzá tartozó hookok törlődnek (hookok: {count}). Ez nem vonható vissza.",
-          "deleteConfirm": "Forgatókönyv törlése",
+          "archive": "Forgatókönyv archiválása",
+          "archiveTitle": "Archiválja a(z) {n}. forgatókönyvet ({name})?",
+          "archiveBody": "A forgatókönyv és a hookjai (hookok: {count}) az Archivált forgatókönyvekbe kerülnek. Semmi sem törlődik. Onnan visszaállíthatja.",
+          "archiveConfirm": "Forgatókönyv archiválása",
           "loadFailed": "Ezt a forgatókönyvet nem sikerült betölteni."
         },
         "save": {
@@ -2446,12 +2446,14 @@
         },
         "archived": {
           "title": "Archivált forgatókönyvek · {market}",
-          "info": "A forgatókönyv archiválódik, amikor az alkotója elhagyja ezt a piacot. Magától visszatér, ha az alkotót újra hozzáadják a piachoz.",
+          "info": "Az archivált forgatókönyvek a hookjaikkal együtt megmaradnak. A Visszaállítás visszahoz egyet. A piachoz újra hozzáadott alkotó magától visszakapja a forgatókönyveit.",
           "empty": "Ezen a piacon nincs archivált forgatókönyv.",
           "row": "{name} · {n}. forgatókönyv",
           "hooks": "Hookok: {count}",
           "on": "Archiválva: {date}",
-          "inMarket": "Ez az alkotó újra ezen a piacon van.",
+          "restore": "Visszaállítás",
+          "restoreFull": "{name} alkotónak már {max} forgatókönyve van. A visszaállításhoz előbb archiváljon egyet.",
+          "creatorGone": "Ez az alkotó nincs ezen a piacon. A forgatókönyv akkor tér vissza, ha az alkotót újra hozzáadják.",
           "delete": "Végleges törlés",
           "deleteTitle": "Véglegesen törlöd ezt a forgatókönyvet?",
           "deleteBody": "{name} {n}. forgatókönyve és a hozzá tartozó hookok (hookok: {count}) törlődnek. Ez nem vonható vissza.",
@@ -2480,11 +2482,11 @@
         },
         "errors": {
           "limitReached": "Egy alkotónak legfeljebb {max} forgatókönyve lehet.",
-          "limitReachedArchived": "Egy alkotónak legfeljebb {max} forgatókönyve lehet, az archiváltakat is beleértve.",
           "hooksLimit": "Egy forgatókönyvnek legfeljebb {max} hookja lehet.",
           "lastHook": "Egy forgatókönyvnek legalább egy hookja marad.",
           "languageNotAvailable": "Egyelőre csak angolul lehet írni.",
-          "carryOverExceeds": "Az új alkotónak több mint {max} forgatókönyve lenne. Inkább archiváld őket.",
+          "restoreLimit": "Ennek az alkotónak már {max} forgatókönyve van. Előbb archiváljon egyet, majd állítsa vissza ezt.",
+          "restoreCreatorMissing": "Ez az alkotó már nincs a piacon. A forgatókönyv akkor tér vissza, ha az alkotót újra hozzáadják.",
           "choiceRequired": "Ennek az alkotónak forgatókönyvei vannak. Válaszd ki, mi legyen velük."
         }
       }

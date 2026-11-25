@@ -136,8 +136,10 @@ export interface ArchivedScript {
   hooks: number
   creator: ScriptCreatorRef
   archived_at: string | null
-  /** True when the creator is in this market again (the script then came back on its own). */
+  /** True while the creator holds a slot in this market. When they are not, the script comes back when they are added again. */
   creator_in_market: boolean
+  /** True when "Restore" works now: the creator is in the market and has fewer than three live scripts. */
+  can_restore: boolean
 }
 
 export interface ScriptBriefPayload {

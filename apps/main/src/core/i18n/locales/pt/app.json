@@ -2346,17 +2346,17 @@
           "draft": "Rascunho",
           "add": "Adicionar guião ({n}/{max})",
           "limit": "Limite de guiões atingido",
-          "limitHint": "Este criador já tem {max} guiões, incluindo os arquivados.",
+          "limitHint": "Este criador já tem {max} guiões. Arquive um para adicionar outro.",
           "footnote": "Até {max} guiões por criador",
           "archived": "Guiões arquivados ({count})"
         },
         "editor": {
           "title": "{name} — Guião {n}",
           "lastEdited": "Última edição: {when}",
-          "delete": "Eliminar guião",
-          "deleteTitle": "Eliminar o guião {n} de {name}?",
-          "deleteBody": "O guião e os seus ganchos serão eliminados (ganchos: {count}). Esta ação não pode ser anulada.",
-          "deleteConfirm": "Eliminar guião",
+          "archive": "Arquivar guião",
+          "archiveTitle": "Arquivar o guião {n} de {name}?",
+          "archiveBody": "O guião e os seus ganchos (ganchos: {count}) passam para Guiões arquivados. Nada é eliminado. Pode restaurá-lo a partir daí.",
+          "archiveConfirm": "Arquivar guião",
           "loadFailed": "Não foi possível carregar este guião."
         },
         "save": {
@@ -2446,12 +2446,14 @@
         },
         "archived": {
           "title": "Guiões arquivados · {market}",
-          "info": "Um guião é arquivado quando o seu criador sai deste mercado. Volta sozinho se o criador for adicionado de novo ao mercado.",
+          "info": "Os guiões arquivados ficam guardados com os seus ganchos. Restaurar volta a pôr um no lugar. Um criador adicionado de novo ao mercado recupera os seus guiões sozinho.",
           "empty": "Não há guiões arquivados neste mercado.",
           "row": "{name} · Guião {n}",
           "hooks": "Ganchos: {count}",
           "on": "Arquivado a {date}",
-          "inMarket": "Este criador voltou a estar neste mercado.",
+          "restore": "Restaurar",
+          "restoreFull": "{name} já tem {max} guiões. Arquive um primeiro para restaurar este.",
+          "creatorGone": "Este criador não está neste mercado. O guião volta quando o criador for adicionado de novo.",
           "delete": "Eliminar definitivamente",
           "deleteTitle": "Eliminar este guião definitivamente?",
           "deleteBody": "O guião {n} de {name} e os seus ganchos (ganchos: {count}) serão eliminados. Esta ação não pode ser anulada.",
@@ -2480,11 +2482,11 @@
         },
         "errors": {
           "limitReached": "Um criador tem no máximo {max} guiões.",
-          "limitReachedArchived": "Um criador tem no máximo {max} guiões, incluindo os arquivados.",
           "hooksLimit": "Um guião tem no máximo {max} ganchos.",
           "lastHook": "Um guião mantém pelo menos um gancho.",
           "languageNotAvailable": "Por agora só se pode escrever em inglês.",
-          "carryOverExceeds": "O novo criador ficaria com mais de {max} guiões. Arquive-os em vez disso.",
+          "restoreLimit": "Este criador já tem {max} guiões. Arquive um primeiro e depois restaure este.",
+          "restoreCreatorMissing": "Este criador já não está no mercado. O guião volta quando o criador for adicionado de novo.",
           "choiceRequired": "Este criador tem guiões. Escolha o que lhes acontece."
         }
       }

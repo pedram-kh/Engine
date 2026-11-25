@@ -137,7 +137,7 @@ async function addScript(slot: string): Promise<void> {
   }
 }
 
-// The editor's script is gone (deleted here, or removed by someone else): the rail is the truth, the guard must not ask.
+// The editor's script is gone (archived here, or removed by someone else): the rail is the truth, the guard must not ask.
 let bypass = false
 async function afterRemoved(): Promise<void> {
   bypass = true
@@ -305,7 +305,7 @@ watch(notesSheet, async (open, was) => {
             :hooks-max="hooksMax"
             :matrix-to="matrixTo"
             :creators-to="creatorsTo"
-            @deleted="afterRemoved"
+            @archived="afterRemoved"
             @gone="afterRemoved"
           />
           <CEmptyState
@@ -364,6 +364,7 @@ watch(notesSheet, async (open, was) => {
       :market="market"
       :market-name="marketName"
       :can-purge="canDecide"
+      :max="max"
       @changed="reload"
     />
     <ScriptsLeaveDialog

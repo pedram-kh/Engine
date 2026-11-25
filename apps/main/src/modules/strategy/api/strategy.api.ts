@@ -415,11 +415,17 @@ export const strategyApi = {
     return http.put<{ data: WaveScript }>(`${base(s)}/scripts/${scriptId}/brief`, payload)
   },
 
-  deleteScript(s: WaveScope, scriptId: string): Promise<{ data: ScriptsOverview }> {
-    return http.delete<{ data: ScriptsOverview }>(`${base(s)}/scripts/${scriptId}`)
+  /** "Archive script": every agency role. Nothing is destroyed; the script moves to the archived list. */
+  archiveScript(s: WaveScope, scriptId: string): Promise<{ data: ScriptsOverview }> {
+    return http.post<{ data: ScriptsOverview }>(`${base(s)}/scripts/${scriptId}/archive`)
   },
 
-  /** Admin and manager only (403 `forbidden`). */
+  /** "Restore" in the archived list: every agency role (422 when the creator already has three, or has left the market). */
+  restoreScript(s: WaveScope, scriptId: string): Promise<{ data: ScriptsOverview }> {
+    return http.post<{ data: ScriptsOverview }>(`${base(s)}/scripts/archived/${scriptId}/restore`)
+  },
+
+  /** The only way to delete one script for good. Admin and manager only (403 `forbidden`). */
   deleteArchivedScript(s: WaveScope, scriptId: string): Promise<{ data: ScriptsOverview }> {
     return http.delete<{ data: ScriptsOverview }>(`${base(s)}/scripts/archived/${scriptId}`)
   },

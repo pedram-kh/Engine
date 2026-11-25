@@ -1,7 +1,7 @@
 /**
  * PL-3.2a — step 6, Scripts: the rail (groups, status, add n/3, footnote, selection), the empty states, the editor (title row,
  * brief, hooks), autosave states in the page (saving, saved, could not save and retry, the 409 view with the person's own text
- * kept), the leave guard, delete script and delete hook confirms, the archived dialog by role, every menu and dialog opened,
+ * kept), the leave guard, archive script and delete hook confirms, the archived dialog by role, every menu and dialog opened,
  * closed and quickly reopened, and hostile text drawn as plain text.
  */
 import { ApiError } from '@catalyst/api-client'
@@ -20,7 +20,8 @@ vi.mock('../api/strategy.api', () => ({
     addHook: vi.fn(),
     duplicateHook: vi.fn(),
     deleteHook: vi.fn(),
-    deleteScript: vi.fn(),
+    archiveScript: vi.fn(),
+    restoreScript: vi.fn(),
     archivedScripts: vi.fn(),
     deleteArchivedScript: vi.fn(),
     listNotes: vi.fn(),
@@ -560,33 +561,35 @@ describe('ScriptsStep (PL-3.2a)', () => {
     })
   })
 
-  describe('delete script and delete hook', () => {
-    it('delete script: the confirm counts the hooks; Cancel sends nothing; Confirm deletes and the page reloads the rail', async () => {
+  describe('archive script and delete hook', () => {
+    it('archive script: the confirm counts the hooks and says it can be restored; Cancel sends nothing; Confirm archives and the page reloads the rail', async () => {
       const w = await mountStep()
-      await w.get('[data-test="script-delete"]').trigger('click')
+      await w.get('[data-test="script-archive"]').trigger('click')
       await flushPromises()
       expect(overlayText()).toContain('hooks: 3')
-      await click('[data-test="script-delete-dialog"] [data-test="confirm-cancel"]')
-      expect(strategyApi.deleteScript).not.toHaveBeenCalled()
-      await w.get('[data-test="script-delete"]').trigger('click')
+      expect(overlayText()).toContain('restore')
+      expect(q('[data-test="script-delete"]')).toBeNull()
+      await click('[data-test="script-archive-dialog"] [data-test="confirm-cancel"]')
+      expect(strategyApi.archiveScript).not.toHaveBeenCalled()
+      await w.get('[data-test="script-archive"]').trigger('click')
       await flushPromises()
-      vi.mocked(strategyApi.deleteScript).mockResolvedValue({
+      vi.mocked(strategyApi.archiveScript).mockResolvedValue({
         data: makeOverview(SK.market, [makeRailCreator(1, [2])]),
       })
-      await click('[data-test="script-delete-dialog"] [data-test="confirm-ok"]')
-      expect(strategyApi.deleteScript).toHaveBeenCalledWith(expect.anything(), SCRIPT_ID(1))
+      await click('[data-test="script-archive-dialog"] [data-test="confirm-ok"]')
+      expect(strategyApi.archiveScript).toHaveBeenCalledWith(expect.anything(), SCRIPT_ID(1))
       expect(vi.mocked(strategyApi.scripts).mock.calls.length).toBeGreaterThanOrEqual(2)
     })
 
-    it('delete script: a server refusal shows inside the dialog and keeps it open', async () => {
+    it('archive script: a server refusal shows inside the dialog and keeps it open', async () => {
       const w = await mountStep()
-      await w.get('[data-test="script-delete"]').trigger('click')
+      await w.get('[data-test="script-archive"]').trigger('click')
       await flushPromises()
-      vi.mocked(strategyApi.deleteScript).mockRejectedValue(
+      vi.mocked(strategyApi.archiveScript).mockRejectedValue(
         new ApiError({ status: 500, code: 'x', message: 'x' }),
       )
-      await click('[data-test="script-delete-dialog"] [data-test="confirm-ok"]')
-      expect(q('[data-test="script-delete-dialog"] [data-test="confirm-error"]')).not.toBeNull()
+      await click('[data-test="script-archive-dialog"] [data-test="confirm-ok"]')
+      expect(q('[data-test="script-archive-dialog"] [data-test="confirm-error"]')).not.toBeNull()
     })
 
     it('delete hook: an empty hook goes at once; one with text asks first; the menu opens, closes and reopens', async () => {
@@ -739,14 +742,39 @@ describe('ScriptsStep (PL-3.2a)', () => {
       expect(vi.mocked(strategyApi.archivedScripts)).toHaveBeenCalledTimes(3)
     })
 
-    it('an archived script whose creator is back says so: the way back is the creator, not a button', async () => {
-      vi.mocked(strategyApi.archivedScripts).mockResolvedValue({
-        data: [makeArchived(1, { creator_in_market: true })],
+    it('restore: every role restores a script that fits; the rail reloads; a full creator or a missing creator shows why and no button works', async () => {
+      const fits = makeArchived(1, { creator_in_market: true, can_restore: true })
+      const full = makeArchived(2, { creator_in_market: true, can_restore: false })
+      const gone = makeArchived(3)
+      vi.mocked(strategyApi.archivedScripts).mockResolvedValue({ data: [fits, full, gone] })
+      vi.mocked(strategyApi.restoreScript).mockResolvedValue({
+        data: makeOverview(SK.market, [makeRailCreator(1, [1, 2])]),
       })
+      const staff = await mountStep(undefined, { archived: 3, role: 'agency_staff' })
+      await staff.get('[data-test="scripts-archived-open"]').trigger('click')
+      await flushPromises()
+      expect(q(`[data-test="archived-delete-${fits.id}"]`)).toBeNull()
+      expect(q(`[data-test="archived-full-${full.id}"]`)).not.toBeNull()
+      expect(q(`[data-test="archived-gone-${gone.id}"]`)).not.toBeNull()
+      expect(q(`[data-test="archived-restore-${full.id}"]`)?.hasAttribute('disabled')).toBe(true)
+      expect(q(`[data-test="archived-restore-${gone.id}"]`)?.hasAttribute('disabled')).toBe(true)
+      const before = vi.mocked(strategyApi.scripts).mock.calls.length
+      await click(`[data-test="archived-restore-${fits.id}"]`)
+      expect(strategyApi.restoreScript).toHaveBeenCalledWith(expect.anything(), fits.id)
+      expect(vi.mocked(strategyApi.scripts).mock.calls.length).toBeGreaterThan(before)
+    })
+
+    it('restore: a server refusal shows on the row', async () => {
+      const fits = makeArchived(1, { creator_in_market: true, can_restore: true })
+      vi.mocked(strategyApi.archivedScripts).mockResolvedValue({ data: [fits] })
+      vi.mocked(strategyApi.restoreScript).mockRejectedValue(
+        new ApiError({ status: 500, code: 'x', message: 'x' }),
+      )
       const w = await mountStep(undefined, { archived: 1 })
       await w.get('[data-test="scripts-archived-open"]').trigger('click')
       await flushPromises()
-      expect(q(`[data-test="archived-back-${makeArchived(1).id}"]`)).not.toBeNull()
+      await click(`[data-test="archived-restore-${fits.id}"]`)
+      expect(q(`[data-test="archived-restore-error-${fits.id}"]`)).not.toBeNull()
     })
   })
 })

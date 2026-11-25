@@ -2346,17 +2346,17 @@
           "draft": "Osnutek",
           "add": "Dodaj scenarij ({n}/{max})",
           "limit": "Dosežena omejitev scenarijev",
-          "limitHint": "Ta ustvarjalec že ima {max} scenarije, vključno z arhiviranimi.",
+          "limitHint": "Ta ustvarjalec že ima {max} scenarije. Za dodajanje novega arhivirajte enega.",
           "footnote": "Do {max} scenarije na ustvarjalca",
           "archived": "Arhivirani scenariji ({count})"
         },
         "editor": {
           "title": "{name} — Scenarij {n}",
           "lastEdited": "Nazadnje urejeno: {when}",
-          "delete": "Izbriši scenarij",
-          "deleteTitle": "Izbrišem scenarij {n} ustvarjalca {name}?",
-          "deleteBody": "Scenarij in njegovi kavlji bodo izbrisani (kavljev: {count}). Tega ni mogoče razveljaviti.",
-          "deleteConfirm": "Izbriši scenarij",
+          "archive": "Arhiviraj scenarij",
+          "archiveTitle": "Arhivirati scenarij {n} ustvarjalca {name}?",
+          "archiveBody": "Scenarij in njegovi kavlji (kavljev: {count}) se premaknejo med Arhivirane scenarije. Nič ni izbrisano. Od tam ga lahko obnovite.",
+          "archiveConfirm": "Arhiviraj scenarij",
           "loadFailed": "Tega scenarija ni bilo mogoče naložiti."
         },
         "save": {
@@ -2446,12 +2446,14 @@
         },
         "archived": {
           "title": "Arhivirani scenariji · {market}",
-          "info": "Scenarij se arhivira, ko njegov ustvarjalec zapusti ta trg. Vrne se sam, če je ustvarjalec na trg ponovno dodan.",
+          "info": "Arhivirani scenariji se hranijo skupaj s kavlji. Obnovi vrne scenarij. Ustvarjalec, ki je ponovno dodan na trg, svoje scenarije dobi nazaj sam.",
           "empty": "Na tem trgu ni arhiviranih scenarijev.",
           "row": "{name} · Scenarij {n}",
           "hooks": "Kavljev: {count}",
           "on": "Arhivirano {date}",
-          "inMarket": "Ta ustvarjalec je spet na tem trgu.",
+          "restore": "Obnovi",
+          "restoreFull": "{name} že ima {max} scenarije. Za obnovitev tega najprej arhivirajte enega.",
+          "creatorGone": "Tega ustvarjalca ni na tem trgu. Scenarij se vrne, ko je ustvarjalec ponovno dodan.",
           "delete": "Izbriši za vedno",
           "deleteTitle": "Izbrišem ta scenarij za vedno?",
           "deleteBody": "Scenarij {n} ustvarjalca {name} in njegovi kavlji (kavljev: {count}) bodo izbrisani. Tega ni mogoče razveljaviti.",
@@ -2480,11 +2482,11 @@
         },
         "errors": {
           "limitReached": "Ustvarjalec ima lahko največ {max} scenarije.",
-          "limitReachedArchived": "Ustvarjalec ima lahko največ {max} scenarije, vključno z arhiviranimi.",
           "hooksLimit": "Scenarij ima lahko največ {max} kavljev.",
           "lastHook": "Scenarij obdrži vsaj en kavelj.",
           "languageNotAvailable": "Zaenkrat je mogoče pisati samo v angleščini.",
-          "carryOverExceeds": "Novi ustvarjalec bi imel več kot {max} scenarije. Raje jih arhivirajte.",
+          "restoreLimit": "Ta ustvarjalec že ima {max} scenarije. Najprej arhivirajte enega, nato obnovite tega.",
+          "restoreCreatorMissing": "Tega ustvarjalca ni več na trgu. Scenarij se vrne, ko je ustvarjalec ponovno dodan.",
           "choiceRequired": "Ta ustvarjalec ima scenarije. Izberite, kaj naj se zgodi z njimi."
         }
       }

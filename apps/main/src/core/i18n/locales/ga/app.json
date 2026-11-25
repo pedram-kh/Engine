@@ -2346,17 +2346,17 @@
           "draft": "Dréacht",
           "add": "Cuir script leis ({n}/{max})",
           "limit": "Sroicheadh teorainn na scripteanna",
-          "limitHint": "Tá {max} script ag an gcruthaitheoir seo cheana, lena n-áirítear na cinn cartlannaithe.",
+          "limitHint": "Tá {max} script ag an gcruthaitheoir seo cheana. Cartlannaigh ceann chun ceann eile a chur leis.",
           "footnote": "Suas le {max} script an cruthaitheoir",
           "archived": "Scripteanna cartlannaithe ({count})"
         },
         "editor": {
           "title": "{name} — Script {n}",
           "lastEdited": "Curtha in eagar go deireanach: {when}",
-          "delete": "Scrios an script",
-          "deleteTitle": "An scriosfar script {n} de chuid {name}?",
-          "deleteBody": "Scriosfar an script agus a hamhráin ghreamaithe (amhráin ghreamaithe: {count}). Ní féidir é seo a chealú.",
-          "deleteConfirm": "Scrios an script",
+          "archive": "Cartlannaigh an script",
+          "archiveTitle": "An gcartlannófar script {n} de chuid {name}?",
+          "archiveBody": "Aistrítear an script agus a amhráin ghreamaithe (amhráin ghreamaithe: {count}) chuig Scripteanna cartlannaithe. Ní scriostar aon rud. Is féidir leat é a athchóiriú as sin.",
+          "archiveConfirm": "Cartlannaigh an script",
           "loadFailed": "Níorbh fhéidir an script seo a luchtú."
         },
         "save": {
@@ -2446,12 +2446,14 @@
         },
         "archived": {
           "title": "Scripteanna cartlannaithe · {market}",
-          "info": "Cartlannaítear script nuair a fhágann a chruthaitheoir an margadh seo. Filleann sé ar ais as féin má chuirtear an cruthaitheoir leis an margadh arís.",
+          "info": "Coinnítear scripteanna cartlannaithe lena n-amhráin ghreamaithe. Cuireann Athchóirigh ceann ar ais. Faigheann cruthaitheoir a chuirtear leis an margadh arís a scripteanna ar ais as féin.",
           "empty": "Níl aon scripteanna cartlannaithe sa mhargadh seo.",
           "row": "{name} · Script {n}",
           "hooks": "Amhráin ghreamaithe: {count}",
           "on": "Cartlannaithe ar {date}",
-          "inMarket": "Tá an cruthaitheoir seo sa mhargadh seo arís.",
+          "restore": "Athchóirigh",
+          "restoreFull": "Tá {max} script ag {name} cheana. Cartlannaigh ceann ar dtús chun an ceann seo a athchóiriú.",
+          "creatorGone": "Níl an cruthaitheoir seo sa mhargadh seo. Filleann an script nuair a chuirtear an cruthaitheoir leis arís.",
           "delete": "Scrios go deo",
           "deleteTitle": "An scriosfar an script seo go deo?",
           "deleteBody": "Scriosfar script {n} de chuid {name} agus a hamhráin ghreamaithe (amhráin ghreamaithe: {count}). Ní féidir é seo a chealú.",
@@ -2480,11 +2482,11 @@
         },
         "errors": {
           "limitReached": "Tá uasmhéid de {max} script ag cruthaitheoir.",
-          "limitReachedArchived": "Tá uasmhéid de {max} script ag cruthaitheoir, lena n-áirítear na cinn cartlannaithe.",
           "hooksLimit": "Tá uasmhéid de {max} amhrán greamaitheach ag script.",
           "lastHook": "Coinníonn script amhrán greamaitheach amháin ar a laghad.",
           "languageNotAvailable": "Is féidir Béarla amháin a scríobh faoi láthair.",
-          "carryOverExceeds": "Bheadh níos mó ná {max} script ag an gcruthaitheoir nua. Cartlannaigh iad ina ionad.",
+          "restoreLimit": "Tá {max} script ag an gcruthaitheoir seo cheana. Cartlannaigh ceann acu ar dtús, ansin athchóirigh an ceann seo.",
+          "restoreCreatorMissing": "Níl an cruthaitheoir seo sa mhargadh a thuilleadh. Filleann an script nuair a chuirtear an cruthaitheoir leis arís.",
           "choiceRequired": "Tá scripteanna ag an gcruthaitheoir seo. Roghnaigh cad a tharlóidh dóibh."
         }
       }
