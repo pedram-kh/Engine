@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Modules\Agencies\Models\Agency;
+use App\Modules\Agencies\Models\AgencyMembership;
+use App\Modules\Identity\Models\User;
 use App\TestHelpers\Http\Middleware\VerifyTestHelperToken;
 use App\TestHelpers\TestHelpersServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -133,4 +136,47 @@ it('TestHelpersServiceProvider::boot() does not register routes when gate is clo
     $after = count(Route::getRoutes()->getRoutes());
 
     expect($after)->toBe($before, 'Provider must not register routes when gate is closed.');
+});
+
+// -----------------------------------------------------------------------------
+// PL-3.2b (H1): the setup helper that now takes `agency_ulid` and `role` (a second user in an EXISTING agency) is a
+// 404 outside local/testing and without the token, and writes nothing.
+// -----------------------------------------------------------------------------
+
+it('H1: agencies/setup with agency_ulid and role is a bare 404 in production even with the right token, and in staging, and writes nothing', function (string $env): void {
+    $agency = Agency::factory()->create();
+    $before = [User::query()->count(), AgencyMembership::query()->count(), Agency::query()->count()];
+    config()->set('app.env', $env);
+
+    $response = $this->withHeader(HELPER_TOKEN_HEADER, (string) config('test_helpers.token'))
+        ->postJson('/api/v1/_test/agencies/setup', ['email' => 'staff-'.$env.'@example.com', 'agency_ulid' => $agency->ulid, 'role' => 'agency_staff']);
+
+    $response->assertStatus(404);
+    expect($response->getContent())->toBe('')
+        ->and([User::query()->count(), AgencyMembership::query()->count(), Agency::query()->count()])->toBe($before);
+})->with(['production', 'staging']);
+
+it('H1: agencies/setup with agency_ulid and role is a bare 404 without the token or with a wrong one, in the testing env, and writes nothing', function (): void {
+    $agency = Agency::factory()->create();
+    $users = User::query()->count();
+    $body = ['email' => 'staff-no-token@example.com', 'agency_ulid' => $agency->ulid, 'role' => 'agency_staff'];
+
+    $none = $this->postJson('/api/v1/_test/agencies/setup', $body);
+    $wrong = $this->withHeader(HELPER_TOKEN_HEADER, 'wrong-token')->postJson('/api/v1/_test/agencies/setup', $body);
+
+    $none->assertStatus(404);
+    $wrong->assertStatus(404);
+    expect($none->getContent())->toBe('')->and($wrong->getContent())->toBe('')
+        ->and(User::query()->count())->toBe($users);
+});
+
+it('H1 (control): the same request with the right token in the testing env creates the second user in the existing agency', function (): void {
+    $agency = Agency::factory()->create();
+
+    $this->withHeader(HELPER_TOKEN_HEADER, (string) config('test_helpers.token'))
+        ->postJson('/api/v1/_test/agencies/setup', ['email' => 'staff-control@example.com', 'agency_ulid' => $agency->ulid, 'role' => 'agency_staff'])
+        ->assertStatus(201);
+
+    $user = User::query()->where('email', 'staff-control@example.com')->firstOrFail();
+    expect(AgencyMembership::query()->where('agency_id', $agency->id)->where('user_id', $user->id)->exists())->toBeTrue();
 });

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Modules\Strategy\Services\ConceptImageStorage;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -11,7 +12,7 @@ use RuntimeException;
 /**
  * Removes exactly what {@see Pl32WalkSeeder} made, and what the walk made under it: both walk agencies (by slug), the users
  * on `@pl32-walk.local` and `@pl32-walk-b.local` (by email) with their creators, and everything under the walk agencies
- * (brands, waves, strategy rows, scripts with their hooks and texts, creators in the wave and their decisions, campaigns, boards, applications, assignments).
+ * (brands, waves, strategy rows, scripts with their hooks, lines, B-roll and texts, the reference images (the stored objects first, then the rows), creators in the wave and their decisions, campaigns, boards, applications, assignments).
  *
  *     php artisan db:seed --class='Database\Seeders\Pl32WalkCleanupSeeder'
  *
@@ -23,6 +24,17 @@ final class Pl32WalkCleanupSeeder extends Seeder
     {
         if (! app()->environment(['local', 'testing'])) {
             throw new RuntimeException('Pl32WalkCleanupSeeder is only allowed in local and testing environments.');
+        }
+
+        // PL-3.2b: the stored objects of the script images go first. A delete that is not confirmed stops the clean-up before any row goes,
+        // so no object is left without a row.
+        $walkAgencies = DB::table('agencies')->whereIn('slug', [Pl32WalkSeeder::AGENCY_A_SLUG, Pl32WalkSeeder::AGENCY_B_SLUG])->pluck('id')->all();
+        $keys = [];
+        foreach (DB::table('wave_script_images')->whereIn('agency_id', $walkAgencies)->get(['storage_key', 'thumb_key']) as $image) {
+            array_push($keys, ...array_values(array_filter([$image->storage_key, $image->thumb_key])));
+        }
+        if (! ConceptImageStorage::deleteAll($keys)) {
+            throw new RuntimeException('A stored script image could not be deleted; nothing was removed. Run the clean-up again.');
         }
 
         DB::transaction(function (): void {
@@ -37,6 +49,10 @@ final class Pl32WalkCleanupSeeder extends Seeder
             $campaignIds = DB::table('campaigns')->whereIn('agency_id', $agencyIds)->pluck('id')->all();
 
             // Children first: the foreign keys of the strategy tables are RESTRICT. Scripts: texts, hooks, scripts, then the slots.
+            DB::table('wave_script_images')->whereIn('agency_id', $agencyIds)->delete();
+            DB::table('wave_script_broll')->whereIn('agency_id', $agencyIds)->delete();
+            DB::table('wave_script_line_texts')->whereIn('agency_id', $agencyIds)->delete();
+            DB::table('wave_script_lines')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('wave_script_hook_texts')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('wave_script_hooks')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('wave_scripts')->whereIn('agency_id', $agencyIds)->delete();
@@ -55,6 +71,7 @@ final class Pl32WalkCleanupSeeder extends Seeder
             DB::table('wave_market_countries')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('wave_strategy_notes')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('wave_strategy_completions')->whereIn('agency_id', $agencyIds)->delete();
+            DB::table('wave_market_script_languages')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('wave_markets')->whereIn('agency_id', $agencyIds)->delete();
             DB::table('waves')->whereIn('agency_id', $agencyIds)->delete();
 

@@ -7,6 +7,7 @@ namespace App\Modules\Strategy\Services;
 use App\Modules\Identity\Models\User;
 use App\Modules\Strategy\Models\WaveConcept;
 use App\Modules\Strategy\Models\WaveCreator;
+use App\Modules\Strategy\Models\WaveMarketScriptLanguage;
 use App\Modules\Strategy\Models\WavePersona;
 use App\Modules\Strategy\Models\WaveScript;
 use App\Modules\Strategy\Models\WaveStrategyCompletion;
@@ -166,6 +167,8 @@ final class StrategyWaveMarketGuard implements WaveMarketGuard
         foreach ($scripts as $script) {
             ScriptArchive::deleteOne($locked, $script, (string) ($markets[$script->market_id] ?? ''), $actor instanceof User ? $actor : null);
         }
+        // PL-3.2b: the market's script languages are a plain structure row (RESTRICT on the market): they go with it.
+        WaveMarketScriptLanguage::query()->where('wave_id', $locked->id)->whereIn('market_id', $removedIds)->delete();
 
         return $scripts->count();
     }

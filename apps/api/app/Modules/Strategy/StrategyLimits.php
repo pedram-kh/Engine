@@ -125,6 +125,23 @@ final class StrategyLimits
 
     public const HOOK_VISUAL = 400;
 
+    /** PL-3.2b: lines per script, B-roll rows per SCRIPT (ruling 1: the frame's 13 is a sample), and the text lengths. */
+    public const LINES_PER_SCRIPT = 30;
+
+    public const BROLL_PER_SCRIPT = 12;
+
+    public const LINE_TEXT = 600;
+
+    public const BROLL_DESCRIPTION = 400;
+
+    /** PL-3.2b (ruling 4): English is always there, plus at most three LOCAL languages per market. */
+    public const LOCAL_LANGUAGES_PER_MARKET = 3;
+
+    /** PL-3.2b (ruling 11): reference images of a hook or a line, and the total of one script. */
+    public const IMAGES_PER_BLOCK = 10;
+
+    public const SCRIPT_IMAGE_TOTAL_BYTES = 300 * 1024 * 1024;
+
     /** PL-3.2a: the durations a script can have, in seconds (the default is the first one marked below). */
     public const SCRIPT_DURATIONS = [15, 20, 30, 45, 60];
 
@@ -183,6 +200,13 @@ final class StrategyLimits
             'hook_audio' => self::HOOK_AUDIO,
             'hook_overlay' => self::HOOK_OVERLAY,
             'hook_visual' => self::HOOK_VISUAL,
+            'lines_per_script' => self::LINES_PER_SCRIPT,
+            'broll_per_script' => self::BROLL_PER_SCRIPT,
+            'line_text' => self::LINE_TEXT,
+            'broll_description' => self::BROLL_DESCRIPTION,
+            'local_languages_per_market' => self::LOCAL_LANGUAGES_PER_MARKET,
+            'images_per_block' => self::IMAGES_PER_BLOCK,
+            'script_image_total_bytes' => self::SCRIPT_IMAGE_TOTAL_BYTES,
         ];
     }
 }

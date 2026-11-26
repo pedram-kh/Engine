@@ -612,6 +612,25 @@ enum AuditAction: string
     case WaveScriptHookDuplicated = 'wave_script_hook.duplicated';
     case WaveScriptHookDeleted = 'wave_script_hook.deleted';
 
+    // PL-3.2b — lines, B-roll, reference images and the market's script languages. LITERAL payload keys: ids (wave, market,
+    // script, line, broll, image, owner), the script number, positions and counts, the language CODES added or removed, a block
+    // kind, a MIME type and a byte size, and a list of changed FIELD NAMES. NEVER a script text, a B-roll description or an image
+    // file name. Erasure: ids and counts only; the five new tables are decided in the ErasureRegistry (scripts and their images
+    // are KEPT as agency work when a creator is erased: ruling 5).
+    case WaveMarketScriptLanguagesUpdated = 'wave_market_script_languages.updated';
+    case WaveScriptHookReordered = 'wave_script_hook.reordered';
+    case WaveScriptLineCreated = 'wave_script_line.created';
+    case WaveScriptLineUpdated = 'wave_script_line.updated';
+    case WaveScriptLineDuplicated = 'wave_script_line.duplicated';
+    case WaveScriptLineDeleted = 'wave_script_line.deleted';
+    case WaveScriptLineReordered = 'wave_script_line.reordered';
+    case WaveScriptBrollCreated = 'wave_script_broll.created';
+    case WaveScriptBrollDeleted = 'wave_script_broll.deleted';
+    case WaveScriptBrollReordered = 'wave_script_broll.reordered';
+    case WaveScriptImageAdded = 'wave_script_image.added';
+    case WaveScriptImageRemoved = 'wave_script_image.removed';
+    case WaveScriptImageReordered = 'wave_script_image.reordered';
+
     // Campaign attachments from the Files library, chunk B (AH-092). A
     // linkage action on the campaign, not a library action on the file — the
     // file's own audit trail (above) is unaffected by any of these. No

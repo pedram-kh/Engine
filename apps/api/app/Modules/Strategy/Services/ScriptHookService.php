@@ -17,8 +17,8 @@ use App\Modules\Waves\Models\Wave;
 use App\Modules\Waves\Models\WaveMarket;
 
 /**
- * The hooks of a script (PL-3.2a): add, edit, duplicate, delete. English only (the market languages are PL-3.2b); the letter is
- * the position and is never stored. EVERY write goes through {@see ScriptGuard::transaction()}; every change moves the script's
+ * The hooks of a script (PL-3.2a, PL-3.2b): add, edit, duplicate, delete, reorder. A text can be written in English and in every local
+ * language of the market (PL-3.2b); the letter is the position and is never stored. EVERY write goes through {@see ScriptGuard::transaction()}; every change moves the script's
  * `revision`, and an edit carries the hook's own `revision`, so two people on different hooks never conflict and two on the same
  * hook get a 409 with the current hook, never a silent overwrite.
  */
@@ -48,8 +48,8 @@ final class ScriptHookService
 
     /**
      * Edit a hook. `$changes` holds only the keys the request sent: `shot_type` (a ShotType value or null), `visual_description`
-     * (text or null) and `texts` (`audio` and/or `overlay`, each `{en: text|null}`; null or blank removes the row). A save that
-     * changes nothing writes nothing. A stale `$revision` with a real change is a 409.
+     * (text or null) and `texts` (`audio` and/or `overlay`, each `{language: text|null}` for English or a language of the market;
+     * null or blank removes the row). A save that changes nothing writes nothing. A stale `$revision` with a real change is a 409.
      *
      * @param  array{shot_type?: string|null, visual_description?: string|null, texts?: array<string, array<string, string|null>>}  $changes
      */
@@ -61,16 +61,19 @@ final class ScriptHookService
             $script = ScriptGuard::lockedScript($locked, $scriptUlid);
             $hook = $this->lockedHook($script, $hookUlid);
 
+            $allowed = ScriptLanguages::allOf($script->market_id);
             foreach ($changes['texts'] ?? [] as $languages) {
                 foreach (array_keys($languages) as $language) {
-                    if ($language !== self::EN) {
-                        throw StrategyRuleViolation::scriptLanguageNotAvailable((string) $language);
+                    if (! in_array((string) $language, $allowed, true)) {
+                        throw StrategyRuleViolation::scriptLanguageNotInMarket((string) $language);
                     }
                 }
             }
 
-            $existing = WaveScriptHookText::query()->where('hook_id', $hook->id)->where('language', self::EN)->get()->keyBy('field');
-            // What really changes, by field name: the scalars, and the English body per text field (null removes the row).
+            // Every stored text of the hook, kept ones in a hidden language included (the presenter shows only the market's languages).
+            $stored = WaveScriptHookText::query()->where('hook_id', $hook->id)->get();
+            $existing = $stored->keyBy(static fn (WaveScriptHookText $t): string => $t->field.':'.$t->language);
+            // What really changes, by field name: the scalars, and the body per text field and language (null removes the row).
             $fields = [];
             $scalars = [];
             $bodies = [];
@@ -83,17 +86,19 @@ final class ScriptHookService
                 $scalars['visual_description'] = $changes['visual_description'];
             }
             foreach ([WaveScriptHookText::AUDIO, WaveScriptHookText::OVERLAY] as $field) {
-                $sent = $changes['texts'][$field] ?? null;
-                if ($sent !== null && array_key_exists(self::EN, $sent) && $sent[self::EN] !== $existing->get($field)?->body) {
-                    $fields[] = $field;
-                    $bodies[$field] = $sent[self::EN];
+                foreach ($changes['texts'][$field] ?? [] as $language => $body) {
+                    if ($body !== $existing->get($field.':'.$language)?->body) {
+                        // English keeps the PL-3.2a field name (`audio`); another language is `audio:sk`.
+                        $fields[] = $language === self::EN ? $field : $field.':'.$language;
+                        $bodies[$field.':'.$language] = $body;
+                    }
                 }
             }
             if ($fields === []) {
                 return $script;
             }
             if ($revision !== $hook->revision) {
-                throw StrategyRuleViolation::scriptConflict('hook', ScriptPresenter::hook($hook, $existing->map(static fn (WaveScriptHookText $t): array => [$t->language => $t->body])->all()));
+                throw StrategyRuleViolation::scriptConflict('hook', ScriptPresenter::hookFor($script, $hook));
             }
 
             if (array_key_exists('shot_type', $scalars)) {
@@ -102,14 +107,15 @@ final class ScriptHookService
             if (array_key_exists('visual_description', $scalars)) {
                 $hook->visual_description = $scalars['visual_description'];
             }
-            foreach ($bodies as $field => $body) {
-                $row = $existing->get($field);
+            foreach ($bodies as $key => $body) {
+                [$field, $language] = explode(':', $key, 2);
+                $row = $existing->get($key);
                 if ($body === null) {
                     $row?->delete();
                 } elseif ($row === null) {
                     WaveScriptHookText::query()->create([
                         'agency_id' => $locked->agency_id, 'wave_id' => $locked->id, 'script_id' => $script->id, 'hook_id' => $hook->id,
-                        'field' => $field, 'language' => self::EN, 'body' => $body, 'origin' => 'manual',
+                        'field' => $field, 'language' => $language, 'body' => $body, 'origin' => 'manual',
                     ]);
                 } else {
                     $row->forceFill(['body' => $body])->save();
@@ -147,6 +153,7 @@ final class ScriptHookService
                     'field' => $text->field, 'language' => $text->language, 'body' => $text->body, 'origin' => $text->origin,
                 ]);
             }
+            ScriptImages::copyBlock($script, $hook->id, null, $copy->id, null, $actor->id);
             $this->touch($script, $actor);
             $this->audit(AuditAction::WaveScriptHookDuplicated, $locked, $script, $actor, $copy->ulid);
 
@@ -166,11 +173,51 @@ final class ScriptHookService
                 throw StrategyRuleViolation::scriptLastHook();
             }
 
+            // The stored images first (a failed object delete throws here, before a row is touched), then the texts, then the hook.
+            ScriptImages::purgeBlock($script->id, $hook->id, null);
             WaveScriptHookText::query()->where('hook_id', $hook->id)->delete();
             $hook->delete();
             WaveScriptHook::query()->where('script_id', $script->id)->where('position', '>', $hook->position)->decrement('position');
             $this->touch($script, $actor);
             $this->audit(AuditAction::WaveScriptHookDeleted, $locked, $script, $actor, $hook->ulid);
+
+            return $script;
+        });
+    }
+
+    /**
+     * Reorder the hooks. `$ids` must be exactly the hooks that exist now (the complete list), otherwise `order_mismatch` with the
+     * current order and nothing is written. No hook's revision moves; the script's does. The letters follow the new positions.
+     *
+     * @param  list<string>  $ids
+     */
+    public function reorder(Brand $brand, Wave $wave, User $actor, string $scriptUlid, array $ids): WaveScript
+    {
+        StrategyGuard::assertBrandWritable($brand);
+
+        return ScriptGuard::transaction($wave, function (Wave $locked) use ($actor, $scriptUlid, $ids): WaveScript {
+            $script = ScriptGuard::lockedScript($locked, $scriptUlid);
+            $hooks = WaveScriptHook::query()->where('script_id', $script->id)->orderBy('position')->orderBy('id')->lockForUpdate()->get();
+            $current = array_values($hooks->map(static fn ($m): string => (string) $m->ulid)->all());
+            if (! ScriptOrder::sameSet($current, $ids)) {
+                throw StrategyRuleViolation::scriptOrderMismatch('hooks', $current);
+            }
+            $byUlid = $hooks->keyBy('ulid');
+            foreach ($ids as $position => $ulid) {
+                $hook = $byUlid->get($ulid);
+                if ($hook !== null && $hook->position !== $position) {
+                    // `position` only: the hook's revision is deliberately NOT moved.
+                    WaveScriptHook::query()->whereKey($hook->id)->update(['position' => $position]);
+                }
+            }
+            $this->touch($script, $actor);
+            Audit::log(
+                action: AuditAction::WaveScriptHookReordered,
+                actor: $actor,
+                subject: $script,
+                metadata: ['wave' => $locked->ulid, 'market' => ScriptGuard::marketUlid($script), 'script' => $script->ulid, 'number' => $script->number, 'count' => count($ids)],
+                agencyId: $locked->agency_id,
+            );
 
             return $script;
         });

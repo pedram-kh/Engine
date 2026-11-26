@@ -33,7 +33,6 @@ use Illuminate\Support\Carbon;
  * @property int $number
  * @property string|null $angle
  * @property int $duration_seconds
- * @property string|null $language
  * @property int $revision
  * @property int $brief_revision
  * @property int|null $created_by_user_id
@@ -58,7 +57,7 @@ final class WaveScript extends Model
      */
     protected $fillable = [
         'agency_id', 'wave_id', 'market_id', 'creator_id', 'wave_creator_id', 'archived_at', 'number', 'angle', 'duration_seconds',
-        'language', 'revision', 'brief_revision', 'created_by_user_id', 'updated_by_user_id',
+        'revision', 'brief_revision', 'created_by_user_id', 'updated_by_user_id',
     ];
 
     public function isArchived(): bool
@@ -94,6 +93,12 @@ final class WaveScript extends Model
     public function hooks(): HasMany
     {
         return $this->hasMany(WaveScriptHook::class, 'script_id')->orderBy('position')->orderBy('id');
+    }
+
+    /** @return HasMany<WaveScriptLine, $this> */
+    public function lines(): HasMany
+    {
+        return $this->hasMany(WaveScriptLine::class, 'script_id')->orderBy('position')->orderBy('id');
     }
 
     /** @return array<string, string> */

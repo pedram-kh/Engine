@@ -23,7 +23,7 @@ uses(TestCase::class, RefreshDatabase::class);
 
 it('K1, K2: the route table of the strategy module is covered by this gate test', function (): void {
     $routes = collect(app('router')->getRoutes()->getRoutes())
-        ->filter(static fn ($r): bool => str_contains($r->uri(), '/waves/{wave}/strategy') && ! str_contains($r->uri(), '/strategy/creators') && ! str_contains($r->uri(), '/strategy/scripts'))
+        ->filter(static fn ($r): bool => str_contains($r->uri(), '/waves/{wave}/strategy') && ! str_contains($r->uri(), '/strategy/creators') && ! str_contains($r->uri(), '/strategy/scripts') && ! str_contains($r->uri(), '/script-languages'))
         ->flatMap(static fn ($r): array => collect($r->methods())->reject(fn ($m) => in_array($m, ['HEAD'], true))->map(fn ($m) => $m.' '.$r->uri())->all())
         ->count();
 

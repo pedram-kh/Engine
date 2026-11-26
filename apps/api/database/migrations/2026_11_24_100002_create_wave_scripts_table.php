@@ -23,6 +23,10 @@ use Illuminate\Support\Facades\Schema;
  * `wave_creator_id` becomes NULL and `archived_at` is set, and the CHECK says exactly one of the two is true. The
  * four-column foreign key makes "the slot is in this wave, this market and this creator's" true in the database; `ON UPDATE
  * CASCADE` on it moves the scripts with the slot when a Replace keeps them (the slot row is updated in place).
+ *
+ * PL-3.2b ruling 9: the table has NO `language` column. It was written by nothing and read by nothing (the market's script
+ * languages live in `wave_market_script_languages`, a script has no language of its own), and an unused column does not ship.
+ * Removed by editing this migration in place, which was allowed because only local databases and CI had run it.
  */
 return new class extends Migration
 {
@@ -60,7 +64,6 @@ return new class extends Migration
             $table->unsignedSmallInteger('number');
             $table->text('angle')->nullable();
             $table->unsignedSmallInteger('duration_seconds')->default(30);
-            $table->char('language', 2)->nullable();
 
             // `revision` moves on EVERY change of the script or of any block of it (PL-3.3 reads it for "edited since").
             // `brief_revision` moves only on a change of the brief block: the brief's own concurrency token, so a hook save

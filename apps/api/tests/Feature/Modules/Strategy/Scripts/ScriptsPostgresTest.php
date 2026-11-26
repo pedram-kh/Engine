@@ -6,9 +6,14 @@ use App\Modules\Creators\Models\Creator;
 use App\Modules\Strategy\Models\WaveScript;
 use App\Modules\Strategy\Models\WaveScriptHook;
 use App\Modules\Strategy\Models\WaveScriptHookText;
+use App\Modules\Strategy\Models\WaveScriptImage;
+use App\Modules\Strategy\Models\WaveScriptLine;
+use App\Modules\Strategy\StrategyLimits;
 use Illuminate\Database\Connection;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Tests\PostgresCommittedTestCase;
 use Tests\Support\CreatorFixtures as F;
@@ -293,4 +298,125 @@ it('G9: Replace moves the scripts with the slot in the database (ON UPDATE CASCA
     S::call($w['admin'], 'POST', F::url($w, "{$slot->ulid}/replace"), ['creator' => $new->ulid])->assertOk();
 
     expect(WaveScript::query()->whereKey($script->id)->firstOrFail()->only(['creator_id', 'wave_creator_id', 'number']))->toBe(['creator_id' => $new->id, 'wave_creator_id' => $slot->id, 'number' => 1]);
+});
+
+// ------------------------------------------------------------------ PL-3.2b P1
+
+it('P1: the CHECKs and composite keys of the lines, B-roll, texts, images and market languages refuse what the services would never write', function (): void {
+    $w = SF::world();
+    [$slot] = SF::slot($w);
+    [$other] = SF::slot($w, 'RO');
+    $script = SF::script($slot);
+    $otherScript = SF::script($other);
+    $line = SF::line($script, 0, 'x', 1);
+    $otherLine = SF::line($otherScript, 0, 'y');
+    $hook = SF::hooksOf($script)[0];
+    $common = ['agency_id' => $w['agency']->id, 'wave_id' => $w['wave']->id, 'script_id' => $script->id, 'created_at' => now(), 'updated_at' => now()];
+    $insert = static fn (string $table, array $row) => static fn () => DB::transaction(fn () => DB::table($table)->insert($row));
+
+    // B-roll: the shot type is one of the ten; a line of ANOTHER script is refused by (script_id, line_id)
+    $broll = $common + ['ulid' => (string) Str::ulid(), 'line_id' => $line->id, 'position' => 5];
+    expect($insert('wave_script_broll', ['shot_type' => 'dolly_zoom'] + $broll))->toThrow(QueryException::class);
+    expect($insert('wave_script_broll', ['line_id' => $otherLine->id] + $broll))->toThrow(QueryException::class);
+    expect($insert('wave_script_broll', ['shot_type' => 'close_up'] + $broll)())->toBeTrue();
+
+    // line texts: a two-letter lowercase language, manual origin, a body with something in it, one per (line, language), a line of this script only
+    $text = $common + ['line_id' => $line->id, 'language' => 'sk', 'body' => 'x', 'origin' => 'manual'];
+    expect($insert('wave_script_line_texts', ['language' => 'SK'] + $text))->toThrow(QueryException::class);
+    expect($insert('wave_script_line_texts', ['language' => 'eng'] + $text))->toThrow(QueryException::class);
+    expect($insert('wave_script_line_texts', ['origin' => 'ai'] + $text))->toThrow(QueryException::class);
+    expect($insert('wave_script_line_texts', ['body' => '  '] + $text))->toThrow(QueryException::class);
+    expect($insert('wave_script_line_texts', ['line_id' => $otherLine->id] + $text))->toThrow(QueryException::class);
+    expect($insert('wave_script_line_texts', $text)())->toBeTrue();
+    expect($insert('wave_script_line_texts', $text))->toThrow(QueryException::class);
+
+    // images: exactly one owner, a mime from the four, a status from the two, an owner of this script only
+    $image = static fn (array $over): array => $over + $common + [
+        'ulid' => (string) Str::ulid(), 'position' => 0, 'storage_key' => 'k/'.Str::ulid().'.png', 'original_filename' => 'a.png', 'declared_bytes' => 5, 'status' => 'pending',
+    ];
+    expect($insert('wave_script_images', $image(['hook_id' => null, 'line_id' => null])))->toThrow(QueryException::class);
+    expect($insert('wave_script_images', $image(['hook_id' => $hook->id, 'line_id' => $line->id])))->toThrow(QueryException::class);
+    expect($insert('wave_script_images', $image(['line_id' => $line->id, 'mime_type' => 'image/svg+xml'])))->toThrow(QueryException::class);
+    expect($insert('wave_script_images', $image(['line_id' => $line->id, 'status' => 'done'])))->toThrow(QueryException::class);
+    expect($insert('wave_script_images', $image(['line_id' => $otherLine->id])))->toThrow(QueryException::class);
+    expect($insert('wave_script_images', $image(['line_id' => $line->id, 'mime_type' => 'image/gif']))())->toBeTrue();
+    expect($insert('wave_script_images', $image(['hook_id' => $hook->id]))())->toBeTrue();
+
+    // market languages: two lowercase letters, never en, one per (market, language), a market of this wave only
+    $lang = ['agency_id' => $w['agency']->id, 'wave_id' => $w['wave']->id, 'market_id' => $slot->market_id, 'language' => 'sk', 'position' => 0, 'created_at' => now(), 'updated_at' => now()];
+    expect($insert('wave_market_script_languages', ['language' => 'en'] + $lang))->toThrow(QueryException::class);
+    expect($insert('wave_market_script_languages', ['language' => 'SK'] + $lang))->toThrow(QueryException::class);
+    expect($insert('wave_market_script_languages', ['wave_id' => $w['otherWave']->id, 'agency_id' => $w['otherAgency']->id] + $lang))->toThrow(QueryException::class);
+    expect($insert('wave_market_script_languages', $lang)())->toBeTrue();
+    expect($insert('wave_market_script_languages', $lang))->toThrow(QueryException::class);
+
+    // a script with children cannot be deleted by hand under the children (the children cascade only through the script row)
+    expect(DB::table('wave_script_lines')->where('script_id', $script->id)->count())->toBe(1);
+});
+
+it('P1: nothing the database holds is a derived value: no stored line number, no stored B-roll code, no unique key on a position', function (): void {
+    foreach (['wave_script_lines', 'wave_script_broll', 'wave_script_hooks'] as $table) {
+        $columns = Schema::getColumnListing($table);
+        expect($columns)->not->toContain('number');
+        expect($columns)->not->toContain('code');
+        expect($columns)->not->toContain('letter');
+        foreach (Schema::getIndexes($table) as $index) {
+            if ($index['unique']) {
+                expect($index['columns'])->not->toContain('position', "{$table} must not have a unique key on position");
+            }
+        }
+    }
+});
+
+it('N1 (parallel): two adds at the same moment at 29 lines leave 30, not 31', function (): void {
+    $w = SF::world();
+    $id = SF::api($w);
+    $script = WaveScript::query()->where('ulid', $id)->firstOrFail();
+    for ($i = 0; $i < 29; $i++) {
+        SF::line($script, $i);
+    }
+
+    $results = scriptsRace($w, ['mode' => 'line_add', 'script' => $id], [[], []]);
+
+    expect($results)->toBe(['ok', 'wave_script.lines_limit'])->and(WaveScriptLine::query()->where('script_id', $script->id)->count())->toBe(30);
+});
+
+it('N1 (parallel): two saves of the same line at the same revision: one wins, one gets the conflict, one text is stored', function (): void {
+    $w = SF::world();
+    $id = SF::api($w);
+    $script = WaveScript::query()->where('ulid', $id)->firstOrFail();
+    $line = SF::line($script, 0);
+
+    $results = scriptsRace($w, ['mode' => 'line', 'script' => $id, 'line' => $line->ulid, 'revision' => 1], [['text' => 'from A'], ['text' => 'from B']]);
+
+    expect($results)->toBe(['ok', 'wave_script.conflict'])->and(DB::table('wave_script_line_texts')->where('line_id', $line->id)->count())->toBe(1)
+        ->and(WaveScriptLine::query()->whereKey($line->id)->value('revision'))->toBe(2);
+});
+
+it('I1 (parallel): two reservations at the same moment cannot pass the 300 MB total, nor the tenth place of a block', function (): void {
+    Storage::fake('media');
+    $w = SF::world();
+    $id = SF::api($w);
+    $script = WaveScript::query()->where('ulid', $id)->firstOrFail();
+    $line = SF::line($script, 0);
+    $cap = StrategyLimits::SCRIPT_IMAGE_TOTAL_BYTES;
+    $fill = fn (int $bytes) => DB::table('wave_script_images')->insert([
+        'ulid' => (string) Str::ulid(), 'agency_id' => $script->agency_id, 'wave_id' => $script->wave_id, 'script_id' => $script->id, 'line_id' => $line->id, 'position' => 0,
+        'storage_key' => 'k/'.Str::ulid().'.png', 'original_filename' => 'a.png', 'declared_bytes' => $bytes, 'size_bytes' => $bytes, 'mime_type' => 'image/png', 'status' => 'ready',
+        'created_at' => now(), 'updated_at' => now(),
+    ]);
+
+    // total: 250 bytes left, two reservations of 200
+    $fill($cap - 250);
+    $results = scriptsRace($w, ['mode' => 'image_init', 'script' => $id, 'block' => 'line', 'owner' => $line->ulid, 'declared' => 200], [[], []]);
+    expect($results)->toBe(['ok', 'wave_script_image.limit_bytes'])->and(WaveScriptImage::query()->where('script_id', $script->id)->where('status', 'pending')->count())->toBe(1);
+
+    // count: the block holds 9 more (the fill is one), so one place is left for two reservations
+    DB::table('wave_script_images')->where('status', 'pending')->delete();
+    DB::table('wave_script_images')->delete();
+    for ($i = 0; $i < StrategyLimits::IMAGES_PER_BLOCK - 1; $i++) {
+        $fill(10);
+    }
+    $results = scriptsRace($w, ['mode' => 'image_init', 'script' => $id, 'block' => 'line', 'owner' => $line->ulid, 'declared' => 10], [[], []]);
+    expect($results)->toBe(['ok', 'wave_script_image.limit_count'])->and(WaveScriptImage::query()->where('line_id', $line->id)->count())->toBe(10);
 });

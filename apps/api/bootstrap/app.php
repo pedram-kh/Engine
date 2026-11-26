@@ -16,6 +16,7 @@ use App\Modules\Identity\Http\Middleware\EnforceImpersonation;
 use App\Modules\Identity\Http\Middleware\SetLocale;
 use App\Modules\Identity\Http\Middleware\UseAdminSessionCookie;
 use App\Modules\Strategy\Console\SweepPendingConceptImages;
+use App\Modules\Strategy\Console\SweepPendingScriptImages;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -68,6 +69,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // row; only rows more than an hour past their expiry). Without the scheduler they pile up as invisible rows and
         // objects: see docs/reviews/pl-2-3-plan.md section 11, "Deploy needs". Safe by hand: `--dry-run`.
         $schedule->command(SweepPendingConceptImages::class)->everyFifteenMinutes()->withoutOverlapping();
+
+        // PL-3.2b: the same for script reference images (abandoned reservations: object first, then the row). A SECOND scheduler
+        // entry for the merge list ("must confirm before `pl` is merged"): without the scheduler they pile up as invisible rows.
+        $schedule->command(SweepPendingScriptImages::class)->everyFifteenMinutes()->withoutOverlapping();
     })
     ->withMiddleware(function (Middleware $middleware): void {
         // Sanctum SPA cookie auth. EnsureFrontendRequestsAreStateful is

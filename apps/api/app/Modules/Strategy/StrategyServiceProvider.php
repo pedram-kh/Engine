@@ -6,6 +6,7 @@ namespace App\Modules\Strategy;
 
 use App\Modules\Campaigns\Events\AssignmentTransitioned;
 use App\Modules\Strategy\Console\SweepPendingConceptImages;
+use App\Modules\Strategy\Console\SweepPendingScriptImages;
 use App\Modules\Strategy\Features\CreatorsScriptsEnabled;
 use App\Modules\Strategy\Features\StrategyEnabled;
 use App\Modules\Strategy\Listeners\ReconcileWaveCreatorOnAccept;
@@ -59,7 +60,7 @@ final class StrategyServiceProvider extends ServiceProvider
         // PL-3.1: the one listener on a path every campaign runs; six binding conditions, see the class.
         Event::listen(AssignmentTransitioned::class, [ReconcileWaveCreatorOnAccept::class, 'handle']);
         if ($this->app->runningInConsole()) {
-            $this->commands([SweepPendingConceptImages::class]);
+            $this->commands([SweepPendingConceptImages::class, SweepPendingScriptImages::class]);
         }
         $this->registerRoutes();
     }

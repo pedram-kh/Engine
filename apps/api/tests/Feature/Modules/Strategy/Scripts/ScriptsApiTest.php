@@ -42,6 +42,11 @@ it('G1: every scripts route answers 404 not_found with the sprint flag off, and 
     $routes = [
         ['GET', ''], ['GET', 'archived'], ['DELETE', "archived/{$u}"], ['POST', "archived/{$u}/restore"], ['POST', ''], ['GET', $u], ['PUT', "{$u}/brief"], ['POST', "{$u}/archive"],
         ['POST', "{$u}/hooks"], ['PUT', "{$u}/hooks/{$u}"], ['POST', "{$u}/hooks/{$u}/duplicate"], ['DELETE', "{$u}/hooks/{$u}"],
+        // PL-3.2b: the order of hooks and lines, a line, its B-roll rows, the reference images.
+        ['PUT', "{$u}/hooks/order"], ['POST', "{$u}/lines"], ['PUT', "{$u}/lines/order"], ['PUT', "{$u}/lines/{$u}"], ['POST', "{$u}/lines/{$u}/duplicate"],
+        ['DELETE', "{$u}/lines/{$u}"], ['POST', "{$u}/lines/{$u}/broll"], ['PUT', "{$u}/lines/{$u}/broll/order"], ['DELETE', "{$u}/lines/{$u}/broll/{$u}"],
+        ['POST', "{$u}/images/uploads/init"], ['POST', "{$u}/images/uploads/complete"], ['PUT', "{$u}/images/order"],
+        ['GET', "{$u}/images/{$u}/file"], ['GET', "{$u}/images/{$u}/thumbnail"], ['DELETE', "{$u}/images/{$u}"],
     ];
     // The table is checked against the router: a new scripts route fails here until it is added.
     $registered = collect(app('router')->getRoutes()->getRoutes())->filter(static fn ($r): bool => str_contains($r->uri(), '/strategy/scripts'))
@@ -281,14 +286,14 @@ it('G11: text limits: exactly at the limit saves, one over is 422; control chara
     S::call($w['admin'], 'PUT', SF::url($w, "{$id}/brief"), ['duration_seconds' => 25, 'revision' => 2])->assertStatus(422);
 });
 
-it('G11b: only English text is accepted for now; another language is refused and writes nothing', function (): void {
+it('G11b: a language the market does not have is refused and writes nothing (PL-3.2b: the market languages decide)', function (): void {
     $w = SF::world();
     [$slot] = SF::slot($w);
     $script = S::call($w['admin'], 'POST', SF::url($w), ['slot' => $slot->ulid])->assertCreated();
     $hook = $script->json('data.hooks.0');
 
     S::call($w['admin'], 'PUT', SF::url($w, "{$script->json('data.id')}/hooks/{$hook['id']}"), ['texts' => ['audio' => ['sk' => 'Ahoj']], 'revision' => 1])
-        ->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_script.language_not_available');
+        ->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_script.language_not_in_market');
     expect(WaveScriptHookText::query()->count())->toBe(0);
 });
 
@@ -505,7 +510,7 @@ it('G15: audit rows: literal payloads with ids, number, counts and field names; 
     // archive, restore, archive and delete: literal keys (wave, market, script, number, creator_id; hooks on the delete), no text
     expect(data_get($meta, '6'))->toBe(['wave' => $w['wave']->ulid, 'market' => $w['mk']['SK'], 'script' => $id, 'number' => 1, 'creator_id' => $slot->creator_id])
         ->and(data_get($meta, '7'))->toBe(['wave' => $w['wave']->ulid, 'market' => $w['mk']['SK'], 'script' => $id, 'number' => 1, 'creator_id' => $slot->creator_id])
-        ->and(data_get($meta, '9.hooks'))->toBe(4)->and(array_keys($meta[9]))->toBe(['wave', 'market', 'script', 'number', 'creator_id', 'hooks'])
+        ->and(data_get($meta, '9.hooks'))->toBe(4)->and(array_keys($meta[9]))->toBe(['wave', 'market', 'script', 'number', 'creator_id', 'hooks', 'lines', 'images'])
         ->and(WaveScriptHook::query()->count())->toBe(0)->and(WaveScriptHookText::query()->count())->toBe(0);
 });
 

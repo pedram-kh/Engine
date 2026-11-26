@@ -56,7 +56,7 @@ it('P1: creates the three tables with the planned columns and the nullable audie
     expect(Wave::query()->findOrFail(Wave::factory()->create()->id)->usp_audience_title)->toBeNull();
 });
 
-it('P1: the eleven migrations run down and up again', function (): void {
+it('P1: the strategy migrations run down and up again, PL-3.2b ones included (and the scripts carry no language column)', function (): void {
     $names = [
         '2026_11_20_100000_add_usp_audience_title_to_waves',
         '2026_11_20_100001_create_wave_usps_table',
@@ -79,7 +79,19 @@ it('P1: the eleven migrations run down and up again', function (): void {
         '2026_11_24_100002_create_wave_scripts_table',
         '2026_11_24_100003_create_wave_script_hooks_table',
         '2026_11_24_100004_create_wave_script_hook_texts_table',
+        // PL-3.2b: the market languages reference the markets; the lines the scripts; the line texts and the B-roll the lines; the images the hooks AND the lines.
+        '2026_11_26_100000_create_wave_market_script_languages_table',
+        '2026_11_26_100001_create_wave_script_lines_table',
+        '2026_11_26_100002_create_wave_script_line_texts_table',
+        '2026_11_26_100003_create_wave_script_broll_table',
+        '2026_11_26_100004_create_wave_script_images_table',
     ];
+    $new = ['wave_market_script_languages', 'wave_script_lines', 'wave_script_line_texts', 'wave_script_broll', 'wave_script_images'];
+    foreach ($new as $table) {
+        expect(Schema::hasTable($table))->toBeTrue("{$table} exists before the rollback");
+    }
+    // Ruling 9: no unused column. The script has no language; the language lives on the market, the line text and the hook text.
+    expect(Schema::hasColumn('wave_scripts', 'language'))->toBeFalse();
     foreach (array_reverse($names) as $name) {
         (require database_path("migrations/{$name}.php"))->down();
     }
@@ -89,6 +101,9 @@ it('P1: the eleven migrations run down and up again', function (): void {
         ->and(Schema::hasTable('wave_concepts'))->toBeFalse()
         ->and(Schema::hasTable('wave_concept_decisions'))->toBeFalse()
         ->and(Schema::hasColumn('waves', 'usp_audience_title'))->toBeFalse();
+    foreach ($new as $table) {
+        expect(Schema::hasTable($table))->toBeFalse("{$table} is gone after the rollback");
+    }
 
     foreach ($names as $name) {
         (require database_path("migrations/{$name}.php"))->up();
@@ -98,7 +113,11 @@ it('P1: the eleven migrations run down and up again', function (): void {
         ->and(Schema::hasTable('wave_persona_angles'))->toBeTrue()
         ->and(Schema::hasTable('wave_concepts'))->toBeTrue()
         ->and(Schema::hasTable('wave_concept_decisions'))->toBeTrue()
-        ->and(Schema::hasColumn('waves', 'usp_audience_title'))->toBeTrue();
+        ->and(Schema::hasColumn('waves', 'usp_audience_title'))->toBeTrue()
+        ->and(Schema::hasColumn('wave_scripts', 'language'))->toBeFalse();
+    foreach ($new as $table) {
+        expect(Schema::hasTable($table))->toBeTrue("{$table} is back after up()");
+    }
 });
 
 it('L2: unique (wave_id, color_key) refuses a duplicate colour and a seventh row cannot exist; another wave is free', function (): void {

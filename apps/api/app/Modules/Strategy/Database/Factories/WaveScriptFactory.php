@@ -30,7 +30,6 @@ final class WaveScriptFactory extends Factory
             'number' => fn (array $a) => self::freeNumber(self::slot($a)),
             'angle' => null,
             'duration_seconds' => 30,
-            'language' => null,
             'revision' => 1,
             'brief_revision' => 1,
         ];

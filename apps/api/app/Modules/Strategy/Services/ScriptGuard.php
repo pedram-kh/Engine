@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Modules\Strategy\Services;
 
+use App\Modules\Identity\Models\User;
 use App\Modules\Strategy\Models\WaveScript;
 use App\Modules\Waves\Models\Wave;
+use App\Modules\Waves\Models\WaveMarket;
 use Closure;
 use Illuminate\Support\Facades\DB;
 
@@ -55,5 +57,19 @@ final class ScriptGuard
         }
 
         return $script;
+    }
+
+    /** Move the script's `revision` (every change of the script or of any block of it) and record who. Call inside the guard. */
+    public static function touch(WaveScript $script, User $actor): void
+    {
+        $script->revision++;
+        $script->updated_by_user_id = $actor->id;
+        $script->save();
+    }
+
+    /** The ulid of the script's market (audit payloads carry it). */
+    public static function marketUlid(WaveScript $script): string
+    {
+        return (string) WaveMarket::query()->whereKey($script->market_id)->value('ulid');
     }
 }

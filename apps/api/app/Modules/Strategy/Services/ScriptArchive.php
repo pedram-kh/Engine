@@ -9,8 +9,11 @@ use App\Modules\Audit\Facades\Audit;
 use App\Modules\Identity\Models\User;
 use App\Modules\Strategy\Models\WaveCreator;
 use App\Modules\Strategy\Models\WaveScript;
+use App\Modules\Strategy\Models\WaveScriptBroll;
 use App\Modules\Strategy\Models\WaveScriptHook;
 use App\Modules\Strategy\Models\WaveScriptHookText;
+use App\Modules\Strategy\Models\WaveScriptLine;
+use App\Modules\Strategy\Models\WaveScriptLineText;
 use App\Modules\Strategy\StrategyLimits;
 use App\Modules\Waves\Models\Wave;
 use App\Modules\Waves\Models\WaveMarket;
@@ -131,7 +134,7 @@ final class ScriptArchive
         self::bringBack($locked, $script, $slot, (string) WaveMarket::query()->whereKey($script->market_id)->value('ulid'), $number, $actor);
     }
 
-    /** Delete the slot's live scripts with their hooks and texts (Remove with "delete"). Returns how many scripts. */
+    /** Delete the slot's live scripts with everything on them, stored images included (Remove with "delete"). Returns how many scripts. */
     public static function deleteLive(Wave $locked, WaveCreator $slot, WaveMarket $market, User $actor): int
     {
         $scripts = self::liveOf($slot);
@@ -142,10 +145,20 @@ final class ScriptArchive
         return $scripts->count();
     }
 
-    /** Delete one script, its hooks and its texts, and write the audit row (ids and counts). */
+    /**
+     * Delete one script with everything that hangs on it, and write the audit row (ids and counts). The stored image OBJECTS go
+     * first: a failed delete throws before a single row is touched (the caller's transaction rolls back and the script stays), and
+     * the script row lock held by every caller means no image can be reserved between the two steps (PL-3.2b, ruling 11). Then the
+     * rows, children before parents (the foreign keys are RESTRICT).
+     */
     public static function deleteOne(Wave $locked, WaveScript $script, string $marketUlid, ?User $actor): void
     {
         $hooks = WaveScriptHook::query()->where('script_id', $script->id)->count();
+        $lines = WaveScriptLine::query()->where('script_id', $script->id)->count();
+        $images = ScriptImages::purgeScript($script->id);
+        WaveScriptBroll::query()->where('script_id', $script->id)->delete();
+        WaveScriptLineText::query()->where('script_id', $script->id)->delete();
+        WaveScriptLine::query()->where('script_id', $script->id)->delete();
         WaveScriptHookText::query()->where('script_id', $script->id)->delete();
         WaveScriptHook::query()->where('script_id', $script->id)->delete();
         $script->delete();
@@ -154,7 +167,7 @@ final class ScriptArchive
             action: AuditAction::WaveScriptDeleted,
             actor: $actor,
             subject: $script,
-            metadata: ['wave' => $locked->ulid, 'market' => $marketUlid, 'script' => $script->ulid, 'number' => $script->number, 'creator_id' => $script->creator_id, 'hooks' => $hooks],
+            metadata: ['wave' => $locked->ulid, 'market' => $marketUlid, 'script' => $script->ulid, 'number' => $script->number, 'creator_id' => $script->creator_id, 'hooks' => $hooks, 'lines' => $lines, 'images' => $images],
             agencyId: $locked->agency_id,
         );
     }

@@ -48,3 +48,23 @@ What this means in production:
 - The lock set is the same as in the first rehearsal; M3 took 28.5 ms before and 26.7 ms now (noise), and the partial index adds no lock on an existing table (it is built on the new, empty `wave_scripts`). `pg_indexes` shows the index with its `WHERE (archived_at IS NULL)`.
 - All five `down()` methods ran clean in reverse order; the tables were gone afterwards and M1 ran forward again.
 - Not measured: production-sized `users`, `creators` and `waves` (same caveat as before).
+
+## Rehearsal 3 (2026-11-26): PL-3.2b, five new migrations and M3 edited in place
+
+- Database: throwaway `pl32b_rehearsal` (created for this run, **dropped after**), container `catalyst-postgres` (127.0.0.1:5435), PostgreSQL. The `catalyst` database was not touched. The name was printed before every command and by the runner itself, which refuses any other name. The tables were **empty** (no synthetic rows): the foreign keys are on new tables, so their check time does not depend on the size of the old ones.
+- Method: a runner kept outside the repository (`/tmp/pl32b/rehearse.php`) called `artisan migrate` (`--path` per file): the 124 earlier migrations first (this includes the PL-3.2a ones, and M3 as it is now), then each new one on its own, a `TransactionCommitting` listener reading `pg_locks` for the migration's own backend (relations in `public`; modes ShareRowExclusive, Share, Exclusive, AccessExclusive). Then `migrate:rollback --step=5` ran the five `down()` methods, a `lock_timeout` failure was provoked, and the five ran forward again.
+- **M3 edited in place, and why:** ruling 9 ("no unused column") removes `wave_scripts.language`. Only local databases and CI have ever run `2026_11_24_100002_create_wave_scripts_table`, so the migration was edited instead of adding a drop-column migration. The edit is the removal of the column and a note in the docblock; nothing else in M3 changed. `StrategySchemaTest` was updated in the same commit. **Any database that already ran the old M3 (for example `pl32_walk`) needs `migrate:fresh`**, because Laravel will not run an edited migration twice. Production does not have M3 yet.
+
+| Migration                                    | Time (empty tables) | Locks held at commit                                                                                                                      |
+| -------------------------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `100000_create_wave_market_script_languages` | 17.3 ms             | new table: `AccessExclusive`, `Share`, `ShareRowExclusive`; `ShareRowExclusive` on `agencies`, `waves`, `wave_markets`                    |
+| `100001_create_wave_script_lines`            | 16.9 ms             | new table (same three); `ShareRowExclusive` on `agencies`, `waves`, `wave_scripts`                                                        |
+| `100002_create_wave_script_line_texts`       | 19.8 ms             | new table (same three); `ShareRowExclusive` on `agencies`, `waves`, `wave_scripts`, `wave_script_lines`                                   |
+| `100003_create_wave_script_broll`            | 21.8 ms             | new table (same three); `ShareRowExclusive` on `agencies`, `waves`, `wave_scripts`, `wave_script_lines`                                   |
+| `100004_create_wave_script_images`           | 28.9 ms             | new table (same three); `ShareRowExclusive` on `agencies`, `waves`, **`users`**, `wave_scripts`, `wave_script_hooks`, `wave_script_lines` |
+
+- Existing tables are only ever **referenced**: `ShareRowExclusive` (blocks INSERT, UPDATE and DELETE on that table for the length of the migration; reads continue) on `agencies`, `waves`, `wave_markets` and, for the images' `uploaded_by_user_id`, on **`users`** (a production table, the busiest of them). Each migration is a few tens of milliseconds on empty tables. No existing table is altered or rewritten; no data is written or backfilled.
+- All five `down()` methods ran clean in reverse order: the five tables were gone and `wave_scripts` has no `language` column afterwards.
+- **`lock_timeout`:** with another session holding `ACCESS EXCLUSIVE` on `wave_scripts`, the lines migration stopped after **5.0 s** with SQLSTATE 55P03 (`canceling statement due to lock timeout`), the table was not created and no `migrations` row was written. Nothing queued behind the lock.
+- Forward again after the rollback: all five tables present.
+- Not measured: timing on production-sized `users`, `agencies`, `waves`. Run the new migrations in a quiet window together with the PL-3.1 and PL-3.2a ones.

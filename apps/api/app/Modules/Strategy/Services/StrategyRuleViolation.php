@@ -350,10 +350,95 @@ final class StrategyRuleViolation extends RuntimeException
         return new self('wave_script.last_hook', 'A script keeps at least one hook.');
     }
 
-    /** A hook text in a language other than English: the market languages arrive with PL-3.2b. */
-    public static function scriptLanguageNotAvailable(string $language): self
+    /** A text in a language that is not English and not one of the market's script languages. */
+    public static function scriptLanguageNotInMarket(string $language): self
     {
-        return new self('wave_script.language_not_available', 'Only English text can be written for now.', 422, ['language' => $language]);
+        return new self('wave_script.language_not_in_market', 'This language is not a script language of this market. Add it to the market first.', 422, ['language' => $language]);
+    }
+
+    /** More than three local languages for one market (English is always there and does not count). */
+    public static function scriptLanguageLimit(): self
+    {
+        $max = StrategyLimits::LOCAL_LANGUAGES_PER_MARKET;
+
+        return new self('wave_script.language_limit', "A market has English and at most {$max} other script languages.", 422, ['max' => $max]);
+    }
+
+    public static function scriptLinesLimit(): self
+    {
+        $max = StrategyLimits::LINES_PER_SCRIPT;
+
+        return new self('wave_script.lines_limit', "A script has at most {$max} lines.", 422, ['max' => $max]);
+    }
+
+    public static function scriptBrollLimit(): self
+    {
+        $max = StrategyLimits::BROLL_PER_SCRIPT;
+
+        return new self('wave_script.broll_limit', "A script has at most {$max} B-roll rows.", 422, ['max' => $max]);
+    }
+
+    /** 404: a save, a duplicate or a delete named a line that someone deleted. The web keeps the writer's text. */
+    public static function scriptLineDeleted(): self
+    {
+        return new self('wave_script_line.deleted', 'This line was deleted.', 404);
+    }
+
+    /**
+     * 409: a line save named a B-roll row that someone deleted. Nothing was written; `current` is the line as it is now.
+     *
+     * @param  array<string, mixed>  $current
+     */
+    public static function scriptBrollGone(array $current): self
+    {
+        return new self('wave_script.broll_gone', 'A B-roll row of this line was deleted by someone else. Review the latest version.', 409, ['block' => 'line', 'current' => $current]);
+    }
+
+    /**
+     * 422: a reorder did not name exactly the rows that exist now (a row was added, deleted or is foreign). Nothing was written.
+     *
+     * @param  list<string>  $current  the ulids in their current order
+     */
+    public static function scriptOrderMismatch(string $what, array $current): self
+    {
+        return new self('wave_script.order_mismatch', 'The list changed since the page was loaded; reload and move again.', 422, ['what' => $what, 'current' => $current]);
+    }
+
+    public static function scriptImageLimitCount(string $block, int $used): self
+    {
+        $max = StrategyLimits::IMAGES_PER_BLOCK;
+
+        return new self('wave_script_image.limit_count', "A {$block} has at most {$max} reference images.", 422, ['used' => $used, 'max' => $max, 'block' => $block]);
+    }
+
+    public static function scriptImageLimitBytes(int $usedBytes, int $askedBytes): self
+    {
+        return new self('wave_script_image.limit_bytes', 'The reference images of a script add up to at most 300 MB.', 422, ['used_bytes' => $usedBytes, 'asked_bytes' => $askedBytes, 'max_bytes' => StrategyLimits::SCRIPT_IMAGE_TOTAL_BYTES]);
+    }
+
+    public static function scriptImageInvalid(string $why): self
+    {
+        return new self('wave_script_image.invalid', $why);
+    }
+
+    public static function scriptImageUnknownUpload(): self
+    {
+        return new self('wave_script_image.unknown_upload', 'This upload is not reserved on this script, or it expired. Start the upload again.');
+    }
+
+    public static function scriptImageAlreadyCompleted(): self
+    {
+        return new self('wave_script_image.already_completed', 'This upload was already completed.');
+    }
+
+    public static function scriptImageDeleteFailed(): self
+    {
+        return new self('wave_script_image.delete_failed', 'A stored image could not be deleted; nothing was removed. Try again.', 500);
+    }
+
+    public static function scriptImageCopyFailed(): self
+    {
+        return new self('wave_script_image.copy_failed', 'The images could not be copied; no copy was made. Try again.', 500);
     }
 
     /**
