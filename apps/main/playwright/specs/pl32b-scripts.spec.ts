@@ -34,7 +34,6 @@ type Json = any
 // A 1x1 PNG, enough for the server to accept as an image.
 const PNG_B64 =
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
-const PNG = Buffer.from(PNG_B64, 'base64')
 
 async function api(page: Page, method: string, path: string, body?: unknown): Promise<Json> {
   return page.evaluate(

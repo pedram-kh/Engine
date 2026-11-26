@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * PL-3.2b — one reference image of a hook or a line (frame 13:3787): a 104 x 68 thumbnail with a 6 px radius and a `#3a3a40`-family
+ * PL-3.2b — one reference image of a hook or a line (frame 13:3787): a 104 x 68 thumbnail with a 6 px radius and an outline-token
  * border, a round remove button at its top right and the file name (11 px, tertiary) under it. The thumbnail is read through the
  * app's own authentication (`useAuthenticatedImage`, shared with the concept images) and shown from a blob URL; until it is ready,
  * or when it cannot be read, a placeholder icon stands in. The image itself is a button: Enter and Space enlarge it.

@@ -3,7 +3,10 @@
  */
 import type {
   ArchivedScript,
+  ScriptBroll,
   ScriptHook,
+  ScriptImage,
+  ScriptLine,
   ScriptPersonaRef,
   ScriptRailCreator,
   ScriptsOverview,
@@ -189,4 +192,59 @@ export function afterHookSave(
       h.id === hookId ? { ...h, ...change, revision: h.revision + 1 } : h,
     ),
   }
+}
+
+export const LINE_ID = (n: number): string => `01LINE${String(n).padStart(20, '0')}`
+export const BROLL_ID = (n: number): string => `01BROL${String(n).padStart(20, '0')}`
+export const IMAGE_ID = (n: number): string => `01IMGE${String(n).padStart(20, '0')}`
+
+/** A line as the server sends it: `n` is its place (1 = the first line, which is "Line 2"); its B-roll codes follow its number. */
+export function makeLine(n: number, over: Partial<ScriptLine> = {}): ScriptLine {
+  return {
+    id: LINE_ID(n),
+    position: n,
+    number: n + 1,
+    cta: false,
+    texts: {},
+    broll: [],
+    images: [],
+    revision: 1,
+    ...over,
+  }
+}
+
+export function makeBroll(
+  lineNumber: number,
+  n: number,
+  over: Partial<ScriptBroll> = {},
+): ScriptBroll {
+  return {
+    id: BROLL_ID(lineNumber * 100 + n),
+    position: n,
+    code: `${lineNumber}_${n}`,
+    shot_type: null,
+    description: null,
+    ...over,
+  }
+}
+
+export function makeImage(n: number, over: Partial<ScriptImage> = {}): ScriptImage {
+  return {
+    id: IMAGE_ID(n),
+    position: n,
+    original_filename: `ref-${n}.png`,
+    mime_type: 'image/png',
+    size_bytes: 1000,
+    has_thumbnail: true,
+    file_url: `/images/${n}/file`,
+    thumbnail_url: `/images/${n}/thumbnail`,
+    ...over,
+  }
+}
+
+/** The 422 a stale order answers with: somebody added or removed a block meanwhile. */
+export function orderMismatch(): ApiError {
+  return ApiError.fromEnvelope(422, {
+    errors: [{ code: 'wave_script.order_mismatch', title: 'order changed' }],
+  })
 }
