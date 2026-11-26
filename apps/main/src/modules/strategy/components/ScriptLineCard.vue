@@ -281,6 +281,7 @@ const theirsLines = computed(() =>
       'lcard--over': over === line.id && dragging !== null && dragging !== line.id,
       'lcard--dragging': dragging === line.id,
       'lcard--gone': gone,
+      'lcard--shut': !open,
     }"
     :data-test="`script-line-${line.id}`"
     :data-number="line.number"
@@ -302,22 +303,6 @@ const theirsLines = computed(() =>
           @dragstart="(e) => emit('dragstart', e)"
           @dragend="emit('dragend')"
         />
-        <button
-          type="button"
-          class="lcard__collapse"
-          :aria-expanded="open"
-          :aria-label="
-            open ? t('app.strategy.scripts.lines.collapse') : t('app.strategy.scripts.lines.expand')
-          "
-          :data-test="`script-line-toggle-${line.id}`"
-          @click="toggle"
-        >
-          <v-icon
-            :icon="open ? 'mdi-chevron-down' : 'mdi-chevron-right'"
-            size="16"
-            aria-hidden="true"
-          />
-        </button>
         <h3 class="lcard__name" :data-test="`script-line-name-${line.id}`">{{ title }}</h3>
         <span v-if="d.cta" class="lcard__cta" :data-test="`script-line-cta-chip-${line.id}`">{{
           t('app.strategy.scripts.lines.cta')
@@ -349,6 +334,22 @@ const theirsLines = computed(() =>
           :test-id="`script-line-status-${line.id}`"
           @retry="block.retry()"
         />
+        <button
+          type="button"
+          class="lcard__collapse"
+          :aria-expanded="open"
+          :aria-label="
+            open ? t('app.strategy.scripts.lines.collapse') : t('app.strategy.scripts.lines.expand')
+          "
+          :data-test="`script-line-toggle-${line.id}`"
+          @click="toggle"
+        >
+          <v-icon
+            :icon="open ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+            size="16"
+            aria-hidden="true"
+          />
+        </button>
         <v-menu v-bind="MENU_PROPS" location="bottom end">
           <template #activator="{ props: act }">
             <button
@@ -633,6 +634,10 @@ const theirsLines = computed(() =>
   border: 1px solid rgb(var(--v-theme-border-color));
   border-radius: 10px;
   background: rgb(var(--v-theme-surface));
+}
+.lcard--shut {
+  /* Frame 13:3916: 48 high (14 + 18 content + border); the 22 px grip and buttons need 12 here for the same height. */
+  padding-block: 12px;
 }
 .lcard--over {
   box-shadow: 0 -3px 0 0 rgb(var(--v-theme-primary));

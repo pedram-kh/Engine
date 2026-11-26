@@ -330,7 +330,7 @@ onBeforeUnmount(() => {
   width: 68px;
   height: 68px;
   padding: 0;
-  border: 1px dashed rgb(var(--v-theme-border-color));
+  border: 1px dashed rgb(var(--v-theme-outline));
   border-radius: 6px;
   background: transparent;
   font: inherit;
@@ -353,7 +353,7 @@ onBeforeUnmount(() => {
   gap: 3px;
   min-height: 58px;
   padding: 14px 12px;
-  border: 1px dashed rgb(var(--v-theme-border-color));
+  border: 1px dashed rgb(var(--v-theme-outline));
   border-radius: 8px;
   background: color-mix(in srgb, rgb(var(--v-theme-surface-bright)) 40%, transparent);
   font: inherit;

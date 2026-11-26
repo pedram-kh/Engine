@@ -69,7 +69,7 @@ const { url, failed } = useAuthenticatedImage(() =>
   height: 68px;
   padding: 0;
   overflow: hidden;
-  border: 1px solid rgb(var(--v-theme-border-color));
+  border: 1px solid rgb(var(--v-theme-outline));
   border-radius: 6px;
   background: rgb(var(--v-theme-surface-bright));
   cursor: zoom-in;

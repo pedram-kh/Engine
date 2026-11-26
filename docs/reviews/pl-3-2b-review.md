@@ -36,3 +36,4 @@ Tip `f71bd674`, run `45737913339`: Frontend, Backend, E2E admin SPA and E2E main
 ## 8. Stage 2 progress log
 
 - Step 1 done (2026-11-26): databases listed (`pl32_e2e` already absent, nothing to drop); `catalyst_test` is the CI/PG-leg throwaway (docs/07-TESTING.md); production-404 gate is `GatingTest` H1 (16 pass, sqlite); tech-debt rows 60 and 61 present.
+- Step 3 (Ruling 10) started: frame read (13:3696, 3803, 3916, 3936, 3379, 3689); VISUAL fixes: collapsed height 48, chevron on the right, image borders from the outline token (#3a3a40). Table in the final report.
