@@ -209,6 +209,11 @@ async function moveBroll(lineId: string, brollId: string, delta: -1 | 1): Promis
 
 function dismissGhost(id: string): void {
   ghosts.value.delete(id)
+  // A card that found out it is gone on its own save (the list was not refreshed) is still in the list: take it out for good.
+  if (props.script.lines.some((l) => l.id === id)) {
+    deletedByMe.add(id)
+    emit('refresh')
+  }
 }
 function startsOpen(id: string): boolean {
   return justAdded.value.has(id) || lines.value.length <= 3

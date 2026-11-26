@@ -306,6 +306,11 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll, refresh }
           </div>
         </div>
         <div class="sed__tools">
+          <ScriptLanguageToggle
+            :languages="script.languages"
+            :view="view"
+            @update:view="(v: LanguageView) => (wanted = v)"
+          />
           <span
             class="sed__save"
             :class="`sed__save--${chip.kind}`"
@@ -340,12 +345,6 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll, refresh }
         <span class="sed__pill" data-test="script-status-pill">{{
           t('app.strategy.scripts.rail.draft')
         }}</span>
-        <ScriptLanguageToggle
-          class="sed__lang"
-          :languages="script.languages"
-          :view="view"
-          @update:view="(v: LanguageView) => (wanted = v)"
-        />
       </div>
 
       <v-alert
@@ -572,9 +571,6 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll, refresh }
   flex-direction: column;
   gap: 12px;
 }
-.sed__lang {
-  margin-inline-start: auto;
-}
 .sed__live {
   position: absolute;
   width: 1px;
@@ -624,6 +620,9 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll, refresh }
   .sed__head {
     flex-direction: column;
     align-items: flex-start;
+  }
+  .sed__tools {
+    flex-wrap: wrap;
   }
 }
 </style>
