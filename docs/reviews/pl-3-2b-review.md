@@ -28,3 +28,7 @@ Break-reverts: `pl-3-2b-break-reverts.md` (36 mutations; the layered-defence cas
 ## 6. Not run, not read
 
 Production scheduler, queue and GD GIF support are not read. No browser walk (Stage 2).
+
+## 7. CI
+
+Tip `f71bd674`, run `45737913339`: Frontend, Backend, E2E admin SPA and E2E main SPA all success. (Run `45737901879` on the earlier plan commit `77d5e73b` was cancelled by this push.)
