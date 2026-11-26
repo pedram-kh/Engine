@@ -89,6 +89,16 @@ describe('ScriptImageField (PL-3.2b)', () => {
     expect(strategyApi.initScriptImage).not.toHaveBeenCalled()
   })
 
+  it('choosing more files than the block has room for: the first fits, the rest are refused by name', async () => {
+    vi.mocked(strategyApi.initScriptImage).mockRejectedValue(new Error('network'))
+    const w = await mountField(9)
+    await pick(w, [file('one.png', 'image/png'), file('two.png', 'image/png')])
+    expect(strategyApi.initScriptImage).toHaveBeenCalledTimes(1)
+    const notices = w.get('[data-test="f-upload-notices"]').text()
+    expect(notices).toContain('two.png')
+    expect(notices).not.toContain('one.png was not added')
+  })
+
   it('an accepted file asks the server for a reservation with its block, type and size', async () => {
     vi.mocked(strategyApi.initScriptImage).mockRejectedValue(new Error('network'))
     const w = await mountField(0)

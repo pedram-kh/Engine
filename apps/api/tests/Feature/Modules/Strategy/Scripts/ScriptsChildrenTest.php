@@ -86,6 +86,30 @@ it('A1: archive and restore keep every child and every stored object', function 
         ->and($shown->json('data.lines.1.images'))->toHaveCount(1)->and($shown->json('data.hooks.0.images'))->toHaveCount(1);
 });
 
+it('A1: the archived list counts each script\'s own lines and READY images (a reservation that was never completed is not an image)', function (): void {
+    $w = SF::world();
+    [$full] = pl32bFullScript($w); // 3 hooks, 2 lines, 2 ready images
+    [$slot] = SF::slot($w);
+    $other = SF::api($w, 'SK', $slot);
+    $script = WaveScript::query()->where('ulid', $other)->firstOrFail();
+    SF::line($script, 0, 'One');
+    SF::line($script, 1, 'Two');
+    SF::line($script, 2, 'Three');
+    // reserved but never completed: it must not be counted
+    S::call($w['staff'], 'POST', SF::url($w, "{$other}/images/uploads/init"), [
+        'block' => 'line', 'id' => $script->lines()->firstOrFail()->ulid, 'mime_type' => 'image/png', 'declared_bytes' => 100, 'original_filename' => 'later.png',
+    ])->assertCreated();
+    SF::rearm();
+
+    S::call($w['admin'], 'POST', SF::url($w, "{$full}/archive"))->assertOk();
+    S::call($w['admin'], 'POST', SF::url($w, "{$other}/archive"))->assertOk();
+
+    $rows = collect(S::call($w['admin'], 'GET', SF::url($w, 'archived').'?market='.$w['mk']['SK'])->assertOk()->json('data'))->keyBy('id');
+    expect($rows)->toHaveCount(2)
+        ->and($rows[$full])->toMatchArray(['hooks' => 3, 'lines' => 2, 'images' => 2])
+        ->and($rows[$other])->toMatchArray(['hooks' => 3, 'lines' => 3, 'images' => 0]);
+});
+
 it('A1: an archived script is read-only: its lines, B-roll and images cannot be changed or added until it is restored', function (): void {
     $w = SF::world();
     [$id] = pl32bFullScript($w);

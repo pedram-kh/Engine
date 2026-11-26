@@ -48,3 +48,27 @@ Databases: **sqlite `:memory:`** (the default of `phpunit.xml`) for every row ex
 - **Role check on the line, B-roll and image routes.** `Gate::authorize('manageScripts')` is "any agency role", which is the same as being a member of the agency, and a non-member is already a 404 before the policy is reached (the same shape as the PL-3.2a routes). Removing the gate from one route therefore changes nothing a test can see. There is no agency user without a role to test it with. I did not claim a break-revert for it.
 - **P1 on Postgres only:** the CHECKs and composite keys do not exist on sqlite, so those two ran on `pl32b_test`.
 - The H1 break-revert covers the production check of the middleware. The provider's own "do not register the routes in production" layer is untouched and was not mutated here (it was the PL-0 gate).
+
+## Stage 2 (web) and the archived counts
+
+Same method: break the code, show the specs red, restore from git, show them green. Databases: Vitest has no database; the API rows ran on sqlite `:memory:`; the archived-counts test also passed whole on PostgreSQL `pl32b_test` (102 tests of `Scripts/`, dropped afterwards). The `catalyst` database was not touched.
+
+| Gate | What was broken                                                               | Tests run                                    | Mutated (red)                                                      | Restored (green) |
+| ---- | ----------------------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------ | ---------------- |
+| AC1  | archived list: `lines` counted from the hooks                                 | `ScriptsChildrenTest`                        | 2 failed, 6 ok                                                     | 8 passed         |
+| AC2  | archived list: images counted without the READY filter (a reservation counts) | `ScriptsChildrenTest`                        | 1 failed, 7 ok                                                     | 8 passed         |
+| AC3  | archived list: every script gets the sum of all images                        | `ScriptsChildrenTest`                        | 1 failed, 7 ok                                                     | 8 passed         |
+| U1   | reorder: every answer confirmed (moves not folded)                            | `useReorder.spec`                            | 1 failed, 2 ok                                                     | 3 passed         |
+| U2   | reorder: a refusal swallowed                                                  | `useReorder.spec`                            | 1 failed, 2 ok                                                     | 3 passed         |
+| U3   | lines: Add never off at 30 of 30                                              | `ScriptLinesSection.spec`                    | 1 failed, 6 ok                                                     | 7 passed         |
+| U4   | lines: limit text from 20 instead of 25                                       | `ScriptLinesSection.spec`                    | 1 failed, 6 ok                                                     | 7 passed         |
+| U5   | languages dialog: no cap on local languages                                   | `ScriptLanguagesDialog.spec`                 | 1 failed, 4 ok                                                     | 5 passed         |
+| U6   | images: a wrong type accepted                                                 | `ScriptImageField.spec`, `scriptsLogic.spec` | 1 failed, 12 ok                                                    | 13 passed        |
+| U7   | images: the 300 MB of the script not checked                                  | `ScriptImageField.spec`                      | 1 failed, 5 ok                                                     | 6 passed         |
+| U8   | images: the block-full check removed                                          | `ScriptImageField.spec`                      | **6 passed (not detected)**, then a test was added: 1 failed, 6 ok | 7 passed         |
+| U9   | language toggle drawn for an English-only market                              | `ScriptLanguageToggle.spec`                  | 1 failed, 3 ok                                                     | 4 passed         |
+| U10  | CTA chip on every line                                                        | `ScriptLineCard.spec`                        | 1 failed, 5 ok                                                     | 6 passed         |
+| U11  | a line deleted elsewhere no longer shows the box                              | `ScriptLineCard.spec`                        | 1 failed, 5 ok                                                     | 6 passed         |
+| U12  | reorder sends only one id instead of the whole list                           | `ScriptLinesSection.spec`                    | 1 failed, 6 ok                                                     | 7 passed         |
+
+Not mutated here (guarded by the browser spec or an earlier gate): English not removable (no Remove button exists for it; the dialog spec asserts that), the no-`v-html` rule (`noVHtml.spec`, PL-3.2a), the colour-literal gate (it was red on a hex literal in a comment and is green after the fix).
