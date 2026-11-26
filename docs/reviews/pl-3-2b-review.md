@@ -32,3 +32,7 @@ Production scheduler, queue and GD GIF support are not read. No browser walk (St
 ## 7. CI
 
 Tip `f71bd674`, run `45737913339`: Frontend, Backend, E2E admin SPA and E2E main SPA all success. (Run `45737901879` on the earlier plan commit `77d5e73b` was cancelled by this push.)
+
+## 8. Stage 2 progress log
+
+- Step 1 done (2026-11-26): databases listed (`pl32_e2e` already absent, nothing to drop); `catalyst_test` is the CI/PG-leg throwaway (docs/07-TESTING.md); production-404 gate is `GatingTest` H1 (16 pass, sqlite); tech-debt rows 60 and 61 present.
