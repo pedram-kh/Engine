@@ -23,6 +23,16 @@ export const PERSONA_REF: ScriptPersonaRef = {
   color_key: 'blue',
 }
 
+export const LIMITS = {
+  scripts_per_creator: 3,
+  hooks_per_script: 6,
+  lines_per_script: 30,
+  broll_per_script: 12,
+  images_per_block: 10,
+  image_total_bytes: 300 * 1024 * 1024,
+  local_languages_per_market: 3,
+}
+
 export function makeHook(n: number, over: Partial<ScriptHook> = {}): ScriptHook {
   return {
     id: HOOK_ID(n),
@@ -31,6 +41,7 @@ export function makeHook(n: number, over: Partial<ScriptHook> = {}): ScriptHook 
     shot_type: null,
     visual_description: null,
     texts: { audio: {}, overlay: {} },
+    images: [],
     revision: 1,
     ...over,
   }
@@ -66,7 +77,11 @@ export function makeScript(n = 1, over: Partial<WaveScript> = {}): WaveScript {
       duration_seconds: 30,
       revision: 1,
     },
+    languages: ['en'],
     hooks: [makeHook(1), makeHook(2), makeHook(3)],
+    lines: [],
+    usage: { hooks: 3, lines: 0, broll: 0, image_bytes: 0 },
+    limits: LIMITS,
     estimate: { words: 40, seconds: 16 },
     updated_at: '2026-11-24T09:00:00.000000Z',
     ...over,
@@ -129,7 +144,7 @@ export function makeOverview(
       creators,
       notes: 0,
     },
-    limits: { scripts_per_creator: 3, hooks_per_script: 6 },
+    limits: LIMITS,
   }
 }
 
@@ -138,6 +153,8 @@ export function makeArchived(n: number, over: Partial<ArchivedScript> = {}): Arc
     id: SCRIPT_ID(900 + n),
     number: n,
     hooks: 3,
+    lines: 2,
+    images: 1,
     creator: {
       id: `01CREA${String(900 + n).padStart(20, '0')}`,
       is_erased: false,
@@ -153,7 +170,7 @@ export function makeArchived(n: number, over: Partial<ArchivedScript> = {}): Arc
 }
 
 /** A 409 `wave_script.conflict`: the block as it is now (built from the real envelope, so `details[0].meta` is what the screen reads). */
-export function conflict(block: 'brief' | 'hook', current: unknown): ApiError {
+export function conflict(block: 'brief' | 'hook' | 'line', current: unknown): ApiError {
   return ApiError.fromEnvelope(409, {
     errors: [{ code: 'wave_script.conflict', title: 'conflict', meta: { block, current } }],
   })

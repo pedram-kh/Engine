@@ -15,7 +15,14 @@ import { strategyApi, type WaveScope } from '../api/strategy.api'
 import { useBlockAutosave } from '../composables/useBlockAutosave'
 import { useRegisterBlock } from '../composables/useSaveRegistry'
 import { MENU_PROPS } from '../constants'
-import { briefPayload, briefValue, sameBrief, type BriefValue } from '../scriptsLogic'
+import {
+  briefPayload,
+  briefValue,
+  estimateFallbackLanguage,
+  languageName,
+  sameBrief,
+  type BriefValue,
+} from '../scriptsLogic'
 import AutoGrowTextarea from './AutoGrowTextarea.vue'
 import BlockConflict from './BlockConflict.vue'
 import BlockStatusLine from './BlockStatusLine.vue'
@@ -30,7 +37,7 @@ const props = defineProps<{
   debounceMs?: number
 }>()
 const emit = defineEmits<{ saved: [script: WaveScript] }>()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const block = useBlockAutosave<BriefValue>({
   remote: () => ({ value: briefValue(props.script.brief), revision: props.script.brief.revision }),
@@ -82,6 +89,7 @@ function useLive(): void {
 }
 
 const estimate = computed(() => props.script.estimate)
+const fallbackLanguage = computed(() => estimateFallbackLanguage(props.script))
 const sourceLabel = computed(() => {
   const a = brief.value.angle
   if (a.custom && !block.draft.value.reset) return t('app.strategy.scripts.brief.angleOwn')
@@ -238,6 +246,16 @@ const theirsLines = computed(() => {
           ? t('app.strategy.scripts.brief.estimate', { n: estimate.seconds })
           : t('app.strategy.scripts.brief.noEstimate')
       }}</span>
+      <span
+        v-if="estimate.words > 0 && fallbackLanguage !== null"
+        class="sbrief__estimate-hint"
+        data-test="script-estimate-hint"
+        >{{
+          t('app.strategy.scripts.lang.estimateFallback', {
+            language: languageName(fallbackLanguage, locale),
+          })
+        }}</span
+      >
     </div>
 
     <BlockConflict
@@ -435,6 +453,10 @@ const theirsLines = computed(() => {
 }
 .sbrief__duration:hover {
   background: rgb(var(--v-theme-surface-bright));
+}
+.sbrief__estimate-hint {
+  font-size: 11.5px;
+  color: rgb(var(--v-theme-text-tertiary, var(--v-theme-on-surface-variant)));
 }
 .sbrief__estimate {
   font-size: 12px;

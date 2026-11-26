@@ -1,22 +1,37 @@
 <script setup lang="ts">
 /**
- * PL-3.2a — the editor of one script (frame 13:3108, the middle column): the title row, the workflow bar (one read-only "Draft"
- * pill until PL-3.3), the brief and the hooks. The script's Lines, B-roll and images are PL-3.2b: nothing is drawn for them
- * here. It loads the script it is given and is re-created (keyed) for another script, after the page flushed the old one.
+ * PL-3.2a, PL-3.2b — the editor of one script (frame 13:3108, the middle column): the title row, the workflow bar (the read-only
+ * "Draft" pill until PL-3.3, and the language control), the brief, the hooks and the lines. The editor holds the script and takes
+ * every answer into it: a block save merges only what it changed (a late answer never puts older text back), a structural answer
+ * (add, delete, order) replaces the script. It loads the script it is given and is re-created (keyed) for another script, after the page flushed the old one.
  * Every block autosaves on its own; the chip in the title row is the worst state of all of them.
  */
 import type { ScriptsOverview, WaveScript } from '@catalyst/api-client'
+import { ApiError } from '@catalyst/api-client'
 import { SCRIPT_TEXT_LIMITS } from '@catalyst/api-client'
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { creatorLabel } from '@/core/creators/creatorLabel'
 import { brandColorVar } from '@/modules/agency/composables/brandColor'
 import { strategyApi, type WaveScope } from '../api/strategy.api'
+import { useBlockDrag } from '../composables/useBlockDrag'
+import { useReorder } from '../composables/useReorder'
 import { provideSaveRegistry } from '../composables/useSaveRegistry'
+import {
+  allImages,
+  applyHookOrder,
+  localLanguages,
+  moveBefore,
+  moveId,
+  normalizeView,
+  type LanguageView,
+} from '../scriptsLogic'
 import { isGone, strategyErrorMessage } from '../strategyErrors'
 import ScriptBrief from './ScriptBrief.vue'
 import ScriptHookCard from './ScriptHookCard.vue'
+import ScriptLanguageToggle from './ScriptLanguageToggle.vue'
+import ScriptLinesSection from './ScriptLinesSection.vue'
 import StrategyConfirmDialog from './StrategyConfirmDialog.vue'
 
 type Route = { name: string; params: Record<string, string>; query: Record<string, string> }
@@ -61,6 +76,28 @@ async function load(): Promise<void> {
 }
 onMounted(load)
 
+/** Reads the script again WITHOUT the skeleton (an image changed, a stale order, a language change): what a person is typing stays. */
+async function refresh(): Promise<void> {
+  try {
+    script.value = (await strategyApi.script(props.scope, props.scriptId)).data
+  } catch (err) {
+    if (isGone(err)) emit('gone')
+  }
+}
+
+// The language view: one language, or English beside one local language. It follows the script's languages when they change.
+const wanted = ref<LanguageView | null>(null)
+const view = computed<LanguageView>(() => {
+  const langs = script.value?.languages ?? ['en']
+  const local = localLanguages(langs)
+  const base: LanguageView =
+    wanted.value ??
+    (local[0] !== undefined
+      ? { mode: 'side', local: local[0] }
+      : { mode: 'single', language: 'en' })
+  return normalizeView(base, langs)
+})
+
 // Only what a save changed is merged in: a late answer must never put an older hook list or brief back.
 function onBriefSaved(s: WaveScript): void {
   const cur = script.value
@@ -84,10 +121,74 @@ function onHookSaved(s: WaveScript): void {
       return next !== undefined && next.revision > h.revision ? next : h
     }),
     estimate: s.estimate,
+    usage: s.usage,
     updated_at: s.updated_at,
     revision: s.revision,
   }
 }
+function onLineSaved(s: WaveScript): void {
+  const cur = script.value
+  if (cur === null) return
+  const byId = new Map(s.lines.map((l) => [l.id, l]))
+  script.value = {
+    ...cur,
+    lines: cur.lines.map((l) => {
+      const next = byId.get(l.id)
+      return next !== undefined && next.revision > l.revision ? next : l
+    }),
+    estimate: s.estimate,
+    usage: s.usage,
+    updated_at: s.updated_at,
+    revision: s.revision,
+  }
+}
+function replaceScript(s: WaveScript): void {
+  script.value = s
+}
+
+// Hooks: reorder by drag, keyboard and menu. A move shows at once and sends the whole list; a stale list reloads the order.
+const hookNotice = ref<string | null>(null)
+const hookLive = ref('')
+const hookOrder = useReorder({
+  optimistic: (ids) => {
+    if (script.value !== null)
+      script.value = { ...script.value, hooks: applyHookOrder(script.value.hooks, ids) }
+  },
+  send: async (ids) => (await strategyApi.orderHooks(props.scope, props.scriptId, ids)).data,
+  confirmed: (s) => (script.value = s),
+  failed: (err) => {
+    void refresh()
+    hookNotice.value =
+      err instanceof ApiError && err.code === 'wave_script.order_mismatch'
+        ? t('app.strategy.scripts.order.changedElsewhere')
+        : strategyErrorMessage(err, t)
+  },
+})
+function moveHook(id: string, delta: -1 | 1): void {
+  if (script.value === null) return
+  hookNotice.value = null
+  const ids = script.value.hooks.map((h) => h.id)
+  const next = moveId(ids, id, delta)
+  if (next.join() === ids.join()) return
+  hookOrder.request(next)
+  const at = next.indexOf(id)
+  hookLive.value = t('app.strategy.scripts.order.moved', {
+    name: t('app.strategy.scripts.hooks.hook', {
+      letter: String.fromCharCode(65 + ids.indexOf(id)),
+    }),
+    now: t('app.strategy.scripts.hooks.hook', { letter: String.fromCharCode(65 + at) }),
+  })
+  void nextTick().then(() =>
+    document.querySelector<HTMLElement>(`[data-test="script-hook-grip-${id}"]`)?.focus(),
+  )
+}
+const hookDrag = useBlockDrag((from, target) => {
+  if (script.value === null) return
+  hookNotice.value = null
+  const ids = script.value.hooks.map((h) => h.id)
+  const next = moveBefore(ids, from, target)
+  if (next.join() !== ids.join()) hookOrder.request(next)
+})
 
 async function structural(call: () => Promise<{ data: WaveScript }>): Promise<string | null> {
   actionError.value = null
@@ -172,7 +273,7 @@ function beforeUnload(e: BeforeUnloadEvent): void {
 onMounted(() => window.addEventListener('beforeunload', beforeUnload))
 onBeforeUnmount(() => window.removeEventListener('beforeunload', beforeUnload))
 
-defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll })
+defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll, refresh })
 </script>
 
 <template>
@@ -239,6 +340,12 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll })
         <span class="sed__pill" data-test="script-status-pill">{{
           t('app.strategy.scripts.rail.draft')
         }}</span>
+        <ScriptLanguageToggle
+          class="sed__lang"
+          :languages="script.languages"
+          :view="view"
+          @update:view="(v: LanguageView) => (wanted = v)"
+        />
       </div>
 
       <v-alert
@@ -284,7 +391,7 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll })
 
       <div class="sed__hooks" data-test="script-hooks">
         <ScriptHookCard
-          v-for="h in script.hooks"
+          v-for="(h, i) in script.hooks"
           :key="h.id"
           :hook="h"
           :script-id="script.id"
@@ -292,12 +399,56 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll })
           :can-delete="script.hooks.length > 1"
           :can-add="script.hooks.length < hooksMax"
           :limits="SCRIPT_TEXT_LIMITS"
+          :languages="script.languages"
+          :view="view"
+          :index="i"
+          :count="script.hooks.length"
+          :image-limits="{
+            images: script.limits.images_per_block,
+            bytes: script.limits.image_total_bytes,
+          }"
+          :script-bytes="script.usage.image_bytes"
+          :dragging="hookDrag.dragging.value"
+          :over="hookDrag.over.value"
           :remove-fn="() => removeHook(h.id)"
           :debounce-ms="debounceMs"
           @saved="onHookSaved"
           @duplicate="duplicateHook(h.id)"
+          @move="(d: -1 | 1) => moveHook(h.id, d)"
+          @dragstart="(e: DragEvent) => hookDrag.start(h.id, e)"
+          @dragover="(e: DragEvent) => hookDrag.hover(h.id, e)"
+          @drop="(e: DragEvent) => hookDrag.drop(h.id, e)"
+          @dragend="hookDrag.end"
+          @images-changed="refresh"
         />
       </div>
+      <v-alert
+        v-if="hookNotice !== null"
+        type="info"
+        variant="tonal"
+        density="compact"
+        closable
+        data-test="script-hooks-notice"
+        @click:close="hookNotice = null"
+        >{{ hookNotice }}</v-alert
+      >
+      <p class="sed__live" role="status" aria-live="polite" data-test="script-hooks-live">
+        {{ hookLive }}
+      </p>
+
+      <ScriptLinesSection
+        :script="script"
+        :scope="scope"
+        :view="view"
+        :text-max="SCRIPT_TEXT_LIMITS.line"
+        :broll-max="SCRIPT_TEXT_LIMITS.broll"
+        :debounce-ms="debounceMs"
+        @replace="replaceScript"
+        @line-saved="onLineSaved"
+        @refresh="refresh"
+        @images-changed="refresh"
+        @gone="emit('gone')"
+      />
 
       <StrategyConfirmDialog
         v-model="archiveOpen"
@@ -305,11 +456,11 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll })
           t('app.strategy.scripts.editor.archiveTitle', { name: creatorName, n: script.number })
         "
         :body="
-          t(
-            'app.strategy.scripts.editor.archiveBody',
-            { count: script.hooks.length },
-            script.hooks.length,
-          )
+          t('app.strategy.scripts.editor.archiveBodyFull', {
+            hooks: script.hooks.length,
+            lines: script.lines.length,
+            images: allImages(script).length,
+          })
         "
         :confirm-label="t('app.strategy.scripts.editor.archiveConfirm')"
         :busy="archiving"
@@ -399,6 +550,7 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll })
 }
 .sed__flow {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   padding: 10px;
@@ -419,6 +571,20 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll })
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+.sed__lang {
+  margin-inline-start: auto;
+}
+.sed__live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 .sed__section {
   display: flex;

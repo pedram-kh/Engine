@@ -47,14 +47,28 @@ const CODE_KEYS: Record<string, string> = {
   'wave_script.restore_limit_reached': 'app.strategy.scripts.errors.restoreLimit',
   'wave_script.restore_creator_missing': 'app.strategy.scripts.errors.restoreCreatorMissing',
   'wave_script.last_hook': 'app.strategy.scripts.errors.lastHook',
-  'wave_script.language_not_available': 'app.strategy.scripts.errors.languageNotAvailable',
+  'wave_script.lines_limit': 'app.strategy.scripts.errors.linesLimit',
+  'wave_script.broll_limit': 'app.strategy.scripts.errors.brollLimit',
+  'wave_script.language_not_in_market': 'app.strategy.scripts.errors.languageNotInMarket',
+  'wave_script.language_limit': 'app.strategy.scripts.errors.languageLimit',
+  'wave_script.order_mismatch': 'app.strategy.scripts.order.changedElsewhere',
+  'wave_script.broll_gone': 'app.strategy.errors.conflict',
+  'wave_script_line.deleted': 'app.strategy.scripts.lines.goneTitle',
+  'wave_script_image.invalid': 'app.strategy.scripts.errors.imageFailed',
+  'wave_script_image.unknown_upload': 'app.strategy.scripts.errors.imageFailed',
+  'wave_script_image.already_completed': 'app.strategy.scripts.errors.imageFailed',
+  'wave_script_image.copy_failed': 'app.strategy.scripts.errors.imageCopyFailed',
+  'wave_script_image.delete_failed': 'app.strategy.scripts.errors.imageDeleteFailed',
   'wave_creator.scripts_choice_required': 'app.strategy.scripts.errors.choiceRequired',
   forbidden: 'app.strategy.errors.forbidden',
 }
 
-/** True when the server answered "not found": the card, the wave or the whole workspace is gone. */
+/**
+ * True when the server answered "not found": the card, the wave or the whole workspace is gone. A line that was deleted elsewhere
+ * (404 with its own code) is NOT this: the script is still there, only that line is not.
+ */
 export function isGone(err: unknown): boolean {
-  return err instanceof ApiError && err.status === 404
+  return err instanceof ApiError && err.status === 404 && err.code !== 'wave_script_line.deleted'
 }
 
 /** True for a server-side validation answer (HTTP 422 with no rule code of ours). */
@@ -116,6 +130,24 @@ export function strategyErrorMessage(err: unknown, t: Translate): string {
     }
     if (err.code === 'wave_script.hooks_limit') {
       return t('app.strategy.scripts.errors.hooksLimit', { max: num('max') ?? 6 })
+    }
+    if (err.code === 'wave_script.lines_limit') {
+      return t('app.strategy.scripts.errors.linesLimit', { max: num('max') ?? 30 })
+    }
+    if (err.code === 'wave_script.broll_limit') {
+      return t('app.strategy.scripts.errors.brollLimit', { max: num('max') ?? 12 })
+    }
+    if (err.code === 'wave_script.language_limit') {
+      return t('app.strategy.scripts.errors.languageLimit', { max: num('max') ?? 3 })
+    }
+    if (err.code === 'wave_script_image.limit_count') {
+      return t('app.strategy.scripts.errors.imageLimitCount', { max: num('max') ?? 10 })
+    }
+    if (err.code === 'wave_script_image.limit_bytes') {
+      const mb = (n: number | null): number => Math.round((n ?? 0) / (1024 * 1024))
+      return t('app.strategy.scripts.errors.imageLimitBytes', {
+        max: mb(num('max_bytes') ?? 300 * 1024 * 1024),
+      })
     }
     if (err.code === 'wave_creator.scripts_choice_required') {
       return t('app.strategy.scripts.errors.choiceRequired', { count: num('scripts') ?? 0 })

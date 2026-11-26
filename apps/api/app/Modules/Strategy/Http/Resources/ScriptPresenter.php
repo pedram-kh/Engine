@@ -332,7 +332,10 @@ final class ScriptPresenter
     public static function archived(Wave $wave, WaveMarket $market): array
     {
         $scripts = WaveScript::query()->where('wave_id', $wave->id)->where('market_id', $market->id)->whereNotNull('archived_at')
-            ->with('creator')->withCount('hooks')->orderBy('archived_at')->orderBy('id')->get();
+            ->with('creator')->withCount(['hooks', 'lines'])->orderBy('archived_at')->orderBy('id')->get();
+        // Ready reference images per script: one grouped read (the archive dialogs say what goes with a script).
+        $imageCounts = WaveScriptImage::query()->whereIn('script_id', $scripts->pluck('id')->all())->where('status', WaveScriptImage::READY)
+            ->selectRaw('script_id, count(*) as n')->groupBy('script_id')->pluck('n', 'script_id')->all();
         $creatorIds = $scripts->pluck('creator_id')->unique()->all();
         $inMarket = WaveCreator::query()->where('wave_id', $wave->id)->where('market_id', $market->id)->whereIn('creator_id', $creatorIds)->pluck('creator_id')->all();
         $liveByCreator = WaveScript::query()->where('wave_id', $wave->id)->whereIn('creator_id', $creatorIds)->whereNull('archived_at')
@@ -342,6 +345,8 @@ final class ScriptPresenter
             'id' => $s->ulid,
             'number' => $s->number,
             'hooks' => (int) $s->getAttribute('hooks_count'),
+            'lines' => (int) $s->getAttribute('lines_count'),
+            'images' => (int) ($imageCounts[$s->id] ?? 0),
             'creator' => self::creator($s->creator),
             'archived_at' => $s->archived_at?->toIso8601String(),
             // Archived scripts come back on their own when this creator is added to this market again.

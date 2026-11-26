@@ -37,7 +37,10 @@ describe('scriptsLogic (PL-3.2a)', () => {
   })
 
   it('a hook sends the whole block with its revision; an empty visual is null', () => {
-    const p = hookPayload({ shot: 'wide', visual: '', audio: 'hi', overlay: '' }, 7)
+    const p = hookPayload(
+      { shot: 'wide', visual: '', audio: 'hi', overlay: '', local: { audio: {}, overlay: {} } },
+      7,
+    )
     expect(p).toEqual({
       shot_type: 'wide',
       visual_description: null,

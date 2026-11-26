@@ -74,6 +74,10 @@ it('A1: archive and restore keep every child and every stored object', function 
     S::call($w['admin'], 'POST', SF::url($w, "{$id}/archive"))->assertOk();
     expect(pl32bCounts())->toBe($counts)->and(Storage::disk('media')->allFiles())->toBe($objects);
 
+    // The archived list says what goes with a script (the dialogs name lines and images where they name hooks).
+    $listed = S::call($w['admin'], 'GET', SF::url($w, 'archived').'?market='.$w['mk']['SK'])->assertOk()->json('data.0');
+    expect($listed)->toMatchArray(['id' => $id, 'hooks' => 3, 'lines' => 2, 'images' => 2]);
+
     S::call($w['admin'], 'POST', SF::url($w, "archived/{$id}/restore"))->assertOk();
     expect(pl32bCounts())->toBe($counts)->and(Storage::disk('media')->allFiles())->toBe($objects);
 

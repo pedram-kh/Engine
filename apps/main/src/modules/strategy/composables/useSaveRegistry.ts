@@ -25,6 +25,8 @@ export interface SaveRegistry {
   unregister: (id: string) => void
   state: ComputedRef<{ kind: 'saved' | 'saving' | 'stuck'; stuck: number }>
   unsaved: ComputedRef<boolean>
+  /** The status of one registered block, or undefined when it is not registered (the section uses it to keep a deleted line's text on screen). */
+  statusOf: (id: string) => BlockStatus | undefined
   /** Flushes every block; true when every one of them is saved afterwards. */
   flushAll: () => Promise<boolean>
 }
@@ -40,6 +42,7 @@ export function provideSaveRegistry(): SaveRegistry {
     unregister: (id) => void blocks.delete(id),
     state: computed(() => scriptSaveState(statuses.value)),
     unsaved: computed(() => statuses.value.some(isUnsaved)),
+    statusOf: (id) => blocks.get(id)?.status.value,
     flushAll: async () => {
       const results = await Promise.all([...blocks.values()].map((b) => b.flush()))
       return results.every(Boolean) && ![...blocks.values()].some((b) => isUnsaved(b.status.value))
@@ -55,4 +58,9 @@ export function useRegisterBlock(id: string, block: RegisteredBlock): void {
   if (registry === null) return
   registry.register(id, block)
   onBeforeUnmount(() => registry.unregister(id))
+}
+
+/** The open script's registry, or null outside an editor (a block read-only view needs no registry). */
+export function useSaveRegistryRead(): SaveRegistry | null {
+  return inject(KEY, null)
 }

@@ -10,7 +10,7 @@
 import { computed, onBeforeUnmount, ref, type ComputedRef, type Ref } from 'vue'
 
 import { classifyFailure, type BlockStatus } from '../scriptsLogic'
-import type { ScriptBrief, ScriptHook } from '@catalyst/api-client'
+import type { ScriptBrief, ScriptHook, ScriptLine } from '@catalyst/api-client'
 
 export interface BlockSnapshot<V> {
   value: V
@@ -24,8 +24,14 @@ export interface BlockAutosaveOptions<V> {
   save: (value: V, revision: number, base: V) => Promise<BlockSnapshot<V>>
   same: (a: V, b: V) => boolean
   /** Reads the block out of a 409's `current`. */
-  fromConflict: (current: ScriptBrief | ScriptHook) => BlockSnapshot<V> | null
+  fromConflict: (current: ScriptBrief | ScriptHook | ScriptLine) => BlockSnapshot<V> | null
   clone: (value: V) => V
+  /**
+   * Called when the server's copy changed while the block holds work of its own (it cannot adopt the new copy): returns the value
+   * with the STRUCTURE of the new copy (a row added elsewhere appears, a row deleted elsewhere goes) and everything else as it was.
+   * Applied to the draft AND to what the draft is compared with, so a structural change is never mistaken for an edit.
+   */
+  reconcile?: (value: V, remote: V) => V
   debounceMs?: number
   retryMs?: readonly number[]
 }
@@ -170,7 +176,14 @@ export function useBlockAutosave<V>(opts: BlockAutosaveOptions<V>): BlockAutosav
   }
 
   function syncRemote(): void {
-    if (status.value === 'dirty' || status.value === 'saving' || status.value === 'failed') return
+    if (status.value === 'dirty' || status.value === 'saving' || status.value === 'failed') {
+      if (opts.reconcile !== undefined) {
+        const r = opts.remote()
+        base.value = opts.reconcile(opts.clone(base.value), r.value)
+        draft.value = opts.reconcile(opts.clone(draft.value), r.value)
+      }
+      return
+    }
     if (status.value === 'conflict' || status.value === 'gone') return
     const r = opts.remote()
     if (r.revision < revision.value) return

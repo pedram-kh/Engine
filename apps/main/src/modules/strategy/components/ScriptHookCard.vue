@@ -1,11 +1,12 @@
 <script setup lang="ts">
 /**
- * PL-3.2a — one hook card (frame 13:3108, node 13:3457): header with "Hook A" and a menu (duplicate, delete) and a collapse
- * control; the audio hook, the visual hook (a shot type from the ten, plus a description) and the optional overlay. English only
- * until PL-3.2b; no reference images and no drag handle yet, so none is drawn. The card autosaves as one block with its own
- * revision. All text is plain text (auto-growing text boxes, and interpolations in the collapsed line and the conflict box).
+ * PL-3.2a, PL-3.2b — one hook card (frame 13:3108, node 13:3457): header with a grip, "Hook A" and a menu (duplicate, move up, move
+ * down, delete) and a collapse control; the audio hook and the optional overlay in the languages of the view (one column, or two
+ * side by side), the visual hook (a shot type from the ten, plus a description: English only) and the reference images. The
+ * card autosaves its texts, shot type and description as one block with its own revision; the images are separate requests (they
+ * save as they are added). All text is plain text.
  */
-import type { ScriptHook, ShotType, WaveScript } from '@catalyst/api-client'
+import type { ScriptHook, ScriptImage, ShotType, WaveScript } from '@catalyst/api-client'
 import { SHOT_TYPES } from '@catalyst/api-client'
 import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -14,11 +15,24 @@ import { strategyApi, type WaveScope } from '../api/strategy.api'
 import { useBlockAutosave } from '../composables/useBlockAutosave'
 import { useRegisterBlock } from '../composables/useSaveRegistry'
 import { MENU_PROPS } from '../constants'
-import { hookPayload, hookValue, sameHook, type HookValue } from '../scriptsLogic'
-import StrategyConfirmDialog from './StrategyConfirmDialog.vue'
+import {
+  EN,
+  hookPayload,
+  hookValue,
+  localLanguages,
+  quoteOf,
+  sameHook,
+  viewLanguages,
+  type HookValue,
+  type LanguageView,
+} from '../scriptsLogic'
 import AutoGrowTextarea from './AutoGrowTextarea.vue'
 import BlockConflict from './BlockConflict.vue'
+import BlockGrip from './BlockGrip.vue'
 import BlockStatusLine from './BlockStatusLine.vue'
+import ScriptImageField from './ScriptImageField.vue'
+import ScriptTextColumns from './ScriptTextColumns.vue'
+import StrategyConfirmDialog from './StrategyConfirmDialog.vue'
 
 const props = defineProps<{
   hook: ScriptHook
@@ -27,6 +41,18 @@ const props = defineProps<{
   canDelete: boolean
   canAdd: boolean
   limits: { audio: number; overlay: number; visual: number }
+  /** The script's languages (`en` first) and what the view shows of them. */
+  languages: string[]
+  view: LanguageView
+  /** Where this hook is in the list (for "Move up" and "Move down"). */
+  index: number
+  count: number
+  /** The image limits and the bytes the whole script holds. */
+  imageLimits: { images: number; bytes: number }
+  scriptBytes: number
+  /** The hook being dragged and the hook it is over (the list owns both). */
+  dragging: string | null
+  over: string | null
   /** Deletes the hook on the server; resolves with a message when it could not, null when it is gone. */
   removeFn: () => Promise<string | null>
   debounceMs?: number
@@ -34,34 +60,46 @@ const props = defineProps<{
 const emit = defineEmits<{
   saved: [script: WaveScript]
   duplicate: []
+  move: [delta: -1 | 1]
+  dragstart: [event: DragEvent]
+  dragover: [event: DragEvent]
+  drop: [event: DragEvent]
+  dragend: []
+  /** An image was added or removed (the editor reads the script again). */
+  imagesChanged: []
 }>()
 const { t } = useI18n()
 
 const block = useBlockAutosave<HookValue>({
-  remote: () => ({ value: hookValue(props.hook), revision: props.hook.revision }),
+  remote: () => ({ value: hookValue(props.hook, props.languages), revision: props.hook.revision }),
   save: async (value, revision) => {
     const res = (
       await strategyApi.saveHook(
         props.scope,
         props.scriptId,
         props.hook.id,
-        hookPayload(value, revision),
+        hookPayload(value, revision, props.languages),
       )
     ).data
     emit('saved', res)
     const mine = res.hooks.find((h) => h.id === props.hook.id)
     if (mine === undefined) throw new Error('hook missing in the answer')
-    return { value: hookValue(mine), revision: mine.revision }
+    return { value: hookValue(mine, props.languages), revision: mine.revision }
   },
   same: sameHook,
   fromConflict: (current) =>
-    'position' in current ? { value: hookValue(current), revision: current.revision } : null,
-  clone: (v) => ({ ...v }),
+    'letter' in current
+      ? { value: hookValue(current, props.languages), revision: current.revision }
+      : null,
+  clone: (v) => ({
+    ...v,
+    local: { audio: { ...v.local.audio }, overlay: { ...v.local.overlay } },
+  }),
   debounceMs: props.debounceMs,
 })
 useRegisterBlock(`hook:${props.hook.id}`, { status: block.status, flush: block.flush })
 watch(
-  () => props.hook,
+  () => [props.hook, props.languages] as const,
   () => block.syncRemote(),
 )
 
@@ -72,7 +110,20 @@ async function toggle(): Promise<void> {
 }
 defineExpose({ flush: block.flush })
 
-const overlayShown = ref(props.hook.texts.overlay.en !== undefined)
+const d = computed(() => block.draft.value)
+const columns = computed(() => viewLanguages(props.view))
+
+// The texts of every language, as the columns read them.
+const audioTexts = computed<Record<string, string>>(() => ({
+  [EN]: d.value.audio,
+  ...d.value.local.audio,
+}))
+const overlayTexts = computed<Record<string, string>>(() => ({
+  [EN]: d.value.overlay,
+  ...d.value.local.overlay,
+}))
+const hasOverlay = computed(() => Object.values(overlayTexts.value).some((x) => x !== ''))
+const overlayShown = ref(Object.values(overlayTexts.value).some((x) => x !== ''))
 async function showOverlay(): Promise<void> {
   overlayShown.value = true
   await nextTick()
@@ -80,28 +131,33 @@ async function showOverlay(): Promise<void> {
 }
 
 function setShot(code: ShotType): void {
-  block.edit((d) => {
-    d.shot = code
+  block.edit((v) => {
+    v.shot = code
   })
 }
-function setField(field: 'audio' | 'overlay' | 'visual', v: string): void {
-  block.edit((d) => {
-    d[field] = v
+function setVisual(v: string): void {
+  block.edit((x) => {
+    x.visual = v
+  })
+}
+function setText(field: 'audio' | 'overlay', language: string, v: string): void {
+  block.edit((x) => {
+    if (language === EN) x[field] = v
+    else x.local[field][language] = v
   })
 }
 
-const d = computed(() => block.draft.value)
-
-// Delete: a hook with anything in it (as the person sees it, saved or not) asks first; an empty one goes at once.
+// Delete: a hook with anything in it (as the person sees it, saved or not), or with images, asks first; an empty one goes at once.
 const confirmOpen = ref(false)
 const removing = ref(false)
 const removeError = ref<string | null>(null)
 const hasContent = computed(
   () =>
-    d.value.audio !== '' ||
     d.value.visual !== '' ||
-    d.value.overlay !== '' ||
-    d.value.shot !== null,
+    d.value.shot !== null ||
+    Object.values(audioTexts.value).some((x) => x !== '') ||
+    hasOverlay.value ||
+    props.hook.images.length > 0,
 )
 async function askRemove(): Promise<void> {
   removeError.value = null
@@ -125,13 +181,15 @@ const shotLabel = computed(() =>
     ? t('app.strategy.scripts.hooks.noShot')
     : t(`app.strategy.scripts.shot.${d.value.shot}`),
 )
-const summary = computed(() => d.value.audio.trim().replace(/\s+/g, ' '))
-function counter(len: number, max: number): boolean {
-  return len > max * 0.8
-}
+const summary = computed(() => quoteOf(audioTexts.value, props.languages))
+const images = computed<ScriptImage[]>(() => props.hook.images)
 
 const lineFor = (v: HookValue): { label: string; text: string }[] => [
   { label: t('app.strategy.scripts.hooks.audio'), text: v.audio },
+  ...localLanguages(props.languages).map((l) => ({
+    label: `${t('app.strategy.scripts.hooks.audio')} (${l.toUpperCase()})`,
+    text: v.local.audio[l] ?? '',
+  })),
   {
     label: t('app.strategy.scripts.hooks.visual'),
     text: [v.shot === null ? '' : t(`app.strategy.scripts.shot.${v.shot}`), v.visual]
@@ -139,15 +197,41 @@ const lineFor = (v: HookValue): { label: string; text: string }[] => [
       .join(' · '),
   },
   { label: t('app.strategy.scripts.hooks.overlay'), text: v.overlay },
+  ...localLanguages(props.languages).map((l) => ({
+    label: `${t('app.strategy.scripts.hooks.overlay')} (${l.toUpperCase()})`,
+    text: v.local.overlay[l] ?? '',
+  })),
 ]
 const mineLines = computed(() => lineFor(d.value))
 const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(block.theirs.value)))
 </script>
 
 <template>
-  <article class="hcard" :data-test="`script-hook-${hook.id}`" :data-letter="hook.letter">
+  <article
+    class="hcard"
+    :class="{
+      'hcard--over': over === hook.id && dragging !== null && dragging !== hook.id,
+      'hcard--dragging': dragging === hook.id,
+    }"
+    :data-test="`script-hook-${hook.id}`"
+    :data-letter="hook.letter"
+    data-block="hook"
+    @dragover="emit('dragover', $event)"
+    @drop="emit('drop', $event)"
+  >
     <header class="hcard__head">
       <div class="hcard__title">
+        <BlockGrip
+          :label="
+            t('app.strategy.scripts.order.grip', {
+              name: t('app.strategy.scripts.hooks.hook', { letter: hook.letter }),
+            })
+          "
+          :test-id="`script-hook-grip-${hook.id}`"
+          @move="(delta) => emit('move', delta)"
+          @dragstart="(e) => emit('dragstart', e)"
+          @dragend="emit('dragend')"
+        />
         <button
           type="button"
           class="hcard__collapse"
@@ -170,6 +254,15 @@ const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(b
         <span v-if="!open" class="hcard__summary" :data-test="`script-hook-summary-${hook.id}`">{{
           summary === '' ? t('app.strategy.scripts.hooks.empty') : `“${summary}”`
         }}</span>
+        <span
+          v-if="!open && images.length > 0"
+          class="hcard__imgchip"
+          :data-test="`script-hook-imgchip-${hook.id}`"
+        >
+          <v-icon icon="mdi-image-outline" size="12" aria-hidden="true" />{{
+            t('app.strategy.scripts.lines.imagesCount', { count: images.length })
+          }}
+        </span>
       </div>
       <div class="hcard__tools">
         <BlockStatusLine
@@ -200,6 +293,22 @@ const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(b
               <v-list-item-title>{{ t('app.strategy.scripts.hooks.duplicate') }}</v-list-item-title>
             </v-list-item>
             <v-list-item
+              :disabled="index === 0"
+              prepend-icon="mdi-arrow-up"
+              :data-test="`script-hook-up-${hook.id}`"
+              @click="emit('move', -1)"
+            >
+              <v-list-item-title>{{ t('app.strategy.scripts.order.up') }}</v-list-item-title>
+            </v-list-item>
+            <v-list-item
+              :disabled="index >= count - 1"
+              prepend-icon="mdi-arrow-down"
+              :data-test="`script-hook-down-${hook.id}`"
+              @click="emit('move', 1)"
+            >
+              <v-list-item-title>{{ t('app.strategy.scripts.order.down') }}</v-list-item-title>
+            </v-list-item>
+            <v-list-item
               :disabled="!canDelete"
               prepend-icon="mdi-delete-outline"
               :data-test="`script-hook-delete-${hook.id}`"
@@ -219,24 +328,15 @@ const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(b
             t('app.strategy.scripts.hooks.audio')
           }}
         </div>
-        <div class="hcard__field">
-          <span class="hcard__lang">EN</span>
-          <AutoGrowTextarea
-            :model-value="d.audio"
-            class="hcard__input"
-            :placeholder="t('app.strategy.scripts.hooks.audioPlaceholder')"
-            :aria-label="t('app.strategy.scripts.hooks.audio')"
-            :error="d.audio.length > limits.audio"
-            :data-test="`script-hook-audio-${hook.id}`"
-            @update:model-value="(v: string) => setField('audio', v)"
-          />
-          <span
-            v-if="counter(d.audio.length, limits.audio)"
-            class="hcard__count"
-            :class="{ 'hcard__count--over': d.audio.length > limits.audio }"
-            >{{ d.audio.length }} / {{ limits.audio }}</span
-          >
-        </div>
+        <ScriptTextColumns
+          :languages="columns"
+          :texts="audioTexts"
+          :max="limits.audio"
+          :placeholder="t('app.strategy.scripts.hooks.audioPlaceholder')"
+          :label="t('app.strategy.scripts.hooks.audio')"
+          :test-id="`script-hook-audio-${hook.id}`"
+          @edit="(language, v) => setText('audio', language, v)"
+        />
       </div>
 
       <div class="hcard__row">
@@ -286,10 +386,10 @@ const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(b
             :aria-label="t('app.strategy.scripts.hooks.visual')"
             :error="d.visual.length > limits.visual"
             :data-test="`script-hook-visual-${hook.id}`"
-            @update:model-value="(v: string) => setField('visual', v)"
+            @update:model-value="setVisual"
           />
           <span
-            v-if="counter(d.visual.length, limits.visual)"
+            v-if="d.visual.length > limits.visual * 0.8"
             class="hcard__count"
             :class="{ 'hcard__count--over': d.visual.length > limits.visual }"
             >{{ d.visual.length }} / {{ limits.visual }}</span
@@ -304,28 +404,19 @@ const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(b
           }}
           <span class="hcard__opt">{{ t('app.strategy.scripts.hooks.optional') }}</span>
         </div>
-        <div class="hcard__field">
-          <template v-if="overlayShown || d.overlay !== ''">
-            <span class="hcard__lang">EN</span>
-            <AutoGrowTextarea
-              :id="`hook-overlay-${hook.id}`"
-              :model-value="d.overlay"
-              class="hcard__input"
-              :placeholder="t('app.strategy.scripts.hooks.overlayPlaceholder')"
-              :aria-label="t('app.strategy.scripts.hooks.overlay')"
-              :error="d.overlay.length > limits.overlay"
-              :data-test="`script-hook-overlay-${hook.id}`"
-              @update:model-value="(v: string) => setField('overlay', v)"
-            />
-            <span
-              v-if="counter(d.overlay.length, limits.overlay)"
-              class="hcard__count"
-              :class="{ 'hcard__count--over': d.overlay.length > limits.overlay }"
-              >{{ d.overlay.length }} / {{ limits.overlay }}</span
-            >
-          </template>
+        <ScriptTextColumns
+          v-if="overlayShown || hasOverlay"
+          :languages="columns"
+          :texts="overlayTexts"
+          :max="limits.overlay"
+          :box-id="`hook-overlay-${hook.id}`"
+          :placeholder="t('app.strategy.scripts.hooks.overlayPlaceholder')"
+          :label="t('app.strategy.scripts.hooks.overlay')"
+          :test-id="`script-hook-overlay-${hook.id}`"
+          @edit="(language, v) => setText('overlay', language, v)"
+        />
+        <div v-else class="hcard__field">
           <button
-            v-else
             type="button"
             class="hcard__add-overlay"
             :data-test="`script-hook-add-overlay-${hook.id}`"
@@ -335,6 +426,18 @@ const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(b
           </button>
         </div>
       </div>
+
+      <ScriptImageField
+        :scope="scope"
+        :script-id="scriptId"
+        block="hook"
+        :block-id="hook.id"
+        :images="images"
+        :script-bytes="scriptBytes"
+        :limits="imageLimits"
+        :test-id="`script-hook-${hook.id}`"
+        @changed="emit('imagesChanged')"
+      />
 
       <BlockConflict
         v-if="block.status.value === 'conflict'"
@@ -348,7 +451,11 @@ const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(b
     <StrategyConfirmDialog
       v-model="confirmOpen"
       :title="t('app.strategy.scripts.hooks.deleteTitle', { letter: hook.letter })"
-      :body="t('app.strategy.scripts.hooks.deleteBody')"
+      :body="
+        images.length > 0
+          ? t('app.strategy.scripts.hooks.deleteBodyImages', { images: images.length })
+          : t('app.strategy.scripts.hooks.deleteBody')
+      "
       :confirm-label="t('app.strategy.scripts.hooks.deleteConfirm')"
       :busy="removing"
       :error="removeError"
@@ -416,11 +523,29 @@ const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(b
   font-size: 13px;
   color: rgb(var(--v-theme-on-surface-variant));
 }
+.hcard__imgchip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgb(var(--v-theme-surface-bright));
+  font-size: 11px;
+  line-height: normal;
+  color: rgb(var(--v-theme-on-surface-variant));
+}
 .hcard__tools {
   display: flex;
   align-items: center;
   gap: 8px;
   flex: none;
+}
+.hcard--over {
+  box-shadow: 0 -3px 0 0 rgb(var(--v-theme-primary));
+}
+.hcard--dragging {
+  opacity: 0.5;
 }
 .hcard__body {
   display: flex;

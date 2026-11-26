@@ -24,6 +24,10 @@ import type {
   ArchivedScript,
   ScriptBriefPayload,
   ScriptHookPayload,
+  ScriptImage,
+  ScriptImageInit,
+  ScriptLanguagesResource,
+  ScriptLinePayload,
   ScriptsOnRemove,
   ScriptsOnReplace,
   ScriptsOverview,
@@ -451,5 +455,115 @@ export const strategyApi = {
 
   deleteHook(s: WaveScope, scriptId: string, hookId: string): Promise<{ data: WaveScript }> {
     return http.delete<{ data: WaveScript }>(`${base(s)}/scripts/${scriptId}/hooks/${hookId}`)
+  },
+
+  // PL-3.2b — hooks order, lines, B-roll, reference images and the market's script languages.
+  orderHooks(s: WaveScope, scriptId: string, ids: string[]): Promise<{ data: WaveScript }> {
+    return http.put<{ data: WaveScript }>(`${base(s)}/scripts/${scriptId}/hooks/order`, { ids })
+  },
+
+  addLine(s: WaveScope, scriptId: string): Promise<{ data: WaveScript }> {
+    return http.post<{ data: WaveScript }>(`${base(s)}/scripts/${scriptId}/lines`)
+  },
+
+  saveLine(
+    s: WaveScope,
+    scriptId: string,
+    lineId: string,
+    payload: ScriptLinePayload,
+  ): Promise<{ data: WaveScript }> {
+    return http.put<{ data: WaveScript }>(`${base(s)}/scripts/${scriptId}/lines/${lineId}`, payload)
+  },
+
+  duplicateLine(s: WaveScope, scriptId: string, lineId: string): Promise<{ data: WaveScript }> {
+    return http.post<{ data: WaveScript }>(
+      `${base(s)}/scripts/${scriptId}/lines/${lineId}/duplicate`,
+    )
+  },
+
+  deleteLine(s: WaveScope, scriptId: string, lineId: string): Promise<{ data: WaveScript }> {
+    return http.delete<{ data: WaveScript }>(`${base(s)}/scripts/${scriptId}/lines/${lineId}`)
+  },
+
+  /** The complete ordered list of the script's line ids (a stale list is 422 `wave_script.order_mismatch`). */
+  orderLines(s: WaveScope, scriptId: string, ids: string[]): Promise<{ data: WaveScript }> {
+    return http.put<{ data: WaveScript }>(`${base(s)}/scripts/${scriptId}/lines/order`, { ids })
+  },
+
+  addBroll(s: WaveScope, scriptId: string, lineId: string): Promise<{ data: WaveScript }> {
+    return http.post<{ data: WaveScript }>(`${base(s)}/scripts/${scriptId}/lines/${lineId}/broll`)
+  },
+
+  deleteBroll(
+    s: WaveScope,
+    scriptId: string,
+    lineId: string,
+    brollId: string,
+  ): Promise<{ data: WaveScript }> {
+    return http.delete<{ data: WaveScript }>(
+      `${base(s)}/scripts/${scriptId}/lines/${lineId}/broll/${brollId}`,
+    )
+  },
+
+  orderBroll(
+    s: WaveScope,
+    scriptId: string,
+    lineId: string,
+    ids: string[],
+  ): Promise<{ data: WaveScript }> {
+    return http.put<{ data: WaveScript }>(
+      `${base(s)}/scripts/${scriptId}/lines/${lineId}/broll/order`,
+      { ids },
+    )
+  },
+
+  scriptLanguages(s: WaveScope, market: string): Promise<{ data: ScriptLanguagesResource }> {
+    return http.get<{ data: ScriptLanguagesResource }>(
+      `${base(s)}/markets/${market}/script-languages`,
+    )
+  },
+
+  /** The market's local languages, in order (English is always there and is not sent). */
+  setScriptLanguages(
+    s: WaveScope,
+    market: string,
+    languages: string[],
+  ): Promise<{ data: ScriptLanguagesResource }> {
+    return http.put<{ data: ScriptLanguagesResource }>(
+      `${base(s)}/markets/${market}/script-languages`,
+      { languages },
+    )
+  },
+
+  initScriptImage(
+    s: WaveScope,
+    scriptId: string,
+    payload: {
+      block: 'hook' | 'line'
+      id: string
+      mime_type: string
+      declared_bytes: number
+      original_filename: string
+    },
+  ): Promise<{ data: ScriptImageInit }> {
+    return http.post<{ data: ScriptImageInit }>(
+      `${base(s)}/scripts/${scriptId}/images/uploads/init`,
+      payload,
+    )
+  },
+
+  completeScriptImage(
+    s: WaveScope,
+    scriptId: string,
+    uploadId: string,
+  ): Promise<{ data: ScriptImage }> {
+    return http.post<{ data: ScriptImage }>(
+      `${base(s)}/scripts/${scriptId}/images/uploads/complete`,
+      { upload_id: uploadId },
+    )
+  },
+
+  deleteScriptImage(s: WaveScope, scriptId: string, imageId: string): Promise<unknown> {
+    return http.delete<unknown>(`${base(s)}/scripts/${scriptId}/images/${imageId}`)
   },
 }

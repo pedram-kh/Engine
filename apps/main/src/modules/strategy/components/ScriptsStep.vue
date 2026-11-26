@@ -6,7 +6,11 @@
  * own script. The editor's blocks autosave; this page keeps the leave guard: moving to another script, market, step or page asks
  * the editor to save first, and only when something still cannot be saved does a dialog let the person stay, retry or leave.
  */
-import type { ScriptsOverview, StrategySummaryResource } from '@catalyst/api-client'
+import type {
+  ScriptLanguagesResource,
+  ScriptsOverview,
+  StrategySummaryResource,
+} from '@catalyst/api-client'
 import { CEmptyState } from '@catalyst/ui'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -14,6 +18,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { strategyApi } from '../api/strategy.api'
 import { useStrategyContext } from '../composables/useStrategyContext'
+import { languageListLabel } from '../scriptsLogic'
 import { strategyErrorMessage } from '../strategyErrors'
 import { provideMarkets } from '../useMarkets'
 import ArchivedScriptsDialog from './ArchivedScriptsDialog.vue'
@@ -21,13 +26,14 @@ import MarketTabs from './MarketTabs.vue'
 import NotesPanel from './NotesPanel.vue'
 import NotesSheet from './NotesSheet.vue'
 import ScriptEditor from './ScriptEditor.vue'
+import ScriptLanguagesDialog from './ScriptLanguagesDialog.vue'
 import ScriptsLeaveDialog from './ScriptsLeaveDialog.vue'
 import ScriptsRail from './ScriptsRail.vue'
 
 const props = defineProps<{ summary: StrategySummaryResource }>()
 const emit = defineEmits<{ changed: [] }>()
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const { brandId, waveId, scope, canDecide } = useStrategyContext()
@@ -91,8 +97,39 @@ async function reload(): Promise<void> {
   emit('changed')
 }
 
-onMounted(load)
+// The market's script languages (English always, up to three local ones): the bar under the tabs and its dialog.
+const languages = ref<ScriptLanguagesResource | null>(null)
+const languagesOpen = ref(false)
+let langTicket = 0
+async function loadLanguages(): Promise<void> {
+  const s = scope.value
+  if (s === null || market.value === '') return
+  const mine = ++langTicket
+  try {
+    const res = await strategyApi.scriptLanguages(s, market.value)
+    if (mine === langTicket) languages.value = res.data
+  } catch {
+    if (mine === langTicket) languages.value = null
+  }
+}
+const languageLabel = computed(() =>
+  languageListLabel(['en', ...(languages.value?.languages.map((l) => l.code) ?? [])], locale.value),
+)
+function saveBeforeLanguages(): Promise<boolean> {
+  return editorRef.value?.flushAll() ?? Promise.resolve(true)
+}
+async function onLanguagesSaved(res: ScriptLanguagesResource): Promise<void> {
+  languages.value = res
+  await editorRef.value?.refresh()
+}
+
+onMounted(() => {
+  void load()
+  void loadLanguages()
+})
 watch(market, () => {
+  languages.value = null
+  void loadLanguages()
   pageError.value = null
   noteDraft.value = ''
   expanded.value = false
@@ -153,7 +190,11 @@ async function afterRemoved(): Promise<void> {
 const archivedOpen = ref(false)
 
 // The leave guard ------------------------------------------------------------------------------------------------
-const editorRef = ref<{ unsaved: boolean; flushAll: () => Promise<boolean> } | null>(null)
+const editorRef = ref<{
+  unsaved: boolean
+  flushAll: () => Promise<boolean>
+  refresh: () => Promise<void>
+} | null>(null)
 const leaveOpen = ref(false)
 const leaveBusy = ref(false)
 let leaveResolve: ((ok: boolean) => void) | null = null
@@ -225,6 +266,18 @@ watch(notesSheet, async (open, was) => {
         }}</span>
       </template>
     </MarketTabs>
+
+    <div v-if="languages !== null" class="sstep__langs" data-test="script-language-bar">
+      <span class="sstep__langs-label">{{ t('app.strategy.scripts.lang.barLabel') }}</span>
+      <span class="sstep__langs-list" data-test="script-language-list">{{ languageLabel }}</span>
+      <v-btn
+        variant="text"
+        size="small"
+        data-test="script-languages-open"
+        @click="languagesOpen = true"
+        >{{ t('app.strategy.scripts.lang.manage') }}</v-btn
+      >
+    </div>
 
     <v-skeleton-loader v-if="loading" type="article" data-test="scripts-skeleton" />
     <v-alert
@@ -367,6 +420,16 @@ watch(notesSheet, async (open, was) => {
       :max="max"
       @changed="reload"
     />
+    <ScriptLanguagesDialog
+      v-if="scope !== null && market !== ''"
+      v-model="languagesOpen"
+      :scope="scope"
+      :market="market"
+      :market-name="marketName"
+      :current="languages"
+      :before-save="saveBeforeLanguages"
+      @saved="onLanguagesSaved"
+    />
     <ScriptsLeaveDialog
       :model-value="leaveOpen"
       :busy="leaveBusy"
@@ -383,6 +446,20 @@ watch(notesSheet, async (open, was) => {
   flex-direction: column;
   gap: 16px;
   min-width: 0;
+}
+.sstep__langs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.sstep__langs-label {
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+.sstep__langs-list {
+  font-weight: 600;
+  color: rgb(var(--v-theme-on-surface));
 }
 .sstep__grid {
   display: grid;

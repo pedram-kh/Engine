@@ -135,7 +135,9 @@ async function doPurge(): Promise<void> {
         t('app.strategy.scripts.archived.title', { market: marketName })
       }}</v-card-title>
       <v-card-text class="px-6">
-        <p class="mb-3" data-test="archived-info">{{ t('app.strategy.scripts.archived.info') }}</p>
+        <p class="mb-3" data-test="archived-info">
+          {{ t('app.strategy.scripts.archived.infoFull') }}
+        </p>
         <v-skeleton-loader v-if="loading" type="list-item-two-line, list-item-two-line" />
         <v-alert
           v-else-if="failed"
@@ -155,7 +157,13 @@ async function doPurge(): Promise<void> {
                 {{ t('app.strategy.scripts.archived.row', { name: label(a), n: a.number }) }}
               </div>
               <div class="arch__meta">
-                {{ t('app.strategy.scripts.archived.hooks', { count: a.hooks }, a.hooks) }}
+                {{
+                  t('app.strategy.scripts.archived.counts', {
+                    hooks: a.hooks,
+                    lines: a.lines,
+                    images: a.images,
+                  })
+                }}
                 <template v-if="a.archived_at">
                   ·
                   {{
@@ -226,11 +234,13 @@ async function doPurge(): Promise<void> {
       :body="
         purging === null
           ? ''
-          : t(
-              'app.strategy.scripts.archived.deleteBody',
-              { name: label(purging), n: purging.number, count: purging.hooks },
-              purging.hooks,
-            )
+          : t('app.strategy.scripts.archived.deleteBodyFull', {
+              name: label(purging),
+              n: purging.number,
+              hooks: purging.hooks,
+              lines: purging.lines,
+              images: purging.images,
+            })
       "
       :confirm-label="t('app.strategy.scripts.archived.deleteConfirm')"
       :busy="purgeBusy"

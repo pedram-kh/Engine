@@ -31,7 +31,6 @@ const KEYS = [
   'app.strategy.scripts.editor.lastEdited',
   'app.strategy.scripts.editor.archive',
   'app.strategy.scripts.editor.archiveTitle',
-  'app.strategy.scripts.editor.archiveBody',
   'app.strategy.scripts.editor.archiveConfirm',
   'app.strategy.scripts.editor.loadFailed',
   'app.strategy.scripts.save.saving',
@@ -108,17 +107,14 @@ const KEYS = [
   'app.strategy.scripts.leave.retry',
   'app.strategy.scripts.leave.leave',
   'app.strategy.scripts.archived.title',
-  'app.strategy.scripts.archived.info',
   'app.strategy.scripts.archived.empty',
   'app.strategy.scripts.archived.row',
-  'app.strategy.scripts.archived.hooks',
   'app.strategy.scripts.archived.on',
   'app.strategy.scripts.archived.restore',
   'app.strategy.scripts.archived.restoreFull',
   'app.strategy.scripts.archived.creatorGone',
   'app.strategy.scripts.archived.delete',
   'app.strategy.scripts.archived.deleteTitle',
-  'app.strategy.scripts.archived.deleteBody',
   'app.strategy.scripts.archived.deleteConfirm',
   'app.strategy.scripts.replace.label',
   'app.strategy.scripts.replace.carry',
@@ -134,16 +130,109 @@ const KEYS = [
   'app.strategy.scripts.errors.limitReached',
   'app.strategy.scripts.errors.hooksLimit',
   'app.strategy.scripts.errors.lastHook',
-  'app.strategy.scripts.errors.languageNotAvailable',
   'app.strategy.scripts.errors.restoreLimit',
   'app.strategy.scripts.errors.restoreCreatorMissing',
   'app.strategy.scripts.errors.choiceRequired',
+  'app.strategy.scripts.hooks.deleteBodyImages',
+  'app.strategy.scripts.editor.archiveBodyFull',
+  'app.strategy.scripts.archived.infoFull',
+  'app.strategy.scripts.archived.counts',
+  'app.strategy.scripts.archived.deleteBodyFull',
+  'app.strategy.scripts.images.add',
+  'app.strategy.scripts.images.drop',
+  'app.strategy.scripts.images.failed',
+  'app.strategy.scripts.images.full',
+  'app.strategy.scripts.images.hint',
+  'app.strategy.scripts.images.label',
+  'app.strategy.scripts.images.open',
+  'app.strategy.scripts.images.progress',
+  'app.strategy.scripts.images.refusedBytes',
+  'app.strategy.scripts.images.refusedCount',
+  'app.strategy.scripts.images.refusedType',
+  'app.strategy.scripts.images.remove',
+  'app.strategy.scripts.images.removeBody',
+  'app.strategy.scripts.images.removeConfirm',
+  'app.strategy.scripts.images.removeTitle',
+  'app.strategy.scripts.images.retry',
+  'app.strategy.scripts.images.usage',
+  'app.strategy.scripts.lang.add',
+  'app.strategy.scripts.lang.alwaysOn',
+  'app.strategy.scripts.lang.barLabel',
+  'app.strategy.scripts.lang.dialogBody',
+  'app.strategy.scripts.lang.dialogTitle',
+  'app.strategy.scripts.lang.estimateFallback',
+  'app.strategy.scripts.lang.full',
+  'app.strategy.scripts.lang.keepNote',
+  'app.strategy.scripts.lang.manage',
+  'app.strategy.scripts.lang.remove',
+  'app.strategy.scripts.lang.removeShort',
+  'app.strategy.scripts.lang.removing',
+  'app.strategy.scripts.lang.sideBySide',
+  'app.strategy.scripts.lang.unsaved',
+  'app.strategy.scripts.lang.used',
+  'app.strategy.scripts.lang.view',
+  'app.strategy.scripts.lang.with',
+  'app.strategy.scripts.lines.add',
+  'app.strategy.scripts.lines.addShot',
+  'app.strategy.scripts.lines.broll',
+  'app.strategy.scripts.lines.collapse',
+  'app.strategy.scripts.lines.cta',
+  'app.strategy.scripts.lines.ctaLabel',
+  'app.strategy.scripts.lines.delete',
+  'app.strategy.scripts.lines.deleteBody',
+  'app.strategy.scripts.lines.deleteConfirm',
+  'app.strategy.scripts.lines.deleteTitle',
+  'app.strategy.scripts.lines.duplicate',
+  'app.strategy.scripts.lines.empty',
+  'app.strategy.scripts.lines.expand',
+  'app.strategy.scripts.lines.goneHint',
+  'app.strategy.scripts.lines.goneTitle',
+  'app.strategy.scripts.lines.imagesCount',
+  'app.strategy.scripts.lines.limit',
+  'app.strategy.scripts.lines.line',
+  'app.strategy.scripts.lines.lineCta',
+  'app.strategy.scripts.lines.menu',
+  'app.strategy.scripts.lines.noLines',
+  'app.strategy.scripts.lines.noShots',
+  'app.strategy.scripts.lines.script',
+  'app.strategy.scripts.lines.scriptPlaceholder',
+  'app.strategy.scripts.lines.shotDelete',
+  'app.strategy.scripts.lines.shotDescription',
+  'app.strategy.scripts.lines.shotDown',
+  'app.strategy.scripts.lines.shotLabel',
+  'app.strategy.scripts.lines.shotLimit',
+  'app.strategy.scripts.lines.shotPlaceholder',
+  'app.strategy.scripts.lines.shotType',
+  'app.strategy.scripts.lines.shotUp',
+  'app.strategy.scripts.lines.shotsCount',
+  'app.strategy.scripts.lines.shotsUsage',
+  'app.strategy.scripts.lines.title',
+  'app.strategy.scripts.lines.usage',
+  'app.strategy.scripts.order.changedElsewhere',
+  'app.strategy.scripts.order.down',
+  'app.strategy.scripts.order.grip',
+  'app.strategy.scripts.order.gripHint',
+  'app.strategy.scripts.order.moved',
+  'app.strategy.scripts.order.up',
+  'app.strategy.scripts.errors.linesLimit',
+  'app.strategy.scripts.errors.brollLimit',
+  'app.strategy.scripts.errors.languageNotInMarket',
+  'app.strategy.scripts.errors.languageLimit',
+  'app.strategy.scripts.errors.imageFailed',
+  'app.strategy.scripts.errors.imageCopyFailed',
+  'app.strategy.scripts.errors.imageDeleteFailed',
+  'app.strategy.scripts.errors.imageLimitCount',
+  'app.strategy.scripts.errors.imageLimitBytes',
   'app.waves.dialog.scriptsWarning',
   'app.waves.dialog.scriptsConfirm',
 ]
 
 /** `locale:key` pairs that are the same word as English on purpose (a loan word such as Persona, Overlay, Hook, POV, or a pattern of names and numbers). */
 const SAME_AS_ENGLISH_BY_DESIGN = new Set<string>([
+  'nl:app.strategy.scripts.lines.shotLabel',
+  'nl:app.strategy.scripts.lines.shotsCount',
+  'mt:app.strategy.scripts.lines.shotLabel',
+  'mt:app.strategy.scripts.lines.shotsCount',
   'da:app.strategy.scripts.hooks.title',
   'de:app.strategy.scripts.hooks.title',
   'el:app.strategy.scripts.hooks.title',
@@ -165,7 +254,6 @@ const SAME_AS_ENGLISH_BY_DESIGN = new Set<string>([
   'da:app.strategy.scripts.shot.close_up',
   'da:app.strategy.scripts.shot.pov',
   'da:app.strategy.scripts.archived.row',
-  'da:app.strategy.scripts.archived.hooks',
   'de:app.strategy.scripts.brief.persona',
   'de:app.strategy.scripts.brief.usps',
   'de:app.strategy.scripts.hooks.hook',
@@ -173,7 +261,6 @@ const SAME_AS_ENGLISH_BY_DESIGN = new Set<string>([
   'de:app.strategy.scripts.hooks.optional',
   'de:app.strategy.scripts.shot.detail',
   'de:app.strategy.scripts.shot.pov',
-  'de:app.strategy.scripts.archived.hooks',
   'el:app.strategy.scripts.brief.title',
   'el:app.strategy.scripts.brief.persona',
   'el:app.strategy.scripts.hooks.hook',
@@ -214,7 +301,6 @@ const SAME_AS_ENGLISH_BY_DESIGN = new Set<string>([
   'mt:app.strategy.scripts.hooks.hook',
   'mt:app.strategy.scripts.hooks.overlay',
   'mt:app.strategy.scripts.shot.close_up',
-  'mt:app.strategy.scripts.archived.hooks',
   'nl:app.strategy.scripts.stepper.count',
   'nl:app.strategy.scripts.rail.title',
   'nl:app.strategy.scripts.rail.script',
@@ -226,7 +312,6 @@ const SAME_AS_ENGLISH_BY_DESIGN = new Set<string>([
   'nl:app.strategy.scripts.shot.detail',
   'nl:app.strategy.scripts.shot.pov',
   'nl:app.strategy.scripts.archived.row',
-  'nl:app.strategy.scripts.archived.hooks',
   'pl:app.strategy.scripts.brief.title',
   'pl:app.strategy.scripts.brief.persona',
   'pl:app.strategy.scripts.hooks.hook',
@@ -243,7 +328,12 @@ const SAME_AS_ENGLISH_BY_DESIGN = new Set<string>([
   'sv:app.strategy.scripts.hooks.hook',
   'sv:app.strategy.scripts.hooks.overlay',
   'sv:app.strategy.scripts.shot.pov',
-  'sv:app.strategy.scripts.archived.hooks',
+])
+
+/** Keys that are the same loan word in every language on purpose ("B-roll", "CTA"). */
+const LOAN_KEYS = new Set<string>([
+  'app.strategy.scripts.lines.broll',
+  'app.strategy.scripts.lines.cta',
 ])
 
 type Bundle = Record<string, unknown>
@@ -267,9 +357,9 @@ function tokens(text: string): string[] {
   ].sort()
 }
 
-describe('PL-3.2a scripts strings', () => {
-  it('checks 123 keys across 24 locales', () => {
-    expect(KEYS).toHaveLength(123)
+describe('PL-3.2a, PL-3.2b scripts strings', () => {
+  it('checks 208 keys across 24 locales', () => {
+    expect(KEYS).toHaveLength(208)
     expect(UI_LOCALES).toHaveLength(24)
   })
 
@@ -316,7 +406,7 @@ describe('PL-3.2a scripts strings', () => {
     for (const locale of TARGETS) {
       const bundle = load(locale)
       for (const key of KEYS) {
-        if (SAME_AS_ENGLISH_BY_DESIGN.has(`${locale}:${key}`)) continue
+        if (LOAN_KEYS.has(key) || SAME_AS_ENGLISH_BY_DESIGN.has(`${locale}:${key}`)) continue
         if (valueAt(bundle, key) === valueAt(en, key)) offenders.push(`${locale}:${key}`)
       }
     }

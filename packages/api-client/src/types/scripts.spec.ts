@@ -37,6 +37,8 @@ describe('scripts types parity with the backend', () => {
       audio: read('HOOK_AUDIO'),
       overlay: read('HOOK_OVERLAY'),
       visual: read('HOOK_VISUAL'),
+      line: read('LINE_TEXT'),
+      broll: read('BROLL_DESCRIPTION'),
     })
   })
 })

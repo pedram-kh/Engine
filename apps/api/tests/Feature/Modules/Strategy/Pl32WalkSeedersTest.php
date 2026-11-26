@@ -87,12 +87,12 @@ it('S5: the 3.2b walk seed: languages, lines, B-roll and images through the serv
     $wave = pl32Wave();
     $count = static fn (string $table): int => DB::table($table)->where('wave_id', $wave->id)->count();
 
-    expect(DB::table('wave_market_script_languages')->where('wave_id', $wave->id)->orderBy('market_id')->orderBy('position')->pluck('language')->all())->toBe(['sk', 'hu', 'sv'])
-        ->and($count('wave_script_lines'))->toBe(4 + 30 + 1 + 1)
-        ->and($count('wave_script_broll'))->toBe(3 + 12 + 1)
-        ->and($count('wave_script_images'))->toBe(2 + 10)
-        ->and(DB::table('wave_script_images')->where('wave_id', $wave->id)->where('status', 'ready')->count())->toBe(12)
-        ->and(Storage::disk('media')->allFiles())->toHaveCount(24)
+    expect(DB::table('wave_market_script_languages')->where('wave_id', $wave->id)->orderBy('market_id')->orderBy('position')->pluck('language')->all())->toBe(['sk', 'hu'])
+        ->and($count('wave_script_lines'))->toBe(4 + 30 + 29 + 3 + 1 + 1 + 2)
+        ->and($count('wave_script_broll'))->toBe(3 + 12 + 11 + 1 + 1)
+        ->and($count('wave_script_images'))->toBe(2 + 10 + 9 + 2)
+        ->and(DB::table('wave_script_images')->where('wave_id', $wave->id)->where('status', 'ready')->count())->toBe(23)
+        ->and(Storage::disk('media')->allFiles())->toHaveCount(46)
         ->and(Feature::active(WavesEnabled::NAME))->toBeFalse()->and(Feature::active(StrategyEnabled::NAME))->toBeFalse()->and(Feature::active(CreatorsScriptsEnabled::NAME))->toBeFalse();
 
     $martin = DB::table('wave_scripts')->join('creators', 'creators.id', '=', 'wave_scripts.creator_id')->where('creators.display_name', 'Martin Kováč')->orderBy('wave_scripts.number')->value('wave_scripts.id');
