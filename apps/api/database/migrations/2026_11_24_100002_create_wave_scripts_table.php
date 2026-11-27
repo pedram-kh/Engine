@@ -63,6 +63,8 @@ return new class extends Migration
 
             $table->unsignedSmallInteger('number');
             $table->text('angle')->nullable();
+            // "The overall setting of the video" (walk ruling): optional English free text of the brief block, at most 500 characters (a service rule).
+            $table->text('setting')->nullable();
             $table->unsignedSmallInteger('duration_seconds')->default(30);
 
             // `revision` moves on EVERY change of the script or of any block of it (PL-3.3 reads it for "edited since").

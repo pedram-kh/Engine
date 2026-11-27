@@ -264,7 +264,7 @@ final class ScriptImageService
         if ($block === 'hook') {
             $hook = WaveScriptHook::query()->where('script_id', $script->id)->where('ulid', $ulid)->first();
             if ($hook === null) {
-                throw StrategyRuleViolation::conflict404();
+                throw StrategyRuleViolation::scriptHookDeleted();
             }
 
             return [$hook->id, null];

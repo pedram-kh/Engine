@@ -32,6 +32,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $archived_at
  * @property int $number
  * @property string|null $angle
+ * @property string|null $setting
  * @property int $duration_seconds
  * @property int $revision
  * @property int $brief_revision
@@ -56,7 +57,7 @@ final class WaveScript extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'agency_id', 'wave_id', 'market_id', 'creator_id', 'wave_creator_id', 'archived_at', 'number', 'angle', 'duration_seconds',
+        'agency_id', 'wave_id', 'market_id', 'creator_id', 'wave_creator_id', 'archived_at', 'number', 'angle', 'setting', 'duration_seconds',
         'revision', 'brief_revision', 'created_by_user_id', 'updated_by_user_id',
     ];
 

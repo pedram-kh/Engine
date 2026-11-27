@@ -56,11 +56,11 @@ final class ScriptLineService
 
     /**
      * Save one line block. `$changes` holds only the keys the request sent: `texts` (language => text, null or blank removes the
-     * row; the language must be English or one of the market's), `cta` (bool) and `broll` (row ulid => `{shot_type?, description?}`).
+     * row; the language must be English or one of the market's), `cta` (bool), `shot_type` and `visual_description` of the line itself, and `broll` (row ulid => `{shot_type?, description?}`).
      * A save that changes nothing writes nothing. A stale `$revision` with a real change is a 409; a row of the line that no longer
      * exists is a 409 `broll_gone`; a deleted line is the 404 "this line was deleted".
      *
-     * @param  array{texts?: array<string, string|null>, cta?: bool, broll?: array<string, array{shot_type?: string|null, description?: string|null}>}  $changes
+     * @param  array{texts?: array<string, string|null>, cta?: bool, shot_type?: string|null, visual_description?: string|null, broll?: array<string, array{shot_type?: string|null, description?: string|null}>}  $changes
      */
     public function update(Brand $brand, Wave $wave, User $actor, string $scriptUlid, string $lineUlid, array $changes, int $revision): WaveScript
     {
@@ -97,6 +97,13 @@ final class ScriptLineService
                 $fields[] = 'cta';
                 $cta = $changes['cta'];
             }
+            $own = [];
+            foreach (['shot_type', 'visual_description'] as $field) {
+                if (array_key_exists($field, $changes) && $changes[$field] !== $line->{$field}) {
+                    $fields[] = $field;
+                    $own[$field] = $changes[$field];
+                }
+            }
             $rowChanges = [];
             foreach ($changes['broll'] ?? [] as $ulid => $sent) {
                 $row = $rows->get((string) $ulid);
@@ -130,6 +137,9 @@ final class ScriptLineService
             if ($cta !== null) {
                 $line->cta = $cta;
             }
+            foreach ($own as $field => $value) {
+                $line->{$field} = $value;
+            }
             foreach ($rowChanges as $ulid => $values) {
                 $rows->get($ulid)?->forceFill($values)->save();
             }
@@ -140,7 +150,7 @@ final class ScriptLineService
                 action: AuditAction::WaveScriptLineUpdated,
                 actor: $actor,
                 subject: $script,
-                // Field NAMES only (`text:sk`, `cta`, `broll_shot_type`, `broll_description`): never the text.
+                // Field NAMES only (`text:sk`, `cta`, `shot_type`, `visual_description`, `broll_shot_type`, `broll_description`): never the text.
                 metadata: ['wave' => $locked->ulid, 'market' => ScriptGuard::marketUlid($script), 'script' => $script->ulid, 'number' => $script->number, 'line' => $line->ulid, 'fields' => array_values(array_unique($fields))],
                 agencyId: $locked->agency_id,
             );
@@ -168,6 +178,7 @@ final class ScriptLineService
             WaveScriptLine::query()->where('script_id', $script->id)->where('position', '>', $line->position)->increment('position');
             $copy = WaveScriptLine::query()->create([
                 'agency_id' => $locked->agency_id, 'wave_id' => $locked->id, 'script_id' => $script->id, 'position' => $line->position + 1, 'cta' => $line->cta,
+                'shot_type' => $line->shot_type, 'visual_description' => $line->visual_description,
             ]);
             foreach (WaveScriptLineText::query()->where('line_id', $line->id)->get() as $text) {
                 WaveScriptLineText::query()->create([

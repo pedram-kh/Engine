@@ -9,6 +9,7 @@ use App\Modules\Strategy\Models\WaveScriptLine;
 use App\Modules\Strategy\Models\WaveScriptLineText;
 use App\Modules\Strategy\StrategyLimits;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
@@ -341,4 +342,94 @@ it('the last line can be deleted (a script needs no line); the rest close the ga
     expect(array_column($res->json('data.lines'), 'number'))->toBe([2, 3])->and(pl32bIds($res))->toBe([$b->ulid, $c->ulid]);
     pl32bCall($w, 'DELETE', $id, "lines/{$b->ulid}")->assertOk();
     pl32bCall($w, 'DELETE', $id, "lines/{$c->ulid}")->assertOk()->assertJsonPath('data.lines', []);
+});
+
+it('L3: a line has an optional shot type and an optional English visual description; they save in the line block with its revision, are checked, copy on duplicate, never reach the audit as text and do not move the estimate', function (): void {
+    $w = SF::world();
+    $id = SF::api($w);
+    $res = pl32bCall($w, 'POST', $id, 'lines')->assertCreated();
+    $line = $res->json('data.lines.0');
+    expect($line)->toMatchArray(['shot_type' => null, 'visual_description' => null]);
+    $words = $res->json('data.estimate.words');
+
+    $saved = pl32bCall($w, 'PUT', $id, "lines/{$line['id']}", ['shot_type' => 'creator_to_camera', 'visual_description' => 'Creator holds the phone up', 'revision' => $line['revision']])->assertOk();
+    $now = $saved->json('data.lines.0');
+    expect($now)->toMatchArray(['shot_type' => 'creator_to_camera', 'visual_description' => 'Creator holds the phone up', 'revision' => $line['revision'] + 1])
+        ->and($saved->json('data.estimate.words'))->toBe($words);
+
+    // checked: a code outside the ten and more than 400 characters are refused, nothing changes
+    pl32bCall($w, 'PUT', $id, "lines/{$line['id']}", ['shot_type' => 'dolly_zoom', 'revision' => $now['revision']])->assertStatus(422);
+    pl32bCall($w, 'PUT', $id, "lines/{$line['id']}", ['visual_description' => str_repeat('x', 401), 'revision' => $now['revision']])->assertStatus(422);
+    // the stale revision with a real change is the conflict, and the line is untouched
+    pl32bCall($w, 'PUT', $id, "lines/{$line['id']}", ['shot_type' => 'wide', 'revision' => $line['revision']])->assertStatus(409);
+    expect(WaveScriptLine::query()->where('ulid', $line['id'])->value('shot_type'))->toBe('creator_to_camera');
+    // null clears both
+    pl32bCall($w, 'PUT', $id, "lines/{$line['id']}", ['shot_type' => null, 'visual_description' => null, 'revision' => $now['revision']])->assertOk();
+
+    // duplicate carries both
+    pl32bCall($w, 'PUT', $id, "lines/{$line['id']}", ['shot_type' => 'detail', 'visual_description' => 'Close on the bag', 'revision' => $now['revision'] + 1])->assertOk();
+    $dup = pl32bCall($w, 'POST', $id, "lines/{$line['id']}/duplicate")->assertCreated();
+    expect($dup->json('data.lines.1'))->toMatchArray(['shot_type' => 'detail', 'visual_description' => 'Close on the bag']);
+
+    // the audit rows carry the field NAMES, never the description
+    $meta = json_encode(DB::table('audit_logs')->where('action', 'wave_script_line.updated')->pluck('metadata')->all());
+    expect($meta)->toContain('visual_description')->and($meta)->not->toContain('Creator holds')->and($meta)->not->toContain('Close on the bag');
+});
+
+it('S1: "the overall setting of the video" is an optional brief field (500 characters, English), saved with the brief revision, in no audit row, and it survives archive and restore', function (): void {
+    $w = SF::world();
+    $id = SF::api($w);
+    expect(S::call($w['admin'], 'GET', SF::url($w, $id))->json('data.brief.setting'))->toBeNull();
+
+    pl32bCall($w, 'PUT', $id, 'brief', ['setting' => str_repeat('x', 501), 'revision' => 1])->assertStatus(422);
+    $saved = pl32bCall($w, 'PUT', $id, 'brief', ['setting' => 'At home in the kitchen, daylight', 'revision' => 1])->assertOk();
+    expect($saved->json('data.brief.setting'))->toBe('At home in the kitchen, daylight')->and($saved->json('data.brief.revision'))->toBe(2);
+    pl32bCall($w, 'PUT', $id, 'brief', ['setting' => str_repeat('y', 500), 'revision' => 2])->assertOk();
+    // a stale revision with a real change conflicts and the text stays
+    pl32bCall($w, 'PUT', $id, 'brief', ['setting' => 'late', 'revision' => 1])->assertStatus(409);
+    pl32bCall($w, 'PUT', $id, 'brief', ['setting' => null, 'revision' => 3])->assertOk();
+    pl32bCall($w, 'PUT', $id, 'brief', ['setting' => 'Kitchen counter', 'revision' => 4])->assertOk();
+
+    $meta = json_encode(DB::table('audit_logs')->where('action', 'wave_script.updated')->pluck('metadata')->all());
+    expect($meta)->toContain('setting')->and($meta)->not->toContain('Kitchen counter')->and($meta)->not->toContain('At home');
+
+    pl32bCall($w, 'POST', $id, 'archive')->assertOk();
+    S::call($w['admin'], 'POST', SF::url($w, "archived/{$id}/restore"))->assertOk();
+    expect(S::call($w['admin'], 'GET', SF::url($w, $id))->json('data.brief.setting'))->toBe('Kitchen counter');
+});
+
+it('FIX1: a save addressed to a deleted line id never touches another line, even one that moved up into its place; the same for its B-roll rows and for a hook', function (): void {
+    $w = SF::world();
+    $id = SF::api($w);
+    $script = WaveScript::query()->where('ulid', $id)->firstOrFail();
+    $a = SF::line($script, 0, 'first', 1);
+    $b = SF::line($script, 1, 'second');
+    $c = SF::line($script, 2, 'third');
+    $rowA = (string) WaveScriptBroll::query()->where('line_id', $a->id)->value('ulid');
+
+    // the other tab deletes line a; b moves up to position 0 (number 2)
+    pl32bCall($w, 'DELETE', $id, "lines/{$a->ulid}", [], 'staff')->assertOk();
+    $before = [$b->fresh()->only(['revision', 'shot_type', 'visual_description', 'cta', 'position']), $c->fresh()->only(['revision', 'position']), WaveScriptLineText::query()->orderBy('id')->pluck('body', 'language')->all()];
+
+    // saves, a duplicate, a B-roll add, a row save, an image reservation and a delete, all by the DELETED id
+    pl32bCall($w, 'PUT', $id, "lines/{$a->ulid}", ['texts' => ['en' => 'late words'], 'cta' => true, 'shot_type' => 'wide', 'revision' => 1])->assertNotFound()->assertJsonPath('errors.0.code', 'wave_script_line.deleted');
+    pl32bCall($w, 'PUT', $id, "lines/{$a->ulid}", ['broll' => [$rowA => ['description' => 'late']], 'revision' => 1])->assertNotFound();
+    pl32bCall($w, 'POST', $id, "lines/{$a->ulid}/duplicate")->assertNotFound();
+    pl32bCall($w, 'POST', $id, "lines/{$a->ulid}/broll")->assertNotFound();
+    pl32bCall($w, 'DELETE', $id, "lines/{$a->ulid}/broll/{$rowA}")->assertNotFound();
+    pl32bCall($w, 'DELETE', $id, "lines/{$a->ulid}")->assertNotFound();
+    expect(S::call($w['staff'], 'POST', SF::url($w, "{$id}/images/uploads/init"), ['block' => 'line', 'id' => $a->ulid, 'mime_type' => 'image/png', 'declared_bytes' => 10, 'original_filename' => 'x.png'])->status())->toBe(404);
+
+    // nothing of that reached a line that is still there
+    $after = [$b->fresh()->only(['revision', 'shot_type', 'visual_description', 'cta', 'position']), $c->fresh()->only(['revision', 'position']), WaveScriptLineText::query()->orderBy('id')->pluck('body', 'language')->all()];
+    expect($after)->toBe($before)->and(WaveScriptLine::query()->count())->toBe(2)->and(WaveScriptBroll::query()->count())->toBe(0);
+    expect(WaveScriptLineText::query()->where('body', 'late words')->exists())->toBeFalse();
+
+    // a hook: delete hook B, then save to B's id: 404 with its own code, hook C (which is now B) is untouched
+    $hooks = SF::hooksOf($script);
+    pl32bCall($w, 'DELETE', $id, "hooks/{$hooks[1]->ulid}", [], 'staff')->assertOk();
+    $c1 = $hooks[2]->fresh();
+    pl32bCall($w, 'PUT', $id, "hooks/{$hooks[1]->ulid}", ['visual_description' => 'late', 'revision' => 1])->assertNotFound()->assertJsonPath('errors.0.code', 'wave_script_hook.deleted');
+    pl32bCall($w, 'DELETE', $id, "hooks/{$hooks[1]->ulid}")->assertNotFound();
+    expect($hooks[2]->fresh()->only(['revision', 'visual_description', 'position']))->toBe($c1->only(['revision', 'visual_description', 'position']));
 });

@@ -11,7 +11,7 @@ use App\Modules\Strategy\Models\WavePersonaAngle;
 use App\Modules\Strategy\Models\WaveScript;
 
 /**
- * The brief of a script (PL-3.2a, plan 1.4): what is STORED on the script (the angle once edited, the duration) and what is READ
+ * The brief of a script (PL-3.2a, plan 1.4): what is STORED on the script (the angle once edited, the duration, the overall setting) and what is READ
  * LIVE from the strategy (the creator's matched persona, the persona's Priority and Support USPs, the angle line while the angle
  * is not edited). Nothing live is copied, so nothing goes stale: a persona change or a matrix change shows at the next load.
  *
@@ -22,7 +22,7 @@ use App\Modules\Strategy\Models\WaveScript;
 final class ScriptBriefReader
 {
     /**
-     * @return array{persona: array{id: string, code: string, title: string, slot: int, color_key: string}|null, usps: list<array{id: string, title: string, color_key: string, level: string}>, angle: array{value: string|null, source: string, custom: bool}, duration_seconds: int, revision: int}
+     * @return array{persona: array{id: string, code: string, title: string, slot: int, color_key: string}|null, usps: list<array{id: string, title: string, color_key: string, level: string}>, angle: array{value: string|null, source: string, custom: bool}, duration_seconds: int, setting: string|null, revision: int}
      */
     public static function read(WaveScript $script, ?int $personaId): array
     {
@@ -67,6 +67,7 @@ final class ScriptBriefReader
             'usps' => $usps,
             'angle' => ['value' => $custom ? $script->angle : $liveAngle, 'source' => $custom ? 'script' : $liveSource, 'custom' => $custom],
             'duration_seconds' => $script->duration_seconds,
+            'setting' => $script->setting,
             'revision' => $script->brief_revision,
         ];
     }

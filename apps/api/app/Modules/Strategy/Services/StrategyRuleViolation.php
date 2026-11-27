@@ -384,6 +384,12 @@ final class StrategyRuleViolation extends RuntimeException
         return new self('wave_script_line.deleted', 'This line was deleted.', 404);
     }
 
+    /** 404: a save, a duplicate or a delete named a hook that someone deleted. The web keeps the writer's text. */
+    public static function scriptHookDeleted(): self
+    {
+        return new self('wave_script_hook.deleted', 'This hook was deleted.', 404);
+    }
+
     /**
      * 409: a line save named a B-roll row that someone deleted. Nothing was written; `current` is the line as it is now.
      *

@@ -69,7 +69,7 @@ final class ScriptLineController
         $this->assertBrand($brand, $agency);
         $model = $this->findWave($wave, $agency, $brand);
         Gate::authorize('manageScripts', WaveScript::class);
-        $input = $request->all();
+        $input = StrategyText::cleanInput($request->all(), ['visual_description', 'shot_type']);
         if (isset($input['texts']) && is_array($input['texts'])) {
             foreach ($input['texts'] as $language => $body) {
                 $input['texts'][$language] = is_string($body) || $body === null ? StrategyText::clean($body) : $body;
@@ -82,18 +82,20 @@ final class ScriptLineController
                 }
             }
         }
-        /** @var array{texts?: array<string, string|null>, cta?: bool, broll?: array<string, array{shot_type?: string|null, description?: string|null}>, revision: int} $data */
+        /** @var array{texts?: array<string, string|null>, cta?: bool, shot_type?: string|null, visual_description?: string|null, broll?: array<string, array{shot_type?: string|null, description?: string|null}>, revision: int} $data */
         $data = Validator::make($input, [
             'texts' => ['sometimes', 'array', $this->languageKeys(...)],
             'texts.*' => ['nullable', 'string', 'max:'.StrategyLimits::LINE_TEXT],
             'cta' => ['sometimes', 'boolean'],
+            'shot_type' => ['sometimes', 'nullable', 'string', Rule::in(ShotType::values())],
+            'visual_description' => ['sometimes', 'nullable', 'string', 'max:'.StrategyLimits::LINE_VISUAL],
             'broll' => ['sometimes', 'array'],
             'broll.*' => ['array'],
             'broll.*.shot_type' => ['sometimes', 'nullable', 'string', Rule::in(ShotType::values())],
             'broll.*.description' => ['sometimes', 'nullable', 'string', 'max:'.StrategyLimits::BROLL_DESCRIPTION],
             'revision' => ['required', 'integer', 'min:1'],
         ])->validate();
-        $changes = array_intersect_key($data, ['texts' => 1, 'cta' => 1, 'broll' => 1]);
+        $changes = array_intersect_key($data, ['texts' => 1, 'cta' => 1, 'shot_type' => 1, 'visual_description' => 1, 'broll' => 1]);
         if (isset($changes['cta'])) {
             $changes['cta'] = (bool) $changes['cta'];
         }

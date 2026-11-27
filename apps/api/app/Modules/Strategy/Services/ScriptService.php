@@ -75,7 +75,7 @@ final class ScriptService
      * Save the brief: the angle (a text, or null to go back to the live persona angle) and/or the duration. `$changes` holds only
      * the keys the request sent. A save that changes nothing writes nothing. With a stale `$revision` and a real change: 409.
      *
-     * @param  array{angle?: string|null, duration_seconds?: int}  $changes
+     * @param  array{angle?: string|null, duration_seconds?: int, setting?: string|null}  $changes
      */
     public function updateBrief(Brand $brand, Wave $wave, User $actor, string $scriptUlid, array $changes, int $revision): WaveScript
     {
@@ -87,6 +87,11 @@ final class ScriptService
             $fields = [];
             $angle = null;
             $duration = null;
+            $setting = null;
+            if (array_key_exists('setting', $changes) && $changes['setting'] !== $script->setting) {
+                $fields[] = 'setting';
+                $setting = $changes['setting'];
+            }
             if (array_key_exists('angle', $changes) && $changes['angle'] !== $script->angle) {
                 $fields[] = 'angle';
                 $angle = $changes['angle'];
@@ -107,6 +112,9 @@ final class ScriptService
             }
             if ($duration !== null) {
                 $script->duration_seconds = $duration;
+            }
+            if (in_array('setting', $fields, true)) {
+                $script->setting = $setting;
             }
             $script->brief_revision++;
             $script->revision++;

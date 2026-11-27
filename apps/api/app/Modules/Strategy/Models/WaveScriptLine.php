@@ -24,6 +24,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $script_id
  * @property int $position
  * @property bool $cta
+ * @property string|null $shot_type
+ * @property string|null $visual_description
  * @property int $revision
  * @property-read WaveScript $script
  */
@@ -42,7 +44,7 @@ final class WaveScriptLine extends Model
     /**
      * @var list<string>
      */
-    protected $fillable = ['agency_id', 'wave_id', 'script_id', 'position', 'cta', 'revision'];
+    protected $fillable = ['agency_id', 'wave_id', 'script_id', 'position', 'cta', 'shot_type', 'visual_description', 'revision'];
 
     public function number(): int
     {

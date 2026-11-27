@@ -256,6 +256,8 @@ final class ScriptPresenter
             'position' => $line->position,
             'number' => ScriptCodes::lineNumber($line->position),
             'cta' => $line->cta,
+            'shot_type' => $line->shot_type,
+            'visual_description' => $line->visual_description,
             'texts' => $texts,
             'broll' => $rows,
             'images' => $images,

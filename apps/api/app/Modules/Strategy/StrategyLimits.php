@@ -119,6 +119,9 @@ final class StrategyLimits
 
     public const SCRIPT_ANGLE = 300;
 
+    /** Walk ruling: "The overall setting of the video", a brief field. */
+    public const SCRIPT_SETTING = 500;
+
     public const HOOK_AUDIO = 300;
 
     public const HOOK_OVERLAY = 100;
@@ -133,6 +136,9 @@ final class StrategyLimits
     public const LINE_TEXT = 600;
 
     public const BROLL_DESCRIPTION = 400;
+
+    /** Walk ruling: the visual description of a line (like a hook's). */
+    public const LINE_VISUAL = 400;
 
     /** PL-3.2b (ruling 4): English is always there, plus at most three LOCAL languages per market. */
     public const LOCAL_LANGUAGES_PER_MARKET = 3;
@@ -197,6 +203,7 @@ final class StrategyLimits
             'scripts_per_creator' => self::SCRIPTS_PER_CREATOR,
             'hooks_per_script' => self::HOOKS_PER_SCRIPT,
             'script_angle' => self::SCRIPT_ANGLE,
+            'script_setting' => self::SCRIPT_SETTING,
             'hook_audio' => self::HOOK_AUDIO,
             'hook_overlay' => self::HOOK_OVERLAY,
             'hook_visual' => self::HOOK_VISUAL,
@@ -204,6 +211,7 @@ final class StrategyLimits
             'broll_per_script' => self::BROLL_PER_SCRIPT,
             'line_text' => self::LINE_TEXT,
             'broll_description' => self::BROLL_DESCRIPTION,
+            'line_visual' => self::LINE_VISUAL,
             'local_languages_per_market' => self::LOCAL_LANGUAGES_PER_MARKET,
             'images_per_block' => self::IMAGES_PER_BLOCK,
             'script_image_total_bytes' => self::SCRIPT_IMAGE_TOTAL_BYTES,

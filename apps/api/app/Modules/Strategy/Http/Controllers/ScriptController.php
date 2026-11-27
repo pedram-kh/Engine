@@ -133,14 +133,15 @@ final class ScriptController
         $model = $this->findWave($wave, $agency, $brand);
         Gate::authorize('manageScripts', WaveScript::class);
 
-        $input = StrategyText::cleanInput($request->all(), ['angle']);
-        /** @var array{angle?: string|null, duration_seconds?: int, revision: int} $data */
+        $input = StrategyText::cleanInput($request->all(), ['angle', 'setting']);
+        /** @var array{angle?: string|null, duration_seconds?: int, setting?: string|null, revision: int} $data */
         $data = Validator::make($input, [
             'angle' => ['sometimes', 'nullable', 'string', 'max:'.StrategyLimits::SCRIPT_ANGLE],
+            'setting' => ['sometimes', 'nullable', 'string', 'max:'.StrategyLimits::SCRIPT_SETTING],
             'duration_seconds' => ['sometimes', 'integer', Rule::in(StrategyLimits::SCRIPT_DURATIONS)],
             'revision' => ['required', 'integer', 'min:1'],
         ])->validate();
-        $changes = array_intersect_key($data, ['angle' => 1, 'duration_seconds' => 1]);
+        $changes = array_intersect_key($data, ['angle' => 1, 'duration_seconds' => 1, 'setting' => 1]);
         /** @var User $actor */
         $actor = $request->user();
 

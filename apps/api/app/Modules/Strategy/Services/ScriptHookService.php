@@ -227,7 +227,7 @@ final class ScriptHookService
     {
         $hook = WaveScriptHook::query()->where('script_id', $script->id)->where('ulid', $ulid)->lockForUpdate()->first();
         if ($hook === null) {
-            throw StrategyRuleViolation::conflict404();
+            throw StrategyRuleViolation::scriptHookDeleted();
         }
 
         return $hook;
