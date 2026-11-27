@@ -9,6 +9,7 @@ use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Strategy\Http\Resources\WaveCreatorCard;
 use App\Modules\Strategy\Models\WaveCreator;
+use App\Modules\Strategy\Models\WaveScript;
 use App\Modules\Waves\Models\Wave;
 use App\Modules\Waves\Models\WaveMarket;
 use Illuminate\Http\Request;
@@ -60,6 +61,12 @@ final class WaveCreatorCandidates
         $inWave = $ids === [] ? new Collection : WaveCreator::query()->where('wave_id', $wave->id)->whereIn('creator_id', $ids)->get(['creator_id', 'market_id'])->keyBy('creator_id');
         $marketUlids = $inWave->isEmpty() ? [] : WaveMarket::query()->where('wave_id', $wave->id)->pluck('ulid', 'id')->all();
 
+        // Walk ruling (PL-3.2b): how many archived scripts each creator has in THIS market of this wave. They come back when the creator
+        // is added or replaces someone here, as far as the limit of three live scripts allows, so the dialog says so before the click.
+        $archived = $market === null || $ids === [] ? [] : WaveScript::query()
+            ->where('wave_id', $wave->id)->where('market_id', $market->id)->whereIn('creator_id', $ids)->whereNotNull('archived_at')
+            ->selectRaw('creator_id, count(*) as total')->groupBy('creator_id')->pluck('total', 'creator_id')->all();
+
         $rows = [];
         foreach ($creators as $creator) {
             $derived = WaveCreatorStatus::derive($applications->get($creator->id), $assignments->get($creator->id));
@@ -71,6 +78,7 @@ final class WaveCreatorCandidates
                 'invited' => $assignments->has($creator->id),
                 'already_in_wave' => $slot !== null,
                 'in_market' => $slot === null ? null : ($marketUlids[$slot->market_id] ?? null),
+                'archived_scripts' => (int) ($archived[$creator->id] ?? 0),
             ];
         }
 

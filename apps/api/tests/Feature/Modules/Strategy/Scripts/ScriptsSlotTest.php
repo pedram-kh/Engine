@@ -170,6 +170,46 @@ it('G9g: Replace with carry-over keeps the numbers; the new creator\'s archived 
         ->and(WaveScript::query()->whereNotNull('archived_at')->count())->toBe(2);
 });
 
+it('G9h: the picker says, per creator, how many archived scripts they have in the asked market (and none from another market)', function (): void {
+    $w = SF::world();
+    $new = F::applicant($w['campaign']);
+    $none = F::applicant($w['campaign']);
+    $sk = F::slot($w, $new, 'SK');
+    SF::script($sk);
+    SF::script($sk);
+    S::call($w['admin'], 'DELETE', F::url($w, $sk->ulid), ['scripts' => 'archive'])->assertOk();
+    $ro = F::slot($w, $new, 'RO');
+    SF::script($ro);
+    S::call($w['admin'], 'DELETE', F::url($w, $ro->ulid), ['scripts' => 'archive'])->assertOk();
+
+    $rows = fn (string $market): array => collect(S::call($w['admin'], 'GET', F::url($w, 'candidates')."?market={$market}")->assertOk()->json('data'))->pluck('archived_scripts', 'id')->all();
+    expect($rows($w['mk']['SK']))->toMatchArray([$new->ulid => 2, $none->ulid => 0])
+        ->and($rows($w['mk']['RO']))->toMatchArray([$new->ulid => 1, $none->ulid => 0]);
+    // no market asked: nothing to say
+    $any = collect(S::call($w['admin'], 'GET', F::url($w, 'candidates'))->assertOk()->json('data'))->pluck('archived_scripts', 'id')->all();
+    expect($any[$new->ulid])->toBe(0);
+});
+
+it('G9i: Add with more archived scripts than three allow brings back the lowest numbers first; the rest stay archived', function (): void {
+    $w = SF::world();
+    $new = F::applicant($w['campaign']);
+    // four archived scripts of one creator in one market (numbers 1, 2, 3 from a first stay, the fourth from a second stay)
+    $first = F::slot($w, $new, 'SK');
+    $a = [SF::script($first), SF::script($first), SF::script($first)];
+    S::call($w['admin'], 'DELETE', F::url($w, $first->ulid), ['scripts' => 'archive'])->assertOk();
+    $second = F::slot($w, $new, 'SK');
+    $b = SF::script($second);
+    S::call($w['admin'], 'DELETE', F::url($w, $second->ulid), ['scripts' => 'archive'])->assertOk();
+    expect(WaveScript::query()->whereNotNull('archived_at')->count())->toBe(4);
+
+    S::call($w['admin'], 'POST', F::url($w, ''), ['market' => $w['mk']['SK'], 'creators' => [$new->ulid]])->assertSuccessful();
+    $live = WaveScript::query()->whereNull('archived_at')->orderBy('number')->get();
+    $left = WaveScript::query()->whereNotNull('archived_at')->get();
+    expect($live->pluck('number')->all())->toBe([1, 2, 3])->and($left)->toHaveCount(1)
+        // the one left archived is the last in number order (number 3, newest): the lowest numbers are the ones that come back
+        ->and($left->first()->ulid)->toBe($b->ulid)->and($left->first()->number)->toBe(3);
+});
+
 it('G17: a market with archived scripts is removed only with confirm_scripts_deleted equal to the count; its scripts, hooks and texts go; one audit row per script; creators block first', function (): void {
     $w = SF::world();
     [$slot] = pl32Slot($w, 2, 'CZ');
