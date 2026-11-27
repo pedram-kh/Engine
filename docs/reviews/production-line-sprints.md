@@ -480,6 +480,8 @@ The walk had 26 steps; all passed except step 17. Rulings:
 - **A flaky test found and fixed:** `StrategyFlagGatesTest` K1 failed 1 run in 4 on Postgres because reading the tracker moves the wave's `updated_at` and the clock ticked between two reads; the clock is now frozen in the test (30 of 30 runs green after). The write on a read path is tech-debt row 67.
 - **Tech-debt rows added:** 63 (1100 px editor squeeze), 64 (Replace question cut at 390), 65 (no image upload browser test, and what it would take), 66 (drag untested at 390), 67 (tracker read writes the wave).
 
+**PL-3.2b status: CLOSED 2026-11-27** after Pedram's walk (26 steps) and re-check of the fixes passed. Code tip `773adfa8`, CI run `45954899505` (all four jobs green: Backend, Frontend, E2E main, E2E admin; first run of this push). Records: `pl-3-2b-review.md`, `pl-3-2b-break-reverts.md`, `pl-3-2-migration-rehearsal.md`, tech-debt rows 59 and 62 to 67. `main` stays at `09169b5a`; pushed is not deployed.
+
 ### PL-3.2b: added to the must-confirm list (2026-11-26)
 
 | What                                                                                                       | Why it matters                                                                                                                                                                                                                              |
