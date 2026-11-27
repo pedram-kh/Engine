@@ -20,7 +20,7 @@ import {
   personaColorKey,
   scriptSaveState,
 } from './scriptsLogic'
-import { isGone } from './strategyErrors'
+import { isGone, strategyErrorMessage } from './strategyErrors'
 import { conflict, makeHook, makeLine, makeScript, PERSONA_REF } from './scriptsTestKit'
 
 describe('scriptsLogic (PL-3.2a)', () => {
@@ -139,6 +139,13 @@ describe('scriptsLogic (PL-3.2b walk rulings)', () => {
     expect(isGone(err('wave_script_hook.deleted'))).toBe(false)
     expect(isGone(err('wave_script_line.deleted'))).toBe(false)
     expect(isGone(err('wave_script.not_found'))).toBe(true)
+  })
+
+  it('the B-roll safety ceiling (422, no number) has its own plain message', () => {
+    const err = new ApiError({ status: 422, code: 'wave_script.broll_ceiling', message: 'x' })
+    expect(strategyErrorMessage(err, (k: string) => `<${k}>`)).toBe(
+      '<app.strategy.scripts.errors.brollCeiling>',
+    )
   })
 
   it('archived scripts come back after the carried ones, up to three live; the rest stay', () => {
