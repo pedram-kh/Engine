@@ -99,6 +99,10 @@ it('S5: the 3.2b walk seed: languages, lines, B-roll and images through the serv
     expect(DB::table('wave_script_lines')->where('script_id', $martin)->count())->toBe(StrategyLimits::LINES_PER_SCRIPT)
         ->and(DB::table('wave_script_broll')->where('script_id', $martin)->count())->toBe(StrategyLimits::BROLL_PER_SCRIPT)
         ->and(DB::table('wave_script_images')->where('script_id', $martin)->count())->toBe(StrategyLimits::IMAGES_PER_BLOCK);
+    // the walk ruling: a line with a shot type and a visual description, a line with only a shot type, and the script's setting
+    expect(DB::table('wave_script_lines')->where('wave_id', $wave->id)->whereNotNull('shot_type')->count())->toBe(2)
+        ->and(DB::table('wave_script_lines')->where('wave_id', $wave->id)->whereNotNull('visual_description')->count())->toBe(1)
+        ->and(DB::table('wave_scripts')->where('wave_id', $wave->id)->whereNotNull('setting')->count())->toBe(1);
     expect(DB::table('wave_script_line_texts')->where('body', Pl32WalkSeeder::HOSTILE)->count())->toBe(2)
         ->and(DB::table('wave_script_broll')->where('description', Pl32WalkSeeder::HOSTILE)->count())->toBe(1);
 

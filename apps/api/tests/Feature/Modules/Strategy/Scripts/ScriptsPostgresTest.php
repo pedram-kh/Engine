@@ -354,6 +354,25 @@ it('P1: the CHECKs and composite keys of the lines, B-roll, texts, images and ma
     expect(DB::table('wave_script_lines')->where('script_id', $script->id)->count())->toBe(1);
 });
 
+it('P2: the line shot type is checked by the database (the ten types or NULL); the visual description and the script setting are plain text', function (): void {
+    $w = SF::world();
+    [$slot] = SF::slot($w);
+    $script = SF::script($slot);
+    $id = SF::api($w);
+    S::call($w['admin'], 'POST', SF::url($w, "{$id}/lines"))->assertCreated();
+    $lineId = DB::table('wave_script_lines')->where('script_id', DB::table('wave_scripts')->where('ulid', $id)->value('id'))->value('id');
+    $set = static fn (array $values) => static fn () => DB::transaction(fn () => DB::table('wave_script_lines')->where('id', $lineId)->update($values));
+
+    expect(Schema::getColumnListing('wave_script_lines'))->toContain('shot_type')->toContain('visual_description')
+        ->and(Schema::getColumnListing('wave_scripts'))->toContain('setting');
+    expect($set(['shot_type' => 'bogus']))->toThrow(QueryException::class);
+    expect($set(['shot_type' => 'Wide']))->toThrow(QueryException::class);
+    foreach (['wide', 'medium', 'close_up', 'detail', 'pov', 'over_the_shoulder', 'top_down', 'screen_recording', 'reaction', 'creator_to_camera', null] as $type) {
+        expect($set(['shot_type' => $type, 'visual_description' => 'A text'])())->toBe(1);
+    }
+    expect(DB::table('wave_scripts')->where('id', $script->id)->update(['setting' => str_repeat('x', 500)]))->toBe(1);
+});
+
 it('P1: nothing the database holds is a derived value: no stored line number, no stored B-roll code, no unique key on a position', function (): void {
     foreach (['wave_script_lines', 'wave_script_broll', 'wave_script_hooks'] as $table) {
         $columns = Schema::getColumnListing($table);

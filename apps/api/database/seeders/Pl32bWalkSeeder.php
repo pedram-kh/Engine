@@ -86,10 +86,13 @@ final class Pl32bWalkSeeder extends Seeder
         for ($i = 0; $i < 4; $i++) {
             $lines[] = $this->addLine($brand, $wave, $admin, $script);
         }
-        $this->save($brand, $wave, $admin, $script, $lines[0], ['texts' => ['en' => 'Lunch for the whole floor is one order away.', 'sk' => 'Obed pre celé poschodie je na jednu objednávku.']]);
-        $this->save($brand, $wave, $admin, $script, $lines[1], ['texts' => ['en' => 'Everyone eats well, you only order once.', 'sk' => 'Všetci sa najedia, objednáte raz.', 'hu' => 'Mindenki jóllakik, te csak egyszer rendelsz.']]);
+        $this->save($brand, $wave, $admin, $script, $lines[0], ['shot_type' => 'wide', 'visual_description' => 'The whole floor at lunchtime, everyone at their desks, one delivery arriving.', 'texts' => ['en' => 'Lunch for the whole floor is one order away.', 'sk' => 'Obed pre celé poschodie je na jednu objednávku.']]);
+        $this->save($brand, $wave, $admin, $script, $lines[1], ['shot_type' => 'creator_to_camera', 'texts' => ['en' => 'Everyone eats well, you only order once.', 'sk' => 'Všetci sa najedia, objednáte raz.', 'hu' => 'Mindenki jóllakik, te csak egyszer rendelsz.']]);
         $this->save($brand, $wave, $admin, $script, $lines[2], ['texts' => ['sk' => 'Iba po slovensky: tento riadok nemá anglickú verziu.']]);
         $this->save($brand, $wave, $admin, $script, $lines[3], ['texts' => ['en' => 'Order the team lunch in the app.', 'sk' => 'Objednajte tímový obed v aplikácii.'], 'cta' => true]);
+
+        // The overall setting of the video (the brief's own revision).
+        app(ScriptService::class)->updateBrief($brand, $wave, $admin, $script->ulid, ['setting' => 'At home in the kitchen, daylight, casual clothes, phone and delivery bag on the counter'], $script->refresh()->brief_revision);
 
         $service = app(ScriptLineService::class);
         foreach ([0, 1] as $i) {

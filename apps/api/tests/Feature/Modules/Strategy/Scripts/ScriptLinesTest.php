@@ -68,6 +68,7 @@ it('N1: a line is numbered from 2 by its position, never stored; moving it renum
     pl32bCall($w, 'POST', $id, 'lines')->assertCreated();
     $second = pl32bCall($w, 'POST', $id, 'lines')->assertCreated();
     expect(array_column($second->json('data.lines'), 'number'))->toBe([2, 3])
+        ->and(Schema::hasColumn('wave_script_lines', 'shot_type'))->toBeTrue()->and(Schema::hasColumn('wave_script_lines', 'visual_description'))->toBeTrue()->and(Schema::hasColumn('wave_scripts', 'setting'))->toBeTrue()
         ->and(Schema::hasColumn('wave_script_lines', 'number'))->toBeFalse()->and(Schema::hasColumn('wave_script_broll', 'code'))->toBeFalse();
 
     $ids = pl32bIds($second);
@@ -409,7 +410,7 @@ it('FIX1: a save addressed to a deleted line id never touches another line, even
 
     // the other tab deletes line a; b moves up to position 0 (number 2)
     pl32bCall($w, 'DELETE', $id, "lines/{$a->ulid}", [], 'staff')->assertOk();
-    $before = [$b->fresh()->only(['revision', 'shot_type', 'visual_description', 'cta', 'position']), $c->fresh()->only(['revision', 'position']), WaveScriptLineText::query()->orderBy('id')->pluck('body', 'language')->all()];
+    $before = [$b->refresh()->only(['revision', 'shot_type', 'visual_description', 'cta', 'position']), $c->refresh()->only(['revision', 'position']), WaveScriptLineText::query()->orderBy('id')->pluck('body', 'language')->all()];
 
     // saves, a duplicate, a B-roll add, a row save, an image reservation and a delete, all by the DELETED id
     pl32bCall($w, 'PUT', $id, "lines/{$a->ulid}", ['texts' => ['en' => 'late words'], 'cta' => true, 'shot_type' => 'wide', 'revision' => 1])->assertNotFound()->assertJsonPath('errors.0.code', 'wave_script_line.deleted');
@@ -421,15 +422,15 @@ it('FIX1: a save addressed to a deleted line id never touches another line, even
     expect(S::call($w['staff'], 'POST', SF::url($w, "{$id}/images/uploads/init"), ['block' => 'line', 'id' => $a->ulid, 'mime_type' => 'image/png', 'declared_bytes' => 10, 'original_filename' => 'x.png'])->status())->toBe(404);
 
     // nothing of that reached a line that is still there
-    $after = [$b->fresh()->only(['revision', 'shot_type', 'visual_description', 'cta', 'position']), $c->fresh()->only(['revision', 'position']), WaveScriptLineText::query()->orderBy('id')->pluck('body', 'language')->all()];
+    $after = [$b->refresh()->only(['revision', 'shot_type', 'visual_description', 'cta', 'position']), $c->refresh()->only(['revision', 'position']), WaveScriptLineText::query()->orderBy('id')->pluck('body', 'language')->all()];
     expect($after)->toBe($before)->and(WaveScriptLine::query()->count())->toBe(2)->and(WaveScriptBroll::query()->count())->toBe(0);
     expect(WaveScriptLineText::query()->where('body', 'late words')->exists())->toBeFalse();
 
     // a hook: delete hook B, then save to B's id: 404 with its own code, hook C (which is now B) is untouched
     $hooks = SF::hooksOf($script);
     pl32bCall($w, 'DELETE', $id, "hooks/{$hooks[1]->ulid}", [], 'staff')->assertOk();
-    $c1 = $hooks[2]->fresh();
+    $c1 = $hooks[2]->refresh()->only(['revision', 'visual_description', 'position']);
     pl32bCall($w, 'PUT', $id, "hooks/{$hooks[1]->ulid}", ['visual_description' => 'late', 'revision' => 1])->assertNotFound()->assertJsonPath('errors.0.code', 'wave_script_hook.deleted');
     pl32bCall($w, 'DELETE', $id, "hooks/{$hooks[1]->ulid}")->assertNotFound();
-    expect($hooks[2]->fresh()->only(['revision', 'visual_description', 'position']))->toBe($c1->only(['revision', 'visual_description', 'position']));
+    expect($hooks[2]->refresh()->only(['revision', 'visual_description', 'position']))->toBe($c1);
 });

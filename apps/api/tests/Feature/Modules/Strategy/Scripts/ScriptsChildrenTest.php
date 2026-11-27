@@ -104,7 +104,8 @@ it('A1: the archived list counts each script\'s own lines and READY images (a re
     S::call($w['admin'], 'POST', SF::url($w, "{$full}/archive"))->assertOk();
     S::call($w['admin'], 'POST', SF::url($w, "{$other}/archive"))->assertOk();
 
-    $rows = collect(S::call($w['admin'], 'GET', SF::url($w, 'archived').'?market='.$w['mk']['SK'])->assertOk()->json('data'))->keyBy('id');
+    $data = S::call($w['admin'], 'GET', SF::url($w, 'archived').'?market='.$w['mk']['SK'])->assertOk()->json('data');
+    $rows = array_combine(array_column($data, 'id'), $data);
     expect($rows)->toHaveCount(2)
         ->and($rows[$full])->toMatchArray(['hooks' => 3, 'lines' => 2, 'images' => 2])
         ->and($rows[$other])->toMatchArray(['hooks' => 3, 'lines' => 3, 'images' => 0]);
