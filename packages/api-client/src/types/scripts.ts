@@ -107,7 +107,6 @@ export interface ScriptLimits {
   scripts_per_creator: number
   hooks_per_script: number
   lines_per_script: number
-  broll_per_script: number
   images_per_block: number
   image_total_bytes: number
   local_languages_per_market: number

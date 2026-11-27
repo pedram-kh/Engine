@@ -210,12 +210,10 @@ const KEYS = [
   'app.strategy.scripts.lines.shotDescription',
   'app.strategy.scripts.lines.shotDown',
   'app.strategy.scripts.lines.shotLabel',
-  'app.strategy.scripts.lines.shotLimit',
   'app.strategy.scripts.lines.shotPlaceholder',
   'app.strategy.scripts.lines.shotType',
   'app.strategy.scripts.lines.shotUp',
   'app.strategy.scripts.lines.shotsCount',
-  'app.strategy.scripts.lines.shotsUsage',
   'app.strategy.scripts.lines.title',
   'app.strategy.scripts.lines.usage',
   'app.strategy.scripts.order.changedElsewhere',
@@ -225,7 +223,7 @@ const KEYS = [
   'app.strategy.scripts.order.moved',
   'app.strategy.scripts.order.up',
   'app.strategy.scripts.errors.linesLimit',
-  'app.strategy.scripts.errors.brollLimit',
+  'app.strategy.scripts.errors.brollCeiling',
   'app.strategy.scripts.errors.languageNotInMarket',
   'app.strategy.scripts.errors.languageLimit',
   'app.strategy.scripts.errors.imageFailed',
@@ -368,8 +366,8 @@ function tokens(text: string): string[] {
 }
 
 describe('PL-3.2a, PL-3.2b scripts strings', () => {
-  it('checks 218 keys across 24 locales', () => {
-    expect(KEYS).toHaveLength(218)
+  it('checks 216 keys across 24 locales', () => {
+    expect(KEYS).toHaveLength(216)
     expect(UI_LOCALES).toHaveLength(24)
   })
 

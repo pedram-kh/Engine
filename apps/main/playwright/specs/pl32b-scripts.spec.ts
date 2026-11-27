@@ -439,7 +439,7 @@ test.describe('Scripts: lines, B-roll, languages, images', () => {
     await expect.poll(() => codes(a)).toEqual(['3_1'])
   })
 
-  test('limits: 29 lines then Add goes off at 30; the line usage shows from 25; B-roll usage from 35 and Add shot off at 40', async ({
+  test('limits: 29 lines then Add goes off at 30 and the line usage shows from 25; B-roll has no limit (46 shots, no counter, Add shot stays on)', async ({
     page,
     request,
   }) => {
@@ -458,18 +458,22 @@ test.describe('Scripts: lines, B-roll, languages, images', () => {
     await expect(page.locator('[data-test="script-add-line"]')).toBeDisabled()
     await shot(page, 'limit-lines')
 
-    // B-roll: 34 rows show nothing, 35 shows the usage, 40 turns Add shot off.
+    // B-roll has no limit: 45 shots show no counter and no near-limit text, and Add shot stays on and works.
     const target = ids[0]
-    await s.addBroll(target, 34)
+    await s.addBroll(target, 45)
     await page.reload()
     await expandAll(page)
     await expect(page.locator(`[data-test="script-line-broll-usage-${target}"]`)).toHaveCount(0)
-    await page.locator(`[data-test="script-line-add-shot-${target}"]`).scrollIntoViewIfNeeded()
-    await page.locator(`[data-test="script-line-add-shot-${target}"]`).click()
-    await expect(page.locator(`[data-test="script-line-broll-usage-${target}"]`)).toBeVisible()
-    for (let i = 0; i < 5; i++)
-      await page.locator(`[data-test="script-line-add-shot-${target}"]`).click()
-    await expect(page.locator(`[data-test="script-line-add-shot-${target}"]`)).toBeDisabled()
+    const add = page.locator(`[data-test="script-line-add-shot-${target}"]`)
+    await add.scrollIntoViewIfNeeded()
+    await expect(add).toBeEnabled()
+    await add.click()
+    await expect(page.locator(`[data-test^="script-broll-delete-"]`)).toHaveCount(46)
+    await expect(add).toBeEnabled()
+    await expect(add).toHaveText(/Add shot/)
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBe(true)
     await shot(page, 'limit-broll')
   })
 

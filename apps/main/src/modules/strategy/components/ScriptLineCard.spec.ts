@@ -27,8 +27,6 @@ async function mountCard(line = makeLine(1), over: Record<string, unknown> = {})
     initiallyOpen: true,
     textMax: 2000,
     brollMax: 500,
-    brollUsed: line.broll.length,
-    brollLimit: 12,
     canAddLine: true,
     imageLimits: { images: 10, bytes: 300 * 1024 * 1024 },
     scriptBytes: 0,
@@ -64,6 +62,15 @@ describe('ScriptLineCard (PL-3.2b)', () => {
       '2_2',
     ])
     expect(w.find(`[data-test="script-line-cta-chip-${id()}"]`).exists()).toBe(false)
+  })
+
+  it('B-roll has no limit: with 45 shots there is no counter and "Add shot" stays on and says so', async () => {
+    const rows = Array.from({ length: 45 }, (_, i) => makeBroll(2, i + 1))
+    const w = await mountCard(makeLine(1, { broll: rows }))
+    const add = w.get(`[data-test="script-line-add-shot-${id()}"]`)
+    expect(add.attributes('disabled')).toBeUndefined()
+    expect(add.text()).toBe('Add shot')
+    expect(w.find(`[data-test="script-line-broll-usage-${id()}"]`).exists()).toBe(false)
   })
 
   it('a CTA line wears the chip next to its name', async () => {

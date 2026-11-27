@@ -17,10 +17,8 @@ import { useBlockAutosave } from '../composables/useBlockAutosave'
 import { useRegisterBlock } from '../composables/useSaveRegistry'
 import { MENU_PROPS } from '../constants'
 import {
-  BROLL_NEAR,
   linePayload,
   lineValue,
-  nearLimit,
   quoteOf,
   reconcileLine,
   sameLine,
@@ -50,8 +48,6 @@ const props = defineProps<{
   textMax: number
   brollMax: number
   /** B-roll rows in the whole script and the most it may hold. */
-  brollUsed: number
-  brollLimit: number
   canAddLine: boolean
   imageLimits: { images: number; bytes: number }
   scriptBytes: number
@@ -206,8 +202,6 @@ async function brollAction(call: () => Promise<string | null>): Promise<void> {
   brollError.value = await call()
   brollBusy.value = false
 }
-const brollFull = computed(() => props.brollUsed >= props.brollLimit)
-const brollNear = computed(() => nearLimit(props.brollUsed, props.brollLimit, BROLL_NEAR))
 
 // Texts as the columns read them.
 const texts = computed<Record<string, string>>(() => ({ ...d.value.texts }))
@@ -614,19 +608,14 @@ const theirsLines = computed(() =>
           <button
             type="button"
             class="lcard__add-shot"
-            :disabled="brollFull || brollBusy || gone"
+            :disabled="brollBusy || gone"
             :data-test="`script-line-add-shot-${line.id}`"
             @click="brollAction(addBrollFn)"
           >
             <v-icon icon="mdi-plus" size="12" aria-hidden="true" />{{
-              brollFull
-                ? t('app.strategy.scripts.lines.shotLimit')
-                : t('app.strategy.scripts.lines.addShot')
+              t('app.strategy.scripts.lines.addShot')
             }}
           </button>
-          <p v-if="brollNear" class="lcard__note" :data-test="`script-line-broll-usage-${line.id}`">
-            {{ t('app.strategy.scripts.lines.shotsUsage', { n: brollUsed, max: brollLimit }) }}
-          </p>
           <p
             v-if="brollError !== null"
             class="lcard__note lcard__note--error"

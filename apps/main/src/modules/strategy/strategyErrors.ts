@@ -48,7 +48,7 @@ const CODE_KEYS: Record<string, string> = {
   'wave_script.restore_creator_missing': 'app.strategy.scripts.errors.restoreCreatorMissing',
   'wave_script.last_hook': 'app.strategy.scripts.errors.lastHook',
   'wave_script.lines_limit': 'app.strategy.scripts.errors.linesLimit',
-  'wave_script.broll_limit': 'app.strategy.scripts.errors.brollLimit',
+  'wave_script.broll_ceiling': 'app.strategy.scripts.errors.brollCeiling',
   'wave_script.language_not_in_market': 'app.strategy.scripts.errors.languageNotInMarket',
   'wave_script.language_limit': 'app.strategy.scripts.errors.languageLimit',
   'wave_script.order_mismatch': 'app.strategy.scripts.order.changedElsewhere',
@@ -139,9 +139,6 @@ export function strategyErrorMessage(err: unknown, t: Translate): string {
     }
     if (err.code === 'wave_script.lines_limit') {
       return t('app.strategy.scripts.errors.linesLimit', { max: num('max') ?? 30 })
-    }
-    if (err.code === 'wave_script.broll_limit') {
-      return t('app.strategy.scripts.errors.brollLimit', { max: num('max') ?? 12 })
     }
     if (err.code === 'wave_script.language_limit') {
       return t('app.strategy.scripts.errors.languageLimit', { max: num('max') ?? 3 })

@@ -55,7 +55,6 @@ const ids = computed(() => lines.value.map((l) => l.id))
 const max = computed(() => props.script.limits.lines_per_script)
 const full = computed(() => lines.value.length >= max.value)
 const near = computed(() => nearLimit(lines.value.length, max.value, LINES_NEAR))
-const brollLimit = computed(() => props.script.limits.broll_per_script)
 const imageLimits = computed(() => ({
   images: props.script.limits.images_per_block,
   bytes: props.script.limits.image_total_bytes,
@@ -282,8 +281,6 @@ function startsOpen(id: string): boolean {
         :initially-open="startsOpen(row.line.id)"
         :text-max="textMax"
         :broll-max="brollMax"
-        :broll-used="script.usage.broll"
-        :broll-limit="brollLimit"
         :can-add-line="!full"
         :image-limits="imageLimits"
         :script-bytes="script.usage.image_bytes"

@@ -30,7 +30,6 @@ export const LIMITS = {
   scripts_per_creator: 3,
   hooks_per_script: 6,
   lines_per_script: 30,
-  broll_per_script: 40,
   images_per_block: 10,
   image_total_bytes: 300 * 1024 * 1024,
   local_languages_per_market: 3,
