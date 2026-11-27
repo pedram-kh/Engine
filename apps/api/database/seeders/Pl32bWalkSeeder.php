@@ -33,8 +33,8 @@ use RuntimeException;
  *   - Lucia's first script: four lines (English and Slovak side by side; one Slovak-only line, so the estimate hint shows; one CTA),
  *       B-roll on the first two, one reference image on the first line and one on the first hook. Her SECOND script is the EMPTY one
  *       (hooks only, no lines).
- *   - Martin's first script AT ITS LIMITS: 30 lines, 12 B-roll rows, and one line with 10 reference images (the caps, one step from refused).
- *       His second script has 29 lines (one step from the line limit); his third has 11 B-roll rows and a line with 9 images.
+ *   - Martin's first script AT ITS LIMITS: 30 lines, 40 B-roll rows, and one line with 10 reference images (the caps, one step from refused).
+ *       His second script has 29 lines (one step from the line limit); his third has 39 B-roll rows and a line with 9 images.
  *   - Katarina: no live script, ONE archived script that keeps lines, B-roll and images (Restore it from "Archived scripts").
  *   - Tomáš's script: the hostile string in a line and in a B-roll description (plain text, never markup).
  *   - Astrid's script: English only (the Nordics market has no other language).
@@ -112,7 +112,7 @@ final class Pl32bWalkSeeder extends Seeder
         $this->image($agency, $brand, $wave, $admin, $script, 'hook', $hook->ulid, 'storyboard.png', 80, 120);
     }
 
-    /** One script at all its limits: 30 lines, 12 B-roll rows, a line with 10 images. */
+    /** One script at all its limits: 30 lines, 40 B-roll rows, a line with 10 images. */
     private function martin(Agency $agency, Brand $brand, Wave $wave, User $admin): void
     {
         $script = $this->scriptOf($wave, 'Martin Kováč');
@@ -124,14 +124,14 @@ final class Pl32bWalkSeeder extends Seeder
             $lines[] = $line;
         }
         for ($i = 0; $i < StrategyLimits::BROLL_PER_SCRIPT; $i++) {
-            $service->brollAdd($brand, $wave, $admin, $script->ulid, $lines[$i % 6]->ulid);
+            $service->brollAdd($brand, $wave, $admin, $script->ulid, $lines[$i % 8]->ulid);
         }
         for ($i = 0; $i < StrategyLimits::IMAGES_PER_BLOCK; $i++) {
             $this->image($agency, $brand, $wave, $admin, $script, 'line', $lines[0]->ulid, "reference-{$i}.png", 60 + $i * 4, 40 + $i * 3);
         }
     }
 
-    /** Script 2: 29 lines. Script 3: 11 B-roll rows and a line with 9 images (each one step from its limit). */
+    /** Script 2: 29 lines. Script 3: 39 B-roll rows and a line with 9 images (each one step from its limit). */
     private function martinNearLimits(Agency $agency, Brand $brand, Wave $wave, User $admin): void
     {
         $service = app(ScriptLineService::class);
@@ -146,7 +146,7 @@ final class Pl32bWalkSeeder extends Seeder
         $lines = [];
         for ($i = 0; $i < 3; $i++) {
             $line = $this->addLine($brand, $wave, $admin, $three);
-            $this->save($brand, $wave, $admin, $three, $line, ['texts' => ['en' => 'Line '.($i + 2).' of the 11-shot script.']]);
+            $this->save($brand, $wave, $admin, $three, $line, ['texts' => ['en' => 'Line '.($i + 2).' of the 39-shot script.']]);
             $lines[] = $line;
         }
         for ($i = 0; $i < StrategyLimits::BROLL_PER_SCRIPT - 1; $i++) {

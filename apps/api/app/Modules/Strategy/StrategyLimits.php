@@ -125,10 +125,10 @@ final class StrategyLimits
 
     public const HOOK_VISUAL = 400;
 
-    /** PL-3.2b: lines per script, B-roll rows per SCRIPT (ruling 1: the frame's 13 is a sample), and the text lengths. */
+    /** PL-3.2b: lines per script, B-roll rows per SCRIPT (40 by the walk ruling: the 12 of the plan was a planning number and too low; the frame's own sample has 13), and the text lengths. */
     public const LINES_PER_SCRIPT = 30;
 
-    public const BROLL_PER_SCRIPT = 12;
+    public const BROLL_PER_SCRIPT = 40;
 
     public const LINE_TEXT = 600;
 

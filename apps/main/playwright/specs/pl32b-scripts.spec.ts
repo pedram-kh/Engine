@@ -439,7 +439,7 @@ test.describe('Scripts: lines, B-roll, languages, images', () => {
     await expect.poll(() => codes(a)).toEqual(['3_1'])
   })
 
-  test('limits: 29 lines then Add goes off at 30; the line usage shows from 25; B-roll usage from 9 and Add shot off at 12', async ({
+  test('limits: 29 lines then Add goes off at 30; the line usage shows from 25; B-roll usage from 35 and Add shot off at 40', async ({
     page,
     request,
   }) => {
@@ -458,16 +458,16 @@ test.describe('Scripts: lines, B-roll, languages, images', () => {
     await expect(page.locator('[data-test="script-add-line"]')).toBeDisabled()
     await shot(page, 'limit-lines')
 
-    // B-roll: 8 rows show nothing, 9 shows the usage, 12 turns Add shot off.
+    // B-roll: 34 rows show nothing, 35 shows the usage, 40 turns Add shot off.
     const target = ids[0]
-    await s.addBroll(target, 8)
+    await s.addBroll(target, 34)
     await page.reload()
     await expandAll(page)
     await expect(page.locator(`[data-test="script-line-broll-usage-${target}"]`)).toHaveCount(0)
     await page.locator(`[data-test="script-line-add-shot-${target}"]`).scrollIntoViewIfNeeded()
     await page.locator(`[data-test="script-line-add-shot-${target}"]`).click()
     await expect(page.locator(`[data-test="script-line-broll-usage-${target}"]`)).toBeVisible()
-    for (let i = 0; i < 3; i++)
+    for (let i = 0; i < 5; i++)
       await page.locator(`[data-test="script-line-add-shot-${target}"]`).click()
     await expect(page.locator(`[data-test="script-line-add-shot-${target}"]`)).toBeDisabled()
     await shot(page, 'limit-broll')

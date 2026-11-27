@@ -168,17 +168,17 @@ it('B1: there is no B-roll on a hook (no route), and a B-roll row is addressed t
     expect(WaveScriptBroll::query()->count())->toBe(1);
 });
 
-it('B1: the 13th B-roll row of a script is refused wherever it goes; a deleted row frees a place', function (): void {
+it('B1: the 41st B-roll row of a script is refused wherever it goes; a deleted row frees a place', function (): void {
     $w = SF::world();
     $id = SF::api($w);
     $script = WaveScript::query()->where('ulid', $id)->firstOrFail();
-    $a = SF::line($script, 0, null, 7);
-    $b = SF::line($script, 1, null, 5);
+    $a = SF::line($script, 0, null, 25);
+    $b = SF::line($script, 1, null, 15);
 
     foreach ([$a, $b] as $line) {
-        pl32bCall($w, 'POST', $id, "lines/{$line->ulid}/broll")->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_script.broll_limit')->assertJsonPath('errors.0.meta.max', 12);
+        pl32bCall($w, 'POST', $id, "lines/{$line->ulid}/broll")->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_script.broll_limit')->assertJsonPath('errors.0.meta.max', 40);
     }
-    expect(WaveScriptBroll::query()->count())->toBe(12);
+    expect(WaveScriptBroll::query()->count())->toBe(40);
 
     $row = WaveScriptBroll::query()->where('line_id', $a->id)->firstOrFail();
     pl32bCall($w, 'DELETE', $id, "lines/{$a->ulid}/broll/{$row->ulid}")->assertOk();

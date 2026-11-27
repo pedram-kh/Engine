@@ -366,8 +366,8 @@ export function nearLimit(count: number, max: number, from: number): boolean {
 
 /** Lines: the limit text starts at 25 of 30. */
 export const LINES_NEAR = 25
-/** B-roll: the limit text starts at 9 of 12. */
-export const BROLL_NEAR = 9
+/** B-roll: the limit text starts at 35 of 40. */
+export const BROLL_NEAR = 35
 /** Images in one block: the usage starts at 8 of 10. */
 export const IMAGES_NEAR = 8
 /** Script image bytes: the usage starts at 80 % of the total. */
