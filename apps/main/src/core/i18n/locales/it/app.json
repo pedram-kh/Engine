@@ -2388,7 +2388,9 @@
           "duration": "Durata",
           "seconds": "{n} secondi",
           "estimate": "Durata stimata: circa {n} s",
-          "noEstimate": "Aggiungi il testo audio per vedere una stima"
+          "noEstimate": "Aggiungi il testo audio per vedere una stima",
+          "setting": "L’ambientazione generale del video",
+          "settingPlaceholder": "A casa, in cucina, luce naturale, abiti casual, telefono e borsa delle consegne sul piano"
         },
         "hooks": {
           "title": "Hook",
@@ -2413,7 +2415,9 @@
           "deleteTitle": "Eliminare l'hook {letter}?",
           "deleteBody": "Questo hook e il suo testo verranno eliminati.",
           "deleteConfirm": "Elimina hook",
-          "deleteBodyImages": "Questo hook, il suo testo e le sue immagini di riferimento (immagini: {images}) verranno eliminati."
+          "deleteBodyImages": "Questo hook, il suo testo e le sue immagini di riferimento (immagini: {images}) verranno eliminati.",
+          "goneTitle": "Questo hook è stato eliminato da qualcun altro",
+          "goneHint": "Il tuo testo è ancora qui. Copialo prima di chiudere."
         },
         "shot": {
           "wide": "Campo lungo",
@@ -2463,7 +2467,9 @@
         "replace": {
           "label": "Questa posizione ha degli script ({count}). Cosa ne facciamo?",
           "carry": "Trasferisci gli script al nuovo creator",
-          "archive": "Archiviali e ricomincia da zero"
+          "archive": "Archiviali e ricomincia da zero",
+          "returnBack": "Script archiviati di {name} che tornano: {count}",
+          "returnStay": "Restano archiviati perché il limite è di tre script attivi: {count}"
         },
         "remove": {
           "label": "Questo creator ha degli script ({count}). Cosa ne facciamo?",
@@ -2572,7 +2578,11 @@
           "shotsCount": "Inquadrature: {count}",
           "shotsUsage": "Inquadrature in questo script: {n} su {max}",
           "title": "Righe dello script",
-          "usage": "Righe: {n} su {max}"
+          "usage": "Righe: {n} su {max}",
+          "visual": "Visivo",
+          "visualPlaceholder": "Cosa vede lo spettatore in questa riga",
+          "lineShotType": "Tipo di inquadratura della riga {n}",
+          "visualSummary": "Visivo: {shot}"
         },
         "order": {
           "changedElsewhere": "L'ordine è stato modificato altrove. È stato ricaricato; il tuo testo è intatto.",

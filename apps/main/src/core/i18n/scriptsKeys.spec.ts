@@ -60,6 +60,16 @@ const KEYS = [
   'app.strategy.scripts.brief.seconds',
   'app.strategy.scripts.brief.estimate',
   'app.strategy.scripts.brief.noEstimate',
+  'app.strategy.scripts.brief.setting',
+  'app.strategy.scripts.brief.settingPlaceholder',
+  'app.strategy.scripts.lines.visual',
+  'app.strategy.scripts.lines.visualPlaceholder',
+  'app.strategy.scripts.lines.lineShotType',
+  'app.strategy.scripts.lines.visualSummary',
+  'app.strategy.scripts.hooks.goneTitle',
+  'app.strategy.scripts.hooks.goneHint',
+  'app.strategy.scripts.replace.returnBack',
+  'app.strategy.scripts.replace.returnStay',
   'app.strategy.scripts.hooks.title',
   'app.strategy.scripts.hooks.hook',
   'app.strategy.scripts.hooks.menu',
@@ -358,8 +368,8 @@ function tokens(text: string): string[] {
 }
 
 describe('PL-3.2a, PL-3.2b scripts strings', () => {
-  it('checks 208 keys across 24 locales', () => {
-    expect(KEYS).toHaveLength(208)
+  it('checks 218 keys across 24 locales', () => {
+    expect(KEYS).toHaveLength(218)
     expect(UI_LOCALES).toHaveLength(24)
   })
 

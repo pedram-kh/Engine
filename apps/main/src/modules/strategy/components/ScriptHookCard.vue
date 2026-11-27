@@ -28,6 +28,7 @@ import {
 } from '../scriptsLogic'
 import AutoGrowTextarea from './AutoGrowTextarea.vue'
 import BlockConflict from './BlockConflict.vue'
+import BlockGone from './BlockGone.vue'
 import BlockGrip from './BlockGrip.vue'
 import BlockStatusLine from './BlockStatusLine.vue'
 import ScriptImageField from './ScriptImageField.vue'
@@ -55,6 +56,8 @@ const props = defineProps<{
   over: string | null
   /** Deletes the hook on the server; resolves with a message when it could not, null when it is gone. */
   removeFn: () => Promise<string | null>
+  /** The hook was deleted by someone else while this card held the person's text: the card stays, read-only for structure. */
+  ghost?: boolean
   debounceMs?: number
 }>()
 const emit = defineEmits<{
@@ -67,6 +70,8 @@ const emit = defineEmits<{
   dragend: []
   /** An image was added or removed (the editor reads the script again). */
   imagesChanged: []
+  /** The person closed the "deleted by someone else" box. */
+  dismiss: []
 }>()
 const { t } = useI18n()
 
@@ -100,7 +105,9 @@ const block = useBlockAutosave<HookValue>({
 useRegisterBlock(`hook:${props.hook.id}`, { status: block.status, flush: block.flush })
 watch(
   () => [props.hook, props.languages] as const,
-  () => block.syncRemote(),
+  () => {
+    if (props.ghost !== true) block.syncRemote()
+  },
 )
 
 const open = ref(true)
@@ -111,6 +118,24 @@ async function toggle(): Promise<void> {
 defineExpose({ flush: block.flush })
 
 const d = computed(() => block.draft.value)
+const gone = computed(() => block.status.value === 'gone' || props.ghost === true)
+// A person's own words, to copy when the hook is gone.
+function goneText(): string {
+  const parts: string[] = []
+  const v = d.value
+  if (v.shot !== null || v.visual !== '')
+    parts.push(
+      `${t('app.strategy.scripts.hooks.visual')}: ${[v.shot === null ? '' : t(`app.strategy.scripts.shot.${v.shot}`), v.visual].filter((x) => x !== '').join(' - ')}`,
+    )
+  const rows: [string, Record<string, string>][] = [
+    [t('app.strategy.scripts.hooks.audio'), { [EN]: v.audio, ...v.local.audio }],
+    [t('app.strategy.scripts.hooks.overlay'), { [EN]: v.overlay, ...v.local.overlay }],
+  ]
+  for (const [label, texts] of rows)
+    for (const [l, text] of Object.entries(texts))
+      if (text !== '') parts.push(`${label} (${l.toUpperCase()}): ${text}`)
+  return parts.join('\n')
+}
 const columns = computed(() => viewLanguages(props.view))
 
 // The texts of every language, as the columns read them.
@@ -212,6 +237,7 @@ const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(b
     :class="{
       'hcard--over': over === hook.id && dragging !== null && dragging !== hook.id,
       'hcard--dragging': dragging === hook.id,
+      'hcard--gone': gone,
     }"
     :data-test="`script-hook-${hook.id}`"
     :data-letter="hook.letter"
@@ -285,7 +311,7 @@ const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(b
           </template>
           <v-list density="compact">
             <v-list-item
-              :disabled="!canAdd"
+              :disabled="!canAdd || gone"
               prepend-icon="mdi-content-copy"
               :data-test="`script-hook-duplicate-${hook.id}`"
               @click="emit('duplicate')"
@@ -293,7 +319,7 @@ const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(b
               <v-list-item-title>{{ t('app.strategy.scripts.hooks.duplicate') }}</v-list-item-title>
             </v-list-item>
             <v-list-item
-              :disabled="index === 0"
+              :disabled="index === 0 || gone"
               prepend-icon="mdi-arrow-up"
               :data-test="`script-hook-up-${hook.id}`"
               @click="emit('move', -1)"
@@ -301,7 +327,7 @@ const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(b
               <v-list-item-title>{{ t('app.strategy.scripts.order.up') }}</v-list-item-title>
             </v-list-item>
             <v-list-item
-              :disabled="index >= count - 1"
+              :disabled="index >= count - 1 || gone"
               prepend-icon="mdi-arrow-down"
               :data-test="`script-hook-down-${hook.id}`"
               @click="emit('move', 1)"
@@ -309,7 +335,7 @@ const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(b
               <v-list-item-title>{{ t('app.strategy.scripts.order.down') }}</v-list-item-title>
             </v-list-item>
             <v-list-item
-              :disabled="!canDelete"
+              :disabled="!canDelete || gone"
               prepend-icon="mdi-delete-outline"
               :data-test="`script-hook-delete-${hook.id}`"
               @click="askRemove"
@@ -320,6 +346,16 @@ const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(b
         </v-menu>
       </div>
     </header>
+
+    <BlockGone
+      v-if="gone"
+      :id="hook.id"
+      prefix="script-hook"
+      :title="t('app.strategy.scripts.hooks.goneTitle')"
+      :hint="t('app.strategy.scripts.hooks.goneHint')"
+      :text="goneText"
+      @dismiss="emit('dismiss')"
+    />
 
     <div v-show="open" class="hcard__body">
       <div class="hcard__row">
@@ -489,6 +525,9 @@ const theirsLines = computed(() => (block.theirs.value === null ? [] : lineFor(b
   min-width: 0;
 }
 .hcard__collapse,
+.hcard--gone {
+  border-color: rgb(var(--v-theme-error));
+}
 .hcard__dots {
   display: inline-flex;
   align-items: center;

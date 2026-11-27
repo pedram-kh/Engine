@@ -8,16 +8,19 @@ import { describe, expect, it } from 'vitest'
 import {
   briefPayload,
   briefValue,
+  archivedReturn,
   classifyFailure,
   hookHasContent,
   hookPayload,
   hookValue,
   isStuck,
   isUnsaved,
+  linePayload,
+  lineValue,
   personaColorKey,
   scriptSaveState,
 } from './scriptsLogic'
-import { conflict, makeHook, makeScript, PERSONA_REF } from './scriptsTestKit'
+import { conflict, makeHook, makeLine, makeScript, PERSONA_REF } from './scriptsTestKit'
 
 describe('scriptsLogic (PL-3.2a)', () => {
   it('an untouched angle is never sent, so a live angle never turns into the script text', () => {
@@ -93,5 +96,51 @@ describe('scriptsLogic (PL-3.2a)', () => {
   it('the persona colour key is null with no persona', () => {
     expect(personaColorKey(null)).toBeNull()
     expect(personaColorKey(PERSONA_REF)).toBe('blue')
+  })
+})
+
+describe('scriptsLogic (PL-3.2b walk rulings)', () => {
+  it('the line shot type and visual description are sent only when changed; blank sends null', () => {
+    const line = makeLine(1)
+    const base = lineValue(line)
+    expect(linePayload({ ...base }, base, 3, ['en'])).toEqual({ revision: 3 })
+    expect(linePayload({ ...base, shot: 'close_up' }, base, 3, ['en'])).toEqual({
+      revision: 3,
+      shot_type: 'close_up',
+    })
+    expect(linePayload({ ...base, visual: 'A hand opens the bag' }, base, 3, ['en'])).toEqual({
+      revision: 3,
+      visual_description: 'A hand opens the bag',
+    })
+    const had = lineValue(makeLine(1, { visual_description: 'old' }))
+    expect(linePayload({ ...had, visual: '  ' }, had, 3, ['en'])).toEqual({
+      revision: 3,
+      visual_description: null,
+    })
+  })
+
+  it('the setting is sent only when changed; blank sends null', () => {
+    const base = briefValue(makeScript().brief)
+    expect(briefPayload({ ...base }, base, 4)).toEqual({ revision: 4 })
+    expect(briefPayload({ ...base, setting: 'In the kitchen' }, base, 4)).toEqual({
+      revision: 4,
+      setting: 'In the kitchen',
+    })
+    const had = { ...base, setting: 'old' }
+    expect(briefPayload({ ...had, setting: '' }, had, 4)).toEqual({ revision: 4, setting: null })
+  })
+
+  it('a save to a deleted hook (404 with its own code) is "gone", like a deleted line', () => {
+    const err = (code: string) => new ApiError({ status: 404, code, message: 'x' })
+    expect(classifyFailure(err('wave_script_hook.deleted'))).toEqual({ kind: 'gone' })
+    expect(classifyFailure(err('wave_script_line.deleted'))).toEqual({ kind: 'gone' })
+  })
+
+  it('archived scripts come back after the carried ones, up to three live; the rest stay', () => {
+    expect(archivedReturn(2, 0)).toEqual({ back: 2, stay: 0 })
+    expect(archivedReturn(2, 2)).toEqual({ back: 1, stay: 1 })
+    expect(archivedReturn(4, 0)).toEqual({ back: 3, stay: 1 })
+    expect(archivedReturn(3, 3)).toEqual({ back: 0, stay: 3 })
+    expect(archivedReturn(0, 3)).toEqual({ back: 0, stay: 0 })
   })
 })

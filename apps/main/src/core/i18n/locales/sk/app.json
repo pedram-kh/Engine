@@ -2388,7 +2388,9 @@
           "duration": "Dĺžka",
           "seconds": "{n} sekúnd",
           "estimate": "Odhadovaná dĺžka: približne {n} s",
-          "noEstimate": "Pridajte zvukový text a uvidíte odhad"
+          "noEstimate": "Pridajte zvukový text a uvidíte odhad",
+          "setting": "Celkové prostredie videa",
+          "settingPlaceholder": "Doma v kuchyni, denné svetlo, bežné oblečenie, telefón a taška na rozvoz na linke"
         },
         "hooks": {
           "title": "Hooky",
@@ -2413,7 +2415,9 @@
           "deleteTitle": "Odstrániť hook {letter}?",
           "deleteBody": "Tento hook a jeho text sa odstránia.",
           "deleteConfirm": "Odstrániť hook",
-          "deleteBodyImages": "Tento hook, jeho text a referenčné obrázky (obrázky: {images}) budú odstránené."
+          "deleteBodyImages": "Tento hook, jeho text a referenčné obrázky (obrázky: {images}) budú odstránené.",
+          "goneTitle": "Tento hook vymazal niekto iný",
+          "goneHint": "Váš text tu stále je. Skopírujte ho, kým to zatvoríte."
         },
         "shot": {
           "wide": "Celok",
@@ -2463,7 +2467,9 @@
         "replace": {
           "label": "Toto miesto má skripty ({count}). Čo s nimi?",
           "carry": "Preniesť skripty na nového tvorcu",
-          "archive": "Archivovať ich a začať odznova"
+          "archive": "Archivovať ich a začať odznova",
+          "returnBack": "Archivované scenáre tvorcu {name}, ktoré sa vrátia: {count}",
+          "returnStay": "Zostávajú v archíve, pretože limit sú tri aktívne scenáre: {count}"
         },
         "remove": {
           "label": "Tento tvorca má skripty ({count}). Čo s nimi?",
@@ -2572,7 +2578,11 @@
           "shotsCount": "Zábery: {count}",
           "shotsUsage": "Zábery v tomto skripte: {n} z {max}",
           "title": "Riadky skriptu",
-          "usage": "Riadky: {n} z {max}"
+          "usage": "Riadky: {n} z {max}",
+          "visual": "Vizuál",
+          "visualPlaceholder": "Čo divák vidí v tejto replike",
+          "lineShotType": "Typ záberu repliky {n}",
+          "visualSummary": "Vizuál: {shot}"
         },
         "order": {
           "changedElsewhere": "Poradie bolo zmenené inde. Načítali sme ho znova; váš text zostal bez zmeny.",

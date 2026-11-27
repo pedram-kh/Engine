@@ -59,6 +59,7 @@ const CODE_KEYS: Record<string, string> = {
   'wave_script_image.already_completed': 'app.strategy.scripts.errors.imageFailed',
   'wave_script_image.copy_failed': 'app.strategy.scripts.errors.imageCopyFailed',
   'wave_script_image.delete_failed': 'app.strategy.scripts.errors.imageDeleteFailed',
+  'wave_script_hook.deleted': 'app.strategy.scripts.hooks.goneTitle',
   'wave_creator.scripts_choice_required': 'app.strategy.scripts.errors.choiceRequired',
   forbidden: 'app.strategy.errors.forbidden',
 }
@@ -68,7 +69,12 @@ const CODE_KEYS: Record<string, string> = {
  * (404 with its own code) is NOT this: the script is still there, only that line is not.
  */
 export function isGone(err: unknown): boolean {
-  return err instanceof ApiError && err.status === 404 && err.code !== 'wave_script_line.deleted'
+  return (
+    err instanceof ApiError &&
+    err.status === 404 &&
+    err.code !== 'wave_script_line.deleted' &&
+    err.code !== 'wave_script_hook.deleted'
+  )
 }
 
 /** True for a server-side validation answer (HTTP 422 with no rule code of ours). */

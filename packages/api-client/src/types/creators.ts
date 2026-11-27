@@ -84,6 +84,8 @@ export interface WaveCreatorCandidate extends WaveCreatorCardData {
   already_in_wave: boolean
   /** The market ulid the creator is already in. */
   in_market: string | null
+  /** Archived scripts this creator has in the market the list was asked for; they come back on Add or Replace, up to three live. */
+  archived_scripts: number
 }
 
 export interface WaveCreatorCandidatesResponse {

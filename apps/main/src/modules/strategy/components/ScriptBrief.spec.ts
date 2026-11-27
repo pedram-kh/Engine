@@ -132,4 +132,41 @@ describe('ScriptBrief (PL-3.2a)', () => {
     await w.setProps({ script: empty })
     expect(w.get('[data-test="script-estimate"]').text()).not.toContain('16')
   })
+
+  it('the setting row sits under Duration, saves with the brief revision and sends only the setting', async () => {
+    const w = await mountBrief()
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    expect(w.get('label[for^="setting-"]').text()).toBe('The overall setting of the video')
+    const order = w.findAll('[data-test="script-duration"], [data-test="script-setting"]')
+    expect(order.map((n) => n.attributes('data-test'))).toEqual([
+      'script-duration',
+      'script-setting',
+    ])
+    const saved = makeScript(1)
+    saved.brief = { ...saved.brief, revision: 2, setting: 'In the kitchen' }
+    vi.mocked(strategyApi.saveBrief).mockResolvedValue({ data: saved })
+    const el = w.get('[data-test="script-setting"] textarea').element as HTMLTextAreaElement
+    el.value = 'In the kitchen'
+    el.dispatchEvent(new Event('input', { bubbles: true }))
+    await vi.advanceTimersByTimeAsync(1600)
+    expect(vi.mocked(strategyApi.saveBrief).mock.calls[0]?.[2]).toEqual({
+      setting: 'In the kitchen',
+      revision: 1,
+    })
+  })
+
+  it('the setting counter shows only near 500 and turns red above it', async () => {
+    const s = makeScript(1)
+    s.brief.setting = 'x'.repeat(100)
+    const w = await mountBrief(s)
+    expect(w.find('[data-test="script-setting-count"]').exists()).toBe(false)
+    const near = makeScript(1)
+    near.brief.setting = 'x'.repeat(420)
+    await w.setProps({ script: near })
+    expect(w.get('[data-test="script-setting-count"]').text()).toContain('420 / 500')
+    const over = makeScript(1)
+    over.brief.setting = 'x'.repeat(501)
+    await w.setProps({ script: over })
+    expect(w.get('[data-test="script-setting-count"]').classes()).toContain('sbrief__count--over')
+  })
 })

@@ -2388,7 +2388,9 @@
           "duration": "Dauer",
           "seconds": "{n} Sekunden",
           "estimate": "Geschätzte Länge: etwa {n} s",
-          "noEstimate": "Füge Audiotext hinzu, um eine Schätzung zu sehen"
+          "noEstimate": "Füge Audiotext hinzu, um eine Schätzung zu sehen",
+          "setting": "Das allgemeine Setting des Videos",
+          "settingPlaceholder": "Zu Hause in der Küche, Tageslicht, lockere Kleidung, Handy und Liefertasche auf der Arbeitsplatte"
         },
         "hooks": {
           "title": "Hooks",
@@ -2413,7 +2415,9 @@
           "deleteTitle": "Hook {letter} löschen?",
           "deleteBody": "Dieser Hook und sein Text werden gelöscht.",
           "deleteConfirm": "Hook löschen",
-          "deleteBodyImages": "Dieser Hook, sein Text und seine Referenzbilder (Bilder: {images}) werden gelöscht."
+          "deleteBodyImages": "Dieser Hook, sein Text und seine Referenzbilder (Bilder: {images}) werden gelöscht.",
+          "goneTitle": "Dieser Hook wurde von jemand anderem gelöscht",
+          "goneHint": "Dein Text ist noch da. Kopiere ihn, bevor du dies schließt."
         },
         "shot": {
           "wide": "Totale",
@@ -2463,7 +2467,9 @@
         "replace": {
           "label": "Dieser Platz hat Skripte ({count}). Was soll mit ihnen geschehen?",
           "carry": "Skripte auf den neuen Creator übertragen",
-          "archive": "Archivieren und neu beginnen"
+          "archive": "Archivieren und neu beginnen",
+          "returnBack": "Archivierte Skripte von {name}, die zurückkommen: {count}",
+          "returnStay": "Bleiben archiviert, weil höchstens drei aktive Skripte erlaubt sind: {count}"
         },
         "remove": {
           "label": "Dieser Creator hat Skripte ({count}). Was soll mit ihnen geschehen?",
@@ -2572,7 +2578,11 @@
           "shotsCount": "Einstellungen: {count}",
           "shotsUsage": "Einstellungen in diesem Skript: {n} von {max}",
           "title": "Skriptzeilen",
-          "usage": "Zeilen: {n} von {max}"
+          "usage": "Zeilen: {n} von {max}",
+          "visual": "Bild",
+          "visualPlaceholder": "Was die Zuschauenden in dieser Zeile sehen",
+          "lineShotType": "Einstellungsgröße von Zeile {n}",
+          "visualSummary": "Bild: {shot}"
         },
         "order": {
           "changedElsewhere": "Die Reihenfolge wurde anderswo geändert. Sie wurde neu geladen; dein Text ist unverändert.",

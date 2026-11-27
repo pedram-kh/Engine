@@ -2388,7 +2388,9 @@
           "duration": "Délka",
           "seconds": "{n} sekund",
           "estimate": "Odhadovaná délka: asi {n} s",
-          "noEstimate": "Přidejte zvukový text a uvidíte odhad"
+          "noEstimate": "Přidejte zvukový text a uvidíte odhad",
+          "setting": "Celkové prostředí videa",
+          "settingPlaceholder": "Doma v kuchyni, denní světlo, běžné oblečení, telefon a taška na rozvoz na lince"
         },
         "hooks": {
           "title": "Hooky",
@@ -2413,7 +2415,9 @@
           "deleteTitle": "Smazat hook {letter}?",
           "deleteBody": "Tento hook a jeho text budou smazány.",
           "deleteConfirm": "Smazat hook",
-          "deleteBodyImages": "Tento hook, jeho text a referenční obrázky (obrázky: {images}) budou smazány."
+          "deleteBodyImages": "Tento hook, jeho text a referenční obrázky (obrázky: {images}) budou smazány.",
+          "goneTitle": "Tento hook smazal někdo jiný",
+          "goneHint": "Váš text tu pořád je. Zkopírujte ho, než to zavřete."
         },
         "shot": {
           "wide": "Celek",
@@ -2463,7 +2467,9 @@
         "replace": {
           "label": "Toto místo má skripty ({count}). Co s nimi?",
           "carry": "Převést skripty na nového tvůrce",
-          "archive": "Archivovat je a začít znovu"
+          "archive": "Archivovat je a začít znovu",
+          "returnBack": "Archivované scénáře tvůrce {name}, které se vrátí: {count}",
+          "returnStay": "Zůstávají v archivu, protože limit jsou tři aktivní scénáře: {count}"
         },
         "remove": {
           "label": "Tento tvůrce má skripty ({count}). Co s nimi?",
@@ -2572,7 +2578,11 @@
           "shotsCount": "Záběry: {count}",
           "shotsUsage": "Záběry v tomto skriptu: {n} z {max}",
           "title": "Řádky skriptu",
-          "usage": "Řádky: {n} z {max}"
+          "usage": "Řádky: {n} z {max}",
+          "visual": "Vizuál",
+          "visualPlaceholder": "Co divák vidí v této replice",
+          "lineShotType": "Typ záběru repliky {n}",
+          "visualSummary": "Vizuál: {shot}"
         },
         "order": {
           "changedElsewhere": "Pořadí bylo změněno jinde. Načetli jsme ho znovu; váš text zůstal beze změny.",

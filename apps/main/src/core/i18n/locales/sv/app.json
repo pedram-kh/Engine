@@ -2388,7 +2388,9 @@
           "duration": "Längd",
           "seconds": "{n} sekunder",
           "estimate": "Beräknad längd: cirka {n} s",
-          "noEstimate": "Lägg till ljudtext för att se en uppskattning"
+          "noEstimate": "Lägg till ljudtext för att se en uppskattning",
+          "setting": "Videons övergripande miljö",
+          "settingPlaceholder": "Hemma i köket, dagsljus, vardagskläder, mobil och leveransväska på bänken"
         },
         "hooks": {
           "title": "Hooks",
@@ -2413,7 +2415,9 @@
           "deleteTitle": "Ta bort hook {letter}?",
           "deleteBody": "Den här hooken och dess text tas bort.",
           "deleteConfirm": "Ta bort hook",
-          "deleteBodyImages": "Den här kroken, dess text och dess referensbilder (bilder: {images}) tas bort."
+          "deleteBodyImages": "Den här kroken, dess text och dess referensbilder (bilder: {images}) tas bort.",
+          "goneTitle": "Den här hooken togs bort av någon annan",
+          "goneHint": "Din text finns kvar. Kopiera den innan du stänger."
         },
         "shot": {
           "wide": "Helbild",
@@ -2463,7 +2467,9 @@
         "replace": {
           "label": "Den här platsen har manus ({count}). Vad ska hända med dem?",
           "carry": "Flytta manusen till den nya creatorn",
-          "archive": "Arkivera dem och börja om"
+          "archive": "Arkivera dem och börja om",
+          "returnBack": "Arkiverade manus för {name} som kommer tillbaka: {count}",
+          "returnStay": "Ligger kvar i arkivet eftersom gränsen är tre aktiva manus: {count}"
         },
         "remove": {
           "label": "Den här creatorn har manus ({count}). Vad ska hända med dem?",
@@ -2572,7 +2578,11 @@
           "shotsCount": "Tagningar: {count}",
           "shotsUsage": "Tagningar i det här skriptet: {n} av {max}",
           "title": "Skriptrader",
-          "usage": "Rader: {n} av {max}"
+          "usage": "Rader: {n} av {max}",
+          "visual": "Bild",
+          "visualPlaceholder": "Vad tittaren ser på den här raden",
+          "lineShotType": "Bildtyp för rad {n}",
+          "visualSummary": "Bild: {shot}"
         },
         "order": {
           "changedElsewhere": "Ordningen ändrades på annat håll. Den har lästs in igen; din text är orörd.",

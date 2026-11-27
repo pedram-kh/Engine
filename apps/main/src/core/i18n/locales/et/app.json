@@ -2388,7 +2388,9 @@
           "duration": "Kestus",
           "seconds": "{n} sekundit",
           "estimate": "Hinnanguline pikkus: umbes {n} s",
-          "noEstimate": "Hinnangu nägemiseks lisa helitekst"
+          "noEstimate": "Hinnangu nägemiseks lisa helitekst",
+          "setting": "Video üldine keskkond",
+          "settingPlaceholder": "Kodus köögis, päevavalgus, vabalt riietatud, telefon ja kulleri kott tööpinnal"
         },
         "hooks": {
           "title": "Konksud",
@@ -2413,7 +2415,9 @@
           "deleteTitle": "Kas kustutada konks {letter}?",
           "deleteBody": "See konks ja selle tekst kustutatakse.",
           "deleteConfirm": "Kustuta konks",
-          "deleteBodyImages": "See hook, selle tekst ja viitepildid (pilte: {images}) kustutatakse."
+          "deleteBodyImages": "See hook, selle tekst ja viitepildid (pilte: {images}) kustutatakse.",
+          "goneTitle": "Selle hooki kustutas keegi teine",
+          "goneHint": "Teie tekst on veel siin. Kopeerige see enne sulgemist."
         },
         "shot": {
           "wide": "Üldplaan",
@@ -2463,7 +2467,9 @@
         "replace": {
           "label": "Sellel kohal on skripte ({count}). Mis nendega juhtub?",
           "carry": "Kanna skriptid üle uuele loojale",
-          "archive": "Arhiveeri need ja alusta otsast"
+          "archive": "Arhiveeri need ja alusta otsast",
+          "returnBack": "Kasutaja {name} arhiveeritud skriptid, mis tulevad tagasi: {count}",
+          "returnStay": "Jäävad arhiivi, sest piir on kolm aktiivset skripti: {count}"
         },
         "remove": {
           "label": "Sellel loojal on skripte ({count}). Mis nendega juhtub?",
@@ -2572,7 +2578,11 @@
           "shotsCount": "Kaadreid: {count}",
           "shotsUsage": "Selle skripti kaadreid: {n} / {max}",
           "title": "Skripti read",
-          "usage": "Ridu: {n} / {max}"
+          "usage": "Ridu: {n} / {max}",
+          "visual": "Visuaal",
+          "visualPlaceholder": "Mida vaataja sellel real näeb",
+          "lineShotType": "Rea {n} kaadri tüüp",
+          "visualSummary": "Visuaal: {shot}"
         },
         "order": {
           "changedElsewhere": "Järjekorda muudeti mujal. See laaditi uuesti; teie tekst on puutumata.",

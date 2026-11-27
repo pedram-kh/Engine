@@ -2388,7 +2388,9 @@
           "duration": "Ilgums",
           "seconds": "{n} sekundes",
           "estimate": "Aptuvenais garums: ap {n} s",
-          "noEstimate": "Pievienojiet audio tekstu, lai redzētu aprēķinu"
+          "noEstimate": "Pievienojiet audio tekstu, lai redzētu aprēķinu",
+          "setting": "Video vispārējā vide",
+          "settingPlaceholder": "Mājās virtuvē, dienasgaisma, ikdienas apģērbs, telefons un piegādes soma uz virsmas"
         },
         "hooks": {
           "title": "Āķi",
@@ -2413,7 +2415,9 @@
           "deleteTitle": "Vai dzēst āķi {letter}?",
           "deleteBody": "Šis āķis un tā teksts tiks dzēsts.",
           "deleteConfirm": "Dzēst āķi",
-          "deleteBodyImages": "Šis hook, tā teksts un atsauces attēli (attēli: {images}) tiks dzēsti."
+          "deleteBodyImages": "Šis hook, tā teksts un atsauces attēli (attēli: {images}) tiks dzēsti.",
+          "goneTitle": "Šo hook izdzēsa kāds cits",
+          "goneHint": "Jūsu teksts vēl ir šeit. Nokopējiet to, pirms aizverat."
         },
         "shot": {
           "wide": "Kopplāns",
@@ -2463,7 +2467,9 @@
         "replace": {
           "label": "Šai vietai ir scenāriji ({count}). Ko ar tiem darīt?",
           "carry": "Pārnest scenārijus uz jauno veidotāju",
-          "archive": "Arhivēt tos un sākt no jauna"
+          "archive": "Arhivēt tos un sākt no jauna",
+          "returnBack": "Veidotāja {name} arhivētie scenāriji, kas atgriežas: {count}",
+          "returnStay": "Paliek arhīvā, jo ierobežojums ir trīs aktīvi scenāriji: {count}"
         },
         "remove": {
           "label": "Šim veidotājam ir scenāriji ({count}). Ko ar tiem darīt?",
@@ -2572,7 +2578,11 @@
           "shotsCount": "Kadri: {count}",
           "shotsUsage": "Kadri šajā scenārijā: {n} no {max}",
           "title": "Scenārija rindas",
-          "usage": "Rindas: {n} no {max}"
+          "usage": "Rindas: {n} no {max}",
+          "visual": "Vizuālais",
+          "visualPlaceholder": "Ko skatītājs redz šajā rindā",
+          "lineShotType": "{n}. rindas kadra veids",
+          "visualSummary": "Vizuālais: {shot}"
         },
         "order": {
           "changedElsewhere": "Secība tika mainīta citur. Tā ir ielādēta no jauna; jūsu teksts nav skarts.",

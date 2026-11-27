@@ -2388,7 +2388,9 @@
           "duration": "Czas trwania",
           "seconds": "{n} sekund",
           "estimate": "Szacowana długość: około {n} s",
-          "noEstimate": "Dodaj tekst audio, aby zobaczyć szacunek"
+          "noEstimate": "Dodaj tekst audio, aby zobaczyć szacunek",
+          "setting": "Ogólne otoczenie wideo",
+          "settingPlaceholder": "W domu w kuchni, światło dzienne, luźne ubranie, telefon i torba dostawcy na blacie"
         },
         "hooks": {
           "title": "Hooki",
@@ -2413,7 +2415,9 @@
           "deleteTitle": "Usunąć hook {letter}?",
           "deleteBody": "Ten hook i jego tekst zostaną usunięte.",
           "deleteConfirm": "Usuń hook",
-          "deleteBodyImages": "Ten hook, jego tekst i obrazy referencyjne (obrazy: {images}) zostaną usunięte."
+          "deleteBodyImages": "Ten hook, jego tekst i obrazy referencyjne (obrazy: {images}) zostaną usunięte.",
+          "goneTitle": "Ten hook usunęła inna osoba",
+          "goneHint": "Twój tekst nadal tu jest. Skopiuj go przed zamknięciem."
         },
         "shot": {
           "wide": "Ujęcie ogólne",
@@ -2463,7 +2467,9 @@
         "replace": {
           "label": "To miejsce ma skrypty ({count}). Co z nimi zrobić?",
           "carry": "Przenieś skrypty do nowego twórcy",
-          "archive": "Zarchiwizuj je i zacznij od nowa"
+          "archive": "Zarchiwizuj je i zacznij od nowa",
+          "returnBack": "Zarchiwizowane skrypty twórcy {name}, które wracają: {count}",
+          "returnStay": "Zostają w archiwum, bo limit to trzy aktywne skrypty: {count}"
         },
         "remove": {
           "label": "Ten twórca ma skrypty ({count}). Co z nimi zrobić?",
@@ -2572,7 +2578,11 @@
           "shotsCount": "Ujęcia: {count}",
           "shotsUsage": "Ujęcia w tym scenariuszu: {n} z {max}",
           "title": "Wiersze scenariusza",
-          "usage": "Wiersze: {n} z {max}"
+          "usage": "Wiersze: {n} z {max}",
+          "visual": "Obraz",
+          "visualPlaceholder": "Co widz widzi w tym wierszu",
+          "lineShotType": "Rodzaj ujęcia wiersza {n}",
+          "visualSummary": "Obraz: {shot}"
         },
         "order": {
           "changedElsewhere": "Kolejność została zmieniona gdzie indziej. Wczytano ją ponownie; Twój tekst jest nietknięty.",

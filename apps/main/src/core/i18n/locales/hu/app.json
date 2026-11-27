@@ -2388,7 +2388,9 @@
           "duration": "Időtartam",
           "seconds": "{n} másodperc",
           "estimate": "Becsült hossz: kb. {n} mp",
-          "noEstimate": "Adj hozzá hangszöveget a becsléshez"
+          "noEstimate": "Adj hozzá hangszöveget a becsléshez",
+          "setting": "A videó általános helyszíne",
+          "settingPlaceholder": "Otthon a konyhában, nappali fény, hétköznapi ruha, telefon és kiszállítótáska a pulton"
         },
         "hooks": {
           "title": "Hookok",
@@ -2413,7 +2415,9 @@
           "deleteTitle": "Törlöd a(z) {letter} hookot?",
           "deleteBody": "Ez a hook és a szövege törlődik.",
           "deleteConfirm": "Hook törlése",
-          "deleteBodyImages": "Ez a hook, a szövege és a referenciaképei (képek: {images}) törlődnek."
+          "deleteBodyImages": "Ez a hook, a szövege és a referenciaképei (képek: {images}) törlődnek.",
+          "goneTitle": "Ezt a hookot valaki más törölte",
+          "goneHint": "A szöveged még itt van. Másold ki, mielőtt bezárod."
         },
         "shot": {
           "wide": "Totál",
@@ -2463,7 +2467,9 @@
         "replace": {
           "label": "Ennek a helynek forgatókönyvei vannak ({count}). Mi legyen velük?",
           "carry": "Forgatókönyvek átvitele az új alkotóra",
-          "archive": "Archiválás és újrakezdés"
+          "archive": "Archiválás és újrakezdés",
+          "returnBack": "{name} archivált szkriptjei, amelyek visszatérnek: {count}",
+          "returnStay": "Archiválva maradnak, mert a korlát három aktív szkript: {count}"
         },
         "remove": {
           "label": "Ennek az alkotónak forgatókönyvei vannak ({count}). Mi legyen velük?",
@@ -2572,7 +2578,11 @@
           "shotsCount": "Felvételek: {count}",
           "shotsUsage": "Felvételek ebben a forgatókönyvben: {n} / {max}",
           "title": "A forgatókönyv sorai",
-          "usage": "Sorok: {n} / {max}"
+          "usage": "Sorok: {n} / {max}",
+          "visual": "Képi világ",
+          "visualPlaceholder": "Mit lát a néző ezen a soron",
+          "lineShotType": "A(z) {n}. sor képbeállítása",
+          "visualSummary": "Képi világ: {shot}"
         },
         "order": {
           "changedElsewhere": "A sorrendet máshol módosították. Újratöltöttük; a szövegedhez nem nyúltunk.",

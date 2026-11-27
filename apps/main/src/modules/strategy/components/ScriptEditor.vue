@@ -6,10 +6,9 @@
  * (add, delete, order) replaces the script. It loads the script it is given and is re-created (keyed) for another script, after the page flushed the old one.
  * Every block autosaves on its own; the chip in the title row is the worst state of all of them.
  */
-import type { ScriptsOverview, WaveScript } from '@catalyst/api-client'
-import { ApiError } from '@catalyst/api-client'
-import { SCRIPT_TEXT_LIMITS } from '@catalyst/api-client'
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import type { ScriptHook, ScriptsOverview, WaveScript } from '@catalyst/api-client'
+import { ApiError, SCRIPT_TEXT_LIMITS } from '@catalyst/api-client'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { creatorLabel } from '@/core/creators/creatorLabel'
@@ -182,6 +181,38 @@ function moveHook(id: string, delta: -1 | 1): void {
     document.querySelector<HTMLElement>(`[data-test="script-hook-grip-${id}"]`)?.focus(),
   )
 }
+// A hook that disappears after the person wrote in it stays as a deleted card (its text can be copied). By the hook's id, never its letter.
+const hookDeletedByMe = new Set<string>()
+const hookGhosts = ref(new Map<string, { hook: ScriptHook; index: number }>())
+watch(
+  () => script.value?.hooks,
+  (now, before) => {
+    const nowIds = new Set((now ?? []).map((h) => h.id))
+    ;(before ?? []).forEach((h, index) => {
+      if (nowIds.has(h.id) || hookDeletedByMe.has(h.id) || hookGhosts.value.has(h.id)) return
+      const status = registry.statusOf(`hook:${h.id}`)
+      if (status !== undefined && status !== 'idle') hookGhosts.value.set(h.id, { hook: h, index })
+    })
+    for (const id of [...hookGhosts.value.keys()]) if (nowIds.has(id)) hookGhosts.value.delete(id)
+  },
+)
+const shownHooks = computed(() => {
+  const out: { hook: ScriptHook; ghost: boolean }[] = (script.value?.hooks ?? []).map((hook) => ({
+    hook,
+    ghost: false,
+  }))
+  const g = [...hookGhosts.value.values()].sort((a, b) => a.index - b.index)
+  for (const { hook, index } of g) out.splice(Math.min(index, out.length), 0, { hook, ghost: true })
+  return out
+})
+function dismissHookGhost(id: string): void {
+  hookGhosts.value.delete(id)
+  // A card that learned it is gone on its own save is still in the list: take it out for good.
+  if (script.value?.hooks.some((h) => h.id === id)) {
+    hookDeletedByMe.add(id)
+    void refresh()
+  }
+}
 const hookDrag = useBlockDrag((from, target) => {
   if (script.value === null) return
   hookNotice.value = null
@@ -200,6 +231,8 @@ async function structural(call: () => Promise<{ data: WaveScript }>): Promise<st
       emit('gone')
       return null
     }
+    // A hook somebody deleted: the list is read again so the screen is the truth.
+    if (err instanceof ApiError && err.code === 'wave_script_hook.deleted') void refresh()
     return strategyErrorMessage(err, t)
   }
 }
@@ -214,8 +247,11 @@ async function duplicateHook(hookId: string): Promise<void> {
     strategyApi.duplicateHook(props.scope, props.scriptId, hookId),
   )
 }
-function removeHook(hookId: string): Promise<string | null> {
-  return structural(() => strategyApi.deleteHook(props.scope, props.scriptId, hookId))
+async function removeHook(hookId: string): Promise<string | null> {
+  hookDeletedByMe.add(hookId)
+  const err = await structural(() => strategyApi.deleteHook(props.scope, props.scriptId, hookId))
+  if (err !== null) hookDeletedByMe.delete(hookId)
+  return err
 }
 
 // Archive the script (every agency role): it moves to the archived list with its hooks and texts, and can be restored there.
@@ -390,9 +426,9 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll, refresh }
 
       <div class="sed__hooks" data-test="script-hooks">
         <ScriptHookCard
-          v-for="(h, i) in script.hooks"
-          :key="h.id"
-          :hook="h"
+          v-for="(row, i) in shownHooks"
+          :key="row.hook.id"
+          :hook="row.hook"
           :script-id="script.id"
           :scope="scope"
           :can-delete="script.hooks.length > 1"
@@ -409,14 +445,16 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll, refresh }
           :script-bytes="script.usage.image_bytes"
           :dragging="hookDrag.dragging.value"
           :over="hookDrag.over.value"
-          :remove-fn="() => removeHook(h.id)"
+          :remove-fn="() => removeHook(row.hook.id)"
+          :ghost="row.ghost"
           :debounce-ms="debounceMs"
           @saved="onHookSaved"
-          @duplicate="duplicateHook(h.id)"
-          @move="(d: -1 | 1) => moveHook(h.id, d)"
-          @dragstart="(e: DragEvent) => hookDrag.start(h.id, e)"
-          @dragover="(e: DragEvent) => hookDrag.hover(h.id, e)"
-          @drop="(e: DragEvent) => hookDrag.drop(h.id, e)"
+          @dismiss="dismissHookGhost(row.hook.id)"
+          @duplicate="duplicateHook(row.hook.id)"
+          @move="(d: -1 | 1) => moveHook(row.hook.id, d)"
+          @dragstart="(e: DragEvent) => hookDrag.start(row.hook.id, e)"
+          @dragover="(e: DragEvent) => hookDrag.hover(row.hook.id, e)"
+          @drop="(e: DragEvent) => hookDrag.drop(row.hook.id, e)"
           @dragend="hookDrag.end"
           @images-changed="refresh"
         />
@@ -493,13 +531,16 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll, refresh }
 }
 .sed__head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px 16px;
 }
+/* With three languages the tools are wide: the title keeps a readable width and the tools drop below it instead of squeezing it. */
 .sed__who {
   display: flex;
   align-items: center;
+  flex: 1 1 320px;
   gap: 8px;
   min-width: 0;
 }
@@ -532,8 +573,8 @@ defineExpose({ unsaved: registry.unsaved, flushAll: registry.flushAll, refresh }
 }
 .sed__tools {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  flex: none;
   gap: 8px;
 }
 .sed__save {

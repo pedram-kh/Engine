@@ -2388,7 +2388,9 @@
           "duration": "Duration",
           "seconds": "{n} seconds",
           "estimate": "Estimated length: about {n} s",
-          "noEstimate": "Add audio text to see an estimate"
+          "noEstimate": "Add audio text to see an estimate",
+          "setting": "The overall setting of the video",
+          "settingPlaceholder": "At home in the kitchen, daylight, casual clothes, phone and delivery bag on the counter"
         },
         "hooks": {
           "title": "Hooks",
@@ -2413,18 +2415,20 @@
           "deleteTitle": "Delete hook {letter}?",
           "deleteBody": "This hook and its text will be deleted.",
           "deleteConfirm": "Delete hook",
-          "deleteBodyImages": "This hook, its text and its reference images (images: {images}) will be deleted."
+          "deleteBodyImages": "This hook, its text and its reference images (images: {images}) will be deleted.",
+          "goneTitle": "This hook was deleted by someone else",
+          "goneHint": "Your text is still here. Copy it before you close this."
         },
         "shot": {
-          "wide": "Wide",
-          "medium": "Medium",
+          "wide": "Wide shot",
+          "medium": "Medium shot",
           "close_up": "Close-up",
-          "detail": "Detail",
+          "detail": "Detail shot",
           "pov": "POV",
           "over_the_shoulder": "Over the shoulder",
           "top_down": "Top-down",
           "screen_recording": "Screen recording",
-          "reaction": "Reaction",
+          "reaction": "Reaction shot",
           "creator_to_camera": "Creator to camera"
         },
         "conflict": {
@@ -2463,7 +2467,9 @@
         "replace": {
           "label": "This slot has scripts ({count}). What happens to them?",
           "carry": "Carry the scripts over to the new creator",
-          "archive": "Archive them and start fresh"
+          "archive": "Archive them and start fresh",
+          "returnBack": "Archived scripts of {name} that come back: {count}",
+          "returnStay": "Left archived because three live scripts is the limit: {count}"
         },
         "remove": {
           "label": "This creator has scripts ({count}). What happens to them?",
@@ -2572,7 +2578,11 @@
           "shotsCount": "Shots: {count}",
           "shotsUsage": "Shots in this script: {n} of {max}",
           "title": "Script lines",
-          "usage": "Lines: {n} of {max}"
+          "usage": "Lines: {n} of {max}",
+          "visual": "Visual",
+          "visualPlaceholder": "What the viewer sees on this line",
+          "lineShotType": "Shot type of line {n}",
+          "visualSummary": "Visual: {shot}"
         },
         "order": {
           "changedElsewhere": "The order was changed elsewhere. It has been reloaded; your text is untouched.",

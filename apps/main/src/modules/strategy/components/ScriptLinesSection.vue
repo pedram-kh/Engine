@@ -18,7 +18,6 @@ import { useSaveRegistryRead } from '../composables/useSaveRegistry'
 import {
   applyBrollOrder,
   applyLineOrder,
-  isUnsaved,
   LINES_NEAR,
   moveBefore,
   moveId,
@@ -69,7 +68,8 @@ const adding = ref(false)
 const justAdded = ref(new Set<string>())
 const deletedByMe = new Set<string>()
 
-// A line that disappears while it holds unsaved text is kept (as a deleted card) so the text can be copied.
+// A line that disappears after the person wrote in it (typing, a save that went through, or a failed one) is kept as a deleted card so
+// the text can be copied. A line they never touched just goes. Everything here is by the line's id, never its number or place.
 const ghosts = ref(new Map<string, { line: ScriptLine; index: number }>())
 watch(
   () => props.script.lines,
@@ -78,7 +78,7 @@ watch(
     ;(before ?? []).forEach((l, index) => {
       if (nowIds.has(l.id) || deletedByMe.has(l.id) || ghosts.value.has(l.id)) return
       const status = registry?.statusOf(`line:${l.id}`)
-      if (status !== undefined && isUnsaved(status)) ghosts.value.set(l.id, { line: l, index })
+      if (status !== undefined && status !== 'idle') ghosts.value.set(l.id, { line: l, index })
     })
     for (const id of [...ghosts.value.keys()]) if (nowIds.has(id)) ghosts.value.delete(id)
   },

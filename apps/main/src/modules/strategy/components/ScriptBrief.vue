@@ -1,12 +1,12 @@
 <script setup lang="ts">
 /**
  * PL-3.2a — the brief card (frame 13:3108, node 13:3405): persona, its Priority and Support USPs, the angle, the duration with the
- * estimate. Persona, USPs and the angle line are read LIVE from steps 2 and 3 (the server sends them with the script); the angle
+ * estimate, and (walk ruling, no frame: built from the rows above) "The overall setting of the video" under the duration. Persona, USPs and the angle line are read LIVE from steps 2 and 3 (the server sends them with the script); the angle
  * and the duration are the strategist's to edit and autosave as one block with its own revision. A creator with no persona gets
  * the prompt in place of the persona and USPs, and the angle and duration still work.
  */
 import type { ScriptDuration, WaveScript } from '@catalyst/api-client'
-import { SCRIPT_DURATIONS } from '@catalyst/api-client'
+import { SCRIPT_DURATIONS, SCRIPT_TEXT_LIMITS } from '@catalyst/api-client'
 import { computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -68,11 +68,19 @@ const custom = computed(
   () => block.draft.value.reset === false && (brief.value.angle.custom || block.dirty.value),
 )
 const angleOver = computed(() => block.draft.value.angle.length > props.angleMax)
+const settingMax = SCRIPT_TEXT_LIMITS.setting
+const settingOver = computed(() => block.draft.value.setting.length > settingMax)
+const settingNear = computed(() => block.draft.value.setting.length >= settingMax * 0.8)
 
 function setAngle(v: string): void {
   block.edit((d) => {
     d.angle = v
     d.reset = false
+  })
+}
+function setSetting(v: string): void {
+  block.edit((d) => {
+    d.setting = v
   })
 }
 function setDuration(n: ScriptDuration): void {
@@ -104,6 +112,7 @@ const mineLines = computed(() => [
     label: t('app.strategy.scripts.brief.duration'),
     text: t('app.strategy.scripts.brief.seconds', { n: block.draft.value.duration }),
   },
+  { label: t('app.strategy.scripts.brief.setting'), text: block.draft.value.setting },
 ])
 const theirsLines = computed(() => {
   const th = block.theirs.value
@@ -115,6 +124,7 @@ const theirsLines = computed(() => {
           label: t('app.strategy.scripts.brief.duration'),
           text: t('app.strategy.scripts.brief.seconds', { n: th.duration }),
         },
+        { label: t('app.strategy.scripts.brief.setting'), text: th.setting },
       ]
 })
 </script>
@@ -256,6 +266,32 @@ const theirsLines = computed(() => {
           })
         }}</span
       >
+    </div>
+
+    <div class="sbrief__row sbrief__row--top">
+      <label class="sbrief__label" :for="`setting-${script.id}`">{{
+        t('app.strategy.scripts.brief.setting')
+      }}</label>
+      <div class="sbrief__angle">
+        <AutoGrowTextarea
+          :id="`setting-${script.id}`"
+          :model-value="block.draft.value.setting"
+          class="sbrief__field"
+          :placeholder="t('app.strategy.scripts.brief.settingPlaceholder')"
+          :error="settingOver"
+          data-test="script-setting"
+          @update:model-value="(v: string) => setSetting(v)"
+        />
+        <div v-if="settingNear" class="sbrief__meta">
+          <span
+            class="sbrief__count"
+            :class="{ 'sbrief__count--over': settingOver }"
+            data-test="script-setting-count"
+          >
+            {{ block.draft.value.setting.length }} / {{ settingMax }}
+          </span>
+        </div>
+      </div>
     </div>
 
     <BlockConflict

@@ -2388,7 +2388,9 @@
           "duration": "Duur",
           "seconds": "{n} seconden",
           "estimate": "Geschatte lengte: ongeveer {n} s",
-          "noEstimate": "Voeg audiotekst toe voor een schatting"
+          "noEstimate": "Voeg audiotekst toe voor een schatting",
+          "setting": "De algemene setting van de video",
+          "settingPlaceholder": "Thuis in de keuken, daglicht, casual kleding, telefoon en bezorgtas op het aanrecht"
         },
         "hooks": {
           "title": "Hooks",
@@ -2413,7 +2415,9 @@
           "deleteTitle": "Hook {letter} verwijderen?",
           "deleteBody": "Deze hook en de tekst ervan worden verwijderd.",
           "deleteConfirm": "Hook verwijderen",
-          "deleteBodyImages": "Deze hook, zijn tekst en zijn referentiebeelden (beelden: {images}) worden verwijderd."
+          "deleteBodyImages": "Deze hook, zijn tekst en zijn referentiebeelden (beelden: {images}) worden verwijderd.",
+          "goneTitle": "Deze hook is door iemand anders verwijderd",
+          "goneHint": "Je tekst staat er nog. Kopieer hem voordat je dit sluit."
         },
         "shot": {
           "wide": "Totaal",
@@ -2463,7 +2467,9 @@
         "replace": {
           "label": "Deze plek heeft scripts ({count}). Wat gebeurt ermee?",
           "carry": "De scripts overzetten naar de nieuwe creator",
-          "archive": "Archiveren en opnieuw beginnen"
+          "archive": "Archiveren en opnieuw beginnen",
+          "returnBack": "Gearchiveerde scripts van {name} die terugkomen: {count}",
+          "returnStay": "Blijven gearchiveerd omdat de limiet drie actieve scripts is: {count}"
         },
         "remove": {
           "label": "Deze creator heeft scripts ({count}). Wat gebeurt ermee?",
@@ -2572,7 +2578,11 @@
           "shotsCount": "Shots: {count}",
           "shotsUsage": "Shots in dit script: {n} van {max}",
           "title": "Scriptregels",
-          "usage": "Regels: {n} van {max}"
+          "usage": "Regels: {n} van {max}",
+          "visual": "Beeld",
+          "visualPlaceholder": "Wat de kijker op deze regel ziet",
+          "lineShotType": "Shottype van regel {n}",
+          "visualSummary": "Beeld: {shot}"
         },
         "order": {
           "changedElsewhere": "De volgorde is elders gewijzigd. Hij is opnieuw geladen; je tekst is ongewijzigd.",

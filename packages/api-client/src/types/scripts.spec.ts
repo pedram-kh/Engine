@@ -34,11 +34,13 @@ describe('scripts types parity with the backend', () => {
       Number(new RegExp(`const ${name} = (\\d+);`).exec(php)?.[1])
     expect({ ...SCRIPT_TEXT_LIMITS }).toEqual({
       angle: read('SCRIPT_ANGLE'),
+      setting: read('SCRIPT_SETTING'),
       audio: read('HOOK_AUDIO'),
       overlay: read('HOOK_OVERLAY'),
       visual: read('HOOK_VISUAL'),
       line: read('LINE_TEXT'),
       broll: read('BROLL_DESCRIPTION'),
+      lineVisual: read('LINE_VISUAL'),
     })
   })
 })

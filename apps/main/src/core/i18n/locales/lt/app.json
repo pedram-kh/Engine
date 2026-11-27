@@ -2388,7 +2388,9 @@
           "duration": "Trukmė",
           "seconds": "{n} sek.",
           "estimate": "Numatoma trukmė: apie {n} s",
-          "noEstimate": "Pridėkite garso tekstą, kad pamatytumėte įvertį"
+          "noEstimate": "Pridėkite garso tekstą, kad pamatytumėte įvertį",
+          "setting": "Bendra vaizdo įrašo aplinka",
+          "settingPlaceholder": "Namuose virtuvėje, dienos šviesa, kasdienė apranga, telefonas ir pristatymo krepšys ant stalviršio"
         },
         "hooks": {
           "title": "Kabliukai",
@@ -2413,7 +2415,9 @@
           "deleteTitle": "Ištrinti kabliuką {letter}?",
           "deleteBody": "Šis kabliukas ir jo tekstas bus ištrinti.",
           "deleteConfirm": "Ištrinti kabliuką",
-          "deleteBodyImages": "Šis hook, jo tekstas ir pavyzdiniai paveikslėliai (paveikslėlių: {images}) bus ištrinti."
+          "deleteBodyImages": "Šis hook, jo tekstas ir pavyzdiniai paveikslėliai (paveikslėlių: {images}) bus ištrinti.",
+          "goneTitle": "Šį hook ištrynė kitas asmuo",
+          "goneHint": "Jūsų tekstas dar čia. Nukopijuokite jį prieš uždarydami."
         },
         "shot": {
           "wide": "Bendras planas",
@@ -2463,7 +2467,9 @@
         "replace": {
           "label": "Šioje vietoje yra scenarijų ({count}). Ką su jais daryti?",
           "carry": "Perkelti scenarijus naujam kūrėjui",
-          "archive": "Suarchyvuoti juos ir pradėti iš naujo"
+          "archive": "Suarchyvuoti juos ir pradėti iš naujo",
+          "returnBack": "Kūrėjo {name} suarchyvuoti scenarijai, kurie grįžta: {count}",
+          "returnStay": "Lieka archyve, nes riba yra trys aktyvūs scenarijai: {count}"
         },
         "remove": {
           "label": "Šis kūrėjas turi scenarijų ({count}). Ką su jais daryti?",
@@ -2572,7 +2578,11 @@
           "shotsCount": "Kadrų: {count}",
           "shotsUsage": "Kadrų šiame scenarijuje: {n} iš {max}",
           "title": "Scenarijaus eilutės",
-          "usage": "Eilučių: {n} iš {max}"
+          "usage": "Eilučių: {n} iš {max}",
+          "visual": "Vaizdas",
+          "visualPlaceholder": "Ką žiūrovas mato šioje eilutėje",
+          "lineShotType": "{n} eilutės kadro tipas",
+          "visualSummary": "Vaizdas: {shot}"
         },
         "order": {
           "changedElsewhere": "Tvarka pakeista kitur. Ji įkelta iš naujo; jūsų tekstas nepaliestas.",

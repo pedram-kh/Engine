@@ -3,6 +3,7 @@
  * near the limit), a move that shows at once and sends the WHOLE id list, and a stale list that reloads and says so.
  */
 import { flushPromises } from '@vue/test-utils'
+import { defineComponent, h } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('../api/strategy.api', () => ({
@@ -12,6 +13,7 @@ vi.mock('../api/strategy.api', () => ({
 import { strategyApi } from '../api/strategy.api'
 import { LIMITS, makeBroll, makeLine, makeScript, orderMismatch } from '../scriptsTestKit'
 import { mountStrategy } from '../strategyTestKit'
+import { provideSaveRegistry } from '../composables/useSaveRegistry'
 import ScriptLinesSection from './ScriptLinesSection.vue'
 
 const SCOPE = { agencyId: 'A', brandId: 'B', waveId: 'W' } as never
@@ -112,5 +114,67 @@ describe('ScriptLinesSection (PL-3.2b)', () => {
     await flushPromises()
     expect(w.emitted('refresh')).toBeDefined()
     expect(w.get('[data-test="script-lines-notice"]').text()).toContain('changed elsewhere')
+  })
+
+  describe('a line deleted in another tab (walk step 17)', () => {
+    // The section reads the save registry the editor provides: this host provides one.
+    const Host = defineComponent({
+      inheritAttrs: false,
+      setup(_, { attrs }) {
+        provideSaveRegistry()
+        return () => h(ScriptLinesSection, attrs)
+      },
+    })
+    async function mountHost(script: ReturnType<typeof withLines>) {
+      const w = await mountStrategy(Host, {
+        script,
+        scope: SCOPE,
+        view: { mode: 'single', language: 'en' },
+        textMax: 2000,
+        brollMax: 500,
+        debounceMs: 5,
+      })
+      await flushPromises()
+      return w
+    }
+
+    it('a line the person wrote in and SAVED stays as a deleted card with the text; the next line moves up under its own id', async () => {
+      const s = withLines(3)
+      const [a, b, c] = s.lines
+      const saved = { ...s, lines: [{ ...a!, texts: { en: 'my words' }, revision: 2 }, b!, c!] }
+      vi.mocked(strategyApi.saveLine).mockResolvedValue({ data: saved })
+      const w = await mountHost(s)
+      const area = w.get(`[data-test="script-line-text-${a!.id}"] textarea`)
+      ;(area.element as HTMLTextAreaElement).value = 'my words'
+      await area.trigger('input')
+      await vi.waitFor(() => expect(strategyApi.saveLine).toHaveBeenCalledTimes(1))
+      await flushPromises()
+      // another tab deletes line a: the server's list now has b and c (numbers 2 and 3)
+      await w.setProps({
+        script: {
+          ...s,
+          lines: [
+            { ...b!, number: 2 },
+            { ...c!, number: 3 },
+          ],
+        },
+      })
+      expect(w.find(`[data-test="script-line-gone-${a!.id}"]`).exists()).toBe(true)
+      expect(
+        (w.get(`[data-test="script-line-text-${a!.id}"] textarea`).element as HTMLTextAreaElement)
+          .value,
+      ).toBe('my words')
+      // b is a different card, still addressed by its own id, and it is not marked gone
+      expect(w.find(`[data-test="script-line-gone-${b!.id}"]`).exists()).toBe(false)
+      expect(w.get(`[data-test="script-line-name-${b!.id}"]`).text()).toBe('Line 2')
+    })
+
+    it('a line the person never touched just goes, with no card', async () => {
+      const s = withLines(2)
+      const w = await mountHost(s)
+      await w.setProps({ script: { ...s, lines: [s.lines[1]!] } })
+      expect(w.find(`[data-test="script-line-gone-${s.lines[0]!.id}"]`).exists()).toBe(false)
+      expect(w.find(`[data-test="script-line-${s.lines[0]!.id}"]`).exists()).toBe(false)
+    })
   })
 })

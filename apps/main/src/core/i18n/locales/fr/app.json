@@ -2388,7 +2388,9 @@
           "duration": "Durée",
           "seconds": "{n} secondes",
           "estimate": "Durée estimée : environ {n} s",
-          "noEstimate": "Ajoutez du texte audio pour voir une estimation"
+          "noEstimate": "Ajoutez du texte audio pour voir une estimation",
+          "setting": "Le cadre général de la vidéo",
+          "settingPlaceholder": "À la maison, dans la cuisine, lumière du jour, tenue décontractée, téléphone et sac de livraison sur le plan de travail"
         },
         "hooks": {
           "title": "Accroches",
@@ -2413,7 +2415,9 @@
           "deleteTitle": "Supprimer l'accroche {letter} ?",
           "deleteBody": "Cette accroche et son texte seront supprimés.",
           "deleteConfirm": "Supprimer l'accroche",
-          "deleteBodyImages": "Ce hook, son texte et ses images de référence (images : {images}) seront supprimés."
+          "deleteBodyImages": "Ce hook, son texte et ses images de référence (images : {images}) seront supprimés.",
+          "goneTitle": "Ce hook a été supprimé par quelqu’un d’autre",
+          "goneHint": "Votre texte est toujours là. Copiez-le avant de fermer."
         },
         "shot": {
           "wide": "Plan large",
@@ -2463,7 +2467,9 @@
         "replace": {
           "label": "Cet emplacement a des scripts ({count}). Que doivent-ils devenir ?",
           "carry": "Reporter les scripts sur le nouveau créateur",
-          "archive": "Les archiver et repartir de zéro"
+          "archive": "Les archiver et repartir de zéro",
+          "returnBack": "Scripts archivés de {name} qui reviennent : {count}",
+          "returnStay": "Restent archivés, car la limite est de trois scripts actifs : {count}"
         },
         "remove": {
           "label": "Ce créateur a des scripts ({count}). Que doivent-ils devenir ?",
@@ -2572,7 +2578,11 @@
           "shotsCount": "Plans : {count}",
           "shotsUsage": "Plans dans ce script : {n} sur {max}",
           "title": "Lignes du script",
-          "usage": "Lignes : {n} sur {max}"
+          "usage": "Lignes : {n} sur {max}",
+          "visual": "Visuel",
+          "visualPlaceholder": "Ce que le spectateur voit sur cette ligne",
+          "lineShotType": "Type de plan de la ligne {n}",
+          "visualSummary": "Visuel : {shot}"
         },
         "order": {
           "changedElsewhere": "L'ordre a été modifié ailleurs. Il a été rechargé ; votre texte n'a pas changé.",

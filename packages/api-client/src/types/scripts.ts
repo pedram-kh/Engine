@@ -28,11 +28,13 @@ export type ScriptDuration = (typeof SCRIPT_DURATIONS)[number]
  */
 export const SCRIPT_TEXT_LIMITS = {
   angle: 300,
+  setting: 500,
   audio: 300,
   overlay: 100,
   visual: 400,
   line: 600,
   broll: 400,
+  lineVisual: 400,
 } as const
 
 /** The image types a script reference accepts (the server reads the real bytes and has the last word). */
@@ -137,6 +139,8 @@ export interface ScriptBrief {
   usps: ScriptBriefUsp[]
   angle: { value: string | null; source: ScriptAngleSource; custom: boolean }
   duration_seconds: number
+  /** "The overall setting of the video": optional English free text, at most `SCRIPT_TEXT_LIMITS.setting`. */
+  setting: string | null
   /** The brief block's own revision: send it back with the save. */
   revision: number
 }
@@ -172,6 +176,9 @@ export interface ScriptLine {
   position: number
   number: number
   cta: boolean
+  /** The line's own shot type and English visual description (both optional). */
+  shot_type: ShotType | null
+  visual_description: string | null
   /** Spoken text by language (`en` first); an empty text is absent. */
   texts: Record<string, string>
   broll: ScriptBroll[]
@@ -218,6 +225,8 @@ export interface ScriptBriefPayload {
   /** A text, or null to go back to the persona's live angle. */
   angle?: string | null
   duration_seconds?: ScriptDuration
+  /** A text, or null to clear it. */
+  setting?: string | null
   revision: number
 }
 
@@ -232,6 +241,8 @@ export interface ScriptHookPayload {
 export interface ScriptLinePayload {
   texts?: Record<string, string | null>
   cta?: boolean
+  shot_type?: ShotType | null
+  visual_description?: string | null
   broll?: Record<string, { shot_type?: ShotType | null; description?: string | null }>
   revision: number
 }

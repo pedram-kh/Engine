@@ -121,4 +121,50 @@ describe('ScriptLineCard (PL-3.2b)', () => {
     await w.get(`[data-test="script-line-gone-close-${line.id}"]`).trigger('click')
     expect(w.emitted('dismiss')).toHaveLength(1)
   })
+
+  it('the Visual row: the shot menu lists the ten types, and a pick and a description save with the line revision', async () => {
+    const line = makeLine(1)
+    const saved = makeScript(1, {
+      lines: [{ ...line, shot_type: 'close_up', visual_description: 'The bag opens', revision: 2 }],
+    })
+    vi.mocked(strategyApi.saveLine).mockResolvedValue({ data: saved })
+    const w = await mountCard(line)
+    await w.get(`[data-test="script-line-shot-${line.id}"]`).trigger('click')
+    await flushPromises()
+    expect(
+      document.body.querySelectorAll(`[data-test^="script-line-shot-${line.id}-"]`),
+    ).toHaveLength(10)
+    document.body
+      .querySelector<HTMLElement>(`[data-test="script-line-shot-${line.id}-close_up"]`)
+      ?.click()
+    const area = w.get(`[data-test="script-line-visual-${line.id}"] textarea`)
+    ;(area.element as HTMLTextAreaElement).value = 'The bag opens'
+    await area.trigger('input')
+    await vi.waitFor(() => expect(strategyApi.saveLine).toHaveBeenCalledTimes(1))
+    expect(vi.mocked(strategyApi.saveLine).mock.calls[0]?.[3]).toEqual({
+      revision: 1,
+      shot_type: 'close_up',
+      visual_description: 'The bag opens',
+    })
+  })
+
+  it('the visual counter shows only near the limit (from 80% of 400) and turns red above it', async () => {
+    const w = await mountCard(makeLine(1, { visual_description: 'x'.repeat(100) }))
+    expect(w.find('.lcard__vcount').exists()).toBe(false)
+    const near = await mountCard(makeLine(1, { visual_description: 'x'.repeat(330) }))
+    expect(near.get('.lcard__vcount').text()).toBe('330 / 400')
+    const over = await mountCard(makeLine(1, { visual_description: 'x'.repeat(401) }))
+    expect(over.get('.lcard__vcount').classes()).toContain('lcard__vcount--over')
+  })
+
+  it('collapsed: "Visual: " and the shot type in lower case when one is set, nothing when not', async () => {
+    const line = makeLine(1, { shot_type: 'creator_to_camera' })
+    const w = await mountCard(line, { initiallyOpen: false })
+    expect(w.get(`[data-test="script-line-visual-summary-${line.id}"]`).text()).toBe(
+      '· Visual: creator to camera',
+    )
+    const none = makeLine(1)
+    const w2 = await mountCard(none, { initiallyOpen: false })
+    expect(w2.find(`[data-test="script-line-visual-summary-${none.id}"]`).exists()).toBe(false)
+  })
 })

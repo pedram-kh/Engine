@@ -2388,7 +2388,9 @@
           "duration": "Kesto",
           "seconds": "{n} sekuntia",
           "estimate": "Arvioitu pituus: noin {n} s",
-          "noEstimate": "Lisää äänitekstiä nähdäksesi arvion"
+          "noEstimate": "Lisää äänitekstiä nähdäksesi arvion",
+          "setting": "Videon yleinen ympäristö",
+          "settingPlaceholder": "Kotona keittiössä, päivänvalo, rennot vaatteet, puhelin ja kuljetuslaukku tasolla"
         },
         "hooks": {
           "title": "Koukut",
@@ -2413,7 +2415,9 @@
           "deleteTitle": "Poistetaanko koukku {letter}?",
           "deleteBody": "Tämä koukku ja sen teksti poistetaan.",
           "deleteConfirm": "Poista koukku",
-          "deleteBodyImages": "Tämä koukku, sen teksti ja viitekuvat (kuvia: {images}) poistetaan."
+          "deleteBodyImages": "Tämä koukku, sen teksti ja viitekuvat (kuvia: {images}) poistetaan.",
+          "goneTitle": "Joku toinen poisti tämän hookin",
+          "goneHint": "Tekstisi on yhä tässä. Kopioi se ennen kuin suljet tämän."
         },
         "shot": {
           "wide": "Laaja kuva",
@@ -2463,7 +2467,9 @@
         "replace": {
           "label": "Tässä paikassa on käsikirjoituksia ({count}). Mitä niille tehdään?",
           "carry": "Siirrä käsikirjoitukset uudelle tekijälle",
-          "archive": "Arkistoi ne ja aloita alusta"
+          "archive": "Arkistoi ne ja aloita alusta",
+          "returnBack": "Tekijän {name} arkistoidut käsikirjoitukset, jotka palaavat: {count}",
+          "returnStay": "Jäävät arkistoon, koska raja on kolme aktiivista käsikirjoitusta: {count}"
         },
         "remove": {
           "label": "Tällä tekijällä on käsikirjoituksia ({count}). Mitä niille tehdään?",
@@ -2572,7 +2578,11 @@
           "shotsCount": "Otoksia: {count}",
           "shotsUsage": "Tämän käsikirjoituksen otoksia: {n} / {max}",
           "title": "Käsikirjoituksen rivit",
-          "usage": "Rivejä: {n} / {max}"
+          "usage": "Rivejä: {n} / {max}",
+          "visual": "Kuva",
+          "visualPlaceholder": "Mitä katsoja näkee tällä rivillä",
+          "lineShotType": "Rivin {n} kuvakoko",
+          "visualSummary": "Kuva: {shot}"
         },
         "order": {
           "changedElsewhere": "Järjestystä muutettiin muualla. Se ladattiin uudelleen; tekstisi on koskematon.",

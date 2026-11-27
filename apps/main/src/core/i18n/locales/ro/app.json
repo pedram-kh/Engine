@@ -2388,7 +2388,9 @@
           "duration": "Durată",
           "seconds": "{n} secunde",
           "estimate": "Durată estimată: aproximativ {n} s",
-          "noEstimate": "Adaugă text audio ca să vezi o estimare"
+          "noEstimate": "Adaugă text audio ca să vezi o estimare",
+          "setting": "Decorul general al videoclipului",
+          "settingPlaceholder": "Acasă, în bucătărie, lumină naturală, haine casual, telefon și geantă de livrare pe blat"
         },
         "hooks": {
           "title": "Hook-uri",
@@ -2413,7 +2415,9 @@
           "deleteTitle": "Ștergi hook-ul {letter}?",
           "deleteBody": "Acest hook și textul lui vor fi șterse.",
           "deleteConfirm": "Șterge hook-ul",
-          "deleteBodyImages": "Acest hook, textul lui și imaginile de referință (imagini: {images}) vor fi șterse."
+          "deleteBodyImages": "Acest hook, textul lui și imaginile de referință (imagini: {images}) vor fi șterse.",
+          "goneTitle": "Acest hook a fost șters de altcineva",
+          "goneHint": "Textul tău este încă aici. Copiază-l înainte de a închide."
         },
         "shot": {
           "wide": "Plan general",
@@ -2463,7 +2467,9 @@
         "replace": {
           "label": "Acest loc are scripturi ({count}). Ce se întâmplă cu ele?",
           "carry": "Transferă scripturile la noul creator",
-          "archive": "Arhivează-le și începe de la zero"
+          "archive": "Arhivează-le și începe de la zero",
+          "returnBack": "Scripturile arhivate ale lui {name} care revin: {count}",
+          "returnStay": "Rămân arhivate pentru că limita este de trei scripturi active: {count}"
         },
         "remove": {
           "label": "Acest creator are scripturi ({count}). Ce se întâmplă cu ele?",
@@ -2572,7 +2578,11 @@
           "shotsCount": "Cadre: {count}",
           "shotsUsage": "Cadre în acest script: {n} din {max}",
           "title": "Rândurile scriptului",
-          "usage": "Rânduri: {n} din {max}"
+          "usage": "Rânduri: {n} din {max}",
+          "visual": "Imagine",
+          "visualPlaceholder": "Ce vede spectatorul pe acest rând",
+          "lineShotType": "Tipul de cadru al rândului {n}",
+          "visualSummary": "Imagine: {shot}"
         },
         "order": {
           "changedElsewhere": "Ordinea a fost schimbată în altă parte. A fost reîncărcată; textul tău este neatins.",

@@ -8,7 +8,7 @@
  * separate requests. A line somebody deleted while it was open keeps the person's text on screen (a message, Copy my text, Close).
  */
 import type { ScriptImage, ScriptLine, ShotType, WaveScript } from '@catalyst/api-client'
-import { SHOT_TYPES } from '@catalyst/api-client'
+import { SCRIPT_TEXT_LIMITS, SHOT_TYPES } from '@catalyst/api-client'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -30,6 +30,7 @@ import {
 } from '../scriptsLogic'
 import AutoGrowTextarea from './AutoGrowTextarea.vue'
 import BlockConflict from './BlockConflict.vue'
+import BlockGone from './BlockGone.vue'
 import BlockGrip from './BlockGrip.vue'
 import BlockStatusLine from './BlockStatusLine.vue'
 import ScriptImageField from './ScriptImageField.vue'
@@ -76,7 +77,7 @@ const emit = defineEmits<{
   /** The person closed the "this line was deleted" box. */
   dismiss: []
 }>()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const block = useBlockAutosave<LineValue>({
   remote: () => ({ value: lineValue(props.line, props.languages), revision: props.line.revision }),
@@ -102,6 +103,8 @@ const block = useBlockAutosave<LineValue>({
   clone: (v) => ({
     texts: { ...v.texts },
     cta: v.cta,
+    shot: v.shot,
+    visual: v.visual,
     broll: Object.fromEntries(Object.entries(v.broll).map(([id, r]) => [id, { ...r }])),
   }),
   reconcile: reconcileLine,
@@ -132,6 +135,27 @@ function setText(language: string, v: string): void {
     x.texts[language] = v
   })
 }
+function setShot(code: ShotType): void {
+  block.edit((x) => {
+    x.shot = code
+  })
+}
+function setVisual(v: string): void {
+  block.edit((x) => {
+    x.visual = v
+  })
+}
+const visualMax = SCRIPT_TEXT_LIMITS.lineVisual
+const visualOver = computed(() => d.value.visual.length > visualMax)
+const visualNear = computed(() => d.value.visual.length >= visualMax * 0.8)
+// The collapsed row names the line's own shot type in lower case, as the frame does ("· Visual: creator to camera").
+const visualSummary = computed(() =>
+  d.value.shot === null
+    ? ''
+    : t('app.strategy.scripts.lines.visualSummary', {
+        shot: shotName(d.value.shot).toLocaleLowerCase(locale.value),
+      }),
+)
 function setCta(v: boolean): void {
   block.edit((x) => {
     x.cta = v
@@ -198,6 +222,8 @@ const hasContent = computed(
     Object.values(d.value.texts).some((x) => x !== '') ||
     props.line.broll.length > 0 ||
     images.value.length > 0 ||
+    d.value.shot !== null ||
+    d.value.visual !== '' ||
     d.value.cta,
 )
 async function askRemove(): Promise<void> {
@@ -225,14 +251,16 @@ const title = computed(() =>
 )
 
 // A person's own words, to copy when the line is gone.
-const copied = ref(false)
-const copyFailed = ref(false)
-async function copyMine(): Promise<void> {
-  copyFailed.value = false
+function goneText(): string {
   const parts: string[] = []
   for (const l of props.languages) {
     const text = d.value.texts[l] ?? ''
     if (text !== '') parts.push(props.languages.length > 1 ? `${l.toUpperCase()}: ${text}` : text)
+  }
+  if (d.value.shot !== null || d.value.visual !== '') {
+    parts.push(
+      `${t('app.strategy.scripts.lines.visual')}: ${[d.value.shot === null ? '' : shotName(d.value.shot), d.value.visual].filter((x) => x !== '').join(' - ')}`,
+    )
   }
   for (const row of props.line.broll) {
     const r = d.value.broll[row.id]
@@ -240,13 +268,7 @@ async function copyMine(): Promise<void> {
       parts.push(`${row.code} ${shotName(r.shot)}: ${r.description}`)
     }
   }
-  try {
-    await navigator.clipboard.writeText(parts.join('\n'))
-    copied.value = true
-  } catch {
-    copyFailed.value = true
-    copied.value = false
-  }
+  return parts.join('\n')
 }
 
 const lineSummary = (v: LineValue): { label: string; text: string }[] => [
@@ -311,6 +333,12 @@ const theirsLines = computed(() =>
           <span class="lcard__summary" :data-test="`script-line-summary-${line.id}`">{{
             summary === '' ? t('app.strategy.scripts.lines.empty') : `“${summary}”`
           }}</span>
+          <span
+            v-if="visualSummary !== ''"
+            class="lcard__shots"
+            :data-test="`script-line-visual-summary-${line.id}`"
+            >· {{ visualSummary }}</span
+          >
           <span class="lcard__shots" :data-test="`script-line-shots-${line.id}`">{{
             line.broll.length === 0
               ? `· ${t('app.strategy.scripts.lines.noShots')}`
@@ -400,33 +428,15 @@ const theirsLines = computed(() =>
       </div>
     </header>
 
-    <div v-if="gone" class="lcard__gone" role="alert" :data-test="`script-line-gone-${line.id}`">
-      <p class="lcard__gone-title">{{ t('app.strategy.scripts.lines.goneTitle') }}</p>
-      <p class="lcard__gone-hint">{{ t('app.strategy.scripts.lines.goneHint') }}</p>
-      <div class="lcard__gone-actions">
-        <v-btn
-          size="small"
-          variant="outlined"
-          :data-test="`script-line-gone-copy-${line.id}`"
-          @click="copyMine"
-          >{{
-            copied
-              ? t('app.strategy.scripts.conflict.copied')
-              : t('app.strategy.scripts.conflict.copy')
-          }}</v-btn
-        >
-        <v-btn
-          size="small"
-          variant="text"
-          :data-test="`script-line-gone-close-${line.id}`"
-          @click="emit('dismiss')"
-          >{{ t('app.strategy.close') }}</v-btn
-        >
-      </div>
-      <p v-if="copyFailed" class="lcard__gone-hint">
-        {{ t('app.strategy.scripts.conflict.copyFailed') }}
-      </p>
-    </div>
+    <BlockGone
+      v-if="gone"
+      :id="line.id"
+      prefix="script-line"
+      :title="t('app.strategy.scripts.lines.goneTitle')"
+      :hint="t('app.strategy.scripts.lines.goneHint')"
+      :text="goneText"
+      @dismiss="emit('dismiss')"
+    />
 
     <div v-show="open" class="lcard__body">
       <div class="lcard__row">
@@ -444,6 +454,66 @@ const theirsLines = computed(() =>
           :test-id="`script-line-text-${line.id}`"
           @edit="setText"
         />
+      </div>
+
+      <div class="lcard__row">
+        <div class="lcard__label">
+          <v-icon icon="mdi-eye-outline" size="13" aria-hidden="true" />{{
+            t('app.strategy.scripts.lines.visual')
+          }}
+          <span class="lcard__opt">{{ t('app.strategy.scripts.hooks.optional') }}</span>
+        </div>
+        <div class="lcard__vfield">
+          <v-menu v-bind="MENU_PROPS" location="bottom start">
+            <template #activator="{ props: act }">
+              <button
+                v-bind="act"
+                type="button"
+                class="lcard__vshot"
+                :class="{ 'lcard__vshot--none': d.shot === null }"
+                :aria-label="t('app.strategy.scripts.lines.lineShotType', { n: line.number })"
+                :data-test="`script-line-shot-${line.id}`"
+              >
+                <v-icon icon="mdi-video-outline" size="12" aria-hidden="true" />
+                <span>{{ shotName(d.shot) }}</span>
+                <v-icon icon="mdi-chevron-down" size="11" aria-hidden="true" />
+              </button>
+            </template>
+            <v-list
+              density="compact"
+              class="lcard__vshots"
+              :data-test="`script-line-shot-menu-${line.id}`"
+            >
+              <v-list-item
+                v-for="code in SHOT_TYPES"
+                :key="code"
+                :active="code === d.shot"
+                :data-test="`script-line-shot-${line.id}-${code}`"
+                @click="setShot(code)"
+              >
+                <v-list-item-title>{{ t(`app.strategy.scripts.shot.${code}`) }}</v-list-item-title>
+                <template v-if="code === d.shot" #append>
+                  <v-icon icon="mdi-check" size="14" aria-hidden="true" />
+                </template>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+          <AutoGrowTextarea
+            :model-value="d.visual"
+            class="lcard__vinput"
+            :placeholder="t('app.strategy.scripts.lines.visualPlaceholder')"
+            :aria-label="t('app.strategy.scripts.lines.visual')"
+            :error="visualOver"
+            :data-test="`script-line-visual-${line.id}`"
+            @update:model-value="setVisual"
+          />
+          <span
+            v-if="visualNear"
+            class="lcard__vcount"
+            :class="{ 'lcard__vcount--over': visualOver }"
+            >{{ d.visual.length }} / {{ visualMax }}</span
+          >
+        </div>
       </div>
 
       <div class="lcard__row">
@@ -755,6 +825,75 @@ const theirsLines = computed(() =>
   line-height: normal;
   color: rgb(var(--v-theme-on-surface-variant));
 }
+.lcard__opt {
+  font-size: 10px;
+  font-weight: 400;
+  color: rgb(var(--v-theme-text-tertiary, var(--v-theme-on-surface-variant)));
+}
+.lcard__vfield {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.lcard__vinput {
+  margin: 0;
+}
+.lcard__vcount {
+  align-self: flex-end;
+  font-size: 11px;
+  color: rgb(var(--v-theme-text-tertiary, var(--v-theme-on-surface-variant)));
+}
+.lcard__vcount--over {
+  color: rgb(var(--v-theme-error));
+  font-weight: 600;
+}
+.lcard__vshot {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  padding: 3px 8px;
+  border: 1px solid rgb(var(--v-theme-border-color));
+  border-radius: 6px;
+  background: rgb(var(--v-theme-surface-bright));
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: normal;
+  color: rgb(var(--v-theme-on-surface));
+  cursor: pointer;
+}
+.lcard__vshot--none {
+  color: rgb(var(--v-theme-on-surface-variant));
+  font-weight: 400;
+}
+.lcard__vshot:hover {
+  border-color: rgb(var(--v-theme-on-surface-variant));
+}
+.lcard__vshots {
+  min-width: 210px;
+  padding: 6px;
+  border-radius: 8px;
+  background: rgb(var(--v-theme-surface-bright));
+}
+.lcard__vshots :deep(.v-list-item) {
+  min-height: 0;
+  padding: 6px 10px;
+  border-radius: 5px;
+}
+.lcard__vshots :deep(.v-list-item-title) {
+  font-size: 12px;
+  line-height: normal;
+}
+.lcard__vshots :deep(.v-list-item--active) {
+  background: color-mix(in srgb, rgb(var(--v-theme-primary)) 10%, transparent);
+  color: rgb(var(--v-theme-primary));
+}
+.lcard__vshots :deep(.v-list-item--active .v-list-item__overlay) {
+  opacity: 0;
+}
 .lcard__broll {
   display: flex;
   flex: 1 1 0;
@@ -904,29 +1043,6 @@ const theirsLines = computed(() =>
   width: 16px;
   height: 16px;
   accent-color: rgb(var(--v-theme-primary));
-}
-.lcard__gone {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 10px 12px;
-  border: 1px solid rgb(var(--v-theme-error));
-  border-radius: 8px;
-}
-.lcard__gone-title {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 600;
-  color: rgb(var(--v-theme-error));
-}
-.lcard__gone-hint {
-  margin: 0;
-  font-size: 12px;
-  color: rgb(var(--v-theme-on-surface-variant));
-}
-.lcard__gone-actions {
-  display: flex;
-  gap: 8px;
 }
 @media (max-width: 599px) {
   .lcard__row {

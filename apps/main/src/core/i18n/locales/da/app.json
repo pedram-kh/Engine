@@ -2388,7 +2388,9 @@
           "duration": "Varighed",
           "seconds": "{n} sekunder",
           "estimate": "Anslået længde: ca. {n} s",
-          "noEstimate": "Tilføj lydtekst for at se et estimat"
+          "noEstimate": "Tilføj lydtekst for at se et estimat",
+          "setting": "Videoens overordnede setting",
+          "settingPlaceholder": "Hjemme i køkkenet, dagslys, afslappet tøj, telefon og leveringstaske på bordet"
         },
         "hooks": {
           "title": "Hooks",
@@ -2413,7 +2415,9 @@
           "deleteTitle": "Slet hook {letter}?",
           "deleteBody": "Denne hook og dens tekst slettes.",
           "deleteConfirm": "Slet hook",
-          "deleteBodyImages": "Denne hook, dens tekst og dens referencebilleder (billeder: {images}) slettes."
+          "deleteBodyImages": "Denne hook, dens tekst og dens referencebilleder (billeder: {images}) slettes.",
+          "goneTitle": "Denne hook blev slettet af en anden",
+          "goneHint": "Din tekst er her stadig. Kopiér den, før du lukker."
         },
         "shot": {
           "wide": "Total",
@@ -2463,7 +2467,9 @@
         "replace": {
           "label": "Denne plads har scripts ({count}). Hvad skal der ske med dem?",
           "carry": "Overfør scripts til den nye creator",
-          "archive": "Arkivér dem, og start forfra"
+          "archive": "Arkivér dem, og start forfra",
+          "returnBack": "Arkiverede scripts for {name}, der kommer tilbage: {count}",
+          "returnStay": "Forbliver arkiveret, fordi grænsen er tre aktive scripts: {count}"
         },
         "remove": {
           "label": "Denne creator har scripts ({count}). Hvad skal der ske med dem?",
@@ -2572,7 +2578,11 @@
           "shotsCount": "Optagelser: {count}",
           "shotsUsage": "Optagelser i dette script: {n} af {max}",
           "title": "Scriptlinjer",
-          "usage": "Linjer: {n} af {max}"
+          "usage": "Linjer: {n} af {max}",
+          "visual": "Visuelt",
+          "visualPlaceholder": "Hvad seeren ser på denne linje",
+          "lineShotType": "Optagelsestype for linje {n}",
+          "visualSummary": "Visuelt: {shot}"
         },
         "order": {
           "changedElsewhere": "Rækkefølgen blev ændret et andet sted. Den er indlæst igen; din tekst er urørt.",

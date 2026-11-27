@@ -2388,7 +2388,9 @@
           "duration": "Tul",
           "seconds": "{n} sekondi",
           "estimate": "Tul stmat: madwar {n} s",
-          "noEstimate": "Żid test tal-awdjo biex tara stima"
+          "noEstimate": "Żid test tal-awdjo biex tara stima",
+          "setting": "L-ambjent ġenerali tal-video",
+          "settingPlaceholder": "Id-dar fil-kċina, dawl tal-jum, ħwejjeġ informali, telefon u borża tal-kunsinna fuq il-bank"
         },
         "hooks": {
           "title": "Hooks",
@@ -2413,7 +2415,9 @@
           "deleteTitle": "Tħassar il-hook {letter}?",
           "deleteBody": "Dan il-hook u t-test tiegħu se jitħassru.",
           "deleteConfirm": "Ħassar il-hook",
-          "deleteBodyImages": "Dan il-hook, it-test tiegħu u l-immaġini ta' referenza tiegħu (immaġini: {images}) se jitħassru."
+          "deleteBodyImages": "Dan il-hook, it-test tiegħu u l-immaġini ta' referenza tiegħu (immaġini: {images}) se jitħassru.",
+          "goneTitle": "Dan il-hook tneħħa minn xi ħadd ieħor",
+          "goneHint": "It-test tiegħek għadu hawn. Ikkopjah qabel tagħlaq dan."
         },
         "shot": {
           "wide": "Shot wiesa'",
@@ -2463,7 +2467,9 @@
         "replace": {
           "label": "Din il-pożizzjoni għandha skripts ({count}). X'għandu jiġri minnhom?",
           "carry": "Ittrasferixxi l-iskripts lill-kreatur il-ġdid",
-          "archive": "Arkivjahom u ibda mill-ġdid"
+          "archive": "Arkivjahom u ibda mill-ġdid",
+          "returnBack": "Skripts arkivjati ta’ {name} li jerġgħu lura: {count}",
+          "returnStay": "Jibqgħu arkivjati għax il-limitu huwa tliet skripts attivi: {count}"
         },
         "remove": {
           "label": "Dan il-kreatur għandu skripts ({count}). X'għandu jiġri minnhom?",
@@ -2572,7 +2578,11 @@
           "shotsCount": "Shots: {count}",
           "shotsUsage": "Shots f'din l-iskrittura: {n} minn {max}",
           "title": "Linji tal-iskrittura",
-          "usage": "Linji: {n} minn {max}"
+          "usage": "Linji: {n} minn {max}",
+          "visual": "Viżiv",
+          "visualPlaceholder": "Dak li jara l-ispettatur f’din ir-ringiela",
+          "lineShotType": "Tip ta’ shot tar-ringiela {n}",
+          "visualSummary": "Viżiv: {shot}"
         },
         "order": {
           "changedElsewhere": "L-ordni nbidel x'imkien ieħor. Tpoġġa mill-ġdid; it-test tiegħek ma ntmesx.",

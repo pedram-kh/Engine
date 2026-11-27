@@ -2388,7 +2388,9 @@
           "duration": "Trajanje",
           "seconds": "{n} sekund",
           "estimate": "Ocenjena dolžina: približno {n} s",
-          "noEstimate": "Dodajte zvočno besedilo, da vidite oceno"
+          "noEstimate": "Dodajte zvočno besedilo, da vidite oceno",
+          "setting": "Splošno okolje videa",
+          "settingPlaceholder": "Doma v kuhinji, dnevna svetloba, sproščena oblačila, telefon in dostavna torba na pultu"
         },
         "hooks": {
           "title": "Kavlji",
@@ -2413,7 +2415,9 @@
           "deleteTitle": "Izbrišem kavelj {letter}?",
           "deleteBody": "Ta kavelj in njegovo besedilo bosta izbrisana.",
           "deleteConfirm": "Izbriši kavelj",
-          "deleteBodyImages": "Ta hook, njegovo besedilo in referenčne slike (slike: {images}) bodo izbrisani."
+          "deleteBodyImages": "Ta hook, njegovo besedilo in referenčne slike (slike: {images}) bodo izbrisani.",
+          "goneTitle": "Ta hook je izbrisal nekdo drug",
+          "goneHint": "Vaše besedilo je še tukaj. Kopirajte ga, preden zaprete."
         },
         "shot": {
           "wide": "Total",
@@ -2463,7 +2467,9 @@
         "replace": {
           "label": "To mesto ima scenarije ({count}). Kaj naj se zgodi z njimi?",
           "carry": "Prenesi scenarije na novega ustvarjalca",
-          "archive": "Arhiviraj jih in začni znova"
+          "archive": "Arhiviraj jih in začni znova",
+          "returnBack": "Arhivirani scenariji ustvarjalca {name}, ki se vrnejo: {count}",
+          "returnStay": "Ostanejo v arhivu, ker so omejitev trije aktivni scenariji: {count}"
         },
         "remove": {
           "label": "Ta ustvarjalec ima scenarije ({count}). Kaj naj se zgodi z njimi?",
@@ -2572,7 +2578,11 @@
           "shotsCount": "Posnetki: {count}",
           "shotsUsage": "Posnetki v tem skriptu: {n} od {max}",
           "title": "Vrstice skripta",
-          "usage": "Vrstice: {n} od {max}"
+          "usage": "Vrstice: {n} od {max}",
+          "visual": "Vizualno",
+          "visualPlaceholder": "Kaj gledalec vidi v tej vrstici",
+          "lineShotType": "Vrsta posnetka vrstice {n}",
+          "visualSummary": "Vizualno: {shot}"
         },
         "order": {
           "changedElsewhere": "Vrstni red je bil spremenjen drugje. Znova je naložen; vaše besedilo je nedotaknjeno.",

@@ -2388,7 +2388,9 @@
           "duration": "Trajanje",
           "seconds": "{n} sekundi",
           "estimate": "Procijenjena duljina: oko {n} s",
-          "noEstimate": "Dodajte audio tekst da vidite procjenu"
+          "noEstimate": "Dodajte audio tekst da vidite procjenu",
+          "setting": "Opći ambijent videa",
+          "settingPlaceholder": "Kod kuće u kuhinji, dnevno svjetlo, opuštena odjeća, mobitel i torba za dostavu na pultu"
         },
         "hooks": {
           "title": "Hookovi",
@@ -2413,7 +2415,9 @@
           "deleteTitle": "Izbrisati hook {letter}?",
           "deleteBody": "Ovaj hook i njegov tekst bit će izbrisani.",
           "deleteConfirm": "Izbriši hook",
-          "deleteBodyImages": "Ovaj hook, njegov tekst i referentne slike (slike: {images}) bit će izbrisani."
+          "deleteBodyImages": "Ovaj hook, njegov tekst i referentne slike (slike: {images}) bit će izbrisani.",
+          "goneTitle": "Ovaj hook izbrisao je netko drugi",
+          "goneHint": "Vaš je tekst još ovdje. Kopirajte ga prije zatvaranja."
         },
         "shot": {
           "wide": "Total",
@@ -2463,7 +2467,9 @@
         "replace": {
           "label": "Ovo mjesto ima skripte ({count}). Što će se dogoditi s njima?",
           "carry": "Prenesi skripte na novog kreatora",
-          "archive": "Arhiviraj ih i počni ispočetka"
+          "archive": "Arhiviraj ih i počni ispočetka",
+          "returnBack": "Arhivirane skripte kreatora {name} koje se vraćaju: {count}",
+          "returnStay": "Ostaju arhivirane jer je ograničenje tri aktivne skripte: {count}"
         },
         "remove": {
           "label": "Ovaj kreator ima skripte ({count}). Što će se dogoditi s njima?",
@@ -2572,7 +2578,11 @@
           "shotsCount": "Kadrovi: {count}",
           "shotsUsage": "Kadrovi u ovoj skripti: {n} od {max}",
           "title": "Retci skripte",
-          "usage": "Retci: {n} od {max}"
+          "usage": "Retci: {n} od {max}",
+          "visual": "Vizual",
+          "visualPlaceholder": "Što gledatelj vidi u ovom retku",
+          "lineShotType": "Vrsta kadra retka {n}",
+          "visualSummary": "Vizual: {shot}"
         },
         "order": {
           "changedElsewhere": "Redoslijed je promijenjen negdje drugdje. Ponovno je učitan; vaš tekst je netaknut.",

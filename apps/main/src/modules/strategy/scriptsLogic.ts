@@ -26,6 +26,8 @@ export interface BriefValue {
   duration: ScriptDuration
   /** True after "Use the persona's angle": the next save sends `angle: null`. */
   reset: boolean
+  /** "The overall setting of the video" (English, optional). */
+  setting: string
 }
 
 export interface HookValue {
@@ -48,6 +50,9 @@ export interface LineValue {
   /** Spoken text by language, English included. */
   texts: Record<string, string>
   cta: boolean
+  /** The line's own shot type and English visual description. */
+  shot: ShotType | null
+  visual: string
   /** By the row's id. A row that is not here is one this draft never touched. */
   broll: Record<string, BrollValue>
 }
@@ -57,6 +62,7 @@ export function briefValue(brief: ScriptBrief): BriefValue {
     angle: brief.angle.value ?? '',
     duration: brief.duration_seconds as ScriptDuration,
     reset: false,
+    setting: brief.setting ?? '',
   }
 }
 
@@ -88,11 +94,22 @@ export function lineValue(line: ScriptLine, languages: readonly string[] = [EN])
   for (const row of line.broll) {
     broll[row.id] = { shot: row.shot_type, description: row.description ?? '' }
   }
-  return { texts, cta: line.cta, broll }
+  return {
+    texts,
+    cta: line.cta,
+    shot: line.shot_type,
+    visual: line.visual_description ?? '',
+    broll,
+  }
 }
 
 export function sameBrief(a: BriefValue, b: BriefValue): boolean {
-  return a.angle === b.angle && a.duration === b.duration && a.reset === b.reset
+  return (
+    a.angle === b.angle &&
+    a.duration === b.duration &&
+    a.reset === b.reset &&
+    a.setting === b.setting
+  )
 }
 
 /** Two text maps are the same when every language in either holds the same text (a missing one is the empty text). */
@@ -119,7 +136,8 @@ export function sameHook(a: HookValue, b: HookValue): boolean {
  * only one side knows (added or deleted in the meantime) is not a change the person made.
  */
 export function sameLine(a: LineValue, b: LineValue): boolean {
-  if (a.cta !== b.cta || !sameTexts(a.texts, b.texts)) return false
+  if (a.cta !== b.cta || a.shot !== b.shot || a.visual !== b.visual) return false
+  if (!sameTexts(a.texts, b.texts)) return false
   for (const id of Object.keys(a.broll)) {
     const x = a.broll[id]
     const y = b.broll[id]
@@ -140,6 +158,8 @@ export function briefPayload(
   else if (value.angle !== base.angle)
     payload.angle = value.angle.trim() === '' ? null : value.angle
   if (value.duration !== base.duration) payload.duration_seconds = value.duration
+  if (value.setting !== base.setting)
+    payload.setting = value.setting.trim() === '' ? null : value.setting
   return payload
 }
 
@@ -180,6 +200,9 @@ export function linePayload(
   }
   if (Object.keys(texts).length > 0) payload.texts = texts
   if (value.cta !== base.cta) payload.cta = value.cta
+  if (value.shot !== base.shot) payload.shot_type = value.shot
+  if (value.visual !== base.visual)
+    payload.visual_description = value.visual.trim() === '' ? null : value.visual
   const broll: NonNullable<ScriptLinePayload['broll']> = {}
   for (const [id, row] of Object.entries(value.broll)) {
     const was = base.broll[id]
@@ -210,7 +233,11 @@ export type SaveFailure =
 export function classifyFailure(err: unknown): SaveFailure {
   if (!(err instanceof ApiError)) return { kind: 'retry' }
   // A save to a line somebody deleted (404 with this code): the line is gone, the person's text stays on screen.
-  if (err.status === 404 && err.code === 'wave_script_line.deleted') return { kind: 'gone' }
+  if (
+    err.status === 404 &&
+    (err.code === 'wave_script_line.deleted' || err.code === 'wave_script_hook.deleted')
+  )
+    return { kind: 'gone' }
   // `broll_gone`: a B-roll shot of this line was deleted elsewhere. It carries the current line like a conflict does.
   if (
     err.status === 409 &&
@@ -516,4 +543,21 @@ export function languageName(code: string, locale: string): string {
 /** "English + Slovak + Hungarian". */
 export function languageListLabel(languages: readonly string[], locale: string): string {
   return languages.map((l) => languageName(l, locale)).join(' + ')
+}
+
+/** The most live scripts one creator holds in a market (the server's `scripts_per_creator`). */
+export const LIVE_SCRIPTS_MAX = 3
+
+/**
+ * What happens to a creator's archived scripts when they come into a market (Add, or Replace): the scripts carried over from the
+ * old creator come first, then the creator's own archived scripts fill what is left of the three places, lowest number first; the
+ * rest stay archived. The server does exactly this (`ScriptArchive::restore`); the dialog says it before the click.
+ */
+export function archivedReturn(
+  archived: number,
+  carried: number,
+  max: number = LIVE_SCRIPTS_MAX,
+): { back: number; stay: number } {
+  const back = Math.max(0, Math.min(archived, max - carried))
+  return { back, stay: Math.max(0, archived - back) }
 }

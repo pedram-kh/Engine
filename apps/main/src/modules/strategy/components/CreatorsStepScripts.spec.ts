@@ -232,6 +232,69 @@ describe('CreatorsStep — scripts choices (PL-3.2a)', () => {
     })
   })
 
+  describe('Archived scripts that come back (walk ruling)', () => {
+    const withArchived = (n: number) =>
+      vi.mocked(strategyApi.creatorCandidates).mockResolvedValue({
+        data: [makeCandidate(1, { archived_scripts: n })],
+        meta: {
+          total: 1,
+          page: 1,
+          per_page: 30,
+          last_page: 1,
+          market: 'SK',
+          market_countries: ['SK'],
+        },
+      })
+    const text = (id: string) => overlay(`[data-test="${id}"]`)?.textContent ?? ''
+
+    it('Replace with carry-over: the carried scripts take places first, the dialog says how many come back and how many stay', async () => {
+      withArchived(2)
+      const w = await mountStep({ 1: 2 })
+      await w.get(`[data-test="creator-replace-${SLOT_ID(1)}"]`).trigger('click')
+      await flushPromises()
+      await click(`[data-test="picker-card-${CREATOR_ID(101)}"]`)
+      const line = text(`creator-picker-returning-${CREATOR_ID(101)}`)
+      expect(line).toMatch(/come back: 1/)
+      expect(line).toMatch(/limit: 1/)
+      // archive instead: nothing is carried, both archived scripts come back, none stay
+      await click('[data-test="creator-picker-scripts-archive"] input')
+      const after = text(`creator-picker-returning-${CREATOR_ID(101)}`)
+      expect(after).toMatch(/come back: 2/)
+      expect(after).not.toMatch(/limit/)
+    })
+
+    it('Add: up to three come back, the rest stay; a creator with none shows no box', async () => {
+      const props = {
+        modelValue: true,
+        scope: { agencyId: 'A', brandId: BRAND_ULID, waveId: WAVE_ULID },
+        market: { id: 'SK', market: 'SK', name: 'Slovakia', countries: ['SK'] } as never,
+        marketName: () => 'Slovakia',
+        personas: [],
+        campaignId: null,
+        campaignName: null,
+        mode: 'add' as const,
+        replacing: null,
+        roomMarket: 5,
+        roomWave: 5,
+        perMarket: 5,
+        perWave: 5,
+      }
+      withArchived(4)
+      await mountStrategy(CreatorPickerDialog, props)
+      await flushPromises()
+      await click(`[data-test="picker-card-${CREATOR_ID(101)}"]`)
+      const line = text(`creator-picker-returning-${CREATOR_ID(101)}`)
+      expect(line).toMatch(/come back: 3/)
+      expect(line).toMatch(/limit: 1/)
+      document.body.innerHTML = ''
+      withArchived(0)
+      await mountStrategy(CreatorPickerDialog, props)
+      await flushPromises()
+      await click(`[data-test="picker-card-${CREATOR_ID(101)}"]`)
+      expect(overlay('[data-test="creator-picker-returning"]')).toBeNull()
+    })
+  })
+
   describe('Replace', () => {
     async function openReplace(counts: Record<number, number>) {
       const w = await mountStep(counts)

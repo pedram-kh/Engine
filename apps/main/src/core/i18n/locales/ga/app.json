@@ -2388,7 +2388,9 @@
           "duration": "Fad",
           "seconds": "{n} soicind",
           "estimate": "Fad measta: thart ar {n} s",
-          "noEstimate": "Cuir téacs fuaime leis chun meastachán a fheiceáil"
+          "noEstimate": "Cuir téacs fuaime leis chun meastachán a fheiceáil",
+          "setting": "Suíomh ginearálta an fhíseáin",
+          "settingPlaceholder": "Sa bhaile sa chistin, solas an lae, éadaí ócáideacha, fón agus mála seachadta ar an gcuntar"
         },
         "hooks": {
           "title": "Amhráin ghreamaitheacha",
@@ -2413,7 +2415,9 @@
           "deleteTitle": "An scriosfar amhrán greamaitheach {letter}?",
           "deleteBody": "Scriosfar an t-amhrán greamaitheach seo agus a théacs.",
           "deleteConfirm": "Scrios an t-amhrán greamaitheach",
-          "deleteBodyImages": "Scriosfar an hook seo, a théacs agus a íomhánna tagartha (íomhánna: {images})."
+          "deleteBodyImages": "Scriosfar an hook seo, a théacs agus a íomhánna tagartha (íomhánna: {images}).",
+          "goneTitle": "Scrios duine éigin eile an hook seo",
+          "goneHint": "Tá do théacs anseo fós. Cóipeáil é sula ndúnann tú seo."
         },
         "shot": {
           "wide": "Lámhaigh leathan",
@@ -2463,7 +2467,9 @@
         "replace": {
           "label": "Tá scripteanna ag an sliotán seo ({count}). Cad a tharlóidh dóibh?",
           "carry": "Aistrigh na scripteanna chuig an gcruthaitheoir nua",
-          "archive": "Cartlannaigh iad agus tosaigh as an nua"
+          "archive": "Cartlannaigh iad agus tosaigh as an nua",
+          "returnBack": "Scripteanna cartlannaithe {name} a fhilleann: {count}",
+          "returnStay": "Fágtar cartlannaithe iad mar is trí script bheo an teorainn: {count}"
         },
         "remove": {
           "label": "Tá scripteanna ag an gcruthaitheoir seo ({count}). Cad a tharlóidh dóibh?",
@@ -2572,7 +2578,11 @@
           "shotsCount": "Seatanna: {count}",
           "shotsUsage": "Seatanna sa script seo: {n} as {max}",
           "title": "Línte an scripte",
-          "usage": "Línte: {n} as {max}"
+          "usage": "Línte: {n} as {max}",
+          "visual": "Amhairc",
+          "visualPlaceholder": "An rud a fheiceann an breathnóir ar an líne seo",
+          "lineShotType": "Cineál seata na líne {n}",
+          "visualSummary": "Amhairc: {shot}"
         },
         "order": {
           "changedElsewhere": "Athraíodh an t-ord in áit eile. Athlódáladh é; níor athraíodh do théacs.",

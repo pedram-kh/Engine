@@ -2388,7 +2388,9 @@
           "duration": "Duração",
           "seconds": "{n} segundos",
           "estimate": "Duração estimada: cerca de {n} s",
-          "noEstimate": "Adicione texto de áudio para ver uma estimativa"
+          "noEstimate": "Adicione texto de áudio para ver uma estimativa",
+          "setting": "O cenário geral do vídeo",
+          "settingPlaceholder": "Em casa, na cozinha, luz do dia, roupa casual, telemóvel e mala de entregas na bancada"
         },
         "hooks": {
           "title": "Ganchos",
@@ -2413,7 +2415,9 @@
           "deleteTitle": "Eliminar o gancho {letter}?",
           "deleteBody": "Este gancho e o seu texto serão eliminados.",
           "deleteConfirm": "Eliminar gancho",
-          "deleteBodyImages": "Este hook, o seu texto e as suas imagens de referência (imagens: {images}) serão eliminados."
+          "deleteBodyImages": "Este hook, o seu texto e as suas imagens de referência (imagens: {images}) serão eliminados.",
+          "goneTitle": "Este hook foi eliminado por outra pessoa",
+          "goneHint": "O seu texto ainda está aqui. Copie-o antes de fechar."
         },
         "shot": {
           "wide": "Plano geral",
@@ -2463,7 +2467,9 @@
         "replace": {
           "label": "Este lugar tem guiões ({count}). O que lhes acontece?",
           "carry": "Passar os guiões para o novo criador",
-          "archive": "Arquivá-los e começar de novo"
+          "archive": "Arquivá-los e começar de novo",
+          "returnBack": "Guiões arquivados de {name} que voltam: {count}",
+          "returnStay": "Ficam arquivados porque o limite é de três guiões ativos: {count}"
         },
         "remove": {
           "label": "Este criador tem guiões ({count}). O que lhes acontece?",
@@ -2572,7 +2578,11 @@
           "shotsCount": "Planos: {count}",
           "shotsUsage": "Planos neste guião: {n} de {max}",
           "title": "Linhas do guião",
-          "usage": "Linhas: {n} de {max}"
+          "usage": "Linhas: {n} de {max}",
+          "visual": "Imagem",
+          "visualPlaceholder": "O que o espectador vê nesta linha",
+          "lineShotType": "Tipo de plano da linha {n}",
+          "visualSummary": "Imagem: {shot}"
         },
         "order": {
           "changedElsewhere": "A ordem foi alterada noutro local. Foi recarregada; o seu texto não foi alterado.",

@@ -24,6 +24,7 @@ import { creatorLabel } from '@/core/creators/creatorLabel'
 import { strategyApi, type WaveScope } from '../api/strategy.api'
 import { MENU_PROPS } from '../constants'
 import { selectable } from '../creatorsLogic'
+import { archivedReturn } from '../scriptsLogic'
 import { nearLimit } from '../limitLogic'
 import { strategyErrorMessage } from '../strategyErrors'
 import type { StrategyMarket } from '../useMarkets'
@@ -124,6 +125,23 @@ const names = computed(() => {
     creatorLabel(c, t, t('app.strategy.creators.card.unnamed')),
   )
   return list.length > 3 ? `${list.slice(0, 3).join(', ')} +${list.length - 3}` : list.join(', ')
+})
+/**
+ * Walk ruling: before the click, how many archived scripts of each chosen creator in this market come back, and how many stay
+ * archived because three live scripts is the limit. In Replace the scripts carried over from the old creator count first.
+ */
+const returning = computed(() => {
+  const carried =
+    single.value && askScripts.value && scriptsChoice.value === 'carry_over'
+      ? (props.scriptCount ?? 0)
+      : 0
+  return selected.value
+    .filter((c) => c.archived_scripts > 0)
+    .map((c) => ({
+      id: c.id,
+      name: creatorLabel(c, t, t('app.strategy.creators.card.unnamed')),
+      ...archivedReturn(c.archived_scripts, carried),
+    }))
 })
 const canSubmit = computed(
   () => selected.value.length > 0 && !overCap.value && !saving.value && !loading.value,
@@ -434,6 +452,24 @@ const title = computed(() =>
             {{ t('app.strategy.creators.picker.selected', { count: selected.length }) }}
           </span>
           <span class="picker__names" data-test="creator-picker-names">{{ names }}</span>
+          <div
+            v-if="returning.length > 0"
+            class="picker__returning"
+            role="status"
+            data-test="creator-picker-returning"
+          >
+            <p
+              v-for="r in returning"
+              :key="r.id"
+              class="picker__returning-line"
+              :data-test="`creator-picker-returning-${r.id}`"
+            >
+              {{ t('app.strategy.scripts.replace.returnBack', { name: r.name, count: r.back }) }}
+              <template v-if="r.stay > 0">
+                <br />{{ t('app.strategy.scripts.replace.returnStay', { count: r.stay }) }}
+              </template>
+            </p>
+          </div>
           <v-radio-group
             v-if="askScripts"
             v-model="scriptsChoice"
@@ -636,6 +672,17 @@ const title = computed(() =>
 .picker__scripts {
   flex: 1 1 320px;
   min-width: 0;
+}
+.picker__returning {
+  flex: 1 1 100%;
+  padding: 8px 10px;
+  border: 1px solid rgb(var(--v-theme-border-color));
+  border-radius: 6px;
+  font-size: 12px;
+}
+.picker__returning-line {
+  margin: 0;
+  color: rgb(var(--v-theme-on-surface));
 }
 .picker__names {
   max-width: 320px;

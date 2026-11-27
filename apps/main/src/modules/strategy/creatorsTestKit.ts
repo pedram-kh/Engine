@@ -112,6 +112,7 @@ export function makeCandidate(
     invited: false,
     already_in_wave: false,
     in_market: null,
+    archived_scripts: 0,
     ...over,
   }
 }
