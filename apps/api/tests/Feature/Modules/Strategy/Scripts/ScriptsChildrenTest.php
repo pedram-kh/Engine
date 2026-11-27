@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Modules\Strategy\Models\WaveCreator;
 use App\Modules\Strategy\Models\WaveScript;
+use App\Modules\Strategy\Models\WaveScriptLine;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -109,6 +110,29 @@ it('A1: the archived list counts each script\'s own lines and READY images (a re
     expect($rows)->toHaveCount(2)
         ->and($rows[$full])->toMatchArray(['hooks' => 3, 'lines' => 2, 'images' => 2])
         ->and($rows[$other])->toMatchArray(['hooks' => 3, 'lines' => 3, 'images' => 0]);
+});
+
+it('A2: the script setting and the line shot type and visual description survive archive, restore and a Replace with carry-over (they live on the rows that move)', function (): void {
+    $w = SF::world();
+    [$id, $slot] = pl32bFullScript($w);
+    $script = WaveScript::query()->where('ulid', $id)->firstOrFail();
+    $script->forceFill(['setting' => 'At home in the kitchen'])->save();
+    $line = WaveScriptLine::query()->where('script_id', $script->id)->orderBy('position')->firstOrFail();
+    $line->forceFill(['shot_type' => 'top_down', 'visual_description' => 'Hands over the counter'])->save();
+    $kept = fn (): array => [
+        WaveScript::query()->whereKey($script->id)->value('setting'),
+        WaveScriptLine::query()->whereKey($line->id)->first(['shot_type', 'visual_description'])?->only(['shot_type', 'visual_description']),
+    ];
+    $want = ['At home in the kitchen', ['shot_type' => 'top_down', 'visual_description' => 'Hands over the counter']];
+
+    S::call($w['admin'], 'POST', SF::url($w, "{$id}/archive"))->assertOk();
+    expect($kept())->toBe($want);
+    S::call($w['admin'], 'POST', SF::url($w, "archived/{$id}/restore"))->assertOk();
+    expect($kept())->toBe($want);
+
+    $new = F::applicant($w['campaign']);
+    S::call($w['admin'], 'POST', F::url($w, "{$slot->ulid}/replace"), ['creator' => $new->ulid, 'scripts' => 'carry_over'])->assertOk();
+    expect($kept())->toBe($want);
 });
 
 it('A1: an archived script is read-only: its lines, B-roll and images cannot be changed or added until it is restored', function (): void {
