@@ -657,6 +657,274 @@ test.describe('Scripts: lines, B-roll, languages, images', () => {
     await expect(lineBox(page, b)).toHaveCount(0)
   })
 
+  test('walk rulings: the line has a shot type and a visual description; the Brief has "The overall setting of the video"; both save, survive a reload and read back', async ({
+    page,
+    request,
+  }) => {
+    const s = await setup(page, request, DESKTOP)
+    const [a] = await s.addLine(1)
+    await s.open()
+    await expandAll(page)
+
+    // the setting row sits under Duration, with the grey example
+    const setting = page.locator('[data-test="script-setting"] textarea:not([aria-hidden])')
+    await expect(page.locator('label[for^="setting-"]')).toHaveText(
+      'The overall setting of the video',
+    )
+    await expect(setting).toHaveAttribute(
+      'placeholder',
+      'At home in the kitchen, daylight, casual clothes, phone and delivery bag on the counter',
+    )
+    await setting.fill('In the office kitchen at noon')
+    await expect(page.locator('[data-test="script-brief-status"]')).toContainText('Saved', {
+      timeout: 8000,
+    })
+
+    // the line: pick a shot type (the ten are listed), type the visual
+    await page.locator(`[data-test="script-line-shot-${a}"]`).click()
+    await expect(page.locator(`[data-test^="script-line-shot-${a}-"]`)).toHaveCount(10)
+    await page.locator(`[data-test="script-line-shot-${a}-creator_to_camera"]`).click()
+    await page
+      .locator(`[data-test="script-line-visual-${a}"] textarea:not([aria-hidden])`)
+      .fill('The creator holds up the delivery bag')
+    await expect(lineStatus(page, a)).toContainText('Saved', { timeout: 8000 })
+    await shot(page, 'line-visual-open')
+
+    const saved = await s.get()
+    expect(saved.brief.setting).toBe('In the office kitchen at noon')
+    expect(saved.lines[0].shot_type).toBe('creator_to_camera')
+    expect(saved.lines[0].visual_description).toBe('The creator holds up the delivery bag')
+
+    await page.reload()
+    await expandAll(page)
+    await expect(setting).toHaveValue('In the office kitchen at noon')
+    await expect(
+      page.locator(`[data-test="script-line-visual-${a}"] textarea:not([aria-hidden])`),
+    ).toHaveValue('The creator holds up the delivery bag')
+    // collapsed: "· Visual: creator to camera"
+    await page.locator(`[data-test="script-line-toggle-${a}"]`).click()
+    await expect(page.locator(`[data-test="script-line-visual-summary-${a}"]`)).toHaveText(
+      '· Visual: creator to camera',
+    )
+    await shot(page, 'line-visual-collapsed')
+  })
+
+  // ---- Walk fix 1 (step 17): everything is addressed by the block's own id and its own revision, never by number or place. ----
+  const hookText = (page: Page, id: string): Locator =>
+    page.locator(`[data-test="script-hook-audio-${id}"] textarea:not([aria-hidden])`)
+  const hookStatus = (page: Page, id: string): Locator =>
+    page.locator(`[data-test="script-hook-status-${id}"]`)
+  const lineTexts = async (s: { get: () => Promise<Json> }): Promise<Record<string, string>> =>
+    Object.fromEntries(
+      (await s.get()).lines.map((l: Json) => [l.id as string, (l.texts.en ?? '') as string]),
+    )
+
+  test('line deleted in another tab, I keep typing: the card says so, my text stays to copy, and nothing is written to the line that moved up', async ({
+    page,
+    request,
+    context,
+  }) => {
+    const s = await setup(page, request, DESKTOP)
+    const [a, b] = await s.addLine(2)
+    await s.open()
+    await expandAll(page)
+    await lineText(page, a).fill('first words')
+    await expect(lineStatus(page, a)).toContainText('Saved', { timeout: 8000 })
+    const before = (await s.get()).lines.find((l: Json) => l.id === b)
+
+    const other = await context.newPage()
+    await s.open(other)
+    await api(other, 'DELETE', `${s.scriptPath}/lines/${a}`)
+
+    // tab one, still showing line a as "Line 2", keeps typing
+    await lineText(page, a).fill('first words and more words typed after the delete')
+    await expect(page.locator(`[data-test="script-line-gone-${a}"]`)).toBeVisible({ timeout: 8000 })
+    await expect(lineText(page, a)).toHaveValue('first words and more words typed after the delete')
+    await shot(page, 'fix1-a-typed-after-delete')
+    // nothing reached the line that took its place: same text, same revision
+    const after = (await s.get()).lines
+    expect(after).toHaveLength(1)
+    expect(after[0].id).toBe(b)
+    expect(after[0].revision).toBe(before.revision)
+    expect(await lineTexts(s)).toEqual({ [b]: '' })
+  })
+
+  test('line saved, then deleted elsewhere, then my page refreshes the list: the card stays with my text (it does not vanish)', async ({
+    page,
+    request,
+    context,
+  }) => {
+    const s = await setup(page, request, DESKTOP)
+    const [a] = await s.addLine(1)
+    await s.open()
+    await expandAll(page)
+    await lineText(page, a).fill('saved before the delete')
+    await expect(lineStatus(page, a)).toContainText('Saved', { timeout: 8000 })
+    const other = await context.newPage()
+    await s.open(other)
+    await api(other, 'DELETE', `${s.scriptPath}/lines/${a}`)
+    // my tab reads the list again (Add line returns it): line a is no longer in it
+    await page.locator('[data-test="script-add-line"]').click()
+    await expect(page.locator(`[data-test="script-line-gone-${a}"]`)).toBeVisible({ timeout: 8000 })
+    await expect(lineText(page, a)).toHaveValue('saved before the delete')
+    await shot(page, 'fix1-a-ghost-after-refresh')
+  })
+
+  test('the next line moves up and takes the number; it keeps its own conflict protection', async ({
+    page,
+    request,
+    context,
+  }) => {
+    const s = await setup(page, request, DESKTOP)
+    const [a, b] = await s.addLine(2)
+    await s.open()
+    await expandAll(page)
+    await expect(page.locator(`[data-test="script-line-name-${b}"]`)).toHaveText('Line 3')
+    await lineText(page, a).fill('line a words')
+    await expect(lineStatus(page, a)).toContainText('Saved', { timeout: 8000 })
+
+    // tab two deletes line a and writes line b: b is now "Line 2" and its revision has moved on
+    const other = await context.newPage()
+    await s.open(other)
+    await api(other, 'DELETE', `${s.scriptPath}/lines/${a}`)
+    const now = (await s.get()).lines[0]
+    expect(now.id).toBe(b)
+    expect(now.number).toBe(2)
+    await api(other, 'PUT', `${s.scriptPath}/lines/${b}`, {
+      texts: { en: 'written in tab two' },
+      revision: now.revision,
+    })
+
+    // tab one types in b (still "Line 3" on its screen, with the old revision): the conflict box appears for b
+    await lineText(page, b).fill('written in tab one')
+    const conflict = page.locator(`[data-test="script-line-conflict-${b}"]`)
+    await expect(conflict).toBeVisible({ timeout: 8000 })
+    await expect(conflict).toContainText('written in tab two')
+    await expect(lineText(page, b)).toHaveValue('written in tab one')
+    await shot(page, 'fix1-b-conflict-on-moved-line')
+    expect(await lineTexts(s)).toEqual({ [b]: 'written in tab two' })
+  })
+
+  test('hooks: Hook B deleted in another tab while I edit it: the hook card says so and keeps my text; Hook C (now B) is untouched', async ({
+    page,
+    request,
+    context,
+  }) => {
+    const s = await setup(page, request, DESKTOP)
+    const [, hb, hc] = s.hookIds as string[]
+    await s.open()
+    await hookText(page, hb).fill('hook b words')
+    await expect(hookStatus(page, hb)).toContainText('Saved', { timeout: 8000 })
+    const before = (await s.get()).hooks.find((h: Json) => h.id === hc)
+
+    const other = await context.newPage()
+    await s.open(other)
+    await api(other, 'DELETE', `${s.scriptPath}/hooks/${hb}`)
+
+    await hookText(page, hb).fill('hook b words and more typed after the delete')
+    await expect(page.locator(`[data-test="script-hook-gone-${hb}"]`)).toBeVisible({
+      timeout: 8000,
+    })
+    await expect(hookText(page, hb)).toHaveValue('hook b words and more typed after the delete')
+    await expect(page.locator(`[data-test="script-hook-gone-copy-${hb}"]`)).toBeVisible()
+    await shot(page, 'fix1-hook-gone')
+    const hooks = (await s.get()).hooks
+    expect(hooks.map((h: Json) => h.id)).not.toContain(hb)
+    const c = hooks.find((h: Json) => h.id === hc)
+    expect(c.revision).toBe(before.revision)
+    expect(c.letter).toBe('B')
+    expect(c.texts.audio.en ?? '').toBe(before.texts.audio.en ?? '')
+    await page.locator(`[data-test="script-hook-gone-close-${hb}"]`).click()
+    await expect(page.locator(`[data-test="script-hook-${hb}"]`)).toHaveCount(0)
+  })
+
+  test('hooks: a hook I wrote in, deleted elsewhere, then my page reads the script again: the hook card stays with my text', async ({
+    page,
+    request,
+    context,
+  }) => {
+    const s = await setup(page, request, DESKTOP)
+    const [, hb] = s.hookIds as string[]
+    await s.open()
+    await hookText(page, hb).fill('hook b saved words')
+    await expect(hookStatus(page, hb)).toContainText('Saved', { timeout: 8000 })
+    const other = await context.newPage()
+    await s.open(other)
+    await api(other, 'DELETE', `${s.scriptPath}/hooks/${hb}`)
+    // my tab reads the script again (a new hook returns the whole script): hook b is no longer in it
+    await page.locator('[data-test="script-add-hook"]').click()
+    await expect(page.locator(`[data-test="script-hook-gone-${hb}"]`)).toBeVisible({
+      timeout: 8000,
+    })
+    await expect(hookText(page, hb)).toHaveValue('hook b saved words')
+    await shot(page, 'fix1-hook-ghost-after-refresh')
+  })
+
+  test('hooks: I edit Hook C that becomes B in the other tab: it keeps its own conflict protection', async ({
+    page,
+    request,
+    context,
+  }) => {
+    const s = await setup(page, request, DESKTOP)
+    const [, hb, hc] = s.hookIds as string[]
+    await s.open()
+    await hookText(page, hc).fill('hook c first words')
+    await expect(hookStatus(page, hc)).toContainText('Saved', { timeout: 8000 })
+    const other = await context.newPage()
+    await s.open(other)
+    await api(other, 'DELETE', `${s.scriptPath}/hooks/${hb}`)
+    const c = (await s.get()).hooks.find((h: Json) => h.id === hc)
+    expect(c.letter).toBe('B')
+    await api(other, 'PUT', `${s.scriptPath}/hooks/${hc}`, {
+      shot_type: null,
+      visual_description: null,
+      texts: { audio: { en: 'written in tab two' }, overlay: { en: '' } },
+      revision: c.revision,
+    })
+    await hookText(page, hc).fill('written in tab one')
+    const conflict = page.locator(`[data-test="script-hook-conflict-${hc}"]`)
+    await expect(conflict).toBeVisible({ timeout: 8000 })
+    await expect(conflict).toContainText('written in tab two')
+    await expect(hookText(page, hc)).toHaveValue('written in tab one')
+    await shot(page, 'fix1-hook-conflict')
+    expect((await s.get()).hooks.find((h: Json) => h.id === hc).texts.audio.en).toBe(
+      'written in tab two',
+    )
+  })
+
+  test('B-roll: a row deleted in another tab while I edit it, and the next row that takes its code: nothing is written to the wrong row', async ({
+    page,
+    request,
+    context,
+  }) => {
+    const s = await setup(page, request, DESKTOP)
+    const [a] = await s.addLine(1)
+    await s.addBroll(a, 2)
+    await s.open()
+    await expandAll(page)
+    const rows = (await s.get()).lines[0].broll.map((r: Json) => r.id as string)
+    const rowText = (id: string): Locator =>
+      page.locator(`[data-test="script-broll-text-${id}"] textarea:not([aria-hidden])`)
+    await rowText(rows[0]).fill('row one words')
+    await expect(lineStatus(page, a)).toContainText('Saved', { timeout: 8000 })
+
+    const other = await context.newPage()
+    await s.open(other)
+    await api(other, 'DELETE', `${s.scriptPath}/lines/${a}/broll/${rows[0]}`)
+
+    // tab one keeps typing in the deleted row: the line says a shot is gone (a conflict), and row two is not touched
+    await rowText(rows[0]).fill('row one words and more after the delete')
+    await expect(page.locator(`[data-test="script-line-conflict-${a}"]`)).toBeVisible({
+      timeout: 8000,
+    })
+    await expect(rowText(rows[0])).toHaveValue('row one words and more after the delete')
+    await shot(page, 'fix1-broll-gone')
+    const line = (await s.get()).lines[0]
+    expect(line.broll.map((r: Json) => r.id)).toEqual([rows[1]])
+    expect(line.broll[0].code).toBe('2_1')
+    expect(line.broll[0].description ?? '').toBe('')
+  })
+
   test('staff: can add, edit and reorder lines and sees the image drop zone, sees no "Delete for good"; a second agency gets not found on the same script', async ({
     page,
     request,
