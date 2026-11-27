@@ -76,3 +76,7 @@ What this means in production:
 - Locks held at commit: `2026_11_24_100002` took `ShareRowExclusive` on `agencies`, `creators`, `users`, `wave_creators`, `wave_markets`, `waves` and on the new `wave_scripts` (plus `AccessExclusive` and `Share` on the new table); `2026_11_26_100001` took `ShareRowExclusive` on `agencies`, `waves`, `wave_scripts` and the new `wave_script_lines` (plus `AccessExclusive` and `Share` on the new table). The same lock set as Rehearsal 3: the new columns add none.
 - Read back from the catalog: `setting text null`, `shot_type character varying(24) null`, `visual_description text null`, and the CHECK with the ten types. The Postgres test P2 (`ScriptsPostgresTest`) refuses `'bogus'` and `'Wide'` and accepts the ten and NULL.
 - Not measured: timing on production-sized tables (unchanged from Rehearsal 3).
+
+## Close-out (2026-11-27): no migration changed
+
+The B-roll limit went away without touching a migration: `wave_script_broll` never had a count CHECK (only `chk_wave_script_broll_shot_type`), the limit lived in `StrategyLimits` and the services. Rehearsal 4 above still describes the migrations as they are. The Postgres folder run on `pl32b_test` (below in the report) migrated the whole set again on a fresh database.

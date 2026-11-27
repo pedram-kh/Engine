@@ -64,3 +64,14 @@ Walk: 26 steps, all passed except step 17; steps 13 and 20 led to rulings (see `
 
 - Tests (this window): see the final report. Break-reverts: `pl-3-2b-break-reverts.md`, section "Walk fixes".
 - Found, not fixed: at a window about 1100 px wide the three columns (rail, editor, notes) leave the editor about 170 px; the replace dialog's question line is cut at 390 px (both existed before and are not in this prompt).
+
+## 10. Close-out (2026-11-27), after Pedram re-checked the fixes
+
+All of Pedram's re-check steps passed (deleted line and hook cards, conflict on a moved-up line, line visual fields, the setting, archive and restore keeping them, the Replace message with carry-over and with archive).
+
+- **No B-roll limit.** Counter, near-limit text and the "Add shot" switch-off are gone from the web (the `BROLL_NEAR` constant, `brollLimit`, `brollFull`, `brollNear`, the `lines.shotsUsage` and `lines.shotLimit` strings and the old `errors.brollLimit` in all 24 locales); the server keeps a safety ceiling of 300 rows per script (`StrategyLimits::BROLL_SAFETY_CEILING`), not sent to the web, refusing with `wave_script.broll_ceiling` and a plain message with no number; the limits sent to the web no longer carry a B-roll number. The ceiling also guards duplicating a line. No migration changed (there was never a count CHECK on the table). Locale count of the key test: 216.
+- **Real browser, 45 shots (walk stack, 1600 and 390):** the script with 30 lines and 45 shots shows no counter and no near-limit text; Add shot is enabled and adds one more (45 to 46 at 1600, 46 to 47 at 390); no sideways scroll at either width (scroll width equals window width).
+- **Walk seed:** Eva Kráľová added (an applicant, Pending; out of the market; one archived script in Slovakia; the picker's eligible set offers her). In my own run Jana Novotná was also offered by the picker (status Declined, selectable); Eva is the clean case without that status. One of Martin's scripts carries 45 shots; the 39-shot script is gone.
+- **Baselines:** see `production-line-sprints.md` ("PL-3.2b close-out checks"): agency 126 and creator 146 identical on `main`, `01084935` and the pl tip; the earlier 12 and 638 were not code.
+- **Flaky test:** `StrategyFlagGatesTest` K1 (clock tick); fixed by freezing the clock; the write on a tracker read is row 67.
+- **Not run / not read:** the Playwright image upload (row 65); the production state of anything; which statement in the tracker code writes the wave (row 67).

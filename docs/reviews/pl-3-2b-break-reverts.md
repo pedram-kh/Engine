@@ -113,3 +113,21 @@ Each row: the code was broken on purpose, the named tests were red, then the cod
 | PW7  | the B-roll "row is gone" check is off                                     | `pl32b-scripts` "a row deleted in another tab"  | 1 failed        | passed                 |
 
 Not detected, kept on purpose: the explicit `wave_script_hook.deleted` branch in `classifyFailure` is redundant with the "any other 404 is gone" line below it (the same answer either way), so removing only that branch changes nothing; the unit test pins the code's meaning through `isGone` instead (V3). Not mutated: the editor head wrapping (a layout fix, checked in the browser at 1600 and 390).
+
+## Close-out (2026-11-27): no B-roll limit, the walk seed, the flag-gate test
+
+| Gate | What was broken                                                                                               | Tests run                              | Mutated (red)   | Restored (green) |
+| ---- | ------------------------------------------------------------------------------------------------------------- | -------------------------------------- | --------------- | ---------------- |
+| C1   | the safety ceiling set back to 40                                                                             | `ScriptLinesTest`, `ScriptsSourceTest` | 3 failed, 20 ok | 23 passed        |
+| C2   | the add-row ceiling check removed                                                                             | `ScriptLinesTest`                      | 1 failed, 18 ok | 19 passed        |
+| C3   | the duplicate-line ceiling check removed                                                                      | `ScriptLinesTest`                      | 1 failed, 18 ok | 19 passed        |
+| C4   | the presenter sends a B-roll number again                                                                     | `ScriptLinesTest`                      | 1 failed, 18 ok | 19 passed        |
+| C5   | the ceiling message carries a number                                                                          | `ScriptLinesTest`                      | 1 failed, 18 ok | 19 passed        |
+| C6   | the seed back to 40 shots                                                                                     | `Pl32WalkSeedersTest`                  | 1 failed, 6 ok  | 7 passed         |
+| C7   | Eva removed with "delete" instead of "archive"                                                                | `Pl32WalkSeedersTest`                  | 3 failed, 4 ok  | 7 passed         |
+| C8   | Eva not an applicant of the campaign                                                                          | `Pl32WalkSeedersTest`                  | 3 failed, 4 ok  | 7 passed         |
+| V10  | web: Add shot off from 40 rows                                                                                | `ScriptLineCard.spec`                  | 1 failed, 9 ok  | 10 passed        |
+| V11  | web: a counter drawn again from 35                                                                            | `ScriptLineCard.spec`                  | 1 failed, 9 ok  | 10 passed        |
+| V12  | web: the ceiling code not mapped to its message (first mutation was NOT detected, 5 passed; a test was added) | `scriptsLogic.spec`                    | 1 failed, 11 ok | 12 passed        |
+| PW8  | browser: Add shot off from 40 rows                                                                            | `pl32b-scripts` "limits"               | 1 failed        | passed           |
+| F1   | flag-gate test K1 with the clock not frozen and one tick between the reads (the flake made deterministic)     | `StrategyFlagGatesTest`                | 1 failed, 3 ok  | 4 passed         |
