@@ -170,17 +170,36 @@ it('B1: there is no B-roll on a hook (no route), and a B-roll row is addressed t
     expect(WaveScriptBroll::query()->count())->toBe(1);
 });
 
-it('B1: the 41st B-roll row of a script is refused wherever it goes; a deleted row frees a place', function (): void {
+it('B1: B-roll has no product limit: 45 shots are fine and the limits sent to the web carry no B-roll number', function (): void {
     $w = SF::world();
     $id = SF::api($w);
     $script = WaveScript::query()->where('ulid', $id)->firstOrFail();
-    $a = SF::line($script, 0, null, 25);
-    $b = SF::line($script, 1, null, 15);
+    $a = SF::line($script, 0, null, 44);
+
+    $res = pl32bCall($w, 'POST', $id, "lines/{$a->ulid}/broll")->assertCreated();
+    expect(WaveScriptBroll::query()->count())->toBe(45)
+        ->and($res->json('data.limits'))->not->toHaveKey('broll_per_script')
+        ->and(array_keys($res->json('data.limits')))->not->toContain('broll_safety_ceiling');
+    // a line with many rows still duplicates
+    pl32bCall($w, 'POST', $id, "lines/{$a->ulid}/duplicate")->assertCreated();
+    expect(WaveScriptBroll::query()->count())->toBe(90);
+});
+
+it('B1b: the server safety ceiling of 300 rows per script refuses with a plain message (no number), wherever the row goes, and a deleted row frees a place', function (): void {
+    $w = SF::world();
+    $id = SF::api($w);
+    $script = WaveScript::query()->where('ulid', $id)->firstOrFail();
+    $a = SF::line($script, 0, null, 150);
+    $b = SF::line($script, 1, null, 150);
 
     foreach ([$a, $b] as $line) {
-        pl32bCall($w, 'POST', $id, "lines/{$line->ulid}/broll")->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_script.broll_limit')->assertJsonPath('errors.0.meta.max', 40);
+        $res = pl32bCall($w, 'POST', $id, "lines/{$line->ulid}/broll")->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_script.broll_ceiling');
+        expect($res->json('errors.0.title'))->toBe('This script has more shots than the system accepts. Remove some before adding more.')
+            ->and($res->json('errors.0'))->not->toHaveKey('meta');
     }
-    expect(WaveScriptBroll::query()->count())->toBe(40);
+    // a duplicate that would pass the ceiling is refused whole
+    pl32bCall($w, 'POST', $id, "lines/{$a->ulid}/duplicate")->assertStatus(422)->assertJsonPath('errors.0.code', 'wave_script.broll_ceiling');
+    expect(WaveScriptBroll::query()->count())->toBe(300);
 
     $row = WaveScriptBroll::query()->where('line_id', $a->id)->firstOrFail();
     pl32bCall($w, 'DELETE', $id, "lines/{$a->ulid}/broll/{$row->ulid}")->assertOk();

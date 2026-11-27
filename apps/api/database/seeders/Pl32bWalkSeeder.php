@@ -6,6 +6,8 @@ namespace Database\Seeders;
 
 use App\Modules\Agencies\Models\Agency;
 use App\Modules\Brands\Models\Brand;
+use App\Modules\Campaigns\Enums\CampaignApplicationStatus;
+use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Creators\Models\Creator;
 use App\Modules\Identity\Models\User;
 use App\Modules\Strategy\Models\WaveCreator;
@@ -18,6 +20,7 @@ use App\Modules\Strategy\Services\ScriptImageStorage;
 use App\Modules\Strategy\Services\ScriptLanguageService;
 use App\Modules\Strategy\Services\ScriptLineService;
 use App\Modules\Strategy\Services\ScriptService;
+use App\Modules\Strategy\Services\WaveCreatorService;
 use App\Modules\Strategy\StrategyLimits;
 use App\Modules\Waves\Database\Factories\WaveFactory;
 use App\Modules\Waves\Models\Wave;
@@ -33,8 +36,8 @@ use RuntimeException;
  *   - Lucia's first script: four lines (English and Slovak side by side; one Slovak-only line, so the estimate hint shows; one CTA),
  *       B-roll on the first two, one reference image on the first line and one on the first hook. Her SECOND script is the EMPTY one
  *       (hooks only, no lines).
- *   - Martin's first script AT ITS LIMITS: 30 lines, 40 B-roll rows, and one line with 10 reference images (the caps, one step from refused).
- *       His second script has 29 lines (one step from the line limit); his third has 39 B-roll rows and a line with 9 images.
+ *   - Martin's first script AT ITS LIMITS: 30 lines, one line with 10 reference images, and 45 shots (B-roll has no limit; 45 shows the page stays usable).
+ *       His second script has 29 lines (one step from the line limit); his third has a line with 9 images.
  *   - Katarina: no live script, ONE archived script that keeps lines, B-roll and images (Restore it from "Archived scripts").
  *   - Tomáš's script: the hostile string in a line and in a B-roll description (plain text, never markup).
  *   - Astrid's script: English only (the Nordics market has no other language).
@@ -48,6 +51,9 @@ use RuntimeException;
  */
 final class Pl32bWalkSeeder extends Seeder
 {
+    /** B-roll has no product limit; one script carries this many shots to show the page stays usable. */
+    public const MANY_SHOTS = 45;
+
     public function run(): void
     {
         if (! app()->environment(['local', 'testing'])) {
@@ -75,6 +81,7 @@ final class Pl32bWalkSeeder extends Seeder
         $this->tomas($brand, $wave, $admin);
         $this->astrid($brand, $wave, $admin);
         $this->katarina($agency, $brand, $wave, $admin);
+        $this->eva($agency, $brand, $wave, $admin);
 
         $this->say('PL-3.2b walk data: lines '.WaveScriptLine::query()->withoutGlobalScopes()->where('wave_id', $wave->id)->count().', B-roll '.WaveScriptBroll::query()->withoutGlobalScopes()->where('wave_id', $wave->id)->count().'.');
     }
@@ -115,7 +122,7 @@ final class Pl32bWalkSeeder extends Seeder
         $this->image($agency, $brand, $wave, $admin, $script, 'hook', $hook->ulid, 'storyboard.png', 80, 120);
     }
 
-    /** One script at all its limits: 30 lines, 40 B-roll rows, a line with 10 images. */
+    /** One script at its limits: 30 lines, a line with 10 images, and 45 shots (B-roll has no limit; the page must stay usable). */
     private function martin(Agency $agency, Brand $brand, Wave $wave, User $admin): void
     {
         $script = $this->scriptOf($wave, 'Martin Kováč');
@@ -126,7 +133,7 @@ final class Pl32bWalkSeeder extends Seeder
             $this->save($brand, $wave, $admin, $script, $line, ['texts' => ['en' => 'Line '.($i + 2).': good food, fair price.']]);
             $lines[] = $line;
         }
-        for ($i = 0; $i < StrategyLimits::BROLL_PER_SCRIPT; $i++) {
+        for ($i = 0; $i < self::MANY_SHOTS; $i++) {
             $service->brollAdd($brand, $wave, $admin, $script->ulid, $lines[$i % 8]->ulid);
         }
         for ($i = 0; $i < StrategyLimits::IMAGES_PER_BLOCK; $i++) {
@@ -134,11 +141,9 @@ final class Pl32bWalkSeeder extends Seeder
         }
     }
 
-    /** Script 2: 29 lines. Script 3: 39 B-roll rows and a line with 9 images (each one step from its limit). */
+    /** Script 2: 29 lines. Script 3: a line with 9 images (each one step from its limit). */
     private function martinNearLimits(Agency $agency, Brand $brand, Wave $wave, User $admin): void
     {
-        $service = app(ScriptLineService::class);
-
         $two = $this->scriptOf($wave, 'Martin Kováč', 1);
         for ($i = 0; $i < StrategyLimits::LINES_PER_SCRIPT - 1; $i++) {
             $line = $this->addLine($brand, $wave, $admin, $two);
@@ -149,11 +154,8 @@ final class Pl32bWalkSeeder extends Seeder
         $lines = [];
         for ($i = 0; $i < 3; $i++) {
             $line = $this->addLine($brand, $wave, $admin, $three);
-            $this->save($brand, $wave, $admin, $three, $line, ['texts' => ['en' => 'Line '.($i + 2).' of the 39-shot script.']]);
+            $this->save($brand, $wave, $admin, $three, $line, ['texts' => ['en' => 'Line '.($i + 2).' of the 9-image script.']]);
             $lines[] = $line;
-        }
-        for ($i = 0; $i < StrategyLimits::BROLL_PER_SCRIPT - 1; $i++) {
-            $service->brollAdd($brand, $wave, $admin, $three->ulid, $lines[$i % 3]->ulid);
         }
         for ($i = 0; $i < StrategyLimits::IMAGES_PER_BLOCK - 1; $i++) {
             $this->image($agency, $brand, $wave, $admin, $three, 'line', $lines[1]->ulid, "nine-{$i}.png", 70 + $i * 3, 50 + $i * 2);
@@ -179,6 +181,27 @@ final class Pl32bWalkSeeder extends Seeder
         $hook = WaveScriptHook::query()->withoutGlobalScopes()->where('script_id', $script->id)->orderBy('position')->firstOrFail();
         $this->image($agency, $brand, $wave, $admin, $script, 'hook', $hook->ulid, 'archived-hook.png', 60, 90);
         app(ScriptService::class)->archive($brand, $wave, $admin, $script->ulid);
+    }
+
+    /**
+     * Eva Kráľová: an applicant of the campaign (Pending, so the picker offers her with no oddities), out of the market, with ONE
+     * archived script in Slovakia. The Replace and Add dialogs say "archived scripts that come back: 1" when she is chosen.
+     */
+    private function eva(Agency $agency, Brand $brand, Wave $wave, User $admin): void
+    {
+        $seeder = app(Pl32WalkSeeder::class);
+        $campaign = Campaign::query()->withoutGlobalScopes()->whereKey($wave->campaign_id)->firstOrFail();
+        $creator = $seeder->creator($agency, $admin, 'eva', 'Eva Kráľová', 'SK', ['food', 'lifestyle']);
+        $seeder->applied($campaign, $creator, CampaignApplicationStatus::Pending);
+
+        $slots = app(WaveCreatorService::class);
+        $slots->add($brand, $wave, $admin, WaveFactory::marketUlid($wave, 'SK'), [$creator->ulid], null);
+        $slot = WaveCreator::query()->where('wave_id', $wave->id)->where('creator_id', $creator->id)->firstOrFail();
+        $created = app(ScriptService::class)->create($brand, $wave, $admin, $slot->ulid);
+        $script = WaveScript::query()->withoutGlobalScopes()->whereKey($created->id)->firstOrFail();
+        $line = $this->addLine($brand, $wave, $admin, $script);
+        $this->save($brand, $wave, $admin, $script, $line, ['texts' => ['en' => 'Eva’s archived line: kept for later.']]);
+        $slots->remove($brand, $wave, $admin, $slot->ulid, 'archive');
     }
 
     private function tomas(Brand $brand, Wave $wave, User $admin): void

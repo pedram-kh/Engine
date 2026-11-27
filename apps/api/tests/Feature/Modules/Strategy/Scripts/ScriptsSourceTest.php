@@ -79,7 +79,7 @@ it('G11d: the limits of the plan, and the cap and duration list are what the mig
         ->and(StrategyLimits::SCRIPT_ANGLE)->toBe(300)->and(StrategyLimits::SCRIPT_DURATIONS)->toBe([15, 20, 30, 45, 60])->and(StrategyLimits::SCRIPT_DURATION_DEFAULT)->toBe(30);
 
     // PL-3.2b (ruling 12 and 11): lines, B-roll, languages, images.
-    expect(StrategyLimits::LINES_PER_SCRIPT)->toBe(30)->and(StrategyLimits::BROLL_PER_SCRIPT)->toBe(40)->and(StrategyLimits::LOCAL_LANGUAGES_PER_MARKET)->toBe(3)
+    expect(StrategyLimits::LINES_PER_SCRIPT)->toBe(30)->and(StrategyLimits::BROLL_SAFETY_CEILING)->toBe(300)->and(StrategyLimits::LOCAL_LANGUAGES_PER_MARKET)->toBe(3)
         ->and(StrategyLimits::IMAGES_PER_BLOCK)->toBe(10)->and(StrategyLimits::SCRIPT_IMAGE_TOTAL_BYTES)->toBe(300 * 1024 * 1024)
         ->and(StrategyLimits::LINE_TEXT)->toBe(600)->and(StrategyLimits::BROLL_DESCRIPTION)->toBe(400);
 

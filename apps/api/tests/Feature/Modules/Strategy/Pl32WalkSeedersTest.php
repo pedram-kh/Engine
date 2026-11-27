@@ -3,9 +3,11 @@
 declare(strict_types=1);
 
 use App\Modules\Agencies\Models\Agency;
+use App\Modules\Campaigns\Models\Campaign;
 use App\Modules\Identity\Models\User;
 use App\Modules\Strategy\Features\CreatorsScriptsEnabled;
 use App\Modules\Strategy\Features\StrategyEnabled;
+use App\Modules\Strategy\Services\WaveCreatorSource;
 use App\Modules\Strategy\StrategyLimits;
 use App\Modules\Waves\Features\WavesEnabled;
 use App\Modules\Waves\Models\Wave;
@@ -88,8 +90,8 @@ it('S5: the 3.2b walk seed: languages, lines, B-roll and images through the serv
     $count = static fn (string $table): int => DB::table($table)->where('wave_id', $wave->id)->count();
 
     expect(DB::table('wave_market_script_languages')->where('wave_id', $wave->id)->orderBy('market_id')->orderBy('position')->pluck('language')->all())->toBe(['sk', 'hu'])
-        ->and($count('wave_script_lines'))->toBe(4 + 30 + 29 + 3 + 1 + 1 + 2)
-        ->and($count('wave_script_broll'))->toBe(3 + 40 + 39 + 1 + 1)
+        ->and($count('wave_script_lines'))->toBe(4 + 30 + 29 + 3 + 1 + 1 + 2 + 1)
+        ->and($count('wave_script_broll'))->toBe(3 + 45 + 0 + 1 + 1)
         ->and($count('wave_script_images'))->toBe(2 + 10 + 9 + 2)
         ->and(DB::table('wave_script_images')->where('wave_id', $wave->id)->where('status', 'ready')->count())->toBe(23)
         ->and(Storage::disk('media')->allFiles())->toHaveCount(46)
@@ -97,12 +99,19 @@ it('S5: the 3.2b walk seed: languages, lines, B-roll and images through the serv
 
     $martin = DB::table('wave_scripts')->join('creators', 'creators.id', '=', 'wave_scripts.creator_id')->where('creators.display_name', 'Martin Kováč')->orderBy('wave_scripts.number')->value('wave_scripts.id');
     expect(DB::table('wave_script_lines')->where('script_id', $martin)->count())->toBe(StrategyLimits::LINES_PER_SCRIPT)
-        ->and(DB::table('wave_script_broll')->where('script_id', $martin)->count())->toBe(StrategyLimits::BROLL_PER_SCRIPT)
+        ->and(DB::table('wave_script_broll')->where('script_id', $martin)->count())->toBe(45)
         ->and(DB::table('wave_script_images')->where('script_id', $martin)->count())->toBe(StrategyLimits::IMAGES_PER_BLOCK);
     // the walk ruling: a line with a shot type and a visual description, a line with only a shot type, and the script's setting
     expect(DB::table('wave_script_lines')->where('wave_id', $wave->id)->whereNotNull('shot_type')->count())->toBe(2)
         ->and(DB::table('wave_script_lines')->where('wave_id', $wave->id)->whereNotNull('visual_description')->count())->toBe(1)
         ->and(DB::table('wave_scripts')->where('wave_id', $wave->id)->whereNotNull('setting')->count())->toBe(1);
+    // Eva: out of the market, one archived script, and the picker's eligible set offers her.
+    $eva = DB::table('creators')->where('display_name', 'Eva Kráľová')->value('id');
+    $campaign = Campaign::query()->withoutGlobalScopes()->whereKey($wave->campaign_id)->firstOrFail();
+    expect($eva)->not->toBeNull()
+        ->and(DB::table('wave_creators')->where('wave_id', $wave->id)->where('creator_id', $eva)->count())->toBe(0)
+        ->and(DB::table('wave_scripts')->where('wave_id', $wave->id)->where('creator_id', $eva)->whereNotNull('archived_at')->count())->toBe(1)
+        ->and(WaveCreatorSource::eligible($wave, $campaign)->where('creators.id', $eva)->exists())->toBeTrue();
     expect(DB::table('wave_script_line_texts')->where('body', Pl32WalkSeeder::HOSTILE)->count())->toBe(2)
         ->and(DB::table('wave_script_broll')->where('description', Pl32WalkSeeder::HOSTILE)->count())->toBe(1);
 

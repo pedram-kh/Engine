@@ -171,8 +171,8 @@ final class ScriptLineService
                 throw StrategyRuleViolation::scriptLinesLimit();
             }
             $rows = WaveScriptBroll::query()->where('line_id', $line->id)->orderBy('position')->orderBy('id')->get();
-            if (WaveScriptBroll::query()->where('script_id', $script->id)->count() + $rows->count() > StrategyLimits::BROLL_PER_SCRIPT) {
-                throw StrategyRuleViolation::scriptBrollLimit();
+            if (WaveScriptBroll::query()->where('script_id', $script->id)->count() + $rows->count() > StrategyLimits::BROLL_SAFETY_CEILING) {
+                throw StrategyRuleViolation::scriptBrollCeiling();
             }
 
             WaveScriptLine::query()->where('script_id', $script->id)->where('position', '>', $line->position)->increment('position');
@@ -280,8 +280,8 @@ final class ScriptLineService
         return ScriptGuard::transaction($wave, function (Wave $locked) use ($actor, $scriptUlid, $lineUlid): WaveScript {
             $script = ScriptGuard::lockedScript($locked, $scriptUlid);
             $line = $this->lockedLine($script, $lineUlid);
-            if (WaveScriptBroll::query()->where('script_id', $script->id)->count() >= StrategyLimits::BROLL_PER_SCRIPT) {
-                throw StrategyRuleViolation::scriptBrollLimit();
+            if (WaveScriptBroll::query()->where('script_id', $script->id)->count() >= StrategyLimits::BROLL_SAFETY_CEILING) {
+                throw StrategyRuleViolation::scriptBrollCeiling();
             }
 
             $row = WaveScriptBroll::query()->create([

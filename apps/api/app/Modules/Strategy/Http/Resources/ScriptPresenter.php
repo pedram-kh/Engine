@@ -121,7 +121,6 @@ final class ScriptPresenter
             'scripts_per_creator' => StrategyLimits::SCRIPTS_PER_CREATOR,
             'hooks_per_script' => StrategyLimits::HOOKS_PER_SCRIPT,
             'lines_per_script' => StrategyLimits::LINES_PER_SCRIPT,
-            'broll_per_script' => StrategyLimits::BROLL_PER_SCRIPT,
             'images_per_block' => StrategyLimits::IMAGES_PER_BLOCK,
             'image_total_bytes' => StrategyLimits::SCRIPT_IMAGE_TOTAL_BYTES,
             'local_languages_per_market' => StrategyLimits::LOCAL_LANGUAGES_PER_MARKET,

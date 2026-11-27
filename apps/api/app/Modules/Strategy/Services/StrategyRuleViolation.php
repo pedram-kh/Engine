@@ -371,11 +371,10 @@ final class StrategyRuleViolation extends RuntimeException
         return new self('wave_script.lines_limit', "A script has at most {$max} lines.", 422, ['max' => $max]);
     }
 
-    public static function scriptBrollLimit(): self
+    /** The safety ceiling (not a product limit): a plain message, no number. */
+    public static function scriptBrollCeiling(): self
     {
-        $max = StrategyLimits::BROLL_PER_SCRIPT;
-
-        return new self('wave_script.broll_limit', "A script has at most {$max} B-roll rows.", 422, ['max' => $max]);
+        return new self('wave_script.broll_ceiling', 'This script has more shots than the system accepts. Remove some before adding more.', 422);
     }
 
     /** 404: a save, a duplicate or a delete named a line that someone deleted. The web keeps the writer's text. */

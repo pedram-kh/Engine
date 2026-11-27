@@ -107,6 +107,29 @@ final class Pl32WalkSeeder extends Seeder
         $this->printUlids();
     }
 
+    /**
+     * @param  list<string>  $categories
+     */
+    public function creator(Agency $agency, User $owner, string $local, string $name, string $country, array $categories): Creator
+    {
+        $user = User::factory()->creator()->create(['email' => $local.self::DOMAIN, 'name' => $name, 'password' => self::PASSWORD]);
+        $creator = Creator::factory()->approved()->kycVerified()->withContact()->create([
+            'user_id' => $user->id, 'display_name' => $name, 'country_code' => $country, 'primary_language' => $country === 'SE' ? 'sv' : 'sk',
+            'categories' => $categories, 'is_discoverable' => true,
+        ]);
+        AgencyCreatorRelation::factory()->create([
+            'agency_id' => $agency->id, 'creator_id' => $creator->id, 'relationship_status' => RelationshipStatus::Roster,
+            'is_blacklisted' => false, 'invited_by_user_id' => $owner->id, 'owner_user_id' => $owner->id,
+        ]);
+
+        return $creator;
+    }
+
+    public function applied(Campaign $campaign, Creator $creator, CampaignApplicationStatus $status): void
+    {
+        CampaignApplication::factory()->status($status)->create(['campaign_id' => $campaign->id, 'agency_id' => $campaign->agency_id, 'creator_id' => $creator->id]);
+    }
+
     private function agencyA(): void
     {
         $agency = AgencyFactory::new()->createOne(['name' => 'PL-3.2 Walk Agency A', 'slug' => self::AGENCY_A_SLUG, 'country_code' => 'SK']);
@@ -195,29 +218,6 @@ final class Pl32WalkSeeder extends Seeder
             $changes['texts']['overlay'] = ['en' => $overlay];
         }
         app(ScriptHookService::class)->update($brand, $wave, $actor, $script->ulid, $first->ulid, $changes, $first->revision);
-    }
-
-    /**
-     * @param  list<string>  $categories
-     */
-    private function creator(Agency $agency, User $owner, string $local, string $name, string $country, array $categories): Creator
-    {
-        $user = User::factory()->creator()->create(['email' => $local.self::DOMAIN, 'name' => $name, 'password' => self::PASSWORD]);
-        $creator = Creator::factory()->approved()->kycVerified()->withContact()->create([
-            'user_id' => $user->id, 'display_name' => $name, 'country_code' => $country, 'primary_language' => $country === 'SE' ? 'sv' : 'sk',
-            'categories' => $categories, 'is_discoverable' => true,
-        ]);
-        AgencyCreatorRelation::factory()->create([
-            'agency_id' => $agency->id, 'creator_id' => $creator->id, 'relationship_status' => RelationshipStatus::Roster,
-            'is_blacklisted' => false, 'invited_by_user_id' => $owner->id, 'owner_user_id' => $owner->id,
-        ]);
-
-        return $creator;
-    }
-
-    private function applied(Campaign $campaign, Creator $creator, CampaignApplicationStatus $status): void
-    {
-        CampaignApplication::factory()->status($status)->create(['campaign_id' => $campaign->id, 'agency_id' => $campaign->agency_id, 'creator_id' => $creator->id]);
     }
 
     private function assign(Campaign $campaign, Creator $creator, AssignmentStatus $status): void

@@ -128,10 +128,11 @@ final class StrategyLimits
 
     public const HOOK_VISUAL = 400;
 
-    /** PL-3.2b: lines per script, B-roll rows per SCRIPT (40 by the walk ruling: the 12 of the plan was a planning number and too low; the frame's own sample has 13), and the text lengths. */
+    /** PL-3.2b: lines per script and the text lengths. B-roll has NO product limit (Pedram, 2026-11-27); only the safety ceiling below. */
     public const LINES_PER_SCRIPT = 30;
 
-    public const BROLL_PER_SCRIPT = 40;
+    /** A server safety ceiling on B-roll rows per script, not a product limit: never sent to the web, never shown, never counted on screen. */
+    public const BROLL_SAFETY_CEILING = 300;
 
     public const LINE_TEXT = 600;
 
@@ -208,7 +209,6 @@ final class StrategyLimits
             'hook_overlay' => self::HOOK_OVERLAY,
             'hook_visual' => self::HOOK_VISUAL,
             'lines_per_script' => self::LINES_PER_SCRIPT,
-            'broll_per_script' => self::BROLL_PER_SCRIPT,
             'line_text' => self::LINE_TEXT,
             'broll_description' => self::BROLL_DESCRIPTION,
             'line_visual' => self::LINE_VISUAL,
