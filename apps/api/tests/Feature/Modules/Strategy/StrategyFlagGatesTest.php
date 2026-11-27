@@ -53,6 +53,12 @@ it('K2: every strategy route is 404 not_found while waves_enabled is OFF even wi
 });
 
 it('K1: the strategy flag changes nothing in the wave detail; in the tracker it adds only the strategy block on strategy rows (PL-2.5)', function (): void {
+    // Reading the tracker writes the wave's updated_at (it makes the tracker rows), so two reads of the detail around it differ by a
+    // second whenever the clock ticks in between: the clock is frozen, as this test is about the flag and not about time.
+    $this->freezeTime();
+    // Reading the tracker writes the wave's updated_at (it makes the tracker rows), so two reads of the detail around it differ by a
+    // second whenever the clock ticks in between: the clock is frozen, as this test is about the flag and not about time.
+    $this->freezeTime();
     $w = S::world();
     $detail = WaveFixtures::wavesUrl($w['agency'], $w['brand'], $w['wave']->ulid);
 
