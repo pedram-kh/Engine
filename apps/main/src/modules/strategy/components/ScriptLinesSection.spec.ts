@@ -122,7 +122,7 @@ describe('ScriptLinesSection (PL-3.2b)', () => {
       inheritAttrs: false,
       setup(_, { attrs }) {
         provideSaveRegistry()
-        return () => h(ScriptLinesSection, attrs)
+        return () => h(ScriptLinesSection as never, attrs)
       },
     })
     async function mountHost(script: ReturnType<typeof withLines>) {

@@ -68,3 +68,11 @@ What this means in production:
 - **`lock_timeout`:** with another session holding `ACCESS EXCLUSIVE` on `wave_scripts`, the lines migration stopped after **5.0 s** with SQLSTATE 55P03 (`canceling statement due to lock timeout`), the table was not created and no `migrations` row was written. Nothing queued behind the lock.
 - Forward again after the rollback: all five tables present.
 - Not measured: timing on production-sized `users`, `agencies`, `waves`. Run the new migrations in a quiet window together with the PL-3.1 and PL-3.2a ones.
+
+## Rehearsal 4 (2026-11-27): the two walk columns edited in place
+
+- Why: after Pedram's walk, `2026_11_26_100001_create_wave_script_lines_table` gained `shot_type` (`varchar(24)`, nullable, with the Postgres CHECK `chk_wave_script_lines_shot_type` of the ten types or NULL) and `visual_description` (`text`, nullable), and `2026_11_24_100002_create_wave_scripts_table` gained `setting` (`text`, nullable). Nothing but local and CI has run these (PROD-DATA RISK none, ruled). Both still begin with `SET LOCAL lock_timeout = '5s'`; both are still create-table migrations, so no existing table is altered.
+- Method: a runner outside the repository booted the app on the throwaway database `pl32b_rehearse`, ran `migrate` on an empty database (all migrations, 933 ms in total) with a `TransactionCommitting` listener reading `pg_locks` for the migration's own backend. The database was dropped afterwards.
+- Locks held at commit: `2026_11_24_100002` took `ShareRowExclusive` on `agencies`, `creators`, `users`, `wave_creators`, `wave_markets`, `waves` and on the new `wave_scripts` (plus `AccessExclusive` and `Share` on the new table); `2026_11_26_100001` took `ShareRowExclusive` on `agencies`, `waves`, `wave_scripts` and the new `wave_script_lines` (plus `AccessExclusive` and `Share` on the new table). The same lock set as Rehearsal 3: the new columns add none.
+- Read back from the catalog: `setting text null`, `shot_type character varying(24) null`, `visual_description text null`, and the CHECK with the ten types. The Postgres test P2 (`ScriptsPostgresTest`) refuses `'bogus'` and `'Wide'` and accepts the ten and NULL.
+- Not measured: timing on production-sized tables (unchanged from Rehearsal 3).

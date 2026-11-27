@@ -72,3 +72,44 @@ Same method: break the code, show the specs red, restore from git, show them gre
 | U12  | reorder sends only one id instead of the whole list                           | `ScriptLinesSection.spec`                    | 1 failed, 6 ok                                                     | 7 passed         |
 
 Not mutated here (guarded by the browser spec or an earlier gate): English not removable (no Remove button exists for it; the dialog spec asserts that), the no-`v-html` rule (`noVHtml.spec`, PL-3.2a), the colour-literal gate (it was red on a hex literal in a comment and is green after the fix).
+
+## Walk fixes (2026-11-27)
+
+Each row: the code was broken on purpose, the named tests were red, then the code was restored and the tests were green. `B*` backend (Pest, sqlite), `V*` Vitest, `PW*` Playwright (`pl32b_e2e`).
+
+| Gate | What was broken                                                           | Tests run                                       | Mutated (red)   | Restored (green)       |
+| ---- | ------------------------------------------------------------------------- | ----------------------------------------------- | --------------- | ---------------------- |
+| B1   | the hook-deleted 404 gets another code                                    | `ScriptLinesTest`                               | 1 failed, 17 ok | 18 passed              |
+| B2   | a line save to a deleted id falls back to the first line                  | `ScriptLinesTest`                               | 1 failed, 17 ok | 18 passed              |
+| B2b  | a hook save to a deleted id falls back to the first hook                  | `ScriptLinesTest`                               | 1 failed, 17 ok | 18 passed              |
+| B3   | the line's own shot type and visual are never written                     | `ScriptLinesTest`                               | 1 failed, 17 ok | 18 passed              |
+| B4   | the shot type is not validated                                            | `ScriptLinesTest`                               | 1 failed, 17 ok | 18 passed              |
+| B4b  | the visual description limit removed                                      | `ScriptLinesTest`                               | 1 failed, 17 ok | 18 passed              |
+| B5   | duplicate drops the two line fields                                       | `ScriptLinesTest`                               | 1 failed, 17 ok | 18 passed              |
+| B6   | the setting is never written                                              | `ScriptLinesTest`                               | 1 failed, 17 ok | 18 passed              |
+| B7   | the setting limit removed                                                 | `ScriptLinesTest`                               | 1 failed, 17 ok | 18 passed              |
+| B8   | B-roll limit 41 instead of 40                                             | Scripts folder, `Pl32WalkSeedersTest`           | 3 failed        | 101 passed, 15 skipped |
+| B9   | the picker counts live instead of archived scripts                        | `ScriptsSlotTest`                               | 1 failed, 12 ok | 13 passed              |
+| B10  | restore brings back the highest numbers first                             | `ScriptsSlotTest`                               | 2 failed, 11 ok | 13 passed              |
+| B11  | restore ignores the limit of three                                        | `ScriptsSlotTest`                               | 2 failed, 11 ok | 13 passed              |
+| B12  | restore wipes the script's setting                                        | `ScriptsChildrenTest`                           | 1 failed, 8 ok  | 9 passed               |
+| B13  | the audit row of a brief save carries the setting text                    | `ScriptLinesTest`, Audit folder                 | 1 failed, 67 ok | 68 passed              |
+| B14  | the audit row of a line save carries the visual text                      | `ScriptLinesTest`                               | 1 failed, 17 ok | 18 passed              |
+| V1   | the payload drops the line shot type                                      | `scriptsLogic.spec`, `ScriptLineCard.spec`      | 2 failed, 18 ok | 20 passed              |
+| V2   | the payload drops the setting                                             | `scriptsLogic.spec`, `ScriptBrief.spec`         | 2 failed, 17 ok | 19 passed              |
+| V3   | a deleted hook (404) is read as "the whole script is gone"                | `scriptsLogic.spec`                             | 1 failed, 10 ok | 11 passed              |
+| V4   | the returning count ignores the carried scripts                           | `scriptsLogic.spec`, `CreatorsStepScripts.spec` | 2 failed, 21 ok | 23 passed              |
+| V5   | the picker never shows the archived-scripts note                          | `CreatorsStepScripts.spec`                      | 2 failed, 10 ok | 12 passed              |
+| V6   | a saved line that is deleted elsewhere vanishes (ghost only when unsaved) | `ScriptLinesSection.spec`                       | 1 failed, 8 ok  | 9 passed               |
+| V7   | the collapsed "Visual:" summary is hidden                                 | `ScriptLineCard.spec`                           | 1 failed, 8 ok  | 9 passed               |
+| V8   | the setting counter is always shown                                       | `ScriptBrief.spec`                              | 1 failed, 7 ok  | 8 passed               |
+| V9   | the setting limit differs from the server's (parity)                      | `packages/api-client` `scripts.spec`            | 1 failed, 2 ok  | 3 passed               |
+| PW1  | a saved line deleted elsewhere vanishes after a refresh                   | `pl32b-scripts` "saved, then deleted elsewhere" | 1 failed        | passed                 |
+| PW2  | a saved hook deleted elsewhere vanishes after a refresh                   | `pl32b-scripts` "reads the script again"        | 1 failed        | passed                 |
+| PW3  | the hook "deleted by someone else" box is not drawn                       | `pl32b-scripts` "Hook B deleted in another tab" | 1 failed        | passed                 |
+| PW4  | a save to a deleted line id lands on the first line                       | `pl32b-scripts` "I keep typing"                 | 1 failed        | passed                 |
+| PW5  | the line revision check is off (the moved-up line loses its conflict)     | `pl32b-scripts` "moves up and takes the number" | 1 failed        | passed                 |
+| PW6  | the hook revision check is off                                            | `pl32b-scripts` "Hook C that becomes B"         | 1 failed        | passed                 |
+| PW7  | the B-roll "row is gone" check is off                                     | `pl32b-scripts` "a row deleted in another tab"  | 1 failed        | passed                 |
+
+Not detected, kept on purpose: the explicit `wave_script_hook.deleted` branch in `classifyFailure` is redundant with the "any other 404 is gone" line below it (the same answer either way), so removing only that branch changes nothing; the unit test pins the code's meaning through `isGone` instead (V3). Not mutated: the editor head wrapping (a layout fix, checked in the browser at 1600 and 390).
