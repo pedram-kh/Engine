@@ -304,6 +304,8 @@ test.describe('Scripts step', () => {
     await archivedBtn.click()
     await expect(page.locator(`[data-test="archived-delete-${s.scriptId}"]`)).toBeVisible()
     await page.locator(`[data-test="archived-restore-${s.scriptId}"]`).click()
+    // wait for the restore to land before leaving the page (a navigation would cancel the request)
+    await expect(page.locator(`[data-test="archived-restore-${s.scriptId}"]`)).toHaveCount(0)
     await page.locator('[data-test="archived-close"]').click()
     await s.open()
     await expect(audio(page, first)).toHaveValue('kept through archive and restore')
