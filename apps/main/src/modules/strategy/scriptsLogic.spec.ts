@@ -20,6 +20,7 @@ import {
   personaColorKey,
   scriptSaveState,
 } from './scriptsLogic'
+import { isGone } from './strategyErrors'
 import { conflict, makeHook, makeLine, makeScript, PERSONA_REF } from './scriptsTestKit'
 
 describe('scriptsLogic (PL-3.2a)', () => {
@@ -134,6 +135,10 @@ describe('scriptsLogic (PL-3.2b walk rulings)', () => {
     const err = (code: string) => new ApiError({ status: 404, code, message: 'x' })
     expect(classifyFailure(err('wave_script_hook.deleted'))).toEqual({ kind: 'gone' })
     expect(classifyFailure(err('wave_script_line.deleted'))).toEqual({ kind: 'gone' })
+    // a deleted hook or line is NOT "the whole script is gone": the page stays
+    expect(isGone(err('wave_script_hook.deleted'))).toBe(false)
+    expect(isGone(err('wave_script_line.deleted'))).toBe(false)
+    expect(isGone(err('wave_script.not_found'))).toBe(true)
   })
 
   it('archived scripts come back after the carried ones, up to three live; the rest stay', () => {
